@@ -5,13 +5,6 @@ component{
 
     function configure(){
 
-        /*
-        coldbox = {
-            invalidEventHandler: "MainController.notFound",
-            invalidEventHandler: "MainController.error",
-        }
-        */
-
         conventions = {
             handlersLocation : "controllers",
         };

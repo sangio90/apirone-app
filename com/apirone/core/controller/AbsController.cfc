@@ -134,7 +134,9 @@
 
     public Any function model(){
 
-        return server[ "wireBox-zerobenefit" ];
+        //TODO naming for configuration
+
+        return server[ "wireBox-apirone" ];
 
     }    
 
