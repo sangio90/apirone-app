@@ -6,25 +6,6 @@
         { file: "/assets/main/js/vendor/jquery-validate/additional-methods.js" },
     ],
 
-    public: [
-        { file: "/modules/assets/template-public/vendor/jquery/jquery.min.js" },
-        { file: "/modules/assets/template-public/vendor/jquery.appear/jquery.appear.min.js" },
-        { file: "/modules/assets/template-public/vendor/jquery.easing/jquery.easing.min.js" },
-        { file: "/modules/assets/template-public/vendor/jquery.cookie/jquery.cookie.min.js" },
-        { file: "/modules/assets/template-public/vendor/bootstrap/js/bootstrap.bundle.min.js" },
-        { file: "/modules/assets/template-public/vendor/jquery.validation/jquery.validate.min.js" },
-        { file: "/modules/assets/template-public/vendor/lazysizes/lazysizes.min.js" },
-        { file: "/modules/assets/template-public/vendor/isotope/jquery.isotope.min.js" },
-        { file: "/modules/assets/template-public/vendor/owl.carousel/owl.carousel.min.js" },
-        { file: "/modules/assets/template-public/vendor/magnific-popup/jquery.magnific-popup.min.js" },
-        { file: "/modules/assets/template-public/vendor/vide/jquery.vide.min.js" },
-        { file: "/modules/assets/template-public/vendor/vivus/vivus.min.js" },
-        { file: "/modules/assets/template-public/js/theme.js" },
-        { file: "/modules/assets/template-public/js/views/view.contact.js" },
-        { file: "/modules/assets/template-public/js/custom.js" },
-        { file: "/modules/assets/template-public/js/theme.init.js" },
-    ],
-        
     manager: [
         { file: "/modules/assets/template-admin/vendor/jquery/jquery.js" },
         { file: "/modules/assets/template-admin/vendor/jquery-browser-mobile/jquery.browser.mobile.js" },

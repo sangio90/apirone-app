@@ -4,7 +4,7 @@
 
 		<cfargument name="priceId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM prices
 			WHERE price_id = <cfqueryparam cfsqltype="varchar" value="#arguments.priceId#">::uuid
@@ -20,7 +20,7 @@
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="variantId" type="String">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				price_id,
 				COUNT(price_id) OVER() AS total
@@ -49,7 +49,7 @@
 
 		<cfargument name="price" type="com.apirone.core.model.bean.Price" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO prices(
 				price,
                 variant_id,
@@ -72,7 +72,7 @@
 
 		<cfargument name="price" type="com.apirone.core.model.bean.Price" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			UPDATE 
 				prices
 			SET
@@ -93,7 +93,7 @@
 
 		<cfargument name="priceId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM prices
 			WHERE

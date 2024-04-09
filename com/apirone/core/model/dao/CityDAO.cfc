@@ -4,7 +4,7 @@
 
 		<cfargument name="cityId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM cities
 			WHERE city_id = <cfqueryparam cfsqltype="varchar" value="#arguments.cityId#">::uuid
@@ -24,7 +24,7 @@
 		<cfargument name="stateId" type="String">
 		<cfargument name="countyId" type="String">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT 	city_id,
 					COUNT(city_id) OVER() AS total
 			FROM cities

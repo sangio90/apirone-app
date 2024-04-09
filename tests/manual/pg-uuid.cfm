@@ -14,12 +14,12 @@
     ) ;
 ---->
 
-<cfquery datasource="zerobenefit">
+<cfquery datasource="apirone">
     INSERT INTO _test_uuid (field)
     VALUES ( 'aut' )
 </cfquery>
 
-<cfquery datasource="zerobenefit" name="q">
+<cfquery datasource="apirone" name="q">
     SELECT *, field_uuid::text AS field_uuid
     FROM _test_uuid
     LIMIT 1
@@ -28,7 +28,7 @@
 <cfdump var="#q.field_uuid#">
 <cfabort>
 
-<cfquery datasource="zerobenefit" result="d">
+<cfquery datasource="apirone" result="d">
     UPDATE _test_uuid
     SET field = '#RandRange(100, 888)#'
     WHERE  
@@ -59,7 +59,7 @@
     1. LETTURA 
 ## ---->
 
-<cfquery datasource="zerobenefit" name="q">
+<cfquery datasource="apirone" name="q">
     SELECT *, field_uuid::text AS field_u
     FROM _test_uuid
     LIMIT 1
@@ -78,7 +78,7 @@ oppure SELECT field_uuid::text AS f_uuid (nme diverso del campo)
 ## ---->
 
 <!---  uuid in cf è maiuscolo, viene trasformato in minuscolo nell'insert --->
-<cfquery datasource="zerobenefit">
+<cfquery datasource="apirone">
     INSERT INTO _test_uuid (field_uuid)
     VALUES ( <cfqueryparam cfsqltype="other" value="#uid#"> )
 </cfquery>
@@ -88,7 +88,7 @@ oppure SELECT field_uuid::text AS f_uuid (nme diverso del campo)
     3. USANDO IL DEFAULT DEL CAMPO
 ## ---->
 
-<cfquery datasource="zerobenefit" name="j">
+<cfquery datasource="apirone" name="j">
     INSERT INTO _test_uuid (field)
     VALUES ( 'a' ) RETURNING field_uuid
 </cfquery>
@@ -99,7 +99,7 @@ oppure SELECT field_uuid::text AS f_uuid (nme diverso del campo)
     4. UPDATE
 ## ---->
 
-<cfquery datasource="zerobenefit" result="d">
+<cfquery datasource="apirone" result="d">
     UPDATE _test_uuid
     SET field = '#RandRange(100, 888)#'
     WHERE  

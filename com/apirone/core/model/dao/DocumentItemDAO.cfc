@@ -7,7 +7,7 @@
 		<!----
 			I need of product_id too
 		---->
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 			 	*
 			FROM 
@@ -26,7 +26,7 @@
 		<cfargument name="documentId" type="String" required="true">
 		<cfargument name="DocumentItem" type="com.apirone.core.model.bean.DocumentItem" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO document_items (
 				document_id,
 				variant_id,
@@ -50,7 +50,7 @@
 
 		<cfargument name="document" type="com.apirone.core.model.bean.Product" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			
 			UPDATE document_items
 			SET
@@ -66,7 +66,7 @@
 
 		<cfargument name="documentId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM document_items 
 			WHERE
@@ -86,7 +86,7 @@
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="quantity">
 		
-        <cfquery name="local.q" datasource="zerobenefit">
+        <cfquery name="local.q" datasource="apirone">
 			SELECT
 				document_item_id,
 				COUNT(document_item_id) OVER() AS total

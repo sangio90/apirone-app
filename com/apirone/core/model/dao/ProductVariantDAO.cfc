@@ -3,7 +3,7 @@
 	<cffunction returntype="Query" name="read">
 
 		<cfargument name="productVariantId" type="String" required="true">
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM variants
 			WHERE variant_id = <cfqueryparam cfsqltype="varchar" value="#arguments.productVariantId#">::uuid
@@ -19,7 +19,7 @@
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="productId" type="String">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				variant_id,
 				COUNT(variant_id) OVER() AS total
@@ -48,7 +48,7 @@
 
 		<cfargument name="productVariant" type="com.apirone.core.model.bean.ProductVariant" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO variants (
 				variant,
 				product_id,
@@ -70,7 +70,7 @@
 
 		<cfargument name="productVariant" type="com.apirone.core.model.bean.ProductVariant" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			UPDATE 
 				variants
 			SET
@@ -89,7 +89,7 @@
 
 		<cfargument name="productVariantId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM variants
 			WHERE variant_id = <cfqueryparam cfsqltype="varchar" value="#arguments.productVariantId#">::uuid
 		</cfquery>

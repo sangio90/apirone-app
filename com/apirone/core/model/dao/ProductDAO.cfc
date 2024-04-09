@@ -5,7 +5,7 @@
 
 		<cfargument name="productId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 			 	*
 			FROM 
@@ -22,7 +22,7 @@
 
 		<cfargument name="product" type="com.apirone.core.model.bean.Product" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO products (
 				product,
 				description,
@@ -50,7 +50,7 @@
 
 		<cfargument name="product" type="com.apirone.core.model.bean.Product" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			
 			UPDATE products
 			SET
@@ -73,7 +73,7 @@
 
 		<cfargument name="productId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM products 
 			WHERE
@@ -93,7 +93,7 @@
 		<cfargument name="productId" type="String" required="true">
 		<cfargument name="productCategoryId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO products_categories (
 				product_id,
 				product_category_id
@@ -113,7 +113,7 @@
 		<cfargument name="productId" type="String" required="true">
 		<cfargument name="productCategoryId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM products_categories
 			WHERE 
 				product_id 			= <cfqueryparam cfsqltype="varchar" value="#arguments.productId#">::uuid
@@ -131,7 +131,7 @@
 		<cfargument name="orderby" required="true" type="String" default="product_id">
 		<cfargument name="code" type="String" >
 
-        <cfquery name="local.q" datasource="zerobenefit">
+        <cfquery name="local.q" datasource="apirone">
 			SELECT
 				product_id,
 				COUNT(product_id) OVER() AS total

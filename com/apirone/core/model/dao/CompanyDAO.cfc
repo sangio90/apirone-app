@@ -4,7 +4,7 @@
 
 		<cfargument name="companyId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM companies
 			WHERE 
@@ -23,7 +23,7 @@
 		<cfargument name="str" type="String">    
 		<cfargument name="vat" type="String">    
 
-        <cfquery name="local.q" datasource="zerobenefit">
+        <cfquery name="local.q" datasource="apirone">
 			SELECT
 				company_id,
 				COUNT(company_id) OVER() AS total
@@ -57,7 +57,7 @@
 
 		<cfargument name="company" type="com.apirone.core.model.bean.Company" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO companies(
 				company,
 				types,
@@ -88,7 +88,7 @@
 
 		<cfargument name="company" type="com.apirone.core.model.bean.Company" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			UPDATE companies 
 			SET 
 				company = <cfqueryparam cfsqltype="Varchar" value="#arguments.company.getName()#">,
@@ -109,7 +109,7 @@
 	<cffunction name="delete" returntype="Boolean">
 
 		<cfargument name="companyId" type="String" required="true">
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM companies
 			WHERE

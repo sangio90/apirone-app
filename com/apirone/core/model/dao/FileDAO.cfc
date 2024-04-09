@@ -4,7 +4,7 @@
 
 		<cfargument name="fileId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM files
 			WHERE file_id = <cfqueryparam cfsqltype="varchar" value="#arguments.fileId#">::uuid
@@ -17,7 +17,7 @@
 	<cffunction returntype="Void" name="delete">
 
 		<cfargument name="fileId" type="String" required="true">
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM files
 			WHERE file_id = <cfqueryparam cfsqltype="varchar" value="#arguments.fileId#">::uuid
@@ -31,7 +31,7 @@
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="productVariantId" type="String">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				file_id,
 				COUNT(file_id) OVER() AS total
@@ -62,7 +62,7 @@
 		<cfargument name="entity" type="com.apirone.core.model.bean.Entity" required="true">
 
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO files(
 				name,
                 type,

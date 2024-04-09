@@ -21,7 +21,7 @@
         destination="/userdata/assets/css"
         type="css">
     
-    <script src="/modules/assets/template-public/vendor/modernizr/modernizr.min.js"></script>
+    <!---- <script src="/modules/assets/template-public/vendor/modernizr/modernizr.min.js"></script> ---->
 
     <!--- <link rel="stylesheet" href="/assets/#static#/manager/css/kendo-custom.css"> --->
     <link rel="stylesheet" href="/assets/#prc.staticVersion#/manager/css/style.css">
@@ -51,17 +51,6 @@
 
             <!-- start: search & user box -->
             <div class="header-right" style="margin-right:30px;">
-
-                <!-----
-                <form action="pages-search-results.html" class="search nav-form">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="q" id="q" placeholder="Cerca...">
-                        <button class="btn btn-default" type="submit"><i class="bx bx-search"></i></button>
-                    </div>
-                </form>
-
-                <span class="separator"></span>
-                ----->
 
                 <div id="userbox" class="userbox">
                     <a href="##" data-bs-toggle="dropdown">

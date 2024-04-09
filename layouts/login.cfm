@@ -20,7 +20,7 @@
                 salt="login-a1"
                 type="css">
 
-            <script src="/modules/assets/template-public/vendor/modernizr/modernizr.min.js"></script>
+            <script src="/modules/assets/manager/vendor/modernizr/modernizr.min.js"></script>
 
             <script>
                 var ZB = {}

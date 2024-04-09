@@ -4,7 +4,7 @@
 
 		<cfargument name="companyTypeId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM company_types
 			WHERE company_type_id = <cfqueryparam cfsqltype="varchar" value="#arguments.companyTypeId#">

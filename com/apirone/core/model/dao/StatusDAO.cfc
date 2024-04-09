@@ -4,7 +4,7 @@
 
 		<cfargument name="categoryId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM status
 			WHERE status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.categoryId#">
@@ -19,7 +19,7 @@
 		<cfargument name="entityId" required="false" type="String">
 		<cfargument name="orderBy" required="false" type="String" default="orderby">
         
-        <cfquery name="local.q" datasource="zerobenefit">
+        <cfquery name="local.q" datasource="apirone">
 			SELECT
 				status_id,
 				COUNT(status_id) OVER() AS total

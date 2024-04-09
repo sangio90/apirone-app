@@ -4,7 +4,7 @@
 
 		<cfargument name="documentId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 			 	*
 			FROM 
@@ -21,7 +21,7 @@
 
 		<cfargument name="document" type="com.apirone.core.model.bean.Document" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO documents (
 				employee_id,
 				status_id
@@ -39,7 +39,7 @@
 
 		<cfargument name="document" type="com.apirone.core.model.bean.Product" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			
 			UPDATE documents
 			SET
@@ -55,7 +55,7 @@
 
 		<cfargument name="documentId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM documents 
 			WHERE
@@ -76,7 +76,7 @@
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="code">
 		
-        <cfquery name="local.q" datasource="zerobenefit">
+        <cfquery name="local.q" datasource="apirone">
 			SELECT
 				document_id,
 				COUNT(document_id) OVER() AS total

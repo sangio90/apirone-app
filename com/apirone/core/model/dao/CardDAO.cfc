@@ -4,7 +4,7 @@
 
 		<cfargument name="cardId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM cards
 			WHERE card_id = <cfqueryparam cfsqltype="varchar" value="#arguments.cardId#">
@@ -20,7 +20,7 @@
 		<cfargument name="orderby" required="true" type="String" default="card_id">
 		<cfargument name="employeeId" type="String">    
 	
-        <cfquery name="local.q" datasource="zerobenefit">
+        <cfquery name="local.q" datasource="apirone">
 			SELECT
 				card_id,
 				COUNT(card_id) OVER() AS total
@@ -51,7 +51,7 @@
 
 		<cfargument name="card" type="com.apirone.core.model.bean.Card" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO cards(
 				card_id,
 				emission_at,
@@ -82,7 +82,7 @@
 
 		<cfargument name="card" type="com.apirone.core.model.bean.Card" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			UPDATE cards 
 			SET 
 				emission_at   = <cfqueryparam cfsqltype="timestamp" value="#arguments.card.getEmissionAt()#">,
@@ -105,7 +105,7 @@
 
 		<cfargument name="cardId" type="String" required="true">
 		
-		<cfquery name="local.q" datasource="zerobenefit" result="result">
+		<cfquery name="local.q" datasource="apirone" result="result">
 			DELETE
 			FROM cards
 			WHERE

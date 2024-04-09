@@ -4,7 +4,7 @@
 
 		<cfargument name="variantTypeId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM variant_types
 			WHERE variant_type_id = <cfqueryparam cfsqltype="varchar" value="#arguments.variantTypeId#">::uuid
@@ -18,7 +18,7 @@
 
 		<cfargument name="variantType" type="com.apirone.core.model.bean.VariantType" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO variant_types (
 				variant_type
 			)
@@ -37,7 +37,7 @@
 		<cfargument name="orderby" required="true" type="String" default="orderby">
 		<cfargument name="code" type="String" >
 
-        <cfquery name="local.q" datasource="zerobenefit">
+        <cfquery name="local.q" datasource="apirone">
 			SELECT
 				variant_type_id,
 				COUNT(variant_type_id) OVER() AS total

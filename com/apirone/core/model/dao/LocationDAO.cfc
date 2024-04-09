@@ -4,7 +4,7 @@
 
 		<cfargument name="locationId" required="true" type="String">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
 				locations
@@ -24,7 +24,7 @@
 		<cfargument name="companyId" type="String">
 		<cfargument name="employeeId" type="String">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				location_id,
 				COUNT(location_id) OVER() AS total
@@ -58,7 +58,7 @@
 		<cfargument name="location" type="com.apirone.core.model.bean.Location" required="true">
 		<cfargument name="entity" type="com.apirone.core.model.bean.Entity" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO locations(
 				address,
                 city_id,
@@ -81,7 +81,7 @@
 
 		<cfargument name="location" type="com.apirone.core.model.bean.Location" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			UPDATE locations 
 			SET address 	= <cfqueryparam cfsqltype="Varchar" value="#arguments.location.getAddress()#">, 
 				city_id 	= <cfqueryparam cfsqltype="Varchar" value="#arguments.location.getCity().getId()#">::uuid,

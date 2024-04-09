@@ -24,7 +24,7 @@ component {
 		idleTimespan: CreateTimeSpan( 0, 0, 0, 10 )
     } ];
 
-    this.datasources["zerobenefit"] = {
+    this.datasources["apirone"] = {
         type     = "postgresql", 
         host     = variables.settings.get('db.host'),
         database = variables.settings.get('db.name'),

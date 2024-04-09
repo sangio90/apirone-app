@@ -4,7 +4,7 @@
 
 		<cfargument name="countyId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM counties
 			WHERE county_id = <cfqueryparam cfsqltype="varchar" value="#arguments.countyId#">

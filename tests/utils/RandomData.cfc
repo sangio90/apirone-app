@@ -4,7 +4,7 @@
 		
         <cfargument name="limit" required="false" type="Numeric" default="5">
 
-        <cfquery datasource="zerobenefit" name="local.q">
+        <cfquery datasource="apirone" name="local.q">
             SELECT *
             FROM public.countries
             ORDER BY RANDOM()
@@ -22,7 +22,7 @@
 		
         <cfargument name="limit" required="false" type="Numeric" default="5">
 
-        <cfquery datasource="zerobenefit" name="local.q">
+        <cfquery datasource="apirone" name="local.q">
             SELECT *
             FROM public.cities
                 INNER JOIN public.counties USING (county_id)
@@ -41,7 +41,7 @@
 		
         <cfargument name="limit" required="false" type="Numeric" default="5">
 
-        <cfquery datasource="zerobenefit" name="local.q">
+        <cfquery datasource="apirone" name="local.q">
             SELECT *
             FROM public.company_types
             ORDER BY RANDOM()

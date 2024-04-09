@@ -6,7 +6,7 @@
 
 		<cfargument name="accountId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 			 	account_id,
 				api_key,
@@ -34,7 +34,7 @@
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT 
 				account_id,
 				COUNT(account_id) OVER() AS total
@@ -64,7 +64,7 @@
 
 		<cfargument name="account" type="com.apirone.core.model.bean.Account" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO accounts (
 				login,
 				api_key
@@ -85,7 +85,7 @@
 
 		<cfargument name="accountId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM accounts 
 			WHERE
@@ -99,7 +99,7 @@
 		<cfargument name="accountId" required="Yes" type="String">
 		<cfargument name="pwd" required="Yes" type="String">
 
-		<cfquery name="local.q" datasource="zerobenefit">
+		<cfquery name="local.q" datasource="apirone">
 			UPDATE accounts
 			SET 
 				pwd = <cfqueryparam cfsqltype="varchar" value="#trim(arguments.pwd)#">

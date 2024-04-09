@@ -1,7 +1,7 @@
 ﻿<cfdump var="#IsEmpty('h')#">
 <cfparam name="notExists" default="">
 
-<cfquery datasource="zerobenefit" result="d">
+<cfquery datasource="apirone" result="d">
     INSERT INTO _test (
         field1,
         field2
@@ -13,7 +13,7 @@
 </cfquery>
 
 <!----
-<cfquery datasource="zerobenefit" result="d">
+<cfquery datasource="apirone" result="d">
     INSERT INTO _test (
         field1,
         field2
