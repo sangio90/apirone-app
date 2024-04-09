@@ -1,0 +1,34 @@
+{  "create":  { 
+        "name" : { 
+            "required" : true,
+            "requiredMessage": "NameRequired"
+         },
+         "price" : {
+            "required" : true,
+            "requiredMessage": "PriceRequired"
+       },
+        "price.value" : {
+             "required" : true,
+             "requiredMessage": "PriceValueRequired"
+        }
+    },
+    "modify":  { 
+        "name" : { 
+            "required" : true,
+            "requiredMessage": "NameRequired"
+        },
+        "price" : {
+            "required" : true,
+            "requiredMessage": "PriceRequired"
+        },
+        "price.id" : {
+            "required" : true,
+            "requiredMessage": "PriceIdRequired"
+        },
+        "price.value" : {
+             "required" : true,
+             "requiredMessage": "PriceValueRequired"
+        }
+    }
+}
+

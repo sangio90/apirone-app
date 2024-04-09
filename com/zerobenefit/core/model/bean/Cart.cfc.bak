@@ -1,0 +1,110 @@
+<cfcomponent>
+	
+	<cffunction name="init" access="public" output="No">
+		
+		<cfargument name="taxPercentage" required="Yes" default="22">
+		<cfargument name="taxIncluded" required="Yes" default="true" type="boolean">
+		<cfargument name="shipment" required="Yes" default="true" type="struct">
+		<cfargument name="payment" required="Yes" default="true" type="struct">
+
+		<cfset variables.taxPercentage = arguments.taxPercentage>
+		<cfset variables.taxIncluded = arguments.taxIncluded>
+		<cfset variables.weight = 0>
+		
+		<cfset variables.products = QueryNew(
+			"productId,productName,companyId,companyName,variantId,variantName,price,quantity,id,image,permalink,weight,unit,totalWeight",
+			"VARCHAR,VARCHAR,VARCHAR,VARCHAR,VARCHAR,VARCHAR,DOUBLE,INTEGER,VARCHAR,VARCHAR,VARCHAR,DOUBLE,VARCHAR,DOUBLE"
+		)>
+
+		<cfset variables.payment = arguments.payment>
+		<cfset variables.shipment = arguments.shipment>
+
+		<cfreturn this />
+
+	</cffunction>
+
+	<!---
+	<cffunction name="getProducts" access="public" output="No">
+		
+		<cfreturn variables.products>
+
+	</cffunction>
+	---->
+
+
+	<cffunction name="getTaxPercentage" access="public" output="No">
+		
+		<cfreturn variables.taxPercentage>
+
+	</cffunction>
+
+
+	<cffunction name="setTaxPercentage" access="public" output="No">
+		
+		<cfargument name="taxPercentage" required="Yes">
+
+		<cfset variables.taxPercentage = arguments.taxPercentage>
+
+	</cffunction>
+
+
+	<cffunction name="getProducts" access="public" output="No">
+
+		<cfquery dbtype="query" name="q">
+			SELECT *
+			FROM variables.products
+			ORDER BY companyId
+		</cfquery>
+		
+		<cfreturn q>
+
+	</cffunction>
+
+
+	<cffunction name="setProducts" access="public" output="No">
+
+		<cfargument name="products" required="Yes">
+
+		<cfset variables.products = arguments.products>
+
+	</cffunction>
+
+
+	<cffunction name="getPayment" access="public" output="No">
+		
+		<cfreturn variables.payment>
+
+	</cffunction>
+
+
+	<cffunction name="setPayment" access="public" output="No">
+		
+		<cfargument name="payment" required="Yes" type="struct">
+
+		<cfset variables.payment = arguments.payment>
+
+	</cffunction>
+
+
+	<cffunction name="getShipment" access="public" output="No">
+		
+		<cfreturn variables.shipment>
+
+	</cffunction>
+
+
+	<cffunction name="setShipment" access="public" output="No">
+		
+		<cfargument name="shipment" required="Yes" type="struct">
+
+		<cfset variables.shipment = arguments.shipment>
+
+	</cffunction>
+
+	<cffunction name="getTaxIncluded" access="public" output="No">
+
+		<cfreturn variables.taxIncluded>
+
+	</cffunction>
+
+</cfcomponent>

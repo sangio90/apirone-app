@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN"
+        "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
+
+<urlrewrite use-query-string="true">
+
+    <!--
+    <rule>
+        <from>/assets/([0-9]*)/manager/(css|js|img)/(.*)</from>
+        <to qsappend="true">/apps/manager/assets/$2/$3</to>
+    </rule>
+    -->
+
+    <rule>
+        <from>/assets/([0-9]*){0,}/{0,}(manager|public)/css/(.*)</from>
+        <to qsappend="true">/apps/$2/assets/css/$3</to>
+    </rule>
+
+    <rule>
+        <from>/assets/([0-9]*){0,}/{0,}(manager|public)/js/(.*)</from>
+        <to qsappend="true">/apps/$2/assets/js/$3</to>
+    </rule>
+
+    <rule>
+        <from>/assets/([0-9]*){0,}/{0,}(manager|public)/img/(.*)</from>
+        <to qsappend="true">/apps/$2/assets/img/$3</to>
+    </rule>
+
+    <rule>
+        <from>/assets/main/([0-9]*){0,}/{0,}css/(.*)</from>
+        <to qsappend="true">/assets/main/css/$2</to>
+    </rule>
+
+    <rule>
+        <from>/assets/main/([0-9]*){0,}/{0,}js/(.*)</from>
+        <to qsappend="true">/assets/main/js/$2</to>
+    </rule>    
+
+    <!--
+    <rule>
+        <from>/assets/([0-9]*)/(manager|public)/img/(.*)</from>
+        <to qsappend="true">/apps/$2/assets/img/$3</to>
+    </rule>
+
+    <rule>
+        <from>/assets/([0-9]*)/(manager|public)/js/(.*)</from>
+        <to qsappend="true">/apps/$2/assets/js/$3</to>
+    </rule>
+    -->
+
+    <rule>
+        <from>/assets/main/img/apple-touch-icon.png$</from>
+        <to qsappend="true">/favicon.ico</to>
+    </rule>
+
+    <rule>
+        <note>Generic Front-Controller URLs</note>
+        <condition type="request-uri" operator="notequal">/(index.cfm|robots.txt|osd.xml|flex2gateway|cfide|cfformgateway|railo-context|lucee|admin-context|modules/contentbox-dsncreator|modules/contentbox-installer|modules/contentbox|files|images|js|javascripts|css|styles|img|config).*</condition>
+        <condition type="request-uri" operator="notequal">\.(html|bmp|svg|gif|jpe?g|png|css|js|txt|xls|ico|swf|woff|ttf|otf|mp4|mp3)$</condition>
+        <condition type="request-filename" operator="notdir"/>
+        <condition type="request-filename" operator="notfile"/>
+        <from>^/(.+)$</from>
+        <to type="passthrough">/index.cfm/$1</to>
+    </rule>    
+
+</urlrewrite>

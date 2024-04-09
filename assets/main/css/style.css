@@ -1,0 +1,39 @@
+thead.k-grid-header tr th { 
+	/*
+	border: 1px solid #ced4da !important;
+    border-radius: .25rem !important; 	
+    */
+}
+
+
+/*-------
+	slightly larger forms (.lg)
+--------*/
+
+.form-check-inline, .form-check-label.lg {
+	line-height: 30px;
+}
+
+.form-check-label.lg, 
+.form-label.lg {
+	font-size: .95rem;
+}
+
+.form-control.lg, 
+.form-check-input.lg {
+	font-size: 1.1rem;
+}
+
+.form-check-inline.lg, .form-check.lg {
+	margin-left: 18px;
+}
+
+.btn.lg {
+	padding: .85rem 1.5rem;
+	font-size: 1.1rem;
+}
+
+.header .logo {
+    float: left !important;
+    margin: 0px 0 0 15px !important;
+}

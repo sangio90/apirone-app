@@ -1,0 +1,16 @@
+{  "default":  { 
+        "code" : { 
+            "required" : true,
+            "requiredMessage": "CodeRequired"
+         },
+         "variantType" : {
+            "required" : true,
+            "requiredMessage": "VariantTypeRequired"
+       },
+        "variantType.id" : {
+             "required" : true,
+             "requiredMessage": "VariantTypeRequired"
+        }
+    }
+}
+

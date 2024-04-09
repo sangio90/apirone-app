@@ -1,0 +1,15 @@
+/cache.properties
+/*.sublime-project
+/*.code-workspace
+/.vscode/settings.json
+/application.log
+/tmp.cfm
+/.vscode
+/.env
+/modules/*
+/tasks/local.properties
+/install.log
+/modules
+/userdata
+/install.log
+/server.json

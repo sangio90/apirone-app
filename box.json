@@ -1,0 +1,62 @@
+{
+    "name":"apirone",
+    "slug":"apirone-site",
+    "author":"",
+    "contributors":[],
+    "dependencies":{
+        "porto-admin-template":"http+cached://www.coridalia.cc/repository/porto-admin-template/porto-admin-template-light-4.1.0.zip",
+        "kendoui":"http+cached://www.coridalia.cc/repository/kendoui/kendoui-2022.1.412.zip",
+        "dataMapper":"http+cached://www.coridalia.cc/repository/dataMapper/dataMapper-1.7.zip",
+        "accessManager":"http+cached://www.coridalia.cc/repository/accessManager/accessManager-1.0.0.zip",
+        "coldbox":"7.2.1+13",
+        "wirebox":"7.2.1+13",
+        "cbvalidation":"4.0.0"
+    },
+    "devDependencies":{
+        "testbox":"5.1.0+2"
+    },
+    "ignore":[
+        "**/.*",
+        "/test/",
+        "/tests/"
+    ],
+    "installPaths":{
+        "porto-admin-template":"modules/assets/template-admin/",
+        "kendoui":"modules/assets/kendoui/",
+        "dataMapper":"modules/external/dataMapper/",
+        "accessManager":"modules/external/accessManager/",
+        "coldbox":"modules/coldbox/",
+        "wirebox":"modules/wirebox/",
+        "cbvalidation":"modules/cbvalidation/",
+        "testbox":"modules/testbox/"
+    },
+    "location":"ForgeboxStorage",
+    "private":false,
+    "scripts":{
+        "build:devel":"task run taskFile=tasks/Build.cfc target=deploy :env=devel",
+        "build:prod":"task run taskFile=tasks/Build.cfc target=deploy :env=prod",
+        "createZip":"task run taskFile=tasks/Build.cfc target=createZip"
+    },
+    "testbox":{
+        "bundles":"",
+        "directory":"tests.com",
+        "excludes":"",
+        "labels":"",
+        "options":{},
+        "recurse":true,
+        "reporter":"",
+        "runner":[
+            {
+                "default":""
+            }
+        ],
+        "testBundles":"",
+        "testSpecs":"",
+        "testSuites":"",
+        "verbose":true,
+        "watchDelay":500,
+        "watchPaths":"**.cfc"
+    },
+    "type":"modules",
+    "version":"1.0.0"
+}

@@ -1,0 +1,50 @@
+.red {
+	color: Red;
+}
+
+.form-control {
+	border-color: #cccccc !important;
+}
+
+.card-title-sign {
+	height: 68px;
+}
+
+.page-header .breadcrumbs {
+	padding-right: 20px !important;
+}
+
+.ui-pnotify-title {
+	font-size: 16px !important;
+}
+
+label.error {
+	line-height: 16px !important;
+	margin-top: 5px !important;
+}
+
+.discount {
+	text-decoration: line-through;
+	color: #cccccc
+}
+
+.table-borderless {
+	border-collapse: collapse;
+	border: 0;
+}
+
+/*
+.form-group:not(:first-child) {
+	padding-top: 1rem;
+	border-top: 1px solid #f3f3f3 !important;
+}
+*/
+
+.form-group:not(:first-child) {
+	padding-top: 0rem !important;
+	/* border-top: 1px solid #f3f3f3 !important; */
+}
+
+h2 {
+	color: #0088cc
+}

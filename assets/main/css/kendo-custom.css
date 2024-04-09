@@ -1,0 +1,76 @@
+.k-block, .k-draghandle, .k-inline-block, .k-widget {
+	border: 1px solid #ced4da;
+}
+
+.k-filter-row th, .k-grid-header th.k-header {
+	-weight: 500;
+}
+
+.k-grid-header th.k-header {
+	border-left: 1px solid #ced4da;
+	border-bottom: 2px solid #CECECE !important;
+	height: 40px !important;
+	vertical-align: middle !important;
+	/*background-color: #b4bbc2;*/
+}
+
+.k-focus {
+	border: 0 !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.no-scrollbar .k-grid-header {
+	padding: 0 !important;
+}
+
+.no-scrollbar .k-grid-content {
+	overflow-y: visible;
+}
+
+/*
+.k-grid .k-command-cell, .k-grid .k-edit-cell, .k-grid .k-grid-edit-row td {
+	padding: .75rem .75rem !important;
+}
+*/
+
+.k-grid table tbody tr th {
+	height: 40px !important;
+}
+
+.k-grid table tbody tr td {
+    border-bottom: 1px solid #e6e6e6 !important;
+	height: 40px !important;
+	padding: 4px 6px !important;
+
+}
+
+.k-grid table tbody tr td input[type=text] {
+	min-height: 20px !important;
+	/* height: 30px; */
+}
+
+.k-grid-content td input[type=text] {
+	width:  calc(100% - 25px);
+}
+
+.k-grid-content td select {
+	width:  calc(100% - 38px);
+}
+
+.k-grid table thead tr th {
+	font-weight: bold !important;
+}
+
+.k-rounded-md {
+	border-radius: 0.25rem !important;
+}
+
+.k-input {
+	border: 1px solid #cccccc !important;
+}
+
+.k-button-solid-base {
+	background-color: #cccccc !important
+}
