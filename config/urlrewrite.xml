@@ -5,13 +5,6 @@
 
 <urlrewrite use-query-string="true">
 
-    <!--
-    <rule>
-        <from>/assets/([0-9]*)/manager/(css|js|img)/(.*)</from>
-        <to qsappend="true">/apps/manager/assets/$2/$3</to>
-    </rule>
-    -->
-
     <rule>
         <from>/assets/([0-9]*){0,}/{0,}(manager|public)/css/(.*)</from>
         <to qsappend="true">/apps/$2/assets/css/$3</to>
@@ -36,18 +29,6 @@
         <from>/assets/main/([0-9]*){0,}/{0,}js/(.*)</from>
         <to qsappend="true">/assets/main/js/$2</to>
     </rule>    
-
-    <!--
-    <rule>
-        <from>/assets/([0-9]*)/(manager|public)/img/(.*)</from>
-        <to qsappend="true">/apps/$2/assets/img/$3</to>
-    </rule>
-
-    <rule>
-        <from>/assets/([0-9]*)/(manager|public)/js/(.*)</from>
-        <to qsappend="true">/apps/$2/assets/js/$3</to>
-    </rule>
-    -->
 
     <rule>
         <from>/assets/main/img/apple-touch-icon.png$</from>
