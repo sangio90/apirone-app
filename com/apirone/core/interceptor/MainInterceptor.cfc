@@ -73,9 +73,9 @@ component extends="coldbox.system.Interceptor"{
         arguments.event.setValue( "dataMapper",  model.getInstance("DataMapper") );
 
         arguments.event.setValue( "config",  config );
-        arguments.event.setValue( "configInLine",  { "variantTypeDefault": config.get('variantTypeDefault') } );
+        //arguments.event.setValue( "configInLine",  { "variantTypeDefault": config.get('variantTypeDefault') } );
 
-        arguments.event.setPrivateValue( "staticVersion",  rc.isDev ? RandRange(1000, 9999) : 20231126 );
+        arguments.event.setPrivateValue( "staticVersion",  rc.isDev ? RandRange(1000, 9999) : 20240409 );
 
         prc.jsScripts = [];
         

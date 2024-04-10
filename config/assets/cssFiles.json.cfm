@@ -85,57 +85,6 @@
         { file: "/modules/assets/template-admin/css/skins/default.css" },
         { file: "/modules/assets/template-admin/vendor/morris/morris.css" },
         { file: "/modules/assets/template-admin/css/custom.css" }
-    ],
-
-    public: [
-        { file: "/modules/assets/template-public/vendor/bootstrap/css/bootstrap.min.css" },
-        { 
-            file: "/modules/assets/template-public/vendor/fontawesome-free/css/all.min.css",
-            replacements: [
-                { 
-                    find: "../webfonts/fa-brands-400.woff2",
-                    replace: "/modules/assets/template-public/vendor/fontawesome-free/webfonts/fa-brands-400.woff2"
-                },
-                { 
-                    find: "../webfonts/fa-brands-400.ttf",
-                    replace: "/modules/assets/template-public/vendor/fontawesome-free/webfonts/fa-brands-400.ttf"
-                },
-                { 
-                    find: "../webfonts/fa-solid-900",
-                    replace: "/modules/assets/template-public/vendor/fontawesome-free/webfonts/fa-solid-900"
-                }
-            ]
-        },
-        { file: "/modules/assets/template-public/vendor/animate/animate.compat.css" },
-        { 
-            file: "/modules/assets/template-public/vendor/simple-line-icons/css/simple-line-icons.min.css",
-            replacements: [
-                { 
-                    find: "../fonts/Simple-Line-Icons.eot?v=2.4.0",
-                    replace: "/modules/assets/template-public/vendor/simple-line-icons/fonts/Simple-Line-Icons.eot?v=2.4.0"
-                },
-                { 
-                    find: "../fonts/Simple-Line-Icons.eot?v=2.4.0#iefix",
-                    replace: "/modules/assets/template-public/vendor/simple-line-icons/fonts/Simple-Line-Icons.eot?v=2.4.0#iefix"
-                },
-                { 
-                    find: "../fonts/Simple-Line-Icons.woff2?v=2.4.0",
-                    replace: "/modules/assets/template-public/vendor/simple-line-icons/fonts/Simple-Line-Icons.woff2?v=2.4.0"
-                }
-            ]
-        },
-        { file: "/modules/assets/template-public/vendor/owl.carousel/assets/owl.carousel.min.css" },
-        { file: "/modules/assets/template-public/vendor/owl.carousel/assets/owl.theme.default.min.css" },
-        { file: "/modules/assets/template-public/vendor/magnific-popup/magnific-popup.min.css" },
-
-        { file: "/modules/assets/template-public/css/theme.css" },
-        { file: "/modules/assets/template-public/css/theme-elements.css" },
-        { file: "/modules/assets/template-public/css/theme-blog.css" },
-        { file: "/modules/assets/template-public/css/theme-shop.css" },
-        { file: "/modules/assets/template-public/css/demos/demo-cleaning-services.css" },
-        { file: "/modules/assets/template-public/css/skins/skin-cleaning-services.css" },
-        { file: "/modules/assets/template-public/css/custom.css" },
-
     ]
 
 }

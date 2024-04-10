@@ -13,9 +13,10 @@ component extends="com.apirone.core.controller.AbsController" {
     function doLogin( event, rc, prc ) {
 
         var user = arguments.event.getValue( "User" );
-        
+
         var access = getAccessManager()
             .exec( user, "auth.login", { "email" = rc.login , "pwd" = rc.pwd } );
+        
 
         if ( access.getStatus() )  {
 

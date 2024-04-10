@@ -35,7 +35,7 @@
         /*
             [ROB] questo andrebbe caricato al boot. ci pensiamo un attimo
         */
-        return server[ "wireBox-zerobenefit" ];
+        return server[ "wireBox-apirone" ];
 
     }    
 
