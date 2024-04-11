@@ -5,6 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var user = arguments.event.getValue( "User" );
 
         prc.config = getConfiguration().get();
+        rc.email = StructKeyExists( cookie, "email" ) ? cookie.email : '';
 
         event.setView( "main/login" ).setLayout( "login" );
 
@@ -15,8 +16,10 @@ component extends="com.apirone.core.controller.AbsController" {
         var user = arguments.event.getValue( "User" );
 
         var access = getAccessManager()
-            .exec( user, "auth.login", { "email" = rc.login , "pwd" = rc.pwd } );
-        
+            .exec( user, "auth.login", { "email" = rc.email , "pwd" = rc.pwd } );
+
+        //cookie.email = rc.email;
+        cfcookie( name="email", value="#rc.email#", expires="15", preservecase=true );
 
         if ( access.getStatus() )  {
 
@@ -34,6 +37,8 @@ component extends="com.apirone.core.controller.AbsController" {
             relocate( uri="/manager/login", postProcessExempt=false, addToken=false );
 
         }
+
+        rc.email = StructKeyExists(cfcookie, "email") ? cfcookie.email : '';
 
     }
 

@@ -44,11 +44,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 		if ( !Len( arguments.account.getLogin() ) ) {
-			throw( type="zerobenefit.LoginNotProvided", message="Login required" );
+			throw( type="apirone.LoginNotProvided", message="Login required" );
 		};
 	
 		if ( !Len( arguments.account.getPwd() ) ) {
-			throw( type="zerobenefit.PasswordNotProvided", message="Password required" );
+			throw( type="apirone.PasswordNotProvided", message="Password required" );
 		};
 
 		var id = getDao().insert( argumentCollection = arguments );
@@ -102,7 +102,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	){
 
 		if ( !Len( arguments.email ) ) {
-			throw( type="zerobenefit.EmailNotProvided", message="Email required" );
+			throw( type="apirone.EmailNotProvided", message="Email required" );
 		};
 	
     	var accounts = search( email=arguments.email ).getData();

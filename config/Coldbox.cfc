@@ -12,7 +12,7 @@ component{
 		 */
 		coldbox = {
 			// Application Setup
-			appName                  : getSystemSetting( "APPNAME", "zerobenefit" ),
+			appName                  : getSystemSetting( "APPNAME", "apirone" ),
 			eventName                : "event",
 			// Development Settings
 			reinitPassword           : "",
@@ -169,11 +169,11 @@ component{
 				// Information about your API
 				"info"		:{
 					// A title for your API
-					"title": "Rest API for ZeroBenefit" ,
+					"title": "Rest API for apirone" ,
 					// A description of your API
 					"contact":{
-						"name": "Zero Benefit IT dep.",
-						"email": "info@zerobenefit.it"
+						"name": "Apir IT dep.",
+						"email": "info@apirone.it"
 					},
 					//The version of your API
 					"version":"1.0.0",
@@ -185,11 +185,11 @@ component{
 				// https://swagger.io/specification/#serverObject
 				"servers" : [
 					{
-						"url" 			: "https://www.zerobenefit.it/api",
+						"url" 			: "https://www.apirone.it/api",
 						"description" 	: "Production server"
 					},
 					{
-						"url" 			: "https://test.zerobenefit.it/api",
+						"url" 			: "https://test.apirone.it/api",
 						"description" 	: "Test server"
 					}
 				],

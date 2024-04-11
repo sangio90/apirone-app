@@ -1,6 +1,7 @@
-ZB.widget = ZB.widget || {};
+var NM = {};
+NM.widget = NM.widget || {};
 
-ZB.widget.notify = function( type, message, title ) {
+NM.widget.notify = function( type, message, title ) {
 
     console.log("ZB.widget.notify")
 

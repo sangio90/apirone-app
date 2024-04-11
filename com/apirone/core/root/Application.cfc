@@ -4,7 +4,7 @@ component {
     
     variables.settings = new config.Settings();
     
-    this.name              = "zerobenefit-core";
+    this.name              = "apirone-core";
     this.nullSupport       = true;
     this.sessionManagement = true;
     this.sessionTimeout    = CreateTimeSpan( 0, 1, 0, 0 );

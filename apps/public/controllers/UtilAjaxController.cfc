@@ -7,7 +7,7 @@
             <cfset var data = { "response" = "success" }>
             <cfset var message = "MESSAGE_SENT;#SerializeJSON(form)#">
 
-            <cfmail from="#form.email#" to="info@zerobenefit.it" bcc="roberto.marzialetti@gmail.com" subject="[zerobenefit.it] contatto del sito" type="HTML">
+            <cfmail from="#form.email#" to="info@apirone.it" bcc="roberto.marzialetti@gmail.com" subject="[apirone.it] contatto del sito" type="HTML">
 
                 <cfdump var="#form#">
                 <br>

@@ -8,10 +8,10 @@
 <html  class="fixed sidebar-left-collapsed sidebar-left-with-menu no-overflowscrolling" data-dev="#rc.isDev#">
 <head>
 
-    <title><cfif Len( prc.title )>#prc.title# - </cfif> ZeroBenefit</title>
+    <title><cfif Len( prc.title )>#prc.title# - </cfif> Apir</title>
 
     <meta charset="utf-8">
-    <meta name="author" content="Nimesia Snc">
+    <meta name="author" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
@@ -21,15 +21,15 @@
         destination="/userdata/assets/css"
         type="css">
     
-    <!---- <script src="/modules/assets/template-public/vendor/modernizr/modernizr.min.js"></script> ---->
+    <script src="/modules/assets/template-admin/vendor/modernizr/modernizr.js"></script>
 
     <!--- <link rel="stylesheet" href="/assets/#static#/manager/css/kendo-custom.css"> --->
     <link rel="stylesheet" href="/assets/#prc.staticVersion#/manager/css/style.css">
 
     <script>
-        var ZB = {};
-        ZB.config = #SerializeJSON( rc.configInLine )#;
-        ZB.message = #SerializeJSON(flash.get("message", {}))#;
+        var AP = {};
+        AP.config = #SerializeJSON( {} )#;
+        AP.message = #SerializeJSON(flash.get("message", {}))#;
     </script>
 
 </head>
@@ -40,7 +40,7 @@
         <header class="header">
             <div class="logo-container">
                 <a href="/manager" class="logo">
-                    <img src="/assets/main/img/logo-horizontal.png" width="23%" height="23%" alt="Zero Benefit" />
+                    <img src="/assets/main/img/logo-horizontal.png" width="50%" height="50%" alt="Apir" />
                 </a>
 
                 <div class="d-md-none toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html" data-fire-event="sidebar-left-opened">

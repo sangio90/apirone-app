@@ -57,7 +57,7 @@
 
                 throw( 
                     message="Sort [#i.sort#] not valid for field [#i.field#]. Only accepted values are ASC or DESC", 
-                    type="zerobenefit.errors.AbsService.SortValueNotValid" 
+                    type="apirone.errors.AbsService.SortValueNotValid" 
                 );
 
             }
@@ -81,7 +81,7 @@
 
             throw( 
                 message="Field [#arguments.field#] not found in available values.",
-                type="zerobenefit.errors.AbsService.DBFieldNotFound" 
+                type="apirone.errors.AbsService.DBFieldNotFound" 
             );
 
         }

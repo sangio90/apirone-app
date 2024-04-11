@@ -74,11 +74,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		){		
 	
 		if ( !Len( arguments.productCategory.getId() ) ) {
-			throw( type="zerobenefit.errors.createProductCategory.IdNotProvided", message="ID required" );
+			throw( type="apirone.errors.createProductCategory.IdNotProvided", message="ID required" );
 		};
 
 		if ( !Len( arguments.productCategory.getName() ) ) {
-			throw( type="zerobenefit.errors.createProductCategory.NameNotProvided", message="Name required" );
+			throw( type="apirone.errors.createProductCategory.NameNotProvided", message="Name required" );
 		};
 
         return getDao().insert( 
@@ -92,11 +92,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		){		
 	
 		if ( !Len( arguments.productCategory.getId() ) ) {
-			throw( type="zerobenefit.errors.updateProductCategory.IdNotProvided", message="ID required" );
+			throw( type="apirone.errors.updateProductCategory.IdNotProvided", message="ID required" );
 		};
 
 		if ( !Len( arguments.productCategory.getName() ) ) {
-			throw( type="zerobenefit.errors.updateProductCategory.NameNotProvided", message="Name required" );
+			throw( type="apirone.errors.updateProductCategory.NameNotProvided", message="Name required" );
 		};
 
         var id = getDao().update( 

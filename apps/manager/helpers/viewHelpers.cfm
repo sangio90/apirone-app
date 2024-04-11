@@ -76,7 +76,7 @@
         savecontent variable="html" {
             echo("
                 <div>
-                    <img src='/assets/main/img/logo.png' alt='ZeroBenefit' style='width: 110px; height: 60px;'>
+                    <img src='/assets/main/img/logo.png' alt='Apir' style='width: 110px; height: 60px;'>
                 </div>
             ");
         }

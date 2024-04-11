@@ -11,7 +11,7 @@
             <div class="card-title-sign mt-3">
                 <div class="row">
                     <div class="col-6 mb-2">
-                        <img src="/assets/main/img/logo.png" height="70" alt="Zerobenefit" />
+                        <img src="/assets/main/img/logo.png" height="70" alt="Apir" />
                     </div>
                     <div class="col-6 text-end mt-5">
                         <h2 class="title text-uppercase font-weight-bold m-0" >
@@ -34,7 +34,7 @@
                     <div class="form-group mb-3">
                         <label>Nome utente</label>
                         <div class="input-group">
-                            <input name="login" id="login" type="text" class="form-control form-control-lg" />
+                            <input name="email" id="email" type="text" class="form-control form-control-lg" value="#rc.email#" />
                             <span class="input-group-text">
                                 <i class="bx bx-user text-4"></i>
                             </span>

@@ -1,6 +1,6 @@
 <cfsetting showdebugoutput="false">
 <cfparam name="url.reporter" default="simple"> <!--- simple --->
-<cfparam name="url.directory" default="tests.specs.com.zerobenefit">
+<cfparam name="url.directory" default="tests.specs.com.Apir">
 <cfparam name="url.recurse"	default="true" type="boolean">
 <cfparam name="url.bundles"	default="">
 <cfparam name="url.labels" 	default="">

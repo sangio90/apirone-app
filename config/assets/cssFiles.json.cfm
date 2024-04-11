@@ -39,19 +39,19 @@
     manager:
     [
         { 
-            file: "/modules/assets/template-public/vendor/fontawesome-free/css/all.min.css",
+            file: "/modules/assets/template-admin/vendor/font-awesome/css/all.min.css",
             replacements: [
                 {
                     find: "../webfonts/fa-brands-400.",
-                    replace: "/modules/assets/template-public/vendor/fontawesome-free/webfonts/fa-brands-400."
+                    replace: "/modules/assets/template-admin/vendor/font-awesome/webfonts/fa-brands-400."
                 },
                 {
                     find: "../webfonts/fa-solid-900.",
-                    replace: "/modules/assets/template-public/vendor/fontawesome-free/webfonts/fa-solid-900."
+                    replace: "/modules/assets/template-admin/vendor/font-awesome/webfonts/fa-solid-900."
                 },
                 {
                     find: "../webfonts/fa-regular-400.", 
-                    replace: "/modules/assets/template-public/vendor/fontawesome-free/webfonts/fa-regular-400."
+                    replace: "/modules/assets/template-admin/vendor/font-awesome/webfonts/fa-regular-400."
                 },
             ]
 

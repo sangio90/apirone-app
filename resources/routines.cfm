@@ -1,4 +1,4 @@
-﻿<cfset wirebox = server['wireBox-zerobenefit']>
+﻿<cfset wirebox = server['wireBox-Apir']>
 <cfset cm = wirebox.getInstance( "CacheManager" )>
 
 <cfoutput>

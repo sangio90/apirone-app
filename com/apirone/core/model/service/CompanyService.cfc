@@ -74,7 +74,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		){		
 
 		if ( vatExists( arguments.company.getVat() ) ) {
-			throw( type="zerobenefit.VatExits", message="Vat [#arguments.company.getVat()#] exists" );
+			throw( type="apirone.VatExits", message="Vat [#arguments.company.getVat()#] exists" );
 		}
 
 		transaction {
