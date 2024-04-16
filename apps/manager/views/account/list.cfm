@@ -1,5 +1,5 @@
 <cfoutput>
-    <div id="account-root">
+    <div id="account-list-root">
 
         <div class="row">
 
@@ -41,7 +41,7 @@
                             
                             <div 
                                 id="account-grid" 
-                                data-bound="ZB.kendo.toggleScrollbar"
+                                data-bound="AP.kendo.toggleScrollbar"
                                 data-columns="[
                                     { 'field':'email', 'title':'Email'},
                                     { 'field':'role.id', 'title':'Ruolo' },
@@ -66,6 +66,6 @@
 
     </div>
 
-    #template( view="jstemplates/account-grid-row" )#
+    #template( view="jstemplate/account/account-grid-row" )#
 
 </cfoutput>

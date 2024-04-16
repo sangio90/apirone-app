@@ -23,7 +23,7 @@
 
             <div class="card-body">
 
-                <form action="/manager/login/do" method="POST" id="login-form" autocomplete="true">
+                <form action="/manager/login/check" method="POST" id="login-form" autocomplete="true">
 
                     <cfif flash.exists('message')>
                         <div class="alert alert-danger alert-dismissible fade show">
@@ -45,7 +45,7 @@
                     <div class="form-group mb-3">
                         <div class="clearfix">
                             <label class="float-left">Password</label>
-                            <a href="/manager/recover-password" class="float-end">Password smarrita?</a>
+                            <a href="/manager/login/recover" class="float-end">Password smarrita?</a>
                         </div>
                         <div class="input-group">
                             <input name="pwd" id="pwd" type="password" class="form-control form-control-lg" />
@@ -58,13 +58,9 @@
 
                     <div class="row">
                         <div class="col-sm-8">
-                            <div class="checkbox-custom checkbox-default">
-                                <input id="RememberMe" name="rememberme" type="checkbox"/>
-                                <label for="RememberMe">Ricordami</label>
-                            </div>
                         </div>
                         <div class="col-sm-4 text-end">
-                            <button type="submit" class="btn btn-primary mt-2">Entra &raquo;</button>
+                            <button type="submit" class="btn btn-primary mt-2">Login &raquo;</button>
                         </div>
                     </div>
 

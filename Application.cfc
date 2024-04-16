@@ -17,7 +17,7 @@ component extends="com.apirone.core.root.Application" {
 
 		super.onApplicationStart();
 
-		if ( !StructKeyExists( application, "cbBootstrap" ) OR StructKeyExists( url, "reinit" )) {
+		//if ( !StructKeyExists( application, "cbBootstrap" ) OR StructKeyExists( url, "reinit" )) {
 
 			cffile( action="append" file="#ExpandPath('/application.log')#" output="#now()# - Root:loadColdbox" );
 
@@ -31,7 +31,7 @@ component extends="com.apirone.core.root.Application" {
 
 			application.cbBootstrap.loadColdbox();
 
-		}
+		//}
 
 		return true;
 	
@@ -39,7 +39,7 @@ component extends="com.apirone.core.root.Application" {
 
 	public Boolean function onSessionStart( string targetPage ) {
 
-		startCart();
+		//startCart();
 
 		startUser();
 
@@ -54,10 +54,6 @@ component extends="com.apirone.core.root.Application" {
 
         if ( !StructKeyExists( session, "user" ) ) {
             startUser()
-        }
-
-        if ( !StructKeyExists( session, "cart" ) ) {
-            startCart()
         }
 
 		if ( super.isDev() OR url.keyExists("reinit") ) {
@@ -79,10 +75,6 @@ component extends="com.apirone.core.root.Application" {
 	*/
 	private Void function startUser(){
 		session.user = new com.apirone.core.model.bean.User();
-	}
-
-	private Void function startCart(){
-		session.cart = new com.apirone.core.model.bean.Cart();
 	}
 
 }

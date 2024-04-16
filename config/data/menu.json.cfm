@@ -5,80 +5,36 @@
         title: "Dashboard"
     },
     {
-        href: "/manager/catalogue",
-        icon: "bx bx-store",
-        title: "Catalogo",
-        roles: "ALL"
-    },
-    {
-        href: "/manager/companies",
-        icon: "far fa-building",
-        title: "Aziende",
-        roles: "ADM"
-    },
-    {
-        href: "#",
-        icon: "far fa-credit-card",
-        title: "Tessere",
-        roles: "ADM",
-        items: [
-            {
-                href: "/manager/cards/slots",
-                icon: "fas fa-cogs",
-                title: "Lista degli slot",
-                roles: "ADM"
-            },
-            {
-                href: "/manager/cards",
-                icon: "fas fa-cogs",
-                title: "Lista delle tessere",
-                roles: "ADM"
-            }
-        ]
-
-    },
-    {
-        href: "/manager/documents",
-        icon: "fas fa-shopping-basket",
-        title: "Ordini",
-        roles: "ADM"
-    },
-    {
-        href: "/manager/catalogue",
-        icon: "fas fa-store",
-        title: "Catalogo",
-        roles: "ADM"
-    },
-    {
         href: "/manager/products",
-        icon: "fas fa-box-open",
+        icon: "bx bx-store",
         title: "Prodotti",
         roles: "ADM"
     },
     {
-        href: "/manager/sales",
-        icon: "fas fa-dollar",
-        title: "Gestione vendite",
-        roles: "ADM"
-    },
-    {
-        href: "/manager/account",
-        icon: "bx bx-user",
-        title: "Account",
+        href: "/manager/plates",
+        icon: "far fa-building",
+        title: "Placche",
         roles: "ADM"
     },
     {
         href: "#",
-        icon: "fas fa-cogs",
-        title: "Configurazioni",
+        icon: "far fa-user",
+        title: "Utenze",
         roles: "ADM",
         items: [
             {
-                href: "/manager/product-categories",
-                icon: "fas fa-cogs",
-                title: "Categorie prodotto",
+                href: "/manager/accounts",
+                icon: "fas fa-user",
+                title: "Lista degli utenti",
                 roles: "ADM"
             },
+            {
+                href: "/manager/roles",
+                icon: "fas fa-users",
+                title: "Lista dei ruoli",
+                roles: "ADM"
+            }
         ]
+
     }
 ]

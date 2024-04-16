@@ -50,6 +50,8 @@ component extends="coldbox.system.Interceptor"{
         */
         if ( module == "manager" ) {
 
+            /*
+
             var allowedEvents = "manager:AuthController.login,manager:AuthController.doLogin,manager:AuthController.logout";
 
             // se non sono loggato, e non un evento ammesso
@@ -59,10 +61,11 @@ component extends="coldbox.system.Interceptor"{
                 relocate( uri="/manager/login", postProcessExempt=false, addToken=false );
                 
             }
+            */
         
         }
 
-        var config = model.getInstance("Configuration");
+        var config = model.getInstance("Configuration").get();
 
         //TODO: set all  private value
 
@@ -70,9 +73,9 @@ component extends="coldbox.system.Interceptor"{
         arguments.event.setValue( "isDev", ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
         
         arguments.event.setValue( "i18n",  model.getInstance("i18nService") );
-        arguments.event.setValue( "dataMapper",  model.getInstance("DataMapper") );
+        //arguments.event.setValue( "dataMapper",  model.getInstance("DataMapper") );
 
-        arguments.event.setValue( "config",  config );
+        arguments.event.setPrivateValue( "config",  config );
         //arguments.event.setValue( "configInLine",  { "variantTypeDefault": config.get('variantTypeDefault') } );
 
         arguments.event.setPrivateValue( "staticVersion",  rc.isDev ? RandRange(1000, 9999) : 20240409 );

@@ -4,6 +4,22 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var user = arguments.event.getValue( "User" );
 
+        prc.title = "Lista degli account";
+        //prc.types = getAccessManager().exec( user, "Lookup.list", [ 'shipmentType' ] );
+
+        prc.jsScripts.add( 'app-account' );
+
+        event.setView('account/list');
+
+    }
+    
+    function get( event, rc, prc ){
+
+        var user = arguments.event.getValue( "User" );
+
+        dump("get");
+        abort;
+
         prc.title = "Account";
         //prc.types = getAccessManager().exec( user, "Lookup.list", [ 'shipmentType' ] );
 

@@ -4,14 +4,46 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var user = arguments.event.getValue( "User" );
 
-        prc.config = getConfiguration().get();
+        //prc.config = getConfiguration().get();
         rc.email = StructKeyExists( cookie, "email" ) ? cookie.email : '';
 
         event.setView( "main/login" ).setLayout( "login" );
 
     }
-    
-    function doLogin( event, rc, prc ) {
+
+    function pincode( event, rc, prc ){
+
+        var user = arguments.event.getValue( "User" );
+
+        event.setView( "main/pincode" ).setLayout( "login" );
+
+    }
+
+    function recover( event, rc, prc ){
+
+        var user = arguments.event.getValue( "User" );
+
+        event.setView( "main/recover" ).setLayout( "login" );
+
+    }
+
+    function checkPincode( event, rc, prc ) {
+
+        var user = arguments.event.getValue( "User" );
+
+        location("/manager/dashboard", false );
+
+    }
+
+    function checkRecover( event, rc, prc ) {
+
+        var user = arguments.event.getValue( "User" );
+
+        location("/manager/login/recover/check", false );
+
+    }
+
+    function checkLogin( event, rc, prc ) {
 
         var user = arguments.event.getValue( "User" );
 
@@ -25,7 +57,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
             super.setAuthUser( access.getAccount() );
             
-            location("/manager/dashboard", false );
+            //location("/manager/dashboard", false );
+            relocate( uri="/manager/login/pincode", postProcessExempt=false, addToken=false );
 
         } else {
 
@@ -39,6 +72,8 @@ component extends="com.apirone.core.controller.AbsController" {
         }
 
         rc.email = StructKeyExists(cfcookie, "email") ? cfcookie.email : '';
+
+        relocate( uri="/manager/login", postProcessExempt=false, addToken=false );
 
     }
 

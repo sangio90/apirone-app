@@ -8,7 +8,7 @@
 
     }
     
-    function ping( event, rc, prc ){
+    function live( event, rc, prc ){
 
         event.setView("util/ping").noLayout()
 

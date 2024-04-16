@@ -11,8 +11,8 @@ component{
 			return "v. #settings('app.version')# Ok!";
 		} );
 
-		get( "/ping" )
-        	.toHandler( "UtilController.ping" );
+		get( "/live" )
+        	.toHandler( "UtilController.live" );
 
     	get( "/dashboard" )
         	.to( "MainController.dashboard" ).end();
@@ -166,26 +166,51 @@ component{
 		get( "/catalogue/complete" )
 			.to('CatalogueController.complete').end();		
 
-		get( "/catalogue" )
-			.to('CatalogueController.list').end();
-
-		get( "/financial" )
-			.to('FinancialController.list').end();
-
-
 		/*
 			auth // login
 		*/
-		post( "/login/do" )
-        	.toHandler( "AuthController.doLogin" );
+		post( "/login/pincode/check" )
+        	.toHandler( "AuthController.checkPincode" );
+
+		post( "/login/check" )
+        	.toHandler( "AuthController.checkLogin" );
+
+		post( "/login/recover/check" )
+        	.toHandler( "AuthController.checkRecover" );
+
+		get( "/login/recover" )
+        	.toHandler( "AuthController.recover" );
+
+		get( "/login/pincode" )
+        	.toHandler( "AuthController.pincode" );
 
 		get( "/login" )
         	.toHandler( "AuthController.login" );
 
-			
 		get( "/logout" )
         	.toHandler( "AuthController.logout" );
 
+
+		/*
+			account
+		*/
+		get( "/accounts/:id" )
+        	.toHandler( "AccountController.get" );
+
+		get( "/accounts" )
+        	.toHandler( "AccountController.list" );
+
+		/*
+		route( "/accounts/:id?" )
+			.withAction( {
+				GET : "get",
+				POST : "save",
+				PUT : "update",
+				DELETE : "remove"
+			} )
+			.toHandler( "AccountController" );
+		*/
+		
 
 		/*
 			lookup

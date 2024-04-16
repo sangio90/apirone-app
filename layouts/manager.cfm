@@ -74,15 +74,6 @@
                                 <a role="menuitem" tabindex="-1" href="/manager/my/profile"><i class="bx bx-user-circle"></i> Il mio profilo</a>
                             </li>
                             <li>
-                                <a role="menuitem" tabindex="-1" href="/manager/cart"><i class="bx bx-user-circle"></i> Carrello</a>
-                            </li>
-                            <li>
-                                <a role="menuitem" tabindex="-1" href="/manager/my/wallet"><i class="bx bx-user-circle"></i> Portafogli</a>
-                            </li>
-                            <li>
-                                <a role="menuitem" tabindex="-1" href="/manager/catalogue"><i class="bx bx-user-circle"></i> Catalogo</a>
-                            </li>
-                            <li>
                                 <a role="menuitem" tabindex="-1" href="/manager/logout"><i class="bx bx-power-off"></i> Esci</a>
                             </li>
                         </ul>
@@ -151,6 +142,7 @@
 
                 </section>
 
+
     </section>
 
     <cfmodule template="/apps/utils/ctags/loadAssets.cfm" 
@@ -169,7 +161,7 @@
             <script src="/assets/#prc.staticVersion#/manager/js/#script#.js"></script>
         </cfloop>
 
-        <iframe src="/manager/ping" style="display: none;"></iframe> 
+        <iframe src="/manager/live" style="display: none;"></iframe> 
     </body>
 </html>
 </cfoutput>

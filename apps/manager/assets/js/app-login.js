@@ -1,7 +1,7 @@
-﻿ZB.login = ZB.login || {};
+﻿AP.login = AP.login || {};
 //ZB.login.fields = ZB.fields || {};
 
-ZB['login-fields'] = {
+AP['login-fields'] = {
 	loginForm: $('#login-form')
 }
 
@@ -11,23 +11,23 @@ $(document).ready(function(){
         dom inits
     */
 
-	if ( ZB['login-fields'].loginForm.length ) {
+	if ( AP['login-fields'].loginForm.length ) {
 
-		ZB.login.init();
+		AP.login.init();
 
 	}
 
 })
 
-ZB.login = function() {
+AP.login = function() {
 
 	var pub = {}
 
 	pub.init = function() {
 
-        ZB['login-fields'].loginForm.find('input')[0].focus()
+        AP['login-fields'].loginForm.find('input')[0].focus()
 
-		ZB['login-fields'].loginForm.validate( {
+		AP['login-fields'].loginForm.validate( {
 			onfocusout: function( element ) {
 				$(element).valid();
 			},

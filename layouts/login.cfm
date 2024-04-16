@@ -6,7 +6,7 @@
     <html class="fixed">
         <head>
 
-            <title>Login - Apir</title>
+            <title>Login - ApirOne</title>
 
             <meta charset="UTF-8">
             <meta name="author" content="Nimesia snc">
@@ -20,10 +20,10 @@
                 salt="login-a1"
                 type="css">
 
-            <script src="/modules/assets/manager/vendor/modernizr/modernizr.min.js"></script>
+            <link href="/assets/#prc.staticVersion#/manager/css/style-login.css" rel="stylesheet" type="text/css">
 
             <script>
-                var ZB = {}
+                var AP = {}
             </script>
 
         </head>

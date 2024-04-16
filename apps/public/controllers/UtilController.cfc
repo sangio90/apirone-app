@@ -4,7 +4,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         cfheader( statuscode="404" statustext="Not found");
 
-        echo("<h2>Not found</h2>");
+        echo("<h2>404. Not found</h2>");
         abort;
 
     }
@@ -19,6 +19,8 @@ component extends="com.apirone.core.controller.AbsController" {
     }
 
     function invalidMethod( event, rc, prc ){
+
+        //dump(arguments);
 
         echo("<h2>Invalid method</h2>");
         abort;
