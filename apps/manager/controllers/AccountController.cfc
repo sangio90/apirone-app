@@ -5,7 +5,6 @@ component extends="com.apirone.core.controller.AbsController" {
         var user = arguments.event.getValue( "User" );
 
         prc.title = "Lista dei ruoli";
-        //prc.types = getAccessManager().exec( user, "Lookup.list", [ 'shipmentType' ] );
 
         prc.list = DESerializeJSON( FileRead( '/config/data/fake/roles.json.cfm' ) );
 

@@ -9,9 +9,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.list = DESerializeJSON( FileRead( '/config/data/fake/roles.json.cfm' ) );
 
-        prc.jsScripts.add( 'app-account' );
+        prc.jsScripts.add( 'app-role' );
 
-        event.setView('account/list');
+        event.setView('role/list');
 
     }
     
@@ -25,7 +25,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.perms = DESerializeJSON( FileRead( '/config/data/fake/perms.json.cfm' ) );
 
-        event.setView('account/detail');
+        event.setView('role/detail');
 
     }
     

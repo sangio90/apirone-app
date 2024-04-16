@@ -58,25 +58,6 @@
                             </div>
 
                         </div>
-                        
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <label class="col-form-label" for="account-desc">Password</label>
-                                        <input class="form-control" id="pwd" name="pwd">
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <label class="col-form-label" for="account-desc">Conferma password</label>
-                                        <input class="form-control" name="pwd2">
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
 
                     </div>
                 </div>

@@ -1,101 +1,125 @@
-ZB.product = ZB.product || {};
+AP.account = AP.account || {};
 
-ZB.product.fields = {
-    root: $('#product-detail'),
-    detailForm: $('#product-detail-form')
+AP.product.fields = {
+    rootList: $('#product-list-root'),
+    rootDetail: $('#product-detail-form')
 }
 
 $(document).ready(function(){
 
-	if ( $('#product-detail').length ) {
+	if ( AP.product.fields.rootList.length ) {
 
-		ZB.product.detail.init();
+		//AP.product.list.init();
+
+	}
+
+	if ( AP.product.fields.rootDetail.length ) {
+
+	    AP.product.detail.init();
 
 	}
 
 })
 
-ZB.product.detail = function() {
+AP.product.list = function() {
 
-    var pub = {};
-
-	pub.showFirstVariant = function( e )  {
-
-		//console.log("showFirstVariant");
-
-		var type = ZB.product.fields.detailForm.find('#variantTypeId').val();
-
-		//console.log("type", type);
-		//console.log("ZB.config.variantTypeDefault", ZB.config.variantTypeDefault)
-
-		if ( type == ZB.config.variantTypeDefault ) {
-
-			$('#show-first-variant').show();
-			$('#show-first-variant-note').hide();
-
-		} else {
-
-			$('#show-first-variant').hide();
-			$('#show-first-variant-note').show();
-
-		}
-
-	}
-
+	var pub = {}
 
 	pub.init = function() {
 
-		pub.showFirstVariant();
+        kendo.bind( FW.product.fields.rootList, viewModel );
 
-		ZB.product.fields.detailForm.validate( {
-            submitHandler: function(form) {
-                form.submit();
-            },
-			onfocusout: function( element ) {
-				$(element).valid();
-			},
-			rules: {
-				code: {
-					required: true,
-					checkCode: true,
-				},
-				name: {
-                    required: true,
-                },
-				companyId: {
-                    required: true,
-                },
-				quantity: {
-                    required: true,
-                    integer: true
-                },
-				price: {
-                    required: true,
-                    number: true
-                },
-				variantTypeId: {
-                    required: true
-                },
-				statusId: {
-                    required: true
-                }
-			},
-			messages: {
-				code: {
-					required: "Codice richiesto",
-					checkCode: "Formato non corretto",
-				},
-				name: "Descrizione richiesta",
-                quantity: "E' richiesto un valore intero",
-                price: "E' richiesto un valore numerico",
-                companyId: "Seleziona una azienda",
-                variantTypeId: "Seleziona un tipo di variante",
-                statusId: "Stato richiesto"
-			},
-		
-		} );
+	}	
 
-		//kendo.bind( ZB.product.fields.root, viewModel )
+    return pub;
+}();
+
+
+AP.product.detail = function() {
+
+    var pub = {};
+
+    var roles = [{ id: 'ADM', 'name':  'Admin' },{ 'id': 'COM', 'name': 'Commerciale' }];
+    var statusList = [{ 'id': 'ACT', 'name': 'Attivo' },{ 'id': 'DEA', 'name': 'Disattivato' }];
+    var data = { 'id': '1', 'name': 'Roberto', 'email': 'roberto@marzialetti.com', 'surname': 'Marzialetti', 'role': { 'id': 'ADM', 'name': 'Admin' } };
+
+	var viewModel = kendo.observable({
+        roles: roles,
+        statusList: statusList,
+        detailForm: {
+            data: data,
+            label: '',
+            title: 'Dettaglio account',
+            action: 'update'
+        },
+
+        edit: function( event ) {
+            
+            FW.product.fields.item.removeClass('d-none');
+
+            this.set("detailForm.data", event.data );
+            this.set("detailForm.title", "Modifica account < " + event.data.email + " >"  );
+            this.set("detailForm.action", "update" );
+
+            return false;
+		},
+
+        setRole: function( event ) {
+
+            console.log("event", event.currentTarget);
+
+            var value = $(event.currentTarget).val();
+
+            console.log("event:value", value);
+
+            if (value == 'ADM') {
+                $('#list-role-admin').show()
+                $('#list-role-commercial').hide();
+            }
+            
+            if (value == 'COM') {
+                $('#list-role-admin').hide()
+                $('#list-role-commercial').show();
+            }
+
+            /*
+            this.set("detailForm.data", event.data );
+            this.set("detailForm.title", "Modifica account < " + event.data.email + " >"  );
+            this.set("detailForm.action", "update" );
+            */
+
+            return false;
+		},
+
+        new: function( event ) {
+
+            FW.product.fields.item.removeClass('d-none');
+
+            var data = { role: { id: 'ADM' }, status: { id: 'ACT' } };
+
+            this.set("detailForm.data", data );
+            this.set("detailForm.title", "Carica account" );
+            this.set("detailForm.action", "create" );
+
+            return false;
+		},
+
+
+		print: function( item ) {
+
+            window.open('/manager/account/print', '_blank');
+
+            return false;
+		},
+
+
+	});    
+
+	pub.init = function() {
+
+        console.log("account:detail:init");
+
+		kendo.bind( AP.product.fields.rootDetail, viewModel )
         
 	}	
 

@@ -6,7 +6,7 @@
     "name": "Commerciale",
   }, {
     "id": "GRP",
-    "name": "GRafico"
+    "name": "Grafico"
   }, 
   
 ]

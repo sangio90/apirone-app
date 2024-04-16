@@ -51,16 +51,16 @@ component{
 		).to('ProductController.new').end();		
 
 		get(
+			"/products/:productId/components"
+		).to('ProductController.components').end();
+
+		get(
 			"/products/:productId"
 		).to('ProductController.edit').end();
 
 		post(
-			"/products/save"
+			"/products"
 		).to('ProductController.save').end();
-		
-		get(
-			"/products/:productId/variants"
-		).to('ProductController.listVariants').end();
 		
 		get(
 			"/products/:productId/images"

@@ -24,32 +24,11 @@
 
                     <div class="row">
                         <div class="col-sm-6">
-                            
-                            <div class="row pb-3">
-                                <label class="col-sm-3 control-label text-sm-end pt-2">
-                                    Cerca 
-                                </label>
-
+                            <div class="row">
                                 <div class="col-sm-9">
                                     <input class="form-control">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <label class="col-sm-3 control-label text-sm-end pt-2">
-                                    Tipo rapporto 
-                                </label>
-
-                                <div class="col-sm-9">
-                                    <select class="form-control">
-                                        <option value="P">Partner</option>
-                                        <option value="C">Cliente</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="offset-sm-3 pt-2">
+                                </div>                                
+                                <div class="col-sm-3">
                                     <a type="button" href="/manager/company/new" class="mb-1 mt-1 me-1 btn btn-primary">Cerca &raquo;</a>
                                 </div>
                             </div>
@@ -63,26 +42,42 @@
             <section class="card mt-1">
                 <section class="card-body">
 
+                    <div class="row">
+                        <div class="mb-3 d-flex justify-content-end col-12">
+                            <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:deleteAll">
+                                <i class="fas fa-remove"></i> Cancella selezionati
+                            </button>
+                            <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:print">
+                                <i class="fas fa-print"></i> Stampa
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:saveAll">
+                                <i class="fas fa-save"></i> Salva tutto
+                            </button>
+                        </div>
+                    </div>
+
                     <table class="table table-responsive-md table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>Codice</th>
+                                <th>ID</th>
                                 <th>Prodotto</th>
-                                <th>Azienda</th>
-                                <th>Prezzo</th>
                                 <th>Status</th>
                                 <th>Creato il</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <cfloop array="#prc.list.getData()#" item="item">
+                            <cfloop array="#prc.list#" item="item">
                                 <tr>
-                                    <td>#item.getCode()#</td>
-                                    <td><a href="/manager/products/#item.getId()#">#item.getName()#</a></td>
-                                    <!--- <td>#item.getCompany().getName()#</td> --->
-                                    <td>#item.getPrice()#</td>
-                                    <td>#item.getStatus().getName()#</td>
-                                    <td>#item.getCreatedAt()#</td>
+                                    <td>#item.id#</td>
+                                    <td><a href="/manager/products/#item.id#">#item.name#</a></td>
+                                    <td>#item.status#</td>
+                                    <td>#item.createdAt#</td>
+                                    <td><a href="/manager/products/#item.id#">Dettagli</a></td>
+                                    <td><a href="/manager/products/#item.id#/components">Componenti</a></td>
+                                    <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value="" /></td>
                                 </tr>
                             </cfloop>
                         </tbody>
