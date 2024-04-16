@@ -84,7 +84,39 @@
             },
         { file: "/modules/assets/template-admin/css/skins/default.css" },
         { file: "/modules/assets/template-admin/vendor/morris/morris.css" },
-        { file: "/modules/assets/template-admin/css/custom.css" }
+        { file: "/modules/assets/template-admin/css/custom.css" },
+
+        { 
+            file: "/modules/assets/kendoui/styles/kendo.common.min.css",
+            replacements:[
+                {
+                    find   : "fonts/glyphs/WebComponentsIcons.ttf",
+                    replace: "/modules/assets/kendoui/styles/fonts/glyphs/WebComponentsIcons.ttf"
+                },
+            ]
+        },
+        { 
+            file: "/modules/assets/kendoui/styles/kendo.default-ocean-blue.min.css",
+            replacements:[
+                {
+                    find   : "Default/loading-image.gif",
+                    replace: "/modules/assets/kendoui/styles/Default/loading-image.gif"
+                }
+            ]
+        },
+        { 
+            file: "/modules/assets/kendoui/styles/kendo.default.mobile.min.css",
+            replacements:[
+                {
+                    find   : "images/kendoui.woff",
+                    replace: "/modules/assets/kendoui/styles/images/kendoui.woff"
+                },
+                {
+                    find   : "images/kendoui.ttf",
+                    replace: "/modules/assets/kendoui/styles/images/kendoui.ttf"
+                }
+            ]
+        },        
     ]
 
 }

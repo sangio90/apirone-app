@@ -119,23 +119,6 @@ component{
 		
 				
 		/*
-			account
-		*/
-		get( "/my/wallet" )
-			.to('CurrentUserController.wallet').end();
-
-		get( "/my/profile" )
-			.to('CurrentUserController.profile').end();
-
-
-		get( "/account/print" )
-        	.toHandler( "AccountController.print" );
-
-		get( "/account" )
-			.to('AccountController.list').end();
-
-
-		/*
 			cart
 		*/
 		get( "/cart/:id/delete" )
@@ -199,6 +182,24 @@ component{
 
 		get( "/accounts" )
         	.toHandler( "AccountController.list" );
+
+		get( "/accounts/print" )
+        	.toHandler( "AccountController.print" );
+
+
+		/*
+			role
+		*/
+		get( "/roles/:id" )
+        	.toHandler( "RoleController.get" );
+
+		get( "/roles" )
+        	.toHandler( "RoleController.list" );
+
+		get( "/roles/print" )
+        	.toHandler( "AccountController.print" );
+
+
 
 		/*
 		route( "/accounts/:id?" )

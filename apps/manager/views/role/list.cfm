@@ -17,8 +17,6 @@
                     </div>
                 </div>
 
-                #renderView("account/form-detail")#
-
                 <section class="card">
                     
                     <div class="card-body">

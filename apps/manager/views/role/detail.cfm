@@ -1,6 +1,7 @@
-﻿<div class="row d-none" id="account-item">
+﻿<cfoutput>
+<div class="row" id="role-item">
     <div class="col-12">
-        <form id="account-detail-form">
+        <form id="role-detail-form">
             <section class="card card-featured card-featured-primary mb-4">
 
                 <header class="card-header">
@@ -8,38 +9,39 @@
                 </header>
                 
                 <div class="card-actions">
-                    <a href="##" class="card-action card-action-dismiss" data-dismiss="account-item"></a>
-                </div>                                
+                    <a href="##" class="card-action card-action-dismiss" data-dismiss="role-item"></a>
+                </div>
+
                 <div class="card-body">
                     <div class="row pb-3">
 
                         <div class="col-lg-12">
-                            <div class="form-group pb-3">
-                                <label class="col-form-label">Email</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-at"></i>
-                                    </span>
-                                    <input class="form-control" name="email" id="email"
-                                        data-bind="value: detailForm.data.email"
-                                    >
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group pb-3">
+                                        <label class="col-form-label" for="role-desc">Nome</label>
+                                        <input class="form-control" name="email" id="email" data-bind="value: detailForm.data.name">
+                                    </div>
                                 </div>
-                                <div id="email-error"></div>
                             </div>
+
                         </div>
 
                         <div class="col-lg-12">
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-12">
                                     <div class="form-group pb-3">
-                                        <label class="col-form-label" for="account-desc">Ruolo</label>
-                                        <select type="text" class="form-control" name="role"
-                                            data-bind="value: detailForm.data.role.id, source: roles"
-                                            data-value-field="id"
-                                            data-text-field="name"
-                                        >
-                                        </select>
+
+                                        <cfloop array="#prc.perms#" item="item">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" value="#item.id#" <cfif ArrayContains(item.roles, "COM")>checked</cfif>  > #item.name#
+                                                </label>
+                                            </div>
+                                        </cfloop>
+
                                     </div>
+
                                 </div>
                                 <div class="col-6">
                                     <div class="form-group pb-3">
@@ -74,7 +76,8 @@
 
                             </div>
 
-                        </div>                        
+                        </div>
+
                     </div>
                 </div>
                 <footer class="card-footer text-end">
@@ -87,3 +90,5 @@
         </form>
     </div>
 </div>  
+
+</cfoutput>

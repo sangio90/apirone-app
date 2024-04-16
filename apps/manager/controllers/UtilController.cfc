@@ -10,7 +10,7 @@
     
     function live( event, rc, prc ){
 
-        event.setView("util/ping").noLayout()
+        event.setView("util/live").noLayout()
 
     }
     

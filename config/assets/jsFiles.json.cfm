@@ -42,5 +42,9 @@
         { file: "/assets/main/js/vendor/jquery-validate/jquery.validate.js" },
         { file: "/assets/main/js/vendor/jquery-validate/additional-methods.js" },
 
+        { file: "/modules/assets/kendoui/js/kendo.all.min.js" },
+        { file: "/modules/assets/kendoui/js/messages/kendo.messages.it-IT.min.js" },
+        { file: "/modules/assets/kendoui/js/cultures/kendo.culture.it-IT.min.js" },
+
     ]
 }
