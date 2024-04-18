@@ -41,10 +41,11 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.title="";
         prc.edit=true;
 
-        prc.units = DESerializeJSON( FileRead( '/config/data/fake/units.json.cfm' ) );
+        prc.units      = DESerializeJSON( FileRead( '/config/data/fake/units.json.cfm' ) );
         prc.statusList = DESerializeJSON( FileRead( '/config/data/fake/status.json.cfm' ) );
         prc.priceLists = DESerializeJSON( FileRead( '/config/data/fake/pricelists.json.cfm' ) );
         prc.components = DESerializeJSON( FileRead( '/config/data/fake/components.json.cfm' ) );
+        prc.products   = DESerializeJSON( FileRead( '/config/data/fake/products.json.cfm' ) );
 
         prc.jsScripts.add( 'app-product-comp' );
 

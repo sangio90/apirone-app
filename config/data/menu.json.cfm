@@ -11,9 +11,15 @@
         roles: "ADM"
     },
     {
-        href: "/manager/plates",
+        href: "/manager/places",
         icon: "far fa-building",
         title: "Placche",
+        roles: "ADM"
+    },
+    {
+        href: "/manager/fruits",
+        icon: "fas fa-user",
+        title: "Frutti",
         roles: "ADM"
     },
     {

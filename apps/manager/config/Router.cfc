@@ -11,8 +11,9 @@ component{
 			return "v. #settings('app.version')# Ok!";
 		} );
 
-		get( "/live" )
-        	.toHandler( "UtilController.live" );
+		route( "/live", function( event, rc, prc ) {
+			return "Live #now()#";
+		} );
 
     	get( "/dashboard" )
         	.to( "MainController.dashboard" ).end();
@@ -23,32 +24,21 @@ component{
 
 
 		/*
-			companies
+			plates
 		*/
+		get(
+			"/plates/:id"
+		).to('PlaceController.edit').end();
 
 		get(
-			"/companies/new"
-		).to('CompanyController.new').end();
+			"/plates"
+		).to('PlaceController.list').end();		
 
-		get(
-			"/companies/:companyId"
-		).to('CompanyController.edit').end();		
-		
-		post(
-			"/companies/save"
-		).to('CompanyController.save').end();
-		
-		get(
-			"/companies"
-		).to('CompanyController.list').end();
-		
+
 
 		/*
 			products
 		*/
-		get(
-			"/products/new"
-		).to('ProductController.new').end();		
 
 		get(
 			"/products/:productId/components"
@@ -63,91 +53,9 @@ component{
 		).to('ProductController.save').end();
 		
 		get(
-			"/products/:productId/images"
-		).to('ProductController.listImages').end();
-		
-		get(
 			"/products"
-		).to('ProductController.list').end();		
+		).to("ProductController.list").end();		
 
-
-		/*
-			cards
-		*/
-		get(
-			"/card/generate"
-		).to('CardController.generate').end();
-
-		post(
-			"/cards/generate-do"
-		).to('CardController.generateAll').end();
-
-		get(
-			"/cards/slots/:id/print"
-		).to('CardController.printCardsBySlot').end();
-
-		get(
-			"/cards/slots"
-		).to('CardController.listSlots').end();
-
-		get(
-			"/cards"
-		).to('CardController.list').end();		
-
-		/*
-			documents
-		*/
-		get(
-			"/documents/:id"
-		).to('DocumentController.get').end();
-
-		get(
-			"/documents"
-		).to('DocumentController.list').end();
-
-
-		/*
-			sales
-		*/
-		get(
-			"/sales/print"
-		).to('SaleController.print').end();
-
-		get(
-			"/sales"
-		).to('SaleController.list').end();
-		
-				
-		/*
-			cart
-		*/
-		get( "/cart/:id/delete" )
-			.to('CartController.deleteProduct').end();
-
-		post( "/cart/add" )
-			.to('CartController.addProduct').end();
-
-		post( "/cart/save" )
-			.to('CartController.save').end();
-
-		get( "/cart/empty" )
-			.to('CartController.empty').end();
-
-		get( "/cart/complete" )
-			.to('CartController.complete').end();
-
-		get( "/cart" )
-			.to('CartController.get').end();
-
-
-		/*
-			catalogue
-		*/
-		get( "/catalogue/products/:id" )
-			.to('CatalogueController.product').end();		
-
-		get( "/catalogue/complete" )
-			.to('CatalogueController.complete').end();		
 
 		/*
 			auth // login
@@ -186,6 +94,15 @@ component{
 		get( "/accounts/print" )
         	.toHandler( "AccountController.print" );
 
+		/*
+			fruit
+		*/
+		get( "/fruits/:id" )
+        	.toHandler( "FruitController.get" );
+
+		get( "/fruits" )
+        	.toHandler( "FruitController.list" );
+
 
 		/*
 			role
@@ -199,19 +116,6 @@ component{
 		get( "/roles/print" )
         	.toHandler( "AccountController.print" );
 
-
-
-		/*
-		route( "/accounts/:id?" )
-			.withAction( {
-				GET : "get",
-				POST : "save",
-				PUT : "update",
-				DELETE : "remove"
-			} )
-			.toHandler( "AccountController" );
-		*/
-		
 
 		/*
 			lookup

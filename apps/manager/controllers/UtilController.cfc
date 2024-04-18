@@ -8,10 +8,4 @@
 
     }
     
-    function live( event, rc, prc ){
-
-        event.setView("util/live").noLayout()
-
-    }
-    
 }

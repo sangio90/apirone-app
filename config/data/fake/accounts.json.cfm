@@ -1,70 +1,57 @@
-﻿[{
-    "id": 1,
-    "name": "Crea prodotto",
-  }, {
-    "id": 2,
-    "name": "Crea placca",
-  }, {
-    "id": 3,
-    "name": "Crea account",
-  }, {
-    "id": 4,
-    "name": "Modifica proprio account",
-  }, {
-    "id": 5,
-    "name": "Modifica prezzi",
-  }, {
-    "id": 6,
-    "name": "Carica preventivo",
-  }, {
-    "id": 6,
-    "name": "Carica preventivo",
-  }, {
+﻿[ {
     "id": 8,
     "name": "Frankie",
     "surname": "Olenin",
     "email": "folenin7@yale.edu",
+    "phone": "+39290681847",
     "role": "Estimator"
   }, {
     "id": 9,
     "name": "Donni",
     "surname": "Gell",
     "email": "dgell8@cbc.ca",
+    "phone": "+39290681855",
     "role": "Commercial"
   }, {
     "id": 10,
     "name": "Bathsheba",
     "surname": "Eusden",
     "email": "beusden9@mac.com",
+    "phone": "+39290681877",
     "role": "Construction Worker"
   }, {
     "id": 11,
     "name": "Pamela",
     "surname": "Reveland",
     "email": "prevelanda@tamu.edu",
+    "phone": "+39290681500",
     "role": "Engineer"
   }, {
     "id": 12,
     "name": "Jarred",
     "surname": "Buick",
     "email": "jbuickb@typepad.com",
+    "phone": "+3989651500",
     "role": "Estimator"
   }, {
     "id": 13,
     "name": "Regine",
     "surname": "Borton",
     "email": "rbortonc@mozilla.org",
+    "phone": "+398965458",
     "role": "Estimator"
   }, {
     "id": 14,
     "name": "Sher",
     "surname": "Wenzel",
     "email": "swenzeld@imageshack.us",
+    "phone": "+398965420",
     "role": "Construction Foreman"
   }, {
     "id": 15,
     "name": "Natale",
     "surname": "Deevey",
     "email": "ndeeveye@si.edu",
+    "phone": "+398965433",
     "role": "Architect"
   }]

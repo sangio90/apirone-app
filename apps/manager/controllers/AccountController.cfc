@@ -4,9 +4,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var user = arguments.event.getValue( "User" );
 
-        prc.title = "Lista dei ruoli";
+        prc.title = "Lista degli account";
 
-        prc.list = DESerializeJSON( FileRead( '/config/data/fake/roles.json.cfm' ) );
+        prc.list = DESerializeJSON( FileRead( '/config/data/fake/accounts.json.cfm' ) );
 
         prc.jsScripts.add( 'app-account' );
 
@@ -18,9 +18,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var user = arguments.event.getValue( "User" );
 
-        prc.title = "Ruolo";
+        prc.title = "Account";
 
-        prc.jsScripts.add( 'app-role' );
+        prc.jsScripts.add( 'app-account' );
 
         prc.perms = DESerializeJSON( FileRead( '/config/data/fake/perms.json.cfm' ) );
 

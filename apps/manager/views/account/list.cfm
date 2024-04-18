@@ -42,15 +42,21 @@
                                 <thead>
                                     <tr>
                                         <th width="5%">ID</th>
-                                        <th width="85%">Descrizione</th>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Role</th>
                                         <th width="3%"><input type="checkbox" name="select-all" class="select-all checkbox-style-1 p-relative top-2" value="" /></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <cfloop array="#prc.list#" item="item">
                                         <tr>
-                                            <td><a href="/manager/roles/#item.id#">#item.id#</td>
-                                            <td><a href="/manager/roles/#item.id#"><strong>#item.name#</strong></a></td>
+                                            <td><a href="/manager/accounts/#item.id#">#item.id#</td>
+                                            <td><a href="/manager/accounts/#item.id#"><strong>#item.name# #item.surname#</strong></a></td>
+                                            <td>#item.email#</td>
+                                            <td>#item.phone#</td>
+                                            <td nowrap>#item.role#</td>
                                             <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value="" /></td>
                                         </tr>
                                     </cfloop>

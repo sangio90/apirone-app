@@ -18,7 +18,8 @@
                         
                         <div class="card-body">
 
-                            <a href="javascript:addComponents()">+ Aggiungi componente</a> | <a href="javascript:addComponents()">+ Aggiungi prodotto</a>
+                            <a href="javascript:addProducts()">+ Aggiungi prodotto</a> | 
+                            <a href="javascript:addComponents()">+ Aggiungi componente</a>
                             <br>
                             <br>
 
@@ -29,7 +30,7 @@
                                         <b>#item.name#</b>
                                         <br>
                                         <cfloop array="#item.values#" item="value">
-                                            #value.name# <a href="javascript:addComponents()">+ Aggiungi componente</a> | <a href="javascript:addComponents()">+ Aggiungi prodotto</a><br>
+                                            #value.name# <a href="javascript:addProducts()">+ Aggiungi prodotto</a> | <a href="javascript:addComponents()">+ Aggiungi componente</a><br>
                                         </cfloop>
 
                                     </div>
@@ -70,9 +71,9 @@
                         
                         <div class="col-6">
 
-                            <select class="form-control" size=15>
-                                <cfloop array="#prc.components#" item="item">
-                                    <option>#item.name#</option>
+                            <select class="form-control" size=15 onclick="getCompValues(this.value)">
+                                <cfloop array="#prc.components#" item="item" >
+                                    <option value="#item.id#">#item.name#</option>
                                 </cfloop>
                             </select>
 
@@ -81,7 +82,7 @@
 
                         <div class="col-6">
 
-                            <select class="form-control" size=15 multiple>
+                            <select class="form-control" size=15 multiple id="list-values">
                                 <cfloop array="#prc.components[1].values#" item="item">
                                     <option>#item.name#</option>
                                 </cfloop>
@@ -100,6 +101,41 @@
             </div>
         </div>
     </div>
+
+    <div class="modal hide fade" tabindex="-1" id="list-products-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Lista dei prodotti</h3>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        
+                        <div class="col-12">
+
+                            <select class="form-control" size=15>
+                                <cfloop array="#prc.products#" item="item">
+                                    <option>#item.name#</option>
+                                </cfloop>
+                            </select>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Salva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var components = #SerializeJSON( prc.components )#;
+    </script>
 
 
 </cfoutput>
