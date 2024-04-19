@@ -29,7 +29,7 @@ component{
 			missingTemplateHandler   : "",
 			// Extension Points
 			applicationHelper        : "",
-			viewsHelper              : "/apps/public/helpers/viewHelpers.cfm",
+			viewsHelper              : "/apps/manager/helpers/viewHelpers.cfm",
 			//modulesExternalLocation  : [],
 			modulesExternalLocation  : [ "/apps" ],
 			viewsExternalLocation    : "",
@@ -38,9 +38,9 @@ component{
 			requestContextDecorator  : "",
 			controllerDecorator      : "",
 			// Error/Exception Handling
-			invalidHTTPMethodHandler : "public:UtilController.invalidMethod",
-			//exceptionHandler         : "public:MainController.error",
-			invalidEventHandler      : "public:UtilController.notFound",
+			invalidHTTPMethodHandler : "manager:UtilController.invalidMethod",
+			//exceptionHandler         : "manager:MainController.error",
+			invalidEventHandler      : "manager:UtilController.notFound",
 			customErrorTemplate      : "/coldbox/system/exceptions/BugReport.cfm",
 			// Application Aspects
 			handlerCaching           : false,

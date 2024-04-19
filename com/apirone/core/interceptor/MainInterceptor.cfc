@@ -8,7 +8,7 @@ component extends="coldbox.system.Interceptor"{
 
         }
 
-        var module = prc.currentRoutedModule;
+        var module = "prc.currentRoutedModule";
 	    
         var model = server[ "wireBox-apirone" ];
 
