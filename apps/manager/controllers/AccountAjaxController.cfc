@@ -5,12 +5,12 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
         var dm = arguments.event.getValue( "DataMapper" );
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         
         param name="url['sort[0][field]']" default="name";
         param name="url['sort[0][dir]']" default="asc";
         
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         var field = url['sort[0][field]'] == 'name' ? 'email' : '';
         var sort = url['sort[0][dir]'];
@@ -42,7 +42,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var obj = getAccessManager()
                 .exec( 
-                    arguments.event.getValue( "User" ), 
+                    prc.user, 
                     "Account.get", 
                     [ rc.id ]
                 );
@@ -56,7 +56,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function saveAll( event, rc, prc ){
         
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var result = super.getResult();
         var ids = [];
 
@@ -88,7 +88,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         param name="selected" default="";
         
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var result = super.getResult();
         var ids = [];
 
@@ -115,7 +115,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function save( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var result = super.getResult();
 
         var raw    = GetHTTPRequestData().content;

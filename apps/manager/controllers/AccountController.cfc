@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.title = "Lista degli account";
 
@@ -16,7 +16,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function get( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.title = "Account";
 
@@ -30,7 +30,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function print( event, rc, prc ) {
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         var result = getAccessManager()
                 .exec( 

@@ -23,6 +23,12 @@
         roles: "ADM"
     },
     {
+        href: "/manager/quotations",
+        icon: "fas fa-comment-dollar",
+        title: "Preventivi",
+        roles: "ADM"
+    },
+    {
         href: "#",
         icon: "far fa-user",
         title: "Utenze",

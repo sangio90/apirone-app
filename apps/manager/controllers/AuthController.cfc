@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function login( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         //prc.config = getConfiguration().get();
         rc.email = StructKeyExists( cookie, "email" ) ? cookie.email : '';
@@ -13,7 +13,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function pincode( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         event.setView( "main/pincode" ).setLayout( "login" );
 
@@ -21,7 +21,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function recover( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         event.setView( "main/recover" ).setLayout( "login" );
 
@@ -29,7 +29,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function checkPincode( event, rc, prc ) {
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         location("/manager/dashboard", false );
 
@@ -37,7 +37,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function checkRecover( event, rc, prc ) {
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         location("/manager/login/recover/check", false );
 
@@ -45,7 +45,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function checkLogin( event, rc, prc ) {
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         var access = getAccessManager()
             .exec( user, "auth.login", { "email" = rc.email , "pwd" = rc.pwd } );

@@ -5,7 +5,7 @@
 <cfoutput>
 
 <!doctype html>
-<html  class="fixed sidebar-left-collapsed sidebar-left-with-menu no-overflowscrolling" data-dev="#rc.isDev#">
+<html  class="fixed sidebar-left-collapsed sidebar-left-with-menu no-overflowscrolling" data-dev="#prc.isDev#">
 <head>
 
     <title><cfif Len( prc.title )>#prc.title# - </cfif> Apir</title>
@@ -55,13 +55,13 @@
                 <div id="userbox" class="userbox">
                     <a href="##" data-bs-toggle="dropdown">
                         <figure class="profile-picture">
-                            <img src="/modules/assets/template-admin/img/!logged-user.jpg" alt="#event.getValue('user').getName()#" class="rounded-circle" 
+                            <img src="/modules/assets/template-admin/img/!logged-user.jpg" alt="#prc.user.getName()#" class="rounded-circle" 
                                 data-lock-picture="/assets/template/img/!logged-user.jpg"
                             >
                         </figure>
-                        <div class="profile-info" data-lock-name="John Doe" data-lock-email="#event.getValue('user').getName()#">
-                            <span class="name">#event.getValue('user').getName()#</span>
-                            <!--- <span class="role">#event.getValue('user').getAccount().getRole().getName()#</span> --->
+                        <div class="profile-info" data-lock-name="John Doe" data-lock-email="#prc.user.getName()#">
+                            <span class="name">#prc.user.getName()#</span>
+                            <!--- <span class="role">#prc.user.getAccount().getRole().getName()#</span> --->
                         </div>
 
                         <i class="fa custom-caret"></i>

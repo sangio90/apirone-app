@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var service = super.service("Card");
 
         prc.companies = super.service("Company").search();
@@ -15,7 +15,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function listSlots( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var service = super.service("Card");
 
         prc.companies = super.service("Company").search();
@@ -30,7 +30,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function printCardsBySlot( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var service = super.service("Card");
 
         prc.companies = super.service("Company").search();
@@ -54,7 +54,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function generateAll( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var cardSvc = super.service("Card");
 
         var card    = super.bean("Card");

@@ -8,6 +8,8 @@ component extends="coldbox.system.Interceptor"{
 
         }
 
+        //TODO: add here canAccess() from Wineshipping
+
         var module = "prc.currentRoutedModule";
 	    
         var model = server[ "wireBox-apirone" ];
@@ -69,16 +71,22 @@ component extends="coldbox.system.Interceptor"{
 
         //TODO: set all  private value
 
-        arguments.event.setValue( "user", session.user );
-        arguments.event.setValue( "isDev", ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
+        prc.user = session.user;
+        prc.isDev = ( ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
+        prc.i18n = model.getInstance("i18nService");
+        prc.config = config;
+        prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20240530;
+
+        //arguments.event.setValue( "user", session.user );
+        //arguments.event.setValue( "isDev", ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
         
-        arguments.event.setValue( "i18n",  model.getInstance("i18nService") );
+        //arguments.event.setValue( "i18n",  model.getInstance("i18nService") );
         //arguments.event.setValue( "dataMapper",  model.getInstance("DataMapper") );
 
-        arguments.event.setPrivateValue( "config",  config );
+        //arguments.event.setPrivateValue( "config",  config );
         //arguments.event.setValue( "configInLine",  { "variantTypeDefault": config.get('variantTypeDefault') } );
 
-        arguments.event.setPrivateValue( "staticVersion",  rc.isDev ? RandRange(1000, 9999) : 20240409 );
+        //arguments.event.setPrivateValue( "staticVersion",  prc.isDev ? RandRange(1000, 9999) : 20240409 );
 
         prc.jsScripts = [];
         

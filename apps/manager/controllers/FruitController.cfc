@@ -2,7 +2,7 @@
 
     function list( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.title = "Lista dei frutti";
 
@@ -16,7 +16,7 @@
     
     function get( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.title = "Frutto";
 

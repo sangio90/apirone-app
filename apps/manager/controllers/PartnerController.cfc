@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.list = DESerializeJSON( FileRead( '/config/data/fake-partners.json' ) );
 
@@ -12,7 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function new( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         event.setView('partner/detail');
 
@@ -22,7 +22,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var service = super.service("Partner");
         var bean = super.bean("Partner");
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         bean.name()
 

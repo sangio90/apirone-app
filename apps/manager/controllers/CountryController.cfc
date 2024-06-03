@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         // geo
         prc.countries = getAccessManager().exec( user, "geo.listCountries" ).getData();

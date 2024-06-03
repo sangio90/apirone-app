@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var service = super.service("Company");
 
         prc.title = "Aziende";
@@ -17,7 +17,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function new( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.title = "Nuova azienda";
 
@@ -27,7 +27,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function edit( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
         var service = super.service("Company");
         var categorySvc = super.service("ProductCategory");
 
@@ -42,7 +42,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function save( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         var company  = super.bean("Company");
         var type     = super.bean("CompanyType");

@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function wallet( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         rc.list = DESerializeJSON( FileRead( '/config/data/fake-wallet.json' ) );
 
@@ -14,7 +14,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function profile( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         rc.list = DESerializeJSON( FileRead( '/config/data/fake-wallet.json' ) );
 

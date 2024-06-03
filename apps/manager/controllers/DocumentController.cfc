@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.title = "Ordini";
 
@@ -14,7 +14,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function get( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
 
         prc.detail = super.service("Document").get( rc.id );

@@ -94,6 +94,7 @@ component{
 		get( "/accounts/print" )
         	.toHandler( "AccountController.print" );
 
+	
 		/*
 			fruit
 		*/
@@ -102,6 +103,20 @@ component{
 
 		get( "/fruits" )
         	.toHandler( "FruitController.list" );
+
+
+		/*
+			quotations
+		*/
+		get( "/quotations/:id" )
+        	.toHandler( "QuotationController.get" );
+
+		get( "/quotations" )
+        	.toHandler( "QuotationController.list" );
+
+		get( "/quotation" )
+        	.toHandler( "QuotationController.new" );
+
 
 
 		/*

@@ -48,3 +48,11 @@ label.error {
 h2 {
 	color: #0088cc
 }
+
+.box-search {
+    background-image: url(/assets/main/img/bg-box-search.png);
+    background-repeat: no-repeat;
+    background-position: top 10px center;
+	background-color: #eeeeee;
+	border: 1px solid #CCCCCC;
+}

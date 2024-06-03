@@ -8,7 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
         //TODO: ad params
         var args = {};
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.title = "Catalogo";
         
@@ -25,7 +25,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         param name="rc.id" default="__";
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.product = super.service('Product').get( rc.id );
 
@@ -38,7 +38,7 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function complete( event, rc, prc ){
 
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         //rc.products = DESerializeJSON( FileRead( '/config/data/fake-cart.json' ) );
 

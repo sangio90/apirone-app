@@ -3,7 +3,7 @@ component extends="com.apirone.core.controller.AbsController" {
     function datajs( event, rc, prc ){
 
         var result = {};
-        var user = arguments.event.getValue( "User" );
+        var user = prc.user;
 
         prc.structData = {
             "shipmentTypes" = getAccessManager().exec( user, "lookup.list", [ 'shipmentType' ] ),
