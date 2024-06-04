@@ -28,11 +28,11 @@ component{
 		*/
 		get(
 			"/plates/:id"
-		).to('PlaceController.edit').end();
+		).to('PlateController.edit').end();
 
 		get(
 			"/plates"
-		).to('PlaceController.list').end();		
+		).to('PlateController.list').end();		
 
 
 
@@ -108,6 +108,10 @@ component{
 		/*
 			quotations
 		*/
+
+		get( "/quotations/00001/items" )
+        	.toHandler( "QuotationController.items" );
+
 		get( "/quotations/:id" )
         	.toHandler( "QuotationController.get" );
 

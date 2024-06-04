@@ -11,7 +11,7 @@
         roles: "ADM"
     },
     {
-        href: "/manager/places",
+        href: "/manager/plates",
         icon: "far fa-building",
         title: "Placche",
         roles: "ADM"

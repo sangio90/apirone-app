@@ -80,7 +80,7 @@
                                 <i class="fas fa-print"></i> Stampa
                             </button>
                             <button type="button" class="btn btn-primary btn-sm" data-bind="click:saveAll">
-                                <i class="fas fa-save"></i> Salva tutto
+                                <i class="far fa-object-ungroup"></i> Unisci preventivi
                             </button>
                         </div>
                     </div>

@@ -58,4 +58,10 @@
         <map from="name" to="name" type="cf:String"  />
     </mapper>
 
+    <mapper id="VatCode" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.VatCode">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="name" to="name" type="cf:String"  />
+        <map from="value" to="value" type="cf:Numeric"  />
+    </mapper>
+
 </mappers>

@@ -56,3 +56,80 @@ h2 {
 	background-color: #eeeeee;
 	border: 1px solid #CCCCCC;
 }
+
+/*
+	sidebar and topbar
+*/
+
+.sidebar-left {
+	background: #4482E8 !important;
+}
+
+
+html.no-overflowscrolling .sidebar-left .nano {
+	background: #4482E8 !important;
+}
+
+@media only screen and (min-width: 768px) {
+	html.sidebar-left-collapsed .sidebar-left .nano {
+		background: #4482E8 !important;
+		box-shadow: -5px 0 0 #2771e8 inset;
+	}
+}
+
+ul.nav-main li a {
+	color: White !important;
+}
+
+html.no-overflowscrolling .nano > .nano-pane > .nano-slider {
+	background: #4482E8 !important;
+}
+
+.page-header {
+	background: #2771e8 !important;
+}
+
+.sidebar-left .sidebar-header .sidebar-title {
+	background: #2771e8 !important;
+}
+
+.sidebar-left .sidebar-header .sidebar-toggle {
+	background: #2771e8 !important;
+}
+
+ul.nav-main > li > a:hover, ul.nav-main > li > a:focus {
+	background-color: #2771e8;
+}
+
+.sidebar-left .sidebar-header .sidebar-toggle i {
+	color: white;
+}
+
+.page-header .breadcrumbs a, .page-header .breadcrumbs span {
+	color: white;
+}
+
+/*
+	// sidebar and topbar
+*/
+
+
+.form-group + .form-group  {
+	border: 0 !important;
+}
+
+.quotation-zone {
+	padding: 10px;
+}
+
+.quotation-plate {
+	border-radius: 10px;
+	background-color: #E2EBFB;
+	padding: 10px;
+}
+
+.quotation-plate-inner {
+	border-radius: 10px;
+	background-color: #E2EBFB;
+	margin: 10px;
+}

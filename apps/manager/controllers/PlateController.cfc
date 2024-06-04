@@ -6,12 +6,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.title = "Placche";
 
-        prc.list = DESerializeJSON( FileRead( '/config/data/fake/places.json.cfm' ) );
+        prc.list = DESerializeJSON( FileRead( '/config/data/fake/plates.json.cfm' ) );
         prc.statusList = DESerializeJSON( FileRead( '/config/data/fake/status.json.cfm' ) );
 
-        prc.jsScripts.add( 'app-place' );
+        prc.jsScripts.add( 'app-plate' );
 
-        event.setView('place/list');
+        event.setView('plate/list');
 
     }
     
@@ -26,9 +26,9 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.units = DESerializeJSON( FileRead( '/config/data/fake/units.json.cfm' ) );
         prc.statusList = DESerializeJSON( FileRead( '/config/data/fake/status.json.cfm' ) );
 
-        prc.jsScripts.add( 'app-place' );
+        prc.jsScripts.add( 'app-plate' );
 
-        event.setView('place/detail');
+        event.setView('plate/detail');
 
     }
     

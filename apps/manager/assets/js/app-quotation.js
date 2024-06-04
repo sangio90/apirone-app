@@ -256,3 +256,14 @@ AP.quotation.detail = function() {
     return pub;
 
 }();
+
+
+addZone = function() {
+    $('#add-zona-modal').modal('show');
+    return false;
+}
+
+addPlate = function() {
+    $('#add-plate-modal').modal('show');
+    return false;
+}

@@ -12,9 +12,9 @@ component extends="wirebox.system.ioc.config.Binder" {
             }
         };
 
-        /*=========
+        /*
             services
-        =========*/
+        */
 
         map("AbsService").to( "com.apirone.core.model.service.AbsService" )
             .asSingleton()
@@ -27,6 +27,11 @@ component extends="wirebox.system.ioc.config.Binder" {
             .asSingleton()
             .property( name = "dao", ref = "ProductCategoryDAO" )
             .property( name = "StatusService", ref = "StatusService" )
+            .parent("AbsService");
+
+        map('VatCodeService').to( "com.apirone.core.model.service.VatCodeService" )
+            .asSingleton()
+            .property( name = "dao", ref = "VatCodeDAO" )
             .parent("AbsService");
 
         map('i18nService').to( "com.apirone.core.model.service.i18nService" )
@@ -94,11 +99,6 @@ component extends="wirebox.system.ioc.config.Binder" {
             .asSingleton()
             .parent("AbsService");
 
-        map('WalletService').to( "com.apirone.core.model.service.WalletService" )
-            .asSingleton()
-            .property( name = "CardService", ref = "CardService" )
-            .parent("AbsService");
-
         map('VariantTypeService').to( "com.apirone.core.model.service.VariantTypeService" )
             .asSingleton()
             .property( name = "dao", ref = "VariantTypeDAO" )
@@ -118,13 +118,6 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "PriceDAO" )
             .parent("AbsService");
             
-        map('CardService').to( "com.apirone.core.model.service.CardService" )
-            .asSingleton()
-            .property( name = "dao", ref = "CardDAO" )
-            .property( name = "StatusService", ref = "StatusService" )
-            .property( name = "CompanyService", ref = "CompanyService" )
-            .parent("AbsService");
-
         map('CompanyTypeService').to( "com.apirone.core.model.service.CompanyTypeService" )
             .asSingleton()
             .property( name = "dao", ref = "CompanyTypeDAO" )
@@ -170,14 +163,17 @@ component extends="wirebox.system.ioc.config.Binder" {
             .parent("AbsService");
             
         
-            /*=========
+        /*
             dao
-        =========*/
+        */
 
         map("AbsDAO").to( "com.apirone.core.model.dao.AbsDAO" )
             .asSingleton();
          
         map("PriceDAO").to( "com.apirone.core.model.dao.PriceDAO" )
+            .asSingleton();
+
+        map("VatCodeDAO").to( "com.apirone.core.model.dao.VatCodeDAO" )
             .asSingleton();
 
         map("DocumentItemDAO").to( "com.apirone.core.model.dao.DocumentItemDAO" )
@@ -220,9 +216,6 @@ component extends="wirebox.system.ioc.config.Binder" {
         map("VariantTypeDAO").to( "com.apirone.core.model.dao.VariantTypeDAO" )
             .asSingleton();
                    
-        map("CardDAO").to( "com.apirone.core.model.dao.CardDAO" )
-            .asSingleton();
-
         map("AccountDAO").to( "com.apirone.core.model.dao.AccountDAO" )
             .asSingleton();
              
