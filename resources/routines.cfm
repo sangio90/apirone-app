@@ -1,4 +1,4 @@
-﻿<cfset wirebox = server['wireBox-Apir']>
+﻿<cfset wirebox = server['wireBox-apirone']>
 <cfset cm = wirebox.getInstance( "CacheManager" )>
 
 <cfoutput>

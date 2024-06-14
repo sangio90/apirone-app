@@ -23,32 +23,33 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "Logger", ref = "Logger" )
             .property( name = "Factory", ref = "Factory" );
         
-        map('ProductCategoryService').to( "com.apirone.core.model.service.ProductCategoryService" )
+        map("ProductCategoryService").to( "com.apirone.core.model.service.ProductCategoryService" )
             .asSingleton()
             .property( name = "dao", ref = "ProductCategoryDAO" )
             .property( name = "StatusService", ref = "StatusService" )
             .parent("AbsService");
 
-        map('VatCodeService').to( "com.apirone.core.model.service.VatCodeService" )
+        map("VatCodeService").to( "com.apirone.core.model.service.VatCodeService" )
             .asSingleton()
             .property( name = "dao", ref = "VatCodeDAO" )
             .parent("AbsService");
 
-        map('i18nService').to( "com.apirone.core.model.service.i18nService" )
+        map("i18nService").to( "com.apirone.core.model.service.i18nService" )
             .asSingleton()
             .parent("AbsService");
 
-        map('ProductService').to( "com.apirone.core.model.service.ProductService" )
+        map("ProductService").to( "com.apirone.core.model.service.ProductService" )
             .asSingleton()
             .property( name = "dao", ref = "ProductDAO" )
             .property( name = "StatusService", ref = "StatusService" )
             .property( name = "VariantTypeService", ref = "VariantTypeService" )
             .property( name = "ProductVariantService", ref = "ProductVariantService" )
             .property( name = "ProductCategoryService", ref = "ProductCategoryService" )
+            .property( name = "ProductTypeService", ref = "ProductTypeService" )
             .property( name = "CompanyService", ref = "CompanyService" )
             .parent("AbsService");
 
-        map('ProductVariantService').to( "com.apirone.core.model.service.ProductVariantService" )
+        map("ProductVariantService").to( "com.apirone.core.model.service.ProductVariantService" )
             .asSingleton()
             .property( name = "dao", ref = "ProductVariantDAO" )
             .property( name = "FileService", ref = "FileService" )
@@ -56,7 +57,7 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "StatusService", ref = "StatusService" )
             .parent("AbsService");
     
-        map('DocumentService').to( "com.apirone.core.model.service.DocumentService" )
+        map("DocumentService").to( "com.apirone.core.model.service.DocumentService" )
             .asSingleton()
             .property( name = "dao", ref = "DocumentDAO" )
             .property( name = "LookupService", ref = "LookupService" )
@@ -65,7 +66,7 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "EmployeeService", ref = "EmployeeService" )
             .parent("AbsService");
     
-        map('DocumentItemService').to( "com.apirone.core.model.service.DocumentItemService" )
+        map("DocumentItemService").to( "com.apirone.core.model.service.DocumentItemService" )
             .asSingleton()
             .property( name = "dao", ref = "DocumentItemDAO" )
             .property( name = "LookupService", ref = "LookupService" )
@@ -74,19 +75,19 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "productService", ref = "productService" )
             .parent("AbsService");
     
-        map('AccountService').to( "com.apirone.core.model.service.AccountService" )
+        map("AccountService").to( "com.apirone.core.model.service.AccountService" )
             .asSingleton()
             .property( name = "dao", ref = "AccountDAO" )
             .property( name = "statusService", ref = "StatusService" )
             .property( name = "lookupService", ref = "LookupService" )
             .parent("AbsService");
 
-        map('APIService').to( "com.apirone.core.model.service.APIService" )
+        map("APIService").to( "com.apirone.core.model.service.APIService" )
             .asSingleton()
             .property( name = "AccountService", ref = "AccountService" )
             .parent("AbsService");
 
-        map('EmployeeService').to( "com.apirone.core.model.service.EmployeeService" )
+        map("EmployeeService").to( "com.apirone.core.model.service.EmployeeService" )
             .asSingleton()
             .property( name = "dao", ref = "EmployeeDAO" )
             .property( name = "StatusService", ref = "StatusService" )
@@ -95,16 +96,16 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "LocationService", ref = "LocationService" )
             .parent("AbsService");
 
-        map('LookupService').to( "com.apirone.core.model.service.LookupService" )
+        map("LookupService").to( "com.apirone.core.model.service.LookupService" )
             .asSingleton()
             .parent("AbsService");
 
-        map('VariantTypeService').to( "com.apirone.core.model.service.VariantTypeService" )
+        map("VariantTypeService").to( "com.apirone.core.model.service.VariantTypeService" )
             .asSingleton()
             .property( name = "dao", ref = "VariantTypeDAO" )
             .parent("AbsService");
 
-        map('CompanyService').to( "com.apirone.core.model.service.CompanyService" )
+        map("CompanyService").to( "com.apirone.core.model.service.CompanyService" )
             .asSingleton()
             .property( name = "dao", ref = "CompanyDAO" )
             .property( name = "StatusService", ref = "StatusService" )
@@ -113,17 +114,17 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "LocationService", ref = "LocationService" )
             .parent("AbsService");
                         
-        map('PriceService').to( "com.apirone.core.model.service.PriceService" )
+        map("PriceService").to( "com.apirone.core.model.service.PriceService" )
             .asSingleton()
             .property( name = "dao", ref = "PriceDAO" )
             .parent("AbsService");
             
-        map('CompanyTypeService').to( "com.apirone.core.model.service.CompanyTypeService" )
+        map("CompanyTypeService").to( "com.apirone.core.model.service.CompanyTypeService" )
             .asSingleton()
             .property( name = "dao", ref = "CompanyTypeDAO" )
             .parent("AbsService");
 
-        map('GeoService').to( "com.apirone.core.model.service.GeoService" )
+        map("GeoService").to( "com.apirone.core.model.service.GeoService" )
             .asSingleton()
             .property( name = "cityDao", ref = "CityDAO" )
             .property( name = "countyDao", ref = "CountyDAO" )
@@ -131,35 +132,40 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "countryDao", ref = "CountryDAO" )
             .parent("AbsService");
            
-        map('AuthService').to( "com.apirone.core.model.service.AuthService" )
+        map("AuthService").to( "com.apirone.core.model.service.AuthService" )
             .asSingleton()
             .property( name = "AccountService", ref = "AccountService" )
             .parent("AbsService");
 
-        map('LocationService').to( "com.apirone.core.model.service.LocationService" )
+        map("LocationService").to( "com.apirone.core.model.service.LocationService" )
             .asSingleton()
             .property( name = "dao", ref = "LocationDAO")
             .property( name = "GeoService", ref = "GeoService" )
             .parent("AbsService");
     
-        map('FileService').to( "com.apirone.core.model.service.FileService" )
+        map("FileService").to( "com.apirone.core.model.service.FileService" )
             .asSingleton()
             .property( name = "dao", ref = "FileDAO" )
             .property( name = "MediaService", ref = "MediaService" )
             .parent("AbsService");
                     
-        map('MediaService').to( "com.apirone.core.model.service.MediaService" )
+        map("MediaService").to( "com.apirone.core.model.service.MediaService" )
             .asSingleton()
             .parent("AbsService");
 
-        map('AccountService').to( "com.apirone.core.model.service.AccountService" )
+        map("AccountService").to( "com.apirone.core.model.service.AccountService" )
             .asSingleton()
             .property( name = "AccountDAO", ref = "AccountDAO" )
             .parent("AbsService");
             
-        map('StatusService').to( "com.apirone.core.model.service.StatusService" )
+        map("StatusService").to( "com.apirone.core.model.service.StatusService" )
             .asSingleton()
             .property( name = "dao", ref = "StatusDAO" )
+            .parent("AbsService");
+            
+        map("ProductTypeService").to( "com.apirone.core.model.service.ProductTypeService" )
+            .asSingleton()
+            .property( name = "dao", ref = "ProductTypeDAO" )
             .parent("AbsService");
             
         
@@ -171,6 +177,9 @@ component extends="wirebox.system.ioc.config.Binder" {
             .asSingleton();
          
         map("PriceDAO").to( "com.apirone.core.model.dao.PriceDAO" )
+            .asSingleton();
+
+        map("ProductTypeDAO").to( "com.apirone.core.model.dao.ProductTypeDAO" )
             .asSingleton();
 
         map("VatCodeDAO").to( "com.apirone.core.model.dao.VatCodeDAO" )

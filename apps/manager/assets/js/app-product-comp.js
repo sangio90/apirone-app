@@ -1,27 +1,21 @@
-AP.role = AP.role || {};
+AP.component = AP.component || {};
 
-AP.role.fields = {
-    rootList: $('#role-list-root'),
-    rootDetail: $('#role-detail-form')
+AP.component.fields = {
+    rootDetail: $('#product-component-root'),
 }
 
 $(document).ready(function(){
 
-	if ( AP.role.fields.rootList.length ) {
+	if ( AP.component.fields.rootDetail.length ) {
 
 		//AP.role.list.init();
-
-	}
-
-	if ( AP.role.fields.rootDetail.length ) {
-
-	    AP.role.detail.init();
 
 	}
 
 })
 
 
+/*
 var addComponents = function() {
 
     $('#list-compoments-modal').modal('show');
@@ -33,27 +27,46 @@ var addProducts = function() {
     $('#list-products-modal').modal('show');
 
 }
+	*/
 
-var getCompValues = function( compId ) {
+AP.component = function() {
+
+	var pub = {}
 
 
-	console.log("getCompValues:id", compId)
+	var viewModel = kendo.observable({
 
-	var select = $('#list-values');
-	select.find('option').remove();
+		components: undefined,
 
-	for ( comp of components ) {
+        listCompotents: function( event ) {
 
-		if ( comp.id == compId ) {
+			$('#list-compoments-modal').modal('show');
 
-			for ( var value of comp.values ) {
+			FW.utils.ajax( {
+				method: "POST",
+				url: "/manager/ajax/option/remove-all",
+				data: selected.serialize(),
+				callback: {
+					done: function() {
+						FW.widget.notify( "success", "Dati cancellati con successo" );
+						dataSources.items.read();
+					}
+				}
+			} )
 
-				select.append('<option value="foo">' + value.name + '</option>')
+            return false;
+		},
 
-			}
+	});   	
 
-		}
+	pub.init = function() {
 
-	}
+		console.log("comp:init")
 
-}
+		kendo.bind( AP.component.fields.rootDetail, viewModel )
+
+	}	
+
+	return pub;
+
+}();

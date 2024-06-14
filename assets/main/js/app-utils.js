@@ -1,6 +1,6 @@
-ZB.utils = ZB.utils || {};
+AP.utils = AP.utils || {};
 
-ZB.utils.getText = function( key, values ) {
+AP.utils.getText = function( key, values ) {
 
 	var text = ZB.data.texts[ key ];
 
@@ -13,7 +13,7 @@ ZB.utils.getText = function( key, values ) {
 };
 
 
-ZB.utils.ajax = function( setup ) {
+AP.utils.ajax = function( setup ) {
 
 	var defaults = {
 		url: '',
@@ -23,7 +23,7 @@ ZB.utils.ajax = function( setup ) {
 			done: undefined,
 			always: undefined,
 			fail: function( xhr ) {
-				ZB.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
+				AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
 			}
 		}
 	};

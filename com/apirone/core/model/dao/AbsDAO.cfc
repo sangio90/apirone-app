@@ -1,5 +1,7 @@
 <cfcomponent>
 
+	<cfset variables.companyId = "azapi">
+
 	<cffunction name="getField" output="No" returntype="Struct">
         
 		<cfargument name="type" required="Yes" type="String">

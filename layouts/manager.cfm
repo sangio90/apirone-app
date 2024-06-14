@@ -40,7 +40,7 @@
         <header class="header">
             <div class="logo-container">
                 <a href="/manager" class="logo">
-                    <img src="/assets/main/img/logo-horizontal.png" width="50%" height="50%" alt="Apir" />
+                    <img src="/assets/main/img/logo.png" width="50%" height="50%" alt="Apir" />
                 </a>
 
                 <div class="d-md-none toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html" data-fire-event="sidebar-left-opened">
@@ -104,7 +104,7 @@
                 <div class="nano">
                     <div class="nano-content" style="right: -17px;">
 
-                            #renderView('util/menu')#
+                            #view('util/menu')#
 
                             <hr class="separator" />
 
@@ -155,6 +155,7 @@
 
         <script src="/assets/#prc.staticVersion#/manager/js/app.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/ondomready.js"></script>
+        <script src="/assets/#prc.staticVersion#/manager/js/app-util.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-widget.js"></script>
 
         <cfloop array="#prc.jsScripts#" index="script">

@@ -52,6 +52,7 @@
         prc.zones = DESerializeJSON( FileRead( '/config/data/fake/zones.json.cfm' ) );
         prc.plates = DESerializeJSON( FileRead( '/config/data/fake/plates.json.cfm' ) );
 
+
         prc.jsScripts.add( "app-quotation" );
 
         event.setView( "quotation/items" );

@@ -2,13 +2,21 @@
     SELECT
         *
     FROM
+    azapi_codtip
+</cfquery>
+<cfdump var="#q#">
+
+<cfquery name="q" datasource="verticale">
+    SELECT
+        *
+    FROM
         anasta
 </cfquery>
 <cfdump var="#q#">
 
 <cfquery name="k" datasource="verticale">
-    SELECT
-        ARCODART, ARSEMLAV, ARTIPMAT, destip
+    SELECT TOP 5
+        *
     FROM
         azapi_artico a 
             LEFT JOIN azapi_codtip t 
@@ -84,5 +92,14 @@
         *
     FROM
         azapi_colori
+</cfquery>
+<cfdump var="#j#">
+
+<cfquery name="j" datasource="verticale">
+    SELECT
+        *
+    FROM
+        azapi_codvar
+    WHERE varcod = 'LEV-AVIO'
 </cfquery>
 <cfdump var="#j#">

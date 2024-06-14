@@ -1,7 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="product-detail">
-
+    <div id="product-component-root">
 
         <div class="row mb-3">
             <div class="col-lg-8">
@@ -19,10 +18,9 @@
                         <div class="card-body">
 
                             <a href="javascript:addProducts()">+ Aggiungi prodotto</a> | 
-                            <a href="javascript:addComponents()">+ Aggiungi componente</a>
+                            <a href="javascript:addComponents()">+ Aggiungi materia prima</a>
                             <br>
                             <br>
-
                             
                             <cfloop array="#prc.components#" item="item">
                                 <div class="form-group row pb-3 ">

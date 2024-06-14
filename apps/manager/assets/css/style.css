@@ -133,3 +133,57 @@ ul.nav-main > li > a:hover, ul.nav-main > li > a:focus {
 	background-color: #E2EBFB;
 	margin: 10px;
 }
+
+.page-header {
+	border-left: 1px solid #4482E8 !important;
+}
+
+.page-header h2 {
+	border: 0 !important;
+}
+
+.nav-link, .nav-link:after {
+	color: White !important;
+}
+
+.nav-link:hover {
+	color: #E3C000 !important;
+}
+
+/*
+ul.nav-main li .nav-children {
+	background-color: #4482E8 !important;
+}
+*/
+
+ul.nav-main li .nav-children li a:hover, ul.nav-main li .nav-children li a:focus {
+	background: #2771e8 !important;
+}
+
+.nav-main li .nav-children {
+	background: #2771e8 !important;
+}
+
+ul.nav-main > li.nav-expanded > a  {
+	background: #2771e8 !important;
+}
+
+
+/*
+	bootstrap custom color
+*/
+
+.btn-primary {
+	background-color: #2771e8 !important;
+	color: White !important;
+}
+
+h2, a {
+	color: #2771e8 !important
+}
+
+input[type="checkbox"] {
+	background-color: #2771e8 !important;
+	color: White !important;
+
+}

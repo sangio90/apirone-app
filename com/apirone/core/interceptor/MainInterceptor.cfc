@@ -94,46 +94,6 @@ component extends="coldbox.system.Interceptor"{
 
     function postEvent( event, data, buffer, rc, prc ){
 
-        //if ( prc.keyExists("currentRouteName") ) {
-
-            if ( prc.currentRouteName.listContains( "/ajax/" ) ) {
-
-                /*
-                    here [ event.noExecution() ] not works
-                    https://community.ortussolutions.com/t/trouble-with-noexecution-and-pdf/9288
-                */
-    
-                var path = "com.apirone.core.model.bean.AjaxResult";
-    
-                var bean = new "#path#"();
-    
-                var result = event.getValue("result");
-    
-                if ( IsInstanceOf( result, path ) ) {
-                    
-                    event.renderData( data=result, contentType="text/json", type="json" )
-                        .noExecution();
-                
-                } else {
-    
-                    if ( !IsSimpleValue( result ) ) {
-    
-                        event.renderData( data=result, contentType="text/json", type="json" )
-                            .noExecution();
-                    
-                    } else {
-    
-                        event.renderData( data=result, contentType="text/json", type="json" )
-                            .noExecution();
-    
-                    }
-    
-                }
-    
-            }            
-
-        //}
-
     }
 
 }

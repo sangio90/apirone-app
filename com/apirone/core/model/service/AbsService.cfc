@@ -88,5 +88,27 @@
 
         return LCase( fields[ arguments.field ] );
     }
+
+    public Query function trimDBFields( required Query records ) {
+
+        var columns = records.columnList();
+
+        var index = 1;
+        
+        for( var record in records ) {
+            
+            for ( var column in columns ) {
+
+                records.setCell( column_name="#column#", value="#trim(record[ column ])#", row_number=index );
+
+            }
+
+            index++;
+            
+        }
+
+
+        return records;
+    }
     
 }

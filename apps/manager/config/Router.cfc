@@ -40,6 +40,14 @@ component{
 			products
 		*/
 
+		route( "/ajax/products" )
+			.withAction( {
+				GET : "list",
+				POST : "create",
+				PUT : "modify"
+			} )
+			.toHandler( "ProductAjaxController" );
+
 		get(
 			"/products/:productId/components"
 		).to('ProductController.components').end();

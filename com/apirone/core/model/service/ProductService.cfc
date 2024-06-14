@@ -3,9 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.ProductDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="ProductVariantService" type="com.apirone.core.model.service.ProductVariantService";
+	property name="ProductTypeService" type="com.apirone.core.model.service.ProductTypeService";
 	property name="variantTypeService" type="com.apirone.core.model.service.VariantTypeService";
-	property name="companyService" type="com.apirone.core.model.service.CompanyService";
-	property name="productCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
 
     public com.apirone.core.model.bean.Product function get(
     		required String productId
@@ -35,8 +34,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String excludeId =  ""
 	){
 	
-		var products = search( code = arguments.code )
-							.getData();
+		var products = search( code = arguments.code ).getData();
 
 		return !isNull( products[1] ) AND products[1].getId() NEQ arguments.excludeId 
 
@@ -54,7 +52,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {
-			rows.add( get( productId = record.product_id ) );
+			rows.add( get( productId = record.arcodart ) );
 		});
 
 	    result.setData( rows );
@@ -64,25 +62,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         return result;
 
     }
-
-	public Void function addCategories( 
-		required com.apirone.core.model.bean.Product product
-	) {
-
-		if ( isNull( arguments.product.getCategories() ) ) {
-			return 
-		}
-
-		arguments.product
-			.getCategories()
-			.each(function(category) {
-					addCategory(
-						productCategoryId = category.getId(),
-						productId = product.getId()
-					)
-				});
-
-	}
 
 	public Void function addVariants(
 		required com.apirone.core.model.bean.Product product
@@ -125,62 +104,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public String function create(
-            required com.apirone.core.model.bean.Product product
-		){	
-			
-		transaction {
-
-			var id =  getDao().insert( 
-				product = arguments.product
-			);
-
-			arguments.product.setId( id );
-
-			addVariants( arguments.product );
-			addCategories( arguments.product );	
-
-			return id.toString();
-
-		}
-
-	}
-
-	public String function update(
-		required com.apirone.core.model.bean.Product product
-	){		
-
-		transaction {
-
-			var prevProduct = get( arguments.product.getId() );
-
-			if ( !isNull( prevProduct.getCategories() ) ) {
-
-				prevProduct.getCategories()
-					.each(function(category) {
-						removeCategory(
-							productCategoryId = category.getId(),
-							productId = product.getId()
-						)
-					});
-
-			}
-		
-			var id = getDao().update( 
-				product = arguments.product
-			);
-
-			addCategories( arguments.product );	
-			addVariants( arguments.product );
-
-			getCacheManager()
-				.remove( getCachekey( id ) );
-
-			return id.toString();
-		}
-
-	}
-
 	public String function addCategory(
             required String productId,
 			required String productCategoryId
@@ -192,30 +115,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					);
 	}
 
-	public Boolean function removeCategory(
-		required String productId,
-		required String productCategoryId
-	){	
 
-		return getDao()
-			.removeCategory(
-				argumentCollection = arguments
-			);
-
-	}
-
-	public Boolean function delete(
-			required String productId
-		){
-	
-		var result = getDao().delete( arguments.productId );
-        getCacheManager().remove( getCachekey( arguments.productId ) );
-
-		return result;
-
-	}
-
-	
     /*
     	private method
 	*/
@@ -228,17 +128,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if( record.recordCount ) { 
 
+			var record = trimDBFields( record );
+
             var product = super.bean( "Product" );
 
-            product.setId( record.product_id.toString() );
-            product.setCode( record.code );
-			product.setName( record.product );
-			product.setDescription( record.description );
+            product.setId( record.arcodart );
+			product.setName( record.ardesart );
+			product.setType( getProductTypeService().get( record.artipmat )  );
+			
+			
+			/*
 			product.setExpirationAt( record.expiration_at );
 			product.setPrice( record.price );
-			product.setCreatedAt( record.created_at );
 
-			product.setVariantType( getVariantTypeService().get( record.variant_type_id ));
+			product.setVariantType( getVariantTypeService().get( record.variant_type_id ) );
             product.setStatus( getStatusService().get( record.status_id ) );
             product.setCompany( getCompanyService().get( record.company_id ) );
 
@@ -248,11 +151,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					.getData()
 			);
 
-			product.setCategories( 
-				getProductCategoryService()
-					.list( productId = record.product_id.toString() )
-					.getData()
-			);
+			*/
 
             return product;
 
