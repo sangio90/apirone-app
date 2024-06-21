@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="/assets/#prc.staticVersion#/manager/css/style.css">
 
     <script>
+        //TODO: use AP.config (for current page) and AP.globalConfig
         var AP = {};
         AP.config = #SerializeJSON( prc.config )#;
         AP.message = #SerializeJSON(flash.get("message", {}))#;

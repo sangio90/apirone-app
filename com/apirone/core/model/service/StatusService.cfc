@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.StatusDAO";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
+	//property name="statusService" type="com.apirone.core.model.service.StatusService";
 
     public com.apirone.core.model.bean.Status function get(
     		required String statusId
@@ -27,11 +27,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-    public com.apirone.core.model.bean.Result function list(
+    public com.apirone.core.model.bean.Status[] function list(
 			required String entityId
     	){
 
-	    var rows = [];
+		/*
     	var result = super.getResult();
 
     	var records = getDao().find( argumentCollection=arguments );
@@ -43,8 +43,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    result.setData( rows );
 	    result.setCount( Val( records.recordcount ) );
 	    result.setTotal( Val( records.total ) );
+		*/
 
-        return result;
+	    var rows = [];
+
+		var records = getDao().find( argumentCollection=arguments );
+
+		records.each( function( record ) {
+			rows.add( get( record.status_id ) );
+		});
+
+        return rows;
 
     }	
 

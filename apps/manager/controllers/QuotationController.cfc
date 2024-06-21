@@ -21,9 +21,12 @@
         prc.title = "Nuovo preventivo";
 
         prc.vatCodeList = super.service("VatCode").list();
-        prc.jsScripts.add( "app-quotation" );
-
+        prc.statusList = super.service("Status").list( "QUOTATION" );
+        
+        prc.destinations = DESerializeJSON( FileRead( '/config/data/fake/destinations.json.cfm' ) );
         prc.config["customers"] = DESerializeJSON( FileRead( '/config/data/fake/customers.json.cfm' ) );
+
+        prc.jsScripts.add( "app-quotation" );
 
         event.setView( "quotation/detail" );
 

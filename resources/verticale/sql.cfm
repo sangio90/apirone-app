@@ -1,4 +1,27 @@
-﻿<cfquery name="q" datasource="verticale">
+﻿<cfquery name="k" datasource="verticale">
+    SELECT
+        CLCODICE, CLDESCRI
+    FROM
+    azapi_colori
+</cfquery>
+<cfdump var="#k#">
+
+
+<cfquery name="k" datasource="verticale">
+    SELECT
+        ARCODART, ardesart
+    FROM
+        azapi_artico a 
+            LEFT JOIN azapi_codtip t 
+                ON a.artipmat = t.codtip
+    where arsemlav='A'
+</cfquery>
+<cfdump var="#k#">
+
+
+<cfabort>
+
+<cfquery name="q" datasource="verticale">
     SELECT
         *
     FROM
@@ -14,16 +37,6 @@
 </cfquery>
 <cfdump var="#q#">
 
-<cfquery name="k" datasource="verticale">
-    SELECT TOP 5
-        *
-    FROM
-        azapi_artico a 
-            LEFT JOIN azapi_codtip t 
-                ON a.artipmat = t.codtip
-    where arsemlav='A'
-</cfquery>
-<cfdump var="#k#">
 
 <cfquery name="j" datasource="verticale">
     SELECT

@@ -15,7 +15,6 @@ $(document).ready(function(){
 })
 
 
-/*
 var addComponents = function() {
 
     $('#list-compoments-modal').modal('show');
@@ -27,7 +26,20 @@ var addProducts = function() {
     $('#list-products-modal').modal('show');
 
 }
-	*/
+
+var showColors = function() {
+
+	$('.general-variant').hide();
+    $('#table-variant-colors').show();
+
+}
+
+var showVariants = function() {
+
+	$('.general-variant').hide();
+    $('#table-variant-variants').show();
+
+}
 
 AP.component = function() {
 

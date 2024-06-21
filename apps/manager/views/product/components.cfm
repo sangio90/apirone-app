@@ -58,7 +58,7 @@
     </div>
 
     <div class="modal hide fade" tabindex="-1" id="list-compoments-modal">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title">Lista delle materie prime</h3>
@@ -67,25 +67,100 @@
 
                     <div class="row">
                         
-                        <div class="col-6">
+                        <div class="col-7">
 
-                            <select class="form-control" size=15 onclick="getCompValues(this.value)">
-                                <cfloop array="#prc.components#" item="item" >
-                                    <option value="#item.id#">#item.name#</option>
-                                </cfloop>
-                            </select>
+
+                            <table class="table table-striped mb-0" id="datatable-ecommerce-list">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">ID</th>
+                                        <th>Nome</th>
+                                        <th width="3%">
+                                            <input type="checkbox" name="select-all" class="select-all checkbox-style-1 p-relative top-2" value="" />
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <cfloop array="#prc.rawMaterials#" item="item">
+                                        <tr>
+                                            <td>#item.id#</td>
+                                            <td>#item.name#</td>
+                                            <td width="150" nowrap>
+                                                - <a class="underline">Aggiungi &raquo;</a><br>
+                                                - <a class="underline" onclick="showVariants()">Varianti &raquo;</a><br>
+                                                - <a class="underline" onclick="showColors()">Colori &raquo;</a><br>
+                                            </td>
+                                        </tr>
+                                    </cfloop>
+                                </tbody>
+                            
+                            </table>
 
 
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-5">
 
-                            <select class="form-control" size=15 multiple id="list-values">
-                                <cfloop array="#prc.components[1].values#" item="item">
-                                    <option>#item.name#</option>
-                                </cfloop>
-                            </select>
+                            <div id="table-variant-colors" style="display: none;" class="general-variant">
 
+                                <h3>Colori</h3>
+
+                                <table class="table table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th width="5%">ID</th>
+                                            <th>Nome</th>
+                                            <th width="3%">
+                                                <input type="checkbox" name="select-all" class="select-all checkbox-style-1 p-relative top-2" value="" />
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <cfloop array="#prc.variants#" item="item">
+                                            <tr>
+                                                <td>#item.id#</td>
+                                                <td>#item.name#</td>
+                                                <td width="150" nowrap>
+                                                    <input type="checkbox" name="select-all" class="select-all checkbox-style-1 p-relative top-2" value="" />
+                                                </td>
+                                            </tr>
+                                        </cfloop>
+                                    </tbody>
+                                
+                                </table>
+
+                            </div>
+
+                            <div id="table-variant-variants" style="display: none;" class="general-variant">
+
+                                <h3>Varianti</h3>
+
+                                <table class="table table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th width="5%">ID</th>
+                                            <th>Nome</th>
+                                            <th width="3%">
+                                                <input type="checkbox" name="select-all" class="select-all checkbox-style-1 p-relative top-2" value="" />
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <cfloop array="#prc.colors#" item="item">
+                                            <tr>
+                                                <td>#item.id#</td>
+                                                <td>#item.name#</td>
+                                                <td width="150" nowrap>
+                                                    <input type="checkbox" name="select-all" class="select-all checkbox-style-1 p-relative top-2" value="" />
+                                                </td>
+                                            </tr>
+                                        </cfloop>
+                                    </tbody>
+                                
+                                </table>
+
+                            </div>
+                        
                         </div>
                     
                     </div>

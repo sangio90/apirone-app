@@ -22,9 +22,9 @@
                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                     <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="##nav-general" type="button" role="tab">Dati generali</button>
                                     <button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button>
+                                    <button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Fatturazione</button>
                                     <button class="nav-link" id="nav-print-tab" data-bs-toggle="tab" data-bs-target="##nav-print" type="button" role="tab">Stampa</button>
                                     <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button>
-                                    <button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Fatturazione</button>
                                     <button class="nav-link" id="nav-shipment-tab" data-bs-toggle="tab" data-bs-target="##nav-shipment" type="button" role="tab">Spedizione</button>
                                     <button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatario</button>
                                 </div>
@@ -39,7 +39,10 @@
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Nome preventivo <span class="required">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="quotation" class="form-control" id="quotation-name">
+                                            <input type="text" name="quotation" class="form-control" id="quotation-name"
+                                                data-rule-required="true"
+                                                data-msg-required="Preventivo richiesto"
+                                            >
                                         </div>
                                     </div>
 
@@ -71,14 +74,13 @@
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Stato</label>
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Stato <span class="required">*</span></label>
                                         <div class="col-sm-9">
                                             <select name="statusId" class="form-control">
                                                 <option value="">-- selezionare</option>
-                                                <option value="ACP">Italiano</option>
-                                                <option value="CRE">Inglese</option>
-                                                <option value="REF">Francese</option>
-                                                <option value="REF">Tedesco</option>
+                                                <cfloop array="#prc.statusList#" item="item">
+                                                    <option value="#item.getId()#">#item.getName()#</option>
+                                                </cfloop>
                                             </select>
                                         </div>
                                     </div>
@@ -196,21 +198,7 @@
                                     </div>
 
                                 </div>
-                
-                                <!---
-                                    print
-                                --->
-                                <div class="tab-pane fade" id="nav-print" role="tabpanel">
-                                    <p>print</p>
-                                </div>
-                            
-                                <!---
-                                    cost / discount
-                                --->
-                                <div class="tab-pane fade" id="nav-discount" role="tabpanel">
-                                    <p>price / discount</p>
-                                </div>
-                            
+
                                 <!---
                                     billing
                                 --->
@@ -277,7 +265,9 @@
                                         <div class="col-sm-9">
                                             <select name="statusId" class="form-control">
                                                 <option value="">-- selezionare</option>
-                                                <option value="REF">22%</option>
+                                                <cfloop array="#prc.statusList#" item="item">
+                                                    <option value="#item.getId()#">#item.getName()#</option>
+                                                </cfloop>
                                             </select>
                                         </div>
                                     </div>
@@ -301,13 +291,50 @@
                                         </div>
                                     </div>                                    
 
+                                </div>                                
+                
+                                <!---
+                                    print
+                                --->
+                                <div class="tab-pane fade" id="nav-print" role="tabpanel">
+                                    <p>print</p>
                                 </div>
-
+                            
+                                <!---
+                                    cost / discount
+                                --->
+                                <div class="tab-pane fade" id="nav-discount" role="tabpanel">
+                                    <p>price / discount</p>
+                                </div>
+                            
                                 <!---
                                     shipment
                                 --->
                                 <div class="tab-pane fade" id="nav-shipment" role="tabpanel">
 
+
+                                    <cfloop array="#prc.destinations#" item="item">
+
+                                        <div class="row" style="padding-bottom: 20px; margin-top: 20px; border-bottom: 1px solid ##EAEAEA">
+                                            
+                                            <label class="col-sm-3 control-label text-sm-end pt-2">
+                                                <input name="destionation" type="radio">
+                                            </label>
+                                            <div class="col-sm-9">
+                                                #item.name#<br>
+                                                #item.address#<br>
+                                                #item.zip# <b>#item.city#</b> (#item.state#)<br>
+                                                #item.country#<br>
+                                            </div>
+                                        
+                                        </div>
+                                        
+                                    </cfloop>
+
+                                </div>
+
+
+                                    <!-----------
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
                                         <div class="col-sm-9">
@@ -370,10 +397,8 @@
                                             <button class="btn btn-primary">Successivo &raquo;</button>
 
                                         </div>
-                                    </div>                                    
-
-                                </div>
-
+                                    </div>
+                                    ----->
 
 
                                 <!---
