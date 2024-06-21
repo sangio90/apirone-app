@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="quotation-detail">
+    <div id="quotation-detail-root">
 
 
         <div class="row mb-3">
@@ -37,14 +37,14 @@
                                 <div class="tab-pane fade show active" id="nav-general" role="tabpanel">
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome preventivo <span class="required">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="quotation" class="form-control" id="quotation-name">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Lingua</label>
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Lingua <span class="required">*</span></label>
                                         <div class="col-sm-9">
                                             <select name="statusId" class="form-control">
                                                 <option value="">-- selezionare</option>
@@ -57,16 +57,16 @@
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Data documento</label>
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Data documento <span class="required">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="date" name="str" class="form-control">
+                                            <input type="text" name="str" class="form-control" value="#DateFormat( now(), 'dd/mm/yyyy' )#">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Data validità</label>
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Data validità <span class="required">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="date" name="str" class="form-control">
+                                            <input type="text" name="str" class="form-control" value="#DateFormat( DateAdd( 'm', 1, now() ), 'dd/mm/yyyy' )#">
                                         </div>
                                     </div>
 
@@ -83,17 +83,21 @@
                                         </div>
                                     </div>
 
+                                    <!---
+                                        TODO: opportunity or lead required
+                                    --->
+
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome opportunità</label>
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome opportunità <span class="required">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="opportunity" class="form-control">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome lead</label>
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome lead <span class="required">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="lead" class="form-control">
                                         </div>
                                     </div>
 
@@ -104,7 +108,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row mb-2">
+                                    <div class="form-group row mb-2 mt-2">
                                         <div class="col-sm-9 offset-sm-3 float-end">
                                            <button class="btn btn-primary">Successivo &raquo;</button>
                                         </div>
@@ -119,17 +123,21 @@
                                 <div class="tab-pane fade" id="nav-fiscal" role="tabpanel">
                                     
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Ragione sociale</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="company" class="form-control" id="company-name">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Listino</label>
                                         <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
+                                            <select name="priceListId" class="form-control">
                                                 <option value="">-- selezionare</option>
+                                                <option value="A">Listino A</option>
+                                                <option value="B">Listino B</option>
+                                                <option value="C">Listino C</option>
+                                                <option value="D">Listino D</option>
                                             </select>
                                         </div>
                                     </div>
@@ -137,8 +145,13 @@
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Pagamento</label>
                                         <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
+                                            <select name="paymentMethodId" class="form-control">
                                                 <option value="">-- selezionare</option>
+                                                <option value="A">Pagamento A</option>
+                                                <option value="B">Pagamento B</option>
+                                                <option value="C">Pagamento C</option>
+                                                <option value="D">Pagamento D</option>
+
                                             </select>
                                         </div>
                                     </div>
@@ -153,7 +166,7 @@
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Aliquota IVA</label>
                                         <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
+                                            <select name="vatCodeId" class="form-control">
                                                 <option value="">-- selezionare</option>
                                                 <cfloop array="#prc.vatCodeList#" item="item">
                                                     <option value="#item.getId()#">#item.getName()# (#item.getValue()#%)</option>
@@ -165,9 +178,10 @@
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Valuta</label>
                                         <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
+                                            <select name="currencyId" class="form-control">
                                                 <option value="">-- selezionare</option>
-                                                <option value="REF">22%</option>
+                                                <option value="EUR">Euro</option>
+                                                <option value="USD">Dollari</option>
                                             </select>
                                         </div>
                                     </div>

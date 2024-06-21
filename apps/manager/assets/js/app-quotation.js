@@ -1,21 +1,23 @@
 AP.quotation = AP.quotation || {};
 
 AP.quotation.fields = {
-    rootList: $('#account-list-root'),
-    rootDetail: $('#account-detail-form')
+    rootList: $('#quotation-list-root'),
+    rootDetail: $('#quotation-detail-root')
 }
 
 $(document).ready(function(){
 
-	if ( AP.account.fields.rootList.length ) {
+	if ( AP.quotation.fields.rootList.length ) {
 
-		//AP.account.list.init();
+		//AP.quotation.list.init();
 
 	}
 
-	if ( AP.account.fields.rootDetail.length ) {
+	if ( AP.quotation.fields.rootDetail.length ) {
 
-	    AP.account.detail.init();
+        //console.log("qui");
+
+	    AP.quotation.detail.init();
 
 	}
 
@@ -189,52 +191,6 @@ AP.quotation.detail = function() {
             action: 'update'
         },
 
-        edit: function( event ) {
-            
-            FW.account.fields.item.removeClass('d-none');
-
-            this.set("detailForm.data", event.data );
-            this.set("detailForm.title", "Modifica account < " + event.data.email + " >"  );
-            this.set("detailForm.action", "update" );
-
-            return false;
-		},
-
-        setRole: function( event ) {
-
-            console.log("event", event.currentTarget);
-
-            var value = $(event.currentTarget).val();
-
-            console.log("event:value", value);
-
-            if (value == 'ADM') {
-                $('#list-role-admin').show()
-                $('#list-role-commercial').hide();
-            }
-            
-            if (value == 'COM') {
-                $('#list-role-admin').hide()
-                $('#list-role-commercial').show();
-            }
-
-            return false;
-		},
-
-        new: function( event ) {
-
-            FW.account.fields.item.removeClass('d-none');
-
-            var data = { role: { id: 'ADM' }, status: { id: 'ACT' } };
-
-            this.set("detailForm.data", data );
-            this.set("detailForm.title", "Carica preventivo" );
-            this.set("detailForm.action", "create" );
-
-            return false;
-		},
-
-
 		print: function( item ) {
 
             window.open('/manager/quotations/print', '_blank');
@@ -248,6 +204,34 @@ AP.quotation.detail = function() {
 	pub.init = function() {
 
         console.log("quotation:detail:init");
+
+        var suggest = $("#quotation-detail-form #company-name");
+
+        suggest.kendoAutoComplete({
+            dataSource: AP.config.customers,
+            dataTextField: "name",
+            select: function( event ) {
+                console.log("event", event)
+                var item = event.dataItem;
+                //var text = item.text();
+
+                var thisForm = $("#quotation-detail-form");
+
+                thisForm.find("select[name=vatCodeId]").val( item.vatCode )
+                thisForm.find("select[name=paymentMethodId]").val( item.paymentMethod )
+                thisForm.find("select[name=priceListId]").val( item.priceList )
+                thisForm.find("select[name=currencyId]").val( item.currency )
+
+                /* The result can be observed in the DevTools(F12) console of the browser. */
+                //console.log(text);
+                // Use the selected item or its text
+            }
+            
+        });
+    
+        var autocomplete = suggest.data("kendoAutoComplete");
+    
+        //autocomplete.suggest("Apples");
 
 		kendo.bind( AP.quotation.fields.rootDetail, viewModel )
         

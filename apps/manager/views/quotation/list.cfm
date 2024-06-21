@@ -90,7 +90,8 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Nome</th>
-                                <th>Codice</th>
+                                <th>Cliente</th>
+                                <th>Numero</th>
                                 <th>Status</th>
                                 <th>Creato il</th>
                                 <th></th>
@@ -101,6 +102,7 @@
                                 <tr>
                                     <td>#item.id#</td>
                                     <td><a href="/manager/quotations/#item.id#">#item.name#</a></td>
+                                    <td>#item.customer#</td>
                                     <td>#item.code#</td>
                                     <td>#item.status#</td>
                                     <td>#item.createdAt#</td>

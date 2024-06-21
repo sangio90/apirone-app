@@ -1,0 +1,42 @@
+﻿[
+    {
+        "id": "0000001",
+        "name": "Hotel Delle Albicocche",
+        "priceList": "A",
+        "paymentMethod": "B",
+        "vatCode": "8",
+        "currency": "USD",
+    },
+    {
+        "id": "0000002",
+        "name": "Ostello Rimini",
+        "priceList": "A",
+        "paymentMethod": "C",
+        "vatCode": "22",
+        "currency": "EUR",
+    },
+    {
+        "id": "0000003",
+        "name": "Hotel Okinawa",
+        "priceList": "B",
+        "paymentMethod": "C",
+        "vatCode": "8",
+        "currency": "EUR",
+    },
+    {
+        "id": "0000004",
+        "name": "Albergo San Paolo",
+        "priceList": "C",
+        "paymentMethod": "A",
+        "vatCode": "22",
+        "currency": "EUR",
+    },
+    {
+        "id": "0000005",
+        "name": "Hotel Eden Grottammare",
+        "priceList": "D",
+        "paymentMethod": "D",
+        "vatCode": "22",
+        "currency": "USD",
+    },
+]

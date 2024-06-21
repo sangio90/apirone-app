@@ -142,11 +142,11 @@ ul.nav-main > li > a:hover, ul.nav-main > li > a:focus {
 	border: 0 !important;
 }
 
-.nav-link, .nav-link:after {
+#menu .nav-link, #menu .nav-link:after {
 	color: White !important;
 }
 
-.nav-link:hover {
+#menu .nav-link:hover {
 	color: #E3C000 !important;
 }
 

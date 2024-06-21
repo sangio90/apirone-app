@@ -23,6 +23,8 @@
         prc.vatCodeList = super.service("VatCode").list();
         prc.jsScripts.add( "app-quotation" );
 
+        prc.config["customers"] = DESerializeJSON( FileRead( '/config/data/fake/customers.json.cfm' ) );
+
         event.setView( "quotation/detail" );
 
     }

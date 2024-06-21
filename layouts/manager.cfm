@@ -28,7 +28,7 @@
 
     <script>
         var AP = {};
-        AP.config = #SerializeJSON( {} )#;
+        AP.config = #SerializeJSON( prc.config )#;
         AP.message = #SerializeJSON(flash.get("message", {}))#;
     </script>
 
