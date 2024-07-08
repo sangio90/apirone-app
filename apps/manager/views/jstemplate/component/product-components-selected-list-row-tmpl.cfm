@@ -1,0 +1,13 @@
+﻿<cfprocessingdirective pageEncoding='UTF-8'>
+
+<cfoutput>
+    <nmscript type="text/x-kendo-template" id="product-components-selected-list-row-tmpl">
+        <tr>
+            <td><span data-bind="text: id"></span></td>
+            <td><span data-bind="text: name"></span></td>
+            <td width="40">
+                <button class="btn"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>
+    </nmscript>
+</cfoutput>

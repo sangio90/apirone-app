@@ -183,13 +183,18 @@ component extends="wirebox.system.ioc.config.Binder" {
             .asSingleton()
             .property( name = "dao", ref = "ComponentDAO" )
             .property( name = "ComponentTypeService", ref = "ComponentTypeService" )
+            .property( name = "VariantService", ref = "VariantService" )
+            .property( name = "ColorService", ref = "ColorService" )
             .parent("AbsService");
-            
-        map("AttributeService").to( "com.apirone.core.model.service.AttributeService" )
+
+        map("VariantService").to( "com.apirone.core.model.service.VariantService" )
             .asSingleton()
             .property( name = "dao", ref = "VariantDAO" )
+            .parent("AbsService");
+
+        map("ColorService").to( "com.apirone.core.model.service.ColorService" )
+            .asSingleton()
             .property( name = "dao", ref = "ColorDAO" )
-            .property( name = "AttributeTypeService", ref = "AttributeTypeService" )
             .parent("AbsService");
             
         
@@ -200,6 +205,12 @@ component extends="wirebox.system.ioc.config.Binder" {
             .asSingleton();
          
         map("ComponentDAO").to( "com.apirone.core.model.dao.ComponentDAO" )
+            .asSingleton();
+         
+        map("VariantDAO").to( "com.apirone.core.model.dao.VariantDAO" )
+            .asSingleton();
+         
+        map("ColorDAO").to( "com.apirone.core.model.dao.ColorDAO" )
             .asSingleton();
          
         map("ComponentTypeDAO").to( "com.apirone.core.model.dao.ComponentTypeDAO" )

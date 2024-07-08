@@ -105,43 +105,43 @@
                 <div class="nano">
                     <div class="nano-content" style="right: -17px;">
 
-                            #view('util/menu')#
+                        #view('util/menu')#
 
-                            <hr class="separator" />
-
-                        </div>
+                        <hr class="separator" />
 
                     </div>
 
-                </aside>
+                </div>
 
-                <section role="main" class="content-body">
+            </aside>
 
-                    <header class="page-header">
-                        <h2>&nbsp;</h2>
+            <section role="main" class="content-body">
 
-                        <div class="right-wrapper text-end">
-                            <ol class="breadcrumbs">
-                                <li>
-                                    <a href="/manager/dashboard">
-                                        <i class="bx bx-home-alt"></i>
-                                    </a>
-                                </li>
+                <header class="page-header">
+                    <h2>&nbsp;</h2>
 
-                                #breadcrumbs( '/manager#prc.currentRouteName#' )#
+                    <div class="right-wrapper text-end">
+                        <ol class="breadcrumbs">
+                            <li>
+                                <a href="/manager/dashboard">
+                                    <i class="bx bx-home-alt"></i>
+                                </a>
+                            </li>
 
-                            </ol>
+                            #breadcrumbs( '/manager#prc.currentRouteName#' )#
 
-                        </div>
-                    </header>
+                        </ol>
 
-                    <div class="row">
-                        <div class="col-lg-12 mb-3">
-                            #view()#
-                        </div>
                     </div>
+                </header>
 
-                </section>
+                <div class="row">
+                    <div class="col-lg-12 mb-3">
+                        #view()#
+                    </div>
+                </div>
+
+            </section>
 
 
     </section>

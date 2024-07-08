@@ -42,7 +42,7 @@
 				arcodart, ardesart,
 				COUNT(arcodart) OVER() AS total
 			FROM
-				#super.sanitizeSQL( "#variables.companyId#_artico" )# a
+				#super.sanitizeSQL( "#variables.companyId#_artico" )# artico
 			WHERE 1=1
 			
 			<cfif !isNull( arguments.typeId )>

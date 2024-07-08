@@ -1,4 +1,52 @@
 ﻿<cfquery name="k" datasource="verticale">
+SELECT
+  *
+FROM
+azapi_listin
+order by 1
+</cfquery>
+<cfdump var="#k#">
+<!--- listino acquisto in dollari  ---->
+<cfabort>
+
+<cfquery name="k" datasource="verticale">
+SELECT varcod, COUNT(vrcodice) OVER() AS total FROM azapi_codvar AS codvar INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod WHERE 1=1 AND comvar.cbcodart = 'LAV-ASS' ORDER BY arcodart OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY;
+</cfquery>
+<cfdump var="#k#">
+<cfabort>
+
+<cfquery name="k" datasource="verticale">
+SELECT
+  *
+FROM
+  azapi_comvar
+</cfquery>
+<cfdump var="#k#">
+<cfabort>
+
+<cfquery name="k" datasource="verticale">
+    SELECT
+      *
+    FROM
+    AZAPI_COMCOL
+</cfquery>
+<cfdump var="#k#">
+    
+<!----
+<cfquery name="k" datasource="verticale">
+SELECT
+  *
+FROM
+  SYSOBJECTS
+WHERE
+  xtype = 'U'
+ORDER BY name
+</cfquery>
+<cfdump var="#k#">
+--->
+<cfabort>
+
+<cfquery name="k" datasource="verticale">
     SELECT
         CLCODICE, CLDESCRI
     FROM

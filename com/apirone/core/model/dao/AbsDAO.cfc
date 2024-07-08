@@ -84,7 +84,7 @@
 
 		<cfargument name="sql" type="String">
 
-	    <cfreturn REReplace( arguments.sql , "[^A-Za-z0-9_ ,]", "", "all" )>
+	    <cfreturn REReplace( arguments.sql , "[^A-Za-z0-9_ ,.]", "", "all" )>
 
 	</cffunction>	
 

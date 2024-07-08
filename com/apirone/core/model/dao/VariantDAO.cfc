@@ -4,50 +4,45 @@
 
 	<cffunction name="read">
 
-		<cfargument name="productId" type="String" required="true">
+		<cfargument name="variatId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="verticale">
 
-			SELECT
-				arcodart, arsemlav, artipmat, arcodart, ardesart, artipmat
+			SELECT *
 			FROM
-				#variables.companyId#_artico a
+                #super.sanitizeSQL( "#variables.companyId#_codvar" )#
 			WHERE
-				arcodart = <cfqueryparam cfsqltype="varchar" value="#arguments.productId#">
+				varcod = <cfqueryparam cfsqltype="varchar" value="#arguments.variatId#">
 		</cfquery>
 
 		<cfreturn local.q>
 
 	</cffunction>
 	
-	<!----
-		a = materia prima
-		m = prodotto finito
-		s = semilavorato
-
-		artiplav = lav = lavorazioni
-	---->
-
 	<cffunction returntype="Query" name="find">
 
-		<cfargument name="typeId" type="String">
+		<cfargument name="componentId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
-		<cfargument name="orderby" required="true" type="String" default="arcodart">
-
+		<cfargument name="orderby" required="true" type="String" default="codvar.varcod">
+		
         <cfquery name="local.q" datasource="verticale">
 			SELECT
-				product_id,
-				COUNT(product_id) OVER() AS total
+				varcod,
+				COUNT(varcod) OVER() AS total
 			FROM
-				products
-			WHERE 1=1
-			
-			<cfif !isNull( arguments.typeId )>
-				AND product_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">
-			</cfif>
+				#super.sanitizeSQL( "#variables.companyId#_codvar" )# AS codvar
                 
+                <cfif !IsNull( arguments.componentId )>
+                    INNER JOIN #super.sanitizeSQL( "#variables.companyId#_comvar" )# AS comvar ON comvar.cbcodvar = codvar.varcod
+                </cfif>
+			WHERE 1=1
+                
+                <cfif !IsNull( arguments.componentId )>
+                    AND cbcodart = <cfqueryparam value="#arguments.componentId#" cfsqltype="varchar">
+                </cfif>
+		
 			ORDER BY 
 				#super.sanitizeSQL( arguments.orderby )#
 

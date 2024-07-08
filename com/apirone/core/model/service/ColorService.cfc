@@ -1,9 +1,10 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.ComponentDAO";
+	property name="dao" type="com.apirone.core.model.dao.ColorDAO";
+	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
-    public com.apirone.core.model.bean.Component function get(
-    		required String componentId, required String typeId
+    public com.apirone.core.model.bean.Color function get(
+    		required String componentId
         ){
 
     	var cm = getCacheManager();
@@ -25,10 +26,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+	public com.apirone.core.model.bean.Color[] function list(
+		String componentId,
+	) {
+		arguments['limit'] = -1;
+		return search(argumentCollection = arguments).getData();
+	}
+
+
     public com.apirone.core.model.bean.Result function search(
-            required String typeId,
-            required Numeric limit = 20,
-			required Numeric offset = 0,
+		             String componentId,
+			required Numeric limit = 20,
+			required Numeric offset = 0
     	){
 
 	    var rows = [];
@@ -37,7 +46,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {
-			rows.add( get( componentId = record.arcodart ) );
+			rows.add( get( componentId = record.clcodice ) );
 		});
 
 	    result.setData( rows );
@@ -53,33 +62,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Component function build(
-    		required String componentId, required String typeId 
+	private com.apirone.core.model.bean.Color function build(
+    		required String colorId
     	){
 
-	    var record = getDao().read( arguments.componentId );
+	    var record = getDao().read( arguments.colorId );
 
 	    if( record.recordCount ) { 
 
 			var record = trimQueryFields( record );
 
-            var bean = super.bean( "Component" );
+            var bean = super.bean( "Color" );
 
-            bean.setId( record.arcodart );
-			bean.setName( record.ardesart );
-			bean.setType( getComponentTypeService().get( record.artipmat )  );
+            bean.setId( record.clcodice );
+			bean.setName( record.cldescri );
 			
             return bean;
 
 	    }
-A
+
 		return nullValue();
 
   	}
 
-  	private String function getCacheKey( required String id, required String typeId ) {
+  	private String function getCacheKey( required String id ) {
 
-  		return "Attribute_#arguments.id#";
+  		return "Color_#arguments.id#";
 
   	}
 
