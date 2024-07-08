@@ -1,4 +1,4 @@
-component extends="com.apirone.core.model.service.AbsService" accessors="true" {
+component extends="com.apirone.core.model.service.AbsService" name="i18nService" accessors="true" singleton {
 
 	public String function get(
 		required String key,

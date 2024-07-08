@@ -68,6 +68,7 @@ h2 {
 
 html.no-overflowscrolling .sidebar-left .nano {
 	background: #4482E8 !important;
+	box-shadow: -5px 0 0 #2771e8 inset !important;
 }
 
 @media only screen and (min-width: 768px) {
@@ -187,3 +188,4 @@ input[type="checkbox"] {
 	color: White !important;
 
 }
+

@@ -89,7 +89,7 @@
         return LCase( fields[ arguments.field ] );
     }
 
-    public Query function trimDBFields( required Query records ) {
+    public Query function trimQueryFields( required Query records ) {
 
         var columns = records.columnList();
 

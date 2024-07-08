@@ -17,8 +17,9 @@
                         
                         <div class="card-body">
 
-                            <a href="javascript:addProducts()">+ Aggiungi prodotto</a> | 
-                            <a href="javascript:addComponents()">+ Aggiungi materia prima</a>
+                            <a href="##" data-bind="click: showComponentsList">+ Aggiungi materia prima</a>
+                            !
+                            <a href="javascript:addComponents()">+ Aggiungi lavorazione</a>
                             <br>
                             <br>
                             

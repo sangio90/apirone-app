@@ -21,12 +21,6 @@ var addComponents = function() {
 
 }
 
-var addProducts = function() {
-
-    $('#list-products-modal').modal('show');
-
-}
-
 var showColors = function() {
 
 	$('.general-variant').hide();
@@ -41,7 +35,7 @@ var showVariants = function() {
 
 }
 
-AP.component = function() {
+AP.component.detail = function() {
 
 	var pub = {}
 
@@ -50,13 +44,13 @@ AP.component = function() {
 
 		components: undefined,
 
-        listCompotents: function( event ) {
+        showComponentsList: function( event ) {
 
 			$('#list-compoments-modal').modal('show');
 
 			FW.utils.ajax( {
 				method: "POST",
-				url: "/manager/ajax/option/remove-all",
+				url: "/manager/ajax/components",
 				data: selected.serialize(),
 				callback: {
 					done: function() {

@@ -1,5 +1,8 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 
+	<!--- TODO: put in configuration --->
+	<cfset variables.companyId = "azapi">
+
 	<cffunction returntype="Query" name="read">
 
 		<cfargument name="typeId" type="String" required="true">
@@ -27,7 +30,7 @@
 				codtip,
 				COUNT(codtip) OVER() AS total
 			FROM
-                #variables.companyId()#_codtip
+				<cfqueryparam value="#variables.companyId()#_codtip" cfsqltype="Varchar">
 			WHERE 1=1
                 
 				<cfif Len( trim( arguments.str ) )>

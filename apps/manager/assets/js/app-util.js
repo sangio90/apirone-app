@@ -1,0 +1,2 @@
+AP.util = AP.util || {};
+

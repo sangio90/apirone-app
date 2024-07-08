@@ -35,6 +35,35 @@ component{
 		).to('PlateController.list').end();		
 
 
+		/*
+			productionTime
+		*/
+
+		route( "/ajax/production-times" )
+			.withAction( {
+				GET = "list",
+				POST = "create",
+				PUT = "modify"
+			} )
+			.toHandler( "ProductionTimeAjaxController" );
+
+		get(
+			"/production-times"
+		).to('ProductionTimeController.list').end();
+	
+		get(
+			"/production-times/:id"
+		).to('ProductionTimeController.list').end();
+
+
+		/*
+			components
+		*/
+
+		get(
+			"/ajax/components"
+		).to("ComponentAjaxController.list").end();
+		
 
 		/*
 			products
@@ -42,9 +71,9 @@ component{
 
 		route( "/ajax/products" )
 			.withAction( {
-				GET : "list",
-				POST : "create",
-				PUT : "modify"
+				GET = "list",
+				POST = "create",
+				PUT = "modify"
 			} )
 			.toHandler( "ProductAjaxController" );
 

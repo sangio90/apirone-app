@@ -32,9 +32,9 @@
 
 	
 
-    /*=========
+    /*
         Private methods
-    =========*/
+    */
 
 	private Void function logMessage( required message, required severity, category="", extraInfo="" ){
 
@@ -55,8 +55,6 @@
 		if( !DirectoryExists( path ) ) {
 			DirectoryCreate( path )
 		}
-
-		cffile( action="append" file="#variables.filePath#" output="#entry#" );
 
 	}
 

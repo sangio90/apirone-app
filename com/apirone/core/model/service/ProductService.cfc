@@ -128,7 +128,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if( record.recordCount ) { 
 
-			var record = trimDBFields( record );
+			var record = trimQueryFields( record );
 
             var product = super.bean( "Product" );
 
@@ -136,23 +136,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			product.setName( record.ardesart );
 			product.setType( getProductTypeService().get( record.artipmat )  );
 			
-			
-			/*
-			product.setExpirationAt( record.expiration_at );
-			product.setPrice( record.price );
-
-			product.setVariantType( getVariantTypeService().get( record.variant_type_id ) );
-            product.setStatus( getStatusService().get( record.status_id ) );
-            product.setCompany( getCompanyService().get( record.company_id ) );
-
-			product.setVariants(
-				getProductVariantService()
-					.list( productId = record.product_id.toString() ) 
-					.getData()
-			);
-
-			*/
-
             return product;
 
 	    }

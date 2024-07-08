@@ -48,5 +48,26 @@
             }
         ]
 
+    },
+    {
+        href: "#",
+        icon: "fas fa-cogs",
+        title: "Configurazioni",
+        roles: "ADM",
+        items: [
+            {
+                href: "/manager/production-times",
+                icon: "fas fa-clock",
+                title: "Tempi di produzioni",
+                roles: "ADM"
+            },
+            {
+                href: "/manager/roles",
+                icon: "fas fa-users",
+                title: "Lista dei ruoli",
+                roles: "ADM"
+            }
+        ]
+
     }
 ]

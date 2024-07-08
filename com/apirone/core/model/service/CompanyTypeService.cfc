@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.CompanyTypeDAO";
+	property name="dao" inject="com.apirone.core.model.dao.CompanyTypeDAO";
 
     public com.apirone.core.model.bean.CompanyType function get(
     		required String companyTypeId
@@ -19,8 +19,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var obj = build( arguments.companyTypeId );
+		
 		cm.put( key, obj );
-        return obj;
+        
+		return obj;
 
 	}
 

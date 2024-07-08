@@ -8,14 +8,14 @@ component extends="wirebox.system.ioc.config.Binder" {
             scopeRegistration = {
                 enabled = true,
                 scope   = "server", // server, cluster, session, application
-                key     = settings.get('app.wirebox.key')
+                key     = settings.get('app.wirebox.key'),
+                scanLocations = ["com.apirone.model"],
             }
         };
 
         /*
             services
         */
-
         map("AbsService").to( "com.apirone.core.model.service.AbsService" )
             .asSingleton()
             .property( name = "Configuration", ref = "Configuration")
@@ -26,6 +26,12 @@ component extends="wirebox.system.ioc.config.Binder" {
         map("ProductCategoryService").to( "com.apirone.core.model.service.ProductCategoryService" )
             .asSingleton()
             .property( name = "dao", ref = "ProductCategoryDAO" )
+            .property( name = "StatusService", ref = "StatusService" )
+            .parent("AbsService");
+
+        map("ProductionTimeService").to( "com.apirone.core.model.service.ProductionTimeService" )
+            .asSingleton()
+            .property( name = "dao", ref = "ProductionTimeDAO" )
             .property( name = "StatusService", ref = "StatusService" )
             .parent("AbsService");
 
@@ -155,7 +161,7 @@ component extends="wirebox.system.ioc.config.Binder" {
 
         map("AccountService").to( "com.apirone.core.model.service.AccountService" )
             .asSingleton()
-            .property( name = "AccountDAO", ref = "AccountDAO" )
+            .property( name = "dao", ref = "AccountDAO" )
             .parent("AbsService");
             
         map("StatusService").to( "com.apirone.core.model.service.StatusService" )
@@ -168,15 +174,41 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "ProductTypeDAO" )
             .parent("AbsService");
             
+        map("ComponentTypeService").to( "com.apirone.core.model.service.ComponentTypeService" )
+            .asSingleton()
+            .property( name = "dao", ref = "ComponentTypeDAO" )
+            .parent("AbsService");
+            
+        map("ComponentService").to( "com.apirone.core.model.service.ComponentService" )
+            .asSingleton()
+            .property( name = "dao", ref = "ComponentDAO" )
+            .property( name = "ComponentTypeService", ref = "ComponentTypeService" )
+            .parent("AbsService");
+            
+        map("AttributeService").to( "com.apirone.core.model.service.AttributeService" )
+            .asSingleton()
+            .property( name = "dao", ref = "VariantDAO" )
+            .property( name = "dao", ref = "ColorDAO" )
+            .property( name = "AttributeTypeService", ref = "AttributeTypeService" )
+            .parent("AbsService");
+            
         
         /*
             dao
         */
-
         map("AbsDAO").to( "com.apirone.core.model.dao.AbsDAO" )
             .asSingleton();
          
+        map("ComponentDAO").to( "com.apirone.core.model.dao.ComponentDAO" )
+            .asSingleton();
+         
+        map("ComponentTypeDAO").to( "com.apirone.core.model.dao.ComponentTypeDAO" )
+            .asSingleton();
+         
         map("PriceDAO").to( "com.apirone.core.model.dao.PriceDAO" )
+            .asSingleton();
+
+        map("ProductionTimeDAO").to( "com.apirone.core.model.dao.ProductionTimeDAO" )
             .asSingleton();
 
         map("ProductTypeDAO").to( "com.apirone.core.model.dao.ProductTypeDAO" )
@@ -199,7 +231,7 @@ component extends="wirebox.system.ioc.config.Binder" {
             .asSingleton();
             
         map("ProductVariantDAO").to( "com.apirone.core.model.dao.ProductVariantDAO" )
-        .asSingleton();
+            .asSingleton();
 
         map("EmployeeDAO").to( "com.apirone.core.model.dao.EmployeeDAO" )
             .asSingleton();
@@ -239,17 +271,18 @@ component extends="wirebox.system.ioc.config.Binder" {
 
         map("LocationDAO").to( "com.apirone.core.model.dao.LocationDAO" )
             .asSingleton();
-        /*=========
+
+        /*
             factory
-        =========*/
+        */
 
         map("factory").to( "com.apirone.core.model.factory.factory" )
             .asSingleton()
 
 
-        /*=========
+        /*
             facades
-        =========*/
+        */
 
         map("ServiceFacade").to( "com.apirone.core.facade.ServiceFacade" )
             .parent( "AbsService" )
@@ -258,17 +291,17 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "RoleService", ref = "RoleService")
 
         
-        /*=========
+        /*
             configuration
-        =========*/
+        */
 
         map("Configuration").to( "com.apirone.core.model.bean.Configuration" )
             .asSingleton()
 
         
-        /*=========
+        /*
             utils
-        =========*/
+        /*
 
         /*
         map("UtilString").to( "com.apirone.core.util.String" )
