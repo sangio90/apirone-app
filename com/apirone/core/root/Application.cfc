@@ -34,14 +34,6 @@ component {
     };
    
     this.datasources["verticale"] = {
-        /*
-        type     = "postgresql", 
-        host     = variables.settings.get('db.host'),
-        database = variables.settings.get('db.name'),
-        port     = variables.settings.get('db.port'),
-        username = variables.settings.get('db.username'),
-        password = variables.settings.get('db.pwd')
-        */
         class: "com.microsoft.sqlserver.jdbc.SQLServerDriver", 
         bundleName: "org.lucee.mssql", 
         bundleVersion: "12.2.0.jre8",
