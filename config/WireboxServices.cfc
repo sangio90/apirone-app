@@ -189,6 +189,7 @@ component extends="wirebox.system.ioc.config.Binder" {
 
         map("VariantService").to( "com.apirone.core.model.service.VariantService" )
             .asSingleton()
+            .property( name = "ColorService", ref = "ColorService" )
             .property( name = "dao", ref = "VariantDAO" )
             .parent("AbsService");
 

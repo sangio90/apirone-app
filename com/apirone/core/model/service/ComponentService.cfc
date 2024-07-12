@@ -74,7 +74,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setName( record.ardesart );
 			bean.setType( getComponentTypeService().get( record.artipmat )  );
 			bean.setVariants( getVariantService().list( componentId=record.arcodart )  );
-			bean.setColors( getColorService().list( componentId=record.arcodart )  );
+			//bean.setColors( getColorService().list( componentId=record.arcodart )  );
 			
             return bean;
 

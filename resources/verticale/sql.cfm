@@ -1,4 +1,17 @@
-﻿<cfquery name="k" datasource="verticale">
+﻿<cfquery name="j" datasource="verticale">
+    SELECT
+        *
+    FROM
+        azapi_colori AS colori
+            INNER JOIN azapi_comcol AS comcol ON comcol.clcodcol = colori.clcodice
+    ORDER BY CLCODART
+</cfquery>
+<cfdump var="#j#">
+
+<cfabort>
+
+
+<cfquery name="k" datasource="verticale">
 SELECT
   *
 FROM
@@ -154,7 +167,6 @@ ORDER BY name
     FROM
         azapi_colori
 </cfquery>
-<cfdump var="#j#">
 
 <cfquery name="j" datasource="verticale">
     SELECT

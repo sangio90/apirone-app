@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.VariantDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
+	property name="colorService" type="com.apirone.core.model.service.ColorService";
 
     public com.apirone.core.model.bean.Variant function get(
     		required String variantId
@@ -76,6 +77,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.varcod );
 			bean.setName( record.vardes );
+
+			//TODO: from componentId to variantId
+			var rnd = RandRange( 1, 4 )
+			var colorList = [ "MATLASPLX8MM000", "MATACCOTTRETROA", "MATFRU000PRBIPA", "NOT_FOUND" ];
+			bean.setColors( getColorService().list( colorList[ rnd ] ) );
 			
             return bean;
 

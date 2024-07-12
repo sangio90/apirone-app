@@ -33,7 +33,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search(argumentCollection = arguments).getData();
 	}
 
-
     public com.apirone.core.model.bean.Result function search(
 		             String componentId,
 			required Numeric limit = 20,

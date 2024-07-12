@@ -24,17 +24,28 @@ AP.component.detail = function() {
 	var viewModel = kendo.observable({
 
 		components: [],
-		colors: [],
 		variants: [],
 		selected: [],
-		showVariants: false,
+		colors: [],
+		showColors: false,
+		showSearchPanel: true,
+		variantsTitle: "Varianti",
+		currentVariant: {},
+		currentComponent: {},
 
 		showSearchResult: function() {
+
+			console.log("components > 0", viewModel.get( "components" ).length > 0);
+			console.log("showVariants", viewModel.get( "showVariants" ));
+			
+			//var ret = viewModel.get( "components" ).length > 0 && !viewModel.get( "showVariants" );
 			var ret = viewModel.get( "components" ).length > 0;
-
-			console.log("showSearchResult", viewModel.get( "components" ).length)
-
 			return ret;
+		},
+
+		showVariants: function() {
+
+			return !viewModel.get("showSearchPanel");
 		},
 
 		useComponent: function( event ) {
@@ -42,6 +53,40 @@ AP.component.detail = function() {
 			var comps = viewModel.get("selected");
 
 			comps.push( event.data );
+
+			viewModel.set("selected", comps);
+			
+			return false;
+		},
+
+		useColor: function( event ) {
+
+			var color = event.data;
+
+			var comp = viewModel.get("currentComponent");
+			var variant = viewModel.get("currentVariant");
+
+			var row = {
+				comp: {
+					id: comp.id,
+					name: comp.name
+				},
+				color: {
+					id: color.id,
+					name: color.name
+				},
+				variant: {
+					id: variant.id,
+					name: variant.name
+				}
+			}
+
+
+			console.log("event:useColor", event );
+
+			var comps = viewModel.get("selected");
+
+			comps.push( row );
 
 			viewModel.set("selected", comps);
 			
@@ -78,24 +123,37 @@ AP.component.detail = function() {
             return false;
 		},
 
-        showColors: function( event ) {
+        openColors: function( event ) {
 
-			console.log("event", event);
+			console.log("openColors:event", event);
+
+			viewModel.set( "currentVariant", event.data );
 
 			viewModel.set("colors", event.data.colors);
-
-			$("#components-colors-list-modal").modal("show");
 
             return false;
 		},
 
-        showVariants: function( event ) {
+        openVariants: function( event ) {
 
-			console.log("event", event);
+			console.log( "event", event );
+			console.log( "event.data.id", event.data.id );
 
-			viewModel.set("colors", event.data.colors);
+			//console.log( "event.parent", event.parent() );
+			//console.log( "event.data.parent", event.data.parent().getByUid(  ) );
 
-			$("#components-colors-list-modal").modal("show");
+			viewModel.set( "currentComponent", event.data );
+
+			viewModel.set( "showSearchPanel", false );
+			viewModel.set( "variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>" );
+			viewModel.set( "variants", event.data.variants );
+
+            return false;
+		},
+
+        backToComponents: function( event ) {
+
+			viewModel.set("showSearchPanel", true);
 
             return false;
 		},
