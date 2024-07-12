@@ -17,7 +17,7 @@ component extends="com.apirone.core.root.Application" {
 
 		super.onApplicationStart();
 
-		//if ( !StructKeyExists( application, "cbBootstrap" ) OR StructKeyExists( url, "reinit" )) {
+		if ( !StructKeyExists( application, "cbBootstrap" ) OR StructKeyExists( url, "reinit" )) {
 
 			cffile( action="append" file="#ExpandPath('/application.log')#" output="#now()# - Root:loadColdbox" );
 
@@ -31,7 +31,7 @@ component extends="com.apirone.core.root.Application" {
 
 			application.cbBootstrap.loadColdbox();
 
-		//}
+		}
 
 		return true;
 	

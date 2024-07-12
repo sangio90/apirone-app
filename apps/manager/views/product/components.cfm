@@ -17,7 +17,7 @@
                         
                         <div class="card-body">
 
-                            <a href="##" data-bind="click: showComponentsList">+ Aggiungi materia prima</a>
+                            <a href="##" data-bind="click:showComponentsList">+ Aggiungi materia prima</a>
                             |
                             <a href="javascript:addComponents()">+ Aggiungi lavorazione</a>
                             |
@@ -61,43 +61,12 @@
         </div>
 
         #view("product/components-list-modal")#
+        <!---
         #view("product/components-colors-list-modal")#
         #view("product/components-variants-list-modal")#
+        ---->
 
     </div>
-
-    <!----
-    <div class="modal hide fade" tabindex="-1" id="list-products-modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Lista dei prodotti</h3>
-                </div>
-                <div class="modal-body">
-
-                    <div class="row">
-                        
-                        <div class="col-12">
-
-                            <select class="form-control" size=15>
-                                <cfloop array="#prc.products#" item="item">
-                                    <option>#item.name#</option>
-                                </cfloop>
-                            </select>
-
-                        </div>
-
-                    </div>
-
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">Salva</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    ---->
 
     <script>
         var components = #SerializeJSON( prc.components )#;

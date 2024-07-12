@@ -39,8 +39,7 @@
                                         <table class="table table-hover pt-5">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">ID</th>
-                                                    <th scope="col">Nome</th>
+                                                    <th scope="col">Componente</th>
                                                     <th scope="col" width="100"></th>
                                                 </tr>
                                             </thead>
@@ -49,6 +48,46 @@
                                             </tbody>
                                         </table>
         
+                                    </div>
+        
+                                    <div data-bind="visible: showVariants">
+                                    
+                                        <div class="row">
+
+                                            <div class="col-6">
+            
+                                                <table class="table table-hover pt-5">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Variante</th>
+                                                            <th scope="col" width="100"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    
+                                                    <tbody data-bind="source:components" data-template="product-comp-variants-row-tmpl">
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+            
+                                            <div class="col-6">
+            
+                                                <table class="table table-hover pt-5">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Colore</th>
+                                                            <th scope="col" width="100"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    
+                                                    <tbody data-bind="source:components" data-template="product-comp-variants-row-tmpl">
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+        
+                                        </div>
+                                    
                                     </div>
         
                                 </div>
@@ -97,7 +136,9 @@
     
     </div>
 
-    #template("jstemplate/component/list-row-tmpl")#
+    #template("jstemplate/color/product-comp-colors-row-tmpl")#
+    #template("jstemplate/variant/product-comp-variants-row-tmpl")#
+    #template("jstemplate/component/product-components-list-row-tmpl")#
     #template("jstemplate/component/product-components-selected-list-row-tmpl")#
 
 </cfoutput>

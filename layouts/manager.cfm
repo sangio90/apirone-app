@@ -8,7 +8,7 @@
 <html  class="fixed sidebar-left-collapsed sidebar-left-with-menu no-overflowscrolling" data-dev="#prc.isDev#">
 <head>
 
-    <title><cfif Len( prc.title )>#prc.title# - </cfif> Apir</title>
+    <title><cfif Len( prc.title )>#prc.title# - </cfif> ApirOne</title>
 
     <meta charset="utf-8">
     <meta name="author" content="">

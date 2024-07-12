@@ -65,6 +65,6 @@
     
     </div>
 
-    #template("jstemplate/component/list-row-tmpl")#
+    #template("jstemplate/component/product-components-list-row-tmpl")#
 
 </cfoutput>

@@ -15,26 +15,6 @@ $(document).ready(function(){
 })
 
 
-var addComponents = function() {
-
-    $("#list-compoments-modal").modal("show");
-
-}
-
-var showColors = function() {
-
-	$(".general-variant").hide();
-    $("#table-variant-colors").show();
-
-}
-
-var showVariants = function() {
-
-	$(".general-variant").hide();
-    $("#table-variant-variants").show();
-
-}
-
 AP.component.detail = function() {
 
 	var pub = {}
@@ -47,6 +27,7 @@ AP.component.detail = function() {
 		colors: [],
 		variants: [],
 		selected: [],
+		showVariants: false,
 
 		showSearchResult: function() {
 			var ret = viewModel.get( "components" ).length > 0;
@@ -94,20 +75,6 @@ AP.component.detail = function() {
 
 			$("#components-list-modal").modal("show");
 
-			/*
-			AP.util.ajax( {
-				method: "POST",
-				url: "/manager/ajax/components",
-				//data: selected.serialize(),
-				callback: {
-					done: function() {
-						NM.widget.notify( "success", "Dati cancellati con successo" );
-						//dataSources.items.read();
-					}
-				}
-			} )
-			*/
-
             return false;
 		},
 
@@ -122,10 +89,15 @@ AP.component.detail = function() {
             return false;
 		},
 
-        showColorsForCount: function( event ) {
+        showVariants: function( event ) {
 
-			return event.colors.length > 0;
+			console.log("event", event);
 
+			viewModel.set("colors", event.data.colors);
+
+			$("#components-colors-list-modal").modal("show");
+
+            return false;
 		},
 
         showVariantsForCount: function( event ) {
