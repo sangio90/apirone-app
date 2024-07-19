@@ -41,7 +41,7 @@ component{
 			invalidHTTPMethodHandler : "manager:UtilController.invalidMethod",
 			//exceptionHandler         : "manager:MainController.error",
 			invalidEventHandler      : "manager:UtilController.notFound",
-			customErrorTemplate      : "/coldbox/system/exceptions/BugReport.cfm",
+			customErrorTemplate      : "/apps/utils/errorReport.cfm",
 			// Application Aspects
 			handlerCaching           : false,
 			eventCaching             : false,

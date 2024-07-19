@@ -3,7 +3,7 @@
         return Replace( renderView( view="#arguments.view#" ), 'nmscript', 'script', 'ALL' );
     }
 
-    function breadcrumbs( String href ){ 
+    function breadcrumbs( required String view ){ 
         return "";
     }
 
@@ -107,6 +107,38 @@
             ");
         }
 
+        return html;
+    }
+
+    function grid( 
+        required String id, 
+        required String rowTemplate, 
+        required String source="rows", 
+        required String columns="[]" 
+    ){ 
+
+        ```
+        <cfsavecontent variable="html">
+            <cfoutput>
+                <div 
+                    id="#arguments.id#"
+                    data-bound="NM.kendo.toggleScrollbar"
+                    data-columns="#arguments.columns#" 
+                    data-role="grid" 
+                    data-sortable="true" 
+                    data-bind="source: rows"
+                    data-pageable="true"
+                    data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
+                    data-no-records="{ template : '<div style=\'width: 100%; text-align: center;\'><br>Nessun record trovato.<br><br></div>'}">
+                </div>
+                
+                #template( view="jstemplate/#arguments.rowTemplate#" )#
+            
+            </cfoutput>
+            
+        </cfsavecontent>
+        ```
+        
         return html;
     }    
 </cfscript>

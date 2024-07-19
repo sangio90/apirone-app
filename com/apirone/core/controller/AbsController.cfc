@@ -123,15 +123,25 @@
 
         flash.put( "message", { "type" = arguments.type, "message" = arguments.message, "title" = title } );
 
-    }      
+    }
 
+
+    public Any function fire( action, payload=NullValue() ){
+
+        var user = var event = application.cbController.getRequestService().getContext().getPrivateValue("user");
+
+        var result = getAccessManager().exec( action=arguments.action, user=user, payload=arguments.payload );
+
+        return result;
+
+    }      
     
-    public dataMapper.DataMapper function getDM(  ){
+    public Any function getDataMapper(  ){
 
         return model().getInstance("DataMapper");
 
     }      
-
+    
     public Any function model(){
 
         //TODO naming for configuration

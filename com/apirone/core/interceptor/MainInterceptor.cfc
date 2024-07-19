@@ -74,16 +74,11 @@ component extends="coldbox.system.Interceptor"{
         prc.user = session.user;
         prc.isDev = ( ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
         prc.i18n = model.getInstance("i18nService");
-        prc.config = config;
+        prc.config = {};//TODO: not all Configuration.cfc please!
         prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20240530;
 
         //arguments.event.setValue( "user", session.user );
         //arguments.event.setValue( "isDev", ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
-        
-        //arguments.event.setValue( "i18n",  model.getInstance("i18nService") );
-        //arguments.event.setValue( "dataMapper",  model.getInstance("DataMapper") );
-
-        //arguments.event.setPrivateValue( "config",  config );
         //arguments.event.setValue( "configInLine",  { "variantTypeDefault": config.get('variantTypeDefault') } );
 
         //arguments.event.setPrivateValue( "staticVersion",  prc.isDev ? RandRange(1000, 9999) : 20240409 );

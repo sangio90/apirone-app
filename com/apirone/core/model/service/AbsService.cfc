@@ -49,14 +49,14 @@
         for ( var i in arguments.fields ) {
 
            
-            if ( !StructKeyExists( i, 'sort' ) ) {
-                i.sort = "ASC";
+            if ( !StructKeyExists( i, "dir" ) ) {
+                i.dir = "ASC";
             }
 
-            if ( !ListFind( "ASC,DESC", i.sort ) ) {
+            if ( !ListFind( "ASC,DESC", i.dir ) ) {
 
                 throw( 
-                    message="Sort [#i.sort#] not valid for field [#i.field#]. Only accepted values are ASC or DESC", 
+                    message="Direction [#i.dir#] not valid for field [#i.field#]. Only accepted values are ASC or DESC", 
                     type="apirone.errors.AbsService.SortValueNotValid" 
                 );
 

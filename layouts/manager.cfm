@@ -23,8 +23,8 @@
     
     <script src="/modules/assets/template-admin/vendor/modernizr/modernizr.js"></script>
 
-    <!--- <link rel="stylesheet" href="/assets/#static#/manager/css/kendo-custom.css"> --->
     <link rel="stylesheet" href="/assets/#prc.staticVersion#/manager/css/style.css">
+    <link rel="stylesheet" href="/assets/main/#prc.staticVersion#/css/kendo-custom.css">
 
     <script>
         //TODO: use AP.config (for current page) and AP.globalConfig
@@ -153,7 +153,9 @@
         type="js">
 
         <script src="/assets/main/js/vendor/js.cookie.min.js"></script>
+        <script src="/assets/main/js/app-kendo.js"></script>
 
+        <script src="/assets/#prc.staticVersion#/manager/js/app.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/ondomready.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-util.js"></script>

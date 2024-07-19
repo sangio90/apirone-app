@@ -56,6 +56,18 @@
         roles: "ADM",
         items: [
             {
+                href: "/manager/lines",
+                icon: "fas fa-layer-group",
+                title: "Linee di prodotto",
+                roles: "ADM"
+            },
+            {
+                href: "/manager/sizes",
+                icon: "fas fa-external-link-square-alt",
+                title: "Dimensioni placche",
+                roles: "ADM"
+            },
+            {
                 href: "/manager/production-times",
                 icon: "fas fa-clock",
                 title: "Tempi di produzioni",

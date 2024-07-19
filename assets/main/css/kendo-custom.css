@@ -74,3 +74,7 @@
 .k-button-solid-base {
 	background-color: #cccccc !important
 }
+
+.k-pager-numbers .k-link.k-state-selected {
+    background-color: #2771e8 !important;
+}

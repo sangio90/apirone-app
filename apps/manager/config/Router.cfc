@@ -120,7 +120,7 @@ component{
 
 
 		/*
-			account
+			accounts
 		*/
 		get( "/accounts/:id" )
         	.toHandler( "AccountController.get" );
@@ -133,7 +133,7 @@ component{
 
 	
 		/*
-			fruit
+			fruits
 		*/
 		get( "/fruits/:id" )
         	.toHandler( "FruitController.get" );
@@ -145,7 +145,6 @@ component{
 		/*
 			quotations
 		*/
-
 		get( "/quotations/00001/items" )
         	.toHandler( "QuotationController.items" );
 
@@ -159,9 +158,21 @@ component{
         	.toHandler( "QuotationController.new" );
 
 
+		/*
+			lines
+		*/
+		get( "/lines/:id" )
+        	.toHandler( "LineController.edit" );
+
+		get( "/lines" )
+        	.toHandler( "LineController.list" );
+
+		get( "/ajax/lines" )
+        	.toHandler( "LineAjaxController.list" );
+
 
 		/*
-			role
+			roles
 		*/
 		get( "/roles/:id" )
         	.toHandler( "RoleController.get" );

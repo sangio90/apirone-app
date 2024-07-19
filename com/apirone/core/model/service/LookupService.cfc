@@ -25,6 +25,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             "bean" = "documentType",
             "file" = "documentTypes.json.cfm"
         },
+        "thickness" = {
+            "bean" = "thickness",
+            "file" = "thicknesses.json.cfm"
+        },
     }
 
     property name="data" type="Struct";

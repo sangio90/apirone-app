@@ -1,9 +1,7 @@
-﻿ZB.kendo = ZB.kendo || {};
+﻿var NM = {};
+NM.kendo = NM.kendo || {};
 
-ZB.kendo.dataSource = function( config = {} ) {
-
-    console.log("config", config)
-    console.log("config?.data", config?.data)
+NM.kendo.dataSource = function( config = {} ) {
 
     var defaults = {
         data: config.data ? config.data : [],
@@ -41,11 +39,10 @@ ZB.kendo.dataSource = function( config = {} ) {
 /*
     remove scrollbar in grid
 */
-ZB.kendo.toggleScrollbar = function( event ) {
+NM.kendo.toggleScrollbar = function( event ) {
     var gridWrapper = event.sender.wrapper;
     var gridDataTable = event.sender.table;
     var gridDataArea = gridDataTable.closest(".k-grid-content");
 
-    //gridWrapper.toggleClass("no-scrollbar", gridDataTable[0].offsetHeight < gridDataArea[0].offsetHeight);
     gridWrapper.addClass("no-scrollbar");
 }

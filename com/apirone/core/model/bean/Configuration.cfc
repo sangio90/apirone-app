@@ -14,20 +14,6 @@ component output="true" accessors="true" {
 				"vat" = settings.get('app.owner.vat'),
 				"email" = settings.get('app.owner.email')
 			},
-			"offices"    = {
-				"registered" = {
-					"phone"   = settings.get('app.owner.phone1'),
-					"address" = settings.get('app.owner.address1'),
-					"city"    = settings.get('app.owner.city1'),
-					"zip"     = settings.get('app.owner.zip1'),
-				},
-				"operational" = {
-					"phone"   = "",
-					"address" = settings.get('app.owner.address2'),
-					"city"    = settings.get('app.owner.city2'),
-					"zip"     = settings.get('app.owner.city2'),
-				}
-			},
 			"filesHost": "#settings.get('files.host')#",
 			"imageVersions" = {
 				"sizes" = {

@@ -9,7 +9,7 @@ component extends="wirebox.system.ioc.config.Binder" {
                 enabled = true,
                 scope   = "server", // server, cluster, session, application
                 key     = settings.get('app.wirebox.key'),
-                scanLocations = ["com.apirone.model"],
+                //scanLocations = ["com.apirone.model"],
             }
         };
 
@@ -187,6 +187,11 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "ColorService", ref = "ColorService" )
             .parent("AbsService");
 
+        map("LineService").to( "com.apirone.core.model.service.LineService" )
+            .asSingleton()
+            .property( name = "dao", ref = "LineDAO" )
+            .parent("AbsService");
+
         map("VariantService").to( "com.apirone.core.model.service.VariantService" )
             .asSingleton()
             .property( name = "ColorService", ref = "ColorService" )
@@ -198,11 +203,19 @@ component extends="wirebox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "ColorDAO" )
             .parent("AbsService");
             
+        map("SizeService").to( "com.apirone.core.model.service.SizeService" )
+            .asSingleton()
+            .property( name = "dao", ref = "SizeDAO" )
+            .parent("AbsService");
+            
         
         /*
             dao
         */
         map("AbsDAO").to( "com.apirone.core.model.dao.AbsDAO" )
+            .asSingleton();
+         
+        map("SizeDAO").to( "com.apirone.core.model.dao.SizeDAO" )
             .asSingleton();
          
         map("ComponentDAO").to( "com.apirone.core.model.dao.ComponentDAO" )
@@ -284,6 +297,10 @@ component extends="wirebox.system.ioc.config.Binder" {
         map("LocationDAO").to( "com.apirone.core.model.dao.LocationDAO" )
             .asSingleton();
 
+        map("LineDAO").to( "com.apirone.core.model.dao.LineDAO" )
+            .asSingleton();
+
+
         /*
             factory
         */
@@ -347,7 +364,7 @@ component extends="wirebox.system.ioc.config.Binder" {
             .asSingleton()
             .initArg(
                 name="configFullPath", 
-                value=ExpandPath("/config/DataMapper.xml.cfm") 
+                value=ExpandPath( "/config/DataMapper.xml.cfm" ) 
             );
     }
 

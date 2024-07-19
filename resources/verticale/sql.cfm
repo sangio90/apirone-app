@@ -2,13 +2,22 @@
     SELECT
         *
     FROM
+        azapi_analin AS linee
+</cfquery>
+<cfdump var="#j#">
+<cfabort>
+
+
+<cfquery name="j" datasource="verticale">
+    SELECT
+        *
+    FROM
         azapi_colori AS colori
             INNER JOIN azapi_comcol AS comcol ON comcol.clcodcol = colori.clcodice
     ORDER BY CLCODART
 </cfquery>
 <cfdump var="#j#">
 
-<cfabort>
 
 
 <cfquery name="k" datasource="verticale">

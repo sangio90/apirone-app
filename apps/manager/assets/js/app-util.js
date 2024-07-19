@@ -64,3 +64,18 @@ AP.util.ajax = function( setup ) {
 	return data;
 
 };
+
+AP.util.checkAll = function( button ) {
+
+    if(button.checked) {
+        // Iterate each checkbox
+        $('input[name=selected]:checkbox').each(function() {
+            this.checked = true;                        
+        });
+    } else {
+        $('input[name=selected]:checkbox').each(function() {
+            this.checked = false;                       
+        });
+    }
+
+};
