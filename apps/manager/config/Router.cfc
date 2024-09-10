@@ -79,15 +79,16 @@ component{
 
 		get(
 			"/products/:productId/components"
-		).to('ProductController.components').end();
-
+		).to("ProductController.components").end();
+	
 		get(
 			"/products/:productId"
 		).to('ProductController.edit').end();
 
+
 		post(
 			"/products"
-		).to('ProductController.save').end();
+		).to("ProductController.save").end();
 		
 		get(
 			"/products"
@@ -161,6 +162,10 @@ component{
 		/*
 			lines
 		*/
+
+		get( "/lines/:lineId/components")
+			.toHandler("LineController.components").end();
+
 		get( "/lines/:id" )
         	.toHandler( "LineController.edit" );
 
@@ -169,6 +174,22 @@ component{
 
 		get( "/ajax/lines" )
         	.toHandler( "LineAjaxController.list" );
+	
+
+		/*
+			size
+		*/
+		get( "/sizes/:id" )
+        	.toHandler( "SizeController.get" );
+
+		get( "/sizes" )
+        	.toHandler( "SizeController.list" );
+
+		get( "/ajax/sizes" )
+        	.toHandler( "SizeAjaxController.list" );
+
+		get( "/sizes/print" )
+        	.toHandler( "SizeController.print" );
 
 
 		/*
@@ -181,7 +202,7 @@ component{
         	.toHandler( "RoleController.list" );
 
 		get( "/roles/print" )
-        	.toHandler( "AccountController.print" );
+        	.toHandler( "RolController.print" );
 
 
 		/*

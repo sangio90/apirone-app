@@ -11,6 +11,13 @@
             </td>
             <td>
                 <div>
+                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:components">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </td>
+            <td>
+                <div>
                     <button type="button" class="btn btn-primary btn-sm" data-bind="click:open">
                         <i class="fas fa-edit"></i>
                     </button>

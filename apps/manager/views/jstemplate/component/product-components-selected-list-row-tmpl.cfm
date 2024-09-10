@@ -16,6 +16,9 @@
                 <span data-bind="text: color.name"></span>
             </td>
             <td>
+                <input size="3">
+            </td>
+            <td>
                 <button class="btn"><i class="fa fa-trash"></i></button>
             </td>
         </tr>

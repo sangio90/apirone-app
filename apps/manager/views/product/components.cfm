@@ -1,6 +1,89 @@
 ﻿<cfoutput>
 
-    <div id="product-components-root">
+    <cfset finishes = [
+        {
+            id = "C1",
+            name = "Acciaio lucido" ,
+            works = [
+                {
+                    id = "L2",
+                    name = "Incisione simboli",
+                },
+                {
+                    id = "L3",
+                    name = "Taglio moduli",
+                    variants = [
+                        {
+                            id = "PL-2MODULI",
+                            name = "INCISIONE 2 MODULI"
+                        },
+                        {
+                            id = "PL-LEVETTA",
+                            name = "INCISIONE LEVETTA"
+                        }
+                    ]
+
+                },
+                {
+                    id = "L4",
+                    name = "Taglio forma placca",
+                    variants = [
+                        {
+                            id = "PL-SQUARE",
+                            name = "PLACCA MODELLO SQUARE",
+                            colors = [
+                                {
+                                    id: "PL-503",
+                                    name: "FORMATO PLACCA 503",
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id = "L9",
+                    name = "Pulitura placche post incisione",
+                    colors = [
+                        {
+                            id: "PL-503",
+                            name: "FORMATO PLACCA 503",
+                        }
+                    ]
+                },
+                {
+                    id = "L10",
+                    name = "Satinatura placca",
+                    colors = [
+                        {
+                            id: "PL-503",
+                            name: "FORMATO PLACCA 503",
+                        }
+                    ]
+                },
+        
+            ]
+        },
+        {
+            id = "C2",
+            name = "Ottone lucido",
+            works = [
+                {
+                    id = "L5",
+                    name = "Pulitura placche",
+                },
+                {
+                    id = "L6",
+                    name = "Satinatura placca",
+                },
+                {
+                    id = "L7",
+                    name = "Assemblaggio",
+                },
+            ]
+        }
+    ]>
+
+    <div id="line-components-root">
 
         <div class="row mb-3">
             <div class="col-lg-8">
@@ -10,61 +93,20 @@
 
         <div class="row">
             <div class="col-lg-12">
-                
-                <form action="/manager/products/save" class="form-horizontal" method="post" id="product-detail-form">
-                    
-                    <section class="card">
-                        
-                        <div class="card-body">
 
-                            <a href="##" data-bind="click:showComponentsList">+ Aggiungi materia prima</a>
-                            |
-                            <a href="javascript:addComponents()">+ Aggiungi lavorazione</a>
-                            |
-                            <a href="javascript:addProduct()">+ Aggiungi altro prodotto</a>
-                            <br>
-                            <br>
-                            
-                            <!----
-                            <cfloop array="#prc.components#" item="item">
-                                <div class="form-group row pb-3 ">
-                                    <div class="col-sm-12">
-                                        <b>#item.name#</b>
-                                        <br>
-                                        <cfloop array="#item.values#" item="value">
-                                            #value.name# <a href="javascript:addProducts()">+ Aggiungi prodotto</a> | <a href="javascript:addComponents()">+ Aggiungi componente</a><br>
-                                        </cfloop>
+                <div class="tab-content"  id="size-tabs-content">
 
-                                    </div>
-                                </div>
+                    <div class="col-lg-12 text-end mt-3 mb-5">
+                        <button class="btn btn-primary btn-sm" data-bind="click:showComponentsList">Carica attributo &raquo;</button>
+                    </div>
 
-                            </cfloop>
-                            ---->
-                        
-                        </div>
-
-                        <footer class="card-footer">
-                            <div class="row justify-content-end">
-                                <div class="col-sm-9">
-                                    <button class="btn btn-primary">Salva &raquo;</button>
-                                    <input type="hidden" name="id" value="" />
-                                </div>
-                            </div>
-                        </footer>
-                    
-                    </section>
-                
-                </form>
+                </div>
             
             </div>
 
         </div>
 
         #view("product/components-list-modal")#
-        <!---
-        #view("product/components-colors-list-modal")#
-        #view("product/components-variants-list-modal")#
-        ---->
 
     </div>
 

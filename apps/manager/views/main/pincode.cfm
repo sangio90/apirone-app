@@ -34,24 +34,11 @@
                     <div class="form-group mb-3">
                         <p>Inserisci il pincode inviato al numero +39 *** *****47</p>
                         <div class="row">
-                            <div class="col-2">
-                                <input name="p1" id="p1" type="text" class="form-control form-control-lg text-center" value="" />
-                            </div>
-                            <div class="col-2">
-                                <input name="p2" id="p2" type="text" class="form-control form-control-lg text-center" value="" />
-                            </div>
-                            <div class="col-2">
-                                <input name="p3" id="p3" type="text" class="form-control form-control-lg text-center" value="" />
-                            </div>
-                            <div class="col-2">
-                                <input name="p4" id="p4" type="text" class="form-control form-control-lg text-center" value="" />
-                            </div>
-                            <div class="col-2">
-                                <input name="p5" id="p5" type="text" class="form-control form-control-lg text-center" value="" />
-                            </div>
-                            <div class="col-2">
-                                <input name="p6" id="p6" type="text" class="form-control form-control-lg text-center" value="" />
-                            </div>
+                            <cfloop from="1" to="6" index="index">
+                                <div class="col-2">
+                                    <input name="p#index#" id="p#index#" type="text" class="form-control form-control-lg text-center" value="" maxlength="1" />
+                                </div>
+                            </cfloop>
                         </div>
                         
                         <div id="login-error"></div>

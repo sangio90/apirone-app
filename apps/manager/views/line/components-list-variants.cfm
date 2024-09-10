@@ -1,4 +1,8 @@
-﻿<cfoutput>
+﻿<!---
+TODO: removed
+--->
+
+<cfoutput>
     <div data-bind="visible: showVariants">
         
         <p><a role="button" data-bind="click:backToComponents">&laquo; Torna ai componenti</a></p>
@@ -29,7 +33,7 @@
                     <thead>
                         <tr>
                             <th scope="col">Colore</th>
-                            <th scope="col" width="100" style="text-align: right"><a href="">Tutti</a></th>
+                            <th scope="col" width="100"></th>
                         </tr>
                     </thead>
                     

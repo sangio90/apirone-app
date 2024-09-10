@@ -11,8 +11,8 @@ component extends="coldbox.system.Interceptor"{
         //TODO: add here canAccess() from Wineshipping
 
         var module = "prc.currentRoutedModule";
+        var model = getModel();
 	    
-        var model = server[ "wireBox-apirone" ];
 
         /*
             API module
@@ -67,14 +67,14 @@ component extends="coldbox.system.Interceptor"{
         
         }
 
-        var config = model.getInstance("Configuration").get();
-
+       
         //TODO: set all  private value
 
         prc.user = session.user;
         prc.isDev = ( ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
         prc.i18n = model.getInstance("i18nService");
-        prc.config = {};//TODO: not all Configuration.cfc please!
+        prc.config = getConfiguration();
+
         prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20240530;
 
         //arguments.event.setValue( "user", session.user );
@@ -88,6 +88,33 @@ component extends="coldbox.system.Interceptor"{
     }
 
     function postEvent( event, data, buffer, rc, prc ){
+
+    }
+
+
+    /*
+        private methods
+    */
+
+    private Struct function getConfiguration(){
+
+        // Select keys from Configuration.cfc 
+        // Not all keys, please!
+        
+        var config = getModel().getInstance("Configuration").get();
+
+        var result = {
+            appName = config.get("appName"),
+            appVersion = config.get("appVersion")
+        };
+
+        return result;
+
+    }
+
+    private Struct function getModel(){
+
+        return server[ "wireBox-apirone" ];;
 
     }
 

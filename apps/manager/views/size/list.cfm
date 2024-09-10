@@ -30,7 +30,7 @@
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '100px' },
                                     { 'field':'name', 'title':'Descrizione'},
-                                    { 'field':'', 'fruitsCount':'', width: '65px'},
+                                    { 'field':'', 'title':'', width: '65px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=AP.util.checkAll(this) name=selectAll>', 
@@ -38,7 +38,7 @@
                                         'headerAttributes': { 'class': 'text-center' }
                                     }
                                 ]",
-                                rowTemplate="size-grid-row-tmpl"
+                                rowTemplate="size/size-grid-row"
                             )#
 
                         </form>

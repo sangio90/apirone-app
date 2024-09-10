@@ -32,6 +32,7 @@
 
 		<cfargument name="typeId" type="String">
 		<cfargument name="processingTypeId" type="String">
+		<cfargument name="str" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -51,6 +52,10 @@
 			
 			<cfif !isNull( arguments.processingTypeId )>
 				AND arsemlav = <cfqueryparam value="#arguments.processingTypeId#" cfsqltype="varchar">
+			</cfif>
+                
+			<cfif !isNull( arguments.str )>
+				AND ardesart LIKE <cfqueryparam value="#arguments.str#%" cfsqltype="varchar">
 			</cfif>
                 
 			ORDER BY 

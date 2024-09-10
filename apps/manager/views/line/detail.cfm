@@ -7,6 +7,9 @@
             <div class="col-lg-8">
                 <h2>#prc.title#</h2>
             </div>
+            <div class="col-lg-4 text-end mt-3">
+                <button class="btn btn-primary btn-sm" onclick="location.href='/manager/lines/SQUARE/components'">Componenti &raquo;</button>
+            </div>
         </div>
 
         <div class="row">
@@ -88,31 +91,8 @@
                                                 </div>
                                                 <div id="price-error"></div>
                                             </div>
-                                        </div>                                
-                    
-                                        <!----
-                                        <div class="form-group row pb-3">
-                                            <label class="col-sm-3 control-label text-sm-end pt-2">Sconto</label>
-                                            <div class="col-sm-9">
-                                                <div class="row">
-                                                    <div class="col-sm-12">
-                                                        <div class="row">
-                                                            <div class="col-sm-6">
-                                                                <input type="number" name="discountValue" class="form-control" placeholder="Valore" />
-                                                            </div>
-                                                            <div class="col-sm-6">
-                                                                <select name="discountType" class="form-control" >
-                                                                    <option value="F">Fisso</option>
-                                                                    <option value="P">Percentuale</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
-                                        ---->
-        
+
                                         <cfif n LT prc.pricelists.len()>
                                             <hr>
                                         </cfif>
@@ -139,7 +119,7 @@
                                     <h3>Dimensioni</h3>
                                     <cfloop array="#prc.sizes#" item="size">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="#thickness.getId()#" id="size_#size.getId()#">
+                                            <input class="form-check-input" type="checkbox" value="#thickness.getId()#" id="size_#size.getId()#" checked>
                                             <label class="form-check-label" for="size_#size.getId()#">
                                                 #size.getName()#
                                             </label>

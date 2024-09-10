@@ -152,6 +152,7 @@
         salt="a1"
         type="js">
 
+
         <script src="/assets/main/js/vendor/js.cookie.min.js"></script>
         <script src="/assets/main/js/app-kendo.js"></script>
 
