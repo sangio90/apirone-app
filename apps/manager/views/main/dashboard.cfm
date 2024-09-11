@@ -5,6 +5,12 @@
     <div class="col-md-12">
 
         #session.user.getAccount().getRole().getId()#
+
+        <p>
+            <a href="/manager/lines/SQUARE/components">Linea</a> | 
+            <a href="/manager/products/0000000001/components">Articolo</a> | 
+        </p>
+
         <cfabort>
 
 

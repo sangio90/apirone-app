@@ -24,6 +24,10 @@ AP.component.detail = function() {
 	var viewModel = kendo.observable({
 
 		components: [],
+		attributes: [],
+		currentAttribute: null,
+		componentsForProduct: [],
+		values: [],
 		variants: [],
 		selected: [],
 		colors: [],
@@ -43,9 +47,62 @@ AP.component.detail = function() {
 			return ret;
 		},
 
-		showVariants: function() {
+		addComponent: function( event ) {
 
-			return !viewModel.get("showSearchPanel");
+			var cur = viewModel.get("currentAttribute");
+
+			console.log("event", event )
+
+			var count = $('#product_counter_' +  cur ).html();
+
+			console.log("count", count )
+
+			var tot = parseInt(count) + 1;
+
+			console.log("tot", tot)
+
+			$('#product_counter_' +  cur ).html( tot )
+
+
+			return false;
+		},
+
+		addDataFromErp: function( event ) {
+
+			viewModel.set( "values", event.data.values );
+
+			$("#components-values-list-modal").modal("show");
+			
+			return false;
+		},
+
+		showValues: function( event ) {
+
+			viewModel.set( "values", event.data.values );
+
+			$("#components-values-list-modal").modal("show");
+			
+			return false;
+		},
+
+		addAttribute: function( event ) {
+
+			console.log("event", event);
+
+			var prds = viewModel.get( "componentsForProduct" );
+
+			prds.push( event.data );
+
+			viewModel.set( "componentsForProduct", prds );
+
+			return false;
+		},
+
+		addSubAttribute: function( event ) {
+
+			console.log("event", event);
+
+			return false;
 		},
 
 		useComponent: function( event ) {
@@ -118,7 +175,21 @@ AP.component.detail = function() {
 
         showComponentsList: function( event ) {
 
+			console.log("showComponentsList", event)
+
+			viewModel.set( "currentAttribute", event.data.id );
+
+
+			console.log("showComponentsList")
+
 			$("#components-list-modal").modal("show");
+
+            return false;
+		},
+
+        showAttributesList: function( event ) {
+
+			$("#attributes-list-modal").modal("show");
 
             return false;
 		},
@@ -136,11 +207,10 @@ AP.component.detail = function() {
 
         openVariants: function( event ) {
 
+			console.log("event.data", event.data);
+
 			console.log( "event", event );
 			console.log( "event.data.id", event.data.id );
-
-			//console.log( "event.parent", event.parent() );
-			//console.log( "event.data.parent", event.data.parent().getByUid(  ) );
 
 			viewModel.set( "currentComponent", event.data );
 
@@ -160,6 +230,8 @@ AP.component.detail = function() {
 
         showVariantsForCount: function( event ) {
 
+			console.log("event.variants.length", event.variants.length);
+
 			return event.variants.length > 0;
 
 		},
@@ -177,7 +249,9 @@ AP.component.detail = function() {
 
 		console.log("comp:init")
 
-		kendo.bind( AP.component.fields.rootDetail, viewModel )
+		kendo.bind( AP.component.fields.rootDetail, viewModel );
+
+		viewModel.set( "attributes", attributes );
 
 	}	
 

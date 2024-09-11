@@ -1,89 +1,6 @@
 ﻿<cfoutput>
 
-    <cfset finishes = [
-        {
-            id = "C1",
-            name = "Acciaio lucido" ,
-            works = [
-                {
-                    id = "L2",
-                    name = "Incisione simboli",
-                },
-                {
-                    id = "L3",
-                    name = "Taglio moduli",
-                    variants = [
-                        {
-                            id = "PL-2MODULI",
-                            name = "INCISIONE 2 MODULI"
-                        },
-                        {
-                            id = "PL-LEVETTA",
-                            name = "INCISIONE LEVETTA"
-                        }
-                    ]
-
-                },
-                {
-                    id = "L4",
-                    name = "Taglio forma placca",
-                    variants = [
-                        {
-                            id = "PL-SQUARE",
-                            name = "PLACCA MODELLO SQUARE",
-                            colors = [
-                                {
-                                    id: "PL-503",
-                                    name: "FORMATO PLACCA 503",
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    id = "L9",
-                    name = "Pulitura placche post incisione",
-                    colors = [
-                        {
-                            id: "PL-503",
-                            name: "FORMATO PLACCA 503",
-                        }
-                    ]
-                },
-                {
-                    id = "L10",
-                    name = "Satinatura placca",
-                    colors = [
-                        {
-                            id: "PL-503",
-                            name: "FORMATO PLACCA 503",
-                        }
-                    ]
-                },
-        
-            ]
-        },
-        {
-            id = "C2",
-            name = "Ottone lucido",
-            works = [
-                {
-                    id = "L5",
-                    name = "Pulitura placche",
-                },
-                {
-                    id = "L6",
-                    name = "Satinatura placca",
-                },
-                {
-                    id = "L7",
-                    name = "Assemblaggio",
-                },
-            ]
-        }
-    ]>
-
-    <div id="line-components-root">
+    <div id="product-components-root">
 
         <div class="row mb-3">
             <div class="col-lg-8">
@@ -97,8 +14,22 @@
                 <div class="tab-content"  id="size-tabs-content">
 
                     <div class="col-lg-12 text-end mt-3 mb-5">
-                        <button class="btn btn-primary btn-sm" data-bind="click:showComponentsList">Carica attributo &raquo;</button>
+                        <button class="btn btn-primary btn-sm" data-bind="click:showAttributesList">Aggiungi attributo &raquo;</button>
                     </div>
+
+                    <table class="table table-hover pt-5">
+                        <thead>
+                            <tr>
+                                <th scope="col" width="100"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody data-bind="source:componentsForProduct" data-template="product-attributes-list-row-tmpl">
+                        </tbody>
+
+                    </table>
 
                 </div>
             
@@ -106,12 +37,17 @@
 
         </div>
 
+        #view("product/attributes-list-modal")#
+        #view("product/components-values-list-modal")#
         #view("product/components-list-modal")#
+
+        #template("jstemplate/product/product-attributes-list-row")#
+        #template("jstemplate/product/values-list-row")#
 
     </div>
 
     <script>
-        var components = #SerializeJSON( prc.components )#;
+        var attributes = #SerializeJSON( prc.components )#;
     </script>
 
 </cfoutput>

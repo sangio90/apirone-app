@@ -1,16 +1,15 @@
 ﻿<cfoutput>
 
-    <div id="components-list-modal" class="modal fade">
+    <div id="attributes-list-modal" class="modal fade">
         
-        <section class="modal-dialog">
+        <section class="modal-dialog  modal-xl">
             <div class="modal-content">
                 
                 <header class="card-header">
-                    <h2 class="card-title">Cerca componenti</h2>
+                    <h2 class="card-title">Aggiungi attributo</h2>
                 </header>
                 
                 <div class="card-body">        
-
 
                     <div class="row">
                     
@@ -29,7 +28,7 @@
                                     </div>
                                 </form>
             
-                                <form id="components-list-search-form" class="row">
+                                <form id="attributes-list-search-form" class="row">
             
                                     <div class="col-md-12">
                                         
@@ -37,18 +36,21 @@
                                             Fai una ricerca
                                         </div>
             
-                                        <div data-bind="visible: showSearchResult">
+                                        <div>
             
                                             <table class="table table-hover pt-5">
                                                 <thead>
                                                     <tr>
-                                                        <th scope="col">Lavorazioni</th>
+                                                        <th scope="col" width="100">ID</th>
+                                                        <th scope="col">Attributo</th>
+                                                        <th scope="col" width="100"></th>
                                                         <th scope="col" width="100"></th>
                                                     </tr>
                                                 </thead>
                                                 
-                                                <tbody data-bind="source:components" data-template="components-list-tmpl">
+                                                <tbody data-bind="source:attributes" data-template="attribute-list-row-tmpl">
                                                 </tbody>
+                
                                             </table>
             
                                         </div>
@@ -60,8 +62,6 @@
                             </div>
 
                         </div>
-
-
                     </div>
                 
                 </div>
@@ -79,9 +79,6 @@
     
     </div>
 
-    #template("jstemplate/color/product-comp-colors-row-tmpl")#
-    #template("jstemplate/variant/product-comp-variants-row-tmpl")#
-    #template("jstemplate/component/product-components-list-row-tmpl")#
-    #template("jstemplate/component/components-list-tmpl")#
+    #template("jstemplate/attribute/attribute-list-row")#
 
 </cfoutput>

@@ -67,4 +67,18 @@
             },
         ]
     },
+    {
+        "id": "FIS",
+        "name": "Fissaggio",
+        "values": [
+            {
+                id: "F01",
+                name: "Fissaggio viti"
+            },
+            {
+                id: "F02",
+                name: "Fissaggio calamite"
+            },
+        ]
+    },
 ]

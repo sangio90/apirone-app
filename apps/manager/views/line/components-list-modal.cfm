@@ -1,8 +1,4 @@
-﻿<!---
-TODO: removed
---->
-
-<cfoutput>
+﻿<cfoutput>
 
     <div id="components-list-modal" class="modal fade">
         
@@ -14,6 +10,28 @@ TODO: removed
                 </header>
                 
                 <div class="card-body">        
+
+
+                    <div class="row">
+                        <div class="col-md-6 mb-5">
+                            Tipologia materiale
+                            <select class="form-control">
+                                <option value="">Finitura</option>
+                                <option value="">Profilo</option>
+                                <option value="">Fissaggio</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-5">
+                            Materiale
+                            <select class="form-control">
+                                <cfloop array="#prc.finishes#" item="item">
+                                    <option value="#item.id#">#item.name#</option>
+                                </cfloop>
+                            </select>
+                        </div>
+                    </div>
+
 
                     <div class="row">
                     
@@ -71,7 +89,7 @@ TODO: removed
                             <table class="table table-hover pt-5">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Componente</th>
+                                        <th scope="col">Lavorazioni</th>
                                         <th scope="col">Variante</th>
                                         <th scope="col">Colore</th>
                                         <th scope="col">Qta</th>
