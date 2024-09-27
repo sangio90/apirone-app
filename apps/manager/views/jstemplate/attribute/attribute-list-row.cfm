@@ -15,6 +15,9 @@
             <td>
                 <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:showValues">Valori</button>
             </td>
+            <td>
+                <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:showValues">Rimuovi</button>
+            </td>
         </tr>
     </nmscript>
 </cfoutput>

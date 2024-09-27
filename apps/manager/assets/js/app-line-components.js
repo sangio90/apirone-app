@@ -34,6 +34,7 @@ AP.lineComponents.detail = function() {
 		components: [],
 		variants: [],
 		selected: [],
+		properties: properties,
 		colors: [],
 		showColors: false,
 		showSearchPanel: true,
@@ -124,9 +125,55 @@ AP.lineComponents.detail = function() {
 
 		},		
 
-        showComponentsList: function( event ) {
+		showLinkedComponents: function( event ) {
+
+			console.log("searchComponents");
+
+			var str = $('#components-search-input').val();
+			var status = $('#components-list-search-form .status');
+
+			status.html('Sto cercando...')
+
+			$.ajax({
+				method: "GET",
+				url: "/manager/ajax/components",
+				data: 'str=' + str,
+				success: function(xhr) {
+					viewModel.set( "components", xhr.data );
+					status.html( "Ho trovato " + xhr.count + " record.") 
+				},
+			});
+
+            return false;
+
+		},		
+
+        showLinkedComponents: function( event ) {
 
 			$("#components-list-modal").modal("show");
+
+            return false;
+		},
+
+        addValue: function( event ) {
+
+			$("#value-add-modal").modal("show");
+
+            return false;
+		},
+
+        addProperty: function( event ) {
+
+			$("#property-add-modal").modal("show");
+
+            return false;
+		},
+
+        showPropertiesList: function( event ) {
+
+			console.log("showPropertiesList")
+
+			$("#properties-list-modal").modal("show");
 
             return false;
 		},
@@ -168,6 +215,15 @@ AP.lineComponents.detail = function() {
 			viewModel.set( "showSearchPanel", false );
 			viewModel.set( "variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>" );
 			viewModel.set( "variants", event.data.variants );
+
+            return false;
+		},
+
+        showValues: function( event ) {
+
+			$("#values-list-modal").modal("show");
+
+			viewModel.set( "values", event.data.values );
 
             return false;
 		},

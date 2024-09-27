@@ -187,6 +187,19 @@ AP.component.detail = function() {
             return false;
 		},
 
+        showPropertiesList: function( event ) {
+
+			console.log("showComponentsList", event)
+
+			viewModel.set( "currentProperty", event.data.id );
+
+			console.log("showComponentsList")
+
+			$("#properties-list-modal").modal("show");
+
+            return false;
+		},
+
         showAttributesList: function( event ) {
 
 			$("#attributes-list-modal").modal("show");

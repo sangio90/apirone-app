@@ -1,4 +1,10 @@
-﻿<cfquery name="k" datasource="verticale">
+﻿<cfdbinfo name="k" type="foreignkeys" datasource="verticale">
+    <cfdump var="#k#">
+
+    <cfabort>
+    
+
+<cfquery name="k" datasource="verticale">
     SELECT *
     FROM
         azapi_artico a 

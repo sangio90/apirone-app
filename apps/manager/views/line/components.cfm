@@ -107,8 +107,14 @@
                 <div class="tab-content"  id="size-tabs-content">
 
                     <div class="col-lg-12 text-end mt-3 mb-5">
+                        <button class="btn btn-primary btn-sm" data-bind="click:showPropertiesList">Proprietà &raquo;</button>
+                    </div>
+
+                    <!----
+                    <div class="col-lg-12 text-end mt-3 mb-5">
                         <button class="btn btn-primary btn-sm" data-bind="click:showComponentsList">Carica attributo &raquo;</button>
                     </div>
+                    ---->
 
                     <table width="100%" class="table">
                         
@@ -119,7 +125,11 @@
                             <cfloop array="#finish.works#" index="work">
                             <tr>
                                 <td>#work.id# #work.name#</td>
-                                <td width="50"><a href="">Cancella</a></td>
+                                <td width="200">
+                                    <a href="">Lavorazioni e materiali</a>
+                                    <a href="">Cancella</a>
+                                </td>
+
                             </tr>
 
                                 <cfif work.keyExists("variants")>
@@ -127,7 +137,10 @@
                                     <cfloop array="#work.variants#" index="variant">
                                         <tr>
                                             <td>-- #variant.id# #variant.name#</td>
-                                            <td width="50"><a href="">Cancella</a></td>
+                                            <td width="200">
+                                                <a href="click:showLinkedComponents">Lavorazioni e materiali</a>
+                                                <a href="">Cancella</a>
+                                            </td>
                                         </tr>
 
                                         <cfif variant.keyExists("colors")>
@@ -135,7 +148,10 @@
                                             <cfloop array="#variant.colors#" index="color">
                                             <tr>
                                                 <td>---- #color.id# #color.name#</td>
-                                                <td width="50"><a href="">Cancella</a></td>
+                                                <td width="200">
+                                                    <a href="">Lavorazioni e materiali</a>
+                                                    <a href="">Cancella</a>
+                                                </td>
                                             </tr>
                                             </cfloop>
 
@@ -169,12 +185,17 @@
 
         </div>
 
-        #view("line/components-list-modal")#
+        <!---- #view("line/components-list-modal")# ---->
+        #view("line/properties-list-modal")#
+        #view("line/properties-list-values-modal")#
+        #view("line/value-add-modal")#
+        #view("line/property-add-modal")#
 
     </div>
 
     <script>
         var components = #SerializeJSON( prc.components )#;
+        var properties = #SerializeJSON( prc.properties )#;
     </script>
 
 </cfoutput>
