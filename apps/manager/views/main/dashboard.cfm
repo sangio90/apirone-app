@@ -11,8 +11,6 @@
             <a href="/manager/products/0000000001/components">Articolo</a> | 
         </p>
 
-        <cfabort>
-
 
         <cfif session.user.getAccount().getRole().getId() IS "ADM"></cfif>
 
@@ -85,7 +83,7 @@
                     <a href="##" class="card-action card-action-dismiss" data-card-dismiss></a>
                 </div>
 
-                <h2 class="card-title">Vendite per azienda</h2>
+                <h2 class="card-title">Vendite per prodotto</h2>
                 <p class="card-subtitle">Negli ultimi 12 mesi.</p>
             </header>
             <div class="card-body">
@@ -130,41 +128,6 @@
                         y: 'Settembre',
                         a: 100,
                         b: 90
-                    }];
-
-                    // See: js/examples/examples.charts.js for more settings.
-
-                </script>
-
-            </div>
-        </section>
-    </div>
-    <div class="col-lg-6">
-        <section class="card">
-            <header class="card-header">
-                <div class="card-actions">
-                    <a href="##" class="card-action card-action-toggle" data-card-toggle></a>
-                    <a href="##" class="card-action card-action-dismiss" data-card-dismiss></a>
-                </div>
-
-                <h2 class="card-title">Vendite per partner</h2>
-                <p class="card-subtitle">Negli ultimi 12 mesi.</p>
-            </header>
-            <div class="card-body">
-
-                <!-- Morris: Donut -->
-                <div class="chart chart-md" id="morrisDonut"></div>
-                <script type="text/javascript">
-
-                    var morrisDonutData = [{
-                        label: "Partner A",
-                        value: 32
-                    }, {
-                        label: "Partner B",
-                        value: 18
-                    }, {
-                        label: "Partner C",
-                        value: 20
                     }];
 
                     // See: js/examples/examples.charts.js for more settings.

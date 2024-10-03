@@ -139,30 +139,21 @@ component extends="com.apirone.core.controller.AbsController" {
     private function prepare( event, rc, prc ){
 
         var ret = {}
-        //var productSvc = super.service('Product');
 
         var items = session.cart.getItems();
 
         if ( !IsNull( items ) ) {
             
-            //dump("items: #items.len()#");
-
             for ( var item in items ) {
 
                 var companyId = item.getProduct().getCompany().getId();
     
-                //var key = prod.getCompany().getId();
-    
                 if ( StructKeyExists( ret, companyId ) ){
 
-                    //dump("esiste");
-    
                     ret[ companyId ].add( item );
                 
                 } else {
     
-                    //dump("non esiste");
-
                     ret.insert( companyId, [ item ] );
                 
                 }

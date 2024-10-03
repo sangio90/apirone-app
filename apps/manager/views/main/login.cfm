@@ -64,20 +64,12 @@
                         </div>
                     </div>
 
-                    <!----
-                    <span class="mt-3 mb-3 line-thru text-center text-uppercase">
-                        <span>or</span>
-                    </span>
-
-                    <p class="text-center">Don't have an account yet? <a href="pages-signup.html">Sign Up!</a></p>
-                    ------->
-
                 </form>
             </div>
         </div>
 
         <p class="text-center text-muted mt-3 mb-3">
-            &copy; Copyright 2022-#Year(now())#. Tutti i diritti riservati.
+            &copy; Copyright 2023-#Year(now())#. Tutti i diritti riservati.
             <br> #prc.config.appName# v.#prc.config.appVersion#
         </p>
     </div>    

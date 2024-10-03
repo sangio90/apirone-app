@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="properties-list-modal" class="modal fade">
+    <div id="attributes-list-modal" class="modal fade">
         
         <section class="modal-dialog  modal-xl">
             <div class="modal-content">

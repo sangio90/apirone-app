@@ -144,8 +144,6 @@
     
     public Any function model(){
 
-        //TODO naming for configuration
-
         return server[ "wireBox-apirone" ];
 
     }    

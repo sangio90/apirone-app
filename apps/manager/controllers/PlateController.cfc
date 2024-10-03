@@ -2,34 +2,27 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = prc.user;
-
         prc.title = "Placche";
 
-        prc.list = DESerializeJSON( FileRead( '/config/data/fake/plates.json.cfm' ) );
-        prc.statusList = DESerializeJSON( FileRead( '/config/data/fake/status.json.cfm' ) );
+        prc.jsScripts.add( "app-plate" );
 
-        prc.jsScripts.add( 'app-plate' );
-
-        event.setView('plate/list');
+        event.setView("plate/list");
 
     }
     
     function edit( event, rc, prc ){
 
-        //addCommonData( prc );
+        prc.obj = super.fire("line.get", [rc.id] );
 
-        //prc.title="Modifica prodotto < #obj.getName()# >";
-        prc.title="";
-        prc.edit=true;
+        prc.title="Modifica linea < #prc.obj.getName()# >";
 
-        prc.units = DESerializeJSON( FileRead( '/config/data/fake/units.json.cfm' ) );
-        prc.statusList = DESerializeJSON( FileRead( '/config/data/fake/status.json.cfm' ) );
+        prc.sizes = super.fire("size.list" );
+        prc.thicknesses = super.fire( "lookup.list", ["thickness"] );
 
-        prc.jsScripts.add( 'app-plate' );
+        prc.jsScripts.add( "app-line-detail" );
 
-        event.setView('plate/detail');
-
-    }
+        event.setView( "line/detail" );
     
+    }
+
 }

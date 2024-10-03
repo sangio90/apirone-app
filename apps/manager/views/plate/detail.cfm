@@ -2,7 +2,6 @@
 
     <div id="product-detail">
 
-
         <div class="row mb-3">
             <div class="col-lg-8">
                 <h2>#prc.title#</h2>
@@ -87,31 +86,7 @@
                                         </div>
                                         <div id="price-error"></div>
                                     </div>
-                                </div>                                
-            
-                                <!----
-                                <div class="form-group row pb-3">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Sconto</label>
-                                    <div class="col-sm-9">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <input type="number" name="discountValue" class="form-control" placeholder="Valore" />
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <select name="discountType" class="form-control" >
-                                                            <option value="F">Fisso</option>
-                                                            <option value="P">Percentuale</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
-                                ---->
-
                             </cfloop>
 
 

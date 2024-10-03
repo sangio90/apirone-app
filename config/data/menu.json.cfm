@@ -5,12 +5,6 @@
         title: "Dashboard"
     },
     {
-        href: "/manager/products",
-        icon: "bx bx-store",
-        title: "Prodotti",
-        roles: "ADM"
-    },
-    {
         href: "/manager/plates",
         icon: "far fa-building",
         title: "Placche",
@@ -58,7 +52,7 @@
             {
                 href: "/manager/lines",
                 icon: "fas fa-layer-group",
-                title: "Linee di prodotto",
+                title: "Linee delle placche",
                 roles: "ADM"
             },
             {

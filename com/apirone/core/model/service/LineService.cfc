@@ -41,7 +41,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {
-			rows.add( get( lineId = record.codlin ) );
+			rows.add( get( lineId = record.line_id ) );
 		});
 
 	    result.setData( rows );
@@ -65,12 +65,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if( record.recordCount ) { 
 
-			var record = trimQueryFields( record );
-
             var bean = super.bean( "Line" );
 
-            bean.setId( record.codlin );
-			bean.setName( record.deslin );
+            bean.setId( record.line_id );
+			bean.setName( record.line );
+			bean.setCreatedAt( record.created_at );
+			bean.setStatus( getStatusService().get( record.status_id ) );
 
             return bean;
 
@@ -82,7 +82,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "Line_#arguments.id#";
+  		return "line_#arguments.id#";
 
   	}
 

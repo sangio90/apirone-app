@@ -57,18 +57,15 @@ component {
 
     this.cache.object = "DefaultCache";
 
-    this.mappings[ "/wirebox" ]    = ExpandPath( "/modules/wirebox/" );
+    //this.mappings[ "/wirebox" ]    = ExpandPath( "/modules/wirebox/" );
     this.mappings[ "/coldbox" ]    = ExpandPath( "/modules/coldbox/" );
     this.mappings[ "/dataMapper" ] = ExpandPath( "/modules/external/dataMapper/" );
 
     public boolean function onRequestStart(){
-
         return true;
-
     }
 
     public Boolean function onSessionStart(){
-
         return true;
     }
 
@@ -78,9 +75,9 @@ component {
 
     public Boolean function onApplicationStart(){
 
-        variables.settings = new config.Settings();
+        //variables.settings = new config.Settings();
 
-        cffile( action="append" file="#ExpandPath('/application.log')#" output="#now()# - CORE:onApplicationStart" );
+        cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - CORE:onApplicationStart" );
 
         startFramework();
 
@@ -102,7 +99,7 @@ component {
 
     private function startFramework(){
 
-        cffile( action="append" file="#ExpandPath('/application.log')#" output="#now()# - CORE:startFramework" );
+        cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - CORE:startFramework" );
 
         new com.apirone.core.loading.Bootstrapper();
 

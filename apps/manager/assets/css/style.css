@@ -183,13 +183,9 @@ h2, a {
 	color: #2771e8 !important
 }
 
-/*
-input[type="checkbox"] {
-	background-color: #2771e8 !important;
-	color: White !important;
+h2 {
+	margin-top: 5px;	
 }
-*/
-
 
 /*
 	bootstrap
@@ -202,4 +198,20 @@ input[type="checkbox"] {
     .modal-xl {
         max-width: 1350px;
 	}
+}
+
+.content-body {
+	padding: 20px !important;
+}
+
+.userbox .dropdown-menu {
+	width: 250px !important;
+}
+
+.userbox .dropdown-menu li a:hover {
+	background-color: #ffffff !important;
+}
+
+.userbox {
+	margin-top: 10px;
 }

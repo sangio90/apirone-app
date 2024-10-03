@@ -30,8 +30,7 @@
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '100px' },
                                     { 'field':'name', 'title':'Descrizione'},
-                                    { 'field':'', 'title':'Materie prime', width: '65px'},
-                                    { 'field':'', 'title':'Dettagli', width: '65px'},
+                                    { 'field':'', 'title':'Configurazione', width: '65px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=AP.util.checkAll(this) name=selectAll>', 

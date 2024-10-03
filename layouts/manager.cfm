@@ -40,7 +40,7 @@
         <!-- start: header -->
         <header class="header">
             <div class="logo-container">
-                <a href="/manager" class="logo">
+                <a href="/manager/dashboard" class="logo">
                     <img src="/assets/main/img/logo.png" width="50%" height="50%" alt="Apir" />
                 </a>
 
@@ -61,7 +61,10 @@
                             >
                         </figure>
                         <div class="profile-info" data-lock-name="John Doe" data-lock-email="#prc.user.getName()#">
-                            <span class="name">#prc.user.getName()#</span>
+                            <span class="name">
+                                #prc.user.getName()#<br>
+                                #prc.user.getAccount().getRole().getId()# - #prc.user.getShortId()#
+                            </span>
                             <!--- <span class="role">#prc.user.getAccount().getRole().getName()#</span> --->
                         </div>
 
@@ -143,7 +146,6 @@
 
             </section>
 
-
     </section>
 
     <cfmodule template="/apps/utils/ctags/loadAssets.cfm" 
@@ -152,18 +154,16 @@
         salt="a1"
         type="js">
 
-
         <script src="/assets/main/js/vendor/js.cookie.min.js"></script>
         <script src="/assets/main/js/app-kendo.js"></script>
 
-        <script src="/assets/#prc.staticVersion#/manager/js/app.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/ondomready.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-util.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-widget.js"></script>
 
-        <cfloop array="#prc.jsScripts#" index="script">
-            <script src="/assets/#prc.staticVersion#/manager/js/#script#.js"></script>
+        <cfloop array="#prc.jsScripts#" index="thisScript">
+            <script src="/assets/#prc.staticVersion#/manager/js/#thisScript#.js"></script>
         </cfloop>
 
         <iframe src="/manager/live" style="display: none;"></iframe> 

@@ -1,4 +1,4 @@
-component extends="wirebox.system.ioc.config.Binder" {
+component extends="coldbox.system.ioc.config.Binder" {
 
     function configure() {
 
@@ -190,6 +190,7 @@ component extends="wirebox.system.ioc.config.Binder" {
         map("LineService").to( "com.apirone.core.model.service.LineService" )
             .asSingleton()
             .property( name = "dao", ref = "LineDAO" )
+            .property( name = "statusService", ref = "StatusService" )
             .parent("AbsService");
 
         map("VariantService").to( "com.apirone.core.model.service.VariantService" )
@@ -350,8 +351,8 @@ component extends="wirebox.system.ioc.config.Binder" {
         map("Logger").to( "com.apirone.core.util.Logger" )
             .asSingleton()
             .initArg(
-                name="filePath", 
-                value=ExpandPath("/") & "../repository/private/logs/application.log" 
+                name="folder", 
+                value=ExpandPath("/../repository/private/logs/")
             );
 
         map("Security").to( "com.apirone.core.util.Security" )

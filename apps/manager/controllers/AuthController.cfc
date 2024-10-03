@@ -2,9 +2,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function login( event, rc, prc ){
 
-        var user = prc.user;
-
-        //prc.config = getConfiguration().get();
         rc.email = StructKeyExists( cookie, "email" ) ? cookie.email : '';
 
         event.setView( "main/login" ).setLayout( "login" );
@@ -55,14 +52,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
         if ( access.getStatus() )  {
 
+
             super.setAuthUser( access.getAccount() );
             
-            //location("/manager/dashboard", false );
-            relocate( uri="/manager/login/pincode", postProcessExempt=false, addToken=false );
+            location("/manager/dashboard", false );
+            //relocate( uri="/manager/login/pincode", postProcessExempt=false, addToken=false );
 
         } else {
 
-            flash.put('message','Login e/o password errate.');
+            flash.put("message","Login e/o password errate.");
 
             //TODO Report Ortus: 
             // - only with "/manager/login" it location to "index.cfm?/manager/login"

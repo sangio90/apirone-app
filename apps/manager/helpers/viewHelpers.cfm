@@ -20,9 +20,9 @@
             //se la chiave roles non c'è l'item è accessibile a tutti
             if ( !row.keyExists("roles") OR (ListFind( row.roles, 'ADM' ) ) ) {
 
-                var parentClass = '';
-                var activeClass = '';
-                var expandedClass = '';
+                var parentClass = "";
+                var activeClass = "";
+                var expandedClass = "";
      
                 if ( StructKeyExists ( row, "items" ) ) {
     
@@ -30,7 +30,7 @@
     
                     for ( var item in row.items ) {
                         if ( item.href == active ) {
-                            expandedClass = 'nav-expanded nav-active';
+                            expandedClass = "nav-expanded nav-active";
                         }
                     }
                 
@@ -41,7 +41,7 @@
                 }
                 
                 var element = '
-                    <li class="#parentClass# #activeClass# #expandedClass#">
+                    <li class="#trim( parentClass & ' ' & activeClass & ' ' & expandedClass)#">
                         <a class="nav-link" href="#row.href#">
                             
                             # Len( row?.badge ) ? '<span class="float-end badge badge-primary">#row.badge#</span>' : '' #
@@ -94,19 +94,22 @@
 
     function getPrintFooter(){ 
 
-        savecontent variable="html" {
-            echo("
+        ```
+        <cfsavecontent variable="html">
+            <cfoutput>
                 <div style='border-top: 1px solid ##EAEAEA;'>
-                    <table width='100%' border=0 style='border-collapse:collapse'>
-                        <tr>
-                            <td style='padding-top:5px'>#cfdocument.currentpagenumber#/#cfdocument.totalpagecount#</td>
-                            <td style='padding-top:5px' align='right'>#LsDateFormat( now(), 'dd/mm/yyyy' )#</td>
-                        </tr>
-                    </table>
-                </div>
-            ");
-        }
-
+                <table width='100%' border=0 style='border-collapse:collapse'>
+                    <tr>
+                        <td style='padding-top:5px'>#cfdocument.currentpagenumber#/#cfdocument.totalpagecount#</td>
+                        <td style='padding-top:5px' align='right'>#LsDateFormat( now(), 'dd/mm/yyyy' )#</td>
+                    </tr>
+                </table>
+            </div>
+        </cfoutput>
+        
+        </cfsavecontent>
+        ```
+        
         return html;
     }
 

@@ -16,11 +16,13 @@
     <mapper id="Line" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Line">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
+        <map from="createdAt" to="createdAt" type="cf:Date"  />
     </mapper>
 
     <mapper id="Size" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Size">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
+        <map from="createdAt" to="createdAt" type="cf:Date"  />
     </mapper>
 
     <mapper id="Status" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Status">
@@ -28,32 +30,11 @@
         <map from="name" to="name" type="cf:String"  />
     </mapper>
 
-    <mapper id="Product" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Product">
-        <map from="id" to="id" type="cf:String"  />
-        <map from="code" to="code" type="cf:String"  />
-        <map from="description" to="description" type="cf:String"  />
-        <map from="companyId" to="companyId" type="cf:String"  />
-        <map from="status" to="status" ref="Status"  />
-        <map from="variantType" to="variantType" ref="VariantType"  />
-        <map from="variants" to="variants"  type="Array" ref="ProductVariant"  />
-
-    </mapper>
-
-    <mapper id="ProductVariant" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductVariant">
-        <map from="id" to="id" type="cf:String"  />
-        <map from="description" to="description" type="cf:String"  />
-        <map from="status" to="status" ref="Status"  />
-        <map from="price" to="price" ref="Price"  />
-        <map from="name" to="name" type="cf:String"  />
-        <map from="images" to="images"  type="Array" ref="File"  />
-    </mapper>
-
     <mapper id="File" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.File">
         <map from="id" to="id" type="cf:String"  />
         <map from="versions" to="versions" type="cf:Struct"  />
         <map from="directory" to="directory" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
-     
     </mapper>
     
     <mapper id="Price" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Price">

@@ -13,13 +13,13 @@ component extends="com.apirone.core.root.Application" {
 
 	public Boolean function onApplicationStart() {
 
-		cffile( action="append" file="#ExpandPath('/application.log')#" output="#now()# - Root:onApplicationStart" );
+		cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:onApplicationStart" );
 
 		super.onApplicationStart();
 
 		if ( !StructKeyExists( application, "cbBootstrap" ) OR StructKeyExists( url, "reinit" )) {
 
-			cffile( action="append" file="#ExpandPath('/application.log')#" output="#now()# - Root:loadColdbox" );
+			cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:loadColdbox" );
 
 			application.cbBootstrap = new coldbox.system.Bootstrap(
 				COLDBOX_CONFIG_FILE,
@@ -48,9 +48,9 @@ component extends="com.apirone.core.root.Application" {
 
 	public Boolean function onRequestStart( string targetPage ) {
 
-		SetLocale("italian (italy)")
+		SetLocale("italian (italy)");
 
-		cffile( action="append" file="#ExpandPath('/application.log')#" output="#now()# - app:onRequestStart" );
+		request.isDev = super.isDev;
 
         if ( !StructKeyExists( session, "user" ) ) {
             startUser()
@@ -58,8 +58,8 @@ component extends="com.apirone.core.root.Application" {
 
 		if ( super.isDev() OR url.keyExists("reinit") ) {
 
-			url.fwreinit = 1;
-			
+			//url.fwreinit = 1;
+
 			onApplicationStart();
 
 		}

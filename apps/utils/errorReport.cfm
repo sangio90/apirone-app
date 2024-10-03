@@ -11,6 +11,7 @@
 <cffile action="write" file="#path#/#code#.html" output="#report#">
 
 <cfoutput>
+    
     <div style="padding:10px">
         <h2 style="padding:0;margin:0;padding-bottom: 6px">Error 500</h2>
         <span>Code: #code#</span>
@@ -18,13 +19,8 @@
 
     <hr>
 
-    <!--- 
-        TODO: do better. Get env from settings 
-        <cfset env = new coldbox.system.core.delegates.Env()>
-        <cfdump var="#env.getSystemSetting('environment')#">
-    ---->
-    <!--- <cfif prc.isDev> --->
+    <cfif IsDefined("prc.isDev") AND prc.isDev>
         #report#
-    <!---- </cfif> ---->
+    </cfif>
 
 </cfoutput>

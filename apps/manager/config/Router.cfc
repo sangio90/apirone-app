@@ -25,7 +25,11 @@ component{
 
 		/*
 			plates
-		*/
+		
+		get(
+			"/plates/new"
+		).to('PlateController.new').end();
+
 		get(
 			"/plates/:id"
 		).to('PlateController.edit').end();
@@ -33,6 +37,11 @@ component{
 		get(
 			"/plates"
 		).to('PlateController.list').end();		
+
+		get(
+			"/ajax/plates"
+		).to('PlateAjaxController.list').end();
+		*/
 
 
 		/*
@@ -162,9 +171,8 @@ component{
 		/*
 			lines
 		*/
-
-		get( "/lines/:lineId/components")
-			.toHandler("LineController.components").end();
+		get( "/lines/:id/attributes")
+			.toHandler( "LineController.attributes" );
 
 		get( "/lines/:id" )
         	.toHandler( "LineController.edit" );

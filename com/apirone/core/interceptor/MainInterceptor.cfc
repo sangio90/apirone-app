@@ -10,10 +10,9 @@ component extends="coldbox.system.Interceptor"{
 
         //TODO: add here canAccess() from Wineshipping
 
-        var module = "prc.currentRoutedModule";
+        var module = prc.currentRoutedModule;
         var model = getModel();
 	    
-
         /*
             API module
         */
@@ -39,7 +38,7 @@ component extends="coldbox.system.Interceptor"{
                 }
 
             } catch( e ) {
-                // Break if not base64
+                // Break if not Base64
                 return arguments.event.renderData(data="Not Authorized",statusCode="401",statusText="Unauthorized")
                     .noExecution();
 
@@ -52,18 +51,15 @@ component extends="coldbox.system.Interceptor"{
         */
         if ( module == "manager" ) {
 
-            /*
-
-            var allowedEvents = "manager:AuthController.login,manager:AuthController.doLogin,manager:AuthController.logout";
+            var allowedEvents = "manager:AuthController.login,manager:AuthController.checkLogin,manager:AuthController.logout";
 
             // se non sono loggato, e non un evento ammesso
             if ( !session.user.isLogged() AND !ListFindNoCase( allowedEvents, event.getContext().event ) ) {
 
-                flash.put('message','Sessione scaduta. Fai il login.');
+                flash.put("message","Sessione scaduta. Fai il login.");
                 relocate( uri="/manager/login", postProcessExempt=false, addToken=false );
                 
             }
-            */
         
         }
 
@@ -71,17 +67,11 @@ component extends="coldbox.system.Interceptor"{
         //TODO: set all  private value
 
         prc.user = session.user;
-        prc.isDev = ( ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
+        prc.isDev = request.isDev();
         prc.i18n = model.getInstance("i18nService");
-        prc.config = getConfiguration();
+        prc.config = getGlobalConfiguration();
 
         prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20240530;
-
-        //arguments.event.setValue( "user", session.user );
-        //arguments.event.setValue( "isDev", ( ListLast( cgi.SERVER_NAME, "." ) IS "local" ) OR cgi.SERVER_NAME EQ "localhost" );
-        //arguments.event.setValue( "configInLine",  { "variantTypeDefault": config.get('variantTypeDefault') } );
-
-        //arguments.event.setPrivateValue( "staticVersion",  prc.isDev ? RandRange(1000, 9999) : 20240409 );
 
         prc.jsScripts = [];
         
@@ -96,7 +86,7 @@ component extends="coldbox.system.Interceptor"{
         private methods
     */
 
-    private Struct function getConfiguration(){
+    private Struct function getGlobalConfiguration(){
 
         // Select keys from Configuration.cfc 
         // Not all keys, please!
@@ -104,8 +94,8 @@ component extends="coldbox.system.Interceptor"{
         var config = getModel().getInstance("Configuration").get();
 
         var result = {
-            appName = config.get("appName"),
-            appVersion = config.get("appVersion")
+            "appName" = config.get("appName"),
+            "appVersion" = config.get("appVersion")
         };
 
         return result;

@@ -1,21 +1,21 @@
-AP.line = AP.line || {};
+AP.plate = AP.plate || {};
 
-AP.line.fields = {
-    listRoot: $('#line-list-root'),
-    detailRoot: $('#line-detail-form')
+AP.plate.fields = {
+    listRoot: $('#plate-list-root'),
+    detailRoot: $('#plate-detail-form')
 }
 
 $(document).ready(function(){
 
-	if ( AP.line.fields.listRoot.length ) {
+	if ( AP.plate.fields.listRoot.length ) {
 
-	    AP.line.list.init();
+	    AP.plate.list.init();
 
 	}
 
-	if ( AP.line.fields.detailRoot.length ) {
+	if ( AP.plate.fields.detailRoot.length ) {
 
-	    AP.line.detail.init();
+	    AP.plate.detail.init();
 
 	}
 
@@ -26,23 +26,16 @@ AP.line.list = function() {
 	var pub = {}
 
 	var dataSources = {
-		items: NM.kendo.dataSource( { url: "/manager/ajax/lines" } )
+		items: NM.kendo.dataSource( { url: "/manager/ajax/plates" } )
 	}
 
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
         
-        //TODO: to remove
         open: function( event ) {
 
             var id = event.data.id
             window.open( "/manager/lines/" + id, '_blank').focus();
-
-        },
-
-        configure: function( event ) {
-            var id = event.data.id
-            window.open( "/manager/lines/" + id + "/attributes", '_blank').focus();
 
         },
 

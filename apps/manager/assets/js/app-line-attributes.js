@@ -1,55 +1,32 @@
-AP.lineComponents = AP.lineComponents || {};
+AP.line.attributes = AP.line.attributes || {};
 
-AP.lineComponents.fields = {
-    root: $("#line-components-root"),
+AP.line.attributes.fields = {
+    root: $("#line-configure-root"),
 }
 
 $(document).ready(function(){
 
-	if ( AP.lineComponents.fields.root.length ) {
+	if ( AP.lineConfigure.fields.root.length ) {
 
-		AP.lineComponents.detail.init();
+		AP.lineConfigure.detail.init();
 
 	}
 
 })
 
-var showWorks = function() {
 
-	$('#table-works').show()
-
-	return false;
-
-}
-
-
-AP.lineComponents.detail = function() {
+AP.line.attributes = function() {
 
 	var pub = {}
 
-	var productId = "d4f0764f-fa4c-46bf-910a-06f3d0c3d626";
-
 	var viewModel = kendo.observable({
 
-		components: [],
-		variants: [],
-		selected: [],
-		properties: properties,
-		colors: [],
-		showColors: false,
-		showSearchPanel: true,
-		variantsTitle: "Varianti",
-		currentVariant: {},
-		currentComponent: {},
+		attributesList: [],
 
-		showSearchResult: function() {
+		showAttributesList: function() {
 
-			console.log("components > 0", viewModel.get( "components" ).length > 0);
-			console.log("showVariants", viewModel.get( "showVariants" ));
-			
-			//var ret = viewModel.get( "components" ).length > 0 && !viewModel.get( "showVariants" );
-			var ret = viewModel.get( "components" ).length > 0;
-			return ret;
+			$("#attributes-list-modal").modal("show");
+
 		},
 
 		showVariants: function() {
@@ -102,21 +79,21 @@ AP.lineComponents.detail = function() {
 			return false;
 		},
 
-		searchComponents: function( event ) {
+		searchAttributes: function( event ) {
 
-			console.log("searchComponents");
+			console.log("searchAttributes");
 
-			var str = $('#components-search-input').val();
-			var status = $('#components-list-search-form .status');
+			var str = $('#attributes-search-input').val();
+			var status = $('#attributes-list-search-form .status');
 
 			status.html('Sto cercando...')
 
 			$.ajax({
 				method: "GET",
-				url: "/manager/ajax/components",
+				url: "/manager/ajax/attributes",
 				data: 'str=' + str,
 				success: function(xhr) {
-					viewModel.set( "components", xhr.data );
+					viewModel.set( "attributesList", xhr.data );
 					status.html( "Ho trovato " + xhr.count + " record.") 
 				},
 			});
@@ -254,7 +231,7 @@ AP.lineComponents.detail = function() {
 
 		console.log("comp:init")
 
-		kendo.bind( AP.lineComponents.fields.root, viewModel )
+		kendo.bind( AP.lineConfigure.fields.root, viewModel )
 
 	}	
 

@@ -5,11 +5,10 @@
     "contributors":[],
     "dependencies":{
         "porto-admin-template":"http+cached://www.coridalia.cc/repository/porto-admin-template/porto-admin-template-light-4.1.0.zip",
-        "kendoui":"http+cached://www.coridalia.cc/repository/kendoui/kendoui-2022.1.412.zip",
+        "kendoui":"http+cached://www.coridalia.cc/repository/kendoui/kendoui-2024.2.514.zip",
         "dataMapper":"http+cached://www.coridalia.cc/repository/dataMapper/dataMapper-1.7.zip",
         "accessManager":"http+cached://www.coridalia.cc/repository/accessManager/accessManager-1.0.0.zip",
         "coldbox":"7.2.1+13",
-        "wirebox":"7.2.1+13",
         "cbvalidation":"4.0.0"
     },
     "devDependencies":{
@@ -26,7 +25,6 @@
         "dataMapper":"modules/external/dataMapper/",
         "accessManager":"modules/external/accessManager/",
         "coldbox":"modules/coldbox/",
-        "wirebox":"modules/wirebox/",
         "cbvalidation":"modules/cbvalidation/",
         "testbox":"modules/testbox/"
     },
