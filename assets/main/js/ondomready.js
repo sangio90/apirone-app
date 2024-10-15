@@ -74,8 +74,6 @@ $(document).ready(function(){
 				if ( next.hasClass('input-group-text') ) {
 
 					// qui bisognerebbe cercare se si è dentro un "div.input-group"
-					console.log("ciao");
-
 					next.insertAfter( error );
 
 				} else {

@@ -36,7 +36,6 @@
 
                         <div class="col-md-12 mt-5">
 
-
                             <table width="100%" class="table">
                                 <cfloop array="#[]#" index="finish">
                                 <tr>
@@ -45,8 +44,6 @@
                                 </cfloop>
                             </table>
         
-        
-                            
                         </div>
     
                     </div>
@@ -65,6 +62,10 @@
         ----->
 
     </div>
+
+    <!--- #template( view="jstemplate/attribute/" )# ---->
+
+    #view("attribute/detail-modal")#
 
     <script>
         <!--- var components = #SerializeJSON( prc.components )#; 

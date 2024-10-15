@@ -11,10 +11,12 @@
     <title><cfif Len( prc.title )>#prc.title# - </cfif> ApirOne</title>
 
     <meta charset="utf-8">
-    <meta name="author" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
+    <!---
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
+    ---->
+    <link href="/assets/main/css/fonts.css" rel="stylesheet" type="text/css">
 
     <cfmodule template="/apps/utils/ctags/loadAssets.cfm" 
         files="#DESerializeJSON( FileRead( '/config/assets/cssFiles.json.cfm' ) ).manager#"
@@ -155,7 +157,8 @@
         type="js">
 
         <script src="/assets/main/js/vendor/js.cookie.min.js"></script>
-        <script src="/assets/main/js/app-kendo.js"></script>
+        <script src="/assets/main/js/nimesia-kendo.js"></script>
+        <script src="/assets/main/js/nimesia-util.js"></script>
 
         <script src="/assets/#prc.staticVersion#/manager/js/app.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/ondomready.js"></script>
@@ -164,9 +167,12 @@
 
         <cfloop array="#prc.jsScripts#" index="thisScript">
             <script src="/assets/#prc.staticVersion#/manager/js/#thisScript#.js"></script>
+            <cfif FileExists( ExpandPath( "/apps/manager/assets/js/tests/#thisScript#-test.js" ) ) AND prc.isDev>
+                <script src="/assets/#prc.staticVersion#/manager/js/tests/#thisScript#-test.js"></script>
+            </cfif>
         </cfloop>
 
-        <iframe src="/manager/live" style="display: none;"></iframe> 
+        <iframe src="/manager/live" style="display:none;"></iframe> 
     </body>
 </html>
 </cfoutput>

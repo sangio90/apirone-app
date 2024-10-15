@@ -66,14 +66,17 @@ component extends="coldbox.system.Interceptor"{
        
         //TODO: set all  private value
 
-        prc.user = session.user;
-        prc.isDev = request.isDev();
-        prc.i18n = model.getInstance("i18nService");
-        prc.config = getGlobalConfiguration();
+        prc.user   = session.user;
+        prc.isDev  = request.isDev();
+        prc.i18n   = model.getInstance("i18nService");
+        prc.config = getGlobalConfiguration(); //js global config
+
+        prc.page = {};  //current js config
 
         prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20240530;
 
         prc.jsScripts = [];
+        //prc.jsTemplates = [];
         
     }
 
@@ -95,7 +98,8 @@ component extends="coldbox.system.Interceptor"{
 
         var result = {
             "appName" = config.get("appName"),
-            "appVersion" = config.get("appVersion")
+            "appVersion" = config.get("appVersion"),
+            "langs" = getModel().getInstance("LangService").list()
         };
 
         return result;

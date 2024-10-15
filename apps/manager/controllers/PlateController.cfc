@@ -16,7 +16,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.title="Modifica linea < #prc.obj.getName()# >";
 
-        prc.sizes = super.fire("size.list" );
+        prc.sizes = super.fire( "size.list" );
         prc.thicknesses = super.fire( "lookup.list", ["thickness"] );
 
         prc.jsScripts.add( "app-line-detail" );

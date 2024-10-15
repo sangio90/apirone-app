@@ -1,23 +1,25 @@
-AP.line.attributes = AP.line.attributes || {};
+AP.lineAttributes = AP.lineAttributes || {};
 
-AP.line.attributes.fields = {
-    root: $("#line-configure-root"),
+AP.lineAttributes.fields = {
+    root: $("#line-attributes-root"),
 }
 
 $(document).ready(function(){
 
-	if ( AP.lineConfigure.fields.root.length ) {
+	if ( AP.lineAttributes.fields.root.length ) {
 
-		AP.lineConfigure.detail.init();
+		AP.lineAttributes.list.init();
 
 	}
 
 })
 
 
-AP.line.attributes = function() {
+AP.lineAttributes.list = function() {
 
 	var pub = {}
+	
+	var service = AP.attribute.detail;
 
 	var viewModel = kendo.observable({
 
@@ -25,7 +27,9 @@ AP.line.attributes = function() {
 
 		showAttributesList: function() {
 
-			$("#attributes-list-modal").modal("show");
+			$("#line-attributes-list-modal").modal("show");
+
+			this.searchAttributes()
 
 		},
 
@@ -42,6 +46,16 @@ AP.line.attributes = function() {
 
 			viewModel.set("selected", comps);
 			
+			return false;
+		},
+
+		addAttribute: function( event ) {
+
+
+			console.log("service", service);
+
+			service.open();
+
 			return false;
 		},
 
@@ -81,7 +95,7 @@ AP.line.attributes = function() {
 
 		searchAttributes: function( event ) {
 
-			console.log("searchAttributes");
+			//console.log("searchAttributes");
 
 			var str = $('#attributes-search-input').val();
 			var status = $('#attributes-list-search-form .status');
@@ -212,26 +226,13 @@ AP.line.attributes = function() {
             return false;
 		},
 
-        showVariantsForCount: function( event ) {
-
-			return event.variants.length > 0;
-
-		},
-
-        showColorsResult: function( event ) {
-
-			$("#components-colors-list-modal").modal("show");
-
-            return false;
-		},
-
-	});   	
+    });   	
 
 	pub.init = function() {
 
 		console.log("comp:init")
 
-		kendo.bind( AP.lineConfigure.fields.root, viewModel )
+		kendo.bind( AP.lineAttributes.fields.root, viewModel )
 
 	}	
 

@@ -129,7 +129,7 @@
                     data-columns="#arguments.columns#" 
                     data-role="grid" 
                     data-sortable="true" 
-                    data-bind="source: rows"
+                    data-bind="source: #arguments.source#"
                     data-pageable="true"
                     data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
                     data-no-records="{ template : '<div style=\'width: 100%; text-align: center;\'><br>Nessun record trovato.<br><br></div>'}">

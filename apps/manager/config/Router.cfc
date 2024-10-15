@@ -183,6 +183,9 @@ component{
 		get( "/ajax/lines" )
         	.toHandler( "LineAjaxController.list" );
 	
+		get( "/ajax/lines/attributes" )
+        	.toHandler( "LineAjaxController.attributes" );
+	
 
 		/*
 			size

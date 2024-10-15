@@ -1,6 +1,6 @@
-if ( localStorage.getItem('sidebar-left-position') !== null ) {
-	var initialPosition = localStorage.getItem('sidebar-left-position');
-	var sidebarLeft = document.querySelector('#sidebar-left .nano-content');
+if ( localStorage.getItem("sidebar-left-position") !== null ) {
+	var initialPosition = localStorage.getItem("sidebar-left-position");
+	var sidebarLeft = document.querySelector("#sidebar-left .nano-content");
 
 	if ( sidebarLeft ) {
 		sidebarLeft.scrollTop = initialPosition;
@@ -8,15 +8,25 @@ if ( localStorage.getItem('sidebar-left-position') !== null ) {
 	
 }
 
-if ( localStorage.getItem( 'sidebar-left-collapsed' ) == 'true' ) {
+// the overlay shows above the first modal, not in the back.
+// https://stackoverflow.com/questions/19305821/multiple-modals-overlay
+$(document).on("show.bs.modal", ".modal", function() {
+    const zIndex = 1040 + 10 * $(".modal:visible").length;
+	console.log("zIndex", zIndex)
+    $(this).css("z-index", zIndex);
+    setTimeout(() => $(".modal-backdrop").not(".modal-stack").css("z-index", zIndex - 1).addClass("modal-stack"));
+});
+
+
+if ( localStorage.getItem( "sidebar-left-collapsed" ) == "true" ) {
 	
-	document.getElementsByTagName( 'html' )[0]
-		.classList.add('sidebar-left-collapsed')
+	document.getElementsByTagName( "html" )[0]
+		.classList.add("sidebar-left-collapsed")
 
 } else {
 
-	document.getElementsByTagName( 'html' )[0]
-		.classList.remove('sidebar-left-collapsed')
+	document.getElementsByTagName( "html" )[0]
+		.classList.remove("sidebar-left-collapsed")
 
 }
 
@@ -71,7 +81,7 @@ $( document ).ready(function() {
 
 	console.log("onDomReady")
 
-	$('#sidebar-button').click(function() {
+	$("#sidebar-button").click(function() {
 		localStorage.setItem( 
 			"sidebar-left-collapsed", 
 			$( "html" ).hasClass( "sidebar-left-collapsed" ) 

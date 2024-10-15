@@ -42,8 +42,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.sizeId = prc.sizes[1].getId();
         
+        prc.jsScripts.add( "app-attribute" );
         prc.jsScripts.add( "app-line-attributes" );
-
+        
         event.setView( "line/attributes" );
 
     }

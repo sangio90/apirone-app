@@ -93,15 +93,6 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "AccountService", ref = "AccountService" )
             .parent("AbsService");
 
-        map("EmployeeService").to( "com.apirone.core.model.service.EmployeeService" )
-            .asSingleton()
-            .property( name = "dao", ref = "EmployeeDAO" )
-            .property( name = "StatusService", ref = "StatusService" )
-            .property( name = "WalletService", ref = "WalletService" )
-            .property( name = "AccountService", ref = "AccountService" )
-            .property( name = "LocationService", ref = "LocationService" )
-            .parent("AbsService");
-
         map("LookupService").to( "com.apirone.core.model.service.LookupService" )
             .asSingleton()
             .parent("AbsService");
@@ -191,6 +182,17 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
             .property( name = "dao", ref = "LineDAO" )
             .property( name = "statusService", ref = "StatusService" )
+            .parent("AbsService");
+
+        map("LangService").to( "com.apirone.core.model.service.LangService" )
+            .asSingleton()
+            .property( name = "dao", ref = "LangDAO" )
+            .parent("AbsService");
+
+        map("TextService").to( "com.apirone.core.model.service.TextService" )
+            .asSingleton()
+            .property( name = "dao", ref = "TextDAO" )
+            .property( name = "LangService", ref = "LangService" )
             .parent("AbsService");
 
         map("VariantService").to( "com.apirone.core.model.service.VariantService" )
@@ -299,6 +301,12 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton();
 
         map("LineDAO").to( "com.apirone.core.model.dao.LineDAO" )
+            .asSingleton();
+
+        map("LangDAO").to( "com.apirone.core.model.dao.LangDAO" )
+            .asSingleton();
+
+        map("TextDAO").to( "com.apirone.core.model.dao.TextDAO" )
             .asSingleton();
 
 

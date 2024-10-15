@@ -1,19 +1,23 @@
 ﻿<cfoutput>
 
-    <div id="attributes-list-modal" class="modal fade">
+    <div id="line-attributes-list-modal" class="modal fade">
         
-        <section class="modal-dialog modal-xl">
+        <section class="modal-dialog modal-lg">
             <div class="modal-content">
                 
                 <header class="card-header">
-                    <h2 class="card-title">Cerca attributi</h2>
+                    <h2 class="card-title">Attributi</h2>
                 </header>
                 
-                <div class="card-body">        
+                <div class="card-body">
 
                     <div class="row">
                     
-                        <div class="col-md-12">
+                        <div class="col-md-12 text-end">
+                            <button class="btn btn-primary btn-sm" data-bind="click:addAttribute">Carica </button>
+                        </div>
+                        
+                        <div class="col-md-12 mt-3">
 
                             <div>
 
@@ -30,34 +34,26 @@
 
                             </div>
 
-                            <div data-bind="visible: showSearchPanel">
+                            <div>
             
-                                <form id="attributes-list-search-form" class="row">
-            
-                                    <div class="col-md-12">
-                                        
-                                        <div class="status">
-                                            Fai una ricerca
-                                        </div>
-            
-                                        <div data-bind="visible: showSearchResult">
-            
-                                            <table class="table table-hover pt-5">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col" width="100">ID</th>
-                                                        <th scope="col">Nome</th>
-                                                        <th scope="col" width="100"></th>
-                                                    </tr>
-                                                </thead>
-                                                
-                                                <tbody data-bind="source:attributesList" data-template="line-attributes-list-row-tmpl">
-                                                </tbody>
-                                            </table>
-            
-                                        </div>
-            
-                                    </div>
+                                <form id="line-attributes-list-search-form" class="row">
+
+                                    #grid( 
+                                        id="line-attributes-grid",
+                                        columns="[
+                                            { 'field':'id', 'title':'ID', width: '100px' },
+                                            { 'field':'name', 'title':'Descrizione'},
+                                            { 'field':'', 'title':'Configurazione', width: '65px'},
+                                            { 
+                                                'field':'', 
+                                                'title':'<input type=checkbox onclick=AP.util.checkAll(this) name=selectAll>', 
+                                                'width':'40px',
+                                                'headerAttributes': { 'class': 'text-center' }
+                                            }
+                                        ]",
+                                        source="attributesList",
+                                        rowTemplate="line/line-attributes-list-row-tmpl"
+                                    )#
             
                                 </form>
 
@@ -80,13 +76,5 @@
         </selection>
     
     </div>
-
-    <!----
-    #template("jstemplate/color/product-comp-colors-row-tmpl")#
-    #template("jstemplate/variant/product-comp-variants-row-tmpl")#
-    #template("jstemplate/component/product-components-list-row-tmpl")#
-    #template("jstemplate/component/product-components-selected-list-row-tmpl")#
-    ---->
-    #template("jstemplate/line/line-attributes-list-row-tmpl")#
 
 </cfoutput>
