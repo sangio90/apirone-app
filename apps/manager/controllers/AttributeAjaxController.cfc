@@ -23,6 +23,8 @@ component extends="com.apirone.core.controller.AbsController" {
     function new( event, rc, prc ){
 
         var texts = [];
+        var result = super.getResult();
+        
         var langs = super.fire("lang.list");
         
         var attribute = super.bean( "Attribute" );
@@ -42,9 +44,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
         }
 
-        attribute.setTexts( texts );
 
-        event.setValue("result", attribute);
+        attribute.setTexts( texts );
+        
+        result.setCount( langs.len() )
+        result.setTotal( langs.len() )
+
+        result.setData( attribute );
+
+        event.setValue("result", result);
         
     }
 

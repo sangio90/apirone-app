@@ -175,7 +175,7 @@ component{
 			.toHandler( "AttributeAjaxController.idExists" );
 
 		get( "/ajax/attributes/new")
-        	.toHandler( "AttributeAjaxController.new" );
+        	.to( "AttributeAjaxController.new" ).end();
 
 		get( "/ajax/attributes/:id")
         	.toHandler( "AttributeAjaxController.get" );

@@ -8,7 +8,7 @@ component extends="coldbox.system.Interceptor"{
 
         }
 
-        //TODO: add here canAccess() from Wineshipping
+        canAccess( event );
 
         var module = prc.currentRoutedModule;
         var model = getModel();
@@ -32,7 +32,7 @@ component extends="coldbox.system.Interceptor"{
 
                 var check = svc.login( accountId = ListFirst( authHeader, ':' ), apiKey = ListLast( authHeader, ':') );
                 
-                if ( check.getStatus() != 'AUTH' ) {
+                if ( check.getStatus() != "AUTH" ) {
                     return arguments.event.renderData(data="#check.getMessage()#",statusCode="401",statusText="Unauthorized")
                                     .noExecution();
                 }
@@ -110,6 +110,87 @@ component extends="coldbox.system.Interceptor"{
 
         return server[ "wireBox-apirone" ];;
 
+    }
+
+    function postEvent( event, data, buffer, rc, prc ){
+
+        if ( prc.keyExists("currentRoutedUrl") AND prc.currentRoutedURL.listContains( "ajax/" ) ) {
+
+            /*
+                here [ event.noExecution() ] not works
+                https://community.ortussolutions.com/t/trouble-with-noexecution-and-pdf/9288
+            */
+
+            var path = "com.apirone.core.model.bean.AjaxResult";
+
+            var bean = new "#path#"();
+
+            var result = event.getValue("result", "result-not-found");
+
+            /*
+                ATTENZIONE:
+                non c'è result se il nome dell'hanlder nel router è sbagliato
+            */
+
+            if ( 
+                IsInstanceOf( result, path ) 
+                OR
+                IsSimpleValue( result )
+                ) {
+
+                event.renderData( data=result, contentType="text/json", type="json" )
+                    .noExecution();
+            
+            } else {
+
+                bean.setTotal( result.len() );
+                bean.setCount( result.len() );
+                bean.setData( result );
+
+                event.renderData( data=bean, contentType="text/json", type="json" )
+                    .noExecution()
+
+            }
+
+        }
+
+    }
+
+    private function canAccess( event ) {
+
+        var currentEvent = arguments.event.getContext().event;
+
+        var allowedEvents = DeserializeJSON( FileRead( ExpandPath("/config/allowedEvents.json.cfm") ) );
+
+        var allowedEventsForUnlogged = allowedEvents.forUnlogged;
+        var allowedEventsForCustomer = ArrayMerge(allowedEvents.forUnlogged, allowedEvents.forCustomer);
+
+        if ( event.getCurrentModule() == "manager" ) {
+
+            if ( session.user.isLogged() ) {
+
+                if( session.user.getAccount().getRole().getId() == "CST" ) {
+
+                    if( !ArrayFindNoCase( allowedEventsForCustomer, currentEvent ) ) {
+
+                        location( "/manager/dashboard?msg=page-not-auth&event=#currentEvent#", false );
+                    
+                    }
+                
+                }
+
+            } else {
+
+                if( !ArrayFindNoCase( allowedEventsForUnlogged, currentEvent ) ) {
+
+                    location( "/manager/login?msg=not-auth", false );
+
+                }
+
+            }
+
+        }
+ 
     }
 
 }

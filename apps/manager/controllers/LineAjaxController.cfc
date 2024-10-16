@@ -14,9 +14,12 @@ component extends="com.apirone.core.controller.AbsController" {
         }
 
         result.setTotal( data.len() );
+        result.setCount( data.len() );
         result.setData( data );
 
-        event.renderData( data=result, contentType="text/json", type="json" );
+        event.setValue("result", result);
+
+        //event.renderData( data=result, contentType="text/json", type="json" );
         
     }
 
