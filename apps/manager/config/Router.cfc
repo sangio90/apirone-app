@@ -169,6 +169,22 @@ component{
 
 
 		/*
+			attributes
+		*/
+		get( "/ajax/attributes/:id/exists")
+			.toHandler( "AttributeAjaxController.idExists" );
+
+		get( "/ajax/attributes/new")
+        	.toHandler( "AttributeAjaxController.new" );
+
+		get( "/ajax/attributes/:id")
+        	.toHandler( "AttributeAjaxController.get" );
+
+		get( "/ajax/attributes")
+        	.toHandler( "AttributeAjaxController.list" );
+
+
+		/*
 			lines
 		*/
 		get( "/lines/:id/attributes")

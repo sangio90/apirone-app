@@ -16,9 +16,11 @@
 
 	<cffunction name="find" returntype="Query">
 
-		<cfargument name="statusId" type="String">
 		<cfargument name="str" type="String">
+		<cfargument name="statusId" type="String">
 		<cfargument name="langId" type="String">
+		<cfargument name="attributeId" type="String">
+		<cfargument name="attributeValueId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -32,16 +34,24 @@
                 INNER JOIN langs USING ( lang_id )
 			WHERE 1=1
 
-			<cfif !isNull( arguments.statusId ) >
-				AND status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.statusId#">
+			<cfif !isNull( arguments.str ) >
+				AND text ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
 			</cfif>
 
-			<cfif !isNull( arguments.str ) >
-				AND text ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.str#%">
+			<cfif !isNull( arguments.statusId ) >
+				AND status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
 			</cfif>
 
 			<cfif !isNull( arguments.langId ) >
-				AND lang_id = <cfqueryparam cfsqltype="varchar" value="#arguments.langId#">
+				AND lang_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.langId#">
+			</cfif>
+
+			<cfif !isNull( arguments.attributeId ) >
+				AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
+			</cfif>
+
+			<cfif !isNull( arguments.attributeValueId ) >
+				AND attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
 			</cfif>
 
 			ORDER BY 

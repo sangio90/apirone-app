@@ -2,6 +2,7 @@ AP.attribute = AP.attribute || {};
 
 AP.attribute.fields = {
     rootDetail: $("#attribute-detail-modal"),
+    detailForm: $("#attribute-detail-form"),
 }
 
 $(document).ready(function(){
@@ -21,9 +22,9 @@ AP.attribute.detail = function() {
 	var viewModel = kendo.observable({
 
         title: "Carica attributo",
-
-		data: {
-			texts: AP.config.langs
+		langs: AP.config.langs,
+		detailForm: {
+			
 		},
 
         callback: {
@@ -32,7 +33,7 @@ AP.attribute.detail = function() {
 
 		open: function() {
 
-			NM.util.modal( { id: $("#attribute-detail-modal") } )
+			//NM.util.modal( { id: $("#attribute-detail-modal") } )
 
 			$("#attribute-detail-modal").modal("show");
 
@@ -61,7 +62,23 @@ AP.attribute.detail = function() {
 
     });
 
-    pub.open = function() {
+    pub.open = function( id ) {
+
+		if ( id ) {
+			var thisUrl = '/ajax/attributes/' + id
+		} else {
+			var thisUrl = '/ajax/attributes/new'
+		}
+
+		/*
+		NM.util.ajax({ method: 'GET', url: thisUrl,
+			callback: {
+				done: function() {
+					console.log("done")
+				}
+			}
+		})
+		*/
 
 		NM.util.openModal( $("#attribute-detail-modal") );
 
@@ -75,9 +92,46 @@ AP.attribute.detail = function() {
 
 		console.log("AP.attribute.detail:init")
 
+		var thisForm = AP.attribute.fields.detailForm;
+
 		kendo.bind( AP.attribute.fields.rootDetail, viewModel )
 
-		//NM.kendo.loadTemplate()
+		thisForm.validate( {
+			onfocusout: function( element ) {
+				$(element).valid();
+			},
+			rules: {
+				attrId: {
+					required: true,
+					remote: {
+						url: "/ajax/attributes/" + $('#attrId').val() + "/exists",
+						type: "GET",
+						data: {
+							username: function() {
+								return $( "#username" ).val();
+						  	}
+						}
+					}
+				},
+			},
+			messages: {
+				attrId: {
+					required: "ID richiesto"
+				},
+			},
+		
+		} );
+
+		thisForm.find("input.lang").each(function(){
+
+			console.log("this", $(this))
+			
+			$(this).rules("add", { 
+				required: true,
+				messages: { required: "Descrizione richiesto" }
+			});
+	   	
+		});
 
 	}	
 

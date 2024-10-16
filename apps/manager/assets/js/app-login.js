@@ -1,5 +1,4 @@
 ﻿AP.login = AP.login || {};
-//ZB.login.fields = ZB.fields || {};
 
 AP['login-fields'] = {
 	loginForm: $('#login-form')

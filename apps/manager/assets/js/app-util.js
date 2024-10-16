@@ -12,7 +12,7 @@ AP.util.getText = function( key, values ) {
 
 };
 
-
+/*
 AP.util.ajax = function( setup ) {
 
 	var defaults = {
@@ -79,3 +79,4 @@ AP.util.checkAll = function( button ) {
     }
 
 };
+*/

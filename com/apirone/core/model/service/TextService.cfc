@@ -37,6 +37,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     private com.apirone.core.model.bean.Result function search(
                      String statusId,
+                     String attributeId,
+                     Numeric attributeValueId,
             required Numeric limit = 20,
 			required Numeric offset = 0,
     	){
@@ -70,7 +72,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if( record.RecordCount ) { 
 			
-			var bean = super.bean( "Lang" );
+			var bean = super.bean( "Text" );
+
 			bean.setId( record.text_id );
 			bean.setName( record.text );
 			bean.setLang( getLangService().getId( record.lang_id ) );

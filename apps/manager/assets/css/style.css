@@ -216,3 +216,19 @@ h2 {
 .userbox {
 	margin-top: 10px;
 }
+
+*:required {
+	border-bottom: 2px solid Red !important;
+}
+
+.card-body {
+	padding: 2rem 2rem !important;
+}
+
+.card-footer {
+	padding: 1rem 2rem !important;
+}
+
+.errors-counter {
+	color: Red;
+}

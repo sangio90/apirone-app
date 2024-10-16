@@ -136,7 +136,7 @@
 
     }      
     
-    public Any function getDataMapper(  ){
+    public Any function getDataMapper(){
 
         return model().getInstance("DataMapper");
 
@@ -145,6 +145,12 @@
     public Any function model(){
 
         return server[ "wireBox-apirone" ];
+
+    }    
+
+    public Any function toStruct( required obj ){
+
+        return DESerializeJSON( SerializeJSON( arguments.obj ) );
 
     }    
 
