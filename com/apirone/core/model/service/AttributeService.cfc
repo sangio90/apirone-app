@@ -53,6 +53,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
 
+    public Boolean function idExists( required String attributeId ){
+		
+		var obj = get( attributeId = arguments.attributeId );
+
+		if( IsNull( obj ) ) {
+			return false;
+		}
+
+        return true;
+
+    }
+
+
     /*
     	private method
 	*/

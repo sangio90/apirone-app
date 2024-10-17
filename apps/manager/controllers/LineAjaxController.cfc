@@ -19,8 +19,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         event.setValue("result", result);
 
-        //event.renderData( data=result, contentType="text/json", type="json" );
-        
     }
 
     function attributes( event, rc, prc ){

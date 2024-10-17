@@ -12,42 +12,20 @@ component{
 		} );
 
 		route( "/live", function( event, rc, prc ) {
-			return "Live #now()#";
+			return "<meta http-equiv='refresh' content='60'>
+				Live #now()#";
 		} );
 
     	get( "/dashboard" )
         	.to( "MainController.dashboard" ).end();
 
-		get(
-			"/countries/list"
+		get("/countries/list"
 		).to('CountryController.list').end();
-
-
-		/*
-			plates
-		
-		get(
-			"/plates/new"
-		).to('PlateController.new').end();
-
-		get(
-			"/plates/:id"
-		).to('PlateController.edit').end();
-
-		get(
-			"/plates"
-		).to('PlateController.list').end();		
-
-		get(
-			"/ajax/plates"
-		).to('PlateAjaxController.list').end();
-		*/
 
 
 		/*
 			productionTime
 		*/
-
 		route( "/ajax/production-times" )
 			.withAction( {
 				GET = "list",
@@ -73,37 +51,6 @@ component{
 			"/ajax/components"
 		).to("ComponentAjaxController.list").end();
 		
-
-		/*
-			products
-		*/
-
-		route( "/ajax/products" )
-			.withAction( {
-				GET = "list",
-				POST = "create",
-				PUT = "modify"
-			} )
-			.toHandler( "ProductAjaxController" );
-
-		get(
-			"/products/:productId/components"
-		).to("ProductController.components").end();
-	
-		get(
-			"/products/:productId"
-		).to('ProductController.edit').end();
-
-
-		post(
-			"/products"
-		).to("ProductController.save").end();
-		
-		get(
-			"/products"
-		).to("ProductController.list").end();		
-
-
 		/*
 			auth // login
 		*/
@@ -171,17 +118,17 @@ component{
 		/*
 			attributes
 		*/
-		get( "/ajax/attributes/:id/exists")
+		get( "/ajax/attributes/exists")
 			.toHandler( "AttributeAjaxController.idExists" );
 
-		get( "/ajax/attributes/new")
-        	.to( "AttributeAjaxController.new" ).end();
+		get( "/ajax/attributes/new" )
+        	.toHandler( "AttributeAjaxController.new" );
 
 		get( "/ajax/attributes/:id")
         	.toHandler( "AttributeAjaxController.get" );
 
 		get( "/ajax/attributes")
-        	.toHandler( "AttributeAjaxController.list" );
+        	.to( "AttributeAjaxController.list" ).end();
 
 
 		/*

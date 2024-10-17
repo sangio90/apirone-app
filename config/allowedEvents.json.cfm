@@ -3,7 +3,7 @@
         "manager:AuthController.resetPwd",
         "manager:AuthController.doResetPwd",
         "manager:AuthController.login",
-        "manager:AuthController.doLogin",
+        "manager:AuthController.checkLogin",
         "manager:AuthController.recovery",
         "manager:AuthController.doRecovery",
         "manager:AuthController.logout",

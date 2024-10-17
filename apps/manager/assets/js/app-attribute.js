@@ -22,22 +22,21 @@ AP.attribute.detail = function() {
 	var viewModel = kendo.observable({
 
         title: "Carica attributo",
-		langs: AP.config.langs,
 		detailForm: {
-			
+
 		},
 
         callback: {
             close: null
         },
 
+		/*
 		open: function() {
-
-			//NM.util.modal( { id: $("#attribute-detail-modal") } )
 
 			$("#attribute-detail-modal").modal("show");
 
 		},
+		*/
 
 		close: function() {
 
@@ -49,7 +48,7 @@ AP.attribute.detail = function() {
 		save: function() {
 
 			$.ajax({
-				method: "GET",
+				method: "POST",
 				url: "/manager/ajax/attributes",
 				data: 'str=' + str,
 				success: function(xhr) {
@@ -65,22 +64,21 @@ AP.attribute.detail = function() {
     pub.open = function( id ) {
 
 		if ( id ) {
-			var thisUrl = '/ajax/attributes/' + id
+			var thisUrl = "/manager/ajax/attributes/" + id
 		} else {
-			var thisUrl = '/ajax/attributes/new'
+			var thisUrl = "/manager/ajax/attributes/new"
 		}
 
-		/*
-		NM.util.ajax({ method: 'GET', url: thisUrl,
+		NM.util.ajax({ 
+			method: 'GET', 
+			url: thisUrl,
 			callback: {
-				done: function() {
-					console.log("done")
+				done: function( xhr ) {
+					viewModel.set( "detailForm", xhr.data );
+					NM.util.openModal( $("#attribute-detail-modal") );
 				}
 			}
 		})
-		*/
-
-		NM.util.openModal( $("#attribute-detail-modal") );
 
     };
 
@@ -103,35 +101,25 @@ AP.attribute.detail = function() {
 			rules: {
 				attrId: {
 					required: true,
+					checkCode: true,
 					remote: {
-						url: "/ajax/attributes/" + $('#attrId').val() + "/exists",
-						type: "GET",
-						data: {
-							username: function() {
-								return $( "#username" ).val();
-						  	}
+						url: "/manager/ajax/attributes/exists",
+						dataFilter: function( xhr ) {
+							var json = JSON.parse( xhr );
+							return json.data == false;
 						}
 					}
 				},
 			},
 			messages: {
 				attrId: {
-					required: "ID richiesto"
+					required: "ID richiesto",
+					checkCode: "Solo numeri, lettere, trattino o trattino basso",
+					remote: "L'attributo esiste"
 				},
 			},
 		
 		} );
-
-		thisForm.find("input.lang").each(function(){
-
-			console.log("this", $(this))
-			
-			$(this).rules("add", { 
-				required: true,
-				messages: { required: "Descrizione richiesto" }
-			});
-	   	
-		});
 
 	}	
 

@@ -16,7 +16,7 @@ component extends="com.apirone.core.controller.AbsController" {
         result.setTotal( data.len() );
         result.setData( data );
 
-        event.renderData( data=result, contentType="text/json", type="json" );
+        event.setValue("result", result );
         
     }
 
@@ -44,7 +44,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         }
 
-
         attribute.setTexts( texts );
         
         result.setCount( langs.len() )
@@ -52,8 +51,24 @@ component extends="com.apirone.core.controller.AbsController" {
 
         result.setData( attribute );
 
-        event.setValue("result", result);
+        event.setValue("result", result );
         
+    }
+
+    function idExists( event, rc, prc ){
+
+        param rc.attrId="__";
+        var result = getResult();
+
+        var texts = [];
+        var result = super.getResult();
+
+        var check = super.fire( "attribute.idExists", [ rc.attrId ] );
+
+        result.setData( check );
+
+        event.setValue("result", result );
+
     }
 
 }

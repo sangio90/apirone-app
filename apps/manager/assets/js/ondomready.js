@@ -107,8 +107,6 @@ $.validator.setDefaults( {
 
 $( document ).ready(function() {
 
-	console.log("onDomReady")
-
 	$("#sidebar-button").click(function() {
 		localStorage.setItem( 
 			"sidebar-left-collapsed", 
@@ -124,7 +122,5 @@ $( document ).ready(function() {
         },
         "Please check your input."
     );
-
-	//console.log("$.validator", $.validator);
 
 });

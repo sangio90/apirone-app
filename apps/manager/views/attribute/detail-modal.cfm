@@ -16,11 +16,13 @@
                         <div class="mb-3 row">
                             <label for="attrId" class="col-sm-2 col-form-label text-end">ID</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control" id="attrId" name="attrId" value="" onkeyup="this.value = this.value.toUpperCase();">
+                                <input type="text" required class="form-control" id="attrId" name="attrId" 
+                                    data-bind="value: detailForm.id"
+                                    onkeyup="this.value = this.value.toUpperCase();">
                             </div>
                         </div>
 
-                        <div data-bind="source: langs" data-template="attribute-lang-row-tmpl">
+                        <div data-bind="source: detailForm.texts" data-template="attribute-lang-row-tmpl">
                         </div>
                     
                     </div>

@@ -82,38 +82,6 @@ component extends="coldbox.system.Interceptor"{
 
     function postEvent( event, data, buffer, rc, prc ){
 
-    }
-
-
-    /*
-        private methods
-    */
-
-    private Struct function getGlobalConfiguration(){
-
-        // Select keys from Configuration.cfc 
-        // Not all keys, please!
-        
-        var config = getModel().getInstance("Configuration").get();
-
-        var result = {
-            "appName" = config.get("appName"),
-            "appVersion" = config.get("appVersion"),
-            "langs" = getModel().getInstance("LangService").list()
-        };
-
-        return result;
-
-    }
-
-    private Struct function getModel(){
-
-        return server[ "wireBox-apirone" ];;
-
-    }
-
-    function postEvent( event, data, buffer, rc, prc ){
-
         if ( prc.keyExists("currentRoutedUrl") AND prc.currentRoutedURL.listContains( "ajax/" ) ) {
 
             /*
@@ -122,7 +90,6 @@ component extends="coldbox.system.Interceptor"{
             */
 
             var path = "com.apirone.core.model.bean.AjaxResult";
-
             var bean = new "#path#"();
 
             var result = event.getValue("result", "result-not-found");
@@ -153,6 +120,34 @@ component extends="coldbox.system.Interceptor"{
             }
 
         }
+
+    }    
+
+
+    /*
+        private methods
+    */
+    
+    private Struct function getGlobalConfiguration(){
+
+        // Select keys from Configuration.cfc 
+        // Not all keys, please!
+        
+        var config = getModel().getInstance("Configuration").get();
+
+        var result = {
+            "appName" = config.get("appName"),
+            "appVersion" = config.get("appVersion"),
+            //"langs" = getModel().getInstance("LangService").list()
+        };
+
+        return result;
+
+    }
+
+    private Struct function getModel(){
+
+        return server[ "wireBox-apirone" ];;
 
     }
 
