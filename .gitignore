@@ -2,16 +2,12 @@
 /*.sublime-project
 /*.code-workspace
 /.vscode/settings.json
-/application.log
 /tmp.cfm
 /.vscode
 /.env
 /modules/*
 /tasks/local.properties
-/install.log
+/*.log
 /modules
 /userdata
 /server.json
-/debug.log
-
-/debug.log

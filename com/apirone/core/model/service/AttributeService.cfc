@@ -66,6 +66,42 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
 
+
+	public String function create(
+			required com.apirone.core.model.bean.Attribute attribute
+		){
+
+		transaction{
+
+			var newId = return getDao().insert( arguments.attribute );
+
+			for ( var text in attribute.getTexts() ) {
+
+				getTextService().delete();
+				getTextService().create();
+	
+			}
+
+		}
+
+		return newId;
+
+	}
+
+	public String function update(
+			required com.apirone.core.model.bean.Attribute attribute
+		){
+		
+            var id = getDao().update( arguments.option ).toString();
+            
+			getCacheManager().remove( getCachekey( id ) );
+			
+			return id;
+    
+	}
+
+
+
     /*
     	private method
 	*/

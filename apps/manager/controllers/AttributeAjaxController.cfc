@@ -55,12 +55,47 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
+    function save( event, rc, prc ){
+
+        var result = super.getResult();
+        var attr = super.bean("Text");
+
+        var json = DESerializeJSON( GetHTTPRequestData() );
+
+        attr.setId( json.id );
+
+        for( var text in json.texts ) {
+
+            var text = super.bean("Text");
+            var lang = super.bean("Lang");
+
+            bean.setLang( lang.setId( text.lang.id ) )
+
+
+        }
+
+        attr.setTexts( texts );
+
+        if( Len( json.id  ) ) {
+            
+            super.fire( "attribute.update" )
+        
+        } else {
+
+            super.fire( "attribute." )
+            
+        }
+        
+        event.setValue("result", result );
+        
+    }
+
     function idExists( event, rc, prc ){
 
         param rc.attrId="__";
+
         var result = getResult();
 
-        var texts = [];
         var result = super.getResult();
 
         var check = super.fire( "attribute.idExists", [ rc.attrId ] );

@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="langService" type="com.apirone.core.model.service.LangService";
 
 	public com.apirone.core.model.bean.Text function get(
-			required String langId
+			required String textId
     	){
 
 			var cm = getCacheManager();
@@ -34,7 +34,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search(argumentCollection = arguments).getData()
 	}
 
-
     private com.apirone.core.model.bean.Result function search(
                      String statusId,
                      String attributeId,
@@ -49,7 +48,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {
-			rows.add( get( langId = record.Text_id ) );
+			rows.add( get( textId = record.text_id ) );
 		});
 
 	    result.setData( rows );
@@ -60,15 +59,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
+	public String function create(
+			required com.apirone.core.model.bean.Text text
+		){
+
+		var newId = return getDao().update( arguments.text );
+
+		return text.getId();
+
+	}
+
+	public String function update(
+			required com.apirone.core.model.bean.Attribute attribute
+		){
+		
+            var id = getDao().update( arguments.option ).toString();
+            
+			getCacheManager().remove( getCachekey( id ) );
+			
+			return id;
+    
+	}
     
     /**
      * @private
      */
     private com.apirone.core.model.bean.Text function build(
-		required String langId
+		required String textId
 	){
 
-		var record = getDao().read( langId = arguments.textId );
+		var record = getDao().read( textId = arguments.textId );
 
 		if( record.RecordCount ) { 
 			
