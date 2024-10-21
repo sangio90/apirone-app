@@ -38,12 +38,12 @@ component extends="com.wineshipping.core.model.service.AbsService" accessors="tr
     public com.wineshipping.core.model.bean.Result function search(
 			required Numeric limit = 20,
 			required Numeric offset = 0,
-			required Array orderby= [ {'field' = 'orderby'} ],
+			required Array orderby= [ {"field" = "orderby"} ],
             		 String shipmentId
     	){
 
 		var thisOrderby = createOrderBy( arguments.orderby );
-		arguments['orderby'] = thisOrderby;
+		arguments["orderby"] = thisOrderby;
 	
 	    var rows = [];
     	var result = super.getResult();

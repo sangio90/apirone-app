@@ -16,7 +16,8 @@
                         <div class="mb-3 row">
                             <label for="attrId" class="col-sm-2 col-form-label text-end">ID</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control" id="attrId" name="attrId" 
+                                <input type="text" required class="form-control col-sm-4" id="attrId" name="attrId"
+                                    maxlength="10"
                                     data-bind="value: detailForm.id"
                                     onkeyup="this.value = this.value.toUpperCase();">
                             </div>
@@ -29,11 +30,12 @@
 
                     <footer class="card-footer">
                         <div class="row">
-                            <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-default me-2" data-bs-dismiss="modal">Chiudi</button>
-                                <button type="submit" class="btn btn-primary">Salva</button>
-                            </div>
-                            <div class="col-md-12 text-end errors-counter mt-3">
+                            <div class="col-md-12 float-end">
+                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
+                                    <i class="fas fa-save"></i> Salva
+                                </button>
+                                <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
+                                <div class="status errors-counter mt-1 float-end me-3"></div>
                             </div>
                         </div>
                     </footer>

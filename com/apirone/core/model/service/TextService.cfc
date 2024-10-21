@@ -30,7 +30,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     public com.apirone.core.model.bean.Result function list(
 		String statusId,
 	) {
-		arguments['limit'] = -1;
+		arguments["limit"] = -1;
 		return search(argumentCollection = arguments).getData()
 	}
 
@@ -63,6 +63,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.Text text
 		){
 
+		
+
 		var newId = return getDao().update( arguments.text );
 
 		return text.getId();
@@ -70,7 +72,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function update(
-			required com.apirone.core.model.bean.Attribute attribute
+		required com.apirone.core.model.bean.Text text
 		){
 		
             var id = getDao().update( arguments.option ).toString();

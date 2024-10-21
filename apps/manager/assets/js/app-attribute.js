@@ -47,15 +47,28 @@ AP.attribute.detail = function() {
 
 		save: function() {
 
-			$.ajax({
-				method: "POST",
-				url: "/manager/ajax/attributes",
-				data: 'str=' + str,
-				success: function(xhr) {
-					viewModel.set( "attributesList", xhr.data );
-					status.html( "Ho trovato " + xhr.count + " record.") 
-				},
-			});
+			var thisForm = AP.attribute.fields.detailForm;
+			var status = thisForm.find(".status");
+
+			if( thisForm.valid() ) {
+
+				NM.util.ajax({ 
+					method: "POST", 
+					url: "/manager/ajax/attributes",
+					data: JSON.stringify( viewModel.get( "detailForm" ) ),
+					callback: {
+						done: function( xhr ) {
+
+							status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+
+							console.log("xhr", xhr)
+						}
+					}
+				})
+
+			}
+
+			return false;
 
 		},
 
@@ -64,13 +77,13 @@ AP.attribute.detail = function() {
     pub.open = function( id ) {
 
 		if ( id ) {
-			var thisUrl = "/manager/ajax/attributes/" + id
+			var thisUrl = "/manager/ajax/attributes/" + id;
 		} else {
-			var thisUrl = "/manager/ajax/attributes/new"
+			var thisUrl = "/manager/ajax/attributes/new";
 		}
 
 		NM.util.ajax({ 
-			method: 'GET', 
+			method: "GET", 
 			url: thisUrl,
 			callback: {
 				done: function( xhr ) {

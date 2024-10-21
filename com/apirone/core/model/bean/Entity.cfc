@@ -1,6 +1,9 @@
-component accessors="true" extends="com.apirone.core.model.bean.AbsBean" {
+component accessors="true" {
 
-    property name="type" type="String" default="";
+	//{ "key" = "value" } 
+	//es. { "attribute.id" = "COLOR" }
+    property name="key";
+    property name="value";    
 
     public com.apirone.core.model.bean.Entity function init(){
         return this;

@@ -130,6 +130,9 @@ component{
 		get( "/ajax/attributes")
         	.to( "AttributeAjaxController.list" ).end();
 
+		post( "/ajax/attributes")
+        	.to( "AttributeAjaxController.save" ).end();
+
 
 		/*
 			lines

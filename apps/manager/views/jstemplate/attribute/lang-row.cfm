@@ -11,6 +11,7 @@
             
             <div class="col-sm-10">
                 <input type="text" required class="lang form-control" 
+                    data-bind="value: name"
                     id="lang_##=lang.id##" 
                     name="lang_##=lang.id##"
                     data-msg-required="Campo richiesto">

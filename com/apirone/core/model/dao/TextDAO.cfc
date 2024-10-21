@@ -69,4 +69,29 @@
 
 	</cffunction>
 
+	<cffunction name="insert" returntype="Numeric">
+
+		<cfargument name="text" type="com.apirone.core.model.bean.Text" required="true">
+
+		<cfset field = getDBField( arguments.text.getEntity().getKey() )>
+
+		<cfquery name="local.q" datasource="apirone">
+			INSERT INTO texts (
+				text,
+				lang_id,
+				#field#
+			)
+			VALUES
+			(
+				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getName()#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getEntity().getValue()#">
+			)
+			RETURNIG text_id
+		</cfquery>
+
+		<cfreturn local.q.text_id>
+
+	</cffunction>
+
 </cfcomponent>

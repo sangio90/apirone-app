@@ -65,20 +65,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
-
-
+	
 	public String function create(
 			required com.apirone.core.model.bean.Attribute attribute
 		){
 
 		transaction{
 
-			var newId = return getDao().insert( arguments.attribute );
+			var newId = getDao().insert( arguments.attribute );
 
 			for ( var text in attribute.getTexts() ) {
 
-				getTextService().delete();
-				getTextService().create();
+				var entity = super.bean("Entity").setId( "attribute.id" );
+
+				text.setEntity( entity );
+
+				//getTextService().delete();
+				getTextService().create( text );
 	
 			}
 
@@ -88,12 +91,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+	
 	public String function update(
 			required com.apirone.core.model.bean.Attribute attribute
 		){
 		
-            var id = getDao().update( arguments.option ).toString();
-            
+            var id = getDao().update( arguments.attribute );
+
+			for ( var text in attribute.getTexts() ) {
+
+				var entity = super.bean("Entity").setId( "attribute.id" );
+
+				text.setEntity( entity );
+
+				getTextService().update( text );
+	
+			}
+
 			getCacheManager().remove( getCachekey( id ) );
 			
 			return id;

@@ -21,7 +21,8 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "Configuration", ref = "Configuration")
             .property( name = "CacheManager", ref = "CacheManager" )
             .property( name = "Logger", ref = "Logger" )
-            .property( name = "Factory", ref = "Factory" );
+            .property( name = "Factory", ref = "Factory" )
+            .property( name = "DBUtil", ref = "DBUtil" );
         
         map("ProductCategoryService").to( "com.apirone.core.model.service.ProductCategoryService" )
             .asSingleton()
@@ -218,7 +219,6 @@ component extends="coldbox.system.ioc.config.Binder" {
             
         map("AttributeValueService").to( "com.apirone.core.model.service.AttributeValueService" )
             .asSingleton()
-            .property( name = "attributeValueService", ref = "attributeValueService" )
             .property( name = "dao", ref = "AttributeValueDAO" )
             .parent("AbsService");
             
@@ -227,6 +227,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             dao
         */
         map("AbsDAO").to( "com.apirone.core.model.dao.AbsDAO" )
+            .property( name = "DBUtil", ref = "DBUtil" )
             .asSingleton();
          
         map("SizeDAO").to( "com.apirone.core.model.dao.SizeDAO" )
@@ -371,6 +372,9 @@ component extends="coldbox.system.ioc.config.Binder" {
             );
 
         map("CacheManager").to( "com.apirone.core.util.CacheManager" )
+            .asSingleton()
+
+        map("DBUtil").to( "com.apirone.core.util.DBUtil" )
             .asSingleton()
 
         map("Logger").to( "com.apirone.core.util.Logger" )

@@ -58,35 +58,47 @@ component extends="com.apirone.core.controller.AbsController" {
     function save( event, rc, prc ){
 
         var result = super.getResult();
-        var attr = super.bean("Text");
+        var attr = super.bean("Attribute");
+        
+        var thisId = "";
+        var messageId = "";
+        var texts = [];
 
-        var json = DESerializeJSON( GetHTTPRequestData() );
+        var json = DESerializeJSON( GetHTTPRequestData().content );
 
         attr.setId( json.id );
 
-        for( var text in json.texts ) {
+        for( var thisText in json.texts ) {
 
             var text = super.bean("Text");
             var lang = super.bean("Lang");
 
-            bean.setLang( lang.setId( text.lang.id ) )
+            text.setName( thisText.name )
+            text.setLang( lang.setId( thisText.lang.id ) );
 
+            texts.add( text );
 
         }
 
         attr.setTexts( texts );
 
-        if( Len( json.id  ) ) {
+        if( Len( json.action == "create"  ) ) {
             
-            super.fire( "attribute.update" )
-        
+            messageId = "attribute.created";
+            thisId = super.fire( "attribute.create", [ attr ] )
+            
         } else {
 
-            super.fire( "attribute." )
+            messageId = "attribute.updated";
+            thisId = super.fire( "attribute.update", [ attr ] )
             
         }
+
+        var message = completeMessage( messageId );
+
+        result.setData(  message, { payload = { id = thisId }  } );
         
-        event.setValue("result", result );
+        event.setValue( "result", result );
         
     }
 

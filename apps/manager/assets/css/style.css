@@ -218,7 +218,7 @@ h2 {
 }
 
 *:required {
-	border-bottom: 2px solid Red !important;
+	border-bottom: 2px solid #C10000 !important;
 }
 
 .card-body {
@@ -230,5 +230,5 @@ h2 {
 }
 
 .errors-counter {
-	color: Red;
+	color: #C10000;
 }

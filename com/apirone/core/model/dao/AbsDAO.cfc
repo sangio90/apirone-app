@@ -1,6 +1,7 @@
 <cfcomponent>
 
 	<cfset variables.companyId = "azapi">
+	<cfproperty name="DBUtil" type="com.apirone.core.model.util.DBUtil">
 
 	<cffunction name="getField" output="No" returntype="Struct">
         
@@ -24,6 +25,7 @@
 		<cfreturn data[ arguments.type ]>
 
 	</cffunction>
+	
 
 	<cffunction returntype="String" name="createFilters">
 
@@ -80,11 +82,20 @@
 
 	</cffunction>
 
+
 	<cffunction returntype="String" name="sanitizeSQL">
 
 		<cfargument name="sql" type="String">
 
 	    <cfreturn REReplace( arguments.sql , "[^A-Za-z0-9_ ,.]", "", "all" )>
+
+	</cffunction>	
+
+	<cffunction returntype="String" name="getDBField">
+
+		<cfargument name="field" type="String">
+
+	    <cfreturn getDBUtil().getDBField( arguments.field )>
 
 	</cffunction>	
 

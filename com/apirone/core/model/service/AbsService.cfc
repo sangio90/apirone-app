@@ -10,6 +10,7 @@
     property name="factory" type="com.apirone.core.model.factory.Factory";
     property name="cacheManager" type="com.apirone.core.util.CacheManager";
 	property name="configuration" type="com.apirone.core.model.bean.Configuration" ;
+	property name="DBUtil" type="com.apirone.core.model.util.DBUtil" ;
 
     /**
      * @param type - il nome del bean
@@ -73,22 +74,6 @@
         return result;
     }
     
-    public String function getDBField( required String field ) {
-
-        var fields = DESerializeJSON( FileRead( ExpandPath('/config/DBFields.json.cfm') ) );
- 
-        if ( !structKeyExists( fields, arguments.field ) ) {
-
-            throw( 
-                message="Field [#arguments.field#] not found in available values.",
-                type="apirone.errors.AbsService.DBFieldNotFound" 
-            );
-
-        }
-
-        return LCase( fields[ arguments.field ] );
-    }
-
     public Query function trimQueryFields( required Query records ) {
 
         var columns = records.columnList();
@@ -107,8 +92,13 @@
             
         }
 
-
         return records;
+    }
+    
+    public String function getDBField( required String field ) {
+
+        return getDBUtil().getDBField( arguments.field );
+
     }
     
 }
