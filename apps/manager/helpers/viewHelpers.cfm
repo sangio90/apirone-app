@@ -136,7 +136,90 @@
                 </div>
                 
                 #template( view="jstemplate/#arguments.rowTemplate#" )#
-            
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function(event) {
+
+                        $("###arguments.id#").find("th.kendo-tooltip").each( function( index ) {
+                            $(this).kendoTooltip({
+                                //filter: "th.kendo-tooltip",
+                                position: "top",
+                                width: function( e ){
+    
+                                    var width = "20"
+                                    console.log("content:event", e);
+    
+                                    /*
+                                    console.log("content:event", e);
+    
+                                    //get with of tooltip by class (tw-NUMBER)
+    
+                                    console.log("event.target", event.target);
+    
+                                    var classes = event.target.prop("className").split(" ");
+    
+                                    for( var clazz of classes ) {
+    
+                                        console.log("clazz", clazz);
+    
+                                        if ( clazz.startsWith("tw-") ) {
+                                            var params = clazz.split("-")
+                                            width = params[1];
+                                        }
+                                    }
+                                        */
+    
+    
+                                    return width;
+                                },
+                                content: function( event ){
+                                    
+                                    return event.target.text()
+                                }
+                            }).data("kendoTooltip");                        } )
+
+                        <!----
+                        $("###arguments.id#").kendoTooltip({
+                            filter: "th.kendo-tooltip",
+                            position: "top",
+                            width: function( e ){
+
+                                var width = "20"
+                                console.log("content:event", e);
+
+                                /*
+                                console.log("content:event", e);
+
+                                //get with of tooltip by class (tw-NUMBER)
+
+                                console.log("event.target", event.target);
+
+                                var classes = event.target.prop("className").split(" ");
+
+                                for( var clazz of classes ) {
+
+                                    console.log("clazz", clazz);
+
+                                    if ( clazz.startsWith("tw-") ) {
+                                        var params = clazz.split("-")
+                                        width = params[1];
+                                    }
+                                }
+                                    */
+
+
+                                return width;
+                            },
+                            */
+                            content: function( event ){
+                                
+                                return event.target.text()
+                            }
+                        }).data("kendoTooltip");
+                        ----->
+                    });
+                </script>
+          
             </cfoutput>
             
         </cfsavecontent>

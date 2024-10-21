@@ -24,6 +24,7 @@
         type="css">
     
     <script src="/modules/assets/template-admin/vendor/modernizr/modernizr.js"></script>
+    <script src="/modules/assets/template-admin/vendor/jquery/jquery.js"></script>
 
     <link rel="stylesheet" href="/assets/#prc.staticVersion#/manager/css/style.css">
     <link rel="stylesheet" href="/assets/main/#prc.staticVersion#/css/kendo-custom.css">

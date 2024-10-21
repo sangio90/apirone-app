@@ -33,6 +33,10 @@
                             </div>
 
                             <div>
+                                <!---
+                                    DOC:
+                                        tw-NUMBER: larghezza del tooltip
+                                --->
             
                                 <form id="line-attributes-list-search-form" class="row">
 
@@ -41,7 +45,7 @@
                                         columns="[
                                             { 'field':'id', 'title':'ID', width: '100px' },
                                             { 'field':'name', 'title':'Descrizione'},
-                                            { 'field':'status', 'title':'Status', width: '65px'},
+                                            { 'field':'status', 'title':'Status', width: '30px', headerAttributes: { 'class': 'kendo-tooltip tw-100'}},
                                             { 'field':'', 'title':'', width: '65px'},
                                             { 
                                                 'field':'', 

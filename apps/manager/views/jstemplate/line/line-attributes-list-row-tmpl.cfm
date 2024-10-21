@@ -10,7 +10,9 @@
                 <span data-bind="text: getAttributeName"></span>
             </td>
             <td>
-                <span data-bind="text: status.id"></span>
+                <span class="square-color" data-bind="style: { backgroundColor: status.color.hex }">
+                    &nbsp;
+                </span>
             </td>
             <td>
                 <div>

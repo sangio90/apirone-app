@@ -231,3 +231,9 @@ h2 {
 .errors-counter {
 	color: #C10000;
 }
+
+.square-color {
+	width: 20px;
+	height: 20px;
+	display: block;
+}

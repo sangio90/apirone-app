@@ -7,7 +7,7 @@
     ],
 
     manager: [
-        { file: "/modules/assets/template-admin/vendor/jquery/jquery.js" },
+        
         { file: "/modules/assets/template-admin/vendor/jquery-browser-mobile/jquery.browser.mobile.js" },
         { file: "/modules/assets/template-admin/vendor/popper/umd/popper.min.js" },
         { file: "/modules/assets/template-admin/vendor/bootstrap/js/bootstrap.bundle.min.js" },

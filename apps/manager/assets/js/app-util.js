@@ -1,82 +1,15 @@
 AP.util = AP.util || {};
 
-NM.util.getText = function( key, values ) {
+AP.util.getText = function( texts, langId="it" ) {
 
-	var text = ZB.data.texts[ key ];
+	for( var thisText of texts  ) {
 
-	if ( text ) {
-		return text;
-	} else {
-		return "** token not found **";
+		if ( thisText.lang.id == langId.toUpperCase() ) {
+			return thisText.name;
+		}
+	
 	}
 
-};
-
-/*
-NM.util.ajax = function( setup ) {
-
-	var defaults = {
-		url: '',
-		data: null,
-		method: 'GET',
-		callback: {
-			done: undefined,
-			always: undefined,
-			fail: function( xhr ) {
-				AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
-			}
-		}
-	};
-
-	var settings = $.extend( true, defaults, setup );
-
-	if ( settings.hasOwnProperty( "cache" ) ) {
-		
-		config.cache = settings.cache;
-		
-		if ( !settings.cache ) {
-			config.headers = {
-				"cache-control": "no-cache"
-			};
-		}
-	}
-
-	var data = 
-		$.ajax( { 
-			url: settings.url, 
-			method: settings.method,
-			data: settings.data
-		} )
-		.done( function( xhr ) {
-			
-			if ( xhr.error === undefined ) { // dal proxy
-				if ( settings.callback.done !== undefined ) {
-					settings.callback.done.apply( null, [ xhr ] );
-				}
-			} else {
-				location.href = '/';
-			}
-			
-		} )
-		.fail( settings.callback.fail )
-		.always( settings.callback.always );
-
-	return data;
+	return "** not found **";
 
 };
-
-NM.util.checkAll = function( button ) {
-
-    if(button.checked) {
-        // Iterate each checkbox
-        $('input[name=selected]:checkbox').each(function() {
-            this.checked = true;                        
-        });
-    } else {
-        $('input[name=selected]:checkbox').each(function() {
-            this.checked = false;                       
-        });
-    }
-
-};
-*/

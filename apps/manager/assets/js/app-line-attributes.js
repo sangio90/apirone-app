@@ -27,13 +27,20 @@ AP.lineAttributes.list = function() {
 
 		getAttributeName: function( event ) {
 
-			console.log("getAttributeName", event)
+			var text = AP.util.getText( event.texts, "it" )
+
+			return text;
 
 		},
 
-		showAttributesList: function() {
+		addAttribute: function( event ) {
 
-			console.log("showAttributesList")
+			service.open();
+
+			return false;
+		},
+
+		showAttributesList: function() {
 
 			$("#line-attributes-list-modal").modal("show");
 
