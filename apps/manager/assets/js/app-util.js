@@ -1,6 +1,6 @@
 AP.util = AP.util || {};
 
-AP.util.getText = function( key, values ) {
+NM.util.getText = function( key, values ) {
 
 	var text = ZB.data.texts[ key ];
 
@@ -13,7 +13,7 @@ AP.util.getText = function( key, values ) {
 };
 
 /*
-AP.util.ajax = function( setup ) {
+NM.util.ajax = function( setup ) {
 
 	var defaults = {
 		url: '',
@@ -65,7 +65,7 @@ AP.util.ajax = function( setup ) {
 
 };
 
-AP.util.checkAll = function( button ) {
+NM.util.checkAll = function( button ) {
 
     if(button.checked) {
         // Iterate each checkbox

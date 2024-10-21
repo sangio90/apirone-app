@@ -87,3 +87,18 @@ NM.util.ajax = function( setup ) {
 	return data;
 
 };
+
+NM.util.checkAll = function( button ) {
+
+    if(button.checked) {
+        // Iterate each checkbox
+        $('input[name=selected]:checkbox').each(function() {
+            this.checked = true;                        
+        });
+    } else {
+        $('input[name=selected]:checkbox').each(function() {
+            this.checked = false;                       
+        });
+    }
+
+};

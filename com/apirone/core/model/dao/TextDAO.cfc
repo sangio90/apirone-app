@@ -28,8 +28,8 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-             text_id, 
-                COUNT text_id OVER() AS total
+             	text_id, 
+				COUNT( text_id ) OVER() AS total
 			FROM texts
                 INNER JOIN langs USING ( lang_id )
 			WHERE 1=1

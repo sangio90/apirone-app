@@ -2,8 +2,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.AttributeDAO";
     property name="textService" type="com.apirone.core.model.service.TextService";
+    property name="statusService" type="com.apirone.core.model.service.StatusServive";
 
-    public com.apirone.core.model.bean.Line function get(
+    public com.apirone.core.model.bean.Attribute function get(
     		required String attributeId
         ){
 
@@ -27,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public com.apirone.core.model.bean.Line[] function list() {
+	public com.apirone.core.model.bean.Attribute[] function list() {
 		arguments['limit'] = -1;
 		
 		return search(argumentCollection = arguments).getData();
@@ -123,7 +124,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Line function build(
+	private com.apirone.core.model.bean.Attribute function build(
     		required String attributeId
     	){
 
@@ -138,6 +139,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             bean.setTexts( getTextService().list( attributeId = record.attribute_id ) )
 
 			bean.setCreatedAt( record.created_at );
+			
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
             return bean;
@@ -150,7 +152,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "line_#arguments.id#";
+  		return "attribute_#arguments.id#";
 
   	}
 

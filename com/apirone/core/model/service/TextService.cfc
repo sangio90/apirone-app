@@ -27,7 +27,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	} 
     
-    public com.apirone.core.model.bean.Result function list(
+    public com.apirone.core.model.bean.Text[] function list(
 		String statusId,
 	) {
 		arguments["limit"] = -1;
@@ -96,7 +96,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.text_id );
 			bean.setName( record.text );
-			bean.setLang( getLangService().getId( record.lang_id ) );
+			bean.setLang( getLangService().get( record.lang_id ) );
 			
 			return bean;
 			

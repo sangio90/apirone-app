@@ -7,7 +7,10 @@
                 <span data-bind="text: id"></span>
             </td>
             <td>
-                <span data-bind="text: name"></span>
+                <span data-bind="text: getAttributeName"></span>
+            </td>
+            <td>
+                <span data-bind="text: status.id"></span>
             </td>
             <td>
                 <div>

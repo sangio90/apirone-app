@@ -33,7 +33,7 @@
                                     { 'field':'', 'title':'', width: '65px'},
                                     { 
                                         'field':'', 
-                                        'title':'<input type=checkbox onclick=AP.util.checkAll(this) name=selectAll>', 
+                                        'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
                                         'width':'40px',
                                         'headerAttributes': { 'class': 'text-center' }
                                     }

@@ -27,6 +27,7 @@
 
     <link rel="stylesheet" href="/assets/#prc.staticVersion#/manager/css/style.css">
     <link rel="stylesheet" href="/assets/main/#prc.staticVersion#/css/kendo-custom.css">
+    <link rel="stylesheet" href="/assets/main/#prc.staticVersion#/css/colors.css">
 
     <script>
         //TODO: use AP.config (for current page) and AP.globalConfig

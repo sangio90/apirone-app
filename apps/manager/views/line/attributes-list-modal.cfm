@@ -20,15 +20,13 @@
                         <div class="col-md-12 mt-3">
 
                             <div>
-
-                                <form class="pb-2" data-bind="events: { submit: search }" id="attributes-search">
-                                    <div class="row">
-                                        <div class="col-md-10 col-sm-12">
-                                            <input class="form-control" placeholder="Cerca..." id="attributes-search-input">
-                                        </div>
-                                        <div class="col-md-2 col-sm-12">
-                                            <button class="btn btn-primary" value="Cerca" data-bind="click: searchAttributes">Cerca</button>
-                                        </div>
+                                
+                                <form class="d-flex align-items-center mb-4" data-bind="events: { submit: search }" id="attributes-search">
+                                    <div class="col me-2">
+                                        <input class="form-control" placeholder="Cerca..." id="attributes-search-input">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-primary" value="Cerca" data-bind="click: searchAttributes">Cerca &raquo;</button>
                                     </div>
                                 </form>
 
@@ -43,10 +41,11 @@
                                         columns="[
                                             { 'field':'id', 'title':'ID', width: '100px' },
                                             { 'field':'name', 'title':'Descrizione'},
-                                            { 'field':'', 'title':'Configurazione', width: '65px'},
+                                            { 'field':'status', 'title':'Status', width: '65px'},
+                                            { 'field':'', 'title':'', width: '65px'},
                                             { 
                                                 'field':'', 
-                                                'title':'<input type=checkbox onclick=AP.util.checkAll(this) name=selectAll>', 
+                                                'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
                                                 'width':'40px',
                                                 'headerAttributes': { 'class': 'text-center' }
                                             }

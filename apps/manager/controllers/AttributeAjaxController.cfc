@@ -3,20 +3,22 @@ component extends="com.apirone.core.controller.AbsController" {
     function list( event, rc, prc ){
 
         var data = [];
-        var result = super.getResult();
+        //var result = super.getResult();
         var dm = getDataMapper();
         
         var rows = super.fire( "attribute.list" );
 
+        /*
         for ( var row in rows ) {
-            var obj = dm.convert( row, "Line", true );
+            var obj = dm.convert( row, "Attri", true );
             data.add( obj );
         }
+            */
 
-        result.setTotal( data.len() );
-        result.setData( data );
+        //result.setTotal( data.len() );
+        //result.setData( data );
 
-        event.setValue("result", result );
+        event.setValue("result", rows );
         
     }
 

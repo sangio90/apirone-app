@@ -1,4 +1,4 @@
-component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
+component accessors="true" {
 
 	//{ "key" = "value" } - es. { "attribute.id" = "COLOR" }
     property name="key";

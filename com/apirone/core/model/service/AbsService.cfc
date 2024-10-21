@@ -18,9 +18,8 @@
      * @param values - dati inuna struttura
      */
 
-    public com.apirone.core.model.bean.AbsBean function bean(
+    public Struct function bean(
         required String type, 
-                 String scope="core", 
                  Struct values={} 
     	){
 
