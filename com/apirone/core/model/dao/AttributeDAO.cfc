@@ -41,7 +41,6 @@
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.attribute.getId()#">
 			)
-			
 		</cfquery>
 
 		<cfreturn arguments.attribute.getId()>

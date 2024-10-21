@@ -161,20 +161,20 @@
     }
 
     // only message
-    public String function message( required String id, required String lang=it ){ //id is a dotted path
+    public String function message( required String id, required String lang="it" ){ //id is a dotted path
 
-		var messages = DeserializeJSON( FileRead(expandPath("/config/assets/messages/#LCase(arguments.lang)#.json.cfm") ) );
+		var messages = DeserializeJSON( FileRead(expandPath("/config/assets/messages-#LCase(arguments.lang)#.json.cfm") ) );
 
         return StructGet( "messages.#id#" );
 
     }
 
     // message and id
-    public Struct function completeMessage( required String id, required String lang=it ){ //id is a dotted path
+    public Struct function completeMessage( required String id, required String lang="it" ){ //id is a dotted path
 
-		var messages = DeserializeJSON( FileRead(expandPath("/config/assets/messages/#LCase(arguments.lang)#.json.cfm") ) );
+		var messages = DeserializeJSON( FileRead(expandPath("/config/assets/messages-#LCase(arguments.lang)#.json.cfm") ) );
 
-        return { id : path, message = StructGet("message.#path#") };
+        return { "id" : arguments.id, "text" = StructGet("messages.#id#") };
 
     }
 

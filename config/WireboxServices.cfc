@@ -18,11 +18,11 @@ component extends="coldbox.system.ioc.config.Binder" {
         */
         map("AbsService").to( "com.apirone.core.model.service.AbsService" )
             .asSingleton()
-            .property( name = "Configuration", ref = "Configuration")
-            .property( name = "CacheManager", ref = "CacheManager" )
             .property( name = "Logger", ref = "Logger" )
             .property( name = "Factory", ref = "Factory" )
-            .property( name = "DBUtil", ref = "DBUtil" );
+            .property( name = "DBUtil", ref = "DBUtil" )
+            .property( name = "CacheManager", ref = "CacheManager" )
+            .property( name = "Configuration", ref = "Configuration");
         
         map("ProductCategoryService").to( "com.apirone.core.model.service.ProductCategoryService" )
             .asSingleton()
@@ -215,6 +215,7 @@ component extends="coldbox.system.ioc.config.Binder" {
         map("AttributeService").to( "com.apirone.core.model.service.AttributeService" )
             .asSingleton()
             .property( name = "dao", ref = "AttributeDAO" )
+            .property( name = "TextService", ref = "TextService" )
             .parent("AbsService");
             
         map("AttributeValueService").to( "com.apirone.core.model.service.AttributeValueService" )
@@ -227,8 +228,8 @@ component extends="coldbox.system.ioc.config.Binder" {
             dao
         */
         map("AbsDAO").to( "com.apirone.core.model.dao.AbsDAO" )
-            .property( name = "DBUtil", ref = "DBUtil" )
-            .asSingleton();
+            .asSingleton()
+            .property( name = "TextService", ref = "TextService" );
          
         map("SizeDAO").to( "com.apirone.core.model.dao.SizeDAO" )
             .asSingleton();
@@ -247,13 +248,13 @@ component extends="coldbox.system.ioc.config.Binder" {
          
         map("ColorDAO").to( "com.apirone.core.model.dao.ColorDAO" )
             .asSingleton();
+
+        map("PriceDAO").to( "com.apirone.core.model.dao.PriceDAO" )
+            .asSingleton();            
          
         map("ComponentTypeDAO").to( "com.apirone.core.model.dao.ComponentTypeDAO" )
             .asSingleton();
-         
-        map("PriceDAO").to( "com.apirone.core.model.dao.PriceDAO" )
-            .asSingleton();
-
+        
         map("ProductionTimeDAO").to( "com.apirone.core.model.dao.ProductionTimeDAO" )
             .asSingleton();
 
@@ -336,17 +337,6 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
 
 
-        /*
-            facades
-        */
-
-        map("ServiceFacade").to( "com.apirone.core.facade.ServiceFacade" )
-            .parent( "AbsService" )
-            .asSingleton()
-            .property( name = "factory", ref = "factory")
-            .property( name = "RoleService", ref = "RoleService")
-
-        
         /*
             configuration
         */

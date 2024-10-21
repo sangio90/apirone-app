@@ -20,6 +20,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.attributeId );
+		
 		cm.put( key, bean );
         
 		return bean;
@@ -76,11 +77,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			for ( var text in attribute.getTexts() ) {
 
-				var entity = super.bean("Entity").setId( "attribute.id" );
+				var entity = super.bean("Entity");
+
+				entity.setKey( "attribute.id" );
+				entity.setValue( newId );
 
 				text.setEntity( entity );
 
-				//getTextService().delete();
 				getTextService().create( text );
 	
 			}
@@ -131,9 +134,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             var bean = super.bean( "Attribute" );
 
             bean.setId( record.attribute_id );
-			//bean.setName( record.attri );
 
-            bean.setTexts( getTextService().list( attributeId = attribute_id ) )
+            bean.setTexts( getTextService().list( attributeId = record.attribute_id ) )
 
 			bean.setCreatedAt( record.created_at );
 			bean.setStatus( getStatusService().get( record.status_id ) );

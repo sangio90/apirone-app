@@ -63,11 +63,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.Text text
 		){
 
-		
+		var newId = getDao().insert( arguments.text );
 
-		var newId = return getDao().update( arguments.text );
-
-		return text.getId();
+		return newId;
 
 	}
 
@@ -75,11 +73,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required com.apirone.core.model.bean.Text text
 		){
 		
-            var id = getDao().update( arguments.option ).toString();
+        var id = getDao().update( arguments.text );
             
-			getCacheManager().remove( getCachekey( id ) );
+		getCacheManager().remove( getCachekey( id ) );
 			
-			return id;
+		return id;
     
 	}
     

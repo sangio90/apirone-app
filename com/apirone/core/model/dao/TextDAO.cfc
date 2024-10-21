@@ -73,7 +73,7 @@
 
 		<cfargument name="text" type="com.apirone.core.model.bean.Text" required="true">
 
-		<cfset field = getDBField( arguments.text.getEntity().getKey() )>
+		<cfset field = super.getDBField( arguments.text.getEntity().getKey() )>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO texts (
@@ -87,10 +87,30 @@
 				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getEntity().getValue()#">
 			)
-			RETURNIG text_id
+			RETURNING text_id
 		</cfquery>
 
 		<cfreturn local.q.text_id>
+
+	</cffunction>
+
+	<cffunction name="update" returntype="Numeric">
+
+		<cfargument name="text" type="com.apirone.core.model.bean.Text" required="true">
+
+		<cfset field = getDBField( arguments.text.getEntity().getKey() )>
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE texts 
+			SET
+				text	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getName()#">,
+				lang_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
+				#field#	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getEntity().getValue()#">
+			WHERE 
+				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
+		</cfquery>
+
+		<cfreturn arguments.text.getId()>
 
 	</cffunction>
 

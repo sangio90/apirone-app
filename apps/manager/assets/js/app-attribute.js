@@ -50,6 +50,8 @@ AP.attribute.detail = function() {
 			var thisForm = AP.attribute.fields.detailForm;
 			var status = thisForm.find(".status");
 
+			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+
 			if( thisForm.valid() ) {
 
 				NM.util.ajax({ 
@@ -59,9 +61,8 @@ AP.attribute.detail = function() {
 					callback: {
 						done: function( xhr ) {
 
-							status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
-
-							console.log("xhr", xhr)
+							status.html("");
+							
 						}
 					}
 				})
@@ -76,10 +77,12 @@ AP.attribute.detail = function() {
 
     pub.open = function( id ) {
 
+		var action = "create";
+		var thisUrl = "/manager/ajax/attributes/new";
+
 		if ( id ) {
-			var thisUrl = "/manager/ajax/attributes/" + id;
-		} else {
-			var thisUrl = "/manager/ajax/attributes/new";
+			action = "update";
+			thisUrl = "/manager/ajax/attributes/" + id;
 		}
 
 		NM.util.ajax({ 
@@ -88,6 +91,7 @@ AP.attribute.detail = function() {
 			callback: {
 				done: function( xhr ) {
 					viewModel.set( "detailForm", xhr.data );
+					viewModel.set( "detailForm.action", action );
 					NM.util.openModal( $("#attribute-detail-modal") );
 				}
 			}

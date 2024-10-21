@@ -1,7 +1,4 @@
-<cfcomponent>
-
-	<cfset variables.companyId = "azapi">
-	<cfproperty name="DBUtil" type="com.apirone.core.model.util.DBUtil">
+<cfcomponent accessors="true">
 
 	<cffunction name="getField" output="No" returntype="Struct">
         
@@ -27,7 +24,7 @@
 	</cffunction>
 	
 
-	<cffunction returntype="String" name="createFilters">
+	<cffunction name="createFilters" returntype="String">
 
 		<cfargument name="filter" required="false" type="Array">
 
@@ -83,7 +80,7 @@
 	</cffunction>
 
 
-	<cffunction returntype="String" name="sanitizeSQL">
+	<cffunction name="sanitizeSQL" returntype="String">
 
 		<cfargument name="sql" type="String">
 
@@ -91,11 +88,16 @@
 
 	</cffunction>	
 
-	<cffunction returntype="String" name="getDBField">
+	<cffunction name="getDBField" returntype="String">
 
-		<cfargument name="field" type="String">
+		<cfargument name="field" type="String" required="true">
 
-	    <cfreturn getDBUtil().getDBField( arguments.field )>
+		<!----
+			Loaded from wirebox not works.
+		---->
+		<cfset var DBUtil = new com.apirone.core.util.DBUtil()>
+
+	    <cfreturn DBUtil.getDBField( arguments.field )>
 
 	</cffunction>	
 
