@@ -55,21 +55,9 @@
 
         #view("line/attributes-list-modal")#
 
-        <!---
-        #view("line/properties-list-values-modal")#
-        #view("line/value-add-modal")#
-        #view("line/property-add-modal")#
-        ----->
-
     </div>
 
-    <!--- #template( view="jstemplate/attribute/" )# ---->
-
     #view("attribute/detail-modal")#
-
-    <script>
-        <!--- var components = #SerializeJSON( prc.components )#; 
-        var properties = #SerializeJSON( prc.properties )#;---->
-    </script>
+    #view("attribute/values-list-modal")#
 
 </cfoutput>

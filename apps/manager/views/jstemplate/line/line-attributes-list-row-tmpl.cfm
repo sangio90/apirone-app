@@ -16,9 +16,16 @@
             </td>
             <td>
                 <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:addAttribute">
+                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:showAttributeValues">
                         <i class="fas fa-edit"></i>
                     </button>
+                </div>
+            </td>
+            <td>
+                <div>
+                    <input type="checkbox" class="form-check-input" name="selected"
+                        data-bind="value:id" 
+                    >                    
                 </div>
             </td>
         </tr>

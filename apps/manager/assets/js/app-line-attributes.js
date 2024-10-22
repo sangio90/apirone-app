@@ -48,6 +48,16 @@ AP.lineAttributes.list = function() {
 
 		},
 
+		showAttributeValues: function( event ) {
+
+			console.log("event", event)
+
+			//$("#line-attributes-list-modal").modal("show");
+
+			service.openValues( event.data.id )
+
+		},
+
 		searchAttributes: function( event ) {
 
 			console.log("searchAttributes");

@@ -99,6 +99,24 @@ AP.attribute.detail = function() {
 
     };
 
+    pub.openValues = function( attributeId ) {
+
+		var thisUrl = "/manager/ajax/values/" + attributeId;
+
+		NM.util.ajax({ 
+			method: "GET", 
+			url: thisUrl,
+			callback: {
+				done: function( xhr ) {
+					//viewModel.set( "detailForm", xhr.data );
+					//viewModel.set( "detailForm.action", action );
+					NM.util.openModal( $("#attribute-values-list-modal") );
+				}
+			}
+		})
+
+    };
+
     pub.save = function() {
 
     };
