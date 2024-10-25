@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="textService" type="com.apirone.core.model.service.TextService";
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
 
-    public com.apirone.core.model.bean.Attribute function get(
+    public com.apirone.core.model.bean.AttributeValue function get(
     		required String attributeValueId
         ){
 
@@ -28,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public com.apirone.core.model.bean.Attribute[] function list() {
+	public com.apirone.core.model.bean.AttributeValue[] function list() {
 		arguments['limit'] = -1;
 		
 		return search( argumentCollection = arguments).getData();

@@ -237,3 +237,8 @@ h2 {
 	height: 20px;
 	display: block;
 }
+
+.modal .tab-content {
+	border: 0 !important;
+	border-top: 1px solid #EEE !important;
+}

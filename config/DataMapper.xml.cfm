@@ -13,6 +13,31 @@
         <map from="name" to="name" type="cf:String"  />
     </mapper>
 
+    <mapper id="Attribute" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Attribute">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="status" to="status" ref="Status"  />
+        <map from="texts" to="texts" ref="Text" type="Array" />
+        <map from="values" to="values" ref="AttributeValue" type="Array" />
+    </mapper>
+
+    <mapper id="AttributeValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="status" to="status" ref="Status"  />
+        <map from="texts" to="texts" ref="Text" type="Array"  />
+    </mapper>
+
+    <mapper id="Text" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Text">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="name" to="name" type="cf:String"  />
+        <map from="lang" to="lang" ref="Lang"  />
+        <map from="status" to="status" ref="Status"  />
+    </mapper>
+
+    <mapper id="Lang" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Lang">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="name" to="name" type="cf:String"  />
+    </mapper>
+
     <mapper id="Line" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Line">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
@@ -28,6 +53,14 @@
     <mapper id="Status" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Status">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
+        <map from="color" to="color" ref="SystemColor"  />
+    </mapper>
+
+    <mapper id="SystemColor" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.SystemColor">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="name" to="name" type="cf:String"  />
+        <map from="class" to="class" type="cf:String"  />
+        <map from="hex" to="hex" type="cf:String"  />
     </mapper>
 
     <mapper id="File" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.File">

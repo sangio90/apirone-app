@@ -4,11 +4,11 @@ $(document).ready(function(){
 
     $("body").find("button[data-bind='click:showAttributesList']").click();
 
-    return;
-    
     setTimeout( function() {
+
+        console.log("ciao");
         
-        $("body").find('button[data-bind="click:addAttribute"]').click();
+        $("body").find("button[data-bind='click:showAttributeValues']").eq(1).click();
 
     }, 1000 )
 

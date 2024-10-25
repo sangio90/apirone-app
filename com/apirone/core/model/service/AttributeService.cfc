@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.AttributeDAO";
     property name="textService" type="com.apirone.core.model.service.TextService";
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
+    property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 
     public com.apirone.core.model.bean.Attribute function get(
     		required String attributeId
@@ -135,12 +136,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             var bean = super.bean( "Attribute" );
 
             bean.setId( record.attribute_id );
-
-            bean.setTexts( getTextService().list( attributeId = record.attribute_id ) )
-
 			bean.setCreatedAt( record.created_at );
-			
+            bean.setTexts( getTextService().list( attributeId = record.attribute_id ) )
 			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setValues( getAttributeValueService().list( attributeId = record.attribute_id ) );
 
             return bean;
 

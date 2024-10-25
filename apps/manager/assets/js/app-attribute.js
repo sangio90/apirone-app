@@ -92,6 +92,7 @@ AP.attribute.detail = function() {
 				done: function( xhr ) {
 					viewModel.set( "detailForm", xhr.data );
 					viewModel.set( "detailForm.action", action );
+					
 					NM.util.openModal( $("#attribute-detail-modal") );
 				}
 			}
@@ -99,9 +100,10 @@ AP.attribute.detail = function() {
 
     };
 
-    pub.openValues = function( attributeId ) {
+    /*
+	pub.openValues = function( attributeId ) {
 
-		var thisUrl = "/manager/ajax/values/" + attributeId;
+		var thisUrl = "/manager/ajax/attribute/" + attributeId + "/values/";
 
 		NM.util.ajax({ 
 			method: "GET", 
@@ -116,6 +118,7 @@ AP.attribute.detail = function() {
 		})
 
     };
+	*/
 
     pub.save = function() {
 

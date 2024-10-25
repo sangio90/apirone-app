@@ -50,11 +50,11 @@ AP.lineAttributes.list = function() {
 
 		showAttributeValues: function( event ) {
 
-			console.log("event", event)
+			console.log("event.data.id", event.data.id)
 
-			//$("#line-attributes-list-modal").modal("show");
+			service.open( event.data.id );
 
-			service.openValues( event.data.id )
+			return false;
 
 		},
 

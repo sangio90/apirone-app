@@ -9,7 +9,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var rows = super.fire( "AttributeValue.list", [ rc.attributeId ] );
 
-        event.setValue("result", rows );
+        //event.setValue( "result", rows );
         
     }
 

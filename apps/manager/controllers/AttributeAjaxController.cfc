@@ -1,5 +1,23 @@
 component extends="com.apirone.core.controller.AbsController" {
 
+    function get( event, rc, prc ){
+
+        var data = [];
+        var result = super.getResult();
+        var dm = getDataMapper();
+        
+        var obj = super.fire( "attribute.get", [ rc.id ] );
+
+
+        var attr = dm.convert( obj, "attribute", true );
+
+        //result.setTotal( obj.len() );
+        result.setData( attr );
+
+        event.setValue("result", result );
+        
+    }
+
     function list( event, rc, prc ){
 
         var data = [];

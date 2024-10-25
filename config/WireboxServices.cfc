@@ -205,6 +205,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "AttributeDAO" )
             .property( name = "StatusService", ref = "StatusService" )
             .property( name = "TextService", ref = "TextService" )
+            .property( name = "AttributeValueService", ref = "AttributeValueService" )
             .parent("AbsService");
             
         map("AttributeValueService").to( "com.apirone.core.model.service.AttributeValueService" )

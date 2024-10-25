@@ -136,11 +136,14 @@ component{
 		/*
 			values
 		*/
-		get( "/ajax/values/attribute/:attributeId")
+
+		/*
+		get( "/ajax/attribute/:attributeId/values")
         	.toHandler( "AttributeValueAjaxController.list" );
 
 		post( "/ajax/values/:attributeId")
         	.to( "AttributeValueAjaxController.save" ).end();
+		*/
 
 
 		/*
