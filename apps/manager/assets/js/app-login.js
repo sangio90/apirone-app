@@ -51,6 +51,30 @@ AP.login = function() {
 
 	}	
 
+	pub.togglePwd = function() {
+
+		var thisForm = AP['login-fields'].loginForm;
+
+		var pwd = thisForm.find('input[name=pwd]');
+		var label = thisForm.find('#label-change-type');
+
+		var type = pwd.prop("type");
+
+		if ( type == "password" ) {
+
+			pwd.prop("type", "text")
+			label.html("Nascondi password");
+
+		} else {
+
+			pwd.prop("type", "password")
+			label.html("Mostra password");
+
+		}
+
+	}
+
+
     return pub;
 
 }();

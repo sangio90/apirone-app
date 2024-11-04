@@ -33,14 +33,21 @@ $.validator.setDefaults( {
 
 	invalidHandler: function( event, validator ) {
 
+		console.log("invalidHandler", validator);
+
 		var count = validator.numberOfInvalids();
 		var thisForm = $(event.currentTarget);
+
+		//console.log("invalidHandler:count", count);
+		//console.log("invalidHandler:thisForm", thisForm);
 
 		if ( count == 1 ) {
 			var message = "<span class='error'>C'è un errore.</span>";
 		} else {
 			var message = "<span class='error'>Ci sono " + count + " errori.</span>";
 		}
+
+		console.log("ele-error-status", thisForm.find('.errors-counter'))
 
 		thisForm.find('.errors-counter').html( message );
 
@@ -73,7 +80,7 @@ $.validator.setDefaults( {
 		var ele = $( element[ 0 ] );
 		var errorEleId = $( "#" + name + "-error" );
 
-		console.log("errorValidation", name)
+		console.log("errorValidation", name, error);
 
 		//TODO: l'elemento di status dovrebbe essere ricercato nel form
 		//in moodo da poter usare lo stesso nome ($elemento-error) più volte nella stessa pagina

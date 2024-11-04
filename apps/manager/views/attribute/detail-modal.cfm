@@ -5,10 +5,12 @@
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
+                <!----
+
                 <form id="attribute-detail-form" method="POST" name="attribute-detail-form">
                 
                     <header class="card-header">
-                        <h2 class="card-title" data-bind="text:title"></h2>
+                        <h2 class="card-title" data-bind="text:detailForm.title"></h2>
                     </header>
                     
                     <div class="card-body">
@@ -41,6 +43,8 @@
                     </footer>
 
                 </form>
+
+                ---->
             
             </div>
         </selection>

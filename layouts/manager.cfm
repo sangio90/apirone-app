@@ -34,6 +34,7 @@
         //TODO: use AP.config (for current page) and AP.globalConfig
         var AP = {};
         AP.config = #SerializeJSON( prc.config )#;
+        AP.page = #SerializeJSON( prc.page )#;
         AP.message = #SerializeJSON(flash.get("message", {}))#;
     </script>
 

@@ -82,6 +82,14 @@
         <map from="name" to="name" type="cf:String"  />
     </mapper>
 
+    <mapper id="Report" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.VariantType">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="name" to="name" type="cf:String"  />
+        <map from="exampleData" to="exampleData" type="cf:String"  />
+        <map from="exampleFile" to="exampleFile" type="cf:String"  />
+        <map from="fileName" to="fileName" type="cf:String"  />
+    </mapper>
+
     <mapper id="VatCode" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.VatCode">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />

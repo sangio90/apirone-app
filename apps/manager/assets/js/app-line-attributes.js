@@ -27,9 +27,9 @@ AP.lineAttributes.list = function() {
 
 		getAttributeName: function( event ) {
 
-			var text = AP.util.getText( event.texts, "it" )
+			var text = AP.util.getMainText( event.texts )
 
-			return text;
+			return text.name;
 
 		},
 

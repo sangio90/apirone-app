@@ -17,7 +17,6 @@
 	<a href="?action=cache.empty">Svuota cache</a>
 	<a href="?action=cache.list">Lista cache</a>
 	<a href="?action=info.read">Info</a>
-	<a href="?action=docs.create">Crea docs</a>
 </div>
 
 <cfif action IS "cache.list">
@@ -60,28 +59,6 @@
 	<cfset cm.removeAll()>
 
 	<p>Rimosse [#count#] chiavi.</p>
-</cfif>
-
-<cfif action IS "docs.create">
-
-	<cfset path = "#ExpandPath( '/' )#../repository/private/docs">
-	
-	<cfif( DirectoryExists( path ) )>
-		<cfset DirectoryDelete( path, true )>
-	</cfif>
-
-	<cfset docbox = new docbox.DocBox( properties = { 
-	    projectTitle = "OpusPlus Docs",
-	    outputDir    = path
-	})>
-
-	<cfset docbox.generate(  
-		source  = ExpandPath( "/com/opusplus/core/" ),
-		mapping = "com.opusplus.core"
-	)>
-
-	<p>Fatto</p>
-
 </cfif>
 
 </cfoutput>

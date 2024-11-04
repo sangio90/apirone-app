@@ -72,6 +72,12 @@
                 icon: "fas fa-users",
                 title: "Lista dei ruoli",
                 roles: "ADM"
+            },
+            {
+                href: "/manager/reports",
+                icon: "fas fa-print",
+                title: "Lista dei report",
+                roles: "ADM"
             }
         ]
 

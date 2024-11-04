@@ -68,7 +68,6 @@ component extends="coldbox.system.Interceptor"{
 
         prc.user   = session.user;
         prc.isDev  = request.isDev();
-        //prc.i18n   = model.getInstance("i18nService");
         prc.config = getGlobalConfiguration(); //js global config
 
         prc.page = {};  //current js config

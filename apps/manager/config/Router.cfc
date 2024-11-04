@@ -124,6 +124,9 @@ component{
 		get( "/ajax/attributes/new" )
         	.toHandler( "AttributeAjaxController.new" );
 
+		post( "/ajax/attributes/values")
+        	.to( "AttributeAjaxController.saveValue" ).end();
+
 		get( "/ajax/attributes/:id")
         	.toHandler( "AttributeAjaxController.get" );
 
@@ -133,16 +136,26 @@ component{
 		post( "/ajax/attributes")
         	.to( "AttributeAjaxController.save" ).end();
 
+
+		/*
+			reports
+		*/
+		get( "/ajax/reports/:id")
+        	.toHandler( "ReportAjaxController.get" );
+
+		get( "/ajax/reports")
+        	.toHandler( "ReportAjaxController.list" );
+
+		get( "/reports/:id" )
+        	.toHandler( "ReportController.get" );
+
+		get( "/reports" )
+        	.toHandler( "ReportController.list" );
+
+
+
 		/*
 			values
-		*/
-
-		/*
-		get( "/ajax/attribute/:attributeId/values")
-        	.toHandler( "AttributeValueAjaxController.list" );
-
-		post( "/ajax/values/:attributeId")
-        	.to( "AttributeValueAjaxController.save" ).end();
 		*/
 
 

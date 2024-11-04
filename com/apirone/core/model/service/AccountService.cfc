@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-    property name="dao" type="com.apirone.core.model.dao.AccountDAO";
+    property name="dao" type="com.apirone.core.model.dao.ReportDAO";
     property name="statusService" type="com.apirone.core.model.service.StatusService";
     property name="lookupService" type="com.apirone.core.model.service.LookupService";
 

@@ -1,14 +1,18 @@
 [ 
     {
-        id: 'ADM',
+        id: "ADM",
         name: "Admin"
     },
     {
-        id: 'CST',
+        id: "CST",
         name: "Customer"
     },
     {
-        id: 'EMP',
+        id: "EMP",
         name: "Employee"
+    },
+    {
+        id: "MAN",
+        name: "Manager"
     }
 ]

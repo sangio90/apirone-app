@@ -57,7 +57,6 @@
 
     </div>
 
-    #view("attribute/detail-modal")#
-    #view("attribute/values-list-modal")#
+    #view("attribute/detail-values-modal")#
 
 </cfoutput>

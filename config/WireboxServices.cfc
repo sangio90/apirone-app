@@ -213,6 +213,12 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "AttributeValueDAO" )
             .parent("AbsService");
             
+        map("ReportService").to( "com.apirone.core.model.service.ReportService" )
+            .asSingleton()
+            .property( name = "dao", ref = "ReportDAO" )
+            .property( name = "StatusService", ref = "StatusService" )
+            .parent("AbsService");
+            
         
         /*
             dao
@@ -221,6 +227,9 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton();
          
         map("SizeDAO").to( "com.apirone.core.model.dao.SizeDAO" )
+            .asSingleton();
+         
+        map("ReportDAO").to( "com.apirone.core.model.dao.ReportDAO" )
             .asSingleton();
          
         map("AttributeDAO").to( "com.apirone.core.model.dao.AttributeDAO" )

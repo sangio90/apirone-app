@@ -57,7 +57,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
 	public String function create(
-			required com.apirone.core.model.bean.AttributeValue attributeValue
+			required com.apirone.core.model.bean.AttributeValue attributeValue,
+			required String attributeId
 		){
 
 		transaction{

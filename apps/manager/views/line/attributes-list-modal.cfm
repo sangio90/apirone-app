@@ -2,7 +2,7 @@
 
     <div id="line-attributes-list-modal" class="modal fade">
         
-        <section class="modal-dialog modal-lg">
+        <section class="modal-dialog modal-xl">
             <div class="modal-content">
                 
                 <header class="card-header">

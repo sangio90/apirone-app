@@ -31,20 +31,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required String entityId
     	){
 
-		/*
-    	var result = super.getResult();
-
-    	var records = getDao().find( argumentCollection=arguments );
-
-		records.each( function( record ) {
-			rows.add( get( record.status_id ) );
-		});
-
-	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
-	    result.setTotal( Val( records.total ) );
-		*/
-
 	    var rows = [];
 
 		var records = getDao().find( argumentCollection=arguments );

@@ -6,12 +6,11 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
         var dm = getDataMapper();
         
+        var langs = super.fire("lang.list");
         var obj = super.fire( "attribute.get", [ rc.id ] );
 
-
         var attr = dm.convert( obj, "attribute", true );
-
-        //result.setTotal( obj.len() );
+        
         result.setData( attr );
 
         event.setValue("result", result );
@@ -121,6 +120,53 @@ component extends="com.apirone.core.controller.AbsController" {
         event.setValue( "result", result );
         
     }
+
+    function saveValue( event, rc, prc ){
+
+        var result = super.getResult();
+    
+        var thisId = "";
+        var messageId = "";
+        var texts = [];
+
+        var json = DESerializeJSON( GetHTTPRequestData().content );
+
+
+        var value = super.bean("AttributeValue");
+        
+        var text = super.bean("Text");
+        var lang = super.bean("Lang");
+        var status = super.bean("Status");
+        var valueStatus = super.bean("Status");
+
+        text.setLang( lang.setId("IT") );
+        text.setStatus( status.setId("ACT") );
+
+        text.setName( json.name )
+
+        value.setTexts( [ text ] );
+        value.setStatus( statusValue.setId( json.status.id ) );
+
+        if( Len( json.action == "create"  ) ) {
+            
+            messageId = "attributeValue.created";
+            thisId = super.fire( "attributeValue.create", [ value ] )
+            
+        } else {
+
+            messageId = "attributeValue.updated";
+            thisId = super.fire( "attributeValue.update", [ value ] )
+            
+        }
+
+        var message = completeMessage( messageId );
+
+        result.setData(  message, { payload = { id = thisId }  } );
+        
+        event.setValue( "result", result );
+        
+    }
+
 
     function idExists( event, rc, prc ){
 

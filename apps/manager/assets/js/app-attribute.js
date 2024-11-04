@@ -1,8 +1,10 @@
 AP.attribute = AP.attribute || {};
 
 AP.attribute.fields = {
-    rootDetail: $("#attribute-detail-modal"),
+    rootDetail: $("#attribute-detail-values-modal"),
     detailForm: $("#attribute-detail-form"),
+    valueForm:  $("#attribute-values-add-form"),
+    valuesForm: $("#attribute-values-form"),
 }
 
 $(document).ready(function(){
@@ -21,8 +23,36 @@ AP.attribute.detail = function() {
 
 	var viewModel = kendo.observable({
 
-        title: "Carica attributo",
+		statusList: AP.page.attributeStatusList,
+		
 		detailForm: {
+			data: {
+				texts: [],
+				values: []
+			},
+			title: "Carica attributo",
+		},
+
+		valueForm: {
+			data: {
+				status: {
+					id: "ACT"
+				},
+				name: ""
+			}
+		},
+
+		getTextName: function() {
+
+			
+			var texts = viewModel.get( "detailForm.data.texts" ).toJSON();
+			
+			if( texts.length ) {
+				var text = AP.util.getMainText( texts );
+				return text.name;
+			}
+	
+			return '';
 
 		},
 
@@ -30,13 +60,6 @@ AP.attribute.detail = function() {
             close: null
         },
 
-		/*
-		open: function() {
-
-			$("#attribute-detail-modal").modal("show");
-
-		},
-		*/
 
 		close: function() {
 
@@ -44,20 +67,25 @@ AP.attribute.detail = function() {
 
 		},
 
+		saveValue: function() {
 
-		save: function() {
+			var thisForm = AP.attribute.fields.valueForm;
 
-			var thisForm = AP.attribute.fields.detailForm;
+			console.log("saveValue", thisForm);
+			console.log("thisForm", thisForm.length);
+			
 			var status = thisForm.find(".status");
 
 			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+
+			console.log("thisForm.valid", thisForm.valid());
 
 			if( thisForm.valid() ) {
 
 				NM.util.ajax({ 
 					method: "POST", 
-					url: "/manager/ajax/attributes",
-					data: JSON.stringify( viewModel.get( "detailForm" ) ),
+					url: "/manager/ajax/attributes/values",
+					data: JSON.stringify( viewModel.get( "valueForm.data" ) ),
 					callback: {
 						done: function( xhr ) {
 
@@ -85,40 +113,23 @@ AP.attribute.detail = function() {
 			thisUrl = "/manager/ajax/attributes/" + id;
 		}
 
+		console.log( "open" );
+
 		NM.util.ajax({ 
 			method: "GET", 
 			url: thisUrl,
 			callback: {
 				done: function( xhr ) {
-					viewModel.set( "detailForm", xhr.data );
+					viewModel.set( "detailForm.data", xhr.data );
 					viewModel.set( "detailForm.action", action );
+					viewModel.set( "detailForm.title", "Modifica attributo " + xhr.data.id );
 					
-					NM.util.openModal( $("#attribute-detail-modal") );
+					NM.util.openModal( $("#attribute-detail-values-modal") );
 				}
 			}
 		})
 
     };
-
-    /*
-	pub.openValues = function( attributeId ) {
-
-		var thisUrl = "/manager/ajax/attribute/" + attributeId + "/values/";
-
-		NM.util.ajax({ 
-			method: "GET", 
-			url: thisUrl,
-			callback: {
-				done: function( xhr ) {
-					//viewModel.set( "detailForm", xhr.data );
-					//viewModel.set( "detailForm.action", action );
-					NM.util.openModal( $("#attribute-values-list-modal") );
-				}
-			}
-		})
-
-    };
-	*/
 
     pub.save = function() {
 
@@ -128,11 +139,12 @@ AP.attribute.detail = function() {
 
 		console.log("AP.attribute.detail:init")
 
-		var thisForm = AP.attribute.fields.detailForm;
+		kendo.bind( AP.attribute.fields.rootDetail, viewModel );
 
-		kendo.bind( AP.attribute.fields.rootDetail, viewModel )
+		var valueForm = AP.attribute.fields.valueForm;
+		var detailForm = AP.attribute.fields.detailForm;
 
-		thisForm.validate( {
+		detailForm.validate( {
 			onfocusout: function( element ) {
 				$(element).valid();
 			},
@@ -148,12 +160,43 @@ AP.attribute.detail = function() {
 						}
 					}
 				},
+				attr: {
+					required: true
+				}
 			},
 			messages: {
 				attrId: {
 					required: "ID richiesto",
 					checkCode: "Solo numeri, lettere, trattino o trattino basso",
 					remote: "L'attributo esiste"
+				},
+				attr: {
+					required: "Descrizione principale richiesta",
+				},
+			},
+		
+		} );
+
+		console.log("valueForm", valueForm);
+
+		valueForm.validate( {
+			onfocusout: function( element ) {
+				$(element).valid();
+			},
+			rules: {
+				newValueName: {
+					required: true,
+				},
+				newValueStatus: {
+					required: true
+				}
+			},
+			messages: {
+				newValueName: {
+					required: "Valore richiesto",
+				},
+				newValueStatus: {
+					required: "Stato richiesto",
 				},
 			},
 		

@@ -48,12 +48,19 @@
                             <a href="/manager/login/recover" class="float-end">Password smarrita?</a>
                         </div>
                         <div class="input-group">
-                            <input name="pwd" id="pwd" type="password" class="form-control form-control-lg" />
+                            <input name="pwd" id="pwd" type="password" class="form-control form-control-lg">
                             <span class="input-group-text">
                                 <i class="bx bx-lock text-4"></i>
                             </span>
                         </div>
-                        <div id="pwd-error"></div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div id="pwd-error" class="field-error-message"></div>
+                            </div>
+                            <div class="col-sm-6 text-end">
+                                <a href="javascript:;" onclick="AP.login.togglePwd()" class="float-end" tabindex="-1" id="label-change-type">Mostra password</a>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
