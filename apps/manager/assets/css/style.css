@@ -2,6 +2,10 @@
 	color: Red;
 }
 
+.green {
+	color: #00841d;
+}
+
 .form-control {
 	border-color: #cccccc !important;
 }
@@ -192,8 +196,15 @@ h2 {
 	bootstrap
 */
 .nav-tabs li.active .nav-link, .nav-tabs li.active .nav-link:hover, .nav-tabs li.active .nav-link:focus {
-	color: #4b4b4b !important;
+    color: #646464 !important;
+	border-bottom: 1px solid White !important;
 }
+
+.nav-tabs li .nav-link, .nav-tabs li .nav-link:hover {
+    color: #898989 !important;
+	border-bottom: 1px solid #EEE !important;
+}
+
 
 /*
 @media (min-width: 1200px) {
@@ -262,6 +273,7 @@ h2 {
 	color: black;
 }
 
+
 /* 
 	divider 
 */
@@ -290,3 +302,7 @@ h2 {
 /* 
 	// divider 
 */
+
+.white-small {
+	color:White; font-size: 10px;
+}

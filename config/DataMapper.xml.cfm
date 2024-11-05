@@ -15,15 +15,18 @@
 
     <mapper id="Attribute" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Attribute">
         <map from="id" to="id" type="cf:String"  />
+        <map from="mainText" to="mainText" type="cf:String"  />
         <map from="status" to="status" ref="Status"  />
-        <map from="texts" to="texts" ref="Text" type="Array" />
+        <!-- <map from="texts" to="texts" ref="Text" type="Array" /> -->
         <map from="values" to="values" ref="AttributeValue" type="Array" />
     </mapper>
 
     <mapper id="AttributeValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
         <map from="id" to="id" type="cf:String"  />
+        <map from="orderBy" to="orderBy" type="cf:Numeric"  />
         <map from="status" to="status" ref="Status"  />
-        <map from="texts" to="texts" ref="Text" type="Array"  />
+        <map from="mainText" to="mainText" type="cf:String"  />
+        <!-- <map from="texts" to="texts" ref="Text" type="Array"  /> -->
     </mapper>
 
     <mapper id="Text" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Text">

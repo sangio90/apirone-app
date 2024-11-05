@@ -12,6 +12,8 @@ component extends="coldbox.system.Interceptor"{
 
         var module = prc.currentRoutedModule;
         var model = getModel();
+
+        prc.isDev  = request.isDev();
 	    
         /*
             API module
@@ -24,9 +26,7 @@ component extends="coldbox.system.Interceptor"{
 
                 var authHeader = ToString( 
                     ToBinary(  
-                        Trim( 
-                            GetHttpRequestData().Headers.authorization.replace('Bearer', '')
-                            ) 
+                        Trim( GetHttpRequestData().Headers.authorization.replace('Bearer', '') ) 
                         ) 
                     );
 
@@ -63,19 +63,21 @@ component extends="coldbox.system.Interceptor"{
         
         }
 
-       
-        //TODO: set all  private value
+        /*
+            TODO: remove all "session.user"
+        */
+        prc.user = session.user;
 
-        prc.user   = session.user;
-        prc.isDev  = request.isDev();
-        prc.config = getGlobalConfiguration(); //js global config
+        request.lang = prc.user.getAccount()?.getLang() ?: loadDefaultLang();
+        prc.lang = request.lang;
+
+        prc.config = getGlobalConfiguration();  //js global config
 
         prc.page = {};  //current js config
 
         prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20240530;
 
         prc.jsScripts = [];
-        //prc.jsTemplates = [];
         
     }
 
@@ -147,6 +149,16 @@ component extends="coldbox.system.Interceptor"{
     private Struct function getModel(){
 
         return server[ "wireBox-apirone" ];;
+
+    }
+
+    private Struct function loadDefaultLang(){
+
+        var lang = new com.apirone.core.model.bean.Lang();
+
+        lang.setId("IT");
+
+        return lang;
 
     }
 

@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="/assets/main/#prc.staticVersion#/css/colors.css">
 
     <script>
-        //TODO: use AP.config (for current page) and AP.globalConfig
+        //TODO: use AP.page for current page and AP.config for global
         var AP = {};
         AP.config = #SerializeJSON( prc.config )#;
         AP.page = #SerializeJSON( prc.page )#;

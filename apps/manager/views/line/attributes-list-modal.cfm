@@ -13,7 +13,7 @@
 
                     <div class="row">
                     
-                        <div class="col-md-12 text-end">
+                        <div class="col-md-12 text-end" style="margin-top: -58px; z-index: 9999999">
                             <button class="btn btn-primary btn-sm" data-bind="click:addAttribute">Carica </button>
                         </div>
                         
@@ -33,11 +33,7 @@
                             </div>
 
                             <div>
-                                <!---
-                                    DOC:
-                                        tw-NUMBER: larghezza del tooltip
-                                --->
-            
+                                
                                 <form id="line-attributes-list-search-form" class="row">
 
                                     #grid( 
@@ -45,8 +41,7 @@
                                         columns="[
                                             { 'field':'id', 'title':'ID', width: '100px' },
                                             { 'field':'name', 'title':'Descrizione'},
-                                            { 'field':'status', 'title':'Status', width: '30px', headerAttributes: { 'class': 'kendo-tooltip tw-100'}},
-                                            { 'field':'', 'title':'', width: '65px'},
+                                            { 'field':'', 'title':'', width: '50px'},
                                             { 
                                                 'field':'', 
                                                 'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

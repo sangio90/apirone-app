@@ -128,7 +128,7 @@
 
     public Any function fire( action, payload=NullValue() ){
 
-        var user = var event = application.cbController.getRequestService().getContext().getPrivateValue("user");
+        var user = application.cbController.getRequestService().getContext().getPrivateValue("user");
 
         var result = getAccessManager().exec( action=arguments.action, user=user, payload=arguments.payload );
 

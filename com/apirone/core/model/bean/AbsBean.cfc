@@ -15,7 +15,38 @@ component accessors="true" {
 		
 		return Right( this.getId(), 6 );
 		
-	}	
+	}
+
+	public com.apirone.core.model.bean.Lang function getCurrentLang(){
+		
+		return request.lang;
+		
+	}
+
+    public Struct function getMainText( langId ){
+
+        if( IsNull( arguments.langId ) ) {
+
+            var langId = getCurrentLang().getId();
+        
+        } else {
+            
+            var langId = arguments.langId;
+        
+        }
+
+        for( var text in getTexts() ) {
+
+            if ( text.getLang().getId() == langId ) {
+                return text
+            }
+
+        }
+
+        return NullValue();
+        
+    }
+
 
 	private Struct function getMetadataObject( required Struct metadata, required String name, String type="properties", Struct result={} ){
 		

@@ -69,6 +69,57 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+
+	public Array function bulkCreate(
+			required com.apirone.core.model.bean.Text[] texts
+		){
+
+		var langs = getLangService().list( statusId="ACT" );
+
+		var ids = [];
+		var langDone = [];
+
+		// one at least
+		var entity = arguments.texts[1].getEntity();
+
+		for( var thisText in arguments.texts ) {
+
+			var newId = getDao().insert( thisText );
+			langDone.add( thisText.getLang().getId() );
+
+			ids.add( newId );
+
+		}
+
+		for ( var thisLang in langs ) {
+
+			if( !ArrayFind( langDone, thisLang.getId() ) ) {
+
+				var text = super.bean("Text");
+				var lang = super.bean("Lang");
+				var status = super.bean("Status");
+
+				text.setName("** To translate");
+
+				lang.setId( thisLang.getId() );
+				status.setId( "TOT" );
+
+				text.setStatus( status );
+				text.setLang( lang );
+				text.setEntity( entity );
+
+				var newId = getDao().insert( text );
+
+				ids.add( newId );
+
+			}
+
+		}
+
+		return ids;
+
+	}
+
 	public String function update(
 		required com.apirone.core.model.bean.Text text
 		){

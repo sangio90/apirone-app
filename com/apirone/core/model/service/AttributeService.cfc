@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.AttributeDAO";
     property name="textService" type="com.apirone.core.model.service.TextService";
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
+    property name="langService" type="com.apirone.core.model.service.LangService";
     property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 
     public com.apirone.core.model.bean.Attribute function get(
@@ -86,9 +87,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				text.setEntity( entity );
 
-				getTextService().create( text );
-	
 			}
+
+			getTextService().bulkCreate( arguments.attribute.getTexts() );
 
 		}
 
@@ -100,16 +101,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update(
 			required com.apirone.core.model.bean.Attribute attribute
 		){
+
+			var id = attribute.getId();
 		
-            var id = getDao().update( arguments.attribute );
+        	getDao().update( arguments.attribute );
 
 			for ( var text in attribute.getTexts() ) {
 
-				var entity = super.bean("Entity").setId( "attribute.id" );
+				var entity = super.bean("Entity")
+				
+				entity.setKey( "attribute.id" );
+				entity.setValue( id );
 
 				text.setEntity( entity );
 
-				getTextService().update( text );
+				if ( Len( text.getId() ) ) {
+					
+					getTextService().update( text );
+				
+				} else {
+					
+					getTextService().create( text );
+
+				}
 	
 			}
 
@@ -119,7 +133,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     
 	}
 
+	public String function getCacheKey( required String id ) {
 
+		return "attribute_#arguments.id#";
+
+	}
 
     /*
     	private method
@@ -149,10 +167,5 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	}
 
-  	private String function getCacheKey( required String id ) {
-
-  		return "attribute_#arguments.id#";
-
-  	}
 
 }

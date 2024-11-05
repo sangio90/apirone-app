@@ -88,12 +88,13 @@
 
 	</cffunction>	
 
-	<cffunction name="getDBField" returntype="String">
+
+	<cffunction name="getDBField" returntype="Struct">
 
 		<cfargument name="field" type="String" required="true">
 
 		<!----
-			Loaded from wirebox not works.
+			TODO: Loaded from wirebox not works.
 		---->
 		<cfset var DBUtil = new com.apirone.core.util.DBUtil()>
 

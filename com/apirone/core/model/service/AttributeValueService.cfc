@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.AttributeValueDAO";
     property name="textService" type="com.apirone.core.model.service.TextService";
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
+    property name="langService" type="com.apirone.core.model.service.LangService";
 
     public com.apirone.core.model.bean.AttributeValue function get(
     		required String attributeValueId
@@ -57,8 +58,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
 	public String function create(
-			required com.apirone.core.model.bean.AttributeValue attributeValue,
-			required String attributeId
+			required com.apirone.core.model.bean.AttributeValue attributeValue
 		){
 
 		transaction{
@@ -74,11 +74,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				text.setEntity( entity );
 
-				getTextService().create( text );
+				//getTextService().create( text );
 	
 			}
 
+			getTextService().bulkCreate( arguments.attributeValue.getTexts() );
+
+
 		}
+
+		getCacheManager().remove( "attribute_" & arguments.attributeValue.getAttributeId() );
 
 		return newId;
 
@@ -89,21 +94,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.AttributeValue attributeValue
 		){
 		
-            var id = getDao().update( arguments.attribute );
+		var id = arguments.attributeValue.getId();
 
-			for ( var text in arguments.attributeValue.getTexts() ) {
+		getDao().update( arguments.attributeValue );
 
-				var entity = super.bean("Entity").setId( "attributeValue.id" );
+		for ( var text in arguments.attributeValue.getTexts() ) {
 
-				text.setEntity( entity );
+			var entity = super.bean("Entity")
+			entity.setKey( "attributeValue.id" );
+			entity.setValue( id );
 
-				getTextService().update( text );
-	
-			}
+			text.setEntity( entity );
 
-			getCacheManager().remove( getCachekey( id ) );
-			
-			return id;
+			getTextService().update( text );
+
+		}
+
+		getCacheManager().remove( getCachekey( id ) );
+		getCacheManager().remove( "attribute_#attributeValue.getAttributeId()#" );
+		
+		return id;
     
 	}
 
@@ -113,7 +123,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Attribute function build(
+	private com.apirone.core.model.bean.AttributeValue function build(
     		required String attributeValueId
     	){
 
@@ -123,13 +133,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             var bean = super.bean( "AttributeValue" );
 
-            bean.setId( record.attribute_id );
-
-            bean.setTexts( getTextService().list( attributeValueId = record.attribute_value_id ) );
+            bean.setId( record.attribute_value_id );
 
 			bean.setCreatedAt( record.created_at );
+			bean.setOrderBy( record.orderby );
 			
 			bean.setStatus( getStatusService().get( record.status_id ) );
+            bean.setTexts( getTextService().list( attributeValueId = record.attribute_value_id ) );
 
             return bean;
 

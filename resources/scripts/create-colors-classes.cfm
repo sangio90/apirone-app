@@ -1,6 +1,6 @@
 ﻿<cfset colors = DESerializeJSON( FileRead( ExpandPath("/config/data/systemColors.json.cfm") ) )>
 
-<cfset classes = "/* Don't change this file, automatically created by systemColors.json. 
+<cfset classes = "/* Don't change this file, automatically created from systemColors.json. 
 Created at #now()# */">
 
 <cfoutput>

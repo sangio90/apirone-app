@@ -27,8 +27,8 @@
                 status
 			WHERE 1=1
                 
-            <cfif !IsNull(arguments.areaId)>
-				AND jsonb_exists( entities, <cfqueryparam value="#arguments.entityId#" cfsqltype="Varchar"> )
+            <cfif !IsNull(arguments.entityId)>
+				AND jsonb_exists( entities, <cfqueryparam value="#UCase( arguments.entityId )#" cfsqltype="Varchar"> )
 			</cfif>
 
 			ORDER BY 

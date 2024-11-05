@@ -79,13 +79,13 @@
 			INSERT INTO texts (
 				text,
 				lang_id,
-				#field#
+				#field.name#
 			)
 			VALUES
 			(
-				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getName()#">,
-				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
-				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getEntity().getValue()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getName()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getLang().getId()#">,
+				<cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
 			)
 			RETURNING text_id
 		</cfquery>
@@ -105,7 +105,7 @@
 			SET
 				text	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getName()#">,
 				lang_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
-				#field#	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getEntity().getValue()#">
+				#field.name#	= <cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
 			WHERE 
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>

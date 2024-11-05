@@ -5,7 +5,7 @@
 
  component output="false" accessors="true" {
 
-    public String function getDBField( required String field ) {
+    public Struct function getDBField( required String field ) {
 
         var fields = DESerializeJSON( FileRead( ExpandPath("/config/DBFields.json.cfm") ) );
  
@@ -18,7 +18,7 @@
 
         }
 
-        return LCase( fields[ arguments.field ] );
+        return fields[ arguments.field ];
     }
 
 }

@@ -21,15 +21,20 @@ AP.attribute.detail = function() {
 
 	var pub = {}
 
+	var dataSource = NM.kendo.dataSource();
+
 	var viewModel = kendo.observable({
 
 		statusList: AP.page.attributeStatusList,
+
+		callback: {
+			onSave: undefined,
+			onLoad: undefined
+		},
 		
 		detailForm: {
-			data: {
-				texts: [],
-				values: []
-			},
+			data: dataSource,
+			action: "create",
 			title: "Carica attributo",
 		},
 
@@ -38,58 +43,108 @@ AP.attribute.detail = function() {
 				status: {
 					id: "ACT"
 				},
+				id: "",
 				name: ""
-			}
+			},
+			title: "Carica valore",
+			labelButton: "Carica"
 		},
 
-		getTextName: function() {
+		isValuesGridVisible: function() {
 
-			
-			var texts = viewModel.get( "detailForm.data.texts" ).toJSON();
-			
-			if( texts.length ) {
-				var text = AP.util.getMainText( texts );
-				return text.name;
+			var values = viewModel.get( "detailForm.data.values" );
+
+			if ( values && values.length ) {
+				return true;
+			}
+
+			return false;
+
+		},
+
+		isIdDisabled: function( event ) {
+
+			return viewModel.get( "detailForm.action" ) == "update" ? true : false;
+
+		},
+
+		editValue: function( event ) {
+
+			var labelButton = "Carica";
+			var title = "Carica valore";
+	
+			if ( event?.data.id ) {
+				labelButton = "Aggiorna";
+				title = "Modifica valore < " + event.data.id + " >"
 			}
 	
-			return '';
+			viewModel.set( "valueForm.data", event.data );
+			viewModel.set( "valueForm.title", title );
+			viewModel.set( "valueForm.labelButton", labelButton );
 
 		},
 
-        callback: {
-            close: null
-        },
+		save: function() {
 
+			var thisForm = AP.attribute.fields.detailForm;
+			var status = thisForm.find(".status");
 
-		close: function() {
+			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+			var attrId = viewModel.get( "detailForm.data.id" ) 
 
-            callback.close()
+			if( thisForm.valid() ) {
 
-		},
+				NM.util.ajax({ 
+					method: "POST", 
+					url: "/manager/ajax/attributes",
+					data: JSON.stringify( viewModel.get( "detailForm" ) ),
+					callback: {
+						done: function( xhr ) {
+							//status.html("<span class='green'>Attributo modificato</span> ");
+							loadAttribute( { id: attrId } );
+
+							if( viewModel.get("callback.onSave") ) {
+								viewModel.get("callback.onSave")()
+							}
+
+						}
+					}
+				})
+
+			}
+
+			return false;
+
+		},		
 
 		saveValue: function() {
 
 			var thisForm = AP.attribute.fields.valueForm;
-
-			console.log("saveValue", thisForm);
-			console.log("thisForm", thisForm.length);
-			
 			var status = thisForm.find(".status");
 
-			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+			console.log("status", status.length);
 
-			console.log("thisForm.valid", thisForm.valid());
+			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+			var attrId = viewModel.get( "detailForm.data.id" ) 
 
 			if( thisForm.valid() ) {
 
 				NM.util.ajax({ 
 					method: "POST", 
 					url: "/manager/ajax/attributes/values",
-					data: JSON.stringify( viewModel.get( "valueForm.data" ) ),
+					data: JSON.stringify( { 
+							value: viewModel.get( "valueForm.data" ), 
+							attributeId: attrId
+						} 
+					),
 					callback: {
 						done: function( xhr ) {
 
-							status.html("");
+							status.html("<span class='green'>Valore salvato</span> ");
+
+							console.log("saveValue:done")
+
+							//loadAttribute( { id: attrId } );
 							
 						}
 					}
@@ -103,17 +158,19 @@ AP.attribute.detail = function() {
 
     });
 
-    pub.open = function( id ) {
+	loadAttribute = function( { id, callback } ) {
 
 		var action = "create";
+		var labelButton = "Carica";
+		var title = "Carica attributo";
 		var thisUrl = "/manager/ajax/attributes/new";
 
 		if ( id ) {
 			action = "update";
+			labelButton = "Aggiorna";
+			title = "Modifica attributo < " + id +" >"		
 			thisUrl = "/manager/ajax/attributes/" + id;
 		}
-
-		console.log( "open" );
 
 		NM.util.ajax({ 
 			method: "GET", 
@@ -122,17 +179,41 @@ AP.attribute.detail = function() {
 				done: function( xhr ) {
 					viewModel.set( "detailForm.data", xhr.data );
 					viewModel.set( "detailForm.action", action );
-					viewModel.set( "detailForm.title", "Modifica attributo " + xhr.data.id );
+					viewModel.set( "detailForm.title", title );
+					viewModel.set( "detailForm.labelButton", labelButton );
 					
-					NM.util.openModal( $("#attribute-detail-values-modal") );
+					if ( callback?.hasOwnProperty("onLoad") ) {
+						callback.onLoad()
+					}
+
 				}
 			}
 		})
 
+	}
+
+    pub.open = function( { id, callback } ) {
+
+		console.log("id", id)
+		console.log("callback", callback)
+
+		viewModel.set("callback.onSave", callback?.onSave);
+		viewModel.set("callback.onLoad", callback?.onLoad);
+
+		loadAttribute( 
+			{
+				id: id, 
+				callback: {
+					onLoad: function() {
+						NM.util.openModal( $("#attribute-detail-values-modal") );
+					}
+				}
+			} 
+		)
+
     };
 
     pub.save = function() {
-
     };
 
 	pub.init = function() {

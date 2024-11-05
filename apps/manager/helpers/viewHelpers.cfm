@@ -114,6 +114,7 @@
     }
 
     function grid( 
+                 String class, 
         required String id, 
         required String rowTemplate, 
         required String source="rows", 
@@ -125,6 +126,7 @@
             <cfoutput>
                 <div 
                     id="#arguments.id#"
+                    class="#arguments.class#"
                     data-bound="NM.kendo.toggleScrollbar"
                     data-columns="#arguments.columns#" 
                     data-role="grid" 
@@ -134,6 +136,7 @@
                     data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
                     data-no-records="{ template : '<div style=\'width: 100%; text-align: center;\'><br>Nessun record trovato.<br><br></div>'}">
                 </div>
+                <div class="white-small">jstemplate/#arguments.rowTemplate#</div>
                 
                 #template( view="jstemplate/#arguments.rowTemplate#" )#
 

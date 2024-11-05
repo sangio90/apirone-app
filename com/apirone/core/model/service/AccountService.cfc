@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="dao" type="com.apirone.core.model.dao.ReportDAO";
     property name="statusService" type="com.apirone.core.model.service.StatusService";
     property name="lookupService" type="com.apirone.core.model.service.LookupService";
+    property name="langService" type="com.apirone.core.model.service.LangService";
 
     public com.apirone.core.model.bean.Account function get(
     		required String accountId
@@ -161,10 +162,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		    account.setId( record.account_id.toString() );
 		    account.setLogin( record.login );
-		    account.setPwd( record.pwd );
+			account.setPwd( record.pwd );
+
 			account.setApiKey( record.api_key.toString() );
 			account.setStatus( getStatusService().get( record.status_id ) );
-			account.setRole( getLookupService().get( 'role', record.role_id ) );
+			account.setRole( getLookupService().get( "role", record.role_id ) );
+			account.setLang( getLangService().get( record.lang_id ) );
 
 	    } 
 			

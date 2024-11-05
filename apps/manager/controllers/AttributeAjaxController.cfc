@@ -6,7 +6,6 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
         var dm = getDataMapper();
         
-        var langs = super.fire("lang.list");
         var obj = super.fire( "attribute.get", [ rc.id ] );
 
         var attr = dm.convert( obj, "attribute", true );
@@ -78,6 +77,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var result = super.getResult();
         var attr = super.bean("Attribute");
+
+        var text = super.bean("Text");
+        var lang = super.bean("Lang");
+        var status = super.bean("Status");
         
         var thisId = "";
         var messageId = "";
@@ -85,24 +88,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
-        attr.setId( json.id );
+        var mainText = json.data.mainText;
 
-        for( var thisText in json.texts ) {
+        text.setId( mainText.id )
+        text.setName( mainText.name )
+        text.setLang( lang.setId( mainText.lang.id ) );
 
-            var text = super.bean("Text");
-            var lang = super.bean("Lang");
-
-            text.setName( thisText.name )
-            text.setLang( lang.setId( thisText.lang.id ) );
-
-            texts.add( text );
-
-        }
-
+        texts.add( text );
+    
+        attr.setId( json.data.id );
         attr.setTexts( texts );
+        attr.setStatus( status.setId( json.data.status.id ) );
 
-        if( Len( json.action == "create"  ) ) {
-            
+        if( json.action == "create"  ) {
+
             messageId = "attribute.created";
             thisId = super.fire( "attribute.create", [ attr ] )
             
@@ -131,35 +130,38 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
-
-        var value = super.bean("AttributeValue");
+        var attrValue = super.bean("AttributeValue");
         
         var text = super.bean("Text");
         var lang = super.bean("Lang");
         var status = super.bean("Status");
         var valueStatus = super.bean("Status");
 
-        text.setLang( lang.setId("IT") );
-        text.setStatus( status.setId("ACT") );
+        text.setLang( lang.setId( "IT" ) );
+        text.setStatus( status.setId( "ACT" ) );
 
-        text.setName( json.name )
+        text.setId( json.value.mainText.id );
+        text.setName( json.value.mainText.name );
 
-        value.setTexts( [ text ] );
-        value.setStatus( statusValue.setId( json.status.id ) );
+        attrValue.setId( json.value?.id );
+        attrValue.setTexts( [ text ] );
+        attrValue.setStatus( valueStatus.setId( json.value.status.id ) );
+        attrValue.setAttributeId( json.attributeId );
+        attrValue.setOrderBy( json.value.orderBy );
 
-        if( Len( json.action == "create"  ) ) {
+        if( !Len( json.value.id ) ) {
             
             messageId = "attributeValue.created";
-            thisId = super.fire( "attributeValue.create", [ value ] )
+            thisId = super.fire( "attributeValue.create", [ attrValue ] )
             
         } else {
 
             messageId = "attributeValue.updated";
-            thisId = super.fire( "attributeValue.update", [ value ] )
+            thisId = super.fire( "attributeValue.update", [ attrValue ] )
             
         }
 
-        var message = completeMessage( messageId );
+        var message = super.completeMessage( messageId );
 
         result.setData(  message, { payload = { id = thisId }  } );
         

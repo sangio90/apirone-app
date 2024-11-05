@@ -86,6 +86,7 @@
         { file: "/modules/assets/template-admin/vendor/morris/morris.css" },
         { file: "/modules/assets/template-admin/css/custom.css" },
 
+        
         { 
             file: "/modules/assets/kendoui/styles/default-ocean-blue.css",
             replacements:[

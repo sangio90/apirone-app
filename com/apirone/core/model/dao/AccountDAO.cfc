@@ -13,6 +13,7 @@
 				status_id,
 				pwd,
 				role_id,
+				lang_id,
 				pgp_sym_decrypt(
 					login::bytea,
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">

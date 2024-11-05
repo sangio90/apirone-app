@@ -50,9 +50,18 @@ AP.lineAttributes.list = function() {
 
 		showAttributeValues: function( event ) {
 
-			console.log("event.data.id", event.data.id)
+			//console.log("event.data.id", event.data.id)
 
-			service.open( event.data.id );
+			service.open( 
+				{ 
+					id: event.data.id, 
+					callback: { 
+						onSave: function() {
+							viewModel.searchAttributes();
+						},
+					} 
+				}
+			)
 
 			return false;
 
