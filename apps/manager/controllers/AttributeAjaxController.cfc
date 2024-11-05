@@ -16,6 +16,26 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
+    function order( event, rc, prc ){
+
+        dump( "order");
+        abort;
+
+        var data = [];
+        var result = super.getResult();
+        var dm = getDataMapper();
+        
+        var obj = super.fire( "attribute.get", [ rc.id ] );
+
+        var attr = dm.convert( obj, "attribute", true );
+        
+        result.setData( attr );
+
+        event.setValue("result", result );
+        
+    }
+
+
     function list( event, rc, prc ){
 
         var data = [];

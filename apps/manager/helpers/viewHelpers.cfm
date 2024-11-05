@@ -117,6 +117,7 @@
                  String class, 
         required String id, 
         required String rowTemplate, 
+        required String sortable=false, 
         required String source="rows", 
         required String columns="[]" 
     ){ 
@@ -130,14 +131,14 @@
                     data-bound="NM.kendo.toggleScrollbar"
                     data-columns="#arguments.columns#" 
                     data-role="grid" 
-                    data-sortable="true" 
+                    data-sortable="#arguments.sortable#" 
                     data-bind="source: #arguments.source#"
                     data-pageable="true"
                     data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
                     data-no-records="{ template : '<div style=\'width: 100%; text-align: center;\'><br>Nessun record trovato.<br><br></div>'}">
                 </div>
                 <div class="white-small">jstemplate/#arguments.rowTemplate#</div>
-                
+
                 #template( view="jstemplate/#arguments.rowTemplate#" )#
 
             </cfoutput>

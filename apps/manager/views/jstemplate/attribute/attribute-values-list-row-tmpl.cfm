@@ -6,7 +6,7 @@
             <td style="border-left: 4px solid ##=status.color.hex##">
                 <span data-bind="text: id"></span>
             </td>
-            <td>
+            <td class="sortable">
                 <span data-bind="text:mainText.name"></span>
             </td>
             <td class="text-center">

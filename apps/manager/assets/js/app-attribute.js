@@ -120,9 +120,7 @@ AP.attribute.detail = function() {
 		saveValue: function() {
 
 			var thisForm = AP.attribute.fields.valueForm;
-			var status = thisForm.find(".status");
-
-			console.log("status", status.length);
+			var status = $("#attribute-values-add-form-status");
 
 			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
 			var attrId = viewModel.get( "detailForm.data.id" ) 
@@ -139,13 +137,8 @@ AP.attribute.detail = function() {
 					),
 					callback: {
 						done: function( xhr ) {
-
 							status.html("<span class='green'>Valore salvato</span> ");
-
-							console.log("saveValue:done")
-
-							//loadAttribute( { id: attrId } );
-							
+							loadAttribute( { id: attrId } );
 						}
 					}
 				})
@@ -168,7 +161,7 @@ AP.attribute.detail = function() {
 		if ( id ) {
 			action = "update";
 			labelButton = "Aggiorna";
-			title = "Modifica attributo < " + id +" >"		
+			title = "Modifica attributo < " + id +" >"
 			thisUrl = "/manager/ajax/attributes/" + id;
 		}
 
@@ -186,10 +179,53 @@ AP.attribute.detail = function() {
 						callback.onLoad()
 					}
 
+					$("#attribute-values-grid .k-grid-container .k-table").kendoSortable({
+						axis: "y",
+						filter: ">tbody >tr",
+						hint: function(element) {
+							var ele = $('<div>')
+							var text = $(element).find('td.sortable').text();
+							
+							ele.text( text )
+								.height(element.height())
+								.width(element.width())
+								.addClass("sortable-hint");
+
+							return ele;
+
+						},
+						placeholder: function( element ) {
+
+							return element.clone()
+								.addClass("sortable-placeholder")
+								.height(element.height())
+								.width(element.width());
+						},						
+
+						end: function( event ) {
+							
+							console.log("from " + event.oldIndex + " to " + event.newIndex);
+
+							if( event.newIndex != 2 && event.oldIndex  ) {
+
+								NM.util.ajax({ 
+									method: "POST",
+									url: "/manager/ajax/attributes/" + id + "/values/order",
+									callback: {
+										done: function( xhr ) {
+
+											console.log("ordered!")
+
+										}
+									}
+								})
+							}
+						}
+						
+					});
 				}
 			}
 		})
-
 	}
 
     pub.open = function( { id, callback } ) {

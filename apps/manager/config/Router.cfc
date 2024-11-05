@@ -127,6 +127,9 @@ component{
 		post( "/ajax/attributes/values")
         	.to( "AttributeAjaxController.saveValue" ).end();
 
+		post( "/ajax/attributes/:id/values/order")
+        	.to( "AttributeAjaxController.order" ).end();
+
 		get( "/ajax/attributes/:id")
         	.toHandler( "AttributeAjaxController.get" );
 

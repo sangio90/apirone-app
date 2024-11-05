@@ -102,7 +102,7 @@
                                     class="no-pager",
                                     columns="[
                                         { 'field':'id', 'title':'ID', width: '100px' },
-                                        { 'field':'name', 'title':'Descrizione'},
+                                        { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
                                         { 'field':'', 'title':'', width: '55px'},
                                         { 
                                             'field':'', 
@@ -153,7 +153,7 @@
                                         <i class="fas fa-save"></i> <span data-bind="text: valueForm.labelButton"></span>
                                     </button>
                                     <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
-                                    <div class="status errors-counter mt-1 float-end me-3"></div>
+                                    <div class="status errors-counter mt-1 float-end me-3" id="attribute-values-add-form-status"></div>
                                 </div>
                             </div>
                         </footer>
