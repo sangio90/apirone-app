@@ -316,15 +316,6 @@ h2 {
 	cursor: move;
 }
 
-.sortable:last-child {
-}
-
-.sortable span {
-}
-
-.sortable:hover {
-}
-
 .sortable-hint {
 	opacity: 0.7;
 	color: black;

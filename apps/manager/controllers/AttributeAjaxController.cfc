@@ -18,18 +18,24 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function order( event, rc, prc ){
 
-        dump( "order");
-        abort;
-
-        var data = [];
         var result = super.getResult();
-        var dm = getDataMapper();
-        
-        var obj = super.fire( "attribute.get", [ rc.id ] );
 
-        var attr = dm.convert( obj, "attribute", true );
-        
-        result.setData( attr );
+        var service = super.service("AttributeValue")
+        var json = DESerializeJSON( GetHTTPRequestData().content );
+
+        var message = completeMessage( "attributeValue.ordered" );
+
+        for( var thisValue in json ) {
+
+            var bean = service.get( thisValue.id );
+            
+            bean.setOrderBy( thisValue.orderBy );
+            
+            service.update( bean )
+
+        }
+
+        result.setData( message );
 
         event.setValue("result", result );
         
@@ -43,6 +49,8 @@ component extends="com.apirone.core.controller.AbsController" {
         var dm = getDataMapper();
         
         var rows = super.fire( "attribute.list" );
+
+        
 
         /*
         for ( var row in rows ) {
@@ -157,8 +165,8 @@ component extends="com.apirone.core.controller.AbsController" {
         var status = super.bean("Status");
         var valueStatus = super.bean("Status");
 
-        text.setLang( lang.setId( "IT" ) );
-        text.setStatus( status.setId( "ACT" ) );
+        text.setLang( lang.setId( json.value.mainText.lang.id ) );
+        text.setStatus( status.setId( json.value.mainText.id ) );
 
         text.setId( json.value.mainText.id );
         text.setName( json.value.mainText.name );

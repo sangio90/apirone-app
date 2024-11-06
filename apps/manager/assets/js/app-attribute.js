@@ -21,17 +21,20 @@ AP.attribute.detail = function() {
 
 	var pub = {}
 
+	var emptyAttributeValue = {
+		id: "",
+		mainText: {
+			id: "",
+			name: ""
+		}
+	}
+
 	var dataSource = NM.kendo.dataSource();
 
 	var viewModel = kendo.observable({
 
 		statusList: AP.page.attributeStatusList,
 
-		callback: {
-			onSave: undefined,
-			onLoad: undefined
-		},
-		
 		detailForm: {
 			data: dataSource,
 			action: "create",
@@ -44,20 +47,32 @@ AP.attribute.detail = function() {
 					id: "ACT"
 				},
 				id: "",
-				name: ""
+				orderBy: 0,
+				mainText: {
+					id: "",
+					name: "",
+					lang: {
+						id: "IT"
+					}
+				}
 			},
 			title: "Carica valore",
 			labelButton: "Carica"
 		},
 
+		callback: {
+			onSave: undefined,
+			onLoad: undefined
+		},
+		
 		isValuesGridVisible: function() {
 
-			var values = viewModel.get( "detailForm.data.values" );
+			var values = viewModel.get("detailForm.data.values");
 
-			if ( values && values.length ) {
+			if ( values?.total() ) {
 				return true;
 			}
-
+			
 			return false;
 
 		},
@@ -170,7 +185,16 @@ AP.attribute.detail = function() {
 			url: thisUrl,
 			callback: {
 				done: function( xhr ) {
+
+					var valuesDataSource = new kendo.data.DataSource({
+						data: xhr.data.values,
+						sort: { field: "orderBy", dir: "asc" } 
+					});
+
+					delete xhr.data.values;
+
 					viewModel.set( "detailForm.data", xhr.data );
+					viewModel.set( "detailForm.data.values", valuesDataSource );
 					viewModel.set( "detailForm.action", action );
 					viewModel.set( "detailForm.title", title );
 					viewModel.set( "detailForm.labelButton", labelButton );
@@ -179,7 +203,9 @@ AP.attribute.detail = function() {
 						callback.onLoad()
 					}
 
-					$("#attribute-values-grid .k-grid-container .k-table").kendoSortable({
+					var table = $("#attribute-values-grid .k-grid-container .k-table");
+
+					table.kendoSortable({
 						axis: "y",
 						filter: ">tbody >tr",
 						hint: function(element) {
@@ -195,7 +221,6 @@ AP.attribute.detail = function() {
 
 						},
 						placeholder: function( element ) {
-
 							return element.clone()
 								.addClass("sortable-placeholder")
 								.height(element.height())
@@ -204,24 +229,42 @@ AP.attribute.detail = function() {
 
 						end: function( event ) {
 							
-							console.log("from " + event.oldIndex + " to " + event.newIndex);
+							if( event.newIndex != event.oldIndex ) {
 
-							if( event.newIndex != 2 && event.oldIndex  ) {
+								var values = viewModel.get("detailForm.data.values").data();
+								var thisForm = $("#attribute-values-form");
+								var status = thisForm.find(".status");
+
+								status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+
+								table.find("tr").each( function( index ) {
+	
+									var ele = $(this);
+									var uid = ele.data("uid");
+	
+									for( var value of values ) {
+										if ( value.get( "uid" ) == uid ) {
+											value.set("orderBy", index*10 );
+										}
+									}
+								
+								});
 
 								NM.util.ajax({ 
 									method: "POST",
 									url: "/manager/ajax/attributes/" + id + "/values/order",
+									data: JSON.stringify( viewModel.get("detailForm.data.values").data() ),
 									callback: {
 										done: function( xhr ) {
-
+											status.html("<span class='green'>Ordinamento salvato.</span> ");
 											console.log("ordered!")
-
 										}
 									}
 								})
+
 							}
 						}
-						
+
 					});
 				}
 			}

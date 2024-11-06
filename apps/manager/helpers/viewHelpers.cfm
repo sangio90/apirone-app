@@ -132,6 +132,7 @@
                     data-columns="#arguments.columns#" 
                     data-role="grid" 
                     data-sortable="#arguments.sortable#" 
+                    data-reorderable="    'rows': { 'clickMoveClick': false }"
                     data-bind="source: #arguments.source#"
                     data-pageable="true"
                     data-row-template="#ListLast( arguments.rowTemplate, "/" )#"

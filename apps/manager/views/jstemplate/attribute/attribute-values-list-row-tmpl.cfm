@@ -8,6 +8,7 @@
             </td>
             <td class="sortable">
                 <span data-bind="text:mainText.name"></span>
+                -<span data-bind="text:orderBy"></span>-
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:editValue">
