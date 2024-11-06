@@ -1,5 +1,26 @@
 component extends="com.apirone.core.controller.AbsController" {
 
+    function addValue( event, rc, prc ){
+
+        dump(rc);
+        abort;
+
+        ```
+            <cfquery datasource="apirone">
+                DELETE FROM apirone
+            </cfquery>
+        ```
+
+
+
+        result.setTotal( data.len() );
+        result.setCount( data.len() );
+        result.setData( data );
+
+        event.setValue("result", result);
+
+    }
+
     function list( event, rc, prc ){
 
         var data = [];

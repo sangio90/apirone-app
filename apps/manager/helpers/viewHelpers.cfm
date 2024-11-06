@@ -136,7 +136,7 @@
                     data-bind="source: #arguments.source#"
                     data-pageable="true"
                     data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
-                    data-no-records="{ template : '<div style=\'width: 100%; text-align: center;\'><br>Nessun record trovato.<br><br></div>'}">
+                    data-no-records="{ template : '<div class=grid-no-data><br>Nessun record trovato.<br><br></div>'}">
                 </div>
                 <div class="white-small">jstemplate/#arguments.rowTemplate#</div>
 

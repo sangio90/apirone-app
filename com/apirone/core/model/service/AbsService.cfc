@@ -47,7 +47,6 @@
         var n = 1;
         
         for ( var i in arguments.fields ) {
-
            
             if ( !StructKeyExists( i, "dir" ) ) {
                 i.dir = "ASC";
@@ -62,7 +61,7 @@
 
             }
             
-            result = result & "#getDBField( i.field )# #i.sort#";
+            result = result & "#getDBField( i.field ).name# #i.sort#";
 
             result = arguments.fields.len() EQ n ? result : result & ", ";
             
@@ -94,10 +93,21 @@
         return records;
     }
     
+
+
+    Struct function getDBField(required String field) {
+        var DBUtil = new com.apirone.core.util.DBUtil();
+        
+        return DBUtil.getDBField( arguments.field );
+    
+    }
+    
+    /*
     public String function getDBField( required String field ) {
 
         return getDBUtil().getDBField( arguments.field );
 
     }
+        */
     
 }

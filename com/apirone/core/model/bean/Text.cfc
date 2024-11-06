@@ -3,8 +3,7 @@
 	property name="lang" type="com.apirone.core.model.bean.Lang";
 	property name="status" type="com.apirone.core.model.bean.Status";
 
-	//{ "key" = "value" } 
-	//es. { "attributeId" = "Color" }
+	//{ "key" = "value" } es. { "attributeId" = "Color" }
 	property name="entity" type="com.apirone.core.model.bean.Entity";
 
 	public Text function init(){

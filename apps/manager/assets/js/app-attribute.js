@@ -36,7 +36,20 @@ AP.attribute.detail = function() {
 		statusList: AP.page.attributeStatusList,
 
 		detailForm: {
-			data: dataSource,
+			data: {
+				status: {
+					id: "ACT"
+				},
+				id: "",
+				orderBy: 0,
+				mainText: {
+					id: "",
+					name: "",
+					lang: {
+						id: "IT"
+					}
+				}
+			},
 			action: "create",
 			title: "Carica attributo",
 		},
@@ -79,7 +92,11 @@ AP.attribute.detail = function() {
 
 		isIdDisabled: function( event ) {
 
-			return viewModel.get( "detailForm.action" ) == "update" ? true : false;
+			var action = viewModel.get( "detailForm.action" );
+
+			console.log("isIdDisabled:action", action);
+
+			return  action == "update" ? true : false;
 
 		},
 
@@ -173,16 +190,19 @@ AP.attribute.detail = function() {
 		var title = "Carica attributo";
 		var thisUrl = "/manager/ajax/attributes/new";
 
-		if ( id ) {
+		if ( id.length ) {
 			action = "update";
 			labelButton = "Aggiorna";
 			title = "Modifica attributo < " + id +" >"
 			thisUrl = "/manager/ajax/attributes/" + id;
 		}
 
+		console.log("id", id);
+
 		NM.util.ajax({ 
 			method: "GET", 
 			url: thisUrl,
+			cache: false,
 			callback: {
 				done: function( xhr ) {
 
@@ -268,27 +288,38 @@ AP.attribute.detail = function() {
 					});
 				}
 			}
-		})
+		})				
+
+
 	}
 
     pub.open = function( { id, callback } ) {
 
-		console.log("id", id)
-		console.log("callback", callback)
+		viewModel.set("detailForm.action", "create");
 
-		viewModel.set("callback.onSave", callback?.onSave);
-		viewModel.set("callback.onLoad", callback?.onLoad);
+		if( id.length ) {
+			viewModel.set("detailForm.action", "update");
 
-		loadAttribute( 
-			{
-				id: id, 
-				callback: {
-					onLoad: function() {
-						NM.util.openModal( $("#attribute-detail-values-modal") );
+			viewModel.set("callback.onSave", callback?.onSave);
+			viewModel.set("callback.onSave", callback?.onSave);
+	
+			loadAttribute( 
+				{
+					id: id, 
+					callback: {
+						onLoad: function() {
+							NM.util.openModal( $("#attribute-detail-values-modal") );
+						}
 					}
-				}
-			} 
-		)
+				} 
+			)
+
+		} else {
+			NM.util.openModal( $("#attribute-detail-values-modal") );
+			return;
+		}
+
+
 
     };
 

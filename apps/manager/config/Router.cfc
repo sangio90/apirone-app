@@ -159,6 +159,10 @@ component{
 		/*
 			texts
 		*/
+
+		get( "/ajax/texts/:id/all")
+        	.toHandler( "TextAjaxController.all" );
+
 		get( "/ajax/texts/:id")
         	.toHandler( "TextAjaxController.get" );
 
@@ -186,6 +190,9 @@ component{
 
 		get( "/lines" )
         	.toHandler( "LineController.list" );
+
+		post( "/ajax/lines/:id/add" )
+        	.toHandler( "LineAjaxController.addValue" );
 
 		get( "/ajax/lines" )
         	.toHandler( "LineAjaxController.list" );

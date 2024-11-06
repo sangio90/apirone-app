@@ -19,16 +19,39 @@
                             <button class="btn btn-primary btn-sm" data-bind="click:showAttributesList">Aggiungi attributo &raquo;</button>
                         </div>
 
-                        <div class="col-md-3 offset-md-9 float-end">
+                        <div class="col-md-6 offset-md-6 float-end">
 
-                            Dimensione:
-                            <select name="size" class="form-control">
-                                <cfloop array="#prc.sizes#" item="item">
-                                    <option value="#item.getId()#" 
-                                    <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
-                                    >#item.getName()#</option>
-                                </cfloop>
-                            </select>
+                            <div class="row" id="line-config-row">
+
+                                <div class="col-md-6 float-end">
+                                    Dimensione:
+                                    <select name="sizeId" class="form-control">
+                                        <cfloop array="#prc.sizes#" item="item">
+                                            <option value="#item.getId()#" 
+                                                <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
+                                            >
+                                                #item.getName()#
+                                            </option>
+                                        </cfloop>
+                                    </select>
+                                </div>
+    
+                                <div class="col-md-6 float-end">
+                                    Finutura:
+                                    <select name="finishId" class="form-control">
+                                        <cfloop array="#prc.finishes#" item="item">
+                                            <option value="#item.getId()#" 
+                                                <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
+                                            >
+                                                #item.getMainText().getName()#
+                                            </option>
+                                        </cfloop>
+                                    </select>
+                                </div>
+    
+
+                            </div>
+
 
                         </div>
 

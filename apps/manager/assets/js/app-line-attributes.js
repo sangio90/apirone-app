@@ -25,6 +25,25 @@ AP.lineAttributes.list = function() {
 
 		attributesList: [],
 
+		selectAttribute: function( event ) {
+
+			console.log( event );
+
+			var sizeId = $("#line-config-row").find("[name=sizeId]").val();
+			var finishId = $("#line-config-row").find("[name=finishId]").val();
+
+			$.ajax({
+				method: "POST",
+				url: "/manager/ajax/lines/" + event.data.id + "/add",
+				data: { finishId: finishId , sizeId: sizeId },
+				success: function(xhr) {
+					//viewModel.set( "attributesList", xhr.data );
+					//status.html( "Ho trovato " + xhr.count + " record.") 
+				},
+			});
+
+		},
+
 		getAttributeName: function( event ) {
 
 			var text = AP.util.getMainText( event.texts )
@@ -35,7 +54,7 @@ AP.lineAttributes.list = function() {
 
 		addAttribute: function( event ) {
 
-			service.open();
+			service.open( { id: '' } );
 
 			return false;
 		},
@@ -50,11 +69,11 @@ AP.lineAttributes.list = function() {
 
 		showAttributeValues: function( event ) {
 
-			//console.log("event.data.id", event.data.id)
+			console.log("event.data.id", event.data.id)
 
 			service.open( 
 				{ 
-					id: event.data.id, 
+					id: event.data.id,
 					callback: { 
 						onSave: function() {
 							viewModel.searchAttributes();

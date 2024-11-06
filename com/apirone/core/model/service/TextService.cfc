@@ -35,16 +35,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search(argumentCollection = arguments).getData()
 	}
 
-    private com.apirone.core.model.bean.Result function search(
+    public com.apirone.core.model.bean.Result function search(
                      String statusId,
                      String attributeId,
                      Numeric attributeValueId,
+                     String langId,
             required Numeric limit = 20,
 			required Numeric offset = 0,
+			required Array orderBy = [ { field='lang.orderBy', sort="asc" } ]
     	){
+
 
 	    var rows = [];
     	var result = super.getResult();
+
+		arguments['orderby'] = super.createOrderBy( arguments['orderby'] );
 
     	var records = getDao().find( argumentCollection=arguments );
 
@@ -150,6 +155,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setName( record.text );
 			bean.setLang( getLangService().get( record.lang_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setEntity( getEntity( record ) );
+
+			getStatusService().get( record.status_id )
+
 			
 			return bean;
 			
@@ -162,6 +171,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
   	private String function getCacheKey( required Numeric id ) {
 
   		return "Text_#arguments.id#";
+
+  	}
+
+  	private com.apirone.core.model.bean.Entity function getEntity( required record ) {
+
+		var entity = super.bean( "Entity" );
+
+		if( Len( record.attribute_id ) ) {
+
+			entity.setKey( "attribute.id" );
+			entity.setValue( record.attribute_id );
+
+			return entity;
+
+		}
+
+		if( Len( record.attribute_value_id ) ) {
+
+			entity.setKey( "attributeValue.id" );
+			entity.setValue( record.attribute_value_id );
+
+			return entity;
+			
+		}
+		
+		return NullValue()
 
   	}
 

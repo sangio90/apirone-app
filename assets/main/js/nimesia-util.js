@@ -55,10 +55,10 @@ NM.util.ajax = function( setup ) {
 
 	if ( settings.hasOwnProperty( "cache" ) ) {
 		
-		config.cache = settings.cache;
+		settings.cache = settings.cache;
 		
 		if ( !settings.cache ) {
-			config.headers = {
+			settings.headers = {
 				"cache-control": "no-cache"
 			};
 		}

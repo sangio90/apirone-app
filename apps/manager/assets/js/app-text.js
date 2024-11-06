@@ -1,8 +1,9 @@
 AP.text = AP.text || {};
 
 AP.text.fields = {
-    listRoot: $('#line-list-root'),
-    detailRoot: $('#line-detail-form')
+    listRoot   : $('#text-list-root'),
+    listSearch : $('#text-search-form'),
+    detailModal: $('#text-detail-modal')
 }
 
 $(document).ready(function(){
@@ -13,36 +14,39 @@ $(document).ready(function(){
 
 	}
 
-	if ( AP.text.fields.detailRoot.length ) {
-
-	    AP.text.detail.init();
-
-	}
-
 })
 
 AP.text.list = function() {
 
 	var pub = {}
 
-	var dataSources = {
-		items: NM.kendo.dataSource( { url: "/manager/ajax/texts" } )
-	}
-
 	var viewModel = kendo.observable({
-		rows: dataSources.items,
-        
-        //TODO: to remove
-        open: function( event ) {
-
-            var id = event.data.id
-            window.open( "/manager/lines/" + id, '_blank').focus();
-
+		
+        rows: undefined,
+		
+        detailForm: {
+            data: {
+                texts: undefined
+            },
+            title: "Traduzione",
+            labelButton: "Salva"
         },
+        
+        edit: function( event ) {
 
-        configure: function( event ) {
-            var id = event.data.id
-            window.open( "/manager/lines/" + id + "/attributes", '_blank').focus();
+            NM.util.ajax({ 
+                method: "GET", 
+                url: "/manager/ajax/texts/" + event.data.id + "/all",
+                callback: {
+                    done: function( xhr ) {
+
+                        viewModel.set( "detailForm.data.texts", xhr.data );
+                        NM.util.openModal( AP.text.fields.detailModal );
+
+                    }
+                }
+            })
+
 
         },
 
@@ -53,14 +57,25 @@ AP.text.list = function() {
             return false;
 		},
 
+        search: function() {
+
+            var qs = AP.text.fields.listSearch.serialize();
+
+            var dataSource = NM.kendo.dataSource({ url: "/manager/ajax/texts?" + qs })
+
+            viewModel.set( "rows", dataSource );
+    
+        }
+
 
 	});
 
+
 	pub.init = function() {
 
-        console.log("init")
-
         kendo.bind( AP.text.fields.listRoot, viewModel );
+
+        viewModel.search();
 
 	}	
 

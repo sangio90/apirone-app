@@ -42,6 +42,7 @@
                                             { 'field':'id', 'title':'ID', width: '100px' },
                                             { 'field':'name', 'title':'Descrizione'},
                                             { 'field':'', 'title':'', width: '50px'},
+                                            { 'field':'', 'title':'', width: '50px'},
                                             { 
                                                 'field':'', 
                                                 'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

@@ -9,18 +9,19 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
+            <td>
+                <span data-bind="text: lang.name"></span>
+            </td>
             <td class="text-center">
                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
                     <i class="fas fa-edit"></i>
                 </button>
             </td>
-            <td>
-                <div>
-                    <input type="checkbox" class="form-check-input"
-                        name="selected"
-                        data-bind="value:id" 
-                    >
-                </div>
+            <td align="center">
+                <input type="checkbox" class="form-check-input"
+                    name="selected"
+                    data-bind="value:id" 
+                >
             </td>
         </tr>
     </nmscript>

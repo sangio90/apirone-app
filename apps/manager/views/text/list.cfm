@@ -1,6 +1,6 @@
 <cfoutput>
 
-    <div id="line-list-root">
+    <div id="text-list-root">
 
         <div class="row mb-3">
             <div class="col-lg-6">
@@ -14,13 +14,23 @@
                 <section class="card">
                     <section class="card-body box-search">
     
-                        <form name="estimate-search-form" id="estimate-search-form" method="post">
+                        <form name="text-search-form" id="text-search-form" method="post">
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Cerca</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control" placeholder="Cerca nel nome o nel codice">
+                                            <input type="text" name="str" class="form-control" placeholder="Cerca traduzione">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Lingua</label>
+                                        <div class="col-sm-9">
+                                            <select name="langId" class="form-control">
+                                                <cfloop array="#prc.langs#" item="item">
+                                                    <option value="#item.getId()#" <cfif item.getId() IS "IT">SELECTED</cfif>>#item.getName()#</option>
+                                                </cfloop>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group row mb-2">
@@ -28,6 +38,9 @@
                                         <div class="col-sm-9">
                                             <select name="statusId" class="form-control">
                                                 <option value="">-- tutti</option>
+                                                <cfloop array="#prc.statusList#" item="item">
+                                                    <option value="#item.getId()#">#item.getName()#</option>
+                                                </cfloop>
                                             </select>
                                         </div>
                                     </div>
@@ -77,11 +90,12 @@
                             </div>
                             
                             #grid( 
-                                id="line-grid",
+                                id="text-list-grid",
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '50px' },
                                     { 'field':'name', 'title':'Traduzione'},
-                                    { 'field':'', 'title':'', width: '65px'},
+                                    { 'field':'name', 'title':'Lingua'},
+                                    { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
@@ -98,6 +112,9 @@
                 </section>
             </div>
         </div>
+
+        #view("text/detail-modal")#
+
     </div>
 
 </cfoutput>

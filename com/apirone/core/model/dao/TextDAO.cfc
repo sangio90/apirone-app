@@ -21,10 +21,18 @@
 		<cfargument name="langId" type="String">
 		<cfargument name="attributeId" type="String">
 		<cfargument name="attributeValueId" type="Numeric">
+		<cfargument name="fromDate" type="Date">
+		<cfargument name="toDate" type="Date">
+		<cfargument name="entity" type="com.apirone.core.model.bean.Entity">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
-		<cfargument name="orderby" required="true" type="String" default="langs.orderby">
+		<cfargument name="orderby" required="true" type="String" default="texts.created_at DESC">
+
+		<cfif !IsNull( arguments.entity )>
+			<cfset field = super.getDBField( arguments.entity.getKey() )>
+			<cfset value = arguments.entity.getValue()>
+		</cfif>
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -34,12 +42,16 @@
                 INNER JOIN langs USING ( lang_id )
 			WHERE 1=1
 
+			<cfif !isNull( arguments.entity ) >
+				AND #field.name# = <cfqueryparam cfsqltype="#field.type#" value="#value#">
+			</cfif>
+
 			<cfif !isNull( arguments.str ) >
 				AND text ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
 			</cfif>
 
 			<cfif !isNull( arguments.statusId ) >
-				AND status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
+				AND texts.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
 			</cfif>
 
 			<cfif !isNull( arguments.langId ) >
@@ -52,6 +64,14 @@
 
 			<cfif !isNull( arguments.attributeValueId ) >
 				AND attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
+			</cfif>
+
+			<cfif !isNull( arguments.fromDate ) >
+				AND texts.created_at >= <cfqueryparam cfsqltype="Date" value="#arguments.fromDate#">
+			</cfif>
+
+			<cfif !isNull( arguments.toDate ) >
+				AND texts.created_at <= <cfqueryparam cfsqltype="Date" value="#arguments.toDate#">
 			</cfif>
 
 			ORDER BY 

@@ -309,7 +309,7 @@ h2 {
 
 
 /* 
-	sortable
+	sortable grid
 */
 
 .sortable {
@@ -334,5 +334,17 @@ h2 {
 }
 
 /* 
-	// sortable
+	// sortable grid
+*/
+
+
+.grid-no-data {
+	width: 100%; 
+	padding-top: 20px; 
+	padding-bottom: 20px; 
+	text-align: center;
+}
+
+/*
+	style=\'width: 100%; padding-top: 10px; padding-bottom: 10px; text-align: center;\'
 */
