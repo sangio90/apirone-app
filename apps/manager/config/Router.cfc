@@ -191,11 +191,15 @@ component{
 		get( "/lines" )
         	.toHandler( "LineController.list" );
 
+		get( "/ajax/lines/:lineId/size/:sizeId/finish/:finishId/conf" )
+        	.toHandler( "LineAjaxController.configuration" );
+
 		post( "/ajax/lines/:id/add" )
         	.toHandler( "LineAjaxController.addValue" );
 
 		get( "/ajax/lines" )
         	.toHandler( "LineAjaxController.list" );
+	
 	
 		get( "/ajax/lines/attributes" )
         	.toHandler( "LineAjaxController.attributes" );

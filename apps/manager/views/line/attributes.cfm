@@ -55,16 +55,22 @@
 
                         </div>
 
-                        <hr>
-
                         <div class="col-md-12 mt-5">
 
-                            <table width="100%" class="table">
-                                <cfloop array="#[]#" index="finish">
-                                <tr>
-                                    <td colspan="2"></td>
-                                </tr>
-                                </cfloop>
+
+                            <table class="table table-hover pt-5">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="50">ID</th>
+                                        <th scope="col">Attributo</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col" width="50"></th>
+                                        <th scope="col" width="50"></th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody data-bind="source:configList" data-template="line-config-row-tmpl">
+                                </tbody>
                             </table>
         
                         </div>
@@ -81,5 +87,7 @@
     </div>
 
     #view("attribute/detail-values-modal")#
+
+    #template( view="jstemplate/line/line-config-row-tmpl" )#
 
 </cfoutput>

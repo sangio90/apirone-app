@@ -24,6 +24,7 @@ AP.lineAttributes.list = function() {
 	var viewModel = kendo.observable({
 
 		attributesList: [],
+		configList: [],
 
 		selectAttribute: function( event ) {
 
@@ -34,11 +35,32 @@ AP.lineAttributes.list = function() {
 
 			$.ajax({
 				method: "POST",
-				url: "/manager/ajax/lines/" + event.data.id + "/add",
-				data: { finishId: finishId , sizeId: sizeId },
+				url: "/manager/ajax/lines/" + AP.page.lineId + "/add",
+				data: { 
+					finishId: finishId , 
+					sizeId: sizeId, 
+					lineId: AP.page.lineId, 
+					attributeId: event.data.id 
+				},
 				success: function(xhr) {
-					//viewModel.set( "attributesList", xhr.data );
-					//status.html( "Ho trovato " + xhr.count + " record.") 
+
+					viewModel.getConfiguration()
+
+				},
+			});
+
+		},
+
+		getConfiguration: function( event ) {
+
+			var sizeId = $("#line-config-row").find("[name=sizeId]").val();
+			var finishId = $("#line-config-row").find("[name=finishId]").val();
+
+			$.ajax({
+				method: "GET",
+				url: "/manager/ajax/lines/" + AP.page.lineId + "/size/" + sizeId + "/finish/" + finishId + "/conf",
+				success: function(xhr) {
+					viewModel.set( "configList", xhr.data )
 				},
 			});
 
@@ -116,6 +138,8 @@ AP.lineAttributes.list = function() {
 		console.log("comp:init")
 
 		kendo.bind( AP.lineAttributes.fields.root, viewModel )
+
+		viewModel.getConfiguration();	
 
 	}	
 

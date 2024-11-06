@@ -26,6 +26,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.jsScripts.add( "app-line-attributes" );
 
         prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
+        prc.page["lineId"] = rc.id;
         
         event.setView( "line/attributes" );
 
