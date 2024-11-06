@@ -170,11 +170,17 @@
     }
 
     // message and id
-    public Struct function completeMessage( required String id, required String lang="it" ){ //id is a dotted path
+    public Struct function completeMessage( required String id, required String langId="it" ){ //id is a dotted path
 
-		var messages = DeserializeJSON( FileRead(expandPath("/config/assets/messages-#LCase(arguments.lang)#.json.cfm") ) );
+		var messages = DeserializeJSON( FileRead(expandPath("/config/assets/messages-#LCase(arguments.langId)#.json.cfm") ) );
 
-        return { "id" : arguments.id, "text" = StructGet("messages.#id#") };
+        var result = StructGet("messages.#id#");
+
+        if( !IsSimpleValue( result ) ) {
+            FileAppend( file=ExpandPath("/message-not-found.log"), data="#now()#;messageIdNotFound:#arguments.id#;langId:#arguments.langId# #Chr(13)##Chr(10)#" );
+        }
+
+        return { "id" : arguments.id, "text" = result };
 
     }
 

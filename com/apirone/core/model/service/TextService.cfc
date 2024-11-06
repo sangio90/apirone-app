@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.TextDAO";
 	property name="langService" type="com.apirone.core.model.service.LangService";
+	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
 	public com.apirone.core.model.bean.Text function get(
 			required String textId
@@ -148,6 +149,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.text_id );
 			bean.setName( record.text );
 			bean.setLang( getLangService().get( record.lang_id ) );
+			bean.setStatus( getStatusService().get( record.status_id ) );
 			
 			return bean;
 			

@@ -17,7 +17,6 @@
         <map from="id" to="id" type="cf:String"  />
         <map from="mainText" to="mainText" type="cf:String"  />
         <map from="status" to="status" ref="Status"  />
-        <!-- <map from="texts" to="texts" ref="Text" type="Array" /> -->
         <map from="values" to="values" ref="AttributeValue" type="Array" />
     </mapper>
 
@@ -26,14 +25,13 @@
         <map from="orderBy" to="orderBy" type="cf:Numeric"  />
         <map from="status" to="status" ref="Status"  />
         <map from="mainText" to="mainText" type="cf:String"  />
-        <!-- <map from="texts" to="texts" ref="Text" type="Array"  /> -->
     </mapper>
 
     <mapper id="Text" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Text">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
-        <map from="lang" to="lang" ref="Lang"  />
-        <map from="status" to="status" ref="Status"  />
+        <map from="lang" to="lang" ref="Lang" />
+        <map from="status" to="status" ref="Status" />
     </mapper>
 
     <mapper id="Lang" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Lang">

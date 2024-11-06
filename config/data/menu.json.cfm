@@ -68,6 +68,12 @@
                 roles: "ADM"
             },
             {
+                href: "/manager/texts",
+                icon: "fas fa-language",
+                title: "Traduzioni",
+                roles: "ADM"
+            },
+            {
                 href: "/manager/roles",
                 icon: "fas fa-users",
                 title: "Lista dei ruoli",

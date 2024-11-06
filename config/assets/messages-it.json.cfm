@@ -6,7 +6,7 @@
     
     "attributeValue": {
         "created": "Valore caricato",
-        "updated": "Valore aggiornato",
+        "updated": "Valore aggiornato"
     },
     
     "home": {

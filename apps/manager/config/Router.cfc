@@ -156,6 +156,19 @@ component{
         	.toHandler( "ReportController.list" );
 
 
+		/*
+			texts
+		*/
+		get( "/ajax/texts/:id")
+        	.toHandler( "TextAjaxController.get" );
+
+		get( "/ajax/texts")
+        	.toHandler( "TextAjaxController.list" );
+
+		get( "/texts" )
+        	.toHandler( "TextController.list" );
+
+
 
 		/*
 			values

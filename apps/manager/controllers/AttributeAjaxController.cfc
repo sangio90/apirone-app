@@ -23,7 +23,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var service = super.service("AttributeValue")
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
-        var message = completeMessage( "attributeValue.ordered" );
+        var message = super.completeMessage( "attributeValue.ordered" );
 
         for( var thisValue in json ) {
 
