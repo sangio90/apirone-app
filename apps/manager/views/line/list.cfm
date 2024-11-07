@@ -19,6 +19,9 @@
 
                             <div class="row">
                                 <div class="mb-3 d-flex justify-content-end col-12">
+                                    <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:organize">
+                                        <i class="fas fa-remove"></i> Configura
+                                    </button>
                                     <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:print">
                                         <i class="fas fa-remove"></i> Stampa
                                     </button>
@@ -30,7 +33,8 @@
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '100px' },
                                     { 'field':'name', 'title':'Descrizione'},
-                                    { 'field':'', 'title':'Configurazione', width: '65px'},
+                                    { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
+                                    { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

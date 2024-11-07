@@ -32,7 +32,6 @@ AP.line.list = function() {
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
         
-        //TODO: to remove
         open: function( event ) {
 
             var id = event.data.id
@@ -49,6 +48,14 @@ AP.line.list = function() {
 		print: function( item ) {
 
             window.open('/manager/lines/print', '_blank');
+
+            return false;
+		},
+
+		combinations: function( event ) {
+
+            var id = event.data.id
+            window.open( "/manager/lines/" + id + "/combinations", '_blank').focus();
 
             return false;
 		},

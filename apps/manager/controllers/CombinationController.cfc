@@ -1,12 +1,16 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+    function organize( event, rc, prc ){
 
-        prc.title = "Linee";
+        prc.title = "Combinazioni per le linee";
 
-        prc.jsScripts.add( "app-line" );
+        //prc.jsScripts.add( "app-line" );
 
-        event.setView("line/list");
+        prc.sizes = super.fire( "size.list" );
+        prc.lines = super.fire( "line.list" );
+        prc.finishes = super.fire( "AttributeValue.list", { attributeId = "FIN0001" } );
+
+        event.setView("combination/organize");
 
     }
 
@@ -29,21 +33,6 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.page["lineId"] = rc.id;
         
         event.setView( "line/attributes" );
-
-    }
-    
-    function combinations( event, rc, prc ){
-
-        prc.obj = super.fire("line.get", [rc.id] );
-
-        prc.title="Combinazioni per la linea < #prc.obj.getName()# >";
-
-        prc.sizes = super.fire( "size.list" );
-        prc.finishes = super.fire( "AttributeValue.list", { attributeId = "FIN0001" } );
-
-        var combinations = super.fire( "combinations.list" { lineId = prc.obj.getId() } );
-
-        event.setView( "line/combinations" );
 
     }
     

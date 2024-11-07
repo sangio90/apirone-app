@@ -9,29 +9,21 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
-            <td>
-                <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:configure">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
+            <td class="text-center">
+                <button type="button" class="btn btn-primary btn-sm" data-bind="click:configure">
+                    <i class="fas fa-edit"></i>
+                </button>
             </td>
-            <!---
-            <td>
-                <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:open">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
+            <td class="text-center">
+                <button type="button" class="btn btn-primary btn-sm" data-bind="click:combinations">
+                    <i class="fas fa-cogs"></i>
+                </button>
             </td>
-            ------>
-            <td>
-                <div>
-                    <input type="checkbox" class="form-check-input"
-                        name="selected"
-                        data-bind="value:id" 
-                    >
-                </div>
+            <td class="text-center">
+                <input type="checkbox" class="form-check-input"
+                    name="selected"
+                    data-bind="value:id" 
+                >
             </td>
         </tr>
     </nmscript>

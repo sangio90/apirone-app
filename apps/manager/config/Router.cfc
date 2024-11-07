@@ -180,8 +180,17 @@ component{
 
 
 		/*
+			combination
+		*/
+
+
+		/*
 			lines
 		*/
+
+		get( "/lines/:id/combinations")
+			.toHandler( "LineController.combinations" );
+
 		get( "/lines/:id/attributes")
 			.toHandler( "LineController.attributes" );
 

@@ -1,6 +1,6 @@
 # ApirOne
 
-Product Configurator Software for Apir Srl.
+ApirOne: product configurator software for Apir Srl.
 
 ## Getting started
 

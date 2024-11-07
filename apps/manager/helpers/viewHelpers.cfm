@@ -132,7 +132,7 @@
                     data-columns="#arguments.columns#" 
                     data-role="grid" 
                     data-sortable="#arguments.sortable#" 
-                    data-reorderable="    'rows': { 'clickMoveClick': false }"
+                    data-reorderable=" 'rows': { 'clickMoveClick': false }"
                     data-bind="source: #arguments.source#"
                     data-pageable="true"
                     data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
@@ -142,8 +142,22 @@
 
                 #template( view="jstemplate/#arguments.rowTemplate#" )#
 
+                <script>
+                    window.onload= function() {
+        
+                        $('###arguments.id# .k-table thead').kendoTooltip({
+                            filter: "th",
+                            content: function (e) {
+                                var target = e.target; 
+                                return $(target).text();
+                            }
+                        });
+        
+                    }
+                </script>
+        
             </cfoutput>
-            
+    
         </cfsavecontent>
         ```
         

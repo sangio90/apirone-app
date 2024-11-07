@@ -63,12 +63,11 @@
                                     <tr>
                                         <th scope="col" width="50">ID</th>
                                         <th scope="col">Attributo</th>
-                                        <th scope="col">Status</th>
+                                        <th scope="col" width="50"></th>
                                         <th scope="col" width="50"></th>
                                         <th scope="col" width="50"></th>
                                     </tr>
                                 </thead>
-                                
                                 <tbody data-bind="source:configList" data-template="line-config-row-tmpl">
                                 </tbody>
                             </table>
@@ -87,6 +86,7 @@
     </div>
 
     #view("attribute/detail-values-modal")#
+    #view("line/components-list-modal")#
 
     #template( view="jstemplate/line/line-config-row-tmpl" )#
 

@@ -51,6 +51,30 @@ AP.lineAttributes.list = function() {
 
 		},
 
+        showComponents: function( event ) {
+
+			$("#components-list-modal").modal("show");
+
+            return false;
+		},
+
+
+		getCalcLevel: function( event ) {
+
+			var txt = "";
+
+			console.log("event", event.data);
+
+			for(var i = 0; i < event.data.level; i++){
+
+				txt = txt + "-";
+
+			}
+
+			return txt;
+			
+		},
+
 		getConfiguration: function( event ) {
 
 			var sizeId = $("#line-config-row").find("[name=sizeId]").val();
