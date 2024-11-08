@@ -348,3 +348,12 @@ h2 {
 /*
 	style=\'width: 100%; padding-top: 10px; padding-bottom: 10px; text-align: center;\'
 */
+
+
+.grey {
+	color: rgb(135, 135, 135);
+}
+
+.h-20 {
+	height: 20px; /* for status div with loadding gif */
+}

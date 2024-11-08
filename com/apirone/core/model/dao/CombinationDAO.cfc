@@ -20,14 +20,27 @@
 	<cffunction name="find" returntype="Query">
 
         <cfargument name="lineId" type="String">
+        <cfargument name="sizeId" type="String">
+        <cfargument name="finishId" type="Numeric">
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT combination_id
 			FROM
 				combinations
-                <cfif !IsNull( arguments.lineId )>
-                    AND line_id = <cfqueryparam cfsqltype="varchar" value="#arguments.lineId#">
+			WHERE 1=1
+                
+				<cfif !IsNull( arguments.lineId )>
+                    AND line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">
                 </cfif>
+
+                <cfif !IsNull( arguments.finishId )>
+                    AND finish_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.finishId#">
+                </cfif>
+
+                <cfif !IsNull( arguments.sizeId )>
+                    AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">
+                </cfif>
+
             ORDER BY 
                 created_at
 		</cfquery>
@@ -74,4 +87,5 @@
 
 	</cffunction>
 
+	
 </cfcomponent>

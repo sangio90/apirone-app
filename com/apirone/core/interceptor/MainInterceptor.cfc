@@ -91,8 +91,6 @@ component extends="coldbox.system.Interceptor"{
             */
 
             var path = "com.apirone.core.model.bean.AjaxResult";
-            var bean = new "#path#"();
-
             var result = event.getValue("result", "result-not-found");
 
             /*
@@ -100,20 +98,24 @@ component extends="coldbox.system.Interceptor"{
                 non c'è result se il nome dell'hanlder nel router è sbagliato
             */
 
-            if ( 
-                IsInstanceOf( result, path ) 
-                OR
-                IsSimpleValue( result )
-                ) {
+            if ( IsInstanceOf( result, path ) ) {
 
                 event.renderData( data=result, contentType="text/json", type="json" )
                     .noExecution();
             
             } else {
 
-                bean.setTotal( result.len() );
-                bean.setCount( result.len() );
+                var bean = new "#path#"();
+
+                bean.setUuid( LCase( CreateUUID() ) );
+                bean.setStatus( "SUCCESS" );
+
                 bean.setData( result );
+
+                if( !IsSimpleValue( result ) ) {
+                    bean.setTotal( result.len() );
+                    bean.setCount( result.len() );
+                }
 
                 event.renderData( data=bean, contentType="text/json", type="json" )
                     .noExecution()
@@ -139,7 +141,6 @@ component extends="coldbox.system.Interceptor"{
         var result = {
             "appName" = config.get("appName"),
             "appVersion" = config.get("appVersion"),
-            //"langs" = getModel().getInstance("LangService").list()
         };
 
         return result;

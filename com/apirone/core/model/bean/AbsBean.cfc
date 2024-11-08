@@ -48,7 +48,7 @@ component accessors="true" {
     }
 
 
-	private Struct function getMetadataObject( required Struct metadata, required String name, String type="properties", Struct result={} ){
+	public Struct function getMetadataObject( required Struct metadata, required String name, String type="properties", Struct result={} ){
 		
 		var i = 0;
 		var k = "";

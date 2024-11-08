@@ -2,7 +2,7 @@ AP.line = AP.line || {};
 
 AP.line.fields = {
     listRoot: $('#line-list-root'),
-    detailRoot: $('#line-detail-form')
+    combinationsRoot: $('#line-combinations-root')
 }
 
 $(document).ready(function(){
@@ -13,9 +13,9 @@ $(document).ready(function(){
 
 	}
 
-	if ( AP.line.fields.detailRoot.length ) {
+	if ( AP.line.fields.combinationsRoot.length ) {
 
-	    AP.line.detail.init();
+	    AP.line.combinations.init();
 
 	}
 
@@ -75,69 +75,101 @@ AP.line.list = function() {
 }();
 
 
-/*
-AP.line.detail = function() {
+
+AP.line.combinations = function() {
 
     var pub = {};
 
-    var roles = [{ id: 'ADM', 'name':  'Admin' },{ 'id': 'COM', 'name': 'Commerciale' }];
-    var statusList = [{ 'id': 'ACT', 'name': 'Attivo' },{ 'id': 'DEA', 'name': 'Disattivato' }];
-    var data = { 'id': '1', 'name': 'Admin', 'email': 'roberto@marzialetti.com', 'surname': 'Marzialetti', 'role': { 'id': 'ADM', 'name': 'Admin' } };
+
+    var changeStatus = function( status, event ) {
+
+        //active 
+        var method = "POST";
+        var classToShow = "active";
+        var classToHide = "deactive";
+        var message = "Combinazione salvata";
+
+        //deactive
+        if ( status == "deactive" ) {
+            method = "DELETE"
+            classToShow = "deactive";
+            classToHide = "active";
+            message = "Combinazione rimossa";
+        }
+
+        var status = $("#line-combinations-status");
+        var values = $(event.currentTarget).data( "values" );
+
+        status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+
+        var size = values.split( "__" )[0];
+        var finish = values.split( "__" )[1];
+
+        NM.util.ajax({ 
+            method: method, 
+            url: "/manager/ajax/lines/" + AP.page.line.id + "/combinations",
+            data: JSON.stringify( { 
+                    sizeId: size,
+                    finishId: finish
+                } 
+            ),
+            callback: {
+                done: function( xhr ) {
+
+                    if( xhr.status == "SUCCESS" ) {
+
+                        var payload = xhr.data.payload;
+
+                        var button = $("button[data-values='" + values +"']");
+
+                        button.filter( "." + classToShow ).show();
+                        button.filter( "." + classToHide ).hide();
+
+                        status.html("<span class='green'>" + message + "</span> ");
+
+                    }
+
+                }
+            }
+        })
+        
+        return false;
+    
+    }
 
 	var viewModel = kendo.observable({
-        roles: roles,
-        statusList: statusList,
-        detailForm: {
-            data: data,
-            label: '',
-            title: 'Dettaglio ruolo',
-            action: 'update'
-        },
 
-        edit: function( event ) {
+        activate: function( event ) {
+
+            event.preventDefault();
+
+            changeStatus("active", event);
+
+		},
+
+        deactivate: function( event ) {
             
-            AP.role.fields.item.removeClass('d-none');
+            event.preventDefault();
 
-            this.set("detailForm.data", event.data );
-            this.set("detailForm.title", "Modifica ruolo < " + event.data.email + " >"  );
-            this.set("detailForm.action", "update" );
+            //TODO: add confirmation modal
 
-            return false;
-		},
+            var isSure = confirm("Sei sicuro di voler cancellare questa combinazione?");
 
-        new: function( event ) {
-
-            AP.role.fields.item.removeClass('d-none');
-
-            var data = { role: { id: 'ADM' }, status: { id: 'ACT' } };
-
-            this.set("detailForm.data", data );
-            this.set("detailForm.title", "Carica account" );
-            this.set("detailForm.action", "create" );
-
-            return false;
-		},
-
-
-		print: function( item ) {
-
-            window.open('/manager/account/print', '_blank');
-
-            return false;
-		},
+            if ( isSure ) {
+                changeStatus("deactive", event);
+            }
+		
+        },
 
 
 	});    
 
 	pub.init = function() {
 
-        console.log("role:detail:init");
-
-		kendo.bind( AP.role.fields.rootDetail, viewModel )
+		kendo.bind( AP.line.fields.combinationsRoot, viewModel )
         
 	}	
 
     return pub;
 
 }();
-*/

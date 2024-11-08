@@ -1,6 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.CombinationsDAO";
+	property name="SizeService" type="com.apirone.core.model.dao.SizeService";
+	property name="LineService" type="com.apirone.core.model.dao.LineService";
+	property name="FinishService" type="com.apirone.core.model.dao.FinishService";
 
     public com.apirone.core.model.bean.Combination function get(
     		required String combinationId
@@ -22,6 +25,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		cm.put( key, bean );
         
 		return bean;
+
+	}
+
+    public com.apirone.core.model.bean.Combination function getByParams(
+			required String lineId,
+			required Numeric finishId,
+			required String sizeId
+		){
+
+		var record = getDao().find( argumentCollection = arguments );
+
+		if ( record.recordcount == 1) {
+
+			return get( record.combination_id );
+
+		}
+
+		return NullValue();
 
 	}
 
@@ -54,15 +75,91 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
-    public Boolean function delete(
-            required Numeric combinationId
-        ){
+    public com.smartvillage.core.model.bean.Outcome function delete(
+			required String combinationId
+		){
 
-    	var result = getDao().delete( argumentCollection=arguments );
+		var outcome = super.bean("Outcome");
 
-        return result;
+        var obj = get( arguments.combinationId );
 
-    }
+		outcome.setData( { combinationId: arguments.combinationId } );
+
+		transaction {
+		
+		    try  {
+
+                var cm = getCacheManager();
+
+                getDao().delete( arguments.combinationId );
+        
+                cm.remove( "combination_#obj.getId()#" );
+                
+			} catch ( any error ) {
+
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteEvent" );
+				outcome.setMessage( "Cannot delete combination [#arguments.combinationId#]" );
+				
+			}
+			
+		}
+
+		return outcome;
+
+	}
+
+    public com.apirone.core.model.bean.Outcome function deleteByParams(
+			required String lineId,
+			required Numeric finishId,
+			required String sizeId
+		){
+
+		var outcome = super.bean("Outcome");
+
+        var obj = getByParams( argumentCollection = arguments );
+
+		var combId = obj.getId()
+
+		outcome.setData( { combinationId: combId } );
+
+		transaction {
+		
+		    try  {
+
+                var cm = getCacheManager();
+
+                getDao().delete( obj.getId() );
+        
+                cm.remove( "combination_#obj.getId()#" );
+                
+			} catch ( any error ) {
+
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteCombination" );
+				outcome.setMessage( "Cannot delete combination [#combId#]" );
+				
+			}
+			
+		}
+
+		return outcome;
+
+	}	
+
+
+	public Numeric function create(
+			required com.apirone.core.model.bean.Combination combination
+		){
+
+		var newId = getDao().insert( arguments.combination );
+
+		return newId;
+
+	}
+
 
 
     /*
@@ -81,7 +178,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.combination_id );
 			bean.setName( "" );
+			bean.setSize( getSizeService().get( record.size_id ) );
+			bean.setLine( getLineService().get( record.line_id ) );
+			bean.setFinish( getFinishService().get( record.finish_id ) );
+			
+			
 			bean.setCreatedAt( record.created_at );
+
+
+
 			//bean.setStatus( getStatusService().get( record.status_id ) );
 
             return bean;

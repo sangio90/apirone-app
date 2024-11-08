@@ -103,7 +103,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function save( event, rc, prc ){
 
-        var result = super.getResult();
         var attr = super.bean("Attribute");
 
         var text = super.bean("Text");
@@ -142,9 +141,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var message = completeMessage( messageId );
 
-        result.setData(  message, { payload = { id = thisId }  } );
-        
-        event.setValue( "result", result );
+        event.setValue( "result", { "message": message, "payload" = { "id" = thisId }  } );
         
     }
 

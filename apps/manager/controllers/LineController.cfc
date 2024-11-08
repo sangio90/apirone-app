@@ -12,7 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function attributes( event, rc, prc ){
 
-        prc.obj = super.fire("line.get", [rc.id] );
+        prc.obj = super.fire( "line.get", [rc.id] );
 
         prc.title="Modifica linea < #prc.obj.getName()# >";
 
@@ -34,14 +34,22 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function combinations( event, rc, prc ){
 
+        prc.existingCombinations = [];
         prc.obj = super.fire("line.get", [rc.id] );
 
         prc.title="Combinazioni per la linea < #prc.obj.getName()# >";
+        prc.page["line"]=prc.obj;
 
         prc.sizes = super.fire( "size.list" );
         prc.finishes = super.fire( "AttributeValue.list", { attributeId = "FIN0001" } );
 
-        var combinations = super.fire( "combinations.list" { lineId = prc.obj.getId() } );
+        var combinationsList = super.fire( "combination.list", { lineId = rc.id } );
+        
+        for( var combination in combinationsList ) {
+            prc.existingCombinations.add( "#combination.getSize().getId()#__#combination.getFinish().getId()#" );
+        }
+
+        prc.jsScripts.add( "app-line" );
 
         event.setView( "line/combinations" );
 

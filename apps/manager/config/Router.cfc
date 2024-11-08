@@ -206,14 +206,20 @@ component{
 		post( "/ajax/lines/:id/add" )
         	.toHandler( "LineAjaxController.addValue" );
 
-		get( "/ajax/lines" )
-        	.toHandler( "LineAjaxController.list" );
-	
-	
+		delete( "/ajax/lines/:id/combinations")
+			.to( "LineAjaxController.deleteCombination" ).end();
+
+		post( "/ajax/lines/:id/combinations")
+			.to( "LineAjaxController.createCombination" ).end();
+
+
 		get( "/ajax/lines/attributes" )
         	.toHandler( "LineAjaxController.attributes" );
-	
 
+		get( "/ajax/lines" )
+        	.toHandler( "LineAjaxController.list" );
+
+			
 		/*
 			size
 		*/
