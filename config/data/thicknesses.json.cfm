@@ -7,4 +7,8 @@
         id: "6MM",
         name: "6 mm"
     },
+    {
+        id: "PL",
+        name: "Plastica"
+    },
 ]

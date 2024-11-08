@@ -171,6 +171,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
             .property( name = "dao", ref = "LineDAO" )
             .property( name = "statusService", ref = "StatusService" )
+            .property( name = "lookupService", ref = "lookupService" )
             .parent("AbsService");
 
         map("CombinationService").to( "com.apirone.core.model.service.CombinationService" )

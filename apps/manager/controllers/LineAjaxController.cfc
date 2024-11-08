@@ -10,11 +10,9 @@ component extends="com.apirone.core.controller.AbsController" {
         ```        
         <cfquery datasource="apirone" name="local.q">
             SELECT *
-            FROM configurations 
+            FROM combination_items
             WHERE
-                finish_id = '#rc.finishId#'
-                AND size_id = '#rc.sizeId#'
-                AND line_id = '#rc.lineId#'
+                combination_id IS NULL
             AND parent_id IS NULL
         </cfquery>
 
@@ -103,7 +101,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }    
 
-
+    /*
     function addValue( event, rc, prc ){
 
         var result = super.getResult();
@@ -119,7 +117,7 @@ component extends="com.apirone.core.controller.AbsController" {
                     AND attribute_id = '#rc.attributeId#'
         </cfquery>
 
-        <cfset attr = super.fire("attribute.get", [ rc.attributeId ] )>
+        <cfset attr = super.fire( "attribute.get", [ rc.attributeId ] )>
 
         <cfloop array="#attr.getValues()#" item="item">
 
@@ -151,6 +149,7 @@ component extends="com.apirone.core.controller.AbsController" {
         event.setValue("result", result);
 
     }
+    */
 
     function list( event, rc, prc ){
 
@@ -192,22 +191,6 @@ component extends="com.apirone.core.controller.AbsController" {
         event.setValue("result", result);
         
     }
-
-    /*
-    function combinations( event, rc, prc ){
-
-        var result = [];
-
-        var combinationsList = super.fire( "combination.list", { lineId = rc.id } );
-
-        for( var combination in combinationsList ) {
-            result.add( "#combination.getSize().getId()#__#combination.getFinish().getId()#" );
-        }
-
-        event.setValue("result", result);
-        
-    }
-    */
 
     function createCombination( event, rc, prc ){
 

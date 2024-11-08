@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="line-attributes-root">
+    <div id="combination-detail-root">
 
         <div class="row mb-3">
             <div class="col-lg-8">
@@ -21,7 +21,7 @@
 
                         <div class="col-md-6 offset-md-6 float-end">
 
-                            <div class="row" id="line-config-row">
+                            <div class="row" id="combination-config-row">
 
                                 <div class="col-md-6 float-end">
                                     Dimensione:
@@ -49,7 +49,6 @@
                                     </select>
                                 </div>
     
-
                             </div>
 
 

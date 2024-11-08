@@ -42,7 +42,13 @@
     <mapper id="Line" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Line">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
+        <map from="thickness" to="thickness" ref="Thickness"  />
         <map from="createdAt" to="createdAt" type="cf:Date"  />
+    </mapper>
+
+    <mapper id="Thickness" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Thickness">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="name" to="name" type="cf:String"  />
     </mapper>
 
     <mapper id="Size" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Size">

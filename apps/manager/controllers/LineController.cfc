@@ -12,6 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function attributes( event, rc, prc ){
 
+        /*
         prc.obj = super.fire( "line.get", [rc.id] );
 
         prc.title="Modifica linea < #prc.obj.getName()# >";
@@ -29,6 +30,25 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.page["lineId"] = rc.id;
         
         event.setView( "line/attributes" );
+        */
+
+        var combinations = super.fire( "combination.list", { lineId = rc.id } );
+
+        dump(DESerializeJSON( SerializeJSON ( combinations )) );
+
+        if( combinations.len() ) {
+
+            cflocation( url="/manager/lines/#rc.id#/combinations/#combinations[1].getId()#", addToken=false );
+
+        } else {
+
+            //setMessage( type="warning", message="Carica almeno una combinazione" );
+
+            //TODO: show message
+            cflocation( url="/manager/lines/#rc.id#/combinations?msg=first-load-combinations", addToken=false );
+
+        }
+
 
     }
     

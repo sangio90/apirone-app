@@ -31,8 +31,9 @@
                             #grid( 
                                 id="line-grid",
                                 columns="[
-                                    { 'field':'id', 'title':'ID', width: '100px' },
+                                    { 'field':'id', 'title':'ID', width: '140px' },
                                     { 'field':'name', 'title':'Descrizione'},
+                                    { 'field':'thickness.name', 'title':'Spessore'},
                                     { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
                                     { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
                                     { 

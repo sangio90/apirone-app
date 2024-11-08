@@ -9,6 +9,9 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
+            <td>
+                <span data-bind="text: thickness.name"></span>
+            </td>
             <td class="text-center">
                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:configure">
                     <i class="fas fa-edit"></i>

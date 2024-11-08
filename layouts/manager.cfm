@@ -42,7 +42,6 @@
 <body>
     <section class="body">
 
-        <!-- start: header -->
         <header class="header">
             <div class="logo-container">
                 <a href="/manager/dashboard" class="logo">
@@ -55,7 +54,6 @@
 
             </div>
 
-            <!-- start: search & user box -->
             <div class="header-right" style="margin-right:30px;">
 
                 <div id="userbox" class="userbox">
@@ -65,7 +63,7 @@
                                 data-lock-picture="/assets/template/img/!logged-user.jpg"
                             >
                         </figure>
-                        <div class="profile-info" data-lock-name="John Doe" data-lock-email="#prc.user.getName()#">
+                        <div class="profile-info" data-lock-name="" data-lock-email="#prc.user.getName()#">
                             <span class="name">
                                 #prc.user.getName()#<br>
                                 #prc.user.getAccount().getRole().getId()# - #prc.user.getShortId()#

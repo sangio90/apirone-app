@@ -1,37 +1,39 @@
-AP.lineAttributes = AP.lineAttributes || {};
+AP.combination = AP.combination || {};
 
-AP.lineAttributes.fields = {
-    root: $("#line-attributes-root"),
+AP.combination.fields = {
+    root: $("#combination-detail-root"),
+	configRow: $("#combination-config-row")
 }
 
 $(document).ready(function(){
 
-	if ( AP.lineAttributes.fields.root.length ) {
+	if ( AP.combination.fields.root.length ) {
 
-		AP.lineAttributes.list.init();
+		AP.combination.list.init();
 
 	}
 
 })
 
 
-AP.lineAttributes.list = function() {
+AP.combination.list = function() {
 
 	var pub = {}
 	
 	var service = AP.attribute.detail;
+	var configRow = AP.combination.fields.configRow;
 
 	var viewModel = kendo.observable({
 
-		attributesList: [],
 		configList: [],
+		attributesList: [],
 
 		selectAttribute: function( event ) {
 
 			console.log( event );
 
-			var sizeId = $("#line-config-row").find("[name=sizeId]").val();
-			var finishId = $("#line-config-row").find("[name=finishId]").val();
+			var sizeId = configRow.find("[name=sizeId]").val();
+			var finishId = configRow.find("[name=finishId]").val();
 
 			$.ajax({
 				method: "POST",
@@ -77,8 +79,8 @@ AP.lineAttributes.list = function() {
 
 		getConfiguration: function( event ) {
 
-			var sizeId = $("#line-config-row").find("[name=sizeId]").val();
-			var finishId = $("#line-config-row").find("[name=finishId]").val();
+			var sizeId = configRow.find("[name=sizeId]").val();
+			var finishId = configRow.find("[name=finishId]").val();
 
 			$.ajax({
 				method: "GET",
@@ -161,7 +163,7 @@ AP.lineAttributes.list = function() {
 
 		console.log("comp:init")
 
-		kendo.bind( AP.lineAttributes.fields.root, viewModel )
+		kendo.bind( AP.combination.fields.root, viewModel )
 
 		viewModel.getConfiguration();	
 

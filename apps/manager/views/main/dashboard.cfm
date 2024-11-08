@@ -4,15 +4,12 @@
 <div class="row" style="margin-bottom:50px">
     <div class="col-md-12">
 
-        #session.user.getAccount().getRole().getId()#
+        #application.cbController.getRequestService().getContext().getPrivateValue("user").getName()#;
 
         <p>
             <a href="/manager/lines/SQUARE/components">Linea</a> | 
             <a href="/manager/products/0000000001/components">Articolo</a> | 
         </p>
-
-
-        <cfif session.user.getAccount().getRole().getId() IS "ADM"></cfif>
 
         <section class="card">
             <header class="card-header">

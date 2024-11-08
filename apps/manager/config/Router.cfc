@@ -182,6 +182,14 @@ component{
 		/*
 			combination
 		*/
+		get( "/combinations/:id")
+			.toHandler( "CombinationController.detail" );
+		
+		post( "/ajax/combinations/:id/item" )
+			.to( "CombinationController.addItem" ).end();
+
+		delete( "/ajax/combinations/:id/item" )
+        	.to( "CombinationController.removeItem" ).end();
 
 
 		/*
@@ -203,15 +211,16 @@ component{
 		get( "/ajax/lines/:lineId/size/:sizeId/finish/:finishId/conf" )
         	.toHandler( "LineAjaxController.configuration" );
 
+		/*
 		post( "/ajax/lines/:id/add" )
         	.toHandler( "LineAjaxController.addValue" );
+		*/
 
 		delete( "/ajax/lines/:id/combinations")
 			.to( "LineAjaxController.deleteCombination" ).end();
 
 		post( "/ajax/lines/:id/combinations")
 			.to( "LineAjaxController.createCombination" ).end();
-
 
 		get( "/ajax/lines/attributes" )
         	.toHandler( "LineAjaxController.attributes" );
