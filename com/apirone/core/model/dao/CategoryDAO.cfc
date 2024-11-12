@@ -6,13 +6,14 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
-			FROM product_categories
-			WHERE product_category_id = <cfqueryparam cfsqltype="varchar" value="#arguments.categoryId#">
+			FROM categories
+			WHERE category_id = <cfqueryparam cfsqltype="varchar" value="#arguments.categoryId#">
 		</cfquery>
 
 		<cfreturn local.q>
 
 	</cffunction>
+
 
 	<cffunction returntype="Query" name="readByName">
 
@@ -20,8 +21,8 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
-			FROM product_categories
-			WHERE product_category = <cfqueryparam cfsqltype="varchar" value="#arguments.category#">
+			FROM categories
+			WHERE category = <cfqueryparam cfsqltype="varchar" value="#arguments.category#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -38,14 +39,14 @@
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT
-				product_category_id,
-				COUNT(product_category_id) OVER() AS total
+				category_id,
+				COUNT(category_id) OVER() AS total
 			FROM
-				product_categories
+				categories
 
 				<cfif !isNull( arguments.productId )>
 					INNER JOIN products_categories c
-						USING (product_category_id)
+						USING (category_id)
 				</cfif>
 			WHERE 1=1
                 
@@ -77,19 +78,20 @@
 		<cfargument name="productCategory" type="com.apirone.core.model.bean.ProductCategory" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO product_categories(
-				product_category_id,
+			INSERT INTO categories(
+				category_id,
 				product_category
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#trim(arguments.productCategory.getId())#">,
 				<cfqueryparam cfsqltype="Varchar" value="#trim(arguments.productCategory.getName())#">
-			) RETURNING product_category_id
+			) RETURNING category_id
 		</cfquery>
 
-		<cfreturn q.product_category_id>
+		<cfreturn q.category_id>
 	
 	</cffunction>
+
 
 	<cffunction name="update" returntype="String">
 
@@ -97,16 +99,17 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
-				product_categories
+				categories
 			SET
 				product_category = <cfqueryparam cfsqltype="Varchar" value="#trim(arguments.productCategory.getName())#">
 			WHERE
-				product_category_id = <cfqueryparam cfsqltype="Varchar" value="#trim(arguments.productCategory.getId())#">
+				category_id = <cfqueryparam cfsqltype="Varchar" value="#trim(arguments.productCategory.getId())#">
 		</cfquery>
 
 		<cfreturn arguments.productCategory.getId()>
 	
 	</cffunction>
+
 
 	<cffunction name="delete" returntype="Boolean">
 
@@ -114,9 +117,9 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE
-			FROM product_categories
+			FROM categories
 			WHERE
-				product_category_id = <cfqueryparam cfsqltype="String" value="#arguments.categoryId#">
+				category_id = <cfqueryparam cfsqltype="String" value="#arguments.categoryId#">
 		</cfquery>
 
 		<cfreturn true>

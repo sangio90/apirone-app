@@ -3,7 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.ProductCategoryDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
-    public com.apirone.core.model.bean.ProductCategory function get(
+    public com.apirone.core.model.bean.Category function get(
     		required String categoryId
         ){
 
@@ -19,9 +19,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    }
 	    
-		var productCategory = build( arguments.categoryId );
-		cm.put( key, productCategory );
-        return productCategory;
+		var bean = build( arguments.categoryId );
+		cm.put( key, bean );
+        
+		return bean;
 
 	}
 	
@@ -30,21 +31,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				 String productId,
 		required Numeric limit = 50,
 		required Numeric offset = 0,
-		required Array orderBy = [ { field='category.name' } ],
+		required Array orderBy = [ { field="category.name" } ],
     ){
 
 		var rows = [];
 
         var result = super.getResult()
 
-		arguments['orderby'] = super.createOrderBy( arguments['orderby'] );
+		arguments["orderby"] = super.createOrderBy( arguments["orderby"] );
 
     	var records = getDao().find( argumentCollection=arguments );
 
 	    for( var record in records ){
 
 	    	rows.add( 
-	    		get( categoryId = record.product_category_id )
+	    		get( categoryId = record.category_id )
 	    	);
 
 	    }
@@ -70,38 +71,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create(
-            required com.apirone.core.model.bean.ProductCategory productCategory
+            required com.apirone.core.model.bean.Category category
 		){		
 	
-		if ( !Len( arguments.productCategory.getId() ) ) {
+		if ( !Len( arguments.category.getId() ) ) {
 			throw( type="apirone.errors.createProductCategory.IdNotProvided", message="ID required" );
 		};
 
-		if ( !Len( arguments.productCategory.getName() ) ) {
+		if ( !Len( arguments.category.getName() ) ) {
 			throw( type="apirone.errors.createProductCategory.NameNotProvided", message="Name required" );
 		};
 
-        return getDao().insert( 
-			productCategory = arguments.productCategory 
-		);
+        return getDao().insert( arguments.productCategory );
 
 	}
 
 	public String function update(
-            required com.apirone.core.model.bean.ProductCategory productCategory
+            required com.apirone.core.model.bean.Category category
 		){		
 	
-		if ( !Len( arguments.productCategory.getId() ) ) {
-			throw( type="apirone.errors.updateProductCategory.IdNotProvided", message="ID required" );
+		if ( !Len( arguments.category.getId() ) ) {
+			throw( type="apirone.errors.updateCategory.IdNotProvided", message="ID required" );
 		};
 
-		if ( !Len( arguments.productCategory.getName() ) ) {
-			throw( type="apirone.errors.updateProductCategory.NameNotProvided", message="Name required" );
+		if ( !Len( arguments.category.getName() ) ) {
+			throw( type="apirone.errors.updateCategory.NameNotProvided", message="Name required" );
 		};
 
-        var id = getDao().update( 
-			productCategory = arguments.productCategory
-		);
+        var id = getDao().update( productCategory = arguments.productCategory );
 		
 		var cm = getCacheManager();
 		

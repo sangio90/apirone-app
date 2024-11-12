@@ -1,14 +1,10 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true"{
 
     property name="status" type="com.apirone.core.model.bean.Status";
-    property name="orderBy" type="Numeric" default=10;
-    
-    property name="attributeId" type="String";
 
-    public AttributeValue function init(){
+    public Category function init(){
 
         return this;
-        
     }
 
 }
