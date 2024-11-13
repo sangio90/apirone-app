@@ -60,6 +60,7 @@
                         </div>
                         
                         <form name="line-grid-form" id="estimate-grid-form" method="post">
+                            
                             #grid( 
                                 id="line-grid",
                                 columns="[
@@ -75,7 +76,7 @@
                                         'headerAttributes': { 'class': 'text-center' }
                                     }
                                 ]",
-                                rowTemplate="line/line-grid-row"
+                                rowTemplate="line/line-grid-row-tmpl"
                             )#
 
                         </form>

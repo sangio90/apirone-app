@@ -2,6 +2,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function detail( event, rc, prc ){
 
+        abort;
+
         prc.obj = super.fire( "line.get", [rc.lineId] );
 
         prc.title="Modifica linea < #prc.obj.getName()# >";

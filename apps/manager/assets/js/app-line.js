@@ -57,12 +57,6 @@ AP.line.list = function() {
 
         },
 
-        configure: function( event ) {
-            var id = event.data.id
-            window.open( "/manager/lines/" + id + "/attributes", '_blank').focus();
-
-        },
-
 		print: function( item ) {
 
             window.open('/manager/lines/print', '_blank');
@@ -74,6 +68,19 @@ AP.line.list = function() {
 
             var id = event.data.id
             window.open( "/manager/lines/" + id + "/combinations", '_blank').focus();
+
+            return false;
+		},
+
+
+		attributes: function( event ) {
+
+            /*
+                note: redirect in controller to first combination
+            */
+
+            var id = event.data.id
+            window.open( "/manager/lines/" + id + "/attributes", '_blank').focus();
 
             return false;
 		},

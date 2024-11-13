@@ -16,15 +16,13 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var combinations = super.fire( "combination.list", { lineId = rc.id } );
 
-        dump(DESerializeJSON( SerializeJSON ( combinations )) );
-
         if( combinations.len() ) {
 
-            cflocation( url="/manager/lines/#rc.id#/combinations/#combinations[1].getId()#", addToken=false );
+            cflocation( url="/manager/combinations/#combinations[1].getId()#", addToken=false );
 
         } else {
 
-            //setMessage( type="warning", message="Carica almeno una combinazione" );
+            setMessage( type="warning", message="Carica almeno una combinazione" );
 
             //TODO: show message
             cflocation( url="/manager/lines/#rc.id#/combinations?msg=first-load-combinations", addToken=false );
