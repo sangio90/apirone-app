@@ -176,14 +176,25 @@ AP.line.combinations = function() {
             
             event.preventDefault();
 
-            //TODO: add confirmation modal
-
-            var isSure = confirm("Sei sicuro di voler cancellare questa combinazione?");
-
-            if ( isSure ) {
-                changeStatus("deactive", event);
-            }
-		
+            bootbox.confirm({
+                title: "Conferma eliminazione",
+                message: "Sei sicuro di voler cancellare questa combinazione?",
+                buttons: {
+                    confirm: {
+                        label: 'Si, confermo',
+                        className: 'btn-primary'
+                    },
+                    cancel: {
+                        label: 'No, chiudi',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if( result ) {
+                        changeStatus("deactive", event);
+                    }
+                }
+            });
         },
 
 
