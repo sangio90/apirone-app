@@ -39,6 +39,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
                      String statusId,
                      String attributeId,
                      Numeric attributeValueId,
+                     Numeric lineCategoryId,
                      String langId,
             required Numeric limit = 20,
 			required Numeric offset = 0,
@@ -49,7 +50,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    var rows = [];
     	var result = super.getResult();
 
-		arguments['orderby'] = super.createOrderBy( arguments['orderby'] );
+		arguments["orderby"] = super.createOrderBy( arguments["orderby"] );
 
     	var records = getDao().find( argumentCollection=arguments );
 
@@ -127,7 +128,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function update(
-		required com.apirone.core.model.bean.Text text
+			required com.apirone.core.model.bean.Text text
 		){
 		
         var id = getDao().update( arguments.text );

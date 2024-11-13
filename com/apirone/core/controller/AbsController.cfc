@@ -154,6 +154,24 @@
 
     }    
 
+    public Struct function paramsFromUrl(){
+
+        var params = {}
+
+        for( var thisParam in url ) {
+
+            var value = url[thisParam];
+
+            if( len( value ) ) {
+                params[ thisParam ] = url[thisParam];
+            }
+
+        }
+
+        return params;
+
+    }    
+
     public Any function bean( required String type ){
 
         return CreateObject( "com.apirone.core.model.bean.#arguments.type#" ).init();

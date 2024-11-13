@@ -156,8 +156,10 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
         var dm = getDataMapper();
-        
-        var rows = super.fire( "line.list" );
+
+        var params = paramsFromUrl();
+
+        var rows = super.fire( "line.list", params );
 
         for ( var row in rows ) {
             var obj = dm.convert( row, "Line", true );

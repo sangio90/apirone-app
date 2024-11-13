@@ -61,7 +61,7 @@
 
             }
             
-            result = result & "#getDBField( i.field ).name# #i.sort#";
+            result = result & "#getDBField( i.field ).name# #i.dir#"; //not "sort"!
 
             result = arguments.fields.len() EQ n ? result : result & ", ";
             

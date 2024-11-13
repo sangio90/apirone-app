@@ -50,10 +50,24 @@
         roles: "ADM",
         items: [
             {
-                href: "/manager/lines",
+                href: "##",
                 icon: "fas fa-layer-group",
-                title: "Linee delle placche",
-                roles: "ADM"
+                title: "Linee",
+                roles: "ADM",
+                items: [
+                    {
+                        href: "/manager/lines",
+                        icon: "fas fa-layer-group",
+                        title: "Lista delle linee",
+                        roles: "ADM"
+                    },
+                    {
+                        href: "/manager/lines/categories",
+                        icon: "fas fa-layer-group",
+                        title: "Categorie",
+                        roles: "ADM"
+                    }
+                ]
             },
             {
                 href: "/manager/sizes",

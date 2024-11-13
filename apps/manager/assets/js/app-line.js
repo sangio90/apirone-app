@@ -2,6 +2,7 @@ AP.line = AP.line || {};
 
 AP.line.fields = {
     listRoot: $('#line-list-root'),
+    searchListForm: $('#line-grid-search-form'),
     combinationsRoot: $('#line-combinations-root')
 }
 
@@ -32,6 +33,23 @@ AP.line.list = function() {
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
         
+        search: function( event ) {
+
+            var thisForm = AP.line.fields.searchListForm;
+
+            var params = thisForm.serializeJSON();
+
+            console.log( "search", event );
+            console.log( "params", params );
+
+            //$('form').serializeJSON();
+
+            viewModel.rows.read( params )
+
+            return false;
+
+        },
+
         open: function( event ) {
 
             var id = event.data.id

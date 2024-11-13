@@ -74,12 +74,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				text.setEntity( entity );
 
-				//getTextService().create( text );
-	
 			}
 
 			getTextService().bulkCreate( arguments.attributeValue.getTexts() );
-
 
 		}
 

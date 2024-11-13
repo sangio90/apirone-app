@@ -9,6 +9,7 @@ PB;Poggiaborse
 PC;Portachiavi
 PE;Portaestintori
 PI;Piantane
+PL;Placche
 PM;Portamenu
 RV;Reggivaligie
 SP;Spille

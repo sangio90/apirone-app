@@ -3,7 +3,7 @@ component accessors="true" {
     property name="id" type="String" default="";
 	property name="name" type="String" default="";
     property name="createdAt" type="Date";
-    property name="updatedAt" type="Date";
+    //property name="updatedAt" type="Date";
 
 	public Struct function toStruct(){
 		

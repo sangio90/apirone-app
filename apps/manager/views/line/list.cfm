@@ -15,19 +15,51 @@
                     
                     <div class="card-body">
 
-                        <form name="estimate-grid-form" id="estimate-grid-form" method="post">
+                        <div class="row">
 
-                            <div class="row">
+                            <div class="col-sm-9">
+
+                                <form id="line-grid-search-form" 
+                                    class="row mb-3" 
+                                    data-bind:'events: { submit: search }'
+                                >
+
+                                    <div class="col-4">
+                                        <input 
+                                            name="str"
+                                            placeholder="Cerca"
+                                            class="form-control" type="text">
+                                    </div>
+
+                                    <div class="col-5">
+                                        <select 
+                                            class="form-control" 
+                                            name="categoryId">
+                                            <option value="">-- tutte le categoria</option>
+                                            <cfloop array="#prc.lineCategories#" item="thisLine">
+                                                <option value="#thisLine.getId()#">#thisLine.getMainName()#</option>
+                                            </cfloop>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="col-2">
+                                        <button type="submit" class="btn btn-primary" data-bind="click:search">Cerca ></button>
+                                    </div>
+                                
+                                </form>
+                            
+                            </div>
+
+                            <div class="col-sm-3">
                                 <div class="mb-3 d-flex justify-content-end col-12">
-                                    <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:organize">
-                                        <i class="fas fa-remove"></i> Configura
-                                    </button>
                                     <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:print">
                                         <i class="fas fa-remove"></i> Stampa
                                     </button>
                                 </div>
                             </div>
-                            
+                        </div>
+                        
+                        <form name="line-grid-form" id="estimate-grid-form" method="post">
                             #grid( 
                                 id="line-grid",
                                 columns="[

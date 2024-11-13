@@ -1,4 +1,6 @@
-﻿<cfscript>
+﻿--
+<cfabort>
+<cfscript>
 
     model = server["wirebox-apirone"];
 

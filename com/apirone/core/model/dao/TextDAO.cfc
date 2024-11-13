@@ -20,7 +20,8 @@
 		<cfargument name="statusId" type="String">
 		<cfargument name="langId" type="String">
 		<cfargument name="attributeId" type="String">
-		<cfargument name="attributeValueId" type="Numeric">
+		<cfargument name="attributeId" type="String">
+		<cfargument name="lineCategoryId" type="Numeric">
 		<cfargument name="fromDate" type="Date">
 		<cfargument name="toDate" type="Date">
 		<cfargument name="entity" type="com.apirone.core.model.bean.Entity">
@@ -64,6 +65,10 @@
 
 			<cfif !isNull( arguments.attributeValueId ) >
 				AND attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
+			</cfif>
+
+			<cfif !isNull( arguments.lineCategoryId ) >
+				AND line_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.lineCategoryId#">
 			</cfif>
 
 			<cfif !isNull( arguments.fromDate ) >
