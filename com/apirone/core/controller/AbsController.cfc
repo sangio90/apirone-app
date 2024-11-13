@@ -154,6 +154,27 @@
 
     }    
 
+
+    public Boolean function isUuid( required String uuid ) {
+
+        if( REFind( "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", arguments.uuid ) == 0 ) {
+            return false;
+        }
+
+        return true;
+    
+    }
+
+    public String function getTempDir() {
+
+		var tempDir = ExpandPath( "/../repository/private/_tmp" );
+        
+        DirectoryCreate( tempDir, true, true );
+
+        return tempDir;
+
+    }    
+
     public Struct function paramsFromUrl(){
 
         var params = {}

@@ -1,32 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-    variables.baseDir = ExpandPath('/') & '../repository/public/media';
+    variables.baseDir = ExpandPath("/../repository/public/media");
 
-    public Struct function getVersions( 
-        required String filePath
-    ) {
-
-        var baseUrl = super.getConfiguration().get('filesHost');
-
-        var imgUrl = "#baseUrl#/media/#filePath#";
-
-        var config = super.getConfiguration();
-
-        var versions = config.get( 'imageVersions.sizes');
-
-        result = Duplicate( versions ).append( Duplicate( config.get( 'imageVersions.crops') ) );
-        result.append( {'original': imgUrl });
-        
-        for ( var key in result ) {
-            var value = result[key];
-            result[key] = Replace( imgUrl, '/_ori/', "/#value#/" )
-        }
-
-        return result
-        
-    }
-
-    
     public Struct function getVersions( 
         required String filePath
     ) {
@@ -53,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     public Struct function create(
         required String filePath,
-        required String entity = 'variants'
+        required String category = 'variants'
     )  {    
 
         var fileName = getUniqueName( filePath );
@@ -62,7 +37,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var dateDir = '#year(now())#/#udf.pad(month(now()), 2, "0")#';
 
-        var directory = '#variables.baseDir#/#entity#/_ori/#dateDir#/';
+        var directory = '#variables.baseDir#/#arguments.category#/_ori/#dateDir#/';
 
         DirectoryCreate(  '#directory#', true, true );
 
@@ -70,30 +45,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         
         fileCopy(source=filePath, destination = result);
         
-        resizeAndCrop( filePath = result, entity=entity, dateDir = dateDir );
+        resizeAndCrop( filePath = result, category=arguments.category, dateDir = dateDir );
 
         return {
             "fileName": fileName,
-            "directory": "/#entity#/_ori/#dateDir#"
+            "directory": "/#arguments.category#/_ori/#dateDir#"
         };
         
     }
 
-        public Void function resizeAndCrop(
-            required String entity,
+    private Void function resizeAndCrop(
+            required String category,
     		required String filePath,
             required String dateDir
         ){
   
-
-        var directory = "#variables.baseDir#/#entity#/";
+        var directory = "#variables.baseDir#/#arguments.category#/";
 
         var fileName = ListLast( filePath, '/');
 
         var file = ImageNew(  filePath  );
 
-        var sizes = super.getConfiguration().get( 'imageVersions.sizes' )
-        var crops = super.getConfiguration().get( 'imageVersions.crops' )
+        var sizes = super.getConfiguration().get( "imageVersions.sizes" );
+        var crops = super.getConfiguration().get( "imageVersions.crops" );
 
         sizes.each((key) => {
 
@@ -124,14 +98,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             // If horizontal
             if ( originalWidth > originalHeight  )  {
 
-                ImageResize(file,  '', height);
-                startX = (ImageGetWidth(file) - ImageGetHeight(file)) / 2
+                ImageResize( file, '', height);
+                startX = ( ImageGetWidth(file) - ImageGetHeight(file) ) / 2
                 startY = 0;
 
             } else   {
 
-                ImageResize(file, width, ''  );
-                startY = (ImageGetHeight(file) - ImageGetWidth(file)) / 2
+                ImageResize( file, width, '' );
+                startY = ( ImageGetHeight(file) - ImageGetWidth(file) ) / 2
                 startX = 0;
             }
 
@@ -154,10 +128,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         var udf = new com.apirone.core.util.Udf();
 
         var name = ListFirst( ListLast( filePath, '/'), '.' );
-        var resultName = "#udf.prettyString( "#name#")#_#randRange(1,9000)#";
+        var thisName = "#udf.prettyString( "#name#")#_#randRange(1,9000)#";
         var ext = ListLast( filePath, '.');
         
-        return "#resultName#.#ext#";
+        return "#thisName#.#ext#";
     }
 
 }
