@@ -37,7 +37,7 @@
                                             name="categoryId">
                                             <option value="">-- tutte le categoria</option>
                                             <cfloop array="#prc.lineCategories#" item="thisLine">
-                                                <option value="#thisLine.getId()#">#thisLine.getMainName()#</option>
+                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
                                             </cfloop>
                                         </select>
                                     </div>
@@ -60,7 +60,7 @@
                         </div>
                         
                         <form name="line-grid-form" id="estimate-grid-form" method="post">
-                            
+
                             #grid( 
                                 id="line-grid",
                                 columns="[

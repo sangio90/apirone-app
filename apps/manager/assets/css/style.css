@@ -357,3 +357,14 @@ h2 {
 .h-20 {
 	height: 20px; /* for status div with loadding gif */
 }
+
+.page-title h4, .page-title h2 {
+	margin: 0px;
+}
+
+.form-inline {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: center; /* Prevent shorter elements from growing to same height as others (e.g., small buttons growing to normal sized button height) */
+
+}

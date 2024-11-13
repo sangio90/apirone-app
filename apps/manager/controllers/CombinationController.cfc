@@ -2,13 +2,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function detail( event, rc, prc ){
 
-        abort;
+        var comb = super.fire( "combination.get", [ rc.id ] );
 
-        prc.obj = super.fire( "line.get", [rc.lineId] );
+        var lineId = comb.getLine().getId();
 
-        prc.title="Modifica linea < #prc.obj.getName()# >";
+        prc.title="Dimensione #comb.getSize().getName()#, finitura #comb.getFinish().getName()#";
+        prc.subtitle="Linea #comb.getLine().getName()#";
 
-        prc.sizes = super.fire("size.list" );
+        prc.sizes = super.fire("size.list", { lineId = lineId } );
+
         prc.statusList = super.fire( "status.list", ["line"] );
         prc.finishes = super.fire( "attributeValue.list", { attributeId = "FIN0001" } );
 
@@ -18,7 +20,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.jsScripts.add( "app-combination" );
 
         prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
-        prc.page["lineId"] = rc.LineId;
+        prc.page["lineId"] = lineId;
         
         event.setView( "combination/detail" );
 

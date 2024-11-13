@@ -26,7 +26,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
         
     }
 
-    public String function getMainName( String langId=NullValue() ){
+    public String function getName( String langId=NullValue() ){
 
         return getMainText( arguments.langId ).getName();
     

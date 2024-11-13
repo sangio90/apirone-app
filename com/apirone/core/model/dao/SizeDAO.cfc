@@ -23,21 +23,21 @@
 	<cffunction returntype="Query" name="find">
 
 		<cfargument name="lineId" type="String">
-
-		<cfargument name="limit" required="true" type="Numeric" default="0">
-        <cfargument name="offset" required="true" type="Numeric" default="0">
+		
 		<cfargument name="orderby" required="true" type="String" default="orderby">
 
         <cfquery name="local.q" datasource="apirone">
-			SELECT
+			SELECT DISTINCT
 				size_id,
-				COUNT(size_id) OVER() AS total
+				COUNT(size_id) OVER() AS total,
+				orderby
 			FROM
 				sizes
+					INNER JOIN combinations USING ( size_id )
 			WHERE 1=1
-
+				
 				<cfif !IsNull( arguments.lineId )>
-                    AND comcol.clcodart = <cfqueryparam value="#arguments.componentId#" cfsqltype="varchar">
+                    AND combinations.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">
                 </cfif>
 			
 			ORDER BY 

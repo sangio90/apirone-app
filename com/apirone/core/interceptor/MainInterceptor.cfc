@@ -66,18 +66,18 @@ component extends="coldbox.system.Interceptor"{
         /*
             TODO: remove all "session.user"
         */
+
+        prc.page = {};  //current js config write in current html page 
+        prc.jsScripts = []; //current js file for current html page 
+
         prc.user = session.user;
 
         request.lang = prc.user.getAccount()?.getLang() ?: loadDefaultLang();
         prc.lang = request.lang;
+        prc.subtitle  = "";
 
         prc.config = getGlobalConfiguration();  //js global config
-
-        prc.page = {};  //current js config
-
         prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20240530;
-
-        prc.jsScripts = [];
         
     }
 

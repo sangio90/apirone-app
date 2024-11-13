@@ -124,7 +124,6 @@
             <section role="main" class="content-body">
 
                 <header class="page-header">
-                    <h2>&nbsp;</h2>
 
                     <div class="right-wrapper text-end">
                         <ol class="breadcrumbs">

@@ -191,12 +191,8 @@ component{
 		delete( "/ajax/combinations/:id/item" )
         	.to( "CombinationController.removeItem" ).end();
 
-
-		/*
-			lines
-				get( "/lines/:id/combinations")
+		get( "/lines/:id/combinations")
 			.toHandler( "LineController.combinations" );
-		*/
 
 		get( "/lines/:id/attributes")
 			.toHandler( "LineController.attributes" );
