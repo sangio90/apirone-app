@@ -1,5 +1,17 @@
 component extends="com.apirone.core.controller.AbsController" {
 
+    function listFinishesBySize( event, rc, prc ){
+
+        var comb = super.fire( "combination.get", [ rc.id ] );
+
+        var lineId = comb.getLine().getId()
+
+        var finishes = super.fire( "finish.list", { lineId: lineId, sizeId: rc.sizeId  } )>
+
+        event.setValue("result", finishes);
+
+    }
+    
     function addItem( event, rc, prc ){
 
         var result = super.getResult();

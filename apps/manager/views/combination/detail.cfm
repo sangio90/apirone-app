@@ -15,49 +15,46 @@
                             <button class="btn btn-primary btn-sm" data-bind="click:showAttributesList">Aggiungi attributo &raquo;</button>
                         </div>
 
-                        <div class="col-md-6 offset-md-6 float-end">
+                        <div class="col-md-12" id="combination-config-row">
 
-                            <div class="row" id="combination-config-row">
+                            <!---
+                                Note: inline form with bootstrap 5 and label
+                                https://codesandbox.io/p/sandbox/bootstrap-5-inline-form-example-065utx
+                            --->
+
+                            <form class="d-flex align-items-center justify-content-end" id="combination-change-form">
+
+                                <label class="me-2">Dimensione:</label>
+                                <select name="sizeId" class="form-control w-auto me-4" 
+                                    <!--- 
+                                        TODO: after we clarify manage the finishings (attribute or not?)
+                                              data-bind="change: loadFishes" 
+                                    ---->
+                                    >
+                                    <cfloop array="#prc.sizes#" item="item">
+                                        <option value="#item.getId()#" 
+                                            <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
+                                        >
+                                            #item.getName()#
+                                        </option>
+                                    </cfloop>
+                                </select>
+                                
+                                <label class="me-2">Finitura:</label>
+                                <select name="finishId" class="form-control w-auto me-4">
+                                    <cfloop array="#prc.finishes#" item="item">
+                                        <option value="#item.getId()#" 
+                                            <cfif item.getId() EQ prc.finishId>SELECTED</cfif>
+                                        >
+                                            #item.getName()#
+                                        </option>
+                                    </cfloop>
+                                </select>
                             
-                                <div class="col-12">
-
-
-                                <!---
-                                    Note: inline form with bootstrap 5 and label
-                                    https://codesandbox.io/p/sandbox/bootstrap-5-inline-form-example-065utx
-                                --->
-
-                                <form class="d-flex align-items-center justify-content-between">
-
-                                    <label class="">Dimensione:</label>
-                                    <select name="sizeId" class="form-control w-auto">
-                                        <cfloop array="#prc.sizes#" item="item">
-                                            <option value="#item.getId()#" 
-                                                <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
-                                            >
-                                                #item.getName()#
-                                            </option>
-                                        </cfloop>
-                                    </select>
-                                    
-                                    <label class="">Finutura:</label>
-                                    <select name="finishId" class="form-control w-auto">
-                                        <cfloop array="#prc.finishes#" item="item">
-                                            <option value="#item.getId()#" 
-                                                <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
-                                            >
-                                                #item.getName()#
-                                            </option>
-                                        </cfloop>
-                                    </select>
+                                <button type="submit" data-bind="click: change" class="btn btn-primary ml-3">Cambia ></button>
+                                
+                            </form>
                               
-                                    <button type="submit" class="btn btn-primary ml-3">Cambia ></button>
-                                  
-                                </form>
-                              
-                            </div>
-                            </div>
-                        
                         </div>
 
                         <div class="col-md-12 mt-5">

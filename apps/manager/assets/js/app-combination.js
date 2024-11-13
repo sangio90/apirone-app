@@ -157,6 +157,44 @@ AP.combination.list = function() {
 
 		},		
 
+		loadFishes: function( event ) {
+
+			console.log("loadFishes");
+
+			var thisForm  = $("#combination-change-form");
+
+			var sizeEle = thisForm.find("[name=sizeId]");
+			var finishEle = thisForm.find("[name=finishid]");
+
+			var sizeId = sizeEle.val()
+
+			finishEle.html("");
+			finishEle.html('Sto cercando...');
+
+			FW.utils.ajax( {
+				method: "POST",
+				url: "/manager/ajax/combinations/:id/size/:id/finishes",
+				data: selected.serialize(),
+				callback: {
+					done: function() {
+						FW.widget.notify( "success", "Dati cancellati con successo" );
+						dataSources.items.read();
+					}
+				}
+			} )
+
+            return false;
+
+		},		
+
+		change: function( event ) {
+
+			console.log("change", event);
+
+            return false;
+
+		},		
+
     });   	
 
 	pub.init = function() {

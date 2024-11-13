@@ -14,7 +14,8 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.statusList = super.fire( "status.list", ["line"] );
         prc.finishes = super.fire( "attributeValue.list", { attributeId = "FIN0001" } );
 
-        prc.sizeId = prc.sizes[1].getId();
+        prc.sizeId = comb.getSize().getId();
+        prc.finishId = comb.getFinish().getId();
         
         prc.jsScripts.add( "app-attribute" );
         prc.jsScripts.add( "app-combination" );
