@@ -34,6 +34,7 @@
         { file: "/modules/assets/template-admin/vendor/liquid-meter/liquid.meter.js" },
         { file: "/modules/assets/template-admin/vendor/pnotify/pnotify.custom.js" },
         { file: "/modules/assets/template-admin/vendor/bootstrap-maxlength/bootstrap-maxlength.js" },
+        
         { file: "/modules/assets/template-admin/js/theme.js" },
         { file: "/modules/assets/template-admin/js/custom.js" },
         { file: "/modules/assets/template-admin/js/theme.init.js" },
@@ -43,6 +44,10 @@
         { file: "/assets/main/js/vendor/jquery-validate/additional-methods.js" },
         { file: "/assets/main/js/vendor/jquery.serializejson.js" },
         { file: "/assets/main/js/vendor/bootbox/bootbox.all.min.js" },
+
+        { file: "/assets/main/js/vendor/jQuery-File-Upload/js/jquery.fileupload.js" },
+        { file: "/assets/main/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process.js" },
+        { file: "/assets/main/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate.js" },
 
         { file: "/modules/assets/kendoui/js/kendo.all.min.js" },
         { file: "/modules/assets/kendoui/js/messages/kendo.messages.it-IT.min.js" },

@@ -1,7 +1,31 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-
     variables.baseDir = ExpandPath('/') & '../repository/public/media';
+
+    public Struct function getVersions( 
+        required String filePath
+    ) {
+
+        var baseUrl = super.getConfiguration().get('filesHost');
+
+        var imgUrl = "#baseUrl#/media/#filePath#";
+
+        var config = super.getConfiguration();
+
+        var versions = config.get( 'imageVersions.sizes');
+
+        result = Duplicate( versions ).append( Duplicate( config.get( 'imageVersions.crops') ) );
+        result.append( {'original': imgUrl });
+        
+        for ( var key in result ) {
+            var value = result[key];
+            result[key] = Replace( imgUrl, '/_ori/', "/#value#/" )
+        }
+
+        return result
+        
+    }
+
     
     public Struct function getVersions( 
         required String filePath
@@ -55,7 +79,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         
     }
 
-    public Void function resizeAndCrop(
+        public Void function resizeAndCrop(
             required String entity,
     		required String filePath,
             required String dateDir
@@ -123,7 +147,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-    private  String  function getUniqueName (
+    private  String  function getUniqueName(
         required String filePath
     ) {
 

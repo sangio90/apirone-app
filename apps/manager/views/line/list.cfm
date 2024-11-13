@@ -35,7 +35,7 @@
                                         <select 
                                             class="form-control" 
                                             name="categoryId">
-                                            <option value="">-- tutte le categoria</option>
+                                            <option value="">-- tutte le categorie</option>
                                             <cfloop array="#prc.lineCategories#" item="thisLine">
                                                 <option value="#thisLine.getId()#">#thisLine.getName()#</option>
                                             </cfloop>

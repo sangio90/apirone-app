@@ -189,11 +189,13 @@ component{
 		get( "/combinations/:id")
 			.to( "CombinationController.detail" ).end();
 		
+			/*
 		post( "/ajax/combinations/:id/item" )
 			.to( "CombinationController.addItem" ).end();
 
 		delete( "/ajax/combinations/:id/item" )
         	.to( "CombinationController.removeItem" ).end();
+			*/
 
 
 		/*

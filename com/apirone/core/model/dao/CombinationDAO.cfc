@@ -2,14 +2,14 @@
 
 	<cffunction name="read" returntype="Query">
 
-		<cfargument name="combinationId" type="Numeric" required="true">
+		<cfargument name="combinationId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT combination_id::varchar, *
 			FROM
 				combinations
 			WHERE
-				combination_id = <cfqueryparam cfsqltype="integer" value="#arguments.combinationId#">
+				combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -24,7 +24,7 @@
         <cfargument name="finishId" type="Numeric">
 
         <cfquery name="local.q" datasource="apirone">
-			SELECT combination_id
+			SELECT combination_id::varchar
 			FROM
 				combinations
 			WHERE 1=1
@@ -50,7 +50,7 @@
 	</cffunction>
 
     
-	<cffunction name="insert" returntype="Numeric">
+	<cffunction name="insert" returntype="String">
 
 		<cfargument name="combination" type="com.apirone.core.model.bean.Combination" required="true">
 
@@ -67,25 +67,24 @@
 			) RETURNING combination_id
 		</cfquery>
 
-		<cfreturn local.q.combination_id>
+		<cfreturn local.q.combination_id.toString()>
 
 	</cffunction>
 
 
 	<cffunction name="delete" returntype="Boolean">
 
-        <cfargument name="combinationId" type="Numeric">
+        <cfargument name="combinationId" type="String">
 
         <cfquery name="local.q" datasource="apirone">
 			DELETE 
             FROM combinations 
             WHERE
-                combination_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationId#">
+                combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationId#">::uuid
 		</cfquery>
 
 		<cfreturn true>
 
 	</cffunction>
 
-	
 </cfcomponent>

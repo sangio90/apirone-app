@@ -1,5 +1,20 @@
 component extends="com.apirone.core.controller.AbsController" {
 
+    function listImages( event, rc, prc ){
+
+        // union between those already inserted and the one to be inserted
+
+        var comb = super.fire( "image.list", { rc.combinationId = rc.combinationId } );
+
+        var lineId = comb.getLine().getId()
+
+        var finishes = super.fire( "finish.list", { lineId: lineId, sizeId: rc.sizeId  } )>
+
+        event.setValue("result", finishes);
+
+    }
+
+
     function listFinishesBySize( event, rc, prc ){
 
         var comb = super.fire( "combination.get", [ rc.id ] );

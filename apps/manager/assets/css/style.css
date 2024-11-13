@@ -368,3 +368,27 @@ h2 {
 	align-items: center; /* Prevent shorter elements from growing to same height as others (e.g., small buttons growing to normal sized button height) */
 
 }
+
+
+/*
+	upload files
+*/
+
+.document-dropzone {
+    margin-top: 20px; 
+    width: 100%; 
+    border: 2px solid #EAEAEA; 
+    height: 110px;
+    background-image: url(/assets/main/img/trascina-qui.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.upload-bar {
+    height: 18px;
+    background: green;
+}
+
+/*
+	// upload files
+*/

@@ -22,7 +22,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var obj = build( arguments.fileId );
 		cm.put( key, obj );
-        return obj;
+        
+		return obj;
 
 	}
 
@@ -49,7 +50,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-
+	public com.apirone.core.model.bean.File[] function list() {
+		arguments['limit'] = -1;
+		
+		return search( argumentCollection = arguments).getData();
+	
+	}
 
 	public com.apirone.core.model.bean.Result function search(
 		required Numeric limit = 50,

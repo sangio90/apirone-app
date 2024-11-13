@@ -109,9 +109,15 @@ AP.combination.list = function() {
 
 		showAttributesList: function() {
 
-			$("#line-attributes-list-modal").modal("show");
+			NM.util.openModal( $("#line-attributes-list-modal") );
 
 			this.searchAttributes()
+
+		},
+
+		showImagesList: function() {
+
+			NM.util.openModal( $("#combination-images-list-modal") );
 
 		},
 
@@ -134,6 +140,29 @@ AP.combination.list = function() {
 
 		},
 
+		searchImages: function( event ) {
+
+			console.log("searchImages");
+
+			var str = $('#attributes-search-input').val();
+			var status = $('#attributes-list-search-form .status');
+
+			status.html('Sto cercando...')
+
+			$.ajax({
+				method: "GET",
+				url: "/manager/ajax/attributes",
+				data: 'str=' + str,
+				success: function(xhr) {
+					viewModel.set( "attributesList", xhr.data );
+					status.html( "Ho trovato " + xhr.count + " record.") 
+				},
+			});
+
+            return false;
+
+		},				
+
 		searchAttributes: function( event ) {
 
 			console.log("searchAttributes");
@@ -154,6 +183,103 @@ AP.combination.list = function() {
 			});
 
             return false;
+
+		},
+
+		initUpload: function() {
+
+			var documents = viewModel.get( "documents" ).data();
+			var shipmentId = viewModel.get( "shipment.id" );
+
+			if( documents.length > 0 ) {
+
+				var modal = $('#documents-upload-modal');
+				modal.modal( "show" );
+
+				for ( var document of documents ) {
+				
+					var uid = document.uid;
+
+					$('#document-upload-' + uid ).fileupload({
+						dropZone: $('#document-upload-dropzone-' + uid),
+						autoUpload: true,
+						formData: { "shipmentId": shipmentId, "documentTypeId": document.id },
+						url: '/manager/ajax/shipment/upload-document',
+						add: function (event, data) { 
+							var uid = $(event.target).data("uid");
+							
+							var status = $('#document-upload-status-' + uid );
+							
+							status.html("");
+							
+							//TODO: get list form configuration
+							if (!(/\.(jpg|jpeg|png|pdf)$/i).test(data.files[0].name)) {
+								status.html('<span class="error">File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>');
+								return false;
+							}
+	
+							data.submit();
+	
+						},
+			
+						progressall: function( event, data ) {
+	
+							var status = $('#document-upload-status-' + uid );
+							status.html("");
+	
+							var uid = $(event.target).data("uid");
+							
+							var progress = parseInt(data.loaded / data.total * 100, 10);
+							$('#document-upload-progress-' + uid + ' .upload-bar').css('width', progress + '%');
+							
+							status.html('Fatto!');
+							
+							var row = viewModel.get("documents").getByUid( uid );
+							
+							row.set("completed", true);
+	
+						}
+					});		
+	
+				}				
+
+			} else {
+
+				viewModel.showPaymentDialog();
+
+			}
+
+		},
+
+		isDocumentCompleted: function( event ) {
+
+			var item = viewModel.get("documents").getByUid( event.uid );
+
+			if( !event.completed ) {
+				return true;
+			}
+
+			return false;
+
+		},
+
+		isDocumentsUploadUncompleted: function( event ) {
+
+			var items = viewModel.get("documents").data();
+
+			for( var item of items ) {
+				if ( !item.completed ) {
+					return true;
+				}
+			}
+
+			return false;
+
+		},
+
+		isDocumentUncompleted: function( event ) {
+
+			return !this.isDocumentCompleted( event );
 
 		},		
 

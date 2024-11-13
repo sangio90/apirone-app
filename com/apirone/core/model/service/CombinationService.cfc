@@ -136,6 +136,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
                 
 			} catch ( any error ) {
 
+				/*
+					set an error 500?
+				*/
+
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteCombination" );
@@ -150,7 +154,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}	
 
 
-	public Numeric function create(
+	public String function create(
 			required com.apirone.core.model.bean.Combination combination
 		){
 
