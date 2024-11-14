@@ -47,7 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Combination[] function list() {
-		arguments['limit'] = -1;
+		arguments["limit"] = -1;
 		
 		return search(argumentCollection = arguments).getData();
 	
@@ -182,16 +182,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.combination_id );
 			bean.setName( "" );
+			bean.setCreatedAt( record.created_at );
+
 			bean.setSize( getSizeService().get( record.size_id ) );
 			bean.setLine( getLineService().get( record.line_id ) );
 			bean.setFinish( getFinishService().get( record.finish_id ) );
 			
-			
-			bean.setCreatedAt( record.created_at );
-
-
-
-			//bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setStatus( getStatusService().get( record.status_id ) );
 
             return bean;
 

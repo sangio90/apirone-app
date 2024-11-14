@@ -58,7 +58,7 @@
                                         <th scope="col" width="50"></th>
                                     </tr>
                                 </thead>
-                                <tbody data-bind="source:configList" data-template="line-config-row-tmpl">
+                                <tbody data-bind="source:items" data-template="combination-item-row-tmpl">
                                 </tbody>
                             </table>
         
@@ -78,6 +78,6 @@
     #view("attribute/detail-values-modal")#
     #view("line/components-list-modal")#
 
-    #template( view="jstemplate/line/line-config-row-tmpl" )#
+    #template( view="jstemplate/combination/combination-item-row-tmpl" )#
 
 </cfoutput>

@@ -30,7 +30,7 @@ component extends="com.wineshipping.core.model.service.AbsService" accessors="tr
 	}
 
     public com.wineshipping.core.model.bean.Result function list(){
-		arguments['limit'] = -1;
+		arguments["limit"] = -1;
 		return search(argumentCollection = arguments)
     }
 

@@ -65,7 +65,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					 String productId
 		){
 
-		arguments['limit'] = -1;
+		arguments["limit"] = -1;
 
 		return search( argumentCollection = arguments );
 

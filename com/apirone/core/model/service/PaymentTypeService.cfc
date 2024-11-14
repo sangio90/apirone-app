@@ -28,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     public com.apirone.core.model.bean.PaymentType[] function list(
 		String str,
 	) {
-		arguments['limit'] = -1;
+		arguments["limit"] = -1;
 		return search(argumentCollection = arguments).getData();
 	}
 

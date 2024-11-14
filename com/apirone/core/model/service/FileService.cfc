@@ -51,7 +51,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.File[] function list() {
-		arguments['limit'] = -1;
+		arguments["limit"] = -1;
 		
 		return search( argumentCollection = arguments).getData();
 	
@@ -91,7 +91,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					 String productVariantId
 		){
 
-		arguments['limit'] = -1;
+		arguments["limit"] = -1;
 
 		return search( argumentCollection = arguments );
 

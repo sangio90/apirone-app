@@ -183,8 +183,11 @@ component{
 			combination
 		*/
 
-		post( "/ajax/combinations/:id/item" )
+		post( "/ajax/combinations/:id/items" )
 			.to( "CombinationAjaxController.addItem" ).end();
+
+		get( "/ajax/combinations/:id/items" )
+			.to( "CombinationAjaxController.listItems" ).end();
 
 		delete( "/ajax/combinations/:id/item" )
         	.to( "CombinationAjaxController.removeItem" ).end();

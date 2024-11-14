@@ -136,7 +136,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Result function list(
 		String fiscalCode
 	) {
-		arguments['limit'] = -1;
+		arguments["limit"] = -1;
 		return search(argumentCollection = arguments)
 	}
 

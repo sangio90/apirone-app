@@ -98,29 +98,39 @@ component extends="coldbox.system.Interceptor"{
                 non c'è result se il nome dell'hanlder nel router è sbagliato
             */
 
-            if ( IsInstanceOf( result, path ) ) {
-
-                event.renderData( data=result, contentType="text/json", type="json" )
+            if( IsSimpleValue( result ) AND  result == "result-not-found" ) {
+                
+                event.renderData( data="Result key not found", statusCode="400" )
                     .noExecution();
             
             } else {
 
-                var bean = new "#path#"();
+                if ( IsInstanceOf( result, path ) ) {
 
-                bean.setUuid( LCase( CreateUUID() ) );
-                bean.setStatus( "SUCCESS" );
-
-                bean.setData( result );
-
-                if( !IsSimpleValue( result ) ) {
-                    bean.setTotal( result.len() );
-                    bean.setCount( result.len() );
+                    event.renderData( data=result, contentType="text/json", type="json" )
+                        .noExecution();
+                
+                } else {
+    
+                    var bean = new "#path#"();
+    
+                    bean.setUuid( LCase( CreateUUID() ) );
+                    bean.setStatus( "SUCCESS" );
+    
+                    bean.setData( result );
+    
+                    if( !IsSimpleValue( result ) ) {
+                        bean.setTotal( result.len() );
+                        bean.setCount( result.len() );
+                    }
+    
+                    event.renderData( data=bean, contentType="text/json", type="json" )
+                        .noExecution()
+    
                 }
 
-                event.renderData( data=bean, contentType="text/json", type="json" )
-                    .noExecution()
-
             }
+
 
         }
 
