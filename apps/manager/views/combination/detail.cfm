@@ -46,9 +46,11 @@
                               
                         </div>
 
-                        <div class="col-md-12 mt-5">
+                        <hr class="my-5">
 
-                            <table class="table table-hover pt-5">
+                        <div class="col-md-12">
+
+                            <table class="table table-hover pt-5" data-bind="visible: showTable" style="display:none">
                                 <thead>
                                     <tr>
                                         <th scope="col" width="50">ID</th>
@@ -61,6 +63,10 @@
                                 <tbody data-bind="source:items" data-template="combination-item-row-tmpl">
                                 </tbody>
                             </table>
+
+                            <div class="py-5" data-bind="invisible: showTable" style="display:none">
+                                <p class="text-center">Nessuna configurazione presente</p>
+                            </div>
         
                         </div>
     

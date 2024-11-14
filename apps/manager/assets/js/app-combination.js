@@ -23,17 +23,18 @@ AP.combination.list = function() {
 	var service = AP.attribute.detail;
 	//var configRow = AP.combination.fields.configRow;
 
+	var dataSources = {
+		items: NM.kendo.dataSource( { url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" } )
+	}
+
 	var viewModel = kendo.observable({
 
-		items: [],
+		items: dataSources.items,
 		attributesList: [],
 
 		selectAttribute: function( event ) {
 
 			console.log( event );
-
-			//var sizeId = configRow.find("[name=sizeId]").val();
-			//var finishId = configRow.find("[name=finishId]").val();
 
 			$.ajax({
 				method: "POST",
@@ -50,6 +51,12 @@ AP.combination.list = function() {
 
 		},
 
+		showTable: function() {
+
+			return viewModel.get("items").view().length ? true : false;
+
+		},
+
         showComponents: function( event ) {
 
 			$("#components-list-modal").modal("show");
@@ -58,22 +65,8 @@ AP.combination.list = function() {
 		},
 
 		getItems: function( event ) {
-
-			var sizeId = configRow.find("[name=sizeId]").val();
-			var finishId = configRow.find("[name=finishId]").val();
-
-			if( finishId.length ) {
-
-				$.ajax({
-					method: "GET",
-					url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
-					success: function(xhr) {
-						viewModel.set( "items", xhr.data )
-					},
-				});
-
-			}
-
+			
+			viewModel.get("items").read()
 
 		},
 
@@ -340,8 +333,7 @@ AP.combination.list = function() {
 		kendo.bind( AP.combination.fields.root, viewModel )
 
 		viewModel.loadFishes();	
-		viewModel.getItems();	
-
+	
 	}	
 
 	return pub;

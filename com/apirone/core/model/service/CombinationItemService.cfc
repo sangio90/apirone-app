@@ -1,9 +1,11 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.CombinationsItemDAO";
+	property name="dao" type="com.apirone.core.model.dao.CombinationItemDAO";
 	property name="CombinationService" type="com.apirone.core.model.service.CombinationService";
+	property name="attributeValueService" type="com.apirone.core.model.service.attributeValueService";
+	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
-    public com.apirone.core.model.bean.Combination function get(
+    public com.apirone.core.model.bean.CombinationItem function get(
     		required String combinationItemId
         ){
 
@@ -26,7 +28,58 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public com.apirone.core.model.bean.CombinationItem[] function list() {
+	public com.apirone.core.model.bean.CombinationItem[] function getTree(
+            required String combinationId,
+            required Numeric parentId=NullValue(), 
+            required String level=1, 
+            required String orderBy=""
+    ) {
+		
+        var result = [];
+
+        var combinationId = arguments.combinationId;
+
+        var items = list( 
+            combinationId = arguments.combinationId,
+            parentId = arguments.parentId
+        )
+
+        var thisLevel = arguments.level;
+
+        var n = 1;
+
+        for( var item in items ) {
+
+            var thisOrderBy = "#arguments.orderBy#.#n#";
+
+            item.setLevel( arguments.level );
+            //item.setOrderBy( thisOrderBy );
+
+            result.add( item );
+
+
+            //abort;
+
+            var rows = getTree( combinationId, item.getId(), thisLevel+1, thisOrderBy );
+
+            cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# - [ combId:#combinationId#, itemId:#item.getId()#, level:#thisLevel+1#, itemLen:#items.len()#, orderBy:#thisOrderBy# ] #rows.len()#");
+
+            result = result.merge( rows );
+
+            n++;
+
+        }
+
+     
+		
+		return result;
+	
+	}
+
+
+	public com.apirone.core.model.bean.CombinationItem[] function list(
+        required String combinationId
+    ) {
 		arguments["limit"] = -1;
 		
 		return search(argumentCollection = arguments).getData();
@@ -45,7 +98,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		records.each(function(record) {
 			rows.add( 
-                get( combinationId = record.combination_item_id ) 
+                get( record.combination_item_id ) 
             );
 		});
 
@@ -108,7 +161,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Combination function build(
+	private com.apirone.core.model.bean.CombinationItem function build(
     		required String combinationItemId
     	){
 
@@ -116,13 +169,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if( record.recordCount ) { 
 
-            var bean = super.bean( "Combination" );
+            var bean = super.bean( "CombinationItem" );
 
             bean.setId( record.combination_item_id );
-			bean.setName( "" );
-			
+            bean.setCombinationId( record.combination_id );
 			bean.setCreatedAt( record.created_at );
+			bean.setParent( get( record.parent_id ) );
+			bean.setOrderBy( record.orderby );
 
+            bean.setSTatus( getStatusService().get( record.status_id ) );
+            bean.setAttributeValue( getAttributeValueService().get( record.attribute_value_id ) );
+			
             return bean;
 
 	    }

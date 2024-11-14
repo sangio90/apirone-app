@@ -4,6 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="SizeService" type="com.apirone.core.model.dao.SizeService";
 	property name="LineService" type="com.apirone.core.model.dao.LineService";
 	property name="FinishService" type="com.apirone.core.model.dao.FinishService";
+	property name="StatusService" type="com.apirone.core.model.dao.StatusService";
 
     public com.apirone.core.model.bean.Combination function get(
     		required String combinationId

@@ -3,56 +3,23 @@ component extends="com.apirone.core.controller.AbsController" {
     function listItems( event, rc, prc ){
 
         var data = [];
-        var dm = getDataMapper();
         var result = super.getResult();
 
-        
+        var  items = super.fire("combinationItem.getTree", { combinationId = rc.id } );
 
+        for( var item in items ) {
 
-        ```        
-        <cfquery datasource="apirone" name="local.q">
-            SELECT *
-            FROM combination_items
-            WHERE
-                combination_id IS NULL
-            AND parent_id IS NULL
-        </cfquery>
+            var row = super.getDataMapper().convert( item, "CombinationItem", true );
 
-        ```        
+            row["level"] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
 
-        var level = 0;
-        var list = [];
-
-        for( var record in local.q ) {
-
-            var value = super.fire( "attributeValue.get", [ record.attribute_value_id ] );
-            var valueObj = dm.convert( value, "AttributeValue", true );
-
-            var row = {
-                "attributeValue" = valueObj,
-                "status" = super.fire( "status.get", [ record.status_id ] ),
-                "level" = RepeatString( "&nbsp;&nbsp;&nbsp;",level ) 
-            }
-
-            list.add( row );
-          
-
-            var rows = recConfiguration( record, 0, rc );
-
-            dump(rows.len());
-            //abort;
-
-            //list.merge( rows );
-
-            for( var item in rows ) {
-                list.add( item )
-            }
+            data.add( row );
 
         }
 
-        result.setTotal( list.len() );
-        result.setCount( list.len() );
-        result.setData( list );
+        result.setTotal( data.len() );
+        result.setCount( data.len() );
+        result.setData( data );
 
         event.setValue("result", result);
 
@@ -160,11 +127,13 @@ component extends="com.apirone.core.controller.AbsController" {
             <cfquery datasource="apirone">
                 INSERT INTO combination_items (
                     combination_id,
-                    attribute_value_id
+                    attribute_value_id,
+                    orderby
                 )
                 VALUES (
                     '#rc.id#',
-                    '#item.getId()#'
+                    '#item.getId()#',
+                    #item.getOrderBy()#
                 )
             </cfquery>
             
