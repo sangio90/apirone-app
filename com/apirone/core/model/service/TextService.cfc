@@ -46,7 +46,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required Array orderBy = [ { field='lang.orderBy', sort="asc" } ]
     	){
 
-
 	    var rows = [];
     	var result = super.getResult();
 
@@ -159,7 +158,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setEntity( getEntity( record ) );
 
 			getStatusService().get( record.status_id )
-
 			
 			return bean;
 			

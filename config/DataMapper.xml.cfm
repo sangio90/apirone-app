@@ -15,7 +15,7 @@
 
     <mapper id="Attribute" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Attribute">
         <map from="id" to="id" type="cf:String"  />
-        <map from="mainText" to="mainText" type="cf:String"  />
+        <map from="name" to="name" type="cf:String"  />
         <map from="status" to="status" ref="Status"  />
         <map from="values" to="values" ref="AttributeValue" type="Array" />
     </mapper>
@@ -55,6 +55,7 @@
     <mapper id="LineCategory" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.LineCategory">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
+        <map from="code" to="code" type="cf:String"  />
     </mapper>
 
     <mapper id="Size" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Size">

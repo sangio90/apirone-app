@@ -14,13 +14,14 @@
 
 	</cffunction>
 
+
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
 		<cfargument name="langId" type="String">
 		<cfargument name="attributeId" type="String">
-		<cfargument name="attributeId" type="String">
+		<cfargument name="attributeValueId" type="String">
 		<cfargument name="lineCategoryId" type="Numeric">
 		<cfargument name="fromDate" type="Date">
 		<cfargument name="toDate" type="Date">
@@ -94,6 +95,7 @@
 
 	</cffunction>
 
+
 	<cffunction name="insert" returntype="Numeric">
 
 		<cfargument name="text" type="com.apirone.core.model.bean.Text" required="true">
@@ -118,6 +120,7 @@
 		<cfreturn local.q.text_id>
 
 	</cffunction>
+
 
 	<cffunction name="update" returntype="Numeric">
 

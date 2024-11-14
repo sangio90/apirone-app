@@ -1,8 +1,9 @@
 {
     combination: {
+        dir: "combination",
         sizes: {
-            orizonal: {
-                dir: "orizonal"
+            horizontal: {
+                dir: "horizontal"
             },
             vertical: {
                 dir: "vertical"

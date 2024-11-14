@@ -27,7 +27,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.page["combinations"] = combinations;
         prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
 
-                event.setView( "combination/detail" );
+        event.setView( "combination/detail" );
 
     }
 
