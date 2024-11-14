@@ -2,11 +2,7 @@
 
     <div id="line-list-root">
 
-        <div class="row mb-3">
-            <div class="col-lg-6">
-                <h2>#prc.title#</h2>
-            </div>
-        </div>
+        <cf_pageTitle prc="#prc#">
 
         <div class="row">
             <div class="col-lg-12">
@@ -66,6 +62,7 @@
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '140px' },
                                     { 'field':'name', 'title':'Descrizione'},
+                                    { 'field':'category.name', 'title':'Categoria'},
                                     { 'field':'thickness.name', 'title':'Spessore'},
                                     { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
                                     { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},

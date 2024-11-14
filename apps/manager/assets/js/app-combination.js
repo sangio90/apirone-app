@@ -46,7 +46,7 @@ AP.combination.list = function() {
 				},
 				success: function(xhr) {
 
-					viewModel.getConfiguration()
+					viewModel.getItems()
 
 				},
 			});
@@ -60,35 +60,23 @@ AP.combination.list = function() {
             return false;
 		},
 
-
-		getCalcLevel: function( event ) {
-
-			var txt = "";
-
-			console.log("event", event.data);
-
-			for(var i = 0; i < event.data.level; i++){
-
-				txt = txt + "-";
-
-			}
-
-			return txt;
-			
-		},
-
-		getConfiguration: function( event ) {
+		getItems: function( event ) {
 
 			var sizeId = configRow.find("[name=sizeId]").val();
 			var finishId = configRow.find("[name=finishId]").val();
 
-			$.ajax({
-				method: "GET",
-				url: "/manager/ajax/lines/" + AP.page.lineId + "/size/" + sizeId + "/finish/" + finishId + "/conf",
-				success: function(xhr) {
-					viewModel.set( "configList", xhr.data )
-				},
-			});
+			if( finishId.length ) {
+
+				$.ajax({
+					method: "GET",
+					url: "/manager/ajax/lines/" + AP.page.lineId + "/size/" + sizeId + "/finish/" + finishId + "/conf",
+					success: function(xhr) {
+						viewModel.set( "configList", xhr.data )
+					},
+				});
+
+			}
+
 
 		},
 
@@ -283,31 +271,52 @@ AP.combination.list = function() {
 
 		},		
 
-		loadFishes: function( event ) {
+		loadFishes: function() {
 
-			console.log("loadFishes");
-
-			var thisForm  = $("#combination-change-form");
-
+			var thisForm  = AP.combination.fields.configRow;
+			var finishEle = thisForm.find("[name=finishId]");
 			var sizeEle = thisForm.find("[name=sizeId]");
-			var finishEle = thisForm.find("[name=finishid]");
 
-			var sizeId = sizeEle.val()
+			var lineId = AP.page.lineId;
+			var sizeId = sizeEle.val();
+			var combinations = AP.page.combinations;
+			var combinationId = AP.page.combinationId;
 
-			finishEle.html("");
-			finishEle.html('Sto cercando...');
+			finishEle.empty("");
+			
+			finishEle.append(
+				$("<option>", { 
+					value: '',
+					text : '-- seleziona'
+				})
+			);
 
-			FW.utils.ajax( {
-				method: "POST",
-				url: "/manager/ajax/combinations/:id/size/:id/finishes",
-				data: selected.serialize(),
-				callback: {
-					done: function() {
-						FW.widget.notify( "success", "Dati cancellati con successo" );
-						dataSources.items.read();
+			finishEle.val( '' );
+			found = false;
+			
+			combinations.forEach(function( combination ) {
+
+				if( 
+					lineId == combination.line.id 
+					&& sizeId == combination.size.id 
+				) {
+
+					if ( combination.id == combinationId ) {
+						found = true;
 					}
+
+					var opt = $("<option>", { 
+						value: combination.id,
+						text : AP.util.getMainText( combination.finish.texts ).name
+					})
+
+					finishEle.append( opt );
+					
 				}
-			} )
+				
+			});
+
+			found ? finishEle.val(  AP.page.combinationId ) : '';
 
             return false;
 
@@ -315,7 +324,13 @@ AP.combination.list = function() {
 
 		change: function( event ) {
 
-			console.log("change", event);
+			var thisId = $(event.currentTarget).val();
+
+			if( thisId != AP.page.combinationId ) {
+
+            	window.location.href = "/manager/combinations/" + thisId;
+			
+			}
 
             return false;
 
@@ -325,11 +340,10 @@ AP.combination.list = function() {
 
 	pub.init = function() {
 
-		console.log("comp:init")
-
 		kendo.bind( AP.combination.fields.root, viewModel )
 
-		viewModel.getConfiguration();	
+		viewModel.loadFishes();	
+		viewModel.getItems();	
 
 	}	
 

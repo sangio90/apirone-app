@@ -179,6 +179,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "LineDAO" )
             .property( name = "statusService", ref = "StatusService" )
             .property( name = "lookupService", ref = "lookupService" )
+            .property( name = "LineCategoryService", ref = "LineCategoryService" )
             .parent("AbsService");
 
         map("LineCategoryService").to( "com.apirone.core.model.service.LineCategoryService" )

@@ -2,11 +2,7 @@
 
     <div id="report-list-root">
 
-        <div class="row mb-3">
-            <div class="col-lg-6">
-                <h2>#prc.title#</h2>
-            </div>
-        </div>
+        <cf_pageTitle prc="#prc#">
 
         <div class="row">
             <div class="col-lg-12">

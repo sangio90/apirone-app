@@ -66,9 +66,10 @@
                         <div class="profile-info" data-lock-name="" data-lock-email="#prc.user.getName()#">
                             <span class="name">
                                 #prc.user.getName()#<br>
+                            </span>
+                            <span class="description">
                                 #prc.user.getAccount().getRole().getId()# - #prc.user.getShortId()#
                             </span>
-                            <!--- <span class="role">#prc.user.getAccount().getRole().getName()#</span> --->
                         </div>
 
                         <i class="fa custom-caret"></i>

@@ -14,16 +14,20 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.statusList = super.fire( "status.list", ["line"] );
         prc.finishes = super.fire( "attributeValue.list", { attributeId = "FIN0001" } );
 
+        combinations = super.fire( "combination.list", { lineId = lineId } );
+
         prc.sizeId = comb.getSize().getId();
-        prc.finishId = comb.getFinish().getId();
         
         prc.jsScripts.add( "app-attribute" );
         prc.jsScripts.add( "app-combination" );
 
-        prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
         prc.page["lineId"] = lineId;
-        
-        event.setView( "combination/detail" );
+        prc.page["combinationId"] = comb.getId();
+        //prc.page["finishId"] = comb.getFinish().getId();
+        prc.page["combinations"] = combinations;
+        prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
+
+                event.setView( "combination/detail" );
 
     }
 

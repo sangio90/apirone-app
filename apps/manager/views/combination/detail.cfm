@@ -26,12 +26,7 @@
                             <form class="d-flex align-items-center justify-content-end" id="combination-change-form">
 
                                 <label class="me-2">Dimensione:</label>
-                                <select name="sizeId" class="form-control w-auto me-4" 
-                                    <!--- 
-                                        TODO: after we clarify manage the finishings (attribute or not?)
-                                              data-bind="change: loadFishes" 
-                                    ---->
-                                    >
+                                <select name="sizeId" class="form-control w-auto me-4" data-bind="events: { change: loadFishes }" >
                                     <cfloop array="#prc.sizes#" item="item">
                                         <option value="#item.getId()#" 
                                             <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
@@ -42,17 +37,10 @@
                                 </select>
                                 
                                 <label class="me-2">Finitura:</label>
-                                <select name="finishId" class="form-control w-auto me-4">
-                                    <cfloop array="#prc.finishes#" item="item">
-                                        <option value="#item.getId()#" 
-                                            <cfif item.getId() EQ prc.finishId>SELECTED</cfif>
-                                        >
-                                            #item.getName()#
-                                        </option>
-                                    </cfloop>
+                                <select name="finishId" class="form-control w-200" data-bind="events: { change: change }" >
                                 </select>
                             
-                                <button type="submit" data-bind="click: change" class="btn btn-primary ml-3">Cambia ></button>
+                                <!--- <button type="submit" data-bind="click: change" class="btn btn-primary ml-3">Cambia ></button> --->
                                 
                             </form>
                               

@@ -3,9 +3,7 @@
 
         <div class="row">
 
-            <div class="col-12">
-                <h1>#prc.title#</h1>
-            </div>
+            <cf_pageTitle prc="#prc#">
 
             <div class="col-12">
 

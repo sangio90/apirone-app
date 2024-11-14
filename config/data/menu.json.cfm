@@ -58,7 +58,7 @@
                     {
                         href: "/manager/lines",
                         icon: "fas fa-layer-group",
-                        title: "Lista delle linee",
+                        title: "Lista",
                         roles: "ADM"
                     },
                     {

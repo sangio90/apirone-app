@@ -43,10 +43,16 @@
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
         <map from="thickness" to="thickness" ref="Thickness"  />
+        <map from="category" to="category" ref="LineCategory"  />
         <map from="createdAt" to="createdAt" type="cf:Date"  />
     </mapper>
 
     <mapper id="Thickness" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Thickness">
+        <map from="id" to="id" type="cf:String"  />
+        <map from="name" to="name" type="cf:String"  />
+    </mapper>
+
+    <mapper id="LineCategory" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.LineCategory">
         <map from="id" to="id" type="cf:String"  />
         <map from="name" to="name" type="cf:String"  />
     </mapper>

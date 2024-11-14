@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.LineDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="lookupService" type="com.apirone.core.model.service.LookupService";
+	property name="LineCategoryService" type="com.apirone.core.model.service.LineCategoryService";
 
     public com.apirone.core.model.bean.Line function get(
     		required String lineId
@@ -73,6 +74,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setCategory( getLineCategoryService().get( record.line_category_id ) );
 
             return bean;
 

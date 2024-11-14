@@ -345,11 +345,6 @@ h2 {
 	text-align: center;
 }
 
-/*
-	style=\'width: 100%; padding-top: 10px; padding-bottom: 10px; text-align: center;\'
-*/
-
-
 .grey {
 	color: rgb(135, 135, 135);
 }
@@ -362,13 +357,6 @@ h2 {
 	margin: 0px;
 }
 
-.form-inline {
-	display: flex;
-	flex-flow: row wrap;
-	align-items: center; /* Prevent shorter elements from growing to same height as others (e.g., small buttons growing to normal sized button height) */
-
-}
-
 
 /*
 	upload files
@@ -379,7 +367,7 @@ h2 {
     width: 100%; 
     border: 2px solid #EAEAEA; 
     height: 110px;
-    background-image: url(/assets/main/img/trascina-qui.png);
+    background-image: url(/assets/main/img/release-here.png);
     background-repeat: no-repeat;
     background-position: center center;
 }
@@ -392,3 +380,17 @@ h2 {
 /*
 	// upload files
 */
+
+
+.header .logo {
+    margin: 5px 0 0 15px !important;
+}
+
+.profile-info .description {
+	color: #878787;
+	font-size: 11px;
+}
+
+.w-200 {
+	width: 200px !important;
+}

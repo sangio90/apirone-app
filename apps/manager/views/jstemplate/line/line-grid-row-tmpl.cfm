@@ -10,6 +10,9 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
+                <span data-bind="text: category.name"></span>
+            </td>
+            <td>
                 <span data-bind="text: thickness.name"></span>
             </td>
             <td class="text-center">
