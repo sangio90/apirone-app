@@ -6,10 +6,10 @@
             <div class="modal-content">
                 
                 <header class="card-header">
-                    <h2 class="card-title">Cerca componenti</h2>
+                    <h2 class="card-title">Cerca componenti da Verticale</h2>
                 </header>
                 
-                <div class="card-body">        
+                <div class="card-body">
 
                     <div class="row">
                     
@@ -17,27 +17,53 @@
 
                             <div data-bind="visible: showSearchPanel">
 
-                                <form class="pb-2" data-bind="events: { submit: search }" id="components-search">
-                                    <div class="row">
-                                        <div class="col-md-10 col-sm-12">
-                                            <input class="form-control" placeholder="Cerca..." id="components-search-input">
-                                        </div>
-                                        <div class="col-md-2 col-sm-12">
-                                            <button class="btn btn-primary" value="Cerca" data-bind="click: search">Cerca</button>
-                                        </div>
+                                <form data-bind="events: { submit: search }" id="component-list-search-form">
+
+                                    <div class="pb-2 d-flex align-items-center justify-content-start">
+
+                                        <input class="form-control me-3" placeholder="Cerca..." id="component-search-input" name="str">
+
+                                        <select class="form-control me-3">
+                                            <option value="LV">Lavorazioni</option>
+                                            <option value="MP">Materie prime</option>
+                                        </select>
+
+                                        <button class="btn btn-primary" data-bind="click: search">Cerca ></button>
+                                    
                                     </div>
-                                </form>
-            
-                                <form id="components-list-search-form" class="row">
-            
-                                    <div class="col-md-12">
-                                        
+                                    <div class="pb-2">
                                         <div class="status">
                                             Fai una ricerca
                                         </div>
+                                    </div>
+
+                                </form>
+            
+                                <form id="component-list-search-result-form" class="row">
+            
+                                    <div class="col-md-12">
+                                        
             
                                         <div data-bind="visible: showSearchResult">
+
+                                            #grid( 
+                                                id="component-list-grid",
+                                                columns="[
+                                                    { 'field':'name', 'title':'Lavorazione/Materia prima'},
+                                                    { 'field':'', 'title':'', width: '50px'},
+                                                    { 'field':'', 'title':'', width: '50px'},
+                                                    { 
+                                                        'field':'', 
+                                                        'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                                        'width':'40px',
+                                                        'headerAttributes': { 'class': 'text-center' }
+                                                    }
+                                                ]",
+                                                source="components",
+                                                rowTemplate="component/component-row-list-tmpl"
+                                            )#
             
+                                            <!----
                                             <table class="table table-hover pt-5">
                                                 <thead>
                                                     <tr>
@@ -49,6 +75,7 @@
                                                 <tbody data-bind="source:components" data-template="components-list-tmpl">
                                                 </tbody>
                                             </table>
+                                            ---->
             
                                         </div>
             
@@ -80,7 +107,7 @@
 
     #template("jstemplate/color/product-comp-colors-row-tmpl")#
     #template("jstemplate/variant/product-comp-variants-row-tmpl")#
-    <!---- #template("jstemplate/component/product-components-list-row-tmpl")# ---->
-    #template("jstemplate/component/components-list-tmpl")#
+    <!--- #template("jstemplate/component/product-components-list-row-tmpl")# --->
+    <!--- #template("jstemplate/component/components-list-tmpl")# --->
 
 </cfoutput>

@@ -175,7 +175,52 @@ component extends="coldbox.system.Interceptor"{
 
     }
 
+    private function hostCanAccess() {
+
+        var host = ListFirst( cgi.http_host, ':' );
+        var authorizedHosts = "test.apirone.cc,www.apirone.cc,apirone.cc,www.apirone.local";
+
+        if( !ListFind( authorizedHosts, host ) ){
+
+            setUnauthorizedMessage( message="Unauthorized host [#host#]" );
+
+        }
+
+    }
+
+    private function userAgentCanAccess() {
+
+        var userAgentBlocked = "curl,python,libwww-perl,wget,badbot";
+
+        var ua = cgi.HTTP_USER_AGENT;
+
+        for( var thisUA in userAgentBlocked ) {
+        
+            if ( ua CONTAINS thisUA ) {
+                
+                setUnauthorizedMessage( message="Unauthorized userAgent [#ua#]" );
+                abort;
+    
+            }
+        
+        }
+    
+    }
+
+    private function setUnauthorizedMessage( required String message ) {
+
+        echo( arguments.message );
+        cfheader(statusCode="404", statusText="Not found");
+        
+        FileAppend( ExpandPath("/../repository/private/logs/secure.log"), "#now()# - #arguments.message# #chr(13)##chr(10)#" );
+        abort;
+
+    }
+
     private function canAccess( event ) {
+
+        hostCanAccess();
+        userAgentCanAccess();
 
         var currentEvent = arguments.event.getContext().event;
 

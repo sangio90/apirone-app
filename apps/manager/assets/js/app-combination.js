@@ -1,13 +1,13 @@
 AP.combination = AP.combination || {};
 
 AP.combination.fields = {
-    root: $("#combination-detail-root"),
+    rootDetail: $("#combination-detail-root"),
 	configRow: $("#combination-config-row")
 }
 
 $(document).ready(function(){
 
-	if ( AP.combination.fields.root.length ) {
+	if ( AP.combination.fields.rootDetail.length ) {
 
 		AP.combination.list.init();
 
@@ -281,6 +281,7 @@ AP.combination.list = function() {
 			);
 
 			finishEle.val( "" );
+			
 			var found = false;
 			
 			combinations.forEach(function( combination ) {
@@ -329,7 +330,7 @@ AP.combination.list = function() {
 
 	pub.init = function() {
 
-		kendo.bind( AP.combination.fields.root, viewModel )
+		kendo.bind( AP.combination.fields.rootDetail, viewModel )
 
 		viewModel.loadFishes();	
 	

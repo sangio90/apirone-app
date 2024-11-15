@@ -95,22 +95,30 @@ AP.component.list = function() {
 
 		search: function( event ) {
 
+			var thisForm = $("#component-list-search-form");
+
 			console.log("searchComponents");
 
-			var str = $('#components-search-input').val();
-			var status = $('#components-list-search-form .status');
+			var str = thisForm.find("[name=str]").val()
+			var status = thisForm.find(".status");
 
-			status.html('Sto cercando...')
+			status.html("Sto cercando...");
 
-			$.ajax({
-				method: "GET",
+			NM.util.ajax({ 
+				method: method, 
 				url: "/manager/ajax/components",
 				data: 'str=' + str,
-				success: function(xhr) {
-					viewModel.set( "components", xhr.data );
-					status.html( "Ho trovato " + xhr.count + " record.") 
-				},
-			});
+				callback: {
+					done: function( xhr ) {
+	
+						if( xhr.status == "SUCCESS" ) {
+							viewModel.set( "components", xhr.data );
+							status.html( "Ho trovato " + xhr.count + " record.") 
+						}
+	
+					}
+				}
+			})					
 
             return false;
 
