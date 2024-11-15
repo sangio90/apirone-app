@@ -1,4 +1,5 @@
 ﻿<cfparam name="prc.title" default="">
+<cfparam name="prc.subtitle" default="">
 
 <cfprocessingdirective suppresswhitespace=true>
 
@@ -8,7 +9,7 @@
 <html  class="fixed sidebar-left-collapsed sidebar-left-with-menu no-overflowscrolling" data-dev="#prc.isDev#">
 <head>
 
-    <title><cfif Len( prc.title )>#prc.title# - </cfif> ApirOne</title>
+    <title><cfif Len( prc.title )>#prc.title# - </cfif><cfif Len( prc.subtitle )>#prc.subtitle# - </cfif> ApirOne</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -157,7 +158,7 @@
         salt="a1"
         type="js">
 
-        <script src="/assets/main/js/vendor/js.cookie.min.js"></script>
+        <script src="/assets/main/js/vendor/js.cookie.min.js"></script> <!--- TODO: put to jsScripts --->
         <script src="/assets/main/js/nimesia-kendo.js"></script>
         <script src="/assets/main/js/nimesia-util.js"></script>
 
@@ -166,12 +167,7 @@
         <script src="/assets/#prc.staticVersion#/manager/js/app-util.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-widget.js"></script>
 
-        <cfloop array="#prc.jsScripts#" index="thisScript">
-            <script src="/assets/#prc.staticVersion#/manager/js/#thisScript#.js"></script>
-            <cfif FileExists( ExpandPath( "/apps/manager/assets/js/tests/#thisScript#-test.js" ) ) AND prc.isDev>
-                <script src="/assets/#prc.staticVersion#/manager/js/tests/#thisScript#-test.js"></script>
-            </cfif>
-        </cfloop>
+        #includeJsFiles()#
 
         <iframe src="/manager/live" style="display:none;"></iframe> 
     </body>

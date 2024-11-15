@@ -39,9 +39,6 @@
                                 <label class="me-2">Finitura:</label>
                                 <select name="finishId" class="form-control w-200" data-bind="events: { change: change }" >
                                 </select>
-                            
-                                <!--- <button type="submit" data-bind="click: change" class="btn btn-primary ml-3">Cambia ></button> --->
-                                
                             </form>
                               
                         </div>
@@ -81,8 +78,8 @@
 
     </div>
 
+    #view("component/list-modal")#
     #view("attribute/detail-values-modal")#
-    #view("line/components-list-modal")#
 
     #template( view="jstemplate/combination/combination-item-row-tmpl" )#
 

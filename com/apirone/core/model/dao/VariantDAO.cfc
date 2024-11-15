@@ -1,6 +1,4 @@
-<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
-	<cfset companyId = "azapi">
+<cfcomponent extends="com.apirone.core.model.dao.VerticaleDAO" accessors="true">
 
 	<cffunction name="read">
 
@@ -37,6 +35,7 @@
                 <cfif !IsNull( arguments.componentId )>
                     INNER JOIN #super.sanitizeSQL( "#variables.companyId#_comvar" )# AS comvar ON comvar.cbcodvar = codvar.varcod
                 </cfif>
+			
 			WHERE 1=1
                 
                 <cfif !IsNull( arguments.componentId )>
@@ -50,6 +49,7 @@
 				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS
 				FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY;
 			</cfif>
+		
 		</cfquery>
 
 		<cfreturn local.q>

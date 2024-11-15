@@ -1,6 +1,8 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
-    public Lang function init(){
+    property name="colors" type="com.apirone.core.model.bean.Color[]";
+
+    public Variant function init(){
 
         return this;
         

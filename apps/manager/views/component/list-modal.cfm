@@ -1,8 +1,8 @@
 ﻿<cfoutput>
 
-    <div id="components-list-modal" class="modal fade">
+    <div id="component-list-modal" class="modal fade">
         
-        <section class="modal-dialog">
+        <section class="modal-dialog modal-xl">
             <div class="modal-content">
                 
                 <header class="card-header">
@@ -11,20 +11,19 @@
                 
                 <div class="card-body">        
 
-
                     <div class="row">
                     
                         <div class="col-12">
 
                             <div data-bind="visible: showSearchPanel">
 
-                                <form class="pb-2" data-bind="events: { submit: searchComponents }" id="components-search">
+                                <form class="pb-2" data-bind="events: { submit: search }" id="components-search">
                                     <div class="row">
                                         <div class="col-md-10 col-sm-12">
                                             <input class="form-control" placeholder="Cerca..." id="components-search-input">
                                         </div>
                                         <div class="col-md-2 col-sm-12">
-                                            <button class="btn btn-primary" value="Cerca" data-bind="click: searchComponents">Cerca</button>
+                                            <button class="btn btn-primary" value="Cerca" data-bind="click: search">Cerca</button>
                                         </div>
                                     </div>
                                 </form>

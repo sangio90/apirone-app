@@ -1,6 +1,4 @@
-<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
-	<cfset companyId = "azapi">
+<cfcomponent extends="com.apirone.core.model.dao.VerticaleDAO" accessors="true">
 
 	<cffunction name="read">
 
@@ -19,6 +17,7 @@
 		<cfreturn local.q>
 
 	</cffunction>
+
 	
 	<!----
 		a = materia prima

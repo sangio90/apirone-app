@@ -21,7 +21,6 @@ AP.combination.list = function() {
 	var pub = {}
 	
 	var service = AP.attribute.detail;
-	//var configRow = AP.combination.fields.configRow;
 
 	var dataSources = {
 		items: NM.kendo.dataSource( { url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" } )
@@ -59,7 +58,7 @@ AP.combination.list = function() {
 
         showComponents: function( event ) {
 
-			$("#components-list-modal").modal("show");
+			$("#component-list-modal").modal("show");
 
             return false;
 		},
@@ -281,8 +280,8 @@ AP.combination.list = function() {
 				})
 			);
 
-			finishEle.val( '' );
-			found = false;
+			finishEle.val( "" );
+			var found = false;
 			
 			combinations.forEach(function( combination ) {
 

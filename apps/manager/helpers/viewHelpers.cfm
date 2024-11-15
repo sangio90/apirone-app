@@ -7,6 +7,19 @@
         return "";
     }
 
+    function includeJSFiles(){ 
+
+        for ( var thisScript in prc.jsScripts ) {
+
+            echo("<script src=""/assets/#prc.staticVersion#/manager/js/#thisScript#.js""></script>");
+            
+            if ( FileExists( ExpandPath( "/apps/manager/assets/js/tests/#thisScript#-test.js" ) ) && prc.isDev ) {
+                        echo("<script src=""/assets/#prc.staticVersion#/manager/js/tests/#thisScript#-test.js""></script>");
+            }
+        }
+        
+    }
+
     function createMenu( required Array data=[], required String active="" ){ 
 
         var html = '';

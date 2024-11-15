@@ -25,51 +25,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
-    function recConfiguration( record, level, rc ){
-
-        var dm = getDataMapper();
-
-
-        ``` 
-        <cfquery datasource="apirone" name="local.q">
-            SELECT *
-            FROM configurations 
-            WHERE
-                finish_id = '#arguments.rc.finishId#'
-                AND size_id = '#arguments.rc.sizeId#'
-                AND line_id = '#arguments.rc.lineId#'
-            AND parent_id = #record.attribute_value_id#
-        </cfquery>
-        ``` 
-
-        var list = []
-        arguments.level = level+1;
-
-        for( var record in local.q ) {
-
-            var value = super.fire( "attributeValue.get", [ record.attribute_value_id ] );
-            var valueObj = dm.convert( value, "AttributeValue", true );
-    
-            var row = {
-                "attributeValue" = valueObj,
-                "status" = super.fire( "status.get", [ record.status_id ] ),
-                "level" = RepeatString( "&nbsp;&nbsp;&nbsp;", level ) 
-            }
-
-            list.add( row );
-                
-            var rows = recConfiguration( record, arguments.level, arguments.rc )
-
-            for( var item in rows ) {
-                list.add( item )
-            }
-    
-        }
-
-        return list;
-
-    }        
-
     function listImages( event, rc, prc ){
 
         // union between those already inserted and the one to be inserted

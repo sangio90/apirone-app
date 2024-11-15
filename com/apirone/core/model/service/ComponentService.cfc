@@ -2,11 +2,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.ComponentDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	//property name="ComponentAttributeService" type="com.apirone.core.model.service.ComponentVariantService";
     property name="ComponentTypeService" type="com.apirone.core.model.service.ComponentTypeService";
     property name="ColorService" type="com.apirone.core.model.service.ColorService";
     property name="VariantService" type="com.apirone.core.model.service.VariantService";
-	//property name="variantTypeService" type="com.apirone.core.model.service.VariantTypeService";
 
     public com.apirone.core.model.bean.Component function get(
     		required String componentId
@@ -25,6 +23,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.componentId );
+		
 		cm.put( key, bean );
         
 		return bean;
@@ -73,8 +72,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             bean.setId( record.arcodart );
 			bean.setName( record.ardesart );
 			bean.setType( getComponentTypeService().get( record.artipmat )  );
-			bean.setVariants( getVariantService().list( componentId=record.arcodart )  );
-			//bean.setColors( getColorService().list( componentId=record.arcodart )  );
+			bean.setVariants( getVariantService().list( componentId=record.arcodart ) );
+			bean.setColors( getColorService().list( componentId=record.arcodart )  );
 			
             return bean;
 

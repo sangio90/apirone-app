@@ -120,8 +120,10 @@ component extends="coldbox.system.Interceptor"{
                     bean.setData( result );
     
                     if( !IsSimpleValue( result ) ) {
+                        
                         bean.setTotal( result.len() );
                         bean.setCount( result.len() );
+                    
                     }
     
                     event.renderData( data=bean, contentType="text/json", type="json" )

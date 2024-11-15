@@ -20,10 +20,10 @@ component extends="com.apirone.core.controller.AbsController" {
         
         prc.jsScripts.add( "app-attribute" );
         prc.jsScripts.add( "app-combination" );
+        prc.jsScripts.add( "app-component" );
 
         prc.page["lineId"] = lineId;
         prc.page["combinationId"] = comb.getId();
-        //prc.page["finishId"] = comb.getFinish().getId();
         prc.page["combinations"] = combinations;
         prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
 
