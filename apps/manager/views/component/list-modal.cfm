@@ -31,6 +31,7 @@
                                         <button class="btn btn-primary" data-bind="click: search">Cerca ></button>
                                     
                                     </div>
+                                    
                                     <div class="pb-2">
                                         <div class="status">
                                             Fai una ricerca

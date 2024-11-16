@@ -99,15 +99,15 @@ AP.component.list = function() {
 
 			console.log("searchComponents");
 
-			var str = thisForm.find("[name=str]").val()
+			var str = thisForm.find("[name=str]").val();
 			var status = thisForm.find(".status");
 
 			status.html("Sto cercando...");
 
 			NM.util.ajax({ 
-				method: method, 
+				method: "GET", 
 				url: "/manager/ajax/components",
-				data: 'str=' + str,
+				data: "str=" + str,
 				callback: {
 					done: function( xhr ) {
 	
@@ -119,6 +119,7 @@ AP.component.list = function() {
 					}
 				}
 			})					
+			  
 
             return false;
 

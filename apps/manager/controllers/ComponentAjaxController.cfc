@@ -5,7 +5,8 @@ component extends="com.apirone.core.controller.AbsController" {
         param rc.str = "";
 
         // processingTypeId="A" -> materie prime
-        var rows = super.service("Component").search( processingTypeId="A", str="#rc.str#" ); //materie prime
+        //materie prime
+        var rows = super.fire("component.search", { processingTypeId="A", str="#rc.str#", limit=15 } ); /
 
         event.setValue("result", rows.getData());
         
