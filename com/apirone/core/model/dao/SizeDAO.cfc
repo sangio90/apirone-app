@@ -7,12 +7,11 @@
 		<cfargument name="sizeId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-
-			SELECT *
+			SELECT size_id::varchar, *
 			FROM
 				sizes
 			WHERE
-				size_id = <cfqueryparam cfsqltype="varchar" value="#arguments.sizeId#">
+				size_id = <cfqueryparam cfsqltype="varchar" value="#arguments.sizeId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -28,16 +27,18 @@
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
-				size_id,
-				COUNT(size_id) OVER() AS total,
-				orderby
+				size_id::varchar, 
+				orderby,
+				COUNT(size_id) OVER() AS total
 			FROM
 				sizes
-					INNER JOIN combinations USING ( size_id )
+					<cfif !IsNull( arguments.lineId )>
+						INNER JOIN combinations USING ( size_id )
+					</cfif>
 			WHERE 1=1
 				
 				<cfif !IsNull( arguments.lineId )>
-                    AND combinations.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">
+                    AND combinations.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
                 </cfif>
 			
 			ORDER BY 

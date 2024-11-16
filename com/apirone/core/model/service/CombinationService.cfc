@@ -31,7 +31,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     public com.apirone.core.model.bean.Combination function getByParams(
 			required String lineId,
-			required Numeric finishId,
+			required String finishId,
 			required String sizeId
 		){
 
@@ -113,7 +113,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     public com.apirone.core.model.bean.Outcome function deleteByParams(
 			required String lineId,
-			required Numeric finishId,
+			required String finishId,
 			required String sizeId
 		){
 
@@ -201,7 +201,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "combination_#arguments.id#";
+  		return "Combination_#arguments.id#";
 
   	}
 

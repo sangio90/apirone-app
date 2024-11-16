@@ -12,6 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
+
     function attributes( event, rc, prc ){
 
         var combinations = super.fire( "combination.list", { lineId = rc.id } );
@@ -29,8 +30,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         }
 
-
     }
+    
     
     function combinations( event, rc, prc ){
 
@@ -41,7 +42,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.page["line"]=prc.obj;
 
         prc.sizes = super.fire( "size.list" );
-        prc.finishes = super.fire( "AttributeValue.list", { attributeId = "FIN0001" } );
+        prc.finishes = super.fire( "finish.list" );
 
         var combinationsList = super.fire( "combination.list", { lineId = rc.id } );
         

@@ -346,7 +346,7 @@ h2 {
 }
 
 .grey {
-	color: rgb(135, 135, 135);
+	color: #878787;
 }
 
 .h-20 {
@@ -393,4 +393,10 @@ h2 {
 
 .w-200 {
 	width: 200px !important;
+}
+
+.little-code {
+	color: #878787;
+	font-style: italic;
+	font-size: 11px;
 }

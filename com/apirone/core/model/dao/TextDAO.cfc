@@ -72,6 +72,10 @@
 				AND line_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.lineCategoryId#">
 			</cfif>
 
+			<cfif !isNull( arguments.finishId ) >
+				AND finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
+			</cfif>
+
 			<cfif !isNull( arguments.fromDate ) >
 				AND texts.created_at >= <cfqueryparam cfsqltype="Date" value="#arguments.fromDate#">
 			</cfif>
@@ -112,7 +116,12 @@
 			(
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getLang().getId()#">,
-				<cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
+				
+				<cfif field.type == "uuid">
+					<cfqueryparam cfsqltype="varchar" value="#arguments.text.getEntity().getValue()#">::uuid
+				<cfelse>
+					<cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
+				</cfif>
 			)
 			RETURNING text_id
 		</cfquery>

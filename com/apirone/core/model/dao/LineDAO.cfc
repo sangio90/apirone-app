@@ -5,11 +5,11 @@
 		<cfargument name="lineId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT line_id::varchar, *
 			FROM
 				lines
 			WHERE
-				line_id = <cfqueryparam cfsqltype="varchar" value="#arguments.lineId#">
+				line_id = <cfqueryparam cfsqltype="varchar" value="#arguments.lineId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -22,7 +22,7 @@
 		<cfargument name="categoryId" type="Numeric">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT line_id::varchar
 			FROM
 				lines
 			WHERE 1=1

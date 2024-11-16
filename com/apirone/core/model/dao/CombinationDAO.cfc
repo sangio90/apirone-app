@@ -5,7 +5,12 @@
 		<cfargument name="combinationId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT combination_id::varchar, *
+			SELECT 
+				combination_id::varchar,
+				size_id::varchar,
+                line_id::varchar,
+                finish_id::varchar,
+				*
 			FROM
 				combinations
 			WHERE
@@ -21,7 +26,7 @@
 
         <cfargument name="lineId" type="String">
         <cfargument name="sizeId" type="String">
-        <cfargument name="finishId" type="Numeric">
+        <cfargument name="finishId" type="String">
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT combination_id::varchar
@@ -30,15 +35,15 @@
 			WHERE 1=1
                 
 				<cfif !IsNull( arguments.lineId )>
-                    AND line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">
+                    AND line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
                 </cfif>
 
                 <cfif !IsNull( arguments.finishId )>
-                    AND finish_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.finishId#">
+                    AND finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
                 </cfif>
 
                 <cfif !IsNull( arguments.sizeId )>
-                    AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">
+                    AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
                 </cfif>
 
             ORDER BY 
@@ -61,9 +66,9 @@
                 finish_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getSize().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getLine().getId()#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.combination.getFinish().getId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getSize().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getLine().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getFinish().getId()#">::uuid
 			) RETURNING combination_id
 		</cfquery>
 

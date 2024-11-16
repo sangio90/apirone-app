@@ -70,6 +70,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             var bean = super.bean( "Line" );
 
             bean.setId( record.line_id );
+			bean.setCode( record.code );
 			bean.setName( record.line );
 			bean.setCreatedAt( record.created_at );
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );

@@ -18,6 +18,7 @@
         "name": "line_category_id",
         "type": "Integer"
     },
+    
     "lineCategory.code": {
         "name": "code",
         "type": "Varchar"
@@ -31,5 +32,10 @@
     "lang.orderBy": {
         "name": "langs.orderby",
         "type": "Integer"
+    },
+
+    "finish.id": {
+        "name": "finish_id",
+        "type": "uuid"
     }
 }

@@ -3,7 +3,6 @@ component accessors="true" {
     property name="id" type="String" default="";
 	property name="name" type="String" default="";
     property name="createdAt" type="Date";
-    //property name="updatedAt" type="Date";
 
 	public Struct function toStruct(){
 		
@@ -13,13 +12,24 @@ component accessors="true" {
 
 	public String function getShortId(){
 		
-		return Right( this.getId(), 6 );
+		return Right( this.getId(), 5 );
 		
 	}
 
 	public com.apirone.core.model.bean.Lang function getCurrentLang(){
+
+		if ( request.keyExists("lang") ) {
+			
+			return request.lang;
 		
-		return request.lang;
+		} else {
+
+			var lang = new com.apirone.core.model.bean.Lang();
+			lang.setId( "IT" );
+
+			return lang;
+
+		}
 		
 	}
 

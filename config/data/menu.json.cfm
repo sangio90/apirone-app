@@ -66,6 +66,12 @@
                         icon: "fas fa-layer-group",
                         title: "Categorie",
                         roles: "ADM"
+                    },
+                    {
+                        href: "/manager/finishes",
+                        icon: "fas fa-layer-group",
+                        title: "Finiture",
+                        roles: "ADM"
                     }
                 ]
             },

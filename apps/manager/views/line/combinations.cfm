@@ -34,7 +34,7 @@
                                     <cfset  finishName = finish.getMainText().getName()>
                                     <tr>
                                         <td>
-                                            #finish.getMainText().getName()# <i class="grey">(#finish.getId()#)</i>
+                                            #finish.getMainText().getName()# <span class="little-code">(#finish.getShortId()#)</span>
                                         </td>
                                         <cfloop array="#prc.sizes#" item="size">
                                             <td>

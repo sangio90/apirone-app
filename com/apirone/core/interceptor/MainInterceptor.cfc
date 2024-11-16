@@ -67,6 +67,9 @@ component extends="coldbox.system.Interceptor"{
             TODO: remove all "session.user"
         */
 
+        url.cicio
+        form.pluto
+
         prc.page = {};  //current js config write in current html page 
         prc.jsScripts = []; //current js file for current html page 
 
@@ -178,7 +181,7 @@ component extends="coldbox.system.Interceptor"{
     private function hostCanAccess() {
 
         var host = ListFirst( cgi.http_host, ':' );
-        var authorizedHosts = "test.apirone.cc,www.apirone.cc,apirone.cc,www.apirone.local";
+        var authorizedHosts = "test.apirone.cc,www.apirone.cc,apirone.cc,www.apirone.local,apirone.local";
 
         if( !ListFind( authorizedHosts, host ) ){
 

@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding='UTF-8'>
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="line-grid-row-tmpl">
+    <script type="text/template" id="finish-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td style="border-left: 4px solid ##=status.color.hex##">
                 <span data-bind="text: shortId"></span>
@@ -13,18 +13,10 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
-                <span data-bind="text: category.name"></span>
-            </td>
-            <td>
-                <span data-bind="text: thickness.name"></span>
+                <div data-bind="source: categories" data-template="finish-category-row-tmpl"></div>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:combinations">
-                    <i class="fas fa-cogs"></i>
-                </button>
-            </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:attributes">
+                <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
                     <i class="fas fa-edit"></i>
                 </button>
             </td>
@@ -35,5 +27,12 @@
                 >
             </td>
         </tr>
-    </nmscript>
+    </script>
 </cfoutput>
+
+<script type="text/template" id="finish-category-row-tmpl">
+    <div>
+        <span data-bind="text: name"></span>
+        <i class="grey">(<span data-bind="text: id"></span>)</i>
+    </div>
+</script>

@@ -44,6 +44,18 @@ component{
 
 
 		/*
+			finishes
+		*/
+
+		get(
+			"/ajax/finishes"
+		).to("FinishAjaxController.list").end();
+		
+		get(
+			"/finishes"
+		).to("FinishController.list").end();
+		
+		/*
 			components
 		*/
 
@@ -248,9 +260,6 @@ component{
 		/*
 			size
 		*/
-		get( "/sizes/:id" )
-        	.toHandler( "SizeController.get" );
-
 		get( "/sizes" )
         	.toHandler( "SizeController.list" );
 

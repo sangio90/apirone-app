@@ -1,6 +1,6 @@
 <cfoutput>
 
-    <div id="line-list-root">
+    <div id="finish-list-root">
 
         <cf_pageTitle prc="#prc#">
 
@@ -15,7 +15,7 @@
 
                             <div class="col-sm-9">
 
-                                <form id="line-grid-search-form" 
+                                <form id="finish-grid-search-form" 
                                     class="row mb-3" 
                                     data-bind:'events: { submit: search }'
                                 >
@@ -61,12 +61,10 @@
                                 id="line-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'code', 'title':'Codice', width: '120px' },
-                                    { 'field':'name', 'title':'Descrizione', width: '150px' },
-                                    { 'field':'category.name', 'title':'Categoria'},
-                                    { 'field':'thickness.name', 'title':'Spessore'},
-                                    { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
-                                    { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
+                                    { 'field':'code', 'title':'Codice', width: '80px'},
+                                    { 'field':'name', 'title':'Descrizione'},
+                                    { 'field':'category.name', 'title':'Categorie'},
+                                    { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
@@ -74,7 +72,7 @@
                                         'headerAttributes': { 'class': 'text-center' }
                                     }
                                 ]",
-                                rowTemplate="line/line-grid-row-tmpl"
+                                rowTemplate="finish/finish-grid-row-tmpl"
                             )#
 
                         </form>
