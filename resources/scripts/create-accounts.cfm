@@ -1,6 +1,4 @@
-﻿--
-<cfabort>
-<cfscript>
+﻿<cfscript>
 
     model = server["wirebox-apirone"];
 
@@ -31,12 +29,20 @@
 
     account = new com.apirone.core.model.bean.Account();
     role = new com.apirone.core.model.bean.Role();
+    status = new com.apirone.core.model.bean.Status();
 
+    /*
     role.setId("MAN");
 
     account.setLogin( "guido.sangiovanni@gslabs.it" );
     account.setPwd( "Gta.ak12aQ" );
     account.setRole( role );
+    */
+
+    account.setLogin( "stavislav@nimesia.com" );
+    account.setPwd( "JSA7!8fs:afn4K" );
+    account.setRole( role.setId( "ADM" ) );
+    account.setStatus( status.setId( "ACT" ) );
 
     svc.create( account );
 

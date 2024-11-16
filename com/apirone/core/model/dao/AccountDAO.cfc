@@ -2,7 +2,7 @@
 	
 	<cfproperty name="Configuration" type="com.apirone.core.model.bean.Configuration"/>
 
-	<cffunction name="read">
+	<cffunction name="read" returntype="Query">
 
 		<cfargument name="accountId" type="String" required="true">
 
@@ -28,7 +28,7 @@
 
 	</cffunction>
 
-	<cffunction name="search">
+	<cffunction name="search" returntype="Query">
 
 		<cfargument name="email" type="String">
 		<cfargument name="login" type="String">
@@ -68,14 +68,18 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO accounts (
 				login,
-				api_key
+				api_key,
+				status_id,
+				role_id
 			)
 			VALUES (
 				pgp_sym_encrypt(
 					<cfqueryparam cfsqltype="varchar" value="#arguments.account.getLogin()#">, 
 					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'>
 				)::varchar,
-				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">
+				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getRole().getId()#">
 			) RETURNING account_id
 		</cfquery>
 	
@@ -97,6 +101,7 @@
 	</cffunction>
 
 	<cffunction name="updatePassword" output="No" returntype="Boolean">
+
 		<cfargument name="accountId" required="Yes" type="String">
 		<cfargument name="pwd" required="Yes" type="String">
 
