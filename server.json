@@ -1,0 +1,21 @@
+{
+    "profile":"${server.profile}",
+    "app":{
+        "cfengine":"lucee@5.4.0.80"
+    },
+    "name":"${server.name}",
+    "openBrowser":false,
+    "web":{
+        "blockSensitivePaths":false,
+        "directoryBrowsing":true,
+        "accessLogEnable":true,
+        "host":"${server.host}",
+        "http":{
+            "port":"${server.port}"
+        },
+        "rewrites":{
+            "enable":true,
+            "config":"config/urlrewrite.xml"
+        }
+    }
+}
