@@ -10,7 +10,7 @@
 <div class="info">
 	<b>Sistema</b>: Lucee #server.lucee.version#<br>
 	<b>Locale</b>: #GetLocaleInfo().name#<br>
-	<b>Memoria</b>: #(GetSystemTotalMemory()-GetSystemFreeMemory())/1000000# MB di #GetSystemTotalMemory()/1000000# MB totali
+	<!--- <b>Memoria</b>: #(GetSystemTotalMemory()-GetSystemFreeMemory())/1000000# MB di #GetSystemTotalMemory()/1000000# MB totali --->
 </div>
 
 <div class="button">

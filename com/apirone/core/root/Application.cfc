@@ -114,7 +114,7 @@ component {
     private String function isDev() {
 
         return ( 
-            ( ListLast( cgi.SERVER_NAME, "." ) IS "local" )
+            ( Right( cgi.SERVER_NAME, 5 ) IS "local" )
             OR 
             ( cgi.SERVER_NAME CT "localhost" ) 
         );
