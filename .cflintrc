@@ -32,12 +32,6 @@
 			"code": "ARG_VAR_CONFLICT"
 		},
 		{
-			"code": "ARG_HINT_MISSING"
-		},
-		{
-			"code": "ARG_HINT_MISSING_SCRIPT"
-		},
-		{
 			"code": "ARGUMENT_INVALID_NAME"
 		},
 		{
@@ -53,9 +47,6 @@
 			"code": "COMPARE_INSTEAD_OF_ASSIGN"
 		},
 		{
-			"code": "COMPONENT_HINT_MISSING"
-		},
-		{
 			"code": "COMPONENT_INVALID_NAME"
 		},
 		{
@@ -63,9 +54,6 @@
 		},
 		{
 			"code": "COMPONENT_TOO_SHORT"
-		},
-		{
-			"code": "COMPONENT_TOO_LONG"
 		},
 		{
 			"code": "COMPONENT_IS_TEMPORARY"
@@ -84,9 +72,6 @@
 		},
 		{
 			"code": "EXPLICIT_BOOLEAN_CHECK"
-		},
-		{
-			"code": "FUNCTION_HINT_MISSING"
 		},
 		{
 			"code": "FILE_SHOULD_START_WITH_LOWERCASE"
