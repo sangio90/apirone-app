@@ -74,7 +74,7 @@
 
 		<cfargument name="finish" type="com.apirone.core.model.bean.Finish" required="true">
 
-        <cfset var items = getCategoriesAsArray( finish.getCategories() )>
+        <cfset var categories = getCategoriesAsArray( finish.getCategories() )>
 
         <cfquery name="local.q" datasource="apirone">
 			INSERT INTO finishes (
@@ -85,7 +85,7 @@
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.finish.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
-				'#SerializeJSON( items )#'
+				'#SerializeJSON( categories )#'
 			) RETURNING finish_id
 		</cfquery>
 
@@ -96,18 +96,22 @@
 
 	<cffunction name="update" returntype="String">
 
-		<cfargument name="attribute" type="com.apirone.core.model.bean.Attribute" required="true">
+		<cfargument name="finish" type="com.apirone.core.model.bean.Finish" required="true">
+
+        <cfset var categories = getCategoriesAsArray( finish.getCategories() )>
 
         <cfquery name="local.q" datasource="apirone">
 			UPDATE 
 				finishes 
 			SET 
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
+				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getCode()#">,
+				categories = '#SerializeJSON( categories )#'
 			WHERE
-				attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getId()#">
+				finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getId()#">::uuid
 		</cfquery>
 
-		<cfreturn arguments.attribute.getId()>
+		<cfreturn arguments.finish.getId()>
 
 	</cffunction>
 

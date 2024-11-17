@@ -52,7 +52,7 @@
                             <div class="col-sm-10">
                                 <select 
                                     id="statusId" 
-                                    class="form-control"
+                                    class="fprm-control"
                                     data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
                                     data-value-field="id"
                                     data-text-field="name"

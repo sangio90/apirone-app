@@ -64,6 +64,41 @@ AP.finish.list = function() {
 
         },
 
+        save: function( event ) {
+
+			var thisForm = AP.finish.fields.detailForm;
+			var status = thisForm.find(".status");
+
+			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+			//var attrId = viewModel.get( "detailForm.data.id" ) 
+
+			if( thisForm.valid() ) {
+
+				NM.util.ajax({ 
+					method: "POST", 
+					url: "/manager/ajax/finishes",
+					data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+					callback: {
+						done: function( xhr ) {
+						
+							status.html("<span class='green'>Finitura salvata</span> ");
+
+							setTimeout( ()=>  
+								$("#finish-detail-modal").modal("hide"), 
+								1000 
+							);
+
+						}
+					}
+				})
+
+			}
+
+
+            return false;
+
+        },
+
         new: function( event ) {
 
 			this.resetForm();

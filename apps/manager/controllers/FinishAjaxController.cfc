@@ -34,4 +34,66 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
+    function save( event, rc, prc ){
+
+        var result = super.getResult();
+        var finish = super.bean("Finish");
+        var category = super.bean("LineCategory");
+        var status = super.bean("Status");
+        var categories = [];
+        
+        var thisId = "";
+        var messageId = "";
+        var texts = [];
+
+        var json = DESerializeJSON( GetHTTPRequestData().content );
+
+        finish.setId( json.id );
+        finish.setCode( json.code );
+
+        for( var thisCategory in json.categories ) {
+            category.setId( thisCategory.id );
+            categories.add( category );
+        }
+
+        finish.setCategories( categories );
+        finish.setStatus( status.setId( json.status.id ) );
+
+        /*
+        for( var thisText in json.texts ) {
+
+            var text = super.bean("Text");
+            var lang = super.bean("Lang");
+
+            text.setName( thisText.name )
+            text.setLang( lang.setId( thisText.lang.id ) );
+
+            texts.add( text );
+
+        }
+        */
+
+        //finish.setCode( texts );
+
+        if( !Len( json.id ) ) {
+            
+            messageId = "finish.created";
+            thisId = super.fire( "finish.create", [ finish ] )
+            
+        } else {
+
+            messageId = "finish.updated";
+            thisId = super.fire( "finish.update", [ finish ] )
+            
+        }
+
+        var message = completeMessage( messageId );
+
+        result.setData( { "message" = message }, { "payload" = { id = thisId }  } );
+        
+        event.setValue( "result", result );
+        
+    }
+
+
 }

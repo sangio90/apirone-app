@@ -81,6 +81,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+	public String function update(
+			required com.apirone.core.model.bean.Finish finish
+		){
+
+		getDao().update( arguments.finish );
+
+		getCacheManager().remove( "Finish_#arguments.finish.getId()#" );
+
+		return arguments.finish.getId();
+
+	}
+
 	public Boolean function codeExists( 
 		required String code,
 				 String excludedId=""

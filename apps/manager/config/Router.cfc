@@ -55,6 +55,10 @@ component{
 			"/ajax/finishes"
 		).to("FinishAjaxController.list").end();
 		
+		post(
+			"/ajax/finishes"
+		).to("FinishAjaxController.save").end();
+		
 		get(
 			"/finishes"
 		).to("FinishController.list").end();

@@ -14,8 +14,9 @@
         <map from="code" to="code" type="cf:String" />
         <map from="categories" to="categories" ref="LineCategory" type="Array" />
         <map from="name" to="name" type="cf:String" />
+        <map from="mainText" to="mainText" ref="Text" />
         <map from="status" to="status" ref="Status" />
-        <!-- <map from="texts" to="texts" ref="Text" type="Array" /> -->
+        <map from="texts" to="texts" ref="Text" type="Array" />
     </mapper>   
 
     <mapper id="Country" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Country">
