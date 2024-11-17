@@ -1,11 +1,12 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
-	<cffunction name="read">
-
+	<cffunction name="read" output="false">
 		<cfargument name="finishId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT finish_id::varchar, categories::varchar, *
+			SELECT
+				finish_id::varchar,
+				categories::varchar,
+				*
 			FROM
 				finishes
 			WHERE
@@ -13,15 +14,16 @@
 		</cfquery>
 
 		<cfreturn local.q>
-
 	</cffunction>
 
-	<cffunction name="readByCode">
-
+	<cffunction name="readByCode" output="false">
 		<cfargument name="code" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT finish_id::varchar, categories::varchar, *
+			SELECT
+				finish_id::varchar,
+				categories::varchar,
+				*
 			FROM
 				finishes
 			WHERE
@@ -29,127 +31,114 @@
 		</cfquery>
 
 		<cfreturn local.q>
+	</cffunction>
 
-	</cffunction>	
-	
-	<cffunction name="find" returntype="Query">
-
+	<cffunction name="find" returntype="Query" output="false">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT DISTINCT finish_id::varchar, categories::varchar, *
+			SELECT
+				DISTINCT
+				finish_id::varchar,
+				categories::varchar,
+				*
 			FROM
 				finishes
 
-				<cfif !IsNull( arguments.str )>
+				<cfif !isNull( arguments.str )>
 					INNER JOIN texts USING ( finish_id )
 				</cfif>
 
 			WHERE 1=1
-				
-                <cfif !isNull(arguments.categoryId)>
-					<!--- TODO: to fix 
+
+				<cfif !isNull( arguments.categoryId )>
+					<!---
+						TODO: to fix
 						// https://stackoverflow.com/questions/79195450/find-record-matching-an-array-json-field
 					--->
-                    AND jsonb_exists_any( finishes.categories, ARRAY[21, 22]::json )
-                </cfif>
+					AND jsonb_exists_any( finishes.categories, ARRAY[21, 22]::json )
+				</cfif>
 
-				<cfif !IsNull( arguments.str )>
-					AND ( 
+				<cfif !isNull( arguments.str )>
+					AND (
 						finishes.code ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
 						OR texts.text ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
 					)
 				</cfif>
 
-            ORDER BY 
-                orderby
+			ORDER BY
+				orderby
 		</cfquery>
 
 		<cfreturn local.q>
-
 	</cffunction>
 
-	<cffunction name="insert" returntype="String">
-
+	<cffunction name="insert" returntype="String" output="false">
 		<cfargument name="finish" type="com.apirone.core.model.bean.Finish" required="true">
 
-        <cfset var categories = getCategoriesAsArray( finish.getCategories() )>
+		<cfset var categories = getCategoriesAsArray( finish.getCategories() )>
 
-        <cfquery name="local.q" datasource="apirone">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO finishes (
 				code,
 				status_id,
-                categories
+				categories
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.finish.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
-				'#SerializeJSON( categories )#'
+				<cfqueryparam cfsqltype="varchar" value="#serializeJSON( categories )#">
 			) RETURNING finish_id
 		</cfquery>
 
 		<cfreturn local.q.finish_id.toString()>
-
 	</cffunction>
 
-
-	<cffunction name="update" returntype="String">
-
+	<cffunction name="update" returntype="String" output="false">
 		<cfargument name="finish" type="com.apirone.core.model.bean.Finish" required="true">
 
-        <cfset var categories = getCategoriesAsArray( finish.getCategories() )>
+		<cfset var categories = getCategoriesAsArray( finish.getCategories() )>
 
-        <cfquery name="local.q" datasource="apirone">
-			UPDATE 
-				finishes 
-			SET 
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE
+				finishes
+			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getCode()#">,
-				categories = '#SerializeJSON( categories )#'
+				categories = <cfqueryparam cfsqltype="varchar" value="#serializeJSON( categories )#">
 			WHERE
 				finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getId()#">::uuid
 		</cfquery>
 
 		<cfreturn arguments.finish.getId()>
-
 	</cffunction>
 
-	<cffunction name="delete" returntype="Numeric">
-
+	<cffunction name="delete" returntype="Numeric" output="false">
 		<cfargument name="finishId" type="String" required="true">
 
-        <cfquery name="local.q" datasource="apirone">
+		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM
-				finishes 
+				finishes
 			WHERE
 				finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 			RETURNING finish_id
 		</cfquery>
 
-		<cfreturn local.q.RecordCount>
-
+		<cfreturn local.q.recordCount>
 	</cffunction>
 
-	
-	<!----
-		private methods 
-	---->
+	<!--- private methods --->
 
-	<cffunction access="private" name="getCategoriesAsArray" returntype="Array">
-
+	<cffunction access="private" name="getCategoriesAsArray" returntype="Array" output="false">
 		<cfargument name="categories" required="true">
 
-        <cfset var items = []>
+		<cfset var items = []>
 
-        <cfloop array="#arguments.categories#" item="thisItem">
+		<cfloop array="#arguments.categories#" item="local.thisItem">
+			<cfset items.add( thisItem.getId() )>
+		</cfloop>
 
-            <cfset items.add( thisItem.getId() )>
-
-        </cfloop>
-
-        <cfreturn items>
-
+		<cfreturn items>
 	</cffunction>
-
 </cfcomponent>
