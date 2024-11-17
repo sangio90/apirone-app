@@ -1,34 +1,34 @@
 AP.finish = AP.finish || {};
 
 AP.finish.fields = {
-    listRoot: $('#finish-list-root'),
-    detailForm: $('#finish-detail-form'),
-    searchListForm: $('#finish-grid-search-form')
-}
+	listRoot: $("#finish-list-root"),
+	detailForm: $("#finish-detail-form"),
+	searchListForm: $("#finish-grid-search-form")
+};
 
-$(document).ready(function(){
+$(document).ready(function (){
 
-	if ( AP.finish.fields.listRoot.length ) {
+	if (AP.finish.fields.listRoot.length) {
 
-	    AP.finish.list.init();
+		AP.finish.list.init();
 
 	}
 
-})
+});
 
-AP.finish.list = function() {
+AP.finish.list = (function () {
 
-	var pub = {}
+	var pub = {};
 
 	var dataSources = {
-		items: NM.kendo.dataSource( { url: "/manager/ajax/finishes" } )
-	}
+		items: NM.kendo.dataSource({ url: "/manager/ajax/finishes" })
+	};
 
 	var defaultDetailForm = {
 		data: {
-			id: '',
-			code: '',
-			name: '',
+			id: "",
+			code: "",
+			name: "",
 			selectedCategories: [],
 			status: {
 				id: "ACT"
@@ -43,101 +43,90 @@ AP.finish.list = function() {
 
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
-        detailForm: defaultDetailForm,
+		detailForm: defaultDetailForm,
 
-		resetForm: function() {
-
-			console.log("resetForm")
-
-			viewModel.set( "detailForm", defaultDetailForm ) 
+		resetForm: function () {
+			viewModel.set("detailForm", defaultDetailForm);
 		},
-        
-        search: function( event ) {
 
-            var thisForm = AP.finish.fields.searchListForm;
+		search: function (event) {
 
-            var params = thisForm.serializeJSON();
+			var thisForm = AP.finish.fields.searchListForm;
 
-            viewModel.rows.read( params )
+			var params = thisForm.serializeJSON();
 
-            return false;
+			viewModel.rows.read(params);
 
-        },
+			return false;
 
-        save: function( event ) {
+		},
+
+		save: function (event) {
 
 			var thisForm = AP.finish.fields.detailForm;
 			var status = thisForm.find(".status");
 
-			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
-			//var attrId = viewModel.get( "detailForm.data.id" ) 
+			status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
+			// var attrId = viewModel.get( "detailForm.data.id" )
 
-			if( thisForm.valid() ) {
+			if(thisForm.valid()) {
 
-				NM.util.ajax({ 
-					method: "POST", 
+				NM.util.ajax({
+					method: "POST",
 					url: "/manager/ajax/finishes",
-					data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+					data: JSON.stringify(viewModel.get("detailForm.data")),
 					callback: {
-						done: function( xhr ) {
-						
+						done: function (xhr) {
+
 							status.html("<span class='green'>Finitura salvata</span> ");
 
-							setTimeout( ()=>  
-								$("#finish-detail-modal").modal("hide"), 
-								1000 
-							);
+							setTimeout(() => $("#finish-detail-modal").modal("hide"), 1000);
 
 						}
 					}
-				})
+				});
 
 			}
 
+			return false;
 
-            return false;
+		},
 
-        },
-
-        new: function( event ) {
+		new: function (event) {
 
 			this.resetForm();
 
-            NM.util.openModal( $("#finish-detail-modal")  );
+			NM.util.openModal($("#finish-detail-modal"));
 
-        },
+		},
 
-        edit: function( event ) {
+		edit: function (event) {
 
-            console.log("edit:event", event);
+			viewModel.set("detailForm.data", event.data);
+			viewModel.set("detailForm.title", "Modifica finitura < " + event.data.code + " >");
 
-            viewModel.set("detailForm.data", event.data);
-            viewModel.set("detailForm.title", "Modifica finitura < " + event.data.code + " >");
+			var selectedCategories = [];
 
-            var selectedCategories = []
-            
-            for ( var category of event.data.categories  )  {
-                selectedCategories.push( category.id )
-            }
+			for (var category of event.data.categories)  {
+				selectedCategories.push(category.id);
+			}
 
-            viewModel.set("detailForm.data.selectedCategories", selectedCategories);
+			viewModel.set("detailForm.data.selectedCategories", selectedCategories);
 
-            NM.util.openModal( $("#finish-detail-modal")  );
+			NM.util.openModal($("#finish-detail-modal"));
 
-        },
+		},
 
 	});
 
-	pub.init = function() {
+	pub.init = function () {
 
-        console.log("AP.finish:init")
+		kendo.bind(AP.finish.fields.listRoot, viewModel);
 
-        kendo.bind( AP.finish.fields.listRoot, viewModel );
+		var detailForm = AP.finish.fields.detailForm;
 
-        var detailForm = AP.finish.fields.detailForm;
-
-		detailForm.validate( {
-			onfocusout: function( element ) {
+		detailForm.validate({
+			onfocusout: function (element) {
 				$(element).valid();
 			},
 			rules: {
@@ -146,9 +135,9 @@ AP.finish.list = function() {
 					checkCode: true,
 					remote: {
 						url: "/manager/ajax/finishes/code-exists",
-						data: { id: function() { return  viewModel.get("detailForm.data.id") } },
-						dataFilter: function( xhr ) {
-							var json = JSON.parse( xhr );
+						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
+						dataFilter: function (xhr) {
+							var json = JSON.parse(xhr);
 							return json.data == false;
 						}
 					}
@@ -161,11 +150,11 @@ AP.finish.list = function() {
 					remote: "Il codice esiste"
 				}
 			},
-		
-		} );        
 
-	}	
+		});
 
-    return pub;
-}();
+	};
+
+	return pub;
+}());
 
