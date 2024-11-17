@@ -79,6 +79,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         super.logout();
     
+        flash.put("message","Ti sei disconnesso.");
+
         location("/manager/login?msg=disconnected", false );
 
     }

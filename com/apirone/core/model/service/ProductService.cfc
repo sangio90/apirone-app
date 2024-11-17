@@ -36,7 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	
 		var products = search( code = arguments.code ).getData();
 
-		return !isNull( products[1] ) AND products[1].getId() NEQ arguments.excludeId 
+		return !isNull( products[1] ) AND products[1].getId() NEQ arguments.excludeId;
 
 	}
 

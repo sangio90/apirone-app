@@ -23,4 +23,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
+    function codeExists( event, rc, prc ){
+
+        param rc.id = "_";
+        param rc.code = "";
+
+        var result = super.fire( "finish.codeExists", { code = rc.code, excludedId = rc.id } );
+
+        event.setValue("result", result);
+
+    }
+
 }

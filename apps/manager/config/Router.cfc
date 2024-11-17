@@ -48,6 +48,10 @@ component{
 		*/
 
 		get(
+			"/ajax/finishes/code-exists"
+		).to("FinishAjaxController.codeExists").end();
+		
+		get(
 			"/ajax/finishes"
 		).to("FinishAjaxController.list").end();
 		

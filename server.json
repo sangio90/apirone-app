@@ -8,8 +8,6 @@
     "web":{
         "blockSensitivePaths":false,
         "directoryBrowsing":true,
-
-        
         "accessLogEnable":true,
         "host":"${server.host}",
         "http":{

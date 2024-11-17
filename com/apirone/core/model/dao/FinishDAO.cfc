@@ -15,6 +15,22 @@
 		<cfreturn local.q>
 
 	</cffunction>
+
+	<cffunction name="readByCode">
+
+		<cfargument name="code" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT finish_id::varchar, categories::varchar, *
+			FROM
+				finishes
+			WHERE
+				code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
+		</cfquery>
+
+		<cfreturn local.q>
+
+	</cffunction>	
 	
 	<cffunction name="find" returntype="Query">
 

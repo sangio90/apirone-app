@@ -5,6 +5,12 @@
         <cf_pageTitle prc="#prc#">
 
         <div class="row">
+            <div class="col-lg-12 text-end mb-3">
+                <button type="submit" class="btn btn-primary btn-sm" data-bind="click:new">Carica</button>
+            </div>
+        </div>
+    
+        <div class="row">
             <div class="col-lg-12">
 
                 <section class="card">
@@ -20,20 +26,31 @@
                                     data-bind:'events: { submit: search }'
                                 >
 
-                                    <div class="col-4">
+                                    <div class="col-3">
                                         <input 
                                             name="str"
                                             placeholder="Cerca"
                                             class="form-control" type="text">
                                     </div>
 
-                                    <div class="col-5">
+                                    <div class="col-4">
                                         <select 
                                             class="form-control" 
                                             name="categoryId">
                                             <option value="">-- tutte le categorie</option>
                                             <cfloop array="#prc.lineCategories#" item="thisLine">
                                                 <option value="#thisLine.getId()#">#thisLine.getName()#</option>
+                                            </cfloop>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="col-3">
+                                        <select 
+                                            class="form-control" 
+                                            name="statusId">
+                                            <option value="">-- status</option>
+                                            <cfloop array="#prc.statuses#" item="thisStatus">
+                                                <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
                                             </cfloop>
                                         </select>
                                     </div>
@@ -46,13 +63,6 @@
                             
                             </div>
 
-                            <div class="col-sm-3">
-                                <div class="mb-3 d-flex justify-content-end col-12">
-                                    <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:print">
-                                        <i class="fas fa-remove"></i> Stampa
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                         
                         <form name="line-grid-form" id="estimate-grid-form" method="post">
@@ -81,6 +91,9 @@
                 </section>
             </div>
         </div>
+
+        #view("finish/detail-modal")#
+
     </div>
 
 </cfoutput>

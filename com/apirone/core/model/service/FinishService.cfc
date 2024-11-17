@@ -81,6 +81,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+	public Boolean function codeExists( 
+		required String code,
+				 String excludedId=""
+	){
+
+		var record = getDao().readByCode( arguments.code );
+
+		if( record.recordCount 
+			AND record.finish_id != arguments.excludedId ) {
+
+			return record.code == arguments.code;
+
+		} 
+
+		return false;
+
+	}
+
     public com.apirone.core.model.bean.Outcome function delete(
 			required String finishId
 		){

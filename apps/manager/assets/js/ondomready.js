@@ -12,7 +12,6 @@ if ( localStorage.getItem("sidebar-left-position") !== null ) {
 // https://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $(document).on("show.bs.modal", ".modal", function() {
     const zIndex = 1040 + 10 * $(".modal:visible").length;
-	console.log("zIndex", zIndex)
     $(this).css("z-index", zIndex);
     setTimeout(() => $(".modal-backdrop").not(".modal-stack").css("z-index", zIndex - 1).addClass("modal-stack"));
 });

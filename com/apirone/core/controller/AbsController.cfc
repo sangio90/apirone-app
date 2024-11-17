@@ -96,28 +96,22 @@
 
     }      
 
-    public Any function getCart(){
-
-        return session.cart;
-
-    }      
-
     public Any function setMessage( message="", type="success", title="" ){
 
         var title = "";
 
         switch( arguments.type ) {
             case "success":
-                title = Len(arguments.title) ? arguments.title : 'Ok';
+                title = Len(arguments.title) ? arguments.title : "Ok";
                 break;
             case "error":
-                title = Len(arguments.title) ? arguments.title : 'Errore';
+                title = Len(arguments.title) ? arguments.title : "Errore";
                 break;
             case "info":
-                title = Len(arguments.title) ? arguments.title : 'Info';
+                title = Len(arguments.title) ? arguments.title : "Info";
                 break;
             case "warning":
-                title = Len(arguments.title) ? arguments.title : 'Attenzione';
+                title = Len(arguments.title) ? arguments.title : "Attenzione";
                 break;
         }
 

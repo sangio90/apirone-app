@@ -23,7 +23,7 @@ NM.util.openModal = function( ele ) {
             currentTop = 20*n;
             currentLeft = 20*n;
 
-            n++
+            n++;
 
         }
 
