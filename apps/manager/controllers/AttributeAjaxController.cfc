@@ -45,59 +45,28 @@ component extends="com.apirone.core.controller.AbsController" {
     function list( event, rc, prc ){
 
         var data = [];
-        //var result = super.getResult();
         var dm = getDataMapper();
+        var result = super.getResult();
         
         var rows = super.fire( "attribute.list" );
 
-        
 
-        /*
+        dump(DESerializeJSON(SerializeJSON( rows[1] )));
+        abort;
+
         for ( var row in rows ) {
-            var obj = dm.convert( row, "Attri", true );
+
+
+
+            var obj = dm.convert( row, "Attribute", true );
             data.add( obj );
-        }
-            */
-
-        //result.setTotal( data.len() );
-        //result.setData( data );
-
-        event.setValue("result", rows );
         
-    }
-
-    function new( event, rc, prc ){
-
-        var texts = [];
-        var result = super.getResult();
-        
-        var langs = super.fire("lang.list");
-        
-        var attribute = super.bean( "Attribute" );
-
-        attribute.setId("");
-
-        for( var lang in langs ) {
-
-            var text = super.bean( "Text" );
-            
-            text.setId( "" );
-            text.setName( "" );
-            
-            text.setLang( lang );
-
-            texts.add( text );
-
         }
 
-        attribute.setTexts( texts );
-        
-        result.setCount( langs.len() )
-        result.setTotal( langs.len() )
+        result.setTotal( data.len() );
+        result.setData( data );
 
-        result.setData( attribute );
-
-        event.setValue("result", result );
+        event.setValue("result", data );
         
     }
 
@@ -115,19 +84,30 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
-        var mainText = json.data.mainText;
+        var categories = [];
 
-        text.setId( mainText.id )
-        text.setName( mainText.name )
-        text.setLang( lang.setId( mainText.lang.id ) );
+        for( var thisCategory in json.selectedCategories ) {
+            var category = super.bean("lineCategory");
+            
+            categories.add( category );
+            category.setId( thisCategory.id )
+
+        }
+
+        //var mainText = json.data.mainText;
+
+        text.setMemento( json.mainText )
+        //text.setName( mainText.name )
+        //text.setLang( lang.setId( mainText.lang.id ) );
 
         texts.add( text );
     
-        attr.setId( json.data.id );
+        attr.setId( json.id );
         attr.setTexts( texts );
-        attr.setStatus( status.setId( json.data.status.id ) );
+        attr.setStatus( status.setId( json.status.id ) );
+        attr.setCategories( categories );
 
-        if( json.action == "create"  ) {
+        if( !Len( json.id )  ) {
 
             messageId = "attribute.created";
             thisId = super.fire( "attribute.create", [ attr ] )

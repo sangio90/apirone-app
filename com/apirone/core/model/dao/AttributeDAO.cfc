@@ -43,18 +43,20 @@
 
 		<cfargument name="attribute" type="com.apirone.core.model.bean.Attribute" required="true">
 
+		<cfset var categories = super.getCategoriesAsArray( attribute.getCategories() )>
+
         <cfquery name="local.q" datasource="apirone">
 			INSERT INTO attributes (
-				attribute_id,
-				status_id
+				status_id,
+				categories
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.attribute.getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">
-			)
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">,
+				'#SerializeJSON(categories)#'
+			) RETURNING attribute_id::varchar
 		</cfquery>
 
-		<cfreturn arguments.attribute.getId()>
+		<cfreturn local.q.attribute_id>
 
 	</cffunction>
 

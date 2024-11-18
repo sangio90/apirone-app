@@ -119,11 +119,8 @@ component{
 		/*
 			attributes
 		*/
-		get( "/ajax/attributes/exists")
-			.toHandler( "AttributeAjaxController.idExists" );
-
 		get( "/ajax/attributes/new" )
-        	.toHandler( "AttributeAjaxController.new" );
+        	.to( "AttributeAjaxController.new" ).end();
 
 		post( "/ajax/attributes/values")
         	.to( "AttributeAjaxController.saveValue" ).end();
@@ -132,13 +129,13 @@ component{
         	.to( "AttributeAjaxController.order" ).end();
 
 		get( "/ajax/attributes/:id")
-        	.toHandler( "AttributeAjaxController.get" );
-
-		get( "/ajax/attributes")
-        	.to( "AttributeAjaxController.list" ).end();
+        	.to( "AttributeAjaxController.get" ).end();
 
 		post( "/ajax/attributes")
         	.to( "AttributeAjaxController.save" ).end();
+
+		get( "/ajax/attributes")
+        	.to( "AttributeAjaxController.list" ).end();
 
 		get("/attributes")
 			.to("AttributeController.list").end();
@@ -279,8 +276,7 @@ component{
 		/*
 			lookup
 		*/
-		get(
-			"/(.*)/datajs" //[TODO] "JSDATA" non funziona
+		get( "/(.*)/datajs" //[TODO] "JSDATA" non funziona
 		).to('LookupController.datajs').end();
 
 			

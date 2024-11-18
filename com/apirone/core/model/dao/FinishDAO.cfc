@@ -77,7 +77,7 @@
 	<cffunction name="insert" returntype="String" output="false">
 		<cfargument name="finish" type="com.apirone.core.model.bean.Finish" required="true">
 
-		<cfset var categories = getCategoriesAsArray( finish.getCategories() )>
+		<cfset var categories = super.getCategoriesAsArray( finish.getCategories() )>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO finishes (
@@ -98,7 +98,7 @@
 	<cffunction name="update" returntype="String" output="false">
 		<cfargument name="finish" type="com.apirone.core.model.bean.Finish" required="true">
 
-		<cfset var categories = getCategoriesAsArray( finish.getCategories() )>
+		<cfset var categories = super.getCategoriesAsArray( finish.getCategories() )>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
@@ -130,15 +130,4 @@
 
 	<!--- private methods --->
 
-	<cffunction access="private" name="getCategoriesAsArray" returntype="Array" output="false">
-		<cfargument name="categories" required="true">
-
-		<cfset var items = []>
-
-		<cfloop array="#arguments.categories#" item="local.thisItem">
-			<cfset items.add( thisItem.getId() )>
-		</cfloop>
-
-		<cfreturn items>
-	</cffunction>
 </cfcomponent>

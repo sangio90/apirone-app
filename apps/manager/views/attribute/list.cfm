@@ -65,13 +65,12 @@
 
                         </div>
                         
-                        <form name="line-grid-form" id="estimate-grid-form" method="post">
+                        <form name="attribute-grid-form" id="attribute-grid-form" method="post">
 
                             #grid( 
-                                id="line-grid",
+                                id="attribute-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'code', 'title':'Codice', width: '80px'},
                                     { 'field':'name', 'title':'Descrizione'},
                                     { 'field':'category.name', 'title':'Categorie'},
                                     { 'field':'', 'title':'', width: '55px'},
@@ -92,8 +91,8 @@
             </div>
         </div>
 
-        #view("attribute/detail-modal")#
-
     </div>
+
+    #view("attribute/detail-modal")#
 
 </cfoutput>

@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
     property name="langService" type="com.apirone.core.model.service.LangService";
     property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
+    property name="lineCategoryService" type="com.apirone.core.model.service.LineCategoryService";
 
     public com.apirone.core.model.bean.Attribute function get(
     		required String attributeId
@@ -158,6 +159,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             bean.setTexts( getTextService().list( attributeId = record.attribute_id ) )
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setValues( getAttributeValueService().list( attributeId = record.attribute_id ) );
+			
+			var categories = super.getCategoriesBeanFromIds( record.categories );
+
+			bean.setCategories( categories );
 
             return bean;
 

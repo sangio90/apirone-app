@@ -6,7 +6,7 @@
 
     "attribute.id": {
         "name": "attribute_id",
-        "type": "Varchar"
+        "type": "uuid"
     },
 
     "attributeValue.id": {

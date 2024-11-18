@@ -103,3 +103,8 @@
 /* 
 	// grid hover tr
 */
+
+
+.k-multiselect {
+	height: 40px !important;
+}

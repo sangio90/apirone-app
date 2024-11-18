@@ -1,8 +1,8 @@
 AP.attribute = AP.attribute || {};
 
 AP.attribute.fields = {
-    listRoot  : $("#attribute-list-modal"),
-    detailRoot: $("#attribute-detail-values-modal"),
+    listRoot  : $("#attribute-list-root"),
+    detailRoot: $("#attribute-detail-modal"),
     detailForm: $("#attribute-detail-form"),
     valueForm : $("#attribute-values-add-form"),
     valuesForm: $("#attribute-values-form"),
@@ -91,16 +91,17 @@ AP.attribute.detail = function() {
 
 		resetDetailForm: function() {
 
+			AP.attribute.detail.detailForm.resetForm();
 			viewModel.set("detailForm", defaults.detailForm );
 
 		},
 		
 		resetValueForm: function() {
 
+			AP.attribute.detail.valueForm.resetForm();
 			viewModel.set("valueForm", defaults.valueForm );
 
 		},
-		
 		
 		isValuesGridVisible: function() {
 
@@ -111,16 +112,6 @@ AP.attribute.detail = function() {
 			}
 			
 			return false;
-
-		},
-
-		isIdDisabled: function( event ) {
-
-			var action = viewModel.get( "detailForm.action" );
-
-			console.log("isIdDisabled:action", action);
-
-			return  action == "update" ? true : false;
 
 		},
 
@@ -155,6 +146,15 @@ AP.attribute.detail = function() {
 
 		},
 
+		new: function( event ) {
+
+			//viewModel.set( "detailForm.data", event.data );
+
+			//viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
+			viewModel.set( "detailForm.title", "Carica attributo" );
+
+		},
+
 		save: function() {
 
 			var thisForm = AP.attribute.fields.detailForm;
@@ -168,7 +168,7 @@ AP.attribute.detail = function() {
 				NM.util.ajax({ 
 					method: "POST", 
 					url: "/manager/ajax/attributes",
-					data: JSON.stringify( viewModel.get( "detailForm" ) ),
+					data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
 					callback: {
 						done: function( xhr ) {
 							//status.html("<span class='green'>Attributo modificato</span> ");
@@ -334,7 +334,19 @@ AP.attribute.detail = function() {
 		})				
 	}
 
-    pub.open = function( { id, callback } ) {
+    pub.new = function( callback ) {
+
+		viewModel.set("detailForm.action", "create");
+		viewModel.set("detailForm.title", "Carica attributo");
+
+		NM.util.openModal( $("#attribute-detail-modal") );
+		
+		return;
+
+	};
+
+
+    pub.edit = function( { id, callback } ) {
 
 		viewModel.set("detailForm.action", "create");
 
@@ -349,14 +361,14 @@ AP.attribute.detail = function() {
 					id: id, 
 					callback: {
 						onLoad: function() {
-							NM.util.openModal( $("#attribute-detail-values-modal") );
+							NM.util.openModal( $("#attribute-detail-modal") );
 						}
 					}
 				} 
 			)
 
 		} else {
-			NM.util.openModal( $("#attribute-detail-values-modal") );
+			NM.util.openModal( $("#attribute-detail-modal") );
 			return;
 		}
 
@@ -446,12 +458,26 @@ AP.attribute.detail = function() {
 
 AP.attribute.list = function() {
 
+	var detailSvc = AP.attribute.detail;
+
 	var pub = {}
 
-	var defaults = {
+	var dataSources = {
+		rows: NM.kendo.dataSource( { url: "/manager/ajax/attributes" } )
 	}
 
 	var viewModel = kendo.observable({
+
+		rows: dataSources.rows,
+
+		new: function() {
+
+
+			detailSvc.new();
+
+			return false;
+
+		},		
 
 		search: function() {
 

@@ -79,6 +79,18 @@
 
 	</cffunction>
 
+	<cffunction access="private" name="getCategoriesAsArray" returntype="Array">
+		<cfargument name="categories" required="true">
+
+		<cfset var items = []>
+
+		<cfloop array="#arguments.categories#" item="local.thisItem">
+			<cfset items.add( local.thisItem.getId() )>
+		</cfloop>
+
+		<cfreturn items>
+	</cffunction>	
+
 
 	<cffunction name="sanitizeSQL" returntype="String">
 

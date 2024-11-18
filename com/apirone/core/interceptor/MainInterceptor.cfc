@@ -67,9 +67,6 @@ component extends="coldbox.system.Interceptor"{
             TODO: remove all "session.user"
         */
 
-        url.cicio
-        form.pluto
-
         prc.page = {};  //current js config write in current html page 
         prc.jsScripts = []; //current js file for current html page 
 

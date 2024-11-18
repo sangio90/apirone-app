@@ -95,19 +95,38 @@
     
 
 
-    Struct function getDBField(required String field) {
+    private Struct function getCategoriesBeanFromIds( required String categories ) { //[2,3,4,5]
+
+        var result = [];
+        var categories = DeserializeJSON( arguments.categories );
+
+        if ( !IsNull( categories ) AND Len( categories ) ) { 
+            
+            var listCategories = [];
+
+            for ( var thisCategory in categories ) {
+
+                var beanCategory = this.service("LineCategory").get( thisCategory );
+
+                if( !IsNull( beanCategory ) ) {
+                    
+                    result.add( beanCategory );
+                
+                }
+
+            }
+
+        }
+
+        return result;
+
+    }
+    
+    private Struct function getDBField(required String field) {
         var DBUtil = new com.apirone.core.util.DBUtil();
         
         return DBUtil.getDBField( arguments.field );
     
     }
-    
-    /*
-    public String function getDBField( required String field ) {
-
-        return getDBUtil().getDBField( arguments.field );
-
-    }
-        */
     
 }
