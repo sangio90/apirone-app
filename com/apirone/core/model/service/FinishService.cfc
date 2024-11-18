@@ -138,16 +138,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( finishId = record.finish_id ) );
 
-			var categories = deserializeJSON( record.categories );
+			var categories = DeserializeJSON( record.categories );
 
-			if ( !isNull( categories ) AND len( categories ) ) {
-				var beanCategories = [];
+			if ( !IsNull( categories ) AND Len( categories ) ) { 
+				
+				var listCategories = [];
 
 				for ( var thisCategory in categories ) {
-					beanCategories.add( getLineCategoryService().get( thisCategory ) )
+
+					var beanCategory = getLineCategoryService().get( thisCategory );
+
+					if( !IsNull( beanCategory ) ) {
+						
+						listCategories.add( beanCategory );
+					
+					}
+
 				}
 
-				bean.setCategories( beanCategories );
+				bean.setCategories( listCategories );
 			}
 
 			return bean;

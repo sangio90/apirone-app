@@ -61,11 +61,11 @@
 			</cfif>
 
 			<cfif !isNull( arguments.attributeId ) >
-				AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
+				AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
 			</cfif>
 
 			<cfif !isNull( arguments.attributeValueId ) >
-				AND attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
+				AND attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">::uuid
 			</cfif>
 
 			<cfif !isNull( arguments.lineCategoryId ) >

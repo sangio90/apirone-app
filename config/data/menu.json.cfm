@@ -82,6 +82,12 @@
                 roles: "ADM"
             },
             {
+                href: "/manager/attributes",
+                icon: "fas fa-external-link-square-alt",
+                title: "Attributi e valori",
+                roles: "ADM"
+            },
+            {
                 href: "/manager/production-times",
                 icon: "fas fa-clock",
                 title: "Tempi di produzioni",

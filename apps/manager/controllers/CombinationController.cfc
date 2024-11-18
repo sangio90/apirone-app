@@ -12,7 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.sizes = super.fire("size.list", { lineId = lineId } );
 
         prc.statusList = super.fire( "status.list", ["line"] );
-        prc.finishes = super.fire( "attributeValue.list", { attributeId = "FIN0001" } );
+        prc.finishes = super.fire( "finish.list" );
 
         combinations = super.fire( "combination.list", { lineId = lineId } );
 
@@ -26,6 +26,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.page["combinationId"] = comb.getId();
         prc.page["combinations"] = combinations;
         prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
+        prc.page["categories"] = super.getCategoriesForJSON();
 
         event.setView( "combination/detail" );
 

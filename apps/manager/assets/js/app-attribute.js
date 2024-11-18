@@ -21,19 +21,7 @@ AP.attribute.detail = function() {
 
 	var pub = {}
 
-	var emptyAttributeValue = {
-		id: "",
-		mainText: {
-			id: "",
-			name: ""
-		}
-	}
-
-	var dataSource = NM.kendo.dataSource();
-
-	var viewModel = kendo.observable({
-
-		statusList: AP.page.attributeStatusList,
+	var defaults = {
 
 		detailForm: {
 			data: {
@@ -42,6 +30,7 @@ AP.attribute.detail = function() {
 				},
 				id: "",
 				orderBy: 0,
+				selectedCategories: [],
 				mainText: {
 					id: "",
 					name: "",
@@ -50,8 +39,8 @@ AP.attribute.detail = function() {
 					}
 				}
 			},
-			action: "create",
 			title: "Carica attributo",
+			action: "create"
 		},
 
 		valueForm: {
@@ -72,11 +61,35 @@ AP.attribute.detail = function() {
 			title: "Carica valore",
 			labelButton: "Carica"
 		},
+	
+	}
+	//var dataSource = NM.kendo.dataSource();
+
+	var viewModel = kendo.observable({
+
+		detailForm: defaults.detailForm,
+		valueForm: defaults.valueForm,
+
+		categories: AP.page.categories,		
+		statusList: AP.page.attributeStatusList,
 
 		callback: {
 			onSave: undefined,
 			onLoad: undefined
 		},
+
+		resetDetailForm: function() {
+
+			viewModel.set("detailForm", defaults.detailForm );
+
+		},
+		
+		resetValueForm: function() {
+
+			viewModel.set("valueForm", defaults.valueForm );
+
+		},
+		
 		
 		isValuesGridVisible: function() {
 
@@ -114,6 +127,21 @@ AP.attribute.detail = function() {
 			viewModel.set( "valueForm.title", title );
 			viewModel.set( "valueForm.labelButton", labelButton );
 
+		},	
+	
+		edit: function( event ) {
+
+			var selectedCategories = [];
+
+			for (var category of event.data.categories)  {
+				selectedCategories.push(category.id);
+			}
+
+			viewModel.set( "detailForm.data", event.data );
+
+			viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
+			viewModel.set( "detailForm.title", "Modifica attributo < " + event.data.id + " >" );
+
 		},
 
 		save: function() {
@@ -138,6 +166,10 @@ AP.attribute.detail = function() {
 							if( viewModel.get("callback.onSave") ) {
 								viewModel.get("callback.onSave")()
 							}
+
+							setTimeout(	function() {
+								viewModel.resetValueForm()
+							}, 1000 )
 
 						}
 					}
@@ -289,8 +321,6 @@ AP.attribute.detail = function() {
 				}
 			}
 		})				
-
-
 	}
 
     pub.open = function( { id, callback } ) {
@@ -398,4 +428,3 @@ AP.attribute.detail = function() {
 	return pub;
 
 }();
-

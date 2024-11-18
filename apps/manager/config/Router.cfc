@@ -19,57 +19,38 @@ component{
     	get( "/dashboard" )
         	.to( "MainController.dashboard" ).end();
 
-		get("/countries/list"
-		).to('CountryController.list').end();
+		get("/countries/list")
+			.to('CountryController.list').end();
 
-
-		/*
-			productionTime
-		*/
-		route( "/ajax/production-times" )
-			.withAction( {
-				GET = "list",
-				POST = "create",
-				PUT = "modify"
-			} )
-			.toHandler( "ProductionTimeAjaxController" );
-
-		get(
-			"/production-times"
-		).to('ProductionTimeController.list').end();
+		get("/production-times")
+			.to('ProductionTimeController.list').end();
 	
-		get(
-			"/production-times/:id"
-		).to('ProductionTimeController.list').end();
+		get( "/production-times/:id")
+			.to('ProductionTimeController.list').end();
 
 
 		/*
 			finishes
 		*/
 
-		get(
-			"/ajax/finishes/code-exists"
-		).to("FinishAjaxController.codeExists").end();
+		get( "/ajax/finishes/code-exists")
+			.to("FinishAjaxController.codeExists").end();
 		
-		get(
-			"/ajax/finishes"
-		).to("FinishAjaxController.list").end();
+		get( "/ajax/finishes")
+			.to("FinishAjaxController.list").end();
 		
-		post(
-			"/ajax/finishes"
-		).to("FinishAjaxController.save").end();
+		post("/ajax/finishes")
+			.to("FinishAjaxController.save").end();
 		
-		get(
-			"/finishes"
-		).to("FinishController.list").end();
+		get( "/finishes" )
+			.to("FinishController.list").end();
 		
 		/*
 			components
 		*/
 
-		get(
-			"/ajax/components"
-		).to("ComponentAjaxController.list").end();
+		get( "/ajax/components")
+			.to("ComponentAjaxController.list").end();
 		
 		/*
 			auth // login
@@ -158,6 +139,10 @@ component{
 
 		post( "/ajax/attributes")
         	.to( "AttributeAjaxController.save" ).end();
+
+		get("/attributes")
+			.to("AttributeController.list").end();
+	
 
 
 		/*

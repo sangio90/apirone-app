@@ -2,55 +2,178 @@
 
     <div id="attribute-detail-modal" class="modal fade">
         
-        <section class="modal-dialog modal-lg">
+        <section class="modal-dialog modal-xl">
             <div class="modal-content">
 
-                <!----
+                <header class="card-header">
+                    <h2 class="card-title" data-bind="text:detailForm.title"></h2>
+                </header>                
 
-                <form id="attribute-detail-form" method="POST" name="attribute-detail-form">
-                
-                    <header class="card-header">
-                        <h2 class="card-title" data-bind="text:detailForm.title"></h2>
-                    </header>
-                    
-                    <div class="card-body">
+                <nav>
 
-                        <div class="mb-3 row">
-                            <label for="attrId" class="col-sm-2 col-form-label text-end">ID</label>
-                            <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" id="attrId" name="attrId"
-                                    maxlength="10"
-                                    data-bind="value: detailForm.id"
-                                    onkeyup="this.value = this.value.toUpperCase();">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item active">
+                            <a class="nav-link active" id="attribute-nav-detail-but" data-bs-toggle="tab" 
+                                href="##attribute-nav-detail-tab" role="tab" aria-controls="tab1" aria-selected="true">
+                                Dettaglio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="attribute-nav-values-but" data-bs-toggle="tab" 
+                                href="##attribute-nav-values-tab" role="tab" aria-controls="tab2" aria-selected="true">
+                                Valori
+                            </a>
+                        </li>
+                    </ul>
+
+                </nav>
+
+                <div class="tab-content" id="nav-tabContent">
+
+                    <!--- panel 1 ---->
+                    <div class="tab-pane fade show active" id="attribute-nav-detail-tab" role="tabpanel" aria-labelledby="attribute-nav-detail-but">                
+
+                        <form id="attribute-detail-form" method="POST" name="attribute-detail-form">
+                        
+                            <div class="card-body">
+
+                                <div class="mb-3 row">
+                                    <label for="attr" class="col-sm-2 col-form-label text-end">Descrizione (it)</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" required class="form-control col-sm-4" id="attr" name="attr"
+                                            data-bind="value: detailForm.data.mainText.name"
+                                        >
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 row">
+                                    <label for="statusId" class="col-sm-2 col-form-label text-end">Disponili per</label>
+                                    <div class="col-sm-10">
+                                        <select id="categories" 
+                                            data-placeholder="Seleziona le categorie"
+                                            data-role="multiselect" 
+                                            data-bind="source: categories, value: detailForm.data.selectedCategories" 
+                                            data-value-field="id"
+                                            data-text-field="name"
+                                            >
+                                        </select>
+    
+                                    </div>
+                                </div>
+
+
+                                <div class="mb-3 row">
+                                    <label for="statusId" class="col-sm-2 col-form-label text-end">Stato</label>
+                                    <div class="col-sm-10">
+                                        <select type="text" class="form-control" name="statusId"
+                                            required
+                                            data-bind="source: statusList, value: detailForm.data.status.id"
+                                            data-value-field="id"
+                                            data-text-field="name">
+                                        </select>
+                                    </div>
+                                </div>
+
                             </div>
-                        </div>
 
-                        <div data-bind="source: detailForm.texts" data-template="attribute-lang-row-tmpl">
-                        </div>
-                    
+                            <footer class="card-footer">
+                                <div class="row">
+                                    <div class="col-md-12 float-end">
+                                        <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
+                                            <i class="fas fa-save"></i> Salva dettaglio
+                                        </button>
+                                        <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
+                                        <div class="status errors-counter mt-1 float-end me-3"></div>
+                                    </div>
+                                </div>
+                            </footer>
+
+                        </form>
+
                     </div>
 
-                    <footer class="card-footer">
-                        <div class="row">
-                            <div class="col-md-12 float-end">
-                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
-                                    <i class="fas fa-save"></i> Salva
-                                </button>
-                                <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
-                                <div class="status errors-counter mt-1 float-end me-3"></div>
+                    <!--- panel 2 ---->
+                    <div class="tab-pane fade" id="attribute-nav-values-tab" role="tabpanel" aria-labelledby="attribute-nav-values-but">
+
+                        <div class="card-body">
+
+                            <div data-bind="invisible: isValuesGridVisible" class="mb-3 alert alert-warning">
+                                <span class="">Nessun valore ancora caricato</span>
                             </div>
+
+                            <form id="attribute-values-form" method="POST" name="attribute-values-form"  class="mb-3" data-bind="visible: isValuesGridVisible">
+
+                                <div class="status text-end mb-2"></div>
+
+                                #grid( 
+                                    id="attribute-values-grid",
+                                    class="no-pager",
+                                    columns="[
+                                        { 'field':'id', 'title':'ID', width: '100px' },
+                                        { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
+                                        { 'field':'', 'title':'', width: '55px'},
+                                        { 
+                                            'field':'', 
+                                            'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
+                                            'width':'40px',
+                                            'headerAttributes': { 'class': 'text-center' }
+                                        }
+                                    ]",
+                                    source="detailForm.data.values",
+                                    rowTemplate="attribute/attribute-values-list-row-tmpl"
+                                )#
+
+                            </form>
+
+                            <div class="divider mb-3" data-bind="text: valueForm.title"></div>
+
+                            <form id="attribute-values-add-form" method="POST" name="attribute-values-add-form">
+
+                                <div class="row mb-3">
+                                    <label for="newValueName" class="col-sm-2 text-end mt-2">Descrizione (it)</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="newValueName" name="newValueName" 
+                                            required
+                                            data-bind="value: valueForm.data.mainText.name">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <label for="newValueStatus" class="col-sm-2 text-end mt-2">Stato</label>
+                                    <div class="col-sm-10">
+                                        <select type="text" class="form-control" name="newValueStatus" id="newValueStatus"
+                                            required
+                                            data-bind="value: valueForm.data.status.id, source: statusList"
+                                            data-value-field="id"
+                                            data-text-field="name">
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                            </form>
+                            
                         </div>
-                    </footer>
 
-                </form>
+                        <footer class="card-footer">
+                            <div class="row">
+                                <div class="col-md-12 float-end">
+                                    <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:saveValue">
+                                        <i class="fas fa-save"></i> <span data-bind="text: valueForm.labelButton"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
+                                    <div class="status errors-counter mt-1 float-end me-3" id="attribute-values-add-form-status"></div>
+                                </div>
+                            </div>
+                        </footer>
 
-                ---->
-            
+                    </div>
+                </div>
+
             </div>
         </selection>
     
     </div>
 
-    #template( view="jstemplate/attribute/lang-row" )#
+    #template( view="jstemplate/attribute/attribute-values-list-row-tmpl" )#
 
 </cfoutput>

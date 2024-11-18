@@ -32,7 +32,7 @@
                 attribute_values
 			WHERE 1=1
 				<cfif !IsNull( arguments.attributeId )>
-					AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
+					AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
 				</cfif>
             ORDER BY 
                 orderby

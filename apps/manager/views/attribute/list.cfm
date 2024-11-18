@@ -1,9 +1,15 @@
-<cfoutput>
+﻿<cfoutput>
 
-    <div id="line-list-root">
+    <div id="attribute-list-root">
 
-        <cf_pageTitle prc="#prc#">
+        #pageTitle()#
 
+        <div class="row">
+            <div class="col-lg-12 text-end mb-3">
+                <button class="btn btn-primary btn-sm" data-bind="click:new">Carica</button>
+            </div>
+        </div>
+    
         <div class="row">
             <div class="col-lg-12">
 
@@ -13,27 +19,38 @@
 
                         <div class="row">
 
-                            <div class="col-sm-12">
+                            <div class="col-sm-9">
 
-                                <form id="line-grid-search-form" 
+                                <form id="attribute-grid-search-form" 
                                     class="row mb-3" 
                                     data-bind:'events: { submit: search }'
                                 >
 
-                                    <div class="col-4">
+                                    <div class="col-3">
                                         <input 
                                             name="str"
                                             placeholder="Cerca"
                                             class="form-control" type="text">
                                     </div>
 
-                                    <div class="col-5">
+                                    <div class="col-4">
                                         <select 
                                             class="form-control" 
                                             name="categoryId">
                                             <option value="">-- tutte le categorie</option>
                                             <cfloop array="#prc.lineCategories#" item="thisLine">
                                                 <option value="#thisLine.getId()#">#thisLine.getName()#</option>
+                                            </cfloop>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="col-3">
+                                        <select 
+                                            class="form-control" 
+                                            name="statusId">
+                                            <option value="">-- status</option>
+                                            <cfloop array="#prc.statuses#" item="thisStatus">
+                                                <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
                                             </cfloop>
                                         </select>
                                     </div>
@@ -54,12 +71,10 @@
                                 id="line-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'code', 'title':'Codice', width: '120px' },
-                                    { 'field':'name', 'title':'Descrizione' },
-                                    { 'field':'category.name', 'title':'Categoria'},
-                                    { 'field':'thickness.name', 'title':'Spessore', width: '110px'},
-                                    { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
-                                    { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
+                                    { 'field':'code', 'title':'Codice', width: '80px'},
+                                    { 'field':'name', 'title':'Descrizione'},
+                                    { 'field':'category.name', 'title':'Categorie'},
+                                    { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
@@ -67,7 +82,7 @@
                                         'headerAttributes': { 'class': 'text-center' }
                                     }
                                 ]",
-                                rowTemplate="line/line-grid-row-tmpl"
+                                rowTemplate="attribute/attribute-grid-row-tmpl"
                             )#
 
                         </form>
@@ -76,6 +91,9 @@
                 </section>
             </div>
         </div>
+
+        #view("attribute/detail-modal")#
+
     </div>
 
 </cfoutput>

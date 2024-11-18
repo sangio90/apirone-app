@@ -7,6 +7,25 @@
         return "";
     }
 
+    function pageTitle(){ 
+
+        ```
+        <cfsavecontent variable="html">
+            <cfoutput>
+                <div class="row mb-3 page-title">
+                    <div class="col-lg-8">
+                        <h2>#prc.title#</h2>
+                        <cfif Len(prc.subtitle)><h4>#prc.subtitle#</h4></cfif>
+                    </div>
+                </div>
+            </cfoutput>
+        </cfsavecontent>
+        ```
+        
+        return html;
+    
+    }
+
     function includeJSFiles(){ 
 
         for ( var thisScript in prc.jsScripts ) {

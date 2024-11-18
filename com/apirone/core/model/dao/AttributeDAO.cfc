@@ -5,11 +5,11 @@
 		<cfargument name="attributeId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT attribute_id::varchar, *
 			FROM
 				attributes
 			WHERE
-				attribute_id = <cfqueryparam cfsqltype="varchar" value="#arguments.attributeId#">
+				attribute_id = <cfqueryparam cfsqltype="varchar" value="#arguments.attributeId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -21,7 +21,7 @@
 		<cfargument name="str" type="String">
 
         <cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT attribute_id::varchar
 			FROM
 				attributes
 					<cfif !IsNull( arguments.str )>

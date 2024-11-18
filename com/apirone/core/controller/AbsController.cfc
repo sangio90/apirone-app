@@ -193,6 +193,24 @@
 
     }
 
+    public Any function getCategoriesForJSON(){
+
+        var data = [];
+
+        var categories = this.service("LineCategory").list();
+
+        for( var thisCategory in categories ) {
+            
+            var category = getDataMapper().convert( thisCategory, "LineCategory", true );
+            
+            data.add( category );
+        
+        }
+
+        return data;
+
+    }
+
     // only message
     public String function message( required String id, required String lang="it" ){ //id is a dotted path
 
