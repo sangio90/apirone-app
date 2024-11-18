@@ -103,7 +103,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.Attribute attribute
 		){
 
-			var id = attribute.getId();
+			var id = arguments.attribute.getId();
 		
         	getDao().update( arguments.attribute );
 

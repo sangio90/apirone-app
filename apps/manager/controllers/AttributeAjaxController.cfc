@@ -96,18 +96,15 @@ component extends="com.apirone.core.controller.AbsController" {
         var categories = [];
 
         for( var thisCategory in json.selectedCategories ) {
+
             var category = super.bean("lineCategory");
             
-            categories.add( category );
             category.setId( thisCategory.id )
+            categories.add( category );
 
         }
 
-        //var mainText = json.data.mainText;
-
         text.setMemento( json.mainText )
-        //text.setName( mainText.name )
-        //text.setLang( lang.setId( mainText.lang.id ) );
 
         texts.add( text );
     

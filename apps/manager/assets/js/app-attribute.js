@@ -74,7 +74,21 @@ AP.attribute.detail = function() {
 		},
 	
 	}
-	//var dataSource = NM.kendo.dataSource();
+
+	invokeCallback = function( func ) {
+
+		var cb = viewModel.get("callback");
+
+		console.log("cb", cb)
+		console.log("typeof", typeof cb[func] == "function" )
+
+		if( typeof cb[func] == "function" ) {
+
+			cb[func]()
+
+		}
+
+	}
 
 	var viewModel = kendo.observable({
 
@@ -92,15 +106,20 @@ AP.attribute.detail = function() {
 
 		resetDetailForm: function() {
 
-			AP.attribute.detail.detailForm.resetForm();
+			var thisForm = AP.attribute.fields.detailForm;
+
 			viewModel.set("detailForm", defaults.detailForm );
+
+			thisForm.find(".status").html("");
+			thisForm.data("validator").resetForm();
 
 		},
 		
 		resetValueForm: function() {
-
-			//AP.attribute.detail.valueForm.resetForm();
-			viewModel.set("valueForm", defaults.valueForm );
+			
+			//viewModel.set("valueForm", defaults.valueForm );
+			
+			//AP.attribute.fields.valueForm.resetForm();
 
 		},
 		
@@ -164,7 +183,6 @@ AP.attribute.detail = function() {
 			var status = thisForm.find(".status");
 
 			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
-			var attrId = viewModel.get( "detailForm.data.id" ) 
 
 			if( thisForm.valid() ) {
 
@@ -174,12 +192,9 @@ AP.attribute.detail = function() {
 					data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
 					callback: {
 						done: function( xhr ) {
-							//status.html("<span class='green'>Attributo modificato</span> ");
-							loadAttribute( { id: attrId } );
+							status.html("<span class='green'>Attributo modificato</span>");
 
-							if( viewModel.get("callback.onSave") ) {
-								viewModel.get("callback.onSave")()
-							}
+							invokeCallback( "onUpdate" );
 
 							setTimeout(	function() {
 								viewModel.resetValueForm()
@@ -193,7 +208,7 @@ AP.attribute.detail = function() {
 
 			return false;
 
-		},		
+		},
 
 		saveValue: function() {
 
@@ -231,8 +246,12 @@ AP.attribute.detail = function() {
 
 	loadAttribute = function( { id, callback } ) {
 
-		console.log("loadAttribute:id", id)
-		console.log("loadAttribute:callback", callback)
+		console.log("callback", callback)
+		
+		viewModel.set("callback", callback )
+		
+		var aa = viewModel.get("callback" )
+		console.log("aa", aa);
 
 		NM.util.ajax({ 
 			method: "GET", 
@@ -252,7 +271,7 @@ AP.attribute.detail = function() {
 					var selectedCategories = [];
 
 					for (var category of xhr.data.categories)  {
-						selectedCategories.push( category.id );
+						selectedCategories.push( category );
 					}
 		
 					viewModel.set( "detailForm.data", xhr.data );
@@ -260,13 +279,16 @@ AP.attribute.detail = function() {
 					viewModel.set( "detailForm.data.values", valuesDataSource );
 					viewModel.set( "detailForm.title", "Modifica attributo <" + xhr.data.name + " >"  );
 					viewModel.set( "detailForm.labelButton", "Aggiorna" );
+
+					var cb = viewModel.get("callback");
+
+					console.log( "cb", cb );
 					
-					if ( callback?.hasOwnProperty("onLoad") ) {
-						callback.onLoad()
+					if ( cb.hasOwnProperty("onLoad") ) {
+						cb.onLoad()
 					}
 
 					NM.util.openModal( $("#attribute-detail-modal") );
-
 
 					var table = $("#attribute-values-grid .k-grid-container .k-table");
 
@@ -338,8 +360,11 @@ AP.attribute.detail = function() {
 
     pub.new = function( callback ) {
 
-		viewModel.set("detailForm.action", "create");
-		viewModel.set("detailForm.title", "Carica attributo");
+		//viewModel.set("detailForm.action", "create");
+		//viewModel.set("detailForm.title", "Carica attributo");
+
+		//AP.attribute.fields.detailForm.resetForm();
+		viewModel.resetDetailForm();
 
 		NM.util.openModal( $("#attribute-detail-modal") );
 		
@@ -352,9 +377,6 @@ AP.attribute.detail = function() {
 
 		loadAttribute( { id: id, callback: callback } );
 
-    };
-
-    pub.save = function() {
     };
 
 	pub.init = function() {
@@ -445,13 +467,14 @@ AP.attribute.list = function() {
 		edit: function( event ) {
 
 			detailApp.edit( { 
-				id: event.data.id ,
+				id: event.data.id,
 				callback: {
 					onLoad: function() {
 						console.log("CARICATO!")
 					},
 					onUpdate: function() {
 						viewModel.rows.read()
+						console.log("AGGIORNATO")
 					}
 				}
 			} );
@@ -461,7 +484,6 @@ AP.attribute.list = function() {
 		},		
 
 		search: function() {
-
 
 			return false;
 

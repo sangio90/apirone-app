@@ -142,7 +142,14 @@
 			SET
 				text	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getName()#">,
 				lang_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
-				#field.name#	= <cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
+				#field.name# = 
+
+					<cfif field.type == "uuid">
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getEntity().getValue()#">::uuid
+					<cfelse>
+						<cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
+					</cfif>
+				
 			WHERE 
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>

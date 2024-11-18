@@ -65,13 +65,16 @@
 
 		<cfargument name="attribute" type="com.apirone.core.model.bean.Attribute" required="true">
 
+		<cfset var categories = super.getCategoriesAsArray( attribute.getCategories() )>
+
         <cfquery name="local.q" datasource="apirone">
 			UPDATE 
 				attributes 
 			SET 
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">,
+				categories = '#SerializeJSON(categories)#'
 			WHERE
-				attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getId()#">
+				attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getId()#">::uuid
 		</cfquery>
 
 		<cfreturn arguments.attribute.getId()>
