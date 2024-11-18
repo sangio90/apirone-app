@@ -117,30 +117,37 @@ component{
 
 
 		/*
+			attribute values
+		*/
+		post( "/ajax/attributes/values")
+        	.to( "AttributeValueAjaxController.save" ).end();
+
+		get( "/ajax/attributes/values/code-exists")
+			.to("AttributeValueAjaxController.codeExists").end();
+		
+		post( "/ajax/attributes/:id/values/order")
+        	.to( "AttributeAjaxController.order" ).end();
+		
+		
+		/*
 			attributes
 		*/
 		get( "/ajax/attributes/new" )
         	.to( "AttributeAjaxController.new" ).end();
 
-		post( "/ajax/attributes/values")
-        	.to( "AttributeAjaxController.saveValue" ).end();
 
-		post( "/ajax/attributes/:id/values/order")
-        	.to( "AttributeAjaxController.order" ).end();
-
-		get( "/ajax/attributes/:id")
+		get( "/ajax/attributes/:id" )
         	.to( "AttributeAjaxController.get" ).end();
 
-		post( "/ajax/attributes")
+		post( "/ajax/attributes" )
         	.to( "AttributeAjaxController.save" ).end();
 
-		get( "/ajax/attributes")
+		get( "/ajax/attributes" )
         	.to( "AttributeAjaxController.list" ).end();
 
 		get("/attributes")
 			.to("AttributeController.list").end();
 	
-
 
 		/*
 			reports
@@ -225,14 +232,6 @@ component{
 
 		get( "/lines" )
         	.toHandler( "LineController.list" );
-
-		/*
-		get( "/ajax/lines/:lineId/size/:sizeId/finish/:finishId/conf" )
-        	.toHandler( "LineAjaxController.configuration" );
-		
-		post( "/ajax/lines/:id/add" )
-        	.toHandler( "LineAjaxController.addValue" );
-		*/
 
 		delete( "/ajax/lines/:id/combinations")
 			.to( "LineAjaxController.deleteCombination" ).end();

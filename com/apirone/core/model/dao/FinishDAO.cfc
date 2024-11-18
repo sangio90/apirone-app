@@ -1,4 +1,5 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
+	
 	<cffunction name="read" output="false">
 		<cfargument name="finishId" type="String" required="true">
 
@@ -127,7 +128,5 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
-
-	<!--- private methods --->
 
 </cfcomponent>

@@ -411,6 +411,18 @@ AP.attribute.detail = function() {
 				newValueName: {
 					required: true,
 				},
+				code: {
+					checkCode: true,
+					required: true,
+					remote: {
+						url: "/manager/ajax/attributes/values/code-exists",
+						data: { id: function () { return  viewModel.get("valueForm.data.id"); } },
+						dataFilter: function (xhr) {
+							var json = JSON.parse(xhr);
+							return json.data == false;
+						}
+					}
+				},
 				newValueStatus: {
 					required: true
 				}
@@ -418,6 +430,11 @@ AP.attribute.detail = function() {
 			messages: {
 				newValueName: {
 					required: "Valore richiesto",
+				},
+				code: {
+					required: "Codice richiesto",
+					checkCode: "Solo numeri, lettere, trattino o trattino basso",
+					remote: "Il codice esiste"
 				},
 				newValueStatus: {
 					required: "Stato richiesto",
@@ -431,6 +448,7 @@ AP.attribute.detail = function() {
 	return pub;
 
 }();
+
 
 
 
@@ -498,3 +516,5 @@ AP.attribute.list = function() {
 	return pub;
 
 }();
+
+
