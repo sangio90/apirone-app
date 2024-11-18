@@ -85,7 +85,8 @@ AP.attribute.detail = function() {
 		statusList: AP.page.attributeStatusList,
 
 		callback: {
-			onSave: undefined,
+			onCreate: undefined,
+			onUpdate: undefined,
 			onLoad: undefined
 		},
 
@@ -98,7 +99,7 @@ AP.attribute.detail = function() {
 		
 		resetValueForm: function() {
 
-			AP.attribute.detail.valueForm.resetForm();
+			//AP.attribute.detail.valueForm.resetForm();
 			viewModel.set("valueForm", defaults.valueForm );
 
 		},
@@ -133,16 +134,18 @@ AP.attribute.detail = function() {
 	
 		edit: function( event ) {
 
+			/*
 			var selectedCategories = [];
 
 			for (var category of event.data.categories)  {
-				selectedCategories.push(category.id);
+				selectedCategories.push( category.id );
 			}
 
 			viewModel.set( "detailForm.data", event.data );
 
 			viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
-			viewModel.set( "detailForm.title", "Modifica attributo < " + event.data.id + " >" );
+			viewModel.set( "detailForm.title", "Modifica attributo < " + event.data.name + " >" );
+			*/
 
 		},
 
@@ -228,26 +231,16 @@ AP.attribute.detail = function() {
 
 	loadAttribute = function( { id, callback } ) {
 
-		var action = "create";
-		var labelButton = "Carica";
-		var title = "Carica attributo";
-		var thisUrl = "/manager/ajax/attributes/new";
-
-		if ( id.length ) {
-			action = "update";
-			labelButton = "Aggiorna";
-			title = "Modifica attributo < " + id +" >"
-			thisUrl = "/manager/ajax/attributes/" + id;
-		}
-
-		console.log("id", id);
+		console.log("loadAttribute:id", id)
+		console.log("loadAttribute:callback", callback)
 
 		NM.util.ajax({ 
 			method: "GET", 
-			url: thisUrl,
-			cache: false,
+			url: "/manager/ajax/attributes/" + id,
 			callback: {
 				done: function( xhr ) {
+
+					console.log("xhr.data.values", xhr.data)
 
 					var valuesDataSource = new kendo.data.DataSource({
 						data: xhr.data.values,
@@ -256,15 +249,24 @@ AP.attribute.detail = function() {
 
 					delete xhr.data.values;
 
+					var selectedCategories = [];
+
+					for (var category of xhr.data.categories)  {
+						selectedCategories.push( category.id );
+					}
+		
 					viewModel.set( "detailForm.data", xhr.data );
+					viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
 					viewModel.set( "detailForm.data.values", valuesDataSource );
-					viewModel.set( "detailForm.action", action );
-					viewModel.set( "detailForm.title", title );
-					viewModel.set( "detailForm.labelButton", labelButton );
+					viewModel.set( "detailForm.title", "Modifica attributo <" + xhr.data.name + " >"  );
+					viewModel.set( "detailForm.labelButton", "Aggiorna" );
 					
 					if ( callback?.hasOwnProperty("onLoad") ) {
 						callback.onLoad()
 					}
+
+					NM.util.openModal( $("#attribute-detail-modal") );
+
 
 					var table = $("#attribute-values-grid .k-grid-container .k-table");
 
@@ -348,29 +350,7 @@ AP.attribute.detail = function() {
 
     pub.edit = function( { id, callback } ) {
 
-		viewModel.set("detailForm.action", "create");
-
-		if( id.length ) {
-			viewModel.set("detailForm.action", "update");
-
-			viewModel.set("callback.onSave", callback?.onSave);
-			viewModel.set("callback.onSave", callback?.onSave);
-	
-			loadAttribute( 
-				{
-					id: id, 
-					callback: {
-						onLoad: function() {
-							NM.util.openModal( $("#attribute-detail-modal") );
-						}
-					}
-				} 
-			)
-
-		} else {
-			NM.util.openModal( $("#attribute-detail-modal") );
-			return;
-		}
+		loadAttribute( { id: id, callback: callback } );
 
     };
 
@@ -391,27 +371,11 @@ AP.attribute.detail = function() {
 				$(element).valid();
 			},
 			rules: {
-				attrId: {
-					required: true,
-					checkCode: true,
-					remote: {
-						url: "/manager/ajax/attributes/exists",
-						dataFilter: function( xhr ) {
-							var json = JSON.parse( xhr );
-							return json.data == false;
-						}
-					}
-				},
 				attr: {
 					required: true
 				}
 			},
 			messages: {
-				attrId: {
-					required: "ID richiesto",
-					checkCode: "Solo numeri, lettere, trattino o trattino basso",
-					remote: "L'attributo esiste"
-				},
 				attr: {
 					required: "Descrizione principale richiesta",
 				},
@@ -458,7 +422,7 @@ AP.attribute.detail = function() {
 
 AP.attribute.list = function() {
 
-	var detailSvc = AP.attribute.detail;
+	var detailApp = AP.attribute.detail;
 
 	var pub = {}
 
@@ -472,8 +436,25 @@ AP.attribute.list = function() {
 
 		new: function() {
 
+			detailApp.new();
 
-			detailSvc.new();
+			return false;
+
+		},		
+
+		edit: function( event ) {
+
+			detailApp.edit( { 
+				id: event.data.id ,
+				callback: {
+					onLoad: function() {
+						console.log("CARICATO!")
+					},
+					onUpdate: function() {
+						viewModel.rows.read()
+					}
+				}
+			} );
 
 			return false;
 

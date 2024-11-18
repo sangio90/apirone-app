@@ -25,9 +25,11 @@
     </mapper>
 
     <mapper id="Attribute" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Attribute">
+        <map from="id" to="id" type="cf:String" />
         <map from="shortId" to="shortId" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="status" to="status" ref="Status" />
+        <map from="mainText" to="mainText" ref="Text" />
         <map from="values" to="values" ref="AttributeValue" type="Array" />
         <map from="categories" to="categories" ref="LineCategory" type="Array" />
     </mapper>

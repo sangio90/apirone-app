@@ -13,7 +13,7 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
-                <div data-bind="source: categories" data-template="finish-category-row-tmpl"></div>
+                <div data-bind="source: categories" data-template="category-row-tmpl"></div>
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
@@ -28,11 +28,8 @@
             </td>
         </tr>
     </script>
+
+    #template( view="jstemplate/category/category-row-tmpl" )#
+
 </cfoutput>
 
-<script type="text/template" id="finish-category-row-tmpl">
-    <div>
-        <span data-bind="text: name"></span>
-        <i class="grey">(<span data-bind="text: id"></span>)</i>
-    </div>
-</script>

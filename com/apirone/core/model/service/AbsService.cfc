@@ -95,7 +95,7 @@
     
 
 
-    private Struct function getCategoriesBeanFromIds( required String categories ) { //[2,3,4,5]
+    private Array function getCategoriesBeanFromIds( required String categories ) { //[2,3,4,5]
 
         var result = [];
         var categories = DeserializeJSON( arguments.categories );
@@ -129,4 +129,12 @@
     
     }
     
+    private Any function service( required String service ){
+
+        var bean = server[ "wireBox-apirone" ].getInstance("#service#Service");
+
+        return bean;
+
+    }
+   
 }

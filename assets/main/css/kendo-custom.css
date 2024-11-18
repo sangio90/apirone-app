@@ -105,6 +105,23 @@
 */
 
 
+/*
+	multiselect
+*/
+
 .k-multiselect {
 	height: 40px !important;
+}
+
+.k-chip {
+	height: 32px !important;
+}
+
+/*
+	// multiselect
+*/
+
+
+.k-list-item.k-selected.k-focus {
+	background-color: #2771e8 !important
 }

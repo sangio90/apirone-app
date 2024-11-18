@@ -50,13 +50,7 @@ component extends="com.apirone.core.controller.AbsController" {
         
         var rows = super.fire( "attribute.list" );
 
-
-        dump(DESerializeJSON(SerializeJSON( rows[1] )));
-        abort;
-
         for ( var row in rows ) {
-
-
 
             var obj = dm.convert( row, "Attribute", true );
             data.add( obj );
@@ -67,6 +61,21 @@ component extends="com.apirone.core.controller.AbsController" {
         result.setData( data );
 
         event.setValue("result", data );
+        
+    }
+
+    function get( event, rc, prc ){
+
+        var result = super.getResult();
+        
+        var row = super.fire( "attribute.get", [ rc.id ] );
+
+        var obj = getDataMapper().convert( row, "Attribute", true );
+
+        result.setTotal( 1 );
+        result.setData( 1 );
+
+        event.setValue("result", obj );
         
     }
 

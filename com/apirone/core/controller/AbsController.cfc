@@ -94,7 +94,7 @@
 
         return bean;
 
-    }      
+    }
 
     public Any function setMessage( message="", type="success", title="" ){
 
