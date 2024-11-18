@@ -131,6 +131,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             var bean = super.bean( "AttributeValue" );
 
             bean.setId( record.attribute_value_id );
+			bean.setCode( record.code );
 
 			bean.setCreatedAt( record.created_at );
 			bean.setOrderBy( record.orderby );

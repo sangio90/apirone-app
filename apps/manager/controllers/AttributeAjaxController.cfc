@@ -160,6 +160,9 @@ component extends="com.apirone.core.controller.AbsController" {
         attrValue.setAttributeId( json.attributeId );
         attrValue.setOrderBy( json.value.orderBy );
 
+        dump( DESerializeJSON (SerializeJSON( attrValue ) ) );
+        abort;
+
         if( !Len( json.value.id ) ) {
             
             messageId = "attributeValue.created";

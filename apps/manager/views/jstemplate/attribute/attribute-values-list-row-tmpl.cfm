@@ -6,9 +6,11 @@
             <td style="border-left: 4px solid ##=status.color.hex##">
                 <span data-bind="text: id"></span>
             </td>
+            <td>
+                <span data-bind="text: code"></span>
+            </td>
             <td class="sortable">
                 <span data-bind="text:mainText.name"></span>
-                -<span data-bind="text:orderBy"></span>-
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:editValue">

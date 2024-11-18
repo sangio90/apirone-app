@@ -51,12 +51,14 @@
 			INSERT INTO attribute_values (
 				status_id,
 				orderby,
-				attribute_id
+				attribute_id,
+				code
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getAttributeId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getAttributeId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getCode()#">
 			) RETURNING attribute_value_id
 		</cfquery>
 
@@ -73,7 +75,8 @@
 			UPDATE attribute_values 
 			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.value.getStatus().getId()#">,
-				orderby = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">
+				orderby = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">,
+				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.value.getCode()#">
 			WHERE
 				attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getId()#">
 		</cfquery>

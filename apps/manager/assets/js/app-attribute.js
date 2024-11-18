@@ -360,10 +360,6 @@ AP.attribute.detail = function() {
 
     pub.new = function( callback ) {
 
-		//viewModel.set("detailForm.action", "create");
-		//viewModel.set("detailForm.title", "Carica attributo");
-
-		//AP.attribute.fields.detailForm.resetForm();
 		viewModel.resetDetailForm();
 
 		NM.util.openModal( $("#attribute-detail-modal") );

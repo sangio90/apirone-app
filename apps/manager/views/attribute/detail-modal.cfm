@@ -109,7 +109,8 @@
                                     id="attribute-values-grid",
                                     class="no-pager",
                                     columns="[
-                                        { 'field':'id', 'title':'ID', width: '100px' },
+                                        { 'field':'id', 'title':'ID', width: '50px' },
+                                        { 'field':'code', 'title':'ID', width: '80px' },
                                         { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
                                         { 'field':'', 'title':'', width: '55px'},
                                         { 
@@ -135,6 +136,16 @@
                                         <input type="text" class="form-control" id="newValueName" name="newValueName" 
                                             required
                                             data-bind="value: valueForm.data.mainText.name">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <label for="code" class="col-sm-2 text-end mt-2">Codice</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="code" name="code"  maxlength="10"
+                                            required
+                                            data-bind="value: valueForm.data.code"
+                                            onkeyup="this.value = this.value.toUpperCase();">
                                     </div>
                                 </div>
                                 
@@ -173,7 +184,5 @@
         </selection>
     
     </div>
-
-    #template( view="jstemplate/attribute/attribute-values-list-row-tmpl" )#
 
 </cfoutput>
