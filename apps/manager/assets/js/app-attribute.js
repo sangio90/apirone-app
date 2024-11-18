@@ -1,21 +1,32 @@
 AP.attribute = AP.attribute || {};
 
 AP.attribute.fields = {
-    rootDetail: $("#attribute-detail-values-modal"),
+    listRoot  : $("#attribute-list-modal"),
+    detailRoot: $("#attribute-detail-values-modal"),
     detailForm: $("#attribute-detail-form"),
-    valueForm:  $("#attribute-values-add-form"),
+    valueForm : $("#attribute-values-add-form"),
     valuesForm: $("#attribute-values-form"),
 }
 
 $(document).ready(function(){
 
-	if ( AP.attribute.fields.rootDetail.length ) {
+	if ( AP.attribute.fields.detailRoot.length ) {
 
 		AP.attribute.detail.init();
 
 	}
 
+	if ( AP.attribute.fields.listRoot.length ) {
+
+		AP.attribute.list.init();
+
+	}
+
 })
+
+/*
+	detail
+*/
 
 AP.attribute.detail = function() {
 
@@ -349,8 +360,6 @@ AP.attribute.detail = function() {
 			return;
 		}
 
-
-
     };
 
     pub.save = function() {
@@ -360,7 +369,7 @@ AP.attribute.detail = function() {
 
 		console.log("AP.attribute.detail:init")
 
-		kendo.bind( AP.attribute.fields.rootDetail, viewModel );
+		kendo.bind( AP.attribute.fields.detailRoot, viewModel );
 
 		var valueForm = AP.attribute.fields.valueForm;
 		var detailForm = AP.attribute.fields.detailForm;
@@ -422,6 +431,42 @@ AP.attribute.detail = function() {
 			},
 		
 		} );
+
+	}	
+
+	return pub;
+
+}();
+
+
+
+/*
+	list
+*/
+
+AP.attribute.list = function() {
+
+	var pub = {}
+
+	var defaults = {
+	}
+
+	var viewModel = kendo.observable({
+
+		search: function() {
+
+
+			return false;
+
+		},		
+
+    });
+
+	pub.init = function() {
+
+		console.log("AP.attribute.list:init")
+
+		kendo.bind( AP.attribute.fields.listRoot, viewModel );
 
 	}	
 
