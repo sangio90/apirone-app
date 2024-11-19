@@ -130,6 +130,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return false;
 	}
 
+	public com.apirone.core.model.bean.Outcome function delete(
+		required Numeric attributeValueId
+	){
+		var outcome = super.bean( "Outcome" );
+
+		var obj = get( arguments.attributeValueId );
+
+		outcome.setData( { attributeValueId = arguments.attributeValueId } );
+
+		transaction {
+
+			try {
+				var result = getDao().delete( arguments.attributeValueId );
+				outcome.setData( { "deletedCount" = result } )
+
+				getCacheManager().remove( "attribute_#obj.getAttributeId()#" );
+				getCacheManager().remove( "attributeValue_#obj.getId()#" );
+			
+			} catch ( any error ) {
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteAttributeValue" );
+				outcome.setMessage( "Cannot delete value [#arguments.attributeValueId#]" );
+			}
+		
+		}
+
+		return outcome;
+	}	
+
 
     /*
     	private method

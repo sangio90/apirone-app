@@ -102,3 +102,13 @@ NM.util.checkAll = function( button ) {
 	});
 
 };
+
+NM.util.autoHideMessage = function( ele, message ) {
+
+	ele.html( message );
+
+	setTimeout(function() {
+		ele.html("")
+	}, 2000 )
+
+};

@@ -75,29 +75,22 @@ AP.attribute.detail = function() {
 	
 	}
 
-	var invokeCallback = function( func ) {
+	var fireCallback = function( func ) {
 
-		var cb = viewModel.get("callback");
+		var callbackList = viewModel.get("callback");
 
-		if( typeof cb[func] == "function" ) {
-			cb[func]()
+		var exists = callbackList?.hasOwnProperty( func )
+
+		if( exists ) {
+
+			var thisCallback = callbackList[ func ]
+
+			if( typeof thisCallback == "function" ) {
+				thisCallback()
+			}
 		}
 
 	}
-
-	/*
-	var resetForm = function( formName ) {
-
-		var thisForm = AP.attribute.fields[ formName ];
-
-		viewModel.set(formName, defaults[ formName ] );
-
-		thisForm.find(".status").html("");
-		thisForm.data("validator").resetForm();
-
-	}
-	*/
-
 
 	var viewModel = kendo.observable({
 
@@ -148,6 +141,23 @@ AP.attribute.detail = function() {
 
 		},
 
+		/*
+		fire: function( event ) {
+
+			console.log("fire:event", $(event.currentTarget))
+			console.log("fire:event:field", event.field)
+
+			var checked = $(event.currentTarget).prop("checked");
+
+			console.log("fire:event:checked", checked)
+
+			$(event.currentTarget).prop("checked", checked);
+
+			return c;
+
+		},
+		*/
+
 		deleteValues: function( event ) {
 
 			var status = $("#attribute-values-delete-status");
@@ -160,26 +170,40 @@ AP.attribute.detail = function() {
 					values.push( $(this).val() )
 				}) 
 
-				values.toString();
+				var ids = values.toString();
+
+				console.log("values", values);
+				console.log("ids", ids);
 
 				NM.util.ajax({ 
 					method: "DELETE", 
 					url: "/manager/ajax/attributes/values",
-					data: values,
+					data: ids,
 					callback: {
 						done: function( xhr ) {
 
-							setTimeout(	function() {
-								viewModel.resetValueForm()
-							}, 1000 )
+							if( xhr.data.payload.hasOwnProperty("errors") ) {
 
+								AP.widget.notify( "error", "Non sonosciuto a cancellare tutti i valori" )
+
+							} else {
+								
+								AP.widget.notify( "success", "Cancellazione avvenuta con successo" )
+
+							}
+
+							var id = viewModel.get("detailForm.data.id");
+							console.log("id", id);
+
+							loadAttribute( { id: viewModel.get("detailForm.data.id") } )
+							
 						}
 					}
 				})
 
 			} else {
 
-				status.html("<span class='red'>Selezionare almeno un valore</span>");
+				NM.util.autoHideMessage( status, "<span class='red'>Selezionare almeno un valore</span>" );
 
 			}
 
@@ -222,13 +246,10 @@ AP.attribute.detail = function() {
 					data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
 					callback: {
 						done: function( xhr ) {
-							status.html("<span class='green'>Attributo modificato</span>");
+							
+							NM.util.autoHideMessage( status, "<span class='green'>Attributo modificato</span>");
 
-							invokeCallback( "onUpdate" );
-
-							setTimeout(	function() {
-								viewModel.resetValueForm()
-							}, 1000 )
+							fireCallback( "onUpdate" );
 
 						}
 					}
@@ -245,10 +266,11 @@ AP.attribute.detail = function() {
 			var thisForm = AP.attribute.fields.valueForm;
 			var status = $("#attribute-values-add-form-status");
 
-			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
 			var attrId = viewModel.get( "detailForm.data.id" ) 
 
 			if( thisForm.valid() ) {
+
+				status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
 
 				NM.util.ajax({ 
 					method: "POST", 
@@ -260,9 +282,17 @@ AP.attribute.detail = function() {
 					),
 					callback: {
 						done: function( xhr ) {
-							status.html("<span class='green'>Valore salvato</span> ");
-							//loadAttribute( { id: attrId } );
-							//viewModel.get("rows").read()
+							//status.html("<span class='green'>Valore salvato</span>");
+
+							NM.util.autoHideMessage( status, "<span class='green'>Valore salvato</span>" );
+
+							var id = viewModel.get("detailForm.data.id")
+							console.log("id", id);
+
+							loadAttribute( {id: id} )
+
+							fireCallback("onSaveValue");
+
 						}
 					}
 				})
@@ -279,11 +309,6 @@ AP.attribute.detail = function() {
 
 		console.log("callback", callback)
 		
-		viewModel.set("callback", callback )
-		
-		var aa = viewModel.get("callback" )
-		console.log("aa", aa);
-
 		NM.util.ajax({ 
 			method: "GET", 
 			url: "/manager/ajax/attributes/" + id,
@@ -311,7 +336,7 @@ AP.attribute.detail = function() {
 					viewModel.set( "detailForm.title", "Modifica attributo <" + xhr.data.name + " >"  );
 					viewModel.set( "detailForm.labelButton", "Aggiorna" );
 
-					invokeCallback("onLoad");
+					fireCallback("onLoad");
 
 					NM.util.openModal( $("#attribute-detail-modal") );
 
@@ -340,27 +365,49 @@ AP.attribute.detail = function() {
 						},						
 
 						end: function( event ) {
-							
+
+							console.log("event.oldIndex", event.oldIndex);
+							console.log("event.newIndex", event.newIndex);
+														
 							if( event.newIndex != event.oldIndex ) {
 
 								var values = viewModel.get("detailForm.data.values").data();
 								var thisForm = $("#attribute-values-form");
 								var status = thisForm.find(".status");
 
+								console.log("values", values.length);
+
+								// INFO: kendo send an extra item to remove accordingly to direction of item
+								if ( event.oldIndex < event.newIndex  ) {
+									var removeItem = event.oldIndex;
+								} else {
+									var removeItem = event.oldIndex+1;
+								}
+
 								status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
 
+								var count = 1;
+
 								table.find("tr").each( function( index ) {
+
+									if ( index != removeItem ) {
+
+										var ele = $(this);
+										var uid = ele.data("uid");
 	
-									var ele = $(this);
-									var uid = ele.data("uid");
+										for( var value of values ) {
 	
-									for( var value of values ) {
-										if ( value.get( "uid" ) == uid ) {
-											value.set("orderBy", index*10 );
+											if ( value.get( "uid" ) == uid ) {
+	
+												value.set("orderBy", count*10 );
+											}
 										}
+										
+										count++;
+
 									}
-								
-								});
+
+								} )
 
 								NM.util.ajax({ 
 									method: "POST",
@@ -368,8 +415,8 @@ AP.attribute.detail = function() {
 									data: JSON.stringify( viewModel.get("detailForm.data.values").data() ),
 									callback: {
 										done: function( xhr ) {
-											status.html("<span class='green'>Ordinamento salvato.</span> ");
-											console.log("ordered!")
+
+											NM.util.autoHideMessage( status, "<span class='green'>Ordinamento salvato.</span>" );
 										}
 									}
 								})
@@ -426,7 +473,7 @@ AP.attribute.detail = function() {
 		
 		} );
 
-		console.log("valueForm", valueForm);
+		//console.log("valueForm", valueForm);
 
 		valueForm.validate( {
 			onfocusout: function( element ) {
@@ -439,6 +486,7 @@ AP.attribute.detail = function() {
 				code: {
 					checkCode: true,
 					required: true,
+					maxlength: 5,
 					remote: {
 						url: "/manager/ajax/attributes/values/code-exists",
 						data: { id: function () { return  viewModel.get("valueForm.data.id"); } },
@@ -454,12 +502,13 @@ AP.attribute.detail = function() {
 			},
 			messages: {
 				newValueName: {
-					required: "Valore richiesto",
+					required: "descrizione richiesta",
 				},
 				code: {
 					required: "Codice richiesto",
 					checkCode: "Solo numeri, lettere, trattino o trattino basso",
-					remote: "Il codice esiste"
+					remote: "Il codice esiste",
+					max: "Al massimo 5 caratteri"
 				},
 				newValueStatus: {
 					required: "Stato richiesto",

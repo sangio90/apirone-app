@@ -25,22 +25,34 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function delete( event, rc, prc ){
-		param rc.id   = "_";
-		param rc.code = "";
-
-        var json = DESerializeJSON( GetHTTPRequestData().content );
-        dump( json );
-        abort;
-
+        
         var result = super.getResult();
+        var list = GetHTTPRequestData().content;
+        var messageId = "attributeValue.deletedAllRecords";
+
+        var errors = [];
+        var payload = "";
+
+        var ids = ListToArray( list );
 
         for( var id in ids ) {
-            var exist = super.fire( "AttributeValue.delete", [ id ] );
+            var outcome = super.fire( "AttributeValue.delete", [ id ] );
+
+            if( outcome.getStatus() == "ERROR"  ) {
+                errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+            }
+
         }
-    
 
-        result.setData( exist );
+        if( errors.len() ) {
+            messageId = "attributeValue.deletedNotAllRecords"
+            payload = { "errors": errors } ;
+        }
 
+        var message = super.completeMessage( messageId );
+
+        result.setData( { "message" = message, "payload" =  payload } );
+        
 		event.setValue( "result", result );
 	}
 

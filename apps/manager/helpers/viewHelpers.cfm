@@ -146,12 +146,12 @@
     }
 
     function grid( 
-                 String class, 
         required String id, 
         required String rowTemplate, 
         required String sortable=false, 
         required String source="rows", 
-        required String columns="[]" 
+        required String columns="[]",
+                 String class
     ){ 
 
         ```
@@ -174,6 +174,7 @@
 
                 #template( view="jstemplate/#arguments.rowTemplate#" )#
 
+                <!----
                 <script>
                     window.onload= function() {
         
@@ -187,6 +188,7 @@
         
                     }
                 </script>
+            --->
         
             </cfoutput>
     

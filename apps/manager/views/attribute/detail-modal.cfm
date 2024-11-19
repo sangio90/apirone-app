@@ -61,7 +61,6 @@
                                     </div>
                                 </div>
 
-
                                 <div class="mb-3 row">
                                     <label for="statusId" class="col-sm-2 col-form-label text-end">Stato</label>
                                     <div class="col-sm-10">
@@ -110,7 +109,7 @@
                                         <button type="button" class="btn btn-default btn-sm float-end" data-bind="click:deleteValues">
                                             <i class="fas fa-trash"></i> <span>Cancella valori</span>
                                         </button>
-                                        <div class="status-delete mt-1 float-end me-3" id="attribute-values-delete-status">Status</div>
+                                        <div class="status-delete mt-1 float-end me-3" id="attribute-values-delete-status"></div>
                                     </div>
                                 </div>
 
@@ -151,7 +150,7 @@
                                 <div class="row mb-3">
                                     <label for="code" class="col-sm-2 text-end mt-2">Codice</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="code" name="code"  maxlength="10"
+                                        <input type="text" class="form-control" id="code" name="code"  maxlength="5"
                                             required
                                             data-bind="value: valueForm.data.code"
                                             onkeyup="this.value = this.value.toUpperCase();">

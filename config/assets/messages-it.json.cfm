@@ -6,7 +6,9 @@
     
     "attributeValue": {
         "created": "Valore caricato",
-        "updated": "Valore aggiornato"
+        "updated": "Valore aggiornato",
+        "deletedAllRecords": "Valori cancellati",
+        "deletedNotAllRecords": "Non sono riuscito a cancella tutti i valori",
     },
 
     "finish": {

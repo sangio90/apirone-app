@@ -96,8 +96,25 @@
 				attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getId()#">
 		</cfquery>
 
+		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# #arguments.value.getcode()# = #arguments.value.getOrderBy()# ">
+
 		<cfreturn arguments.value.getId()>
 
+	</cffunction>
+
+	<cffunction name="delete" returntype="Numeric">
+		
+		<cfargument name="attributeValueId" type="Numeric" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			DELETE FROM
+				attribute_values
+			WHERE
+			attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
+			RETURNING attribute_value_id
+		</cfquery>
+
+		<cfreturn local.q.recordCount>
 	</cffunction>
 
 </cfcomponent>
