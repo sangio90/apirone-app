@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        prc.title = "Categorie delle linee";
+        prc.title = "Categorie";
 
         prc.lineCategories = super.fire( "lineCategory.list" );
 

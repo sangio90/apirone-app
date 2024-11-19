@@ -78,7 +78,7 @@ AP.finish.list = (function () {
 					callback: {
 						done: function (xhr) {
 
-							status.html("<span class='green'>Finitura salvata</span> ");
+							NM.util.autoHideMessage( status, "<span class='green'>Finitura salvata</span>" )
 
 							setTimeout(() => $("#finish-detail-modal").modal("hide"), 1000);
 

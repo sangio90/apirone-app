@@ -43,6 +43,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		size.setId( json.id );
 		size.setCode( json.code );
+		size.setName( json.name );
 
         if ( Len( json?.selectedCategories ) ) {
 

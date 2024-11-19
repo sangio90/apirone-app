@@ -7,7 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     		required String sizeId
         ){
 
-    	var cm = getCacheManager();
+    	var cm = super.getCacheManager();
 
     	var key = getCacheKey( arguments.sizeId );
 
@@ -86,10 +86,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		getDao().update( arguments.size );
 
-		getCacheManager().remove( "Size_#arguments.size.getId()#" );
+		super.getCacheManager().remove( "Size_#arguments.size.getId()#" );
 
 		return arguments.size.getId();
 	}
+
 
 	public Boolean function codeExists(
 		required String code,
@@ -106,6 +107,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return false;
 	}
+
 
 	public com.apirone.core.model.bean.Outcome function delete(
 		required String sizeId

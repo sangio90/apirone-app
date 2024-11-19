@@ -2,11 +2,7 @@
 
     <div id="size-list-root">
 
-        <div class="row mb-3">
-            <div class="col-lg-6">
-                <h2>#prc.title#</h2>
-            </div>
-        </div>
+        #pageTitle()#
 
         <div class="row">
             <div class="col-lg-12">
@@ -50,7 +46,7 @@
             </div>
         </div>
 
-        #view("finish/detail-modal")#
+        #view("size/detail-modal")#
         
     </div>
 

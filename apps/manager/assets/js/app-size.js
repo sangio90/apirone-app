@@ -76,7 +76,16 @@ AP.size.list = (function () {
 					data: JSON.stringify(viewModel.get("detailForm.data")),
 					callback: {
 						done: function (xhr) {
-							NM.util.autoHideMessagr( status, "<span class='green'>Dimensione salvata</span>" )
+							
+							if( xhr.status == "SUCCESS" ) {
+
+								viewModel.get("rows").read();
+								NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
+
+								setTimeout( () => $("#size-detail-modal").modal("hide"), 1500 );
+
+							}
+
 						}
 					}
 				});
@@ -97,6 +106,8 @@ AP.size.list = (function () {
 
 		edit: function (event) {
 
+			console.log("edit");
+
 			viewModel.set("detailForm.data", event.data);
 			viewModel.set("detailForm.title", "Modifica dimensione < " + event.data.code + " >");
 
@@ -105,15 +116,14 @@ AP.size.list = (function () {
 			if( event.data.categories ) {
 				
 				for (var category of event?.data?.categories)  {
-					selectedCategories.push(category.id);
+					selectedCategories.push( category );
 				}
 	
 			}
 
-
 			viewModel.set("detailForm.data.selectedCategories", selectedCategories);
 
-			NM.util.openModal($("#size-detail-modal"));
+			NM.util.openModal( $("#size-detail-modal") );
 
 		},
 

@@ -2,7 +2,7 @@
 
     <div id="line-category-list-root">
 
-        <cf_pageTitle prc="#prc#">
+        #pageTitle()#
 
         <div class="row">
             <div class="col-lg-12">

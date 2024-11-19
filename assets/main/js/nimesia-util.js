@@ -109,6 +109,6 @@ NM.util.autoHideMessage = function( ele, message ) {
 
 	setTimeout(function() {
 		ele.html("")
-	}, 2000 )
+	}, 1500 )
 
 };

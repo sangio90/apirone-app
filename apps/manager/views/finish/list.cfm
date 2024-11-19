@@ -65,10 +65,10 @@
 
                         </div>
                         
-                        <form name="line-grid-form" id="estimate-grid-form" method="post">
+                        <form name="finish-grid-form" id="finish-grid-form" method="post">
 
                             #grid( 
-                                id="line-grid",
+                                id="finish-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
                                     { 'field':'code', 'title':'Codice', width: '80px'},
