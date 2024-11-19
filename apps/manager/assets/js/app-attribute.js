@@ -150,6 +150,7 @@ AP.attribute.detail = function() {
 
 		deleteValues: function( event ) {
 
+			var status = $("#attribute-values-delete-status");
 			var checks = $('#attribute-values-form').find("[name=selected]:checked");
 
 			if ( checks.length ) {
@@ -176,10 +177,10 @@ AP.attribute.detail = function() {
 					}
 				})
 
-				console.log("checks:len", checks.length);
-				console.log("checks", checks);
-				console.log("values", values);
-	
+			} else {
+
+				status.html("<span class='red'>Selezionare almeno un valore</span>");
+
 			}
 
 		},	

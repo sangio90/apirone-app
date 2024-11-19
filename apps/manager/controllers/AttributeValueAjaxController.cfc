@@ -24,7 +24,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function deleteValues( event, rc, prc ){
+	function delete( event, rc, prc ){
 		param rc.id   = "_";
 		param rc.code = "";
 

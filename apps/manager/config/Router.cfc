@@ -130,7 +130,7 @@ component{
         	.to( "AttributeValueAjaxController.order" ).end();
 		
 		delete( "/ajax/attributes/values")
-        	.to( "AttributeValueAjaxController.deleteValues" ).end();
+        	.to( "AttributeValueAjaxController.delete" ).end();
 		
 		
 		/*

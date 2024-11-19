@@ -104,12 +104,13 @@
                             <form id="attribute-values-form" method="POST" name="attribute-values-form"  class="mb-3" data-bind="visible: isValuesGridVisible">
 
                                 <div class="row mb-2">
-                                    <div class="status col-6"></div>
+                                    <div class="status col-6">
                                     </div>
                                     <div class="text-end col-6">
-                                        <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:deleteValues">
+                                        <button type="button" class="btn btn-default btn-sm float-end" data-bind="click:deleteValues">
                                             <i class="fas fa-trash"></i> <span>Cancella valori</span>
                                         </button>
+                                        <div class="status-delete mt-1 float-end me-3" id="attribute-values-delete-status">Status</div>
                                     </div>
                                 </div>
 
@@ -131,7 +132,7 @@
                                     source="detailForm.data.values",
                                     rowTemplate="attribute/attribute-values-list-row-tmpl"
                                 )#
-
+                            
                             </form>
 
                             <div class="divider mb-3" data-bind="text: valueForm.title"></div>
