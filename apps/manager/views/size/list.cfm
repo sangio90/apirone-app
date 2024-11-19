@@ -26,11 +26,13 @@
                             </div>
                             
                             #grid( 
-                                id="line-grid",
+                                id="size-grid",
                                 columns="[
-                                    { 'field':'id', 'title':'ID', width: '100px' },
-                                    { 'field':'name', 'title':'Descrizione'},
-                                    { 'field':'', 'title':'', width: '65px'},
+                                    { 'field':'shortId', 'title':'ID', width: '80px' },
+                                    { 'field':'code', 'title':'Codice', width: '80px' },
+                                    { 'field':'categories', 'title':'Categorie'},
+                                    { 'field':'fruitsCount', 'title':'Frutti'},
+                                    { 'field':'', 'title':'', width: '50px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
@@ -47,8 +49,9 @@
                 </section>
             </div>
         </div>
+
+        #view("finish/detail-modal")#
         
     </div>
-
 
 </cfoutput>

@@ -253,14 +253,24 @@ component{
 		/*
 			size
 		*/
-		get( "/sizes" )
-        	.toHandler( "SizeController.list" );
+
+		get( "/ajax/sizes/code-exists")
+			.to("SizeAjaxController.codeExists").end();
 
 		get( "/ajax/sizes" )
-        	.toHandler( "SizeAjaxController.list" );
+        	.to( "SizeAjaxController.list" ).end();
+
+		post( "/ajax/sizes" )
+        	.to( "SizeAjaxController.save" ).end();
+
+		delete( "/ajax/sizes" )
+        	.to( "SizeAjaxController.delete" ).end();
 
 		get( "/sizes/print" )
-        	.toHandler( "SizeController.print" );
+        	.to( "SizeController.print" ).end();
+
+		get( "/sizes" )
+        	.to( "SizeController.list" ).end();
 
 
 		/*

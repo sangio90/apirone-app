@@ -1,56 +1,162 @@
 AP.size = AP.size || {};
 
 AP.size.fields = {
-    listRoot: $('#size-list-root'),
-    detailRoot: $('#size-detail-form')
-}
+	listRoot: $("#size-list-root"),
+	detailForm: $("#size-detail-form"),
+	searchListForm: $("#size-grid-search-form")
+};
 
-$(document).ready(function(){
+$(document).ready(function (){
 
-	if ( AP.size.fields.listRoot.length ) {
+	if (AP.size.fields.listRoot.length) {
 
-	    AP.size.list.init();
+		AP.size.list.init();
 
 	}
 
-})
+});
 
-AP.size.list = function() {
+AP.size.list = (function () {
 
-	var pub = {}
+	var pub = {};
 
 	var dataSources = {
-		items: NM.kendo.dataSource( { url: "/manager/ajax/sizes" } )
-	}
+		items: NM.kendo.dataSource({ url: "/manager/ajax/sizes" })
+	};
+
+	var defaultDetailForm = {
+		data: {
+			id: "",
+			code: "",
+			fruitsCount: "",
+			selectedCategories: [],
+			status: {
+				id: "ACT"
+			}
+		},
+		statuses: AP.page.statuses,
+		categories: AP.page.categories,
+
+		title: "Carica dimensione"
+	};
+
 
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
-        
-        open: function( event ) {
+		detailForm: defaultDetailForm,
 
-            var id = event.data.id
-            window.open( "/manager/sizes/" + id, '_blank').focus();
-
-        },
-
-		print: function( item ) {
-
-            window.open('/manager/sizes/print', '_blank');
-
-            return false;
+		resetForm: function () {
+			viewModel.set("detailForm", defaultDetailForm);
 		},
 
+		search: function (event) {
+
+			var thisForm = AP.size.fields.searchListForm;
+
+			var params = thisForm.serializeJSON();
+
+			viewModel.rows.read(params);
+
+			return false;
+
+		},
+
+		save: function (event) {
+
+			var thisForm = AP.size.fields.detailForm;
+			var status = thisForm.find(".status");
+
+			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+
+			if(thisForm.valid()) {
+
+				NM.util.ajax({
+					method: "POST",
+					url: "/manager/ajax/sizes",
+					data: JSON.stringify(viewModel.get("detailForm.data")),
+					callback: {
+						done: function (xhr) {
+							NM.util.autoHideMessagr( status, "<span class='green'>Dimensione salvata</span>" )
+						}
+					}
+				});
+
+			}
+
+			return false;
+
+		},
+
+		new: function (event) {
+
+			this.resetForm();
+
+			NM.util.openModal($("#size-detail-modal"));
+
+		},
+
+		edit: function (event) {
+
+			viewModel.set("detailForm.data", event.data);
+			viewModel.set("detailForm.title", "Modifica dimensione < " + event.data.code + " >");
+
+			var selectedCategories = [];
+
+			if( event.data.categories ) {
+				
+				for (var category of event?.data?.categories)  {
+					selectedCategories.push(category.id);
+				}
+	
+			}
+
+
+			viewModel.set("detailForm.data.selectedCategories", selectedCategories);
+
+			NM.util.openModal($("#size-detail-modal"));
+
+		},
 
 	});
 
-	pub.init = function() {
+	pub.init = function () {
 
-        console.log("size:init")
+		kendo.bind(AP.size.fields.listRoot, viewModel);
 
-        kendo.bind( AP.size.fields.listRoot, viewModel );
+		var detailForm = AP.size.fields.detailForm;
 
-	}	
+		detailForm.validate({
+			onfocusout: function (element) {
+				$(element).valid();
+			},
+			rules: {
+				code: {
+					required: true,
+					maxlength: 3,
+					checkCode: true,
+					remote: {
+						url: "/manager/ajax/sizes/code-exists",
+						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
+						dataFilter: function (xhr) {
+							var json = JSON.parse(xhr);
+							return json.data == false;
+						}
+					}
+				}
+			},
+			messages: {
+				code: {
+					required: "Codice richiesto",
+					maxlength: "Al massimo 3 caratteri",
+					checkCode: "Solo numeri, lettere, trattino o trattino basso",
+					remote: "Il codice esiste"
+				}
+			},
 
-    return pub;
-}();
+		});
+
+	};
+
+	return pub;
+}());
 

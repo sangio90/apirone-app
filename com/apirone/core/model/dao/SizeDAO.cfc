@@ -18,6 +18,23 @@
 
 	</cffunction>
 
+	<cffunction name="readByCode" output="false">
+		<cfargument name="code" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				size_id::varchar,
+				categories::varchar,
+				*
+			FROM
+				sizes
+			WHERE
+				code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
     
 	<cffunction returntype="Query" name="find">
 
@@ -47,6 +64,69 @@
 
 		<cfreturn local.q>
 
+	</cffunction>	
+
+
+	<cffunction name="insert" returntype="String" output="false">
+		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
+
+		<cfset var categories = super.getCategoriesAsArray( size.getCategories() )>
+
+		<cfquery name="local.q" datasource="apirone">
+			INSERT INTO sizes (
+				code,
+				size,
+				status_id,
+				categories,
+				fruits_count
+			)
+			VALUES (
+				<cfqueryparam cfsqltype="varchar" value="#arguments.size.getCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getName()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="varchar" value="#serializeJSON( categories )#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.size.getFruitsCount()#">
+			) RETURNING size_id
+		</cfquery>
+
+		<cfreturn local.q.size_id.toString()>
+	</cffunction>
+
+	<cffunction name="update" returntype="String">
+		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
+
+		<cfset var categories = SerializeJSON( super.getCategoriesAsArray( size.getCategories() ) )>
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE
+				sizes
+			SET
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
+				size = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getName()#">,
+				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getCode()#">,
+				categories = <cfqueryparam cfsqltype="Other" value="#categories#">,
+				fruits_count = <cfqueryparam cfsqltype="Integer" value="#arguments.size.getFruitsCount()#">
+			WHERE
+				size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getId()#">::uuid
+		</cfquery>
+
+
+
+		<cfreturn arguments.size.getId()>
+	</cffunction>
+
+	<cffunction name="delete" returntype="Numeric">
+		<cfargument name="sizeId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			DELETE FROM
+				sizes
+			WHERE
+				size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
+			RETURNING size_id
+		</cfquery>
+
+		<cfreturn local.q.recordCount>
 	</cffunction>	
 
 </cfcomponent>

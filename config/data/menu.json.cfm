@@ -51,7 +51,7 @@
         items: [
             {
                 href: "/manager/lines/categories",
-                icon: "fas fa-layer-group",
+                icon: "fas fa-stream",
                 title: "Categorie",
                 roles: "ADM"
             },
@@ -89,12 +89,6 @@
                 href: "/manager/texts",
                 icon: "fas fa-language",
                 title: "Traduzioni",
-                roles: "ADM"
-            },
-            {
-                href: "/manager/roles",
-                icon: "fas fa-users",
-                title: "Lista dei ruoli",
                 roles: "ADM"
             },
             {

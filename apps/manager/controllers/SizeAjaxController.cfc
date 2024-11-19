@@ -20,4 +20,60 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
+	function codeExists( event, rc, prc ){
+		param rc.id   = "_";
+		param rc.code = "";
+
+		var result = super.fire( "size.codeExists", { code = rc.code, excludedId = rc.id } );
+
+		event.setValue( "result", result );
+	}
+
+	function save( event, rc, prc ){
+		var result     = super.getResult();
+		var size     = super.bean( "Size" );
+		var status     = super.bean( "Status" );
+		var categories = [];
+
+		var thisId    = "";
+		var messageId = "";
+		var texts     = [];
+
+		var json = deserializeJSON( getHTTPRequestData().content );
+
+		size.setId( json.id );
+		size.setCode( json.code );
+
+        if ( Len( json?.selectedCategories ) ) {
+
+            for ( var thisCategory in json.selectedCategories ) {
+				
+				var category   = super.bean( "LineCategory" );
+                
+				category.setId( thisCategory.id );
+                categories.add( category );
+            }
+
+        }
+
+		size.setCategories( categories );
+		size.setStatus( status.setId( json.status.id ) );
+		size.setFruitsCount( json.fruitsCount );
+
+		if ( !len( json.id ) ) {
+			messageId = "size.created";
+			thisId    = super.fire( "size.create", [ size ] )
+		} else {
+			messageId = "size.updated";
+			thisId    = super.fire( "size.update", [ size ] )
+		}
+
+		var message = completeMessage( messageId );
+
+		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+
+		event.setValue( "result", result );
+	}
+
+
 }

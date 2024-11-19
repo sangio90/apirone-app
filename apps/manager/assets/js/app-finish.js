@@ -145,7 +145,7 @@ AP.finish.list = (function () {
 			},
 			messages: {
 				code: {
-					required: "ID richiesto",
+					required: "Codice richiesto",
 					checkCode: "Solo numeri, lettere, trattino o trattino basso",
 					remote: "Il codice esiste"
 				}

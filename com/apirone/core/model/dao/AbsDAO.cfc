@@ -88,7 +88,7 @@
 			<cfset items.add( local.thisItem.getId() )>
 		</cfloop>
 
-		<cfreturn items>
+		<cfreturn items.len() ? items : NullValue()>
 	</cffunction>	
 
 

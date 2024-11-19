@@ -118,7 +118,7 @@
 
         }
 
-        return result;
+        return result.len() ? result : NullValue();
 
     }
     

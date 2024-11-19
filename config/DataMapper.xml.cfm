@@ -86,7 +86,12 @@
 
     <mapper id="Size" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Size">
         <map from="id" to="id" type="cf:String" />
+        <map from="shortId" to="shortId" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
+        <map from="code" to="code" type="cf:String" />
+        <map from="fruitsCount" to="fruitsCount" type="cf:Integer" />
+        <map from="status" to="status" ref="Status" />
+        <map from="categories" to="categories" ref="LineCategory" type="Array" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
     </mapper>
 
