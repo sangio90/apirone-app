@@ -13,24 +13,24 @@ AP.widget.notify = function( type, message, title ) {
     var icon = '';
 
     switch ( type ) {
-        case 'error':
-            icon = 'fa-solid fa-circle-exclamation';
-            title = title ? title : 'Errore';
+        case "error":
+            icon = "fas fa-exclamation-circle";
+            title = title ? title : "Errore";
             break;
 
-        case 'info':
-            icon = 'fa-solid fa-circle-info';
-            title = title ? title : 'Informazioni';
+        case "info":
+            icon = "fas fa-info-circle";
+            title = title ? title : "Informazioni";
             break;
 
-        case 'warning':
-            icon = 'fa-solid fa-circle-exclamation';
-            title = title ? title : 'Attenzione';
+        case "warning":
+            icon = "fas fa-exclamation-triangle";
+            title = title ? title : "Attenzione";
             break;
 
-        case 'success':
-            icon = 'fa-solid fa-circle-check';
-            title = title ? title : 'Ok';
+        case "success":
+            icon = "fas fa-check-circle";
+            title = title ? title : "Ok";
             break;
 
         default:

@@ -50,35 +50,27 @@
         roles: "ADM",
         items: [
             {
-                href: "##",
+                href: "/manager/lines/categories",
+                icon: "fas fa-layer-group",
+                title: "Categorie",
+                roles: "ADM"
+            },
+            {
+                href: "/manager/lines",
                 icon: "fas fa-layer-group",
                 title: "Linee",
                 roles: "ADM",
-                items: [
-                    {
-                        href: "/manager/lines",
-                        icon: "fas fa-layer-group",
-                        title: "Lista",
-                        roles: "ADM"
-                    },
-                    {
-                        href: "/manager/lines/categories",
-                        icon: "fas fa-layer-group",
-                        title: "Categorie",
-                        roles: "ADM"
-                    },
-                    {
-                        href: "/manager/finishes",
-                        icon: "fas fa-layer-group",
-                        title: "Finiture",
-                        roles: "ADM"
-                    }
-                ]
+            },
+            {
+                href: "/manager/finishes",
+                icon: "fas fa-palette",
+                title: "Finiture",
+                roles: "ADM"
             },
             {
                 href: "/manager/sizes",
-                icon: "fas fa-external-link-square-alt",
-                title: "Dimensioni placche",
+                icon: "fas fa-expand-alt",
+                title: "Dimensioni",
                 roles: "ADM"
             },
             {
