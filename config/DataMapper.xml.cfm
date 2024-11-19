@@ -36,6 +36,7 @@
 
     <mapper id="AttributeValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
         <map from="id" to="id" type="cf:String" />
+        <map from="code" to="code" type="cf:String" />
         <map from="orderBy" to="orderBy" type="cf:Numeric" />
         <map from="name" to="name" type="cf:String" />
         <map from="status" to="status" ref="Status" />

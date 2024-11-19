@@ -15,7 +15,31 @@ component extends="com.apirone.core.controller.AbsController" {
 		param rc.id   = "_";
 		param rc.code = "";
 
-		var result = super.fire( "finish.codeExists", { code = rc.code, excludedId = rc.id } );
+        var result = super.getResult();
+    
+		var exist = super.fire( "AttributeValue.codeExists", { code = rc.code, excludedId = rc.id } );
+
+        result.setData( exist );
+
+		event.setValue( "result", result );
+	}
+
+	function deleteValues( event, rc, prc ){
+		param rc.id   = "_";
+		param rc.code = "";
+
+        var json = DESerializeJSON( GetHTTPRequestData().content );
+        dump( json );
+        abort;
+
+        var result = super.getResult();
+
+        for( var id in ids ) {
+            var exist = super.fire( "AttributeValue.delete", [ id ] );
+        }
+    
+
+        result.setData( exist );
 
 		event.setValue( "result", result );
 	}
@@ -48,9 +72,7 @@ component extends="com.apirone.core.controller.AbsController" {
         attrValue.setStatus( valueStatus.setId( json.value.status.id ) );
         attrValue.setAttributeId( json.attributeId );
         attrValue.setOrderBy( json.value.orderBy );
-
-        dump( DESerializeJSON (SerializeJSON( attrValue ) ) );
-        abort;
+        attrValue.setCode( json.value.code );
 
         if( !Len( json.value.id ) ) {
             
@@ -66,7 +88,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var message = super.completeMessage( messageId );
 
-        result.setData(  message, { payload = { id = thisId }  } );
+        result.setData( { "message" = message, "payload" = { id = thisId }  } );
         
         event.setValue( "result", result );
         

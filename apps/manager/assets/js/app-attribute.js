@@ -75,20 +75,29 @@ AP.attribute.detail = function() {
 	
 	}
 
-	invokeCallback = function( func ) {
+	var invokeCallback = function( func ) {
 
 		var cb = viewModel.get("callback");
 
-		console.log("cb", cb)
-		console.log("typeof", typeof cb[func] == "function" )
-
 		if( typeof cb[func] == "function" ) {
-
 			cb[func]()
-
 		}
 
 	}
+
+	/*
+	var resetForm = function( formName ) {
+
+		var thisForm = AP.attribute.fields[ formName ];
+
+		viewModel.set(formName, defaults[ formName ] );
+
+		thisForm.find(".status").html("");
+		thisForm.data("validator").resetForm();
+
+	}
+	*/
+
 
 	var viewModel = kendo.observable({
 
@@ -104,6 +113,7 @@ AP.attribute.detail = function() {
 			onLoad: undefined
 		},
 
+		//TODO: only one "resetForm"
 		resetDetailForm: function() {
 
 			var thisForm = AP.attribute.fields.detailForm;
@@ -116,10 +126,13 @@ AP.attribute.detail = function() {
 		},
 		
 		resetValueForm: function() {
-			
-			//viewModel.set("valueForm", defaults.valueForm );
-			
-			//AP.attribute.fields.valueForm.resetForm();
+
+			var thisForm = AP.attribute.fields.valueForm;
+
+			viewModel.set("valueForm", defaults.detailForm );
+
+			thisForm.find(".status").html("");
+			thisForm.data("validator").resetForm();
 
 		},
 		
@@ -135,6 +148,42 @@ AP.attribute.detail = function() {
 
 		},
 
+		deleteValues: function( event ) {
+
+			var checks = $('#attribute-values-form').find("[name=selected]:checked");
+
+			if ( checks.length ) {
+
+				var values = [];
+				checks.each(function(){
+					values.push( $(this).val() )
+				}) 
+
+				values.toString();
+
+				NM.util.ajax({ 
+					method: "DELETE", 
+					url: "/manager/ajax/attributes/values",
+					data: values,
+					callback: {
+						done: function( xhr ) {
+
+							setTimeout(	function() {
+								viewModel.resetValueForm()
+							}, 1000 )
+
+						}
+					}
+				})
+
+				console.log("checks:len", checks.length);
+				console.log("checks", checks);
+				console.log("values", values);
+	
+			}
+
+		},	
+	
 		editValue: function( event ) {
 
 			var labelButton = "Carica";
@@ -152,29 +201,9 @@ AP.attribute.detail = function() {
 		},	
 	
 		edit: function( event ) {
-
-			/*
-			var selectedCategories = [];
-
-			for (var category of event.data.categories)  {
-				selectedCategories.push( category.id );
-			}
-
-			viewModel.set( "detailForm.data", event.data );
-
-			viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
-			viewModel.set( "detailForm.title", "Modifica attributo < " + event.data.name + " >" );
-			*/
-
 		},
 
 		new: function( event ) {
-
-			//viewModel.set( "detailForm.data", event.data );
-
-			//viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
-			viewModel.set( "detailForm.title", "Carica attributo" );
-
 		},
 
 		save: function() {
@@ -231,7 +260,8 @@ AP.attribute.detail = function() {
 					callback: {
 						done: function( xhr ) {
 							status.html("<span class='green'>Valore salvato</span> ");
-							loadAttribute( { id: attrId } );
+							//loadAttribute( { id: attrId } );
+							//viewModel.get("rows").read()
 						}
 					}
 				})
@@ -280,13 +310,7 @@ AP.attribute.detail = function() {
 					viewModel.set( "detailForm.title", "Modifica attributo <" + xhr.data.name + " >"  );
 					viewModel.set( "detailForm.labelButton", "Aggiorna" );
 
-					var cb = viewModel.get("callback");
-
-					console.log( "cb", cb );
-					
-					if ( cb.hasOwnProperty("onLoad") ) {
-						cb.onLoad()
-					}
+					invokeCallback("onLoad");
 
 					NM.util.openModal( $("#attribute-detail-modal") );
 

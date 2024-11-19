@@ -14,7 +14,7 @@
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:editValue">
-                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-edit"></i>
                 </button>
             </td>
             <td class="text-center">

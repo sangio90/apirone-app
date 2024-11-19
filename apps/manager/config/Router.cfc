@@ -119,14 +119,18 @@ component{
 		/*
 			attribute values
 		*/
-		post( "/ajax/attributes/values")
-        	.to( "AttributeValueAjaxController.save" ).end();
 
 		get( "/ajax/attributes/values/code-exists")
 			.to("AttributeValueAjaxController.codeExists").end();
 		
+		post( "/ajax/attributes/values")
+        	.to( "AttributeValueAjaxController.save" ).end();
+
 		post( "/ajax/attributes/:id/values/order")
-        	.to( "AttributeAjaxController.order" ).end();
+        	.to( "AttributeValueAjaxController.order" ).end();
+		
+		delete( "/ajax/attributes/values")
+        	.to( "AttributeValueAjaxController.deleteValues" ).end();
 		
 		
 		/*

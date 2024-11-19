@@ -103,14 +103,22 @@
 
                             <form id="attribute-values-form" method="POST" name="attribute-values-form"  class="mb-3" data-bind="visible: isValuesGridVisible">
 
-                                <div class="status text-end mb-2"></div>
+                                <div class="row mb-2">
+                                    <div class="status col-6"></div>
+                                    </div>
+                                    <div class="text-end col-6">
+                                        <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:deleteValues">
+                                            <i class="fas fa-trash"></i> <span>Cancella valori</span>
+                                        </button>
+                                    </div>
+                                </div>
 
                                 #grid( 
                                     id="attribute-values-grid",
                                     class="no-pager",
                                     columns="[
                                         { 'field':'id', 'title':'ID', width: '50px' },
-                                        { 'field':'code', 'title':'ID', width: '80px' },
+                                        { 'field':'code', 'title':'Codice', width: '80px' },
                                         { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
                                         { 'field':'', 'title':'', width: '55px'},
                                         { 

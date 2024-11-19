@@ -21,9 +21,10 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				attribute_value_id
+				attribute_value_id, 
+				code
 			FROM
-				finishes
+				attribute_values
 			WHERE
 				code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
 		</cfquery>
