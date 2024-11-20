@@ -96,7 +96,7 @@ AP.finish.list = (function () {
 
 			this.resetForm();
 
-			NM.util.openModal($("#finish-detail-modal"));
+			NM.util.openModal( $("#finish-detail-modal") );
 
 		},
 

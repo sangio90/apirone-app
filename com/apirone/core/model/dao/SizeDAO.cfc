@@ -40,6 +40,7 @@
 
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
+		<cfargument name="lineId" type="String">
 		<cfargument name="orderby" required="true" type="String" default="orderby">
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -111,6 +112,7 @@
 		<cfreturn local.q.size_id.toString()>
 	</cffunction>
 
+
 	<cffunction name="update" returntype="String">
 		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
 
@@ -132,6 +134,7 @@
 		<cfreturn arguments.size.getId()>
 	
 	</cffunction>
+	
 
 	<cffunction name="delete" returntype="Numeric">
 		<cfargument name="sizeId" type="String" required="true">

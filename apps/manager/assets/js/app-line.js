@@ -1,9 +1,11 @@
 AP.line = AP.line || {};
 
 AP.line.fields = {
-    listRoot: $('#line-list-root'),
-    searchListForm: $('#line-grid-search-form'),
-    combinationsRoot: $('#line-combinations-root')
+    listRoot: $("#line-list-root"),
+    detailRoot: $("#line-detail-modal"),
+    detailForm: $("#line-detail-form"),
+    searchListForm: $("#line-grid-search-form"),
+    combinationsRoot: $("#line-combinations-root")
 }
 
 $(document).ready(function(){
@@ -20,11 +22,157 @@ $(document).ready(function(){
 
 	}
 
+	if ( AP.line.fields.detailRoot.length ) {
+
+	    AP.line.detail.init();
+
+	}
+
 })
+
+
+AP.line.detail = function() {
+
+	var pub = {}
+
+	var dataSources = {
+		items: NM.kendo.dataSource( { url: "/manager/ajax/lines" } )
+	}
+
+	var defaultDetailForm = {
+		data: {
+			id: "",
+			code: "",
+			name: "",
+			category: {
+                id: ""
+            },
+			thickness: {
+                id: ""
+            },
+			status: {
+				id: "ACT"
+			}
+		},
+		
+        statuses: AP.page.statuses,
+		categories: AP.page.categories,
+
+		title: "Carica linea"
+	};    
+
+	var viewModel = kendo.observable({
+		//rows: dataSources.items,
+
+        detailForm: defaultDetailForm,
+        
+		resetForm: function () {
+			viewModel.set("detailForm", defaultDetailForm);
+		},
+
+        edit: function( event ) {
+        },
+
+        new: function( event ) {
+
+            this.resetForm();
+
+            NM.util.openModal( AP.line.fields.detailRoot );
+
+            return false;
+
+        },
+
+        save: function( event ) {
+
+			var thisForm = AP.size.fields.detailForm;
+			var status = thisForm.find(".status");
+
+			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+
+			if(thisForm.valid()) {
+
+				NM.util.ajax({
+					method: "POST",
+					url: "/manager/ajax/sizes",
+					data: JSON.stringify(viewModel.get("detailForm.data")),
+					callback: {
+						done: function (xhr) {
+							
+							if( xhr.status == "SUCCESS" ) {
+
+								viewModel.get("rows").read();
+								NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
+
+								setTimeout( () => $("#size-detail-modal").modal("hide"), 1000 );
+
+							}
+
+						}
+					}
+				});
+
+			}
+
+            return false;
+
+        },
+
+	});
+
+	pub.new = function() {
+
+        viewModel.new()
+
+    },
+
+	pub.init = function() {
+
+        console.log("detail:init")
+
+        kendo.bind( AP.line.fields.detailRoot, viewModel );
+
+		var detailForm = AP.line.fields.detailForm;
+
+		detailForm.validate({
+			onfocusout: function (element) {
+				$(element).valid();
+			},
+			rules: {
+				code: {
+					required: true,
+					checkCode: true,
+					remote: {
+						url: "/manager/ajax/lines/code-exists",
+						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
+						dataFilter: function (xhr) {
+							var json = JSON.parse(xhr);
+							return json.data == false;
+						}
+					}
+				}
+			},
+			messages: {
+				code: {
+					required: "Codice richiesto",
+					checkCode: "Solo numeri, lettere, trattino o trattino basso",
+					remote: "Il codice esiste"
+				}
+			},
+
+		});
+
+	}	
+
+    return pub;
+}();
+
 
 AP.line.list = function() {
 
 	var pub = {}
+
+    var detailApp = AP.line.detail;
 
 	var dataSources = {
 		items: NM.kendo.dataSource( { url: "/manager/ajax/lines" } )
@@ -39,12 +187,17 @@ AP.line.list = function() {
 
             var params = thisForm.serializeJSON();
 
-            console.log( "search", event );
-            console.log( "params", params );
-
-            //$('form').serializeJSON();
-
             viewModel.rows.read( params )
+
+            return false;
+
+        },
+
+        new: function( event ) {
+
+            console.log("detailApp", detailApp)
+
+            detailApp.new();
 
             return false;
 
@@ -98,7 +251,6 @@ AP.line.list = function() {
 
     return pub;
 }();
-
 
 
 AP.line.combinations = function() {

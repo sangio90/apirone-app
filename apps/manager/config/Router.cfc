@@ -285,6 +285,12 @@ component{
 		get( "/roles/print" )
         	.toHandler( "RolController.print" );
 
+		/*
+			system
+		*/
+		get( "/system" )
+        	.toHandler( "systemController.get" );
+
 
 		/*
 			lookup

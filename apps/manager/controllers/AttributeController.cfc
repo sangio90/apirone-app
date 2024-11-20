@@ -7,7 +7,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.lineCategories = super.fire( "lineCategory.list" );
         prc.statuses = super.fire( "status.list", ["FINISH"] );
 
-        prc.page["categories"] = super.getCategoriesForJSON();
+        prc.page["categories"] = super.getCategoriesAsJSON();
         prc.page["attributeStatusList"] = prc.statuses;
 
         prc.jsScripts.add( "app-attribute" );

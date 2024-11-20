@@ -193,7 +193,7 @@
 
     }
 
-    public Any function getCategoriesForJSON(){
+    public Any function getCategoriesAsJSON(){
 
         var data = [];
 

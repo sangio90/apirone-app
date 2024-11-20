@@ -64,11 +64,11 @@
                                 data-lock-picture="/assets/template/img/!logged-user.jpg"
                             >
                         </figure>
-                        <div class="profile-info" data-lock-name="" data-lock-email="#prc.user.getName()#">
+                        <div class="profile-info" data-lock-name="#prc.user.getName()#" data-lock-email="#prc.user.getName()#">
                             <span class="name">
                                 #prc.user.getName()#<br>
                             </span>
-                            <span class="description">
+                            <span class="role">
                                 #prc.user.getAccount().getRole().getId()# - #prc.user.getShortId()#
                             </span>
                         </div>

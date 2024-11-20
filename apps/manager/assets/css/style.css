@@ -61,6 +61,16 @@ h2 {
 	border: 1px solid #CCCCCC;
 }
 
+.box-search-small {
+	background-image: url(/assets/main/img/bg-box-search-small.png);
+    background-repeat: no-repeat;	
+	border: 1px solid #EAEAEA; 
+	border-radius: 5px; 
+	background-color: #F5F5F5; 
+	padding: 20px; 
+}
+
+
 /*
 	sidebar and topbar
 */
@@ -399,4 +409,8 @@ h2 {
 	color: #878787;
 	font-style: italic;
 	font-size: 11px;
+}
+
+.btn {
+	white-space:nowrap !important;
 }

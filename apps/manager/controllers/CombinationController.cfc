@@ -26,7 +26,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.page["combinationId"] = comb.getId();
         prc.page["combinations"] = combinations;
         prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
-        prc.page["categories"] = super.getCategoriesForJSON();
+        prc.page["categories"] = super.getCategoriesAsJSON();
 
         event.setView( "combination/detail" );
 

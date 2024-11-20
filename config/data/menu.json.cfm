@@ -99,5 +99,11 @@
             }
         ]
 
+    },
+    {
+        href: "/manager/system",
+        icon: "fab fa-redhat",
+        title: "Sistema",
+        roles: "ADM"
     }
 ]

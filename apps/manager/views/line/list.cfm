@@ -2,9 +2,10 @@
 
     <div id="line-list-root">
 
-        <cf_pageTitle prc="#prc#">
+        #pageTitle()#
 
         <div class="row">
+            
             <div class="col-lg-12">
 
                 <section class="card">
@@ -13,37 +14,38 @@
 
                         <div class="row">
 
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
 
-                                <form id="line-grid-search-form" 
-                                    class="row mb-3" 
-                                    data-bind:'events: { submit: search }'
-                                >
+                                <div class="mb-3 box-search-small"> 
 
-                                    <div class="col-4">
-                                        <input 
-                                            name="str"
-                                            placeholder="Cerca"
-                                            class="form-control" type="text">
-                                    </div>
+                                    <form id="line-grid-search-form" 
+                                        class="d-flex align-items-center justify-content-end" 
+                                        data-bind:'events: { submit: search }'>
 
-                                    <div class="col-5">
-                                        <select 
-                                            class="form-control" 
-                                            name="categoryId">
-                                            <option value="">-- tutte le categorie</option>
-                                            <cfloop array="#prc.lineCategories#" item="thisLine">
-                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
-                                            </cfloop>
-                                        </select>
-                                    </div>
+                                            <input 
+                                                name="str"
+                                                placeholder="Cerca"
+                                                class="form-control me-2" type="text">
+
+                                            <select 
+                                                class="form-control me-2" 
+                                                name="categoryId">
+                                                <option value="">-- tutte le categorie</option>
+                                                <cfloop array="#prc.lineCategories#" item="thisLine">
+                                                    <option value="#thisLine.getId()#">#thisLine.getName()#</option>
+                                                </cfloop>
+                                            </select>
+                                        
+                                            <button type="submit" class="btn btn-primary w-auto" data-bind="click:search">Cerca ></button>
                                     
-                                    <div class="col-2">
-                                        <button type="submit" class="btn btn-primary" data-bind="click:search">Cerca ></button>
-                                    </div>
-                                
-                                </form>
+                                    </form>
+
+                                </div>
                             
+                            </div>
+                            
+                            <div class="col-sm-6 text-end pt-3">
+                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:new">Carica +</button>
                             </div>
 
                         </div>
@@ -76,6 +78,9 @@
                 </section>
             </div>
         </div>
+
     </div>
+
+    #view("line/detail-modal")#
 
 </cfoutput>
