@@ -57,6 +57,7 @@ AP.line.detail = function() {
 		
         statuses: AP.page.statuses,
 		categories: AP.page.categories,
+		thicknesses: AP.page.thicknesses,
 
 		title: "Carica linea"
 	};    
@@ -85,7 +86,7 @@ AP.line.detail = function() {
 
         save: function( event ) {
 
-			var thisForm = AP.size.fields.detailForm;
+			var thisForm = AP.line.fields.detailForm;
 			var status = thisForm.find(".status");
 
 			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
@@ -94,7 +95,7 @@ AP.line.detail = function() {
 
 				NM.util.ajax({
 					method: "POST",
-					url: "/manager/ajax/sizes",
+					url: "/manager/ajax/lines",
 					data: JSON.stringify(viewModel.get("detailForm.data")),
 					callback: {
 						done: function (xhr) {
@@ -104,7 +105,7 @@ AP.line.detail = function() {
 								viewModel.get("rows").read();
 								NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
 
-								setTimeout( () => $("#size-detail-modal").modal("hide"), 1000 );
+								setTimeout( () => $("#line-detail-modal").modal("hide"), 1000 );
 
 							}
 

@@ -4,13 +4,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.title = "Linee";
 
-        prc.lineCategories = super.fire( "lineCategory.list" );
         prc.statuses = super.fire( "status.list", ["LINE"] );
+        prc.thicknesses = super.fire( "lookup.list", [ "thickness" ] );
+        prc.lineCategories = super.fire( "lineCategory.list" );
 
         prc.jsScripts.add( "app-line" );
 
+        prc.page["statuses"] = prc.statuses;
+        prc.page["thicknesses"] = prc.thicknesses;
         prc.page["categories"] = super.getCategoriesAsJSON();
-        prc.page["status"] = prc.statuses;
 
         event.setView("line/list");
 

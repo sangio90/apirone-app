@@ -54,6 +54,72 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
+	public String function create(
+		required com.apirone.core.model.bean.Line line
+	){
+
+		var newId = getDao().insert( arguments.line );
+
+		return newId;
+	}
+
+	public String function update(
+		required com.apirone.core.model.bean.Line line
+	){
+		getDao().update( arguments.line );
+
+		super.getCacheManager().remove( "line_#arguments.line.getId()#" );
+
+		return arguments.line.getId();
+	}
+
+
+	public Boolean function codeExists(
+		required String code,
+		String excludedId = ""
+	){
+		var record = getDao().readByCode( arguments.code );
+
+		if (
+			record.recordCount
+			&& record.line_id != arguments.excludedId
+		) {
+			return record.code == arguments.code;
+		}
+
+		return false;
+	}
+
+
+	public com.apirone.core.model.bean.Outcome function delete(
+		required String lineId
+	){
+		var outcome = super.bean( "Outcome" );
+
+		var obj = get( arguments.lineId );
+
+		outcome.setData( { lineId = arguments.lineId } );
+
+		transaction {
+			try {
+				var result = getDao().delete( arguments.lineId );
+				outcome.setData( { "deletedCount" = result } )
+
+				getCacheManager().remove( "line_#arguments.lineId#" );
+
+			} catch ( any error ) {
+				
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteLine" );
+				outcome.setMessage( "Cannot delete line [#arguments.lineId#]" );
+			
+			}
+		}
+
+		return outcome;
+	}	
+
 
     /*
     	private method

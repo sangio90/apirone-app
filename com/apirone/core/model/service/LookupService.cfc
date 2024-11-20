@@ -52,12 +52,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         return this;
     }	
 
-    /*
-        list() and get() shoulds
-        overried all other methods
-    */
-
-    public com.apirone.core.model.bean.AbsBean function get( required String entity, required String value ) {
+    public com.apirone.core.model.bean.AbsBean function get( 
+        required String entity, 
+        required String value
+    ) {
 
         var result = NullValue();
 

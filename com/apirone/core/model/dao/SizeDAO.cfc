@@ -1,7 +1,5 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 
-	<cfset companyId = "azapi">
-
 	<cffunction name="read">
 
 		<cfargument name="sizeId" type="String" required="true">

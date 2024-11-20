@@ -25,27 +25,34 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Nome</label>
+                            <label class="col-sm-2 col-form-label text-end">Descrizione</label>
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4" name="name"
+                                    data-msg-required="Descrizione richiesto"
                                     maxlength="125"
                                     data-bind="value: detailForm.data.name">
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Nome</label>
+                            <label class="col-sm-2 col-form-label text-end">Spessore</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" name="name"
-                                    maxlength="125"
-                                    data-bind="value: detailForm.data.name">
+                                <select id="thickness" class="form-control"
+                                    data-placeholder="Seleziona lo spessore"
+                                    data-bind="source: detailForm.thicknesses, value: detailForm.data.thickness.id" 
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                    >
+                                </select>
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Categoria</label>
                             <div class="col-sm-10">
-                                <select id="categories" 
+                                <select id="category" 
+                                    required
+                                    class="form-control"
                                     data-placeholder="Seleziona la categoria"
                                     data-bind="source: detailForm.categories, value: detailForm.data.category.id" 
                                     data-value-field="id"
@@ -58,9 +65,7 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Stato</label>
                             <div class="col-sm-10">
-                                <select 
-                                    id="statusId" 
-                                    class="fprm-control"
+                                <select id="statusId" class="form-control"
                                     data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
                                     data-value-field="id"
                                     data-text-field="name"
