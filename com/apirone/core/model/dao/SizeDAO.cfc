@@ -38,9 +38,11 @@
     
 	<cffunction returntype="Query" name="find">
 
-		<cfargument name="lineId" type="String">
-		
+		<cfargument name="str" type="String">
+		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="orderby" required="true" type="String" default="orderby">
+		<cfargument name="limit" required="true" type="Numeric" default="0">
+        <cfargument name="offset" required="true" type="Numeric" default="0">
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
@@ -52,14 +54,31 @@
 					<cfif !IsNull( arguments.lineId )>
 						INNER JOIN combinations USING ( size_id )
 					</cfif>
+
 			WHERE 1=1
 				
 				<cfif !IsNull( arguments.lineId )>
                     AND combinations.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
                 </cfif>
-			
+
+				<cfif !IsNull( arguments.str )>
+					AND sizes.code ILIKE <cfqueryparam value="#arguments.str#%" cfsqltype="varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.categoryId )>
+					AND categories @> ANY ('{[#arguments.categoryId#]}')
+				</cfif>
+
 			ORDER BY 
 				#super.sanitizeSQL( arguments.orderby )#
+
+			<cfif arguments.limit GTE 0>
+				LIMIT 
+					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
+				OFFSET
+					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
+			</cfif>
+
 		</cfquery>
 
 		<cfreturn local.q>
@@ -109,10 +128,9 @@
 			WHERE
 				size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getId()#">::uuid
 		</cfquery>
-
-
-
+		
 		<cfreturn arguments.size.getId()>
+	
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">

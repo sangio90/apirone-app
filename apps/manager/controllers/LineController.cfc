@@ -38,8 +38,8 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.existingCombinations = [];
         prc.obj = super.fire("line.get", [rc.id] );
 
-        prc.title="Combinazioni per la linea < #prc.obj.getName()# >";
-        prc.page["line"]=prc.obj;
+        prc.page["line"] = prc.obj;
+        prc.title = "Combinazioni per la linea < #prc.obj.getName()# >";
 
         prc.sizes = super.fire( "size.list" );
         prc.finishes = super.fire( "finish.list" );

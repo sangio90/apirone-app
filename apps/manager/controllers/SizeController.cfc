@@ -5,11 +5,11 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.title = "Dimensioni";
 
         prc.statuses = super.fire( "status.list", ["SIZE"] );
-        prc.lineCategories = super.fire( "lineCategory.list" );
+        prc.categories = super.fire( "lineCategory.list" );
 
         var categories = [];
 
-        for( var thisCategory in prc.lineCategories ) {
+        for( var thisCategory in prc.categories ) {
             var row = super.getDataMapper().convert( thisCategory, "LineCategory", true );
             categories.add( row );
         }

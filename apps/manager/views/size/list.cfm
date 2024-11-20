@@ -11,6 +11,26 @@
                     
                     <div class="card-body">
 
+                        <form name="size-grid-search-form" id="size-grid-search-form" method="get" class="d-flex align-items-center mb-4" data-bind="events: { submit: search }" >
+
+                            <div class="col me-2">
+                                <input class="form-control" placeholder="Cerca..." id="attributes-search-input" name="str">
+                            </div>
+
+                            <div class="col-auto me-2 col-7">
+                                <select class="form-control" name="categoryId">
+                                    <option value="">-- tutte le categorie</option>
+                                    <cfloop array="#prc.categories#" item="item">
+                                        <option value="#item.getId()#">#item.getName()#</option>
+                                    </cfloop>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary" value="Cerca" data-bind="click: search">Cerca &raquo;</button>
+                            </div>
+
+                        </form>
+
                         <form name="size-grid-form" id="size-grid-form" method="post">
 
                             <div class="row">

@@ -5,8 +5,10 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
         var dm = getDataMapper();
+
+		var params = super.paramsFromUrl();
         
-        var rows = super.fire( "size.list" );
+        var rows = super.fire( "size.list", params );
 
         for ( var row in rows ) {
             var obj = dm.convert( row, "Size", true );

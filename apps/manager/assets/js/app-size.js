@@ -53,7 +53,11 @@ AP.size.list = (function () {
 
 			var thisForm = AP.size.fields.searchListForm;
 
+			console.log("searchListForm", thisForm)
+			
 			var params = thisForm.serializeJSON();
+			
+			console.log("params", params)
 
 			viewModel.rows.read(params);
 
