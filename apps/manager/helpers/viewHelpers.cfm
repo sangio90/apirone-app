@@ -192,7 +192,6 @@
 
                 #template( view="jstemplate/#arguments.rowTemplate#" )#
 
-                <!----
                 <script>
                     window.onload= function() {
         
@@ -206,7 +205,6 @@
         
                     }
                 </script>
-            --->
         
             </cfoutput>
     

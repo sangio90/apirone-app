@@ -94,16 +94,6 @@ AP.line.detail = function() {
 			viewModel.set("detailForm", defaultDetailForm);
 		},
 
-        edit: function( event ) {
-        },
-
-            /*
-        new: function( event ) {
-            return false;
-
-        },
-        */
-
         save: function( event ) {
 
 			var thisForm = AP.line.fields.detailForm;
@@ -152,12 +142,21 @@ AP.line.detail = function() {
 
         NM.util.openModal( AP.line.fields.detailRoot );
 
+    },
+
+	pub.edit = function( { id, onSave } ) {
+
+        if ( onSave ) {
+            viewModel.set("callback.onSave", onSave)
+        }
+
+        viewModel.resetForm();
+
+        NM.util.openModal( AP.line.fields.detailRoot );
 
     },
 
 	pub.init = function() {
-
-        console.log("detail:init")
 
         kendo.bind( AP.line.fields.detailRoot, viewModel );
 
@@ -232,6 +231,18 @@ AP.line.list = function() {
             }
 
             detailApp.new( { onSave: onSave } );
+
+            return false;
+
+        },
+
+        edit: function( event ) {
+
+            var onSave = function() {
+                viewModel.get("rows").read();
+            }
+
+            detailApp.edit( { id, event.data.id, onSave: onSave } );
 
             return false;
 

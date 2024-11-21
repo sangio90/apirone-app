@@ -55,6 +55,7 @@
                                     { 'field':'name', 'title':'Descrizione' },
                                     { 'field':'category.name', 'title':'Categoria'},
                                     { 'field':'thickness.name', 'title':'Spessore', width: '110px'},
+                                    { 'field':'', 'title':'Modifica', width: '55px'},
                                     { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
                                     { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
                                     { 
