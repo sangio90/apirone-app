@@ -23,6 +23,25 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
+    function get( event, rc, prc ){
+
+        param rc.id = "___";
+        var result = super.getResult();
+
+        if ( !super.isUuid( rc.id ) ) {
+            return event.setValue("result", "No UUID");
+        }
+
+        var bean = super.fire( "line.get", [ rc.id ] );
+
+        var obj = super.getDataMapper().convert( bean, "Line", true );
+
+        result.setData( obj );
+
+        event.setValue("result", result);
+
+    }
+
     function attributes( event, rc, prc ){
 
         param rc.str="";

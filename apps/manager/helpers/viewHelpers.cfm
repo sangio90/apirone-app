@@ -215,12 +215,12 @@
     }    
 
 
-    private function getButton( required String label="", String bindFunc="", String size="md", String type="submit", String icon="" ){ 
+    private function getButton( required String label="", String bindFunc="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
 
         ```
         <cfsavecontent variable="html">
             <cfoutput>
-                <button type="#arguments.type#" class="btn btn-primary btn-#arguments.size#" 
+                <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size#" 
                     #Len( arguments.bindFunc ) ? 'data-bind="#arguments.bindFunc#"' : ''#>
                     <i class="fas fa-#arguments.icon#"></i> #arguments.label#
                 </button>

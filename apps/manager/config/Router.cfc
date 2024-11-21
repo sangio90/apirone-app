@@ -237,6 +237,9 @@ component{
 		get( "/ajax/lines/attributes" )
         	.to( "LineAjaxController.attributes" ).end();
 
+		get( "/ajax/lines/:id")
+			.to( "LineAjaxController.get" ).end();
+
 		get( "/ajax/lines" )
         	.to( "LineAjaxController.list" ).end();
 

@@ -8,7 +8,8 @@
 
     property name="logger" type="com.apirone.core.util.Logger";
     property name="factory" type="com.apirone.core.model.factory.Factory";
-    property name="cacheManager" type="com.apirone.core.util.CacheManager";
+    //ROB: removed because it generates errors when business logic is reloaded.
+    //property name="cacheManager" type="com.apirone.core.util.CacheManager"; 
 	property name="configuration" type="com.apirone.core.model.bean.Configuration" ;
 	property name="DBUtil" type="com.apirone.core.model.util.DBUtil" ;
 
@@ -93,8 +94,6 @@
         return records;
     }
     
-
-
     private Array function getCategoriesBeanFromIds( required String categories ) { //[2,3,4,5]
 
         var result = [];
@@ -129,11 +128,24 @@
     
     }
     
-    private Any function service( required String service ){
+    private Struct function getCacheManager() {
+        var DBUtil = new com.apirone.core.util.DBUtil();
+        
+        return model().getInstance("CacheManager");
+    
+    }
+    
+    private Struct function service( required String service ){
 
-        var bean = server[ "wireBox-apirone" ].getInstance("#service#Service");
+        var bean = model().getInstance("#service#Service");
 
         return bean;
+
+    }
+   
+    private Struct function model(){
+
+        return server[ "wireBox-apirone" ];
 
     }
    

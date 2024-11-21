@@ -35,6 +35,11 @@ AP.line.detail = function() {
 
 	var pub = {}
 
+    AP.page.categories.unshift( { id: "", name: "-- Seleziona una categoria" } );
+    AP.page.thicknesses.unshift( { id: "", name: "-- Seleziona uno spessore" } );
+
+    //console.log("categories", AP.page.categories);
+
 	var defaultDetailForm = {
 		data: {
 			id: "",
@@ -62,12 +67,7 @@ AP.line.detail = function() {
 
 		var callbackList = viewModel.get("callback");
 
-        console.log("callbackList:func", func)
-        console.log("callbackList", callbackList)
-
 		var exists = callbackList?.hasOwnProperty( func );
-
-        console.log("callbackList:exists", exists)
 
 		if( exists ) {
 
@@ -91,6 +91,14 @@ AP.line.detail = function() {
 		},
         
 		resetForm: function () {
+
+            var detailForm = AP.line.fields.detailForm
+
+            var validator = detailForm.validate();
+            validator.resetForm();
+
+            detailForm.find(".status").html("");
+
 			viewModel.set("detailForm", defaultDetailForm);
 		},
 
@@ -152,7 +160,24 @@ AP.line.detail = function() {
 
         viewModel.resetForm();
 
-        NM.util.openModal( AP.line.fields.detailRoot );
+        NM.util.ajax({ 
+            method: "GET", 
+            url: "/manager/ajax/lines/" + id,
+            callback: {
+                done: function( xhr ) {
+
+                    if( xhr.status == "SUCCESS" ) {
+
+                        viewModel.set("detailForm.data", xhr.data );
+                        viewModel.set("detailForm.title", "Modifica linea" );
+
+                        NM.util.openModal( AP.line.fields.detailRoot );
+
+                    }
+
+                }
+            }
+        })        
 
     },
 
@@ -242,7 +267,7 @@ AP.line.list = function() {
                 viewModel.get("rows").read();
             }
 
-            detailApp.edit( { id, event.data.id, onSave: onSave } );
+            detailApp.edit( { id: event.data.id, onSave: onSave } );
 
             return false;
 
