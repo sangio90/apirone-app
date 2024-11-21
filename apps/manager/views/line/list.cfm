@@ -7,7 +7,7 @@
         <div class="row">
 
             <div class="col-sm-12 text-end pb-3">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:new">Carica +</button>
+                #addButton( "Carica linea", "click:new", "sm" )#
             </div>
             
             <div class="col-lg-12">
@@ -26,16 +26,16 @@
                                         class="d-flex align-items-center justify-content-end" 
                                         data-bind:'events: { submit: search }'>
 
-                                            <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
-                                            <select class="form-control me-2" name="categoryId">
-                                                <option value="">-- tutte le categorie</option>
-                                                <cfloop array="#prc.lineCategories#" item="thisLine">
-                                                    <option value="#thisLine.getId()#">#thisLine.getName()#</option>
-                                                </cfloop>
-                                            </select>
-                                        
-                                            <button type="submit" class="btn btn-primary w-auto" data-bind="click:search">Cerca ></button>
+                                        <select class="form-control me-2" name="categoryId">
+                                            <option value="">-- tutte le categorie</option>
+                                            <cfloop array="#prc.lineCategories#" item="thisLine">
+                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
+                                            </cfloop>
+                                        </select>
+                                    
+                                        #searchButton( "Cerca linea", "click:search" )#
                                     
                                     </form>
 

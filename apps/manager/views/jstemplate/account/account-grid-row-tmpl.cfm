@@ -3,7 +3,7 @@
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="account-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
-            <td>
+            <td style="border-left: 4px solid ##=status.color.hex##">
                 <span data-bind="text: email"></span>
             </td>
             <td>

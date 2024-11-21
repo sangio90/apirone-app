@@ -277,7 +277,7 @@ AP.line.list = function() {
 
 	pub.init = function() {
 
-        console.log("init")
+        console.log("list:init")
 
         kendo.bind( AP.line.fields.listRoot, viewModel );
 
@@ -290,7 +290,6 @@ AP.line.list = function() {
 AP.line.combinations = function() {
 
     var pub = {};
-
 
     var changeStatus = function( status, event ) {
 

@@ -26,6 +26,24 @@
     
     }
 
+    function addButton( required String label, String bindFunc ){ 
+
+        arguments["icon"] =  "plus";
+
+        return getButton( argumentCollection = arguments );
+        
+        return html;
+    
+    }
+
+    function searchButton( required String label, String bindFunc ){ 
+
+        arguments["icon"] =  "search";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
     function includeJSFiles(){ 
 
         for ( var thisScript in prc.jsScripts ) {
@@ -197,4 +215,23 @@
         
         return html;
     }    
+
+
+    private function getButton( required String label="", String bindFunc="", String size="md", String type="submit", String icon="" ){ 
+
+        ```
+        <cfsavecontent variable="html">
+            <cfoutput>
+                <button type="#arguments.type#" class="btn btn-primary btn-#arguments.size#" 
+                    #Len( arguments.bindFunc ) ? 'data-bind="#arguments.bindFunc#"' : ''#>
+                    <i class="fas fa-#arguments.icon#"></i> #arguments.label#
+                </button>
+            </cfoutput>
+        </cfsavecontent>
+        ```
+        
+        return html;
+    
+    }
+
 </cfscript>

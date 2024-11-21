@@ -86,7 +86,7 @@
 
     <mapper id="Account" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Account">
         <map from="id" to="id" type="cf:String" />
-        <map from="login" to="login" type="cf:String" />
+        <map from="email" to="email" type="cf:String" />
         <map from="serial" to="serial" type="cf:Numeric" />
         <map from="status" to="status" ref="Status" />
         <map from="role" to="role" ref="Role" />
