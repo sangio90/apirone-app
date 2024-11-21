@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
-    property name="login" type="String";
+    property name="email" type="String";
     property name="pwd" type="String";
     property name="apiKey" type="String";
     property name="serial" type="Numeric";

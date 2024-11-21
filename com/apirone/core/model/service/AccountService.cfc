@@ -160,14 +160,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    	var account = super.bean( "Account" );
 
 		    account.setId( record.account_id.toString() );
-		    account.setLogin( record.login );
+		    account.setEmail( record.email );
 			account.setPwd( record.pwd );
+			account.setSerial( record.serial );
 
-			account.setApiKey( record.api_key.toString() );
+			account.setApiKey( record.api_key );
+
 			account.setStatus( getStatusService().get( record.status_id ) );
 			account.setRole( getLookupService().get( "role", record.role_id ) );
 			account.setLang( getLangService().get( record.lang_id ) );
-			account.setSerial( record.serial );
 
 	    } 
 			

@@ -36,6 +36,8 @@ AP.account.list = function() {
         
         search: function( event ) {
 
+            console.log("search")
+
             var thisForm = AP.account.fields.searchListForm;
 
             var params = thisForm.serializeJSON();
@@ -72,9 +74,8 @@ AP.account.list = function() {
 	pub.init = function() {
 
         console.log("account:init")
-        dataSources.items.read()
 
-        kendo.bind( AP.account.fields.rootList, viewModel );
+        kendo.bind( AP.account.fields.listRoot, viewModel );
 
 	}	
 

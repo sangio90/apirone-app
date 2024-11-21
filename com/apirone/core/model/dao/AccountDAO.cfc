@@ -16,9 +16,9 @@
 				lang_id,
 				serial,
 				pgp_sym_decrypt(
-					login::bytea,
+					email::bytea,
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
-				) AS login
+				) AS email
 			FROM 
 				accounts
 			WHERE 
@@ -32,7 +32,6 @@
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="email" type="String">
-		<cfargument name="login" type="String">
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
 
@@ -43,12 +42,9 @@
 			FROM 
 				accounts
 			WHERE 1=1
-				<cfif !isNull( arguments.login )>
-					AND pgp_sym_decrypt(login::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.login#">
-				</cfif>
 
 				<cfif !isNull( arguments.email )>
-					AND pgp_sym_decrypt(login::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.email#">
+					AND pgp_sym_decrypt(email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.email#">
 				</cfif>
 
 			<cfif arguments.limit GTE 0>
@@ -69,14 +65,14 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO accounts (
-				login,
+				email,
 				api_key,
 				status_id,
 				role_id
 			)
 			VALUES (
 				pgp_sym_encrypt(
-					<cfqueryparam cfsqltype="varchar" value="#arguments.account.getLogin()#">, 
+					<cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">, 
 					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'>
 				)::varchar,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">,
