@@ -2,15 +2,14 @@
 
     <div id="finish-list-root">
 
-        <cf_pageTitle prc="#prc#">
+        #pageTitle()#
 
         <div class="row">
+
             <div class="col-lg-12 text-end mb-3">
-                <button type="submit" class="btn btn-primary btn-sm" data-bind="click:new">Carica</button>
+                <button type="submit" class="btn btn-primary btn-sm" data-bind="click:new">Carica +</button>
             </div>
-        </div>
-    
-        <div class="row">
+
             <div class="col-lg-12">
 
                 <section class="card">
@@ -21,45 +20,32 @@
 
                             <div class="col-sm-9">
 
-                                <form id="finish-grid-search-form" 
-                                    class="row mb-3" 
-                                    data-bind:'events: { submit: search }'
-                                >
+                                <div class="mb-3 box-search-small"> 
 
-                                    <div class="col-3">
-                                        <input 
-                                            name="str"
-                                            placeholder="Cerca"
-                                            class="form-control" type="text">
-                                    </div>
+                                    <form id="finish-grid-search-form" 
+                                        class="d-flex align-items-center justify-content-end" 
+                                        data-bind:'events: { submit: search }'>
 
-                                    <div class="col-4">
-                                        <select 
-                                            class="form-control" 
-                                            name="categoryId">
+                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+
+                                        <select class="form-control me-2" name="categoryId">
                                             <option value="">-- tutte le categorie</option>
                                             <cfloop array="#prc.lineCategories#" item="thisLine">
                                                 <option value="#thisLine.getId()#">#thisLine.getName()#</option>
                                             </cfloop>
                                         </select>
-                                    </div>
                                     
-                                    <div class="col-3">
-                                        <select 
-                                            class="form-control" 
-                                            name="statusId">
+                                        <select class="form-control me-2" name="statusId">
                                             <option value="">-- status</option>
                                             <cfloop array="#prc.statuses#" item="thisStatus">
                                                 <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
                                             </cfloop>
                                         </select>
-                                    </div>
                                     
-                                    <div class="col-2">
                                         <button type="submit" class="btn btn-primary" data-bind="click:search">Cerca ></button>
-                                    </div>
-                                
-                                </form>
+                                    </form>
+                            
+                                </div>
                             
                             </div>
 

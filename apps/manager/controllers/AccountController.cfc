@@ -2,15 +2,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = prc.user;
-
         prc.title = "Lista degli account";
 
-        prc.list = DESerializeJSON( FileRead( '/config/data/fake/accounts.json.cfm' ) );
+        //prc.list = DESerializeJSON( FileRead( '/config/data/fake/accounts.json.cfm' ) );
 
-        prc.jsScripts.add( 'app-account' );
+        prc.list = super.fire("account.search").getData();
 
-        event.setView('account/list');
+        prc.jsScripts.add( "app-account" );
+
+        event.setView("account/list");
 
     }
     

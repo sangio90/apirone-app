@@ -4,8 +4,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var data = [];
         var result = super.getResult();
-        var dm = arguments.event.getValue( "DataMapper" );
-        var user = prc.user;
+        var dm = super.getDataMapper()
         
         param name="url['sort[0][field]']" default="name";
         param name="url['sort[0][dir]']" default="asc";
@@ -14,13 +13,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var field = url['sort[0][field]'] == 'name' ? 'email' : '';
         var sort = url['sort[0][dir]'];
-        
-        var rows = getAccessManager().exec( 
-                    user, 
-                    "Account.search", 
-                    { orderBy = [ { 'field' = field, 'sort' = sort }]  } 
-                ).getData();
 
+        var rows = super.fire("account.search").getData();
+        
         for ( var row in rows ) {
 
             var obj = dm.convert( row, "Account", true );
@@ -31,7 +26,7 @@ component extends="com.apirone.core.controller.AbsController" {
         result.setTotal( data.len() );
         result.setData( data );
 
-        event.renderData( data=result, contentType="text/json", type="json" );
+		event.setValue( "result", result );
         
     }
 

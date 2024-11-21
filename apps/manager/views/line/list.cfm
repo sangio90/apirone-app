@@ -5,6 +5,10 @@
         #pageTitle()#
 
         <div class="row">
+
+            <div class="col-sm-12 text-end pb-3">
+                <button type="button" class="btn btn-primary btn-sm" data-bind="click:new">Carica +</button>
+            </div>
             
             <div class="col-lg-12">
 
@@ -22,14 +26,9 @@
                                         class="d-flex align-items-center justify-content-end" 
                                         data-bind:'events: { submit: search }'>
 
-                                            <input 
-                                                name="str"
-                                                placeholder="Cerca"
-                                                class="form-control me-2" type="text">
+                                            <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
-                                            <select 
-                                                class="form-control me-2" 
-                                                name="categoryId">
+                                            <select class="form-control me-2" name="categoryId">
                                                 <option value="">-- tutte le categorie</option>
                                                 <cfloop array="#prc.lineCategories#" item="thisLine">
                                                     <option value="#thisLine.getId()#">#thisLine.getName()#</option>
@@ -44,10 +43,6 @@
                             
                             </div>
                             
-                            <div class="col-sm-6 text-end pt-3">
-                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:new">Carica +</button>
-                            </div>
-
                         </div>
                         
                         <form name="line-grid-form" id="estimate-grid-form" method="post">

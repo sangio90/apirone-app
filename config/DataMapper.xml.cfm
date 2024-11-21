@@ -84,6 +84,15 @@
         <map from="code" to="code" type="cf:String" />
     </mapper>
 
+    <mapper id="Account" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Account">
+        <map from="id" to="id" type="cf:String" />
+        <map from="login" to="login" type="cf:String" />
+        <map from="serial" to="serial" type="cf:Numeric" />
+        <map from="status" to="status" ref="Status" />
+        <map from="role" to="role" ref="Role" />
+        <map from="lang" to="lang" ref="Lang" />
+    </mapper>
+
     <mapper id="Size" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Size">
         <map from="id" to="id" type="cf:String" />
         <map from="shortId" to="shortId" type="cf:String" />
@@ -139,6 +148,11 @@
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="value" to="value" type="cf:Numeric" />
+    </mapper>
+
+    <mapper id="Role" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Role">
+        <map from="id" to="id" type="cf:String" />
+        <map from="name" to="name" type="cf:String" />
     </mapper>
 
 </mappers>

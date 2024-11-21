@@ -14,6 +14,7 @@
 				pwd,
 				role_id,
 				lang_id,
+				serial,
 				pgp_sym_decrypt(
 					login::bytea,
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
@@ -28,7 +29,7 @@
 
 	</cffunction>
 
-	<cffunction name="search" returntype="Query">
+	<cffunction name="find" returntype="Query">
 
 		<cfargument name="email" type="String">
 		<cfargument name="login" type="String">
@@ -41,12 +42,13 @@
 				COUNT(account_id) OVER() AS total
 			FROM 
 				accounts
-			WHERE 
+			WHERE 1=1
 				<cfif !isNull( arguments.login )>
-					pgp_sym_decrypt(login::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.login#">
+					AND pgp_sym_decrypt(login::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.login#">
 				</cfif>
+
 				<cfif !isNull( arguments.email )>
-					pgp_sym_decrypt(login::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.email#">
+					AND pgp_sym_decrypt(login::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.email#">
 				</cfif>
 
 			<cfif arguments.limit GTE 0>

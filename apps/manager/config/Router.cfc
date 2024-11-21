@@ -80,14 +80,14 @@ component{
 		/*
 			accounts
 		*/
-		get( "/accounts/:id" )
-        	.toHandler( "AccountController.get" );
+		get( "/ajax/accounts" )
+        	.to( "AccountAjaxController.list" ).end();
 
 		get( "/accounts" )
-        	.toHandler( "AccountController.list" );
+        	.to( "AccountController.list" ).end();
 
 		get( "/accounts/print" )
-        	.toHandler( "AccountController.print" );
+        	.to( "AccountController.print" ).end();
 
 	
 		/*

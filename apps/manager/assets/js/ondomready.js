@@ -32,7 +32,7 @@ $.validator.setDefaults( {
 
 	invalidHandler: function( event, validator ) {
 
-		console.log("invalidHandler", validator);
+		//console.log("invalidHandler", validator);
 
 		var count = validator.numberOfInvalids();
 		var thisForm = $(event.currentTarget);

@@ -32,8 +32,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     		required String login
     	){
 
-		var records = getDao()
-						.search( argumentCollection=arguments );
+		var records = getDao().find( argumentCollection=arguments );
 
         return BooleanFormat( records.RecordCount );
 
@@ -127,7 +126,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows = [];
 		var result = super.getResult();
 
-		var records = getDao().search( argumentCollection=arguments );
+		var records = getDao().find( argumentCollection=arguments );
 
 		for( var record in records ){
 
@@ -168,6 +167,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setStatus( getStatusService().get( record.status_id ) );
 			account.setRole( getLookupService().get( "role", record.role_id ) );
 			account.setLang( getLangService().get( record.lang_id ) );
+			account.setSerial( record.serial );
 
 	    } 
 			
