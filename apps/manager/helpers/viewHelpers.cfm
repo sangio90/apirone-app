@@ -10,7 +10,7 @@
     function pageTitle(){ 
 
         ```
-        <cfsavecontent variable="html">
+        <cfsavecontent variable="local.html">
             <cfoutput>
                 <div class="row mb-3 page-title">
                     <div class="col-lg-8">
@@ -22,23 +22,21 @@
         </cfsavecontent>
         ```
         
-        return html;
+        return local.html;
     
     }
 
     function addButton( required String label, String bindFunc ){ 
 
-        arguments["icon"] =  "plus";
+        arguments["icon"] = "plus";
 
         return getButton( argumentCollection = arguments );
-        
-        return html;
     
     }
 
     function searchButton( required String label, String bindFunc ){ 
 
-        arguments["icon"] =  "search";
+        arguments["icon"] = "search";
 
         return getButton( argumentCollection = arguments );
     
@@ -145,7 +143,7 @@
     function getPrintFooter(){ 
 
         ```
-        <cfsavecontent variable="html">
+        <cfsavecontent variable="local.html">
             <cfoutput>
                 <div style='border-top: 1px solid ##EAEAEA;'>
                 <table width='100%' border=0 style='border-collapse:collapse'>
@@ -160,7 +158,7 @@
         </cfsavecontent>
         ```
         
-        return html;
+        return local.html;
     }
 
     function grid( 
@@ -169,11 +167,11 @@
         required String sortable=false, 
         required String source="rows", 
         required String columns="[]",
-                 String class
+                 String class=""
     ){ 
 
         ```
-        <cfsavecontent variable="html">
+        <cfsavecontent variable="local.html">
             <cfoutput>
                 <div 
                     id="#arguments.id#"
@@ -211,14 +209,14 @@
         </cfsavecontent>
         ```
         
-        return html;
+        return local.html;
     }    
 
 
     private function getButton( required String label="", String bindFunc="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
 
         ```
-        <cfsavecontent variable="html">
+        <cfsavecontent variable="local.html">
             <cfoutput>
                 <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size#" 
                     #Len( arguments.bindFunc ) ? 'data-bind="#arguments.bindFunc#"' : ''#>
@@ -228,7 +226,7 @@
         </cfsavecontent>
         ```
         
-        return html;
+        return local.html;
     
     }
 

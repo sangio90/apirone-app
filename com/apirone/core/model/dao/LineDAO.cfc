@@ -57,7 +57,7 @@
 				</cfif>
 
             ORDER BY 
-                orderby
+                code
 		</cfquery>
 
 		<cfreturn local.q>

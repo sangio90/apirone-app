@@ -35,7 +35,7 @@
                                             </cfloop>
                                         </select>
                                     
-                                        #searchButton( "Cerca linea", "click:search" )#
+                                        #searchButton( "Cerca", "click:search" )#
                                     
                                     </form>
 
@@ -45,7 +45,7 @@
                             
                         </div>
                         
-                        <form name="line-grid-form" id="estimate-grid-form" method="post">
+                        <form name="line-grid-form" id="line-grid-form" method="post">
 
                             #grid( 
                                 id="line-grid",

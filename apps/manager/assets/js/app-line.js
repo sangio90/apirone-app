@@ -104,12 +104,12 @@ AP.line.detail = function() {
 
         save: function( event ) {
 
-			var thisForm = AP.line.fields.detailForm;
-			var status = thisForm.find(".status");
+			var detailForm = AP.line.fields.detailForm;
+			var status = detailForm.find(".status");
 
-			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+		    status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
 
-			if(thisForm.valid()) {
+			if(detailForm.valid()) {
 
 				NM.util.ajax({
 					method: "POST",
@@ -363,8 +363,6 @@ AP.line.combinations = function() {
                 done: function( xhr ) {
 
                     if( xhr.status == "SUCCESS" ) {
-
-                        var payload = xhr.data.payload;
 
                         var button = $("button[data-values='" + values +"']");
 

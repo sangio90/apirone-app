@@ -59,7 +59,7 @@
         user.setAccount( arguments.account );
         
         user.setId( arguments.account.getId() );
-        user.setName( arguments.account.getLogin() );
+        user.setName( arguments.account.getEmail() );
 
         session.user = user;
 
