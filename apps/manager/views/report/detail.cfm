@@ -2,7 +2,7 @@
 <div class="row" id="report-item">
     <div class="col-12">
         <form id="report-detail-form">
-            <section class="card card-featured card-featured-primary mb-4">
+            <section class="card">
 
                 <header class="card-header">
                     <h2 class="card-title">#prc.title#</h2>
@@ -28,31 +28,20 @@
                         <div class="form-group pb-2">
                             <label class="col-form-label" for="report-desc">JSON di esempio</label>
                             <p class="field-value">
-                                <textarea cols="10" rows="20" style="width: 100%" class="form-control">
-                                    #prc.report.getExampleData()#
-                                </textarea>
+                                <pre id="formatted-example" style="border: 1px solid ##CCCCCC; color: Black; padding: 10px;"></pre>
                             </p>
                         </div>
 
                     </div>
                 </div>
-                <!----
-                <footer class="card-footer text-end">
-                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:save">
-                        <i class="fas fa-save"></i> Salva
-                    </button>
-
-                </footer>
-                ---->
-                <div id="example"></div>
             </section>
         </form>
     </div>
 </div>  
 
 <script>
-    //var obj = #prc.report.getExampleData()#;
-    //document.getElementById('example').innerHTML = JSON.stringify(obj, null, 3);
+    var obj = #prc.report.getExampleData()#;
+    document.getElementById('formatted-example').innerHTML = JSON.stringify(obj, null, '\t');
 </script>
 
 </cfoutput>

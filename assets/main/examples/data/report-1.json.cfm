@@ -33,7 +33,7 @@
                 name: "Finitura:Ottone Industriale",
                 description: "Profilo:Taglio Diritto, Fissaggio:Calamite, Incisione Logo:No, Forma:Rotonda, Orientamento:Orizzontale",
                 image: {
-                    url: "https://test.apirone.cc/assets/main/examples/img/casa-tipica-in-legno-1024x682.jpg"
+                    url: "https://placehold.co/500x500.jpg"
                 },
                 quantity: 1,
                 price: 10.5,
@@ -59,6 +59,9 @@
             product: {
                 name: "Finitura:Ottone Industriale",
                 description: "Profilo:Taglio Diritto, Fissaggio:Calamite, Incisione Logo:No, Forma:Rotonda, Orientamento:Orizzontale",
+                image: {
+                    url: "https://placehold.co/500x500.jpg"
+                },
                 quantity: 1,
                 price: 10.5,
                 total: 10.5

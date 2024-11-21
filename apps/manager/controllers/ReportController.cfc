@@ -16,6 +16,8 @@ component extends="com.apirone.core.controller.AbsController" {
     
     function get( event, rc, prc ){
 
+        param rc.id=0;
+
         var report = super.fire( "report.get", [ rc.id ] );
         
         prc.title = "Report < #report.getName()# >";
@@ -23,7 +25,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.jsScripts.add( "app-report" );
 
         //var document = DESerializeJSON( FileRead( '/assets/main/examples/example-#report.getId()#.json.cfm' ) );
-        var document = DESerializeJSON( "/assets/main/examples/data/report-1.json.cfm" );
+        var document = DESerializeJSON( FileRead( "/assets/main/examples/data/report-#rc.id#.json.cfm" ) );
        
         var example = {
             "meta" = {
@@ -38,19 +40,6 @@ component extends="com.apirone.core.controller.AbsController" {
         report.setExampleData( SerializeJSON( example ) );
 
         prc.report = report;
-
-        /*
-        switch ( rc.id ) {
-            case 1:
-
-
-                
-                break;
-            default:
-
-                abort showerror="Ciao";
-        }
-        */
 
         event.setView("report/detail");
 

@@ -414,3 +414,7 @@ h2 {
 .btn {
 	white-space:nowrap !important;
 }
+
+.underline {
+	text-decoration: underline !important;
+}
