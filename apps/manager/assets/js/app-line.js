@@ -62,7 +62,12 @@ AP.line.detail = function() {
 
 		var callbackList = viewModel.get("callback");
 
-		var exists = callbackList?.hasOwnProperty( func )
+        console.log("callbackList:func", func)
+        console.log("callbackList", callbackList)
+
+		var exists = callbackList?.hasOwnProperty( func );
+
+        console.log("callbackList:exists", exists)
 
 		if( exists ) {
 
@@ -92,15 +97,12 @@ AP.line.detail = function() {
         edit: function( event ) {
         },
 
+            /*
         new: function( event ) {
-
-            this.resetForm();
-
-            NM.util.openModal( AP.line.fields.detailRoot );
-
             return false;
 
         },
+        */
 
         save: function( event ) {
 
@@ -140,9 +142,16 @@ AP.line.detail = function() {
 
 	});
 
-	pub.new = function() {
+	pub.new = function( { onSave } ) {
 
-        viewModel.new()
+        if ( onSave ) {
+            viewModel.set("callback.onSave", onSave)
+        }
+
+        viewModel.resetForm();
+
+        NM.util.openModal( AP.line.fields.detailRoot );
+
 
     },
 
@@ -217,13 +226,12 @@ AP.line.list = function() {
 
             console.log("detailApp", detailApp)
 
-            var callback = {
-                onSave: function(){
-                    viewModel.get("rows").read();
-                }
+            var onSave = function() {
+                console.log("onSave");
+                viewModel.get("rows").read();
             }
 
-            detailApp.new( callback );
+            detailApp.new( { onSave: onSave } );
 
             return false;
 

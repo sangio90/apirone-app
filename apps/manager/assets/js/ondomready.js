@@ -79,7 +79,7 @@ $.validator.setDefaults( {
 		var ele = $( element[ 0 ] );
 		var errorEleId = $( "#" + name + "-error" );
 
-		console.log("errorValidation", name, error);
+		//console.log("errorValidation", name, error);
 
 		//TODO: l'elemento di status dovrebbe essere ricercato nel form
 		//in moodo da poter usare lo stesso nome ($elemento-error) più volte nella stessa pagina
