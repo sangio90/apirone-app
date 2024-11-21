@@ -35,10 +35,6 @@ AP.line.detail = function() {
 
 	var pub = {}
 
-	var dataSources = {
-		items: NM.kendo.dataSource( { url: "/manager/ajax/lines" } )
-	}
-
 	var defaultDetailForm = {
 		data: {
 			id: "",
@@ -60,12 +56,34 @@ AP.line.detail = function() {
 		thicknesses: AP.page.thicknesses,
 
 		title: "Carica linea"
-	};    
+	};
+
+	var fireCallback = function( func ) {
+
+		var callbackList = viewModel.get("callback");
+
+		var exists = callbackList?.hasOwnProperty( func )
+
+		if( exists ) {
+
+			var thisCallback = callbackList[ func ]
+
+			if( typeof thisCallback == "function" ) {
+				thisCallback()
+			}
+		}
+
+	}
 
 	var viewModel = kendo.observable({
-		//rows: dataSources.items,
 
         detailForm: defaultDetailForm,
+
+        callback: {
+			onCreate: undefined,
+			onUpdate: undefined,
+			onLoad: undefined
+		},
         
 		resetForm: function () {
 			viewModel.set("detailForm", defaultDetailForm);
@@ -102,10 +120,11 @@ AP.line.detail = function() {
 							
 							if( xhr.status == "SUCCESS" ) {
 
-								viewModel.get("rows").read();
-								NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
+								NM.util.autoHideMessage( status, "<span class='green'>Linea salvata</span>" );
 
 								setTimeout( () => $("#line-detail-modal").modal("hide"), 1000 );
+
+                                fireCallback("onSave");
 
 							}
 
@@ -198,7 +217,13 @@ AP.line.list = function() {
 
             console.log("detailApp", detailApp)
 
-            detailApp.new();
+            var callback = {
+                onSave: function(){
+                    viewModel.get("rows").read();
+                }
+            }
+
+            detailApp.new( callback );
 
             return false;
 

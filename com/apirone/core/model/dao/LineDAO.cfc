@@ -68,8 +68,6 @@
 	<cffunction name="insert" returntype="String" output="false">
 		<cfargument name="line" type="com.apirone.core.model.bean.Line" required="true">
 
-		<cfset var categories = super.getCategoriesAsArray( line.getCategories() )>
-
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO lines (
 				code,

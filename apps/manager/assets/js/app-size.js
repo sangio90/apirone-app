@@ -40,7 +40,6 @@ AP.size.list = (function () {
 		title: "Carica dimensione"
 	};
 
-
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
 		detailForm: defaultDetailForm,

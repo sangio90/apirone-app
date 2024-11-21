@@ -38,7 +38,6 @@
                             <label class="col-sm-2 col-form-label text-end">Spessore</label>
                             <div class="col-sm-10">
                                 <select id="thickness" class="form-control"
-                                    data-placeholder="Seleziona lo spessore"
                                     data-bind="source: detailForm.thicknesses, value: detailForm.data.thickness.id" 
                                     data-value-field="id"
                                     data-text-field="name"
@@ -52,8 +51,8 @@
                             <div class="col-sm-10">
                                 <select id="category" 
                                     required
+                                    data-msg-required="Categoria richiesta"
                                     class="form-control"
-                                    data-placeholder="Seleziona la categoria"
                                     data-bind="source: detailForm.categories, value: detailForm.data.category.id" 
                                     data-value-field="id"
                                     data-text-field="name"
@@ -66,6 +65,7 @@
                             <label class="col-sm-2 col-form-label text-end">Stato</label>
                             <div class="col-sm-10">
                                 <select id="statusId" class="form-control"
+                                    required
                                     data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
                                     data-value-field="id"
                                     data-text-field="name"

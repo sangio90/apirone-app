@@ -10,9 +10,9 @@ component output="true" accessors="true" {
 			"appName"    = settings.get('app.name'),
 			"appVersion" = settings.get('app.version'),
 			"owner"      = {
-				"name" = settings.get('app.owner.name'),
-				"vat" = settings.get('app.owner.vat'),
-				"email" = settings.get('app.owner.email')
+				"name" = settings.get('owner.namename'),
+				"vat" = settings.get('owner.namevat'),
+				"email" = settings.get('owner.nameemail')
 			},
 			"filesHost": "#settings.get('files.host')#",
 			"imageVersions" = {
@@ -24,7 +24,7 @@ component output="true" accessors="true" {
 					"thumbnail" =  '50x50'
 				}
 			},
-			"encryptKey": settings.get('security.db.encryptKey'),
+			"encryptKey": settings.get('db.encryptKey'),
 			"variantTypeDefault": "c5eb08a5-48f3-4b4b-abf7-b9b01ed05ceb",
 		};
 

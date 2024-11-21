@@ -225,17 +225,8 @@ component{
 			lines
 		*/
 
-		get( "/lines/:id/combinations")
-			.toHandler( "LineController.combinations" );
-
-		get( "/lines/:id/attributes")
-			.toHandler( "LineController.attributes" );
-
-		get( "/lines/:id" )
-        	.toHandler( "LineController.edit" );
-
-		get( "/lines" )
-        	.toHandler( "LineController.list" );
+		get( "/ajax/lines/code-exists")
+			.to("LineAjaxController.codeExists").end();
 
 		delete( "/ajax/lines/:id/combinations")
 			.to( "LineAjaxController.deleteCombination" ).end();
@@ -244,10 +235,30 @@ component{
 			.to( "LineAjaxController.createCombination" ).end();
 
 		get( "/ajax/lines/attributes" )
-        	.toHandler( "LineAjaxController.attributes" );
+        	.to( "LineAjaxController.attributes" ).end();
 
 		get( "/ajax/lines" )
-        	.toHandler( "LineAjaxController.list" );
+        	.to( "LineAjaxController.list" ).end();
+
+		post( "/ajax/lines" )
+        	.to( "LineAjaxController.save" ).end();
+
+		delete( "/ajax/lines" )
+        	.to( "LineAjaxController.delete" ).end();
+
+		get( "/lines/:id/combinations")
+			.to( "LineController.combinations" ).end();
+
+		get( "/lines/:id/attributes")
+			.to( "LineController.attributes" ).end();
+
+			/*
+		get( "/lines/:id" )
+        	.toHandler( "LineController.get" );
+			*/
+
+		get( "/lines" )
+        	.to( "LineController.list" ).end();
 
 			
 		/*
