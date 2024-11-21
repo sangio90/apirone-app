@@ -12,7 +12,7 @@
             <td>
                 <span data-bind="text: fileName"></span>
             </td>
-            <td>
+            <td nowrap>
                 <span data-bind="text: exampleFile"></span>
             </td>
             <td>

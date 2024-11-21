@@ -12,9 +12,16 @@ component extends="com.apirone.core.controller.AbsController" {
 
         cfloop( file="/.env", item="item" ) {
 
+            var key = ListFirst( item, "=" )
+            var value = ListRest( item, "=" )
+
+            if( key CONTAINS "pwd" OR key CONTAINS "password" ) {
+                //value = "***************";
+            }
+
             var row = {
-                key = ListFirst( item, "=" ),
-                value = ListRest( item, "=" )
+                key = key,
+                value = value
             }
 
             prc.keys.add( row );

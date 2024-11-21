@@ -26,9 +26,9 @@
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '50px' },
                                     { 'field':'name', 'title':'Descrizione'},
-                                    { 'field':'', 'title':'File JRXML', width: '450px'},
+                                    { 'field':'', 'title':'File JRXML'},
                                     { 'field':'', 'title':'File di esempio', width: '450px'},
-                                    { 'field':'', 'title':'', width: '65px'},
+                                    { 'field':'', 'title':'', width: '50px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

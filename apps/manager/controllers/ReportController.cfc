@@ -23,7 +23,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.jsScripts.add( "app-report" );
 
         //var document = DESerializeJSON( FileRead( '/assets/main/examples/example-#report.getId()#.json.cfm' ) );
-        var document = DESerializeJSON( FileRead( '/assets/main/examples/data/report-1.json.cfm' ) );
+        var document = DESerializeJSON( "/assets/main/examples/data/report-1.json.cfm" );
        
         var example = {
             "meta" = {
