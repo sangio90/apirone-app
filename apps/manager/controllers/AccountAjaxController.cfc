@@ -42,66 +42,7 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
-    
-    function saveAll( event, rc, prc ){
-        
-        var user = prc.user;
-        var result = super.getResult();
-        var ids = [];
-
-        var raw  = GetHTTPRequestData().content;
-        var data = DESerializeJSON( raw );
-
-        for ( var row in data ) {
-
-            var bean = getAccessManager().exec( user, "Account.get", [ row.id ] );
-
-            bean.setEmail( row.email );
-            bean.getRole.setId( row.role.id );
-
-            var id = getAccessManager().exec( user, "Account.update", [ bean ] );
-
-            ids.add( id );
-
-        }
-
-        result.setTotal( data.len() );
-        result.setCount( data.len() );
-        result.setData( { "action": 'ACCOUNTS_SAVED', "ids": ids } );
-
-        event.setValue("result", result);
-
-    }
-
-    function removeAll( event, rc, prc ){
-
-        param name="selected" default="";
-        
-        var user = prc.user;
-        var result = super.getResult();
-        var ids = [];
-
-        for ( var row in selected ) {
-
-            var id = getAccessManager()
-                .exec( 
-                    user, 
-                    "Account.delete",
-                    [ row ]
-                );
-
-            ids.add( row );
-
-        }
-
-        result.setTotal( ids.len() );
-        result.setCount( ids.len() );
-        result.setData( { "action": 'ACCOUNTS_DELETED', "ids": ids } );
-
-        event.renderData( data=result, contentType="text/json", type="json" );
-
-    }    
-
+   
     function save( event, rc, prc ){
 
         var user = prc.user;
@@ -157,5 +98,38 @@ component extends="com.apirone.core.controller.AbsController" {
         event.setValue( "result", result );
 
     }    
+
+	function delete( event, rc, prc ){
+        
+        var result = super.getResult();
+        var list = GetHTTPRequestData().content;
+        var messageId = "account.deletedAllRecords";
+
+        var errors = [];
+        var payload = "";
+
+        var ids = ListToArray( list );
+
+        for( var id in ids ) {
+            var outcome = super.fire( "account.delete", [ id ] );
+
+            if( outcome.getStatus() == "ERROR"  ) {
+                errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+            }
+
+        }
+
+        if( errors.len() ) {
+            messageId = "line.deletedNotAllRecords"
+            payload = { "errors": errors } ;
+        }
+
+        var message = super.completeMessage( messageId );
+
+        result.setData( { "message" = message, "payload" =  payload } );
+        
+		event.setValue( "result", result );
+	}    
+
 
 }

@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-    property name="dao" type="com.apirone.core.model.dao.ReportDAO";
+    property name="dao" type="com.apirone.core.model.dao.AccountDAO";
     property name="statusService" type="com.apirone.core.model.service.StatusService";
     property name="lookupService" type="com.apirone.core.model.service.LookupService";
     property name="langService" type="com.apirone.core.model.service.LangService";
@@ -70,17 +70,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public Boolean function delete(
-			required String accountId
-		){
-	
-		var result = getDao().delete( arguments.accountId );
+	public com.apirone.core.model.bean.Outcome function delete(
+		required String accountId
+	){
+		var outcome = super.bean( "Outcome" );
 
-		getCacheManager().remove( getCacheKey( arguments.accountId ) );
+		var obj = get( arguments.accountId );
 
-		return result;
+		outcome.setData( { accountId = arguments.accountId } );
 
-	}
+		transaction {
+			try {
+				var result = getDao().delete( arguments.accountId );
+				outcome.setData( { "deletedCount" = result } )
+
+				getCacheManager().remove( getCacheKey( arguments.accountId ) );
+
+			} catch ( any error ) {
+				
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteAccount" );
+				outcome.setMessage( "Cannot delete account [#arguments.accountId#]" );
+			
+			}
+		}
+
+		return outcome;
+	}	
 
 	public Boolean function setPassword(
 			required String accountId,

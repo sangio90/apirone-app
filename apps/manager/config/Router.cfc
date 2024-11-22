@@ -83,11 +83,11 @@ component{
 		get( "/ajax/accounts" )
         	.to( "AccountAjaxController.list" ).end();
 
+		delete( "/ajax/accounts" )
+        	.to( "AccountAjaxController.delete" ).end();
+
 		get( "/accounts" )
         	.to( "AccountController.list" ).end();
-
-		delete( "/accounts" )
-        	.to( "AccountController.delete" ).end();
 
 		get( "/accounts/print" )
         	.to( "AccountController.print" ).end();

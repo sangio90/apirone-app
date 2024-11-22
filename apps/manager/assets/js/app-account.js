@@ -2,7 +2,8 @@ AP.account = AP.account || {};
 
 AP.account.fields = {
     listRoot: $("#account-list-root"),
-    detailRoot: $("#account-detail-form"),
+    detailRoot: $("#account-detail-modal"),
+    detailForm: $("#account-detail-form"),
     searchListForm: $("#account-grid-search-form")
 }
 
@@ -139,24 +140,48 @@ AP.account.detail = function() {
 
     var pub = {};
 
-    var roles = [{ id: 'ADM', 'name':  'Admin' },{ 'id': 'COM', 'name': 'Commerciale' }];
-    var statusList = [{ 'id': 'ACT', 'name': 'Attivo' },{ 'id': 'DEA', 'name': 'Disattivato' }];
-    var data = { 'id': '1', 'name': 'Roberto', 'email': 'roberto@marzialetti.com', 'surname': 'Marzialetti', 'role': { 'id': 'ADM', 'name': 'Admin' } };
+	var defaultDetailForm = {
+		data: {
+			id: "",
+			code: "",
+			name: "",
+			category: {
+                id: ""
+            },
+			thickness: {
+                id: ""
+            },
+			status: {
+				id: "ACT"
+			}
+		},
+		
+        statuses: AP.page.statuses,
+        roles: AP.page.roles,
+        langs: AP.page.langs,
+
+		title: "Carica account"
+	};
 
 	var viewModel = kendo.observable({
-        roles: roles,
-        statusList: statusList,
-        detailForm: {
-            data: data,
-            label: '',
-            title: 'Dettaglio account',
-            action: 'update'
-        },
+        detailForm: defaultDetailForm,
+
+
+		resetForm: function () {
+
+            var detailForm = AP.account.fields.detailForm;
+
+            var validator = detailForm.validate();
+            validator.resetForm();
+
+            detailForm.find(".status").html("");
+
+			viewModel.set("detailForm", defaultDetailForm);
+		},
+
 
         edit: function( event ) {
             
-            FW.account.fields.item.removeClass('d-none');
-
             this.set("detailForm.data", event.data );
             this.set("detailForm.title", "Modifica account < " + event.data.email + " >"  );
             this.set("detailForm.action", "update" );
@@ -166,48 +191,13 @@ AP.account.detail = function() {
 
         getCreatedAt: function( event ) {
 
-            console.log("event", event);
-
             return FW.kendo.formatDate( event.createdAt );
             
 		},
 
-        setRole: function( event ) {
-
-            console.log("event", event.currentTarget);
-
-            var value = $(event.currentTarget).val();
-
-            console.log("event:value", value);
-
-            if (value == 'ADM') {
-                $('#list-role-admin').show()
-                $('#list-role-commercial').hide();
-            }
-            
-            if (value == 'COM') {
-                $('#list-role-admin').hide()
-                $('#list-role-commercial').show();
-            }
-
-            /*
-            this.set("detailForm.data", event.data );
-            this.set("detailForm.title", "Modifica account < " + event.data.email + " >"  );
-            this.set("detailForm.action", "update" );
-            */
-
-            return false;
-		},
-
         new: function( event ) {
 
-            FW.account.fields.item.removeClass('d-none');
-
-            var data = { role: { id: 'ADM' }, status: { id: 'ACT' } };
-
-            this.set("detailForm.data", data );
-            this.set("detailForm.title", "Carica account" );
-            this.set("detailForm.action", "create" );
+            viewModel.resetForm()
 
             return false;
 		},

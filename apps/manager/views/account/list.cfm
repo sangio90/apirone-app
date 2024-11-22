@@ -18,7 +18,7 @@
 
                         <div class="row">
 
-                            <div class="col-sm-6">
+                            <div class="col-sm-8">
 
                                 <div class="mb-3 box-search-small"> 
 
@@ -28,9 +28,16 @@
 
                                         <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
-                                        <select class="form-control me-2" name="categoryId">
+                                        <select class="form-control me-2" name="roleId">
                                             <option value="">-- tutti i ruoli</option>
-                                            <cfloop array="#[]#" item="thisLine">
+                                            <cfloop array="#prc.roles#" item="thisLine">
+                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
+                                            </cfloop>
+                                        </select>
+                                    
+                                        <select class="form-control me-2" name="statusId">
+                                            <option value="">-- tutti gli stati</option>
+                                            <cfloop array="#prc.statuses#" item="thisLine">
                                                 <option value="#thisLine.getId()#">#thisLine.getName()#</option>
                                             </cfloop>
                                         </select>
@@ -43,7 +50,7 @@
                             
                             </div>
 
-                            <div class="col-sm-6 text-end mt-4">
+                            <div class="col-sm-4 text-end mt-4">
 
                                 <div class="float-end">
                                     #deleteButton( label="Cancella", bind="click:delete", size="sm" )#

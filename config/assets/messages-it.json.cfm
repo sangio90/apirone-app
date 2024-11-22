@@ -8,12 +8,17 @@
         "created": "Valore caricato",
         "updated": "Valore aggiornato",
         "deletedAllRecords": "Valori cancellati",
-        "deletedNotAllRecords": "Non sono riuscito a cancella tutti i valori",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
     "line": {
         "deletedAllRecords": "Valori cancellati",
-        "deletedNotAllRecords": "Non sono riuscito a cancella tutti i valori",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
+    },
+
+    "account": {
+        "deletedAllRecords": "Valori cancellati",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
     "finish": {

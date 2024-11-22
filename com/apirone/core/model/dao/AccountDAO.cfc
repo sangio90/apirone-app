@@ -33,6 +33,11 @@
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="email" type="String">
+		<cfargument name="str" type="String">
+		<cfargument name="roleId" type="String">
+		<cfargument name="langId" type="String">
+		<cfargument name="statusId" type="String">
+		
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
 
@@ -49,7 +54,12 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
-					AND pgp_sym_decrypt(email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.str#%">
+					AND (
+						pgp_sym_decrypt(email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) 
+						ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.str#%">
+						OR 
+						account_id::varchar ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#">
+					)
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>
@@ -101,18 +111,18 @@
 		<cfreturn q.account_id>
 	</cffunction>
 
-	<cffunction name="delete" returntype="Boolean">
-
-		<cfargument name="accountId" type="String" required="true">
+	<cffunction name="delete" returntype="Numeric">
+		<cfargument name="lineId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			DELETE
-			FROM accounts 
+			DELETE FROM
+				accounts
 			WHERE
-				account_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.accountId#">
+				account_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+			RETURNING account_id
 		</cfquery>
 
-		<cfreturn true>
+		<cfreturn local.q.recordCount>
 	</cffunction>
 
 	<cffunction name="updatePassword" output="No" returntype="Boolean">
