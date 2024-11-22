@@ -64,20 +64,6 @@
                                                 rowTemplate="component/component-row-list-tmpl"
                                             )#
             
-                                            <!----
-                                            <table class="table table-hover pt-5">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Lavorazioni</th>
-                                                        <th scope="col" width="100"></th>
-                                                    </tr>
-                                                </thead>
-                                                
-                                                <tbody data-bind="source:components" data-template="components-list-tmpl">
-                                                </tbody>
-                                            </table>
-                                            ---->
-            
                                         </div>
             
                                     </div>

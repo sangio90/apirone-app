@@ -52,7 +52,7 @@
             {
                 href: "/manager/lines/categories",
                 icon: "fas fa-stream",
-                title: "Categorie",
+                title: "Categorie prodotti",
                 roles: "ADM"
             },
             {

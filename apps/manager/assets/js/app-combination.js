@@ -71,6 +71,8 @@ AP.combination.list = function() {
 
 		getAttributeName: function( event ) {
 
+			console.log("getAttributeName:event", event);
+
 			var text = AP.util.getMainText( event.texts )
 
 			return text.name;

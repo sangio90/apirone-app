@@ -2,7 +2,7 @@
 
     <div id="combination-detail-root">
 
-        <cf_pageTitle prc="#prc#">
+        #pageTitle()#
 
         <div class="row">
             <div class="col-md-12">
@@ -18,14 +18,10 @@
 
                         <div class="col-md-12" id="combination-config-row">
 
-                            <!---
-                                Note: inline form with bootstrap 5 and label
-                                https://codesandbox.io/p/sandbox/bootstrap-5-inline-form-example-065utx
-                            --->
-
                             <form class="d-flex align-items-center justify-content-end" id="combination-change-form">
 
                                 <label class="me-2">Dimensione:</label>
+
                                 <select name="sizeId" class="form-control w-auto me-4" data-bind="events: { change: loadFishes }" >
                                     <cfloop array="#prc.sizes#" item="item">
                                         <option value="#item.getId()#" 
