@@ -6,7 +6,7 @@
 
         <div class="row">
             <div class="col-lg-12 text-end mb-3">
-                <button class="btn btn-primary btn-sm" data-bind="click:new">Carica</button>
+                #addButton( "Carica", "click:new", "sm" )#
             </div>
         </div>
     
@@ -19,46 +19,31 @@
 
                         <div class="row">
 
-                            <div class="col-sm-9">
+                            <div class="mb-3 box-search-small col-8">
 
                                 <form id="attribute-grid-search-form" 
-                                    class="row mb-3" 
+                                    class="d-flex align-items-center justify-content-end" 
                                     data-bind:'events: { submit: search }'
                                 >
 
-                                    <div class="col-3">
-                                        <input 
-                                            name="str"
-                                            placeholder="Cerca"
-                                            class="form-control" type="text">
-                                    </div>
+                                    <input name="str" placeholder="Cerca" class="form-control me-3" type="text">
 
-                                    <div class="col-4">
-                                        <select 
-                                            class="form-control" 
-                                            name="categoryId">
-                                            <option value="">-- tutte le categorie</option>
-                                            <cfloop array="#prc.lineCategories#" item="thisLine">
-                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
-                                            </cfloop>
-                                        </select>
-                                    </div>
+                                    <select class="form-control me-3" name="categoryId">
+                                        <option value="">-- tutte le categorie</option>
+                                        <cfloop array="#prc.lineCategories#" item="thisLine">
+                                            <option value="#thisLine.getId()#">#thisLine.getName()#</option>
+                                        </cfloop>
+                                    </select>
                                     
-                                    <div class="col-3">
-                                        <select 
-                                            class="form-control" 
-                                            name="statusId">
-                                            <option value="">-- status</option>
-                                            <cfloop array="#prc.statuses#" item="thisStatus">
-                                                <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
-                                            </cfloop>
-                                        </select>
-                                    </div>
+                                    <select class="form-control me-3" name="statusId">
+                                        <option value="">-- status</option>
+                                        <cfloop array="#prc.statuses#" item="thisStatus">
+                                            <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
+                                        </cfloop>
+                                    </select>
+
+                                    #searchButton("Cerca", "click:search")#
                                     
-                                    <div class="col-2">
-                                        <button type="submit" class="btn btn-primary" data-bind="click:search">Cerca ></button>
-                                    </div>
-                                
                                 </form>
                             
                             </div>
