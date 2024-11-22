@@ -144,15 +144,15 @@ AP.combination.list = function() {
 
 			console.log("searchAttributes");
 
-			var str = $('#attributes-search-input').val();
-			var status = $('#attributes-list-search-form .status');
+			var str = $("#attributes-search-input").val();
+			var status = $("#attributes-list-search-form .status");
 
-			status.html('Sto cercando...')
+			status.html("Sto cercando...")
 
 			$.ajax({
 				method: "GET",
 				url: "/manager/ajax/attributes",
-				data: 'str=' + str,
+				data: "str=" + str,
 				success: function(xhr) {
 					viewModel.set( "attributesList", xhr.data );
 					status.html( "Ho trovato " + xhr.count + " record.") 

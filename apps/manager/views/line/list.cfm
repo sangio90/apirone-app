@@ -6,7 +6,7 @@
 
         <div class="row">
 
-            <div class="col-sm-12 text-end pb-3">
+            <div class="col-lg-12 text-end pb-3">
                 #addButton( bind="click:new", size="sm" )#
             </div>
             

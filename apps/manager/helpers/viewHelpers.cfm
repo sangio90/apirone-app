@@ -221,7 +221,7 @@
     }    
 
 
-    private function getButton( required String label="", String bind="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
+    private function getButton( required String label, String bind="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
 
         ```
         <cfsavecontent variable="local.html">

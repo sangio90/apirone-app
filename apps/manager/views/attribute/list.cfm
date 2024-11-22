@@ -6,7 +6,7 @@
 
         <div class="row">
             <div class="col-lg-12 text-end mb-3">
-                #addButton( "Carica", "click:new", "sm" )#
+                #addButton( bind="click:new", size="sm" )#
             </div>
         </div>
     
@@ -42,7 +42,7 @@
                                         </cfloop>
                                     </select>
 
-                                    #searchButton("Cerca", "click:search")#
+                                    #searchButton(bind="click:search")#
                                     
                                 </form>
                             
