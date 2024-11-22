@@ -55,7 +55,7 @@
                                     { 'field':'role.id', 'title':'Ruolo' },
                                     { 'field':'lang.id', 'title':'Lingua' },
                                     { 'field':'createdAt', 'title':'Creato il' },
-                                    { 'field':'', 'title':'', width: '40px'},
+                                    { 'field':'', 'title':'', width: '50px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

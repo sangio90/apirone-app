@@ -200,15 +200,16 @@
 
                 <script>
                     window.onload= function() {
-        
-                        $('###arguments.id# .k-table thead').kendoTooltip({
-                            filter: "th",
-                            content: function (e) {
-                                var target = e.target; 
-                                return $(target).text();
+
+                        $("###arguments.id# .k-table thead th").each(function(){
+                            var ele = $(this);
+                            var text = ele.text();
+
+                            if( text.length ) {
+                                ele.kendoTooltip({content: text})
                             }
-                        });
-        
+
+                        })
                     }
                 </script>
         
