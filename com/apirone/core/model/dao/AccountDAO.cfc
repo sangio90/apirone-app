@@ -30,6 +30,27 @@
 
 	</cffunction>
 
+	<cffunction name="readByEmail" returntype="Query">
+
+		<cfargument name="email" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+			 	account_id,
+				pgp_sym_decrypt(
+					email::bytea,
+					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
+				) AS email
+			FROM 
+				accounts
+			WHERE 
+				pgp_sym_decrypt(email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.email#">
+		</cfquery>
+
+		<cfreturn local.q>
+
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="email" type="String">

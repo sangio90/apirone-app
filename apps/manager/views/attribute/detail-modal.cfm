@@ -47,7 +47,7 @@
                                 </div>
 
                                 <div class="mb-3 row">
-                                    <label for="statusId" class="col-sm-2 col-form-label text-end">Disponili per</label>
+                                    <label for="categories" class="col-sm-2 col-form-label text-end">Disponili per</label>
                                     <div class="col-sm-10">
                                         <select id="categories" 
                                             data-placeholder="Seleziona le categorie"

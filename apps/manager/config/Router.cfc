@@ -80,6 +80,9 @@ component{
 		/*
 			accounts
 		*/
+		get( "/ajax/accounts/email-exists" )
+        	.to( "AccountAjaxController.emailExists" ).end();
+
 		get( "/ajax/accounts" )
         	.to( "AccountAjaxController.list" ).end();
 

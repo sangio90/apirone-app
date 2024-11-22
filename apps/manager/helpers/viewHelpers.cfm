@@ -34,9 +34,17 @@
     
     }
 
-    function searchButton( String bind, required String label="Cerca",  ){ 
+    function searchButton( String bind, required String label="Cerca" ){ 
 
         arguments["icon"] = "search";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
+    function saveButton( String bind, required String label="Salva" ){ 
+
+        arguments["icon"] = "save";
 
         return getButton( argumentCollection = arguments );
     

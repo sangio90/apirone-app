@@ -93,4 +93,6 @@
 
     </div>
 
+    #view("account/detail-modal")#
+
 </cfoutput>

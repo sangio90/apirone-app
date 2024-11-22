@@ -12,6 +12,7 @@ module.exports = {
 			"module": "writable",
 			"document": "readonly",
 			"setTimeout": "readonly",
+			"window": "readonly",
 			"kendo": "readonly",
 			"console": "readonly",
 		}

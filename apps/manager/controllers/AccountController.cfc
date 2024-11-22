@@ -6,6 +6,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.roles = super.fire("lookup.list", [ "role" ]);
         prc.statuses = super.fire("status.list", [ "ACCOUNT" ]);
+        prc.langs = super.fire("lang.list");
+
+        prc.page["roles"] = prc.roles;
+        prc.page["statuses"] = prc.statuses;
+        prc.page["langs"] = prc.langs;
 
         prc.jsScripts.add( "app-account" );
 
