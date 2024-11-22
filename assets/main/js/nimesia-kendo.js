@@ -46,3 +46,17 @@ NM.kendo.toggleScrollbar = function( event ) {
 
     gridWrapper.addClass("no-scrollbar");
 }
+
+NM.kendo.formatDate = function( date, type='normal' ) {
+    //example date, from server: July, 13 2022 10:50:39 +0200, culture: en-US
+
+    if ( type == 'normal' ) {
+        var ret = kendo.toString( kendo.parseDate( date, "MMMM, dd yyyy HH:mm:ss", "en-US"), 'dd/MM/yyyy HH:mm' )
+    }
+
+    if ( type == 'short' ) {
+        var ret = kendo.toString( kendo.parseDate( date, "MMMM, dd yyyy HH:mm:ss", "en-US"), 'dd/MM' )
+    }
+
+    return ret
+}

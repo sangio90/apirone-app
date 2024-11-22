@@ -19,8 +19,6 @@ AP.component.list = function() {
 
 	var pub = {}
 
-	var productId = "d4f0764f-fa4c-46bf-910a-06f3d0c3d626";
-
 	var viewModel = kendo.observable({
 
 		components: [],
@@ -35,10 +33,6 @@ AP.component.list = function() {
 
 		showSearchResult: function() {
 
-			//console.log("components > 0", viewModel.get( "components" ).length > 0);
-			//console.log("showVariants", viewModel.get( "showVariants" ));
-			
-			//var ret = viewModel.get( "components" ).length > 0 && !viewModel.get( "showVariants" );
 			var ret = viewModel.get( "components" ).length > 0;
 			return ret;
 		},
@@ -80,7 +74,6 @@ AP.component.list = function() {
 					name: variant.name
 				}
 			}
-
 
 			console.log("event:useColor", event );
 

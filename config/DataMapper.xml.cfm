@@ -86,8 +86,10 @@
 
     <mapper id="Account" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Account">
         <map from="id" to="id" type="cf:String" />
+        <map from="shortId" to="shortId" type="cf:String" />
         <map from="email" to="email" type="cf:String" />
         <map from="serial" to="serial" type="cf:Numeric" />
+        <map from="createdAt" to="createdAt" type="cf:String" />
         <map from="status" to="status" ref="Status" />
         <map from="role" to="role" ref="Role" />
         <map from="lang" to="lang" ref="Lang" />

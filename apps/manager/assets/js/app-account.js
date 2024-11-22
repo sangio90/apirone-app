@@ -33,6 +33,12 @@ AP.account.list = function() {
 
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
+
+        getCreatedAt: function( event ) {
+
+            return NM.kendo.formatDate( event.createdAt );
+            
+		},
         
         search: function( event ) {
 
@@ -110,6 +116,14 @@ AP.account.detail = function() {
             this.set("detailForm.action", "update" );
 
             return false;
+		},
+
+        getCreatedAt: function( event ) {
+
+            console.log("event", event);
+
+            return FW.kendo.formatDate( event.createdAt );
+            
 		},
 
         setRole: function( event ) {

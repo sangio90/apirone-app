@@ -42,29 +42,3 @@
     </div>
 
 </cfoutput>
-
-
-<!------
-                                    <form id="line-attributes-list-search-form" class="row">
-
-                                    #grid( 
-                                        id="line-attributes-grid",
-                                        columns="[
-                                            { 'field':'id', 'title':'ID', width: '100px' },
-                                            { 'field':'name', 'title':'Descrizione'},
-                                            { 'field':'', 'title':'', width: '50px'},
-                                            { 'field':'', 'title':'', width: '50px'},
-                                            { 
-                                                'field':'', 
-                                                'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                                'width':'40px',
-                                                'headerAttributes': { 'class': 'text-center' }
-                                            }
-                                        ]",
-                                        source="attributesList",
-                                        rowTemplate="line/line-attributes-list-row-tmpl"
-                                    )#
-            
-                                </form>
-
-                                ----->

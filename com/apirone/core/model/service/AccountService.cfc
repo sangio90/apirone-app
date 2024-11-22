@@ -144,6 +144,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+	public String function createPassword( 
+		required String accountId,
+		required String pwd
+	  ) {
+
+	  var token = 
+		  "jbGM,xxJJaJX-ol@@5m88" &
+		  arguments.accountId &
+		  "HTt,Tgajiawsui7,9iR09" & 
+		  arguments.pwd;
+
+	  return Hash( token, "SHA-512" );
+
+	}
+
+	private String function getCacheKey( required String id ) {
+
+		return "Account_#arguments.id#";
+
+	}
+
     /**
      * @private
      */
@@ -165,6 +186,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setSerial( record.serial );
 
 			account.setApiKey( record.api_key );
+			account.setCreatedAt( record.created_at  );
 
 			account.setStatus( getStatusService().get( record.status_id ) );
 			account.setRole( getLookupService().get( "role", record.role_id ) );
@@ -174,27 +196,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 		return account;
 		
-  	}
-
-  	public String function createPassword( 
-		  required String accountId,
-		  required String pwd
-		) {
-
-        var token = 
-            "jbGM,xxJJaJX-ol@@5m88" &
-            arguments.accountId &
-            "HTt,Tgajiawsui7,9iR09" & 
-            arguments.pwd;
-
-		return Hash( token, "SHA-512" );
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "Account_#arguments.id#";
-
   	}
 
 }

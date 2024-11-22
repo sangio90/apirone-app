@@ -43,7 +43,6 @@
                                 <form id="component-list-search-result-form" class="row">
             
                                     <div class="col-md-12">
-                                        
             
                                         <div data-bind="visible: showSearchResult">
 
@@ -51,14 +50,8 @@
                                                 id="component-list-grid",
                                                 columns="[
                                                     { 'field':'name', 'title':'Lavorazione/Materia prima'},
-                                                    { 'field':'', 'title':'', width: '50px'},
-                                                    { 'field':'', 'title':'', width: '50px'},
-                                                    { 
-                                                        'field':'', 
-                                                        'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                                        'width':'40px',
-                                                        'headerAttributes': { 'class': 'text-center' }
-                                                    }
+                                                    { 'field':'', 'title':'', width: '100px'},
+                                                    { 'field':'', 'title':'', width: '100px'}
                                                 ]",
                                                 source="components",
                                                 rowTemplate="component/component-row-list-tmpl"
@@ -71,6 +64,8 @@
                                 </form>
 
                             </div>
+
+                            #view("component/component-list-variant")#
 
                         </div>
 
@@ -94,7 +89,5 @@
 
     #template("jstemplate/color/product-comp-colors-row-tmpl")#
     #template("jstemplate/variant/product-comp-variants-row-tmpl")#
-    <!--- #template("jstemplate/component/product-components-list-row-tmpl")# --->
-    <!--- #template("jstemplate/component/components-list-tmpl")# --->
 
 </cfoutput>

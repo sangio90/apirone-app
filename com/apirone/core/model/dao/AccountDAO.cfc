@@ -8,6 +8,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
+				created_at,
 			 	account_id,
 				api_key,
 				status_id,
