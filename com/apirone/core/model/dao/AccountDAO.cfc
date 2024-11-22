@@ -44,8 +44,24 @@
 				accounts
 			WHERE 1=1
 
-				<cfif !isNull( arguments.email )>
+				<cfif !IsNull( arguments.email )>
 					AND pgp_sym_decrypt(email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.email#">
+				</cfif>
+
+				<cfif !IsNull( arguments.str )>
+					AND pgp_sym_decrypt(email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.str#%">
+				</cfif>
+
+				<cfif !IsNull( arguments.statusId )>
+					AND status_id ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.statusId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.langId )>
+					AND lang_id ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.langId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.roleId )>
+					AND role_id ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.roleId#">
 				</cfif>
 
 			<cfif arguments.limit GTE 0>

@@ -13,7 +13,7 @@
                 <span data-bind="text:mainText.name"></span>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:editValue">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:editValue">
                     <i class="fas fa-edit"></i>
                 </button>
             </td>

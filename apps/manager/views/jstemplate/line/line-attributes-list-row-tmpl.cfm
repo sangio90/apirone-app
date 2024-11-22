@@ -10,12 +10,12 @@
                 <span data-bind="text: name"></span>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:selectAttribute">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:selectAttribute">
                     <i class="fas fa-plus"></i> 
                 </button>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:showAttributeValues">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:showAttributeValues">
                     <i class="fas fa-eye"></i> 
                 </button>
             </td>

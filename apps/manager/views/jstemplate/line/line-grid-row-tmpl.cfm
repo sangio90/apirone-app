@@ -19,17 +19,17 @@
                 <span data-bind="text: thickness.name"></span>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:edit">
                     <i class="fas fa-edit"></i>
                 </button>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:combinations">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:combinations">
                     <i class="fas fa-cogs"></i>
                 </button>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:attributes">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:attributes">
                     <i class="fas fa-external-link-square-alt"></i>
                 </button>
             </td>

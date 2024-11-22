@@ -8,10 +8,6 @@
         name: "Customer"
     },
     {
-        id: "EMP",
-        name: "Employee"
-    },
-    {
         id: "MAN",
         name: "Manager"
     }

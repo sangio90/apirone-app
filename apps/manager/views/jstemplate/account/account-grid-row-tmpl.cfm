@@ -19,7 +19,7 @@
                 <span data-bind="text: getCreatedAt"></span>
             </td>
             <td>
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:edit">
                     <i class="fas fa-edit"></i>
                 </button>
             </td>

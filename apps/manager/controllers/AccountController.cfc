@@ -4,8 +4,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.title = "Lista degli account";
 
-        //prc.list = DESerializeJSON( FileRead( '/config/data/fake/accounts.json.cfm' ) );
-
         prc.list = super.fire("account.search").getData();
 
         prc.jsScripts.add( "app-account" );

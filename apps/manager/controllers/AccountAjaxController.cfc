@@ -5,16 +5,10 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
         var dm = super.getDataMapper()
-        
-        param name="url['sort[0][field]']" default="name";
-        param name="url['sort[0][dir]']" default="asc";
-        
-        var user = prc.user;
 
-        var field = url['sort[0][field]'] == 'name' ? 'email' : '';
-        var sort = url['sort[0][dir]'];
-
-        var rows = super.fire("account.search").getData();
+        var args = paramsFromUrl()
+        
+        var rows = super.fire("account.search", args).getData();
         
         for ( var row in rows ) {
 

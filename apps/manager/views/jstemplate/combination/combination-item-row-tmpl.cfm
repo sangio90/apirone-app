@@ -11,17 +11,17 @@
                 <span data-bind="text: attributeValue.name"></span>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:showAttributesList">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:showAttributesList">
                     <i class="fas fa-plus"></i> 
                 </button>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:showComponents">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:showComponents">
                     <i class="fas fa-window-restore"></i> 
                 </button>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" data-bind="click:removeAttribute">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:removeAttribute">
                     <i class="fas fa-trash"></i> 
                 </button>
             </td>

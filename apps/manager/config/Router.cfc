@@ -86,6 +86,9 @@ component{
 		get( "/accounts" )
         	.to( "AccountController.list" ).end();
 
+		delete( "/accounts" )
+        	.to( "AccountController.delete" ).end();
+
 		get( "/accounts/print" )
         	.to( "AccountController.print" ).end();
 

@@ -42,6 +42,17 @@
                                 </div>
                             
                             </div>
+
+                            <div class="col-sm-6 text-end mt-4">
+
+                                <div class="float-end">
+                                    #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
+                                </div>
+
+                                <div class="status mt-1 float-end me-3" id="status-delete"></div>
+
+                            </div>
+
                             
                         </div>
                         
