@@ -273,19 +273,55 @@ AP.line.list = function() {
 
         },
 
-        open: function( event ) {
+        delete: function( event ) {
 
-            var id = event.data.id
-            window.open( "/manager/lines/" + id, '_blank').focus();
+			var status = $("#status-delete");
+			var checks = $('#line-grid').find("[name=selected]:checked");
+
+            console.log("checks", checks)
+
+			if ( checks.length ) {
+
+				var values = [];
+
+				checks.each(function(){
+					values.push( $(this).val() )
+				}) 
+
+				var ids = values.toString();
+
+				console.log("values", values);
+				console.log("ids", ids);
+
+				NM.util.ajax({ 
+					method: "DELETE", 
+					url: "/manager/ajax/lines",
+					data: ids,
+					callback: {
+						done: function( xhr ) {
+
+							if( xhr.data.payload.hasOwnProperty("errors") ) {
+								AP.widget.notify( "error", "Non riesco a cancellare tutti i valori" )
+							} else {
+								AP.widget.notify( "success", "Cancellazione avvenuta con successo" )
+							}
+
+							var id = viewModel.get("detailForm.data.id");
+							console.log("id", id);
+
+							viewModel.rows.read()
+							
+						}
+					}
+				})
+
+			} else {
+
+				NM.util.autoHideMessage( status, "<span class='red'>Selezionare almeno un valore</span>" );
+
+			}            
 
         },
-
-		print: function( item ) {
-
-            window.open('/manager/lines/print', '_blank');
-
-            return false;
-		},
 
 		combinations: function( event ) {
 

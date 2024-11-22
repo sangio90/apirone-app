@@ -26,7 +26,7 @@
     
     }
 
-    function addButton( required String label, String bindFunc ){ 
+    function addButton( required String label, String bind ){ 
 
         arguments["icon"] = "plus";
 
@@ -34,9 +34,17 @@
     
     }
 
-    function searchButton( required String label, String bindFunc ){ 
+    function searchButton( required String label, String bind ){ 
 
         arguments["icon"] = "search";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
+    function deleteButton( required String label, String bind ){ 
+
+        arguments["icon"] = "trash";
 
         return getButton( argumentCollection = arguments );
     
@@ -213,13 +221,13 @@
     }    
 
 
-    private function getButton( required String label="", String bindFunc="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
+    private function getButton( required String label="", String bind="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
 
         ```
         <cfsavecontent variable="local.html">
             <cfoutput>
                 <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size#" 
-                    #Len( arguments.bindFunc ) ? 'data-bind="#arguments.bindFunc#"' : ''#>
+                    #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#>
                     <i class="fas fa-#arguments.icon#"></i> #arguments.label#
                 </button>
             </cfoutput>

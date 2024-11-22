@@ -42,31 +42,46 @@
                                 </div>
                             
                             </div>
+                            <div class="col-sm-6 text-end mt-4">
+
+                                <div class="float-end">
+                                    #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
+                                </div>
+
+                                <div class="status mt-1 float-end me-3" id="status-delete"></div>
+
+                            </div>
                             
                         </div>
                         
                         <form name="line-grid-form" id="line-grid-form" method="post">
 
-                            #grid( 
-                                id="line-grid",
-                                columns="[
-                                    { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'code', 'title':'Codice', width: '120px' },
-                                    { 'field':'name', 'title':'Descrizione' },
-                                    { 'field':'category.name', 'title':'Categoria'},
-                                    { 'field':'thickness.name', 'title':'Spessore', width: '110px'},
-                                    { 'field':'', 'title':'Modifica', width: '55px'},
-                                    { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
-                                    { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
-                                    { 
-                                        'field':'', 
-                                        'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                        'width':'40px',
-                                        'headerAttributes': { 'class': 'text-center' }
-                                    }
-                                ]",
-                                rowTemplate="line/line-grid-row-tmpl"
-                            )#
+                            <div class="col-12">
+
+                                #grid( 
+                                    id="line-grid",
+                                    columns="[
+                                        { 'field':'shortId', 'title':'ID', width: '80px' },
+                                        { 'field':'code', 'title':'Codice', width: '120px' },
+                                        { 'field':'name', 'title':'Descrizione' },
+                                        { 'field':'category.name', 'title':'Categoria'},
+                                        { 'field':'thickness.name', 'title':'Spessore', width: '110px'},
+                                        { 'field':'', 'title':'Modifica', width: '55px'},
+                                        { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
+                                        { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
+                                        { 
+                                            'field':'', 
+                                            'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                            'width':'40px',
+                                            'headerAttributes': { 'class': 'text-center' }
+                                        }
+                                    ]",
+                                    rowTemplate="line/line-grid-row-tmpl"
+                                )#                                
+
+                            </div>
+
+
 
                         </form>
                                         
