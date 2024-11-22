@@ -19,19 +19,13 @@
                 <span data-bind="text: thickness.name"></span>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:edit">
-                    <i class="fas fa-edit"></i>
-                </button>
+                #iconButton(bind="click:edit", icon="edit")#
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:combinations">
-                    <i class="fas fa-cogs"></i>
-                </button>
+                #iconButton(bind="click:combinations", icon="cogs")#
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:attributes">
-                    <i class="fas fa-external-link-square-alt"></i>
-                </button>
+                #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"

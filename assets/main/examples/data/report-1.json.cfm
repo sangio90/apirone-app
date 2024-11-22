@@ -4,6 +4,9 @@
         date: "2024-05-20",
         validUntil: "2024-06-20",
         number: "P.644/4",
+        payment: {
+            name: "30% anticipo-saldo da definire" 
+        },
         customer: {
             name: "BORGHI VALERIA",
             phone: "393477107657",
@@ -37,21 +40,20 @@
                 },
                 quantity: 1,
                 price: 10.5,
-                total: 10.5
+                total: 10.5,
+                position: "Lista di posizinio on una stringa"
             },
             fruits: [ 
                 {
                     id: "4.0-2",
                     name: "Deviatore a levetta - 1p 10ax",
                     description: "Finitura:Ottone satinato - Incisione Frutto:No - Forma Levetta:AVIO -",
-                    position: "CUCINA/1"
                 },
                 {
                     id: "4.0-2",
                     name: "VerniciatoColore:Nero",
                     description: "Profilo:Taglio Diritto - Fissaggio:Calamite - Incisione Logo:No - Forma:Rettangolare - Orientamento:Orizzontale",
                     note: "PRESA NASCOSTE IN",
-                    position: "CUCINA/2"
                 }
             ]
         },
@@ -64,42 +66,42 @@
                 },
                 quantity: 1,
                 price: 10.5,
-                total: 10.5
+                total: 10.5,
+                position: "CUCINA/1"
+
             },
             fruits: [ 
                 {
                     id: "4.0-2",
                     name: "Deviatore a levetta - 1p 10ax",
                     description: "Finitura:Ottone satinato - Incisione Frutto:No - Forma Levetta:AVIO",
-                    position: "CUCINA/1"
+                    note: "PRESA NASCOSTE IN"
                 },
                 {
                     id: "4.0-2",
                     name: "VerniciatoColore:Nero",
                     description: "Profilo:Taglio Diritto - Fissaggio:Calamite - Incisione Logo:No - Forma:Rettangolare - Orientamento:Orizzontale",
-                    note: "PRESA NASCOSTE IN",
-                    position: "CUCINA/2"
+                    note: "PRESA NASCOSTE IN"
                 }
             ]
 
         }
     ],
     footer: {
-        totalGoods: 100,
-        vat: {
-            name: "Imposta 20%",
-            value: 30
-        },
-        total:  120,
-        discount: {
-            name: "Sconto 10%",
-            value: "3%"
-        },
-        shipment: {
-            name: "Spedizione 6/8 Settimane" 
-        },
-        payment: {
-            name: "30% anticipo-saldo da definire" 
-        }
+        totals: [
+            {
+                "Totale merce": 10000
+            },
+            {
+                "IVA 20%": 1200
+            },
+            {
+                "Sconto 50%": 2200
+            },
+            {
+                "Totale fattura": 2400
+            }
+        ],
+        description: "text in html"
     }
 }

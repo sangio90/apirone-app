@@ -50,6 +50,15 @@
     
     }
 
+    function iconButton( String bind, required String icon ){ 
+
+        arguments["label"] = "";
+        arguments["variant"] = "default";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
     function includeJSFiles(){ 
 
         for ( var thisScript in prc.jsScripts ) {

@@ -85,18 +85,17 @@
                             id: "4.0-2",
                             name: "Deviatore a levetta - 1p 10ax",
                             description: "Finitura:Ottone satinato - Incisione Frutto:No - Forma Levetta:AVIO -",
-                            position: "CUCINA/1"
+                            note: "COD.1 - FINITURA OTTONE CRUDO",
                         },
                         {
                             id: "4.0-2",
                             name: "VerniciatoColore:Nero",
                             description: "Profilo:Taglio Diritto - Fissaggio:Calamite - Incisione Logo:No - Forma:Rettangolare - Orientamento:Orizzontale",
-                            note: "PRESA NASCOSTE IN",
-                            position: "CUCINA/2"
+                            note: "COD.1 - FINITURA OTTONE CRUDO"
                         }
                     ],
                     notes: [
-                        "3) Cod. 502TC13R - Tappo copriforo - 1/2 modulo -",
+                        "3. Cod. 502TC13R - Tappo copriforo - 1/2 modulo -",
                         "ALVEOLI SCHRMATI - ESTETICA RIDOTTA -"
                     ]
                 }

@@ -6,8 +6,6 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
         var dm = super.getDatamapper();
         
-        var user = prc.user;
-
         var rows = super.fire( "report.search" ).getData();
 
         for ( var row in rows ) {

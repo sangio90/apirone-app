@@ -2,8 +2,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var user = prc.user;
-
         prc.title = "Lista dei report";
 
         //prc.list = super.fire( "report.list" );
