@@ -1,6 +1,6 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	
-	<cffunction name="read" output="false">
+	<cffunction name="read" returntype="Query">
 		<cfargument name="finishId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
@@ -17,7 +17,7 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction name="readByCode" output="false">
+	<cffunction name="readByCode" returntype="Query">
 		<cfargument name="code" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
@@ -34,7 +34,7 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction name="find" returntype="Query" output="false">
+	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
 
@@ -54,11 +54,7 @@
 			WHERE 1=1
 
 				<cfif !isNull( arguments.categoryId )>
-					<!---
-						TODO: to fix
-						// https://stackoverflow.com/questions/79195450/find-record-matching-an-array-json-field
-					--->
-					AND jsonb_exists_any( finishes.categories, ARRAY[21, 22]::json )
+					AND categories @> ANY ('{[#arguments.categoryId#]}')
 				</cfif>
 
 				<cfif !isNull( arguments.str )>
@@ -75,7 +71,7 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction name="insert" returntype="String" output="false">
+	<cffunction name="insert" returntype="String">
 		<cfargument name="finish" type="com.apirone.core.model.bean.Finish" required="true">
 
 		<cfset var categories = super.getCategoriesAsArray( finish.getCategories() )>
@@ -87,16 +83,16 @@
 				categories
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.finish.getCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="varchar" value="#serializeJSON( categories )#">
+				<cfqueryparam cfsqltype="Other" value="#serializeJSON( categories )#">
 			) RETURNING finish_id
 		</cfquery>
 
 		<cfreturn local.q.finish_id.toString()>
 	</cffunction>
 
-	<cffunction name="update" returntype="String" output="false">
+	<cffunction name="update" returntype="String">
 		<cfargument name="finish" type="com.apirone.core.model.bean.Finish" required="true">
 
 		<cfset var categories = super.getCategoriesAsArray( finish.getCategories() )>
@@ -115,7 +111,7 @@
 		<cfreturn arguments.finish.getId()>
 	</cffunction>
 
-	<cffunction name="delete" returntype="Numeric" output="false">
+	<cffunction name="delete" returntype="Numeric">
 		<cfargument name="finishId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">

@@ -35,9 +35,6 @@ AP.line.detail = function() {
 
 	var pub = {}
 
-    AP.page.categories.unshift( { id: "", name: "-- Seleziona una categoria" } );
-    AP.page.thicknesses.unshift( { id: "", name: "-- Seleziona uno spessore" } );
-
     //console.log("categories", AP.page.categories);
 
 	var defaultDetailForm = {
@@ -185,6 +182,9 @@ AP.line.detail = function() {
 
         kendo.bind( AP.line.fields.detailRoot, viewModel );
 
+        AP.page.categories.unshift( { id: "", name: "-- Seleziona una categoria" } );
+        AP.page.thicknesses.unshift( { id: "", name: "-- Seleziona uno spessore" } );
+   
 		var detailForm = AP.line.fields.detailForm;
 
 		detailForm.validate({

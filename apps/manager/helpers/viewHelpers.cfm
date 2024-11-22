@@ -26,7 +26,7 @@
     
     }
 
-    function addButton( required String label, String bind ){ 
+    function addButton( String bind, required String label="Carica" ){ 
 
         arguments["icon"] = "plus";
 
@@ -34,7 +34,7 @@
     
     }
 
-    function searchButton( required String label, String bind ){ 
+    function searchButton( String bind, required String label="Cerca",  ){ 
 
         arguments["icon"] = "search";
 
@@ -42,7 +42,7 @@
     
     }
 
-    function deleteButton( required String label, String bind ){ 
+    function deleteButton( String bind, required String label="Cancella" ){ 
 
         arguments["icon"] = "trash";
 

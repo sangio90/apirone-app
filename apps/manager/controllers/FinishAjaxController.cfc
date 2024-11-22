@@ -42,12 +42,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "";
 		var texts     = [];
 
-		var json = deserializeJSON( getHTTPRequestData().content );
+		var json = DeserializeJSON( getHTTPRequestData().content );
 
 		finish.setId( json.id );
 		finish.setCode( json.code );
 
-		for ( var thisCategory in json.categories ) {
+		for ( var thisCategory in json.selectedCategories ) {
 			category.setId( thisCategory.id );
 			categories.add( category );
 		}
@@ -55,21 +55,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		finish.setCategories( categories );
 		finish.setStatus( status.setId( json.status.id ) );
 
-		/*
-        for( var thisText in json.texts ) {
+		var text = super.bean("Text");
+		var lang = super.bean("Lang");
 
-            var text = super.bean("Text");
-            var lang = super.bean("Lang");
+		text.setName( json.name )
+		text.setLang( lang.setId( "IT" ) );
 
-            text.setName( thisText.name )
-            text.setLang( lang.setId( thisText.lang.id ) );
+		texts.add( text );
 
-            texts.add( text );
-
-        }
-        */
-
-		// finish.setCode( texts );
+		finish.setTexts( texts );
 
 		if ( !len( json.id ) ) {
 			messageId = "finish.created";

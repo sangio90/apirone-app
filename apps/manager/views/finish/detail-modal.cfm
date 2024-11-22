@@ -51,8 +51,9 @@
                             <label class="col-sm-2 col-form-label text-end">Stato</label>
                             <div class="col-sm-10">
                                 <select 
+                                    required
                                     id="statusId" 
-                                    class="fprm-control"
+                                    class="form-control"
                                     data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
                                     data-value-field="id"
                                     data-text-field="name"

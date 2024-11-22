@@ -66,8 +66,7 @@ AP.finish.list = (function () {
 			var thisForm = AP.finish.fields.detailForm;
 			var status = thisForm.find(".status");
 
-			status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
-			// var attrId = viewModel.get( "detailForm.data.id" )
+			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
 
 			if(thisForm.valid()) {
 
@@ -81,6 +80,8 @@ AP.finish.list = (function () {
 							NM.util.autoHideMessage( status, "<span class='green'>Finitura salvata</span>" )
 
 							setTimeout(() => $("#finish-detail-modal").modal("hide"), 1000);
+
+							viewModel.rows.read();
 
 						}
 					}

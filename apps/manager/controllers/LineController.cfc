@@ -42,13 +42,13 @@ component extends="com.apirone.core.controller.AbsController" {
     function combinations( event, rc, prc ){
 
         prc.existingCombinations = [];
-        prc.obj = super.fire("line.get", [rc.id] );
+        prc.line = super.fire("line.get", [rc.id] );
 
-        prc.page["line"] = prc.obj;
-        prc.title = "Combinazioni per la linea < #prc.obj.getName()# >";
+        prc.page["line"] = prc.line;
+        prc.title = "Combinazioni per la linea < #prc.line.getName()# >";
 
-        prc.sizes = super.fire( "size.list" );
-        prc.finishes = super.fire( "finish.list" );
+        prc.sizes = super.fire( "size.list", { categoryId = prc.line.getCategory().getId() } );
+        prc.finishes = super.fire( "finish.list", { categoryId = prc.line.getCategory().getId() } );
 
         var combinationsList = super.fire( "combination.list", { lineId = rc.id } );
         

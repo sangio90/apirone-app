@@ -7,7 +7,7 @@
         <div class="row">
 
             <div class="col-lg-12 text-end mb-3">
-                <button type="submit" class="btn btn-primary btn-sm" data-bind="click:new">Carica +</button>
+                #addButton( bind="click:new", size="sm" )#
             </div>
 
             <div class="col-lg-12">
@@ -41,8 +41,9 @@
                                                 <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
                                             </cfloop>
                                         </select>
+
+                                        #searchButton( bind="click:search" )#
                                     
-                                        <button type="submit" class="btn btn-primary" data-bind="click:search">Cerca ></button>
                                     </form>
                             
                                 </div>

@@ -79,7 +79,7 @@
     </div>
 
     #view("component/list-modal")#
-    #view("attribute/detail-values-modal")#
+    #view("attribute/detail-modal")#
 
     #template( view="jstemplate/combination/combination-item-row-tmpl" )#
 

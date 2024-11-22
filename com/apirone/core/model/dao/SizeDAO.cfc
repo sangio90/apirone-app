@@ -46,6 +46,7 @@
         <cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
 				size_id::varchar, 
+				code,
 				orderby,
 				COUNT(size_id) OVER() AS total
 			FROM
