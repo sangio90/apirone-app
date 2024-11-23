@@ -98,9 +98,6 @@
 			"code": "NEVER_USE_QUERY_IN_CFM"
 		},
 		{
-			"code": "OUTPUT_ATTR"
-		},
-		{
 			"code": "QUERYPARAM_REQ"
 		},
 		{
