@@ -183,6 +183,22 @@
 
         }
 
+        /*
+            paging
+        */
+
+        if( url.keyExists("count") ){
+
+            params["limit"] = url.count;
+
+            if( url.keyExists("page") ){
+                
+                params["offset"] = ( url.page - 1 ) * url.count;
+            
+            }
+
+        }
+
         return params;
 
     }    

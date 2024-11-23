@@ -192,6 +192,7 @@
         required String sortable=false, 
         required String source="rows", 
         required String columns="[]",
+        required String pageSizes="['15', '50', '100' ]",
                  String class=""
     ){ 
 
@@ -207,8 +208,7 @@
                     data-sortable="#arguments.sortable#" 
                     data-reorderable=""
                     data-bind="source: #arguments.source#"
-                    data-pageable="{ 'pageSizes': ['20', '50', '100' ] }"
-                    data-pa="true"
+                    data-pageable="{ 'pageSizes': #arguments.pageSizes# }"
                     data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
                     data-no-records="{ template : '<div class=grid-no-data><br>Nessun record trovato.<br><br></div>'}">
                 </div>

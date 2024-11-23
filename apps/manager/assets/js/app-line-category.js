@@ -19,7 +19,7 @@ AP.lineCategory.list = (function () {
 	var pub = {};
 
 	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/lines/categories", pageSize: 4, serverPaging: true })
+		items: NM.kendo.dataSource({ url: "/manager/ajax/lines/categories" })
 	};
 
 	var viewModel = kendo.observable({

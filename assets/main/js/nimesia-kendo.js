@@ -3,49 +3,12 @@ NM.kendo = NM.kendo || {};
 
 NM.kendo.dataSource = function (config = {}) {
 
-    var dataSource = new kendo.data.DataSource({
-        transport: {
-          // The remote endpoint which will receive the request parameters and return the response containing the data.
-          read: {
-            url: "http://apirone.local:7110/manager/ajax/lines/categories",
-          },
-
-            parameterMap: function (data, type) {
-                console.log("data.pageSize", data.pageSize);
-                console.log("type", type);
-                return {
-                    $page: data.page
-                }
-          
-            },
-
-        },
-        pageSize: 20,
-        schema: {
-            data: "data", 
-            total: "total"
-        },
-
-      
-        serverPaging: true
-      });
-
-      console.log("dataSource:total", dataSource.total())
-      console.log("dataSource:pageSize", dataSource.pageSize())
-
-      //dataSource.pageSize( dataSource.totalPages )
-
-      return dataSource;
-
-};
-
-/*
-NM.kendo.dataSource = function (config = {}) {
+    console.log("config.count", config.count)
 
     var defaults = {
         data: config.data ? config.data : [],
-        pageSize: config?.count,
-        serverPaging: config?.serverPaging,
+        pageSize: config.count ? config.count : 15,
+        serverPaging: config?.serverPaging ? config.serverPaging : true,
         serverSorting: config?.serverSorting,
         change: function () {
             $.each(this.data(), function (index, item) {
@@ -57,7 +20,14 @@ NM.kendo.dataSource = function (config = {}) {
     if (config.url != undefined) {
 
         defaults.transport = { "read": config.url };
-        defaults.schema = { "data": "data", pageSize: "count" };
+        defaults.schema = { "data": "data", total: "total" };
+
+        defaults.transport.parameterMap = function (data, type) {
+            return {
+                page: data.page,
+                count: data.pageSize,
+            }
+        };
 
         if (config.model) {
             defaults.schema.model = config.model;
@@ -72,7 +42,7 @@ NM.kendo.dataSource = function (config = {}) {
     return dataSource;
 
 };
-*/
+
 
 /*
     remove scrollbar in grid

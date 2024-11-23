@@ -4,10 +4,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var data = [];
         var result = super.getResult();
-        var dm = getDataMapper();
+        var dm = super.getDataMapper();
 
-        var params = paramsFromUrl();
-        var params["limit"] = 15;
+        var params = super.paramsFromUrl();
+        params["orderBy"] = [ { "field": 'lineCategory.id' } ]
 
         var rows = super.fire( "lineCategory.search", params );
 

@@ -14,7 +14,11 @@ component extends="coldbox.system.Interceptor"{
         var model = getModel();
 
         prc.isDev  = request.isDev();
-	    
+
+        /* paging */
+        param url.page = 1;
+        param url.count = 15;
+
         /*
             API module
         */
@@ -73,6 +77,7 @@ component extends="coldbox.system.Interceptor"{
         prc.user = session.user;
 
         request.lang = prc.user.getAccount()?.getLang() ?: loadDefaultLang();
+
         prc.lang = request.lang;
         prc.subtitle  = "";
 
