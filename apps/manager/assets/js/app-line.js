@@ -6,36 +6,36 @@ AP.line.fields = {
     detailForm: $("#line-detail-form"),
     searchListForm: $("#line-grid-search-form"),
     combinationsRoot: $("#line-combinations-root")
-}
+};
 
-$(document).ready(function(){
+$(document).ready(function (){
 
-	if ( AP.line.fields.listRoot.length ) {
+	if (AP.line.fields.listRoot.length) {
 
 	    AP.line.list.init();
 
 	}
 
-	if ( AP.line.fields.combinationsRoot.length ) {
+	if (AP.line.fields.combinationsRoot.length) {
 
 	    AP.line.combinations.init();
 
 	}
 
-	if ( AP.line.fields.detailRoot.length ) {
+	if (AP.line.fields.detailRoot.length) {
 
 	    AP.line.detail.init();
 
 	}
 
-})
+});
 
 
-AP.line.detail = function() {
+AP.line.detail = (function () {
 
-	var pub = {}
+	var pub = {};
 
-    //console.log("categories", AP.page.categories);
+    // console.log("categories", AP.page.categories);
 
 	var defaultDetailForm = {
 		data: {
@@ -52,7 +52,7 @@ AP.line.detail = function() {
 				id: "ACT"
 			}
 		},
-		
+
         statuses: AP.page.statuses,
 		categories: AP.page.categories,
 		thicknesses: AP.page.thicknesses,
@@ -60,22 +60,22 @@ AP.line.detail = function() {
 		title: "Carica linea"
 	};
 
-	var fireCallback = function( func ) {
+	var fireCallback = function (func) {
 
 		var callbackList = viewModel.get("callback");
 
-		var exists = callbackList?.hasOwnProperty( func );
+		var exists = callbackList?.hasOwnProperty(func);
 
-		if( exists ) {
+		if(exists) {
 
-			var thisCallback = callbackList[ func ]
+			var thisCallback = callbackList[ func ];
 
-			if( typeof thisCallback == "function" ) {
-				thisCallback()
+			if(typeof thisCallback == "function") {
+				thisCallback();
 			}
 		}
 
-	}
+	};
 
 	var viewModel = kendo.observable({
 
@@ -86,10 +86,10 @@ AP.line.detail = function() {
 			onUpdate: undefined,
 			onLoad: undefined
 		},
-        
+
 		resetForm: function () {
 
-            var detailForm = AP.line.fields.detailForm
+            var detailForm = AP.line.fields.detailForm;
 
             var validator = detailForm.validate();
             validator.resetForm();
@@ -99,12 +99,12 @@ AP.line.detail = function() {
 			viewModel.set("detailForm", defaultDetailForm);
 		},
 
-        save: function( event ) {
+        save: function (event) {
 
 			var detailForm = AP.line.fields.detailForm;
 			var status = detailForm.find(".status");
 
-		    status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+		    status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
 
 			if(detailForm.valid()) {
 
@@ -114,12 +114,12 @@ AP.line.detail = function() {
 					data: JSON.stringify(viewModel.get("detailForm.data")),
 					callback: {
 						done: function (xhr) {
-							
-							if( xhr.status == "SUCCESS" ) {
 
-								NM.util.autoHideMessage( status, "<span class='green'>Linea salvata</span>" );
+							if(xhr.status == "SUCCESS") {
 
-								setTimeout( () => $("#line-detail-modal").modal("hide"), 1000 );
+								NM.util.autoHideMessage(status, "<span class='green'>Linea salvata</span>");
+
+								setTimeout(() => $("#line-detail-modal").modal("hide"), 1000);
 
                                 fireCallback("onSave");
 
@@ -137,54 +137,54 @@ AP.line.detail = function() {
 
 	});
 
-	pub.new = function( { onSave } ) {
+	pub.new = function ({ onSave }) {
 
-        if ( onSave ) {
-            viewModel.set("callback.onSave", onSave)
+        if (onSave) {
+            viewModel.set("callback.onSave", onSave);
         }
 
         viewModel.resetForm();
 
-        NM.util.openModal( AP.line.fields.detailRoot );
+        NM.util.openModal(AP.line.fields.detailRoot);
 
     },
 
-	pub.edit = function( { id, onSave } ) {
+	pub.edit = function ({ id, onSave }) {
 
-        if ( onSave ) {
-            viewModel.set("callback.onSave", onSave)
+        if (onSave) {
+            viewModel.set("callback.onSave", onSave);
         }
 
         viewModel.resetForm();
 
-        NM.util.ajax({ 
-            method: "GET", 
+        NM.util.ajax({
+            method: "GET",
             url: "/manager/ajax/lines/" + id,
             callback: {
-                done: function( xhr ) {
+                done: function (xhr) {
 
-                    if( xhr.status == "SUCCESS" ) {
+                    if(xhr.status == "SUCCESS") {
 
-                        viewModel.set("detailForm.data", xhr.data );
-                        viewModel.set("detailForm.title", "Modifica linea" );
+                        viewModel.set("detailForm.data", xhr.data);
+                        viewModel.set("detailForm.title", "Modifica linea");
 
-                        NM.util.openModal( AP.line.fields.detailRoot );
+                        NM.util.openModal(AP.line.fields.detailRoot);
 
                     }
 
                 }
             }
-        })        
+        });
 
     },
 
-	pub.init = function() {
+	pub.init = function () {
 
-        kendo.bind( AP.line.fields.detailRoot, viewModel );
+        kendo.bind(AP.line.fields.detailRoot, viewModel);
 
-        AP.page.categories.unshift( { id: "", name: "-- Seleziona una categoria" } );
-        AP.page.thicknesses.unshift( { id: "", name: "-- Seleziona uno spessore" } );
-   
+        AP.page.categories.unshift({ id: "", name: "-- Seleziona una categoria" });
+        AP.page.thicknesses.unshift({ id: "", name: "-- Seleziona uno spessore" });
+
 		var detailForm = AP.line.fields.detailForm;
 
 		detailForm.validate({
@@ -215,131 +215,131 @@ AP.line.detail = function() {
 
 		});
 
-	}	
+	};
 
     return pub;
-}();
+}());
 
 
-AP.line.list = function() {
+AP.line.list = (function () {
 
-	var pub = {}
+	var pub = {};
 
     var detailApp = AP.line.detail;
 
 	var dataSources = {
-		items: NM.kendo.dataSource( { url: "/manager/ajax/lines" } )
-	}
+		items: NM.kendo.dataSource({ url: "/manager/ajax/lines" })
+	};
 
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
-        
-        search: function( event ) {
+
+        search: function (event) {
 
             var thisForm = AP.line.fields.searchListForm;
 
             var params = thisForm.serializeJSON();
 
-            viewModel.rows.read( params )
+            viewModel.rows.read(params);
 
             return false;
 
         },
 
-        new: function( event ) {
+        new: function (event) {
 
-            console.log("detailApp", detailApp)
+            console.log("detailApp", detailApp);
 
-            var onSave = function() {
+            var onSave = function () {
                 console.log("onSave");
                 viewModel.get("rows").read();
-            }
+            };
 
-            detailApp.new( { onSave: onSave } );
+            detailApp.new({ onSave: onSave });
 
             return false;
 
         },
 
-        edit: function( event ) {
+        edit: function (event) {
 
-            var onSave = function() {
+            var onSave = function () {
                 viewModel.get("rows").read();
-            }
+            };
 
-            detailApp.edit( { id: event.data.id, onSave: onSave } );
+            detailApp.edit({ id: event.data.id, onSave: onSave });
 
             return false;
 
         },
 
-        delete: function( event ) {
+        delete: function (event) {
 
 			var status = $("#status-delete");
-			var checks = $('#line-grid').find("[name=selected]:checked");
+			var checks = $("#line-grid").find("[name=selected]:checked");
 
-            console.log("checks", checks)
+            console.log("checks", checks);
 
-			if ( checks.length ) {
+			if (checks.length) {
 
 				var values = [];
 
-				checks.each(function(){
-					values.push( $(this).val() )
-				}) 
+				checks.each(function (){
+					values.push($(this).val());
+				});
 
 				var ids = values.toString();
 
 				console.log("values", values);
 				console.log("ids", ids);
 
-				NM.util.ajax({ 
-					method: "DELETE", 
+				NM.util.ajax({
+					method: "DELETE",
 					url: "/manager/ajax/lines",
 					data: ids,
 					callback: {
-						done: function( xhr ) {
+						done: function (xhr) {
 
-							if( xhr.data.payload.hasOwnProperty("errors") ) {
-								AP.widget.notify( "error", "Non riesco a cancellare tutti i valori" )
+							if(xhr.data.payload.hasOwnProperty("errors")) {
+								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
 							} else {
-								AP.widget.notify( "success", "Cancellazione avvenuta con successo" )
+								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 							}
 
 							var id = viewModel.get("detailForm.data.id");
 							console.log("id", id);
 
-							viewModel.rows.read()
-							
+							viewModel.rows.read();
+
 						}
 					}
-				})
+				});
 
 			} else {
 
-				NM.util.autoHideMessage( status, "<span class='red'>Selezionare almeno un valore</span>" );
+				NM.util.autoHideMessage(status, "<span class='red'>Selezionare almeno un valore</span>");
 
-			}            
+			}
 
         },
 
-		combinations: function( event ) {
+		combinations: function (event) {
 
-            var id = event.data.id
-            window.open( "/manager/lines/" + id + "/combinations", '_blank').focus();
+            var id = event.data.id;
+            window.open("/manager/lines/" + id + "/combinations", "_blank").focus();
 
             return false;
 		},
 
 
-		attributes: function( event ) {
+		attributes: function (event) {
 
             /*
                 note: redirect in controller to first combination
             */
 
-            var id = event.data.id
-            window.open( "/manager/lines/" + id + "/attributes", '_blank').focus();
+            var id = event.data.id;
+            window.open("/manager/lines/" + id + "/attributes", "_blank").focus();
 
             return false;
 		},
@@ -347,63 +347,62 @@ AP.line.list = function() {
 
 	});
 
-	pub.init = function() {
+	pub.init = function () {
 
-        console.log("list:init")
+        console.log("list:init");
 
-        kendo.bind( AP.line.fields.listRoot, viewModel );
+        kendo.bind(AP.line.fields.listRoot, viewModel);
 
-	}	
+	};
 
     return pub;
-}();
+}());
 
 
-AP.line.combinations = function() {
+AP.line.combinations = (function () {
 
     var pub = {};
 
-    var changeStatus = function( status, event ) {
+    var changeStatus = function (status, event) {
 
-        //active 
+        // active
         var method = "POST";
         var classToShow = "active";
         var classToHide = "deactive";
         var message = "Combinazione salvata";
 
-        //deactive
-        if ( status == "deactive" ) {
-            method = "DELETE"
+        // deactive
+        if (status == "deactive") {
+            method = "DELETE";
             classToShow = "deactive";
             classToHide = "active";
             message = "Combinazione rimossa";
         }
 
         var status = $("#line-combinations-status");
-        var values = $(event.currentTarget).data( "values" );
+        var values = $(event.currentTarget).data("values");
 
-        status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+        status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
 
-        var size = values.split( "__" )[0];
-        var finish = values.split( "__" )[1];
+        var size = values.split("__")[0];
+        var finish = values.split("__")[1];
 
-        NM.util.ajax({ 
-            method: method, 
+        NM.util.ajax({
+            method: method,
             url: "/manager/ajax/lines/" + AP.page.line.id + "/combinations",
-            data: JSON.stringify( { 
+            data: JSON.stringify({
                     sizeId: size,
                     finishId: finish
-                } 
-            ),
+                }),
             callback: {
-                done: function( xhr ) {
+                done: function (xhr) {
 
-                    if( xhr.status == "SUCCESS" ) {
+                    if(xhr.status == "SUCCESS") {
 
                         var button = $("button[data-values='" + values +"']");
 
-                        button.filter( "." + classToShow ).show();
-                        button.filter( "." + classToHide ).hide();
+                        button.filter("." + classToShow).show();
+                        button.filter("." + classToHide).hide();
 
                         status.html("<span class='green'>" + message + "</span> ");
 
@@ -411,15 +410,15 @@ AP.line.combinations = function() {
 
                 }
             }
-        })
-        
+        });
+
         return false;
-    
-    }
+
+    };
 
 	var viewModel = kendo.observable({
 
-        activate: function( event ) {
+        activate: function (event) {
 
             event.preventDefault();
 
@@ -427,8 +426,8 @@ AP.line.combinations = function() {
 
 		},
 
-        deactivate: function( event ) {
-            
+        deactivate: function (event) {
+
             event.preventDefault();
 
             bootbox.confirm({
@@ -436,16 +435,16 @@ AP.line.combinations = function() {
                 message: "Sei sicuro di voler cancellare questa combinazione?",
                 buttons: {
                     confirm: {
-                        label: 'Si, confermo',
-                        className: 'btn-primary'
+                        label: "Si, confermo",
+                        className: "btn-primary"
                     },
                     cancel: {
-                        label: 'No, chiudi',
-                        className: 'btn-danger'
+                        label: "No, chiudi",
+                        className: "btn-danger"
                     }
                 },
                 callback: function (result) {
-                    if( result ) {
+                    if(result) {
                         changeStatus("deactive", event);
                     }
                 }
@@ -453,14 +452,14 @@ AP.line.combinations = function() {
         },
 
 
-	});    
+	});
 
-	pub.init = function() {
+	pub.init = function () {
 
-		kendo.bind( AP.line.fields.combinationsRoot, viewModel )
-        
-	}	
+		kendo.bind(AP.line.fields.combinationsRoot, viewModel);
+
+	};
 
     return pub;
 
-}();
+}());

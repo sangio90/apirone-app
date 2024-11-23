@@ -1,101 +1,101 @@
 AP.role = AP.role || {};
 
 AP.role.fields = {
-    rootList: $('#role-list-root'),
-    rootDetail: $('#role-detail-form')
-}
+    rootList: $("#role-list-root"),
+    rootDetail: $("#role-detail-form")
+};
 
-$(document).ready(function(){
+$(document).ready(function (){
 
-	if ( AP.role.fields.rootList.length ) {
+	if (AP.role.fields.rootList.length) {
 
-		//AP.role.list.init();
+		// AP.role.list.init();
 
 	}
 
-	if ( AP.role.fields.rootDetail.length ) {
+	if (AP.role.fields.rootDetail.length) {
 
 	    AP.role.detail.init();
 
 	}
 
-})
+});
 
-AP.role.list = function() {
+AP.role.list = (function () {
 
-	var pub = {}
+	var pub = {};
 
-	pub.init = function() {
+	pub.init = function () {
 
-        kendo.bind( FW.role.fields.rootList, viewModel );
+        kendo.bind(AP.role.fields.rootList, viewModel);
 
-	}	
+	};
 
     return pub;
-}();
+}());
 
 
-AP.role.detail = function() {
+AP.role.detail = (function () {
 
     var pub = {};
 
-    var roles = [{ id: 'ADM', 'name':  'Admin' },{ 'id': 'COM', 'name': 'Commerciale' }];
-    var statusList = [{ 'id': 'ACT', 'name': 'Attivo' },{ 'id': 'DEA', 'name': 'Disattivato' }];
-    var data = { 'id': '1', 'name': 'Admin', 'email': 'roberto@marzialetti.com', 'surname': 'Marzialetti', 'role': { 'id': 'ADM', 'name': 'Admin' } };
+    var roles = [{ id: "ADM", "name":  "Admin" }, { "id": "COM", "name": "Commerciale" }];
+    var statusList = [{ "id": "ACT", "name": "Attivo" }, { "id": "DEA", "name": "Disattivato" }];
+    var data = { "id": "1", "name": "Admin", "email": "roberto@marzialetti.com", "surname": "Marzialetti", "role": { "id": "ADM", "name": "Admin" } };
 
 	var viewModel = kendo.observable({
         roles: roles,
         statusList: statusList,
         detailForm: {
             data: data,
-            label: '',
-            title: 'Dettaglio ruolo',
-            action: 'update'
+            label: "",
+            title: "Dettaglio ruolo",
+            action: "update"
         },
 
-        edit: function( event ) {
-            
-            AP.role.fields.item.removeClass('d-none');
+        edit: function (event) {
 
-            this.set("detailForm.data", event.data );
-            this.set("detailForm.title", "Modifica ruolo < " + event.data.email + " >"  );
-            this.set("detailForm.action", "update" );
+            AP.role.fields.item.removeClass("d-none");
 
-            return false;
-		},
-
-        new: function( event ) {
-
-            AP.role.fields.item.removeClass('d-none');
-
-            var data = { role: { id: 'ADM' }, status: { id: 'ACT' } };
-
-            this.set("detailForm.data", data );
-            this.set("detailForm.title", "Carica account" );
-            this.set("detailForm.action", "create" );
+            this.set("detailForm.data", event.data);
+            this.set("detailForm.title", "Modifica ruolo < " + event.data.email + " >");
+            this.set("detailForm.action", "update");
 
             return false;
 		},
 
+        new: function (event) {
 
-		print: function( item ) {
+            AP.role.fields.item.removeClass("d-none");
 
-            window.open('/manager/account/print', '_blank');
+            var data = { role: { id: "ADM" }, status: { id: "ACT" } };
+
+            this.set("detailForm.data", data);
+            this.set("detailForm.title", "Carica account");
+            this.set("detailForm.action", "create");
 
             return false;
 		},
 
 
-	});    
+		print: function (item) {
 
-	pub.init = function() {
+            window.open("/manager/account/print", "_blank");
+
+            return false;
+		},
+
+
+	});
+
+	pub.init = function () {
 
         console.log("role:detail:init");
 
-		kendo.bind( AP.role.fields.rootDetail, viewModel )
-        
-	}	
+		kendo.bind(AP.role.fields.rootDetail, viewModel);
+
+	};
 
     return pub;
 
-}();
+}());

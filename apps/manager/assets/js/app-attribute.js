@@ -6,31 +6,31 @@ AP.attribute.fields = {
     detailForm: $("#attribute-detail-form"),
     valueForm : $("#attribute-values-add-form"),
     valuesForm: $("#attribute-values-form"),
-}
+};
 
-$(document).ready(function(){
+$(document).ready(function (){
 
-	if ( AP.attribute.fields.detailRoot.length ) {
+	if (AP.attribute.fields.detailRoot.length) {
 
 		AP.attribute.detail.init();
 
 	}
 
-	if ( AP.attribute.fields.listRoot.length ) {
+	if (AP.attribute.fields.listRoot.length) {
 
 		AP.attribute.list.init();
 
 	}
 
-})
+});
 
 /*
 	detail
 */
 
-AP.attribute.detail = function() {
+AP.attribute.detail = (function () {
 
-	var pub = {}
+	var pub = {};
 
 	var defaults = {
 
@@ -72,32 +72,32 @@ AP.attribute.detail = function() {
 			title: "Carica valore",
 			labelButton: "Carica"
 		},
-	
-	}
 
-	var fireCallback = function( func ) {
+	};
+
+	var fireCallback = function (func) {
 
 		var callbackList = viewModel.get("callback");
 
-		var exists = callbackList?.hasOwnProperty( func )
+		var exists = callbackList?.hasOwnProperty(func);
 
-		if( exists ) {
+		if(exists) {
 
-			var thisCallback = callbackList[ func ]
+			var thisCallback = callbackList[ func ];
 
-			if( typeof thisCallback == "function" ) {
-				thisCallback()
+			if(typeof thisCallback == "function") {
+				thisCallback();
 			}
 		}
 
-	}
+	};
 
 	var viewModel = kendo.observable({
 
 		detailForm: defaults.detailForm,
 		valueForm: defaults.valueForm,
 
-		categories: AP.page.categories,		
+		categories: AP.page.categories,
 		statusList: AP.page.attributeStatusList,
 
 		callback: {
@@ -106,37 +106,37 @@ AP.attribute.detail = function() {
 			onLoad: undefined
 		},
 
-		//TODO: only one "resetForm"
-		resetDetailForm: function() {
+		// TODO: only one "resetForm"
+		resetDetailForm: function () {
 
 			var thisForm = AP.attribute.fields.detailForm;
 
-			viewModel.set("detailForm", defaults.detailForm );
+			viewModel.set("detailForm", defaults.detailForm);
 
 			thisForm.find(".status").html("");
 			thisForm.data("validator").resetForm();
 
 		},
-		
-		resetValueForm: function() {
+
+		resetValueForm: function () {
 
 			var thisForm = AP.attribute.fields.valueForm;
 
-			viewModel.set("valueForm", defaults.detailForm );
+			viewModel.set("valueForm", defaults.detailForm);
 
 			thisForm.find(".status").html("");
 			thisForm.data("validator").resetForm();
 
 		},
-		
-		isValuesGridVisible: function() {
+
+		isValuesGridVisible: function () {
 
 			var values = viewModel.get("detailForm.data.values");
 
-			if ( values?.total() ) {
+			if (values?.total()) {
 				return true;
 			}
-			
+
 			return false;
 
 		},
@@ -158,102 +158,102 @@ AP.attribute.detail = function() {
 		},
 		*/
 
-		deleteValues: function( event ) {
+		deleteValues: function (event) {
 
 			var status = $("#attribute-values-delete-status");
-			var checks = $('#attribute-values-form').find("[name=selected]:checked");
+			var checks = $("#attribute-values-form").find("[name=selected]:checked");
 
-			if ( checks.length ) {
+			if (checks.length) {
 
 				var values = [];
-				checks.each(function(){
-					values.push( $(this).val() )
-				}) 
+				checks.each(function (){
+					values.push($(this).val());
+				});
 
 				var ids = values.toString();
 
 				console.log("values", values);
 				console.log("ids", ids);
 
-				NM.util.ajax({ 
-					method: "DELETE", 
+				NM.util.ajax({
+					method: "DELETE",
 					url: "/manager/ajax/attributes/values",
 					data: ids,
 					callback: {
-						done: function( xhr ) {
+						done: function (xhr) {
 
-							if( xhr.data.payload.hasOwnProperty("errors") ) {
+							if(xhr.data.payload.hasOwnProperty("errors")) {
 
-								AP.widget.notify( "error", "Non sonosciuto a cancellare tutti i valori" )
+								AP.widget.notify("error", "Non sonosciuto a cancellare tutti i valori");
 
 							} else {
-								
-								AP.widget.notify( "success", "Cancellazione avvenuta con successo" )
+
+								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 
 							}
 
 							var id = viewModel.get("detailForm.data.id");
 							console.log("id", id);
 
-							loadAttribute( { id: viewModel.get("detailForm.data.id") } )
-							
+							loadAttribute({ id: viewModel.get("detailForm.data.id") });
+
 						}
 					}
-				})
+				});
 
 			} else {
 
-				NM.util.autoHideMessage( status, "<span class='red'>Selezionare almeno un valore</span>" );
+				NM.util.autoHideMessage(status, "<span class='red'>Selezionare almeno un valore</span>");
 
 			}
 
-		},	
-	
-		editValue: function( event ) {
+		},
+
+		editValue: function (event) {
 
 			var labelButton = "Carica";
 			var title = "Carica valore";
-	
-			if ( event?.data.id ) {
+
+			if (event?.data.id) {
 				labelButton = "Aggiorna";
-				title = "Modifica valore < " + event.data.id + " >"
+				title = "Modifica valore < " + event.data.id + " >";
 			}
-	
-			viewModel.set( "valueForm.data", event.data );
-			viewModel.set( "valueForm.title", title );
-			viewModel.set( "valueForm.labelButton", labelButton );
 
-		},	
-	
-		edit: function( event ) {
+			viewModel.set("valueForm.data", event.data);
+			viewModel.set("valueForm.title", title);
+			viewModel.set("valueForm.labelButton", labelButton);
+
 		},
 
-		new: function( event ) {
+		edit: function (event) {
 		},
 
-		save: function() {
+		new: function (event) {
+		},
+
+		save: function () {
 
 			var thisForm = AP.attribute.fields.detailForm;
 			var status = thisForm.find(".status");
 
-			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+			status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
 
-			if( thisForm.valid() ) {
+			if(thisForm.valid()) {
 
-				NM.util.ajax({ 
-					method: "POST", 
+				NM.util.ajax({
+					method: "POST",
 					url: "/manager/ajax/attributes",
-					data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+					data: JSON.stringify(viewModel.get("detailForm.data")),
 					callback: {
-						done: function( xhr ) {
-							
-							NM.util.autoHideMessage( status, "<span class='green'>Attributo modificato</span>");
+						done: function (xhr) {
 
-							fireCallback( "onUpdate" );
+							NM.util.autoHideMessage(status, "<span class='green'>Attributo modificato</span>");
+
+							fireCallback("onUpdate");
 
 						}
 					}
-				})
+				});
 
 			}
 
@@ -261,41 +261,40 @@ AP.attribute.detail = function() {
 
 		},
 
-		saveValue: function() {
+		saveValue: function () {
 
 			var thisForm = AP.attribute.fields.valueForm;
 			var status = $("#attribute-values-add-form-status");
 
-			var attrId = viewModel.get( "detailForm.data.id" ) 
+			var attrId = viewModel.get("detailForm.data.id");
 
-			if( thisForm.valid() ) {
+			if(thisForm.valid()) {
 
-				status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+				status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
 
-				NM.util.ajax({ 
-					method: "POST", 
+				NM.util.ajax({
+					method: "POST",
 					url: "/manager/ajax/attributes/values",
-					data: JSON.stringify( { 
-							value: viewModel.get( "valueForm.data" ), 
+					data: JSON.stringify({
+							value: viewModel.get("valueForm.data"),
 							attributeId: attrId
-						} 
-					),
+						}),
 					callback: {
-						done: function( xhr ) {
-							//status.html("<span class='green'>Valore salvato</span>");
+						done: function (xhr) {
+							// status.html("<span class='green'>Valore salvato</span>");
 
-							NM.util.autoHideMessage( status, "<span class='green'>Valore salvato</span>" );
+							NM.util.autoHideMessage(status, "<span class='green'>Valore salvato</span>");
 
-							var id = viewModel.get("detailForm.data.id")
+							var id = viewModel.get("detailForm.data.id");
 							console.log("id", id);
 
-							loadAttribute( {id: id} )
+							loadAttribute({id: id});
 
 							fireCallback("onSaveValue");
 
 						}
 					}
-				})
+				});
 
 			}
 
@@ -305,21 +304,21 @@ AP.attribute.detail = function() {
 
     });
 
-	loadAttribute = function( { id, callback } ) {
+	loadAttribute = function ({ id, callback }) {
 
-		console.log("callback", callback)
-		
-		NM.util.ajax({ 
-			method: "GET", 
+		console.log("callback", callback);
+
+		NM.util.ajax({
+			method: "GET",
 			url: "/manager/ajax/attributes/" + id,
 			callback: {
-				done: function( xhr ) {
+				done: function (xhr) {
 
-					console.log("xhr.data.values", xhr.data)
+					console.log("xhr.data.values", xhr.data);
 
 					var valuesDataSource = new kendo.data.DataSource({
 						data: xhr.data.values,
-						sort: { field: "orderBy", dir: "asc" } 
+						sort: { field: "orderBy", dir: "asc" }
 					});
 
 					delete xhr.data.values;
@@ -327,29 +326,29 @@ AP.attribute.detail = function() {
 					var selectedCategories = [];
 
 					for (var category of xhr.data.categories)  {
-						selectedCategories.push( category );
+						selectedCategories.push(category);
 					}
-		
-					viewModel.set( "detailForm.data", xhr.data );
-					viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
-					viewModel.set( "detailForm.data.values", valuesDataSource );
-					viewModel.set( "detailForm.title", "Modifica attributo <" + xhr.data.name + " >"  );
-					viewModel.set( "detailForm.labelButton", "Aggiorna" );
+
+					viewModel.set("detailForm.data", xhr.data);
+					viewModel.set("detailForm.data.selectedCategories", selectedCategories);
+					viewModel.set("detailForm.data.values", valuesDataSource);
+					viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
+					viewModel.set("detailForm.labelButton", "Aggiorna");
 
 					fireCallback("onLoad");
 
-					NM.util.openModal( $("#attribute-detail-modal") );
+					NM.util.openModal($("#attribute-detail-modal"));
 
 					var table = $("#attribute-values-grid .k-grid-container .k-table");
 
 					table.kendoSortable({
 						axis: "y",
 						filter: ">tbody >tr",
-						hint: function(element) {
-							var ele = $('<div>')
-							var text = $(element).find('td.sortable').text();
-							
-							ele.text( text )
+						hint: function (element) {
+							var ele = $("<div>");
+							var text = $(element).find("td.sortable").text();
+
+							ele.text(text)
 								.height(element.height())
 								.width(element.width())
 								.addClass("sortable-hint");
@@ -357,19 +356,19 @@ AP.attribute.detail = function() {
 							return ele;
 
 						},
-						placeholder: function( element ) {
+						placeholder: function (element) {
 							return element.clone()
 								.addClass("sortable-placeholder")
 								.height(element.height())
 								.width(element.width());
-						},						
+						},
 
-						end: function( event ) {
+						end: function (event) {
 
 							console.log("event.oldIndex", event.oldIndex);
 							console.log("event.newIndex", event.newIndex);
-														
-							if( event.newIndex != event.oldIndex ) {
+
+							if(event.newIndex != event.oldIndex) {
 
 								var values = viewModel.get("detailForm.data.values").data();
 								var thisForm = $("#attribute-values-form");
@@ -378,48 +377,48 @@ AP.attribute.detail = function() {
 								console.log("values", values.length);
 
 								// INFO: kendo send an extra item to remove accordingly to direction of item
-								if ( event.oldIndex < event.newIndex  ) {
+								if (event.oldIndex < event.newIndex) {
 									var removeItem = event.oldIndex;
 								} else {
 									var removeItem = event.oldIndex+1;
 								}
 
-								status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+								status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
 
 								var count = 1;
 
-								table.find("tr").each( function( index ) {
+								table.find("tr").each(function (index) {
 
-									if ( index != removeItem ) {
+									if (index != removeItem) {
 
 										var ele = $(this);
 										var uid = ele.data("uid");
-	
-										for( var value of values ) {
-	
-											if ( value.get( "uid" ) == uid ) {
-	
-												value.set("orderBy", count*10 );
+
+										for(var value of values) {
+
+											if (value.get("uid") == uid) {
+
+												value.set("orderBy", count*10);
 											}
 										}
-										
+
 										count++;
 
 									}
 
-								} )
+								});
 
-								NM.util.ajax({ 
+								NM.util.ajax({
 									method: "POST",
 									url: "/manager/ajax/attributes/" + id + "/values/order",
-									data: JSON.stringify( viewModel.get("detailForm.data.values").data() ),
+									data: JSON.stringify(viewModel.get("detailForm.data.values").data()),
 									callback: {
-										done: function( xhr ) {
+										done: function (xhr) {
 
-											NM.util.autoHideMessage( status, "<span class='green'>Ordinamento salvato.</span>" );
+											NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
 										}
 									}
-								})
+								});
 
 							}
 						}
@@ -427,37 +426,37 @@ AP.attribute.detail = function() {
 					});
 				}
 			}
-		})				
-	}
+		});
+	};
 
-    pub.new = function( callback ) {
+    pub.new = function (callback) {
 
 		viewModel.resetDetailForm();
 
-		NM.util.openModal( $("#attribute-detail-modal") );
-		
+		NM.util.openModal($("#attribute-detail-modal"));
+
 		return;
 
 	};
 
 
-    pub.edit = function( { id, callback } ) {
+    pub.edit = function ({ id, callback }) {
 
-		loadAttribute( { id: id, callback: callback } );
+		loadAttribute({ id: id, callback: callback });
 
     };
 
-	pub.init = function() {
+	pub.init = function () {
 
-		console.log("AP.attribute.detail:init")
+		console.log("AP.attribute.detail:init");
 
-		kendo.bind( AP.attribute.fields.detailRoot, viewModel );
+		kendo.bind(AP.attribute.fields.detailRoot, viewModel);
 
 		var valueForm = AP.attribute.fields.valueForm;
 		var detailForm = AP.attribute.fields.detailForm;
 
-		detailForm.validate( {
-			onfocusout: function( element ) {
+		detailForm.validate({
+			onfocusout: function (element) {
 				$(element).valid();
 			},
 			rules: {
@@ -470,13 +469,13 @@ AP.attribute.detail = function() {
 					required: "Descrizione principale richiesta",
 				},
 			},
-		
-		} );
 
-		//console.log("valueForm", valueForm);
+		});
 
-		valueForm.validate( {
-			onfocusout: function( element ) {
+		// console.log("valueForm", valueForm);
+
+		valueForm.validate({
+			onfocusout: function (element) {
 				$(element).valid();
 			},
 			rules: {
@@ -514,81 +513,79 @@ AP.attribute.detail = function() {
 					required: "Stato richiesto",
 				},
 			},
-		
-		} );
 
-	}	
+		});
+
+	};
 
 	return pub;
 
-}();
-
-
+}());
 
 
 /*
 	list
 */
 
-AP.attribute.list = function() {
+AP.attribute.list = (function () {
 
 	var detailApp = AP.attribute.detail;
 
-	var pub = {}
+	var pub = {};
 
 	var dataSources = {
-		rows: NM.kendo.dataSource( { url: "/manager/ajax/attributes" } )
-	}
+		rows: NM.kendo.dataSource({ url: "/manager/ajax/attributes" })
+	};
 
 	var viewModel = kendo.observable({
 
 		rows: dataSources.rows,
 
-		new: function() {
+		new: function () {
 
 			detailApp.new();
 
 			return false;
 
-		},		
+		},
 
-		edit: function( event ) {
+		edit: function (event) {
 
-			detailApp.edit( { 
+			detailApp.edit({
 				id: event.data.id,
 				callback: {
-					onLoad: function() {
-						console.log("CARICATO!")
+					onLoad: function () {
+						console.log("CARICATO!");
 					},
-					onUpdate: function() {
-						viewModel.rows.read()
-						console.log("AGGIORNATO")
+					onUpdate: function () {
+						viewModel.rows.read();
+						console.log("AGGIORNATO");
 					}
 				}
-			} );
+			});
 
 			return false;
 
-		},		
+		},
 
-		search: function() {
+		search: function () {
 
 			return false;
 
-		},		
+		},
 
     });
 
-	pub.init = function() {
+	pub.init = function () {
 
-		console.log("AP.attribute.list:init")
+		console.log("AP.attribute.list:init");
 
-		kendo.bind( AP.attribute.fields.listRoot, viewModel );
+		kendo.bind(AP.attribute.fields.listRoot, viewModel);
 
-	}	
+	};
 
 	return pub;
 
-}();
+}());
 
 

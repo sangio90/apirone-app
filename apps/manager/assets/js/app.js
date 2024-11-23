@@ -1,10 +1,10 @@
 AP.core = AP.core || {};
 
-$(document).ready(function(){
+$(document).ready(function (){
 
     /* dom inits */
 
-	if ( $('#sidebar-left').length ) {
+	if ($("#sidebar-left").length) {
 
 		AP.core.init();
 
@@ -12,25 +12,25 @@ $(document).ready(function(){
 
 	/* message */
 
-	if ( AP.message ) {
+	if (AP.message) {
 
-		if ( Object.keys( AP.message ).length != 0 ) {
+		if (Object.keys(AP.message).length != 0) {
 
-			AP.widget.notify( AP.message.type, AP.message.message );
+			AP.widget.notify(AP.message.type, AP.message.message);
 		}
 
 	}
 
-})
+});
 
-AP.core = function() {
+AP.core = (function () {
 
-	var pub = {}
+	var pub = {};
 
-	pub.init = function() {};
+	pub.init = function () {};
 
-    pub.setSidebar = function(){}
+    pub.setSidebar = function (){};
 
     return pub;
 
-}();
+}());

@@ -1,114 +1,114 @@
 AP.report = AP.report || {};
 
 AP.report.fields = {
-    rootList: $('#report-list-root'),
-    rootDetail: $('#report-detail-form')
-}
+    rootList: $("#report-list-root"),
+    rootDetail: $("#report-detail-form")
+};
 
-$(document).ready(function(){
+$(document).ready(function (){
 
-	if ( AP.report.fields.rootList.length ) {
+	if (AP.report.fields.rootList.length) {
 
 	    AP.report.list.init();
 
 	}
 
-	if ( AP.report.fields.rootDetail.length ) {
+	if (AP.report.fields.rootDetail.length) {
 
 	    AP.report.detail.init();
 
 	}
 
-})
+});
 
-AP.report.list = function() {
+AP.report.list = (function () {
 
-	var pub = {}
+	var pub = {};
 
 	var dataSources = {
-		items: NM.kendo.dataSource( { url: "/manager/ajax/reports" } )
-	}
+		items: NM.kendo.dataSource({ url: "/manager/ajax/reports" })
+	};
 
 	var viewModel = kendo.observable({
 		rows: dataSources.items,
         detailForm: {
         },
 
-		deleteAll: function( item ) {
+		deleteAll: function (item) {
 		},
 
-		save: function( item ) {
+		save: function (item) {
 		},
 
-		
-		saveAll: function( item ) {
+
+		saveAll: function (item) {
 		},
 
-        edit: function( event ) {
+        edit: function (event) {
 
             var thisUrl = "/manager/reports/" + event.data.id;
-            window.open( thisUrl, '_blank').focus();
+            window.open(thisUrl, "_blank").focus();
 		},
 
-        new: function( event ) {
+        new: function (event) {
 		},
 
-		print: function( item ) {
+		print: function (item) {
 		},
 
 
 	});
 
-	pub.init = function() {
+	pub.init = function () {
 
-        kendo.bind( AP.report.fields.rootList, viewModel );
+        kendo.bind(AP.report.fields.rootList, viewModel);
 
-	}	
+	};
 
     return pub;
-}();
+}());
 
 
-AP.report.detail = function() {
+AP.report.detail = (function () {
 
     var pub = {};
 
 	var viewModel = kendo.observable({
         detailForm: {
             data: {},
-            label: '',
-            title: 'Dettaglio report',
-            action: 'update'
+            label: "",
+            title: "Dettaglio report",
+            action: "update"
         },
 
-        edit: function( event ) {
+        edit: function (event) {
             return false;
 		},
 
-        new: function( event ) {
-
-            return false;
-		},
-
-
-		print: function( item ) {
-
-            window.open('/manager/reports/print', '_blank');
+        new: function (event) {
 
             return false;
 		},
 
 
-	});    
+		print: function (item) {
 
-	pub.init = function() {
+            window.open("/manager/reports/print", "_blank");
+
+            return false;
+		},
+
+
+	});
+
+	pub.init = function () {
 
         console.log("report:detail:init");
 
-		kendo.bind( AP.report.fields.rootDetail, viewModel )
-        
-	}	
+		kendo.bind(AP.report.fields.rootDetail, viewModel);
+
+	};
 
     return pub;
 
-}();
+}());

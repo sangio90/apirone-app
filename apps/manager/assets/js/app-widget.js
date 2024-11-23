@@ -1,8 +1,8 @@
 AP.widget = AP.widget || {};
 
-AP.widget.notify = function( type, message, title ) {
+AP.widget.notify = function (type, message, title) {
 
-    console.log("ZB.widget.notify")
+    console.log("ZB.widget.notify");
 
 	var stack_topleft = {"dir1": "down", "dir2": "right", "push": "top"};
 	var stack_bottomleft = {"dir1": "right", "dir2": "up", "push": "top"};
@@ -10,9 +10,10 @@ AP.widget.notify = function( type, message, title ) {
 	var stack_bar_top = {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0};
 	var stack_bar_bottom = {"dir1": "up", "dir2": "right", "push": "bottom", "spacing1": 0, "spacing2": 0};
 
-    var icon = '';
+    var icon = "";
+    var title = "";
 
-    switch ( type ) {
+    switch (type) {
         case "error":
             icon = "fas fa-exclamation-circle";
             title = title ? title : "Errore";
@@ -34,15 +35,15 @@ AP.widget.notify = function( type, message, title ) {
             break;
 
         default:
-            throw 'Notify type [ ' + type + ' ] not found';
+            throw "Notify type [ " + type + " ] not found";
             return;
       }
-      
+
     var notice = new PNotify({
         type: type,
         title: title,
         text: message,
-        addclass: 'stack-bar-top',
+        addclass: "stack-bar-top",
         width: "100%",
         icon: icon,
         buttons: {
@@ -52,8 +53,8 @@ AP.widget.notify = function( type, message, title ) {
         stack: stack_bar_top
     });
 
-    notice.get().click(function() {
+    notice.get().click(function () {
         notice.remove();
     });
 
-}
+};
