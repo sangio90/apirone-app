@@ -41,7 +41,7 @@
     account.setRole( role );
     */
 
-    account.setLogin( "stanislav@nimesia.com" );
+    account.setEmail( "stanislav@nimesia.com" );
     account.setPwd( "JSA7!8fs:afn4K" );
     account.setRole( role.setId( "ADM" ) );
     account.setStatus( status.setId( "ACT" ) );

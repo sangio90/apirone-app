@@ -3,7 +3,7 @@ component extends="com.apirone.core.root.Application" {
     this.name = "apirone-site";
 	this.pdf.fontDirectory = "/assets/main/fonts";
 	this.customtagPaths = [ "/apps/utils/ctags/" ];
-	
+
 	COLDBOX_APP_ROOT_PATH = GetDirectoryFromPath( GetCurrentTemplatePath() );
 	COLDBOX_APP_MAPPING   = "";
 	COLDBOX_CONFIG_FILE   = "config.Coldbox";
@@ -35,7 +35,7 @@ component extends="com.apirone.core.root.Application" {
 		}
 
 		return true;
-	
+
 	}
 
 	public Boolean function onSessionStart( string targetPage ) {

@@ -1,5 +1,5 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-	
+
 	<cffunction name="read" returntype="Query">
 		<cfargument name="finishId" type="String" required="true">
 
@@ -54,7 +54,7 @@
 			WHERE 1=1
 
 				<cfif !isNull( arguments.categoryId )>
-					AND categories @> ANY ('{[#arguments.categoryId#]}')
+					AND categories @> ANY ('{[<cfqueryparam cfsqltype="Numeric" value="#arguments.categoryId#">]}')
 				</cfif>
 
 				<cfif !isNull( arguments.str )>

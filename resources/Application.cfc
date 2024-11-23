@@ -13,7 +13,7 @@
 
             cfheader(statuscode="404", statustext="Not Found");
             echo("Not allowed");
-            
+
             abort;
 
         }
@@ -22,7 +22,7 @@
 	}
 
 	private function getRealIP(){
-		
+
         var headers = GetHTTPRequestData().headers;
 
         if ( StructKeyExists( headers, "x-cluster-client-ip" ) ) {
@@ -33,7 +33,7 @@
 		}
 
 		return Len( CGI.REMOTE_ADDR ) ? Trim( listFirst( CGI.REMOTE_ADDR ) ) : "999.999.999.999";
-	
+
     }
 
 }

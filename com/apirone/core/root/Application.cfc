@@ -1,9 +1,9 @@
 component {
 
     pageEncoding "UTF-8";
-    
+
     variables.settings = new config.Settings();
-    
+
     this.name              = "apirone-core";
     this.nullSupport       = true;
     this.sessionManagement = true;
@@ -25,28 +25,28 @@ component {
     } ];
 
     this.datasources["apirone"] = {
-        type     = "postgresql", 
+        type     = "postgresql",
         host     = variables.settings.get('db.host'),
         database = variables.settings.get('db.name'),
         port     = variables.settings.get('db.port'),
         username = variables.settings.get('db.username'),
         password = variables.settings.get('db.pwd')
     };
-   
+
     this.datasources["verticale"] = {
-        class: "com.microsoft.sqlserver.jdbc.SQLServerDriver", 
-        bundleName: "org.lucee.mssql", 
+        class: "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+        bundleName: "org.lucee.mssql",
         bundleVersion: "12.2.0.jre8",
         connectionString: "jdbc:sqlserver://#variables.settings.get('verticaledb.host')#:#variables.settings.get('verticaledb.port')#;DATABASENAME=#variables.settings.get('verticaledb.name')#;SelectMethod=direct",
         username: "#variables.settings.get('verticaledb.username')#",
         password: "#variables.settings.get('verticaledb.pwd')#",
-        
+
         // optional settings
         connectionLimit:-1, // default:-1
         liveTimeout:15, // default: -1; unit: minutes
         validate:false, // default: false
     };
-   
+
     this.cache.connections["DefaultCache"] = {
         class         = "org.lucee.extension.cache.eh.EHCache",
         bundleName    = "ehcache.extension",
@@ -87,14 +87,14 @@ component {
     public Boolean function OnMissingTemplate(){
 
         cfheader( statusCode="404" statusText="Not found");
-                
+
         echo("404. Not found");
 
         return true;
     }
-    
+
     /*
-        Private methods 
+        Private methods
     */
 
     private function startFramework(){
@@ -108,17 +108,17 @@ component {
     private String function getVersion() {
 
         return this.version;
-        
+
     }
 
     private String function isDev() {
 
-        return ( 
+        return (
             ( Right( cgi.SERVER_NAME, 5 ) IS "local" )
-            OR 
-            ( cgi.SERVER_NAME CT "localhost" ) 
+            OR
+            ( cgi.SERVER_NAME CT "localhost" )
         );
-        
+
     }
 
 }
