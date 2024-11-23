@@ -29,7 +29,7 @@
 
 	</cffunction>
 
-	<cffunction returntype="Query" name="find">
+	<cffunction name="find" returntype="Query">
 
 		<cfargument name="str" type="String">    	
 		<cfargument name="lineId" type="Numeric">    

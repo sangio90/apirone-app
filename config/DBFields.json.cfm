@@ -37,5 +37,14 @@
     "finish.id": {
         "name": "finish_id",
         "type": "uuid"
+    },
+
+   "category.name": {
+        "name": "line_category",
+        "type": "varchar"
+    },
+   "category.code": {
+        "name": "code",
+        "type": "varchar"
     }
 }

@@ -23,18 +23,18 @@ $(document).ready(function(){
 
 })
 
-AP.quotation.list = function() {
+AP.quotation.list = (function() {
 
-	var pub = {}
+	var pub = {};
 
 	pub.init = function() {
 
-        kendo.bind( FW.account.fields.rootList, viewModel );
+        kendo.bind(FW.account.fields.rootList, viewModel);
 
-	}	
+	};
 
     return pub;
-}();
+}());
 
 
 AP.quotation.detail = function() {

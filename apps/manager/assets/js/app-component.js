@@ -2,22 +2,22 @@ AP.component = AP.component || {};
 
 AP.component.fields = {
     rootList: $("#component-list-modal"),
-}
+};
 
-$(document).ready(function(){
+$(document).ready(function (){
 
-	if ( AP.component.fields.rootList.length ) {
+	if (AP.component.fields.rootList.length) {
 
 		AP.component.list.init();
 
 	}
 
-})
+});
 
 
-AP.component.list = function() {
+AP.component.list = (function () {
 
-	var pub = {}
+	var pub = {};
 
 	var viewModel = kendo.observable({
 
@@ -31,29 +31,29 @@ AP.component.list = function() {
 		currentVariant: {},
 		currentComponent: {},
 
-		showSearchResult: function() {
+		showSearchResult: function () {
 
-			var ret = viewModel.get( "components" ).length > 0;
+			var ret = viewModel.get("components").length > 0;
 			return ret;
 		},
 
-		showVariants: function() {
+		showVariants: function () {
 
 			return !viewModel.get("showSearchPanel");
 		},
 
-		useComponent: function( event ) {
+		useComponent: function (event) {
 
 			var comps = viewModel.get("selected");
 
-			comps.push( event.data );
+			comps.push(event.data);
 
 			viewModel.set("selected", comps);
-			
+
 			return false;
 		},
 
-		useColor: function( event ) {
+		useColor: function (event) {
 
 			var color = event.data;
 
@@ -73,20 +73,20 @@ AP.component.list = function() {
 					id: variant.id,
 					name: variant.name
 				}
-			}
+			};
 
-			console.log("event:useColor", event );
+			console.log("event:useColor", event);
 
 			var comps = viewModel.get("selected");
 
-			comps.push( row );
+			comps.push(row);
 
 			viewModel.set("selected", comps);
-			
+
 			return false;
 		},
 
-		search: function( event ) {
+		search: function (event) {
 
 			var thisForm = $("#component-list-search-form");
 
@@ -97,86 +97,87 @@ AP.component.list = function() {
 
 			status.html("Sto cercando...");
 
-			NM.util.ajax({ 
-				method: "GET", 
+            var params = thisForm.serializeJSON();
+
+			NM.util.ajax({
+				method: "GET",
 				url: "/manager/ajax/components",
-				data: "str=" + str,
+				data: params,
 				callback: {
-					done: function( xhr ) {
-	
-						if( xhr.status == "SUCCESS" ) {
-							viewModel.set( "components", xhr.data );
-							status.html( "Ho trovato " + xhr.count + " record.") 
+					done: function (xhr) {
+
+						if(xhr.status == "SUCCESS") {
+							viewModel.set("components", xhr.data);
+							status.html("Ho trovato " + xhr.count + " record.");
 						}
-	
+
 					}
 				}
-			})					
-			  
+			});
 
             return false;
 
-		},		
+		},
 
-        showComponentsList: function( event ) {
+        showComponentsList: function (event) {
 
 			$("#components-list-modal").modal("show");
 
             return false;
 		},
 
-        openColors: function( event ) {
+        openColors: function (event) {
 
 			console.log("openColors:event", event);
 
-			viewModel.set( "currentVariant", event.data );
+			viewModel.set("currentVariant", event.data);
 
 			viewModel.set("colors", event.data.colors);
 
             return false;
 		},
 
-        openVariants: function( event ) {
+        openVariants: function (event) {
 
-			viewModel.set( "currentComponent", event.data );
+			viewModel.set("currentComponent", event.data);
 
-			viewModel.set( "showSearchPanel", false );
-			viewModel.set( "variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>" );
-			viewModel.set( "variants", event.data.variants );
+			viewModel.set("showSearchPanel", false);
+			viewModel.set("variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>");
+			viewModel.set("variants", event.data.variants);
 
             return false;
 		},
 
-        backToComponents: function( event ) {
+        backToComponents: function (event) {
 
 			viewModel.set("showSearchPanel", true);
 
             return false;
 		},
 
-        showVariantsForCount: function( event ) {
+        showVariantsForCount: function (event) {
 
 			return event.variants.length > 0;
 
 		},
 
-        showColorsResult: function( event ) {
+        showColorsResult: function (event) {
 
 			$("#components-colors-list-modal").modal("show");
 
             return false;
 		},
 
-	});   	
+	});
 
-	pub.init = function() {
+	pub.init = function () {
 
-		console.log("component:init")
+		console.log("component:init");
 
-		kendo.bind( AP.component.fields.rootList, viewModel )
+		kendo.bind(AP.component.fields.rootList, viewModel);
 
-	}	
+	};
 
 	return pub;
 
-}();
+}());

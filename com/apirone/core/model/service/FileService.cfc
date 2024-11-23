@@ -58,10 +58,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Result function search(
+				 String str,
+				 String productVariantId,
 		required Numeric limit = 50,
 		required Numeric offset = 0,
-				 String str,
-				 String productVariantId
     ){
 
 		var rows = [];

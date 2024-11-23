@@ -1,66 +1,54 @@
 <cfoutput>
+	<div id="line-list-root">
+		#pageTitle()#
 
-    <div id="line-list-root">
+		<div class="row">
+			<div class="col-lg-12 text-end pb-3">
+				#addButton( bind = "click:new", size = "sm" )#
+			</div>
 
-        #pageTitle()#
-
-        <div class="row">
-
-            <div class="col-lg-12 text-end pb-3">
-                #addButton( bind="click:new", size="sm" )#
-            </div>
-            
-            <div class="col-lg-12">
-
-                <section class="card">
-                    
-                    <div class="card-body">
-
-                        <div class="row">
-
-                            <div class="col-sm-6">
-
-                                <div class="mb-3 box-search-small"> 
-
-                                    <form id="line-grid-search-form" 
-                                        class="d-flex align-items-center justify-content-end" 
-                                        data-bind:'events: { submit: search }'>
-
+			<div class="col-lg-12">
+				<section class="card">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="mb-3 box-search-small">
+									<form
+										id   ="line-grid-search-form"
+										class="d-flex align-items-center justify-content-end"
+										data-bind: 'events: { submit: search } '>
+										
                                         <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
-                                        <select class="form-control me-2" name="categoryId">
-                                            <option value="">-- tutte le categorie</option>
-                                            <cfloop array="#prc.lineCategories#" item="thisLine">
-                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
-                                            </cfloop>
-                                        </select>
-                                    
-                                        #searchButton( bind="click:search" )#
-                                    
-                                    </form>
+										<select class="form-control me-2" name="categoryId">
+											<option value="">-- tutte le categorie</option>
+											<cfloop array="#prc.lineCategories#" item="thisLine">
+												<option value="#thisLine.getId()#">#thisLine.getName()#</option>
+											</cfloop>
+										</select>
 
-                                </div>
-                            
-                            </div>
-                            <div class="col-sm-6 text-end mt-4">
+										#searchButton( bind = "click:search" )#
+									</form>
+								</div>
+							</div>
+							<div class="col-sm-6 text-end mt-4">
+								<div class="float-end">
+									#deleteButton(
+										label = "Cancella",
+										bind  = "click:delete",
+										size  = "sm"
+									)#
+								</div>
 
-                                <div class="float-end">
-                                    #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
-                                </div>
+								<div class="status mt-1 float-end me-3" id="status-delete"></div>
+							</div>
+						</div>
 
-                                <div class="status mt-1 float-end me-3" id="status-delete"></div>
-
-                            </div>
-                            
-                        </div>
-                        
-                        <form name="line-grid-form" id="line-grid-form" method="post">
-
-                            <div class="col-12">
-
-                                #grid( 
-                                    id="line-grid",
-                                    columns="[
+						<form name="line-grid-form" id="line-grid-form" method="post">
+							<div class="col-12">
+								#grid(
+									id      = "line-grid",
+									columns = "[
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '120px' },
                                         { 'field':'name', 'title':'Descrizione' },
@@ -70,28 +58,22 @@
                                         { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
                                         { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
                                         { 
-                                            'field':'', 
-                                            'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                            'width':'40px',
+                                            'field'           :'', 
+                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                            'width'           :'40px',
                                             'headerAttributes': { 'class': 'text-center' }
                                         }
                                     ]",
-                                    rowTemplate="line/line-grid-row-tmpl"
-                                )#                                
+									rowTemplate = "line/line-grid-row-tmpl"
+								)#
+							</div>
+						</form>
+					</div>
+				</section>
+			</div>
+		</div>
+	</div>
 
-                            </div>
-
-
-
-                        </form>
-                                        
-                    </div>
-                </section>
-            </div>
-        </div>
-
-    </div>
-
-    #view("line/detail-modal")#
+	#view( "line/detail-modal" )#
 
 </cfoutput>

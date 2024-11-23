@@ -30,9 +30,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     public com.apirone.core.model.bean.Result function search(
 				 String str,
 				 String lineId,
-		required Numeric limit = 50,
+		required Numeric limit = 20,
 		required Numeric offset = 0,
-		required Array orderBy = [ { field="category.name" } ],
+		required Array orderBy = [ { field="category.code" } ],
     ){
 
 		var rows = [];

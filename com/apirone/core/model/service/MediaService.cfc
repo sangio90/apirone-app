@@ -14,8 +14,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
         var versions = config.get( 'imageVersions.sizes');
 
-        result = Duplicate( versions ).append( Duplicate( config.get( 'imageVersions.crops') ) );
-        result.append( {'original': imgUrl });
+        result = Duplicate( versions ).append( Duplicate( config.get( "imageVersions.crops") ) );
+        result.append( { "original": imgUrl });
         
         for ( var key in result ) {
             var value = result[key];
@@ -111,11 +111,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             file.crop( startX, startY, height, width );
          
-            sizePath = '#directory#/#crop#/#dateDir#';
+            sizePath = "#directory#/#crop#/#dateDir#";
 
             DirectoryCreate( sizePath, true, true );
             
-            file.write( '#sizePath#/#fileName#', true)
+            file.write( "#sizePath#/#fileName#", true)
 
         })
 
