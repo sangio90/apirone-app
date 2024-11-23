@@ -8,17 +8,32 @@ NM.kendo.dataSource = function (config = {}) {
           // The remote endpoint which will receive the request parameters and return the response containing the data.
           read: {
             url: "http://apirone.local:7110/manager/ajax/lines/categories",
-          }
+          },
+
+            parameterMap: function (data, type) {
+                console.log("data.pageSize", data.pageSize);
+                console.log("type", type);
+                return {
+                    $page: data.page
+                }
+          
+            },
+
         },
+        pageSize: 20,
         schema: {
             data: "data", 
-            pageSize: "count",
             total: "total"
         },
-        serverPaging: true,
-        pageSize: 10, // The number of items per page.
-        page: 3 // Change the page property to see a different set of items. The endpoint contains 77 items in total. This means that there are eight pages (eight pages multiplied by 10 records each).
+
+      
+        serverPaging: true
       });
+
+      console.log("dataSource:total", dataSource.total())
+      console.log("dataSource:pageSize", dataSource.pageSize())
+
+      //dataSource.pageSize( dataSource.totalPages )
 
       return dataSource;
 

@@ -207,7 +207,8 @@
                     data-sortable="#arguments.sortable#" 
                     data-reorderable=""
                     data-bind="source: #arguments.source#"
-                    data-pageable="true"
+                    data-pageable="{ 'pageSizes': ['20', '50', '100' ] }"
+                    data-pa="true"
                     data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
                     data-no-records="{ template : '<div class=grid-no-data><br>Nessun record trovato.<br><br></div>'}">
                 </div>
