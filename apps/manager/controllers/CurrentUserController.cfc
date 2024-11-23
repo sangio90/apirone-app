@@ -1,26 +1,10 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function wallet( event, rc, prc ){
+    function get( event, rc, prc ){
 
-        var user = prc.user;
+        prc.title = "Il mio account";
 
-        rc.list = DESerializeJSON( FileRead( '/config/data/fake-wallet.json' ) );
-
-        rc.title = "Portafogli";
-
-        event.setView('my/wallet');
-
-    }
-    
-    function profile( event, rc, prc ){
-
-        var user = prc.user;
-
-        rc.list = DESerializeJSON( FileRead( '/config/data/fake-wallet.json' ) );
-
-        rc.title = "I miei dati";
-
-        event.setView('my/profile');
+        event.setView( "my/account" );
 
     }
     

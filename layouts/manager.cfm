@@ -80,7 +80,7 @@
                         <ul class="list-unstyled mb-2">
                             <li class="divider"></li>
                             <li>
-                                <a role="menuitem" tabindex="-1" href="/manager/my/profile"><i class="bx bx-user-circle"></i> Il mio profilo</a>
+                                <a role="menuitem" tabindex="-1" href="/manager/my/account"><i class="bx bx-user-circle"></i> Il mio profilo</a>
                             </li>
                             <li>
                                 <a role="menuitem" tabindex="-1" href="/manager/logout"><i class="bx bx-power-off"></i> Esci</a>

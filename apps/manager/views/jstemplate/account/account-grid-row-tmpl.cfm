@@ -10,6 +10,9 @@
                 <span data-bind="text: email"></span>
             </td>
             <td>
+                <span data-bind="text: name"></span>
+            </td>
+            <td>
                 <span data-bind="text: role.name"></span>
             </td>
             <td>

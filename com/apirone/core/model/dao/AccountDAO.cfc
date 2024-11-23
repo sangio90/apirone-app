@@ -8,18 +8,11 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				created_at,
-			 	account_id,
-				api_key,
-				status_id,
-				pwd,
-				role_id,
-				lang_id,
-				serial,
 				pgp_sym_decrypt(
 					email::bytea,
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
-				) AS email
+				) AS email,
+				*
 			FROM 
 				accounts
 			WHERE 

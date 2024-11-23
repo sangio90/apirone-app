@@ -88,6 +88,7 @@
         <map from="id" to="id" type="cf:String" />
         <map from="shortId" to="shortId" type="cf:String" />
         <map from="email" to="email" type="cf:String" />
+        <map from="name" to="name" type="cf:String" />
         <map from="serial" to="serial" type="cf:Numeric" />
         <map from="createdAt" to="createdAt" type="cf:String" />
         <map from="status" to="status" ref="Status" />

@@ -187,7 +187,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			account.setId( record.account_id.toString() );
 			account.setEmail( record.email );
-			account.setName( record.name );
+			account.setName( record.account );
 			account.setPwd( record.pwd );
 			account.setSerial( record.serial );
 

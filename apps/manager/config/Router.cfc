@@ -19,14 +19,17 @@ component{
     	get( "/dashboard" )
         	.to( "MainController.dashboard" ).end();
 
-		get("/countries/list")
-			.to('CountryController.list').end();
 
-		get("/production-times")
-			.to('ProductionTimeController.list').end();
-	
-		get( "/production-times/:id")
-			.to('ProductionTimeController.list').end();
+
+		/*
+			current account
+		*/
+		
+		post( "/ajax/my/change-pwd" )
+        	.to( "CurrentUserAjaxController.changePwd" ).end();
+
+		get( "/my/account" )
+        	.to( "CurrentUserController.get" ).end();
 
 
 		/*
@@ -297,19 +300,19 @@ component{
 			roles
 		*/
 		get( "/roles/:id" )
-        	.toHandler( "RoleController.get" );
+        	.to( "RoleController.get" ).end();
 
 		get( "/roles" )
-        	.toHandler( "RoleController.list" );
+        	.to( "RoleController.list" ).end();
 
 		get( "/roles/print" )
-        	.toHandler( "RolController.print" );
+        	.to( "RolController.print" ).end();
 
 		/*
 			system
 		*/
 		get( "/system" )
-        	.toHandler( "systemController.get" );
+        	.to( "SystemController.get" ).end();
 
 
 		/*

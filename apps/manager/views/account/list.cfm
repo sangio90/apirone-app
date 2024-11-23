@@ -70,6 +70,7 @@
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px'},
                                     { 'field':'email', 'title':'Email'},
+                                    { 'field':'name', 'title':'Nome'},
                                     { 'field':'role.id', 'title':'Ruolo' },
                                     { 'field':'lang.id', 'title':'Lingua' },
                                     { 'field':'createdAt', 'title':'Creato il' },
