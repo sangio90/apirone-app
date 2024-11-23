@@ -7,15 +7,16 @@ component extends="com.apirone.core.controller.AbsController" {
         var dm = getDataMapper();
 
 		var params = super.paramsFromUrl();
-        
-        var rows = super.fire( "size.list", params );
 
-        for ( var row in rows ) {
+        var rows = super.fire( "size.search", params );
+
+        for ( var row in rows.getData() ) {
             var obj = dm.convert( row, "Size", true );
             data.add( obj );
         }
 
-        result.setTotal( data.len() );
+        result.setTotal( rows.getTotal() );
+        result.setCount( rows.getCount() );
         result.setData( data );
 
         event.setValue( "result", result );

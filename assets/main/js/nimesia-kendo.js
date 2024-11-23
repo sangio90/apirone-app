@@ -23,10 +23,13 @@ NM.kendo.dataSource = function (config = {}) {
         defaults.schema = { "data": "data", total: "total" };
 
         defaults.transport.parameterMap = function (data, type) {
-            return {
-                page: data.page,
-                count: data.pageSize,
-            }
+
+            data["count"] = data.pageSize;
+            delete data.pageSize;
+            delete data.skip;
+            delete data.take;
+
+            return data;
         };
 
         if (config.model) {
