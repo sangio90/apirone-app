@@ -55,6 +55,18 @@ component{
 		get( "/ajax/components")
 			.to("ComponentAjaxController.list").end();
 		
+
+		/*
+			production times
+		*/
+
+		get( "/ajax/production-times")
+			.to("ProductionTimeAjaxController.list").end();
+		
+		get( "/production-times")
+			.to("ProductionTimeController.list").end();
+		
+
 		/*
 			auth // login
 		*/

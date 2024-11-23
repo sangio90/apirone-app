@@ -79,12 +79,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if( record.recordCount ) { 
 
-			var record = trimQueryFields( record );
-
             var bean = super.bean( "ProductionTime" );
 
             bean.setId( record.production_time_id );
 			bean.setName( record.production_time );
+			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setCreatedAt( record.created_at );
 			
             return bean;

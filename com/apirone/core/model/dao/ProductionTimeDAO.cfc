@@ -58,6 +58,8 @@
     
 	<cffunction returntype="Query" name="find">
 
+		<cfargument name="str" type="String">
+
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="production_time">
@@ -69,6 +71,14 @@
 			FROM
                 production_times
 			WHERE 1=1
+
+				<cfif !IsNull( arguments.str )>
+					AND 
+					( 
+						production_times.production_time_id ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
+						OR production_times.production_time ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
+					)
+				</cfif>
 			
 			ORDER BY 
 				#super.sanitizeSQL( arguments.orderby )#
