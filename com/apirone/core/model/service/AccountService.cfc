@@ -35,7 +35,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function create(
 		required com.apirone.core.model.bean.Account account
 	){
-		if ( !len( arguments.account.getLogin() ) ) {
+		if ( !len( arguments.account.getEmail() ) ) {
 			throw( type = "apirone.LoginNotProvided", message = "Login required" );
 		};
 
@@ -182,7 +182,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var account = nullValue();
 
 		if ( record.RecordCount ) {
-			
+
 			var account = super.bean( "Account" );
 
 			account.setId( record.account_id.toString() );
