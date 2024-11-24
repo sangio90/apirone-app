@@ -31,19 +31,19 @@ AP.plate.designer = (function () {
 		// });
 
 		// Make the six divs inside the parent draggable
-		$(".draggable").draggable({
+		$(".grid-column").draggable({
 			containment: "#parent",
 			stop: function (event, ui) {
 				// Ensure only one section can be dragged at a time
-				$(".draggable").draggable("option", "disabled", true);
+				$(".grid-column").draggable("option", "disabled", true);
 				$(this).draggable("option", "disabled", false);
 			}
 		});
 
 		// Make the horizontal draggable div
-		$("#horizontal-draggable").draggable({
+		$("#draggable-plate-item").draggable({
 			axis: "x", // Only allow horizontal dragging
-			containment: "#parent",
+			containment: "#plate-grid",
 			grid: [50]
 		});
 
