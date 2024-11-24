@@ -30,7 +30,6 @@
 		/*
 			finishes
 		*/
-
 		get( "/ajax/finishes/code-exists" ).to( "FinishAjaxController.codeExists" ).end();
 
 		get( "/ajax/finishes" ).to( "FinishAjaxController.list" ).end();
@@ -39,10 +38,10 @@
 
 		get( "/finishes" ).to( "FinishController.list" ).end();
 
+
 		/*
 			components
 		*/
-
 		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
 
 
@@ -112,7 +111,6 @@
 		/*
 			attribute values
 		*/
-
 		get( "/ajax/attributes/values/code-exists" ).to( "AttributeValueAjaxController.codeExists" ).end();
 
 		post( "/ajax/attributes/values" ).to( "AttributeValueAjaxController.save" ).end();
@@ -126,7 +124,6 @@
 			attributes
 		*/
 		get( "/ajax/attributes/new" ).to( "AttributeAjaxController.new" ).end();
-
 
 		get( "/ajax/attributes/:id" ).to( "AttributeAjaxController.get" ).end();
 
@@ -152,7 +149,6 @@
 		/*
 			texts
 		*/
-
 		get( "/ajax/texts/:id/all" ).toHandler( "TextAjaxController.all" );
 
 		get( "/ajax/texts/:id" ).toHandler( "TextAjaxController.get" );
@@ -162,16 +158,9 @@
 		get( "/texts" ).toHandler( "TextController.list" );
 
 
-
-		/*
-			values
-		*/
-
-
 		/*
 			combination
 		*/
-
 		post( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.addItem" ).end();
 
 		get( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.listItems" ).end();
@@ -185,16 +174,14 @@
 		/*
 			lines category
 		*/
-
 		get( "/ajax/lines/categories" ).to( "LineCategoryAjaxController.list" ).end();
-		get( "/lines/categories" ).toHandler( "LineCategoryController.list" );
 
+		get( "/lines/categories" ).toHandler( "LineCategoryController.list" );
 
 
 		/*
 			lines
 		*/
-
 		get( "/ajax/lines/code-exists" ).to( "LineAjaxController.codeExists" ).end();
 
 		delete( "/ajax/lines/:id/combinations" ).to( "LineAjaxController.deleteCombination" ).end();
@@ -215,18 +202,12 @@
 
 		get( "/lines/:id/attributes" ).to( "LineController.attributes" ).end();
 
-		/*
-		get( "/lines/:id" )
-        	.toHandler( "LineController.get" );
-			*/
-
 		get( "/lines" ).to( "LineController.list" ).end();
 
 
 		/*
 			size
 		*/
-
 		get( "/ajax/sizes/code-exists" ).to( "SizeAjaxController.codeExists" ).end();
 
 		get( "/ajax/sizes" ).to( "SizeAjaxController.list" ).end();

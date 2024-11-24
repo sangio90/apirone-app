@@ -321,7 +321,7 @@ AP.attribute.detail = (function () {
 					viewModel.set("detailForm.labelButton", "Aggiorna");
 
 					//fireCallback("onLoad");
-					AP.util.fireCallback( "onLoad", viewModel.get("callback") ):
+					AP.util.fireCallback( "onLoad", viewModel.get("callback") );
 
 					NM.util.openModal($("#attribute-detail-modal"));
 
