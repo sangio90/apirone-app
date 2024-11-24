@@ -29,9 +29,6 @@
 			"code": "AVOID_USING_CFUPDATE_TAG"
 		},
 		{
-			"code": "ARG_VAR_CONFLICT"
-		},
-		{
 			"code": "ARGUMENT_INVALID_NAME"
 		},
 		{
@@ -104,9 +101,6 @@
 			"code": "UNUSED_LOCAL_VARIABLE"
 		},
 		{
-			"code": "UNUSED_METHOD_ARGUMENT"
-		},
-		{
 			"code": "SQL_SELECT_STAR"
 		},
 		{
@@ -126,6 +120,15 @@
 	"excludes": [
 		{
 			"code": "ARG_VAR_MIXED"
+		},
+		{
+			"code": "OUTPUT_ATTR"
+		},
+		{
+			"code": "ARG_VAR_CONFLICT"
+		},
+		{
+			"code": "UNUSED_METHOD_ARGUMENT"
 		}
 	]
 }

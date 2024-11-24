@@ -63,11 +63,11 @@ h2 {
 
 .box-search-small {
 	background-image: url(/assets/main/img/bg-box-search-small.png);
-    background-repeat: no-repeat;	
-	border: 1px solid #EAEAEA; 
-	border-radius: 5px; 
-	background-color: #F5F5F5; 
-	padding: 10px; 
+    background-repeat: no-repeat;
+	border: 1px solid #EAEAEA;
+	border-radius: 5px;
+	background-color: #F5F5F5;
+	padding: 10px;
 }
 
 
@@ -199,7 +199,7 @@ h2, a {
 }
 
 h2 {
-	margin-top: 5px;	
+	margin-top: 5px;
 }
 
 /*
@@ -284,8 +284,8 @@ h2 {
 }
 
 
-/* 
-	divider 
+/*
+	divider
 */
 
 .divider {
@@ -293,24 +293,24 @@ h2 {
 	align-items: center;
 	text-transform: uppercase;
 }
-  
+
 .divider::before, .divider::after {
 	flex: 1;
 	content: '';
 	padding: 0.5px;
 	background-color: #CCCCCC;
 }
-  
+
 .divider::before {
 	margin-right: 10px;
 }
-  
+
 .divider::after {
 	margin-left: 10px;
 }
-  
-/* 
-	// divider 
+
+/*
+	// divider
 */
 
 .white-small {
@@ -318,7 +318,7 @@ h2 {
 }
 
 
-/* 
+/*
 	sortable grid
 */
 
@@ -343,15 +343,15 @@ h2 {
 	background-color: #e0e0e0;
 }
 
-/* 
+/*
 	// sortable grid
 */
 
 
 .grid-no-data {
-	width: 100%; 
-	padding-top: 20px; 
-	padding-bottom: 20px; 
+	width: 100%;
+	padding-top: 20px;
+	padding-bottom: 20px;
 	text-align: center;
 }
 
@@ -373,9 +373,9 @@ h2 {
 */
 
 .document-dropzone {
-    margin-top: 20px; 
-    width: 100%; 
-    border: 2px solid #EAEAEA; 
+    margin-top: 20px;
+    width: 100%;
+    border: 2px solid #EAEAEA;
     height: 110px;
     background-image: url(/assets/main/img/release-here.png);
     background-repeat: no-repeat;
@@ -417,4 +417,366 @@ h2 {
 
 .underline {
 	text-decoration: underline !important;
+}
+
+/* TODO: spostare inclusione dei file CSS in controller */
+/* SEZIONE PER LA PAGINA: plate/designer */
+
+#config-placca {
+	display: block;
+	width: 100%;
+}
+
+#lista_frutti {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#lista_frutti li {
+	min-height: 60px;
+	display: inline-block;
+	width: 100%;
+
+	padding: 10px 0;
+	border-bottom: 1px solid #ccc;
+}
+
+#lista_frutti li span.frutti-list-btn {
+	float: left;
+	margin-top: 10px;
+	margin-right: 10px;
+}
+
+#lista_frutti li span.frutti-img {
+	height: 40px;
+	width: 40px;
+	display: inline-block;
+	text-align: center;
+	float: left;
+}
+
+#lista_frutti li span.frutti-list-code {
+	height: 40px;
+
+	display: inline-block;
+	padding: 10px 0 0 10px;
+}
+
+#lista_frutti li img {
+	height: 40px;
+	max-width: 40px;
+}
+
+
+.immagine-placca {
+	text-align: center;
+	background-color: #ECECEC;
+}
+
+
+
+.immagine-placca {
+	position: relative;
+	height: 500px;
+}
+
+#img-immagine-placca {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.immagine-placca #config_grid {
+	position: relative;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	height: 180px;
+}
+
+.immagine-placca #config_grid.dim_placca_1 {
+	width: 50px;
+}
+
+.immagine-placca #config_grid.dim_placca_2 {
+	width: 100px;
+}
+
+.immagine-placca #config_grid.dim_placca_3 {
+	width: 150px;
+}
+
+.immagine-placca #config_grid.dim_placca_4 {
+	width: 200px;
+}
+
+.immagine-placca #config_grid.dim_placca_5 {
+	width: 250px;
+}
+
+.immagine-placca #config_grid.dim_placca_6 {
+	width: 300px;
+}
+
+.immagine-placca #config_grid.dim_placca_7 {
+	width: 350px;
+}
+
+.immagine-placca #config_grid.dim_placca_8 {
+	width: 400px;
+}
+
+.immagine-placca #config_grid.dim_placca_9 {
+	width: 450px;
+}
+
+.immagine-placca #config_grid.dim_placca_10 {
+	width: 500px;
+}
+
+.immagine-placca #config_grid.dim_placca_11 {
+	width: 550px;
+}
+
+.immagine-placca #config_grid.dim_placca_12 {
+	width: 600px;
+}
+
+.immagine-placca #config_grid.dim_placca_13 {
+	width: 650px;
+}
+
+.immagine-placca #config_grid.dim_placca_14 {
+	width: 700px;
+}
+
+.immagine-placca #config_grid.dim_placca_15 {
+	width: 750px;
+}
+
+.immagine-placca #config_grid.dim_placca_16 {
+	width: 800px;
+}
+
+.immagine-placca #config_grid.dim_placca_22 {
+	width: 1100px;
+}
+
+
+
+.immagine-placca #config_grid #config_grid_print {
+	height: inherit;
+}
+
+.immagine-placca #config_grid #config_grid_print div {
+	position: relative;
+	width: 50px;
+	height: inherit;
+	float: left;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p1 {
+	border: 1px dashed #AA3939;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p2 {
+	border: 1px dashed #862D63;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p3 {
+	border: 1px dashed #4F2C73;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p4 {
+	border: 1px dashed #2E4272;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p5 {
+	border: 1px dashed #267158;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p6 {
+	border: 1px dashed #7A9E35;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p7 {
+	border: 1px dashed #AAAA39;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p8 {
+	border: 1px dashed #AA8A39;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p9 {
+	border: 1px dashed #AA7A39;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p10 {
+	border: 1px dashed #AA6239;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p11 {
+	border: 1px dashed #A33743;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p12 {
+	border: 1px dashed #8E305C;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p13 {
+	border: 1px dashed #652770;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p14 {
+	border: 1px dashed #4E2D73;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p15 {
+	border: 1px dashed #AA3939;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p16 {
+	border: 1px dashed #862D63;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p17 {
+	border: 1px dashed #862D63;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p18 {
+	border: 1px dashed #862D63;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p19 {
+	border: 1px dashed #862D63;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p20 {
+	border: 1px dashed #862D63;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p21 {
+	border: 1px dashed #862D63;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print .p22 {
+	border: 1px dashed #862D63;
+}
+
+.immagine-placca:hover #config_grid #config_grid_print.plf .p5,
+.immagine-placca:hover #config_grid #config_grid_print.plf .p6,
+.immagine-placca:hover #config_grid #config_grid_print.plf .p11,
+.immagine-placca:hover #config_grid #config_grid_print.plf .p12,
+.immagine-placca:hover #config_grid #config_grid_print.plf .p17,
+.immagine-placca:hover #config_grid #config_grid_print.plf .p18 {
+	background-color: rgba(201, 76, 76, 0.3);
+}
+
+.immagine-placca #config_grid .frutto {
+	height: inherit;
+	position: absolute;
+	top: 0 !important;
+}
+
+.immagine-placca #config_grid .frutto.over {
+	background-color: rgba(255, 255, 255, 0.5);
+	border: 1px dashed #000;
+}
+
+.immagine-placca #config_grid .frutto:hover {
+	background-color: rgba(255, 255, 255, 0.2);
+	border: 1px dashed #000;
+}
+
+.immagine-placca #config_grid .frutto0 {
+	width: 50px;
+}
+
+.immagine-placca #config_grid .frutto1 {
+	width: 100px;
+}
+
+.immagine-placca #config_grid .frutto2 {
+	width: 200px;
+}
+
+.immagine-placca #config_grid .frutto3 {
+	width: 300px;
+}
+
+.immagine-placca #config_grid .frutto img {
+	width: 100%;
+	height: 100%;
+}
+
+
+#lista_frutti_prodotti {
+	list-style: none;
+	margin: 0;
+	padding: 0 0 0 0;
+}
+
+#lista_frutti_prodotti>li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 5px;
+	padding-left: 10px;
+}
+
+#lista_frutti_prodotti>li:hover {
+	background-color: #ECECEC;
+}
+
+#lista_frutti_prodotti .nome {
+	font-size: 1.3rem;
+	margin-right: 10px;
+	padding-bottom: 10px;
+	display: inline-block;
+}
+
+#lista_frutti_prodotti .html {
+	display: inline-block;
+}
+
+#lista_frutti_prodotti .html .configuratore ul {
+	margin-bottom: 5px;
+}
+
+#div_prezzo td.valore {
+	text-align: right;
+}
+
+#lista_frutti_prodotti .configuratore ul li {
+	width: auto;
+	margin-right: 10px;
+}
+
+#parent {
+	width: 350px;
+	height: 150px;
+	border: 1px solid #ccc;
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	justify-items: center;
+	align-items: center;
+}
+
+.draggable {
+	width: 50px;
+	height: 100px;
+	border: 1px solid #000;
+}
+
+#horizontal-draggable {
+	width: 100px;
+	height: 100px;
+	border: 1px solid red;
+	position: absolute;
+	top: 0px;
+	left: 0;
 }

@@ -66,7 +66,7 @@ AP.finish.list = (function () {
 			var thisForm = AP.finish.fields.detailForm;
 			var status = thisForm.find(".status");
 
-			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+			status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
 
 			if(thisForm.valid()) {
 

@@ -1,28 +1,44 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list(
+		event,
+		rc,
+		prc
+	){
+		prc.title = "Placche";
 
-        prc.title = "Placche";
+		prc.jsScripts.add( "app-plate" );
 
-        prc.jsScripts.add( "app-plate" );
+		event.setView( "plate/list" );
+	}
 
-        event.setView("plate/list");
+	function edit(
+		event,
+		rc,
+		prc
+	){
+		prc.obj = super.fire( "line.get", [ rc.id ] );
 
-    }
-    
-    function edit( event, rc, prc ){
+		prc.title = "Modifica linea < #prc.obj.getName()# >";
 
-        prc.obj = super.fire("line.get", [rc.id] );
+		prc.sizes       = super.fire( "size.list" );
+		prc.thicknesses = super.fire( "lookup.list", [ "thickness" ] );
 
-        prc.title="Modifica linea < #prc.obj.getName()# >";
+		prc.jsScripts.add( "app-line-detail" );
 
-        prc.sizes = super.fire( "size.list" );
-        prc.thicknesses = super.fire( "lookup.list", ["thickness"] );
+		event.setView( "line/detail" );
+	}
 
-        prc.jsScripts.add( "app-line-detail" );
+	function designer(
+		event,
+		rc,
+		prc
+	){
+		prc.title = "Designer placche";
 
-        event.setView( "line/detail" );
-    
-    }
+		prc.jsScripts.add("app-plate");
+
+		event.setView( "plate/designer" );
+	}
 
 }
