@@ -63,11 +63,11 @@ h2 {
 
 .box-search-small {
 	background-image: url(/assets/main/img/bg-box-search-small.png);
-    background-repeat: no-repeat;	
-	border: 1px solid #EAEAEA; 
-	border-radius: 5px; 
-	background-color: #F5F5F5; 
-	padding: 10px; 
+    background-repeat: no-repeat;
+	border: 1px solid #EAEAEA;
+	border-radius: 5px;
+	background-color: #F5F5F5;
+	padding: 10px;
 }
 
 
@@ -199,7 +199,7 @@ h2, a {
 }
 
 h2 {
-	margin-top: 5px;	
+	margin-top: 5px;
 }
 
 /*
@@ -284,8 +284,8 @@ h2 {
 }
 
 
-/* 
-	divider 
+/*
+	divider
 */
 
 .divider {
@@ -293,24 +293,24 @@ h2 {
 	align-items: center;
 	text-transform: uppercase;
 }
-  
+
 .divider::before, .divider::after {
 	flex: 1;
 	content: '';
 	padding: 0.5px;
 	background-color: #CCCCCC;
 }
-  
+
 .divider::before {
 	margin-right: 10px;
 }
-  
+
 .divider::after {
 	margin-left: 10px;
 }
-  
-/* 
-	// divider 
+
+/*
+	// divider
 */
 
 .white-small {
@@ -318,7 +318,7 @@ h2 {
 }
 
 
-/* 
+/*
 	sortable grid
 */
 
@@ -343,15 +343,15 @@ h2 {
 	background-color: #e0e0e0;
 }
 
-/* 
+/*
 	// sortable grid
 */
 
 
 .grid-no-data {
-	width: 100%; 
-	padding-top: 20px; 
-	padding-bottom: 20px; 
+	width: 100%;
+	padding-top: 20px;
+	padding-bottom: 20px;
 	text-align: center;
 }
 
@@ -373,9 +373,9 @@ h2 {
 */
 
 .document-dropzone {
-    margin-top: 20px; 
-    width: 100%; 
-    border: 2px solid #EAEAEA; 
+    margin-top: 20px;
+    width: 100%;
+    border: 2px solid #EAEAEA;
     height: 110px;
     background-image: url(/assets/main/img/release-here.png);
     background-repeat: no-repeat;
@@ -417,4 +417,78 @@ h2 {
 
 .underline {
 	text-decoration: underline !important;
+}
+
+/* TODO: spostare inclusione dei file CSS in controller */
+/* SEZIONE PER LA PAGINA: plate/designer */
+
+.plate-background {
+	text-align: center;
+	background-color: #ECECEC;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	height: 500px;
+}
+
+#plate-grid {
+	width: 300px;
+	height: 180px;
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+	box-sizing: content-box;
+}
+
+#plate-grid:hover .grid-column.p1 {
+	border: 1px dashed lightblue;
+}
+#plate-grid:hover .grid-column.p2 {
+	border: 1px dashed lightgreen;
+}
+#plate-grid:hover .grid-column.p3 {
+	border: 1px dashed lightcoral;
+}
+#plate-grid:hover .grid-column.p4 {
+	border: 1px dashed lightgoldenrodyellow;
+}
+#plate-grid:hover .grid-column.p5 {
+	border: 1px dashed lightpink;
+}
+#plate-grid:hover .grid-column.p6 {
+	border: 1px dashed lightgray;
+}
+
+.grid-column {
+	width: 100px;
+	height: 180px;
+}
+
+.grid-column .position-label {
+	color: black;
+	display: none;
+}
+
+#plate-grid:hover .grid-column .position-label {
+	display: initial;
+}
+
+#draggable-plate-item {
+	width: 200px;
+	height: 180px;
+	position: absolute;
+	top: 0px;
+	left: 0;
+}
+
+#draggable-plate-item:hover {
+	background-color: #a3fda170;
+	border: 1px dashed black;
 }

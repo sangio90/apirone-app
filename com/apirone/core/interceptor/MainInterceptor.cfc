@@ -1,5 +1,5 @@
 component extends="coldbox.system.Interceptor"{
-	
+
     function preProcess( event, data, buffer, rc, prc ){
 
         if ( !structKeyExists( prc, 'currentRoutedModule') ) {
@@ -23,19 +23,19 @@ component extends="coldbox.system.Interceptor"{
             API module
         */
         if ( module == "api" ) {
-        
+
             var svc = model.getInstance('APIService');
 
             try {
 
-                var authHeader = ToString( 
-                    ToBinary(  
-                        Trim( GetHttpRequestData().Headers.authorization.replace('Bearer', '') ) 
-                        ) 
+                var authHeader = ToString(
+                    ToBinary(
+                        Trim( GetHttpRequestData().Headers.authorization.replace('Bearer', '') )
+                        )
                     );
 
                 var check = svc.login( accountId = ListFirst( authHeader, ':' ), apiKey = ListLast( authHeader, ':') );
-                
+
                 if ( check.getStatus() != "AUTH" ) {
                     return arguments.event.renderData(data="#check.getMessage()#",statusCode="401",statusText="Unauthorized")
                                     .noExecution();
@@ -49,7 +49,7 @@ component extends="coldbox.system.Interceptor"{
             }
         }
 
-        
+
         /*
             MANAGER module
         */
@@ -62,17 +62,17 @@ component extends="coldbox.system.Interceptor"{
 
                 flash.put("message","Sessione scaduta. Fai il login.");
                 relocate( uri="/manager/login", postProcessExempt=false, addToken=false );
-                
+
             }
-        
+
         }
 
         /*
             TODO: remove all "session.user"
         */
 
-        prc.page = {};  //current js config write in current html page 
-        prc.jsScripts = []; //current js file for current html page 
+        prc.page = {};  //current js config write in current html page
+        prc.jsScripts = []; //current js file for current html page
 
         prc.user = session.user;
 
@@ -82,8 +82,8 @@ component extends="coldbox.system.Interceptor"{
         prc.subtitle  = "";
 
         prc.config = getGlobalConfiguration();  //js global config
-        prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20241121;
-        
+        prc.staticVersion = 20241121;
+
     }
 
     function postEvent( event, data, buffer, rc, prc ){
@@ -104,36 +104,36 @@ component extends="coldbox.system.Interceptor"{
             */
 
             if( IsSimpleValue( result ) AND  result == "result-not-found" ) {
-                
+
                 event.renderData( data="Result key not found", statusCode="400" )
                     .noExecution();
-            
+
             } else {
 
                 if ( IsInstanceOf( result, path ) ) {
 
                     event.renderData( data=result, contentType="text/json", type="json" )
                         .noExecution();
-                
+
                 } else {
-    
+
                     var bean = new "#path#"();
-    
+
                     bean.setUuid( LCase( CreateUUID() ) );
                     bean.setStatus( "SUCCESS" );
-    
+
                     bean.setData( result );
-    
+
                     if( !IsSimpleValue( result ) ) {
-                        
+
                         bean.setTotal( result.len() );
                         bean.setCount( result.len() );
-                    
+
                     }
-    
+
                     event.renderData( data=bean, contentType="text/json", type="json" )
                         .noExecution()
-    
+
                 }
 
             }
@@ -141,18 +141,17 @@ component extends="coldbox.system.Interceptor"{
 
         }
 
-    }    
-
+    }
 
     /*
         private methods
     */
-    
+
     private Struct function getGlobalConfiguration(){
 
-        // Select keys from Configuration.cfc 
+        // Select keys from Configuration.cfc
         // Not all keys, please!
-        
+
         var config = getModel().getInstance("Configuration").get();
 
         var result = {
@@ -200,23 +199,23 @@ component extends="coldbox.system.Interceptor"{
         var ua = cgi.HTTP_USER_AGENT;
 
         for( var thisUA in userAgentBlocked ) {
-        
+
             if ( ua CONTAINS thisUA ) {
-                
+
                 setUnauthorizedMessage( message="Unauthorized userAgent [#ua#]" );
                 abort;
-    
+
             }
-        
+
         }
-    
+
     }
 
     private function setUnauthorizedMessage( required String message ) {
 
         echo( arguments.message );
         cfheader(statusCode="404", statusText="Not found");
-        
+
         FileAppend( ExpandPath("/../repository/private/logs/secure.log"), "#now()# - #arguments.message# #chr(13)##chr(10)#" );
         abort;
 
@@ -243,9 +242,9 @@ component extends="coldbox.system.Interceptor"{
                     if( !ArrayFindNoCase( allowedEventsForCustomer, currentEvent ) ) {
 
                         location( "/manager/dashboard?msg=page-not-auth&event=#currentEvent#", false );
-                    
+
                     }
-                
+
                 }
 
             } else {
@@ -259,7 +258,7 @@ component extends="coldbox.system.Interceptor"{
             }
 
         }
- 
+
     }
 
 }
