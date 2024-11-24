@@ -40,7 +40,12 @@
 						<span class="position-label">Pos 6</span>
 					</div>
 
-					<div id="draggable-plate-item" style="cursor: move;">
+					<div
+						id="draggable-plate-item"
+						data-element-dimension="2"
+						data-start-position-index="0"
+						data-end-position-index="1"
+						>
 						<img style="width: 100%; height: 100%; object-fit: fill;" id="foto_frutto_shuko" src="/assets/main/img/foto_frutto.png">
 					</div>
 				</div>

@@ -489,6 +489,7 @@ h2 {
 }
 
 #draggable-plate-item:hover {
+	cursor: move;
 	background-color: #a3fda170;
 	border: 1px dashed black;
 }
