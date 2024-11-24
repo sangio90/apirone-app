@@ -30,6 +30,7 @@ AP.component.list = (function () {
 		variantsTitle: "Varianti",
 		currentVariant: {},
 		currentComponent: {},
+		selectedComponents: [],
 
 		showSearchResult: function () {
 
@@ -174,7 +175,7 @@ AP.component.list = (function () {
 
 		console.log("component:init");
 
-		kendo.bind(AP.component.fields.rootList, viewModel);
+		//kendo.bind(AP.component.fields.rootList, viewModel);
 
 	};
 

@@ -3,13 +3,12 @@ NM.kendo = NM.kendo || {};
 
 NM.kendo.dataSource = function (config = {}) {
 
-    console.log("config.count", config.count)
-
     var defaults = {
         data: config.data ? config.data : [],
         pageSize: config.count ? config.count : 15,
         serverPaging: config?.serverPaging ? config.serverPaging : true,
         serverSorting: config?.serverSorting,
+        
         change: function () {
             $.each(this.data(), function (index, item) {
                 item.set("index", index+1);

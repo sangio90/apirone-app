@@ -8,13 +8,18 @@
 
 				<div class="card-body">
 					<div class="row">
-						<div class="col-12">
+						
+						<div class="col-9">
+
 							<div data-bind="visible: showSearchPanel">
 								<form data-bind="events: { submit: search }" id="component-list-search-form">
+
 									<div class="pb-2 d-flex align-items-center justify-content-start">
+
 										<input
+											id="component-search-input"
+											placeholder="Cerca..." 
 											class      ="form-control me-3"
-											placeholder="Cerca..." id="component-search-input"
 											name       ="str"
 										>
 
@@ -23,7 +28,8 @@
 											<option value="LAV">Lavorazioni</option>
 										</select>
 
-										<button class="btn btn-primary" data-bind="click: search">Cerca ></button>
+										#searchButton(bind="click:search")#
+
 									</div>
 
 									<div class="pb-2">
@@ -52,7 +58,25 @@
 							</div>
 
 							#view( "component/component-list-variant" )#
+						
 						</div>
+
+						<div class="col-9">
+
+							<table class="table table-hover pt-5">
+								<thead>
+									<tr>
+										<th scope="col">Componenti</th>
+										<th scope="col" width="100"></th>
+									</tr>
+								</thead>
+								
+								<tbody data-bind="source:selectedComponents" data-template="component-selected-row-tmpl">
+								</tbody>
+							</table>
+
+						</div>
+
 					</div>
 				</div>
 
@@ -60,6 +84,9 @@
 					<div class="row">
 						<div class="col-md-12 text-end">
 							<button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
+
+							#saveButton(bind="click:save", size="sm")#
+
 						</div>
 					</div>
 				</footer>
@@ -67,6 +94,5 @@
 		</section>
 	</div>
 
-	#template( "jstemplate/color/product-comp-colors-row-tmpl" )#
-	#template( "jstemplate/variant/product-comp-variants-row-tmpl" )#
+	#template( "jstemplate/component/component-selected-row-tmpl" )#
 </cfoutput>

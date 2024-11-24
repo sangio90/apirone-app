@@ -28,7 +28,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
     public String function getName( String langId=NullValue() ){
 
-        return getMainText( arguments.langId )?.getName() ?: 'Not found';
+        return getMainText( arguments.langId )?.getName() ?: '** Not found';
     
     }
 

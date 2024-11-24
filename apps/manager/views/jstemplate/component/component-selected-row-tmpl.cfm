@@ -1,7 +1,7 @@
 ﻿<cfprocessingdirective pageEncoding='UTF-8'>
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="product-components-selected-list-row-tmpl">
+    <nmscript type="text/x-kendo-template" id="component-selected-row-tmpl">
         <tr>
             <td>
                 <b data-bind="text: comp.id"></b><br>

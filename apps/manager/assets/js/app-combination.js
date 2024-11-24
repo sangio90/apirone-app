@@ -20,7 +20,7 @@ AP.combination.list = (function () {
 
 	var pub = {};
 
-	var service = AP.attribute.detail;
+	var attributeApp = AP.attribute.detail;
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" })
@@ -81,7 +81,7 @@ AP.combination.list = (function () {
 
 		addAttribute: function (event) {
 
-			service.open({ id: "" });
+			attributeApp.new();
 
 			return false;
 		},

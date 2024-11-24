@@ -17,7 +17,7 @@
                         </tr>
                     </thead>
                     
-                    <tbody data-bind="source:variants" data-template="product-comp-variants-row-tmpl">
+                    <tbody data-bind="source:variants" data-template="component-variants-row-tmpl">
                     </tbody>
                 </table>
                 
@@ -33,7 +33,7 @@
                         </tr>
                     </thead>
                     
-                    <tbody data-bind="source:colors" data-template="product-comp-colors-row-tmpl">
+                    <tbody data-bind="source:colors" data-template="component-colors-row-tmpl">
                     </tbody>
                 </table>
                 
@@ -41,5 +41,9 @@
 
         </div>
     
-    </div>   
+    </div> 
+    
+	#template( "jstemplate/component/component-colors-row-tmpl" )#
+	#template( "jstemplate/component/component-variants-row-tmpl" )#
+    
 </cfoutput>
