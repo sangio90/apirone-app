@@ -232,7 +232,7 @@ AP.attribute.detail = (function () {
 
 							NM.util.autoHideMessage(status, "<span class='green'>Attributo modificato</span>");
 
-							AP.util.fireCallback( "onUpdate", viewModel.get("callback") ):
+							AP.util.fireCallback( "onUpdate", viewModel.get("callback") );
 							//fireCallback("onUpdate");
 
 						}
