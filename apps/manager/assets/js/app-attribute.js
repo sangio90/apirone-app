@@ -75,23 +75,6 @@ AP.attribute.detail = (function () {
 
 	};
 
-	var fireCallback = function (func) {
-
-		var callbackList = viewModel.get("callback");
-
-		var exists = callbackList?.hasOwnProperty(func);
-
-		if(exists) {
-
-			var thisCallback = callbackList[ func ];
-
-			if(typeof thisCallback == "function") {
-				thisCallback();
-			}
-		}
-
-	};
-
 	var viewModel = kendo.observable({
 
 		detailForm: defaults.detailForm,
@@ -249,7 +232,8 @@ AP.attribute.detail = (function () {
 
 							NM.util.autoHideMessage(status, "<span class='green'>Attributo modificato</span>");
 
-							fireCallback("onUpdate");
+							AP.util.fireCallback( "onUpdate", viewModel.get("callback") ):
+							//fireCallback("onUpdate");
 
 						}
 					}
@@ -290,7 +274,8 @@ AP.attribute.detail = (function () {
 
 							loadAttribute({id: id});
 
-							fireCallback("onSaveValue");
+							//fireCallback("onSaveValue");
+							AP.util.fireCallback( "onSaveValue", viewModel.get("callback") );
 
 						}
 					}
@@ -335,7 +320,8 @@ AP.attribute.detail = (function () {
 					viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
 					viewModel.set("detailForm.labelButton", "Aggiorna");
 
-					fireCallback("onLoad");
+					//fireCallback("onLoad");
+					AP.util.fireCallback( "onLoad", viewModel.get("callback") ):
 
 					NM.util.openModal($("#attribute-detail-modal"));
 
@@ -433,7 +419,7 @@ AP.attribute.detail = (function () {
 
 		viewModel.resetDetailForm();
 
-		NM.util.openModal($("#attribute-detail-modal"));
+		NM.util.openModal( $("#attribute-detail-modal") );
 
 		return;
 

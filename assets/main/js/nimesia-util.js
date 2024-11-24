@@ -17,6 +17,9 @@ NM.util.openModal = function( ele ) {
 
         if( currentId !=  $dialog.attr("id") ) {
 
+            var top = modal.offset().top;
+            var left = modal.offset().left;
+    
             currentTop = 20*n;
             currentLeft = 20*n;
 
@@ -27,6 +30,9 @@ NM.util.openModal = function( ele ) {
     }
 
     ele.modal("show");
+
+	console.log("left", currentLeft)
+	console.log("top", currentTop)
 
     ele.offset({ left: currentLeft, top: currentTop });
 

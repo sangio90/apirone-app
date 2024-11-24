@@ -77,12 +77,10 @@
 
                             <footer class="card-footer">
                                 <div class="row">
-                                    <div class="col-md-12 float-end">
-                                        <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
-                                            <i class="fas fa-save"></i> Salva dettaglio
-                                        </button>
-                                        <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
-                                        <div class="status errors-counter mt-1 float-end me-3"></div>
+                                    <div class="col-md-12 d-flex justify-content-end">
+                                        <div class="status errors-counter mt-1 me-3"></div>
+                                        <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
+                                        #saveButton(bind="click:save", size="sm")#
                                     </div>
                                 </div>
                             </footer>

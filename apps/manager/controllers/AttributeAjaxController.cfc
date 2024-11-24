@@ -21,20 +21,23 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var dm = getDataMapper();
         var result = super.getResult();
-        
-        var rows = super.fire( "attribute.list" );
 
-        for ( var row in rows ) {
+        var params = super.paramsFromUrl();
+        
+        var rows = super.fire( "attribute.search", params );
+
+        for ( var row in rows.getData() ) {
 
             var obj = dm.convert( row, "Attribute", true );
             data.add( obj );
         
         }
 
-        result.setTotal( data.len() );
+        result.setCount( rows.getCount() );
+        result.setTotal( rows.getTotal() );
         result.setData( data );
 
-        event.setValue("result", data );
+        event.setValue("result", result );
         
     }
 

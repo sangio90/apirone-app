@@ -70,7 +70,7 @@
             </div>
         </div>
 
-        #view("line/attributes-list-modal")#
+        #view("combination/attributes-list-modal")#
 
     </div>
 

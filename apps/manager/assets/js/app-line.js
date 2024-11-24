@@ -60,23 +60,6 @@ AP.line.detail = (function () {
 		title: "Carica linea"
 	};
 
-	var fireCallback = function (func) {
-
-		var callbackList = viewModel.get("callback");
-
-		var exists = callbackList?.hasOwnProperty(func);
-
-		if(exists) {
-
-			var thisCallback = callbackList[ func ];
-
-			if(typeof thisCallback == "function") {
-				thisCallback();
-			}
-		}
-
-	};
-
 	var viewModel = kendo.observable({
 
         detailForm: defaultDetailForm,
@@ -121,7 +104,9 @@ AP.line.detail = (function () {
 
 								setTimeout(() => $("#line-detail-modal").modal("hide"), 1000);
 
-                                fireCallback("onSave");
+                                AP.util.fireCallback( "onSave", viewModel.get("callback") );
+                                
+                                //fireCallback("onSave");
 
 							}
 

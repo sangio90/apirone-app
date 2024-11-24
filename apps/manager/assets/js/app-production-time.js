@@ -52,22 +52,6 @@ AP.productionTime.detail = (function () {
 		title: "Carica tempo di produzione"
 	};
 
-	var fireCallback = function (func) {
-
-		var callbackList = viewModel.get("callback");
-
-		var exists = callbackList?.hasOwnProperty(func);
-
-		if(exists) {
-
-			var thisCallback = callbackList[ func ];
-
-			if(typeof thisCallback == "function") {
-				thisCallback();
-			}
-		}
-
-	};
 
 	var viewModel = kendo.observable({
 
@@ -113,7 +97,9 @@ AP.productionTime.detail = (function () {
 
 								setTimeout(() => $("#line-detail-modal").modal("hide"), 1000);
 
-                                fireCallback("onSave");
+                                //fireCallback("onSave");
+
+                                AP.util.fireCallback( "onSave", viewModel.get("callback") );
 
 							}
 

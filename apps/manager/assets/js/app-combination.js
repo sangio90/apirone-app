@@ -35,17 +35,19 @@ AP.combination.list = (function () {
 
 			console.log(event);
 
-			$.ajax({
+			NM.util.ajax({
 				method: "POST",
 				url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
 				data: {
 					attributeId: event.data.id
 				},
-				success: function (xhr) {
+				callback: {
+					success: function (xhr) {
 
-					viewModel.getItems();
-
-				},
+						viewModel.getItems();
+	
+					},
+				}
 			});
 
 		},
@@ -88,7 +90,7 @@ AP.combination.list = (function () {
 
 		showAttributesList: function () {
 
-			NM.util.openModal($("#line-attributes-list-modal"));
+			NM.util.openModal( $("#combination-attributes-list-modal") );
 
 			this.searchAttributes();
 
@@ -104,7 +106,7 @@ AP.combination.list = (function () {
 
 			console.log("event.data.id", event.data.id);
 
-			service.open({
+			attributeApp.edit({
 					id: event.data.id,
 					callback: {
 						onSave: function () {

@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="line-attributes-list-modal" class="modal fade">
+    <div id="combination-attributes-list-modal" class="modal fade">
         
         <section class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -14,7 +14,8 @@
                     <div class="row">
                     
                         <div class="col-md-12 text-end" style="margin-top: -58px; z-index: 9999999">
-                            <button class="btn btn-primary btn-sm" data-bind="click:addAttribute">Carica </button>
+                            <!--- <button class="btn btn-primary btn-sm" data-bind="click:addAttribute">Carica </button> ---->
+                            #addButton( bind="click:addAttribute", size="sm" )#
                         </div>
                         
                         <div class="col-md-12 mt-3">
@@ -34,10 +35,10 @@
 
                             <div>
                                 
-                                <form id="line-attributes-list-search-form" class="row">
+                                <form id="combination-attributes-list-search-form" class="row">
 
                                     #grid( 
-                                        id="line-attributes-grid",
+                                        id="combination-attributes-grid",
                                         columns="[
                                             { 'field':'id', 'title':'ID', width: '100px' },
                                             { 'field':'name', 'title':'Descrizione'},
@@ -51,7 +52,7 @@
                                             }
                                         ]",
                                         source="attributesList",
-                                        rowTemplate="line/line-attributes-list-row-tmpl"
+                                        rowTemplate="combination/combination-attributes-list-row-tmpl"
                                     )#
             
                                 </form>
