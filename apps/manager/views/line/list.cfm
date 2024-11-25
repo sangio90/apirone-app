@@ -10,9 +10,9 @@
 			<div class="col-lg-12">
 				<section class="card">
 					<div class="card-body">
-						<div class="row">
+						<div class="row d-flex align-items-center mb-3">
 							<div class="col-sm-6">
-								<div class="mb-3 box-search-small">
+								<div class="box-search-small">
 									<form
 										id   ="line-grid-search-form"
 										class="d-flex align-items-center justify-content-end"
@@ -31,7 +31,8 @@
 									</form>
 								</div>
 							</div>
-							<div class="col-sm-6 text-end mt-4">
+
+							<div class="col-sm-6 text-end">
 								<div class="float-end">
 									#deleteButton(
 										label = "Cancella",

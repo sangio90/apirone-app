@@ -2,6 +2,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function login( event, rc, prc ){
 
+        if( session.user.isLogged() ) {
+            location("/manager/dashboard", false );
+        }
+
         rc.email = StructKeyExists( cookie, "email" ) ? cookie.email : '';
 
         event.setView( "main/login" ).setLayout( "login" );
@@ -10,15 +14,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function pincode( event, rc, prc ){
 
-        var user = prc.user;
-
         event.setView( "main/pincode" ).setLayout( "login" );
 
     }
 
     function recover( event, rc, prc ){
-
-        var user = prc.user;
 
         event.setView( "main/recover" ).setLayout( "login" );
 
@@ -44,8 +44,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var user = prc.user;
 
-        var access = getAccessManager()
-            .exec( user, "auth.login", { "email" = rc.email , "pwd" = rc.pwd } );
+        var access = super.fire( "auth.login", { "email" = rc.email , "pwd" = rc.pwd } );
 
         //cookie.email = rc.email;
         cfcookie( name="email", value="#rc.email#", expires="15", preservecase=true );
@@ -62,7 +61,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
             flash.put("message","Login e/o password errate.");
 
-            //TODO Report Ortus: 
+            //TODO: Report Ortus: 
             // - only with "/manager/login" it location to "index.cfm?/manager/login"
             // - with "uri" work fine, but raise an exception. Work adding "postProcessExempt=false"
             relocate( uri="/manager/login", postProcessExempt=false, addToken=false );

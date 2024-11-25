@@ -73,6 +73,13 @@
                                     </div>
                                 </div>
 
+                                <div class="row mb-3" data-bind="invisible: isUpdate">
+                                    <label class="col-sm-2">&nbsp;</label>
+                                    <div class="col-sm-10 grey">
+                                        Successivamente potrai caricare i valori dell'attributo
+                                    </div>
+                                </div>
+
                             </div>
 
                             <footer class="card-footer">
@@ -166,7 +173,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
                             </form>
                             
                         </div>

@@ -86,7 +86,16 @@ AP.attribute.detail = (function () {
 		callback: {
 			onCreate: undefined,
 			onUpdate: undefined,
-			onLoad: undefined
+			onLoad: undefined,
+			onUpdateValue: undefined,
+			onCreateValue: undefined
+		},
+
+		isUpdate: function() {
+
+			console.log("isUpdate", viewModel.get("detailForm.data.id").length)
+
+			return viewModel.get("detailForm.data.id").length;
 		},
 
 		// TODO: only one "resetForm"
@@ -98,6 +107,8 @@ AP.attribute.detail = (function () {
 
 			thisForm.find(".status").html("");
 			thisForm.data("validator").resetForm();
+
+			$("#attribute-nav-values-but").removeClass("disabled");
 
 		},
 
@@ -123,23 +134,6 @@ AP.attribute.detail = (function () {
 			return false;
 
 		},
-
-		/*
-		fire: function( event ) {
-
-			console.log("fire:event", $(event.currentTarget))
-			console.log("fire:event:field", event.field)
-
-			var checked = $(event.currentTarget).prop("checked");
-
-			console.log("fire:event:checked", checked)
-
-			$(event.currentTarget).prop("checked", checked);
-
-			return c;
-
-		},
-		*/
 
 		deleteValues: function (event) {
 
@@ -219,21 +213,41 @@ AP.attribute.detail = (function () {
 			var thisForm = AP.attribute.fields.detailForm;
 			var status = thisForm.find(".status");
 
-			status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
+			status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
 
 			if(thisForm.valid()) {
+
+				var data = viewModel.get("detailForm.data");
 
 				NM.util.ajax({
 					method: "POST",
 					url: "/manager/ajax/attributes",
-					data: JSON.stringify(viewModel.get("detailForm.data")),
+					data: JSON.stringify( data ),
 					callback: {
 						done: function (xhr) {
 
-							NM.util.autoHideMessage(status, "<span class='green'>Attributo modificato</span>");
+							console.log("xhr", xhr);
 
-							AP.util.fireCallback( "onUpdate", viewModel.get("callback") );
-							//fireCallback("onUpdate");
+							var callback = data.get("id").length ? "onUpdate" : "onCreate";
+
+							NM.util.autoHideMessage(status, "<span class='green'>" + xhr.data.message.text + "</span>");
+							
+							setTimeout(() => {
+
+								var onLoad = function() {
+
+									$("#attribute-nav-values-but").removeClass("disabled");
+									$("#attribute-nav-values-but").tab("show");
+
+								}
+
+								viewModel.set("callback.onLoad", onLoad);
+
+								loadAttribute( { id: xhr.data.payload.id, callback: callback } );
+
+							}, 1000);
+
+							AP.util.fireCallback( callback, viewModel.get("callback") );
 
 						}
 					}
@@ -254,7 +268,7 @@ AP.attribute.detail = (function () {
 
 			if(thisForm.valid()) {
 
-				status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
+				status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
 
 				NM.util.ajax({
 					method: "POST",
@@ -265,7 +279,6 @@ AP.attribute.detail = (function () {
 						}),
 					callback: {
 						done: function (xhr) {
-							// status.html("<span class='green'>Valore salvato</span>");
 
 							NM.util.autoHideMessage(status, "<span class='green'>Valore salvato</span>");
 
@@ -274,8 +287,7 @@ AP.attribute.detail = (function () {
 
 							loadAttribute({id: id});
 
-							//fireCallback("onSaveValue");
-							AP.util.fireCallback( "onSaveValue", viewModel.get("callback") );
+							AP.util.fireCallback( "onUpdateValue", viewModel.get("callback") );
 
 						}
 					}
@@ -289,9 +301,9 @@ AP.attribute.detail = (function () {
 
     });
 
-	loadAttribute = function ({ id, callback }) {
+	loadAttribute = function ({ id }) {
 
-		console.log("callback", callback);
+		//console.log("loadAttribute:callback", callback);
 
 		NM.util.ajax({
 			method: "GET",
@@ -320,7 +332,7 @@ AP.attribute.detail = (function () {
 					viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
 					viewModel.set("detailForm.labelButton", "Aggiorna");
 
-					//fireCallback("onLoad");
+					fireCallback("onLoad");
 					AP.util.fireCallback( "onLoad", viewModel.get("callback") );
 
 					NM.util.openModal($("#attribute-detail-modal"));
@@ -362,14 +374,14 @@ AP.attribute.detail = (function () {
 
 								console.log("values", values.length);
 
-								// INFO: kendo send an extra item to remove accordingly to direction of item
+								// INFO: kendo send an extra item to remove accordingly to direction of d&d
 								if (event.oldIndex < event.newIndex) {
 									var removeItem = event.oldIndex;
 								} else {
 									var removeItem = event.oldIndex+1;
 								}
 
-								status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
+								status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
 
 								var count = 1;
 
@@ -415,9 +427,11 @@ AP.attribute.detail = (function () {
 		});
 	};
 
-    pub.new = function (callback) {
+    pub.new = function ( callback ) {
 
 		viewModel.resetDetailForm();
+
+		$("#attribute-nav-values-but").addClass("disabled");
 
 		NM.util.openModal( $("#attribute-detail-modal") );
 
@@ -560,6 +574,51 @@ AP.attribute.list = (function () {
 
 		},
 
+        delete: function (event) {
+
+			var status = $("#status-delete");
+			var checks = $("#attribute-grid").find("[name=selected]:checked");
+
+			if (checks.length) {
+
+				var values = [];
+
+				checks.each(function (){
+					values.push($(this).val());
+				});
+
+				var ids = values.toString();
+
+				NM.util.ajax({
+					method: "DELETE",
+					url: "/manager/ajax/attributes",
+					data: ids,
+					callback: {
+						done: function (xhr) {
+
+							if(xhr.data.payload.hasOwnProperty("errors")) {
+								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
+							} else {
+								AP.widget.notify("success", "Cancellazione avvenuta con successo");
+							}
+
+							var id = viewModel.get("detailForm.data.id");
+							console.log("id", id);
+
+							viewModel.rows.read();
+
+						}
+					}
+				});
+
+			} else {
+
+				NM.util.autoHideMessage(status, "<span class='red'>Selezionare almeno un valore</span>");
+
+			}
+
+        },		
+
     });
 
 	pub.init = function () {
@@ -573,5 +632,3 @@ AP.attribute.list = (function () {
 	return pub;
 
 }());
-
-

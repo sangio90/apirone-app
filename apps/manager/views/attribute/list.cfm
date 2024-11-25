@@ -17,9 +17,9 @@
                     
                     <div class="card-body">
 
-                        <div class="row">
+                        <div class="row d-flex align-items-center mb-3">
 
-                            <div class="mb-3 box-search-small col-8">
+                            <div class=" box-search-small col-8">
 
                                 <form id="attribute-grid-search-form" 
                                     class="d-flex align-items-center justify-content-end" 
@@ -46,6 +46,16 @@
                                     
                                 </form>
                             
+                            </div>
+
+                            <div class="col-sm-4 text-end">
+
+                                <div class="float-end">
+                                    #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
+                                </div>
+
+                                <div class="status mt-1 float-end me-3" id="status-delete"></div>
+
                             </div>
 
                         </div>

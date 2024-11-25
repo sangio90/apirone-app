@@ -59,7 +59,6 @@
                                 <div class="status mt-1 float-end me-3" id="status-delete"></div>
 
                             </div>
-
                             
                         </div>
                         
