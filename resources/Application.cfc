@@ -1,4 +1,4 @@
-﻿component extends="com.apirone.core.root.Application" {
+﻿component extends="/Application" {
 
     this.name        = "apirone-resources";
     this.nullSupport = true;
@@ -8,6 +8,12 @@
         var allowedIPs = "127.0.0.1,185.6.241.249,79.19.179.30";
 
         var ip = getRealIP();
+
+        if( url.KeyExists("fwreinit") AND fwreinit == 1 ) {
+
+            super.loadColdbox()
+
+        }
 
         if ( !ListFind( allowedIPs, ip ) ) {
 

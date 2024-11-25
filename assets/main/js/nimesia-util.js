@@ -15,7 +15,6 @@ NM.util.openModal = function( ele ) {
     for ( var dialog of dialogs ) {
         
         var $dialog = $(dialog)
-        var modal = $dialog.find(".modal-dialog");
 
         if( currentId !=  $dialog.attr("id") ) {
 

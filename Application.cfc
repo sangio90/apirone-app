@@ -20,17 +20,7 @@ component extends="com.apirone.core.root.Application" {
 
 		if ( !StructKeyExists( application, "cbBootstrap" ) OR StructKeyExists( url, "reinit" )) {
 
-			cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:loadColdbox" );
-
-			application.cbBootstrap = new coldbox.system.Bootstrap(
-				COLDBOX_CONFIG_FILE,
-				COLDBOX_APP_ROOT_PATH,
-				COLDBOX_APP_KEY,
-				COLDBOX_APP_MAPPING,
-				COLDBOX_FAIL_FAST
-			);
-
-			application.cbBootstrap.loadColdbox();
+			loadColdbox()
 
 		}
 
@@ -76,6 +66,22 @@ component extends="com.apirone.core.root.Application" {
 	*/
 	private Void function startUser(){
 		session.user = new com.apirone.core.model.bean.User();
+	}
+
+	public Void function loadColdbox(){
+		
+		cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:loadColdbox" );
+
+		application.cbBootstrap = new coldbox.system.Bootstrap(
+			COLDBOX_CONFIG_FILE,
+			COLDBOX_APP_ROOT_PATH,
+			COLDBOX_APP_KEY,
+			COLDBOX_APP_MAPPING,
+			COLDBOX_FAIL_FAST
+		);
+
+		application.cbBootstrap.loadColdbox();
+	
 	}
 
 }
