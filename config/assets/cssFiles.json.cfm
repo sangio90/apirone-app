@@ -72,7 +72,6 @@
         { file: "/modules/assets/template-admin/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.css" },
         { file: "/modules/assets/template-admin/vendor/jquery-ui/jquery-ui.css" },
         { file: "/modules/assets/template-admin/vendor/jquery-ui/jquery-ui.theme.css" },
-        { file: "/modules/assets/template-admin/vendor/bootstrap-multiselect/css/bootstrap-multiselect.css" },
         { file: "/modules/assets/template-admin/vendor/morris/morris.css" },
         { file: "/modules/assets/template-admin/css/theme.css",
             replacements: [

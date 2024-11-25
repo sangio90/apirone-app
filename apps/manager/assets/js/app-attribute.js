@@ -70,7 +70,6 @@ AP.attribute.detail = (function () {
 					}
 				}
 			},
-			title: "Carica un valore",
 
 			labelButton: "Carica"
 		},
@@ -95,14 +94,13 @@ AP.attribute.detail = (function () {
 
 		getFormValueTitle: function() {
 
+			var data = viewModel.get("valueForm.data");
 			var values = viewModel.get("detailForm.data.values");
 
-			console.log("getTitle:values", values?.length)
-			console.log("getTitle:valueForm.data.id", viewModel.get("valueForm.data.id").length)
 
-			if ( viewModel.get("valueForm.data.id").length ) {
+			if ( data.id ) {
 				
-				return "Modifica valore < " + valueForm.data.id + " >";
+				return "Modifica valore < " + data.id + " >";
 			
 			} else {
 				
@@ -216,12 +214,11 @@ AP.attribute.detail = (function () {
 
 		editValue: function (event) {
 
-			labelButton = "Aggiorna";
-			title = "Modifica valore < " + event.data.id + " >";
+			console.log("editValue:event", event);
 
 			viewModel.set("valueForm.data", event.data);
-			viewModel.set("valueForm.title", title);
-			viewModel.set("valueForm.labelButton", labelButton);
+			viewModel.set("valueForm.title", "Modifica valore < " + event.data.id + " >");
+			viewModel.set("valueForm.labelButton", "Aggiorna");
 
 		},
 
@@ -286,7 +283,7 @@ AP.attribute.detail = (function () {
 
 		newValue: function () {
 
-			resetValueForm();
+			viewModel.resetValueForm();
 
 		},
 
@@ -538,7 +535,7 @@ AP.attribute.detail = (function () {
 			},
 			messages: {
 				newValueName: {
-					required: "descrizione richiesta",
+					required: "Descrizione richiesta",
 				},
 				code: {
 					required: "Codice richiesto",

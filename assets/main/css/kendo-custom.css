@@ -125,3 +125,11 @@
 .k-list-item.k-selected.k-focus {
 	background-color: #2771e8 !important
 }
+
+/*
+	remove extra select unused...
+	https://www.telerik.com/forums/multiselect-kendo-add-a-useless-select-widget
+*/
+.multiselect-native-select .btn-group {
+	display: none;
+}

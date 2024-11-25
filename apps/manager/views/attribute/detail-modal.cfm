@@ -185,12 +185,15 @@
 
                         <footer class="card-footer">
                             <div class="row">
-                                <div class="col-md-12 float-end">
-                                    <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:saveValue">
+                                <div class="col-md-12 d-flex justify-content-end">
+                                    
+                                    <div class="status errors-counter mt-1 float-end me-3" id="attribute-values-add-form-status"></div>
+                                    
+                                    <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
+
+                                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:saveValue">
                                         <i class="fas fa-save"></i> <span data-bind="text: valueForm.labelButton"></span>
                                     </button>
-                                    <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
-                                    <div class="status errors-counter mt-1 float-end me-3" id="attribute-values-add-form-status"></div>
                                 </div>
                             </div>
                         </footer>
