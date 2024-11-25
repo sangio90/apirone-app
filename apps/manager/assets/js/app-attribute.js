@@ -6,6 +6,7 @@ AP.attribute.fields = {
     detailForm: $("#attribute-detail-form"),
     valueForm : $("#attribute-values-add-form"),
     valuesForm: $("#attribute-values-form"),
+    searchForm: $("#attribute-grid-search-form")
 };
 
 $(document).ready(function (){
@@ -566,6 +567,7 @@ AP.attribute.detail = (function () {
 AP.attribute.list = (function () {
 
 	var detailApp = AP.attribute.detail;
+	var fields = AP.attribute.fields;
 
 	var pub = {};
 
@@ -606,7 +608,14 @@ AP.attribute.list = (function () {
 
 		search: function () {
 
+			var thisForm = fields.searchForm;
+
+			var params = thisForm.serializeJSON();
+
+			viewModel.rows.read(params);
+
 			return false;
+
 
 		},
 

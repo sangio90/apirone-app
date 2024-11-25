@@ -54,7 +54,8 @@
 			WHERE 1=1
 
 				<cfif !isNull( arguments.categoryId )>
-					AND categories @> ANY ('{[<cfqueryparam cfsqltype="Numeric" value="#arguments.categoryId#">]}')
+					<!--- INFO: with cfqueryparam not works --->
+					AND categories @> ANY ('{[#sanitizeSQL(arguments.categoryId)#]}')
 				</cfif>
 
 				<cfif !isNull( arguments.str )>

@@ -23,7 +23,8 @@
 		<cfargument name="str" type="String">
 
         <cfquery name="local.q" datasource="apirone">
-			SELECT attribute_id::varchar
+			SELECT 
+				attribute_id::varchar
 			FROM
 				attributes
 					<cfif !IsNull( arguments.str )>
@@ -32,6 +33,15 @@
 			WHERE 1=1
 				<cfif !IsNull( arguments.str )>
 					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.str#%">
+				</cfif>
+
+				<cfif !IsNull( arguments.statusId )>
+					AND attributes.status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.statusId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.categoryId )>
+					<!--- INFO: with cfqueryparam not works --->
+					AND categories @> ANY ('{[#sanitizeSQL(arguments.categoryId)#]}')
 				</cfif>
             ORDER BY 
                 attribute_id
