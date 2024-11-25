@@ -1,4 +1,4 @@
-AP.attribute = AP.attribute || {};
+AP.attribute = AP.attribute || {} //BROKEN THIS
 
 AP.attribute.fields = {
     listRoot  : $("#attribute-list-root"),

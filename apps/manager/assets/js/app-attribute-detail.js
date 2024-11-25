@@ -122,7 +122,7 @@ AP.attribute.detail = (function () {
 		// TODO: only one "resetForm"
 		resetDetailForm: function () {
 
-			var thisForm = AP.attribute.fields.detailForm;
+			var thisForm = fields.detailForm;
 
 			viewModel.set("detailForm", defaults.detailForm);
 
@@ -135,7 +135,7 @@ AP.attribute.detail = (function () {
 
 		resetValueForm: function () {
 
-			var thisForm = AP.attribute.fields.valueForm;
+			var thisForm = fields.valueForm;
 
 			viewModel.set("valueForm", defaults.detailForm);
 
@@ -219,7 +219,7 @@ AP.attribute.detail = (function () {
 
 		save: function () {
 
-			var thisForm = AP.attribute.fields.detailForm;
+			var thisForm = fields.detailForm;
 			var status = thisForm.find(".status");
 
 			status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
@@ -255,11 +255,11 @@ AP.attribute.detail = (function () {
 	
 									}
 	
-									viewModel.set("callback.onLoad", onLoad);
+									//viewModel.set("callback.onLoad", onLoad);
+
+                                    loadAttribute( { id: xhr.data.payload.id } );
 
 								}
-
-								loadAttribute( { id: xhr.data.payload.id } );
 
 							}, 700);
 
@@ -284,7 +284,7 @@ AP.attribute.detail = (function () {
 
 		saveValue: function () {
 
-			var thisForm = AP.attribute.fields.valueForm;
+			var thisForm = fields.valueForm;
 			var status = $("#attribute-values-add-form-status");
 
 			var attrId = viewModel.get("detailForm.data.id");
@@ -462,9 +462,13 @@ AP.attribute.detail = (function () {
 	};
 
 
-    pub.edit = function ({ id  }) {
+    pub.edit = function ({ id, callback }) {
 
-		loadAttribute({ id: id  });
+        if( callback ) {
+            viewModel.set("callback.onUpdate", callback.onUpdate );
+        }
+
+		loadAttribute( { id: id  });
 
     };
 
