@@ -69,7 +69,7 @@ AP.attribute.detail = (function () {
 					}
 				}
 			},
-			title: "Carica valore",
+			title: "Carica il primo valore",
 			labelButton: "Carica"
 		},
 
@@ -322,8 +322,12 @@ AP.attribute.detail = (function () {
 
 					var selectedCategories = [];
 
-					for (var category of xhr.data.categories)  {
-						selectedCategories.push(category);
+					if( xhr.data?.categories ) {
+						
+						for (var category of xhr.data.categories )  {
+							selectedCategories.push(category);
+						}
+	
 					}
 
 					viewModel.set("detailForm.data", xhr.data);
@@ -429,6 +433,7 @@ AP.attribute.detail = (function () {
 
     pub.new = function ( callback ) {
 
+		viewModel.resetValueForm();
 		viewModel.resetDetailForm();
 
 		$("#attribute-nav-values-but").addClass("disabled");

@@ -2,11 +2,13 @@ NM.util = NM.util || {};
 
 NM.util.openModal = function( ele ) {
 
-    var dialogs = $(".modal");
+    var dialogs = $(".modal.show"); //opened dialog
     var currentId = ele.attr("id");
 
     var currentTop = 0;
     var currentLeft = 0;
+
+	console.log("how many dialogs?", dialogs.length)
 
     var n=1;
 
@@ -17,9 +19,6 @@ NM.util.openModal = function( ele ) {
 
         if( currentId !=  $dialog.attr("id") ) {
 
-            var top = modal.offset().top;
-            var left = modal.offset().left;
-    
             currentTop = 20*n;
             currentLeft = 20*n;
 
@@ -29,12 +28,12 @@ NM.util.openModal = function( ele ) {
 
     }
 
+	console.log("currentTop", currentTop)
+	console.log("currentLeft", currentLeft)
+
     ele.modal("show");
 
-	console.log("left", currentLeft)
-	console.log("top", currentTop)
-
-    ele.offset({ left: currentLeft, top: currentTop });
+	ele.offset({ left: currentLeft, top: currentTop });
 
 };
 

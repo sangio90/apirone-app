@@ -27,6 +27,7 @@
     function deleteButton( String bind, required String label="Cancella" ){ 
 
         arguments["icon"] = "trash";
+        arguments["variant"] = "default";
 
         return getButton( argumentCollection = arguments );
     
@@ -41,7 +42,14 @@
     
     }
 
-    private function getButton( required String label, String bind="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
+    private function getButton( 
+        required String label,
+                 String bind="", 
+                 String size="md", 
+                 String type="submit", 
+                 String variant="primary", 
+                 String icon="" 
+    ){ 
 
         ```
         <cfsavecontent variable="local.html">

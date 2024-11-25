@@ -21,7 +21,8 @@
                 id: '6MM',
                 name: '6 mm'
             },
-            createdAt: '22/11/2024 15:20' ,
+            createdAt: '22/11/2024 15:20',
+            id: '2aja1' 
 
         },
 
@@ -47,8 +48,8 @@
                 id: 'PL',
                 name: 'Plastica'
             },
-            createdAt: '20/11/2024 15:20' ,
-
+            createdAt: '20/11/2024 15:20',
+            id: '35ahw' 
         }
 
     ],

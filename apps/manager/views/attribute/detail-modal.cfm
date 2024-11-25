@@ -102,7 +102,7 @@
                         <div class="card-body">
 
                             <div data-bind="invisible: isValuesGridVisible" class="mb-3 alert alert-warning">
-                                <span class="">Nessun valore ancora caricato</span>
+                                <span>Nessun valore ancora caricato</span>
                             </div>
 
                             <form id="attribute-values-form" method="POST" name="attribute-values-form"  class="mb-3" data-bind="visible: isValuesGridVisible">
