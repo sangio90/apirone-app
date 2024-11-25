@@ -1,4 +1,4 @@
-﻿component extends="/Application" {
+﻿component extends=".Application" {
 
     this.name        = "apirone-resources";
     this.nullSupport = true;
@@ -9,12 +9,6 @@
 
         var ip = getRealIP();
 
-        if( url.KeyExists("fwreinit") AND fwreinit == 1 ) {
-
-            super.loadColdbox()
-
-        }
-
         if ( !ListFind( allowedIPs, ip ) ) {
 
             cfheader(statuscode="404", statustext="Not Found");
@@ -24,8 +18,15 @@
 
         }
 
+        if( url.KeyExists("fwreinit") AND fwreinit == 1 ) {
+
+            super.loadColdbox()
+
+        }
+
         return true;
-	}
+	
+    }
 
 	private function getRealIP(){
 

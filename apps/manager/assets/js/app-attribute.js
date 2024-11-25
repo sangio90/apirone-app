@@ -69,7 +69,8 @@ AP.attribute.detail = (function () {
 					}
 				}
 			},
-			title: "Carica il primo valore",
+			title: "Carica un valore",
+
 			labelButton: "Carica"
 		},
 
@@ -90,6 +91,32 @@ AP.attribute.detail = (function () {
 			onUpdateValue: undefined,
 			onCreateValue: undefined
 		},
+
+		getFormValueTitle: function() {
+
+			var values = viewModel.get("detailForm.data.values");
+
+			console.log("getTitle:values", values?.length)
+			console.log("getTitle:valueForm.data.id", viewModel.get("valueForm.data.id").length)
+
+			if ( viewModel.get("valueForm.data.id").length ) {
+				
+				return "Modifica valore < " + valueForm.data.id + " >";
+			
+			} else {
+				
+				if ( values?.total() == 0 ) {
+					
+					return "Carica il primo valore";
+				
+				} else {
+
+					return "Carica valore";
+				
+				}
+			}
+		},
+
 
 		isUpdate: function() {
 
@@ -188,13 +215,8 @@ AP.attribute.detail = (function () {
 
 		editValue: function (event) {
 
-			var labelButton = "Carica";
-			var title = "Carica valore";
-
-			if (event?.data.id) {
-				labelButton = "Aggiorna";
-				title = "Modifica valore < " + event.data.id + " >";
-			}
+			labelButton = "Aggiorna";
+			title = "Modifica valore < " + event.data.id + " >";
 
 			viewModel.set("valueForm.data", event.data);
 			viewModel.set("valueForm.title", title);
@@ -236,8 +258,10 @@ AP.attribute.detail = (function () {
 
 								var onLoad = function() {
 
-									$("#attribute-nav-values-but").removeClass("disabled");
-									$("#attribute-nav-values-but").tab("show");
+									var tab = $("#attribute-nav-values-but");
+
+									tab.removeClass("disabled");
+									tab.tab("show");
 
 								}
 
@@ -245,7 +269,7 @@ AP.attribute.detail = (function () {
 
 								loadAttribute( { id: xhr.data.payload.id, callback: callback } );
 
-							}, 1000);
+							}, 700);
 
 							AP.util.fireCallback( callback, viewModel.get("callback") );
 
@@ -258,6 +282,13 @@ AP.attribute.detail = (function () {
 			return false;
 
 		},
+
+		newValue: function () {
+
+			resetValueForm();
+
+		},
+
 
 		saveValue: function () {
 
@@ -333,7 +364,7 @@ AP.attribute.detail = (function () {
 					viewModel.set("detailForm.data", xhr.data);
 					viewModel.set("detailForm.data.selectedCategories", selectedCategories);
 					viewModel.set("detailForm.data.values", valuesDataSource);
-					viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
+					//viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
 					viewModel.set("detailForm.labelButton", "Aggiorna");
 
 					//fireCallback("onLoad");

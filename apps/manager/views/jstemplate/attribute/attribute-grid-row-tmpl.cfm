@@ -13,6 +13,9 @@
                 <div data-bind="source: categories" data-template="category-row-tmpl"></div>
             </td>
             <td class="text-center">
+                <span data-bind="text: values.length"></span>
+            </td>
+            <td class="text-center">
                 <button type="button" class="btn btn-default btn-sm" data-bind="click:edit">
                     <i class="fas fa-edit"></i>
                 </button>

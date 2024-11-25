@@ -114,6 +114,7 @@
                                         <button type="button" class="btn btn-default btn-sm float-end" data-bind="click:deleteValues">
                                             <i class="fas fa-trash"></i> <span>Cancella valori</span>
                                         </button>
+
                                         <div class="status-delete mt-1 float-end me-3" id="attribute-values-delete-status"></div>
                                     </div>
                                 </div>
@@ -139,7 +140,11 @@
                             
                             </form>
 
-                            <div class="divider mb-3" data-bind="text: valueForm.title"></div>
+                            <div class="text-end mt-5 mb-2">
+                                #addButton(label="Carica valore", bind="click:newValue", size="sm")#
+                            </div>
+
+                            <div class="divider mb-3" data-bind="text: getFormValueTitle"></div>
 
                             <form id="attribute-values-add-form" method="POST" name="attribute-values-add-form">
 

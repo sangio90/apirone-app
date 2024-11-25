@@ -5,7 +5,9 @@
 		<cfargument name="attributeId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT attribute_id::varchar, *
+			SELECT 
+				attribute_id::varchar, 
+				*
 			FROM
 				attributes
 			WHERE

@@ -68,6 +68,7 @@
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
                                     { 'field':'name', 'title':'Descrizione'},
                                     { 'field':'category.name', 'title':'Categorie'},
+                                    { 'field':'', 'title':'Numero di valori', width: '55px'},
                                     { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 

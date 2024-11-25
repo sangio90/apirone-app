@@ -146,7 +146,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setData( { "deletedCount" = result } )
 
 				getCacheManager().remove( "attribute_#obj.getAttributeId()#" );
-				getCacheManager().remove( "attributeValue_#obj.getId()#" );
+				getCacheManager().remove( getCacheKey( obj.getId() ) );
 			
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -177,12 +177,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.attribute_value_id );
 			bean.setCode( record.code );
+			bean.setAttributeId( record.attribute_id );
 
 			bean.setCreatedAt( record.created_at );
 			bean.setOrderBy( record.orderby );
 			
 			bean.setStatus( getStatusService().get( record.status_id ) );
             bean.setTexts( getTextService().list( attributeValueId = record.attribute_value_id ) );
+            
 
             return bean;
 
