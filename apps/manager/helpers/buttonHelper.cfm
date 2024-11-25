@@ -1,5 +1,11 @@
 ﻿<cfscript>
 
+    function button( String bind, required String label="" ){ 
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
     function addButton( String bind, required String label="Carica" ){ 
 
         arguments["icon"] = "plus";

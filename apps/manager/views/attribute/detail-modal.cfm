@@ -141,8 +141,8 @@
                             
                             </form>
 
-                            <div class="text-end mt-5 mb-2">
-                                #addButton(label="Carica valore", bind="click:newValue", size="sm")#
+                            <div class="text-end mt-4 mb-2">
+                                #button(label="Azzera", bind="click:newValue", size="sm", variant="default")#
                             </div>
 
                             <div class="divider mb-3" data-bind="text: getFormValueTitle"></div>

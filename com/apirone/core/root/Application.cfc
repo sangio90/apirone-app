@@ -116,7 +116,7 @@ component {
         return (
             ( Right( cgi.SERVER_NAME, 5 ) IS "local" )
             OR
-            ( cgi.SERVER_NAME CT "localhost" )
+            ( cgi.SERVER_NAME CONTAINS "localhost" )
         );
 
     }

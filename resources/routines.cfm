@@ -16,6 +16,7 @@
 <div class="button">
 	<a href="?action=cache.empty">Svuota cache</a>
 	<a href="?action=cache.list">Lista cache</a>
+	<a href="/resources/errors/list.cfm">Errori</a>
 	<a href="?action=info.read">Info</a>
 </div>
 
