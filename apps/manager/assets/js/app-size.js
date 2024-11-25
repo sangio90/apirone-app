@@ -130,6 +130,50 @@ AP.size.list = (function () {
 
 		},
 
+        delete: function (event) {
+
+			var status = $("#status-delete");
+			var checks = $("#size-grid").find("[name=selected]:checked");
+
+			if (checks.length) {
+
+				var values = [];
+
+				checks.each(function (){
+					values.push($(this).val());
+				});
+
+				var ids = values.toString();
+
+				NM.util.ajax({
+					method: "DELETE",
+					url: "/manager/ajax/sizes",
+					data: ids,
+					callback: {
+						done: function (xhr) {
+
+							if(xhr.data.payload.hasOwnProperty("errors")) {
+								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
+							} else {
+								AP.widget.notify("success", "Cancellazione avvenuta con successo");
+							}
+
+							var id = viewModel.get("detailForm.data.id");
+
+							viewModel.rows.read();
+
+						}
+					}
+				});
+
+			} else {
+
+				NM.util.autoHideMessage(status, "<span class='red'>Selezionare almeno un valore</span>");
+
+			}
+
+        },		
+
 	});
 
 	pub.init = function () {

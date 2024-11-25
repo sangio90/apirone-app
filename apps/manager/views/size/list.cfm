@@ -10,8 +10,8 @@
 			<div class="col-lg-12">
 				<section class="card">
 					<div class="card-body">
-						<div class="row">
-							<div class="mb-3 box-search-small col-8">
+						<div class="row d-flex align-items-center mb-3">
+							<div class="box-search-small col-6">
 								<form
 									name  ="size-grid-search-form" id="size-grid-search-form"
 									method="get"
@@ -40,6 +40,18 @@
 									</div>
 								</form>
 							</div>
+
+							<div class="col-6 text-end">
+								<div class="float-end">
+									#deleteButton(
+										bind  = "click:delete",
+										size  = "sm"
+									)#
+								</div>
+
+								<div class="status float-end me-3" id="status-delete"></div>
+							</div>
+
 						</div>
 
 						<form name="size-grid-form" id="size-grid-form" method="post">
@@ -47,9 +59,9 @@
 								id      = "size-grid",
 								columns = "[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'code', 'title':'Codice', width: '80px' },
+                                    { 'field':'code', 'title':'Codice', width: '120px' },
                                     { 'field':'categories', 'title':'Categorie'},
-                                    { 'field':'fruitsCount', 'title':'Frutti'},
+                                    { 'field':'fruitsCount', 'title':'Frutti', width: '100px'},
                                     { 'field':'', 'title':'', width: '50px'},
                                     { 
                                         'field'           :'', 

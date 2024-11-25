@@ -16,6 +16,11 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
+    "size": {
+        "deletedAllRecords": "Valori cancellati",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
+    },
+
     "account": {
         "deletedAllRecords": "Valori cancellati",
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
