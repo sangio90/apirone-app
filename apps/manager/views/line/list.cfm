@@ -11,7 +11,7 @@
 				<section class="card">
 					<div class="card-body">
 						<div class="row d-flex align-items-center mb-3">
-							<div class="col-sm-6">
+							<div class="col-sm-8">
 								<div class="box-search-small">
 									<form
 										id   ="line-grid-search-form"
@@ -32,7 +32,7 @@
 								</div>
 							</div>
 
-							<div class="col-sm-6 text-end">
+							<div class="col-sm-4">
 								<div class="float-end">
 									#deleteButton(
 										bind  = "click:delete",

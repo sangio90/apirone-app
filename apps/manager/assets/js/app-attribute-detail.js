@@ -1,25 +1,18 @@
 AP.attribute = AP.attribute || {};
+AP.fields.attribute = AP.fields.attribute || {};
 
-AP.attribute.fields = {
-    listRoot  : $("#attribute-list-root"),
+AP.fields.attribute.detail = {
     detailRoot: $("#attribute-detail-modal"),
     detailForm: $("#attribute-detail-form"),
     valueForm : $("#attribute-values-add-form"),
-    valuesForm: $("#attribute-values-form"),
-    searchForm: $("#attribute-grid-search-form")
-};
+    valuesForm: $("#attribute-values-form")
+};   
 
 $(document).ready(function (){
 
-	if (AP.attribute.fields.detailRoot.length) {
+	if (AP.fields.attribute.detail.detailRoot.length) {
 
 		AP.attribute.detail.init();
-
-	}
-
-	if (AP.attribute.fields.listRoot.length) {
-
-		AP.attribute.list.init();
 
 	}
 
@@ -32,6 +25,8 @@ $(document).ready(function (){
 AP.attribute.detail = (function () {
 
 	var pub = {};
+    
+    var fields = AP.fields.attribute.detail;
 
 	var defaults = {
 
@@ -477,10 +472,12 @@ AP.attribute.detail = (function () {
 
 		console.log("AP.attribute.detail:init");
 
-		kendo.bind(AP.attribute.fields.detailRoot, viewModel);
+		kendo.bind( fields.detailRoot, viewModel);
 
-		var valueForm = AP.attribute.fields.valueForm;
-		var detailForm = AP.attribute.fields.detailForm;
+        console.log("fields", fields)
+
+		var valueForm = fields.valueForm;
+		var detailForm = fields.detailForm;
 
 		detailForm.validate({
 			onfocusout: function (element) {
@@ -542,125 +539,6 @@ AP.attribute.detail = (function () {
 			},
 
 		});
-
-	};
-
-	return pub;
-
-}());
-
-
-/*
-	list
-*/
-
-AP.attribute.list = (function () {
-
-	var detailApp = AP.attribute.detail;
-	var fields = AP.attribute.fields;
-
-	var pub = {};
-
-	var dataSources = {
-		rows: NM.kendo.dataSource({ url: "/manager/ajax/attributes" })
-	};
-
-	var viewModel = kendo.observable({
-
-		rows: dataSources.rows,
-
-		new: function () {
-
-			detailApp.new();
-
-			return false;
-
-		},
-
-		edit: function (event) {
-
-			detailApp.edit({
-				id: event.data.id,
-				callback: {
-					onLoad: function () {
-						console.log("CARICATO!");
-					},
-					onUpdate: function () {
-						viewModel.rows.read();
-						console.log("AGGIORNATO");
-					}
-				}
-			});
-
-			return false;
-
-		},
-
-		search: function () {
-
-			var thisForm = fields.searchForm;
-
-			var params = thisForm.serializeJSON();
-
-			viewModel.rows.read(params);
-
-			return false;
-
-
-		},
-
-        delete: function (event) {
-
-			var status = $("#status-delete");
-			var checks = $("#attribute-grid").find("[name=selected]:checked");
-
-			if (checks.length) {
-
-				var values = [];
-
-				checks.each(function (){
-					values.push($(this).val());
-				});
-
-				var ids = values.toString();
-
-				NM.util.ajax({
-					method: "DELETE",
-					url: "/manager/ajax/attributes",
-					data: ids,
-					callback: {
-						done: function (xhr) {
-
-							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
-							} else {
-								AP.widget.notify("success", "Cancellazione avvenuta con successo");
-							}
-
-							var id = viewModel.get("detailForm.data.id");
-							console.log("id", id);
-
-							viewModel.rows.read();
-
-						}
-					}
-				});
-
-			} else {
-
-				NM.util.autoHideMessage(status, "<span class='red'>Selezionare almeno un valore</span>");
-
-			}
-
-        },		
-
-    });
-
-	pub.init = function () {
-
-		console.log("AP.attribute.list:init");
-
-		kendo.bind(AP.attribute.fields.listRoot, viewModel);
 
 	};
 
