@@ -118,6 +118,7 @@
 		post( "/ajax/attributes/:id/values/order" ).to( "AttributeValueAjaxController.order" ).end();
 
 		delete( "/ajax/attributes/values" ).to( "AttributeValueAjaxController.delete" ).end();
+		
 
 
 		/*
@@ -128,6 +129,8 @@
 		get( "/ajax/attributes/:id" ).to( "AttributeAjaxController.get" ).end();
 
 		post( "/ajax/attributes" ).to( "AttributeAjaxController.save" ).end();
+
+		delete( "/ajax/attributes" ).to( "AttributeAjaxController.delete" ).end();
 
 		get( "/ajax/attributes" ).to( "AttributeAjaxController.list" ).end();
 

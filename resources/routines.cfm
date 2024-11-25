@@ -6,7 +6,7 @@
 	
 <cfparam name="action" default="">
 
-<h1>Routine <a href="?">Restart</a></h1>
+<h1>Routine <a href="?fwreinit=1">FwReinit</a></h1>
 <div class="info">
 	<b>Sistema</b>: Lucee #server.lucee.version#<br>
 	<b>Locale</b>: #GetLocaleInfo().name#<br>

@@ -82,8 +82,8 @@ component extends="coldbox.system.Interceptor"{
         prc.subtitle  = "";
 
         prc.config = getGlobalConfiguration();  //js global config
-        prc.staticVersion = 20241121;
-        //prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20241121;
+        //prc.staticVersion = 20241121;
+        prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20241121;
 
     }
 

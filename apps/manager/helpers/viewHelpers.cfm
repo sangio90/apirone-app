@@ -1,6 +1,6 @@
 <cfscript>
     function template( required String view ){ 
-        return Replace( renderView( view="#arguments.view#" ), 'nmscript', 'script', 'ALL' );
+        return Replace( renderView( view="#arguments.view#" ), "nmscript", "script", "ALL" );
     }
 
     function breadcrumbs( required String view ){ 
@@ -26,47 +26,6 @@
     
     }
 
-    function addButton( String bind, required String label="Carica" ){ 
-
-        arguments["icon"] = "plus";
-
-        return getButton( argumentCollection = arguments );
-    
-    }
-
-    function searchButton( String bind, required String label="Cerca" ){ 
-
-        arguments["icon"] = "search";
-
-        return getButton( argumentCollection = arguments );
-    
-    }
-
-    function saveButton( String bind, required String label="Salva" ){ 
-
-        arguments["icon"] = "save";
-
-        return getButton( argumentCollection = arguments );
-    
-    }
-
-    function deleteButton( String bind, required String label="Cancella" ){ 
-
-        arguments["icon"] = "trash";
-
-        return getButton( argumentCollection = arguments );
-    
-    }
-
-    function iconButton( String bind, required String icon ){ 
-
-        arguments["label"] = "";
-        arguments["variant"] = "default";
-
-        return getButton( argumentCollection = arguments );
-    
-    }
-
     function includeJSFiles(){ 
 
         for ( var thisScript in prc.jsScripts ) {
@@ -82,16 +41,16 @@
 
     function createMenu( required Array data=[], required String active="" ){ 
 
-        var html = '';
+        var html = "";
 
         if ( !arguments.data.len() ) {
-            arguments.data = DeserializeJSON( FileRead( ExpandPath('/config/data/menu.json.cfm') ) );
+            arguments.data = DeserializeJSON( FileRead( ExpandPath("/config/data/menu.json.cfm") ) );
         }
 
         for ( var row in arguments.data ) {
 
             //se la chiave roles non c'è l'item è accessibile a tutti
-            if ( !row.keyExists("roles") OR (ListFind( row.roles, 'ADM' ) ) ) {
+            if ( !row.keyExists("roles") OR (ListFind( row.roles, "ADM" ) ) ) {
 
                 var parentClass = "";
                 var activeClass = "";
@@ -239,22 +198,6 @@
         return local.html;
     }    
 
-
-    private function getButton( required String label, String bind="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
-
-        ```
-        <cfsavecontent variable="local.html">
-            <cfoutput>
-                <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size#" 
-                    #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#>
-                    <i class="fas fa-#arguments.icon#"></i> #arguments.label#
-                </button>
-            </cfoutput>
-        </cfsavecontent>
-        ```
-        
-        return local.html;
-    
-    }
+    include "buttonHelper.cfm";
 
 </cfscript>

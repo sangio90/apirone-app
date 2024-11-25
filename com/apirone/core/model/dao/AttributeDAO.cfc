@@ -81,4 +81,19 @@
 
 	</cffunction>
 
+	<cffunction name="delete" returntype="Numeric">
+		<cfargument name="attributeId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			DELETE FROM
+				attributes
+			WHERE
+				attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
+			RETURNING attribute_id
+		</cfquery>
+
+		<cfreturn local.q.recordCount>
+	</cffunction>
+
+
 </cfcomponent>

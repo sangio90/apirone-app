@@ -35,13 +35,12 @@
 							<div class="col-sm-6 text-end">
 								<div class="float-end">
 									#deleteButton(
-										label = "Cancella",
 										bind  = "click:delete",
 										size  = "sm"
 									)#
 								</div>
 
-								<div class="status mt-1 float-end me-3" id="status-delete"></div>
+								<div class="status float-end me-3" id="status-delete"></div>
 							</div>
 						</div>
 

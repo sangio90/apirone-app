@@ -1,0 +1,61 @@
+﻿<cfscript>
+
+    function addButton( String bind, required String label="Carica" ){ 
+
+        arguments["icon"] = "plus";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
+    function searchButton( String bind, required String label="Cerca" ){ 
+
+        arguments["icon"] = "search";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
+    function saveButton( String bind, required String label="Salva" ){ 
+
+        arguments["icon"] = "save";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
+    function deleteButton( String bind, required String label="Cancella" ){ 
+
+        arguments["icon"] = "trash";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
+    function iconButton( String bind, required String icon ){ 
+
+        arguments["label"] = "";
+        arguments["variant"] = "default";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
+    private function getButton( required String label, String bind="", String size="md", String type="submit", String variant="primary", String icon="" ){ 
+
+        ```
+        <cfsavecontent variable="local.html">
+            <cfoutput>
+                <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size#" 
+                    #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#>
+                    <i class="fas fa-#arguments.icon#"></i> #arguments.label#
+                </button>
+            </cfoutput>
+        </cfsavecontent>
+        ```
+        
+        return local.html;
+    
+    }
+
+</cfscript>

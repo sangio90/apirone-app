@@ -332,7 +332,7 @@ AP.attribute.detail = (function () {
 					viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
 					viewModel.set("detailForm.labelButton", "Aggiorna");
 
-					fireCallback("onLoad");
+					//fireCallback("onLoad");
 					AP.util.fireCallback( "onLoad", viewModel.get("callback") );
 
 					NM.util.openModal($("#attribute-detail-modal"));

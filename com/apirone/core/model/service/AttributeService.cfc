@@ -134,6 +134,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     
 	}
 
+	public com.apirone.core.model.bean.Outcome function delete(
+		required String attributeId
+	){
+		var outcome = super.bean( "Outcome" );
+
+		var obj = get( arguments.attributeId );
+
+		outcome.setData( { attributeId = arguments.attributeId } );
+
+		transaction {
+			try {
+				var result = getDao().delete( arguments.attributeId );
+				outcome.setData( { "deletedCount" = result } )
+
+				getCacheManager().remove( getCacheKey( arguments.attributeId ) );
+
+			} catch ( any error ) {
+				
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteAttribute" );
+				outcome.setMessage( "Cannot delete attribute [#arguments.attributeId#]" );
+			
+			}
+		}
+
+		return outcome;
+	}
+
+
 	public String function getCacheKey( required String id ) {
 
 		return "attribute_#arguments.id#";
