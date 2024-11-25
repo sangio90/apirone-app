@@ -7,10 +7,11 @@
 
                 <form id="line-detail-form" method="POST" name="line-detail-form">
                 
-                    <header class="card-header">
+                    <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:detailForm.title"></h2>
-                    </header>
-                    
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
+                    </header>                
+                        
                     <div class="card-body">
 
                         <div class="mb-3 row">

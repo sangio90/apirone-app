@@ -246,26 +246,31 @@ AP.attribute.detail = (function () {
 					callback: {
 						done: function (xhr) {
 
-							console.log("xhr", xhr);
-
-							var callback = data.get("id").length ? "onUpdate" : "onCreate";
+							var callback = viewModel.isUpdate() ? "onUpdate" : "onCreate";
 
 							NM.util.autoHideMessage(status, "<span class='green'>" + xhr.data.message.text + "</span>");
+
+							console.log("callback", callback);
+							console.log("save:id", data.get("id"));
 							
 							setTimeout(() => {
 
-								var onLoad = function() {
+								if ( !viewModel.isUpdate() ) {
 
-									var tab = $("#attribute-nav-values-but");
+									var onLoad = function() {
 
-									tab.removeClass("disabled");
-									tab.tab("show");
+										var tab = $("#attribute-nav-values-but");
+	
+										tab.removeClass("disabled");
+										tab.tab("show");
+	
+									}
+	
+									viewModel.set("callback.onLoad", onLoad);
 
 								}
 
-								viewModel.set("callback.onLoad", onLoad);
-
-								loadAttribute( { id: xhr.data.payload.id, callback: callback } );
+								loadAttribute( { id: xhr.data.payload.id } );
 
 							}, 700);
 
@@ -332,15 +337,19 @@ AP.attribute.detail = (function () {
 
 	loadAttribute = function ({ id }) {
 
-		//console.log("loadAttribute:callback", callback);
-
 		NM.util.ajax({
 			method: "GET",
 			url: "/manager/ajax/attributes/" + id,
 			callback: {
 				done: function (xhr) {
 
-					console.log("xhr.data.values", xhr.data);
+					var selectedCategories = [];
+
+					if( xhr.data?.categories ) {
+						for (var category of xhr.data.categories )  {
+							selectedCategories.push(category);
+						}
+					}
 
 					var valuesDataSource = new kendo.data.DataSource({
 						data: xhr.data.values,
@@ -349,23 +358,13 @@ AP.attribute.detail = (function () {
 
 					delete xhr.data.values;
 
-					var selectedCategories = [];
-
-					if( xhr.data?.categories ) {
-						
-						for (var category of xhr.data.categories )  {
-							selectedCategories.push(category);
-						}
-	
-					}
-
 					viewModel.set("detailForm.data", xhr.data);
 					viewModel.set("detailForm.data.selectedCategories", selectedCategories);
 					viewModel.set("detailForm.data.values", valuesDataSource);
-					//viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
-					viewModel.set("detailForm.labelButton", "Aggiorna");
+					viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
+					//viewModel.set("detailForm.labelButton", "Aggiorna");
 
-					//fireCallback("onLoad");
+
 					AP.util.fireCallback( "onLoad", viewModel.get("callback") );
 
 					NM.util.openModal($("#attribute-detail-modal"));
@@ -474,9 +473,9 @@ AP.attribute.detail = (function () {
 	};
 
 
-    pub.edit = function ({ id, callback }) {
+    pub.edit = function ({ id  }) {
 
-		loadAttribute({ id: id, callback: callback });
+		loadAttribute({ id: id  });
 
     };
 
