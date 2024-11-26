@@ -104,7 +104,7 @@
 			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getCode()#">,
-				categories = <cfqueryparam cfsqltype="varchar" value="#serializeJSON( categories )#">
+				categories = <cfqueryparam cfsqltype="Other" value="#serializeJSON( categories )#">
 			WHERE
 				finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getId()#">::uuid
 		</cfquery>

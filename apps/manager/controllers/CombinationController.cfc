@@ -18,7 +18,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.sizeId = comb.getSize().getId();
         
-        prc.jsScripts.add( "app-attribute" );
+        //prc.jsScripts.add( "app-attribute-list" );
+        prc.jsScripts.add( "app-attribute-detail" );
         prc.jsScripts.add( "app-combination" );
         prc.jsScripts.add( "app-component" );
 

@@ -16,9 +16,9 @@
                     
                     <div class="card-body">
 
-                        <div class="row">
+                        <div class="row d-flex align-items-center mb-3">
 
-                            <div class="col-sm-9">
+                            <div class="col-sm-8">
 
                                 <div class="mb-3 box-search-small"> 
 
@@ -45,9 +45,19 @@
                                         #searchButton( bind="click:search" )#
                                     
                                     </form>
-                            
+
                                 </div>
-                            
+
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="float-end">
+                                    #deleteButton(
+                                        bind  = "click:delete",
+                                        size  = "sm"
+                                    )#
+                                </div>
+
+                                <div class="status float-end me-3" id="status-delete"></div>
                             </div>
 
                         </div>

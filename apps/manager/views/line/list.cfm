@@ -27,6 +27,10 @@
 											</cfloop>
 										</select>
 
+										<select class="form-control me-2" name="categoryId">
+											<option value="">-- Ordina per</option>
+										</select>
+
 										#searchButton( bind = "click:search" )#
 									</form>
 								</div>
