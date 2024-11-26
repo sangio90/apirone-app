@@ -57,7 +57,6 @@ component {
 
     this.cache.object = "DefaultCache";
 
-    //this.mappings[ "/wirebox" ]    = ExpandPath( "/modules/wirebox/" );
     this.mappings[ "/coldbox" ]    = ExpandPath( "/modules/coldbox/" );
     this.mappings[ "/dataMapper" ] = ExpandPath( "/modules/external/dataMapper/" );
 
