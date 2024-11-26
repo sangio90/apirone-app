@@ -5,7 +5,7 @@
 
 	function init() {
 
-		var config = DESerializeJSON( FileRead( getCWD() & '/tasks/config.json.cfm' ) );
+		var config = DESerializeJSON( FileRead( getCWD() & "/tasks/config.json.cfm" ) );
 
 		var code = DateTimeFormat( now(), "yyyymmdd-HHnnss-lll" );
 

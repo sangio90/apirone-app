@@ -2,13 +2,7 @@ AP.widget = AP.widget || {};
 
 AP.widget.notify = function (type, message, title) {
 
-    console.log("ZB.widget.notify");
-
-	var stack_topleft = {"dir1": "down", "dir2": "right", "push": "top"};
-	var stack_bottomleft = {"dir1": "right", "dir2": "up", "push": "top"};
-	var stack_bottomright = {"dir1": "up", "dir2": "left", "firstpos1": 15, "firstpos2": 15};
 	var stack_bar_top = {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0};
-	var stack_bar_bottom = {"dir1": "up", "dir2": "right", "push": "bottom", "spacing1": 0, "spacing2": 0};
 
     var icon = "";
     var title = "";
@@ -40,6 +34,7 @@ AP.widget.notify = function (type, message, title) {
       }
 
     var notice = new PNotify({
+        delay: 2000,
         type: type,
         title: title,
         text: message,

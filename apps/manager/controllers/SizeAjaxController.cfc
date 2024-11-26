@@ -62,7 +62,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		size.setCategories( categories );
 		size.setStatus( status.setId( json.status.id ) );
-		size.setFruitsCount( json.fruitsCount );
+		size.setFruitsCount( Len( json.fruitsCount) ? json.fruitsCount : NullValue() );
 
 		if ( !len( json.id ) ) {
 			messageId = "size.created";

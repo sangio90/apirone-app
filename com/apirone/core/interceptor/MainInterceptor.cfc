@@ -83,7 +83,7 @@ component extends="coldbox.system.Interceptor"{
 
         prc.config = getGlobalConfiguration();  //js global config
         //prc.staticVersion = 20241121;
-        prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20241121;
+        prc.staticVersion = prc.isDev ? RandRange(1000, 9999) : 20241126;
 
     }
 
@@ -183,7 +183,7 @@ component extends="coldbox.system.Interceptor"{
     private function hostCanAccess() {
 
         var host = ListFirst( cgi.http_host, ':' );
-        var authorizedHosts = "test.apirone.cc,www.apirone.cc,apirone.cc,www.apirone.local,apirone.local";
+        var authorizedHosts = "test.apirone.cc,www.apirone.cc,apirone.cc,www.apirone.local,apirone.local,127.0.0.1";
 
         if( !ListFind( authorizedHosts, host ) ){
 

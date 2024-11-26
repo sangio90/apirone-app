@@ -1,5 +1,6 @@
-﻿Remove cfabort
+﻿cfabort
 <cfabort>
+
 <cfscript>
 
     model = server["wirebox-apirone"];
@@ -41,8 +42,9 @@
     account.setRole( role );
     */
 
-    account.setEmail( "stanislav@nimesia.com" );
-    account.setPwd( "JSA7!8fs:afn4K" );
+    account.setEmail( "pietroa@apir.com" );
+    account.setName( "Pietro A." );
+    account.setPwd( "gHGar@aeW1z" );
     account.setRole( role.setId( "ADM" ) );
     account.setStatus( status.setId( "ACT" ) );
 

@@ -103,7 +103,7 @@
 				<cfqueryparam cfsqltype="varchar" value="#arguments.size.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="varchar" value="#serializeJSON( categories )#">,
+				<cfqueryparam cfsqltype="Other" value="#serializeJSON( categories )#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.size.getFruitsCount()#">
 			) RETURNING size_id
 		</cfquery>

@@ -239,31 +239,25 @@ AP.attribute.detail = (function () {
 
 							NM.util.autoHideMessage(status, "<span class='green'>" + xhr.data.message.text + "</span>");
 
-							console.log("callback", callback);
-							console.log("save:id", data.get("id"));
+							console.log("save:id", data.get("id") );
+							console.log("save:callback", callback);
 							
 							setTimeout(() => {
 
 								if ( !viewModel.isUpdate() ) {
 
-									var onLoad = function() {
+									var tab = $("#attribute-nav-values-but");
 
-										var tab = $("#attribute-nav-values-but");
+									tab.removeClass("disabled");
+									tab.tab("show");
 	
-										tab.removeClass("disabled");
-										tab.tab("show");
-	
-									}
-	
-									//viewModel.set("callback.onLoad", onLoad);
-
                                     loadAttribute( { id: xhr.data.payload.id } );
 
 								}
 
-							}, 700);
+								AP.util.fireCallback( callback, viewModel.get("callback") );
 
-							AP.util.fireCallback( callback, viewModel.get("callback") );
+							}, 700);
 
 						}
 					}
@@ -449,6 +443,10 @@ AP.attribute.detail = (function () {
 	};
 
     pub.new = function ( callback ) {
+
+        if( callback ) {
+            viewModel.set("callback.onCreate", callback.onCreate );
+        }
 
 		viewModel.resetValueForm();
 		viewModel.resetDetailForm();

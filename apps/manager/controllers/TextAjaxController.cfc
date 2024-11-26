@@ -47,28 +47,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
         var dm = getDataMapper();
 
-        var params = {};
-
-        if( rc.keyExists("langId") AND Len( rc.langId )  ) {
-            params["langId"] = rc.langId;    
-        }
-
-        if( rc.keyExists("str") AND Len( rc.str )  ) {
-            params["str"] = rc.str;
-        }
-
-        if( rc.keyExists("statusId") AND Len( rc.statusId )  ) {
-            params["statusId"] = rc.langId;    
-        }
-
-        if( rc.keyExists("fromDate") AND IsDate( rc.fromDate )  ) {
-            params["fromDate"] = rc.fromDate;
-        }        
-
-        if( rc.keyExists("toDate") AND IsDate( rc.toDate )  ) {
-            params["toDate"] = rc.toDate;
-        }        
-
+        var params = paramsFromUrl();
         
         var rows = super.fire( "text.search", params );
 

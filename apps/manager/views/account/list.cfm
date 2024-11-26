@@ -7,7 +7,7 @@
         <div class="row">
 
             <div class="col-sm-12 text-end pb-3">
-                #addButton(bind="click:new", size="sm")#
+                #addButton( bind="click:new", size="sm" )#
             </div>
             
             <div class="col-lg-12">
@@ -16,11 +16,11 @@
                     
                     <div class="card-body">
 
-                        <div class="row">
+                        <div class="row d-flex align-items-center mb-3 ">
 
                             <div class="col-sm-8">
 
-                                <div class="mb-3 box-search-small"> 
+                                <div class="box-search-small"> 
 
                                     <form id="account-grid-search-form" 
                                         class="d-flex align-items-center justify-content-end" 
@@ -50,7 +50,7 @@
                             
                             </div>
 
-                            <div class="col-sm-4 text-end mt-4">
+                            <div class="col-sm-4 text-end">
 
                                 <div class="float-end">
                                     #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
