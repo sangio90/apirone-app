@@ -108,14 +108,15 @@ AP.finish.list = (function () {
 
 			var selectedCategories = [];
 
+			var selectedCategories = [];
+
 			if( event.data.categories ) {
 				
-				for (var category of event.data.categories)  {
-					selectedCategories.push(category.id);
+				for (var category of event?.data?.categories)  {
+					selectedCategories.push( category );
 				}
 	
 			}
-
 
 			viewModel.set("detailForm.data.selectedCategories", selectedCategories);
 
@@ -150,8 +151,6 @@ AP.finish.list = (function () {
 							} else {
 								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 							}
-
-							var id = viewModel.get("detailForm.data.id");
 
 							viewModel.rows.read();
 

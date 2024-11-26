@@ -34,7 +34,6 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var result     = super.getResult();
 		var finish     = super.bean( "Finish" );
-		var category   = super.bean( "LineCategory" );
 		var status     = super.bean( "Status" );
 		var categories = [];
 
@@ -47,10 +46,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		finish.setId( json.id );
 		finish.setCode( json.code );
 
-		dump(json.selectedCategories);
-		abort;
-
 		for ( var thisCategory in json.selectedCategories ) {
+
+			var category   = super.bean( "LineCategory" );
+
 			category.setId( thisCategory.id );
 			categories.add( category );
 		}

@@ -18,8 +18,9 @@
                             <label class="col-sm-2 col-form-label text-end">Codice</label>
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4" name="code"
-                                    
                                     maxlength="5"
+                                    data-rule-required="true"
+                                    data-msg-required="Codice richiesto"
                                     data-bind="value: detailForm.data.code"
                                     onkeyup="this.value = this.value.toUpperCase();">
                             </div>
@@ -29,6 +30,8 @@
                             <label class="col-sm-2 col-form-label text-end">Nome</label>
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4" name="name"
+                                    data-rule-required="true"
+                                    data-msg-required="Descrizione richiesta"
                                     maxlength="125"
                                     data-bind="value: detailForm.data.name">
                             </div>
