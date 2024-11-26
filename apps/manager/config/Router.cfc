@@ -18,11 +18,11 @@
 
 		get( "/plate/designer" ).to( "PlateController.designer" ).end();
 
+
 		/*
 			current account
 		*/
-
-		post( "/ajax/my/change-pwd" ).to( "CurrentUserAjaxController.changePwd" ).end();
+		post( "/ajax/change-pwd" ).to( "CurrentUserAjaxController.changePwd" ).end();
 
 		get( "/my/account" ).to( "CurrentUserController.get" ).end();
 
@@ -49,11 +49,9 @@
 			production times
 		*/
 
-		get( "/ajax/production-times")
-			.to("ProductionTimeAjaxController.list").end();
+		get( "/ajax/production-times").to("ProductionTimeAjaxController.list").end();
 
-		get( "/production-times")
-			.to("ProductionTimeController.list").end();
+		get( "/production-times").to("ProductionTimeController.list").end();
 
 
 		/*
@@ -241,10 +239,9 @@
 
 		/*
 			lookup
+			[TODO] "JSDATA" non funziona
 		*/
-		get(
-			"/(.*)/datajs" // [TODO] "JSDATA" non funziona
-		).to( "LookupController.datajs" ).end();
+		get( "/(.*)/datajs" ).to( "LookupController.datajs" ).end();
 
 
 		/*

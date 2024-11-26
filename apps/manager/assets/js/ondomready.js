@@ -125,13 +125,17 @@ $(document).ready(function () {
 		);
 	});
 
-    $.validator.addMethod(
-        "checkCode",
-        function (value, element) {
+    $.validator.addMethod( "checkCode", function (value, element) {
           var re = new RegExp(/^([a-zA-Z0-9_-]+)$/);
           return this.optional(element) || re.test(value);
         },
         "Please check your input."
     );
+
+	$.validator.addMethod( "pwdRule", function( value, element ) {
+		var re = new RegExp( "(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!_@$%^&*-]).{8,}$", "i" );
+		return this.optional(element) || re.test(value);
+	}, "Deve contenere almeno un carattere maiuscolo, un numero e un carattere speciale." );
+
 
 });

@@ -4,8 +4,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.title = "Il mio account";
 
+        prc.jsScripts.add( "app-my" );
+
         event.setView( "my/account" );
 
     }
-    
+  
 }

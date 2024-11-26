@@ -9,7 +9,7 @@
         "dataMapper":"http+cached://www.coridalia.cc/repository/dataMapper/dataMapper-1.7.zip",
         "accessManager":"http+cached://www.coridalia.cc/repository/accessManager/accessManager-1.0.0.zip",
         "coldbox":"7.2.1+13",
-        "cbvalidation":"4.0.0"
+        "cbvalidation":"4.4.0"
     },
     "devDependencies":{
         "testbox":"5.1.0+2"

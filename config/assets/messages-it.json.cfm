@@ -35,5 +35,10 @@
     },
 
     "login": {
+    },
+
+   "my": {
+        "currentPasswordNotMatch": "La password corrente non è corretta. Riprova",
+        "passwordChanged": "Password modificata con successo"
     }
 }

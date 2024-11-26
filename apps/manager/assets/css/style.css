@@ -245,6 +245,7 @@ h2 {
 }
 
 .card-body {
+    padding: 1rem 2rem 2rem 2rem !important;
 }
 
 .card-footer {

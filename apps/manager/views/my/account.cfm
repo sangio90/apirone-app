@@ -75,31 +75,47 @@
                                     
                                     <div class="col-12">
                                         <div class="form-group pb-3">
-                                            <label class="col-form-label" for="option-desc">Password</label>
-                                            <input type="password" class="form-control" name="pwd" 
+                                            <label class="col-form-label" for="current-pwd">Password corrente</label>
+                                            <input type="password" class="form-control" name="currentPwd" id="current-pwd"
+                                                required
                                                 maxlength="20"
                                                 data-rule-required="true"
-                                                data-msg-required="Password richiesta"
-                                                data-rule-equalTo="##pwd2"
-                                                data-msg-equalTo="Le password non coincidono"
-                                                data-rule-pwdRule="true"
+                                                data-msg-required="Password corrente richiesta"
                                             >
                                         </div>
                                     </div>
                                     
                                     <div class="col-12">
                                         <div class="form-group pb-3">
-                                            <label class="col-form-label" for="option-desc">Conferma password</label>
-                                            <input type="password" class="form-control" name="pwd2" id="pwd2"
+                                            <label class="col-form-label" for="new-pwd">Nuova password</label>
+                                            <input type="password" class="form-control" name="newPwd" id="new-pwd"
+                                                required
                                                 maxlength="20"
                                                 data-rule-required="true"
-                                                data-msg-required="La password di conferma è richiesta"
+                                                data-msg-required="Password richiesta"
+                                                data-rule-pwdRule="true"
+                                                data-msg-pwdRule="Almeno 10 caratteri e contenere almeno un numero e un carattere speciale"
                                             >
                                         </div>
                                     </div>
                                     
-                                    <div class="col-12 mt-3">
-                                        #saveButton( label="Modifica password", size="md") #
+                                    <div class="col-12">
+                                        <div class="form-group pb-3">
+                                            <label class="col-form-label" for="confirm-pwd">Conferma password</label>
+                                            <input type="password" class="form-control" name="confirmPwd" id="confirm-pwd"
+                                                required
+                                                maxlength="20"
+                                                data-rule-required="true"
+                                                data-msg-required="La password di conferma è richiesta"
+                                                data-rule-equalTo="##new-pwd"
+                                                data-msg-equalTo="Le password non coincidono"
+                                            >
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12 mt-3 d-flex align-elements-baseline justify-content-start">
+                                        #saveButton( label="Modifica password", size="md", bind="click:save")#
+                                        <div class="status ms-2 mt-2"></div>
                                     </div>
 
                                 </div>

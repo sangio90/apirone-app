@@ -37,11 +37,10 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
-		<cfargument name="orderBy" type="String" default="code">
+		<cfargument name="orderBy" type="String" default="code asc, taxcode desc">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT
-				DISTINCT
+			SELECT DISTINCT
 				finish_id::varchar,
 				categories::varchar,
 				*
@@ -56,7 +55,7 @@
 
 				<cfif !isNull( arguments.categoryId )>
 					<!--- INFO: with cfqueryparam not works --->
-					AND categories @> ANY ('{[#sanitizeSQL(arguments.categoryId)#]}')
+					AND categories @> ANY ('{[#super.sanitizeSQL(arguments.categoryId)#]}')
 				</cfif>
 
 				<cfif !isNull( arguments.str )>

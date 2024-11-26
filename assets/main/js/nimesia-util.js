@@ -8,8 +8,6 @@ NM.util.openModal = function( ele ) {
     var currentTop = 0;
     var currentLeft = 0;
 
-	console.log("how many dialogs?", dialogs.length)
-
     var n=1;
 
     for ( var dialog of dialogs ) {
