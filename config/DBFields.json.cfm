@@ -39,6 +39,11 @@
         "type": "uuid"
     },
 
+    "finish.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+
    "category.name": {
         "name": "line_category",
         "type": "varchar"

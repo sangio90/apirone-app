@@ -169,7 +169,7 @@
 
     }    
 
-    public Struct function paramsFromUrl(){
+    public Struct function paramsFromUrl( String prefix="" ){
 
         var params = {}
 
@@ -177,8 +177,33 @@
 
             var value = url[thisParam];
 
-            if( len( value ) ) {
-                params[ thisParam ] = url[thisParam];
+            if ( thisParam != "orderBy" ) {
+
+
+                if( len( value ) ) {
+                    params[ thisParam ] = url[thisParam];
+                }
+
+            } else {
+
+                /*
+                    "orderBy" field
+                */
+
+                var dir = "asc";
+                var count = ListLen( value, "-" );
+                var field = listFirst( value, "-" );
+
+                if( Len( arguments.prefix ) ) {
+                    field = arguments.prefix & "." & listFirst( value, "-" );
+                }
+
+                if ( count > 1 ) {
+                    dir = ListLast( value, "-" );
+                }
+
+                params["orderBy"] = [ { field=field, dir=dir } ];
+
             }
 
         }

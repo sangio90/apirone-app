@@ -18,7 +18,7 @@
 
                         <div class="row d-flex align-items-center mb-3">
 
-                            <div class="col-sm-8">
+                            <div class="col-sm-9">
 
                                 <div class="mb-3 box-search-small"> 
 
@@ -42,6 +42,13 @@
                                             </cfloop>
                                         </select>
 
+                                        <select class="form-control me-2" name="orderBy">
+                                            <option value="code-asc">Codice [A-Z]</option>
+                                            <option value="code-desc">Codice [Z-A]</option>
+                                            <option value="name-asc">Descrizione [A-Z]</option>
+                                            <option value="name-desc">Descrizione [Z-A]</option>
+                                        </select>
+
                                         #searchButton( bind="click:search" )#
                                     
                                     </form>
@@ -49,7 +56,7 @@
                                 </div>
 
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <div class="float-end">
                                     #deleteButton(
                                         bind  = "click:delete",

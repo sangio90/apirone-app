@@ -116,7 +116,7 @@ AP.attribute.list = (function () {
 
 			} else {
 
-				NM.util.autoHideMessage(status, "<span class='red'>Selezionare almeno un valore</span>");
+				NM.util.autoHideMessage(status, "<span class='red'>Seleziona almeno un valore</span>");
 
 			}
 

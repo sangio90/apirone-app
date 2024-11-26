@@ -42,18 +42,18 @@
 
     }
 
-    public String function createOrderBy(required Array fields=[]) {
+    public String function createOrderBy(required Array fields=[], String prefix="" ) {
         
         var result = "";
         var n = 1;
-        
+
         for ( var i in arguments.fields ) {
            
             if ( !StructKeyExists( i, "dir" ) ) {
                 i.dir = "ASC";
             }
 
-            if ( !ListFind( "ASC,DESC", i.dir ) ) {
+            if ( !ListFindNoCase( "ASC,DESC", i.dir ) ) {
 
                 throw( 
                     message="Direction [#i.dir#] not valid for field [#i.field#]. Only accepted values are ASC or DESC", 
@@ -61,7 +61,7 @@
                 );
 
             }
-            
+
             result = result & "#getDBField( i.field ).name# #i.dir#"; //not "sort"!
 
             result = arguments.fields.len() EQ n ? result : result & ", ";
@@ -72,6 +72,7 @@
 
         return result;
     }
+
     
     public Query function trimQueryFields( required Query records ) {
 
@@ -93,6 +94,7 @@
 
         return records;
     }
+
     
     private Array function getCategoriesBeanFromIds( required String categories ) { //[2,3,4,5]
 

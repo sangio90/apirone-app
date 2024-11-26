@@ -37,6 +37,7 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
+		<cfargument name="orderBy" type="String" default="code">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -66,7 +67,7 @@
 				</cfif>
 
 			ORDER BY
-				orderby
+				#super.sanitizeSQL( arguments.orderBy )#
 		</cfquery>
 
 		<cfreturn local.q>

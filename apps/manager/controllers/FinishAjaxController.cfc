@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var dm = getDataMapper();
 
-		var params = super.paramsFromUrl();
+		var params = super.paramsFromUrl( "finish" );
 
 		var rows = super.fire( "finish.list", params );
 

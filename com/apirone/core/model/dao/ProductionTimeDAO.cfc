@@ -75,8 +75,8 @@
 				<cfif !IsNull( arguments.str )>
 					AND 
 					( 
-						production_times.production_time_id ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
-						OR production_times.production_time ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
+						production_times.production_time_id ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
+						OR production_times.production_time ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 					)
 				</cfif>
 			

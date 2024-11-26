@@ -30,9 +30,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments ).getData();
 	}
 
-	public com.apirone.core.model.bean.Result function search(){
+	public com.apirone.core.model.bean.Result function search(
+		required Array orderBy = [ { field='finish.code' } ],
+	){
 		var rows   = [];
 		var result = super.getResult();
+
+		arguments['orderby'] = super.createOrderBy( arguments["orderby"], "finish" );
 
 		var records = getDao().find( argumentCollection = arguments );
 
