@@ -54,7 +54,7 @@
 			</cfif>
                 
 			<cfif !isNull( arguments.str )>
-				AND ardesart LIKE <cfqueryparam value="#arguments.str#%" cfsqltype="varchar">
+				AND ardesart LIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
 			</cfif>
                 
 			ORDER BY 

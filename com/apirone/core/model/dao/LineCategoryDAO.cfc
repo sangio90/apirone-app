@@ -51,7 +51,7 @@
 			WHERE 1=1
                 
 				<cfif Len( trim( arguments.str ) )>
-					AND line_category ILIKE <cfqueryparam value="#arguments.str#%" cfsqltype="Varchar">
+					AND line_category ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="Varchar">
 				</cfif>
 
 				<cfif !isNull( arguments.lineId )>

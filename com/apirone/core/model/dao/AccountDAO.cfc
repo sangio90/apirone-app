@@ -70,7 +70,7 @@
 				<cfif !IsNull( arguments.str )>
 					AND (
 						pgp_sym_decrypt(email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) 
-						ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.str#%">
+						ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 						OR 
 						account_id::varchar ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#">
 					)

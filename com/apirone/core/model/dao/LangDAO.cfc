@@ -35,7 +35,7 @@
 			</cfif>
 
 			<cfif !isNull( arguments.str ) >
-				AND lang ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.str#%">
+				AND lang ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 			</cfif>
 
 			ORDER BY 

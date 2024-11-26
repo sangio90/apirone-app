@@ -34,7 +34,7 @@
 			WHERE 1=1
                 
 				<cfif Len( trim( arguments.str ) )>
-					AND destip ILIKE <cfqueryparam value="#arguments.str#%" cfsqltype="Varchar">
+					AND destip ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="Varchar">
 				</cfif>
 
 			ORDER BY 

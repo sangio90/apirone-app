@@ -47,6 +47,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		finish.setId( json.id );
 		finish.setCode( json.code );
 
+		dump(json.selectedCategories);
+		abort;
+
 		for ( var thisCategory in json.selectedCategories ) {
 			category.setId( thisCategory.id );
 			categories.add( category );

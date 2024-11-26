@@ -49,7 +49,7 @@
 			</cfif>
 
 			<cfif !isNull( arguments.str ) >
-				AND text ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
+				AND text ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 			</cfif>
 
 			<cfif !isNull( arguments.statusId ) >

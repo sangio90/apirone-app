@@ -62,7 +62,7 @@
                 </cfif>
 
 				<cfif !IsNull( arguments.str )>
-					AND sizes.code ILIKE <cfqueryparam value="#arguments.str#%" cfsqltype="varchar">
+					AND sizes.code ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.categoryId )>

@@ -51,8 +51,8 @@
 				<cfif !IsNull( arguments.str )>
 					AND 
 					( 
-						lines.code ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
-						OR lines.line ILIKE <cfqueryparam cfsqltype="Varchar" value="#arguments.str#%">
+						lines.code ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
+						OR lines.line ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 					)
 				</cfif>
 
