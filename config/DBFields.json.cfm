@@ -14,12 +14,12 @@
         "type": "Integer"
     },
 
-    "lineCategory.id": {
-        "name": "line_category_id",
+    "productCategory.id": {
+        "name": "product_category_id",
         "type": "Integer"
     },
     
-    "lineCategory.code": {
+    "productCategory.code": {
         "name": "code",
         "type": "Varchar"
     },
@@ -49,11 +49,11 @@
         "type": "Varchar"
     },
 
-   "category.name": {
-        "name": "line_category",
+   "product_category.name": {
+        "name": "product_category",
         "type": "varchar"
     },
-   "category.code": {
+   "product_category.code": {
         "name": "code",
         "type": "varchar"
     }

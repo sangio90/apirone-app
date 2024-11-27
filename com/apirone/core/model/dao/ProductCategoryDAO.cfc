@@ -6,14 +6,13 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
-			FROM line_categories
-			WHERE line_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
+			FROM product_categories
+			WHERE product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
 		</cfquery>
 
 		<cfreturn local.q>
 
 	</cffunction>
-
 
 	<cffunction returntype="Query" name="readByCode">
 
@@ -21,7 +20,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
-			FROM line_categories
+			FROM product_categories
 			WHERE code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
 		</cfquery>
 
@@ -40,12 +39,12 @@
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT
-				line_category_id,
-				COUNT(line_category_id) OVER() AS total
+				product_category_id,
+				COUNT(product_category_id) OVER() AS total
 			FROM
-				line_categories
+				product_categories
 				<cfif !IsNull( arguments.lineId )>
-					INNER JOIN lines l USONG ( line_category_id )
+					INNER JOIN lines l USONG ( product_category_id )
 				</cfif>
 
 			WHERE 1=1
@@ -76,56 +75,55 @@
 
 	<cffunction name="insert" returntype="Numeric">
 
-		<cfargument name="lineCategory" type="com.apirone.core.model.bean.ProductCategory" required="true">
+		<cfargument name="ProductCategory" type="com.apirone.core.model.bean.ProductCategory" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO line_categories (
+			INSERT INTO product_categories (
 				code,
 				status_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.lineCategory.getCode()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.lineCategory.getStatus().getId()#">
-			) RETURNING line_category_id
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getStatus().getId()#">
+			) RETURNING product_category_id
 		</cfquery>
 
-		<cfreturn q.line_category_id>
+		<cfreturn q.product_category_id>
 	
 	</cffunction>
 
 
 	<cffunction name="update" returntype="String">
 
-		<cfargument name="lineCategory" type="com.apirone.core.model.bean.lineCategory" required="true">
+		<cfargument name="ProductCategory" type="com.apirone.core.model.bean.ProductCategory" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
-				line_categories
+				product_categories
 			SET
-				code = <cfqueryparam cfsqltype="Varchar" value="#trim(arguments.lineCategory.getCode())#">,
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineCategory.getStatus().getId()#">
+				code = <cfqueryparam cfsqltype="Varchar" value="#trim(arguments.ProductCategory.getCode())#">,
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getStatus().getId()#">
 			WHERE
-				line_categorie_id = <cfqueryparam cfsqltype="Integer" value="#trim(arguments.lineCategory.getId())#">
+				line_categorie_id = <cfqueryparam cfsqltype="Integer" value="#trim(arguments.ProductCategory.getId())#">
 		</cfquery>
 
-		<cfreturn arguments.lineCategory.getId()>
+		<cfreturn arguments.ProductCategory.getId()>
 	
 	</cffunction>
 
 
-	<cffunction name="delete" returntype="Boolean">
-
-		<cfargument name="categoryId" type="String" required="true">
+	<cffunction name="delete" returntype="Numeric">
+		<cfargument name="productCategoryId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			DELETE
-			FROM line_categories
+			DELETE FROM
+				product_categories
 			WHERE
-				line_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
+				product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productCategoryId#">
+			RETURNING product_category_id
 		</cfquery>
 
-		<cfreturn true>
-	
+		<cfreturn local.q.recordCount>
 	</cffunction>
 
 </cfcomponent>

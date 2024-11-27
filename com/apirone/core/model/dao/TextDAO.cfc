@@ -23,7 +23,7 @@
 		
 		<cfargument name="attributeId" type="String">
 		<cfargument name="attributeValueId" type="String">
-		<cfargument name="lineCategoryId" type="Numeric">
+		<cfargument name="ProductCategoryId" type="Numeric">
 		<cfargument name="sizeId" type="String">
 
 		<cfargument name="fromDate" type="Date">
@@ -82,8 +82,8 @@
 				AND attribute_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
 			</cfif>
 
-			<cfif !isNull( arguments.lineCategoryId ) >
-				AND line_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.lineCategoryId#">
+			<cfif !isNull( arguments.ProductCategoryId ) >
+				AND product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.ProductCategoryId#">
 			</cfif>
 
 			<cfif !isNull( arguments.finishId ) >

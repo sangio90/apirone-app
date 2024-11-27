@@ -45,7 +45,7 @@
 			WHERE 1=1
 				
 				<cfif !IsNull( arguments.categoryId )>
-					AND lines.line_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
+					AND lines.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
@@ -73,7 +73,7 @@
 				code,
 				line,
 				status_id,
-				line_category_id,
+				product_category_id,
 				thickness_id,
 				orderby
 			)
@@ -101,7 +101,7 @@
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
 				line = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getCode()#">,
-				line_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.line.getCategory().getId()#">,
+				product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.line.getCategory().getId()#">,
 				thickness_id = <cfqueryparam cfsqltype="Integer" value="#arguments.line?.getTickness()?.getId()#">,
 				orderby = 20
 			WHERE

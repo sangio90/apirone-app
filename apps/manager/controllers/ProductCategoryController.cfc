@@ -4,11 +4,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.title = "Categorie";
 
-        prc.lineCategories = super.fire( "lineCategory.list" );
+        prc.statusList = super.fire( "status.list", ["product_category"] );
 
         prc.jsScripts.add( "app-product-category" );
 
-        event.setView("line/category/list");
+        event.setView("product-category/list");
 
     }
 

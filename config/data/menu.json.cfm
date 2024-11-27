@@ -58,7 +58,7 @@
 		roles: "ADM",
 		items: [
 			{
-				href: "/manager/lines/categories",
+				href: "/manager/product-categories",
 				icon: "fas fa-stream",
 				title: "Categorie prodotti",
 				roles: "ADM"

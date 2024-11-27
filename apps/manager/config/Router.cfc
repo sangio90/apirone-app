@@ -176,6 +176,7 @@
 			lines category
 		*/
 		get( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.list" ).end();
+		delete( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.delete" ).end();
 
 		get( "/product-categories" ).to( "ProductCategoryController.list" ).end();
 

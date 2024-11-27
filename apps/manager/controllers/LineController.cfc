@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.statuses = super.fire( "status.list", ["LINE"] );
         prc.thicknesses = super.fire( "lookup.list", [ "thickness" ] );
-        prc.lineCategories = super.fire( "lineCategory.list" );
+        prc.lineCategories = super.fire( "ProductCategory.list" );
 
         prc.jsScripts.add( "app-line" );
 

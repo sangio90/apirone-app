@@ -4,7 +4,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.title = "Finiture";
 
-        prc.lineCategories = super.fire( "lineCategory.list" );
+        prc.lineCategories = super.fire( "ProductCategory.list" );
         prc.statuses = super.fire( "status.list", ["FINISH"] );
 
         var categories = [];

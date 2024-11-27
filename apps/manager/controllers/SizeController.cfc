@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.title = "Dimensioni";
 
         prc.statuses = super.fire( "status.list", ["SIZE"] );
-        prc.categories = super.fire( "lineCategory.list" );
+        prc.categories = super.fire( "ProductCategory.list" );
 
         var categories = [];
 

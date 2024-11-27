@@ -39,7 +39,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
                      String statusId,
                      String attributeId,
                      Numeric attributeValueId,
-                     Numeric lineCategoryId,
+                     Numeric ProductCategoryId,
                      String finishId,
                      String langId,
             required Numeric limit = 20,

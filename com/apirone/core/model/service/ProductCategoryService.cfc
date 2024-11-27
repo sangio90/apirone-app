@@ -5,12 +5,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="textService" type="com.apirone.core.model.service.TextService";
 
     public com.apirone.core.model.bean.ProductCategory function get(
-    		required String lineCategoryId
+    		required String ProductCategoryId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.lineCategoryId );
+    	var key = getCacheKey( arguments.ProductCategoryId );
 
 	   	var cache = cm.get( key ) ;
 
@@ -20,7 +20,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    }
 	    
-		var bean = build( arguments.lineCategoryId );
+		var bean = build( arguments.ProductCategoryId );
 		cm.put( key, bean );
         
 		return bean;
@@ -46,7 +46,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    for( var record in records ){
 
 	    	rows.add( 
-	    		get( lineCategoryId = record.line_category_id )
+	    		get( ProductCategoryId = record.product_category_id )
 	    	);
 
 	    }
@@ -60,7 +60,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
     public com.apirone.core.model.bean.ProductCategory[] function list(
-			required Array orderBy = [ { field='lineCategory.code' } ],
+			required Array orderBy = [ { field='ProductCategory.code' } ],
 					 String str,
 					 String productId
 		){
@@ -92,7 +92,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				var entity = super.bean("Entity");
 
-				entity.setKey( "lineCategory.id" );
+				entity.setKey( "ProductCategory.id" );
 				entity.setValue( newId );
 
 				text.setEntity( entity );
@@ -132,20 +132,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public Boolean function delete(
-			required String lineCategoryId
-		){
-	
-		var result = getDao().delete( arguments.lineCategoryId );
+	public com.apirone.core.model.bean.Outcome function delete(
+		required String productCategoryId
+	){
+		var outcome = super.bean( "Outcome" );
 
-		var cm = super.getCacheManager();
+		var obj = get( arguments.productCategoryId );
 
-		cm.remove( getCachekey( arguments.lineCategoryId ) );
+		outcome.setData( { productCategoryId = arguments.productCategoryId } );
 
-		return result;
+		transaction {
+			try {
+				var result = getDao().delete( arguments.productCategoryId );
+				outcome.setData( { "deletedCount" = result } )
 
-	}
+				getCacheManager().remove( getCacheKey( arguments.productCategoryId ) );
 
+			} catch ( any error ) {
+				
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteProductCategory" );
+				outcome.setMessage( "Cannot delete product category [#arguments.productCategoryId#]" );
+			
+			}
+		}
+
+		return outcome;
+	}	
 
 	public Boolean function nameExists(
 			required String name
@@ -162,21 +176,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	*/
 
 	private com.apirone.core.model.bean.ProductCategory function build(
-    		required String lineCategoryId
+    		required String ProductCategoryId
     	){
 
-	    var record = getDao().read( arguments.lineCategoryId );
+	    var record = getDao().read( arguments.ProductCategoryId );
 
 	    if( record.RecordCount ) { 
 
           	var bean = super.bean( "ProductCategory" );
 
-            bean.setId( record.line_category_id );
+            bean.setId( record.product_category_id );
             bean.setCode( record.code );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setCreatedAt( record.created_at );
 
-            bean.setTexts( getTextService().list( lineCategoryId = record.line_category_id ) );
+            bean.setTexts( getTextService().list( ProductCategoryId = record.product_category_id ) );
 
 			return bean;
 			

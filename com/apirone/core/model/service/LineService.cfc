@@ -145,7 +145,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setCategory( getProductCategoryService().get( record.line_category_id ) );
+			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
 
             return bean;
 

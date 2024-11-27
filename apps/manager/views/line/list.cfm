@@ -3,6 +3,7 @@
 		#pageTitle()#
 
 		<div class="row">
+			
 			<div class="col-lg-12 text-end pb-3">
 				#addButton( bind = "click:new", size = "sm" )#
 			</div>
@@ -10,6 +11,7 @@
 			<div class="col-lg-12">
 				<section class="card">
 					<div class="card-body">
+						
 						<div class="row d-flex align-items-center mb-3">
 							<div class="col-sm-8">
 								<div class="box-search-small">
