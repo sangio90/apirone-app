@@ -63,26 +63,17 @@
 
 	}	
 
-	public function createDocs () {
-
-		var docbox = CreateObject("component", "modules.external.docbox.DocBox").init();
-
-		docbox
-			.addStrategy( "HTML", {
-				projectTitle: "Opusplus",
-				ouputdir: ExpandPath("/resources/docs/opusplus")
-			})
-			.generate( source=ExpandPath("/com/opusplus") )
-	}
-
 	public function createZip() {
 
 		var current = getCwd();
 
 		var zipsDir = "#current#/../zips/";
 
+		var currVersion = trim( command('package show version').run( returnOutput=true ) );
+		var version = currVersion+1;
+		var version = trim( command('package set version=#version#').run( returnOutput=true ) );
+
 		var slug = trim( command('package show slug').run( returnOutput=true ) );
-		var version = trim( command('package show version').run( returnOutput=true ) );
 
 		var dirName = "#slug#_#getCode()#";
 
@@ -105,7 +96,6 @@
 
 		FileWrite( file="#sourceDir#/#slug#.txt", data="Build on #DateTimeFormat(now(), 'dd/mm/yyyy HH:nn:ss')#; version #version#" );
 
-		//print.greenLine( "simple: #IsSimpleValue(files)#" );
 		print.greenLine( "Total files: #files.len()#" );
 
 
@@ -201,6 +191,8 @@
 		// merge envs file. local commands!
 		StructAppend( mainItems, envItems, true );
 		StructAppend( mainItems, localItems, true );
+
+		mainItems.put( "app.version", trim( command('package show version').run( returnOutput=true ) ) );
 
 		var serverItems = orderStruct( mainItems );
 
