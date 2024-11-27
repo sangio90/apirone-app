@@ -19,7 +19,7 @@ component{
 			reinitKey                : "fwreinit",
 			handlersIndexAutoReload  : true,
 			// Implicit Events
-			defaultEvent             : "MainController.home",
+			defaultEvent             : "manager:MainController.login",
 			requestStartHandler      : "",
 			requestEndHandler        : "",
 			applicationStartHandler  : "",
@@ -58,7 +58,7 @@ component{
 		 * --------------------------------------------------------------------------
 		 */
 		settings = {
-			key: "MyValue"
+			key: ""
 		};
 
 		/**

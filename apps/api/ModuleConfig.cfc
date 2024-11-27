@@ -13,12 +13,6 @@ component{
             defaultLayout = "api.cfm"
         };
 
-        /*
-        coldbox = {
-            exceptionHandler = "MainController.error",
-        }
-        */
-
     }
 
 }

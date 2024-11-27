@@ -4,7 +4,7 @@ component extends="coldbox.system.Interceptor"{
 
         if ( !structKeyExists( prc, 'currentRoutedModule') ) {
 
-            cflocation( url="/public/home", addtoken="false" );
+            cflocation( url="/manager/login", addtoken="false" );
 
         }
 

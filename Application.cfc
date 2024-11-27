@@ -10,8 +10,6 @@ component extends="com.apirone.core.root.Application" {
 	COLDBOX_APP_KEY       = "";
 	COLDBOX_FAIL_FAST     = false;
 
-    //this.mappings[ "/coldbox" ] = ExpandPath( "/modules/coldbox/" );
-
 	public Boolean function onApplicationStart() {
 
 		cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:onApplicationStart" );
@@ -29,8 +27,6 @@ component extends="com.apirone.core.root.Application" {
 	}
 
 	public Boolean function onSessionStart( string targetPage ) {
-
-		//startCart();
 
 		startUser();
 
@@ -54,6 +50,7 @@ component extends="com.apirone.core.root.Application" {
 			onApplicationStart();
 
 		}
+		
 
 		application.cbBootstrap.onRequestStart( arguments.targetPage );
 
