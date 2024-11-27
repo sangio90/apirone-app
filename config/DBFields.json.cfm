@@ -39,6 +39,11 @@
         "type": "uuid"
     },
 
+    "size.id": {
+        "name": "size_id",
+        "type": "uuid"
+    },
+
     "finish.code": {
         "name": "code",
         "type": "Varchar"
@@ -52,4 +57,4 @@
         "name": "code",
         "type": "varchar"
     }
-}
+}   

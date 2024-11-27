@@ -108,6 +108,7 @@
         <map from="name" to="name" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
         <map from="fruitsCount" to="fruitsCount" type="cf:Integer" />
+        <map from="mainText" to="mainText" ref="Text" />
         <map from="status" to="status" ref="Status" />
         <map from="categories" to="categories" ref="LineCategory" type="Array" />
         <map from="createdAt" to="createdAt" type="cf:Date" />

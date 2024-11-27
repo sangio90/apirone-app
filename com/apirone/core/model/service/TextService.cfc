@@ -196,6 +196,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 		}
 		
+		if( Len( record.finish_id ) ) {
+
+			entity.setKey( "finish.id" );
+			entity.setValue( record.finish_id );
+
+			return entity;
+			
+		}
+		
+		if( Len( record.size_id ) ) {
+
+			entity.setKey( "size.id" );
+			entity.setValue( record.size_id );
+
+			return entity;
+			
+		}
+		
 		return NullValue()
 
   	}

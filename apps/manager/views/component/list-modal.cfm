@@ -9,7 +9,7 @@
 				<div class="card-body">
 					<div class="row">
 						
-						<div class="col-9">
+						<div class="col-7">
 
 							<div data-bind="visible: showSearchPanel">
 								<form data-bind="events: { submit: search }" id="component-list-search-form">
@@ -61,17 +61,17 @@
 						
 						</div>
 
-						<div class="col-9">
+						<div class="col-5">
 
 							<table class="table table-hover pt-5">
 								<thead>
 									<tr>
-										<th scope="col">Componenti</th>
+										<th scope="col">Componenti per </th>
 										<th scope="col" width="100"></th>
 									</tr>
 								</thead>
 								
-								<tbody data-bind="source:selectedComponents" data-template="component-selected-row-tmpl">
+								<tbody data-bind="source:selected" data-template="component-selected-row-tmpl">
 								</tbody>
 							</table>
 
@@ -95,4 +95,5 @@
 	</div>
 
 	#template( "jstemplate/component/component-selected-row-tmpl" )#
+
 </cfoutput>

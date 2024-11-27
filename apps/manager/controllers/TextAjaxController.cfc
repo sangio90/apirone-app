@@ -9,7 +9,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var text = super.fire( "text.get", [ rc.id ] );
 
-        var rows = super.fire( "text.list", { entity = text.getEntity()  } );
+        var rows = super.fire( "text.list", { entity = text.getEntity() } );
+
         
         for( var row in rows ) {
 

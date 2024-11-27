@@ -13,7 +13,7 @@
                     <thead>
                         <tr>
                             <th scope="col">Variante</th>
-                            <th scope="col" width="100"></th>
+                            <th scope="col" width="30"></th>
                         </tr>
                     </thead>
                     
@@ -29,7 +29,7 @@
                     <thead>
                         <tr>
                             <th scope="col">Colore</th>
-                            <th scope="col" width="100" style="text-align: right"><a href="">Tutti</a></th>
+                            <th scope="col" width="30" style="text-align: right"><a href="">Tutti</a></th>
                         </tr>
                     </thead>
                     

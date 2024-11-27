@@ -30,6 +30,13 @@ AP.size.list = (function () {
 			code: "",
 			fruitsCount: "",
 			selectedCategories: [],
+			mainText: {
+				id: "",
+				name: "",
+				lang: {
+					id: "IT"
+				}
+			},
 			status: {
 				id: "ACT"
 			}

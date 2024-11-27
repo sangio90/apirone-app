@@ -33,9 +33,14 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result     = super.getResult();
-		var size     = super.bean( "Size" );
-		var status     = super.bean( "Status" );
+		
+		var result = super.getResult();
+
+		var size   = super.bean( "Size" );
+		var status = super.bean( "Status" );
+		var text   = super.bean("Text");
+		var lang   = super.bean("Lang");
+
 		var categories = [];
 
 		var thisId    = "";
@@ -46,7 +51,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		size.setId( json.id );
 		size.setCode( json.code );
-		size.setName( json.name );
+		//size.setName( json.name );
 
         if ( Len( json?.selectedCategories ) ) {
 
@@ -59,6 +64,14 @@ component extends="com.apirone.core.controller.AbsController" {
             }
 
         }
+
+        text.setLang( lang.setId( json.mainText.lang.id ) );
+        text.setStatus( status.setId( json.mainText.id ) );
+
+        text.setId( json.mainText.id );
+        text.setName( json.mainText.name );
+
+        size.setTexts( [ text ] );
 
 		size.setCategories( categories );
 		size.setStatus( status.setId( json.status.id ) );

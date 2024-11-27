@@ -10,17 +10,16 @@
                 <span data-bind="text: code"></span>
             </td>
             <td>
+                <span data-bind="text: mainText.name"></span>
+            </td>
+            <td>
                 <div data-bind="source: categories" data-template="category-row-tmpl"></div>
             </td>
             <td>
                 <span data-bind="text: fruitsCount"></span>
             </td>
             <td>
-                <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
+                #iconButton(bind="click:edit", icon="edit")#
             </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input" name="selected"

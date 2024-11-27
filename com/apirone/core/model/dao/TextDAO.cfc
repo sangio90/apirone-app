@@ -20,9 +20,12 @@
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
 		<cfargument name="langId" type="String">
+		
 		<cfargument name="attributeId" type="String">
 		<cfargument name="attributeValueId" type="String">
 		<cfargument name="lineCategoryId" type="Numeric">
+		<cfargument name="sizeId" type="String">
+
 		<cfargument name="fromDate" type="Date">
 		<cfargument name="toDate" type="Date">
 		<cfargument name="entity" type="com.apirone.core.model.bean.Entity">
@@ -36,6 +39,7 @@
 			<cfset value = arguments.entity.getValue()>
 		</cfif>
 
+
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
              	text_id, 
@@ -45,7 +49,13 @@
 			WHERE 1=1
 
 			<cfif !isNull( arguments.entity ) >
-				AND #field.name# = <cfqueryparam cfsqltype="#field.type#" value="#value#">
+				
+				AND #field.name# = 
+					<cfif field.type == "uuid">
+						<cfqueryparam cfsqltype="Varchar" value="#value#">::uuid
+					<cfelse>
+						<cfqueryparam cfsqltype="#field.type#" value="#value#">
+					</cfif>
 			</cfif>
 
 			<cfif !isNull( arguments.str ) >
@@ -62,6 +72,10 @@
 
 			<cfif !isNull( arguments.attributeId ) >
 				AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
+			</cfif>
+
+			<cfif !isNull( arguments.sizeId ) >
+				AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
 			</cfif>
 
 			<cfif !isNull( arguments.attributeValueId ) >

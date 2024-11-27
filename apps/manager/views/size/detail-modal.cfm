@@ -20,7 +20,7 @@
                                 <input type="text" required class="form-control col-sm-4" name="code"
                                     maxlength="3"
                                     data-bind="value: detailForm.data.code"
-                                    onkeyup="this.value = this.value.toUpperCase();">
+                                    onkeyup="this.value = this.value.toUpperCase()">
                             </div>
                         </div>
 
@@ -29,14 +29,14 @@
                             <div class="col-sm-10">
                                 <input type="text" class="form-control col-sm-4" name="name"
                                     maxlength="125"
-                                    data-bind="value: detailForm.data.name">
+                                    data-bind="value: detailForm.data.mainText.name">
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Numero di frutti</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" name="code"
+                                <input type="text" required class="form-control col-sm-4" name="fruitsCount"
                                     maxlength="3"
                                     data-bind="value: detailForm.data.fruitsCount">
                             </div>

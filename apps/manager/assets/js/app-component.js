@@ -18,6 +18,7 @@ $(document).ready(function (){
 AP.component.list = (function () {
 
 	var pub = {};
+	var fields = AP.component.fields;
 
 	var viewModel = kendo.observable({
 
@@ -30,7 +31,7 @@ AP.component.list = (function () {
 		variantsTitle: "Varianti",
 		currentVariant: {},
 		currentComponent: {},
-		selectedComponents: [],
+		//selectedComponents: [],
 
 		showSearchResult: function () {
 
@@ -175,7 +176,7 @@ AP.component.list = (function () {
 
 		console.log("component:init");
 
-		//kendo.bind(AP.component.fields.rootList, viewModel);
+		kendo.bind( fields.rootList, viewModel );
 
 	};
 

@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.SizeDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
+	property name="textService" type="com.apirone.core.model.service.TextService";
 
     public com.apirone.core.model.bean.Size function get(
     		required String sizeId
@@ -63,7 +64,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var newId = getDao().insert( arguments.size );
 
-		/*
 		transaction {
 		
 			for ( var text in arguments.size.getTexts() ) {
@@ -77,7 +77,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getTextService().bulkCreate( arguments.size.getTexts() );
 		}
-		*/
 
 		return newId;
 	}
@@ -159,8 +158,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setName( record.size );
 			bean.setCode( record.code );
 			bean.setFruitsCount( record.fruits_count );
+			
 			bean.setCategories( getCategoriesBeanFromIds( record.categories ) );
-			bean.setStatus( getStatusService().get( record.status_id )  );
+			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setTexts( getTextService().list( sizeId = record.size_id ) );
+			
 			bean.setCreatedAt( record.created_at );
 			
             return bean;
