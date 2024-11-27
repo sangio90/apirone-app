@@ -1,10 +1,10 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.LineCategoryDAO";
+	property name="dao" type="com.apirone.core.model.dao.ProductCategoryDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="textService" type="com.apirone.core.model.service.TextService";
 
-    public com.apirone.core.model.bean.LineCategory function get(
+    public com.apirone.core.model.bean.ProductCategory function get(
     		required String lineCategoryId
         ){
 
@@ -59,7 +59,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-    public com.apirone.core.model.bean.LineCategory[] function list(
+    public com.apirone.core.model.bean.ProductCategory[] function list(
 			required Array orderBy = [ { field='lineCategory.code' } ],
 					 String str,
 					 String productId
@@ -72,11 +72,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create(
-            required com.apirone.core.model.bean.LineCategory category
+            required com.apirone.core.model.bean.ProductCategory category
 		){		
 	
 		if ( !Len( arguments.category.getCode() ) ) {
-			throw( type="apirone.errors.createLineCategory.codeNotProvided", message="Code required" );
+			throw( type="apirone.errors.createProductCategory.codeNotProvided", message="Code required" );
 		};
 
 	
@@ -106,7 +106,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 
 
-        return getDao().insert( arguments.LineCategory );
+        return getDao().insert( arguments.ProductCategory );
 
 	}
 
@@ -115,18 +115,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		){		
 	
 		if ( !Len( arguments.category.getId() ) ) {
-			throw( type="apirone.errors.updateLineCategory.IdNotProvided", message="ID required" );
+			throw( type="apirone.errors.updateProductCategory.IdNotProvided", message="ID required" );
 		};
 
 		if ( !Len( arguments.category.getName() ) ) {
-			throw( type="apirone.errors.updateLineCategory.NameNotProvided", message="Name required" );
+			throw( type="apirone.errors.updateProductCategory.NameNotProvided", message="Name required" );
 		};
 
-        var id = getDao().update( LineCategory = arguments.LineCategory );
+        var id = getDao().update( ProductCategory = arguments.ProductCategory );
 		
 		var cm = getCacheManager();
 		
-        cm.remove( arguments.LineCategory.getId() );
+        cm.remove( arguments.ProductCategory.getId() );
 
 		return id;
 
@@ -161,7 +161,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private methods
 	*/
 
-	private com.apirone.core.model.bean.LineCategory function build(
+	private com.apirone.core.model.bean.ProductCategory function build(
     		required String lineCategoryId
     	){
 
@@ -169,7 +169,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if( record.RecordCount ) { 
 
-          	var bean = super.bean( "LineCategory" );
+          	var bean = super.bean( "ProductCategory" );
 
             bean.setId( record.line_category_id );
             bean.setCode( record.code );
@@ -188,7 +188,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "LineCategory_#arguments.id#";
+  		return "ProductCategory_#arguments.id#";
 
   	}
 

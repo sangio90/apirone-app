@@ -57,7 +57,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
             for ( var thisCategory in json.selectedCategories ) {
 				
-				var category   = super.bean( "LineCategory" );
+				var category   = super.bean( "ProductCategory" );
                 
 				category.setId( thisCategory.id );
                 categories.add( category );

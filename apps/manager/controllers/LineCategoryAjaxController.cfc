@@ -12,7 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var rows = super.fire( "lineCategory.search", params );
 
         for ( var row in rows.getData() ) {
-            var obj = dm.convert( row, "LineCategory", true );
+            var obj = dm.convert( row, "ProductCategory", true );
             data.add( obj );
         }
 

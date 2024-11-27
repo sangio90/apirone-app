@@ -76,7 +76,7 @@
 
 	<cffunction name="insert" returntype="Numeric">
 
-		<cfargument name="lineCategory" type="com.apirone.core.model.bean.LineCategory" required="true">
+		<cfargument name="lineCategory" type="com.apirone.core.model.bean.ProductCategory" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO line_categories (

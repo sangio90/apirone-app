@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding='UTF-8'>
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="line-category-grid-row-tmpl">
+    <nmscript type="text/x-kendo-template" id="product-category-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td>
                 <span data-bind="text: id"></span>

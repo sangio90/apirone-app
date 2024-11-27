@@ -18,7 +18,7 @@
         <map from="id" to="id" type="cf:String" />
         <map from="shortId" to="shortId" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
-        <map from="categories" to="categories" ref="LineCategory" type="Array" />
+        <map from="categories" to="categories" ref="ProductCategory" type="Array" />
         <map from="name" to="name" type="cf:String" />
         <map from="mainText" to="mainText" ref="Text" />
         <map from="status" to="status" ref="Status" />
@@ -37,7 +37,7 @@
         <map from="status" to="status" ref="Status" />
         <map from="mainText" to="mainText" ref="Text" />
         <map from="values" to="values" ref="AttributeValue" type="Array" />
-        <map from="categories" to="categories" ref="LineCategory" type="Array" />
+        <map from="categories" to="categories" ref="ProductCategory" type="Array" />
     </mapper>
 
     <mapper id="AttributeValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
@@ -74,7 +74,7 @@
         <map from="code" to="code" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="thickness" to="thickness" ref="Thickness" />
-        <map from="category" to="category" ref="LineCategory" />
+        <map from="category" to="category" ref="ProductCategory" />
         <map from="status" to="status" ref="Status" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
     </mapper>
@@ -84,7 +84,7 @@
         <map from="name" to="name" type="cf:String" />
     </mapper>
 
-    <mapper id="LineCategory" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.LineCategory">
+    <mapper id="ProductCategory" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductCategory">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
@@ -110,7 +110,7 @@
         <map from="fruitsCount" to="fruitsCount" type="cf:Integer" />
         <map from="mainText" to="mainText" ref="Text" />
         <map from="status" to="status" ref="Status" />
-        <map from="categories" to="categories" ref="LineCategory" type="Array" />
+        <map from="categories" to="categories" ref="ProductCategory" type="Array" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
     </mapper>
 

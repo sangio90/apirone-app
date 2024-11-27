@@ -1,6 +1,6 @@
 <cfoutput>
 
-    <div id="line-category-list-root">
+    <div id="product-category-list-root">
 
         #pageTitle()#
 
@@ -11,11 +11,11 @@
                     
                     <div class="card-body">
 
-                        <form name="line-category-grid-form" id="line-category-grid-form" method="post">
+                        <form name="product-category-grid-form" id="product-category-grid-form" method="post">
 
                             #grid( 
                                 source="rows",
-                                id="line-category-grid",
+                                id="product-category-grid",
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '50px' },
                                     { 'field':'id', 'title':'Codice', width: '150px' },
@@ -27,7 +27,7 @@
                                         'headerAttributes': { 'class': 'text-center' }
                                     }
                                 ]",
-                                rowTemplate="line/category/line-category-grid-row-tmpl"
+                                rowTemplate="line/category/product-category-grid-row-tmpl"
                             )#
 
                         </form>

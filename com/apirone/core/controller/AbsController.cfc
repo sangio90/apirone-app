@@ -238,11 +238,11 @@
 
         var data = [];
 
-        var categories = this.service("LineCategory").list();
+        var categories = this.service("ProductCategory").list();
 
         for( var thisCategory in categories ) {
             
-            var category = getDataMapper().convert( thisCategory, "LineCategory", true );
+            var category = getDataMapper().convert( thisCategory, "ProductCategory", true );
             
             data.add( category );
         

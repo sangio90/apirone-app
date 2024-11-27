@@ -107,7 +107,7 @@
 
             for ( var thisCategory in categories ) {
 
-                var beanCategory = this.service("LineCategory").get( thisCategory );
+                var beanCategory = this.service("ProductCategory").get( thisCategory );
 
                 if( !IsNull( beanCategory ) ) {
                     

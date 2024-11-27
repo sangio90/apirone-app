@@ -9,7 +9,7 @@
 .k-grid-header th.k-header {
 	border-left: 1px solid #ced4da;
 	border-bottom: 2px solid #CECECE !important;
-	height: 2 0px !important;
+	height: 30px !important;
 	vertical-align: middle !important;
 	/*background-color: #b4bbc2;*/
 }
@@ -87,14 +87,7 @@
 	color: #000000;
 }
 
-.k-grid .k-state-selected:hover { 
-	background-color: #F4F0E5;  
-	color: #000000;
-}
-  
-.k-grid tr:hover,
-.k-grid td.k-state-selected:hover,
-.k-grid tr.k-state-selected:hover td {  
+.k-grid .k-master-row:hover td {  
 	color: #000000;   
 	background-color: #F4F0E5;
 }

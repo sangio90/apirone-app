@@ -5,7 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
     property name="langService" type="com.apirone.core.model.service.LangService";
     property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
-    property name="lineCategoryService" type="com.apirone.core.model.service.LineCategoryService";
+    property name="lineCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
 
     public com.apirone.core.model.bean.Attribute function get(
     		required String attributeId

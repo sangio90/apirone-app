@@ -1,7 +1,7 @@
 AP.lineCategory = AP.lineCategory || {};
 
 AP.lineCategory.fields = {
-    listRoot: $("#line-category-list-root")
+    listRoot: $("#product-category-list-root")
 };
 
 $(document).ready(function (){

@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao"                 type="com.apirone.core.model.dao.FinishDAO";
 	property name="statusService"       type="com.apirone.core.model.service.StatusService";
-	property name="LineCategoryService" type="com.apirone.core.model.service.LineCategoryService";
+	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
 	property name="textService"         type="com.apirone.core.model.service.TextService";
 
 	public com.apirone.core.model.bean.Finish function get(

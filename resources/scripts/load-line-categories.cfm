@@ -2,7 +2,7 @@
 <cfabort>
 <cfscript>
     model = server["wirebox-apirone"];
-    svc = model.getInstance("LineCategoryService");
+    svc = model.getInstance("ProductCategoryService");
 
     csvfile = FileRead( ExpandPath("/resources/data/categories.csv.cfm") );
 
@@ -11,7 +11,7 @@
         code = listFirst( line, ";" );
         name = listLast( line, ";" );
 
-        category = new com.apirone.core.model.bean.LineCategory();
+        category = new com.apirone.core.model.bean.ProductCategory();
         /*
         status = new com.apirone.core.model.bean.Status();
         text = new com.apirone.core.model.bean.Text();

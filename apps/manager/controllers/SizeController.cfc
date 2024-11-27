@@ -10,7 +10,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var categories = [];
 
         for( var thisCategory in prc.categories ) {
-            var row = super.getDataMapper().convert( thisCategory, "LineCategory", true );
+            var row = super.getDataMapper().convert( thisCategory, "ProductCategory", true );
             categories.add( row );
         }
 

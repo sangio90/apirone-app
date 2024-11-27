@@ -175,9 +175,9 @@
 		/*
 			lines category
 		*/
-		get( "/ajax/lines/categories" ).to( "LineCategoryAjaxController.list" ).end();
+		get( "/ajax/lines/categories" ).to( "ProductCategoryAjaxController.list" ).end();
 
-		get( "/lines/categories" ).toHandler( "LineCategoryController.list" );
+		get( "/lines/categories" ).toHandler( "ProductCategoryController.list" );
 
 
 		/*

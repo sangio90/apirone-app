@@ -118,7 +118,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var line       = super.bean( "Line" );
 		var status     = super.bean( "Status" );
 		var thickness  = super.bean( "Thickness" );
-		var category   = super.bean( "LineCategory" );
+		var category   = super.bean( "ProductCategory" );
 
 		var thisId    = "";
 		var messageId = "";

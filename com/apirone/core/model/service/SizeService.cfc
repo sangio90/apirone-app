@@ -86,6 +86,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		getDao().update( arguments.size );
 
+		var id = arguments.size.getId();
+
+		for ( var text in arguments.size.getTexts() ) {
+
+			var entity = super.bean("Entity")
+			
+			entity.setKey( "size.id" );
+			entity.setValue( id );
+
+			text.setEntity( entity );
+
+			if ( Len( text.getId() ) ) {
+				
+				getTextService().update( text );
+			
+			} else {
+				
+				getTextService().create( text );
+
+			}
+
+		}
+
+
 		super.getCacheManager().remove( "Size_#arguments.size.getId()#" );
 
 		return arguments.size.getId();
