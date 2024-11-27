@@ -1,7 +1,8 @@
 AP.productCategory = AP.productCategory || {};
 
 AP.productCategory.fields = {
-    listRoot: $("#product-category-list-root")
+    listRoot      : $("#product-category-list-root"),
+    searchForm: $("#product-category-grid-search-form")
 };
 
 $(document).ready(function (){
@@ -19,12 +20,107 @@ AP.productCategory.list = (function () {
 	var pub = {};
 	var fields = AP.productCategory.fields;
 
+	var defaultDetailForm = {
+		data: {
+			id: "",
+			code: "",
+			name: "",
+			status: {
+				id: "ACT"
+			}
+		},
+
+        statuses: AP.page.statuses,
+
+		title: "Carica categoria"
+	};
+
+
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/product-categories" })
 	};
 
 	var viewModel = kendo.observable({
+		
+		detailForm: defaultDetailForm,
 		rows: dataSources.items,
+
+        search: function (event) {
+
+            var thisForm = fields.searchForm;
+
+            var params = thisForm.serializeJSON();
+
+            viewModel.rows.read(params);
+
+            return false;
+
+        },
+
+		resetForm: function () {
+
+            var detailForm = fields.detailForm;
+
+            var validator = detailForm.validate();
+            validator.resetForm();
+
+            detailForm.find(".status").html("");
+
+			viewModel.set("detailForm", defaultDetailForm);
+		},
+
+
+        save: function (event) {
+
+			var detailForm = fields.detailForm;
+			var status = detailForm.find(".status");
+
+		    status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+
+			if(detailForm.valid()) {
+
+				NM.util.ajax({
+					method: "POST",
+					url: "/manager/ajax/product-categories",
+					data: JSON.stringify(viewModel.get("detailForm.data")),
+					callback: {
+						done: function (xhr) {
+
+							if(xhr.status == "SUCCESS") {
+
+								NM.util.autoHideMessage(status, "<span class='green'>Categoria salvata</span>");
+
+								setTimeout(() => $("#line-detail-modal").modal("hide"), 1000);
+
+							}
+
+						}
+					}
+				});
+
+			}
+
+            return false;
+
+        },
+
+		new: function () {
+
+			viewModel.resetForm();
+	
+			NM.util.openModal( fields.detailRoot );
+	
+		},
+	
+		edit: function ( event ) {
+	
+			viewModel.resetForm();
+	
+			viewModel.set("detailForm.data", event.data);
+			viewModel.set("detailForm.title", "Modifica categoria <" + event.data.code + " >");
+	
+		},
+	
 
         delete: function (event) {
 
@@ -53,9 +149,6 @@ AP.productCategory.list = (function () {
 								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 							}
 
-							var id = viewModel.get("detailForm.data.id");
-							console.log("id", id);
-
 							viewModel.rows.read();
 
 						}
@@ -75,6 +168,37 @@ AP.productCategory.list = (function () {
 	pub.init = function () {
 
     	kendo.bind( fields.listRoot, viewModel);
+
+		var detailForm = fields.detailForm;
+
+		detailForm.validate({
+			onfocusout: function (element) {
+				$(element).valid();
+			},
+			rules: {
+				code: {
+					required: true,
+					checkCode: true,
+					remote: {
+						url: "/manager/ajax/product-categories/code-exists",
+						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
+						dataFilter: function (xhr) {
+							var json = JSON.parse(xhr);
+							return json.data == false;
+						}
+					}
+				}
+			},
+			messages: {
+				code: {
+					required: "Codice richiesto",
+					checkCode: "Solo numeri, lettere, trattino o trattino basso",
+					remote: "Il codice esiste"
+				}
+			},
+
+		});
+
 
 	};
 

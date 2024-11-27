@@ -20,13 +20,13 @@
 							<div class="col-sm-8">
 								<div class="box-search-small">
 									<form
-										id   ="line-grid-search-form"
+										id   ="product-category-grid-search-form"
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search } '>
 										
                                         <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
-                                        <select class="form-control" name="statusId">
+                                        <select class="form-control me-2" name="statusId">
                                             <option value="">-- Seleziona</option>
                                             <cfloop array="#prc.statusList#" item="item">
                                                 <option value="#item.getId()#" SELECTED>#item.getName()#</option>
@@ -61,6 +61,7 @@
                                     { 'field':'id', 'title':'ID', width: '50px' },
                                     { 'field':'id', 'title':'Codice', width: '150px' },
                                     { 'field':'name', 'title':'Descrizione'},
+                                    { 'field':'', 'title':'', width: '50px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
@@ -77,6 +78,10 @@
                 </section>
             </div>
         </div>
+
+        #view( "product-category/detail-modal" )#
+
     </div>
+
 
 </cfoutput>

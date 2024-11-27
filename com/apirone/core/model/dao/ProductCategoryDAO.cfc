@@ -31,6 +31,7 @@
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="str" type="String">    	
+		<cfargument name="statusId" type="String">    	
 		<cfargument name="lineId" type="Numeric">    
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
@@ -38,19 +39,25 @@
 		<cfargument name="orderby" required="true" type="String" default="code">
 
         <cfquery name="local.q" datasource="apirone">
-			SELECT
+			SELECT DISTINCT
 				product_category_id,
 				COUNT(product_category_id) OVER() AS total
 			FROM
 				product_categories
+					INNER JOIN texts USING ( product_category_id )
+				
 				<cfif !IsNull( arguments.lineId )>
-					INNER JOIN lines l USONG ( product_category_id )
+					INNER JOIN lines l USING ( product_category_id )
 				</cfif>
 
 			WHERE 1=1
                 
 				<cfif Len( trim( arguments.str ) )>
-					AND line_category ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="Varchar">
+					AND texts.text ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="Varchar">
+				</cfif>
+
+				<cfif Len( trim( arguments.statusId ) )>
+					AND product_categories.status_id = <cfqueryparam value="#arguments.statusId#" cfsqltype="Varchar">
 				</cfif>
 
 				<cfif !isNull( arguments.lineId )>
