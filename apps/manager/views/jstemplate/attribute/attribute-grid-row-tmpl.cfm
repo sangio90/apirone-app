@@ -10,7 +10,7 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
-                <div data-bind="source: categories" data-template="category-row-tmpl"></div>
+                <div data-bind="source: categories" data-template="product-category-row-tmpl"></div>
             </td>
             <td class="text-center">
                 <span data-bind="text: values.length"></span>
@@ -29,6 +29,6 @@
         </tr>
     </nmscript>
 
-    #template( view="jstemplate/category/category-row-tmpl" )#
+    #template( view="jstemplate/product-category/product-category-row-tmpl" )#
 
 </cfoutput>

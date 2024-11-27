@@ -13,7 +13,7 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
-                <div data-bind="source: categories" data-template="category-row-tmpl"></div>
+                <div data-bind="source: categories" data-template="product-category-row-tmpl"></div>
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-default btn-sm" data-bind="click:edit">
@@ -29,7 +29,7 @@
         </tr>
     </script>
 
-    #template( view="jstemplate/category/category-row-tmpl" )#
+    #template( view="jstemplate/product-category/product-category-row-tmpl" )#
 
 </cfoutput>
 

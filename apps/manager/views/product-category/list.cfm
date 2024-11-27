@@ -27,7 +27,7 @@
                                         'headerAttributes': { 'class': 'text-center' }
                                     }
                                 ]",
-                                rowTemplate="line/category/product-category-grid-row-tmpl"
+                                rowTemplate="category-product/product-category-grid-row-tmpl"
                             )#
 
                         </form>
