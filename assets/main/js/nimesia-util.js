@@ -25,9 +25,6 @@ NM.util.openModal = function( ele ) {
 
     }
 
-	console.log("currentTop", currentTop)
-	console.log("currentLeft", currentLeft)
-
     ele.modal("show");
 
 	ele.offset({ left: currentLeft, top: currentTop });

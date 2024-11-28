@@ -39,11 +39,41 @@
                               
                         </div>
 
-                        <hr class="my-5">
-
                         <div class="col-md-12">
 
-                            <table class="table table-hover pt-5" data-bind="visible: showTable" style="display:none">
+                            <div data-bind="visible: showTable">
+
+                                #grid(
+                                    id      = "combination-items-grid",
+                                    class   = "no-pager",
+                                    columns = "[
+                                        { 'field':'Id', 'title':'ID', width: '20px' },
+                                        { 'field':'name', 'title':'Attributo' },
+                                        { 'field':'', 'title':'Aggancia altri attributi', width: '55px'},
+                                        { 'field':'', 'title':'Aggiungi componenti all attributo', width: '55px'},
+                                        { 
+                                            'field'           :'', 
+                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                            'width'           :'40px',
+                                            'headerAttributes': { 'class': 'text-center' }
+                                        }
+                                    ]",
+                                    source: "items",
+                                    rowTemplate = "combination/combination-item-row-tmpl"
+                                )#
+
+                            </div>
+
+                            <div class="py-5" data-bind="invisible: showTable" style="display:none">
+                                <hr class="mb-5">
+                                <p class="text-center pt-5">
+                                    Nessuna configurazione presente
+                                </p>
+                            </div>                            
+
+                            <!----
+
+                            <table class="table table-hover pt-5" style="display:none">
                                 <thead>
                                     <tr>
                                         <th scope="col" width="50">ID</th>
@@ -57,9 +87,8 @@
                                 </tbody>
                             </table>
 
-                            <div class="py-5" data-bind="invisible: showTable" style="display:none">
-                                <p class="text-center">Nessuna configurazione presente</p>
-                            </div>
+                            ---->
+
         
                         </div>
     
@@ -76,7 +105,5 @@
 
     #view("component/list-modal")#
     #view("attribute/detail-modal")#
-
-    #template( view="jstemplate/combination/combination-item-row-tmpl" )#
 
 </cfoutput>

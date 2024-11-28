@@ -21,9 +21,10 @@
                 </button>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:removeAttribute">
-                    <i class="fas fa-trash"></i> 
-                </button>
+                <input type="checkbox" class="form-check-input"
+                    name="selected"
+                    data-bind="value:id" 
+                >
             </td>
         </tr>
     </nmscript>

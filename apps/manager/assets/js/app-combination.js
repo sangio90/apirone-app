@@ -3,7 +3,8 @@ AP.combination = AP.combination || {};
 AP.combination.fields = {
     rootDetail: $("#combination-detail-root"),
 	configRow: $("#combination-config-row"),
-	attributeSearchForm: $("#attributes-search-form")
+	attributeSearchForm: $("#attributes-search-form"),
+	attributeModal: $("#combination-attributes-list-modal")
 };
 
 $(document).ready(function (){
@@ -34,6 +35,10 @@ AP.combination.list = (function () {
 		items: dataSources.items,
 		attributesList: dataSources.attributesList,
 
+		/*
+			attributes methods
+		*/ 
+
 		selectAttribute: function (event) {
 
 			NM.util.ajax({
@@ -43,19 +48,15 @@ AP.combination.list = (function () {
 					attributeId: event.data.id
 				},
 				callback: {
-					success: function (xhr) {
+					done: function (xhr) {
 
-						viewModel.getItems();
+						viewModel.get("items").read();
+
+						setTimeout(() => fields.attributeModal.modal("hide"), 800);
 	
 					},
 				}
 			});
-
-		},
-
-		showTable: function () {
-
-			return viewModel.get("items").view().length ? true : false;
 
 		},
 
@@ -64,12 +65,6 @@ AP.combination.list = (function () {
 			$("#component-list-modal").modal("show");
 
             return false;
-		},
-
-		getItems: function (event) {
-
-			viewModel.get("items").read();
-
 		},
 
 		getAttributeName: function (event) {
@@ -96,17 +91,35 @@ AP.combination.list = (function () {
 
 		},
 
+		removeAttributes: function (event) {
+
+			NM.util.ajax({
+				method: "POST",
+				url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
+				data: {
+					attributeId: event.data.id
+				},
+				callback: {
+					done: function (xhr) {
+
+						viewModel.get("items").read();
+	
+					},
+				}
+			});
+
+
+			console.log("")
+
+			return false;
+
+		},
+
 		showAttributesList: function () {
 
 			NM.util.openModal( $("#combination-attributes-list-modal") );
 
 			this.searchAttributes();
-
-		},
-
-		showImagesList: function () {
-
-			NM.util.openModal($("#combination-images-list-modal"));
 
 		},
 
@@ -127,9 +140,6 @@ AP.combination.list = (function () {
 
 		},
 
-		searchImages: function (event) {
-		},
-
 		searchAttributes: function (event) {
 
 			var thisForm = fields.attributeSearchForm;
@@ -141,6 +151,26 @@ AP.combination.list = (function () {
 
             return false;
 
+		},		
+
+		/*
+			// attributes methods
+		*/ 
+
+
+		showTable: function () {
+
+			return viewModel.get("items").view().length ? true : false;
+
+		},
+
+		showImagesList: function () {
+
+			NM.util.openModal($("#combination-images-list-modal"));
+
+		},
+
+		searchImages: function (event) {
 		},
 
 		initUpload: function () {
@@ -205,38 +235,6 @@ AP.combination.list = (function () {
 				viewModel.showPaymentDialog();
 
 			}
-
-		},
-
-		isDocumentCompleted: function (event) {
-
-			var item = viewModel.get("documents").getByUid(event.uid);
-
-			if(!event.completed) {
-				return true;
-			}
-
-			return false;
-
-		},
-
-		isDocumentsUploadUncompleted: function (event) {
-
-			var items = viewModel.get("documents").data();
-
-			for(var item of items) {
-				if (!item.completed) {
-					return true;
-				}
-			}
-
-			return false;
-
-		},
-
-		isDocumentUncompleted: function (event) {
-
-			return !this.isDocumentCompleted(event);
 
 		},
 

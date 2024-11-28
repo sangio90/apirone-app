@@ -19,23 +19,22 @@
                         
                         <div class="col-md-12 mt-3">
 
-                            <div>
+                            <div class="row">
                                 
-                                <form class="row  align-items-center mb-4" data-bind="events: { submit: search }" id="attributes-search-form">
-                                    <div class="col me-2">
-                                        <input class="form-control" placeholder="Cerca..." name="str">
-                                    </div>
-                                    <div class="col-auto">
-                                        <button class="btn btn-primary" value="Cerca" data-bind="click: searchAttributes">Cerca &raquo;</button>
-                                    </div>
-                                </form>
-
-                            </div>
-
-                            <div>
+                                <div class="col-12">
                                 
-                                <form id="combination-attributes-list-search-form" class="row">
+                                    <form class="row  align-items-center mb-4" data-bind="events: { submit: search }" id="attributes-search-form">
+                                        <div class="col me-2">
+                                            <input class="form-control" placeholder="Cerca..." name="str">
+                                        </div>
+                                        <div class="col-auto">
+                                            #searchButton( bind="click:searchAttributes" )#
+                                        </div>
+                                    </form>
+                                
+                                </div>
 
+                                <div class="col-12">
                                     #grid( 
                                         id="combination-attributes-grid",
                                         columns="[
@@ -47,9 +46,8 @@
                                         source="attributesList",
                                         rowTemplate="combination/combination-attributes-list-row-tmpl"
                                     )#
+                                </div>
             
-                                </form>
-
                             </div>
 
                         </div>
