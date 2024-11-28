@@ -341,6 +341,7 @@ AP.line.list = (function () {
 AP.line.combinations = (function () {
 
     var pub = {};
+    var fields = AP.line.fields;
 
     var changeStatus = function (status, event) {
 
@@ -397,6 +398,16 @@ AP.line.combinations = (function () {
 
 	var viewModel = kendo.observable({
 
+        attributes: function (event) {
+
+            var lineId = window.location.href.split("/")[5];
+            
+            window.open("/manager/lines/" + lineId + "/attributes", "_blank").focus();
+            
+            return false;
+
+		},
+
         activate: function (event) {
 
             event.preventDefault();
@@ -435,7 +446,7 @@ AP.line.combinations = (function () {
 
 	pub.init = function () {
 
-		kendo.bind(AP.line.fields.combinationsRoot, viewModel);
+		kendo.bind( fields.combinationsRoot, viewModel);
 
 	};
 

@@ -2,7 +2,8 @@ AP.combination = AP.combination || {};
 
 AP.combination.fields = {
     rootDetail: $("#combination-detail-root"),
-	configRow: $("#combination-config-row")
+	configRow: $("#combination-config-row"),
+	attributeSearchForm: $("#attributes-search-form")
 };
 
 $(document).ready(function (){
@@ -20,20 +21,20 @@ AP.combination.list = (function () {
 
 	var pub = {};
 
+	var fields = AP.combination.fields;
 	var attributeApp = AP.attribute.detail;
 
 	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" })
+		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" }),
+		attributesList: undefined
 	};
 
 	var viewModel = kendo.observable({
 
 		items: dataSources.items,
-		attributesList: [],
+		attributesList: dataSources.attributesList,
 
 		selectAttribute: function (event) {
-
-			console.log(event);
 
 			NM.util.ajax({
 				method: "POST",
@@ -83,9 +84,16 @@ AP.combination.list = (function () {
 
 		addAttribute: function (event) {
 
-			attributeApp.new();
+			attributeApp.new({
+				callback: {
+					onCreate: function () {
+						viewModel.attributesList.read();
+					}
+				}
+			});
 
 			return false;
+
 		},
 
 		showAttributesList: function () {
@@ -107,59 +115,29 @@ AP.combination.list = (function () {
 			console.log("event.data.id", event.data.id);
 
 			attributeApp.edit({
-					id: event.data.id,
-					callback: {
-						onSave: function () {
-							viewModel.searchAttributes();
-						},
-					}
-				});
+				id: event.data.id,
+				callback: {
+					onSave: function () {
+						viewModel.searchAttributes();
+					},
+				}
+			});
 
 			return false;
 
 		},
 
 		searchImages: function (event) {
-
-			console.log("searchImages");
-
-			var str = $("#attributes-search-input").val();
-			var status = $("#attributes-list-search-form .status");
-
-			status.html("Sto cercando...");
-
-			$.ajax({
-				method: "GET",
-				url: "/manager/ajax/attributes",
-				data: "str=" + str,
-				success: function (xhr) {
-					viewModel.set("attributesList", xhr.data);
-					status.html("Ho trovato " + xhr.count + " record.");
-				},
-			});
-
-            return false;
-
 		},
 
 		searchAttributes: function (event) {
 
-			console.log("searchAttributes");
+			var thisForm = fields.attributeSearchForm;
+			var params = thisForm.serialize();
 
-			var str = $("#attributes-search-input").val();
-			var status = $("#attributes-list-search-form .status");
+			var dataSource = NM.kendo.dataSource({ url: "/manager/ajax/attributes?" + params });
 
-			status.html("Sto cercando...");
-
-			$.ajax({
-				method: "GET",
-				url: "/manager/ajax/attributes",
-				data: "str=" + str,
-				success: function (xhr) {
-					viewModel.set("attributesList", xhr.data);
-					status.html("Ho trovato " + xhr.count + " record.");
-				},
-			});
+			viewModel.set( "attributesList", dataSource );
 
             return false;
 

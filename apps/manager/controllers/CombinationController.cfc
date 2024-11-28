@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var lineId = comb.getLine().getId();
 
-        prc.title="Dimensione #comb.getSize().getName()#, finitura #comb.getFinish().getName()#";
+        prc.title="Dimensione #comb.getSize().getCode()#, finitura #comb.getFinish().getName()#";
         prc.subtitle="Linea #comb.getLine().getName()#";
 
         prc.sizes = super.fire("size.list", { lineId = lineId } );
@@ -18,7 +18,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         prc.sizeId = comb.getSize().getId();
         
-        //prc.jsScripts.add( "app-attribute-list" );
         prc.jsScripts.add( "app-attribute-detail" );
         prc.jsScripts.add( "app-combination" );
         prc.jsScripts.add( "app-component" );

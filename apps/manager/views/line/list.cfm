@@ -72,7 +72,7 @@
                                         { 'field':'thickness.name', 'title':'Spessore', width: '110px'},
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
-                                        { 'field':'', 'title':'Dimensioni e finiture', width: '55px'},
+                                        { 'field':'', 'title':'Attributi per le combinazioni', width: '55px'},
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

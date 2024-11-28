@@ -14,7 +14,6 @@
                     <div class="row">
                     
                         <div class="col-md-12 text-end" style="margin-top: -58px; z-index: 9999999">
-                            <!--- <button class="btn btn-primary btn-sm" data-bind="click:addAttribute">Carica </button> ---->
                             #addButton( bind="click:addAttribute", size="sm" )#
                         </div>
                         
@@ -22,9 +21,9 @@
 
                             <div>
                                 
-                                <form class="d-flex align-items-center mb-4" data-bind="events: { submit: search }" id="attributes-search">
+                                <form class="row  align-items-center mb-4" data-bind="events: { submit: search }" id="attributes-search-form">
                                     <div class="col me-2">
-                                        <input class="form-control" placeholder="Cerca..." id="attributes-search-input">
+                                        <input class="form-control" placeholder="Cerca..." name="str">
                                     </div>
                                     <div class="col-auto">
                                         <button class="btn btn-primary" value="Cerca" data-bind="click: searchAttributes">Cerca &raquo;</button>
@@ -42,14 +41,8 @@
                                         columns="[
                                             { 'field':'id', 'title':'ID', width: '100px' },
                                             { 'field':'name', 'title':'Descrizione'},
-                                            { 'field':'', 'title':'', width: '50px'},
-                                            { 'field':'', 'title':'', width: '50px'},
-                                            { 
-                                                'field':'', 
-                                                'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                                'width':'40px',
-                                                'headerAttributes': { 'class': 'text-center' }
-                                            }
+                                            { 'field':'', 'title':'Aggiungi attributo alla combinazione', width: '50px'},
+                                            { 'field':'', 'title':'Modifica attributo', width: '50px'}
                                         ]",
                                         source="attributesList",
                                         rowTemplate="combination/combination-attributes-list-row-tmpl"

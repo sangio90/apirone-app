@@ -114,7 +114,7 @@ AP.attribute.detail = (function () {
 
 		isUpdate: function() {
 
-			console.log("isUpdate", viewModel.get("detailForm.data.id").length)
+			//console.log("isUpdate", viewModel.get("detailForm.data.id").length)
 
 			return viewModel.get("detailForm.data.id").length;
 		},
@@ -170,8 +170,8 @@ AP.attribute.detail = (function () {
 
 				var ids = values.toString();
 
-				console.log("values", values);
-				console.log("ids", ids);
+				//console.log("values", values);
+				//console.log("ids", ids);
 
 				NM.util.ajax({
 					method: "DELETE",
@@ -191,7 +191,7 @@ AP.attribute.detail = (function () {
 							}
 
 							var id = viewModel.get("detailForm.data.id");
-							console.log("id", id);
+							//console.log("id", id);
 
 							loadAttribute({ id: viewModel.get("detailForm.data.id") });
 
@@ -209,7 +209,7 @@ AP.attribute.detail = (function () {
 
 		editValue: function (event) {
 
-			console.log("editValue:event", event);
+			//console.log("editValue:event", event);
 
 			viewModel.set("valueForm.data", event.data);
 			viewModel.set("valueForm.title", "Modifica valore < " + event.data.id + " >");
@@ -472,11 +472,11 @@ AP.attribute.detail = (function () {
 
 	pub.init = function () {
 
-		console.log("AP.attribute.detail:init");
+		//console.log("AP.attribute.detail:init");
 
 		kendo.bind( fields.detailRoot, viewModel);
 
-        console.log("fields", fields)
+        //console.log("fields", fields)
 
 		var valueForm = fields.valueForm;
 		var detailForm = fields.detailForm;

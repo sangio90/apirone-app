@@ -5,6 +5,11 @@
         #pageTitle()#
 
         <div class="row">
+
+            <div class="col-sm-12 text-end pb-3">
+                #button( label="Dimensioni e finiture &raquo;", bind="click:attributes", size="sm" )#
+            </div>
+
             <div class="col-lg-12">
 
                 <section class="card">
@@ -25,7 +30,7 @@
                                 <tr>
                                     <th></th>
                                     <cfloop array="#prc.sizes#" item="size">
-                                        <th>#size.getName()#</th>
+                                        <th>#size.getCode()#</th>
                                     </cfloop>
                                 </tr>
                                 </thead>

@@ -11,18 +11,13 @@
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-default btn-sm" data-bind="click:selectAttribute">
-                    <i class="fas fa-plus"></i> 
+                    <i class="fas fa-plus"></i>
                 </button>
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-default btn-sm" data-bind="click:showAttributeValues">
-                    <i class="fas fa-eye"></i> 
+                    <i class="fas fa-edit"></i>
                 </button>
-            </td>
-            <td class="text-center">
-                <input type="checkbox" class="form-check-input" name="selected"
-                    data-bind="value:id" 
-                >                    
             </td>
         </tr>
     </nmscript>

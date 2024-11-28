@@ -27,7 +27,7 @@
                                         <option value="#item.getId()#" 
                                             <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
                                         >
-                                            #item.getName()#
+                                            #item.getCode()#
                                         </option>
                                     </cfloop>
                                 </select>
