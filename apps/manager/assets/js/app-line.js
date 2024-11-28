@@ -260,10 +260,7 @@ AP.line.list = (function () {
 
         delete: function (event) {
 
-			var status = $("#status-delete");
 			var checks = $("#line-grid").find("[name=selected]:checked");
-
-            console.log("checks", checks);
 
 			if (checks.length) {
 
@@ -274,9 +271,6 @@ AP.line.list = (function () {
 				});
 
 				var ids = values.toString();
-
-				console.log("values", values);
-				console.log("ids", ids);
 
 				NM.util.ajax({
 					method: "DELETE",
@@ -302,7 +296,7 @@ AP.line.list = (function () {
 
 			} else {
 
-				NM.util.autoHideMessage(status, "<span class='red'>Seleziona almeno un valore</span>");
+                AP.widget.notify("warning", "Seleziona almeno un valore");
 
 			}
 

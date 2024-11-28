@@ -36,9 +36,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-    public com.apirone.core.model.bean.Result function search(){
+    public com.apirone.core.model.bean.Result function search(
+				String str,
+				String categoryId,
+				String statusId,
+		required Numeric limit = 20,
+		required Numeric offset = 0,
+		required Array orderBy = [ { field="line.code" } ],
+	){
 	    var rows = [];
     	var result = super.getResult();
+
+		arguments["orderby"] = super.createOrderBy( arguments["orderby"] );
 
     	var records = getDao().find( argumentCollection=arguments );
 

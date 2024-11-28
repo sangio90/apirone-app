@@ -37,14 +37,23 @@
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
 
+		<cfargument name="limit" required="true" type="Numeric" default="0">
+        <cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="orderby" required="true" type="String" default="code">
+
 		<cfquery name="local.q" datasource="apirone">
-			SELECT line_id::varchar
+			SELECT 
+				line_id::varchar
 			FROM
 				lines
 			WHERE 1=1
-				
+
 				<cfif !IsNull( arguments.categoryId )>
 					AND lines.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.statusId )>
+					AND lines.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
@@ -55,8 +64,15 @@
 					)
 				</cfif>
 
-            ORDER BY 
-                code
+			ORDER BY
+				#super.sanitizeSQL( arguments.orderby )#
+
+			<cfif arguments.limit GT 0>
+				LIMIT  
+					<cfqueryparam value="#arguments.limit#" cfsqltype="integer">
+				OFFSET 
+					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
+			</cfif>
 		</cfquery>
 
 		<cfreturn local.q>

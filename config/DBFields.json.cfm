@@ -55,4 +55,14 @@
         "type": "Varchar"
     },
 
+    "line.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+
+    "line.name": {
+        "name": "line",
+        "type": "Varchar"
+    },
+
 }   

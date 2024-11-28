@@ -36,7 +36,7 @@
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
-		<cfargument name="orderby" required="true" type="String" default="code">
+		<cfargument name="orderby" required="true" type="String" default="product_category_id">
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT

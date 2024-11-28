@@ -13,12 +13,12 @@
 					<div class="card-body">
 						
 						<div class="row d-flex align-items-center mb-3">
-							<div class="col-sm-8">
+							<div class="col-sm-10">
 								<div class="box-search-small">
 									<form
 										id   ="line-grid-search-form"
 										class="d-flex align-items-center justify-content-end"
-										data-bind: 'events: { submit: search } '>
+										data-bind: 'events: { submit: search }'>
 										
                                         <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
@@ -29,8 +29,18 @@
 											</cfloop>
 										</select>
 
-										<select class="form-control me-2" name="categoryId">
-											<option value="">-- Ordina per</option>
+										<select class="form-control me-2" name="statusId">
+											<option value="">-- tutti gli stati</option>
+											<cfloop array="#prc.statuses#" item="item">
+												<option value="#item.getId()#">#item.getName()#</option>
+											</cfloop>
+										</select>
+
+										<select class="form-control me-2" name="orderBy">
+											<option value="line.code-asc" SELECTED>Codice [A-Z]</option>
+											<option value="line.code-desc">Codice [Z-A]</option>
+											<option value="line.name-asc">Descrizione [A-Z]</option>
+											<option value="line.name-desc">Descrizione [Z-A]</option>
 										</select>
 
 										#searchButton( bind = "click:search" )#
@@ -38,7 +48,7 @@
 								</div>
 							</div>
 
-							<div class="col-sm-4">
+							<div class="col-sm-2">
 								<div class="float-end">
 									#deleteButton(
 										bind  = "click:delete",
