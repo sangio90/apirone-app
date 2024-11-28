@@ -28,8 +28,8 @@
 
                                         <select class="form-control me-2" name="statusId">
                                             <option value="">-- Seleziona</option>
-                                            <cfloop array="#prc.statusList#" item="item">
-                                                <option value="#item.getId()#" SELECTED>#item.getName()#</option>
+                                            <cfloop array="#prc.statuses#" item="item">
+                                                <option value="#item.getId()#">#item.getName()#</option>
                                             </cfloop>
                                         </select>
 
@@ -60,8 +60,8 @@
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '50px' },
                                     { 'field':'id', 'title':'Codice', width: '150px' },
-                                    { 'field':'name', 'title':'Descrizione'},
-                                    { 'field':'', 'title':'', width: '50px'},
+                                    { 'field':'mainText.name', 'title':'Descrizione'},
+                                    { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

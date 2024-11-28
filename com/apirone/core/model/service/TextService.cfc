@@ -213,8 +213,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return entity;
 			
 		}
+
+		if( Len( record.product_category_id ) ) {
+
+			entity.setKey( "productCategory.id" );
+			entity.setValue( record.product_category_id );
+
+			return entity;
+			
+		}
+
+		throw( type="apirone.errors.textWithoutEntity", message="No entity linked to this translation. Text Id: [#record.text_id#]" );
 		
-		return NullValue()
+		//return NullValue()
 
   	}
 

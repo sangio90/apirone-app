@@ -175,7 +175,11 @@
 		/*
 			lines category
 		*/
+		get( "/ajax/product-categories/code-exists" ).to( "ProductCategoryAjaxController.codeExists" ).end();
+
 		get( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.list" ).end();
+		post( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.save" ).end();
+		
 		delete( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.delete" ).end();
 
 		get( "/product-categories" ).to( "ProductCategoryController.list" ).end();

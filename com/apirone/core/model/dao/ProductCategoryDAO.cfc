@@ -40,6 +40,7 @@
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
+				code,
 				product_category_id,
 				COUNT(product_category_id) OVER() AS total
 			FROM
@@ -111,7 +112,7 @@
 				code = <cfqueryparam cfsqltype="Varchar" value="#trim(arguments.ProductCategory.getCode())#">,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getStatus().getId()#">
 			WHERE
-				line_categorie_id = <cfqueryparam cfsqltype="Integer" value="#trim(arguments.ProductCategory.getId())#">
+				product_category_id = <cfqueryparam cfsqltype="Integer" value="#trim(arguments.ProductCategory.getId())#">
 		</cfquery>
 
 		<cfreturn arguments.ProductCategory.getId()>

@@ -34,15 +34,15 @@ AP.widget.notify = function (type, message, title) {
       }
 
     var notice = new PNotify({
-        delay: 2000,
-        type: type,
-        title: title,
-        text: message,
+        delay   : 3000,
+        type    : type,
+        title   : title,
+        text    : message,
         addclass: "stack-bar-top",
-        width: "100%",
-        icon: icon,
-        buttons: {
-            closer: true,
+        width   : "100%",
+        icon    : icon,
+        buttons : {
+            closer : true,
             sticker: false
         },
         stack: stack_bar_top

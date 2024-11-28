@@ -32,7 +32,6 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="str" type="String">

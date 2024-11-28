@@ -70,8 +70,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var dm = getCacheManager();
 
-		dump(dm);
-
 		dm.remove( getCacheKey ( arguments.line.getId() ) );
 
 		return arguments.line.getId();
@@ -93,7 +91,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return false;
 	}
-
 
 	public com.apirone.core.model.bean.Outcome function delete(
 		required String lineId

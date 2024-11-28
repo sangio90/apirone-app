@@ -54,7 +54,57 @@ component extends="com.apirone.core.controller.AbsController" {
         result.setData( { "message" = message, "payload" =  payload } );
         
 		event.setValue( "result", result );
-	}    
+	}
 
+
+	function save( event, rc, prc ){
+		var result     = super.getResult();
+
+		var text     = super.bean( "Text" );
+		var lang     = super.bean( "Lang" );
+		var status   = super.bean( "Status" );
+		var category = super.bean( "ProductCategory" );
+
+		var thisId    = "";
+		var messageId = "";
+
+		var json = DeserializeJSON( getHTTPRequestData().content );
+
+		category.setId( json.id );
+		category.setCode( json.code );
+
+		category.setStatus( status.setId( json.status.id ) );
+
+        text.setLang( lang.setId( json.mainText.lang.id ) );
+        //text.setStatus( status.setId( json.mainText.status.id ) );
+
+        text.setId( json.mainText.id );
+        text.setName( json.mainText.name );
+
+        category.setTexts( [ text ] );
+        
+		if ( !len( json.id ) ) {
+			messageId = "productCategory.created";
+			thisId    = super.fire( "productCategory.create", [ category ] )
+		} else {
+			messageId = "productCategory.updated";
+			thisId    = super.fire( "productCategory.update", [ category ] )
+		}
+
+		var message = completeMessage( messageId );
+
+		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+
+		event.setValue( "result", result );
+	}
+
+	function codeExists( event, rc, prc ){
+		param rc.id   = "_";
+		param rc.code = "";
+
+		var result = super.fire( "productCategory.codeExists", { code = rc.code, excludedId = rc.id } );
+
+		event.setValue( "result", result );
+	}
 
 }

@@ -89,6 +89,7 @@
         <map from="name" to="name" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
         <map from="status" to="status" ref="Status" />
+        <map from="mainText" to="mainText" ref="Text" />
     </mapper>
 
     <mapper id="Account" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Account">

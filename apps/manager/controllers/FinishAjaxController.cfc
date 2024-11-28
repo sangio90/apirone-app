@@ -61,7 +61,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var lang = super.bean("Lang");
 
 		text.setName( json.name )
-		text.setLang( lang.setId( "IT" ) );
+		text.setLang( lang.setId( "IT" ) ); //FIXME: this, get lang from json
 
 		texts.add( text );
 

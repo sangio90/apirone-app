@@ -1,8 +1,10 @@
 AP.productCategory = AP.productCategory || {};
 
 AP.productCategory.fields = {
-    listRoot      : $("#product-category-list-root"),
-    searchForm: $("#product-category-grid-search-form")
+    listRoot  : $("#product-category-list-root"),
+    searchForm: $("#product-category-grid-search-form"),
+    detailRoot: $("#product-category-detail-modal"),
+    detailForm: $("#product-category-detail-form")
 };
 
 $(document).ready(function (){
@@ -24,7 +26,13 @@ AP.productCategory.list = (function () {
 		data: {
 			id: "",
 			code: "",
-			name: "",
+			mainText: {
+				name: "",
+				id: "",
+				lang: {
+					id: "IT"
+				}
+			},
 			status: {
 				id: "ACT"
 			}
@@ -113,11 +121,15 @@ AP.productCategory.list = (function () {
 		},
 	
 		edit: function ( event ) {
-	
+			
 			viewModel.resetForm();
 	
 			viewModel.set("detailForm.data", event.data);
 			viewModel.set("detailForm.title", "Modifica categoria <" + event.data.code + " >");
+
+			NM.util.openModal( fields.detailRoot );
+
+			return false;
 	
 		},
 	

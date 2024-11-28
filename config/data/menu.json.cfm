@@ -90,7 +90,7 @@
 			{
 				href: "/manager/production-times",
 				icon: "fas fa-clock",
-				title: "Tempi di produzioni",
+				title: "Tempi di produzione",
 				roles: "ADM"
 			},
 			{
