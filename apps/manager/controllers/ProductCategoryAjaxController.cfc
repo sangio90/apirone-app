@@ -7,7 +7,6 @@ component extends="com.apirone.core.controller.AbsController" {
         var dm = super.getDataMapper();
 
         var params = super.paramsFromUrl();
-        params["orderBy"] = [ { "field": 'ProductCategory.id' } ]
 
         var rows = super.fire( "ProductCategory.search", params );
 

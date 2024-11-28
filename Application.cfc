@@ -4,12 +4,6 @@ component extends="com.apirone.core.root.Application" {
 	this.pdf.fontDirectory = "/assets/main/fonts";
 	this.customtagPaths = [ "/apps/utils/ctags/" ];
 
-	COLDBOX_APP_ROOT_PATH = GetDirectoryFromPath( GetCurrentTemplatePath() );
-	COLDBOX_APP_MAPPING   = "";
-	COLDBOX_CONFIG_FILE   = "config.Coldbox";
-	COLDBOX_APP_KEY       = "";
-	COLDBOX_FAIL_FAST     = false;
-
 	public Boolean function onApplicationStart() {
 
 		cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:onApplicationStart" );
@@ -68,6 +62,12 @@ component extends="com.apirone.core.root.Application" {
 	public Void function loadColdbox(){
 		
 		cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:loadColdbox" );
+
+		var COLDBOX_APP_ROOT_PATH = GetDirectoryFromPath( GetCurrentTemplatePath() );
+		var COLDBOX_APP_MAPPING   = "";
+		var COLDBOX_CONFIG_FILE   = "config.Coldbox";
+		var COLDBOX_APP_KEY       = "";
+		var COLDBOX_FAIL_FAST     = false;
 
 		application.cbBootstrap = new coldbox.system.Bootstrap(
 			COLDBOX_CONFIG_FILE,

@@ -32,7 +32,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				 String lineId,
 		required Numeric limit = 20,
 		required Numeric offset = 0,
-		required Array orderBy = [ { field="category.code" } ],
+		required Array orderBy = [ { field="productCategory.code" } ],
     ){
 
 		var rows = [];

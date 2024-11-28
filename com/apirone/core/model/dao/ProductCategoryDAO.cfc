@@ -42,6 +42,8 @@
 			SELECT DISTINCT
 				code,
 				product_category_id,
+				lang_id,
+				texts.text,
 				COUNT(product_category_id) OVER() AS total
 			FROM
 				product_categories
@@ -52,7 +54,9 @@
 				</cfif>
 
 			WHERE 1=1
-                
+
+				AND texts.lang_id='IT'
+				
 				<cfif Len( trim( arguments.str ) )>
 					AND texts.text ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="Varchar">
 				</cfif>
@@ -65,7 +69,9 @@
 					AND l.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">
 				</cfif>
 
-			ORDER BY 
+			GROUP BY 
+				product_category_id, texts.text, lang_id
+			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>

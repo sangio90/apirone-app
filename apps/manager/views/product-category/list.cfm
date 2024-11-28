@@ -27,14 +27,19 @@
                                         <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
                                         <select class="form-control me-2" name="statusId">
-                                            <option value="">-- Seleziona</option>
+                                            <option value="">-- seleziona</option>
                                             <cfloop array="#prc.statuses#" item="item">
                                                 <option value="#item.getId()#">#item.getName()#</option>
                                             </cfloop>
                                         </select>
 
 										<select class="form-control me-2" name="orderBy">
-											<option value="">-- Ordina per</option>
+											<option value="productCategory.id-asc">ID [A-Z]</option>
+											<option value="productCategory.id-desc">ID [Z-A]</option>
+											<option value="productCategory.code-asc">Codice [A-Z]</option>
+											<option value="productCategory.code-desc">Codice [Z-A]</option>
+											<option value="text.text-asc">Descrizione [A-Z]</option>
+											<option value="text.text-desc">Descrizione [Z-A]</option>
 										</select>
 
 										#searchButton( bind = "click:search" )#

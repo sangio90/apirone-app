@@ -169,7 +169,7 @@
 
     }    
 
-    public Struct function paramsFromUrl( String prefix="" ){
+    public Struct function paramsFromUrl(){
 
         var params = {}
 
@@ -194,9 +194,11 @@
                 var count = ListLen( value, "-" );
                 var field = listFirst( value, "-" );
 
+                /* prefix from UI
                 if( Len( arguments.prefix ) ) {
                     field = arguments.prefix & "." & listFirst( value, "-" );
                 }
+                */
 
                 if ( count > 1 ) {
                     dir = ListLast( value, "-" );

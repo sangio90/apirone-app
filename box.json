@@ -57,5 +57,5 @@
         "watchPaths":"**.cfc"
     },
     "type":"modules",
-    "version":"101"
+    "version":"102"
 }

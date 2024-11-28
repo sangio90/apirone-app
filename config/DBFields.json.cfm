@@ -1,9 +1,5 @@
 ﻿{
-    "category.status": {
-        "name": "status_id",
-        "type": "Varchar"
-    },
-
+    
     "attribute.id": {
         "name": "attribute_id",
         "type": "uuid"
@@ -17,6 +13,11 @@
     "productCategory.id": {
         "name": "product_category_id",
         "type": "Integer"
+    },
+    
+    "productCategory.code": {
+        "name": "code",
+        "type": "Varchar"
     },
     
     "productCategory.code": {
@@ -49,12 +50,9 @@
         "type": "Varchar"
     },
 
-   "product_category.name": {
-        "name": "product_category",
-        "type": "varchar"
+    "text.text": {
+        "name": "text",
+        "type": "Varchar"
     },
-   "product_category.code": {
-        "name": "code",
-        "type": "varchar"
-    }
+
 }   
