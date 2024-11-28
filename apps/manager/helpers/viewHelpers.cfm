@@ -33,7 +33,7 @@
             echo("<script src=""/assets/#prc.staticVersion#/manager/js/#thisScript#.js""></script>");
             
             if ( FileExists( ExpandPath( "/apps/manager/assets/js/tests/#thisScript#-test.js" ) ) && prc.isDev ) {
-                        echo("<script src=""/assets/#prc.staticVersion#/manager/js/tests/#thisScript#-test.js""></script>");
+                echo("<script src=""/assets/#prc.staticVersion#/manager/js/tests/#thisScript#-test.js""></script>");
             }
         }
         
@@ -73,7 +73,7 @@
                 }
                 
                 var element = '
-                    <li class="#trim( parentClass & ' ' & activeClass & ' ' & expandedClass)#">
+                    <li class="#trim( parentClass & ' ' & activeClass & ' ' & expandedClass )#">
                         <a class="nav-link" href="#row.href#">
                             
                             # Len( row?.badge ) ? '<span class="float-end badge badge-primary">#row.badge#</span>' : '' #
@@ -177,7 +177,6 @@
 
                 <script>
                     window.onload= function() {
-
                         $("###arguments.id# .k-table thead th").each(function(){
                             var ele = $(this);
                             var text = ele.text();
@@ -189,9 +188,7 @@
                         })
                     }
                 </script>
-        
             </cfoutput>
-    
         </cfsavecontent>
         ```
         

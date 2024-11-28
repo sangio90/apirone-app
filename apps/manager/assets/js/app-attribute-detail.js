@@ -255,6 +255,8 @@ AP.attribute.detail = (function () {
 
 								}
 
+								console.log("save:callback:name", callback );
+
 								AP.util.fireCallback( callback, viewModel.get("callback") );
 
 							}, 700);
@@ -442,7 +444,7 @@ AP.attribute.detail = (function () {
 		});
 	};
 
-    pub.new = function ( callback ) {
+    pub.new = function ( { callback } ) {
 
         if( callback ) {
             viewModel.set("callback.onCreate", callback.onCreate );
