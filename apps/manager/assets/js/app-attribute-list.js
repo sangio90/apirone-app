@@ -79,7 +79,6 @@ AP.attribute.list = (function () {
 
         delete: function (event) {
 
-			var status = $("#status-delete");
 			var checks = $("#attribute-grid").find("[name=selected]:checked");
 
 			if (checks.length) {
@@ -105,9 +104,6 @@ AP.attribute.list = (function () {
 								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 							}
 
-							var id = viewModel.get("detailForm.data.id");
-							console.log("id", id);
-
 							viewModel.rows.read();
 
 						}
@@ -116,7 +112,7 @@ AP.attribute.list = (function () {
 
 			} else {
 
-				NM.util.autoHideMessage(status, "<span class='red'>Seleziona almeno un valore</span>");
+				AP.widget.notify("warning", "Selezionare almeno un attributo");
 
 			}
 

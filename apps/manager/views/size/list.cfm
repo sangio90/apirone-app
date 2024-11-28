@@ -48,8 +48,6 @@
 										size  = "sm"
 									)#
 								</div>
-
-								<div class="status float-end me-3" id="status-delete"></div>
 							</div>
 
 						</div>

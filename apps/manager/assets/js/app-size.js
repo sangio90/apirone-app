@@ -139,7 +139,6 @@ AP.size.list = (function () {
 
         delete: function (event) {
 
-			var status = $("#status-delete");
 			var checks = $("#size-grid").find("[name=selected]:checked");
 
 			if (checks.length) {
@@ -160,7 +159,7 @@ AP.size.list = (function () {
 						done: function (xhr) {
 
 							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
+								AP.widget.notify("error", "Non riesco a cancellare tutte le dimensioni");
 							} else {
 								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 							}
@@ -175,7 +174,7 @@ AP.size.list = (function () {
 
 			} else {
 
-				NM.util.autoHideMessage(status, "<span class='red'>Seleziona almeno un valore</span>");
+				AP.widget.notify("warning", "Selezionare almeno una dimensione");
 
 			}
 

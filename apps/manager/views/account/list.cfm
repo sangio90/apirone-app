@@ -56,8 +56,6 @@
                                     #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
                                 </div>
 
-                                <div class="status mt-1 float-end me-3" id="status-delete"></div>
-
                             </div>
                             
                         </div>
@@ -72,7 +70,7 @@
                                     { 'field':'name', 'title':'Nome'},
                                     { 'field':'role.id', 'title':'Ruolo' },
                                     { 'field':'lang.id', 'title':'Lingua' },
-                                    { 'field':'createdAt', 'title':'Creato il' },
+                                    { 'field':'createdAt', 'title':'Creato il', width: '130px' },
                                     { 'field':'', 'title':'', width: '50px'},
                                     { 
                                         'field':'', 

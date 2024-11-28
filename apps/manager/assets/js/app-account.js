@@ -230,7 +230,6 @@ AP.account.list = (function () {
 
         delete: function (event) {
 
-			var status = $("#status-delete");
 			var checks = $("#account-grid").find("[name=selected]:checked");
 
 			if (checks.length) {
@@ -256,9 +255,6 @@ AP.account.list = (function () {
 								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 							}
 
-							var id = viewModel.get("detailForm.data.id");
-							console.log("id", id);
-
 							viewModel.rows.read();
 
 						}
@@ -267,7 +263,7 @@ AP.account.list = (function () {
 
 			} else {
 
-				NM.util.autoHideMessage(status, "<span class='red'>Seleziona almeno un valore</span>");
+				AP.widget.notify("warning", "Seleziona almeno un account");
 
 			}
 
