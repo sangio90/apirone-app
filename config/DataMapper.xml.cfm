@@ -101,6 +101,7 @@
         <map from="createdAt" to="createdAt" type="cf:String" />
         <map from="status" to="status" ref="Status" />
         <map from="role" to="role" ref="Role" />
+        <map from="roles" to="roles" type="Array" ref="Role" />
         <map from="lang" to="lang" ref="Lang" />
     </mapper>
 

@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
         var dm = super.getDataMapper()
 
-        var args = paramsFromUrl()
+        var args = super.paramsFromUrl()
         
         var rows = super.fire("account.search", args).getData();
         
@@ -24,80 +24,61 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
-    function emailExists( event, rc, prc ){
+	function emailExists( event, rc, prc ){
+		param rc.id   = "_";
+		param rc.email = "";
 
-        param name="rc.id" default="___";
-        var result = super.getResult();
+		var result = super.fire( "account.emailExists", { email = rc.email, excludedId = rc.id } );
 
-        var obj = getAccessManager()
-                .exec( 
-                    prc.user, 
-                    "Account.get", 
-                    [ rc.id ]
-                );
-
-        result.setData( IsNull( obj ) ? false : true );
-
-        event.setValue("result", result);
-        
-    }
-
+		event.setValue( "result", result );
+	}
    
-    function save( event, rc, prc ){
+	function save( event, rc, prc ){
+		var result  = super.getResult();
 
-        var user = prc.user;
-        var result = super.getResult();
+		var account = super.bean( "Account" );
+		var status  = super.bean( "Status" );
+		var lang    = super.bean( "Lang" );
 
-        var raw    = GetHTTPRequestData().content;
-        var json   = DESerializeJSON( raw );
+		var thisId    = "";
+		var messageId = "";
+		var roles     = [];
 
-        if ( json.action == "create" ) {
+		var json = DeserializeJSON( getHTTPRequestData().content );
 
-            var actionLog = "OPTION_CREATED";
-            var method = "Account.update";
-            var bean = super.bean( "Option" );
-            var price = super.bean( "Price" );
-            price.setType( super.bean( "PriceType" ) );
-            bean.setPrice( price );
+		account.setId( json.id );
+		account.setEmail( json.email );
+		account.setName( json.name );
+		account.setPwd( json.pwd );
+		account.setPhone( json.phone );
+		account.setLang( lang.setId( json.lang.id ) );
+		account.setStatus( status.setId( json.status.id ) );
 
-        } else {
+		for ( var thisRole in json.selectedRoles ) {
 
-            var actionLog = "OPTION_UPDATED";
-            var method = "Account.update";
-            var bean = getAccessManager().exec( user, "Account.get", [ json.data.id ] );
+			var role   = super.bean( "Role" );
 
-        }
+			role.setId( thisRole.id );
+			roles.add( role );
+		}
 
-        bean.setName( json.data.name );
-        bean.setQuantity( Val( json.data.quantity ) );
-        bean.getPrice().setValue( json.data.price.value );
-        bean.getPrice().getType().setId( json.data.price.type.id );
+		account.setRoles( roles );
 
-        bean.setTypes( [] );
+		if ( !len( json.id ) ) {
+			messageId = "account.created";
+			thisId    = super.fire( "account.create", [ account ] );
+		} else {
+			messageId = "account.updated";
+			thisId    = super.fire( "account.update", [ account ] );
+		}
 
-        var beanTypes = []
+		var message = completeMessage( messageId );
 
-        if ( StructKeyExists( json, "selectedTypes" ) ) {
-            for ( var type in json.selectedTypes ) {
+		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
 
-                var shipType = super.bean( "ShipmentType" );
-                
-                beanTypes.add( 
-                    shipType.setId( type ) 
-                );
+		event.setValue( "result", result );
+	}
 
-            }
-        } 
-
-        bean.setTypes( beanTypes );
-
-        var id = getAccessManager().exec( user, method, [ bean ] );
-
-        result.setData( { "action" = actionLog, "id": id } );
-
-        event.setValue( "result", result );
-
-    }    
 
 	function delete( event, rc, prc ){
         

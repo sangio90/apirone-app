@@ -12,6 +12,8 @@
 					email::bytea,
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
 				) AS email,
+				account_id::varchar,
+				roles::varchar,
 				*
 			FROM 
 				accounts
@@ -29,7 +31,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-			 	account_id,
+			 	account_id::varchar,
 				pgp_sym_decrypt(
 					email::bytea,
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
@@ -57,7 +59,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT 
-				account_id,
+				account_id::varchar,
 				COUNT(account_id) OVER() AS total
 			FROM 
 				accounts
@@ -104,12 +106,17 @@
 
 		<cfargument name="account" type="com.apirone.core.model.bean.Account" required="true">
 
+		<cfset var roles = SerializeJSON( getRolesAsArray( account.getRoles() ) )>
+
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO accounts (
 				email,
 				api_key,
 				status_id,
-				role_id
+				role_id,
+				roles,
+				phone,
+				account
 			)
 			VALUES (
 				pgp_sym_encrypt(
@@ -118,12 +125,39 @@
 				)::varchar,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getRole().getId()#">
-			) RETURNING account_id
+				'ADM',
+				<cfqueryparam cfsqltype="Other" value="#roles#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getPhone()#">
+				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">
+			) RETURNING account_id::varchar
 		</cfquery>
 	
 		<cfreturn q.account_id>
 	</cffunction>
+
+	<cffunction name="update" returntype="String">
+
+		<cfargument name="account" type="com.apirone.core.model.bean.Account" required="true">
+
+		<cfset var roles = SerializeJSON( getRolesAsArray( account.getRoles() ) )>
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE accounts 
+			SET
+				phone = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getPhone()#">
+				email = pgp_sym_encrypt( <cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">,  <cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'> )::varchar,
+				api_key = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">,
+				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
+				role_id = 'ADM',
+				roles = <cfqueryparam cfsqltype="Other" value="#roles#">,
+				account = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">
+			WHERE
+				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.account.getId()#">::uuid
+		</cfquery>
+	
+		<cfreturn arguments.account.getId()>
+	</cffunction>
+
 
 	<cffunction name="delete" returntype="Numeric">
 		<cfargument name="lineId" type="String" required="true">
@@ -138,6 +172,7 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
+
 
 	<cffunction name="updatePassword" output="No" returntype="Boolean">
 
@@ -155,5 +190,19 @@
 		<cfreturn true>
 
 	</cffunction>
+
+	
+	<cffunction access="private" name="getRolesAsArray" returntype="Array">
+		<cfargument name="roles" required="true">
+
+		<cfset var items = []>
+
+		<cfloop array="#arguments.roles#" item="local.thisItem">
+			<cfset items.add( local.thisItem.getId() )>
+		</cfloop>
+
+		<cfreturn items.len() ? items : NullValue()>
+	</cffunction>	
+
 
 </cfcomponent>

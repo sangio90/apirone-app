@@ -70,13 +70,13 @@
 		var zipsDir = "#current#/../zips/";
 
 		var currVersion = trim( command('package show version').run( returnOutput=true ) );
-		var version = currVersion+1;
-		var version = trim( command('package set version=#version#').run( returnOutput=true ) );
+		var version = Val( currVersion )+1;
+		trim( command('package set version=#version#').run( returnOutput=true ) );
 
 		var slug = trim( command('package show slug').run( returnOutput=true ) );
 
-		var dirName = "#slug#_#getCode()#";
-
+		var dirName = "#slug#_#DateTimeFormat( now(), "yyyymmdd" )#_#version#";
+		
 		var containerDir = "#current#/../zips/#dirName#";
 		var sourceDir = "#containerDir#/code";
 
@@ -98,13 +98,12 @@
 
 		print.greenLine( "Total files: #files.len()#" );
 
-
 		for ( var item in files ) {
-			if( fileExists( item )) {
+			if( FileExists( item )) {
 
 				var myFile = Replace( item, current, '', 'ALL' );
 
-				var currDir = getDirectoryFromPath( myFile );
+				var currDir = GetDirectoryFromPath( myFile );
 
 				if ( !DirectoryExists( sourceDir & "/" & currDir ) ) {
 					DirectoryCreate( sourceDir & "/" & currDir );
@@ -116,7 +115,7 @@
 			
 		}
 
-		cfzip( action="zip", source=containerDir, file=zipsDir & "/" & dirName & ".zip", recurse=true );		
+		cfzip( action="zip", source=containerDir, file=zipsDir & "/" & dirName & ".zip", recurse=true );
 
 		print.greenLine( '... zip created in [ #dirName#.zip ]!' );
 

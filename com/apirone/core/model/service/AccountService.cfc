@@ -24,19 +24,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return account;
 	}
 
-	public Boolean function loginExists(
-		required String login
-	){
-		var records = getDao().find( argumentCollection = arguments );
-
-		return booleanFormat( records.RecordCount );
-	}
-
 	public String function create(
 		required com.apirone.core.model.bean.Account account
 	){
 		if ( !len( arguments.account.getEmail() ) ) {
-			throw( type = "apirone.LoginNotProvided", message = "Login required" );
+			throw( type = "apirone.EmailNotProvided", message = "Email required" );
 		};
 
 		if ( !len( arguments.account.getPwd() ) ) {
@@ -103,6 +95,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String excludedId = ""
 	){
 		var record = getDao().readByEmail( arguments.email );
+
+		dump( arguments );
+		abort;
 
 		if (
 			record.recordCount
@@ -185,7 +180,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var account = super.bean( "Account" );
 
-			account.setId( record.account_id.toString() );
+			account.setId( record.account_id );
 			account.setEmail( record.email );
 			account.setName( record.account );
 			account.setPwd( record.pwd );
@@ -197,7 +192,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setStatus( getStatusService().get( record.status_id ) );
 			account.setRole( getLookupService().get( "role", record.role_id ) );
 
+			if( !IsNull( record.roles ) ) {
+
+				var roles = [];
+
+				DeserializeJSON( record.roles ).each( function( item ){
+					
+					var role = getLookupService().get( "role", item );
+					roles.add( role );
+				
+				});
+
+				account.setRoles( roles );
+
+			}
+
 			account.setLang( getLangService().get( record.lang_id ) );
+
 		}
 
 		return account;

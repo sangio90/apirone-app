@@ -108,8 +108,6 @@ AP.finish.list = (function () {
 
 			var selectedCategories = [];
 
-			var selectedCategories = [];
-
 			if( event.data.categories ) {
 				
 				for (var category of event?.data?.categories)  {

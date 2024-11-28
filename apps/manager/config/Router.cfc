@@ -79,6 +79,7 @@
 
 		get( "/ajax/accounts" ).to( "AccountAjaxController.list" ).end();
 
+		post( "/ajax/accounts" ).to( "AccountAjaxController.save" ).end();
 		delete( "/ajax/accounts" ).to( "AccountAjaxController.delete" ).end();
 
 		get( "/accounts" ).to( "AccountController.list" ).end();

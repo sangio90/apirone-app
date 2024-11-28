@@ -13,7 +13,7 @@
                     </header>                
                     
                     <div class="card-body">
-                        <div class="row pb-3">
+                        <div class="row">
 
                             <div class="col-6">
                                 <div class="form-group pb-3">
@@ -59,7 +59,7 @@
                                     <label class="col-form-label">Ruoli</label>
                                     <select id="roles" required
                                         data-role="multiselect"
-                                        data-bind="source: roles, value: detailForm.data.selectedRoles" 
+                                        data-bind="source: detailForm.roles, value: detailForm.data.selectedRoles" 
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
@@ -81,15 +81,16 @@
 
                         </div>
 
-                        <div class="row">
+                        <div class="row" data-bind="invisible: isUpdate">
                             <div class="col-6">
                                 <div class="form-group">
                                     <label class="col-form-label">Password</label>
                                     <input class="form-control" id="pwd" name="pwd" type="password" required
+                                        data-bind="value: detailForm.data.pwd"
                                         data-rule-required="true"
                                         data-msg-required="Password richiesta"
-                                        data-rule-pwd="true"
-                                        data-msg-pwd="Almeno 8 caratteri, un numero, un carattere speciale"
+                                        data-rule-pwdRule="true"
+                                        data-msg-pwdRule="Almeno 8 caratteri, un numero, un carattere speciale"
                                     >
                                 </div>
                             </div>
@@ -99,12 +100,11 @@
                                     <input class="form-control" name="pwd2" type="password" required
                                         data-rule-required="true"
                                         data-msg-required="Conferma la password"
-                                        data-rule-equalTo="pwd"
-                                        data-msg-pwd="Le password non coincidono"
+                                        data-rule-equalTo="##pwd"
+                                        data-msg-equalTo="Le password non coincidono"
                                     >
                                 </div>
                             </div>
-
                         </div>
 
                     </div>

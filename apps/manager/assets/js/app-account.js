@@ -41,12 +41,13 @@ AP.account.detail = (function () {
 			lang: {
 				id: "IT"
 			},
-			selectedRoles: []
+			selectedRoles: [],
+			pwd: ''
 		},
 
-        statuses: AP.page.statuses,
         roles: AP.page.roles,
         langs: AP.page.langs,
+        statuses: AP.page.statuses,
 
 		title: "Carica account"
 	};
@@ -58,8 +59,6 @@ AP.account.detail = (function () {
 
             var detailForm = fields.detailForm;
 
-            console.log("fields.detailForm", fields.detailForm);
-
             var validator = detailForm.validate();
             validator.resetForm();
 
@@ -68,17 +67,53 @@ AP.account.detail = (function () {
 			viewModel.set("detailForm", defaultDetailForm);
 		},
 
-        callback: {
-			onCreate: undefined,
-			onUpdate: undefined,
-			onLoad: undefined
-		},
-
         getCreatedAt: function (event) {
 
             return NM.kendo.formatDate( event.createdAt );
 
 		},
+
+		isUpdate: function() {
+
+			return viewModel.get("detailForm.data.id").length > 0;
+
+		},
+
+        save: function (event) {
+
+			var detailForm = fields.detailForm;
+			var status = detailForm.find(".status");
+
+		    status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+
+			if(detailForm.valid()) {
+
+				NM.util.ajax({
+					method: "POST",
+					url: "/manager/ajax/accounts",
+					data: JSON.stringify(viewModel.get("detailForm.data")),
+					callback: {
+						done: function (xhr) {
+
+							if(xhr.status == "SUCCESS") {
+
+								NM.util.autoHideMessage(status, "<span class='green'>Account salvato</span>");
+
+								setTimeout(() => $("#account-detail-modal").modal("hide"), 1000);
+
+								viewModel.rows.read()
+
+							}
+
+						}
+					}
+				});
+
+			}
+
+            return false;
+
+        },
 
 		print: function (item) {
 
@@ -87,49 +122,39 @@ AP.account.detail = (function () {
             return false;
 		},
 
-
 	});
 
-	pub.new = function ({ onSave }) {
+	pub.new = function() {
 
-        if (onSave) {
-            viewModel.set("callback.onSave", onSave);
-        }
+		viewModel.resetForm();
 
-        viewModel.resetForm();
+		NM.util.openModal( fields.detailRoot );
 
-        NM.util.openModal(AP.account.fields.detailRoot);
+	},
 
-    },
+	pub.edit = function( event ) {
 
-	pub.edit = function ({ id, onSave }) {
+		viewModel.resetForm();
 
-        if (onSave) {
-            viewModel.set("callback.onSave", onSave);
-        }
+		viewModel.set( "detailForm.data", event.data )
+		viewModel.set( "detailForm.title", "Modifica di < " + event.data.email + " >" );
 
-        viewModel.resetForm();
+		var selectedRoles = [];
 
-        NM.util.ajax({
-            method: "GET",
-            url: "/manager/ajax/accounts/" + id,
-            callback: {
-                done: function (xhr) {
+		if( event.data.roles ) {
+			
+			for (var role of event?.data?.roles)  {
+				selectedRoles.push( role );
+			}
 
-                    if(xhr.status == "SUCCESS") {
+		}
 
-                        viewModel.set("detailForm.data", xhr.data);
-                        viewModel.set("detailForm.title", "Modifica linea");
+		viewModel.set("detailForm.data.selectedRoles", selectedRoles);
 
-                        NM.util.openModal(AP.line.fields.detailRoot);
+		NM.util.openModal( fields.detailRoot );
 
-                    }
+	}
 
-                }
-            }
-        });
-
-    },
 	pub.init = function () {
 
         console.log("account:detail:init");
@@ -177,8 +202,8 @@ AP.account.list = (function () {
 
 	var pub = {};
 
-    var detailApp = AP.account.detail;
     var fields = AP.account.fields;
+    var detailApp = AP.account.detail;
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/accounts" })
@@ -207,23 +232,21 @@ AP.account.list = (function () {
 
         },
 
-        new: function (event) {
+        new: function () {
 
-            console.log("detailApp", detailApp);
+            detailApp.new();
 
-            var onSave = function () {
-                viewModel.get("rows").read();
-            };
+        },
 
-            detailApp.new({ onSave: onSave });
+        edit: function (event) {
 
-            NM.util.openModal(AP.account.fields.detailRoot);
+            detailApp.edit( event );
 
         },
 
 		print: function (item) {
 
-            window.open("/manager/lines/print", "_blank");
+            window.open("/manager/accounts/print", "_blank");
 
             return false;
 		},
@@ -250,7 +273,7 @@ AP.account.list = (function () {
 						done: function (xhr) {
 
 							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
+								AP.widget.notify("error", "Non riesco a cancellare tutti gli account");
 							} else {
 								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 							}
