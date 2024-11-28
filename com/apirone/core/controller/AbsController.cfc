@@ -60,6 +60,7 @@
         
         user.setId( arguments.account.getId() );
         user.setName( arguments.account.getEmail() );
+        user.setRole( arguments.account.getRoles()[1] );
 
         session.user = user;
 

@@ -238,7 +238,7 @@ component extends="coldbox.system.Interceptor"{
 
             if ( session.user.isLogged() ) {
 
-                if( session.user.getAccount().getRole().getId() == "CST" ) {
+                if( session.user.getRole().getId() == "CST" ) {
 
                     if( !ArrayFindNoCase( allowedEventsForCustomer, currentEvent ) ) {
 

@@ -70,7 +70,7 @@
                                 #prc.user.getName()#<br>
                             </span>
                             <span class="role">
-                                #prc.user.getAccount().getRole().getId()# - #prc.user.getShortId()#
+                                #prc.user.getRole().getId()# - #prc.user.getShortId()#
                             </span>
                         </div>
 
