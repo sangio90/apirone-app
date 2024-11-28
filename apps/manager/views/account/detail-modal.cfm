@@ -85,7 +85,7 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label class="col-form-label">Password</label>
-                                    <input class="form-control" id="pwd" name="pwd" type="password" required
+                                    <input class="form-control ignore" id="pwd" name="pwd" type="password" required
                                         data-bind="value: detailForm.data.pwd"
                                         data-rule-required="true"
                                         data-msg-required="Password richiesta"
@@ -97,7 +97,7 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label class="col-form-label">Conferma password</label>
-                                    <input class="form-control" name="pwd2" type="password" required
+                                    <input class="form-control ignore" name="pwd2" type="password" required
                                         data-rule-required="true"
                                         data-msg-required="Conferma la password"
                                         data-rule-equalTo="##pwd"

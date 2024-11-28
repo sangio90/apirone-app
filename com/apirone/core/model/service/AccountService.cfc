@@ -42,6 +42,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return id;
 	}
 
+	public String function update(
+		required com.apirone.core.model.bean.Account account
+	){
+		if ( !len( arguments.account.getEmail() ) ) {
+			throw( type = "apirone.EmailNotProvided", message = "Email required" );
+		};
+
+		var id = getDao().update( argumentCollection = arguments );
+
+		getCacheManager().remove( getCacheKey( arguments.account.getId() ));
+
+		return id;
+	}
+
 	public Boolean function updatePassword(
 		required String pwd,
 		required String accountId
@@ -95,9 +109,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String excludedId = ""
 	){
 		var record = getDao().readByEmail( arguments.email );
-
-		dump( arguments );
-		abort;
 
 		if (
 			record.recordCount

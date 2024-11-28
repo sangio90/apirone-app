@@ -101,7 +101,7 @@ AP.account.detail = (function () {
 
 								setTimeout(() => $("#account-detail-modal").modal("hide"), 1000);
 
-								viewModel.rows.read()
+								AP.account.list.refresh();
 
 							}
 
@@ -164,6 +164,7 @@ AP.account.detail = (function () {
 		var detailForm = fields.detailForm;
 
 		detailForm.validate({
+			ignore: ".ignore", //for change action, skip password.
 			onfocusout: function (element) {
 				$(element).valid();
 			},
@@ -293,6 +294,12 @@ AP.account.list = (function () {
         },
 
 	});
+
+	pub.refresh = function() {
+
+		viewModel.rows.read()
+
+	},
 
 	pub.init = function () {
 

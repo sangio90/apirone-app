@@ -48,9 +48,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		account.setId( json.id );
 		account.setEmail( json.email );
-		account.setName( json.name );
-		account.setPwd( json.pwd );
-		account.setPhone( json.phone );
+		account.setName( json?.name );
+		account.setPwd( json?.pwd );
+		account.setPhone( json?.phone );
 		account.setLang( lang.setId( json.lang.id ) );
 		account.setStatus( status.setId( json.status.id ) );
 

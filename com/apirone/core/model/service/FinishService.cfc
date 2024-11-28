@@ -77,7 +77,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		getDao().update( arguments.finish );
 
-		getCacheManager().remove( "Finish_#arguments.finish.getId()#" );
+		getCacheManager().remove( getCacheKey( arguments.finish.getId() ));
 
 		return arguments.finish.getId();
 	}

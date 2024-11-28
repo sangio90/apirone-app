@@ -89,7 +89,9 @@
 				<cfif !IsNull( arguments.roleId )>
 					AND role_id ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.roleId#">
 				</cfif>
-
+				
+			ORDER BY 
+				serial DESC
 			<cfif arguments.limit GTE 0>
 				LIMIT 
 					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
@@ -125,7 +127,7 @@
 				)::varchar,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
-				'ADM',
+				NULL,
 				<cfqueryparam cfsqltype="Other" value="#roles#">,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getPhone()#">
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">
@@ -144,13 +146,13 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE accounts 
 			SET
-				phone = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getPhone()#">
+				phone = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getPhone()#">,
+				account = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">,
 				email = pgp_sym_encrypt( <cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">,  <cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'> )::varchar,
 				api_key = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">,
 				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
-				role_id = 'ADM',
-				roles = <cfqueryparam cfsqltype="Other" value="#roles#">,
-				account = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">
+				role_id = NULL,
+				roles = <cfqueryparam cfsqltype="Other" value="#roles#">
 			WHERE
 				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.account.getId()#">::uuid
 		</cfquery>
