@@ -11,6 +11,10 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
+    "combination": {
+        "itemsDeleted": "Ho cancellato tutti gli attributi",
+    },
+
     "line": {
         "deletedAllRecords": "Valori cancellati",
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",

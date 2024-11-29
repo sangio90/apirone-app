@@ -124,7 +124,6 @@ AP.finish.list = (function () {
 
         delete: function (event) {
 
-			var status = $("#status-delete");
 			var checks = $("#finish-grid").find("[name=selected]:checked");
 
 			if (checks.length) {
@@ -158,7 +157,7 @@ AP.finish.list = (function () {
 
 			} else {
 
-				NM.util.autoHideMessage(status, "<span class='red'>Seleziona almeno un valore</span>");
+				AP.widget.notify("warning", "Seleziona almeno un valore");
 
 			}
 

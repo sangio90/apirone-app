@@ -167,7 +167,8 @@
 
 		get( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.listItems" ).end();
 
-		delete( "/ajax/combinations/:id/item" ).to( "CombinationAjaxController.removeItem" ).end();
+		//delete( "/ajax/combinations/:id/item" ).to( "CombinationAjaxController.removeItem" ).end();
+		delete( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.removeItems" ).end();
 
 		get( "/combinations/:id" ).to( "CombinationController.detail" ).end();
 

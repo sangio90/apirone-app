@@ -176,8 +176,10 @@
                 #template( view="jstemplate/#arguments.rowTemplate#" )#
 
                 <script>
-                    window.onload= function() {
+                    window.addEventListener("load",function(event) {
+
                         $("###arguments.id# .k-table thead th").each(function(){
+
                             var ele = $(this);
                             var text = ele.text();
 
@@ -186,7 +188,8 @@
                             }
 
                         })
-                    }
+
+                    },false);
                 </script>
             </cfoutput>
         </cfsavecontent>

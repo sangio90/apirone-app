@@ -60,13 +60,6 @@ AP.combination.list = (function () {
 
 		},
 
-        showComponents: function (event) {
-
-			$("#component-list-modal").modal("show");
-
-            return false;
-		},
-
 		getAttributeName: function (event) {
 
 			console.log("getAttributeName:event", event);
@@ -93,25 +86,46 @@ AP.combination.list = (function () {
 
 		removeAttributes: function (event) {
 
-			NM.util.ajax({
-				method: "POST",
-				url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
-				data: {
-					attributeId: event.data.id
-				},
-				callback: {
-					done: function (xhr) {
+			var checks = $("#combination-items-grid").find("[name=selected]:checked");
 
-						viewModel.get("items").read();
-	
-					},
-				}
-			});
+			if (checks.length) {
 
+				var values = [];
 
-			console.log("")
+				checks.each(function (){
+					values.push($(this).val());
+				});
 
-			return false;
+				var ids = values.toString();
+
+				NM.util.ajax({
+					method: "DELETE",
+					url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
+					data: { items: ids },
+					callback: {
+						done: function (xhr) {
+
+							AP.widget.notify("success", xhr.data.message.text );
+
+							/*
+							if(xhr.data.payload.hasOwnProperty("errors")) {
+								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
+							} else {
+								AP.widget.notify("success", xhr.data.message.text );
+							}
+							*/
+
+							viewModel.items.read();
+
+						}
+					}
+				});
+
+			} else {
+
+				AP.widget.notify( "warning", "Seleziona almeno un attributo" );
+
+			}
 
 		},
 
@@ -158,7 +172,14 @@ AP.combination.list = (function () {
 		*/ 
 
 
-		showTable: function () {
+        showComponents: function (event) {
+
+			$("#component-list-modal").modal("show");
+
+            return false;
+		},
+
+		showItems: function () {
 
 			return viewModel.get("items").view().length ? true : false;
 
@@ -238,7 +259,7 @@ AP.combination.list = (function () {
 
 		},
 
-		loadFishes: function () {
+		loadFinishes: function () {
 
 			var thisForm  = AP.combination.fields.configRow;
 			var finishEle = thisForm.find("[name=finishId]");
@@ -308,7 +329,7 @@ AP.combination.list = (function () {
 
 		kendo.bind(AP.combination.fields.rootDetail, viewModel);
 
-		viewModel.loadFishes();
+		viewModel.loadFinishes();
 
 	};
 
