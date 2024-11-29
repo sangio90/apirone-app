@@ -64,6 +64,11 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
         var attribute = super.fire( "attribute.get", [ rc.attributeId ] );
 
+        param rc.id = '_';          //Current combination
+        param rc.parentId = 0;      //Parent item, if exists
+        param rc.attributeId = 0;   //To add values ​​to this attribute
+
+        
         ```
         <cfquery datasource="apirone">
             DELETE FROM combination_items
@@ -83,12 +88,14 @@ component extends="com.apirone.core.controller.AbsController" {
                 INSERT INTO combination_items (
                     combination_id,
                     attribute_value_id,
-                    orderby
+                    orderby,
+                    parent_id
                 )
                 VALUES (
                     '#rc.id#',
                     '#item.getId()#',
-                    #item.getOrderBy()#
+                    #item.getOrderBy()#,
+                    #( Val(rc.parentId) ? rc.parentId : 'NULL' )#
                 )
             </cfquery>
             
@@ -96,9 +103,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
         ```
 
-        var message = completeMessage( "configuration.saved" );
+        var message = completeMessage( "combination.itemsAdded" );
 
-        result.setData( message );
+        result.setData( { "message" = message } );
 
         event.setValue( "result", result );
 

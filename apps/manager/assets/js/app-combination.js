@@ -35,24 +35,31 @@ AP.combination.list = (function () {
 		items: dataSources.items,
 		attributesList: dataSources.attributesList,
 
+		currentItem: 0,
+
+
 		/*
 			attributes methods
 		*/ 
 
 		selectAttribute: function (event) {
 
+			var parentId = viewModel.get("currentItem");
+			console.log("parentId", parentId);
+
 			NM.util.ajax({
 				method: "POST",
 				url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
 				data: {
-					attributeId: event.data.id
+					attributeId: event.data.id,
+					parentId: viewModel.get("currentItem")
 				},
 				callback: {
 					done: function (xhr) {
 
 						viewModel.get("items").read();
 
-						setTimeout(() => fields.attributeModal.modal("hide"), 800);
+						setTimeout(() => fields.attributeModal.modal("hide"), 600);
 	
 					},
 				}
@@ -129,9 +136,15 @@ AP.combination.list = (function () {
 
 		},
 
-		showAttributesList: function () {
+		showAttributesList: function (event) {
 
-			NM.util.openModal( $("#combination-attributes-list-modal") );
+			var rootId = $(event.currentTarget).data( "item-id" );
+
+			console.log("showAttributesList:rootId", rootId);
+
+			viewModel.set("currentItem", rootId);
+
+			NM.util.openModal( fields.attributeModal );
 
 			this.searchAttributes();
 
