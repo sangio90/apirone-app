@@ -9,7 +9,7 @@
 				<div class="card-body">
 					<div class="row">
 						
-						<div class="col-7">
+						<div class="col-6">
 
 							<div data-bind="visible: showSearchPanel">
 								<form data-bind="events: { submit: search }" id="component-list-search-form">
@@ -61,19 +61,24 @@
 						
 						</div>
 
-						<div class="col-5">
+						<div class="col-6">
 
-							<table class="table table-hover pt-5">
+							<h2>Componenti selezionati per <span data-bind="text: getCurrentItemName"></span></h2>
+
+							<table class="table table-hover pt-5" data-bind="visible: showSelectedComponentTable">
 								<thead>
 									<tr>
-										<th scope="col">Componenti per <span data-bind="text: currentItem.name"></span></th>
+										<th scope="col">Componenti</th>
 										<th scope="col" width="100"></th>
 									</tr>
 								</thead>
-								
 								<tbody data-bind="source:selected" data-template="component-selected-row-tmpl">
 								</tbody>
 							</table>
+
+							<div class="pt-5" data-bind="invisible: showSelectedComponentTable">
+								<p class="align-center">Nessun componente ancora selezionato</p>
+							</div>
 
 						</div>
 

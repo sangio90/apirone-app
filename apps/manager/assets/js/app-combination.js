@@ -48,8 +48,14 @@ AP.combination.list = (function () {
 		if ( data?.attributeValue ) {
 
 			item = {
-				attribute: data.attribute,
-				attributeValue: data?.attributeValue
+				attribute: {
+					id: data.attribute.id,
+					name: data.attribute.name
+				},
+				attributeValue: {
+					id: data.attributeValue.id,
+					name: data.attributeValue.name
+				}
 			}
 
 		}
@@ -161,7 +167,7 @@ AP.combination.list = (function () {
 
 			var item = normalizeComponentItem( event.data );
 
-			console.log("showAttributesList:item", item);
+			//console.log("normalizeComponentItem", item);
 
 			viewModel.set("itemForAttributes", item);
 
@@ -173,7 +179,7 @@ AP.combination.list = (function () {
 
 		showAttributeValues: function (event) {
 
-			console.log("event.data.id", event.data.id);
+			//console.log("event.data.id", event.data.id);
 
 			attributeApp.edit({
 				id: event.data.id,
@@ -210,7 +216,11 @@ AP.combination.list = (function () {
 
 			console.log("showComponents", event.data);
 
-			$("#component-list-modal").modal("show");
+			AP.component.list.setCurrentItem( event.data );
+
+			viewModel.set( "itemForComponents", event.data );
+
+			NM.util.openModal( $("#component-list-modal") );
 
             return false;
 		},
@@ -223,75 +233,7 @@ AP.combination.list = (function () {
 
 		showImagesList: function () {
 
-			NM.util.openModal($("#combination-images-list-modal"));
-
-		},
-
-		searchImages: function (event) {
-		},
-
-		initUpload: function () {
-
-			var documents = viewModel.get("documents").data();
-			var shipmentId = viewModel.get("shipment.id");
-
-			if(documents.length > 0) {
-
-				var modal = $("#documents-upload-modal");
-				modal.modal("show");
-
-				for (var document of documents) {
-
-					var uid = document.uid;
-
-					$("#document-upload-" + uid).fileupload({
-						dropZone: $("#document-upload-dropzone-" + uid),
-						autoUpload: true,
-						formData: { "shipmentId": shipmentId, "documentTypeId": document.id },
-						url: "/manager/ajax/shipment/upload-document",
-						add: function (event, data) {
-							var uid = $(event.target).data("uid");
-
-							var status = $("#document-upload-status-" + uid);
-
-							status.html("");
-
-							// TODO: get list form configuration
-							if (!(/\.(jpg|jpeg|png|pdf)$/i).test(data.files[0].name)) {
-								status.html("<span class=\"error\">File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>");
-								return false;
-							}
-
-							data.submit();
-
-						},
-
-						progressall: function (event, data) {
-
-							var status = $("#document-upload-status-" + uid);
-							status.html("");
-
-							var uid = $(event.target).data("uid");
-
-							var progress = parseInt(data.loaded / data.total * 100, 10);
-							$("#document-upload-progress-" + uid + " .upload-bar").css("width", progress + "%");
-
-							status.html("Fatto!");
-
-							var row = viewModel.get("documents").getByUid(uid);
-
-							row.set("completed", true);
-
-						}
-					});
-
-				}
-
-			} else {
-
-				viewModel.showPaymentDialog();
-
-			}
+			NM.util.openModal( $("#combination-images-list-modal") );
 
 		},
 
@@ -360,6 +302,17 @@ AP.combination.list = (function () {
 		},
 
     });
+
+	pub.currentItem = function() {
+
+		var result = {
+			forAttribute: viewModel.get("itemForAttributes"),
+			forComponent: viewModel.get("itemFomComponents")
+		}
+
+		return result;
+
+	},
 
 	pub.init = function () {
 

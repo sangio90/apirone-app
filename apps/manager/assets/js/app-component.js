@@ -31,7 +31,8 @@ AP.component.list = (function () {
 		variantsTitle: "Varianti",
 		currentVariant: {},
 		currentComponent: {},
-		//selectedComponents: [],
+
+		currentItem: undefined,
 
 		showSearchResult: function () {
 
@@ -170,7 +171,28 @@ AP.component.list = (function () {
             return false;
 		},
 
+		showSelectedComponentTable: function() {
+
+			return viewModel.get("selected").length > 0;
+
+		},
+
+        getCurrentItemName: function (event) {
+
+			var attrName = viewModel.get("currentItem.attribute.name") 
+					+ " / " 
+					+ viewModel.get("currentItem.attributeValue.name");
+
+            return attrName;
+		},
+
 	});
+
+	pub.setCurrentItem = function ( item ) {
+
+		viewModel.set("currentItem", item );
+
+	};
 
 	pub.init = function () {
 
