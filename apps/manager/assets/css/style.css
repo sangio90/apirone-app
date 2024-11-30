@@ -424,6 +424,8 @@ h2 {
 /* SEZIONE PER LA PAGINA: plate/designer */
 
 .plate-background {
+	width: 1200px;
+	height: 500px;
 	text-align: center;
 	background-color: #ECECEC;
 	background-size: cover;
