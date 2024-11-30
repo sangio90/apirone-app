@@ -18,7 +18,12 @@
                             <div class="col-6">
                                 <div class="form-group pb-3">
                                     <label class="col-form-label" for="account-desc">Nome</label>
-                                    <input class="form-control" name="name" id="name" data-bind="value: detailForm.data.name">
+                                    <input class="form-control" name="name" id="name" 
+                                        required
+                                        data-rule-required="true"
+                                        data-msg-required="Nome richiesto"
+                                        data-bind="value: detailForm.data.name"
+                                        >
                                 </div>
                             </div>
 
@@ -70,7 +75,8 @@
                             <div class="col-6">
                                 <div class="form-group pb-3">
                                     <label class="col-form-label" for="account-desc">Stato</label>
-                                    <select type="text" class="form-control" name="status" required
+                                    <select type="text" class="form-control" name="status" 
+                                        required
                                         data-bind="value: detailForm.data.status.id, source: detailForm.statuses"
                                         data-value-field="id"
                                         data-text-field="name"
@@ -85,7 +91,8 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label class="col-form-label">Password</label>
-                                    <input class="form-control ignore" id="pwd" name="pwd" type="password" required
+                                    <input class="form-control ignore" id="pwd" name="pwd" type="password" 
+                                        required
                                         data-bind="value: detailForm.data.pwd"
                                         data-rule-required="true"
                                         data-msg-required="Password richiesta"

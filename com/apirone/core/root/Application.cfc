@@ -14,10 +14,10 @@ component {
     this.charset.resource = "UTF-8";
 
     this.mailservers =[ {
-		host: variables.settings.get('mailserver.host'),
-		port: variables.settings.get('mailserver.port'),
-		username: variables.settings.get('mailserver.username'),
-		password: variables.settings.get('mailserver.pwd'),
+		host: variables.settings.get("mailserver.host"),
+		port: variables.settings.get("mailserver.port"),
+		username: variables.settings.get("mailserver.username"),
+		password: variables.settings.get("mailserver.pwd"),
 		ssl: false,
 		tls: true,
 		lifeTimespan: CreateTimeSpan( 0, 0, 1, 0 ),
@@ -26,11 +26,11 @@ component {
 
     this.datasources["apirone"] = {
         type     = "postgresql",
-        host     = variables.settings.get('db.host'),
-        database = variables.settings.get('db.name'),
-        port     = variables.settings.get('db.port'),
-        username = variables.settings.get('db.username'),
-        password = variables.settings.get('db.pwd')
+        host     = variables.settings.get("db.host"),
+        database = variables.settings.get("db.name"),
+        port     = variables.settings.get("db.port"),
+        username = variables.settings.get("db.username"),
+        password = variables.settings.get("db.pwd")
     };
 
     this.datasources["verticale"] = {
@@ -38,8 +38,8 @@ component {
         bundleName: "org.lucee.mssql",
         bundleVersion: "12.2.0.jre8",
         connectionString: "jdbc:sqlserver://#variables.settings.get('verticaledb.host')#:#variables.settings.get('verticaledb.port')#;DATABASENAME=#variables.settings.get('verticaledb.name')#;SelectMethod=direct",
-        username: "#variables.settings.get('verticaledb.username')#",
-        password: "#variables.settings.get('verticaledb.pwd')#",
+        username: variables.settings.get("verticaledb.username"),
+        password: variables.settings.get("verticaledb.pwd"),
 
         // optional settings
         connectionLimit:-1, // default:-1
@@ -59,18 +59,6 @@ component {
 
     this.mappings[ "/coldbox" ]    = ExpandPath( "/modules/coldbox/" );
     this.mappings[ "/dataMapper" ] = ExpandPath( "/modules/external/dataMapper/" );
-
-    public boolean function onRequestStart(){
-        return true;
-    }
-
-    public Boolean function onSessionStart(){
-        return true;
-    }
-
-    public Boolean function OnSessionEnd(){
-        return true;
-    }
 
     public Boolean function onApplicationStart(){
 

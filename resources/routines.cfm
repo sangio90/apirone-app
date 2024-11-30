@@ -62,9 +62,7 @@
 	<p>Rimosse [#count#] chiavi.</p>
 </cfif>
 
-
-<cfdump var="#GetApplicationMetadata()#">
-
+<cfdump var="#GetApplicationMetadata().datasources#">
 
 </cfoutput>
 

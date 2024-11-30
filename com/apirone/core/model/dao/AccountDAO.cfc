@@ -13,7 +13,7 @@
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
 				) AS email,
 				account_id::varchar,
-				roles::varchar,
+				roles,
 				*
 			FROM
 				accounts
