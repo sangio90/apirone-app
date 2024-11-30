@@ -437,14 +437,9 @@ h2 {
 }
 
 #plate-grid {
-	width: 300px;
-	height: 180px;
 	position: relative;
 	overflow: hidden;
-	display: flex;
-	flex-wrap: nowrap;
-	justify-content: center;
-	align-items: center;
+	display: grid;
 	box-sizing: content-box;
 }
 
@@ -467,11 +462,6 @@ h2 {
 	border: 1px dashed lightgray;
 }
 
-.grid-column {
-	width: 100px;
-	height: 180px;
-}
-
 .grid-column .position-label {
 	color: black;
 	display: none;
@@ -481,16 +471,29 @@ h2 {
 	display: initial;
 }
 
-#draggable-plate-item {
-	width: 200px;
-	height: 180px;
+.draggable-plate-item {
 	position: absolute;
-	top: 0px;
-	left: 0;
+	z-index: 0;
 }
 
-#draggable-plate-item:hover {
-	cursor: move;
+.draggable-plate-item.is-dragging {
+	z-index: 1;
+}
+
+.draggable-plate-item:hover {
+	cursor: grab;
 	background-color: #a3fda170;
 	border: 1px dashed black;
+}
+
+.draggable-plate-item:hover.is-dragging {
+	cursor: grabbing;
+}
+
+.draggable-plate-item:hover.is-dragging.is-colliding {
+	background-color: #fda1a170;
+}
+
+.draggable-plate-item:hover.is-dragging.is-colliding.is-not-swappable {
+	cursor: no-drop;
 }
