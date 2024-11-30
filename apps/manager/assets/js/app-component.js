@@ -20,11 +20,16 @@ AP.component.list = (function () {
 	var pub = {};
 	var fields = AP.component.fields;
 
+	var dataSources = {
+		selected: NM.kendo.dataSource({ url: "/manager/ajax/combination-items/" + "/components"  })
+	}
+
 	var viewModel = kendo.observable({
 
 		components: [],
 		variants: [],
-		selected: [],
+		selected: dataSources.selected,
+
 		colors: [],
 		showColors: false,
 		showSearchPanel: true,
@@ -174,6 +179,16 @@ AP.component.list = (function () {
 		showSelectedComponentTable: function() {
 
 			return viewModel.get("selected").length > 0;
+
+		},
+
+		removeComponent: function( event ) {
+
+			console.log("removeComponent:event", event)
+
+			viewModel.get("selected").getByUid( event.data.uid );
+
+			return false;
 
 		},
 

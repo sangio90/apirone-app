@@ -24,8 +24,8 @@
 										>
 
 										<select class="form-control me-3" name="processingTypeId">
-											<option value="A">Materie prime</option>
-											<option value="LAV">Lavorazioni</option>
+											<option value="MP">Materie prime</option>
+											<option value="LV">Lavorazioni</option>
 										</select>
 
 										#searchButton(bind="click:search")#
@@ -63,13 +63,11 @@
 
 						<div class="col-6">
 
-							<h2>Componenti selezionati per <span data-bind="text: getCurrentItemName"></span></h2>
-
-							<table class="table table-hover pt-5" data-bind="visible: showSelectedComponentTable">
+							<table class="table table-hover pt-5">
 								<thead>
 									<tr>
-										<th scope="col">Componenti</th>
-										<th scope="col" width="100"></th>
+										<th scope="col" colspan="3">Componenti selezionati per <span data-bind="text: getCurrentItemName"></span></th>
+										<th scope="col" width="50"></th>
 									</tr>
 								</thead>
 								<tbody data-bind="source:selected" data-template="component-selected-row-tmpl">
@@ -77,7 +75,7 @@
 							</table>
 
 							<div class="pt-5" data-bind="invisible: showSelectedComponentTable">
-								<p class="align-center">Nessun componente ancora selezionato</p>
+								<p class="text-center">Nessun componente ancora selezionato</p>
 							</div>
 
 						</div>

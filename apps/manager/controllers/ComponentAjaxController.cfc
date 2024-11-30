@@ -4,6 +4,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         param rc.str = "";
 
+        var params = super.paramsFromUrl();
+
         var result = super.getResult();
 
         var args = super.paramsFromUrl()
@@ -12,7 +14,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         // processingTypeId="A" -> materie prime
         //materie prime
-        var rows = super.fire("component.search", { processingTypeId="A", str="#rc.str#", limit=15 } ); 
+        var rows = super.fire("component.search", params ); 
 
         result.setTotal( rows.getTotal() )
         result.setCount( rows.getCount() )

@@ -163,15 +163,15 @@
 		/*
 			combination
 		*/
+		get( "/ajax/combination-items/:id/components" ).to( "CombinationItemAjaxController.listComponents" ).end();
+
 		post( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.addItem" ).end();
 
 		get( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.listItems" ).end();
 
-		//delete( "/ajax/combinations/:id/item" ).to( "CombinationAjaxController.removeItem" ).end();
 		delete( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.removeItems" ).end();
 
 		get( "/combinations/:id" ).to( "CombinationController.detail" ).end();
-
 
 
 		/*
@@ -180,8 +180,9 @@
 		get( "/ajax/product-categories/code-exists" ).to( "ProductCategoryAjaxController.codeExists" ).end();
 
 		get( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.list" ).end();
+
 		post( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.save" ).end();
-		
+
 		delete( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.delete" ).end();
 
 		get( "/product-categories" ).to( "ProductCategoryController.list" ).end();

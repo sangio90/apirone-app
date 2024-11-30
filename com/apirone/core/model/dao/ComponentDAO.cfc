@@ -39,7 +39,10 @@
 
         <cfquery name="local.q" datasource="verticale">
 			SELECT
-				arcodart, ardesart,
+				arcodart, 
+				ardesart,
+				arsemlav,
+				artipmat,
 				COUNT(arcodart) OVER() AS total
 			FROM
 				#super.sanitizeSQL( "#variables.companyId#_artico" )# artico
@@ -48,9 +51,15 @@
 			<cfif !isNull( arguments.typeId )>
 				AND codtip = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">
 			</cfif>
+
+			<!--- lavorazioni --->
+			<cfif arguments.processingTypeId == "LV">
+				AND artipmat = 'LAV'
+			</cfif>
 			
-			<cfif !isNull( arguments.processingTypeId )>
-				AND arsemlav = <cfqueryparam value="#arguments.processingTypeId#" cfsqltype="varchar">
+			<!--- materie prime --->
+			<cfif arguments.processingTypeId == "MP">
+				AND arsemlav = 'A' AND artipmat <> 'LAV'
 			</cfif>
                 
 			<cfif !isNull( arguments.str )>
