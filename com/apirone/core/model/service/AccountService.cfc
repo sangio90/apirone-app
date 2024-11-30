@@ -57,8 +57,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Boolean function updatePassword(
-		required String pwd,
-		required String accountId
+		required String accountId,
+		required String pwd
 	){
 		getDao().updatePassword( arguments.accountId, pwd );
 
