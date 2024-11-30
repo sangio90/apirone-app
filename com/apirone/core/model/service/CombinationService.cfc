@@ -189,6 +189,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setLine( getLineService().get( record.line_id ) );
 			bean.setFinish( getFinishService().get( record.finish_id ) );
 			
+			//bean.setAttribute( "" );
+			
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
             return bean;

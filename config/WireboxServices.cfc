@@ -189,6 +189,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "CombinationItemDAO" )
             .property( name = "statusService", ref = "statusService" )
             .property( name = "attributeValueService", ref = "AttributeValueService" )
+            .property( name = "attributeService", ref = "AttributeService" )
             .parent("AbsService");
 
 

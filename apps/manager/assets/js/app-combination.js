@@ -30,12 +30,41 @@ AP.combination.list = (function () {
 		attributesList: undefined
 	};
 
+	var normalizeComponentItem = function( data ) {
+
+		var item = {
+			attribute: {
+				id: 0,
+				name: ""
+			},
+			attributeValue: {
+				id: 0,
+				name: ""
+			}
+		}
+
+		console.log("data?.attributeValue", data?.attributeValue)
+
+		if ( data?.attributeValue ) {
+
+			item = {
+				attribute: data.attribute,
+				attributeValue: data?.attributeValue
+			}
+
+		}
+
+		return item;
+
+	}
+
 	var viewModel = kendo.observable({
 
 		items: dataSources.items,
 		attributesList: dataSources.attributesList,
 
-		currentItem: 0,
+		itemForAttributes: undefined,
+		itemFomComponents: undefined,
 
 
 		/*
@@ -44,7 +73,7 @@ AP.combination.list = (function () {
 
 		selectAttribute: function (event) {
 
-			var parentId = viewModel.get("currentItem");
+			var parentId = viewModel.get("itemForAttributes.id");
 			console.log("parentId", parentId);
 
 			NM.util.ajax({
@@ -52,7 +81,7 @@ AP.combination.list = (function () {
 				url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
 				data: {
 					attributeId: event.data.id,
-					parentId: viewModel.get("currentItem")
+					parentId: viewModel.get("itemForAttributes.id")
 				},
 				callback: {
 					done: function (xhr) {
@@ -114,14 +143,6 @@ AP.combination.list = (function () {
 
 							AP.widget.notify("success", xhr.data.message.text );
 
-							/*
-							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
-							} else {
-								AP.widget.notify("success", xhr.data.message.text );
-							}
-							*/
-
 							viewModel.items.read();
 
 						}
@@ -138,11 +159,11 @@ AP.combination.list = (function () {
 
 		showAttributesList: function (event) {
 
-			var rootId = $(event.currentTarget).data( "item-id" );
+			var item = normalizeComponentItem( event.data );
 
-			console.log("showAttributesList:rootId", rootId);
+			console.log("showAttributesList:item", item);
 
-			viewModel.set("currentItem", rootId);
+			viewModel.set("itemForAttributes", item);
 
 			NM.util.openModal( fields.attributeModal );
 
@@ -186,6 +207,8 @@ AP.combination.list = (function () {
 
 
         showComponents: function (event) {
+
+			console.log("showComponents", event.data);
 
 			$("#component-list-modal").modal("show");
 

@@ -49,9 +49,16 @@
         <map from="mainText" to="mainText" ref="Text" />
     </mapper>
 
+    <mapper id="AttributeForCombination" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Attribute">
+        <map from="id" to="id" type="cf:String" />
+        <map from="name" to="name" type="cf:String" />
+        <map from="mainText" to="mainText" ref="Text" />
+    </mapper>
+
     <mapper id="CombinationItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.CombinationItem">
         <map from="id" to="id" type="cf:String" />
         <map from="attributeValue" to="attributeValue" ref="AttributeValue" />
+        <map from="attribute" to="Attribute" ref="AttributeForCombination" />
         <map from="status" to="status" ref="Status" />
         <map from="level" to="level" type="cf:String" />
     </mapper>   

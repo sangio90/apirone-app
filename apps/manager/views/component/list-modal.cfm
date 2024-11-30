@@ -66,7 +66,7 @@
 							<table class="table table-hover pt-5">
 								<thead>
 									<tr>
-										<th scope="col">Componenti per </th>
+										<th scope="col">Componenti per <span data-bind="text: currentItem.name"></span></th>
 										<th scope="col" width="100"></th>
 									</tr>
 								</thead>

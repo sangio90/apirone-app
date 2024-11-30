@@ -2,7 +2,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.CombinationItemDAO";
 	property name="CombinationService" type="com.apirone.core.model.service.CombinationService";
-	property name="attributeValueService" type="com.apirone.core.model.service.attributeValueService";
+	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
+	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
     public com.apirone.core.model.bean.CombinationItem function get(
@@ -177,8 +178,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setParent( get( record.parent_id ) );
 			bean.setOrderBy( record.orderby );
 
-            bean.setSTatus( getStatusService().get( record.status_id ) );
-            bean.setAttributeValue( getAttributeValueService().get( record.attribute_value_id ) );
+            bean.setStatus( getStatusService().get( record.status_id ) );
+
+			var attributeValue = getAttributeValueService().get( record.attribute_value_id );
+            
+			bean.setAttributeValue( attributeValue );
+            bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
 			
             return bean;
 

@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var  items = super.fire("combinationItem.getTree", { combinationId = rc.id } );
+        var  items = super.fire("CombinationItem.getTree", { combinationId = rc.id } );
 
         for( var item in items ) {
 
@@ -24,40 +24,6 @@ component extends="com.apirone.core.controller.AbsController" {
         event.setValue("result", result);
 
     }
-
-    function listImages( event, rc, prc ){
-
-        // union between those already inserted and the one to be inserted
-
-        var comb = super.fire( "file.list", { rc.combinationId = rc.combinationId } );
-
-        var lineId = comb.getLine().getId()
-
-        var finishes = super.fire( "finish.list", { lineId: lineId, sizeId: rc.sizeId  } )>
-
-        event.setValue("result", finishes);
-
-    }
-
-    function upload( event, rc, prc ){
-
-        var tmpDir = getTempDir();
-        var entity = super.bean("Entity");
-
-		cffile( filefield=rc.files[1], nameconflict="MAKEUNIQUE", destination=tmpDir, action="UPLOAD" );
-
-        entity.setType( "shipment" );
-        entity.setValue( rc.shipmentId );
-        
-        store( filePath = "#tmpDir#/#cffile.ServerFile#", user = prc.user, entity = entity, typeId = rc.documentTypeId );
-
-        var result = super.getResult();
-        
-        result.setData( { "message" = "File caricato" } );
-
-        event.setValue( "result", result );
-        
-    }    
 
     function addItem( event, rc, prc ){
 
@@ -134,24 +100,5 @@ component extends="com.apirone.core.controller.AbsController" {
         event.setValue("result", result);
 
     }
-
-    private function store( filePath, user, entity, typeId ){
-
-        var fileId = getAccessManager()
-                .exec( 
-                    arguments.user,
-                    "file.store", 
-                    { 
-                        filePath       = arguments.filePath,
-                        accountId      = user.getAccount().getId(),
-                        scope          = "shipments",
-                        documentTypeId = arguments.typeId,
-                        entity         = arguments.entity
-                     } 
-                );
-
-        return fileId;
-       
-    }    
 
 }
