@@ -40,38 +40,81 @@ AP.plate.designer = (function () {
 				y2: null,
 				width: elementBounds.width / CELL_SIZE_IN_X,
 				height: elementBounds.height / CELL_SIZE_IN_Y,
+				originalPosition: {
+					x1: uiElement.originalPosition.left / CELL_SIZE_IN_X,
+					x2: null,
+					y1: uiElement.originalPosition.top / CELL_SIZE_IN_Y,
+					y2: null,
+				},
 			};
 
-			result.x2 = result.x1 + result.width;
-			result.y2 = result.y1 + result.height;
+			result.x2 = result.x1 + result.width - 1;
+			result.y2 = result.y1 + result.height - 1;
+
+			result.originalPosition.x2 = result.originalPosition.x1 + result.width - 1;
+			result.originalPosition.y2 = result.originalPosition.y1 + result.height - 1;
 
 			return result;
 		}
 
-		function isColliding(box, grid) {
+		function isProhibitedPosition(plateItemPosition, grid) {
 			let result = false;
 
 			// Broad phase
-			const xAxis = { start: box.x1, end: box.x2 };
-			const yAxis = { start: box.y1, end: box.y2 };
-			const gridSection = plateGrid.slice(yAxis.start, yAxis.end).map(inner => inner.slice(xAxis.start, xAxis.end));
-			const possibleBoxes = {};
-			for (const row of gridSection) {
+			const axisRanges = extract2dAxisRanges(plateItemPosition);
+
+			const gridSection = AP.util.slice2DArray({
+				array: grid,
+				rowRange: axisRanges.y,
+				colRange: axisRanges.x,
+				isInclusiveEnd: true,
+			});
+
+			// Narrow phase
+			result = gridSection.some(row => row.some(cell => cell == CELL_TYPES.PROHIBITED));
+
+			return result;
+		}
+
+		function extractPlateItemsFrom(grid, cellPredicate = () => true) {
+			const result = {};
+
+			for (const row of grid) {
 				for (const cell of row) {
-					if (cell != box.id && cell != CELL_TYPES.EMPTY) {
-						if (!possibleBoxes.hasOwnProperty(cell)) {
-							possibleBoxes[cell] = pageData.PLATE_ELEMENTS[cell];
+					if (cellPredicate(cell)) {
+						if (!result.hasOwnProperty(cell)) {
+							result[cell] = pageData.PLATE_ELEMENTS[cell];
 						}
 					}
 				}
 			}
 
+			return result;
+		}
+
+		function isColliding(plateItemPosition, grid) {
+			let result = false;
+
+			// Broad phase
+			const axisRanges = extract2dAxisRanges(plateItemPosition);
+			const subGrid = AP.util.slice2DArray({
+				array: grid,
+				rowRange: axisRanges.y,
+				colRange: axisRanges.x,
+				isInclusiveEnd: true,
+			});
+
+			const possibleBoxes = extractPlateItemsFrom(
+				subGrid,
+				cell => cell != plateItemPosition.id && cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
+			);
+
 			// Narrow phase
 			for (const [key, candidateBox] of Object.entries(possibleBoxes)) {
 				if (
-					candidateBox.x1 <= box.x2 && candidateBox.x2 >= box.x1
+					candidateBox.x1 <= plateItemPosition.x2 && candidateBox.x2 >= plateItemPosition.x1
 					&&
-					candidateBox.y1 <= box.y2 && candidateBox.y2 >= box.y1
+					candidateBox.y1 <= plateItemPosition.y2 && candidateBox.y2 >= plateItemPosition.y1
 				) {
 					result = true;
 
@@ -82,10 +125,113 @@ AP.plate.designer = (function () {
 			return result;
 		}
 
-		function canSwap(box, grid) {
+		function canSwapWithCollidedItem(plateItemPosition, grid) {
 			let result = false;
 
+			// Broad phase
+			const axisRanges = extract2dAxisRanges(plateItemPosition);
+			const subGrid = AP.util.slice2DArray({
+				array: grid,
+				rowRange: axisRanges.y,
+				colRange: axisRanges.x,
+				isInclusiveEnd: true,
+			});
+
+			// Narrow phase
+			const possibleBoxes = extractPlateItemsFrom(
+				subGrid,
+				cell => cell != plateItemPosition.id && cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
+			);
+
+			result = Object.keys(possibleBoxes).length == 1;
+
 			return result;
+		}
+
+		// TODO:
+		function swapPositionsWithCollidingItem(plateItemPosition, grid) {
+
+		}
+
+		function extract2dAxisRanges(position) {
+			return {
+				x: { start: position.x1, end: position.x2 },
+				y: { start: position.y1, end: position.y2 },
+			};
+		}
+
+		// TODO: manca la gestione di una mezza mossa (la grid non contiene la reale situazione quando muovo in verticale di un mezzo passo)
+		function updatePlateItemNewPosition(ui, grid) {
+			const itemBoundingBox = parseBoundingBox(ui);
+
+			const originalPositionAxisRanges = extract2dAxisRanges(itemBoundingBox.originalPosition);
+
+			const subGridOriginalPosition = AP.util.slice2DArray({
+				array: grid,
+				rowRange: originalPositionAxisRanges.y,
+				colRange: originalPositionAxisRanges.x,
+				isInclusiveEnd: true,
+			});
+
+			const plateItem = extractPlateItemsFrom(
+				subGridOriginalPosition,
+				cell => cell == itemBoundingBox.id
+			);
+
+			if (plateItem.hasOwnProperty(itemBoundingBox.id)) {
+				plateItem[itemBoundingBox.id].x1 = itemBoundingBox.x1;
+				plateItem[itemBoundingBox.id].x2 = itemBoundingBox.x2;
+				plateItem[itemBoundingBox.id].y1 = itemBoundingBox.y1;
+				plateItem[itemBoundingBox.id].y2 = itemBoundingBox.y2;
+			}
+
+			const newPositionAxisRanges = extract2dAxisRanges(itemBoundingBox);
+
+			const subGridNewPosition = AP.util.slice2DArray({
+				array: grid,
+				rowRange: newPositionAxisRanges.y,
+				colRange: newPositionAxisRanges.x,
+				isInclusiveEnd: true,
+			});
+
+			console.log("before", originalPositionAxisRanges, "after", newPositionAxisRanges);
+
+			if (AP.util.areTwoArraysOfSameDimensions(subGridOriginalPosition, subGridNewPosition)) {
+				AP.util.swapElementsOfTwoArrays(subGridOriginalPosition, subGridNewPosition);
+
+				for (let y1 = originalPositionAxisRanges.y.start, y2 = 0; y1 <= originalPositionAxisRanges.y.end; y1++, y2++) {
+					for (let x1 = originalPositionAxisRanges.x.start, x2 = 0; x1 <= originalPositionAxisRanges.x.end; x1++, x2++) {
+						grid[y1][x1] = subGridOriginalPosition[y2][x2];
+					}
+				}
+
+				for (let y1 = newPositionAxisRanges.y.start, y2 = 0; y1 <= newPositionAxisRanges.y.end; y1++, y2++) {
+					for (let x1 = newPositionAxisRanges.x.start, x2 = 0; x1 <= newPositionAxisRanges.x.end; x1++, x2++) {
+						grid[y1][x1] = subGridNewPosition[y2][x2];
+					}
+				}
+
+				console.table(grid);
+			}
+		}
+
+		function isChangedPlateItemFinalPosition(plateItem) {
+			return plateItem.originalPosition.top != plateItem.position.top
+				|| plateItem.originalPosition.left != plateItem.position.left;
+		}
+
+		function renderGrid(plateGrid) {
+			const allBoxes = extractPlateItemsFrom(
+				plateGrid,
+				cell => cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
+			);
+
+			for (const [key, box] of Object.entries(allBoxes)) {
+				const $box = $(`#${key}`);
+
+				$box.css("left", box.x1 * CELL_SIZE_IN_X);
+				$box.css("top", box.y1 * CELL_SIZE_IN_Y);
+			}
 		}
 
 		$(".draggable-plate-item").draggable({
@@ -95,41 +241,53 @@ AP.plate.designer = (function () {
 			grid: [CELL_SIZE_IN_X, CELL_SIZE_IN_Y],
 			// revert: true,
 			revertDuration: 250,
-			start: function(event, ui) {
-				// console.log("start", event, ui);
+			start: function (event, ui) {
+				const $draggablePlateItem = ui.helper;
 
-				ui.helper.addClass("is-dragging");
+				$draggablePlateItem.addClass("is-dragging");
 			},
 			drag: function (event, ui) {
-				// TODO: qui bisogna inserire la logica di controllo durante lo spostamento, ovvero, se ci sono degli altri frutti
-				// devo capire se posso switch'are le loro posizioni oppure devo mettere indietro il draggable perche' manca la distanza minima
-				// Solo in questo metodo posso modificare la posizione del draggable con il metodo:
-				// ui.position.left = [NUMERO_PIXEL];
+				const $draggablePlateItem = ui.helper;
 
 				const newBoundingBox = parseBoundingBox(ui);
-				// console.log(newBoundingBox.x1, newBoundingBox.x2, newBoundingBox.y1, newBoundingBox.y2);
 
-				if (isColliding(newBoundingBox, plateGrid)) {
-					ui.helper.addClass("is-colliding");
-
-					if (canSwap(newBoundingBox, plateGrid)) {
-						console.log("can swap");
-
-						ui.helper.removeClass("is-not-swappable");
-						// swapWithCollidingBox(newBoundingBox);
-					} else {
-						ui.helper.addClass("is-not-swappable");
-					}
+				if (isProhibitedPosition(newBoundingBox, plateGrid)) {
+					ui.position.left = ui.originalPosition.left;
+					ui.position.top = ui.originalPosition.top;
 				} else {
-					ui.helper.removeClass("is-colliding");
+					if (isColliding(newBoundingBox, plateGrid)) {
+						$draggablePlateItem.addClass("is-colliding");
+
+						if (canSwapWithCollidedItem(newBoundingBox, plateGrid)) {
+							$draggablePlateItem.removeClass("is-not-swappable");
+						} else {
+							$draggablePlateItem.addClass("is-not-swappable");
+						}
+					} else {
+						$draggablePlateItem.removeClass("is-colliding");
+					}
 				}
+
 			},
 			stop: function (event, ui) {
-				// console.log("stop", event, ui);
+				const $draggablePlateItem = ui.helper;
 
-				// TODO: devo aggiornare la plateGrid, se le coordinate finali sono diverse da quelle di partenza
-				ui.helper.removeClass("is-dragging");
-				ui.helper.removeClass("is-not-swappable");
+				$draggablePlateItem.removeClass("is-dragging");
+				$draggablePlateItem.removeClass("is-not-swappable");
+
+				if (isChangedPlateItemFinalPosition(ui)) {
+					const newBoundingBox = parseBoundingBox(ui);
+
+					if (isColliding(newBoundingBox, plateGrid)) {
+						if (canSwapWithCollidedItem(newBoundingBox, plateGrid)) {
+							swapPositionsWithCollidingItem(newBoundingBox, plateGrid);
+						}
+					} else {
+						updatePlateItemNewPosition(ui, plateGrid);
+					}
+
+					renderGrid(plateGrid);
+				}
 			},
 		});
 	};
