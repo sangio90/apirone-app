@@ -1,9 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao"           type="com.apirone.core.model.dao.AccountDAO";
+	property name="langService"   type="com.apirone.core.model.service.LangService";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="lookupService" type="com.apirone.core.model.service.LookupService";
-	property name="langService"   type="com.apirone.core.model.service.LangService";
 
 	public com.apirone.core.model.bean.Account function get(
 		required String accountId
@@ -28,11 +28,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required com.apirone.core.model.bean.Account account
 	){
 		if ( !len( arguments.account.getEmail() ) ) {
-			throw( type = "apirone.EmailNotProvided", message = "Email required" );
+			throw( type = "apirone.accountService.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
 		};
 
 		if ( !len( arguments.account.getPwd() ) ) {
-			throw( type = "apirone.PasswordNotProvided", message = "Password required" );
+			throw( type = "apirone.accountService.PasswordNotProvided", message = "Password is required" );
 		};
 
 		var id = getDao().insert( argumentCollection = arguments );
@@ -46,7 +46,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required com.apirone.core.model.bean.Account account
 	){
 		if ( !len( arguments.account.getEmail() ) ) {
-			throw( type = "apirone.EmailNotProvided", message = "Email required" );
+			throw( type = "apirone.accountService.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
 		};
 
 		var id = getDao().update( argumentCollection = arguments );
@@ -82,10 +82,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setData( { "deletedCount" = result } )
 
 				getCacheManager().remove( getCacheKey( arguments.accountId ) );
+
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteAccount" );
+				outcome.setType( "ApirOne.accountService.CannotDeleteAccount" );
 				outcome.setMessage( "Cannot delete account [#arguments.accountId#]" );
 			}
 		}
@@ -93,10 +94,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+	/*
+		TODO: replace name with updatePassword
+	*/
 	public Boolean function setPassword(
 		required String accountId,
 		required String newPwd
 	){
+
+		var obj = get( arguments.accountId )
+
+		if( IsNull( obj ) ) {
+			throw( type = "apirone.accountService.AccountNotExists", message = "Account id [#arguments.accountId#] not exists" );
+		}
+
+		if ( !len( arguments.newPwd ) ) {
+			throw( type = "apirone.accountService.PasswordNotProvided", message = "Password is required" );
+		};
+
 		var pwd = createPassword( arguments.accountId, arguments.newPwd );
 
 		getDao().updatePassword( arguments.accountId, pwd );
@@ -127,7 +142,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required String email
 	){
 		if ( !len( arguments.email ) ) {
-			throw( type = "apirone.EmailNotProvided", message = "Email required" );
+			throw( type = "apirone.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
 		};
 
 		var accounts = search( email = arguments.email ).getData();

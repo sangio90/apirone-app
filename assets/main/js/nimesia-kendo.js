@@ -21,14 +21,14 @@ NM.kendo.dataSource = function (config = {}) {
         defaults.transport = { "read": config.url };
         defaults.schema = { "data": "data", total: "total" };
 
-        defaults.transport.parameterMap = function (data, type) {
+        defaults.transport.parameterMap = function (params, type) {
 
-            data["count"] = data.pageSize;
-            delete data.pageSize;
-            delete data.skip;
-            delete data.take;
+            params["count"] = params.pageSize;
+            delete params.pageSize;
+            delete params.skip;
+            delete params.take;
 
-            return data;
+            return params;
         };
 
         if (config.model) {

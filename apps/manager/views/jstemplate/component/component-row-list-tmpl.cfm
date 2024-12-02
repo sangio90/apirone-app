@@ -7,13 +7,16 @@
                 <b data-bind="text: id"></b><br>
                 <span data-bind="text: name"></span>
             </td>
-            <td width="120">
+            <td class="text-end">
+                
                 <span data-bind="visible: showVariantsForCount">
-                    <input type="button" value="Varianti &raquo;" class="btn btn-primary btn-sm" data-bind="click:openVariants">
+                    #iconButton( bind="click:openVariants", size="sm", icon="chevron-right", variant="default" )#
                 </span>
-            </td>
-            <td width="120">
-                <input type="button" value="Seleziona &raquo;" class="btn btn-primary btn-sm" data-bind="click:useComponent">
+
+                <span data-bind="invisible: showVariantsForCount">
+                    #addButton( bind="click:useComponent", label="Aggiungi", size="sm", variant="default")#
+                </span>
+            
             </td>
         </tr>
     </nmscript>

@@ -15,8 +15,12 @@
                 <b data-bind="text: color.id"></b><br>
                 <span data-bind="text: color.name"></span>
             </td>
+            <td nowrap>
+                <input data-bind="text: quantity" class="form-control">
+            </td>
             <td>
-                <button class="btn" data-bind="click: removeComponent"><i class="fa fa-trash"></i></button>
+                <!--- <button class="btn" data-bind="click: removeComponent"><i class="fa fa-trash"></i></button> ---->
+                #iconButton( icon="trash", bind="click:removeComponent" )#
             </td>
         </tr>
     </nmscript>

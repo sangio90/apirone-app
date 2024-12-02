@@ -158,6 +158,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "ComponentTypeService", ref = "ComponentTypeService" )
             .property( name = "VariantService", ref = "VariantService" )
             .property( name = "ColorService", ref = "ColorService" )
+            .property( name = "LookupService", ref = "LookupService" )
             .parent("AbsService");
 
         map("LineService").to( "com.apirone.core.model.service.LineService" )

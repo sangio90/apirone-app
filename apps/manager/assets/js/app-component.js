@@ -20,15 +20,11 @@ AP.component.list = (function () {
 	var pub = {};
 	var fields = AP.component.fields;
 
-	var dataSources = {
-		selected: NM.kendo.dataSource({ url: "/manager/ajax/combination-items/" + "/components"  })
-	}
-
 	var viewModel = kendo.observable({
 
 		components: [],
 		variants: [],
-		selected: dataSources.selected,
+		selected: [],
 
 		colors: [],
 		showColors: false,
@@ -54,7 +50,7 @@ AP.component.list = (function () {
 
 			var comps = viewModel.get("selected");
 
-			comps.push(event.data);
+			comps.push( event.data );
 
 			viewModel.set("selected", comps);
 
@@ -69,6 +65,7 @@ AP.component.list = (function () {
 			var variant = viewModel.get("currentVariant");
 
 			var row = {
+				quantity: 1,
 				comp: {
 					id: comp.id,
 					name: comp.name
@@ -87,7 +84,7 @@ AP.component.list = (function () {
 
 			var comps = viewModel.get("selected");
 
-			comps.push(row);
+			comps.push( row );
 
 			viewModel.set("selected", comps);
 
@@ -127,12 +124,14 @@ AP.component.list = (function () {
 
 		},
 
+		/*
         showComponentsList: function (event) {
 
 			$("#components-list-modal").modal("show");
 
             return false;
 		},
+		*/
 
         openColors: function (event) {
 
@@ -206,6 +205,26 @@ AP.component.list = (function () {
 	pub.setCurrentItem = function ( item ) {
 
 		viewModel.set("currentItem", item );
+
+	};
+
+	pub.open = function ( itemId ) {
+
+		console.log("open:itemId", itemId)
+
+		NM.util.ajax({
+			method: "GET",
+			url: "/manager/ajax/combination-items/" + itemId + "/components",
+			callback: {
+				done: function (xhr) {
+					
+					viewModel.set("selected", xhr.data);
+
+					NM.util.openModal( $("#component-list-modal") );
+
+				}
+			}
+		});
 
 	};
 

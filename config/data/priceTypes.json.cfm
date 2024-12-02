@@ -1,10 +1,10 @@
 [ 
     {
-        id: 'P',
+        id: "P",
         name: "Percentage"
     },
     {
-        id: 'F',
+        id: "F",
         name: "Fixed"
     }
 ]

@@ -1,10 +1,10 @@
 [ 
     {
-        id: 'P',
+        id: "P",
         name: "Private"
     },
     {
-        id: 'C',
+        id: "C",
         name: "Company"
     }
 ]

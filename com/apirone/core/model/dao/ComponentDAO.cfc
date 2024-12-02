@@ -7,7 +7,13 @@
 		<cfquery name="local.q" datasource="verticale">
 
 			SELECT
-				arcodart, arsemlav, artipmat, arcodart, ardesart, artipmat
+				arcodart, 
+				arsemlav, 
+				artipmat, 
+				arcodart, 
+				ardesart, 
+				artipmat,
+				IIF (artipmat = 'LAV', 'LV', 'MP') AS processiong_type_id
 			FROM
 				#variables.companyId#_artico a
 			WHERE
@@ -43,7 +49,8 @@
 				ardesart,
 				arsemlav,
 				artipmat,
-				COUNT(arcodart) OVER() AS total
+				COUNT(arcodart) OVER() AS total,
+				IIF (artipmat = 'LAV', 'LV', 'MT') AS processiong_type_id
 			FROM
 				#super.sanitizeSQL( "#variables.companyId#_artico" )# artico
 			WHERE 1=1

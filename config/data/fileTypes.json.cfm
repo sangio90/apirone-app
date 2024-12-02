@@ -1,10 +1,10 @@
 [ 
     {
-        id: 'PT',
+        id: "PT",
         name: "Patente"
     },
     {
-        id: 'FT',
+        id: "FT",
         name: "Fattura"
     }
 ]

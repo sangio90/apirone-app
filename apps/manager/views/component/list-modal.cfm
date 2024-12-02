@@ -23,12 +23,12 @@
 											name       ="str"
 										>
 
-										<select class="form-control me-3" name="processingTypeId">
+										<select class="form-control me-3" name="processingTypeId" style="width:46%">
 											<option value="MP">Materie prime</option>
 											<option value="LV">Lavorazioni</option>
 										</select>
 
-										#searchButton(bind="click:search")#
+										#iconButton( bind="click:search", icon="search", variant="primary" )#
 
 									</div>
 
@@ -40,14 +40,14 @@
 								</form>
 
 								<form id="component-list-search-result-form" class="row">
+									
 									<div class="col-md-12">
 										<div data-bind="visible: showSearchResult">
 											#grid(
 												id      = "component-list-grid",
 												columns = "[
                                                     { 'field':'name', 'title':'Lavorazione/Materia prima'},
-                                                    { 'field':'', 'title':'', width: '100px'},
-                                                    { 'field':'', 'title':'', width: '100px'}
+                                                    { 'field':'', 'title':'', width: '110px'},
                                                 ]",
 												source      = "components",
 												rowTemplate = "component/component-row-list-tmpl"

@@ -23,6 +23,7 @@ AP.combination.list = (function () {
 	var pub = {};
 
 	var fields = AP.combination.fields;
+	var componentApp = AP.component.list;
 	var attributeApp = AP.attribute.detail;
 
 	var dataSources = {
@@ -70,7 +71,6 @@ AP.combination.list = (function () {
 		attributesList: dataSources.attributesList,
 
 		itemForAttributes: undefined,
-		itemFomComponents: undefined,
 
 
 		/*
@@ -212,16 +212,11 @@ AP.combination.list = (function () {
 		*/ 
 
 
-        showComponents: function (event) {
+        showComponentsList: function (event) {
 
-			console.log("showComponents", event.data);
-
-			AP.component.list.setCurrentItem( event.data );
-
-			viewModel.set( "itemForComponents", event.data );
-
-			NM.util.openModal( $("#component-list-modal") );
-
+			componentApp.open( event.data.id );
+			componentApp.setCurrentItem( event.data );
+			
             return false;
 		},
 
@@ -303,6 +298,7 @@ AP.combination.list = (function () {
 
     });
 
+	/*
 	pub.currentItem = function() {
 
 		var result = {
@@ -313,10 +309,11 @@ AP.combination.list = (function () {
 		return result;
 
 	},
+	*/
 
 	pub.init = function () {
 
-		kendo.bind(AP.combination.fields.rootDetail, viewModel);
+		kendo.bind( fields.rootDetail, viewModel );
 
 		viewModel.loadFinishes();
 

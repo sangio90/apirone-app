@@ -39,11 +39,10 @@
     
     }
 
-    function iconButton( String bind, required String icon ){ 
+    function iconButton( String bind, required String icon, String variant="default" ){ 
 
         arguments["label"] = "";
-        arguments["variant"] = "default";
-
+        
         return getButton( argumentCollection = arguments );
     
     }

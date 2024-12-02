@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="ComponentTypeService" type="com.apirone.core.model.service.ComponentTypeService";
     property name="ColorService" type="com.apirone.core.model.service.ColorService";
     property name="VariantService" type="com.apirone.core.model.service.VariantService";
+    property name="LookupService" type="com.apirone.core.model.service.LookupService";
 
     public com.apirone.core.model.bean.Component function get(
     		required String componentId
@@ -72,9 +73,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             bean.setId( record.arcodart );
 			bean.setName( record.ardesart );
 			bean.setType( getComponentTypeService().get( record.artipmat )  );
+			bean.setProcessingType( getLookupService().get( "processingType", record.processiong_type_id )  );
 			bean.setVariants( getVariantService().list( componentId=record.arcodart ) );
 			bean.setColors( getColorService().list( componentId=record.arcodart )  );
-			
+
             return bean;
 
 	    }
