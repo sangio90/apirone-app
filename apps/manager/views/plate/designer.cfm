@@ -11,6 +11,7 @@
 	PLATE_GRID = [
 		["A", "A", "A", "A", "B", "B"],
 		["A", "A", "A", "A", "B", "B"],
+		["0", "0", "0", "0", "_", "_"],
 		["_", "_", "_", "_", "_", "_"],
 		["_", "_", "_", "_", "_", "_"],
 	];
@@ -61,13 +62,18 @@
 					>
 					<cfloop from="1" to="#arrayLen(PLATE_GRID)#" index="y">
 						<cfloop from="1" to="#arrayLen(PLATE_GRID[y])#" index="x">
+							<cfscript>
+								isProhibitedCell = PLATE_GRID[y][x] == "0";
+							</cfscript>
 							<div
-								class="grid-column p#x#"
+								class="grid-column p#x# #isProhibitedCell ? 'prohibited' : ''#"
 								style="grid-row: #y# / #y + 1#; grid-column: #x# / #x + 1#;"
 								>
-								<span class="position-label" style="font-size: 8px;">
-									(#x#, #y#)
-								</span>
+								<cfif NOT isProhibitedCell>
+									<span class="position-label" style="font-size: 8px;">
+										(#x#, #y#)
+									</span>
+								</cfif>
 							</div>
 						</cfloop>
 					</cfloop>

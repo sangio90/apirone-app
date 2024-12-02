@@ -445,22 +445,22 @@ h2 {
 	box-sizing: content-box;
 }
 
-#plate-grid:hover .grid-column.p1 {
+#plate-grid:hover .grid-column:not(.prohibited).p1 {
 	border: 1px dashed lightblue;
 }
-#plate-grid:hover .grid-column.p2 {
+#plate-grid:hover .grid-column:not(.prohibited).p2 {
 	border: 1px dashed lightgreen;
 }
-#plate-grid:hover .grid-column.p3 {
+#plate-grid:hover .grid-column:not(.prohibited).p3 {
 	border: 1px dashed lightcoral;
 }
-#plate-grid:hover .grid-column.p4 {
+#plate-grid:hover .grid-column:not(.prohibited).p4 {
 	border: 1px dashed lightgoldenrodyellow;
 }
-#plate-grid:hover .grid-column.p5 {
+#plate-grid:hover .grid-column:not(.prohibited).p5 {
 	border: 1px dashed lightpink;
 }
-#plate-grid:hover .grid-column.p6 {
+#plate-grid:hover .grid-column:not(.prohibited).p6 {
 	border: 1px dashed lightgray;
 }
 

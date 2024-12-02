@@ -8,15 +8,16 @@ module.exports = {
 			"$": "readonly",
 			"AP": "readonly",
 			"NM": "readonly",
+			"kendo": "readonly",
 			"alert": "writable",
+			"window": "readonly",
 			"module": "writable",
+			"console": "readonly",
 			"bootbox": "readonly",
 			"document": "readonly",
+			"pageData": "readonly",
 			"setTimeout": "readonly",
 			"localStorage": "readonly",
-			"window": "readonly",
-			"kendo": "readonly",
-			"console": "readonly",
 		}
 	},
 	rules: {
@@ -33,7 +34,12 @@ module.exports = {
 		"no-nested-ternary": "warn",
 		"no-trailing-spaces": "warn",
 		"array-bracket-spacing": "warn",
-		"space-before-function-paren": ["never"],
+		"space-before-function-paren": [
+			"warn", {
+				"anonymous": "always",
+				"named": "never"
+			}
+		],
 		"function-paren-newline": "warn",
 		"no-multiple-empty-lines": "warn",
 		"newline-per-chained-call": [
