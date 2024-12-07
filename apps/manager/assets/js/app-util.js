@@ -28,11 +28,47 @@ AP.util.slice2DArray = function (params) {
 		params.isInclusiveEnd = false;
 	}
 
+	const startRow = params.rowRange.start;
+	const endRow = params.isInclusiveEnd ? params.rowRange.end + 1 : params.rowRange.end;
+
 	// Slice the rows
-	const slicedRows = params.array.slice(params.rowRange.start, params.isInclusiveEnd ? params.rowRange.end + 1 : params.rowRange.end);
+	const slicedRows = params.array.slice(startRow, endRow);
+
+	const startCol = params.colRange.start;
+	const endCol = params.isInclusiveEnd ? params.colRange.end + 1 : params.colRange.end;
 
 	// Slice the columns for each row
-	const slicedArray = slicedRows.map(row => row.slice(params.colRange.start, params.isInclusiveEnd ? params.colRange.end + 1 : params.colRange.end));
+	const slicedArray = slicedRows.map(row => row.slice(startCol, endCol));
+
+	return slicedArray;
+};
+
+AP.util.splice2DArray = function (params) {
+	if (!Array.isArray(params.array) || !params.array.length) {
+		throw new Error("Input array must be a non-empty 2D array.");
+	}
+
+	if (!params.hasOwnProperty("isInclusiveEnd")) {
+		params.isInclusiveEnd = false;
+	}
+
+	if (!params.hasOwnProperty("replaceItem")) {
+		params.replaceItem = null;
+	}
+
+	const startRow = params.rowRange.start;
+	const endRow = params.isInclusiveEnd ? params.rowRange.end + 1 : params.rowRange.end;
+
+	// Slice the rows
+	const slicedRows = params.array.slice(startRow, endRow);
+
+	const startCol = params.colRange.start;
+	const endCol = params.isInclusiveEnd ? params.colRange.end + 1 : params.colRange.end;
+	const colsDeleteCount = Math.abs(startCol - endCol);
+	const replaceArray = new Array(colsDeleteCount).fill(params.replaceItem);
+
+	// Splice the columns for each row
+	const slicedArray = slicedRows.map(row => row.splice(startCol, colsDeleteCount, ...replaceArray));
 
 	return slicedArray;
 };

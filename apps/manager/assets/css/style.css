@@ -423,7 +423,7 @@ h2 {
 /* TODO: spostare inclusione dei file CSS in controller */
 /* SEZIONE PER LA PAGINA: plate/designer */
 
-.plate-background {
+.plate-background.horizontal-orientation {
 	width: 1200px;
 	height: 500px;
 	text-align: center;
@@ -435,7 +435,21 @@ h2 {
 	justify-content: center;
 	align-items: center;
 	position: relative;
-	height: 500px;
+}
+
+.plate-background.vertical-orientation {
+	height: 1200px;
+	width: 500px;
+	text-align: center;
+	background-color: #ECECEC;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: relative;
 }
 
 #plate-grid {

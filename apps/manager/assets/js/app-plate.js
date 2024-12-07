@@ -148,11 +148,6 @@ AP.plate.designer = (function () {
 			return result;
 		}
 
-		// TODO:
-		function swapPositionsWithCollidingItem(plateItemPosition, grid) {
-
-		}
-
 		function extract2dAxisRanges(position) {
 			return {
 				x: { start: position.x1, end: position.x2 },
@@ -160,59 +155,118 @@ AP.plate.designer = (function () {
 			};
 		}
 
-		// TODO: manca la gestione di una mezza mossa (la grid non contiene la reale situazione quando muovo in verticale di un mezzo passo)
 		function updatePlateItemNewPosition(ui, grid) {
 			const itemBoundingBox = parseBoundingBox(ui);
 
 			const originalPositionAxisRanges = extract2dAxisRanges(itemBoundingBox.originalPosition);
+			const newPositionAxisRanges = extract2dAxisRanges(itemBoundingBox);
+			const showInnerModifications = false;
 
-			const subGridOriginalPosition = AP.util.slice2DArray({
+			console.table(grid);
+
+			const subGridOriginalPosition = AP.util.splice2DArray({
 				array: grid,
 				rowRange: originalPositionAxisRanges.y,
 				colRange: originalPositionAxisRanges.x,
+				replaceItem: CELL_TYPES.EMPTY,
 				isInclusiveEnd: true,
 			});
 
-			const plateItem = extractPlateItemsFrom(
-				subGridOriginalPosition,
-				cell => cell == itemBoundingBox.id
-			);
-
-			if (plateItem.hasOwnProperty(itemBoundingBox.id)) {
-				plateItem[itemBoundingBox.id].x1 = itemBoundingBox.x1;
-				plateItem[itemBoundingBox.id].x2 = itemBoundingBox.x2;
-				plateItem[itemBoundingBox.id].y1 = itemBoundingBox.y1;
-				plateItem[itemBoundingBox.id].y2 = itemBoundingBox.y2;
+			if (showInnerModifications) {
+				console.table(grid);
 			}
 
-			const newPositionAxisRanges = extract2dAxisRanges(itemBoundingBox);
-
-			const subGridNewPosition = AP.util.slice2DArray({
+			const subGridNewPosition = AP.util.splice2DArray({
 				array: grid,
 				rowRange: newPositionAxisRanges.y,
 				colRange: newPositionAxisRanges.x,
+				replaceItem: CELL_TYPES.EMPTY,
 				isInclusiveEnd: true,
 			});
 
-			console.log("before", originalPositionAxisRanges, "after", newPositionAxisRanges);
-
-			if (AP.util.areTwoArraysOfSameDimensions(subGridOriginalPosition, subGridNewPosition)) {
-				AP.util.swapElementsOfTwoArrays(subGridOriginalPosition, subGridNewPosition);
-
-				for (let y1 = originalPositionAxisRanges.y.start, y2 = 0; y1 <= originalPositionAxisRanges.y.end; y1++, y2++) {
-					for (let x1 = originalPositionAxisRanges.x.start, x2 = 0; x1 <= originalPositionAxisRanges.x.end; x1++, x2++) {
-						grid[y1][x1] = subGridOriginalPosition[y2][x2];
-					}
-				}
-
-				for (let y1 = newPositionAxisRanges.y.start, y2 = 0; y1 <= newPositionAxisRanges.y.end; y1++, y2++) {
-					for (let x1 = newPositionAxisRanges.x.start, x2 = 0; x1 <= newPositionAxisRanges.x.end; x1++, x2++) {
-						grid[y1][x1] = subGridNewPosition[y2][x2];
-					}
-				}
-
+			if (showInnerModifications) {
 				console.table(grid);
 			}
+
+			const replacingItemKey = new Set(subGridOriginalPosition.flat());
+			let replacedItemKeys = new Set(subGridNewPosition.flat());
+			if (replacedItemKeys.size == 2 && replacedItemKeys.has(CELL_TYPES.EMPTY)) {
+				replacedItemKeys = new Set(subGridNewPosition.flat().filter(i => i != CELL_TYPES.EMPTY));
+			}
+
+			if (replacingItemKey.size == 1 && replacedItemKeys.size == 1) {
+				const replaceItemOriginalPosition = replacedItemKeys.values().next().value;
+
+				const subGridOriginalPosition = AP.util.splice2DArray({
+					array: grid,
+					rowRange: originalPositionAxisRanges.y,
+					colRange: originalPositionAxisRanges.x,
+					replaceItem: replaceItemOriginalPosition,
+					isInclusiveEnd: true,
+				});
+
+				if (showInnerModifications) {
+					console.table(grid);
+				}
+
+				const replaceItemNewPosition = replacingItemKey.values().next().value;
+
+				const subGridNewPosition = AP.util.splice2DArray({
+					array: grid,
+					rowRange: newPositionAxisRanges.y,
+					colRange: newPositionAxisRanges.x,
+					replaceItem: replaceItemNewPosition,
+					isInclusiveEnd: true,
+				});
+
+				if (showInnerModifications) {
+					console.table(grid);
+				}
+			}
+
+			console.table(grid);
+
+			updatePlateItemCoordinates(grid);
+		}
+
+		function updatePlateItemCoordinates(grid) {
+			const plateItems = extractPlateItemsFrom(
+				grid,
+				cell => cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
+			);
+
+			const plateItemsMap = {};
+			for (let y = 0; y < grid.length; y++) {
+				const row = grid[y];
+
+				for (let x = 0; x < grid.length; x++) {
+					const plateItemKey = row[x];
+
+					if (plateItems.hasOwnProperty(plateItemKey)) {
+						if (!plateItemsMap.hasOwnProperty(plateItemKey)) {
+							plateItemsMap[plateItemKey] = {
+								x: new Set(),
+								y: new Set(),
+							};
+						}
+
+						plateItemsMap[plateItemKey].x.add(x);
+						plateItemsMap[plateItemKey].y.add(y);
+					}
+				}
+			}
+
+			Object.entries(plateItems).forEach(([plateItemKey, value]) => {
+				const updatedPlateItem = plateItemsMap[plateItemKey];
+				const coordsX = Array.from(updatedPlateItem.x);
+				const coordsY = Array.from(updatedPlateItem.y);
+
+				value.x1 = Math.min(...coordsX);
+				value.x2 = Math.max(...coordsX);
+
+				value.y1 = Math.min(...coordsY);
+				value.y2 = Math.max(...coordsY);
+			});
 		}
 
 		function isChangedPlateItemFinalPosition(plateItem) {
@@ -235,7 +289,7 @@ AP.plate.designer = (function () {
 		}
 
 		$(".draggable-plate-item").draggable({
-			// axis: "x",
+			// axis: "x", // TODO: rendere parametrico in base alla configurazione: "solo verticale", "solo orizontale", "entrambi"
 			containment: "#plate-grid",
 			distance: MIN_DISTANCE_BEFORE_DRAGGING,
 			grid: [CELL_SIZE_IN_X, CELL_SIZE_IN_Y],
@@ -280,7 +334,8 @@ AP.plate.designer = (function () {
 
 					if (isColliding(newBoundingBox, plateGrid)) {
 						if (canSwapWithCollidedItem(newBoundingBox, plateGrid)) {
-							swapPositionsWithCollidingItem(newBoundingBox, plateGrid);
+							// swapPositionsWithCollidingItem(newBoundingBox, plateGrid);
+							updatePlateItemNewPosition(ui, plateGrid);
 						}
 					} else {
 						updatePlateItemNewPosition(ui, plateGrid);
