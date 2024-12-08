@@ -5,13 +5,9 @@ AP.plate.fields = {
 };
 
 $(document).ready(function () {
-
 	if (AP.plate.fields.designerRoot.length) {
-
 		AP.plate.designer.init();
-
 	}
-
 });
 
 AP.plate.designer = (function () {
@@ -24,6 +20,13 @@ AP.plate.designer = (function () {
 		};
 		const CELL_SIZE_IN_X = pageData.GRID_CELL_DIMENSIONS.WIDTH;
 		const CELL_SIZE_IN_Y = pageData.GRID_CELL_DIMENSIONS.HEIGHT;
+		const MOVING_DIRECTIONS = {
+			LEFT: "←",
+			RIGHT: "→",
+			UP: "↑",
+			DOWN: "↓",
+			NONE: "",
+		};
 
 		const plateGrid = pageData.PLATE_GRID;
 
@@ -36,8 +39,12 @@ AP.plate.designer = (function () {
 				id: uiElement.helper.attr("id"),
 				x1: uiElement.position.left / CELL_SIZE_IN_X,
 				x2: null,
+				deltaX: 0,
+				directionX: MOVING_DIRECTIONS.NONE,
 				y1: uiElement.position.top / CELL_SIZE_IN_Y,
 				y2: null,
+				deltaY: 0,
+				directionY: MOVING_DIRECTIONS.NONE,
 				width: elementBounds.width / CELL_SIZE_IN_X,
 				height: elementBounds.height / CELL_SIZE_IN_Y,
 				originalPosition: {
@@ -53,6 +60,22 @@ AP.plate.designer = (function () {
 
 			result.originalPosition.x2 = result.originalPosition.x1 + result.width - 1;
 			result.originalPosition.y2 = result.originalPosition.y1 + result.height - 1;
+
+			result.deltaX = result.x2 - result.originalPosition.x2;
+			const deltaXSign = Math.sign(result.deltaX);
+			if (deltaXSign == 1) {
+				result.directionX = MOVING_DIRECTIONS.RIGHT;
+			} else if (deltaXSign == -1) {
+				result.directionX = MOVING_DIRECTIONS.LEFT;
+			}
+
+			result.deltaY = result.y2 - result.originalPosition.y2;
+			const deltaYSign = Math.sign(result.deltaY);
+			if (deltaYSign == 1) {
+				result.directionY = MOVING_DIRECTIONS.DOWN;
+			} else if (deltaYSign == -1) {
+				result.directionY = MOVING_DIRECTIONS.UP;
+			}
 
 			return result;
 		}
@@ -125,7 +148,109 @@ AP.plate.designer = (function () {
 			return result;
 		}
 
+		function isPossibleToMoveByDeltas(params) {
+			let result = false;
+
+			const gridMargins = {
+				left: 0,
+				right: params.grid[0].length - 1,
+				up: 0,
+				down: params.grid.length - 1,
+			};
+
+			const newCoordinateX = params.plateItem.x1 + params.deltaX;
+			if (gridMargins.left <= newCoordinateX && newCoordinateX <= gridMargins.right) {
+				result = true;
+			}
+
+			// TODO:
+			// const newCoordinateY = params.plateItem.y1 + params.deltaY;
+			// if (gridMargins.up <= newCoordinateY && newCoordinateY <= gridMargins.down) {
+			// 	result = true;
+			// }
+
+			return result;
+		}
+
+		function canPushCollidedItem(plateItemPosition, grid) {
+			let result = false;
+
+			// Broad phase
+			const axisRanges = extract2dAxisRanges(plateItemPosition);
+			const subGrid = AP.util.slice2DArray({
+				array: grid,
+				rowRange: axisRanges.y,
+				colRange: axisRanges.x,
+				isInclusiveEnd: true,
+			});
+
+			// Narrow phase
+			const possibleBoxes = extractPlateItemsFrom(
+				subGrid,
+				cell => cell != plateItemPosition.id && cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
+			);
+
+			const collidedPlateItemKeys = Object.keys(possibleBoxes);
+			if (collidedPlateItemKeys.length == 1) {
+				result = isPossibleToMoveByDeltas({
+					plateItem: possibleBoxes[collidedPlateItemKeys[0]],
+					deltaX: plateItemPosition.deltaX,
+					deltaY: plateItemPosition.deltaY,
+					grid: grid
+				});
+			}
+
+			return result;
+		}
+
+		function changePositionsPushingCollidingItem(plateItemPosition, grid) {
+			// Broad phase
+			const axisRanges = extract2dAxisRanges(plateItemPosition);
+			const subGrid = AP.util.slice2DArray({
+				array: grid,
+				rowRange: axisRanges.y,
+				colRange: axisRanges.x,
+				isInclusiveEnd: true,
+			});
+
+			// Narrow phase
+			const possibleBoxes = extractPlateItemsFrom(
+				subGrid,
+				cell => cell != plateItemPosition.id && cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
+			);
+
+			const collidedPlateItemKeys = Object.keys(possibleBoxes);
+			if (collidedPlateItemKeys.length == 1) {
+				const collidingItemToPushKey = collidedPlateItemKeys[0];
+				const collidingItemToPush = possibleBoxes[collidingItemToPushKey];
+
+				AP.util.splice2DArray({
+					array: grid,
+					rowRange: { start: collidingItemToPush.y1, end: collidingItemToPush.y2 },
+					colRange: { start: collidingItemToPush.x1, end: collidingItemToPush.x2 },
+					replaceItem: CELL_TYPES.EMPTY,
+					isInclusiveEnd: true,
+				});
+
+				console.table(grid);
+
+				AP.util.splice2DArray({
+					array: grid,
+					rowRange: { start: collidingItemToPush.y1 + plateItemPosition.deltaY, end: collidingItemToPush.y2 + plateItemPosition.deltaY },
+					colRange: { start: collidingItemToPush.x1 + plateItemPosition.deltaX, end: collidingItemToPush.x2 + plateItemPosition.deltaX },
+					replaceItem: collidingItemToPushKey,
+					isInclusiveEnd: true,
+				});
+
+				updatePlateItemNewPosition(plateItemPosition, grid);
+			}
+
+			updatePlateItemsCoordinates(grid);
+		}
+
+		// TODO:
 		function canSwapWithCollidedItem(plateItemPosition, grid) {
+			return false;
 			let result = false;
 
 			// Broad phase
@@ -148,6 +273,52 @@ AP.plate.designer = (function () {
 			return result;
 		}
 
+		function swapPositionsWithCollidingItem(itemBoundingBox, grid) {
+			const newPositionAxisRanges = extract2dAxisRanges(itemBoundingBox);
+
+			console.table(grid);
+
+			const subGridNewPosition = AP.util.slice2DArray({
+				array: grid,
+				rowRange: newPositionAxisRanges.y,
+				colRange: newPositionAxisRanges.x,
+				isInclusiveEnd: true,
+			});
+
+			const collidedPlateItemKeys = new Set(subGridNewPosition.flat());
+
+			if (collidedPlateItemKeys.size == 2) {
+				const originalPositionAxisRanges = extract2dAxisRanges(itemBoundingBox.originalPosition);
+				const collidedPlateItems = extractPlateItemsFrom(grid, cell => collidedPlateItemKeys.has(cell));
+
+				const subGridOriginalPosition = AP.util.splice2DArray({
+					array: grid,
+					rowRange: originalPositionAxisRanges.y,
+					colRange: originalPositionAxisRanges.x,
+					replaceItem: CELL_TYPES.EMPTY,
+					isInclusiveEnd: true,
+				});
+
+				console.table(grid);
+
+				// const replaceItemNewPosition = replacingItemKey.values().next().value;
+
+				const subGridNewPosition = AP.util.splice2DArray({
+					array: grid,
+					rowRange: newPositionAxisRanges.y,
+					colRange: newPositionAxisRanges.x,
+					replaceItem: CELL_TYPES.EMPTY,
+					isInclusiveEnd: true,
+				});
+
+				console.table(grid);
+			}
+
+			console.table(grid);
+
+			updatePlateItemsCoordinates(grid);
+		}
+
 		function extract2dAxisRanges(position) {
 			return {
 				x: { start: position.x1, end: position.x2 },
@@ -155,14 +326,9 @@ AP.plate.designer = (function () {
 			};
 		}
 
-		function updatePlateItemNewPosition(ui, grid) {
-			const itemBoundingBox = parseBoundingBox(ui);
-
+		function updatePlateItemNewPosition(itemBoundingBox, grid) {
 			const originalPositionAxisRanges = extract2dAxisRanges(itemBoundingBox.originalPosition);
 			const newPositionAxisRanges = extract2dAxisRanges(itemBoundingBox);
-			const showInnerModifications = false;
-
-			console.table(grid);
 
 			const subGridOriginalPosition = AP.util.splice2DArray({
 				array: grid,
@@ -172,10 +338,6 @@ AP.plate.designer = (function () {
 				isInclusiveEnd: true,
 			});
 
-			if (showInnerModifications) {
-				console.table(grid);
-			}
-
 			const subGridNewPosition = AP.util.splice2DArray({
 				array: grid,
 				rowRange: newPositionAxisRanges.y,
@@ -183,10 +345,6 @@ AP.plate.designer = (function () {
 				replaceItem: CELL_TYPES.EMPTY,
 				isInclusiveEnd: true,
 			});
-
-			if (showInnerModifications) {
-				console.table(grid);
-			}
 
 			const replacingItemKey = new Set(subGridOriginalPosition.flat());
 			let replacedItemKeys = new Set(subGridNewPosition.flat());
@@ -205,10 +363,6 @@ AP.plate.designer = (function () {
 					isInclusiveEnd: true,
 				});
 
-				if (showInnerModifications) {
-					console.table(grid);
-				}
-
 				const replaceItemNewPosition = replacingItemKey.values().next().value;
 
 				const subGridNewPosition = AP.util.splice2DArray({
@@ -218,18 +372,14 @@ AP.plate.designer = (function () {
 					replaceItem: replaceItemNewPosition,
 					isInclusiveEnd: true,
 				});
-
-				if (showInnerModifications) {
-					console.table(grid);
-				}
 			}
 
 			console.table(grid);
 
-			updatePlateItemCoordinates(grid);
+			updatePlateItemsCoordinates(grid);
 		}
 
-		function updatePlateItemCoordinates(grid) {
+		function updatePlateItemsCoordinates(grid) {
 			const plateItems = extractPlateItemsFrom(
 				grid,
 				cell => cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
@@ -312,10 +462,10 @@ AP.plate.designer = (function () {
 					if (isColliding(newBoundingBox, plateGrid)) {
 						$draggablePlateItem.addClass("is-colliding");
 
-						if (canSwapWithCollidedItem(newBoundingBox, plateGrid)) {
-							$draggablePlateItem.removeClass("is-not-swappable");
-						} else {
+						if (!canSwapWithCollidedItem(newBoundingBox, plateGrid)) {
 							$draggablePlateItem.addClass("is-not-swappable");
+						} else {
+							$draggablePlateItem.removeClass("is-not-swappable");
 						}
 					} else {
 						$draggablePlateItem.removeClass("is-colliding");
@@ -333,12 +483,13 @@ AP.plate.designer = (function () {
 					const newBoundingBox = parseBoundingBox(ui);
 
 					if (isColliding(newBoundingBox, plateGrid)) {
-						if (canSwapWithCollidedItem(newBoundingBox, plateGrid)) {
-							// swapPositionsWithCollidingItem(newBoundingBox, plateGrid);
-							updatePlateItemNewPosition(ui, plateGrid);
+						if (canPushCollidedItem(newBoundingBox, plateGrid)) {
+							changePositionsPushingCollidingItem(newBoundingBox, plateGrid);
+						} else if (canSwapWithCollidedItem(newBoundingBox, plateGrid)) {
+							swapPositionsWithCollidingItem(newBoundingBox, plateGrid);
 						}
 					} else {
-						updatePlateItemNewPosition(ui, plateGrid);
+						updatePlateItemNewPosition(newBoundingBox, plateGrid);
 					}
 
 					renderGrid(plateGrid);

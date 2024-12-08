@@ -506,10 +506,11 @@ h2 {
 	cursor: grabbing;
 }
 
-.draggable-plate-item:hover.is-dragging.is-colliding {
+/* .draggable-plate-item:hover.is-dragging.is-colliding {
 	background-color: #fda1a170;
-}
+} */
 
 .draggable-plate-item:hover.is-dragging.is-colliding.is-not-swappable {
+	background-color: #fda1a170;
 	cursor: no-drop;
 }
