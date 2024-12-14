@@ -2,15 +2,14 @@
 
 	<cffunction name="read">
 
-		<cfargument name="variatId" type="String" required="true">
+		<cfargument name="variantId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="verticale">
-
 			SELECT *
 			FROM
                 #super.sanitizeSQL( "#variables.companyId#_codvar" )#
 			WHERE
-				varcod = <cfqueryparam cfsqltype="varchar" value="#arguments.variatId#">
+				varcod = <cfqueryparam cfsqltype="varchar" value="#arguments.variantId#">
 		</cfquery>
 
 		<cfreturn local.q>

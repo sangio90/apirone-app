@@ -74,9 +74,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setName( record.ardesart );
 			bean.setType( getComponentTypeService().get( record.artipmat )  );
 			bean.setProcessingType( getLookupService().get( "processingType", record.processiong_type_id )  );
-			bean.setVariants( getVariantService().list( componentId=record.arcodart ) );
-			bean.setColors( getColorService().list( componentId=record.arcodart )  );
 
+			var variants = getVariantService().list( componentId=record.arcodart );
+			var colors = getColorService().list( componentId=record.arcodart );
+
+			if( !variants.len() ) {
+				var variant =  super.bean("Variant");
+				
+				variant.setId("_NOVAR");
+				variant.setName("Nessuna variante");
+
+				variants.add( variant );
+			}
+
+			if( !colors.len() ) {
+
+				var color =  super.bean("Color");
+				
+				color.setId("_NOCOL");
+				color.setName("Nessun colore");
+
+				colors.add( color );
+
+			}
+
+			for( var thisVariant in variants ) {
+				thisVariant.setColors( colors )
+			}
+
+			bean.setVariants( variants );
+			
             return bean;
 
 	    }

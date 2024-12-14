@@ -11,7 +11,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var key = getCacheKey( arguments.locationId );
 	
-			   var cache = cm.get( key ) ;
+			var cache = cm.get( key ) ;
+			
 	
 			if ( cache.status ) {
 			

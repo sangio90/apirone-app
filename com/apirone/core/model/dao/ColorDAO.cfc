@@ -32,8 +32,6 @@
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="colori.clcodice">
 
-		<cfdump var="#arguments#">
-		
         <cfquery name="local.q" datasource="verticale">
 			SELECT
 				clcodice,

@@ -80,6 +80,7 @@
 		get( "/ajax/accounts" ).to( "AccountAjaxController.list" ).end();
 
 		post( "/ajax/accounts" ).to( "AccountAjaxController.save" ).end();
+		
 		delete( "/ajax/accounts" ).to( "AccountAjaxController.delete" ).end();
 
 		get( "/accounts" ).to( "AccountController.list" ).end();
@@ -164,6 +165,7 @@
 			combination
 		*/
 		get( "/ajax/combination-items/:id/components" ).to( "CombinationItemAjaxController.listComponents" ).end();
+		post( "/ajax/combination-items/:id/components" ).to( "CombinationItemAjaxController.saveComponents" ).end();
 
 		post( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.addItem" ).end();
 

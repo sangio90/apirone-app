@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="combination-detail-root">
+    <div id="combination-detail-root_X">
 
         #pageTitle()#
 
@@ -10,6 +10,12 @@
                 <section class="card">
                     
                     <div class="card-body">
+
+                        <div>
+                            #view("component/list-modal")#        
+                        </div>
+
+                        <!-----
 
                         <div class="col-md-12">
                             <button class="btn btn-primary btn-sm" data-bind="click:showAttributesList">Aggiungi attributo &raquo;</button>
@@ -109,6 +115,8 @@
                             </div>                            
 
                         </div>
+
+                        ---->
     
                     </div>
             
@@ -121,7 +129,6 @@
 
     </div>
 
-    #view("component/list-modal")#
     #view("attribute/detail-modal")#
 
 </cfoutput>

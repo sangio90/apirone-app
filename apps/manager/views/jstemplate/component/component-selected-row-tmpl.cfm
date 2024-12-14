@@ -15,10 +15,10 @@
                 <b data-bind="text: color.id"></b><br>
                 <span data-bind="text: color.name"></span>
             </td>
-            <td nowrap>
-                <input data-bind="text: quantity" class="form-control">
+            <td width="60">
+                <input data-bind="text: quantity" class="form-control text-end">
             </td>
-            <td>
+            <td width="40" class="text-end">
                 <!--- <button class="btn" data-bind="click: removeComponent"><i class="fa fa-trash"></i></button> ---->
                 #iconButton( icon="trash", bind="click:removeComponent" )#
             </td>

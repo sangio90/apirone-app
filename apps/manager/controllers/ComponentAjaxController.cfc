@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
         param rc.str = "";
        
         var result = super.getResult();
-        var params = super.paramsFromUrl();
+        var params = super.paramsFromUrl( "component" );
 
         var rows = super.fire("component.search", params ); 
 

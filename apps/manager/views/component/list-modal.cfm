@@ -1,24 +1,29 @@
 ﻿<cfoutput>
-	<div id="component-list-modal" class="modal fade">
+	<div id="component-list-modal"> <!--- class="modal fade" ---->
+
+		<!-----
+
 		<section class="modal-dialog modal-xl">
 			<div class="modal-content">
 				<header class="card-header">
-					<h2 class="card-title">Cerca componenti da Verticale</h2>
+					<h2 class="card-title">Componenti per <span data-bind="text: getCurrentItemName"></span></h2>
 				</header>
 
 				<div class="card-body">
+					------->
 					<div class="row">
-						
-						<div class="col-6">
+
+						<div class="col-12">
 
 							<div data-bind="visible: showSearchPanel">
+
 								<form data-bind="events: { submit: search }" id="component-list-search-form">
 
-									<div class="pb-2 d-flex align-items-center justify-content-start">
+									<div class="pb-2 d-flex align-items-center justify-content-start box-search-small">
 
 										<input
 											id="component-search-input"
-											placeholder="Cerca..." 
+											placeholder="Cerca in Verticale..." 
 											class      ="form-control me-3"
 											name       ="str"
 										>
@@ -46,41 +51,70 @@
 											#grid(
 												id      = "component-list-grid",
 												columns = "[
-                                                    { 'field':'name', 'title':'Lavorazione/Materia prima'},
-                                                    { 'field':'', 'title':'', width: '110px'},
-                                                ]",
+													{ 'field':'name', 'title':'Lavorazione/Materia prima'},
+													{ 'field':'', 'title':'', width: '42px' },
+												]",
 												source      = "components",
 												rowTemplate = "component/component-row-list-tmpl"
 											)#
 										</div>
 									</div>
 								</form>
+							
 							</div>
 
-							#view( "component/component-list-variant" )#
+							<!---- #view( "component/component-list-variant" )# ---->
 						
 						</div>
 
+						<!----
 						<div class="col-6">
 
-							<table class="table table-hover pt-5">
-								<thead>
-									<tr>
-										<th scope="col" colspan="3">Componenti selezionati per <span data-bind="text: getCurrentItemName"></span></th>
-										<th scope="col" width="50"></th>
-									</tr>
-								</thead>
-								<tbody data-bind="source:selected" data-template="component-selected-row-tmpl">
-								</tbody>
-							</table>
+							<form id="component-list-selected-form" class="row">
 
-							<div class="pt-5" data-bind="invisible: showSelectedComponentTable">
-								<p class="text-center">Nessun componente ancora selezionato</p>
+								<div class="col-12">
+
+									<h4>Componenti selezionati</h4>
+
+									<div class="pb-2 d-flex align-items-center justify-content-start mb-2">
+
+										<input
+											id="component-search-selected-input"
+											placeholder="Filtra..." 
+											class      ="form-control me-3 form-control-sm"
+											name       ="str"
+										>
+
+										<select class="form-control me-3 form-control-sm" name="processingTypeId" style="width:46%">
+											<option value="MP">Materie prime</option>
+											<option value="LV">Lavorazioni</option>
+										</select>
+
+										#iconButton( bind="click:filterSelected", icon="search", variant="primary", size="sm" )#
+
+									</div>
+
+
+									<table class="table table-hover pt-5">
+										<tbody data-bind="source:selected" data-template="component-selected-row-tmpl">
+										</tbody>
+									</table>
+
+									<div class="pt-5" data-bind="invisible: showSelectedTable">
+										<p class="text-center">Nessun componente ancora selezionato</p>
+									</div>
+
+									<p>#saveButton(bind="click:save", size="sm")#</p>
+
+								</div>
+							
 							</div>
 
 						</div>
+						---->
 
 					</div>
+					<!----
 				</div>
 
 				<footer class="card-footer">
@@ -95,6 +129,7 @@
 				</footer>
 			</div>
 		</section>
+		----->
 	</div>
 
 	#template( "jstemplate/component/component-selected-row-tmpl" )#

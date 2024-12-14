@@ -43,7 +43,8 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT 
-				line_id::varchar
+				line_id::varchar,
+				COUNT(line_id) OVER() AS total
 			FROM
 				lines
 			WHERE 1=1
@@ -117,7 +118,7 @@
 				line = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getCode()#">,
 				product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.line.getCategory().getId()#">,
-				thickness_id = <cfqueryparam cfsqltype="Integer" value="#arguments.line?.getTickness()?.getId()#">,
+				thickness_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line?.getThickness()?.getId()#">,
 				orderby = 20
 			WHERE
 				line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getId()#">::uuid

@@ -172,6 +172,9 @@
 
     public Struct function paramsFromUrl(){
 
+        param url.page = 1;
+        param url.count = 15;
+
         var params = {}
 
         for( var thisParam in url ) {

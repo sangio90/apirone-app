@@ -6,17 +6,17 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
         var dm = getDataMapper();
 
-        var params = paramsFromUrl();
+        var params = super.paramsFromUrl();
 
-        var rows = super.fire( "line.list", params );
+        var rows = super.fire( "line.search", params );
 
-        for ( var row in rows ) {
+        for ( var row in rows.getData() ) {
             var obj = dm.convert( row, "Line", true );
             data.add( obj );
         }
 
-        result.setTotal( data.len() );
-        result.setCount( data.len() );
+        result.setTotal( rows.getTotal() );
+        result.setCount( rows.getCount() );
         result.setData( data );
 
         event.setValue("result", result);
@@ -35,6 +35,10 @@ component extends="com.apirone.core.controller.AbsController" {
         var bean = super.fire( "line.get", [ rc.id ] );
 
         var obj = super.getDataMapper().convert( bean, "Line", true );
+
+        if( !obj.keyExists( "thickness" ) ) {
+            obj["thickness"] = { "id" = "", "name" = "" }
+        }
 
         result.setData( obj );
 

@@ -31,7 +31,7 @@ AP.combination.list = (function () {
 		attributesList: undefined
 	};
 
-	var normalizeComponentItem = function( data ) {
+	var normalizeComponentItem = function (data) {
 
 		var item = {
 			attribute: {
@@ -42,11 +42,9 @@ AP.combination.list = (function () {
 				id: 0,
 				name: ""
 			}
-		}
+		};
 
-		console.log("data?.attributeValue", data?.attributeValue)
-
-		if ( data?.attributeValue ) {
+		if (data?.attributeValue) {
 
 			item = {
 				attribute: {
@@ -57,13 +55,13 @@ AP.combination.list = (function () {
 					id: data.attributeValue.id,
 					name: data.attributeValue.name
 				}
-			}
+			};
 
 		}
 
 		return item;
 
-	}
+	};
 
 	var viewModel = kendo.observable({
 
@@ -75,7 +73,7 @@ AP.combination.list = (function () {
 
 		/*
 			attributes methods
-		*/ 
+		*/
 
 		selectAttribute: function (event) {
 
@@ -95,7 +93,7 @@ AP.combination.list = (function () {
 						viewModel.get("items").read();
 
 						setTimeout(() => fields.attributeModal.modal("hide"), 600);
-	
+
 					},
 				}
 			});
@@ -147,7 +145,7 @@ AP.combination.list = (function () {
 					callback: {
 						done: function (xhr) {
 
-							AP.widget.notify("success", xhr.data.message.text );
+							AP.widget.notify("success", xhr.data.message.text);
 
 							viewModel.items.read();
 
@@ -157,7 +155,7 @@ AP.combination.list = (function () {
 
 			} else {
 
-				AP.widget.notify( "warning", "Seleziona almeno un attributo" );
+				AP.widget.notify("warning", "Seleziona almeno un attributo");
 
 			}
 
@@ -165,13 +163,13 @@ AP.combination.list = (function () {
 
 		showAttributesList: function (event) {
 
-			var item = normalizeComponentItem( event.data );
+			var item = normalizeComponentItem(event.data);
 
-			//console.log("normalizeComponentItem", item);
+			// console.log("normalizeComponentItem", item);
 
 			viewModel.set("itemForAttributes", item);
 
-			NM.util.openModal( fields.attributeModal );
+			NM.util.openModal(fields.attributeModal);
 
 			this.searchAttributes();
 
@@ -179,7 +177,7 @@ AP.combination.list = (function () {
 
 		showAttributeValues: function (event) {
 
-			//console.log("event.data.id", event.data.id);
+			// console.log("event.data.id", event.data.id);
 
 			attributeApp.edit({
 				id: event.data.id,
@@ -201,22 +199,23 @@ AP.combination.list = (function () {
 
 			var dataSource = NM.kendo.dataSource({ url: "/manager/ajax/attributes?" + params });
 
-			viewModel.set( "attributesList", dataSource );
+			viewModel.set("attributesList", dataSource);
 
             return false;
 
-		},		
+		},
 
 		/*
 			// attributes methods
-		*/ 
+		*/
 
 
         showComponentsList: function (event) {
 
-			componentApp.open( event.data.id );
-			componentApp.setCurrentItem( event.data );
+			componentApp.setCurrentItem(event.data);
 			
+			componentApp.open(event.data.id);
+
             return false;
 		},
 
@@ -228,7 +227,7 @@ AP.combination.list = (function () {
 
 		showImagesList: function () {
 
-			NM.util.openModal( $("#combination-images-list-modal") );
+			NM.util.openModal($("#combination-images-list-modal"));
 
 		},
 
@@ -313,7 +312,7 @@ AP.combination.list = (function () {
 
 	pub.init = function () {
 
-		kendo.bind( fields.rootDetail, viewModel );
+		kendo.bind(fields.rootDetail, viewModel);
 
 		viewModel.loadFinishes();
 

@@ -79,9 +79,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setName( record.vardes );
 
 			//TODO: from componentId to variantId
-			var rnd = RandRange( 1, 4 )
-			var colorList = [ "MATLASPLX8MM000", "MATACCOTTRETROA", "MATFRU000PRBIPA", "NOT_FOUND" ];
-			bean.setColors( getColorService().list( colorList[ rnd ] ) );
+			//var rnd = RandRange( 1, 4 )
+			//var colorList = [ "MATLASPLX8MM000", "MATACCOTTRETROA", "MATFRU000PRBIPA", "NOT_FOUND" ];
+			//bean.setColors( getColorService().list( colorList[ rnd ] ) );
 			
             return bean;
 

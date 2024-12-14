@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
-    public ProcessingType function init(){
+    public Thickness function init(){
 
         return this;
     }

@@ -23,7 +23,7 @@ NM.kendo.dataSource = function (config = {}) {
 
         defaults.transport.parameterMap = function (params, type) {
 
-            params["count"] = params.pageSize;
+            params.count = params.pageSize;
             delete params.pageSize;
             delete params.skip;
             delete params.take;
@@ -37,9 +37,9 @@ NM.kendo.dataSource = function (config = {}) {
 
     }
 
-	var settings = $.extend(true, defaults, config);
+	//var settings = $.extend(true, defaults, config);
 
-    var dataSource = new kendo.data.DataSource(settings);
+    var dataSource = new kendo.data.DataSource(defaults);
 
     return dataSource;
 

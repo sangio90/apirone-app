@@ -27,4 +27,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
+    function saveComponents( event, rc, prc ){
+
+        dump(rc);
+        abort;
+
+        var data = [];
+        var result = super.getResult();
+
+        result.setTotal( 0 );
+        result.setCount( 0 );
+        result.setData( data );
+
+        event.setValue("result", result );
+
+    }
+
 }

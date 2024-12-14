@@ -20,9 +20,13 @@ AP.component.list = (function () {
 	var pub = {};
 	var fields = AP.component.fields;
 
+	var dataSources = {
+		components: NM.kendo.dataSource({ url: "/manager/ajax/components" })
+	};
+
 	var viewModel = kendo.observable({
 
-		components: [],
+		components: dataSources.components,
 		variants: [],
 		selected: [],
 
@@ -41,16 +45,30 @@ AP.component.list = (function () {
 			return ret;
 		},
 
+		filterSelected: function () {
+
+			console.log("filterSelected");
+
+			return;
+		},
+
 		showVariants: function () {
+
+			console.log("showVariants");
+
+			viewModel.set("variants", []);
+			viewModel.set("colors", []);
 
 			return !viewModel.get("showSearchPanel");
 		},
 
 		useComponent: function (event) {
 
+			console.log("useComponent");
+
 			var comps = viewModel.get("selected");
 
-			comps.push( event.data );
+			comps.push(event.data);
 
 			viewModel.set("selected", comps);
 
@@ -84,7 +102,7 @@ AP.component.list = (function () {
 
 			var comps = viewModel.get("selected");
 
-			comps.push( row );
+			comps.push(row);
 
 			viewModel.set("selected", comps);
 
@@ -97,16 +115,35 @@ AP.component.list = (function () {
 
 			console.log("searchComponents");
 
+			/*
 			var str = thisForm.find("[name=str]").val();
 			var status = thisForm.find(".status");
+			*/
 
-			status.html("Sto cercando...");
+			//status.html("Sto cercando...");
 
             var params = thisForm.serializeJSON();
 
+			viewModel.components.read(params);
+
+			//status.html("Ho trovato " + xhr.count + " record.");
+	
+            return false;
+
+		},
+
+		save: function (event) {
+
+			var thisForm = $("#component-list-selected-form");
+			var status = thisForm.find(".status");
+
+            var params = thisForm.serializeJSON();
+
+			var current = viewModel.get("currentItem");
+
 			NM.util.ajax({
-				method: "GET",
-				url: "/manager/ajax/components",
+				method: "POST",
+				url: "/ajax/combination-items/" + current.id + "/components",
 				data: params,
 				callback: {
 					done: function (xhr) {
@@ -175,15 +212,15 @@ AP.component.list = (function () {
             return false;
 		},
 
-		showSelectedComponentTable: function() {
+		showSelectedTable: function () {
 
 			return viewModel.get("selected").length > 0;
 
 		},
 
-		removeComponent: function( event ) {
+		removeComponent: function (event) {
 
-			console.log("removeComponent:event", event)
+			console.log("removeComponent:event", event);
 
 			viewModel.get("selected").getByUid( event.data.uid );
 
@@ -193,8 +230,8 @@ AP.component.list = (function () {
 
         getCurrentItemName: function (event) {
 
-			var attrName = viewModel.get("currentItem.attribute.name") 
-					+ " / " 
+			var attrName = viewModel.get("currentItem.attribute.name")
+					+ " / "
 					+ viewModel.get("currentItem.attributeValue.name");
 
             return attrName;
@@ -202,25 +239,25 @@ AP.component.list = (function () {
 
 	});
 
-	pub.setCurrentItem = function ( item ) {
+	pub.setCurrentItem = function (item) {
 
-		viewModel.set("currentItem", item );
+		viewModel.set("currentItem", item);
 
 	};
 
-	pub.open = function ( itemId ) {
+	pub.open = function (itemId) {
 
-		console.log("open:itemId", itemId)
+		console.log("open:itemId", itemId);
 
 		NM.util.ajax({
 			method: "GET",
 			url: "/manager/ajax/combination-items/" + itemId + "/components",
 			callback: {
 				done: function (xhr) {
-					
+
 					viewModel.set("selected", xhr.data);
 
-					NM.util.openModal( $("#component-list-modal") );
+					NM.util.openModal($("#component-list-modal"));
 
 				}
 			}
@@ -232,7 +269,7 @@ AP.component.list = (function () {
 
 		console.log("component:init");
 
-		kendo.bind( fields.rootList, viewModel );
+		kendo.bind(fields.rootList, viewModel);
 
 	};
 
