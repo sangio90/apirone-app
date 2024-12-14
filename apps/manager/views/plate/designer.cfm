@@ -1,7 +1,8 @@
 <cfscript>
-	GRID_CELL_DIMENSIONS = {
-		"WIDTH" = 25, // in px
-		"HEIGHT" = 45, // in px
+	GRID_CELL_DIMENSIONS = { // in px
+		"WIDTH" = 45,
+		"HEIGHT" = 90,
+		"PROHIBITED_HEIGHT" = 105,
 	};
 	// Data from backend
 	// LEGEND:
@@ -11,25 +12,55 @@
 	PLATE_GRID = [
 		["A", "A", "A", "A", "B", "B"],
 		["A", "A", "A", "A", "B", "B"],
-		["0", "0", "0", "0", "_", "_"],
-		["_", "_", "_", "_", "_", "_"],
-		["_", "_", "_", "_", "_", "_"],
+		["0", "0", "0", "0", "0", "0"],
+		["_", "C", "C", "_", "I", "I"],
+		["_", "C", "C", "_", "I", "I"],
+
+		// ["A", "A", "A", "A", "_", "_"],
+		// ["A", "A", "A", "A", "_", "_"],
+		// ["0", "0", "0", "0", "_", "_"],
+		// ["_", "_", "_", "_", "B", "B"],
+		// ["_", "_", "_", "_", "B", "B"],
+
+		 // Special 2
+		// ["0", "0", "B", "B",],
+		// ["0", "0", "B", "B",],
+		// ["0", "0", "0", "0",],
+		// ["B2", "B2", "0", "0",],
+		// ["B2", "B2", "0", "0",],
+		// ["0", "0", "0", "0",],
+		// ["A", "A", "A", "A",],
+		// ["A", "A", "A", "A",],
 	];
 
 	PLATE_ELEMENTS = {
 		A = {
 			"imgSrc" = "/assets/main/img/foto_frutto_schuko.png",
 			"x1" = 0,
-			"y1" = 0,
 			"x2" = 3,
+			"y1" = 0,
 			"y2" = 1,
 		},
 		B = {
 			"imgSrc" = "/assets/main/img/foto_frutto_bipasso.png",
 			"x1" = 4,
-			"y1" = 0,
 			"x2" = 5,
+			"y1" = 0,
 			"y2" = 1,
+		},
+		C = {
+			"imgSrc" = "/assets/main/img/foto_frutto_cat6.png",
+			"x1" = 1,
+			"x2" = 2,
+			"y1" = 3,
+			"y2" = 4,
+		},
+		I = {
+			"imgSrc" = "/assets/main/img/foto_frutto_interruttore.png",
+			"x1" = 4,
+			"x2" = 5,
+			"y1" = 3,
+			"y2" = 4,
 		},
 	};
 </cfscript>
@@ -55,7 +86,16 @@
 		</div>
 
 		<div class="plate-designer">
-			<div class="plate-background" style="background-image: url('/assets/main/img/foto_placca.png');">
+			<div class="plate-background vertical-orientation" style="background-image: url('/assets/main/img/3X2VERTICALE.jpg');">
+				<!--- <style>
+					.grid-column {
+						height: #GRID_CELL_DIMENSIONS.HEIGHT#px;
+					}
+
+					.grid-column.prohibited {
+						height: #GRID_CELL_DIMENSIONS.PROHIBITED_HEIGHT#px;
+					}
+				</style> --->
 				<div
 					id="plate-grid"
 					style="grid-auto-rows: #GRID_CELL_DIMENSIONS.HEIGHT#px; grid-auto-columns: #GRID_CELL_DIMENSIONS.WIDTH#px;"
