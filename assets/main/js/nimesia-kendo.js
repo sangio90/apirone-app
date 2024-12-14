@@ -18,7 +18,13 @@ NM.kendo.dataSource = function (config = {}) {
 
     if (config.url != undefined) {
 
-        defaults.transport = { "read": config.url };
+        defaults.transport = { 
+            read: { 
+                url: config.url,
+                data: config?.params
+            } 
+        };
+        
         defaults.schema = { "data": "data", total: "total" };
 
         defaults.transport.parameterMap = function (params, type) {
@@ -31,6 +37,14 @@ NM.kendo.dataSource = function (config = {}) {
             return params;
         };
 
+        if( config.requestStart ) {
+            defaults.requestStart = config.requestStart
+        }
+
+        if( config.requestEnd ) {
+            defaults.requestEnd = config.requestEnd
+        }
+
         if (config.model) {
             defaults.schema.model = config.model;
         }
@@ -39,7 +53,7 @@ NM.kendo.dataSource = function (config = {}) {
 
 	//var settings = $.extend(true, defaults, config);
 
-    var dataSource = new kendo.data.DataSource(defaults);
+    var dataSource = new kendo.data.DataSource( defaults );
 
     return dataSource;
 

@@ -233,6 +233,8 @@ AP.combination.list = (function () {
 
 		loadFinishes: function () {
 
+			console.log("loadFinishes");
+
 			var thisForm  = AP.combination.fields.configRow;
 			var finishEle = thisForm.find("[name=finishId]");
 			var sizeEle = thisForm.find("[name=sizeId]");
@@ -253,12 +255,12 @@ AP.combination.list = (function () {
 
 			var found = false;
 
+			console.log("combinations", combinations);
+
 			combinations.forEach(function (combination) {
 
-				if(
-					lineId == combination.line.id
-					&& sizeId == combination.size.id
-				) {
+				if( lineId == combination.line.id 
+						&& sizeId == combination.size.id ) {
 
 					if (combination.id == combinationId) {
 						found = true;
@@ -311,6 +313,8 @@ AP.combination.list = (function () {
 	*/
 
 	pub.init = function () {
+
+		console.log("combination:init")
 
 		kendo.bind(fields.rootDetail, viewModel);
 

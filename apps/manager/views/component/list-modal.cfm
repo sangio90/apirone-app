@@ -1,7 +1,5 @@
 ﻿<cfoutput>
-	<div id="component-list-modal"> <!--- class="modal fade" ---->
-
-		<!-----
+	<div id="component-list-modal" class="modal fade">
 
 		<section class="modal-dialog modal-xl">
 			<div class="modal-content">
@@ -10,7 +8,6 @@
 				</header>
 
 				<div class="card-body">
-					------->
 					<div class="row">
 
 						<div class="col-12">
@@ -47,7 +44,7 @@
 								<form id="component-list-search-result-form" class="row">
 									
 									<div class="col-md-12">
-										<div data-bind="visible: showSearchResult">
+										<div> <!--- data-bind="visible: showSearchResult" ---->
 											#grid(
 												id      = "component-list-grid",
 												columns = "[
@@ -63,11 +60,10 @@
 							
 							</div>
 
-							<!---- #view( "component/component-list-variant" )# ---->
+							#view( "component/component-list-variant" )#
 						
 						</div>
 
-						<!----
 						<div class="col-6">
 
 							<form id="component-list-selected-form" class="row">
@@ -111,10 +107,8 @@
 							</div>
 
 						</div>
-						---->
 
 					</div>
-					<!----
 				</div>
 
 				<footer class="card-footer">
@@ -129,7 +123,6 @@
 				</footer>
 			</div>
 		</section>
-		----->
 	</div>
 
 	#template( "jstemplate/component/component-selected-row-tmpl" )#

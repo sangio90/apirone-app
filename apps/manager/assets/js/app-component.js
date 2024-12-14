@@ -20,13 +20,9 @@ AP.component.list = (function () {
 	var pub = {};
 	var fields = AP.component.fields;
 
-	var dataSources = {
-		components: NM.kendo.dataSource({ url: "/manager/ajax/components" })
-	};
-
 	var viewModel = kendo.observable({
 
-		components: dataSources.components,
+		components: undefined,
 		variants: [],
 		selected: [],
 
@@ -112,22 +108,27 @@ AP.component.list = (function () {
 		search: function (event) {
 
 			var thisForm = $("#component-list-search-form");
-
-			console.log("searchComponents");
-
-			/*
-			var str = thisForm.find("[name=str]").val();
 			var status = thisForm.find(".status");
-			*/
 
-			//status.html("Sto cercando...");
+			var requestStart = function() {
+				status.html("Sto cercando...");
+			}
+
+			var requestEnd = function( xhr ) {
+				status.html("Ho trovato " + xhr.response.total + " componenti");
+			}
 
             var params = thisForm.serializeJSON();
+			
+			var dataSource = NM.kendo.dataSource({ 
+				url: "/manager/ajax/components", 
+				params: params, 
+				requestEnd: requestEnd, 
+				requestStart: requestStart
+			});
 
-			viewModel.components.read(params);
-
-			//status.html("Ho trovato " + xhr.count + " record.");
-	
+			viewModel.set("components", dataSource );
+			
             return false;
 
 		},
