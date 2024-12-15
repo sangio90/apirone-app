@@ -12,7 +12,7 @@
                     <div class="card-body">
 
                         <div class="col-md-12">
-                            <button class="btn btn-primary btn-sm" data-bind="click:showAttributesList">Aggiungi attributo &raquo;</button>
+                            <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Aggiungi attributo &raquo;</button>
                             <button class="btn btn-primary btn-sm" data-bind="click:listImages">Aggiungi immagine &raquo;</button>
                         </div>
 

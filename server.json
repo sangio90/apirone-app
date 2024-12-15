@@ -1,7 +1,7 @@
 {
     "profile":"${server.profile}",
     "app":{
-        "cfengine":"lucee@5.4.0.80"
+        "cfengine":"lucee@5.4.6.9"
     },
     "name":"${server.name}",
     "openBrowser":false,

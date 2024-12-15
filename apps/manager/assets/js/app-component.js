@@ -37,23 +37,54 @@ AP.component.list = (function () {
 
 		showSearchResult: function () {
 
-			var ret = viewModel.get("components").length > 0;
-			return ret;
+			return viewModel.get("components")?.total() > 0;
+		
+		},
+
+		resetFilterSelected: function () {
+
+            var thisForm = $("#component-list-selected-form");
+
+            thisForm.find( "input[name=str]" ).val("");
+
+            dataSource.filter( [] );
+
+            dataSource.view();
+
+            return false;
 		},
 
 		filterSelected: function () {
 
-			console.log("filterSelected");
+            var thisForm = $("#component-list-selected-form");
+			var dataSource = viewModel.get("selected");
 
-			return;
+            var str = thisForm.find( "input[name=str]" ).val();
+            var typeId = thisForm.find( "select[name=processingTypeId]" ).val();
+
+            var filters = [];
+
+            if ( str.length ) {
+                filters.push( { field: "name", operator: "contains", value: str } )
+            };
+
+            if ( typeId.length ) {
+                filters.push( { field: "typeId", operator: "eq", value: typeId } )
+            };
+
+            dataSource.filter( filters );
+
+            dataSource.view();
+
+            return false;
 		},
 
 		showVariants: function () {
 
 			console.log("showVariants");
 
-			viewModel.set("variants", []);
-			viewModel.set("colors", []);
+			//viewModel.set("variants", []);
+			//viewModel.set("colors", []);
 
 			return !viewModel.get("showSearchPanel");
 		},

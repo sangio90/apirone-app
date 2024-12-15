@@ -161,7 +161,7 @@ AP.combination.list = (function () {
 
 		},
 
-		showAttributesList: function (event) {
+		openAttributesList: function (event) {
 
 			var item = normalizeComponentItem(event.data);
 
@@ -175,7 +175,7 @@ AP.combination.list = (function () {
 
 		},
 
-		showAttributeValues: function (event) {
+		openAttributeValues: function (event) {
 
 			// console.log("event.data.id", event.data.id);
 

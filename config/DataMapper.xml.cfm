@@ -1,6 +1,3 @@
-<!DOCTYPE dataMapper PUBLIC "-//DATAMAPPER//DTD DATAMAPPER//EN"
-        "http://mm-projects.s3.amazonaws.com/dtd/dataMapper.dtd">
-
 <mappers>
 
     <mapper id="State" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.State">

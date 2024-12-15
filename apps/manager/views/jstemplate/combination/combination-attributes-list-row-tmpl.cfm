@@ -15,7 +15,7 @@
                 </button>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:showAttributeValues">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:openAttributeValues">
                     <i class="fas fa-edit"></i>
                 </button>
             </td>

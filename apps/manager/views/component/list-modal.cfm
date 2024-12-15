@@ -1,7 +1,7 @@
 ﻿<cfoutput>
 	<div id="component-list-modal" class="modal fade">
 
-		<section class="modal-dialog modal-xl">
+		<section class="modal-dialog modal-fullscreen">
 			<div class="modal-content">
 				<header class="card-header">
 					<h2 class="card-title">Componenti per <span data-bind="text: getCurrentItemName"></span></h2>
@@ -10,7 +10,7 @@
 				<div class="card-body">
 					<div class="row">
 
-						<div class="col-12">
+						<div class="col-6">
 
 							<div data-bind="visible: showSearchPanel">
 
@@ -44,17 +44,21 @@
 								<form id="component-list-search-result-form" class="row">
 									
 									<div class="col-md-12">
-										<div> <!--- data-bind="visible: showSearchResult" ---->
-											#grid(
-												id      = "component-list-grid",
-												columns = "[
-													{ 'field':'name', 'title':'Lavorazione/Materia prima'},
-													{ 'field':'', 'title':'', width: '42px' },
-												]",
-												source      = "components",
-												rowTemplate = "component/component-row-list-tmpl"
-											)#
+
+										<div data-bind="visible: showSearchResult">
+
+										#grid(
+											id      = "component-list-grid",
+											columns = "[
+												{ 'field':'name', 'title':'Lavorazione/Materia prima'},
+												{ 'field':'', 'title':'', width: '42px' },
+											]",
+											source      = "components",
+											rowTemplate = "component/component-row-list-tmpl"
+										)#
+
 										</div>
+
 									</div>
 								</form>
 							
@@ -87,6 +91,7 @@
 										</select>
 
 										#iconButton( bind="click:filterSelected", icon="search", variant="primary", size="sm" )#
+										#iconButton( bind="click:resetFfilterSelected", icon="search", variant="secondary", size="sm" )#
 
 									</div>
 
