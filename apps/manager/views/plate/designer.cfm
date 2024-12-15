@@ -1,8 +1,8 @@
 <cfscript>
 	GRID_CELL_DIMENSIONS = { // in px
 		"WIDTH" = 45,
-		"HEIGHT" = 90,
-		"PROHIBITED_HEIGHT" = 105,
+		"HEIGHT" = 180,
+		"PROHIBITED_HEIGHT" = 104,
 	};
 	// Data from backend
 	// LEGEND:
@@ -10,11 +10,15 @@
 	// "_" - empty free space
 	// "0" - prohibited space
 	PLATE_GRID = [
-		["A", "A", "A", "A", "B", "B"],
-		["A", "A", "A", "A", "B", "B"],
-		["0", "0", "0", "0", "0", "0"],
-		["_", "C", "C", "_", "I", "I"],
-		["_", "C", "C", "_", "I", "I"],
+		["_", "A", "A", "A", "A", "_", "A2", "A2", "A2", "A2", "B", "B", "_", "_", "_", "_",],
+		// ["0", "0", "0", "0", "0", "0",],
+		// ["_", "C", "C", "_", "I", "I",],
+
+		// ["A", "A", "A", "A", "B", "B"],
+		// ["A", "A", "A", "A", "B", "B"],
+		// ["0", "0", "0", "0", "0", "0"],
+		// ["_", "C", "C", "_", "I", "I"],
+		// ["_", "C", "C", "_", "I", "I"],
 
 		// ["A", "A", "A", "A", "_", "_"],
 		// ["A", "A", "A", "A", "_", "_"],
@@ -35,33 +39,64 @@
 
 	PLATE_ELEMENTS = {
 		A = {
+			"id" = "A",
 			"imgSrc" = "/assets/main/img/foto_frutto_schuko.png",
-			"x1" = 0,
-			"x2" = 3,
+			"x1" = 1,
+			"x2" = 4,
 			"y1" = 0,
-			"y2" = 1,
+			"y2" = 0,
+			"gaps" = {
+				"x" = 0,
+				"y" = 0,
+			},
+		},
+		A2 = {
+			"id" = "A2",
+			"imgSrc" = "/assets/main/img/foto_frutto_schuko.png",
+			"x1" = 6,
+			"x2" = 9,
+			"y1" = 0,
+			"y2" = 0,
+			"gaps" = {
+				"x" = 0,
+				"y" = 0,
+			},
 		},
 		B = {
+			"id" = "B",
 			"imgSrc" = "/assets/main/img/foto_frutto_bipasso.png",
-			"x1" = 4,
-			"x2" = 5,
+			"x1" = 10,
+			"x2" = 11,
 			"y1" = 0,
-			"y2" = 1,
+			"y2" = 0,
+			"gaps" = {
+				"x" = 0,
+				"y" = 0,
+			},
 		},
-		C = {
-			"imgSrc" = "/assets/main/img/foto_frutto_cat6.png",
-			"x1" = 1,
-			"x2" = 2,
-			"y1" = 3,
-			"y2" = 4,
-		},
-		I = {
-			"imgSrc" = "/assets/main/img/foto_frutto_interruttore.png",
-			"x1" = 4,
-			"x2" = 5,
-			"y1" = 3,
-			"y2" = 4,
-		},
+		// C = {
+		// 	"id" = "C",
+		// 	"imgSrc" = "/assets/main/img/foto_frutto_cat6.png",
+		// 	"x1" = 4,
+		// 	"x2" = 5,
+		// 	"y1" = 0,
+		// 	"y2" = 0,
+		// 	"gaps" = {
+		// 		"x" = 0,
+		// 		"y" = 0,
+		// 	},
+		// },
+		// I = {
+		// 	"imgSrc" = "/assets/main/img/foto_frutto_interruttore.png",
+		// 	"x1" = 2,
+		// 	"x2" = 3,
+		// 	"y1" = 0,
+		// 	"y2" = 0,
+		// 	"gaps" = {
+		// 		"x" = 0,
+		// 		"y" = 0,
+		// 	},
+		// },
 	};
 </cfscript>
 
@@ -85,55 +120,66 @@
 			</button>
 		</div>
 
-		<div class="plate-designer">
-			<div class="plate-background vertical-orientation" style="background-image: url('/assets/main/img/3X2VERTICALE.jpg');">
-				<!--- <style>
-					.grid-column {
-						height: #GRID_CELL_DIMENSIONS.HEIGHT#px;
-					}
+		<style>
+			##plate-layers {
+				width: #ArrayLen(PLATE_GRID[1]) * GRID_CELL_DIMENSIONS.WIDTH#px;
+				height: #ArrayLen(PLATE_GRID) * GRID_CELL_DIMENSIONS.HEIGHT#px;
+			}
+		</style>
 
-					.grid-column.prohibited {
-						height: #GRID_CELL_DIMENSIONS.PROHIBITED_HEIGHT#px;
-					}
-				</style> --->
+		<div class="plate-designer">
+			<div class="plate-background horizontal-orientation" style="background-image: url('/assets/main/img/508.jpg');">
 				<div
-					id="plate-grid"
-					style="grid-auto-rows: #GRID_CELL_DIMENSIONS.HEIGHT#px; grid-auto-columns: #GRID_CELL_DIMENSIONS.WIDTH#px;"
-					>
-					<cfloop from="1" to="#arrayLen(PLATE_GRID)#" index="y">
-						<cfloop from="1" to="#arrayLen(PLATE_GRID[y])#" index="x">
+					id="plate-layers">
+					<div
+						id="plate-grid"
+						style="grid-template-rows: #GRID_CELL_DIMENSIONS.HEIGHT#px #GRID_CELL_DIMENSIONS.PROHIBITED_HEIGHT#px #GRID_CELL_DIMENSIONS.HEIGHT#px; grid-template-columns: repeat(6, #GRID_CELL_DIMENSIONS.WIDTH#px);"
+						>
+						<cfloop from="1" to="#arrayLen(PLATE_GRID)#" index="y">
+							<cfloop from="1" to="#arrayLen(PLATE_GRID[y])#" index="x">
+								<cfscript>
+									isProhibitedCell = PLATE_GRID[y][x] == "0";
+								</cfscript>
+								<div
+									class="grid-column p#x# #isProhibitedCell ? 'prohibited' : ''#"
+									style="grid-row: #y# / #y + 1#; grid-column: #x# / #x + 1#;"
+									>
+									<cfif NOT isProhibitedCell>
+										<span class="position-label" style="font-size: 8px;">
+											(#x#, #y#)
+										</span>
+									</cfif>
+								</div>
+							</cfloop>
+						</cfloop>
+					</div>
+
+					<div
+						id="plate-items"
+						>
+						<cfloop collection="#PLATE_ELEMENTS#" item="elementKey">
 							<cfscript>
-								isProhibitedCell = PLATE_GRID[y][x] == "0";
+								element = PLATE_ELEMENTS[elementKey];
+
+								left = GRID_CELL_DIMENSIONS.WIDTH * element.x1;
+								top = GRID_CELL_DIMENSIONS.HEIGHT * element.y1 + (GRID_CELL_DIMENSIONS.PROHIBITED_HEIGHT * element.gaps.y);
+
+								width = GRID_CELL_DIMENSIONS.WIDTH * (element.x2 - element.x1 + 1);
+								height = GRID_CELL_DIMENSIONS.HEIGHT * (element.y2 - element.y1 + 1);
 							</cfscript>
+
 							<div
-								class="grid-column p#x# #isProhibitedCell ? 'prohibited' : ''#"
-								style="grid-row: #y# / #y + 1#; grid-column: #x# / #x + 1#;"
+								id="#elementKey#"
+								class="draggable-plate-item"
+								style="left: #left#px; top: #top#px; width: #width#px; height: #height#px;"
 								>
-								<cfif NOT isProhibitedCell>
-									<span class="position-label" style="font-size: 8px;">
-										(#x#, #y#)
-									</span>
-								</cfif>
+								<img
+									src="#element.imgSrc#"
+									style="width: 100%; height: 100%; object-fit: fill;"
+									>
 							</div>
 						</cfloop>
-					</cfloop>
-
-					<cfloop collection="#PLATE_ELEMENTS#" item="elementKey">
-						<cfscript>
-							element = PLATE_ELEMENTS[elementKey];
-						</cfscript>
-
-						<div
-							id="#elementKey#"
-							class="draggable-plate-item"
-							style="left: #GRID_CELL_DIMENSIONS.WIDTH * element.x1#px; top: #GRID_CELL_DIMENSIONS.HEIGHT * element.y1#px; width: #GRID_CELL_DIMENSIONS.WIDTH * (element.x2 - element.x1 + 1)#px; height: #GRID_CELL_DIMENSIONS.HEIGHT * (element.y2 - element.y1 + 1)#px;"
-							>
-							<img
-								src="#element.imgSrc#"
-								style="width: 100%; height: 100%; object-fit: fill;"
-								>
-						</div>
-					</cfloop>
+					</div>
 				</div>
 			</div>
 		</div>
