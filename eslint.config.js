@@ -29,7 +29,7 @@ module.exports = {
 		"dot-notation": "warn",
 		"block-spacing": "warn",
 		"comma-spacing": "warn",
-		"spaced-comment": "always",
+		"spaced-comment": "warn",
 		"space-in-parens": ["warn", "never"],
 		"no-nested-ternary": "warn",
 		"no-trailing-spaces": "warn",

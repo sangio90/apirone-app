@@ -423,58 +423,60 @@ h2 {
 /* TODO: spostare inclusione dei file CSS in controller */
 /* SEZIONE PER LA PAGINA: plate/designer */
 
+.plate-background {
+	text-align: center;
+	background-color: #ECECEC;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+}
+
 .plate-background.horizontal-orientation {
 	width: 1200px;
 	height: 500px;
-	text-align: center;
-	background-color: #ECECEC;
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: center;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position: relative;
 }
 
 .plate-background.vertical-orientation {
-	height: 1200px;
 	width: 500px;
-	text-align: center;
-	background-color: #ECECEC;
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: center;
-	display: flex;
+	height: 1200px;
 	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	position: relative;
 }
 
-#plate-grid {
+#plate-layers {
 	position: relative;
 	overflow: hidden;
 	display: grid;
-	box-sizing: content-box;
 }
 
-#plate-grid:hover .grid-column:not(.prohibited).p1 {
+#plate-grid {
+	grid-area: 1 / 1 / 1 / 1;
+	position: relative;
+	overflow: hidden;
+	display: grid;
+	height: inherit;
+	width: inherit;
+}
+
+.plate-background:hover .grid-column:not(.prohibited).p1 {
 	border: 1px dashed lightblue;
 }
-#plate-grid:hover .grid-column:not(.prohibited).p2 {
+.plate-background:hover .grid-column:not(.prohibited).p2 {
 	border: 1px dashed lightgreen;
 }
-#plate-grid:hover .grid-column:not(.prohibited).p3 {
+.plate-background:hover .grid-column:not(.prohibited).p3 {
 	border: 1px dashed lightcoral;
 }
-#plate-grid:hover .grid-column:not(.prohibited).p4 {
+.plate-background:hover .grid-column:not(.prohibited).p4 {
 	border: 1px dashed lightgoldenrodyellow;
 }
-#plate-grid:hover .grid-column:not(.prohibited).p5 {
+.plate-background:hover .grid-column:not(.prohibited).p5 {
 	border: 1px dashed lightpink;
 }
-#plate-grid:hover .grid-column:not(.prohibited).p6 {
+.plate-background:hover .grid-column:not(.prohibited).p6 {
 	border: 1px dashed lightgray;
 }
 
@@ -483,8 +485,16 @@ h2 {
 	display: none;
 }
 
-#plate-grid:hover .grid-column .position-label {
+#plate-grid .grid-column .position-label {
 	display: initial;
+}
+
+#plate-items {
+	grid-area: 1 / 1 / 1 / 1;
+	position: relative;
+	overflow: hidden;
+	height: inherit;
+	width: inherit;
 }
 
 .draggable-plate-item {
