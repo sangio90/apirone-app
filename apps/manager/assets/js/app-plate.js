@@ -203,13 +203,13 @@ AP.plate.designer = (function () {
 				return result;
 			}
 
-			const firstMetadata = overlappingMetadata.overlappedPlateItems[0];
-			const pushedPlateItemWidth = firstMetadata.item.x2 - firstMetadata.item.x1 + 1;
+			const firstPlateItemMetadata = overlappingMetadata.overlappedPlateItems[0];
+			const pushedPlateItemWidth = firstPlateItemMetadata.item.x2 - firstPlateItemMetadata.item.x1 + 1;
 
-			if (plateItem.width >= firstMetadata.overlappedWidth && plateItem.width != pushedPlateItemWidth) {
+			if (plateItem.width >= firstPlateItemMetadata.overlappedWidth && plateItem.width != pushedPlateItemWidth) {
 				const centerIndexesPushedItem = getCenteredIndexes({
-					start: firstMetadata.item.x1,
-					end: firstMetadata.item.x2 + 1,
+					start: firstPlateItemMetadata.item.x1,
+					end: firstPlateItemMetadata.item.x2 + 1,
 				});
 
 				const centerIndexesPlateItem = getCenteredIndexes({
@@ -225,7 +225,7 @@ AP.plate.designer = (function () {
 				}
 			}
 
-			result.pushedPlateItem = firstMetadata.item;
+			result.pushedPlateItem = firstPlateItemMetadata.item;
 
 			const gridMargins = {
 				left: 0,
@@ -236,7 +236,7 @@ AP.plate.designer = (function () {
 
 			const isOverlappingOnLeftSide = plateItem.x1 <= result.pushedPlateItem.x1;
 
-			const deltaX = isOverlappingOnLeftSide ? firstMetadata.overlappedWidth : -firstMetadata.overlappedWidth;
+			const deltaX = isOverlappingOnLeftSide ? firstPlateItemMetadata.overlappedWidth : -firstPlateItemMetadata.overlappedWidth;
 
 			let newCoordinateX1 = result.pushedPlateItem.x1 + deltaX;
 			let newCoordinateX2 = result.pushedPlateItem.x2 + deltaX;
@@ -417,8 +417,8 @@ AP.plate.designer = (function () {
 		}
 
 		function isChangedPlateItemFinalPosition(plateItem) {
-			return plateItem.originalPosition.top != plateItem.position.top
-				|| plateItem.originalPosition.left != plateItem.position.left;
+			return plateItem.originalPosition.y1 != plateItem.y1
+				|| plateItem.originalPosition.x1 != plateItem.x1;
 		}
 
 		function restoreInitialPosition(plateItemPosition, grid) {
@@ -503,7 +503,7 @@ AP.plate.designer = (function () {
 
 				const newBoundingBox = parseBoundingBox(ui);
 
-				if (isChangedPlateItemFinalPosition(ui)) {
+        if (isChangedPlateItemFinalPosition(newBoundingBox)) {
 					const overlappingMetadata = getOverlappingMetadata(newBoundingBox, plateGrid);
 
 					if (overlappingMetadata.isOverlapping) {
