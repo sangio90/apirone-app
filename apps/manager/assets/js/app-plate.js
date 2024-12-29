@@ -10,524 +10,633 @@ $(document).ready(function () {
 	}
 });
 
-AP.plate.designer = (function () {
-	var pub = {};
+let PLATE_WIDTH;
+let PLATE_HEIGHT;
+let FREE_CELL_WIDTH;
+let FREE_CELL_HEIGHT;
 
-	pub.init = function () {
-		const CELL_TYPES = {
-			EMPTY: "_",
-			PROHIBITED: "0",
+const MIN_DISTANCE_BEFORE_DRAGGING = 1;
+
+const ORIENTATION = {
+	VERTICAL: "V",
+	HORIZONTAL: "H",
+	"V": "VERTICAL",
+	"H": "HORIZONTAL",
+};
+
+const CELL_TYPE = {
+	FREE: "_",
+	PROHIBITED: "0",
+	"_": "FREE",
+	"0": "PROHIBITED",
+};
+
+const utils = {
+	convertAbsolutePosition(position) {
+		return {
+			row: Math.round(position.top / FREE_CELL_HEIGHT),
+			column: Math.round(position.left / FREE_CELL_WIDTH),
 		};
-		const CELL_SIZE_IN_X = pageData.GRID_CELL_DIMENSIONS.WIDTH;
-		const CELL_SIZE_IN_Y = pageData.GRID_CELL_DIMENSIONS.HEIGHT;
-		const MOVING_DIRECTIONS = {
-			LEFT: "←",
-			RIGHT: "→",
-			UP: "↑",
-			DOWN: "↓",
-			NONE: "",
+	},
+};
+
+class FruitPosition {
+	constructor(
+		row,
+		column,
+	) {
+		this.row = row;
+		this.column = column;
+	}
+
+	getTop() {
+		return this.row * FREE_CELL_HEIGHT;
+	}
+
+	getLeft() {
+		return this.column * FREE_CELL_WIDTH;
+	}
+}
+
+class Rectangle {
+	constructor(
+		width,
+		height,
+		orientation
+	) {
+		this.width = width;
+		this.height = height;
+		this.orientation = orientation;
+	}
+}
+
+class Plate extends Rectangle {
+	constructor(parameters) {
+		super(parameters.width, parameters.height, parameters.orientation);
+
+		this.uuid = parameters.uuid;
+		this.code = parameters.code;
+		this.img = parameters.img;
+		this.grid = parameters.grid;
+		this.isSpecial = parameters.isSpecial;
+	}
+
+	/**
+	 * Creates HTML nodes and inserts them in the DOM to visualize grid property
+	 */
+	drawGridWithin($rootNode) {
+		const $plateBackground = $("<div/>", {
+			"class": "plate-background horizontal-orientation",
+			"css": {
+				"background-image": `url('${this.img}')`,
+			},
+			"appendTo": $rootNode
+		});
+
+		const $plateLayers = $("<div/>", {
+			"id": "plate-layers",
+			"css": {
+				"width": `${this.grid[0].length * FREE_CELL_WIDTH}px`,
+				"height": `${this.grid.length * FREE_CELL_HEIGHT}px`,
+			},
+			"appendTo": $plateBackground
+		});
+
+		const plateCSS = {
+			"grid-template-rows": "",
+			"grid-template-columns": `repeat(${this.grid[0].length}, ${FREE_CELL_WIDTH}px)`,
 		};
 
-		const plateGrid = pageData.PLATE_GRID;
-
-		const MIN_DISTANCE_BEFORE_DRAGGING = 1;
-
-		function parseBoundingBox(uiElement) {
-			const elementBounds = uiElement.helper[0].getBoundingClientRect();
-
-			const result = {
-				id: uiElement.helper.attr("id"),
-				x1: Math.round(uiElement.position.left / CELL_SIZE_IN_X),
-				x2: null,
-				deltaX: 0,
-				directionX: MOVING_DIRECTIONS.NONE,
-				y1: Math.round(uiElement.position.top / CELL_SIZE_IN_Y),
-				y2: null,
-				deltaY: 0,
-				directionY: MOVING_DIRECTIONS.NONE,
-				width: elementBounds.width / CELL_SIZE_IN_X,
-				height: elementBounds.height / CELL_SIZE_IN_Y,
-				originalPosition: {
-					x1: Math.round(uiElement.originalPosition.left / CELL_SIZE_IN_X),
-					x2: null,
-					y1: Math.round(uiElement.originalPosition.top / CELL_SIZE_IN_Y),
-					y2: null,
-				},
-			};
-
-			result.x2 = result.x1 + result.width - 1;
-			result.y2 = result.y1 + result.height - 1;
-
-			result.originalPosition.x2 = result.originalPosition.x1 + result.width - 1;
-			result.originalPosition.y2 = result.originalPosition.y1 + result.height - 1;
-
-			result.deltaX = result.x2 - result.originalPosition.x2;
-			const deltaXSign = Math.sign(result.deltaX);
-			if (deltaXSign == 1) {
-				result.directionX = MOVING_DIRECTIONS.RIGHT;
-			} else if (deltaXSign == -1) {
-				result.directionX = MOVING_DIRECTIONS.LEFT;
-			}
-
-			result.deltaY = result.y2 - result.originalPosition.y2;
-			const deltaYSign = Math.sign(result.deltaY);
-			if (deltaYSign == 1) {
-				result.directionY = MOVING_DIRECTIONS.DOWN;
-			} else if (deltaYSign == -1) {
-				result.directionY = MOVING_DIRECTIONS.UP;
-			}
-
-			return result;
+		for (let i = 0; i < this.grid.length; i++) {
+			plateCSS["grid-template-rows"] = plateCSS["grid-template-rows"].concat(` ${FREE_CELL_HEIGHT}px `);
 		}
 
-		function isProhibitedPosition(plateItemPosition, grid) {
-			let result = false;
+		const $plateGrid = $("<div/>", {
+			"id": "plate-grid",
+			"css": plateCSS,
+			"appendTo": $plateLayers
+		});
 
-			// Broad phase
-			const axisRanges = extract2DAxisRanges(plateItemPosition);
+		for (let y = 1; y <= this.grid.length; y++) {
+			const row = this.grid[y - 1];
 
-			// console.log(axisRanges.x, axisRanges.y);
+			for (let x = 1; x <= row.length; x++) {
+				const cell = row[x - 1];
 
-			const gridSection = AP.util.slice2DArray({
-				array: grid,
-				rowRange: axisRanges.y,
-				colRange: axisRanges.x,
-				isInclusiveEnd: true,
-			});
-
-			// console.table(gridSection);
-
-			// Narrow phase
-			result = gridSection.some(row => row.some(cell => cell == CELL_TYPES.PROHIBITED));
-
-			return result;
-		}
-
-		function extractPlateItemsFrom(grid, cellPredicate = () => true) {
-			const result = {};
-
-			for (const row of grid) {
-				for (const cell of row) {
-					if (cellPredicate(cell)) {
-						if (!result.hasOwnProperty(cell)) {
-							result[cell] = pageData.PLATE_ELEMENTS[cell];
-						}
-					}
-				}
-			}
-
-			return result;
-		}
-
-		function getOverlappingMetadata(plateItemPosition, grid) {
-			const result = {
-				overlappedPlateItems: [],
-				isOverlapping: false,
-			};
-
-			// Broad phase
-			const axisRanges = extract2DAxisRanges(plateItemPosition);
-			const subGrid = AP.util.slice2DArray({
-				array: grid,
-				rowRange: axisRanges.y,
-				colRange: axisRanges.x,
-				isInclusiveEnd: true,
-			});
-
-			const possibleBoxes = extractPlateItemsFrom(
-				subGrid,
-				cell => cell != plateItemPosition.id && cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
-			);
-
-			result.isOverlapping = Object.entries(possibleBoxes).length > 0;
-
-			// Narrow phase
-			for (const [key, candidateBox] of Object.entries(possibleBoxes)) {
-				const x5 = Math.max(plateItemPosition.x1, candidateBox.x1);
-				const x6 = Math.min(plateItemPosition.x2, candidateBox.x2);
-				const width = x6 - x5 + 1;
-
-				const y5 = Math.max(plateItemPosition.y1, candidateBox.y1);
-				const y6 = Math.min(plateItemPosition.y2, candidateBox.y2);
-				const height = y6 - y5 + 1;
-
-				if (x5 > x6) {
-					result.isOverlapping = false;
-
-					break;
-				}
-
-				if (y5 > y6) {
-					result.isOverlapping = false;
-
-					break;
-				}
-
-				result.overlappedPlateItems.push({
-					item: candidateBox,
-					overlappedWidth: width,
-					overlappedHeight: height,
+				const $plateCell = $("<div/>", {
+					"class": `grid-column p${x} ${cell.type == CELL_TYPE.PROHIBITED ? "prohibited" : ""}`,
+					"css": {
+						"grid-row": `${y} / ${y + 1}`,
+						"grid-column": `${x} / ${x + 1}`,
+					},
+					"appendTo": $plateGrid,
 				});
-			}
 
-			return result;
+				if (cell.type != CELL_TYPE.PROHIBITED) {
+					const $cellLabel = $("<span/>", {
+						"text": `(${x}, ${y})`,
+						"class": "position-label",
+						"css": {
+							"font-size": "8px",
+						},
+						"appendTo": $plateCell,
+					});
+				}
+			}
+		}
+	}
+}
+
+class Cell extends Rectangle {
+	constructor(width, height, orientation, type) {
+		super(width, height, orientation);
+
+		this.type = type;
+	}
+}
+
+class Fruit extends Rectangle {
+	constructor(params) {
+		super(params.width, params.height, params.orientation);
+
+		this.uuid = params.uuid;
+		this.code = params.code;
+		this.name = params.name;
+		this.img = params.img;
+
+		this._$element = null;
+		this._position = null;
+		this._originalPosition = null;
+		this._lastPosition = null;
+	}
+
+	get position() {
+		return this._position;
+	}
+
+	set position(value) {
+		this._position = value;
+	}
+
+	get lastPosition() {
+		return this._lastPosition;
+	}
+
+	set lastPosition(value) {
+		this._lastPosition = value;
+	}
+
+	get $element() {
+		return this._$element;
+	}
+
+	set $element(value) {
+		this._$element = value;
+	}
+
+	initDraggableWidget(controller) {
+		const self = this;
+
+		self._$element.draggable({
+			// axis: "x", // TODO: rendere parametrico in base alla configurazione: "solo verticale", "solo orizontale", "entrambi"
+			containment: "#fruits",
+			distance: MIN_DISTANCE_BEFORE_DRAGGING,
+			// grid: [ATOMIC_WIDTH],
+			revertDuration: 250,
+			start: function (event, ui) {
+				controller.onStartDragging(self, event, ui);
+			},
+			drag: function (event, ui) {
+				controller.onDragging(self, event, ui);
+			},
+			stop: function (event, ui) {
+				controller.onStopDragging(self, event, ui);
+			},
+		});
+	}
+
+	isOverlappingWith(otherFruit) {
+		let result = true;
+
+		const x5 = Math.max(this.position.getLeft(), otherFruit.position.getLeft());
+		const x6 = Math.min(this.position.getLeft() + this.width, otherFruit.position.getLeft() + otherFruit.width);
+
+		const y5 = Math.max(this.position.getTop(), otherFruit.position.getTop());
+		const y6 = Math.min(this.position.getTop() + this.height, otherFruit.position.getTop() + otherFruit.height);
+
+		if (x5 >= x6) {
+			result = false;
 		}
 
-		function getCenteredIndexes(xRange) {
-			const result = {
-				x1: null,
-				x2: null,
-			};
-
-			const arrLen = xRange.end - xRange.start;
-
-			if (arrLen >= 2 && arrLen % 2 == 0) {
-				result.x1 = xRange.start + (arrLen / 2) - 1;
-				result.x2 = xRange.end - (arrLen / 2);
-			}
-
-			return result;
+		if (y5 >= y6) {
+			result = false;
 		}
 
-		function canPushOverlappedItems(overlappingMetadata, plateItem, grid) {
-			let result = {
-				canPush: false,
-				pushedPlateItem: null,
-				x1: 0,
-				x2: 0,
-				y1: 0,
-				y2: 0,
-			};
+		return result;
+	}
 
-			if (overlappingMetadata.overlappedPlateItems.length	> 1) {
+	canSwapWith(otherFruit) {
+		// Only if both are in the same position and are of equal size
+		return this.position.row == otherFruit.position.row
+			&& this.position.column == otherFruit.position.column
+			&& this.position.getTop() + this.height == otherFruit.position.getTop() + otherFruit.height
+			&& this.position.getLeft() + this.width == otherFruit.position.getLeft() + otherFruit.width;
+	}
+
+	swapPositionWith(otherFruit) {
+		this.position = otherFruit.position;
+		otherFruit.position = this._originalPosition;
+	}
+
+	fitsWithin(containmentGrid) {
+		const colSpan = {
+			start: this.position.column,
+			end: this.position.column + (this.width / FREE_CELL_WIDTH),
+		};
+
+		const rowSpan = {
+			start: this.position.row,
+			end: this.position.row + (this.height / FREE_CELL_HEIGHT),
+		};
+
+		return 0 <= colSpan.start && colSpan.end <= containmentGrid[0].length
+			&& 0 <= rowSpan.start && rowSpan.end <= containmentGrid.length;
+	}
+
+	/**
+	 * Calculates a separation vector that moves the given overlapping Fruit away from this Fruit
+	 * @param {Array} otherFruit
+	 * @returns Array of two elements: [x, y]
+	 */
+	calculateSeparation(otherFruit) {
+		const result = [0, 0];
+
+		const thisCenterPoint = [
+			this.position.getLeft() + (this.width / 2),
+			this.position.getTop() + (this.height / 2),
+		];
+
+		const otherCenterPoint = [
+			otherFruit.position.getLeft() + (otherFruit.width / 2),
+			otherFruit.position.getTop() + (otherFruit.height / 2),
+		];
+
+		const separationVector = [
+			otherCenterPoint[0] - thisCenterPoint[0],
+			otherCenterPoint[1] - thisCenterPoint[1],
+		];
+
+		const vectorLength = Math.sqrt(Math.pow(separationVector[0], 2) + Math.pow(separationVector[1], 2)); // Pythagorean theorem
+
+		if (vectorLength == 0) {
+			return result; // Avoid division by zero
+		}
+
+		const normalizedVector = [separationVector[0] / vectorLength, separationVector[1] / vectorLength];
+		const moveAmount = FREE_CELL_WIDTH; // Adjust it on your needs
+
+		result[0] = normalizedVector[0] * moveAmount;
+		result[1] = normalizedVector[1] * moveAmount;
+
+		return result;
+	}
+
+	hasChangedPosition() {
+		return this._originalPosition.column != this.position.column
+			|| this._originalPosition.row != this.position.row;
+	}
+
+	makePositionSnapshot() {
+		this._originalPosition = new FruitPosition(this.position.row, this.position.column);
+	}
+
+	restorePositionToLastSnapshot() {
+		this.position = this._originalPosition;
+	}
+
+	startDragging() {
+		this.$element.addClass("is-dragging");
+	}
+
+	stopDragging() {
+		this.$element.removeClass("is-dragging");
+		this.$element.removeClass("is-not-swappable");
+	}
+
+	/**
+	 * Renders Fruit based on current position
+	 */
+	render() {
+		this.$element.css({
+			left: this.position.getLeft(),
+			top: this.position.getTop(),
+		});
+	}
+}
+
+class FruitsController {
+	constructor(params) {
+		this.plate = params.plate;
+		this.fruits = params.fruits;
+	}
+
+	/**
+	 *	Creates HTML nodes and inserts them in the DOM to visualize fruits on the grid
+	 */
+	drawFruitsWithin($rootNode) {
+		const $fruits = $("<div/>", {
+			"id": "fruits",
+			"appendTo": $rootNode
+		});
+
+		for (let i = 0; i < this.fruits.length; i++) {
+			const fruit = this.fruits[i];
+
+			const $fruit = $("<div/>", {
+				"id": fruit.uuid,
+				"class": "draggable-fruit",
+				"css": {
+					"top": `${fruit.position.getTop()}px`,
+					"left": `${fruit.position.getLeft()}px`,
+					"width": `${fruit.width}px`,
+					"height": `${fruit.height}px`,
+				},
+				"appendTo": $fruits,
+			});
+
+			const $img = $("<img/>", {
+				"src": fruit.img,
+				"class": "fruit-img",
+				"appendTo": $fruit,
+			});
+
+			fruit.$element = $fruit;
+		}
+	}
+
+	/**
+	 * Initializes jQuery UI Draggable Widget for each fruit
+	 */
+	makeFruitsDraggable() {
+		for (const fruit of this.fruits) {
+			fruit.initDraggableWidget(this);
+		}
+	}
+
+	restoreAllFruitPositions() {
+		for (const fruit of this.fruits) {
+			fruit.restorePositionToLastSnapshot();
+		}
+	}
+
+	isFruitInProhibitedPosition(fruit) {
+		const rowRange = { start: fruit.position.row, end: fruit.position.row + (fruit.height / FREE_CELL_HEIGHT) };
+		const colRange = { start: fruit.position.column, end: fruit.position.column + (fruit.width / FREE_CELL_WIDTH) };
+
+		const subGrid = AP.util.slice2DArray({
+			array: this.plate.grid,
+			rowRange: rowRange,
+			colRange: colRange,
+		});
+
+		const result = subGrid.some(row => row.some(cell => cell.type == CELL_TYPE.PROHIBITED));
+
+		return result;
+	}
+
+	renderFruits() {
+		for (const fruit of this.fruits) {
+			fruit.render();
+		}
+	}
+
+	hasOverlappedFruits() {
+		return this.fruits.some(fruit => {
+			return this.fruits.some(otherFruit => otherFruit != fruit ? fruit.isOverlappingWith(otherFruit) : false);
+		});
+	}
+
+	moveAwayAllFruitsFrom(targetFruit) {
+		let result = true;
+
+		const filteredFruits = this.fruits.filter(f => f != targetFruit);
+
+		const MAX_ITERATIONS = 1000;
+
+		let counter = 0;
+		while (this.hasOverlappedFruits()) {
+			if (counter > MAX_ITERATIONS) {
+				result = false;
+
+				console.error("DANGER! Potential infinite loop.");
+
 				return result;
 			}
 
-			const firstPlateItemMetadata = overlappingMetadata.overlappedPlateItems[0];
-			const pushedPlateItemWidth = firstPlateItemMetadata.item.x2 - firstPlateItemMetadata.item.x1 + 1;
+			const overlapVectors = [];
 
-			if (plateItem.width >= firstPlateItemMetadata.overlappedWidth && plateItem.width != pushedPlateItemWidth) {
-				const centerIndexesPushedItem = getCenteredIndexes({
-					start: firstPlateItemMetadata.item.x1,
-					end: firstPlateItemMetadata.item.x2 + 1,
-				});
+			for (const fruit of filteredFruits) {
+				const vector = this.generateNormalizedOverlapVector(fruit);
 
-				const centerIndexesPlateItem = getCenteredIndexes({
-					start: plateItem.x1,
-					end: plateItem.x2 + 1,
-				});
+				if (vector[0] != 0 || vector[1] != 0) {
+					overlapVectors.push([fruit, vector]);
+				}
+			}
 
-				if (
-					centerIndexesPushedItem.x1 == centerIndexesPlateItem.x1
-					&& centerIndexesPushedItem.x2 == centerIndexesPlateItem.x2
-				) {
+			for (const [fruit, vector] of overlapVectors) {
+				const isSuccess = this.translateFruitByVector(fruit, vector);
+
+				if (!isSuccess) {
+					result = false;
+
 					return result;
 				}
 			}
 
-			result.pushedPlateItem = firstPlateItemMetadata.item;
+			counter++;
+		}
 
-			const gridMargins = {
-				left: 0,
-				right: grid[0].length - 1,
-				up: 0,
-				down: grid.length - 1,
-			};
+		return result;
+	}
 
-			const isOverlappingOnLeftSide = plateItem.x1 <= result.pushedPlateItem.x1;
+	generateNormalizedOverlapVector(fruit) {
+		const vector = [0, 0];
 
-			const deltaX = isOverlappingOnLeftSide ? firstPlateItemMetadata.overlappedWidth : -firstPlateItemMetadata.overlappedWidth;
+		const filteredFruits = this.fruits.filter(f => f != fruit);
 
-			let newCoordinateX1 = result.pushedPlateItem.x1 + deltaX;
-			let newCoordinateX2 = result.pushedPlateItem.x2 + deltaX;
+		for (const otherFruit of filteredFruits) {
+			if (fruit.isOverlappingWith(otherFruit)) {
+				const innerVector = fruit.calculateSeparation(otherFruit);
 
-			if (
-				gridMargins.left <= newCoordinateX1 && newCoordinateX1 <= gridMargins.right
-				&& gridMargins.left <= newCoordinateX2 && newCoordinateX2 <= gridMargins.right
-			) {
-				const axisRangesPossibleLeft = extract2DAxisRanges(result.pushedPlateItem);
-				axisRangesPossibleLeft.x.start += deltaX;
-				axisRangesPossibleLeft.x.end += deltaX;
+				vector[0] += innerVector[0];
+				vector[1] += innerVector[1];
+			}
+		}
 
-				const subGrid = AP.util.slice2DArray({
-					array: grid,
-					rowRange: axisRangesPossibleLeft.y,
-					colRange: axisRangesPossibleLeft.x,
-					isInclusiveEnd: true,
-				});
+		return vector;
+	}
 
-				// Narrow phase
-				const possibleBoxes = extractPlateItemsFrom(
-					subGrid,
-					cell => cell != result.pushedPlateItem.id && cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
+	translateFruitByVector(fruit, vector) {
+		const convertedPosition = utils.convertAbsolutePosition({
+			left: vector[0],
+			top: vector[1],
+		});
+
+		fruit.position = new FruitPosition(
+			fruit.position.row - convertedPosition.row,
+			fruit.position.column - convertedPosition.column,
+		);
+
+		return !this.isFruitInProhibitedPosition(fruit)
+			&& fruit.fitsWithin(this.plate.grid);
+	}
+
+	/**
+	 * Triggered when dragging starts
+	 * @param {Fruit} fruit
+	 * @param {Event} event
+	 * @param {object} ui
+	 */
+	onStartDragging(fruit, event, ui) {
+		fruit.startDragging();
+
+		for (const f of this.fruits) {
+			f.makePositionSnapshot();
+		}
+	}
+
+	/**
+	 * Triggered while the mouse is moved during the dragging, immediately before the current move happens
+	 * @param {Fruit} fruit
+	 * @param {Event} event
+	 * @param {object} ui
+	 */
+	onDragging(fruit, event, ui) {
+		fruit.lastPosition = fruit.position;
+
+		const convertedPosition = utils.convertAbsolutePosition(ui.position);
+		fruit.position = new FruitPosition(convertedPosition.row, convertedPosition.column);
+
+		if (this.isFruitInProhibitedPosition(fruit)) {
+			fruit.position = fruit.lastPosition;
+
+			ui.position.left = fruit.position.getLeft();
+			ui.position.top = fruit.position.getTop();
+		}
+	}
+
+	/**
+	 * Triggered when dragging stops
+	 * @param {Fruit} fruit
+	 * @param {Event} event
+	 * @param {object} ui
+	 */
+	onStopDragging(fruit, event, ui) {
+		const convertedPosition = utils.convertAbsolutePosition(ui.position);
+		fruit.position = new FruitPosition(convertedPosition.row, convertedPosition.column);
+
+		if (fruit.hasChangedPosition()) {
+			if (this.hasOverlappedFruits()) {
+				const otherFruit = this.fruits.find(f =>
+					f != fruit
+					&& f.position.row == fruit.position.row
+					&& f.position.column == fruit.position.column
 				);
 
-				if (Object.keys(possibleBoxes).length == 0) {
-					result.canPush = true;
-
-					result.x1 = axisRangesPossibleLeft.x.start;
-					result.x2 = axisRangesPossibleLeft.x.end;
-				}
-			}
-
-			// TODO:
-			// const newCoordinateY = params.plateItem.y1 + params.deltaY;
-			// if (gridMargins.up <= newCoordinateY && newCoordinateY <= gridMargins.down) {
-			// 	result = true;
-			// }
-
-			return result;
-		}
-
-		function changePositionsPushingOverlappedItem(pushingMetadata, plateItemPosition, grid) {
-			const oldAxisRangesPushedItem = extract2DAxisRanges(pushingMetadata.pushedPlateItem);
-
-			AP.util.splice2DArray({
-				array: grid,
-				rowRange: oldAxisRangesPushedItem.y,
-				colRange: oldAxisRangesPushedItem.x,
-				replaceItem: CELL_TYPES.EMPTY,
-				isInclusiveEnd: true,
-			});
-
-			console.table(grid);
-
-			const newAxisRangesPushedItem = extract2DAxisRanges(pushingMetadata);
-
-			AP.util.splice2DArray({
-				array: grid,
-				rowRange: newAxisRangesPushedItem.y,
-				colRange: newAxisRangesPushedItem.x,
-				replaceItem: pushingMetadata.pushedPlateItem.id,
-				isInclusiveEnd: true,
-			});
-
-			console.table(grid);
-
-			updatePlateItemNewPosition(plateItemPosition, grid);
-
-			updatePlateItemsCoordinates(grid);
-		}
-
-		function canSwapWithOverlappedItems(overlappingMetadata, plateItem) {
-			if (overlappingMetadata.overlappedPlateItems.length > 1) {
-				return false;
-			}
-
-			const firstMetadata = overlappingMetadata.overlappedPlateItems[0];
-			const overlappedItem = firstMetadata.item;
-			const overlappedItemWidth = overlappedItem.x2 - overlappedItem.x1 + 1;
-			const overlappedItemHeight = overlappedItem.y2 - overlappedItem.y1 + 1;
-
-			return overlappedItemWidth == plateItem.width
-				&& overlappedItemHeight == plateItem.height
-				&& firstMetadata.overlappedWidth == plateItem.width
-				&& firstMetadata.overlappedHeight == plateItem.height;
-		}
-
-		function swapPositionsWithOverlappedItem(overlappingMetadata, plateItem, grid) {
-			console.table(grid);
-
-			const originalPositionAxisRanges = extract2DAxisRanges(plateItem.originalPosition);
-			AP.util.splice2DArray({
-				array: grid,
-				rowRange: originalPositionAxisRanges.y,
-				colRange: originalPositionAxisRanges.x,
-				replaceItem: overlappingMetadata.overlappedPlateItems[0].item.id,
-				isInclusiveEnd: true,
-			});
-
-			console.table(grid);
-
-			const newPositionAxisRanges = extract2DAxisRanges(plateItem);
-			AP.util.splice2DArray({
-				array: grid,
-				rowRange: newPositionAxisRanges.y,
-				colRange: newPositionAxisRanges.x,
-				replaceItem: plateItem.id,
-				isInclusiveEnd: true,
-			});
-
-			console.table(grid);
-
-			updatePlateItemsCoordinates(grid);
-		}
-
-		function extract2DAxisRanges(position) {
-			return {
-				x: { start: position.x1, end: position.x2 },
-				y: { start: position.y1, end: position.y2 },
-			};
-		}
-
-		function updatePlateItemNewPosition(itemBoundingBox, grid) {
-			const newPositionAxisRanges = extract2DAxisRanges(itemBoundingBox);
-
-			AP.util.splice2DArray({
-				array: grid,
-				rowRange: newPositionAxisRanges.y,
-				colRange: newPositionAxisRanges.x,
-				replaceItem: itemBoundingBox.id,
-				isInclusiveEnd: true,
-			});
-
-			console.table(grid);
-
-			updatePlateItemsCoordinates(grid);
-		}
-
-		function updatePlateItemsCoordinates(grid) {
-			const plateItems = extractPlateItemsFrom(
-				grid,
-				cell => cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
-			);
-
-			const plateItemsMap = {};
-			for (let y = 0; y < grid.length; y++) {
-				const row = grid[y];
-
-				for (let x = 0; x < row.length; x++) {
-					const plateItemKey = row[x];
-
-					if (plateItems.hasOwnProperty(plateItemKey)) {
-						if (!plateItemsMap.hasOwnProperty(plateItemKey)) {
-							plateItemsMap[plateItemKey] = {
-								x: new Set(),
-								y: new Set(),
-							};
-						}
-
-						plateItemsMap[plateItemKey].x.add(x);
-						plateItemsMap[plateItemKey].y.add(y);
-					}
-				}
-			}
-
-			Object.entries(plateItems).forEach(([plateItemKey, value]) => {
-				const updatedPlateItem = plateItemsMap[plateItemKey];
-				const coordsX = Array.from(updatedPlateItem.x);
-				const coordsY = Array.from(updatedPlateItem.y);
-
-				value.x1 = Math.min(...coordsX);
-				value.x2 = Math.max(...coordsX);
-
-				value.y1 = Math.min(...coordsY);
-				value.y2 = Math.max(...coordsY);
-			});
-		}
-
-		function isChangedPlateItemFinalPosition(plateItem) {
-			return plateItem.originalPosition.y1 != plateItem.y1
-				|| plateItem.originalPosition.x1 != plateItem.x1;
-		}
-
-		function restoreInitialPosition(plateItemPosition, grid) {
-			const axisRanges = extract2DAxisRanges(plateItemPosition.originalPosition);
-
-			AP.util.splice2DArray({
-				array: grid,
-				rowRange: axisRanges.y,
-				colRange: axisRanges.x,
-				replaceItem: plateItemPosition.id,
-				isInclusiveEnd: true,
-			});
-		}
-
-		function renderGrid(plateGrid) {
-			const allBoxes = extractPlateItemsFrom(
-				plateGrid,
-				cell => cell != CELL_TYPES.EMPTY && cell != CELL_TYPES.PROHIBITED
-			);
-
-			for (const [key, box] of Object.entries(allBoxes)) {
-				const $box = $(`#${key}`);
-
-				$box.css("left", box.x1 * CELL_SIZE_IN_X);
-				$box.css("top", box.y1 * CELL_SIZE_IN_Y);
-			}
-		}
-
-		$(".draggable-plate-item").draggable({
-			// axis: "x", // TODO: rendere parametrico in base alla configurazione: "solo verticale", "solo orizontale", "entrambi"
-			containment: "#plate-items",
-			distance: MIN_DISTANCE_BEFORE_DRAGGING,
-			grid: [CELL_SIZE_IN_X],
-			revertDuration: 250,
-			start: function (event, ui) {
-				const $draggablePlateItem = ui.helper;
-
-				$draggablePlateItem.addClass("is-dragging");
-
-				const originalBoundingBox = parseBoundingBox(ui);
-				const axisRanges = extract2DAxisRanges(originalBoundingBox.originalPosition);
-
-				AP.util.splice2DArray({
-					array: plateGrid,
-					rowRange: axisRanges.y,
-					colRange: axisRanges.x,
-					replaceItem: CELL_TYPES.EMPTY,
-					isInclusiveEnd: true,
-				});
-			},
-			drag: function (event, ui) {
-				// const $draggablePlateItem = ui.helper;
-
-				// const newBoundingBox = parseBoundingBox(ui);
-
-				// console.log(newBoundingBox.x1, newBoundingBox.x2, newBoundingBox.deltaX, newBoundingBox.directionX);
-				// console.log(ui.position);
-
-				// if (isProhibitedPosition(newBoundingBox, plateGrid)) {
-				// ui.position.left = ui.originalPosition.left;
-				// ui.position.top = ui.originalPosition.top;
-				// } else {
-				// 	if (isColliding(newBoundingBox, plateGrid)) {
-				// 		$draggablePlateItem.addClass("is-colliding");
-
-				// 		if (!canSwapWithCollidingItem(newBoundingBox, plateGrid)) {
-				// 			$draggablePlateItem.addClass("is-not-swappable");
-				// 		} else {
-				// 			$draggablePlateItem.removeClass("is-not-swappable");
-				// 		}
-				// 	} else {
-				// 		$draggablePlateItem.removeClass("is-colliding");
-				// 	}
-				// }
-
-			},
-			stop: function (event, ui) {
-				const $draggablePlateItem = ui.helper;
-
-				$draggablePlateItem.removeClass("is-dragging");
-				$draggablePlateItem.removeClass("is-not-swappable");
-
-				const newBoundingBox = parseBoundingBox(ui);
-
-        if (isChangedPlateItemFinalPosition(newBoundingBox)) {
-					const overlappingMetadata = getOverlappingMetadata(newBoundingBox, plateGrid);
-
-					if (overlappingMetadata.isOverlapping) {
-						if (canSwapWithOverlappedItems(overlappingMetadata, newBoundingBox)) {
-							swapPositionsWithOverlappedItem(overlappingMetadata, newBoundingBox, plateGrid);
-						} else {
-							const pushingMetadata = canPushOverlappedItems(overlappingMetadata, newBoundingBox, plateGrid);
-
-							if (pushingMetadata.canPush) {
-								changePositionsPushingOverlappedItem(pushingMetadata, newBoundingBox, plateGrid);
-							} else {
-								restoreInitialPosition(newBoundingBox, plateGrid);
-							}
-						}
-					} else {
-						updatePlateItemNewPosition(newBoundingBox, plateGrid);
-					}
+				if (otherFruit && fruit.canSwapWith(otherFruit)) {
+					fruit.swapPositionWith(otherFruit);
 				} else {
-					restoreInitialPosition(newBoundingBox, plateGrid);
-				}
+					const isOperationSuccessful = this.moveAwayAllFruitsFrom(fruit, this.plate.grid);
 
-				renderGrid(plateGrid);
-			},
+					if (!isOperationSuccessful) {
+						this.restoreAllFruitPositions();
+					}
+				}
+			}
+		}
+
+		fruit.stopDragging();
+
+		this.renderFruits();
+	}
+}
+
+AP.plate.designer = (function () {
+	var pub = {};
+
+	pub.init = function () {
+		/*
+		Sappiamo:
+			- l'orientamento della placca
+			- width e height dell'intera placca
+			- griglia dell'intera placca
+			- width e height di un sottomodulo
+		*/
+
+		PLATE_WIDTH = pageData.PLATE.WIDTH;
+		PLATE_HEIGHT = pageData.PLATE.HEIGHT;
+		FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS.WIDTH;
+		FREE_CELL_HEIGHT = pageData.GRID_CELL_DIMENSIONS.HEIGHT;
+
+		const grid = [];
+		for (let iRow = 0; iRow < pageData.PLATE.GRID.length; iRow++) {
+			const row = [];
+
+			for (let iCol = 0; iCol < pageData.PLATE.GRID[iRow].length; iCol++) {
+				const cellType = pageData.PLATE.GRID[iRow][iCol];
+
+				row.push(new Cell(
+					FREE_CELL_WIDTH,
+					FREE_CELL_HEIGHT,
+					pageData.PLATE.ORIENTATION,
+					cellType,
+				));
+			}
+
+			grid.push(row);
+		}
+
+		const plate = new Plate({
+			width: PLATE_WIDTH,
+			height: PLATE_HEIGHT,
+			orientation: ORIENTATION.HORIZONTAL,
+			uuid: "",
+			code: "5x8",
+			img: "/assets/main/img/508.jpg",
+			grid: grid,
+			isSpecial: false,
 		});
+
+		plate.drawGridWithin($(".plate-designer"));
+
+		const fruits = [];
+
+		for (const fruit of Object.values(pageData.FRUITS)) {
+			const fruitObj = new Fruit({
+				width: fruit.width,
+				height: fruit.height,
+				orientation: ORIENTATION.HORIZONTAL,
+				uuid: fruit.uuid,
+				code: fruit.code,
+				name: fruit.name,
+				img: fruit.img,
+			});
+
+			fruitObj.position = new FruitPosition(
+				fruit.row,
+				fruit.column,
+			);
+
+			fruits.push(fruitObj);
+		}
+
+		const fruitController = new FruitsController({
+			plate: plate,
+			fruits: fruits,
+		});
+
+		fruitController.drawFruitsWithin($("#plate-layers"));
+		fruitController.makeFruitsDraggable();
 	};
 
 	return pub;

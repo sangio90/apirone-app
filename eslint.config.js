@@ -40,7 +40,7 @@ module.exports = {
 				"named": "never"
 			}
 		],
-		"function-paren-newline": "warn",
+		"function-paren-newline": "off",
 		"no-multiple-empty-lines": "warn",
 		"newline-per-chained-call": [
 			"warn", {
