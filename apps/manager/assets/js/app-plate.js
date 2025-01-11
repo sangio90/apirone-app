@@ -64,9 +64,13 @@ class Rectangle {
 		height,
 		orientation
 	) {
-		this.width = width;
-		this.height = height;
 		this.orientation = orientation;
+		this.width = orientation == ORIENTATION.VERTICAL ? height : width;
+		this.height = orientation == ORIENTATION.VERTICAL ? width : height;
+	}
+
+	isSquare() {
+		return this.width == this.height;
 	}
 }
 
@@ -86,8 +90,10 @@ class Plate extends Rectangle {
 	 */
 	drawGridWithin($rootNode) {
 		const $plateBackground = $("<div/>", {
-			"class": "plate-background horizontal-orientation",
+			"class": "plate-background",
 			"css": {
+				"width": `${this.width}px`,
+				"height": `${this.height}px`,
 				"background-image": `url('${this.img}')`,
 			},
 			"appendTo": $rootNode
@@ -95,21 +101,25 @@ class Plate extends Rectangle {
 
 		const $plateLayers = $("<div/>", {
 			"id": "plate-layers",
-			"css": {
-				"width": `${this.grid[0].length * FREE_CELL_WIDTH}px`,
-				"height": `${this.grid.length * FREE_CELL_HEIGHT}px`,
-			},
 			"appendTo": $plateBackground
 		});
 
 		const plateCSS = {
 			"grid-template-rows": "",
-			"grid-template-columns": `repeat(${this.grid[0].length}, ${FREE_CELL_WIDTH}px)`,
+			"grid-template-columns": "",
 		};
 
 		for (let i = 0; i < this.grid.length; i++) {
-			plateCSS["grid-template-rows"] = plateCSS["grid-template-rows"].concat(` ${FREE_CELL_HEIGHT}px `);
+			const row = this.grid[i];
+
+			const maxCellHeight = row.reduce((acc, curr) => curr.height > acc ? curr.height : acc, 0);
+
+			plateCSS["grid-template-rows"] = plateCSS["grid-template-rows"].concat(` ${maxCellHeight}px `);
 		}
+
+		const maxCellWidth = this.grid[0].reduce((acc, curr) => curr.width > acc ? curr.width : acc, 0);
+
+		plateCSS["grid-template-columns"] = `repeat(${this.grid[0].length}, ${maxCellWidth}px)`;
 
 		const $plateGrid = $("<div/>", {
 			"id": "plate-grid",
@@ -293,10 +303,12 @@ class Fruit extends Rectangle {
 		}
 
 		const normalizedVector = [separationVector[0] / vectorLength, separationVector[1] / vectorLength];
-		const moveAmount = FREE_CELL_WIDTH; // Adjust it on your needs
 
-		result[0] = normalizedVector[0] * moveAmount;
-		result[1] = normalizedVector[1] * moveAmount;
+		const moveAmountX = FREE_CELL_WIDTH; // Adjust it on your needs
+		const moveAmountY = FREE_CELL_HEIGHT; // Adjust it on your needs
+
+		result[0] = normalizedVector[0] * moveAmountX;
+		result[1] = normalizedVector[1] * moveAmountY;
 
 		return result;
 	}
@@ -320,7 +332,6 @@ class Fruit extends Rectangle {
 
 	stopDragging() {
 		this.$element.removeClass("is-dragging");
-		this.$element.removeClass("is-not-swappable");
 	}
 
 	/**
@@ -364,9 +375,27 @@ class FruitsController {
 				"appendTo": $fruits,
 			});
 
+			const imgCSS = {
+				"width": `${fruit.width}px`,
+				"height": `${fruit.height}px`,
+			};
+
+			if (fruit.orientation == ORIENTATION.VERTICAL) {
+				const tmp = imgCSS.width;
+				imgCSS.width = imgCSS.height;
+				imgCSS.height = tmp;
+
+				if (fruit.isSquare()) {
+					imgCSS.transform = "rotate(90deg)";
+				} else {
+					imgCSS.transform = "rotate(90deg) translate(-50%, 0%)";
+				}
+			}
+
 			const $img = $("<img/>", {
 				"src": fruit.img,
 				"class": "fruit-img",
+				"css": imgCSS,
 				"appendTo": $fruit,
 			});
 
@@ -500,16 +529,16 @@ class FruitsController {
 	onStartDragging(fruit, event, ui) {
 		fruit.startDragging();
 
-		for (const f of this.fruits) {
-			f.makePositionSnapshot();
+		for (const fruit of this.fruits) {
+			fruit.makePositionSnapshot();
 		}
 	}
 
 	/**
-	 * Triggered while the mouse is moved during the dragging, immediately before the current move happens
+	 * Triggered while the mouse is moved during the dragging, immediately before the current move happens.
 	 * @param {Fruit} fruit
 	 * @param {Event} event
-	 * @param {object} ui
+	 * @param {object} ui The values may be changed to modify where the element will be positioned. This is useful for custom containment, snapping, etc
 	 */
 	onDragging(fruit, event, ui) {
 		fruit.lastPosition = fruit.position;
@@ -575,8 +604,14 @@ AP.plate.designer = (function () {
 
 		PLATE_WIDTH = pageData.PLATE.WIDTH;
 		PLATE_HEIGHT = pageData.PLATE.HEIGHT;
-		FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS.WIDTH;
-		FREE_CELL_HEIGHT = pageData.GRID_CELL_DIMENSIONS.HEIGHT;
+		FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
+		FREE_CELL_HEIGHT = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
+
+		if (pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].ORIENTATION == ORIENTATION.VERTICAL) {
+			const tmp = FREE_CELL_WIDTH;
+			FREE_CELL_WIDTH = FREE_CELL_HEIGHT;
+			FREE_CELL_HEIGHT = tmp;
+		}
 
 		const grid = [];
 		for (let iRow = 0; iRow < pageData.PLATE.GRID.length; iRow++) {
@@ -586,9 +621,9 @@ AP.plate.designer = (function () {
 				const cellType = pageData.PLATE.GRID[iRow][iCol];
 
 				row.push(new Cell(
-					FREE_CELL_WIDTH,
-					FREE_CELL_HEIGHT,
-					pageData.PLATE.ORIENTATION,
+					pageData.GRID_CELL_DIMENSIONS[cellType].WIDTH,
+					pageData.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
+					pageData.GRID_CELL_DIMENSIONS[cellType].ORIENTATION,
 					cellType,
 				));
 			}
@@ -597,12 +632,12 @@ AP.plate.designer = (function () {
 		}
 
 		const plate = new Plate({
-			width: PLATE_WIDTH,
-			height: PLATE_HEIGHT,
-			orientation: ORIENTATION.HORIZONTAL,
-			uuid: "",
-			code: "5x8",
-			img: "/assets/main/img/508.jpg",
+			width: pageData.PLATE.WIDTH,
+			height: pageData.PLATE.HEIGHT,
+			orientation: pageData.PLATE.ORIENTATION,
+			uuid: pageData.PLATE.UUID,
+			code: pageData.PLATE.CODE,
+			img: pageData.PLATE.IMG,
 			grid: grid,
 			isSpecial: false,
 		});
@@ -615,7 +650,7 @@ AP.plate.designer = (function () {
 			const fruitObj = new Fruit({
 				width: fruit.width,
 				height: fruit.height,
-				orientation: ORIENTATION.HORIZONTAL,
+				orientation: fruit.orientation,
 				uuid: fruit.uuid,
 				code: fruit.code,
 				name: fruit.name,
