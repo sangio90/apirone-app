@@ -20,11 +20,17 @@ AP.component.list = (function () {
 	var pub = {};
 	var fields = AP.component.fields;
 
+	var ds = new kendo.data.DataSource({ data: [ { name: "Roberto" } ] });
+
+	var dataSources = {
+		selected: ds
+	};
+
 	var viewModel = kendo.observable({
 
 		components: undefined,
 		variants: [],
-		selected: [],
+		selected: dataSources.selected,
 
 		colors: [],
 		showColors: false,
@@ -58,6 +64,11 @@ AP.component.list = (function () {
 
             var thisForm = $("#component-list-selected-form");
 			var dataSource = viewModel.get("selected");
+			
+			//dataSource.fetch();
+			
+			console.log( "data", dataSource );
+			console.log( "data", dataSource.data() );
 
             var str = thisForm.find( "input[name=str]" ).val();
             var typeId = thisForm.find( "select[name=processingTypeId]" ).val();
@@ -89,19 +100,6 @@ AP.component.list = (function () {
 			return !viewModel.get("showSearchPanel");
 		},
 
-		useComponent: function (event) {
-
-			console.log("useComponent");
-
-			var comps = viewModel.get("selected");
-
-			comps.push(event.data);
-
-			viewModel.set("selected", comps);
-
-			return false;
-		},
-
 		useColor: function (event) {
 
 			var color = event.data;
@@ -125,13 +123,18 @@ AP.component.list = (function () {
 				}
 			};
 
-			console.log("event:useColor", event);
+			console.log("useColor:event", event);
 
-			var comps = viewModel.get("selected");
+			//var comps = viewModel.get("selected");
 
-			comps.push(row);
+			console.log("useColor:dataSource", dataSources.selected );
 
-			viewModel.set("selected", comps);
+			dataSources.selected.add( row );
+
+			console.log("total", dataSources.selected.total() );
+
+			//console.log("fetch", dataSources.selected.fetch() );
+			console.log("total", dataSources.selected.total() );
 
 			return false;
 		},
@@ -143,11 +146,11 @@ AP.component.list = (function () {
 
 			var requestStart = function() {
 				status.html("Sto cercando...");
-			}
+			};
 
 			var requestEnd = function( xhr ) {
 				status.html("Ho trovato " + xhr.response.total + " componenti");
-			}
+			};
 
             var params = thisForm.serializeJSON();
 			
@@ -246,8 +249,12 @@ AP.component.list = (function () {
 
 		showSelectedTable: function () {
 
-			return viewModel.get("selected").length > 0;
-
+			console.log("viewModel", viewModel);
+			console.log("viewModel:selected", viewModel.get("selected"));
+			console.log("viewModel:colors", viewModel.get("colors"));
+			
+			return viewModel.get("selected").length;
+		
 		},
 
 		removeComponent: function (event) {

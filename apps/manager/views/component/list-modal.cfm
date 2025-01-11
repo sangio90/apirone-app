@@ -91,7 +91,7 @@
 										</select>
 
 										#iconButton( bind="click:filterSelected", icon="search", variant="primary", size="sm" )#
-										#iconButton( bind="click:resetFfilterSelected", icon="search", variant="secondary", size="sm" )#
+										#iconButton( bind="click:resetFfilterSelected", icon="times", variant="default", size="sm", classes="ms-3" )#
 
 									</div>
 

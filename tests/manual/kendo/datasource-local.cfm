@@ -43,15 +43,42 @@
         ]
     });
 
+    console.log(" dataSource.data() ", dataSource.length );
     dataSource.fetch();
+    
+    console.log(" dataSource.data() ", dataSource.data() );
 
     var viewModel = kendo.observable({
         title: "Questo è il titolo",
         rows: dataSource,
-        total: dataSource.total()
+        total: dataSource.data().length
     });
 
     kendo.bind( $("#root"), viewModel );
+
+    var ds = viewModel.get("rows");
+
+    ds.add( { name: "Katia" } );
+
+    //ds.sync()
+
+    var ds = viewModel.get("rows");
+
+    
+    console.log("ds1", dataSource );
+    console.log("ds:kendo", new kendo.data.DataSource( [ 
+            { name: "Roberto" },
+            { name: "Alessandra" },
+            { name: "Emanuela" },
+        ] )  );
+
+
+
+
+
+
+    console.log(" dataSource.data() ", ds.data().length );
+
 
 </script>
 
