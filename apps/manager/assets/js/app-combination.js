@@ -210,7 +210,7 @@ AP.combination.list = (function () {
 		*/
 
 
-        showComponentsList: function (event) {
+        openComponentsList: function (event) {
 
 			componentApp.setCurrentItem(event.data);
 			

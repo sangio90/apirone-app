@@ -74,7 +74,14 @@
 
 								<div class="col-12">
 
-									<h4>Componenti selezionati</h4>
+									<div class="row">
+										<div class="col-6">
+											<h4>Componenti selezionati</h4>
+										</div>
+										<div class="col-6 mt-2 text-end" id="status-selected">
+											ciao
+										</div>
+									</div>
 
 									<div class="pb-2 d-flex align-items-center justify-content-start mb-2">
 
@@ -91,7 +98,7 @@
 										</select>
 
 										#iconButton( bind="click:filterSelected", icon="search", variant="primary", size="sm" )#
-										#iconButton( bind="click:resetFfilterSelected", icon="times", variant="default", size="sm", classes="ms-3" )#
+										#iconButton( bind="click:resetFilterSelected", icon="times", variant="default", size="sm", classes="ms-3" )#
 
 									</div>
 

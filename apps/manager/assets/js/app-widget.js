@@ -53,3 +53,14 @@ AP.widget.notify = function (type, message, title) {
     });
 
 };
+
+
+AP.widget.autoClearMessage = function (id, message) {
+
+    var ele = $( "#" + id );
+
+    ele.html( message );
+
+    setTimeout(() => ele.html(""), 2000);
+
+};

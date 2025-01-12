@@ -20,11 +20,37 @@ AP.component.list = (function () {
 	var pub = {};
 	var fields = AP.component.fields;
 
-	var ds = new kendo.data.DataSource({ data: [ { name: "Roberto" } ] });
-
 	var dataSources = {
-		selected: ds
+		selected: new kendo.data.DataSource({ data: [] })
 	};
+
+	var selectedExists = function( row ) {
+
+		var id = createId( row );
+
+		console.log("selectedExists:id", id);
+
+		var dataSource = viewModel.get("selected");
+
+		for( var item of dataSource.data() ) {
+			if ( item.id == id ) {
+				return true;
+			}
+		}
+
+		return false;
+
+	}
+
+	var createId = function( row ) {
+
+		var id = row.comp.id + "-" + row.color.id + "-" + row.variant.id;
+
+		console.log("createId:id", id);
+
+		return  id;
+
+	}
 
 	var viewModel = kendo.observable({
 
@@ -76,11 +102,11 @@ AP.component.list = (function () {
             var filters = [];
 
             if ( str.length ) {
-                filters.push( { field: "name", operator: "contains", value: str } )
+                filters.push( { field: "name", operator: "contains", value: str } );
             };
 
             if ( typeId.length ) {
-                filters.push( { field: "typeId", operator: "eq", value: typeId } )
+                filters.push( { field: "typeId", operator: "eq", value: typeId } );
             };
 
             dataSource.filter( filters );
@@ -100,14 +126,17 @@ AP.component.list = (function () {
 			return !viewModel.get("showSearchPanel");
 		},
 
-		useColor: function (event) {
+		addColor: function (event) {
 
 			var color = event.data;
 
 			var comp = viewModel.get("currentComponent");
 			var variant = viewModel.get("currentVariant");
 
+			console.log("dataSource:selected:total:1", viewModel.get("selected").total() );
+
 			var row = {
+				id: comp.id + "-" + color.id + "-" + variant.id,
 				quantity: 1,
 				comp: {
 					id: comp.id,
@@ -123,18 +152,26 @@ AP.component.list = (function () {
 				}
 			};
 
-			console.log("useColor:event", event);
+			var exists = selectedExists( row );
 
-			//var comps = viewModel.get("selected");
+			console.log("addColor:exists", exists);
 
-			console.log("useColor:dataSource", dataSources.selected );
+			if( exists ) {
 
-			dataSources.selected.add( row );
+				AP.widget.autoClearMessage("status-selected", "<span class='red'>È stato già aggiunto</span>")
 
-			console.log("total", dataSources.selected.total() );
+
+			} else {
+
+				viewModel.get("selected").add( row );
+
+			}
+
+
+			console.log("dataSource:selected:total:2", viewModel.get("selected").total() );
 
 			//console.log("fetch", dataSources.selected.fetch() );
-			console.log("total", dataSources.selected.total() );
+			//console.log("total", dataSources.selected.total() );
 
 			return false;
 		},
@@ -249,11 +286,9 @@ AP.component.list = (function () {
 
 		showSelectedTable: function () {
 
-			console.log("viewModel", viewModel);
-			console.log("viewModel:selected", viewModel.get("selected"));
-			console.log("viewModel:colors", viewModel.get("colors"));
-			
-			return viewModel.get("selected").length;
+			var dataSource = viewModel.get("selected");
+
+			return dataSource.total() > 0;
 		
 		},
 
@@ -294,7 +329,7 @@ AP.component.list = (function () {
 			callback: {
 				done: function (xhr) {
 
-					viewModel.set("selected", xhr.data);
+					viewModel.get("selected").data( xhr.data );
 
 					NM.util.openModal($("#component-list-modal"));
 

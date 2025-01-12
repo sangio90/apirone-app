@@ -8,7 +8,7 @@
                 <span data-bind="text: name"></span>
             </td>
             <td width="30">
-                <input type="button" value="&raquo;" class="btn btn-primary btn-sm" data-bind="click:useColor">
+                <input type="button" value="&raquo;" class="btn btn-primary btn-sm" data-bind="click:addColor">
             </td>
         </tr>
     </nmscript>

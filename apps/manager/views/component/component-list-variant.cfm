@@ -43,7 +43,7 @@
     
     </div> 
     
-	#template( "jstemplate/component/component-colors-row-tmpl" )#
 	#template( "jstemplate/component/component-variants-row-tmpl" )#
+	#template( "jstemplate/component/component-colors-row-tmpl" )#
     
 </cfoutput>

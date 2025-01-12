@@ -74,8 +74,13 @@
 
 
 
+    for( var item of dataSource.data() ) {
+        console.log("item", item);
+    }
 
-
+    for (var i = 0; i < dataSource.data().length; i++) {
+        console.log("===item", dataSource.data()[i]);
+    }
 
     console.log(" dataSource.data() ", ds.data().length );
 

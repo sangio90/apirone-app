@@ -16,7 +16,7 @@
                 </button>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:showComponentsList">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:openComponentsList">
                     <i class="fas fa-window-restore"></i> 
                 </button>
             </td>
