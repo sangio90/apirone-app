@@ -10,16 +10,7 @@
             <td class="text-center">
 
                 #iconButton( bind="click:openVariants", size="sm", icon="chevron-right", variant="default" )#
-                
-                <!---
-                <span data-bind="visible: showVariantsForCount">
-                    #iconButton( bind="click:openVariants", size="sm", icon="chevron-right", variant="default" )#
-                </span>
-
-                <span data-bind="invisible: showVariantsForCount">
-                    #addButton( bind="click:useComponent", label="Aggiungi", size="sm", variant="default")#
-                </span>
-                ---->
+            
             
             </td>
         </tr>

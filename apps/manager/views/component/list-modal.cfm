@@ -10,7 +10,7 @@
 				<div class="card-body">
 					<div class="row">
 
-						<div class="col-6">
+						<div class="col-4">
 
 							<div data-bind="visible: showSearchPanel">
 
@@ -68,7 +68,7 @@
 						
 						</div>
 
-						<div class="col-6">
+						<div class="col-8">
 
 							<form id="component-list-selected-form" class="row">
 
@@ -79,7 +79,7 @@
 											<h4>Componenti selezionati</h4>
 										</div>
 										<div class="col-6 mt-2 text-end" id="status-selected">
-											ciao
+											
 										</div>
 									</div>
 
@@ -93,6 +93,7 @@
 										>
 
 										<select class="form-control me-3 form-control-sm" name="processingTypeId" style="width:46%">
+											<option value="">Tutte le tipologie</option>
 											<option value="MP">Materie prime</option>
 											<option value="LV">Lavorazioni</option>
 										</select>

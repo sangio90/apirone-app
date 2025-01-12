@@ -75,6 +75,8 @@ AP.component.list = (function () {
 
 		resetFilterSelected: function () {
 
+			var dataSource = viewModel.get("selected");
+
             var thisForm = $("#component-list-selected-form");
 
             thisForm.find( "input[name=str]" ).val("");
@@ -91,22 +93,17 @@ AP.component.list = (function () {
             var thisForm = $("#component-list-selected-form");
 			var dataSource = viewModel.get("selected");
 			
-			//dataSource.fetch();
-			
-			console.log( "data", dataSource );
-			console.log( "data", dataSource.data() );
-
             var str = thisForm.find( "input[name=str]" ).val();
             var typeId = thisForm.find( "select[name=processingTypeId]" ).val();
 
             var filters = [];
 
             if ( str.length ) {
-                filters.push( { field: "name", operator: "contains", value: str } );
+                filters.push( { field: "comp.name", operator: "contains", value: str } );
             };
 
             if ( typeId.length ) {
-                filters.push( { field: "typeId", operator: "eq", value: typeId } );
+                filters.push( { field: "comp.processingType.id", operator: "eq", value: typeId } );
             };
 
             dataSource.filter( filters );
@@ -133,14 +130,18 @@ AP.component.list = (function () {
 			var comp = viewModel.get("currentComponent");
 			var variant = viewModel.get("currentVariant");
 
-			console.log("dataSource:selected:total:1", viewModel.get("selected").total() );
+			console.log("addColor:comp", comp);
 
 			var row = {
 				id: comp.id + "-" + color.id + "-" + variant.id,
 				quantity: 1,
 				comp: {
 					id: comp.id,
-					name: comp.name
+					name: comp.name,
+					processingType: {
+						id: comp.processingType.id,
+						name: comp.processingType.name
+					}
 				},
 				color: {
 					id: color.id,
@@ -157,21 +158,10 @@ AP.component.list = (function () {
 			console.log("addColor:exists", exists);
 
 			if( exists ) {
-
 				AP.widget.autoClearMessage("status-selected", "<span class='red'>È stato già aggiunto</span>")
-
-
 			} else {
-
 				viewModel.get("selected").add( row );
-
 			}
-
-
-			console.log("dataSource:selected:total:2", viewModel.get("selected").total() );
-
-			//console.log("fetch", dataSources.selected.fetch() );
-			//console.log("total", dataSources.selected.total() );
 
 			return false;
 		},
@@ -294,9 +284,18 @@ AP.component.list = (function () {
 
 		removeComponent: function (event) {
 
-			console.log("removeComponent:event", event);
+			var dataSource = viewModel.get("selected");
 
-			viewModel.get("selected").getByUid( event.data.uid );
+			console.log("removeComponent:event", event);
+			console.log("removeComponent:event.data.uid", event.data.uid);
+
+			var row = dataSource.getByUid( event.data.uid );
+
+			console.log("row", row);
+
+
+			dataSource.remove( row );
+
 
 			return false;
 
