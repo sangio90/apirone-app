@@ -65,13 +65,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     		required String colorId
     	){
 
+        var bean = super.bean( "Color" );
+
+		if( arguments.colorId == "_NOCOL" ) {
+	
+			bean.setId("_NOCOL");
+			bean.setName("Nessun colore");
+
+			return bean;
+
+		}
+	
 	    var record = getDao().read( arguments.colorId );
 
 	    if( record.recordCount ) { 
 
 			var record = trimQueryFields( record );
-
-            var bean = super.bean( "Color" );
 
             bean.setId( record.clcodice );
 			bean.setName( record.cldescri );

@@ -1,10 +1,10 @@
-<cfcomponent extends="com.apirone.core.model.dao.VerticaleDAO" accessors="true">
+<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 
 	<cffunction name="read">
 
 		<cfargument name="combinationComponentId" type="Numeric" required="true">
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
                 combination_item_components
@@ -25,7 +25,7 @@
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="created_at desc">
 
-        <cfquery name="local.q" datasource="verticale">
+        <cfquery name="local.q" datasource="apirone">
 			SELECT
                 combination_item_component_id,
 				COUNT(combination_item_component_id) OVER() AS total
@@ -34,7 +34,7 @@
 			WHERE 1=1
 			
 			<cfif !isNull( arguments.combinationItemId )>
-				AND combination_item_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Integer">
+				AND combination_item_id = <cfqueryparam value="#arguments.combinationItemId#" cfsqltype="Integer">
 			</cfif>
 
 			ORDER BY 

@@ -67,22 +67,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     		required String variantId
     	){
 
+        var bean = super.bean( "Variant" );
+
+		if( arguments.variantId == "_NOVAR" ) {
+		
+			bean.setId("_NOVAR");
+			bean.setName("Nessuna variante");
+
+			return bean;
+
+		}
+
 	    var record = getDao().read( arguments.variantId );
 
 	    if( record.recordCount ) { 
 
 			var record = trimQueryFields( record );
 
-            var bean = super.bean( "Variant" );
-
             bean.setId( record.varcod );
 			bean.setName( record.vardes );
 
-			//TODO: from componentId to variantId
-			//var rnd = RandRange( 1, 4 )
-			//var colorList = [ "MATLASPLX8MM000", "MATACCOTTRETROA", "MATFRU000PRBIPA", "NOT_FOUND" ];
-			//bean.setColors( getColorService().list( colorList[ rnd ] ) );
-			
             return bean;
 
 	    }

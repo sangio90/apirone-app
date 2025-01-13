@@ -66,11 +66,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Component function build(
-    		required String componentId
+	private com.apirone.core.model.bean.CombinationComponent function build(
+    		required String combinationComponentId
     	){
 
-	    var record = getDao().read( arguments.componentId );
+	    var record = getDao().read( arguments.combinationComponentId );
 
 	    if( record.recordCount ) { 
 
@@ -78,7 +78,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.combination_item_component_id );
             bean.setQuantity( record.quantity );
-			
+
             bean.setComponent( getComponentService().get( record.component_id ) );
 			bean.setVariant( getVariantService().get( record.variant_id ) );
 			bean.setColor( getColorService().get( record.color_id ) );

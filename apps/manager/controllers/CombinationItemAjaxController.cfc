@@ -5,23 +5,39 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var  items = super.fire("CombinationItem.listComponents", { combinationItemId = rc.id } );
+        var  items = super.fire("CombinationComponent.list", { combinationItemId = rc.id } );
 
         for( var item in items ) {
 
-            //var row = super.getDataMapper().convert( item, "CombinationItem", true );
-
-            //row["level"] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
+            var row = {
+                "quantity" = item.getQuantity(),
+                "comp" = {
+                    "id" = item.getComponent().getId(),
+                    "name" = item.getComponent().getName(),
+                    "processingType" = {
+                        "id" = item.getComponent().getProcessingType().getId(),
+                        "name" = item.getComponent().getProcessingType().getName()
+                    }
+                },
+                "variant" = {
+                    "id" = item.getVariant().getId(),
+                    "name" = item.getVariant().getName()
+                },
+                "color" = {
+                    "id" = item.getColor().getId(),
+                    "name" = item.getColor().getName()
+                }
+            }
 
             data.add( row );
 
         }
 
-        result.setTotal( 0 );
-        result.setCount( 0 );
+        result.setTotal( items.len() );
+        result.setCount( items.len() );
         result.setData( data );
 
-        event.setValue("result", result );
+        event.setValue( "result", result );
 
     }
 
@@ -29,7 +45,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var result = super.getResult();
 
-        var components = DeserializeJSON( getHTTPRequestData().content );
+        var components = DeserializeJSON( GetHTTPRequestData().content );
 
         var itemId = rc.id;
 
