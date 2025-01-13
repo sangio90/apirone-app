@@ -8,6 +8,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
     property name="parent" type="com.apirone.core.model.bean.CombinationItem"; //TODO: is this usefull?
     property name="attributeValue" type="com.apirone.core.model.bean.AttributeValue";
     property name="attribute" type="com.apirone.core.model.bean.Attribute";
+    
+    property name="components" type="com.apirone.core.model.bean.CombinationComponent[]";
 
     public CombinationItem function init(){
 

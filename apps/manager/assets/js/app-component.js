@@ -44,7 +44,7 @@ AP.component.list = (function () {
 
 	var createId = function( row ) {
 
-		var id = row.comp.id + "-" + row.color.id + "-" + row.variant.id;
+		var id = row.comp.id + "$$$" + row.color.id + "$$$" + row.variant.id;
 
 		console.log("createId:id", id);
 
@@ -133,7 +133,7 @@ AP.component.list = (function () {
 			console.log("addColor:comp", comp);
 
 			var row = {
-				id: comp.id + "-" + color.id + "-" + variant.id,
+				id: createId( row ),
 				quantity: 1,
 				comp: {
 					id: comp.id,
@@ -199,14 +199,14 @@ AP.component.list = (function () {
 			var thisForm = $("#component-list-selected-form");
 			var status = thisForm.find(".status");
 
-            var params = thisForm.serializeJSON();
+            //var params = thisForm.serializeJSON();
 
 			var current = viewModel.get("currentItem");
 
 			NM.util.ajax({
 				method: "POST",
-				url: "/ajax/combination-items/" + current.id + "/components",
-				data: params,
+				url: "/manager/ajax/combination-items/" + current.id + "/components",
+				data: JSON.stringify( viewModel.get("selected").data() ),
 				callback: {
 					done: function (xhr) {
 
@@ -222,15 +222,6 @@ AP.component.list = (function () {
             return false;
 
 		},
-
-		/*
-        showComponentsList: function (event) {
-
-			$("#components-list-modal").modal("show");
-
-            return false;
-		},
-		*/
 
         openColors: function (event) {
 
@@ -291,11 +282,7 @@ AP.component.list = (function () {
 
 			var row = dataSource.getByUid( event.data.uid );
 
-			console.log("row", row);
-
-
 			dataSource.remove( row );
-
 
 			return false;
 

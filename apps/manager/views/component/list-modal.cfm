@@ -79,7 +79,6 @@
 											<h4>Componenti selezionati</h4>
 										</div>
 										<div class="col-6 mt-2 text-end" id="status-selected">
-											
 										</div>
 									</div>
 

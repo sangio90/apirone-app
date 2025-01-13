@@ -88,6 +88,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
+    public Boolean function addComponent(
+            required Numeric combinationItemId,
+            required com.apirone.core.model.bean.CombinationComponent combinationComponent
+        ){
+
+		transaction {
+			getDao().deleteComponent( argumentCollection=arguments );
+			getDao().insertComponent( argumentCollection=arguments );
+		}
+
+        return true;
+
+    }
+
     public com.apirone.core.model.bean.Result function search(
             String lineId
         ){

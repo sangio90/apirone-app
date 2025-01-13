@@ -76,7 +76,6 @@
 
 	</cffunction>
 
-
 	<cffunction name="delete" returntype="Boolean">
 
         <cfargument name="combinationId" type="String">

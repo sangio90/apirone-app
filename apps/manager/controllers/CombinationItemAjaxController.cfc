@@ -29,15 +29,29 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function saveComponents( event, rc, prc ){
 
-        dump(rc);
-        abort;
+        var components = DeserializeJSON( getHTTPRequestData().content );
 
-        var data = [];
-        var result = super.getResult();
+        var itemId = rc.id;
 
-        result.setTotal( 0 );
-        result.setCount( 0 );
-        result.setData( data );
+        var combinationComponent = super.bean("CombinationComponent");
+        var component = super.bean("Component");
+        var variant = super.bean("Variant");
+        var color = super.bean("Color");
+
+        for( var thisComponent in components ) {
+
+            variant.setId( thisComponent.variant.id )
+            color.setId( thisComponent.color.id )
+            component.setId( thisComponent.comp.id )
+
+            combinationComponent.setComponent( component );
+            combinationComponent.setColor( color );
+            combinationComponent.setVariant( variant );
+            combinationComponent.setQuantity( thisComponent.quantity );
+            
+            super.fire( "CombinationItem.addComponent", { combinationItemId = itemId, combinationComponent = combinationComponent } );
+
+        }
 
         event.setValue("result", result );
 

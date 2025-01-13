@@ -11,7 +11,6 @@
 
                 #iconButton( bind="click:openVariants", size="sm", icon="chevron-right", variant="default" )#
             
-            
             </td>
         </tr>
     </nmscript>

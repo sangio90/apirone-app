@@ -85,4 +85,63 @@
 
 	</cffunction>
 
+
+	<cffunction name="deleteComponents" returntype="Boolean">
+
+		<cfargument name="combinationItemId" type="Numeric" required="true">
+
+        <cfquery name="local.q" datasource="apirone">
+			DELETE FROM combination_item_components 
+			WHERE
+				combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
+		</cfquery>
+
+		<cfreturn true>
+
+	</cffunction>
+
+	<cffunction name="deleteComponent" returntype="Boolean">
+
+		<cfargument name="combinationItemId" type="Numeric" required="true">
+		<cfargument name="combinationComponent" type="com.apirone.core.model.bean.CombinationComponent" required="true">
+
+        <cfquery name="local.q" datasource="apirone">
+			DELETE FROM combination_item_components 
+			WHERE
+				combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
+				AND component_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getComponent().getId()#">
+				AND variant_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getVariant().getId()#">
+				AND color_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getColor().getId()#">
+		</cfquery>
+
+		<cfreturn true>
+
+	</cffunction>
+
+	<cffunction name="insertComponent" returntype="Numeric">
+
+		<cfargument name="combinationItemId" type="Numeric" required="true">
+		<cfargument name="combinationComponent" type="com.apirone.core.model.bean.CombinationComponent" required="true">
+
+        <cfquery name="local.q" datasource="apirone">
+			INSERT INTO combination_item_components (
+				combination_item_id,
+				component_id,
+				color_id,
+				variant_id,
+				quantity
+			)
+			VALUES (
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.combinationItemId#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getComponent().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getColor().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getVariant().getId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.combinationComponent.getQuantity()#">
+			) RETURNING combination_item_component_id
+		</cfquery>
+
+		<cfreturn local.q.combination_item_component_id>
+
+	</cffunction>
+
 </cfcomponent>
