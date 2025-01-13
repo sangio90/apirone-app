@@ -5,19 +5,17 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        /*
-        var  items = super.fire("CombinationItem.getTree", { combinationId = rc.id } );
+        var  items = super.fire("CombinationItem.listComponents", { combinationItemId = rc.id } );
 
         for( var item in items ) {
 
-            var row = super.getDataMapper().convert( item, "CombinationItem", true );
+            //var row = super.getDataMapper().convert( item, "CombinationItem", true );
 
-            row["level"] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
+            //row["level"] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
 
             data.add( row );
 
         }
-        */
 
         result.setTotal( 0 );
         result.setCount( 0 );
@@ -28,6 +26,8 @@ component extends="com.apirone.core.controller.AbsController" {
     }
 
     function saveComponents( event, rc, prc ){
+
+        var result = super.getResult();
 
         var components = DeserializeJSON( getHTTPRequestData().content );
 
@@ -53,7 +53,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
         }
 
-        event.setValue("result", result );
+        var message = completeMessage( "combination.componentAdded" );
+
+        result.setData( { "message" = message } );
+
+        event.setValue( "result", result );
 
     }
 

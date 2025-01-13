@@ -172,4 +172,8 @@
         <map from="name" to="name" type="cf:String" />
     </mapper>
 
+    <mapper id="CombinationComponent" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.CombinationComponent">
+        <map from="id" to="id" type="cf:String" />
+    </mapper>
+
 </mappers>
