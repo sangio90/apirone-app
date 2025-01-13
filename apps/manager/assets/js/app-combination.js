@@ -34,6 +34,7 @@ AP.combination.list = (function () {
 	var normalizeComponentItem = function (data) {
 
 		var item = {
+			id: 0,
 			attribute: {
 				id: 0,
 				name: ""
@@ -47,6 +48,7 @@ AP.combination.list = (function () {
 		if (data?.attributeValue) {
 
 			item = {
+				id: data.id,
 				attribute: {
 					id: data.attribute.id,
 					name: data.attribute.name
@@ -77,8 +79,11 @@ AP.combination.list = (function () {
 
 		selectAttribute: function (event) {
 
+			var item = viewModel.get("itemForAttributes");
 			var parentId = viewModel.get("itemForAttributes.id");
-			console.log("parentId", parentId);
+
+			console.log("selectAttribute:item", item);
+			console.log("selectAttribute:parentId", parentId);
 
 			NM.util.ajax({
 				method: "POST",
@@ -163,11 +168,13 @@ AP.combination.list = (function () {
 
 		openAttributesList: function (event) {
 
-			var item = normalizeComponentItem(event.data);
+			console.log("openAttributesList:event.data", event.data);
 
-			// console.log("normalizeComponentItem", item);
+			var item = normalizeComponentItem( event.data );
 
-			viewModel.set("itemForAttributes", item);
+			console.log("openAttributesList:normalizeComponentItem", item);
+
+			viewModel.set( "itemForAttributes", item );
 
 			NM.util.openModal(fields.attributeModal);
 

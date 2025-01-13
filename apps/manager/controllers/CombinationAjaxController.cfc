@@ -34,8 +34,9 @@ component extends="com.apirone.core.controller.AbsController" {
         param rc.parentId = 0;      //Parent item, if exists
         param rc.attributeId = 0;   //To add values ​​to this attribute
 
-        
+
         ```
+        
         <cfquery datasource="apirone">
             DELETE FROM combination_items
             WHERE 

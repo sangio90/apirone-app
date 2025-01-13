@@ -19,7 +19,7 @@
                 <span data-bind="text: color.name"></span>
             </td>
             <td width="100">
-                <input data-bind="text: quantity" class="form-control text-end">
+                <input data-bind="value: quantity" class="form-control text-end">
             </td>
             <td width="40" class="text-end">
                 #iconButton( icon="trash", bind="click:removeComponent" )#

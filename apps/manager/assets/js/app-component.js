@@ -44,11 +44,13 @@ AP.component.list = (function () {
 
 	var createId = function( row ) {
 
+		console.log("createId:row", row);
+
 		var id = row.comp.id + "$$$" + row.color.id + "$$$" + row.variant.id;
 
 		console.log("createId:id", id);
 
-		return  id;
+		return id;
 
 	}
 
@@ -130,10 +132,10 @@ AP.component.list = (function () {
 			var comp = viewModel.get("currentComponent");
 			var variant = viewModel.get("currentVariant");
 
-			console.log("addColor:comp", comp);
+			console.log( "addColor:comp", comp );
 
 			var row = {
-				id: createId( row ),
+				//id: createId( comp ),
 				quantity: 1,
 				comp: {
 					id: comp.id,
@@ -153,12 +155,14 @@ AP.component.list = (function () {
 				}
 			};
 
+			row.id = createId( row );
+
 			var exists = selectedExists( row );
 
 			console.log("addColor:exists", exists);
 
 			if( exists ) {
-				AP.widget.autoClearMessage("status-selected", "<span class='red'>È stato già aggiunto</span>")
+				AP.widget.autoClearMessage( "status-selected", "<span class='red'>È stato già aggiunto</span>" );
 			} else {
 				viewModel.get("selected").add( row );
 			}
@@ -197,7 +201,7 @@ AP.component.list = (function () {
 		save: function (event) {
 
 			var thisForm = $("#component-list-selected-form");
-			var status = thisForm.find(".status");
+			var status = $("#status-selected");
 
             //var params = thisForm.serializeJSON();
 
@@ -211,8 +215,11 @@ AP.component.list = (function () {
 					done: function (xhr) {
 
 						if(xhr.status == "SUCCESS") {
-							viewModel.set("components", xhr.data);
-							status.html("Ho trovato " + xhr.count + " record.");
+
+							console.log("save:SUCCESS")
+
+							//viewModel.set("components", xhr.data);
+							AP.widget.autoClearMessage( "status-selected", "<span class='green'>Configurazione salvata</span>" );
 						}
 
 					}
