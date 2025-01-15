@@ -91,9 +91,17 @@
 		/*
 			fruits
 		*/
-		get( "/fruits/:id" ).toHandler( "FruitController.get" );
+		get( "/ajax/fruits/code-exists" ).to( "FruitAjaxController.codeExists" ).end();
 
-		get( "/fruits" ).toHandler( "FruitController.list" );
+		get( "/ajax/fruits/:id" ).to( "FruitAjaxController.get" ).end();
+
+		get( "/ajax/fruits" ).to( "FruitAjaxController.list" ).end();
+
+		post( "/ajax/fruits" ).to( "FruitAjaxController.save" ).end();
+
+		delete( "/ajax/fruits" ).to( "FruitAjaxController.delete" ).end();
+
+		get( "/fruits" ).to( "FruitController.list" ).end();
 
 
 		/*

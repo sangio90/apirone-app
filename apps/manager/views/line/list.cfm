@@ -5,6 +5,11 @@
 		<div class="row">
 			
 			<div class="col-lg-12 text-end pb-3">
+
+                <button type="button" class="btn btn-default btn-md" onclick="location.href='/report_linee_20241212120500.pdf'">
+                    <i class="fas fa-print"></i> Stampa
+                </button>
+
 				#addButton( bind = "click:new", size = "sm" )#
 			</div>
 

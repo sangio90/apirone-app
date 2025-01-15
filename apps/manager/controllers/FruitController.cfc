@@ -2,15 +2,14 @@
 
     function list( event, rc, prc ){
 
-        var user = prc.user;
+        prc.title = "Frutti";
+        prc.statuses = super.fire( "status.list", ["FRUIT"] );
 
-        prc.title = "Lista dei frutti";
+        prc.jsScripts.add( "app-fruit" );
 
-        prc.list = DESerializeJSON( FileRead( '/config/data/fake/fruits.json.cfm' ) );
+        prc.page["statuses"] = prc.statuses;
 
-        prc.jsScripts.add( 'app-fruit' );
-
-        event.setView('fruit/list');
+        event.setView("fruit/list");
 
     }
     

@@ -8,6 +8,7 @@
             </td>
             <td>
                 <span data-bind="html: level"></span>
+                <span data-bind="text: attribute.name"></span>: 
                 <span data-bind="text: attributeValue.name"></span>
             </td>
             <td class="text-center">

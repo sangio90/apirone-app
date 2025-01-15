@@ -22,7 +22,7 @@
 
                                 <label class="me-2">Dimensione:</label>
 
-                                <select name="sizeId" class="form-control w-auto me-4" data-bind="events: { change: loadFishes }" >
+                                <select name="sizeId" class="form-control w-auto me-4" data-bind="events: { change: loadFinishes }">
                                     <cfloop array="#prc.sizes#" item="item">
                                         <option value="#item.getId()#" 
                                             <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
