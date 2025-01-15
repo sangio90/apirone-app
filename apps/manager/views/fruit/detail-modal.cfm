@@ -28,7 +28,7 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Numero posizioni</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" 
+                                <input type="text" required class="form-control numeric" 
                                     name="positionsCount"
                                     maxlength="5"
                                     data-bind="value: detailForm.data.positionsCount">
@@ -49,7 +49,7 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Stato</label>
                             <div class="col-sm-10">
-                                <select id="statusId" class="form-control"
+                                <select id="statusId" class="form-control" name="statusId"
                                     required
                                     data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
                                     data-value-field="id"

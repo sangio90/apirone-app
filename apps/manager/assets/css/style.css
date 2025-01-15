@@ -529,3 +529,5 @@ h2 {
 .draggable-fruit:hover.is-dragging {
 	cursor: grabbing;
 }
+
+.numeric { width: 100px; text-align: right; }

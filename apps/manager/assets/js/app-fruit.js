@@ -2,6 +2,7 @@
 
 AP.fruit.fields = {
 	listRoot: $("#fruit-list-root"),
+	detailRoot: $("#fruit-detail-modal"),
 	detailForm: $("#fruit-detail-form"),
 	searchListForm: $("#fruit-grid-search-form")
 };
@@ -19,6 +20,7 @@ $(document).ready(function (){
 AP.fruit.list = (function () {
 
 	var pub = {};
+	var fields = AP.fruit.fields;
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/fruits" })
@@ -57,13 +59,11 @@ AP.fruit.list = (function () {
 
 			var thisForm = AP.fruit.fields.searchListForm;
 
-			console.log("searchListForm", thisForm)
+			console.log("searchListForm", thisForm);
 			
 			var params = thisForm.serializeJSON();
 			
-			console.log("params", params)
-
-			viewModel.rows.read(params);
+			viewModel.rows.read( params );
 
 			return false;
 
@@ -90,7 +90,7 @@ AP.fruit.list = (function () {
 								viewModel.get("rows").read();
 								NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
 
-								setTimeout( () => $("#fruit-detail-modal").modal("hide"), 1500 );
+								setTimeout( () => fields.detailRoot.modal("hide"), 1500 );
 
 							}
 
@@ -108,7 +108,7 @@ AP.fruit.list = (function () {
 
 			this.resetForm();
 
-			NM.util.openModal($("#fruit-detail-modal"));
+			NM.util.openModal( fields.detailRoot );
 
 		},
 
@@ -119,7 +119,7 @@ AP.fruit.list = (function () {
 			viewModel.set("detailForm.data", event.data);
 			viewModel.set("detailForm.title", "Modifica frutto < " + event.data.code + " >");
 
-			NM.util.openModal( $("#fruit-detail-modal") );
+			NM.util.openModal( fields.detailRoot );
 
 		},
 
@@ -173,6 +173,7 @@ AP.fruit.list = (function () {
 		kendo.bind(AP.fruit.fields.listRoot, viewModel);
 
 		var detailForm = AP.fruit.fields.detailForm;
+		
 
 		detailForm.validate({
 			onfocusout: function (element) {
@@ -191,6 +192,16 @@ AP.fruit.list = (function () {
 							return json.data == false;
 						}
 					}
+				},
+				positionsCount: {
+					required: true,
+					digits: true
+				},
+				name: {
+					required: true,
+				},
+				statusId: {
+					required: true,
 				}
 			},
 			messages: {
@@ -199,6 +210,16 @@ AP.fruit.list = (function () {
 					maxlength: "Al massimo 3 caratteri",
 					checkCode: "Solo numeri, lettere, trattino o trattino basso",
 					remote: "Il codice esiste"
+				},
+				positionsCount: {
+					required: "Numero posizioni richieste",
+					digits: "Richiesto un valore intero"
+				},
+				name: {
+					required: "Descrizione richiesta",
+				},
+				statusId: {
+					required: "Status richiesto",
 				}
 			},
 

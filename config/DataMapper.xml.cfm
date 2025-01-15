@@ -83,6 +83,15 @@
         <map from="createdAt" to="createdAt" type="cf:Date" />
     </mapper>
 
+    <mapper id="Fruit" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Fruit">
+        <map from="id" to="id" type="cf:String" />
+        <map from="shortId" to="shortId" type="cf:String" />
+        <map from="code" to="code" type="cf:String" />
+        <map from="status" to="status" ref="Status" />
+        <map from="positionsCount" to="positionsCount" type="cf:Integer" />
+        <map from="createdAt" to="createdAt" type="cf:Date" />
+    </mapper>
+
     <mapper id="Thickness" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Thickness">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />

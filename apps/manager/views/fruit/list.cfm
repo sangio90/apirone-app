@@ -1,4 +1,5 @@
 <cfoutput>
+	
 	<div id="fruit-list-root">
 		#pageTitle()#
 
@@ -72,8 +73,9 @@
 				</section>
 			</div>
 		</div>
-	</div>
 
-	#view( "fruit/detail-modal" )#
+		#view( "fruit/detail-modal" )#
+
+	</div>
 
 </cfoutput>
