@@ -306,19 +306,6 @@ AP.combination.list = (function () {
 
     });
 
-	/*
-	pub.currentItem = function() {
-
-		var result = {
-			forAttribute: viewModel.get("itemForAttributes"),
-			forComponent: viewModel.get("itemFomComponents")
-		}
-
-		return result;
-
-	},
-	*/
-
 	pub.init = function () {
 
 		console.log("combination:init")

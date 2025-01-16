@@ -65,7 +65,7 @@ AP.component.list = (function () {
 		showSearchPanel: true,
 		variantsTitle: "Varianti",
 		currentVariant: {},
-		currentComponent: {},
+		currentProduct: {},
 
 		currentItem: undefined,
 
@@ -129,7 +129,7 @@ AP.component.list = (function () {
 
 			var color = event.data;
 
-			var comp = viewModel.get("currentComponent");
+			var product = viewModel.get("currentProduct");
 			var variant = viewModel.get("currentVariant");
 
 			console.log( "addColor:comp", comp );
@@ -137,12 +137,12 @@ AP.component.list = (function () {
 			var row = {
 				//id: createId( comp ),
 				quantity: 1,
-				comp: {
-					id: comp.id,
-					name: comp.name,
+				product: {
+					id: product.id,
+					name: product.name,
 					processingType: {
-						id: comp.processingType.id,
-						name: comp.processingType.name
+						id: product.processingType.id,
+						name: product.processingType.name
 					}
 				},
 				color: {
@@ -243,7 +243,7 @@ AP.component.list = (function () {
 
         openVariants: function (event) {
 
-			viewModel.set("currentComponent", event.data);
+			viewModel.set("currentProduct", event.data);
 
 			viewModel.set("showSearchPanel", false);
 			viewModel.set("variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>");

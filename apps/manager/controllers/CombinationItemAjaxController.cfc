@@ -11,12 +11,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
             var row = {
                 "quantity" = item.getQuantity(),
-                "comp" = {
-                    "id" = item.getComponent().getId(),
-                    "name" = item.getComponent().getName(),
+                "product" = {
+                    "id" = item.getProduct().getId(),
+                    "name" = item.getProduct().getName(),
                     "processingType" = {
-                        "id" = item.getComponent().getProcessingType().getId(),
-                        "name" = item.getComponent().getProcessingType().getName()
+                        "id" = item.getProduct().getProcessingType().getId(),
+                        "name" = item.getProduct().getProcessingType().getName()
                     }
                 },
                 "variant" = {
@@ -49,18 +49,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var itemId = rc.id;
 
-        var combinationComponent = super.bean("CombinationComponent");
-        var component = super.bean("Component");
+        var product = super.bean("Product");
         var variant = super.bean("Variant");
         var color = super.bean("Color");
+
+        var combinationComponent = super.bean("Combination");.
+
 
         for( var thisComponent in components ) {
 
             variant.setId( thisComponent.variant.id )
             color.setId( thisComponent.color.id )
-            component.setId( thisComponent.comp.id )
+            product.setId( thisComponent.comp.id )
 
-            combinationComponent.setComponent( component );
+            combinationComponent.setProduct( product );
             combinationComponent.setColor( color );
             combinationComponent.setVariant( variant );
             combinationComponent.setQuantity( thisComponent.quantity );

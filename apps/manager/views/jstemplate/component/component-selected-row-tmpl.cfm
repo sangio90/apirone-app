@@ -4,11 +4,11 @@
     <nmscript type="text/x-kendo-template" id="component-selected-row-tmpl">
         <tr>
             <td width="10">
-                <b data-bind="text: comp.processingType.id"></b>
+                <b data-bind="text: product.processingType.id"></b>
             </td>
             <td class="text-truncate">
-                <b data-bind="text: comp.id"></b><br>
-                <span data-bind="text: comp.name"></span>
+                <b data-bind="text: product.id"></b><br>
+                <span data-bind="text: product.name"></span>
             </td>
             <td class="text-truncate">
                 <b data-bind="text: variant.id"></b><br>
