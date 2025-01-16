@@ -40,9 +40,9 @@
 
 
 		/*
-			components
+			products
 		*/
-		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
+		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
 
 
 		/*
@@ -102,18 +102,6 @@
 		delete( "/ajax/fruits" ).to( "FruitAjaxController.delete" ).end();
 
 		get( "/fruits" ).to( "FruitController.list" ).end();
-
-
-		/*
-			quotations
-		*/
-		get( "/quotations/00001/items" ).toHandler( "QuotationController.items" );
-
-		get( "/quotations/:id" ).toHandler( "QuotationController.get" );
-
-		get( "/quotations" ).toHandler( "QuotationController.list" );
-
-		get( "/quotation" ).toHandler( "QuotationController.new" );
 
 
 		/*

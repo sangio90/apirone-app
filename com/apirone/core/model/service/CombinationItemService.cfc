@@ -1,11 +1,10 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.CombinationItemDAO";
-	property name="CombinationService" type="com.apirone.core.model.service.CombinationService";
+	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
 	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 	property name="combinationComponentService" type="com.apirone.core.model.service.CombinationComponentService";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
     public com.apirone.core.model.bean.CombinationItem function get(
     		required String combinationItemId

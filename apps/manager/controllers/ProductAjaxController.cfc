@@ -2,21 +2,19 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        var rows = super.service("Product").search( processingTypeId="A" ).getData(); //materie prime
+        param rc.str = "";
+       
+        var result = super.getResult();
+        var params = super.paramsFromUrl( "product" );
 
-        dump( rows );
+        var rows = super.fire("product.search", params ); 
 
-        event.renderData( data=rows, contentType="text/json", type="json" );
+        result.setTotal( rows.getTotal() )
+        result.setCount( rows.getCount() )
+        result.setData( rows.getData() )
+
+        event.setValue("result",  result );
         
     }
-
-	function codeExists( event, rc, prc ){
-		param rc.id   = "_";
-		param rc.code = "";
-
-		var result = super.fire( "productCategory.codeExists", { code = rc.code, excludedId = rc.id } );
-
-		event.setValue( "result", result );
-	}
 
 }

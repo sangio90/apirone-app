@@ -186,13 +186,13 @@ AP.component.list = (function () {
             var params = thisForm.serializeJSON();
 			
 			var dataSource = NM.kendo.dataSource({ 
-				url: "/manager/ajax/components", 
+				url: "/manager/ajax/products", 
 				params: params, 
 				requestEnd: requestEnd, 
 				requestStart: requestStart
 			});
 
-			viewModel.set("components", dataSource );
+			viewModel.set( "components", dataSource );
 			
             return false;
 
