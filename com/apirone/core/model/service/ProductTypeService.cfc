@@ -1,9 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.ComponentTypeDAO";
+	property name="dao" type="com.apirone.core.model.dao.ProductTypeDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
-    public com.apirone.core.model.bean.ComponentType function get(
+    public com.apirone.core.model.bean.productType function get(
     		required String typeId
         ){
 
@@ -85,17 +85,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private methods
 	*/
 
-	private com.apirone.core.model.bean.ComponentType function build(
-    		required String componentTypeId
+	private com.apirone.core.model.bean.productType function build(
+    		required String productTypeId
     	){
 
-	    var record = getDao().read( arguments.componentTypeId );
+	    var record = getDao().read( arguments.productTypeId );
 
 	    if( record.RecordCount ) { 
 
 			var record = super.trimQueryFields( record );
 
-          	var bean = super.bean( "ComponentType" );
+          	var bean = super.bean( "ProductType" );
 
 			bean.setId( record.codtip );
 			bean.setName( record.destip );
@@ -110,7 +110,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "ComponentType_#arguments.id#";
+  		return "productType_#arguments.id#";
 
   	}
 

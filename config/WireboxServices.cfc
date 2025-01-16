@@ -158,10 +158,10 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "ComponentTypeDAO" )
             .parent("AbsService");
             
-        map("ComponentService").to( "com.apirone.core.model.service.ComponentService" )
+        map("ProductService").to( "com.apirone.core.model.service.ProductService" )
             .asSingleton()
             .property( name = "dao", ref = "ComponentDAO" )
-            .property( name = "ComponentTypeService", ref = "ComponentTypeService" )
+            .property( name = "ProductTypeService", ref = "ProductTypeService" )
             .property( name = "VariantService", ref = "VariantService" )
             .property( name = "ColorService", ref = "ColorService" )
             .property( name = "LookupService", ref = "LookupService" )
@@ -301,7 +301,7 @@ component extends="coldbox.system.ioc.config.Binder" {
         map("AttributeValueDAO").to( "com.apirone.core.model.dao.AttributeValueDAO" )
             .asSingleton();
          
-        map("ComponentDAO").to( "com.apirone.core.model.dao.ComponentDAO" )
+        map("ProductDAO").to( "com.apirone.core.model.dao.ProductDAO" )
             .asSingleton();
          
         map("VariantDAO").to( "com.apirone.core.model.dao.VariantDAO" )

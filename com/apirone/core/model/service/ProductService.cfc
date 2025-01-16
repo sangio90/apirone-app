@@ -2,9 +2,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.ProductDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="ProductVariantService" type="com.apirone.core.model.service.ProductVariantService";
-	property name="ProductTypeService" type="com.apirone.core.model.service.ProductTypeService";
-	//property name="VariantTypeService" type="com.apirone.core.model.service.VariantTypeService";
+    property name="productTypeService" type="com.apirone.core.model.service.ProductTypeService";
+    property name="ColorService" type="com.apirone.core.model.service.ColorService";
+    property name="VariantService" type="com.apirone.core.model.service.VariantService";
+    property name="LookupService" type="com.apirone.core.model.service.LookupService";
 
     public com.apirone.core.model.bean.Product function get(
     		required String productId
@@ -22,27 +23,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    } 
 	    
-		var product = build( arguments.productId );
-		cm.put( key, product );
+		var bean = build( arguments.productId );
+		
+		cm.put( key, bean );
         
-		return product;
-
-	}
-
-	public Boolean function codeExists(
-		required String code,
-		String excludeId =  ""
-	){
-	
-		var products = search( code = arguments.code ).getData();
-
-		return !isNull( products[1] ) AND products[1].getId() NEQ arguments.excludeId;
+		return bean;
 
 	}
 
     public com.apirone.core.model.bean.Result function search(
 			required Numeric limit = 20,
-			required Numeric offset = 0,
+			required Numeric offset = 0
     	){
 
 	    var rows = [];
@@ -77,13 +68,45 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var record = trimQueryFields( record );
 
-            var product = super.bean( "Product" );
+            var bean = super.bean( "Product" );
 
-            product.setId( record.arcodart );
-			product.setName( record.ardesart );
-			product.setType( getProductTypeService().get( record.artipmat )  );
+            bean.setId( record.arcodart );
+			bean.setName( record.ardesart );
+			bean.setType( getProductTypeService().get( record.artipmat )  );
+			bean.setProcessingType( getLookupService().get( "processingType", record.processiong_type_id )  );
+
+			var variants = getVariantService().list( productId=record.arcodart );
+			var colors = getColorService().list( productId=record.arcodart );
+
+			/*
+			if( !variants.len() ) {
+				var variant =  super.bean("Variant");
+				
+				variant.setId("_NOVAR");
+				variant.setName("Nessuna variante");
+
+				variants.add( variant );
+			}
+
+			if( !colors.len() ) {
+
+				var color =  super.bean("Color");
+				
+				color.setId("_NOCOL");
+				color.setName("Nessun colore");
+
+				colors.add( color );
+
+			}
+			*/
+
+			for( var thisVariant in variants ) {
+				thisVariant.setColors( colors )
+			}
+
+			bean.setVariants( variants );
 			
-            return product;
+            return bean;
 
 	    }
 
