@@ -91,7 +91,7 @@
 		<cfargument name="combinationItemId" type="Numeric" required="true">
 
         <cfquery name="local.q" datasource="apirone">
-			DELETE FROM combination_item_components 
+			DELETE FROM components 
 			WHERE
 				combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
 		</cfquery>
@@ -106,10 +106,10 @@
 		<cfargument name="combinationComponent" type="com.apirone.core.model.bean.CombinationComponent" required="true">
 
         <cfquery name="local.q" datasource="apirone">
-			DELETE FROM combination_item_components 
+			DELETE FROM components
 			WHERE
 				combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
-				AND component_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getComponent().getId()#">
+				AND product_it = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getComponent().getId()#">
 				AND variant_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getVariant().getId()#">
 				AND color_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getColor().getId()#">
 		</cfquery>
@@ -124,9 +124,9 @@
 		<cfargument name="combinationComponent" type="com.apirone.core.model.bean.CombinationComponent" required="true">
 
         <cfquery name="local.q" datasource="apirone">
-			INSERT INTO combination_item_components (
+			INSERT INTO components (
 				combination_item_id,
-				component_id,
+				product_it,
 				color_id,
 				variant_id,
 				quantity
@@ -137,10 +137,10 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getColor().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationComponent.getVariant().getId()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.combinationComponent.getQuantity()#">
-			) RETURNING combination_item_component_id
+			) RETURNING component_id
 		</cfquery>
 
-		<cfreturn local.q.combination_item_component_id>
+		<cfreturn local.q.component_id>
 
 	</cffunction>
 

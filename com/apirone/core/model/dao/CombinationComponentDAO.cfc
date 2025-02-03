@@ -7,9 +7,9 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
-                combination_item_components
+                components
 			WHERE
-                combination_item_component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationComponentId#">
+				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationComponentId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -27,10 +27,10 @@
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT
-                combination_item_component_id,
-				COUNT(combination_item_component_id) OVER() AS total
+                component_id,
+				COUNT(component_id) OVER() AS total
 			FROM
-            combination_item_components
+            	components
 			WHERE 1=1
 			
 			<cfif !isNull( arguments.combinationItemId )>

@@ -2,30 +2,32 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function detail( event, rc, prc ){
 
-        var comb = super.fire( "combination.get", [ rc.id ] );
+        var combination = super.fire( "combination.get", [ rc.id ] );
 
-        var lineId = comb.getLine().getId();
+        prc.size = combination.getSize();
+        prc.line = combination.getLine();
 
-        prc.title="Dimensione #comb.getSize().getCode()#, finitura #comb.getFinish().getName()#";
-        prc.subtitle="Linea #comb.getLine().getName()#";
+        prc.title="Dimensione #combination.getSize().getCode()#, finitura #combination.getFinish().getName()#";
+        prc.subtitle="Linea #combination.getLine().getName()#";
 
-        prc.sizes = super.fire("size.list", { lineId = lineId } );
+        prc.sizes = super.fire("size.list", { lineId = prc.line.getId() } );
 
         prc.statusList = super.fire( "status.list", ["line"] );
         prc.finishes = super.fire( "finish.list" );
 
-        combinations = super.fire( "combination.list", { lineId = lineId } );
+        combinations = super.fire( "combination.list", { lineId = prc.line.getId() } );
 
-        prc.sizeId = comb.getSize().getId();
         
         prc.jsScripts.add( "app-attribute-detail" );
         prc.jsScripts.add( "app-component" );
         prc.jsScripts.add( "app-combination" );
 
-        prc.page["lineId"] = lineId;
-        prc.page["combinationId"] = comb.getId();
+        prc.page["lineId"] = prc.line.getId();
+
+        prc.page["combinationId"] = combination.getId();
         prc.page["combinations"] = combinations;
         prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
+
         prc.page["categories"] = super.getCategoriesAsJSON();
 
         event.setView( "combination/detail" );

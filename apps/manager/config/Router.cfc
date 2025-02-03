@@ -156,6 +156,11 @@
 
 		get( "/texts" ).toHandler( "TextController.list" );
 
+		/*
+			components
+		*/
+		get( "/ajax/components/:id/components" ).to( "CombinationItemAjaxController.listComponents" ).end();
+
 
 		/*
 			combination

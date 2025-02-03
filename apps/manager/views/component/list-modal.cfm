@@ -4,7 +4,7 @@
 		<section class="modal-dialog modal-fullscreen">
 			<div class="modal-content">
 				<header class="card-header">
-					<h2 class="card-title">Componenti per <span data-bind="text: getCurrentItemName"></span></h2>
+					<h2 class="card-title">Componenti per <span data-bind="text: getModalTitle"></span></h2>
 				</header>
 
 				<div class="card-body">

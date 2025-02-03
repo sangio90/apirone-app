@@ -3,7 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.CombinationComponentDAO";
     property name="colorService" type="com.apirone.core.model.service.ColorService";
     property name="variantService" type="com.apirone.core.model.service.VariantService";
-    property name="componentService" type="com.apirone.core.model.service.ComponentService";
+    property name="productService" type="com.apirone.core.model.service.ProductService";
 
     public com.apirone.core.model.bean.CombinationComponent function get(
     		required Numeric combinationComponentId
@@ -50,7 +50,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {
-			rows.add( get( combinationComponentId = record.combination_item_component_id ) );
+			rows.add( get( combinationComponentId = record.component_id ) );
 		});
 
 	    result.setData( rows );
@@ -76,10 +76,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             var bean = super.bean( "CombinationComponent" );
 
-            bean.setId( record.combination_item_component_id );
+            bean.setId( record.component_id );
             bean.setQuantity( record.quantity );
 
-            bean.setComponent( getComponentService().get( record.component_id ) );
+            bean.setProduct( getProductService().get( record.product_id ) );
 			bean.setVariant( getVariantService().get( record.variant_id ) );
 			bean.setColor( getColorService().get( record.color_id ) );
 

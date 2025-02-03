@@ -10,10 +10,95 @@
                 <section class="card">
                     
                     <div class="card-body">
+                        
+                        <div class="col-md-12">
+
+                            <!---
+
+                            <h3>Ordina elementi</h3>
+
+                            <div class="col-md-12 mb-5" id="order-element">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td>Forma placca: Rettangolare</td>
+                                        </tr>
+                                        <tr>
+                                            <td>-- Colore: Rosso</td>
+                                        </tr>
+                                        <tr>
+                                            <td>---- Incisione logo: Con incisione</td>
+                                        </tr>
+                                        <tr>
+                                            <td>---- Incisione logo: Senza incisione</td>
+                                        </tr>
+                                        <tr>
+                                            <td>-- Colore: Bianco</td>
+                                        </tr>
+                                        <tr>
+                                            <td>-- Colore: Nero</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Forma placca: Raggiata</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Forma placca: Ottagonale</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            --->
+
+                            <h3>Aggiungi immagini <a data-bind="click:openImagesList" style="font-size: 14px; text-decoration: underline;">Immagini per la placca</a></h3>
+    
+                            <!----
+                            <div class="col-md-12 mb-5" id="add-image">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td>Forma placca: Rettangolare</td>
+                                            <td width="100"><a data-bind="click:openImageList">Aggiungi</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-- Colore: Rosso</td>
+                                            <td width="100"><a data-bind="click:openImageList">Aggiungi</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>---- Incisione logo: Con incisione</td>
+                                            <td width="100"><a href="">Aggiungi</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>---- Incisione logo: Senza incisione</td>
+                                            <td width="100"><a href="">Aggiungi</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-- Colore: Bianco</td>
+                                            <td width="100"><a href="">Aggiungi</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>-- Colore: Nero</td>
+                                            <td width="100"><a href="">Aggiungi</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Forma placca: Raggiata</td>
+                                            <td width="100"><a href="">Aggiungi</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Forma placca: Ottagonale</td>
+                                            <td width="100"><a href="">Aggiungi</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            ---->
+    
+                        </div>
+                        
 
                         <div class="col-md-12">
                             <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Aggiungi attributo &raquo;</button>
-                            <button class="btn btn-primary btn-sm" data-bind="click:listImages">Aggiungi immagine &raquo;</button>
+                            <button class="btn btn-primary btn-sm" data-bind="click:openImagesList">Aggiungi immagine &raquo;</button>
                         </div>
 
                         <div class="col-md-12 mb-4" id="combination-config-row">
@@ -25,7 +110,7 @@
                                 <select name="sizeId" class="form-control w-auto me-4" data-bind="events: { change: loadFinishes }">
                                     <cfloop array="#prc.sizes#" item="item">
                                         <option value="#item.getId()#" 
-                                            <cfif item.getId() EQ prc.sizeId>SELECTED</cfif>
+                                            <cfif item.getId() EQ prc.size.getId()>SELECTED</cfif>
                                         >
                                             #item.getCode()#
                                         </option>
@@ -47,20 +132,39 @@
                                 <div class="row d-flex align-items-center mb-2">
 
                                     <div class="col-sm-9">
+
+                                        <p>
+                                            - <a href="" 
+                                                data-type="lineSize" 
+
+                                                data-size-id="#prc.size.getId()#"
+                                                data-size-name="#prc.size.getCode()#"
+
+                                                data-line-id="#prc.size.getId()#"
+                                                data-line-name="#prc.line.getName()#"
+                                                
+                                                data-bind="click: openComponentsList" class="underline">
+                                                    Componenti per #prc.line.getName()# / #prc.size.getCode()#
+                                                </a>
+                                            <br>
+                                            - <a href="" class="underline">Componenti base per questa combinazione</a>
+                                        </p>
         
+                                        <!---
                                         <div class="mb-3 box-search-small"> 
         
                                             <form id="finish-grid-search-form" 
                                                 class="d-flex align-items-center justify-content-end" 
                                                 data-bind:'events: { submit: search }'>
         
-                                                <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+                                                <input name="str" placeholder="Cerca..." class="form-control me-2" type="text">
         
                                                 #searchButton( bind="click:search" )#
                                             
                                             </form>
         
                                         </div>
+                                        ----->
         
                                     </div>
                                     <div class="col-sm-3">
@@ -117,7 +221,9 @@
             </div>
         </div>
 
-        #view("combination/attributes-list-modal")#
+        <!--- #view("combination/attributes-list-modal")#
+        #view("combination/images-list-modal")#
+        --->
 
     </div>
 

@@ -36,37 +36,41 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
         ```
+
+        <cftransaction>
         
-        <cfquery datasource="apirone">
-            DELETE FROM combination_items
-            WHERE 
-                combination_id = '#rc.id#'
-                AND attribute_value_id IN 
-                    ( 
-                        SELECT attribute_value_id 
-                        FROM attribute_values 
-                        WHERE attribute_id = '#rc.attributeId#'
-                    )
-        </cfquery>
-
-        <cfloop array="#attribute.getValues()#" item="item">
-
             <cfquery datasource="apirone">
-                INSERT INTO combination_items (
-                    combination_id,
-                    attribute_value_id,
-                    orderby,
-                    parent_id
-                )
-                VALUES (
-                    '#rc.id#',
-                    '#item.getId()#',
-                    #item.getOrderBy()#,
-                    #( Val(rc.parentId) ? rc.parentId : 'NULL' )#
-                )
+                DELETE FROM combination_items
+                WHERE 
+                    combination_id = '#rc.id#'
+                    AND attribute_value_id IN 
+                        ( 
+                            SELECT attribute_value_id 
+                            FROM attribute_values 
+                            WHERE attribute_id = '#rc.attributeId#'
+                        )
             </cfquery>
-            
-        </cfloop>
+
+            <cfloop array="#attribute.getValues()#" item="item">
+
+                <cfquery datasource="apirone">
+                    INSERT INTO combination_items (
+                        combination_id,
+                        attribute_value_id,
+                        orderby,
+                        parent_id
+                    )
+                    VALUES (
+                        '#rc.id#',
+                        '#item.getId()#',
+                        #item.getOrderBy()#,
+                        #( Val(rc.parentId) ? rc.parentId : 'NULL' )#
+                    )
+                </cfquery>
+                
+            </cfloop>
+
+        </cftransaction>
 
         ```
 

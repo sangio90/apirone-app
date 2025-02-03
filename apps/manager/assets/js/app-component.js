@@ -42,11 +42,45 @@ AP.component.list = (function () {
 
 	}
 
+	var getCurrentConfig = function() {
+
+		var current = viewModel("currentItem");
+
+		var result = {
+			modalTitle: "",
+			postUrl: ""
+		}
+
+		if( current ) {
+
+			switch( current.type ) {
+			
+				case "lineSize":
+
+					result.modalTitle = current.line.name + " / " + current.size.name;
+				  
+					break;
+				
+				case "combination":
+
+					result.modalTitle = current.attribute.name + " / " + current.attributeValue.name;
+					
+					break;
+				
+				default:
+			}
+
+		}
+
+		return result;
+
+	}
+
 	var createId = function( row ) {
 
 		console.log("createId:row", row);
 
-		var id = row.comp.id + "$$$" + row.color.id + "$$$" + row.variant.id;
+		var id = row.product.id + "$$$" + row.color.id + "$$$" + row.variant.id;
 
 		console.log("createId:id", id);
 
@@ -132,7 +166,8 @@ AP.component.list = (function () {
 			var product = viewModel.get("currentProduct");
 			var variant = viewModel.get("currentVariant");
 
-			console.log( "addColor:comp", comp );
+			console.log( "addColor:product", product );
+			console.log( "addColor:variant", variant );
 
 			var row = {
 				//id: createId( comp ),
@@ -159,7 +194,7 @@ AP.component.list = (function () {
 
 			var exists = selectedExists( row );
 
-			console.log("addColor:exists", exists);
+			console.log( "addColor:exists", exists );
 
 			if( exists ) {
 				AP.widget.autoClearMessage( "status-selected", "<span class='red'>È stato già aggiunto</span>" );
@@ -209,7 +244,7 @@ AP.component.list = (function () {
 
 			NM.util.ajax({
 				method: "POST",
-				url: "/manager/ajax/combination-items/" + current.id + "/components",
+				url: getCurrentConfig().postUrl,
 				data: JSON.stringify( viewModel.get("selected").data() ),
 				callback: {
 					done: function (xhr) {
@@ -295,18 +330,19 @@ AP.component.list = (function () {
 
 		},
 
-        getCurrentItemName: function (event) {
+        getModalTitle: function ( event ) {
 
-			var attrName = viewModel.get("currentItem.attribute.name")
-					+ " / "
-					+ viewModel.get("currentItem.attributeValue.name");
+			var name = getCurrentConfig().modalTitle;
 
-            return attrName;
+			return name;
+
 		},
 
 	});
 
 	pub.setCurrentItem = function (item) {
+
+		console.log("pub.setCurrentItem:item", item);
 
 		viewModel.set("currentItem", item);
 
@@ -318,7 +354,7 @@ AP.component.list = (function () {
 
 		NM.util.ajax({
 			method: "GET",
-			url: "/manager/ajax/combination-items/" + itemId + "/components",
+			//url: "/manager/ajax/combination-items/" + itemId + "/components",
 			callback: {
 				done: function (xhr) {
 

@@ -4,7 +4,8 @@ AP.combination.fields = {
     rootDetail: $("#combination-detail-root"),
 	configRow: $("#combination-config-row"),
 	attributeSearchForm: $("#attributes-search-form"),
-	attributeModal: $("#combination-attributes-list-modal")
+	attributeModal: $("#combination-attributes-list-modal"),
+	imageModal: $("#combination-images-list-modal")
 };
 
 $(document).ready(function (){
@@ -67,11 +68,18 @@ AP.combination.list = (function () {
 
 	var viewModel = kendo.observable({
 
+		isImagesCompleted: true,
+		isImagesUncompleted: false,
+
 		items: dataSources.items,
 		attributesList: dataSources.attributesList,
 
 		itemForAttributes: undefined,
 
+		images: [ 
+			{ id: "H", name: "Orizzontale" },
+			{ id: "V", name: "Verticale" }
+		],
 
 		/*
 			attributes methods
@@ -182,6 +190,16 @@ AP.combination.list = (function () {
 
 		},
 
+		openImagesList: function (event) {
+
+			console.log("openImageList:event.data", event.data);
+
+			NM.util.openModal( fields.imageModal );
+
+			this.searchAttributes();
+
+		},
+
 		openAttributeValues: function (event) {
 
 			// console.log("event.data.id", event.data.id);
@@ -219,7 +237,48 @@ AP.combination.list = (function () {
 
         openComponentsList: function (event) {
 
-			componentApp.setCurrentItem(event.data);
+			var element = $( event.currentTarget );
+
+			console.log("event.currentTarget", event.currentTarget);
+			console.log("element", element);
+
+			if ( !element.attr("data-type") ) {
+				console.error("ERROR. Set data-type attribute in currentTarget");
+				return;
+			}
+
+			var type = element.data("type");
+
+			console.log("openComponentsList:type", type);
+
+			if( type == "lineSize" ) {
+
+				var value = {
+					type: "lineSize",
+					size: {
+						id: element.data("size-id"),
+						name: element.data("size-name")
+					},
+					line: {
+						id: element.data("line-id"),
+						name: element.data("line-name")
+					}
+				};
+
+				console.log("openComponentsList:element", element);
+				console.log("openComponentsList:value1", value);
+			}
+			
+			if( type == "attribute" ) {
+				var value = event.data;
+			}
+			
+			//componentApp.setCurrentItem(event.data);
+
+			console.log("openComponentsList:value", value);
+			console.log("openComponentsList:type", type);
+
+			componentApp.setCurrentItem( value );
 			
 			componentApp.open(event.data.id);
 
@@ -313,6 +372,172 @@ AP.combination.list = (function () {
 		kendo.bind(fields.rootDetail, viewModel);
 
 		viewModel.loadFinishes();
+
+
+		initSort();
+		
+		initUpload();
+
+	};
+
+	var initUpload = function() {
+
+		console.log("initUpload");
+
+
+		//var documents = viewModel.get( "documents" ).data();
+		//var shipmentId = viewModel.get( "shipment.id" );
+
+		var documents = viewModel.get("images");
+
+		if( documents.length > 0 ) {
+
+			var modal = $("#documents-upload-modal");
+			modal.modal( "show" );
+
+			for ( var document of documents ) {
+			
+				var uid = document.uid;
+
+				$("#document-upload-" + uid ).fileupload({
+					dropZone: $("#document-upload-dropzone-" + uid),
+					autoUpload: true,
+					formData: { "shipmentId": 0, "documentTypeId": document.id },
+					url: "/manager/ajax/shipment/upload-document",
+					add: function (event, data) { 
+						var uid = $(event.target).data("uid");
+						
+						var status = $("#document-upload-status-" + uid );
+						
+						status.html("");
+						
+						//TODO: get list form configuration
+						if (!(/\.(jpg|jpeg|png|pdf)$/i).test(data.files[0].name)) {
+							status.html("<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>");
+							return false;
+						}
+
+						data.submit();
+
+					},
+		
+					progressall: function( event, data ) {
+
+						var status = $('#document-upload-status-' + uid );
+						status.html("");
+
+						var uid = $(event.target).data("uid");
+						
+						var progress = parseInt(data.loaded / data.total * 100, 10);
+						$("#document-upload-progress-" + uid + " .upload-bar").css("width", progress + "%");
+						
+						status.html("Fatto!");
+						
+						var row = viewModel.get("documents").getByUid( uid );
+						
+						row.set("completed", true);
+
+					}
+				});		
+
+			}				
+
+		} else {
+
+			viewModel.showPaymentDialog();
+
+		}
+
+
+	};
+
+	var initSort = function() {
+
+		var table = $("#order-element table");
+
+		table.kendoSortable({
+			axis: "y",
+			filter: ">tbody >tr",
+			hint: function (element) {
+				var ele = $("<div>");
+				var text = $(element).find("td.sortable").text();
+
+				ele.text(text)
+					.height(element.height())
+					.width(element.width())
+					.addClass("sortable-hint");
+
+				return ele;
+
+			},
+			placeholder: function (element) {
+				return element.clone()
+					.addClass("sortable-placeholder")
+					.height(element.height())
+					.width(element.width());
+			},
+
+			end: function (event) {
+
+				console.log("event.oldIndex", event.oldIndex);
+				console.log("event.newIndex", event.newIndex);
+
+				if(event.newIndex != event.oldIndex) {
+
+					var values = viewModel.get("detailForm.data.values").data();
+					var thisForm = $("#attribute-values-form");
+					var status = thisForm.find(".status");
+
+					console.log("values", values.length);
+
+					// INFO: kendo send an extra item to remove accordingly to direction of d&d
+					if (event.oldIndex < event.newIndex) {
+						var removeItem = event.oldIndex;
+					} else {
+						var removeItem = event.oldIndex+1;
+					}
+
+					status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
+
+					var count = 1;
+
+					table.find("tr").each(function (index) {
+
+						if (index != removeItem) {
+
+							var ele = $(this);
+							var uid = ele.data("uid");
+
+							for(var value of values) {
+
+								if (value.get("uid") == uid) {
+
+									value.set("orderBy", count*10);
+								}
+							}
+
+							count++;
+
+						}
+
+					});
+
+					NM.util.ajax({
+						method: "POST",
+						url: "/manager/ajax/attributes/" + id + "/values/order",
+						data: JSON.stringify(viewModel.get("detailForm.data.values").data()),
+						callback: {
+							done: function (xhr) {
+
+								NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
+							}
+						}
+					});
+
+				}
+			}
+
+		});
 
 	};
 
