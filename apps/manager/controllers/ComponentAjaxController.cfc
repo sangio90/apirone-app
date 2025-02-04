@@ -1,11 +1,34 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function listComponents( event, rc, prc ){
+    function list( event, rc, prc ){
+
+        var rc.typeId = "____";
 
         var data = [];
         var result = super.getResult();
 
-        var  items = super.fire("CombinationComponent.list", { combinationItemId = rc.id } );
+        var params = {};
+
+        dump(rc);
+        abort;
+
+        if( rc.typeId == "combination" ) {
+            params = { combination = rc.combinationId };
+        }
+
+        if( rc.typeId == "item" ) {
+            params = { combinationItemId = rc.itemId };
+        }
+
+        if( rc.typeId == "lineSize" ) {
+            params = { lineId = rc.lineId, sizeId = rc.sizeId };
+        }
+
+        dump(rc);
+
+        abort;
+
+        var  items = super.fire( "Component.list", params );
 
         for( var item in items ) {
 
@@ -41,7 +64,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
-    function saveComponents( event, rc, prc ){
+    function save( event, rc, prc ){
 
         var result = super.getResult();
 

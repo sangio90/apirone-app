@@ -159,14 +159,20 @@
 		/*
 			components
 		*/
-		get( "/ajax/components/:id/components" ).to( "CombinationItemAjaxController.listComponents" ).end();
+		//get( "/ajax/components/:id/components" ).to( "CombinationItemAjaxController.listComponents" ).end();
+		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
+		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end();
+		
+		//post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end();
+
+		get( "/ajax/pallets/" )
 
 
 		/*
 			combination
-		*/
 		get( "/ajax/combination-items/:id/components" ).to( "CombinationItemAjaxController.listComponents" ).end();
 		post( "/ajax/combination-items/:id/components" ).to( "CombinationItemAjaxController.saveComponents" ).end();
+		*/
 
 		post( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.addItem" ).end();
 

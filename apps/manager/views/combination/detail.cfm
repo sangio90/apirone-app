@@ -134,7 +134,7 @@
                                     <div class="col-sm-9">
 
                                         <p>
-                                            - <a href="" 
+                                            - <a class="underline"
                                                 data-type="lineSize" 
 
                                                 data-size-id="#prc.size.getId()#"
@@ -143,11 +143,19 @@
                                                 data-line-id="#prc.size.getId()#"
                                                 data-line-name="#prc.line.getName()#"
                                                 
-                                                data-bind="click: openComponentsList" class="underline">
+                                                data-bind="click: openComponentsList">
                                                     Componenti per #prc.line.getName()# / #prc.size.getCode()#
                                                 </a>
                                             <br>
-                                            - <a href="" class="underline">Componenti base per questa combinazione</a>
+                                            - <a class="underline"
+                                                data-type="combination" 
+
+                                                data-combination-id="#rc.id#"
+                                                data-combination-name="#prc.subtitle# / #prc.title#"
+                                                
+                                                data-bind="click: openComponentsList">
+                                                    Componenti base per questa combinazione
+                                                </a>
                                         </p>
         
                                         <!---

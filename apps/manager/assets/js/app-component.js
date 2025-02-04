@@ -44,11 +44,15 @@ AP.component.list = (function () {
 
 	var getCurrentConfig = function() {
 
-		var current = viewModel("currentItem");
+		var current = viewModel.get("currentItem");
+		var baseUrl = "/manager/ajax/components";
+
+		console.log("current", current);
 
 		var result = {
 			modalTitle: "",
-			postUrl: ""
+			modifyUrl: "",
+			readUrl: ""
 		}
 
 		if( current ) {
@@ -57,13 +61,25 @@ AP.component.list = (function () {
 			
 				case "lineSize":
 
-					result.modalTitle = current.line.name + " / " + current.size.name;
+					result.modalTitle = "linea a dimensione: " + current.line.name + " / " + current.size.name;
+					result.readUrl = baseUrl + "?typeId=linesize&lineId=" + current.line.id + "&sizeId=" + current.size.id;
+					result.modifyUrl = result.readUrl
 				  
+					break;
+				
+				case "item":
+
+					result.modalTitle = "elemento: " + current.attribute.name + " / " + current.attributeValue.name;
+					result.readUrl = baseUrl + "?typeId=attribute&&itemId=" + current.item.id;
+					result.modifyUrl = result.readUrl;
+					
 					break;
 				
 				case "combination":
 
-					result.modalTitle = current.attribute.name + " / " + current.attributeValue.name;
+					result.modalTitle = "combinazione: " + current.combination.name;
+					result.readUrl = baseUrl + "?typeId=combination&combinationId=" + current.combination.id;
+					result.modifyUrl = result.readUrl;
 					
 					break;
 				
@@ -244,7 +260,8 @@ AP.component.list = (function () {
 
 			NM.util.ajax({
 				method: "POST",
-				url: getCurrentConfig().postUrl,
+				//url: getCurrentConfig().postUrl,
+				url: getCurrentConfig().modifyUrl,
 				data: JSON.stringify( viewModel.get("selected").data() ),
 				callback: {
 					done: function (xhr) {
@@ -267,10 +284,7 @@ AP.component.list = (function () {
 
         openColors: function (event) {
 
-			console.log("openColors:event", event);
-
 			viewModel.set("currentVariant", event.data);
-
 			viewModel.set("colors", event.data.colors);
 
             return false;
@@ -340,27 +354,23 @@ AP.component.list = (function () {
 
 	});
 
-	pub.setCurrentItem = function (item) {
+	pub.open = function ( item ) {
 
-		console.log("pub.setCurrentItem:item", item);
+		//console.log("open:itemId", itemId);
 
-		viewModel.set("currentItem", item);
+		viewModel.set( "currentItem", item );
 
-	};
-
-	pub.open = function (itemId) {
-
-		console.log("open:itemId", itemId);
+		console.log( "readUrl", getCurrentConfig().readUrl );
 
 		NM.util.ajax({
 			method: "GET",
-			//url: "/manager/ajax/combination-items/" + itemId + "/components",
+			url: getCurrentConfig().readUrl,
 			callback: {
 				done: function (xhr) {
 
 					viewModel.get("selected").data( xhr.data );
 
-					NM.util.openModal($("#component-list-modal"));
+					NM.util.openModal( $("#component-list-modal") );
 
 				}
 			}

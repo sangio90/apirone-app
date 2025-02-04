@@ -234,13 +234,9 @@ AP.combination.list = (function () {
 			// attributes methods
 		*/
 
-
         openComponentsList: function (event) {
 
 			var element = $( event.currentTarget );
-
-			console.log("event.currentTarget", event.currentTarget);
-			console.log("element", element);
 
 			if ( !element.attr("data-type") ) {
 				console.error("ERROR. Set data-type attribute in currentTarget");
@@ -249,38 +245,61 @@ AP.combination.list = (function () {
 
 			var type = element.data("type");
 
-			console.log("openComponentsList:type", type);
+			switch( type ) {
+			
+				case "lineSize":
 
-			if( type == "lineSize" ) {
+					var value = {
+						type: "lineSize",
+						size: {
+							id: element.data("size-id"),
+							name: element.data("size-name")
+						},
+						line: {
+							id: element.data("line-id"),
+							name: element.data("line-name")
+						}
+					};
+				  
+					break;
+				
+				case "item":
 
-				var value = {
-					type: "lineSize",
-					size: {
-						id: element.data("size-id"),
-						name: element.data("size-name")
-					},
-					line: {
-						id: element.data("line-id"),
-						name: element.data("line-name")
+					var value = {
+						type: "item",
+						item: {
+							id: event.data.id
+						},
+						attribute: {
+							id: event.data.attribute.id,
+							name: event.data.attribute.name
+						},
+						attributeValue: {
+							id: event.data.attributeValue.id,
+							name: event.data.attributeValue.name
+						},
 					}
-				};
 
-				console.log("openComponentsList:element", element);
-				console.log("openComponentsList:value1", value);
-			}
-			
-			if( type == "attribute" ) {
-				var value = event.data;
-			}
-			
-			//componentApp.setCurrentItem(event.data);
+					break;
+				
+				case "combination":
 
-			console.log("openComponentsList:value", value);
-			console.log("openComponentsList:type", type);
+					var value = {
+						type: "combination",
+						combination: {
+							id: element.data("combination-id"),
+							name: element.data("combination-name")
+						},
+					};
+			  
+					break;
+				
+				default:
+			};
 
-			componentApp.setCurrentItem( value );
-			
-			componentApp.open(event.data.id);
+			console.log("openComponentsList:item", value );
+
+			componentApp.open( value );
 
             return false;
 		},

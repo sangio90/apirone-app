@@ -194,13 +194,6 @@
 
                                     #saveButton( bind="click:saveValue", size="sm" )#
 
-                                    <!---
-                                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:saveValue">
-
-                                        <i class="fas fa-save"></i> <span data-bind="text: valueForm.labelButton"></span>
-                                         <i class="fas fa-save"></i> <span data-bind="text: valueForm.labelButton"></span> 
-                                    </button>
-                                    ---->
                                 </div>
                             </div>
                         </footer>
