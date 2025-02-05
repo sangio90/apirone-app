@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
-    public DocumentType function init(){
+    public FileType function init(){
 
         return this;
     }

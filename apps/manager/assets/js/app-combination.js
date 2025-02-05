@@ -5,7 +5,7 @@ AP.combination.fields = {
 	configRow: $("#combination-config-row"),
 	attributeSearchForm: $("#attributes-search-form"),
 	attributeModal: $("#combination-attributes-list-modal"),
-	imageModal: $("#combination-images-list-modal")
+	imagesModal: $("#combination-images-list-modal")
 };
 
 $(document).ready(function (){
@@ -29,6 +29,7 @@ AP.combination.list = (function () {
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" }),
+		images: NM.kendo.dataSource( { data: [ { id: "H", name: "Orizzontale" }, { id: "V", name: "Verticale" } ]} ),
 		attributesList: undefined
 	};
 
@@ -76,10 +77,7 @@ AP.combination.list = (function () {
 
 		itemForAttributes: undefined,
 
-		images: [ 
-			{ id: "H", name: "Orizzontale" },
-			{ id: "V", name: "Verticale" }
-		],
+		images: dataSources.images,
 
 		/*
 			attributes methods
@@ -192,11 +190,57 @@ AP.combination.list = (function () {
 
 		openImagesList: function (event) {
 
+			var element = $( event.currentTarget );
+
+			if ( !element.attr("data-type") ) {
+				console.error("ERROR. Set data-type attribute in currentTarget");
+				return;
+			}
+
+			var type = element.data("type");
+
+			switch( type ) {
+			
+				case "item":
+
+					var value = {
+						type: "item",
+						item: {
+							id: event.data.id
+						},
+					}
+
+					break;
+				
+				case "combination":
+
+					var value = {
+						type: "combination",
+						combination: {
+							id: element.data("combination-id"),
+						},
+					};
+			  
+					break;
+				
+				default:
+			};
+
+			console.log("openComponentsList:item", value );
+
+			componentApp.open( value );			
+
+			/*
 			console.log("openImageList:event.data", event.data);
 
-			NM.util.openModal( fields.imageModal );
+			NM.util.openModal( fields.imagesModal );
+
+			$("#document-image").addClass("d-none");
 
 			this.searchAttributes();
+			*/
+
+			return false;
 
 		},
 
@@ -395,34 +439,30 @@ AP.combination.list = (function () {
 
 		initSort();
 		
-		initUpload();
+		//initUpload();
 
 	};
 
 	var initUpload = function() {
 
 		console.log("initUpload");
-
-
-		//var documents = viewModel.get( "documents" ).data();
-		//var shipmentId = viewModel.get( "shipment.id" );
-
 		var documents = viewModel.get("images");
 
-		if( documents.length > 0 ) {
+		console.log("initUpload:images", viewModel.get("images"))
+
+		if( documents.total() > 0 ) {
 
 			var modal = $("#documents-upload-modal");
 			modal.modal( "show" );
 
-			for ( var document of documents ) {
+			for ( var document of documents.data() ) {
 			
 				var uid = document.uid;
 
 				$("#document-upload-" + uid ).fileupload({
 					dropZone: $("#document-upload-dropzone-" + uid),
 					autoUpload: true,
-					formData: { "shipmentId": 0, "documentTypeId": document.id },
-					url: "/manager/ajax/shipment/upload-document",
+					url: "/manager/ajax/combinations/" + AP.page.combinationId + "/upload",
 					add: function (event, data) { 
 						var uid = $(event.target).data("uid");
 						
@@ -452,7 +492,9 @@ AP.combination.list = (function () {
 						
 						status.html("Fatto!");
 						
-						var row = viewModel.get("documents").getByUid( uid );
+						//var row = viewModel.get("documents").getByUid( uid );
+
+						$("#document-image").eq(0).removeClass("d-none");
 						
 						row.set("completed", true);
 
@@ -461,12 +503,7 @@ AP.combination.list = (function () {
 
 			}				
 
-		} else {
-
-			viewModel.showPaymentDialog();
-
 		}
-
 
 	};
 

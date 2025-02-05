@@ -28,6 +28,12 @@
 
             <div id="document-upload-status-##: uid ##"></div>
 
+            <div id="document-image" class="d-none">
+                <a href="/502.jpg" target="_blank" >
+                    <img src="/502.jpg" width="400" height="150" style="border: 1px solid LightGray">
+                </a>
+            </div>
+
             <hr class="my-4">
 
         </div>

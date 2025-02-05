@@ -2,25 +2,24 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        param rc.typeId = "";
+        param rc.by = "";
 
         var data = [];
         var result = super.getResult();
 
         var params = {};
 
-        if( rc.typeId == "combination" ) {
+        if( rc.by == "combination" ) {
             params = { combinationId = rc.combinationId };
         }
 
-        if( rc.typeId == "item" ) {
+        if( rc.by == "item" ) {
             params = { combinationItemId = rc.itemId };
         }
 
-        if( rc.typeId == "lineSize" ) {
+        if( rc.by == "lineSize" ) {
             params = { lineId = rc.lineId, sizeId = rc.sizeId };
         }
-
 
         var  items = super.fire( "Component.list", params );
 

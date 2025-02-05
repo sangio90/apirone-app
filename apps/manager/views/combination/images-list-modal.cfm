@@ -13,23 +13,11 @@
                     </header>
                     
                     <div class="card-body">                
-
-                        <!----
-                        <div style="border: 1px solid ##EAEAEA; padding; 10px; height: 150px" class="mb-3">
-                            <span style="color: ##CCCCCC">Versione orizzontale</span>
-                        </div>
-
-                        <div style="border: 1px solid ##EAEAEA; padding; 10px; height: 150px" class="mb-3">
-                            <span style="color: ##CCCCCC">Versione verticale</span>
-                        </div>
-                        ---->
-
                         
                         <div class="row"
                             data-bind="source: images" 
                             data-template="combination-images-item-tmpl">
                         </div>
-                        
                     
                     </div>
 

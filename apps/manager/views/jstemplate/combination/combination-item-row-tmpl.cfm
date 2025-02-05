@@ -12,6 +12,11 @@
                 <span data-bind="text: attributeValue.name"></span>
             </td>
             <td class="text-center">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList">
+                    <i class="fas fa-image"></i> 
+                </button>
+            </td>
+            <td class="text-center">
                 <button type="button" class="btn btn-default btn-sm" data-bind="click:openAttributesList">
                     <i class="fas fa-plus"></i> 
                 </button>

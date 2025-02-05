@@ -50,51 +50,13 @@
                             
                             --->
 
-                            <h3>Aggiungi immagini <a data-bind="click:openImagesList" style="font-size: 14px; text-decoration: underline;">Immagini per la placca</a></h3>
-    
-                            <!----
-                            <div class="col-md-12 mb-5" id="add-image">
-                                <table class="table">
-                                    <tbody>
-                                        <tr>
-                                            <td>Forma placca: Rettangolare</td>
-                                            <td width="100"><a data-bind="click:openImageList">Aggiungi</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>-- Colore: Rosso</td>
-                                            <td width="100"><a data-bind="click:openImageList">Aggiungi</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>---- Incisione logo: Con incisione</td>
-                                            <td width="100"><a href="">Aggiungi</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>---- Incisione logo: Senza incisione</td>
-                                            <td width="100"><a href="">Aggiungi</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>-- Colore: Bianco</td>
-                                            <td width="100"><a href="">Aggiungi</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>-- Colore: Nero</td>
-                                            <td width="100"><a href="">Aggiungi</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Forma placca: Raggiata</td>
-                                            <td width="100"><a href="">Aggiungi</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Forma placca: Ottagonale</td>
-                                            <td width="100"><a href="">Aggiungi</a></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            ---->
+                            <h3>Aggiungi immagini 
+                                <a href="" data-type="combination" data-bind="click:openImagesList" style="font-size: 14px; text-decoration: underline;">
+                                    Immagini per questa placca
+                                </a>
+                            </h3>
     
                         </div>
-                        
 
                         <div class="col-md-12">
                             <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Aggiungi attributo &raquo;</button>
@@ -198,7 +160,8 @@
                                         columns = "[
                                             { 'field':'Id', 'title':'ID', width: '60px' },
                                             { 'field':'name', 'title':'Attributo' },
-                                            { 'field':'', 'title':'Aggancia altri attributi', width: '55px'},
+                                            { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
+                                            { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
                                             { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
                                             { 
                                                 'field'           :'', 
@@ -231,10 +194,9 @@
             </div>
         </div>
 
-        <!--- #view("combination/attributes-list-modal")#
+        <!--- #view("combination/attributes-list-modal")# --->
         #view("combination/images-list-modal")#
-        --->
-
+        
     </div>
 
     #view("attribute/detail-modal")#

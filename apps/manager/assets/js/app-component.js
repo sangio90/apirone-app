@@ -62,7 +62,7 @@ AP.component.list = (function () {
 				case "lineSize":
 
 					result.modalTitle = "linea a dimensione: " + current.line.name + " / " + current.size.name;
-					result.readUrl = baseUrl + "?typeId=linesize&lineId=" + current.line.id + "&sizeId=" + current.size.id;
+					result.readUrl = baseUrl + "?by=linesize&lineId=" + current.line.id + "&sizeId=" + current.size.id;
 					result.modifyUrl = result.readUrl
 				  
 					break;
@@ -70,7 +70,7 @@ AP.component.list = (function () {
 				case "item":
 
 					result.modalTitle = "elemento: " + current.attribute.name + " / " + current.attributeValue.name;
-					result.readUrl = baseUrl + "?typeId=item&&itemId=" + current.item.id;
+					result.readUrl = baseUrl + "?by=item&&itemId=" + current.item.id;
 					result.modifyUrl = result.readUrl;
 					
 					break;
@@ -78,7 +78,7 @@ AP.component.list = (function () {
 				case "combination":
 
 					result.modalTitle = "combinazione: " + current.combination.name;
-					result.readUrl = baseUrl + "?typeId=combination&combinationId=" + current.combination.id;
+					result.readUrl = baseUrl + "?by=combination&combinationId=" + current.combination.id;
 					result.modifyUrl = result.readUrl;
 					
 					break;
@@ -134,7 +134,6 @@ AP.component.list = (function () {
             thisForm.find( "input[name=str]" ).val("");
 
             dataSource.filter( [] );
-
             dataSource.view();
 
             return false;

@@ -16,12 +16,15 @@ component output="true" accessors="true" {
 			},
 			"filesHost": "#settings.get("files.host")#",
 			"imageVersions" = {
-				"sizes" = {
-					"small" = 300,
-					"medium" = 600,
+				"combinationItem" = {
+					"sizes" = {
+						"small" = "200",
+					},
 				},
-				"crops" = {
-					"thumbnail" =  "50x50"
+				"plates" = {
+					"sizes" = {
+						"small" = "200",
+					},
 				}
 			},
 			"encryptKey": settings.get("db.encryptKey")

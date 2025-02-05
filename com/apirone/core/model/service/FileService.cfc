@@ -1,14 +1,14 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.FileDAO";
-	property name="fileTypeService" type="com.apirone.core.model.service.FileTypeService";
-	property name="MediaService" type="com.apirone.core.model.service.MediaService";
+    property name="dao" type="com.apirone.core.model.dao.FileDAO";
+    property name="lookupService" type="com.apirone.core.model.service.LookupService";
+    property name="fileTypeService" type="com.apirone.core.model.service.FileTypeService";
 
-    public com.apirone.core.model.bean.File function get(
+    public com.apirone.core.model.bean.file function get(
     		required String fileId
-        ){
+    	){
 
-    	var cm = super.getCacheManager();
+    	var cm = getCacheManager();
 
     	var key = getCacheKey( arguments.fileId );
 
@@ -16,128 +16,192 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if ( cache.status ) {
 	    
-	      	return cache.data;
+	      return cache.data;
 	    
 	    } 
 	    
 		var obj = build( arguments.fileId );
 		cm.put( key, obj );
-        
-		return obj;
-
-	}
-
-	public String function create(
-		required com.apirone.core.model.bean.File file,
-		required com.apirone.core.model.bean.Entity entity
-	){		
-
-		return getDao().insert( 
-			argumentCollection = arguments
-		).toString()
-
-	}
-
 	
-	public Void function delete(
-		required String fileId
-	){		
+        return obj;
 
-	
-		return getDao().delete( 
-			argumentCollection = arguments
-		)
+    }
 
+	public com.apirone.core.model.bean.Result function list(
+		String shipmentId,
+		String profileId
+	) {
+		arguments['limit'] = -1;
+		return search(argumentCollection = arguments)
 	}
 
-	public com.apirone.core.model.bean.File[] function list() {
-		arguments["limit"] = -1;
-		
-		return search( argumentCollection = arguments).getData();
-	
-	}
 
-	public com.apirone.core.model.bean.Result function search(
-				 String str,
-				 String productVariantId,
-		required Numeric limit = 50,
-		required Numeric offset = 0,
-    ){
+    public com.apirone.core.model.bean.Result function search(
+					 String shipmentId,
+					 String profileId,
+			required Numeric limit = 20,
+			required Numeric offset = 0
+		 
+    	){
 
-		var rows = [];
-
-        var result = super.getResult()
+	    var rows = [];
+    	var result = super.getResult();
 
     	var records = getDao().find( argumentCollection=arguments );
 
-	    for( var record in records ){
+		records.each(function(record) {
+			rows.add( get( fileId = record.file_id ) );
+		});
 
-	    	rows.add( 
-	    		get( fileId = record.file_id )
-	    	);
-
-	    }
-
-		result.setTotal( records.total );
-		result.setCount( records.RecordCount() );
-		result.setData( rows );
+	    result.setData( rows );
+	    result.setCount( Val( records.recordcount ) );
+	    result.setTotal( Val( records.total ) );
 
         return result;
 
-	}
+    }
 
-    public com.apirone.core.model.bean.Result function list(
-					 String str,
-					 String productVariantId
+	/*
+	public String function create(
+			required com.apirone.core.model.bean.File file,
+            		 com.apirone.core.model.bean.Entity entity
 		){
 
-		arguments["limit"] = -1;
+        return getDao()
+        			.insert( argumentCollection = arguments )
+            		.toString();
 
-		return search( argumentCollection = arguments );
+	}
+	*/
+
+	public String function update(
+			required com.apirone.core.model.bean.File file,
+            required com.apirone.core.model.bean.Entity entity
+		){
+		
+            var id = getDao()
+                        .update( file = arguments.file, entity = arguments.entity )
+                        .toString();
+            
+			getCacheManager().remove( getCachekey( id ) );
+			
+			return id;
+    
+	}
+
+	public void function delete(
+		required String fileId
+	){
+
+		getDao().delete( arguments.fileId );
+		
+		getCacheManager().remove( getCachekey( arguments.fileId ) );
 
 	}
 
-    /*
-    	private method
-	*/
 
-	private com.apirone.core.model.bean.File function build(
+	public String function create(
+		required String filePath, //full path of file, from /tmp for example
+		required String scope, //accounts
+		required String fileTypeId,
+				 Struct entity,
+	){
+
+		var thisFile = "";
+
+		var bean = super.bean("File");
+		var type = super.bean("FileType");
+
+		var root = ExpandPath("/../repository/private/" );
+
+		var account = getAccountService().get( arguments.accountId );
+		var home = account.getHome();
+
+		var dayPath = DateFormat( now(), "yyyy/mm" )
+
+		var destination = root & "accounts" & "/" & home & "/" & arguments.scope & "/" & dayPath;
+
+		DirectoryCreate( destination, true, true );
+
+		var fileName = ListFirst( ListLast( arguments.filePath, "/" ), "." );
+		var fileExt  = ListLast( arguments.filePath, "." );
+
+		var unique = Left( LCase( Replace( CreateUUID(), '-', '', 'ALL' ) ), 5 );
+        var name = prettyString( fileName ) & '_' & unique & '.' & LCase( fileExt );
+        
+		cffile( source="#arguments.filePath#", destination="#destination#/#name#", action="RENAME" );
+
+		var fileInfo = FileInfo( "#destination#/#name#" );
+	
+		bean.setName( name );
+		bean.setDescription('');
+		bean.setDirectory( arguments.scope & '/' & dayPath );
+		bean.setSize( fileInfo.size );
+		bean.setType( type.setId( arguments.fileTypeId ) );
+		bean.setAccount( account );
+		bean.setEntity( arguments.entity );
+
+		if ( IsImageFile( "#destination#/#name#" ) ) {
+
+			var info = ImageInfo( "#destination#/#name#" );
+
+			bean.setHeight( info.height );
+			bean.setWidth( info.width );
+			bean.setAlt("");
+			bean.setExtension("");
+		
+		}
+
+		//var result = create( bean );
+
+        getDao()
+			.insert( argumentCollection = arguments )
+			.toString();
+
+
+		return result;
+	
+	}
+
+
+    /**
+     * @private
+     */
+  	private com.apirone.core.model.bean.file function build(
     		required String fileId
     	){
 
-	    var record = getDao().read( arguments.fileId );
+	    var record = getDao().read( fileId = arguments.fileId );
 
 	    if( record.RecordCount ) { 
 
-          	var obj = super.bean( "File" );
+	    	var obj = super.bean( "File" );
 
-            obj.setId( record.file_id.toString() );
+		    obj.setId( record.file_id.toString() );
+            obj.setName( record.name );
+			
+			// it's documentType!
+        	obj.setType( getDocumentTypeService().get( record.type_id ) );
             obj.setSize( record.size );
             obj.setWidth( record.width );
             obj.setHeight( record.height );
-			obj.setName( record.name );
-            obj.setExtension( record.extension );
+            obj.setAlt( record.alt );
             obj.setDescription( record.description );
+            obj.setExtension( record.extension );
             obj.setDirectory( record.directory );
-            obj.setDefault( record.default );
-			
-			/*
-			obj.setVersions(
-				getMediaService().getVersions( obj.getPath() )
-			)
-			*/
+            obj.setAccount( getAccountService().get( record.account_id ) );
 
 			return obj;
-			
-	    }
+		
+		}
 
-    	return NullValue();
+		return nullValue();
 
   	}
 
   	private String function getCacheKey( required String id ) {
 
-  		return "File_#arguments.id#";
+  		return "file_#arguments.id#";
 
   	}
 

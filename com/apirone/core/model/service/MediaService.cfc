@@ -60,6 +60,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             required String dateDir
         ){
   
+            /*
         var directory = "#variables.baseDir#/#arguments.category#/";
 
         var fileName = ListLast( filePath, '/');
@@ -118,6 +119,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             file.write( "#sizePath#/#fileName#", true)
 
         })
+            */
 
 	}
 
