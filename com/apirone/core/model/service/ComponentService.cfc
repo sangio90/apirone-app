@@ -34,57 +34,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public com.apirone.core.model.bean.Component[] function getTree(
-            required String combinationId,
-            required Numeric parentId=NullValue(), 
-            required String level=1, 
-            required String orderBy=""
-    ) {
-		
-        var result = [];
-
-        var combinationId = arguments.combinationId;
-
-        var items = list( 
-            combinationId = arguments.combinationId,
-            parentId = arguments.parentId
-        )
-
-        var thisLevel = arguments.level;
-
-        var n = 1;
-
-        for( var item in items ) {
-
-            var thisOrderBy = "#arguments.orderBy#.#n#";
-
-            item.setLevel( arguments.level );
-            //item.setOrderBy( thisOrderBy );
-
-            result.add( item );
-
-
-            //abort;
-
-            var rows = getTree( combinationId, item.getId(), thisLevel+1, thisOrderBy );
-
-            cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# - [ combId:#combinationId#, itemId:#item.getId()#, level:#thisLevel+1#, itemLen:#items.len()#, orderBy:#thisOrderBy# ] #rows.len()#");
-
-            result = result.merge( rows );
-
-            n++;
-
-        }
-
-     
-		
-		return result;
-	
-	}
-
-
 	public com.apirone.core.model.bean.Component[] function list(
-        required String combinationId
+    	String lineId,
+    	String sizeId,
+    	String combinationId,
+    	Numeric combinationItemId
     ) {
 		arguments["limit"] = -1;
 		
@@ -128,7 +82,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		records.each(function(record) {
 			rows.add( 
-                get( record.combination_item_id ) 
+                get( record.component_id ) 
             );
 		});
 
@@ -141,7 +95,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
     public com.smartvillage.core.model.bean.Outcome function delete(
-			required String combinationId
+			required String componentId
 		){
 
 		var outcome = super.bean("Outcome");
@@ -164,8 +118,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteEvent" );
-				outcome.setMessage( "Cannot delete combination [#arguments.combinationId#]" );
+				outcome.setType( "ApirOne.CannotDeleteComponent" );
+				outcome.setMessage( "Cannot delete component [#arguments.componentId#]" );
 				
 			}
 			
@@ -176,10 +130,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create(
-			required com.apirone.core.model.bean.Component Component
+			required com.apirone.core.model.bean.Component component
 		){
 
-		var newId = getDao().insert( arguments.Component );
+		getDao().delete( arguments.component );
+		var newId = getDao().insert( arguments.component );
 
 		return newId;
 
@@ -202,22 +157,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             var bean = super.bean( "Component" );
 
             bean.setId( record.component_id );
-            //bean.setCombinationId( record.combination_id );
+
 			bean.setProduct( getProductService().get( record.product_id ) );
 			bean.setVariant( getVariantService().get( record.variant_id ) );
 			bean.setColor( getColorService().get( record.color_id ) );
-			bean.setCreatedAt( record.created_at );
-			//bean.setParent( get( record.parent_id ) );
-			//bean.setOrderBy( record.orderby );
+
 			bean.setQuantity( record.quantity );
+			bean.setCreatedAt( record.created_at );
 
             bean.setStatus( getStatusService().get( record.status_id ) );
 
-			//var attributeValue = getAttributeValueService().get( record.attribute_value_id );
-            
-			//bean.setAttributeValue( attributeValue );
-            //bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
-			
             return bean;
 
 	    }

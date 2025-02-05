@@ -134,20 +134,22 @@
                                     <div class="col-sm-9">
 
                                         <p>
-                                            - <a class="underline"
+                                            - <a href=""
+                                                class="underline"
                                                 data-type="lineSize" 
 
                                                 data-size-id="#prc.size.getId()#"
                                                 data-size-name="#prc.size.getCode()#"
 
-                                                data-line-id="#prc.size.getId()#"
+                                                data-line-id="#prc.line.getId()#"
                                                 data-line-name="#prc.line.getName()#"
                                                 
                                                 data-bind="click: openComponentsList">
                                                     Componenti per #prc.line.getName()# / #prc.size.getCode()#
                                                 </a>
                                             <br>
-                                            - <a class="underline"
+                                            - <a href=""
+                                                class="underline"
                                                 data-type="combination" 
 
                                                 data-combination-id="#rc.id#"

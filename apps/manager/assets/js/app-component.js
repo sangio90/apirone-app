@@ -70,7 +70,7 @@ AP.component.list = (function () {
 				case "item":
 
 					result.modalTitle = "elemento: " + current.attribute.name + " / " + current.attributeValue.name;
-					result.readUrl = baseUrl + "?typeId=attribute&&itemId=" + current.item.id;
+					result.readUrl = baseUrl + "?typeId=item&&itemId=" + current.item.id;
 					result.modifyUrl = result.readUrl;
 					
 					break;
@@ -151,11 +151,11 @@ AP.component.list = (function () {
             var filters = [];
 
             if ( str.length ) {
-                filters.push( { field: "comp.name", operator: "contains", value: str } );
+                filters.push( { field: "product.name", operator: "contains", value: str } );
             };
 
             if ( typeId.length ) {
-                filters.push( { field: "comp.processingType.id", operator: "eq", value: typeId } );
+                filters.push( { field: "product.processingType.id", operator: "eq", value: typeId } );
             };
 
             dataSource.filter( filters );
@@ -260,7 +260,6 @@ AP.component.list = (function () {
 
 			NM.util.ajax({
 				method: "POST",
-				//url: getCurrentConfig().postUrl,
 				url: getCurrentConfig().modifyUrl,
 				data: JSON.stringify( viewModel.get("selected").data() ),
 				callback: {
@@ -360,7 +359,7 @@ AP.component.list = (function () {
 
 		viewModel.set( "currentItem", item );
 
-		console.log( "readUrl", getCurrentConfig().readUrl );
+		//console.log( "readUrl", getCurrentConfig().readUrl );
 
 		NM.util.ajax({
 			method: "GET",
