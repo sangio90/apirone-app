@@ -185,7 +185,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setStatus( getStatusService().get( record.status_id ) );
             bean.setTexts( getTextService().list( attributeValueId = record.attribute_value_id ) );
             
-
             return bean;
 
 	    }

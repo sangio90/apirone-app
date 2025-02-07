@@ -29,7 +29,7 @@ AP.combination.list = (function () {
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" }),
-		images: NM.kendo.dataSource( { data: [ { id: "H", name: "Orizzontale" }, { id: "V", name: "Verticale" } ]} ),
+		//images: NM.kendo.dataSource( { data: [ { id: "H", name: "Orizzontale" }, { id: "V", name: "Verticale" } ]} ),
 		attributesList: undefined
 	};
 
@@ -77,7 +77,8 @@ AP.combination.list = (function () {
 
 		itemForAttributes: undefined,
 
-		images: dataSources.images,
+		images: undefined,
+		currentImageEntity: undefined,
 
 		/*
 			attributes methods
@@ -203,12 +204,15 @@ AP.combination.list = (function () {
 			
 				case "item":
 
+					var id = element.data("combination-item-it");
+
 					var value = {
 						type: "item",
-						item: {
-							id: event.data.id
-						},
+						id: id
 					}
+
+					var params = { by: "item", combinationItemId: value.id }
+					var thisUrl = "/ajax/combination-items/" + value.id + "/images";
 
 					break;
 				
@@ -216,29 +220,29 @@ AP.combination.list = (function () {
 
 					var value = {
 						type: "combination",
-						combination: {
-							id: element.data("combination-id"),
-						},
+						id: AP.page.combinationId
 					};
+
+					var params = { by: "combination", combinationItemId: value.id }
+
+					var thisUrl = "/ajax/combinations/" + AP.page.combinationId + "/images";
 			  
 					break;
 				
 				default:
+					console.error("ERROR. Type [" + type + "] for image not found");
 			};
 
-			console.log("openComponentsList:item", value );
+			console.log("thisUrl", thisUrl);
 
-			componentApp.open( value );			
+			var dataSource = NM.kendo.dataSource({ url: thisUrl });
 
-			/*
-			console.log("openImageList:event.data", event.data);
+			dataSource.read();
+
+			viewModel.set( "currentImageEntity", value );
+			viewModel.set( "images", dataSource );
 
 			NM.util.openModal( fields.imagesModal );
-
-			$("#document-image").addClass("d-none");
-
-			this.searchAttributes();
-			*/
 
 			return false;
 

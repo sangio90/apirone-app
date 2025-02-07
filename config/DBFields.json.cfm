@@ -40,6 +40,11 @@
         "type": "uuid"
     },
 
+    "fileKind.id": {
+        "name": "file_kind_id",
+        "type": "Varchar"
+    },
+
     "size.id": {
         "name": "size_id",
         "type": "uuid"

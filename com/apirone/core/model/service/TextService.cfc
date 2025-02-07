@@ -81,6 +81,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.Text[] texts
 		){
 
+		/*
+			all translations of a same entity
+		*/
+
 		var langs = getLangService().list( statusId="ACT" );
 
 		var ids = [];
@@ -102,8 +106,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			if( !ArrayFind( langDone, thisLang.getId() ) ) {
 
-				var text = super.bean("Text");
-				var lang = super.bean("Lang");
+				var text   = super.bean("Text");
+				var lang   = super.bean("Lang");
 				var status = super.bean("Status");
 
 				text.setName("** To translate");

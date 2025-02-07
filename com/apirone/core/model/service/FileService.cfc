@@ -28,8 +28,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
 	public com.apirone.core.model.bean.Result function list(
-		String shipmentId,
-		String profileId
+		String kindId,
+		String combinationId,
+		String combinationItemId,
 	) {
 		arguments['limit'] = -1;
 		return search(argumentCollection = arguments)
@@ -37,11 +38,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
     public com.apirone.core.model.bean.Result function search(
-					 String shipmentId,
-					 String profileId,
+					 String kindId,
+					 String combinationId,
+					 String combinationItemId,
 			required Numeric limit = 20,
 			required Numeric offset = 0
-		 
     	){
 
 	    var rows = [];

@@ -27,9 +27,12 @@
 
 	<cffunction name="find" returntype="Query">
 
+		<cfargument name="combinationId" type="String">
+		<cfargument name="combinationItemId" type="Numeric">
+		<cfargument name="kindId" type="String">
+
 		<cfargument name="limit" required="true" type="Numeric" default="50">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
-		<cfargument name="productVariantId" type="String">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -39,8 +42,16 @@
 				files
 			WHERE 1=1
 	
-			<cfif !isNull( arguments.productVariantId ) >
-				AND variant_id = <cfqueryparam value="#arguments.productVariantId#" cfsqltype="varchar">::uuid
+			<cfif !isNull( arguments.combinationId ) >
+				AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
+			</cfif>
+
+			<cfif !isNull( arguments.combinationItemId ) >
+				AND combination_item_id = <cfqueryparam value="#arguments.combinationItemId#" cfsqltype="Integer">
+			</cfif>
+
+			<cfif !isNull( arguments.kindId ) >
+				AND kind_id = <cfqueryparam value="#arguments.kindId#" cfsqltype="Varchar">
 			</cfif>
 
 			<cfif arguments.limit GT 0>
@@ -50,6 +61,8 @@
 					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 
+            ORDER BY 
+                created_at
 		</cfquery>
 
 		<cfreturn local.q>

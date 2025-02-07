@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
-    property name="type" type="String";
+    property name="kind" type="com.apirone.core.model.bean.FileKind";
     property name="size" type="Numeric";
     property name="width" type="Numeric";
     property name="height" type="Numeric";

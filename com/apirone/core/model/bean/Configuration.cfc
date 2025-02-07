@@ -15,17 +15,51 @@ component output="true" accessors="true" {
 				"email" = settings.get("owner.nameemail")
 			},
 			"filesHost": "#settings.get("files.host")#",
-			"imageVersions" = {
+			"imagesConfig" = {
 				"combinationItem" = {
-					"sizes" = {
-						"small" = "200",
-					},
+					"path" = "",
+					"kinds" = [
+						{
+							"id" = "horizontal", //in db.texts
+							"sizes" = [
+								{
+									"width" = "200"
+								}
+							]
+						},
+						{
+							"id" = "vertical", //in db.texts
+							"sizes" = [
+								{
+									"width" = "200"
+								},
+							]
+	
+						}
+					],
 				},
-				"plates" = {
-					"sizes" = {
-						"small" = "200",
-					},
-				}
+				"combination" = {
+					"path" = "",
+					"kinds" = [
+						{
+							"id" = "horizontal", //in texts
+							"sizes" = [
+								{
+									"width" = "200"
+								}
+							]
+						},
+						{
+							"id" = "vertical",
+							"sizes" = [
+								{
+									"width" = "200"
+								},
+							]
+	
+						}
+					],
+				},
 			},
 			"encryptKey": settings.get("db.encryptKey")
 		};
