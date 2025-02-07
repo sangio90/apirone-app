@@ -121,10 +121,14 @@
     }
 
 
-    public Any function fire( action, payload=NullValue() ){
+    public Any function fire( required String action, payload=NullValue() ){
+        
+		if ( ListLen( action, "." ) != 2 ) {
+			throw( type = "apirone.AbsController.ActionNotHasTwoPart", message = "Action [#arguments.action#] must have two part: controller.method." );
+		};
 
         var user = application.cbController.getRequestService().getContext().getPrivateValue("user");
-
+        
         var result = getAccessManager().exec( action=arguments.action, user=user, payload=arguments.payload );
 
         return result;

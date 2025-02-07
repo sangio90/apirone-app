@@ -1,9 +1,10 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.FileKindDAO";
     property name="textService" type="com.apirone.core.model.service.TextService";
+    property name="statusService" type="com.apirone.core.model.service.StatusService";
+    property name="langService" type="com.apirone.core.model.service.LangService";
 
-    public com.apirone.core.model.bean.AttributeValue function get(
+    public com.apirone.core.model.bean.fileKind function get(
     		required String fileKindId
         ){
 
@@ -31,37 +32,82 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.AttributeValue function build(
+	private com.apirone.core.model.bean.FileKind function build(
     		required String fileKindId
     	){
 
-	    var record = getDao().read( arguments.fileKindId );
+		var records = DESerializeJSON( FileRead( "/config/data/fileKinds.json.cfm" ) );
 
-	    if( record.recordCount ) {
+		for( var record in records ) {
 
-            var bean = super.bean( "AttributeValue" );
+			if( record.id == arguments.fileKindId ) {
 
-            bean.setId( record.attribute_value_id );
-			bean.setCode( record.code );
-			bean.setAttributeId( record.attribute_id );
+				var bean = super.bean("fileKind");
+				
+				bean.setId( record.id );
 
-			bean.setCreatedAt( record.created_at );
-			bean.setOrderBy( record.orderby );
-			
-			bean.setStatus( getStatusService().get( record.status_id ) );
-            bean.setTexts( getTextService().list( fileKindId = record.attribute_value_id ) );
-            
-            return bean;
+				bean.setStatus( getStatusService().get( "ACT" ) );
+				bean.setTexts( createTexts( record ) );
+				
+				return bean;
+	
+			}
 
-	    }
+		}
 
 		return nullValue();
 
   	}
 
+  	private com.apirone.core.model.bean.Text[] function createTexts( required Struct record ) {
+
+		var langs = getLangService().list();
+
+		var texts = [];
+
+
+		for( var thisLang in langs ) {
+			
+			var name = "** To translate";
+			var id = "NOT_SET";
+
+			for( var thisText in arguments.record.texts ) {
+
+				if( thisLang.getId() == thisText.lang.id ) {
+
+					id = arguments.record.id;
+					name = thisText.name;
+
+				}
+
+				var text   = super.bean("Text");
+				var lang   = super.bean("Lang");
+				var status = super.bean("Status");
+				
+				status.setId( "ACT" );
+				
+				lang.setId( thisLang.getId() );
+	
+				text.setId( -1 );
+				text.setName( name );
+				
+				text.setId( id );
+				text.setStatus( status );
+				text.setLang( lang );
+	
+			}
+
+			texts.add( text );
+
+		}
+		
+  		return texts;
+
+  	}
+
   	private String function getCacheKey( required String id ) {
 
-  		return "attributeValue_#arguments.id#";
+  		return "fileKind_#arguments.id#";
 
   	}
 

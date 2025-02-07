@@ -20,7 +20,7 @@ component output="true" accessors="true" {
 					"path" = "",
 					"kinds" = [
 						{
-							"id" = "horizontal", //in db.texts
+							"id" = "horizontal", //in fileKinds.json
 							"sizes" = [
 								{
 									"width" = "200"
@@ -28,7 +28,7 @@ component output="true" accessors="true" {
 							]
 						},
 						{
-							"id" = "vertical", //in db.texts
+							"id" = "vertical", //in fileKinds.json
 							"sizes" = [
 								{
 									"width" = "200"
@@ -42,7 +42,7 @@ component output="true" accessors="true" {
 					"path" = "",
 					"kinds" = [
 						{
-							"id" = "horizontal", //in texts
+							"id" = "horizontal", //in fileKinds.json
 							"sizes" = [
 								{
 									"width" = "200"

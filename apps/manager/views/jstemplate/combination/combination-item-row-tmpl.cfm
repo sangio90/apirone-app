@@ -12,7 +12,7 @@
                 <span data-bind="text: attributeValue.name"></span>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList" data-type="combinationItem">
                     <i class="fas fa-image"></i> 
                 </button>
             </td>

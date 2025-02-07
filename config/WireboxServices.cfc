@@ -118,6 +118,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
             .property( name = "dao", ref = "FileDAO" )
             .property( name = "MediaService", ref = "MediaService" )
+            .property( name = "FileKindService", ref = "FileKindService" )
             .parent("AbsService");
                     
         map("MediaService").to( "com.apirone.core.model.service.MediaService" )
@@ -156,6 +157,13 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "VariantService", ref = "VariantService" )
             .property( name = "ColorService", ref = "ColorService" )
             .property( name = "LookupService", ref = "LookupService" )
+            .parent("AbsService");
+
+        map("FileKindService").to( "com.apirone.core.model.service.FileKindService" )
+            .asSingleton()
+            .property( name = "StatusService", ref = "StatusService" )
+            .property( name = "TextService", ref = "TextService" )
+            .property( name = "LangService", ref = "LangService" )
             .parent("AbsService");
 
         map("LineService").to( "com.apirone.core.model.service.LineService" )

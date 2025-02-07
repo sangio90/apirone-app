@@ -12,44 +12,7 @@
                     <div class="card-body">
                         
                         <div class="col-md-12">
-
-                            <!---
-
-                            <h3>Ordina elementi</h3>
-
-                            <div class="col-md-12 mb-5" id="order-element">
-                                <table class="table">
-                                    <tbody>
-                                        <tr>
-                                            <td>Forma placca: Rettangolare</td>
-                                        </tr>
-                                        <tr>
-                                            <td>-- Colore: Rosso</td>
-                                        </tr>
-                                        <tr>
-                                            <td>---- Incisione logo: Con incisione</td>
-                                        </tr>
-                                        <tr>
-                                            <td>---- Incisione logo: Senza incisione</td>
-                                        </tr>
-                                        <tr>
-                                            <td>-- Colore: Bianco</td>
-                                        </tr>
-                                        <tr>
-                                            <td>-- Colore: Nero</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Forma placca: Raggiata</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Forma placca: Ottagonale</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
                            
-                            --->
-
                             <h3>Aggiungi immagini 
                                 <a href="" data-type="combination" data-bind="click:openImagesList" style="font-size: 14px; text-decoration: underline;">
                                     Immagini per questa placca

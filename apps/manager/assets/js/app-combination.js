@@ -69,8 +69,8 @@ AP.combination.list = (function () {
 
 	var viewModel = kendo.observable({
 
-		isImagesCompleted: true,
-		isImagesUncompleted: false,
+		isImageCompleted: true,
+		isImageUncompleted: false,
 
 		items: dataSources.items,
 		attributesList: dataSources.attributesList,
@@ -212,7 +212,7 @@ AP.combination.list = (function () {
 					}
 
 					var params = { by: "item", combinationItemId: value.id }
-					var thisUrl = "/ajax/combination-items/" + value.id + "/images";
+					var thisUrl = "/manager/ajax/combination-items/" + value.id + "/images";
 
 					break;
 				
@@ -225,7 +225,7 @@ AP.combination.list = (function () {
 
 					var params = { by: "combination", combinationItemId: value.id }
 
-					var thisUrl = "/ajax/combinations/" + AP.page.combinationId + "/images";
+					var thisUrl = "/manager/ajax/combinations/" + AP.page.combinationId + "/images";
 			  
 					break;
 				
@@ -456,21 +456,21 @@ AP.combination.list = (function () {
 
 		if( documents.total() > 0 ) {
 
-			var modal = $("#documents-upload-modal");
-			modal.modal( "show" );
+			//var modal = $("#documents-upload-modal");
+			//modal.modal( "show" );
 
 			for ( var document of documents.data() ) {
 			
 				var uid = document.uid;
 
-				$("#document-upload-" + uid ).fileupload({
-					dropZone: $("#document-upload-dropzone-" + uid),
+				$("#image-upload-" + uid ).fileupload({
+					dropZone: $("#image-upload-dropzone-" + uid),
 					autoUpload: true,
 					url: "/manager/ajax/combinations/" + AP.page.combinationId + "/upload",
 					add: function (event, data) { 
 						var uid = $(event.target).data("uid");
 						
-						var status = $("#document-upload-status-" + uid );
+						var status = $("#image-upload-status-" + uid );
 						
 						status.html("");
 						
@@ -486,19 +486,19 @@ AP.combination.list = (function () {
 		
 					progressall: function( event, data ) {
 
-						var status = $('#document-upload-status-' + uid );
+						var status = $('#image-upload-status-' + uid );
 						status.html("");
 
 						var uid = $(event.target).data("uid");
 						
 						var progress = parseInt(data.loaded / data.total * 100, 10);
-						$("#document-upload-progress-" + uid + " .upload-bar").css("width", progress + "%");
+						$("#image-upload-progress-" + uid + " .upload-bar").css("width", progress + "%");
 						
 						status.html("Fatto!");
 						
-						//var row = viewModel.get("documents").getByUid( uid );
+						//var row = viewModel.get("images").getByUid( uid );
 
-						$("#document-image").eq(0).removeClass("d-none");
+						$("#image-image").eq(0).removeClass("d-none");
 						
 						row.set("completed", true);
 

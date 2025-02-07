@@ -34,7 +34,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var item = {};
 
-        var file = super.bean("Bean");
+        var file = super.bean("File");
 
         if( rc.by == "combinations" ) {
             var params = { combinationId = rc.id }
@@ -52,36 +52,26 @@ component extends="com.apirone.core.controller.AbsController" {
 
             var result = super.fire( "file.list", params );
 
-            dump(result);
-
             if( result.getCount() ) {
                 
                 data.add( resul.getData()[1] );
             
             } else {
 
-                data.add(
-                    file.setDirectory("");
-                    file.setName("");
-                )
+                var kind = super.fire("fileKind.get", [ kind.id ] );
+
+                file.setKind( kind );
+                
+                file.setName("");
+                file.setDirectory("");
+
+                data.add( file );
 
             }
 
         }
 
-        dump(data);
-        abort;
-        
-        dump(rc);
-        abort;
-
-        super.fire( "file.list", { params } );
-
-        var result = super.getResult();
-        
-        result.setData( { "message" = "File caricato" } );
-
-        event.setValue( "result", result );
+        event.setValue( "result", data );
         
     }
 
