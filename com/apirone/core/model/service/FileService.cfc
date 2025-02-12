@@ -28,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
 	public com.apirone.core.model.bean.Result function list(
-		String kindId,
+		String typeId,
 		String combinationId,
 		String combinationItemId,
 	) {
@@ -38,7 +38,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
     public com.apirone.core.model.bean.Result function search(
-					 String kindId,
+					 String typeId,
 					 String combinationId,
 					 String combinationItemId,
 			required Numeric limit = 20,
@@ -103,24 +103,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create(
 		required String filePath, //full path of file, from /tmp for example
-		required String scope, //accounts
-		required String fileTypeId,
+		required String typeId, //accounts
+		required String scope,
 				 Struct entity,
 	){
 
 		var thisFile = "";
 
+		var config = getConfiguration().get("imagesConfig")[ arguments.scope ];
+
 		var bean = super.bean("File");
 		var type = super.bean("FileType");
 
-		var root = ExpandPath("/../repository/private/" );
-
-		var account = getAccountService().get( arguments.accountId );
-		var home = account.getHome();
+		var root = ExpandPath( "/../repository/public/media/" );
 
 		var dayPath = DateFormat( now(), "yyyy/mm" )
-
-		var destination = root & "accounts" & "/" & home & "/" & arguments.scope & "/" & dayPath;
+		
+		var destination = root & "/#config.path#/" & dayPath;
 
 		DirectoryCreate( destination, true, true );
 
@@ -136,11 +135,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	
 		bean.setName( name );
 		bean.setDescription('');
-		bean.setDirectory( arguments.scope & '/' & dayPath );
+		bean.setDirectory( dayPath );
 		bean.setSize( fileInfo.size );
-		bean.setType( type.setId( arguments.fileTypeId ) );
-		bean.setAccount( account );
-		bean.setEntity( arguments.entity );
+
+		bean.setType( type.setId( arguments.typeId ) )
 
 		if ( IsImageFile( "#destination#/#name#" ) ) {
 
@@ -155,10 +153,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		//var result = create( bean );
 
-        getDao()
-			.insert( argumentCollection = arguments )
+        var result = getDao()
+			.insert( file = bean, entity = arguments.entity )
 			.toString();
-
 
 		return result;
 	
@@ -180,9 +177,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		    obj.setId( record.file_id.toString() );
             obj.setName( record.name );
-			
+
 			// it's documentType!
-        	obj.setType( getDocumentTypeService().get( record.type_id ) );
+        	obj.setType( getFileTypeService().get( record.file_type_id ) );
             obj.setSize( record.size );
             obj.setWidth( record.width );
             obj.setHeight( record.height );
@@ -190,7 +187,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             obj.setDescription( record.description );
             obj.setExtension( record.extension );
             obj.setDirectory( record.directory );
-            obj.setAccount( getAccountService().get( record.account_id ) );
 
 			return obj;
 		

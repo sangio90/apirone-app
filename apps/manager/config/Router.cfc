@@ -133,6 +133,7 @@
 		delete( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.removeItems" ).end();
 
 		get( "/ajax/:by-regex:(combinations|combination-items)/:id/images" ).to( "FileAjaxController.list" ).end();
+		post( "/ajax/:by-regex:(combinations|combination-items)/:id/images" ).to( "FileAjaxController.upload" ).end();
 
 		get( "/combinations/:id" ).to( "CombinationController.detail" ).end();
 		//get( "/ajax/combinations/:id/files" ).to( "FileAjaxController.list" ).end();
@@ -142,7 +143,7 @@
 		/*
 			combination items
 		*/
-		post( "/ajax/combination-items/:id/upload" ).to( "FileAjaxController.upload" ).end();
+		//post( "/ajax/combination-items/:id/upload" ).to( "FileAjaxController.upload" ).end();
 		//get( "/ajax/combination-items/:id/files" ).to( "FileAjaxController.list" ).end();
 		//get( "/ajax/combination-items/:id/files" ).to( "FileAjaxController.list" ).end();
 

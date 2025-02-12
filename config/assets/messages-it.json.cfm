@@ -36,6 +36,10 @@
         "updated": "Finitura aggiornata"
     },    
     
+    "file": {
+        "imageCreated": "Immagine salvata",
+    },    
+    
     "home": {
     },
 

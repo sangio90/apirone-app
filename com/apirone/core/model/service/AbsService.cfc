@@ -95,6 +95,11 @@
         return records;
     }
 
+    private String function prettyString( required String str ) {
+        var util = new com.apirone.core.util.Udf();
+        
+        return util.prettyString( arguments.str );
+    }
     
     private Array function getCategoriesBeanFromIds( required String categories ) { //[2,3,4,5]
 
@@ -150,5 +155,5 @@
         return server[ "wireBox-apirone" ];
 
     }
-   
+
 }

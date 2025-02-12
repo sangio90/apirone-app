@@ -29,7 +29,7 @@
 
 		<cfargument name="combinationId" type="String">
 		<cfargument name="combinationItemId" type="Numeric">
-		<cfargument name="kindId" type="String">
+		<cfargument name="typeId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -42,16 +42,16 @@
 				files
 			WHERE 1=1
 	
-			<cfif !isNull( arguments.combinationId ) >
+			<cfif !isNull( arguments.combinationId )>
 				AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
 			</cfif>
 
-			<cfif !isNull( arguments.combinationItemId ) >
+			<cfif !isNull( arguments.combinationItemId )>
 				AND combination_item_id = <cfqueryparam value="#arguments.combinationItemId#" cfsqltype="Integer">
 			</cfif>
 
-			<cfif !isNull( arguments.kindId ) >
-				AND kind_id = <cfqueryparam value="#arguments.kindId#" cfsqltype="Varchar">
+			<cfif !isNull( arguments.typeId )>
+				AND file_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
 			</cfif>
 
 			<cfif arguments.limit GT 0>
@@ -74,11 +74,12 @@
 		<cfargument name="file" type="com.apirone.core.model.bean.File" required="true">
 		<cfargument name="entity" type="com.apirone.core.model.bean.Entity" required="true">
 
+		<cfset var dbField = getDBField( arguments.entity.getKey() )>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO files(
 				name,
-                type,
+                file_type_id,
                 size,
                 width,
                 height,
@@ -86,11 +87,11 @@
                 description,
                 directory,
                 extension, 
-                #getField( arguments.entity.getType() ).name#
+                #dbField.name#
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getName()#">,
-                <cfqueryparam cfsqltype="Varchar" value="#arguments.file.getType()#">,
+                <cfqueryparam cfsqltype="Varchar" value="#arguments.file.getType().getId()#">,
                 <cfqueryparam cfsqltype="integer" value="#arguments.file.getSize()#">,
                 <cfqueryparam cfsqltype="integer" value="#arguments.file.getWidth()#">,
                 <cfqueryparam cfsqltype="integer" value="#arguments.file.getHeight()#">,
@@ -98,7 +99,7 @@
                 <cfqueryparam cfsqltype="Varchar" value="#arguments.file.getDescription()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getDirectory()#">,
                 <cfqueryparam cfsqltype="Varchar" value="#arguments.file.getExtension()#">,
-                <cfqueryparam cfsqltype="Varchar" value="#arguments.entity.getId()#">::uuid
+                <cfqueryparam cfsqltype="Varchar" value="#arguments.entity.getValue()#">::#dbField.type#
 			) RETURNING file_id
 		</cfquery>
 

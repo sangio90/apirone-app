@@ -1,5 +1,6 @@
 <cfcomponent accessors="true">
 
+	<!----
 	<cffunction name="getField" output="No" returntype="Struct">
         
 		<cfargument name="type" required="Yes" type="String">
@@ -22,6 +23,7 @@
 		<cfreturn data[ arguments.type ]>
 
 	</cffunction>
+	----->
 	
 
 	<cffunction name="createFilters" returntype="String">

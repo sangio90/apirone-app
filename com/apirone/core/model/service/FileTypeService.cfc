@@ -4,13 +4,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="statusService" type="com.apirone.core.model.service.StatusService";
     property name="langService" type="com.apirone.core.model.service.LangService";
 
-    public com.apirone.core.model.bean.fileKind function get(
-    		required String fileKindId
+    public com.apirone.core.model.bean.FileType function get(
+    		required String fileTypeId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.fileKindId );
+    	var key = getCacheKey( arguments.fileTypeId );
 
 	   	var cache = cm.get( key ) ;
 
@@ -20,7 +20,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    } 
 	    
-		var bean = build( arguments.fileKindId );
+		var bean = build( arguments.fileTypeId );
 		
 		cm.put( key, bean );
         
@@ -32,17 +32,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.FileKind function build(
-    		required String fileKindId
+	private com.apirone.core.model.bean.FileType function build(
+    		required String fileTypeId
     	){
 
-		var records = DESerializeJSON( FileRead( "/config/data/fileKinds.json.cfm" ) );
+		var records = DESerializeJSON( FileRead( "/config/data/fileTypes.json.cfm" ) );
 
 		for( var record in records ) {
 
-			if( record.id == arguments.fileKindId ) {
+			if( record.id == arguments.fileTypeId ) {
 
-				var bean = super.bean("fileKind");
+				var bean = super.bean("FileType");
 				
 				bean.setId( record.id );
 
@@ -107,7 +107,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "fileKind_#arguments.id#";
+  		return "FileType_#arguments.id#";
 
   	}
 

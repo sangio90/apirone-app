@@ -70,4 +70,14 @@
         "type": "Varchar"
     },
 
+    "combinationItem.id": {
+        "name": "combination_item_id",
+        "type": "Integer"
+    },
+
+    "combination.id": {
+        "name": "combination_id",
+        "type": "uuid"
+    },
+
 }   

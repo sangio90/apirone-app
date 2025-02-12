@@ -17,10 +17,11 @@ component output="true" accessors="true" {
 			"filesHost": "#settings.get("files.host")#",
 			"imagesConfig" = {
 				"combinationItem" = {
-					"path" = "",
-					"kinds" = [
+					"dbField" = "combinationItem.id",
+					"path" = "combination-items",
+					"types" = [
 						{
-							"id" = "horizontal", //in fileKinds.json
+							"id" = "horizontal", //in filetypes.json
 							"sizes" = [
 								{
 									"width" = "200"
@@ -28,7 +29,7 @@ component output="true" accessors="true" {
 							]
 						},
 						{
-							"id" = "vertical", //in fileKinds.json
+							"id" = "vertical", //in filetypes.json
 							"sizes" = [
 								{
 									"width" = "200"
@@ -39,8 +40,9 @@ component output="true" accessors="true" {
 					],
 				},
 				"combination" = {
-					"path" = "",
-					"kinds" = [
+					"dbField" = "combination.id",
+					"path" = "combinations",
+					"types" = [
 						{
 							"id" = "horizontal", //in fileKinds.json
 							"sizes" = [

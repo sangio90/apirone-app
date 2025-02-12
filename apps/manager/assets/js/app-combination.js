@@ -77,20 +77,29 @@ AP.combination.list = (function () {
 
 		itemForAttributes: undefined,
 
+		//images: NM.kendo.dataSource(),
 		images: undefined,
 		currentImageEntity: undefined,
+		currentUploadUrl: undefined,
 
 		/*
 			attributes methods
 		*/
+
+		getImageTypeText: function( event ) {
+
+			var text = AP.util.getMainText( event.type.texts.toJSON() );
+
+			return text.name;
+		},
 
 		selectAttribute: function (event) {
 
 			var item = viewModel.get("itemForAttributes");
 			var parentId = viewModel.get("itemForAttributes.id");
 
-			console.log("selectAttribute:item", item);
-			console.log("selectAttribute:parentId", parentId);
+			//console.log("selectAttribute:item", item);
+			//console.log("selectAttribute:parentId", parentId);
 
 			NM.util.ajax({
 				method: "POST",
@@ -114,7 +123,7 @@ AP.combination.list = (function () {
 
 		getAttributeName: function (event) {
 
-			console.log("getAttributeName:event", event);
+			//console.log("getAttributeName:event", event);
 
 			var text = AP.util.getMainText(event.texts);
 
@@ -175,11 +184,11 @@ AP.combination.list = (function () {
 
 		openAttributesList: function (event) {
 
-			console.log("openAttributesList:event.data", event.data);
+			//console.log("openAttributesList:event.data", event.data);
 
 			var item = normalizeComponentItem( event.data );
 
-			console.log("openAttributesList:normalizeComponentItem", item);
+			//console.log("openAttributesList:normalizeComponentItem", item);
 
 			viewModel.set( "itemForAttributes", item );
 
@@ -211,7 +220,7 @@ AP.combination.list = (function () {
 						id: id
 					}
 
-					var params = { by: "item", combinationItemId: value.id }
+					//var params = { by: "item", combinationItemId: value.id }
 					var thisUrl = "/manager/ajax/combination-items/" + value.id + "/images";
 
 					break;
@@ -223,7 +232,7 @@ AP.combination.list = (function () {
 						id: AP.page.combinationId
 					};
 
-					var params = { by: "combination", combinationItemId: value.id }
+					//var params = { by: "combination", combinationItemId: value.id }
 
 					var thisUrl = "/manager/ajax/combinations/" + AP.page.combinationId + "/images";
 			  
@@ -233,16 +242,15 @@ AP.combination.list = (function () {
 					console.error("ERROR. Type [" + type + "] for image not found");
 			};
 
-			console.log("thisUrl", thisUrl);
-
 			var dataSource = NM.kendo.dataSource({ url: thisUrl });
 
-			dataSource.read();
-
 			viewModel.set( "currentImageEntity", value );
+			viewModel.set( "currentUploadUrl", thisUrl );
 			viewModel.set( "images", dataSource );
 
-			NM.util.openModal( fields.imagesModal );
+			//console.log( "d:total", d.total() );
+
+			initUpload();
 
 			return false;
 
@@ -440,75 +448,82 @@ AP.combination.list = (function () {
 
 		viewModel.loadFinishes();
 
-
 		initSort();
 		
-		//initUpload();
-
 	};
 
 	var initUpload = function() {
 
-		console.log("initUpload");
-		var documents = viewModel.get("images");
+		var images = viewModel.get("images");
 
-		console.log("initUpload:images", viewModel.get("images"))
+		var thisUrl = viewModel.get("currentUploadUrl");
 
-		if( documents.total() > 0 ) {
+		NM.util.openModal( fields.imagesModal );		
 
-			//var modal = $("#documents-upload-modal");
-			//modal.modal( "show" );
+		console.log("total", images.total())
 
-			for ( var document of documents.data() ) {
+		// it shouldn't be needed "fetch"
+		images.fetch().then( function() {
+
+			if( images.total() > 0 ) {
+
+				console.log("total:in", images.total())
+	
+				for ( var image of images.data() ) {
 			
-				var uid = document.uid;
+					var uid = image.uid;
 
-				$("#image-upload-" + uid ).fileupload({
-					dropZone: $("#image-upload-dropzone-" + uid),
-					autoUpload: true,
-					url: "/manager/ajax/combinations/" + AP.page.combinationId + "/upload",
-					add: function (event, data) { 
-						var uid = $(event.target).data("uid");
-						
-						var status = $("#image-upload-status-" + uid );
-						
-						status.html("");
-						
-						//TODO: get list form configuration
-						if (!(/\.(jpg|jpeg|png|pdf)$/i).test(data.files[0].name)) {
-							status.html("<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>");
-							return false;
+					console.log("image", image)
+
+					$("#image-upload-" + uid ).fileupload({
+						dropZone: $("#image-upload-dropzone-" + uid),
+						autoUpload: true,
+						formData: { "typeId": image.type.id },
+						url: thisUrl,
+						add: function (event, data) { 
+							var uid = $(event.target).data("uid");
+							
+							var status = $("#image-upload-status-" + uid );
+							
+							status.html("");
+							
+							//TODO: get list form configuration
+							if (!(/\.(jpg|jpeg|png|pdf)$/i).test(data.files[0].name)) {
+								status.html("<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>");
+								return false;
+							}
+	
+							data.submit();
+	
+						},
+			
+						progressall: function( event, data ) {
+	
+							var status = $('#image-upload-status-' + uid );
+							status.html("");
+	
+							var uid = $(event.target).data("uid");
+							
+							var progress = parseInt(data.loaded / data.total * 100, 10);
+							$("#image-upload-progress-" + uid + " .upload-bar").css("width", progress + "%");
+							
+							status.html("Fatto!");
+							
+							var row = viewModel.get("images").getByUid( uid );
+	
+							//$("#image-image").eq(0).removeClass("d-none");
+							
+							row.set("complete", true);
+	
 						}
+					});		
+	
+				}				
+	
+			}			
 
-						data.submit();
-
-					},
-		
-					progressall: function( event, data ) {
-
-						var status = $('#image-upload-status-' + uid );
-						status.html("");
-
-						var uid = $(event.target).data("uid");
-						
-						var progress = parseInt(data.loaded / data.total * 100, 10);
-						$("#image-upload-progress-" + uid + " .upload-bar").css("width", progress + "%");
-						
-						status.html("Fatto!");
-						
-						//var row = viewModel.get("images").getByUid( uid );
-
-						$("#image-image").eq(0).removeClass("d-none");
-						
-						row.set("completed", true);
-
-					}
-				});		
-
-			}				
-
-		}
-
+		} )
+			.catch( error => { console.error( error ) } )
 	};
 
 	var initSort = function() {
@@ -585,7 +600,7 @@ AP.combination.list = (function () {
 					NM.util.ajax({
 						method: "POST",
 						url: "/manager/ajax/attributes/" + id + "/values/order",
-						data: JSON.stringify(viewModel.get("detailForm.data.values").data()),
+						data: JSON.stringify( viewModel.get("detailForm.data.values").data() ),
 						callback: {
 							done: function (xhr) {
 

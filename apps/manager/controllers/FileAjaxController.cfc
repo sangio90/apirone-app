@@ -1,32 +1,5 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function upload( event, rc, prc ){
-
-        var tmpDir = getTempDir();
-        var entity = super.bean("Entity");
-
-        if( rc.by == "item" ) {
-            entity.setKey( "combinationItemId" );
-            entity.setValue( rc.itemId );
-        }
-
-        if( rc.by == "combination" ) {
-            entity.setKey( "combinationId" );
-            entity.setValue( rc.combinationId );
-        }
-
-		cffile( filefield=rc.files[1], nameconflict="MAKEUNIQUE", destination=tmpDir, action="UPLOAD" );
-
-        super.fire( "file.create", {  filePath = "#tmpDir#/#cffile.ServerFile#", entity = entity } );
-
-        var result = super.getResult();
-        
-        result.setData( { "message" = "File caricato" } );
-
-        event.setValue( "result", result );
-        
-    }
-
     function list( event, rc, prc ){
 
         param rc.by = "____";
@@ -46,28 +19,39 @@ component extends="com.apirone.core.controller.AbsController" {
             var config = getConfiguration().get("imagesConfig")[ "combinationItem" ];
         }
 
-        for( var kind in config.kinds  ) {
+        var count = 1;
+        for( var type in config.types  ) {
 
-            params.put( "kindId", kind.id );
+            params.put( "typeId", type.id );
 
             var result = super.fire( "file.list", params );
 
             if( result.getCount() ) {
+
+                dump( result.getData()[1] );
+                abort;
                 
-                data.add( resul.getData()[1] );
-            
+                data.add( result.getData()[1] );
+
             } else {
 
-                var kind = super.fire("fileKind.get", [ kind.id ] );
+                var type = super.fire("fileType.get", [ type.id ] );
 
-                file.setKind( kind );
+                file.setType( type );
                 
+                file.setId( count );
                 file.setName("");
                 file.setDirectory("");
 
-                data.add( file );
+                var json = DESerializeJSON( SerializeJSON( file ) );
+
+                json["complete"] = false;
+
+                data.add( json );
 
             }
+
+            var count++;
 
         }
 
@@ -75,7 +59,36 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
+    function upload( event, rc, prc ){
+
+        var tmpDir = getTempDir();
+        var entity = super.bean("Entity");
+        var scope = "";
+
+        if( rc.by == "combinations-items" ) {
+            entity.setKey( "combinationItem.id" );
+            scope = "combinationItem";
+        }
+
+        if( rc.by == "combinations" ) {
+            entity.setKey( "combination.id" );
+            scope = "combination";
+        }
+
+        entity.setValue( rc.id );
+
+		cffile( filefield=rc.files[1], nameconflict="MAKEUNIQUE", destination=tmpDir, action="UPLOAD" );
+
+        super.fire( "file.create", { filePath = "#tmpDir#/#cffile.ServerFile#", entity = entity, typeId=rc.typeId, scope=scope } );
+
+        var result = super.getResult();
+        
+        var message = super.completeMessage( "file.imageCreated" );
+
+        result.setData( { "message" = message, "payload" =  {} } );
+        
+        event.setValue( "result", result );
+        
+    }
+
 }
-
-
-

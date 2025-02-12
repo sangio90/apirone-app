@@ -382,15 +382,15 @@ h2 {
 
 
 /*
-	upload files
+	dropzone
 */
 
-.document-dropzone {
+.image-dropzone {
 	margin-top: 20px;
 	width: 100%;
 	border: 2px solid #EAEAEA;
 	height: 110px;
-	background-image: url(/assets/main/img/release-here.png);
+	background-image: url( "/assets/main/img/release-here.png" );
 	background-repeat: no-repeat;
 	background-position: center center;
 }
@@ -401,7 +401,7 @@ h2 {
 }
 
 /*
-	// upload files
+	// dropzone
 */
 
 

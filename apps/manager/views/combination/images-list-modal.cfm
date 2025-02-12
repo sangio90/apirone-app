@@ -1,5 +1,4 @@
-﻿
-<cfoutput>
+﻿<cfoutput>
 
     <div id="combination-images-list-modal" class="modal fade">
         
@@ -24,11 +23,7 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-primary btn-sm me-2 float-end disabled" 
-                                    id="button-next-document"
-                                    data-bind="css: { disabled: isDocumentsUploadUncompleted }, click: showPaymentDialog">Carica &raquo;
-                                </button>
-                                <div class="status errors-counter mt-2 error float-end clear-end me-3"></div>
+                                <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
                             </div>
                         </div>
                     </footer>                    

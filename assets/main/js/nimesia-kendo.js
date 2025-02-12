@@ -1,6 +1,81 @@
 ﻿var NM = {};
 NM.kendo = NM.kendo || {};
 
+NM.kendo.dataSource = function( config = {} ) {
+
+    var defaults = {
+        data: config.data ? config.data : [],
+        pageSize: config.count ? config.count : 20,
+        serverPaging: config?.serverPaging,
+        serverSorting: config?.serverSorting,
+        change: function( a, b, c, d) {
+            /* setto un indice numerico per riga */
+            $.each(this.data(), function(index, item) {
+                item.set( "index", index+1 );
+            });
+        }
+    };
+
+    if ( config.url != undefined ) {
+
+        defaults[ "serverPaging" ] = true;
+        defaults[ "serverSorting" ] = true;
+        defaults[ "transport" ] = { "read": config.url };
+        defaults[ "schema" ] = { data: "data", pageSize: "count", total: "total" };
+
+        defaults[ "transport" ][ "parameterMap" ] = function( params, type ) {
+            
+            if (type == "read") {
+
+                var result = {};
+
+                //console.log("params.skip", params.skip)
+
+                result["start"] = params.skip+1;
+    
+                if ( params.sort && params.sort.length ) {
+                    /* 
+                        posso così aggiungere altri sort in futuro: sort1, sort2  
+                        es: sort0=status_desc
+                    */
+                    result['sort0'] = params.sort[0].field + "_" + params.sort[0].dir;
+                }
+    
+                return result;
+            }
+        }
+
+        if( config.requestStart ) {
+            defaults.requestStart = config.requestStart
+        }
+
+        if( config.requestEnd ) {
+            defaults.requestEnd = config.requestEnd
+        }
+
+        if (config.model) {
+            defaults.schema.model = config.model;
+        }
+
+        if ( config.model ) {
+            defaults[ "schema" ][ "model" ] = config.model;
+        }
+
+    }
+
+	var settings = $.extend( true, defaults, config );
+
+    if ( config.count ) {
+        settings.pageSize  = config.count
+    }
+
+    var dataSource = new kendo.data.DataSource( settings );
+
+    return dataSource;
+
+};
+
+/*
 NM.kendo.dataSource = function (config = {}) {
 
     var defaults = {
@@ -51,13 +126,12 @@ NM.kendo.dataSource = function (config = {}) {
 
     }
 
-	//var settings = $.extend(true, defaults, config);
-
     var dataSource = new kendo.data.DataSource( defaults );
 
     return dataSource;
 
 };
+*/
 
 
 /*
