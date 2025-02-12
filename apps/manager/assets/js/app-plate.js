@@ -109,17 +109,39 @@ class Plate extends Rectangle {
 			"grid-template-columns": "",
 		};
 
+		const gridTemplateRows = [];
+		const gridTemplateColumns = [];
+
+		for (let i = 0; i < this.grid.length; i++) {
+			gridTemplateRows.push(0);
+		}
+
+		for (let i = 0; i < this.grid[0].length; i++) {
+			gridTemplateColumns.push(0);
+		}
+
 		for (let i = 0; i < this.grid.length; i++) {
 			const row = this.grid[i];
 
-			const maxCellHeight = row.reduce((acc, curr) => curr.height > acc ? curr.height : acc, 0);
+			const maxCellHeight = Math.max(...row.map(x => x.height));
 
-			plateCSS["grid-template-rows"] = plateCSS["grid-template-rows"].concat(` ${maxCellHeight}px `);
+			gridTemplateRows[i] = maxCellHeight;
 		}
 
-		const maxCellWidth = this.grid[0].reduce((acc, curr) => curr.width > acc ? curr.width : acc, 0);
+		for (let i = 0; i < this.grid[0].length; i++) {
+			const cells = [];
 
-		plateCSS["grid-template-columns"] = `repeat(${this.grid[0].length}, ${maxCellWidth}px)`;
+			for (let j = 0; j < this.grid.length; j++) {
+				cells.push(this.grid[j][i]);
+			}
+
+			const minCellWidth = Math.min(...cells.map(x => x.width));
+
+			gridTemplateColumns[i] = minCellWidth;
+		}
+
+		plateCSS["grid-template-rows"] = gridTemplateRows.map(x => `${x}px`).join(" ");
+		plateCSS["grid-template-columns"] = gridTemplateColumns.map(x => `${x}px`).join(" ");
 
 		const $plateGrid = $("<div/>", {
 			"id": "plate-grid",
