@@ -19,27 +19,29 @@ component extends="com.apirone.core.controller.AbsController" {
             var config = getConfiguration().get("imagesConfig")[ "combinationItem" ];
         }
 
-        var count = 1;
         for( var type in config.types  ) {
 
-            params.put( "typeId", type.id );
+            params.put("typeId", type.id )
 
-            var result = super.fire( "file.list", params );
+            var images = super.fire( "file.list", params );
 
-            if( result.getCount() ) {
+            // esiste l'immagine
+            if( images.getCount() ) {
 
-                dump( result.getData()[1] );
-                abort;
-                
-                data.add( result.getData()[1] );
+                var image = images.getData()[1];
+                var json = DESerializeJSON( SerializeJSON( image ) );
 
+                json["complete"] = true;
+
+
+            // se non esiste, servo un'immagine vuota
             } else {
 
                 var type = super.fire("fileType.get", [ type.id ] );
 
                 file.setType( type );
                 
-                file.setId( count );
+                file.setId( "" );
                 file.setName("");
                 file.setDirectory("");
 
@@ -47,11 +49,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
                 json["complete"] = false;
 
-                data.add( json );
 
             }
 
-            var count++;
+            data.add( json );
 
         }
 

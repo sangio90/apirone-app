@@ -62,19 +62,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
-	/*
-	public String function create(
-			required com.apirone.core.model.bean.File file,
-            		 com.apirone.core.model.bean.Entity entity
-		){
-
-        return getDao()
-        			.insert( argumentCollection = arguments )
-            		.toString();
-
-	}
-	*/
-
 	public String function update(
 			required com.apirone.core.model.bean.File file,
             required com.apirone.core.model.bean.Entity entity

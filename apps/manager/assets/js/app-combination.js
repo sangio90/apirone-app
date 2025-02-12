@@ -69,9 +69,6 @@ AP.combination.list = (function () {
 
 	var viewModel = kendo.observable({
 
-		isImageCompleted: true,
-		isImageUncompleted: false,
-
 		items: dataSources.items,
 		attributesList: dataSources.attributesList,
 
