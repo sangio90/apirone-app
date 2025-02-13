@@ -227,6 +227,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 		}
 
+		if( Len( record.fruit_id ) ) {
+
+			entity.setKey( "fruit.id" );
+			entity.setValue( record.fruit_id );
+
+			return entity;
+			
+		}
+
 		throw( type="apirone.errors.textWithoutEntity", message="No entity linked to this translation. Text Id: [#record.text_id#]" );
 		
 		//return NullValue()

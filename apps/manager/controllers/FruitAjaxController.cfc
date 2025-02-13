@@ -56,9 +56,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var fruit  = super.bean( "Fruit" );
 		var status = super.bean( "Status" );
-
-		var thisId = "";
-		var messageId = "";
+		var text   = super.bean( "Text" );
+		var lang   = super.bean( "Lang" );
 
 		var json = deserializeJSON( getHTTPRequestData().content );
 
@@ -66,13 +65,22 @@ component extends="com.apirone.core.controller.AbsController" {
 		fruit.setCode( json.code );
 
 		fruit.setStatus( status.setId( json.status.id ) );
+        fruit.setPositionsCount( json.positionsCount )
+
+        text.setLang( lang.setId( json.mainText.lang.id ) );
+        text.setStatus( status.setId( "ACT" ) );
+
+        text.setId( json.mainText.id );
+        text.setName( json.name );
+
+        fruit.setTexts( [ text ] );
 
 		if ( !len( json.id ) ) {
-			messageId = "fruit.created";
-			thisId    = super.fire( "fruit.create", [ fruit ] )
+			var messageId = "fruit.created";
+			var thisId    = super.fire( "fruit.create", [ fruit ] )
 		} else {
-			messageId = "fruit.updated";
-			thisId    = super.fire( "fruit.update", [ fruit ] )
+			var messageId = "fruit.updated";
+			var thisId    = super.fire( "fruit.update", [ fruit ] )
 		}
 
 		var message = completeMessage( messageId );

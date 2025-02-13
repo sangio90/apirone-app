@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="textService" type="com.apirone.core.model.service.TextService";
 
-    public com.apirone.core.model.bean.Size function get(
+    public com.apirone.core.model.bean.Fruit function get(
     		required String fruitId
         ){
 
@@ -28,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Fruit[] function list(
-		String lineId,
+		String lineId
 	) {
 		arguments["limit"] = -1;
 		return search(argumentCollection = arguments).getData();
@@ -58,23 +58,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
 	public String function create(
-		required com.apirone.core.model.bean.Size size
+		required com.apirone.core.model.bean.Fruit fruit
 	){
 
-		var newId = getDao().insert( arguments.size );
+		var newId = getDao().insert( arguments.fruit );
 
 		transaction {
 		
-			for ( var text in arguments.size.getTexts() ) {
+			for ( var text in arguments.fruit.getTexts() ) {
 				var entity = super.bean( "Entity" );
 
-				entity.setKey( "size.id" );
+				entity.setKey( "fruit.id" );
 				entity.setValue( newId );
 
 				text.setEntity( entity );
 			}
 
-			getTextService().bulkCreate( arguments.size.getTexts() );
+			getTextService().bulkCreate( arguments.fruit.getTexts() );
 		}
 
 		return newId;
@@ -83,11 +83,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update(
 		required com.apirone.core.model.bean.Fruit fruit
 	){
-		getDao().update( arguments.size );
+		getDao().update( arguments.fruit );
 
-		var id = arguments.size.getId();
+		var id = arguments.fruit.getId();
 
-		for ( var text in arguments.size.getTexts() ) {
+		for ( var text in arguments.fruit.getTexts() ) {
 
 			var entity = super.bean("Entity")
 			
@@ -109,9 +109,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 
-		super.getCacheManager().remove( "Fruid_#arguments.size.getId()#" );
+		super.getCacheManager().remove( "Fruit_#arguments.fruit.getId()#" );
 
-		return arguments.size.getId();
+		return arguments.fruit.getId();
 	}
 
 
@@ -167,7 +167,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Size function build(
+	private com.apirone.core.model.bean.Fruit function build(
     		required String fruitId
     	){
 
@@ -196,7 +196,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "Size_#arguments.id#";
+  		return "Fruit_#arguments.id#";
 
   	}
 

@@ -16,6 +16,7 @@
 
 	</cffunction>
 
+
 	<cffunction name="readByCode" output="false">
 		<cfargument name="code" type="String" required="true">
 
@@ -73,9 +74,7 @@
 
 
 	<cffunction name="insert" returntype="String" output="false">
-		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
-
-		<cfset var categories = super.getCategoriesAsArray( size.getCategories() )>
+		<cfargument name="fruit" type="com.apirone.core.model.bean.Fruit" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO fruits (
@@ -84,9 +83,9 @@
 				positions_count
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.size.getCode()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.size.getPositionsCount()#">
+				<cfqueryparam cfsqltype="varchar" value="#arguments.fruit.getCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.fruit.getPositionsCount()#">
 			) RETURNING fruit_id
 		</cfquery>
 
@@ -95,26 +94,25 @@
 
 
 	<cffunction name="update" returntype="String">
-		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
-
-		<cfset var categories = SerializeJSON( super.getCategoriesAsArray( size.getCategories() ) )>
+		<cfargument name="fruit" type="com.apirone.core.model.bean.Fruit" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
 				fruits
 			SET
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
-				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getCode()#">,
-				positions_count = <cfqueryparam cfsqltype="Integer" value="#arguments.size.getPositionsCount()#">
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getStatus().getId()#">,
+				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getCode()#">,
+				positions_count = <cfqueryparam cfsqltype="Integer" value="#arguments.fruit.getPositionsCount()#">
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getStatus().getId()#">
 			WHERE
-				fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getId()#">::uuid
+				fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getId()#">::uuid
 		</cfquery>
 		
-		<cfreturn arguments.size.getId()>
+		<cfreturn arguments.fruit.getId()>
 	
 	</cffunction>
-	
 
+	
 	<cffunction name="delete" returntype="Numeric">
 		<cfargument name="fruitId" type="String" required="true">
 

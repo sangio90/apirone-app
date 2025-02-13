@@ -19,12 +19,6 @@
 		]
 	},
 	{
-		href: "/manager/fruits",
-		icon: "fas fa-user",
-		title: "Frutti",
-		roles: "ADM"
-	},
-	{
 		href: "/manager/quotations",
 		icon: "fas fa-comment-dollar",
 		title: "Preventivi",
@@ -68,6 +62,12 @@
 				icon: "fas fa-layer-group",
 				title: "Linee",
 				roles: "ADM",
+			},
+			{
+				href: "/manager/fruits",
+				icon: "fas fa-apple-alt",
+				title: "Frutti",
+				roles: "ADM"
 			},
 			{
 				href: "/manager/finishes",

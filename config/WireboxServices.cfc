@@ -33,6 +33,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
             .property( name = "dao", ref = "FruitDAO" )
             .property( name = "StatusService", ref = "StatusService" )
+            .property( name = "TextService", ref = "TextService" )
             .parent("AbsService");
 
         map("FinishService").to( "com.apirone.core.model.service.FinishService" )

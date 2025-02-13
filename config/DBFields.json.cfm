@@ -50,6 +50,11 @@
         "type": "uuid"
     },
 
+    "fruit.id": {
+        "name": "fruit_id",
+        "type": "uuid"
+    },
+
     "finish.code": {
         "name": "code",
         "type": "Varchar"
