@@ -90,6 +90,29 @@ AP.combination.list = (function () {
 			return text.name;
 		},
 
+		getSmallImageUri: function( event ) {
+
+			var uri = event.uri;
+
+			if( event.uri != "" ) {
+				uri.replace("_ori", "500");
+				return uri;
+			}
+
+			return "/assets/main/img/img-not-found.png";
+		},
+
+		getImageUri: function( event ) {
+
+			var uri = event.uri;
+
+			if( event.uri != "" ) {
+				return uri;
+			}
+
+			return "";
+		},
+
 		selectAttribute: function (event) {
 
 			var item = viewModel.get("itemForAttributes");
@@ -457,7 +480,7 @@ AP.combination.list = (function () {
 
 		NM.util.openModal( fields.imagesModal );		
 
-		console.log("total", images.total())
+		console.log("total", images.total() );
 
 		// it shouldn't be needed "fetch"
 		images.fetch().then( function() {
@@ -475,7 +498,7 @@ AP.combination.list = (function () {
 					$("#image-upload-" + uid ).fileupload({
 						dropZone: $("#image-upload-dropzone-" + uid),
 						autoUpload: true,
-						formData: { "typeId": image.type.id },
+						formData: { "typeId": image.type.id, "imageId": image.id },
 						url: thisUrl,
 						add: function (event, data) { 
 							var uid = $(event.target).data("uid");

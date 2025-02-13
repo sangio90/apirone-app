@@ -17,50 +17,42 @@ component output="true" accessors="true" {
 			"filesHost": "#settings.get("files.host")#",
 			"imagesConfig" = {
 				"combinationItem" = {
-					"dbField" = "combinationItem.id",
 					"path" = "combination-items",
-					"types" = [
-						{
-							"id" = "horizontal", //in filetypes.json
+					"types" = {
+						"horizontal" = {
 							"sizes" = [
 								{
-									"width" = "200"
+									"width" = "500"
 								}
 							]
 						},
-						{
-							"id" = "vertical", //in filetypes.json
+						"vertical" = {
 							"sizes" = [
 								{
-									"width" = "200"
-								},
-							]
-	
+									"width" = "500"
+								}
+							]							
 						}
-					],
+					}
 				},
 				"combination" = {
-					"dbField" = "combination.id",
 					"path" = "combinations",
-					"types" = [
-						{
-							"id" = "horizontal", //in fileKinds.json
+					"types" = {
+						"horizontal" = {
 							"sizes" = [
 								{
-									"width" = "200"
+									"width" = "500"
 								}
 							]
 						},
-						{
-							"id" = "vertical",
+						"vertical" = {
 							"sizes" = [
 								{
-									"width" = "200"
-								},
-							]
-	
+									"width" = "500"
+								}
+							]							
 						}
-					],
+					}
 				},
 			},
 			"encryptKey": settings.get("db.encryptKey")

@@ -51,7 +51,7 @@
 			</cfif>
 
 			<cfif !isNull( arguments.typeId )>
-				AND file_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
+				AND type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
 			</cfif>
 
 			<cfif arguments.limit GT 0>
@@ -79,7 +79,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO files(
 				name,
-                file_type_id,
+                type_id,
+				kind_id,
                 size,
                 width,
                 height,
@@ -92,6 +93,7 @@
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getName()#">,
                 <cfqueryparam cfsqltype="Varchar" value="#arguments.file.getType().getId()#">,
+                <cfqueryparam cfsqltype="Varchar" value="#arguments.file.getKind().getId()#">,
                 <cfqueryparam cfsqltype="integer" value="#arguments.file.getSize()#">,
                 <cfqueryparam cfsqltype="integer" value="#arguments.file.getWidth()#">,
                 <cfqueryparam cfsqltype="integer" value="#arguments.file.getHeight()#">,

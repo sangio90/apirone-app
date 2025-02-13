@@ -19,9 +19,9 @@ component extends="com.apirone.core.controller.AbsController" {
             var config = getConfiguration().get("imagesConfig")[ "combinationItem" ];
         }
 
-        for( var type in config.types  ) {
+        for( var typeId in config.types  ) {
 
-            params.put("typeId", type.id )
+            params.put("typeId", typeId )
 
             var images = super.fire( "file.list", params );
 
@@ -29,15 +29,17 @@ component extends="com.apirone.core.controller.AbsController" {
             if( images.getCount() ) {
 
                 var image = images.getData()[1];
+
                 var json = DESerializeJSON( SerializeJSON( image ) );
 
                 json["complete"] = true;
+                json["uri"] = image.getUri();
 
 
             // se non esiste, servo un'immagine vuota
             } else {
 
-                var type = super.fire("fileType.get", [ type.id ] );
+                var type = super.fire("fileType.get", [ typeId ] );
 
                 file.setType( type );
                 
@@ -48,6 +50,7 @@ component extends="com.apirone.core.controller.AbsController" {
                 var json = DESerializeJSON( SerializeJSON( file ) );
 
                 json["complete"] = false;
+                json["uri"] = "";
 
 
             }
@@ -64,29 +67,33 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var tmpDir = getTempDir();
         var entity = super.bean("Entity");
-        var scope = "";
+        var kindId = "";
 
         if( rc.by == "combinations-items" ) {
             entity.setKey( "combinationItem.id" );
-            scope = "combinationItem";
+            kindId = "combinationItem";
         }
 
         if( rc.by == "combinations" ) {
             entity.setKey( "combination.id" );
-            scope = "combination";
+            kindId = "combination";
         }
 
         entity.setValue( rc.id );
 
 		cffile( filefield=rc.files[1], nameconflict="MAKEUNIQUE", destination=tmpDir, action="UPLOAD" );
 
-        super.fire( "file.create", { filePath = "#tmpDir#/#cffile.ServerFile#", entity = entity, typeId=rc.typeId, scope=scope } );
+        if( Len( rc.imageId ) ) {
+            super.fire( "file.delete", { fileId = rc.imageId } );
+        }
+
+        super.fire( "file.create", { filePath = "#tmpDir#/#cffile.ServerFile#", entity = entity, typeId=rc.typeId, kindId=kindId } );
 
         var result = super.getResult();
         
         var message = super.completeMessage( "file.imageCreated" );
 
-        result.setData( { "message" = message, "payload" =  {} } );
+        result.setData( { "message" = message } );
         
         event.setValue( "result", result );
         

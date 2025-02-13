@@ -90,42 +90,44 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create(
 		required String filePath, //full path of file, from /tmp for example
-		required String typeId, //accounts
-		required String scope,
+		required String typeId,
+		required String kindId,
 				 Struct entity,
 	){
 
 		var thisFile = "";
 
-		var config = getConfiguration().get("imagesConfig")[ arguments.scope ];
+		var config = getConfiguration().get("imagesConfig")[ arguments.kindId ];
 
 		var bean = super.bean("File");
 		var type = super.bean("FileType");
+		var kind = super.bean("FileKind");
 
 		var root = ExpandPath( "/../repository/public/media/" );
 
 		var dayPath = DateFormat( now(), "yyyy/mm" )
 		
-		var destination = root & "/#config.path#/" & dayPath;
+		var destination = root & "/#config.path#/" & "_ori/" & dayPath;
 
 		DirectoryCreate( destination, true, true );
 
 		var fileName = ListFirst( ListLast( arguments.filePath, "/" ), "." );
 		var fileExt  = ListLast( arguments.filePath, "." );
 
-		var unique = Left( LCase( Replace( CreateUUID(), '-', '', 'ALL' ) ), 5 );
-        var name = prettyString( fileName ) & '_' & unique & '.' & LCase( fileExt );
+		var unique = Left( LCase( Replace( CreateUUID(), "-", "", "ALL" ) ), 5 );
+        var name = prettyString( fileName ) & "_" & unique & "." & LCase( fileExt );
         
 		cffile( source="#arguments.filePath#", destination="#destination#/#name#", action="RENAME" );
 
 		var fileInfo = FileInfo( "#destination#/#name#" );
 	
 		bean.setName( name );
-		bean.setDescription('');
+		bean.setDescription("");
 		bean.setDirectory( dayPath );
 		bean.setSize( fileInfo.size );
 
-		bean.setType( type.setId( arguments.typeId ) )
+		bean.setType( type.setId( arguments.typeId ) );
+		bean.setKind( kind.setId( arguments.kindId ) );
 
 		if ( IsImageFile( "#destination#/#name#" ) ) {
 
@@ -138,14 +140,50 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		
 		}
 
-		//var result = create( bean );
-
-        var result = getDao()
+        var newId = getDao()
 			.insert( file = bean, entity = arguments.entity )
 			.toString();
 
-		return result;
-	
+		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# image inserted");
+
+		var imageType = config.types[ typeId ];
+
+		if( imageType.keyExists( "sizes" ) ) {
+
+			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# key sizes exists");
+
+			var thisFile = get( newId );
+
+			for( var size in imageType.sizes ) {
+
+				//cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# resize: #size#");
+
+				resize( thisFile.getPath(), size.width );
+
+			}
+
+		}
+
+		return newId;
+
+	}
+
+    public Void function resize(
+    		required String filePath,
+    		required Numeric size
+        ){
+  
+        var sizePath = Replace( filePath, "_ori", size );
+
+        var directory = getDirectoryFromPath( sizePath );
+
+        var file = ImageNew( arguments.filePath );
+
+		DirectoryCreate( directory, true, true );
+		ImageResize( file, size );
+
+		file.write( sizePath, true );
+
 	}
 
 
@@ -161,12 +199,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    if( record.RecordCount ) { 
 
 	    	var obj = super.bean( "File" );
+	    	var kind = super.bean( "FileKind" );
 
 		    obj.setId( record.file_id.toString() );
             obj.setName( record.name );
 
-			// it's documentType!
-        	obj.setType( getFileTypeService().get( record.file_type_id ) );
+        	obj.setType( getFileTypeService().get( record.type_id ) );
+        	obj.setKind( kind.setId( record.kind_id ) );
             obj.setSize( record.size );
             obj.setWidth( record.width );
             obj.setHeight( record.height );
