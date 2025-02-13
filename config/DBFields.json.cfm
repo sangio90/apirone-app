@@ -55,6 +55,16 @@
         "type": "uuid"
     },
 
+    "fruit.code": {
+        "name": "code",
+        "type": "String"
+    },
+
+    "fruit.created": {
+        "name": "created_at",
+        "type": "date"
+    },
+
     "finish.code": {
         "name": "code",
         "type": "Varchar"
@@ -85,4 +95,4 @@
         "type": "uuid"
     },
 
-}   
+}

@@ -8,6 +8,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var params = super.paramsFromUrl();
 
+        dump(params);
+
         var rows = super.fire( "fruit.search", params );
 
         for ( var row in rows.getData() ) {
@@ -54,10 +56,11 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var result = super.getResult();
 
-		var fruit  = super.bean( "Fruit" );
-		var status = super.bean( "Status" );
-		var text   = super.bean( "Text" );
-		var lang   = super.bean( "Lang" );
+		var fruit      = super.bean( "Fruit" );
+		var status     = super.bean( "Status" );
+		var statusText = super.bean( "Status" );
+		var text       = super.bean( "Text" );
+		var lang       = super.bean( "Lang" );
 
 		var json = deserializeJSON( getHTTPRequestData().content );
 
@@ -68,10 +71,10 @@ component extends="com.apirone.core.controller.AbsController" {
         fruit.setPositionsCount( json.positionsCount )
 
         text.setLang( lang.setId( json.mainText.lang.id ) );
-        text.setStatus( status.setId( "ACT" ) );
+        text.setStatus( statusText.setId( "ACT" ) );
 
         text.setId( json.mainText.id );
-        text.setName( json.name );
+        text.setName( json.mainText.name );
 
         fruit.setTexts( [ text ] );
 

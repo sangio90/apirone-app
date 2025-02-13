@@ -37,13 +37,14 @@
 	<cffunction returntype="Query" name="find">
 
 		<cfargument name="str" type="String">
+		<cfargument name="statusId" type="String">
 
         <cfargument name="orderby" required="true" type="String" default="code">
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
 
         <cfquery name="local.q" datasource="apirone">
-			SELECT DISTINCT
+			SELECT 
 				fruit_id::varchar, 
 				code,
 				orderby,
@@ -54,6 +55,10 @@
 				
 				<cfif !IsNull( arguments.str )>
 					AND fruits.code ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.statusId )>
+					AND fruits.status_id = <cfqueryparam value="#arguments.statusId#" cfsqltype="varchar">
 				</cfif>
 
 			ORDER BY 
@@ -83,7 +88,7 @@
 				positions_count
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.fruit.getCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.fruit.getPositionsCount()#">
 			) RETURNING fruit_id

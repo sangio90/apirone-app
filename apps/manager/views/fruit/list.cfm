@@ -1,12 +1,12 @@
 <cfoutput>
 	
 	<div id="fruit-list-root">
+		
 		#pageTitle()#
 
 		<div class="row">
 			
 			<div class="col-lg-12 text-end pb-3">
-
 				#addButton( bind = "click:new", size = "sm" )#
 			</div>
 
@@ -63,7 +63,14 @@
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '120px' },
                                         { 'field':'name', 'title':'Descrizione' },
-                                        { 'field':'', 'title':'Modifica', width: '55px'}
+                                        { 'field':'', 'title':'Modifica', width: '55px'},
+                                        { 
+                                            'field'           :'', 
+                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                            'width'           :'40px',
+                                            'headerAttributes': { 'class': 'text-center' }
+                                        }
+
                                     ]",
 									rowTemplate = "fruit/fruit-grid-row-tmpl"
 								)#

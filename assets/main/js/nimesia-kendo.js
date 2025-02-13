@@ -24,21 +24,31 @@ NM.kendo.dataSource = function( config = {} ) {
         defaults[ "schema" ] = { data: "data", pageSize: "count", total: "total" };
 
         defaults[ "transport" ][ "parameterMap" ] = function( params, type ) {
+
+            console.log("params", params)
             
             if (type == "read") {
 
-                var result = {};
+                var result = params;
 
                 //console.log("params.skip", params.skip)
 
                 result["start"] = params.skip+1;
+
+                params.count = params.pageSize;
+                params["start"] = params.skip+1
+                delete params.pageSize;
+                delete params.page;
+                delete params.skip;
+                delete params.take;
+    
     
                 if ( params.sort && params.sort.length ) {
                     /* 
                         posso così aggiungere altri sort in futuro: sort1, sort2  
                         es: sort0=status_desc
                     */
-                    result['sort0'] = params.sort[0].field + "_" + params.sort[0].dir;
+                    result["sort0"] = params.sort[0].field + "_" + params.sort[0].dir;
                 }
     
                 return result;

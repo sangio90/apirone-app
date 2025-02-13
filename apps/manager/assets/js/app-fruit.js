@@ -62,6 +62,9 @@ AP.fruit.list = (function () {
 			console.log("searchListForm", thisForm);
 			
 			var params = thisForm.serializeJSON();
+
+			console.log("searchListForm:params", params);
+
 			
 			viewModel.rows.read( params );
 
@@ -121,6 +124,8 @@ AP.fruit.list = (function () {
 
 			NM.util.openModal( fields.detailRoot );
 
+			return false;
+
 		},
 
         delete: function (event) {
@@ -145,7 +150,7 @@ AP.fruit.list = (function () {
 						done: function (xhr) {
 
 							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutte le dimensioni");
+								AP.widget.notify("error", "Non riesco a cancellare tutti i frutti");
 							} else {
 								AP.widget.notify("success", "Cancellazione avvenuta con successo");
 							}
@@ -160,7 +165,7 @@ AP.fruit.list = (function () {
 
 			} else {
 
-				AP.widget.notify("warning", "Selezionare almeno una dimensione");
+				AP.widget.notify("warning", "Selezionare almeno un frutto");
 
 			}
 
@@ -174,7 +179,6 @@ AP.fruit.list = (function () {
 
 		var detailForm = AP.fruit.fields.detailForm;
 		
-
 		detailForm.validate({
 			onfocusout: function (element) {
 				$(element).valid();

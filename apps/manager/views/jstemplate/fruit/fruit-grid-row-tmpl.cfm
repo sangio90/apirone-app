@@ -10,7 +10,7 @@
                 <span data-bind="text: code"></span>
             </td>
             <td>
-                <span data-bind="text: name"></span>
+                <span data-bind="text: mainText.name"></span>
             </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#

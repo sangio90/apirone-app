@@ -1,31 +1,5 @@
 <cfcomponent accessors="true">
 
-	<!----
-	<cffunction name="getField" output="No" returntype="Struct">
-        
-		<cfargument name="type" required="Yes" type="String">
-        
-        <cfset var data = {
-            "C" = {
-                "table" = "companies",
-                "name"  = "company_id",
-            },
-            "E" = {
-                "table" = "employees",
-                "name"  = "employee_id",
-            },
-			"PV" = {
-                "table" = "variants",
-                "name"  = "variant_id",
-            }
-        }>
-
-		<cfreturn data[ arguments.type ]>
-
-	</cffunction>
-	----->
-	
-
 	<cffunction name="createFilters" returntype="String">
 
 		<cfargument name="filter" required="false" type="Array">

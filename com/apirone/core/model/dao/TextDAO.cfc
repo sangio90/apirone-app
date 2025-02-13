@@ -90,6 +90,10 @@
 				AND finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 			</cfif>
 
+			<cfif !isNull( arguments.fruitId ) >
+				AND fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruitId#">::uuid
+			</cfif>
+
 			<cfif !isNull( arguments.fromDate ) >
 				AND texts.created_at >= <cfqueryparam cfsqltype="Date" value="#arguments.fromDate#">
 			</cfif>
@@ -167,6 +171,8 @@
 			WHERE 
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>
+
+		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# field: #field.name# - value:#arguments.text.getEntity().getValue()#">
 
 		<cfreturn arguments.text.getId()>
 

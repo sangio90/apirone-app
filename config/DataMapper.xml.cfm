@@ -90,6 +90,7 @@
         <map from="status" to="status" ref="Status" />
         <map from="positionsCount" to="positionsCount" type="cf:Integer" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
+        <map from="mainText" to="mainText" ref="Text" />
     </mapper>
 
     <mapper id="Thickness" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Thickness">

@@ -36,9 +36,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     public com.apirone.core.model.bean.Result function search(
 		             String str,
+			required Array orderBy = [ { field="fruit.created", dir="desc" } ],
 			required Numeric limit = 20,
 			required Numeric offset = 0
     	){
+
+		arguments["orderby"] = super.createOrderBy( arguments["orderby"] );
 
 	    var rows = [];
     	var result = super.getResult();
@@ -183,7 +186,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( fruitId = record.fruit_id ) );
-			
+
 			bean.setCreatedAt( record.created_at );
 			
             return bean;
