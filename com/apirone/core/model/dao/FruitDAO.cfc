@@ -103,7 +103,6 @@
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getStatus().getId()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getCode()#">,
 				positions_count = <cfqueryparam cfsqltype="Integer" value="#arguments.fruit.getPositionsCount()#">
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getStatus().getId()#">
 			WHERE
 				fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruit.getId()#">::uuid
 		</cfquery>

@@ -118,6 +118,10 @@ $.validator.setDefaults({
 
 $(document).ready(function () {
 
+	$("input[type=text].uppercase").keyup(function(){
+		this.value = this.value.toUpperCase();
+	});
+	
 	$("#sidebar-button").click(function () {
 		localStorage.setItem(
 			"sidebar-left-collapsed",
