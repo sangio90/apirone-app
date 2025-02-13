@@ -10,7 +10,7 @@
     property name="factory" type="com.apirone.core.model.factory.Factory";
     //ROB: removed because it generates errors when business logic is reloaded.
     //property name="cacheManager" type="com.apirone.core.util.CacheManager"; 
-	property name="configuration" type="com.apirone.core.model.bean.Configuration" ;
+	//property name="configuration" type="com.apirone.core.model.bean.Configuration" ;
 	property name="DBUtil" type="com.apirone.core.model.util.DBUtil" ;
 
     /**
@@ -139,6 +139,13 @@
         var DBUtil = new com.apirone.core.util.DBUtil();
         
         return model().getInstance("CacheManager");
+    
+    }
+    
+    private Struct function getConfiguration() {
+        var config = new com.apirone.core.model.bean.Configuration();
+        
+        return config;
     
     }
     

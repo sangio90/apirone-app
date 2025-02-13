@@ -18,7 +18,6 @@
                             <div class="text-end mb-1"> 
                                 <span data-bind="invisible: complete" class="text-end"><span class="badge bg-secondary" style="font-size:13px">Da caricare</span></span>
                                 <span data-bind="visible: complete" class="text-end"><span class="badge bg-success" style="font-size:13px">Caricato</span></span>
-                                <!--- <span data-bind="visible: complete" class="text-end"><span class="badge bg-success" style="font-size:13px">Caricato</span></span> ---->
                             </div>
                         </div>
             
@@ -38,9 +37,9 @@
                 </div>
 
                 <div class="col-4 mb-2">
-
-                    <img src="/assets/main/image-not-found" class="img-responsive">
-
+                    <a href="" data-bind="attr: { href: getImageHref }" target="_blank">
+                        <img class="img-fluid" data-bind="attr: { src: getImageSrc }" height="500">
+                    </a>
                 </div>
 
             </div>

@@ -15,7 +15,7 @@ component extends="com.apirone.core.controller.AbsController" {
         }
 
         if( rc.by == "combination-items" ) {
-            var params = { combinationItem = rc.id }
+            var params = { combinationItemId = rc.id }
             var config = getConfiguration().get("imagesConfig")[ "combinationItem" ];
         }
 
@@ -34,6 +34,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
                 json["complete"] = true;
                 json["uri"] = image.getUri();
+                json["shortId"] = Right( image.getId(), 5 );
 
 
             // se non esiste, servo un'immagine vuota
@@ -51,6 +52,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
                 json["complete"] = false;
                 json["uri"] = "";
+                json["shortId"] = "";
 
 
             }
@@ -67,16 +69,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var tmpDir = getTempDir();
         var entity = super.bean("Entity");
-        var kindId = "";
 
-        if( rc.by == "combinations-items" ) {
+        if( rc.by == "combination-items" ) {
             entity.setKey( "combinationItem.id" );
-            kindId = "combinationItem";
+            var kindId = "combinationItem";
         }
 
         if( rc.by == "combinations" ) {
             entity.setKey( "combination.id" );
-            kindId = "combination";
+            var kindId = "combination";
         }
 
         entity.setValue( rc.id );
@@ -87,13 +88,22 @@ component extends="com.apirone.core.controller.AbsController" {
             super.fire( "file.delete", { fileId = rc.imageId } );
         }
 
-        super.fire( "file.create", { filePath = "#tmpDir#/#cffile.ServerFile#", entity = entity, typeId=rc.typeId, kindId=kindId } );
+        var fileId = super.fire( "file.create", { filePath = "#tmpDir#/#cffile.ServerFile#", entity = entity, typeId=rc.typeId, kindId=kindId } );
 
         var result = super.getResult();
         
+        var file = super.fire( "file.get", [ fileId ] );
+
         var message = super.completeMessage( "file.imageCreated" );
 
-        result.setData( { "message" = message } );
+        result.setData( 
+            { 
+                "message" = message, 
+                "payload" = {
+                    "imageId" = file.getId()
+                }
+            }
+        );
         
         event.setValue( "result", result );
         

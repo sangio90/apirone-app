@@ -9,24 +9,13 @@
 
                 <section class="card">
                     
-                    <div class="card-body">
+                    <div class="card-body row">
+
+                        <div class="col-md-4">
+                            <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
+                        </div>
                         
-                        <div class="col-md-12">
-                           
-                            <h3>Aggiungi immagini 
-                                <a href="" data-type="combination" data-bind="click:openImagesList" style="font-size: 14px; text-decoration: underline;">
-                                    Immagini per questa placca
-                                </a>
-                            </h3>
-    
-                        </div>
-
-                        <div class="col-md-12">
-                            <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Aggiungi attributo &raquo;</button>
-                            <button class="btn btn-primary btn-sm" data-bind="click:openImagesList">Aggiungi immagine &raquo;</button>
-                        </div>
-
-                        <div class="col-md-12 mb-4" id="combination-config-row">
+                        <div class="col-md-8 mb-4" id="combination-config-row">
 
                             <form class="d-flex align-items-center justify-content-end" id="combination-change-form">
 
@@ -52,7 +41,11 @@
 
                         <div class="col-md-12">
 
-                            <div data-bind="visible: showItems">
+                            <!--- 
+                                data-bind="visible: showItems" 
+                                TODO: add this. remove from above menu 
+                            ---->
+                            <div >
 
                                 <div class="row d-flex align-items-center mb-2">
 
@@ -70,7 +63,7 @@
                                                 data-line-name="#prc.line.getName()#"
                                                 
                                                 data-bind="click: openComponentsList">
-                                                    Componenti per #prc.line.getName()# / #prc.size.getCode()#
+                                                    Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
                                                 </a>
                                             <br>
                                             - <a href=""
@@ -81,8 +74,22 @@
                                                 data-combination-name="#prc.subtitle# / #prc.title#"
                                                 
                                                 data-bind="click: openComponentsList">
-                                                    Componenti base per questa combinazione
+                                                    Componenti base per questa combinazione &raquo;
                                                 </a>
+                                            <br>
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="combination" 
+                                                data-bind="click:openImagesList">
+                                                Aggiungi immagini per questa placca &raquo;
+                                            </a>
+                                            <br>
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="combination" 
+                                                data-bind="click:openReorderingModal">
+                                                Riordina elementi &raquo;
+                                            </a>
                                         </p>
         
                                         <!---
@@ -141,12 +148,14 @@
 
                             </div>
 
+                            <!---
                             <div class="py-3" data-bind="invisible: showItems" style="display:none">
                                 <hr class="mb-5">
                                 <p class="text-center pt-3">
                                     Nessuna configurazione presente
                                 </p>
-                            </div>                            
+                            </div>
+                            ---->
 
                         </div>
     
@@ -159,6 +168,7 @@
 
         <!--- #view("combination/attributes-list-modal")# --->
         #view("combination/images-list-modal")#
+        #view("combination/reordering-modal")#
         
     </div>
 

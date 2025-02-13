@@ -50,14 +50,14 @@
                                                     data-values="#size.getId()#__#finish.getId()#"
                                                     <cfif !exists>style="display: none"</cfif>
                                                     >
-                                                    Rimuovi
+                                                    <i class="fa fa-minus"></i>
                                                 </button>
 
                                                 <button class="btn btn-primary btn-sm deactive" data-bind="click:activate" 
                                                     data-values="#size.getId()#__#finish.getId()#"
                                                     <cfif exists>style="display: none"</cfif>
                                                     >
-                                                    Aggiungi
+                                                    <i class="fa fa-plus"></i>
                                                 </button>
                                             
                                             </td>

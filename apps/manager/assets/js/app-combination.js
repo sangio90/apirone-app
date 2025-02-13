@@ -5,7 +5,8 @@ AP.combination.fields = {
 	configRow: $("#combination-config-row"),
 	attributeSearchForm: $("#attributes-search-form"),
 	attributeModal: $("#combination-attributes-list-modal"),
-	imagesModal: $("#combination-images-list-modal")
+	imagesModal: $("#combination-images-list-modal"),
+	reorderingModal: $("#combination-reordering-modal")
 };
 
 $(document).ready(function (){
@@ -87,39 +88,45 @@ AP.combination.list = (function () {
 
 			var text = AP.util.getMainText( event.type.texts.toJSON() );
 
-			return text.name;
+			return text.name + " " + event.shortId;
 		},
 
-		getSmallImageUri: function( event ) {
+		getImageSrc: function( event ) {
 
 			var uri = event.uri;
 
 			if( event.uri != "" ) {
-				uri.replace("_ori", "500");
-				return uri;
+				var replaced = uri.replace("_ori", "500");
+
+				console.log("getImageUri:event.uri:replaced", replaced);
+				
+				return replaced;
 			}
 
 			return "/assets/main/img/img-not-found.png";
 		},
 
-		getImageUri: function( event ) {
+		getImageHref: function( event ) {
 
 			var uri = event.uri;
 
+			console.log("getImageUri:event.uri", event.uri);
+
 			if( event.uri != "" ) {
+				console.log("event.uri", event.uri);
 				return uri;
 			}
 
-			return "";
+			console.log("getImageUri:event.uri", "vuoto");
+
+			// TODO: not work with target=_blank
+			return "javascript:void(0)";
 		},
 
 		selectAttribute: function (event) {
 
 			var item = viewModel.get("itemForAttributes");
 			var parentId = viewModel.get("itemForAttributes.id");
-
-			//console.log("selectAttribute:item", item);
-			//console.log("selectAttribute:parentId", parentId);
 
 			NM.util.ajax({
 				method: "POST",
@@ -218,6 +225,16 @@ AP.combination.list = (function () {
 
 		},
 
+		openReorderingModal: function (event) {
+
+			NM.util.openModal( fields.reorderingModal );
+
+			//this.searchAttributes();
+
+			return false;
+
+		},
+
 		openImagesList: function (event) {
 
 			var element = $( event.currentTarget );
@@ -231,17 +248,14 @@ AP.combination.list = (function () {
 
 			switch( type ) {
 			
-				case "item":
-
-					var id = element.data("combination-item-it");
+				case "combinationItem":
 
 					var value = {
 						type: "item",
-						id: id
-					}
+						id: event.data.id
+					};
 
-					//var params = { by: "item", combinationItemId: value.id }
-					var thisUrl = "/manager/ajax/combination-items/" + value.id + "/images";
+					var thisUrl = "/manager/ajax/combination-items/" + event.data.id + "/images";
 
 					break;
 				
@@ -251,8 +265,6 @@ AP.combination.list = (function () {
 						type: "combination",
 						id: AP.page.combinationId
 					};
-
-					//var params = { by: "combination", combinationItemId: value.id }
 
 					var thisUrl = "/manager/ajax/combinations/" + AP.page.combinationId + "/images";
 			  
@@ -516,10 +528,19 @@ AP.combination.list = (function () {
 							data.submit();
 	
 						},
-			
+
+						success: function( event, data ) {
+							//TODO
+							console.log("success")
+							console.log("success", data)
+						},
+
 						progressall: function( event, data ) {
+
+							console.log("progressall:event", event)
+							console.log("progressall:data", data)
 	
-							var status = $('#image-upload-status-' + uid );
+							var status = $( "#image-upload-status-" + uid );
 							status.html("");
 	
 							var uid = $(event.target).data("uid");
@@ -531,10 +552,12 @@ AP.combination.list = (function () {
 							
 							var row = viewModel.get("images").getByUid( uid );
 	
-							//$("#image-image").eq(0).removeClass("d-none");
+							setTimeout(() => {
+								initUpload();
+							}, "1000");
+							  
 							
-							row.set("complete", true);
-	
+
 						}
 					});		
 	
@@ -548,7 +571,7 @@ AP.combination.list = (function () {
 
 	var initSort = function() {
 
-		var table = $("#order-element table");
+		var table = $("#combination-ordering-items-grid table");
 
 		table.kendoSortable({
 			axis: "y",
@@ -577,8 +600,11 @@ AP.combination.list = (function () {
 				console.log("event.oldIndex", event.oldIndex);
 				console.log("event.newIndex", event.newIndex);
 
+				$("#combination-reordering-status").html("<span class='success'>Salvato!</span>")
+
 				if(event.newIndex != event.oldIndex) {
 
+					/*
 					var values = viewModel.get("detailForm.data.values").data();
 					var thisForm = $("#attribute-values-form");
 					var status = thisForm.find(".status");
@@ -628,6 +654,8 @@ AP.combination.list = (function () {
 							}
 						}
 					});
+
+					*/
 
 				}
 			}

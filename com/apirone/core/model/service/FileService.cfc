@@ -97,7 +97,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var thisFile = "";
 
-		var config = getConfiguration().get("imagesConfig")[ arguments.kindId ];
+		dump(arguments);
+
+		dump(super.getConfiguration());
+
+		var config = super.getConfiguration().get("imagesConfig")[ arguments.kindId ];
+
+		dump(config);
+
 
 		var bean = super.bean("File");
 		var type = super.bean("FileType");
@@ -155,8 +162,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var thisFile = get( newId );
 
 			for( var size in imageType.sizes ) {
-
-				//cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# resize: #size#");
 
 				resize( thisFile.getPath(), size.width );
 

@@ -53,7 +53,7 @@ AP.component.list = (function () {
 			modalTitle: "",
 			modifyUrl: "",
 			readUrl: ""
-		}
+		};
 
 		if( current ) {
 
@@ -87,6 +87,8 @@ AP.component.list = (function () {
 			}
 
 		}
+
+		console.log("getCurrentConfig:result", result)
 
 		return result;
 
