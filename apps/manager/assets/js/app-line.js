@@ -87,7 +87,7 @@ AP.line.detail = (function () {
 			var detailForm = AP.line.fields.detailForm;
 			var status = detailForm.find(".status");
 
-		    status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
+		    status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
 
 			if(detailForm.valid()) {
 
@@ -102,12 +102,10 @@ AP.line.detail = (function () {
 
 								NM.util.autoHideMessage(status, "<span class='green'>Linea salvata</span>");
 
-								setTimeout(() => $("#line-detail-modal").modal("hide"), 1000);
+								setTimeout( () => $("#line-detail-modal").modal("hide"), 1000 );
 
                                 AP.util.fireCallback( "onSave", viewModel.get("callback") );
                                 
-                                //fireCallback("onSave");
-
 							}
 
 						}

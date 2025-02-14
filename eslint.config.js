@@ -30,7 +30,6 @@ module.exports = {
 		"block-spacing": "warn",
 		"comma-spacing": "warn",
 		"spaced-comment": "warn",
-		"space-in-parens": ["warn", "never"],
 		"no-nested-ternary": "warn",
 		"no-trailing-spaces": "warn",
 		"array-bracket-spacing": "warn",

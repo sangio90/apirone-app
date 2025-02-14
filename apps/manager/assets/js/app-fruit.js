@@ -60,12 +60,11 @@ AP.fruit.list = (function () {
 			var thisForm = AP.fruit.fields.searchListForm;
 
 			console.log("searchListForm", thisForm);
-			
+
 			var params = thisForm.serializeJSON();
 
 			console.log("searchListForm:params", params);
 
-			
 			viewModel.rows.read( params );
 
 			return false;
@@ -77,17 +76,17 @@ AP.fruit.list = (function () {
 			var thisForm = AP.fruit.fields.detailForm;
 			var status = thisForm.find(".status");
 
-			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
 
 			if(thisForm.valid()) {
 
 				NM.util.ajax({
 					method: "POST",
 					url: "/manager/ajax/fruits",
-					data: JSON.stringify(viewModel.get("detailForm.data")),
+					data: JSON.stringify( viewModel.get("detailForm.data") ),
 					callback: {
 						done: function (xhr) {
-							
+
 							if( xhr.status == "SUCCESS" ) {
 
 								viewModel.get("rows").read();
@@ -169,7 +168,7 @@ AP.fruit.list = (function () {
 
 			}
 
-        },		
+        }
 
 	});
 
