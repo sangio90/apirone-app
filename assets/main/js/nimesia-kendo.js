@@ -28,8 +28,6 @@ NM.kendo.dataSource = function (config = {}) {
 
         defaults.transport.parameterMap = function (params, type ) {
 
-            console.log("new:params", params);
-
             params.count = params.pageSize;
             delete params.pageSize;
             delete params.skip;

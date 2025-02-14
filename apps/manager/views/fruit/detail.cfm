@@ -11,7 +11,7 @@
                     
                     <div class="card-body row">
 
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-4">
                             <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
                         </div>
                         
@@ -32,8 +32,8 @@
                                                 class="underline"
                                                 data-type="combination" 
 
-                                                data-combination-id="#rc.id#"
-                                                data-combination-name="#prc.subtitle# / #prc.title#"
+                                                data-fruit-id="#prc.fruit.getId()#"
+                                                data-fruit-code="#prc.fruit.getCode()#"
                                                 
                                                 data-bind="click: openComponentsList">
                                                     Componenti base per questo frutto &raquo;
@@ -129,6 +129,7 @@
             </div>
         </div>
 
+        #view("combination/attributes-list-modal")# <!--- move file to "atttribute" dir --->
         #view("combination/images-list-modal")#
         #view("combination/reordering-modal")#
         

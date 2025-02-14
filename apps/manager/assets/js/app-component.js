@@ -58,37 +58,37 @@ AP.component.list = (function () {
 		if( current ) {
 
 			switch( current.type ) {
-			
+
 				case "lineSize":
 
 					result.modalTitle = "linea a dimensione: " + current.line.name + " / " + current.size.name;
 					result.readUrl = baseUrl + "?by=linesize&lineId=" + current.line.id + "&sizeId=" + current.size.id;
 					result.modifyUrl = result.readUrl
-				  
+
 					break;
-				
+
 				case "item":
 
 					result.modalTitle = "elemento: " + current.attribute.name + " / " + current.attributeValue.name;
 					result.readUrl = baseUrl + "?by=item&&itemId=" + current.item.id;
 					result.modifyUrl = result.readUrl;
-					
+
 					break;
-				
+
 				case "combination":
 
 					result.modalTitle = "combinazione: " + current.combination.name;
 					result.readUrl = baseUrl + "?by=combination&combinationId=" + current.combination.id;
 					result.modifyUrl = result.readUrl;
-					
+
 					break;
-				
+
 				default:
 			}
 
 		}
 
-		console.log("getCurrentConfig:result", result)
+		//console.log("getCurrentConfig:result", result)
 
 		return result;
 

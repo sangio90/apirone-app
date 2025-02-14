@@ -1,22 +1,17 @@
 ﻿AP.fruit = AP.fruit || {};
+AP.fields.fruit = AP.fields.fruit || {};
 
-AP.fruit.fields = {
-	listRoot: $("#fruit-list-root"),
-	detailRoot: $("#fruit-detail-modal"),
-	attributesRoot: $("#fruit-detail-root"),
-	detailForm: $("#fruit-detail-form"),
-	searchListForm: $("#fruit-grid-search-form")
+AP.fields.fruit = {
+	detailRoot: $("#fruit-detail-root"),
+
+	attributeSearchForm: $("#attributes-search-form"),
+	attributeModal: $("#combination-attributes-list-modal"),
+
 };
 
 $(document).ready(function (){
 
-	if (AP.fruit.fields.listRoot.length) {
-
-		AP.fruit.list.init();
-
-	}
-
-	if (AP.fruit.fields.attributesRoot.length) {
+	if (AP.fields.fruit.detailRoot.length) {
 
 		AP.fruit.attribute.init();
 
@@ -27,7 +22,7 @@ $(document).ready(function (){
 AP.fruit.list = (function () {
 
 	var pub = {};
-	var fields = AP.fruit.fields;
+	var fields = AP.fields.fruit;
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/fruits" })
@@ -64,7 +59,7 @@ AP.fruit.list = (function () {
 
 		search: function (event) {
 
-			var thisForm = AP.fruit.fields.searchListForm;
+			var thisForm = AP.fields.fruit.searchListForm;
 
 			console.log("searchListForm", thisForm);
 
@@ -88,7 +83,7 @@ AP.fruit.list = (function () {
 
 		save: function (event) {
 
-			var thisForm = AP.fruit.fields.detailForm;
+			var thisForm = AP.fields.fruit.detailForm;
 			var status = thisForm.find(".status");
 
 			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
@@ -189,9 +184,9 @@ AP.fruit.list = (function () {
 
 	pub.init = function () {
 
-		kendo.bind(AP.fruit.fields.listRoot, viewModel);
+		kendo.bind(AP.fields.fruit.listRoot, viewModel);
 
-		var detailForm = AP.fruit.fields.detailForm;
+		var detailForm = AP.fields.fruit.detailForm;
 		
 		detailForm.validate({
 			onfocusout: function (element) {
@@ -251,7 +246,10 @@ AP.fruit.list = (function () {
 AP.fruit.attribute = (function () {
 
 	var pub = {};
-	var fields = AP.fruit.fields;
+	var fields = AP.fields.fruit;
+
+	var componentApp = AP.component.list;
+	var attributeApp = AP.attribute.detail;
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/fruits" })
@@ -305,7 +303,7 @@ AP.fruit.attribute = (function () {
 
 		save: function (event) {
 
-			var thisForm = AP.fruit.fields.detailForm;
+			var thisForm = AP.fields.fruit.detailForm;
 			var status = thisForm.find(".status");
 
 			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
@@ -345,7 +343,34 @@ AP.fruit.attribute = (function () {
 		},
 
         delete: function (event) {
-        }
+        },
+
+		searchAttributes: function (event) {
+
+			var thisForm = fields.attributeSearchForm;
+			var params = thisForm.serialize();
+
+			var dataSource = NM.kendo.dataSource({ url: "/manager/ajax/attributes?" + params });
+
+			viewModel.set("attributesList", dataSource);
+
+            return false;
+
+		},
+
+		openAttributesList: function (event) {
+
+			//var item = normalizeComponentItem( event.data );
+
+			//viewModel.set( "itemForAttributes", item );
+
+			NM.util.openModal( fields.attributeModal );
+
+			this.searchAttributes();
+
+			return false;
+
+		},
 
 	});
 
@@ -353,10 +378,7 @@ AP.fruit.attribute = (function () {
 
 		console.log("AP.fruit.attribute:init")
 
-		var componentApp = AP.component.list;
-		var attributeApp = AP.attribute.detail;
-
-		kendo.bind( AP.fruit.fields.attributesRoot, viewModel );
+		kendo.bind( AP.fields.fruit.detailRoot, viewModel );
 
 	};
 

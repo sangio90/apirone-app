@@ -74,8 +74,22 @@
                                                 data-combination-name="#prc.subtitle# / #prc.title#"
                                                 
                                                 data-bind="click: openComponentsList">
-                                                    Componenti base per questa combinazione &raquo;
+                                                    Componenti base per questa placca &raquo;
                                                 </a>
+                                            <br>
+
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="item" 
+
+                                                data-combination-id="0"
+                                                data-combination-name="Attributo radice"
+                                                
+                                                data-bind="click: openAttributesList">
+                                                    Aggiungi attributo di base &raquo;
+                                                </a>
+
+                                            <br>
                                             <br>
                                             - <a href=""
                                                 class="underline"
@@ -88,7 +102,7 @@
                                                 class="underline"
                                                 data-type="combination" 
                                                 data-bind="click:openReorderingModal">
-                                                Riordina elementi &raquo;
+                                                Riordina attributi &raquo;
                                             </a>
                                         </p>
         
@@ -166,7 +180,7 @@
             </div>
         </div>
 
-        <!--- #view("combination/attributes-list-modal")# --->
+        #view("combination/attributes-list-modal")#
         #view("combination/images-list-modal")#
         #view("combination/reordering-modal")#
         

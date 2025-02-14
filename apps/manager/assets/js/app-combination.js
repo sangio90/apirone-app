@@ -208,6 +208,8 @@ AP.combination.list = (function () {
 
 		openAttributesList: function (event) {
 
+			console.log("openAttributesList");
+
 			var item = normalizeComponentItem( event.data );
 
 			viewModel.set( "itemForAttributes", item );
@@ -215,6 +217,8 @@ AP.combination.list = (function () {
 			NM.util.openModal(fields.attributeModal);
 
 			this.searchAttributes();
+
+			return false;
 
 		},
 
@@ -417,12 +421,9 @@ AP.combination.list = (function () {
 
 			var found = false;
 
-			console.log("combinations", combinations);
-
 			combinations.forEach(function (combination) {
 
-				if( lineId == combination.line.id 
-						&& sizeId == combination.size.id ) {
+				if( lineId == combination.line.id && sizeId == combination.size.id ) {
 
 					if (combination.id == combinationId) {
 						found = true;
@@ -570,8 +571,8 @@ AP.combination.list = (function () {
 				var text = $(element).find("td.sortable").text();
 
 				ele.text(text)
-					.height(element.height())
-					.width(element.width())
+					.height( element.height() )
+					.width( element.width() )
 					.addClass("sortable-hint");
 
 				return ele;
@@ -589,7 +590,7 @@ AP.combination.list = (function () {
 				console.log("event.oldIndex", event.oldIndex);
 				console.log("event.newIndex", event.newIndex);
 
-				$("#combination-reordering-status").html("<span class='success'>Salvato!</span>")
+				$("#combination-reordering-status").html("<span class='green'>Salvato!</span>")
 
 				if(event.newIndex != event.oldIndex) {
 

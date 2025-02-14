@@ -6,7 +6,7 @@ AP.fields.attribute.detail = {
     detailForm: $("#attribute-detail-form"),
     valueForm : $("#attribute-values-add-form"),
     valuesForm: $("#attribute-values-form")
-};   
+};
 
 $(document).ready(function (){
 
@@ -25,7 +25,7 @@ $(document).ready(function (){
 AP.attribute.detail = (function () {
 
 	var pub = {};
-    
+
     var fields = AP.fields.attribute.detail;
 
 	var defaults = {

@@ -13,8 +13,9 @@
                     
                     <div class="card-body">                
                         
-                        <div class="col-12 text-right mb-2" id="combination-reordering-status">
+                        <div class="col-12 text-end mb-2" id="combination-reordering-status">
                         </div>
+                        
                         <div class="col-12">
 
                             #grid(

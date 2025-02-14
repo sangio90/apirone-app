@@ -5,27 +5,13 @@
         prc.title = "Frutti";
         prc.statuses = super.fire( "status.list", ["FRUIT"] );
 
-        prc.jsScripts.add( "app-fruit" );
+        prc.jsScripts.add( "app-fruit-list" );
 
         prc.page["statuses"] = prc.statuses;
 
         event.setView("fruit/list");
 
     }
-
-    /*
-    function get( event, rc, prc ){
-
-        var user = prc.user;
-
-        prc.title = "Frutto";
-
-        prc.jsScripts.add( 'app-fruit' );
-
-        event.setView('fruit/detail');
-
-    }
-    */
 
     function detail( event, rc, prc ){
 
@@ -37,7 +23,7 @@
 
         prc.jsScripts.add( "app-component" );
         prc.jsScripts.add( "app-attribute-detail" );
-        prc.jsScripts.add( "app-fruit" );
+        prc.jsScripts.add( "app-fruit-detail" );
 
         prc.page["fruitId"] = prc.fruit.getId();
 
