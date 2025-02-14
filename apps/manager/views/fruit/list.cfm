@@ -64,6 +64,7 @@
                                         { 'field':'code', 'title':'Codice', width: '120px' },
                                         { 'field':'name', 'title':'Descrizione' },
                                         { 'field':'name', 'title':'Posizioni', width: '50px' },
+                                        { 'field':'', 'title':'Aggiungi componenti', width: '55px'},
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 
                                             'field'           :'', 

@@ -1,137 +1,140 @@
 ﻿<cfoutput>
 
-    <div id="product-detail">
+    <div id="fruit-detail-root">
 
-
-        <div class="row mb-3">
-            <div class="col-lg-8">
-                <h2>#prc.title#</h2>
-            </div>
-        </div>
+        #pageTitle()#
 
         <div class="row">
-            <div class="col-lg-12">
-                
-                <form action="/manager/products/save" class="form-horizontal" method="post" id="product-detail-form">
+            <div class="col-md-12">
+
+                <section class="card">
                     
-                    <section class="card">
+                    <div class="card-body row">
+
+                        <div class="col-md-4">
+                            <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
+                        </div>
                         
-                        <div class="card-body">
-                            
-                            <div class="form-group row pb-3">
-                                <label class="col-sm-3 control-label text-sm-end pt-2">Codice</label>
-                                <div class="col-sm-9">
-                                    <input type="text" name="code" class="form-control" maxlength="15" placeholder="" value="001"
-                                        onkeyup="this.value=this.value.toUpperCase()" 
-                                    />
-                                </div>
-                            </div>
+                        <div class="col-md-12">
 
-                            <div class="form-group row pb-3">
-                                <label class="col-sm-3 control-label text-sm-end pt-2">Unità di misura</label>
-                                <div class="col-sm-9">
-                                    <select class="form-control" name="companyId" id="companyId">
-                                        <option value="">-- seleziona</option>
-                                        <cfloop array="#prc.units#" item="item">
-                                            <option value="#item.id#" SELECTED>#item.name#</option>
-                                        </cfloop>
-                                    </select>
-                                </div>
-                            </div>
+                            <!--- 
+                                data-bind="visible: showItems" 
+                                TODO: add this. remove from above menu 
+                            ---->
+                            <div >
 
-                            <div class="form-group row pb-3">
-                                <label class="col-sm-3 control-label text-sm-end pt-2">
-                                    Stato
-                                </label>
-                                <div class="col-sm-9">
-                                    <select class="form-control" name="statusId">
-                                        <option value="">-- Seleziona</option>
-                                        <cfloop array="#prc.statusList#" item="item">
-                                            <option value="#item.id#" SELECTED>#item.name#</option>
-                                        </cfloop>
-                                    </select>
-                                </div>
-                            </div>
+                                <div class="row d-flex align-items-center mb-2">
 
-                            <cfloop array="#prc.priceLists#" item="item">
-                                <br>
-                                <br>
-                                <div class="form-group row pb-3 ">
-                                    <div class="col-sm-3 offset-md-3">
-                                        <b>#item.name#</b>
-                                    </div>
-                                </div>
-
-                            
-                                <div class="form-group row pb-3">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Prezzo</label>
                                     <div class="col-sm-9">
-                                        <div class="input-group">
-                                            <input type="number" name="price" class="form-control" placeholder="" value="#item.price#" />
-                                            <span class="input-group-text">
-                                                <i class="fa fa-euro text-4"></i>
-                                            </span>
-                                        </div>
-                                        <div id="price-error"></div>
-                                    </div>
-                                </div>
 
-                                <div class="form-group row pb-3">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Costo</label>
-                                    <div class="col-sm-9">
-                                        <div class="input-group">
-                                            <input type="number" name="price" class="form-control" placeholder="" value="#item.cost#" />
-                                            <span class="input-group-text">
-                                                <i class="fa fa-euro text-4"></i>
-                                            </span>
+                                        <p>
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="combination" 
+
+                                                data-combination-id="#rc.id#"
+                                                data-combination-name="#prc.subtitle# / #prc.title#"
+                                                
+                                                data-bind="click: openComponentsList">
+                                                    Componenti base per questo frutto &raquo;
+                                                </a>
+                                            <br>
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="combination" 
+                                                data-bind="click:openImagesList">
+                                                Aggiungi immagini per questo frutto &raquo;
+                                            </a>
+                                            <br>
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="combination" 
+                                                data-bind="click:openReorderingModal">
+                                                Riordina elementi &raquo;
+                                            </a>
+                                        </p>
+        
+                                        <!---
+                                        <div class="mb-3 box-search-small"> 
+        
+                                            <form id="finish-grid-search-form" 
+                                                class="d-flex align-items-center justify-content-end" 
+                                                data-bind:'events: { submit: search }'>
+        
+                                                <input name="str" placeholder="Cerca..." class="form-control me-2" type="text">
+        
+                                                #searchButton( bind="click:search" )#
+                                            
+                                            </form>
+        
                                         </div>
-                                        <div id="price-error"></div>
+                                        ----->
+        
                                     </div>
+                                    <div class="col-sm-3">
+                                        <div class="float-end">
+                                            #deleteButton(
+                                                bind  = "click:removeAttributes",
+                                                size  = "sm"
+                                            )#
+                                        </div>
+        
+                                        <div class="status float-end me-3" id="status-delete"></div>
+                                    </div>
+        
                                 </div>                                
-            
-                                <!----
-                                <div class="form-group row pb-3">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Sconto</label>
-                                    <div class="col-sm-9">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <input type="number" name="discountValue" class="form-control" placeholder="Valore" />
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <select name="discountType" class="form-control" >
-                                                            <option value="F">Fisso</option>
-                                                            <option value="P">Percentuale</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                ---->
 
-                            </cfloop>
+                                <form id="combination-grid-form">
 
+                                    #grid(
+                                        id      = "combination-items-grid",
+                                        class   = "no-pager",
 
-                        <footer class="card-footer">
-                            <div class="row justify-content-end">
-                                <div class="col-sm-9">
-                                    <button class="btn btn-primary">Salva &raquo;</button>
-                                    <input type="hidden" name="id" value="" />
-                                </div>
+                                        columns = "[
+                                            { 'field':'Id', 'title':'ID', width: '60px' },
+                                            { 'field':'name', 'title':'Attributo' },
+                                            { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
+                                            { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
+                                            { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
+                                            { 
+                                                'field'           :'', 
+                                                'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                                'width'           :'40px',
+                                                'headerAttributes': { 'class': 'text-center' }
+                                            }
+                                        ]",
+                                        source: "items",
+                                        rowTemplate = "combination/combination-item-row-tmpl"
+                                    )#
+
+                                </form>
+
                             </div>
-                        </footer>
-                    
-                    </section>
-                
-                </form>
-            
-            </div>
 
+                            <!---
+                            <div class="py-3" data-bind="invisible: showItems" style="display:none">
+                                <hr class="mb-5">
+                                <p class="text-center pt-3">
+                                    Nessuna configurazione presente
+                                </p>
+                            </div>
+                            ---->
+
+                        </div>
+    
+                    </div>
+            
+                </section>
+
+            </div>
         </div>
 
+        #view("combination/images-list-modal")#
+        #view("combination/reordering-modal")#
+        
     </div>
+
+    #view("attribute/detail-modal")#
+    #view("component/list-modal")#
 
 </cfoutput>

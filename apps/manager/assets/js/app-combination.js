@@ -30,7 +30,6 @@ AP.combination.list = (function () {
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" }),
-		//images: NM.kendo.dataSource( { data: [ { id: "H", name: "Orizzontale" }, { id: "V", name: "Verticale" } ]} ),
 		attributesList: undefined
 	};
 
@@ -150,8 +149,6 @@ AP.combination.list = (function () {
 
 		getAttributeName: function (event) {
 
-			//console.log("getAttributeName:event", event);
-
 			var text = AP.util.getMainText(event.texts);
 
 			return text.name;
@@ -211,11 +208,7 @@ AP.combination.list = (function () {
 
 		openAttributesList: function (event) {
 
-			//console.log("openAttributesList:event.data", event.data);
-
 			var item = normalizeComponentItem( event.data );
-
-			//console.log("openAttributesList:normalizeComponentItem", item);
 
 			viewModel.set( "itemForAttributes", item );
 
@@ -228,8 +221,6 @@ AP.combination.list = (function () {
 		openReorderingModal: function (event) {
 
 			NM.util.openModal( fields.reorderingModal );
-
-			//this.searchAttributes();
 
 			return false;
 
@@ -289,8 +280,6 @@ AP.combination.list = (function () {
 		},
 
 		openAttributeValues: function (event) {
-
-			// console.log("event.data.id", event.data.id);
 
 			attributeApp.edit({
 				id: event.data.id,

@@ -78,6 +78,7 @@
 		get( "/ajax/fruits" ).to( "FruitAjaxController.list" ).end();
 		post( "/ajax/fruits" ).to( "FruitAjaxController.save" ).end();
 		delete( "/ajax/fruits" ).to( "FruitAjaxController.delete" ).end();
+		get( "/fruits/:id/detail" ).to( "FruitController.detail" ).end();
 		get( "/fruits" ).to( "FruitController.list" ).end();
 
 
@@ -136,22 +137,7 @@
 		post( "/ajax/:by-regex:(combinations|combination-items)/:id/images" ).to( "FileAjaxController.upload" ).end();
 
 		get( "/combinations/:id" ).to( "CombinationController.detail" ).end();
-		//get( "/ajax/combinations/:id/files" ).to( "FileAjaxController.list" ).end();
 
-		//get( "/ajax/:by-regex:(combinations|combination-items)/:id/images" ).to( "FileAjaxController.list" ).end();
-
-		/*
-			combination items
-		*/
-		//post( "/ajax/combination-items/:id/upload" ).to( "FileAjaxController.upload" ).end();
-		//get( "/ajax/combination-items/:id/files" ).to( "FileAjaxController.list" ).end();
-		//get( "/ajax/combination-items/:id/files" ).to( "FileAjaxController.list" ).end();
-
-		/*
-			files
-		*/
-		//get( "/ajax/files" ).to( "FileAjaxController.list" ).end();
-		//post( "/ajax/files" ).to( "FileAjaxController.upload" ).end();
 
 		/*
 			lines category

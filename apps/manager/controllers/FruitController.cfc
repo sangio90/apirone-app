@@ -12,7 +12,8 @@
         event.setView("fruit/list");
 
     }
-    
+
+    /*
     function get( event, rc, prc ){
 
         var user = prc.user;
@@ -24,5 +25,26 @@
         event.setView('fruit/detail');
 
     }
-    
+    */
+
+    function detail( event, rc, prc ){
+
+        prc.fruit = super.fire( "fruit.get", [ rc.id ] );
+
+        prc.title = "Frutto #prc.fruit.getCode()#";
+
+        prc.statusList = super.fire( "status.list", ["line"] );
+
+        prc.jsScripts.add( "app-component" );
+        prc.jsScripts.add( "app-attribute-detail" );
+        prc.jsScripts.add( "app-fruit" );
+
+        prc.page["fruitId"] = prc.fruit.getId();
+
+        prc.page["attributeStatusList"] = super.fire( "status.list", ["attribute"] );
+
+        event.setView( "fruit/detail" );
+
+    }
+
 }

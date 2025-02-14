@@ -131,7 +131,7 @@
                                             { 'field':'Id', 'title':'ID', width: '60px' },
                                             { 'field':'name', 'title':'Attributo' },
                                             { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
-                                            { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
+                                            { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
                                             { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
                                             { 
                                                 'field'           :'', 

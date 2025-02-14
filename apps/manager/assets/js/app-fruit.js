@@ -3,6 +3,7 @@
 AP.fruit.fields = {
 	listRoot: $("#fruit-list-root"),
 	detailRoot: $("#fruit-detail-modal"),
+	attributesRoot: $("#fruit-detail-root"),
 	detailForm: $("#fruit-detail-form"),
 	searchListForm: $("#fruit-grid-search-form")
 };
@@ -12,6 +13,12 @@ $(document).ready(function (){
 	if (AP.fruit.fields.listRoot.length) {
 
 		AP.fruit.list.init();
+
+	}
+
+	if (AP.fruit.fields.attributesRoot.length) {
+
+		AP.fruit.attribute.init();
 
 	}
 
@@ -69,6 +76,14 @@ AP.fruit.list = (function () {
 
 			return false;
 
+		},
+
+		attributes: function (event) {
+
+            var id = event.data.id;
+            window.open("/manager/fruits/" + id + "/detail", "_blank").focus();
+
+            return false;
 		},
 
 		save: function (event) {
@@ -227,6 +242,121 @@ AP.fruit.list = (function () {
 			},
 
 		});
+
+	};
+
+	return pub;
+}());
+
+AP.fruit.attribute = (function () {
+
+	var pub = {};
+	var fields = AP.fruit.fields;
+
+	var dataSources = {
+		items: NM.kendo.dataSource({ url: "/manager/ajax/fruits" })
+	};
+
+	var viewModel = kendo.observable({
+		rows: dataSources.items,
+
+		openComponentsList: function (event) {
+
+			var element = $( event.currentTarget );
+
+			if ( !element.attr("data-type") ) {
+				console.error("ERROR. Set data-type attribute in currentTarget");
+				return;
+			}
+
+			var type = element.data("type");
+
+			switch( type ) {
+
+				case "fruit":
+
+					var value = {
+						type: "fruit",
+						fruit: {
+							id: element.data("size-id"),
+							name: element.data("size-name")
+						},
+					};
+
+					break;
+
+				case "fruitItem":
+
+					var value = {
+						type: "fruitItem",
+					};
+
+					break;
+
+				default:
+			};
+
+			console.log("openComponentsList:item", value );
+
+			componentApp.open( value );
+
+            return false;
+		},		
+
+		save: function (event) {
+
+			var thisForm = AP.fruit.fields.detailForm;
+			var status = thisForm.find(".status");
+
+			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+
+			if(thisForm.valid()) {
+
+				NM.util.ajax({
+					method: "POST",
+					url: "/manager/ajax/fruits",
+					data: JSON.stringify( viewModel.get("detailForm.data") ),
+					callback: {
+						done: function (xhr) {
+
+							if( xhr.status == "SUCCESS" ) {
+
+								viewModel.get("rows").read();
+								NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
+
+								setTimeout( () => fields.detailRoot.modal("hide"), 1500 );
+
+							}
+
+						}
+					}
+				});
+
+			}
+
+			return false;
+
+		},
+
+		new: function (event) {
+		},
+
+		edit: function (event) {
+		},
+
+        delete: function (event) {
+        }
+
+	});
+
+	pub.init = function () {
+
+		console.log("AP.fruit.attribute:init")
+
+		var componentApp = AP.component.list;
+		var attributeApp = AP.attribute.detail;
+
+		kendo.bind( AP.fruit.fields.attributesRoot, viewModel );
 
 	};
 
