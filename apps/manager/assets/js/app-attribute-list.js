@@ -116,7 +116,7 @@ AP.attribute.list = (function () {
 
 			}
 
-        },		
+        },
 
     });
 

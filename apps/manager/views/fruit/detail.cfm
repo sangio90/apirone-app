@@ -30,7 +30,7 @@
                                         <p>
                                             - <a href=""
                                                 class="underline"
-                                                data-type="combination" 
+                                                data-type="fruit" 
 
                                                 data-fruit-id="#prc.fruit.getId()#"
                                                 data-fruit-code="#prc.fruit.getCode()#"
@@ -48,9 +48,20 @@
                                             <br>
                                             - <a href=""
                                                 class="underline"
+                                                data-type="item" 
+
+                                                data-fruit-id="#prc.fruit.getId()#"
+                                                data-parent-id="0"
+                                                
+                                                data-bind="click: openAttributesList">
+                                                    Aggiungi attributo di base &raquo;
+                                                </a>
+                                            <br>
+                                            - <a href=""
+                                                class="underline"
                                                 data-type="combination" 
                                                 data-bind="click:openReorderingModal">
-                                                Riordina elementi &raquo;
+                                                Riordina attributi &raquo;
                                             </a>
                                         </p>
         
@@ -129,7 +140,7 @@
             </div>
         </div>
 
-        #view("combination/attributes-list-modal")# <!--- move file to "atttribute" dir --->
+        #view("combination/attributes-list-modal")#
         #view("combination/images-list-modal")#
         #view("combination/reordering-modal")#
         

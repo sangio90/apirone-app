@@ -9,19 +9,33 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var params = {};
 
-        if( rc.by == "combination" ) {
-            params = { combinationId = rc.combinationId };
+        switch ( rc.by ) {
+            case "combination":
+                params = { combinationId = rc.combinationId };
+                break;
+
+            case "item":
+                params = { combinationItemId = rc.itemId };
+                break;
+                
+            case "lineSize":
+                params = { lineId = rc.lineId, sizeId = rc.sizeId };
+                break;
+
+            case "fruit":
+                params = { fruitId = rc.fruitId };
+                break;
+
+            case "fruitItem":
+                params = { fruitCombinationItemId = rc.itemId };
+                break;
+
+            default: 
+                throw (type="apirone.error.TypeSearchNotValid", message="Type search [#rc.by#] not valid");
+                break;
         }
 
-        if( rc.by == "item" ) {
-            params = { combinationItemId = rc.itemId };
-        }
-
-        if( rc.by == "lineSize" ) {
-            params = { lineId = rc.lineId, sizeId = rc.sizeId };
-        }
-
-        var  items = super.fire( "Component.list", params );
+        var  items = super.fire( "component.list", params );
 
         for( var item in items ) {
 
@@ -63,38 +77,55 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var components = DeserializeJSON( GetHTTPRequestData().content );
 
-        if( rc.typeId == "item" ) {
+        switch ( rc.by ) {
+            case "combination":
 
-            var component = super.bean("ComponentCombinationItem");
-            var item = super.bean("CombinationItem");
+                var component = super.bean("ComponentCombination");
+                var combination = super.bean("Combination");
 
-            component.setCombinationItem( item.setId( rc.itemId ) );
+                component.setCombination( combination.setId( rc.combinationId ) );
 
-        }
+                break;
 
-        if( rc.typeId == "lineSize" ) {
+            case "item":
 
-            var component = super.bean("ComponentLineSize");
-            
-            var size = super.bean("size");
-            var line = super.bean("line");
+                var component = super.bean("ComponentCombinationItem");
+                var item = super.bean("CombinationItem");
 
-            component.setLine( line.setId( rc.lineId ) );
-            component.setSize( size.setId( rc.sizeId ) );
+                component.setCombinationItem( item.setId( rc.itemId ) );
 
-        }
+                break;
+                
+            case "lineSize":
+                var component = super.bean("ComponentLineSize");
+                
+                var size = super.bean("size");
+                var line = super.bean("line");
 
-        if( rc.typeId == "combination" ) {
+                component.setLine( line.setId( rc.lineId ) );
+                component.setSize( size.setId( rc.sizeId ) );
 
-            var component = super.bean("ComponentCombination");
-            var combination = super.bean("Combination");
+                break;
 
-            component.setCombination( combination.setId( rc.combinationId ) );
+            case "fruit":
+                
+                var component = super.bean("ComponentFruit");
+                var fruit = super.bean("fruit");
 
+                component.setFruit( fruit.setId( rc.fruitId ) );
+
+                break;
+
+            case "fruitItem":
+                params = { fruitCombinationItemId = rc.itemId };
+                break;
+
+            default: 
+                throw (type="apirone.error.TypeSaveNotValid", message="Type save [#rc.typeId#] not valid");
+                break;
         }
 
         for( var thisComponent in components ) {
-
 
             var color   = super.bean("Color");
             var product = super.bean("Product");

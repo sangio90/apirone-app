@@ -72,14 +72,51 @@
 
 	<cffunction name="delete" returntype="Boolean">
 
+        <cfargument name="fruitId" type="String">
+        <cfargument name="attributeId" type="String">
+        <cfargument name="combinationId" type="String">
         <cfargument name="combinationItemId" type="String">
 
+		<cfif IsNull( arguments.combinationItemId )
+			AND IsNull( arguments.combinationId )
+			AND IsNull( arguments.attributeId )
+			AND IsNull( arguments.combinationItemId )
+			AND IsNull( arguments.fruitId )>
+
+			<cfthrow type="ApirOne.errors.NoArgumentsPassed" message="At least one parameter is required to delete">
+
+		</cfif>
+
+		<cfquery datasource="apirone">
+			DELETE 
+			FROM combination_items
+			WHERE 1=1
+				
+				<cfif !IsNull( arguments.combinationItemId )>
+					AND combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.combinationId )>
+					AND combination_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.attributeId )>
+					AND attribute_value_id IN (
+						SELECT attribute_value_id 
+						FROM attribute_values 
+						WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
+					)
+				</cfif>
+		</cfquery>
+
+		<!---
         <cfquery name="local.q" datasource="apirone">
 			DELETE 
             FROM combination_items 
             WHERE
                 combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
 		</cfquery>
+		---->
 
 		<cfreturn true>
 

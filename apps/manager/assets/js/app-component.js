@@ -61,15 +61,31 @@ AP.component.list = (function () {
 
 				case "lineSize":
 
-					result.modalTitle = "linea a dimensione: " + current.line.name + " / " + current.size.name;
+					result.modalTitle = "Componenti per linea a dimensione: " + current.line.name + " / " + current.size.name;
 					result.readUrl = baseUrl + "?by=linesize&lineId=" + current.line.id + "&sizeId=" + current.size.id;
-					result.modifyUrl = result.readUrl
+					result.modifyUrl = result.readUrl;
+
+					break;
+
+				case "fruit":
+
+					result.modalTitle = "Componenti base per frutto: " + current.fruit.code;
+					result.readUrl = baseUrl + "?by=fruit&fruitId=" + current.fruit.id;
+					result.modifyUrl = result.readUrl;
+
+					break;
+
+				case "fruitItem":
+
+					result.modalTitle =	"Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.name;
+					result.readUrl = baseUrl + "?by=fruitItem&&itemId=" + current.item.id;
+					result.modifyUrl = result.readUrl;
 
 					break;
 
 				case "item":
 
-					result.modalTitle = "elemento: " + current.attribute.name + " / " + current.attributeValue.name;
+					result.modalTitle = "Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.name;
 					result.readUrl = baseUrl + "?by=item&&itemId=" + current.item.id;
 					result.modifyUrl = result.readUrl;
 
@@ -77,7 +93,7 @@ AP.component.list = (function () {
 
 				case "combination":
 
-					result.modalTitle = "combinazione: " + current.combination.name;
+					result.modalTitle = "Componenti base per combinazione: " + current.combination.name;
 					result.readUrl = baseUrl + "?by=combination&combinationId=" + current.combination.id;
 					result.modifyUrl = result.readUrl;
 
@@ -356,11 +372,13 @@ AP.component.list = (function () {
 
 	pub.open = function ( item ) {
 
-		//console.log("open:itemId", itemId);
+		console.log("component:open:item", item);
 
 		viewModel.set( "currentItem", item );
 
-		//console.log( "readUrl", getCurrentConfig().readUrl );
+		var current = viewModel.get( "currentItem" );
+		console.log("component:open:curr", current );
+		console.log("component:open:getCurrentConfig", getCurrentConfig() );
 
 		NM.util.ajax({
 			method: "GET",

@@ -1,16 +1,18 @@
 ﻿<cfoutput>
 	<div id="component-list-modal" class="modal fade">
 
-		<section class="modal-dialog modal-fullscreen">
+		<section class="modal-dialog modal-xl">
 			<div class="modal-content">
-				<header class="card-header">
-					<h2 class="card-title">Componenti per <span data-bind="text: getModalTitle"></span></h2>
+				
+				<header class="card-header d-flex align-elements-center justify-content-between">
+					<h2 class="card-title"><span data-bind="text: getModalTitle"></span></h2>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
 				</header>
 
 				<div class="card-body">
 					<div class="row">
 
-						<div class="col-4">
+						<div class="col-6">
 
 							<div data-bind="visible: showSearchPanel">
 
@@ -68,7 +70,7 @@
 						
 						</div>
 
-						<div class="col-8">
+						<div class="col-6">
 
 							<form id="component-list-selected-form" class="row">
 
@@ -112,7 +114,7 @@
 										<p class="text-center">Nessun componente ancora selezionato</p>
 									</div>
 
-									<p>#saveButton(bind="click:save", size="sm")#</p>
+									<p>#saveButton( bind="click:save", size="sm" )#</p>
 
 								</div>
 							

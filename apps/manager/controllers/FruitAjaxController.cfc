@@ -93,7 +93,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-
 	function delete( event, rc, prc ){
         
         var result = super.getResult();
@@ -125,5 +124,86 @@ component extends="com.apirone.core.controller.AbsController" {
         
 		event.setValue( "result", result );
 	}    
+
+    function addItem( event, rc, prc ){
+
+        var result = super.getResult();
+        var attribute = super.fire( "attribute.get", [ rc.attributeId ] );
+
+        param rc.id = '_';          //Current fruit
+        param rc.parentId = 0;      //Parent item, if exists
+        param rc.attributeId = 0;   //To add values ​​to this attribute
+
+
+        ```
+
+        <cftransaction>
+        
+            <cfquery datasource="apirone">
+                DELETE FROM combination_items
+                WHERE 
+                    combination_id = '#rc.id#'
+                    AND attribute_value_id IN 
+                        ( 
+                            SELECT attribute_value_id 
+                            FROM attribute_values 
+                            WHERE attribute_id = '#rc.attributeId#'
+                        )
+            </cfquery>
+
+            <cfloop array="#attribute.getValues()#" item="item">
+
+                <cfquery datasource="apirone">
+                    INSERT INTO combination_items (
+                        combination_id,
+                        attribute_value_id,
+                        orderby,
+                        parent_id
+                    )
+                    VALUES (
+                        '#rc.id#',
+                        '#item.getId()#',
+                        #item.getOrderBy()#,
+                        #( Val(rc.parentId) ? rc.parentId : 'NULL' )#
+                    )
+                </cfquery>
+                
+            </cfloop>
+
+        </cftransaction>
+
+        ```
+
+        var message = completeMessage( "combination.itemsAdded" );
+
+        result.setData( { "message" = message } );
+
+        event.setValue( "result", result );
+
+    }
+
+    function removeItems( event, rc, prc ){
+
+        var result = super.getResult();
+
+        param rc.items = "_";
+
+
+        ```
+        <!--- TODO: better than this --->
+        <cfquery datasource="apirone">
+            DELETE FROM combination_items
+            WHERE combination_item_id IN ( #rc.items# )
+        </cfquery>
+
+        ```
+
+        var message = completeMessage( "combination.itemsDeleted" );
+
+        result.setData( { "message" = message } );
+
+        event.setValue("result", result);
+
+    }
 
 }

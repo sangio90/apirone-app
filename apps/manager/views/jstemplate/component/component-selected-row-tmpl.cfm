@@ -6,15 +6,15 @@
             <td width="10">
                 <b data-bind="text: product.processingType.id"></b>
             </td>
-            <td class="text-truncate">
+            <td>
                 <b data-bind="text: product.id"></b><br>
                 <span data-bind="text: product.name"></span>
             </td>
-            <td class="text-truncate">
+            <td>
                 <b data-bind="text: variant.id"></b><br>
                 <span data-bind="text: variant.name"></span>
             </td>
-            <td class="text-truncate">
+            <td>
                 <b data-bind="text: color.id"></b><br>
                 <span data-bind="text: color.name"></span>
             </td>

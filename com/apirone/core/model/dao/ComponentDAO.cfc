@@ -23,6 +23,8 @@
 		<cfargument name="sizeId" type="String">
 		<cfargument name="combinationId" type="String">
 		<cfargument name="combinationItemId" type="Numeric">
+		<cfargument name="fruitId" type="String">
+		<cfargument name="fruitCombinationitemId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -38,6 +40,14 @@
 			
 			<cfif !isNull( arguments.combinationItemId )>
 				AND combination_item_id = <cfqueryparam value="#arguments.combinationItemId#" cfsqltype="Integer">
+			</cfif>
+
+			<cfif !isNull( arguments.fruitId )>
+				AND fruit_id = <cfqueryparam value="#arguments.fruitId#" cfsqltype="Varchar">::uuid
+			</cfif>
+
+			<cfif !isNull( arguments.fruitCombinationItemId )>
+				AND fruit_combination_item_id = <cfqueryparam value="#arguments.fruitCombinationItemId#" cfsqltype="Integer">
 			</cfif>
 
 			<cfif !isNull( arguments.combinationId )>
@@ -90,6 +100,10 @@
 
 				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombination" )>
 					combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getCombination().getId()#">::uuid
+				</cfif>
+
+				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentFruit" )>
+					fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getFruit().getId()#">::uuid
 				</cfif>				
 		</cfquery>
 
@@ -121,6 +135,10 @@
 					combination_id
 				</cfif>
 
+				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentFruit" )>
+					fruit_id
+				</cfif>
+
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getProduct().getId()#">,
@@ -139,6 +157,10 @@
 
 				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombination" )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getCombination().getId()#">::uuid
+				</cfif>
+
+				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentFruit" )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getFruit().getId()#">::uuid
 				</cfif>
 
 			) RETURNING component_id

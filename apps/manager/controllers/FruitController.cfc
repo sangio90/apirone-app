@@ -17,7 +17,7 @@
 
         prc.fruit = super.fire( "fruit.get", [ rc.id ] );
 
-        prc.title = "Frutto #prc.fruit.getCode()#";
+        prc.title = "Frutto < #prc.fruit.getCode()# >";
 
         prc.statusList = super.fire( "status.list", ["line"] );
 

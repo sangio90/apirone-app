@@ -1,5 +1,4 @@
 ﻿<cfoutput>
-
     <div id="line-detail-modal" class="modal fade">
         
         <section class="modal-dialog modal-lg">

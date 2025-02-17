@@ -124,6 +124,8 @@ AP.combination.list = (function () {
 
 		selectAttribute: function (event) {
 
+			//console.log("selectAttribute");
+
 			var item = viewModel.get("itemForAttributes");
 			var parentId = viewModel.get("itemForAttributes.id");
 
@@ -214,7 +216,7 @@ AP.combination.list = (function () {
 
 			viewModel.set( "itemForAttributes", item );
 
-			NM.util.openModal(fields.attributeModal);
+			NM.util.openModal( fields.attributeModal );
 
 			this.searchAttributes();
 

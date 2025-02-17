@@ -71,8 +71,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
         }
 
-     
-		
 		return result;
 	
 	}
@@ -136,7 +134,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
     public com.smartvillage.core.model.bean.Outcome function delete(
-			required String combinationId
+			String combinationId,
+			String attributeId,
+			String fruitId
 		){
 
 		var outcome = super.bean("Outcome");

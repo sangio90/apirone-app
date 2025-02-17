@@ -74,6 +74,7 @@
 			fruits
 		*/
 		get( "/ajax/fruits/code-exists" ).to( "FruitAjaxController.codeExists" ).end();
+		post( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.addItem" ).end();
 		get( "/ajax/fruits/:id" ).to( "FruitAjaxController.get" ).end();
 		get( "/ajax/fruits" ).to( "FruitAjaxController.list" ).end();
 		post( "/ajax/fruits" ).to( "FruitAjaxController.save" ).end();
