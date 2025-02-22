@@ -386,7 +386,6 @@ class Fruit extends Rectangle {
 		const self = this;
 
 		self._$element.draggable({
-			// axis: "x", // TODO: rendere parametrico in base alla configurazione: "solo verticale", "solo orizontale", "entrambi"
 			containment: "#fruits",
 			distance: MIN_DISTANCE_BEFORE_DRAGGING,
 			// grid: [ATOMIC_WIDTH],
@@ -847,8 +846,8 @@ AP.plate.designer = (function () {
 	pub.init = function () {
 		PLATE_WIDTH = pageData.PLATE.WIDTH;
 		PLATE_HEIGHT = pageData.PLATE.HEIGHT;
-		FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH; // TODO: non devo usarla
-		FREE_CELL_HEIGHT = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT; // TODO: non devo usarla
+		FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
+		FREE_CELL_HEIGHT = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
 
 		if (pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].ORIENTATION == ORIENTATION.VERTICAL) {
 			const tmp = FREE_CELL_WIDTH;
