@@ -71,7 +71,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         param rc.categories = "";
 
-        var product = super.bean("Product");
+        var product = super.bean("RawProduct");
         var company = super.bean("Company");
         var status = super.bean("Status");
         var variantType = super.bean("VariantType");
@@ -80,7 +80,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var categories = [];
         
-        var service = super.service("Product");
+        var service = super.service("RawProduct");
         /*
         var variantSvc = super.service("ProductVariant");
         var priceSvc = super.service("Price");

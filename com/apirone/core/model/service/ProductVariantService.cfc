@@ -5,7 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="FileService" type="com.apirone.core.model.service.FileService";
 
-    public com.apirone.core.model.bean.ProductVariant function get(
+    public com.apirone.core.model.bean.RawProductVariant function get(
     		required String productVariantId
         ){
 		
@@ -31,7 +31,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create(
-            required com.apirone.core.model.bean.ProductVariant productVariant
+            required com.apirone.core.model.bean.RawProductVariant productVariant
 		){	
 		
 		transaction {
@@ -52,7 +52,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function update(
-            required com.apirone.core.model.bean.ProductVariant productVariant
+            required com.apirone.core.model.bean.RawProductVariant productVariant
 		){		
 
         transaction {
@@ -86,7 +86,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 	
     public com.apirone.core.model.bean.Result function list(
-		String productId,
+		String rawProductId,
 	) {
 		arguments["limit"] = -1;
 		return search(argumentCollection = arguments)
@@ -96,7 +96,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     public com.apirone.core.model.bean.Result function search(
 			required Numeric limit = 20,
 			required Numeric offset = 0,
-			String productId,
+			String rawProductId,
     	){
 
     	var result = super.getResult();
@@ -121,7 +121,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.ProductVariant function build(
+	private com.apirone.core.model.bean.RawProductVariant function build(
     		required String productVariantId
     	){
 
@@ -140,7 +140,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             productVariant.setId( record.variant_id.toString() );
 			productVariant.setName( record.variant );
             productVariant.setStatus( getStatusService().get( record.status_id ) );
-			productVariant.setProductId( record.product_id.toString() );
+			productVariant.setProductId( record.raw_product_id.toString() );
 			productVariant.setPrice( price );
 		
 			productVariant.setDescription( record.description );

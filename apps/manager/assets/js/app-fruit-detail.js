@@ -25,14 +25,13 @@ AP.fruit.detail = (function () {
 	var fields = AP.fields.fruit;
 
 	var componentApp = AP.component.list;
-	var attributeApp = AP.attribute.detail;
 
 	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/fruits" })
+		items: NM.kendo.dataSource({ url: "/manager/ajax/fruits/" + AP.page.fruitId + "/items" }),
 	};
 
 	var viewModel = kendo.observable({
-		rows: dataSources.items,
+		items: dataSources.items,
 		itemForAttributes: {
 			id: 0
 		},
@@ -82,18 +81,6 @@ AP.fruit.detail = (function () {
             return false;
 		},
 
-		save: function (event) {
-		},
-
-		new: function (event) {
-		},
-
-		edit: function (event) {
-		},
-
-        delete: function (event) {
-        },
-
 		searchAttributes: function (event) {
 
 			var thisForm = fields.attributeSearchForm;
@@ -111,7 +98,7 @@ AP.fruit.detail = (function () {
 
 			var element = $( event.currentTarget );
 
-			var itemId = element.attr("data-item-id");
+			var itemId = element.attr("data-parent-id");
 
 			viewModel.set( "itemForAttributes.id", itemId );
 
@@ -125,16 +112,14 @@ AP.fruit.detail = (function () {
 
 		selectAttribute: function (event) {
 
-			console.log("selectAttribute")
-
-			var item = viewModel.get("itemForAttributes");
-			var parentId = viewModel.get("itemForAttributes.id");
+			console.log( "selectAttribute:event", event );
 
 			NM.util.ajax({
 				method: "POST",
 				url: "/manager/ajax/fruits/" + AP.page.fruitId + "/items",
 				data: {
 					fruitId: AP.page.fruitId,
+					attributeId: event.data.id,
 					parentId: viewModel.get("itemForAttributes.id")
 				},
 				callback: {

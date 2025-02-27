@@ -4,7 +4,7 @@
 
 		setFullRewrites( true );
 
-		route( "/products/:productId/variants" )
+		route( "/products/:rawProductId/variants" )
 			.withAction( {
 				POST : "create",
 				PUT : "modify"
@@ -20,7 +20,7 @@
 			.toHandler( "ProductVariantController" );
 
 
-		route( "/products/:productId" )
+		route( "/products/:rawProductId" )
 			.withAction( {
 				GET : "get",
 				DELETE : "delete"

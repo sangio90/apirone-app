@@ -35,9 +35,9 @@ NM.util.openModal = function( ele ) {
 NM.util.ajax = function( setup ) {
 
 	var defaults = {
-		url: '',
+		url: "",
 		data: null,
-		method: 'GET',
+		method: "GET",
 		callback: {
 			done: undefined,
 			always: undefined,
@@ -50,9 +50,9 @@ NM.util.ajax = function( setup ) {
 	var settings = $.extend( true, defaults, setup );
 
 	if ( settings.hasOwnProperty( "cache" ) ) {
-		
+
 		settings.cache = settings.cache;
-		
+
 		if ( !settings.cache ) {
 			settings.headers = {
 				"cache-control": "no-cache"
@@ -61,13 +61,13 @@ NM.util.ajax = function( setup ) {
 	}
 
 	var data = 
-		$.ajax( { 
+		$.ajax( {
 			url: settings.url, 
 			method: settings.method,
 			data: settings.data
 		} )
 		.done( function( xhr ) {
-			
+
 			if ( xhr.error === undefined ) { // dal proxy
 				if ( settings.callback.done !== undefined ) {
 					settings.callback.done.apply( null, [ xhr ] );
@@ -75,7 +75,7 @@ NM.util.ajax = function( setup ) {
 			} else {
 				location.href = '/';
 			}
-			
+
 		} )
 		.fail( settings.callback.fail )
 		.always( settings.callback.always );

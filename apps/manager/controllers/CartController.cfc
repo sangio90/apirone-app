@@ -50,7 +50,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var item = super.bean('CartItem');
 
         var variant = variantSvc.get( rc.variantId );
-        var product = productSvc.get( rc.productId );
+        var product = productSvc.get( rc.rawProductId );
 
         item.setVariant( variant );
         item.setProduct( product );

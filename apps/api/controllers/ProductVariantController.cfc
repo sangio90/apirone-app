@@ -40,16 +40,16 @@ component extends="com.apirone.core.controller.AbsController" {
         
         var result = super.getResult();
 
-        var product = super.service('Product').get( rc.productId );
+        var product = super.service('Product').get( rc.rawProductId );
 
         var prevVariants = !isNull( product.getVariants() ) ? product.getVariants() : [];
         prevVariants.push( productVariant );
         product.setVariants( prevVariants );
 
-        var productId = super.service("Product")
+        var rawProductId = super.service("RawProduct")
                                 .update(  product );
 
-        result.setData( {'productId': productId} )
+        result.setData( {'rawProductId': rawProductId} )
        
         event
             .getResponse()
@@ -73,7 +73,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var result = super.getResult();
 
-        var product = super.service('Product').get( rc.productId );
+        var product = super.service('Product').get( rc.rawProductId );
         var prevVariants = !isNull( product.getVariants() ) ? product.getVariants() : [];
     
         product.setVariants( prevVariants.map( (variant ) => {
@@ -83,10 +83,10 @@ component extends="com.apirone.core.controller.AbsController" {
             return variant
         })) 
 
-        var productId = super.service("Product")
+        var rawProductId = super.service("RawProduct")
                                 .update(  product );
 
-        result.setData( {'productId': productId} )
+        result.setData( {'rawProductId': rawProductId} )
        
         event
             .getResponse()
@@ -99,7 +99,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var result = super.getResult();
 
-        var productId = super.service("Product")
+        var rawProductId = super.service("RawProduct")
                                 .delete( rc.productVariantId );
 
         result.setData( {'DeletedVariantId': rc.productVariantId} )

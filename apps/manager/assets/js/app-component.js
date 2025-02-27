@@ -252,28 +252,21 @@ AP.component.list = (function () {
 			};
 
             var params = thisForm.serializeJSON();
-			
+
 			var dataSource = NM.kendo.dataSource({ 
-				url: "/manager/ajax/products", 
-				params: params, 
+				url: "/manager/ajax/raw-products",
+				params: params,
 				requestEnd: requestEnd, 
 				requestStart: requestStart
 			});
 
 			viewModel.set( "components", dataSource );
-			
+
             return false;
 
 		},
 
 		save: function (event) {
-
-			var thisForm = $("#component-list-selected-form");
-			var status = $("#status-selected");
-
-            //var params = thisForm.serializeJSON();
-
-			var current = viewModel.get("currentItem");
 
 			NM.util.ajax({
 				method: "POST",
@@ -284,9 +277,8 @@ AP.component.list = (function () {
 
 						if(xhr.status == "SUCCESS") {
 
-							console.log("save:SUCCESS")
+							console.log("save:SUCCESS");
 
-							//viewModel.set("components", xhr.data);
 							AP.widget.autoClearMessage( "status-selected", "<span class='green'>Configurazione salvata</span>" );
 						}
 

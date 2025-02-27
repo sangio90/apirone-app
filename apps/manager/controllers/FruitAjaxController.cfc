@@ -132,38 +132,36 @@ component extends="com.apirone.core.controller.AbsController" {
 
         param rc.id = '_';          //Current fruit
         param rc.parentId = 0;      //Parent item, if exists
-        param rc.attributeId = 0;   //To add values ​​to this attribute
-
+        param rc.attributeId = 0;   //To add items ​​to this attribute
 
         ```
-
         <cftransaction>
         
             <cfquery datasource="apirone">
-                DELETE FROM combination_items
+                DELETE FROM product_items
                 WHERE 
-                    combination_id = '#rc.id#'
+                    fruit_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
                     AND attribute_value_id IN 
                         ( 
                             SELECT attribute_value_id 
                             FROM attribute_values 
-                            WHERE attribute_id = '#rc.attributeId#'
+                            WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#rc.attributeId#">::uuid
                         )
             </cfquery>
 
             <cfloop array="#attribute.getValues()#" item="item">
 
                 <cfquery datasource="apirone">
-                    INSERT INTO combination_items (
-                        combination_id,
+                    INSERT INTO product_items (
+                        fruit_id,
                         attribute_value_id,
                         orderby,
                         parent_id
                     )
                     VALUES (
-                        '#rc.id#',
-                        '#item.getId()#',
-                        #item.getOrderBy()#,
+                        <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid,
+                        <cfqueryparam cfsqltype="Integer" value="#item.getId()#">,
+                        <cfqueryparam cfsqltype="Integer" value="#item.getOrderBy()#">,
                         #( Val(rc.parentId) ? rc.parentId : 'NULL' )#
                     )
                 </cfquery>
@@ -174,7 +172,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         ```
 
-        var message = completeMessage( "combination.itemsAdded" );
+        var message = completeMessage( "fruit.itemsAdded" );
 
         result.setData( { "message" = message } );
 
@@ -192,8 +190,8 @@ component extends="com.apirone.core.controller.AbsController" {
         ```
         <!--- TODO: better than this --->
         <cfquery datasource="apirone">
-            DELETE FROM combination_items
-            WHERE combination_item_id IN ( #rc.items# )
+            DELETE FROM product_items
+            WHERE product_item_id IN ( #rc.items# )
         </cfquery>
 
         ```
@@ -201,6 +199,31 @@ component extends="com.apirone.core.controller.AbsController" {
         var message = completeMessage( "combination.itemsDeleted" );
 
         result.setData( { "message" = message } );
+
+        event.setValue("result", result);
+
+    }
+
+    function listItems( event, rc, prc ){
+
+        var data = [];
+        var result = super.getResult();
+
+        var  items = super.fire("ProductItem.getTree", { combinationId = rc.id } );
+
+        for( var item in items ) {
+
+            var row = super.getDataMapper().convert( item, "ProductItem", true );
+
+            row["level"] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
+
+            data.add( row );
+
+        }
+
+        result.setTotal( data.len() );
+        result.setCount( data.len() );
+        result.setData( data );
 
         event.setValue("result", result);
 

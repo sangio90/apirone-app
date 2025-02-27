@@ -15,7 +15,7 @@ component extends="com.apirone.core.controller.AbsController" {
         }
 
         if( rc.by == "combination-items" ) {
-            var params = { combinationItemId = rc.id }
+            var params = { roductItemId = rc.id }
             var config = getConfiguration().get("imagesConfig")[ "combinationItem" ];
         }
 

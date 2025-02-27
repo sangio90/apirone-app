@@ -5,11 +5,11 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var  items = super.fire("CombinationItem.getTree", { combinationId = rc.id } );
+        var  items = super.fire("ProductItem.getTree", { combinationId = rc.id } );
 
         for( var item in items ) {
 
-            var row = super.getDataMapper().convert( item, "CombinationItem", true );
+            var row = super.getDataMapper().convert( item, "ProductItem", true );
 
             row["level"] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
 
@@ -34,13 +34,11 @@ component extends="com.apirone.core.controller.AbsController" {
         param rc.parentId = 0;      //Parent item, if exists
         param rc.attributeId = 0;   //To add values ​​to this attribute
 
-
         ```
-
         <cftransaction>
         
             <cfquery datasource="apirone">
-                DELETE FROM combination_items
+                DELETE FROM product_items
                 WHERE 
                     combination_id = '#rc.id#'
                     AND attribute_value_id IN 
@@ -54,7 +52,7 @@ component extends="com.apirone.core.controller.AbsController" {
             <cfloop array="#attribute.getValues()#" item="item">
 
                 <cfquery datasource="apirone">
-                    INSERT INTO combination_items (
+                    INSERT INTO product_items (
                         combination_id,
                         attribute_value_id,
                         orderby,
@@ -92,8 +90,8 @@ component extends="com.apirone.core.controller.AbsController" {
         ```
         <!--- TODO: better than this --->
         <cfquery datasource="apirone">
-            DELETE FROM combination_items
-            WHERE combination_item_id IN ( #rc.items# )
+            DELETE FROM product_items
+            WHERE product_item_id IN ( #rc.items# )
         </cfquery>
 
         ```

@@ -2,8 +2,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function get( event, rc, prc ){
         
-        var record = super.service("Product")
-                            .get( rc.productId );
+        var record = super.service("RawProduct")
+                            .get( rc.rawProductId );
 
         var result = super.getResult();
 
@@ -30,7 +30,7 @@ component extends="com.apirone.core.controller.AbsController" {
             'offset': url.limit * (url.page - 1)
         };
         
-        var rows = super.service("Product")
+        var rows = super.service("RawProduct")
                             .search(argumentCollection = arguments);
 
         var result = super.getResult();
@@ -57,10 +57,10 @@ component extends="com.apirone.core.controller.AbsController" {
             return;
         }
         
-        var productId = super.service("Product")
+        var rawProductId = super.service("RawProduct")
                                 .create(  product );
 
-        result.setData( {'productId': productId} )
+        result.setData( {'rawProductId': rawProductId} )
        
         event
             .getResponse()
@@ -83,11 +83,11 @@ component extends="com.apirone.core.controller.AbsController" {
         
         }
         
-        var productId = super.service("Product")
+        var rawProductId = super.service("RawProduct")
                                 .update( product );
 
         var result = super.getResult();
-        result.setData( {'productId': productId} )
+        result.setData( {'rawProductId': rawProductId} )
         
         event
             .getResponse()
@@ -97,11 +97,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function delete( event, rc, prc ) {
         
-        super.service("Product")
-                    .delete( rc.productId );
+        super.service("RawProduct")
+                    .delete( rc.rawProductId );
 
         var result = super.getResult();
-        result.setData( {'deletedProductId': rc.productId} )
+        result.setData( {'deletedProductId': rc.rawProductId} )
         
         event
             .getResponse()
@@ -109,7 +109,7 @@ component extends="com.apirone.core.controller.AbsController" {
     }
 
     private function validateJson(
-        required com.apirone.core.model.bean.Product product
+        required com.apirone.core.model.bean.RawProduct product
     ) {
 
         var validation = Validate( 

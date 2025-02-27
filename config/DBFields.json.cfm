@@ -86,7 +86,7 @@
     },
 
     "combinationItem.id": {
-        "name": "combination_item_id",
+        "name": "product_item_id",
         "type": "Integer"
     },
 

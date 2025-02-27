@@ -5,7 +5,7 @@
 		<cfargument name="documentItemId" type="String" required="true">
 
 		<!----
-			I need of product_id too
+			I need of raw_product_id too
 		---->
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -48,7 +48,7 @@
 
 	<cffunction name="update" returntype="String">
 
-		<cfargument name="document" type="com.apirone.core.model.bean.Product" required="true">
+		<cfargument name="document" type="com.apirone.core.model.bean.RawProduct" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			

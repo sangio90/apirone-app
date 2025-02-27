@@ -22,7 +22,7 @@
 		<cfargument name="lineId" type="String">
 		<cfargument name="sizeId" type="String">
 		<cfargument name="combinationId" type="String">
-		<cfargument name="combinationItemId" type="Numeric">
+		<cfargument name="roductItemId" type="Numeric">
 		<cfargument name="fruitId" type="String">
 		<cfargument name="fruitCombinationitemId" type="String">
 
@@ -38,16 +38,16 @@
             	components
 			WHERE 1=1
 			
-			<cfif !isNull( arguments.combinationItemId )>
-				AND combination_item_id = <cfqueryparam value="#arguments.combinationItemId#" cfsqltype="Integer">
+			<cfif !isNull( arguments.roductItemId )>
+				AND product_item_id = <cfqueryparam value="#arguments.roductItemId#" cfsqltype="Integer">
 			</cfif>
 
 			<cfif !isNull( arguments.fruitId )>
 				AND fruit_id = <cfqueryparam value="#arguments.fruitId#" cfsqltype="Varchar">::uuid
 			</cfif>
 
-			<cfif !isNull( arguments.fruitCombinationItemId )>
-				AND fruit_combination_item_id = <cfqueryparam value="#arguments.fruitCombinationItemId#" cfsqltype="Integer">
+			<cfif !isNull( arguments.fruitProductItemId )>
+				AND fruit_product_item_id = <cfqueryparam value="#arguments.fruitProductItemId#" cfsqltype="Integer">
 			</cfif>
 
 			<cfif !isNull( arguments.combinationId )>
@@ -84,7 +84,7 @@
 			DELETE FROM 
 				components
 			WHERE 1=1
-				AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getProduct().getId()#">
+				AND raw_product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getProduct().getId()#">
 				AND variant_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">
 				AND color_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getColor().getId()#">
 				AND
@@ -94,8 +94,8 @@
 					AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getSize().getId()#">::uuid
 				</cfif>
 
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombinationItem" )>
-					combination_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.component.getCombinationItem().getId()#">
+				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentProductItem" )>
+					product_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.component.getProductItem().getId()#">
 				</cfif>
 
 				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombination" )>
@@ -117,7 +117,7 @@
 
         <cfquery name="local.q" datasource="apirone">
 			INSERT INTO components (
-				product_id,
+				raw_product_id,
 				color_id,
 				variant_id,
 				quantity,
@@ -127,8 +127,8 @@
 					size_id
 				</cfif>
 
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombinationItem" )>
-					combination_item_id
+				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentProductItem" )>
+					product_item_id
 				</cfif>
 
 				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombination" )>
@@ -151,8 +151,8 @@
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getSize().getId()#">::uuid
 				</cfif>
 
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombinationItem" )>
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.component.getCombinationItem().getId()#">
+				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentProductItem" )>
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.component.getProductItem().getId()#">
 				</cfif>
 
 				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombination" )>

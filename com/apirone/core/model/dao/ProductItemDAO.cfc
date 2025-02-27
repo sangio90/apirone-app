@@ -2,16 +2,16 @@
 
 	<cffunction name="read" returntype="Query">
 
-		<cfargument name="combinationItemId" type="String" required="true">
+		<cfargument name="roductItemId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT 
                 combination_id::varchar, 
                 *
 			FROM
-				combination_items
+				product_items
 			WHERE
-				combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
+				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.roductItemId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -26,9 +26,9 @@
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT 
-                combination_item_id, parent_id
+                product_item_id, parent_id
 			FROM
-				combination_items
+				product_items
 			WHERE 1=1
                 
                 <cfif IsNull( arguments.parentId ) >
@@ -52,20 +52,20 @@
     
 	<cffunction name="insert" returntype="String">
 
-		<cfargument name="combinationItem" type="com.apirone.core.model.bean.CombinationItem" required="true">
+		<cfargument name="combinationItem" type="com.apirone.core.model.bean.ProductItem" required="true">
 
         <cfquery name="local.q" datasource="apirone">
-			INSERT INTO combination_items (
+			INSERT INTO product_items (
                 attribute_value_id,
                 combination_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationItem.getAttributeValue().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationItem.getCombinationId()#">
-			) RETURNING combination_item_id
+			) RETURNING product_item_id
 		</cfquery>
 
-		<cfreturn local.q.combination_item_id>
+		<cfreturn local.q.product_item_id>
 
 	</cffunction>
 
@@ -75,12 +75,12 @@
         <cfargument name="fruitId" type="String">
         <cfargument name="attributeId" type="String">
         <cfargument name="combinationId" type="String">
-        <cfargument name="combinationItemId" type="String">
+        <cfargument name="roductItemId" type="String">
 
-		<cfif IsNull( arguments.combinationItemId )
+		<cfif IsNull( arguments.roductItemId )
 			AND IsNull( arguments.combinationId )
 			AND IsNull( arguments.attributeId )
-			AND IsNull( arguments.combinationItemId )
+			AND IsNull( arguments.roductItemId )
 			AND IsNull( arguments.fruitId )>
 
 			<cfthrow type="ApirOne.errors.NoArgumentsPassed" message="At least one parameter is required to delete">
@@ -89,11 +89,11 @@
 
 		<cfquery datasource="apirone">
 			DELETE 
-			FROM combination_items
+			FROM product_items
 			WHERE 1=1
 				
-				<cfif !IsNull( arguments.combinationItemId )>
-					AND combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
+				<cfif !IsNull( arguments.roductItemId )>
+					AND product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.roductItemId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.combinationId )>
@@ -112,9 +112,9 @@
 		<!---
         <cfquery name="local.q" datasource="apirone">
 			DELETE 
-            FROM combination_items 
+            FROM product_items 
             WHERE
-                combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
+                product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.roductItemId#">
 		</cfquery>
 		---->
 
@@ -125,12 +125,12 @@
 
 	<cffunction name="deleteComponents" returntype="Boolean">
 
-		<cfargument name="combinationItemId" type="Numeric" required="true">
+		<cfargument name="roductItemId" type="Numeric" required="true">
 
         <cfquery name="local.q" datasource="apirone">
 			DELETE FROM components 
 			WHERE
-				combination_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.combinationItemId#">
+				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.roductItemId#">
 		</cfquery>
 
 		<cfreturn true>

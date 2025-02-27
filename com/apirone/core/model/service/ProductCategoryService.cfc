@@ -62,7 +62,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     public com.apirone.core.model.bean.ProductCategory[] function list(
 			required Array orderBy = [ { field='ProductCategory.code' } ],
 					 String str,
-					 String productId
+					 String rawProductId
 		){
 
 		arguments["limit"] = -1;
@@ -111,11 +111,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		){		
 	
 		if ( !Len( arguments.ProductCategory.getCode() ) ) {
-			throw( type="apirone.errors.createProductCategory.codeNotProvided", message="Code required" );
+			throw( type="apirone.errors.updateProductCategory.codeNotProvided", message="Code required" );
 		};
 	
 		if ( !Len( arguments.ProductCategory.getTexts() ) ) {
-			throw( type="apirone.errors.createLineTexts.noTexsProvided", message="At least one description required" );
+			throw( type="apirone.errors.updateProductCategory.noTexsProvided", message="At least one description required" );
 		};		
 	
 		var cm = getCacheManager();

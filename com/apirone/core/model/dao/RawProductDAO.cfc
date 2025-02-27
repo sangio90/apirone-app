@@ -2,7 +2,7 @@
 
 	<cffunction name="read">
 
-		<cfargument name="productId" type="String" required="true">
+		<cfargument name="rawProductId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="verticale">
 
@@ -17,7 +17,7 @@
 			FROM
 				#variables.companyId#_artico a
 			WHERE
-				arcodart = <cfqueryparam cfsqltype="varchar" value="#arguments.productId#">
+				arcodart = <cfqueryparam cfsqltype="varchar" value="#arguments.rawProductId#">
 		</cfquery>
 
 		<cfreturn local.q>

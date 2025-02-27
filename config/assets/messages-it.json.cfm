@@ -16,6 +16,11 @@
         "itemsAdded": "Attributi aggiunti con successo"
     },
 
+    "fruit": {
+        "itemsDeleted": "Ho cancellato tutti gli attributi",
+        "itemsAdded": "Attributi aggiunti con successo"
+    },
+
     "line": {
         "deletedAllRecords": "Valori cancellati",
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
@@ -46,7 +51,7 @@
     "login": {
     },
 
-   "my": {
+    "my": {
         "currentPasswordNotMatch": "La password corrente non è corretta. Riprova",
         "passwordChanged": "Password modificata con successo"
     }

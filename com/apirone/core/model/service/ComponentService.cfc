@@ -38,7 +38,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	String lineId,
     	String sizeId,
     	String combinationId,
-    	Numeric combinationItemId
+    	Numeric roductItemId
     ) {
 		arguments["limit"] = -1;
 		
@@ -158,7 +158,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.component_id );
 
-			bean.setProduct( getProductService().get( record.product_id ) );
+			bean.setProduct( getProductService().get( record.raw_product_id ) );
 			bean.setVariant( getVariantService().get( record.variant_id ) );
 			bean.setColor( getColorService().get( record.color_id ) );
 

@@ -1,18 +1,18 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.CombinationItemDAO";
+	property name="dao" type="com.apirone.core.model.dao.ProductItemDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
 	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 	property name="combinationComponentService" type="com.apirone.core.model.service.CombinationComponentService";
 
-    public com.apirone.core.model.bean.CombinationItem function get(
-    		required String combinationItemId
+    public com.apirone.core.model.bean.ProductItem function get(
+    		required String productItemId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.combinationItemId );
+    	var key = getCacheKey( arguments.productItemId );
 
 	   	var cache = cm.get( key ) ;
 
@@ -22,16 +22,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    } 
 	    
-		var bean = build( arguments.combinationItemId );
+		var bean = build( arguments.productItemId );
 		cm.put( key, bean );
         
 		return bean;
 
 	}
 
-	public com.apirone.core.model.bean.CombinationItem[] function getTree(
+	public com.apirone.core.model.bean.ProductItem[] function getTree(
             required String combinationId,
-            required Numeric parentId=NullValue(), 
+            required Numeric parentId=NullValue(),
             required String level=1, 
             required String orderBy=""
     ) {
@@ -54,13 +54,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             var thisOrderBy = "#arguments.orderBy#.#n#";
 
             item.setLevel( arguments.level );
-            //item.setOrderBy( thisOrderBy );
 
             result.add( item );
-
-
-            //abort;
-
+			
             var rows = getTree( combinationId, item.getId(), thisLevel+1, thisOrderBy );
 
             cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# - [ combId:#combinationId#, itemId:#item.getId()#, level:#thisLevel+1#, itemLen:#items.len()#, orderBy:#thisOrderBy# ] #rows.len()#");
@@ -76,7 +72,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public com.apirone.core.model.bean.CombinationItem[] function list(
+	public com.apirone.core.model.bean.ProductItem[] function list(
         required String combinationId
     ) {
 		arguments["limit"] = -1;
@@ -87,17 +83,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
     public com.apirone.core.model.bean.CombinationComponent[] function listComponents(
-            required Numeric combinationItemId,
+            required Numeric productItemId,
         ){
 
-		var result = getCombinationComponentService().list( combinationItemId = combinationItemId );
+		var result = getCombinationComponentService().list( productItemId = productItemId );
 
         return result;
 
     }
 
     public Boolean function addComponent(
-            required Numeric combinationItemId,
+            required Numeric productItemId,
             required com.apirone.core.model.bean.CombinationComponent combinationComponent
         ){
 
@@ -121,7 +117,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		records.each(function(record) {
 			rows.add( 
-                get( record.combination_item_id ) 
+                get( record.product_item_id ) 
             );
 		});
 
@@ -171,7 +167,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create(
-			required com.apirone.core.model.bean.CombinationItem combinationItem
+			required com.apirone.core.model.bean.ProductItem combinationItem
 		){
 
 		var newId = getDao().insert( arguments.combinationItem );
@@ -186,17 +182,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.CombinationItem function build(
-    		required String combinationItemId
+	private com.apirone.core.model.bean.ProductItem function build(
+    		required String productItemId
     	){
 
-	    var record = getDao().read( arguments.combinationItemId );
+	    var record = getDao().read( arguments.productItemId );
 
 	    if( record.recordCount ) { 
 
-            var bean = super.bean( "CombinationItem" );
+            var bean = super.bean( "ProductItem" );
 
-            bean.setId( record.combination_item_id );
+            bean.setId( record.product_item_id );
             bean.setCombinationId( record.combination_id );
 			bean.setCreatedAt( record.created_at );
 			bean.setParent( get( record.parent_id ) );

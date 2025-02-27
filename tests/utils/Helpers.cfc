@@ -161,7 +161,7 @@ component extends="testbox.system.BaseSpec"{
         raw.variants = variants;
         //raw.company = company.raw;
 
-        var bean = factory.createInstance( "Product", raw );
+        var bean = factory.createInstance( "RawProduct", raw );
 
         return  {
             "obj" = bean,

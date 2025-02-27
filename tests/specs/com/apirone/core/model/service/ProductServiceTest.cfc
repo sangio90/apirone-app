@@ -3,7 +3,7 @@ component extends="testbox.system.BaseSpec"{
     function setup(){
 
         variables.wirebox = new wirebox.system.ioc.Injector( "config.WireboxServices" );
-        variables.svc = variables.wirebox.getInstance( "ProductService" );
+        variables.svc = variables.wirebox.getInstance( "RawProductService" );
         variables.variantTypeSvc = variables.wirebox.getInstance( "VariantTypeService" );
         variables.productCategorySvc = variables.wirebox.getInstance( "ProductCategoryService" );
         var cm = variables.wirebox.getInstance( "CacheManager" );
@@ -151,9 +151,9 @@ component extends="testbox.system.BaseSpec"{
 
         createProduct.setVariantType( variantType );
 
-        var productId = variables.svc.create( createProduct );
+        var rawProductId = variables.svc.create( createProduct );
 
-        var product = variables.svc.get(productId);
+        var product = variables.svc.get(rawProductId);
 
         var exists = variables.svc.codeExists(product.getCode() );
         $assert.isTrue(  exists EQ true, "" ); 
@@ -162,7 +162,7 @@ component extends="testbox.system.BaseSpec"{
         $assert.isTrue(  existsWithId EQ false, "" ); 
 
 
-        variables.svc.delete( productId );
+        variables.svc.delete( rawProductId );
         
         var exists = variables.svc.codeExists(product.getCode() );
         $assert.isTrue(  exists EQ false, "" ); 

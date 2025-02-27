@@ -74,7 +74,6 @@ AP.combination.list = (function () {
 
 		itemForAttributes: undefined,
 
-		//images: NM.kendo.dataSource(),
 		images: undefined,
 		currentImageEntity: undefined,
 		currentUploadUrl: undefined,
@@ -97,8 +96,6 @@ AP.combination.list = (function () {
 			if( event.uri != "" ) {
 				var replaced = uri.replace("_ori", "500");
 
-				console.log("getImageUri:event.uri:replaced", replaced);
-				
 				return replaced;
 			}
 
@@ -109,14 +106,10 @@ AP.combination.list = (function () {
 
 			var uri = event.uri;
 
-			console.log("getImageUri:event.uri", event.uri);
-
 			if( event.uri != "" ) {
 				console.log("event.uri", event.uri);
 				return uri;
 			}
-
-			console.log("getImageUri:event.uri", "vuoto");
 
 			// TODO: not work with target=_blank
 			return "javascript:void(0)";

@@ -37,7 +37,7 @@
 		/*
 			products
 		*/
-		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
+		get( "/ajax/raw-products" ).to( "RawProductAjaxController.list" ).end();
 
 
 		/*
@@ -75,6 +75,7 @@
 		*/
 		get( "/ajax/fruits/code-exists" ).to( "FruitAjaxController.codeExists" ).end();
 		post( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.addItem" ).end();
+		get( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.listItems" ).end();
 		get( "/ajax/fruits/:id" ).to( "FruitAjaxController.get" ).end();
 		get( "/ajax/fruits" ).to( "FruitAjaxController.list" ).end();
 		post( "/ajax/fruits" ).to( "FruitAjaxController.save" ).end();

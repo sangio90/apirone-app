@@ -15,7 +15,7 @@ component extends="com.apirone.core.controller.AbsController" {
                 break;
 
             case "item":
-                params = { combinationItemId = rc.itemId };
+                params = { roductItemId = rc.itemId };
                 break;
                 
             case "lineSize":
@@ -27,7 +27,7 @@ component extends="com.apirone.core.controller.AbsController" {
                 break;
 
             case "fruitItem":
-                params = { fruitCombinationItemId = rc.itemId };
+                params = { fruitProductItemId = rc.itemId };
                 break;
 
             default: 
@@ -41,7 +41,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
             var row = {
                 "quantity" = item.getQuantity(),
-                "product" = {
+                "rawProduct" = {
                     "id" = item.getProduct().getId(),
                     "name" = item.getProduct().getName(),
                     "processingType" = {
@@ -89,10 +89,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
             case "item":
 
-                var component = super.bean("ComponentCombinationItem");
-                var item = super.bean("CombinationItem");
+                var component = super.bean("ComponentProductItem");
+                var item = super.bean("ProductItem");
 
-                component.setCombinationItem( item.setId( rc.itemId ) );
+                component.setProductItem( item.setId( rc.itemId ) );
 
                 break;
                 
@@ -117,7 +117,7 @@ component extends="com.apirone.core.controller.AbsController" {
                 break;
 
             case "fruitItem":
-                params = { fruitCombinationItemId = rc.itemId };
+                params = { fruitProductItemId = rc.itemId };
                 break;
 
             default: 
@@ -128,7 +128,7 @@ component extends="com.apirone.core.controller.AbsController" {
         for( var thisComponent in components ) {
 
             var color   = super.bean("Color");
-            var product = super.bean("Product");
+            var product = super.bean("RawProduct");
             var variant = super.bean("Variant");
 
             variant.setId( thisComponent.variant.id )

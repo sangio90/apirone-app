@@ -37,7 +37,7 @@
 
 	<cffunction name="update" returntype="String">
 
-		<cfargument name="document" type="com.apirone.core.model.bean.Product" required="true">
+		<cfargument name="document" type="com.apirone.core.model.bean.RawProduct" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			

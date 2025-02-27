@@ -20,7 +20,7 @@
 
 	<cffunction name="insert" returntype="String">
 
-		<cfargument name="bean" type="com.apirone.core.model.bean.ProductionTime" required="true">
+		<cfargument name="bean" type="com.apirone.core.model.bean.RawProductionTime" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 
@@ -41,7 +41,7 @@
 
 	<cffunction name="update" returntype="String">
 
-		<cfargument name="bean" type="com.apirone.core.model.bean.ProductionTime" required="true">
+		<cfargument name="bean" type="com.apirone.core.model.bean.RawProductionTime" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE production_times 

@@ -17,10 +17,6 @@
                         
                         <div class="col-md-12">
 
-                            <!--- 
-                                data-bind="visible: showItems" 
-                                TODO: add this. remove from above menu 
-                            ---->
                             <div >
 
                                 <div class="row d-flex align-items-center mb-2">
@@ -121,15 +117,6 @@
                                 </form>
 
                             </div>
-
-                            <!---
-                            <div class="py-3" data-bind="invisible: showItems" style="display:none">
-                                <hr class="mb-5">
-                                <p class="text-center pt-3">
-                                    Nessuna configurazione presente
-                                </p>
-                            </div>
-                            ---->
 
                         </div>
     
