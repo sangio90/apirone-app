@@ -7,6 +7,7 @@ AP.plate.fields = {
 $(document).ready(function () {
 	if (AP.plate.fields.designerRoot.length) {
 		AP.plate.designer.init();
+		AP.plate.designer.run();
 	}
 });
 
@@ -31,30 +32,108 @@ const CELL_TYPE = {
 	"0": "PROHIBITED",
 };
 
+const MOVE_DIRECTION = {
+	STILL: 0,
+	LEFT: 1,
+	RIGHT: 2,
+	TOP: 4,
+	BOTTOM: 8,
+};
+
 const utils = {
-	convertAbsolutePosition(position) {
-		return {
-			row: Math.round(position.top / FREE_CELL_HEIGHT),
-			column: Math.round(position.left / FREE_CELL_WIDTH),
+	convertAbsolutePositionToGridPosition(ui, fruitPosition) {
+		let newPositionDirection = MOVE_DIRECTION.STILL;
+		const deltaLeft = Math.sign(ui.position.left - ui.originalPosition.left);
+		if (deltaLeft > 0) {
+			newPositionDirection = MOVE_DIRECTION.RIGHT;
+		} else if (deltaLeft < 0) {
+			newPositionDirection = MOVE_DIRECTION.LEFT;
+		}
+
+		const deltaTop = Math.sign(ui.position.top - ui.originalPosition.top);
+		if (deltaTop > 0) {
+			newPositionDirection |= MOVE_DIRECTION.BOTTOM;
+		} else if (deltaTop < 0) {
+			newPositionDirection |= MOVE_DIRECTION.TOP;
+		}
+
+		const fruitsController = AP.plate.designer.fruitsController;
+		const grid = fruitsController.plate.grid;
+
+		const result = {
+			row: null,
+			column: null,
 		};
+
+		for (let row = 0; row < grid.length; row++) {
+			for (let column = 0; column < grid[row].length; column++) {
+				let cell = grid[row][column];
+
+				if ((newPositionDirection & MOVE_DIRECTION.RIGHT) == MOVE_DIRECTION.RIGHT) {
+					if (cell.left <= fruitPosition.right && fruitPosition.right <= cell.right) {
+						const fruitWidth = Math.abs(fruitPosition.left - fruitPosition.right);
+
+						result.column = (column - (fruitWidth / FREE_CELL_WIDTH)) + 1;
+					}
+				} else { // MOVE_DIRECTION.LEFT
+					if (cell.left <= fruitPosition.left && fruitPosition.left <= cell.right) {
+						result.column = column;
+					}
+				}
+
+				if ((newPositionDirection & MOVE_DIRECTION.BOTTOM) == MOVE_DIRECTION.BOTTOM) {
+					if (cell.top <= fruitPosition.bottom && fruitPosition.bottom <= cell.bottom) {
+						result.row = row;
+					}
+				} else { // MOVE_DIRECTION.TOP
+					if (cell.top <= fruitPosition.top && fruitPosition.top <= cell.bottom) {
+						result.row = row;
+					}
+				}
+			}
+		}
+
+		return result;
+	},
+	doRectanglesCollide(rectA, rectB) {
+		let result = true;
+
+		if (
+			rectA.right <= rectB.left
+			|| rectA.left >= rectB.right
+			|| rectA.bottom <= rectB.top
+			|| rectA.top >= rectB.bottom
+		) {
+			result = false;
+		}
+
+		return result;
+	},
+	extractTopLeftPositionFrom(gridPosition) {
+		const fruitsController = AP.plate.designer.fruitsController;
+		const grid = fruitsController.plate.grid;
+
+		const result = {
+			top: null,
+			left: null,
+		};
+
+		const cell = grid[gridPosition.row][gridPosition.column];
+
+		result.top = cell.top;
+		result.left = cell.left;
+
+		return result;
 	},
 };
 
-class FruitPosition {
+class FruitGridPosition {
 	constructor(
 		row,
 		column,
 	) {
 		this.row = row;
 		this.column = column;
-	}
-
-	getTop() {
-		return this.row * FREE_CELL_HEIGHT;
-	}
-
-	getLeft() {
-		return this.column * FREE_CELL_WIDTH;
 	}
 }
 
@@ -67,6 +146,49 @@ class Rectangle {
 		this.orientation = orientation;
 		this.width = orientation == ORIENTATION.VERTICAL ? height : width;
 		this.height = orientation == ORIENTATION.VERTICAL ? width : height;
+
+		this._$element = null;
+
+		this._top = null;
+		this._bottom = null;
+		this._left = null;
+		this._right = null;
+	}
+
+	get $element() {
+		return this._$element;
+	}
+
+	set $element(value) {
+		this._$element = value;
+	}
+
+	get top() {
+		return this._top;
+	}
+
+	set top(value) {
+		this._top = value;
+
+		this._bottom = this._top + this.height;
+	}
+
+	get bottom() {
+		return this._bottom;
+	}
+
+	get left() {
+		return this._left;
+	}
+
+	set left(value) {
+		this._left = value;
+
+		this._right = this._left + this.width;
+	}
+
+	get right() {
+		return this._right;
 	}
 
 	isSquare() {
@@ -75,14 +197,14 @@ class Rectangle {
 }
 
 class Plate extends Rectangle {
-	constructor(parameters) {
-		super(parameters.width, parameters.height, parameters.orientation);
+	constructor(args) {
+		super(args.width, args.height, args.orientation);
 
-		this.uuid = parameters.uuid;
-		this.code = parameters.code;
-		this.img = parameters.img;
-		this.grid = parameters.grid;
-		this.isSpecial = parameters.isSpecial;
+		this.uuid = args.uuid;
+		this.code = args.code;
+		this.img = args.img;
+		this.grid = args.grid;
+		this.isSpecial = args.isSpecial;
 	}
 
 	/**
@@ -98,6 +220,11 @@ class Plate extends Rectangle {
 			},
 			"appendTo": $rootNode
 		});
+
+		const platePosition = $plateBackground.position();
+
+		this.top = platePosition.top;
+		this.left = platePosition.left;
 
 		const $plateLayers = $("<div/>", {
 			"id": "plate-layers",
@@ -132,7 +259,9 @@ class Plate extends Rectangle {
 			const cells = [];
 
 			for (let j = 0; j < this.grid.length; j++) {
-				cells.push(this.grid[j][i]);
+				const cell = this.grid[j][i];
+
+				cells.push(cell);
 			}
 
 			const minCellWidth = Math.min(...cells.map(x => x.width));
@@ -164,6 +293,8 @@ class Plate extends Rectangle {
 					"appendTo": $plateGrid,
 				});
 
+				cell.$element = $plateCell;
+
 				if (cell.type != CELL_TYPE.PROHIBITED) {
 					const $cellLabel = $("<span/>", {
 						"text": `(${x}, ${y})`,
@@ -174,6 +305,14 @@ class Plate extends Rectangle {
 						"appendTo": $plateCell,
 					});
 				}
+
+				cell.height = gridTemplateRows[y - 1];
+				cell.width = gridTemplateColumns[x - 1];
+
+				const cellPosition = $plateCell.position();
+
+				cell.top = cellPosition.top;
+				cell.left = cellPosition.left;
 			}
 		}
 	}
@@ -184,53 +323,69 @@ class Cell extends Rectangle {
 		super(width, height, orientation);
 
 		this.type = type;
-	}
-}
-
-class Fruit extends Rectangle {
-	constructor(params) {
-		super(params.width, params.height, params.orientation);
-
-		this.uuid = params.uuid;
-		this.code = params.code;
-		this.name = params.name;
-		this.img = params.img;
-
-		this._$element = null;
 		this._position = null;
-		this._originalPosition = null;
-		this._lastPosition = null;
 	}
 
 	get position() {
 		return this._position;
 	}
 
-	set position(value) {
-		this._position = value;
+	set position(position) {
+		this._position = position;
 	}
 
-	get lastPosition() {
-		return this._lastPosition;
+	setIsOverlapped(value) {
+		if (value) {
+			this.$element.addClass("overlapped");
+		} else {
+			this.$element.removeClass("overlapped");
+		}
 	}
 
-	set lastPosition(value) {
-		this._lastPosition = value;
+	setIfOverlappedBy(fruitPosition) {
+		const cellRectangle = {
+			top: this.top,
+			bottom: this.bottom,
+			left: this.left,
+			right: this.right,
+		};
+
+		this.setIsOverlapped(utils.doRectanglesCollide(fruitPosition, cellRectangle));
+	}
+}
+
+class Fruit extends Rectangle {
+	constructor(args) {
+		super(args.width, args.height, args.orientation);
+
+		this.uuid = args.uuid;
+		this.code = args.code;
+		this.name = args.name;
+		this.img = args.img;
+
+		this._gridPosition = null;
+		this._originalGridPosition = null;
 	}
 
-	get $element() {
-		return this._$element;
+	get gridPosition() {
+		return this._gridPosition;
 	}
 
-	set $element(value) {
-		this._$element = value;
+	set gridPosition(value) {
+		this._gridPosition = value;
+
+		if (Math.sign(this._gridPosition.row) >= 0 && Math.sign(this._gridPosition.column) >= 0) {
+			const { top, left } = utils.extractTopLeftPositionFrom(this._gridPosition);
+
+			this.top = top;
+			this.left = left;
+		}
 	}
 
 	initDraggableWidget(controller) {
 		const self = this;
 
 		self._$element.draggable({
-			// axis: "x", // TODO: rendere parametrico in base alla configurazione: "solo verticale", "solo orizontale", "entrambi"
 			containment: "#fruits",
 			distance: MIN_DISTANCE_BEFORE_DRAGGING,
 			// grid: [ATOMIC_WIDTH],
@@ -250,11 +405,11 @@ class Fruit extends Rectangle {
 	isOverlappingWith(otherFruit) {
 		let result = true;
 
-		const x5 = Math.max(this.position.getLeft(), otherFruit.position.getLeft());
-		const x6 = Math.min(this.position.getLeft() + this.width, otherFruit.position.getLeft() + otherFruit.width);
+		const x5 = Math.max(this.left, otherFruit.left);
+		const x6 = Math.min(this.left + this.width, otherFruit.left + otherFruit.width);
 
-		const y5 = Math.max(this.position.getTop(), otherFruit.position.getTop());
-		const y6 = Math.min(this.position.getTop() + this.height, otherFruit.position.getTop() + otherFruit.height);
+		const y5 = Math.max(this.top, otherFruit.top);
+		const y6 = Math.min(this.top + this.height, otherFruit.top + otherFruit.height);
 
 		if (x5 >= x6) {
 			result = false;
@@ -269,26 +424,26 @@ class Fruit extends Rectangle {
 
 	canSwapWith(otherFruit) {
 		// Only if both are in the same position and are of equal size
-		return this.position.row == otherFruit.position.row
-			&& this.position.column == otherFruit.position.column
-			&& this.position.getTop() + this.height == otherFruit.position.getTop() + otherFruit.height
-			&& this.position.getLeft() + this.width == otherFruit.position.getLeft() + otherFruit.width;
+		return this.gridPosition.row == otherFruit.gridPosition.row
+			&& this.gridPosition.column == otherFruit.gridPosition.column
+			&& this.top + this.height == otherFruit.top + otherFruit.height
+			&& this.left + this.width == otherFruit.left + otherFruit.width;
 	}
 
 	swapPositionWith(otherFruit) {
-		this.position = otherFruit.position;
-		otherFruit.position = this._originalPosition;
+		this.gridPosition = otherFruit.gridPosition;
+		otherFruit.gridPosition = this._originalGridPosition;
 	}
 
 	fitsWithin(containmentGrid) {
 		const colSpan = {
-			start: this.position.column,
-			end: this.position.column + (this.width / FREE_CELL_WIDTH),
+			start: this.gridPosition.column,
+			end: this.gridPosition.column + (this.width / FREE_CELL_WIDTH),
 		};
 
 		const rowSpan = {
-			start: this.position.row,
-			end: this.position.row + (this.height / FREE_CELL_HEIGHT),
+			start: this.gridPosition.row,
+			end: this.gridPosition.row + (this.height / FREE_CELL_HEIGHT),
 		};
 
 		return 0 <= colSpan.start && colSpan.end <= containmentGrid[0].length
@@ -304,13 +459,13 @@ class Fruit extends Rectangle {
 		const result = [0, 0];
 
 		const thisCenterPoint = [
-			this.position.getLeft() + (this.width / 2),
-			this.position.getTop() + (this.height / 2),
+			this.left + (this.width / 2),
+			this.top + (this.height / 2),
 		];
 
 		const otherCenterPoint = [
-			otherFruit.position.getLeft() + (otherFruit.width / 2),
-			otherFruit.position.getTop() + (otherFruit.height / 2),
+			otherFruit.left + (otherFruit.width / 2),
+			otherFruit.top + (otherFruit.height / 2),
 		];
 
 		const separationVector = [
@@ -336,16 +491,16 @@ class Fruit extends Rectangle {
 	}
 
 	hasChangedPosition() {
-		return this._originalPosition.column != this.position.column
-			|| this._originalPosition.row != this.position.row;
+		return this._originalGridPosition.column != this.gridPosition.column
+			|| this._originalGridPosition.row != this.gridPosition.row;
 	}
 
 	makePositionSnapshot() {
-		this._originalPosition = new FruitPosition(this.position.row, this.position.column);
+		this._originalGridPosition = new FruitGridPosition(this.gridPosition.row, this.gridPosition.column);
 	}
 
 	restorePositionToLastSnapshot() {
-		this.position = this._originalPosition;
+		this.gridPosition = this._originalGridPosition;
 	}
 
 	startDragging() {
@@ -356,21 +511,29 @@ class Fruit extends Rectangle {
 		this.$element.removeClass("is-dragging");
 	}
 
+	onEnterInProhibitedPosition() {
+		this.$element.addClass("is-in-prohibited-position");
+	}
+
+	onExitFromProhibitedPosition() {
+		this.$element.removeClass("is-in-prohibited-position");
+	}
+
 	/**
 	 * Renders Fruit based on current position
 	 */
 	render() {
 		this.$element.css({
-			left: this.position.getLeft(),
-			top: this.position.getTop(),
+			left: this.left,
+			top: this.top,
 		});
 	}
 }
 
 class FruitsController {
-	constructor(params) {
-		this.plate = params.plate;
-		this.fruits = params.fruits;
+	constructor(args) {
+		this.plate = args.plate;
+		this.fruits = args.fruits;
 	}
 
 	/**
@@ -389,8 +552,8 @@ class FruitsController {
 				"id": fruit.uuid,
 				"class": "draggable-fruit",
 				"css": {
-					"top": `${fruit.position.getTop()}px`,
-					"left": `${fruit.position.getLeft()}px`,
+					"top": `${fruit.top}px`,
+					"left": `${fruit.left}px`,
 					"width": `${fruit.width}px`,
 					"height": `${fruit.height}px`,
 				},
@@ -440,17 +603,31 @@ class FruitsController {
 		}
 	}
 
-	isFruitInProhibitedPosition(fruit) {
-		const rowRange = { start: fruit.position.row, end: fruit.position.row + (fruit.height / FREE_CELL_HEIGHT) };
-		const colRange = { start: fruit.position.column, end: fruit.position.column + (fruit.width / FREE_CELL_WIDTH) };
+	isFruitInProhibitedPosition(fruitRectangle) {
+		let result = false;
 
-		const subGrid = AP.util.slice2DArray({
-			array: this.plate.grid,
-			rowRange: rowRange,
-			colRange: colRange,
-		});
+		for (const row of this.plate.grid) {
+			if (result) {
+				break;
+			}
 
-		const result = subGrid.some(row => row.some(cell => cell.type == CELL_TYPE.PROHIBITED));
+			for (const cell of row) {
+				if (cell.type == CELL_TYPE.PROHIBITED) {
+					const cellRectangle = {
+						top: cell.top,
+						bottom: cell.top + cell.height,
+						left: cell.left,
+						right: cell.left + cell.width,
+					};
+
+					if (utils.doRectanglesCollide(fruitRectangle, cellRectangle)) {
+						result = true;
+
+						break;
+					}
+				}
+			}
+		}
 
 		return result;
 	}
@@ -528,17 +705,24 @@ class FruitsController {
 	}
 
 	translateFruitByVector(fruit, vector) {
-		const convertedPosition = utils.convertAbsolutePosition({
-			left: vector[0],
-			top: vector[1],
-		});
+		const convertedGridPosition = {
+			column: vector[0] / FREE_CELL_WIDTH,
+			row: vector[1] / FREE_CELL_HEIGHT,
+		};
 
-		fruit.position = new FruitPosition(
-			fruit.position.row - convertedPosition.row,
-			fruit.position.column - convertedPosition.column,
+		fruit.gridPosition = new FruitGridPosition(
+			fruit.gridPosition.row - convertedGridPosition.row,
+			fruit.gridPosition.column - convertedGridPosition.column,
 		);
 
-		return !this.isFruitInProhibitedPosition(fruit)
+		const fruitRectangle = {
+			top: fruit.top,
+			bottom: fruit.top + fruit.height,
+			left: fruit.left,
+			right: fruit.left + fruit.width,
+		};
+
+		return !this.isFruitInProhibitedPosition(fruitRectangle)
 			&& fruit.fitsWithin(this.plate.grid);
 	}
 
@@ -563,17 +747,35 @@ class FruitsController {
 	 * @param {object} ui The values may be changed to modify where the element will be positioned. This is useful for custom containment, snapping, etc
 	 */
 	onDragging(fruit, event, ui) {
-		fruit.lastPosition = fruit.position;
+		let newFruitPosition = {
+			top: ui.position.top,
+			bottom: ui.position.top + fruit.height,
+			left: ui.position.left,
+			right: ui.position.left + fruit.width,
+		};
 
-		const convertedPosition = utils.convertAbsolutePosition(ui.position);
-		fruit.position = new FruitPosition(convertedPosition.row, convertedPosition.column);
+		const { row, column } = utils.convertAbsolutePositionToGridPosition(ui, newFruitPosition);
+		const gridPosition = new FruitGridPosition(row, column);
+		const { top, left } = utils.extractTopLeftPositionFrom(gridPosition);
+		newFruitPosition = {
+			top: top,
+			bottom: top + fruit.height,
+			left: left,
+			right: left + fruit.width,
+		};
 
-		if (this.isFruitInProhibitedPosition(fruit)) {
-			fruit.position = fruit.lastPosition;
-
-			ui.position.left = fruit.position.getLeft();
-			ui.position.top = fruit.position.getTop();
+		for (const row of this.plate.grid) {
+			for (const cell of row) {
+				cell.setIfOverlappedBy(newFruitPosition);
+			}
 		}
+
+		if (this.isFruitInProhibitedPosition(newFruitPosition)) {
+			fruit.onEnterInProhibitedPosition();
+		} else {
+			fruit.onExitFromProhibitedPosition();
+		}
+
 	}
 
 	/**
@@ -583,24 +785,48 @@ class FruitsController {
 	 * @param {object} ui
 	 */
 	onStopDragging(fruit, event, ui) {
-		const convertedPosition = utils.convertAbsolutePosition(ui.position);
-		fruit.position = new FruitPosition(convertedPosition.row, convertedPosition.column);
+		for (const row of this.plate.grid) {
+			for (const cell of row) {
+				cell.setIsOverlapped(false);
+			}
+		}
 
-		if (fruit.hasChangedPosition()) {
-			if (this.hasOverlappedFruits()) {
-				const otherFruit = this.fruits.find(f =>
-					f != fruit
-					&& f.position.row == fruit.position.row
-					&& f.position.column == fruit.position.column
-				);
+		const newFruitPosition = {
+			top: ui.position.top,
+			bottom: ui.position.top + fruit.height,
+			left: ui.position.left,
+			right: ui.position.left + fruit.width,
+		};
 
-				if (otherFruit && fruit.canSwapWith(otherFruit)) {
-					fruit.swapPositionWith(otherFruit);
-				} else {
-					const isOperationSuccessful = this.moveAwayAllFruitsFrom(fruit, this.plate.grid);
+		const { row, column } = utils.convertAbsolutePositionToGridPosition(ui, newFruitPosition);
+		fruit.gridPosition = new FruitGridPosition(row, column);
 
-					if (!isOperationSuccessful) {
-						this.restoreAllFruitPositions();
+		const fruitPosition = {
+			top: fruit.top,
+			bottom: fruit.bottom,
+			left: fruit.left,
+			right: fruit.right,
+		};
+
+		if (this.isFruitInProhibitedPosition(fruitPosition)) {
+			fruit.restorePositionToLastSnapshot();
+		} else {
+			if (fruit.hasChangedPosition()) {
+				if (this.hasOverlappedFruits()) {
+					const otherFruit = this.fruits.find(f =>
+						f != fruit
+						&& f.gridPosition.row == fruit.gridPosition.row
+						&& f.gridPosition.column == fruit.gridPosition.column
+					);
+
+					if (otherFruit && fruit.canSwapWith(otherFruit)) {
+						fruit.swapPositionWith(otherFruit);
+					} else {
+						const isOperationSuccessful = this.moveAwayAllFruitsFrom(fruit, this.plate.grid);
+
+						if (!isOperationSuccessful) {
+							this.restoreAllFruitPositions();
+						}
 					}
 				}
 			}
@@ -613,17 +839,11 @@ class FruitsController {
 }
 
 AP.plate.designer = (function () {
-	var pub = {};
+	var pub = {
+		fruitsController: null,
+	};
 
 	pub.init = function () {
-		/*
-		Sappiamo:
-			- l'orientamento della placca
-			- width e height dell'intera placca
-			- griglia dell'intera placca
-			- width e height di un sottomodulo
-		*/
-
 		PLATE_WIDTH = pageData.PLATE.WIDTH;
 		PLATE_HEIGHT = pageData.PLATE.HEIGHT;
 		FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
@@ -636,18 +856,21 @@ AP.plate.designer = (function () {
 		}
 
 		const grid = [];
+
 		for (let iRow = 0; iRow < pageData.PLATE.GRID.length; iRow++) {
 			const row = [];
 
 			for (let iCol = 0; iCol < pageData.PLATE.GRID[iRow].length; iCol++) {
 				const cellType = pageData.PLATE.GRID[iRow][iCol];
 
-				row.push(new Cell(
+				const cell = new Cell(
 					pageData.GRID_CELL_DIMENSIONS[cellType].WIDTH,
 					pageData.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
 					pageData.GRID_CELL_DIMENSIONS[cellType].ORIENTATION,
 					cellType,
-				));
+				);
+
+				row.push(cell);
 			}
 
 			grid.push(row);
@@ -664,8 +887,6 @@ AP.plate.designer = (function () {
 			isSpecial: false,
 		});
 
-		plate.drawGridWithin($(".plate-designer"));
-
 		const fruits = [];
 
 		for (const fruit of Object.values(pageData.FRUITS)) {
@@ -679,21 +900,29 @@ AP.plate.designer = (function () {
 				img: fruit.img,
 			});
 
-			fruitObj.position = new FruitPosition(
-				fruit.row,
-				fruit.column,
-			);
-
 			fruits.push(fruitObj);
 		}
 
-		const fruitController = new FruitsController({
+		pub.fruitsController = new FruitsController({
 			plate: plate,
 			fruits: fruits,
 		});
+	};
 
-		fruitController.drawFruitsWithin($("#plate-layers"));
-		fruitController.makeFruitsDraggable();
+	pub.run = function () {
+		pub.fruitsController.plate.drawGridWithin($(".plate-designer"));
+
+		for (const fruit of Object.values(pageData.FRUITS)) {
+			const fruitObj = pub.fruitsController.fruits.find(x => x.uuid == fruit.uuid);
+
+			fruitObj.gridPosition = new FruitGridPosition(
+				fruit.row,
+				fruit.column,
+			);
+		}
+
+		pub.fruitsController.drawFruitsWithin($("#plate-layers"));
+		pub.fruitsController.makeFruitsDraggable();
 	};
 
 	return pub;

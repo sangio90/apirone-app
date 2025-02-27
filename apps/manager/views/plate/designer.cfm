@@ -1,10 +1,9 @@
 <cfscript>
-	// FOR DEMO:
 	// Data from backend
 	PLATE = { // horizontal
 		"UUID" = "",
-		"CODE" = "2x2",
-		"IMG" = "/assets/main/img/2X2.jpg",
+		"CODE" = "508",
+		"IMG" = "/assets/main/img/508.jpg",
 		"WIDTH" = 1200, // in px
 		"HEIGHT" = 500, // in px
 		"ORIENTATION" = "H", // "V" - VERTICAL, "H" - HORIZONTAL
@@ -12,7 +11,7 @@
 			// LEGEND:
 			// "_" - empty free space
 			// "0" - prohibited space
-			["_", "_", "_", "_", "0", "0", "_", "_", "_", "_",],
+			["_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_",],
 			// ["_", "_", "_", "_",],
 			// ["0", "0", "0", "0",],
 			// ["_", "_", "_", "_",],
@@ -33,17 +32,17 @@
 	};
 
 	FRUITS = {
-		// A = {
-		// 	"width" = GRID_CELL_DIMENSIONS["_"].WIDTH * 4,
-		// 	"height" = GRID_CELL_DIMENSIONS["_"].HEIGHT * 1,
-		// 	"orientation" = "H",
-		// 	"uuid" = "A",
-		// 	"code" = "schuko",
-		// 	"name" = "SCHK 2P + 1T",
-		// 	"img" = "/assets/main/img/foto_frutto_schuko.png",
-		// 	"row" = 0,
-		// 	"column" = 0,
-		// },
+		A = {
+			"row" = 0,
+			"column" = 6,
+			"width" = GRID_CELL_DIMENSIONS["_"].WIDTH * 4,
+			"height" = GRID_CELL_DIMENSIONS["_"].HEIGHT * 1,
+			"orientation" = "H",
+			"uuid" = "A",
+			"code" = "schuko",
+			"name" = "SCHK 2P + 1T",
+			"img" = "/assets/main/img/foto_frutto_schuko.png",
+		},
 		// A2 = {
 		// 	"width" = GRID_CELL_DIMENSIONS["_"].WIDTH * 4,
 		// 	"height" = GRID_CELL_DIMENSIONS["_"].HEIGHT * 1,
@@ -55,28 +54,28 @@
 		// 	"row" = 0,
 		// 	"column" = 6,
 		// },
-		// B = {
-		// 	"width" = GRID_CELL_DIMENSIONS["_"].WIDTH * 2,
-		// 	"height" = GRID_CELL_DIMENSIONS["_"].HEIGHT * 1,
-		// 	"orientation" = "H",
-		// 	"uuid" = "B",
-		// 	"code" = "bipasso",
-		// 	"name" = "BIPAS.",
-		// 	"img" = "/assets/main/img/foto_frutto_bipasso.png",
-		// 	"row" = 0,
-		// 	"column" = 4,
-		// },
-		// C = {
-		// 	"width" = GRID_CELL_DIMENSIONS["_"].WIDTH * 2,
-		// 	"height" = GRID_CELL_DIMENSIONS["_"].HEIGHT * 1,
-		// 	"orientation" = "H",
-		// 	"uuid" = "C",
-		// 	"code" = "cat6",
-		// 	"name" = "CAT 6",
-		// 	"img" = "/assets/main/img/foto_frutto_cat6.png",
-		// 	"row" = 0,
-		// 	"column" = 6,
-		// },
+		B = {
+			"row" = 0,
+			"column" = 0,
+			"width" = GRID_CELL_DIMENSIONS["_"].WIDTH * 2,
+			"height" = GRID_CELL_DIMENSIONS["_"].HEIGHT * 1,
+			"orientation" = "H",
+			"uuid" = "B",
+			"code" = "bipasso",
+			"name" = "BIPAS.",
+			"img" = "/assets/main/img/foto_frutto_bipasso.png",
+		},
+		C = {
+			"row" = 0,
+			"column" = 2,
+			"width" = GRID_CELL_DIMENSIONS["_"].WIDTH * 2,
+			"height" = GRID_CELL_DIMENSIONS["_"].HEIGHT * 1,
+			"orientation" = "H",
+			"uuid" = "C",
+			"code" = "cat6",
+			"name" = "CAT 6",
+			"img" = "/assets/main/img/foto_frutto_cat6.png",
+		},
 		// I = {
 		// 	"width" = GRID_CELL_DIMENSIONS["_"].WIDTH * 2,
 		// 	"height" = GRID_CELL_DIMENSIONS["_"].HEIGHT * 1,

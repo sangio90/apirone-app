@@ -60,6 +60,7 @@ module.exports = {
 		"no-else-return": "error",
 		"no-new-wrappers": "error",
 		"no-multi-assign": "error",
+		"no-const-assign": "error",
 		"no-useless-escape": "error",
 		"no-param-reassign": "error",
 		"no-mixed-operators": "error",
