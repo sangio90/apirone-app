@@ -5,7 +5,7 @@
 
 	public Boolean function OnRequestStart( string targetPage ) {
 
-        var allowedIPs = "127.0.0.1,185.6.241.249,79.19.179.30,194.183.87.112";
+        var allowedIPs = "127.0.0.1,185.6.241.249,79.19.179.30,194.183.87.112,185.52.113.41";
 
         var ip = getRealIP();
 

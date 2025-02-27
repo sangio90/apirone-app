@@ -26,7 +26,7 @@
 	
 	<cffunction returntype="Query" name="find">
 
-		<cfargument name="componentId" type="String">
+		<cfargument name="rawProductId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -39,14 +39,14 @@
 			FROM
 				#super.sanitizeSQL( "#variables.companyId#_colori" )# colori
 
-                <cfif !IsNull( arguments.componentId )>
+                <cfif !IsNull( arguments.rawProductId )>
                     INNER JOIN #super.sanitizeSQL( "#variables.companyId#_comcol" )# comcol ON comcol.clcodcol = colori.clcodice
                 </cfif>
 
 			WHERE 1=1
 
-				<cfif !IsNull( arguments.componentId )>
-                    AND comcol.clcodart = <cfqueryparam value="#arguments.componentId#" cfsqltype="varchar">
+				<cfif !IsNull( arguments.rawProductId )>
+                    AND comcol.clcodart = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="varchar">
                 </cfif>
 			
 			ORDER BY 

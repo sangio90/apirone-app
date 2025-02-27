@@ -4,12 +4,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
     public com.apirone.core.model.bean.Color function get(
-    		required String componentId
+    		required String colorId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.componentId );
+    	var key = getCacheKey( arguments.colorId );
 
 	   	var cache = cm.get( key ) ;
 
@@ -19,7 +19,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    } 
 	    
-		var bean = build( arguments.componentId );
+		var bean = build( arguments.colorId );
 		cm.put( key, bean );
         
 		return bean;
@@ -27,14 +27,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Color[] function list(
-		String componentId,
+			String rawProductId,
 	) {
 		arguments["limit"] = -1;
 		return search(argumentCollection = arguments).getData();
 	}
 
     public com.apirone.core.model.bean.Result function search(
-		             String componentId,
+		             String rawProductId,
 			required Numeric limit = 20,
 			required Numeric offset = 0
     	){
@@ -45,7 +45,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {
-			rows.add( get( componentId = record.clcodice ) );
+			rows.add( get( colorId = record.clcodice ) );
 		});
 
 	    result.setData( rows );
