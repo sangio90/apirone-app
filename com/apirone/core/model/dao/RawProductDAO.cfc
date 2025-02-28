@@ -43,6 +43,7 @@
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="arcodart">
 
+
         <cfquery name="local.q" datasource="verticale">
 			SELECT
 				arcodart, 
@@ -70,7 +71,10 @@
 			</cfif>
                 
 			<cfif !isNull( arguments.str )>
-				AND ardesart LIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+				AND ( 
+						ardesart LIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+						OR arcodart LIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+					)
 			</cfif>
                 
 			ORDER BY 

@@ -161,7 +161,7 @@ AP.component.list = (function () {
 
             var thisForm = $("#component-list-selected-form");
 			var dataSource = viewModel.get("selected");
-			
+
             var str = thisForm.find( "input[name=str]" ).val();
             var typeId = thisForm.find( "select[name=processingTypeId]" ).val();
 
@@ -253,6 +253,8 @@ AP.component.list = (function () {
 
             var params = thisForm.serializeJSON();
 
+			console.log("params", params);
+
 			var dataSource = NM.kendo.dataSource({ 
 				url: "/manager/ajax/raw-products",
 				params: params,
@@ -276,9 +278,6 @@ AP.component.list = (function () {
 					done: function (xhr) {
 
 						if(xhr.status == "SUCCESS") {
-
-							console.log("save:SUCCESS");
-
 							AP.widget.autoClearMessage( "status-selected", "<span class='green'>Configurazione salvata</span>" );
 						}
 
@@ -305,6 +304,8 @@ AP.component.list = (function () {
 			viewModel.set("showSearchPanel", false);
 			viewModel.set("variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>");
 			viewModel.set("variants", event.data.variants);
+
+			viewModel.set("colors", []);
 
             return false;
 		},
@@ -334,7 +335,7 @@ AP.component.list = (function () {
 			var dataSource = viewModel.get("selected");
 
 			return dataSource.total() > 0;
-		
+
 		},
 
 		removeComponent: function (event) {
@@ -368,9 +369,13 @@ AP.component.list = (function () {
 
 		viewModel.set( "currentItem", item );
 
-		var current = viewModel.get( "currentItem" );
-		console.log("component:open:curr", current );
-		console.log("component:open:getCurrentConfig", getCurrentConfig() );
+		//var current = viewModel.get( "currentItem" );
+
+		//console.log("component:open:curr", current );
+		//console.log("component:open:getCurrentConfig", getCurrentConfig() );
+
+		viewModel.set( "colors", [] );
+		viewModel.set( "variants", [] );
 
 		NM.util.ajax({
 			method: "GET",

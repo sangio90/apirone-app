@@ -1,4 +1,61 @@
-﻿<cfdbinfo name="k" type="foreignkeys" datasource="verticale">
+﻿<cfset art="CRPOLDO000VERNI">   <!--- senza varianti --->
+<cfset art="LAV-ASSEMBLBINS">   <!--- con colore senza variante --->
+<cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
+<cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
+
+<h3>Articolo</h3>
+<cfquery name="n" datasource="verticale" result="result">
+<!------
+    SELECT *
+    FROM
+        azapi_artico a 
+    where arcodart = '#art#'
+---->
+    SELECT
+        arcodart,
+        arsemlav,
+        artipmat,
+        arcodart,
+        ardesart,
+        artipmat,
+        IIF (artipmat = 'LAV', 'LV', 'MP') AS processiong_type_id
+    FROM
+        azapi_artico a
+    WHERE 1=1
+        AND arcodart = '#art#'
+        --AND ardesart LIKE '%#art#%'
+</cfquery>
+
+<cfdump var="#n#">
+<cfdump var="#result#">
+
+
+<h3>Varianti</h3>
+<cfquery name="j" datasource="verticale">
+    SELECT *
+    FROM azapi_codvar AS codvar 
+        INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod 
+    WHERE 1=1 
+        AND comvar.cbcodart = '#art#' 
+    --ORDER BY arcodart 
+</cfquery>
+
+<cfdump var="#j#">
+
+<h3>Colori</h3>
+<cfquery name="k" datasource="verticale">
+    SELECT *
+    FROM azapi_colori AS colori
+        INNER JOIN azapi_comcol AS comcol ON comcol.clcodcol = colori.clcodice
+    WHERE 1=1
+        AND comcol.clcodart = '#art#' 
+</cfquery>
+
+<cfdump var="#k#">
+
+<cfabort>
+
+<cfdbinfo name="k" type="foreignkeys" datasource="verticale">
     <cfdump var="#k#">
 
     <cfabort>
@@ -17,14 +74,6 @@
 <cfabort>
 
 
-<cfquery name="k" datasource="verticale">
-    SELECT *
-    FROM azapi_codvar AS codvar 
-        INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod 
-    WHERE 1=1 AND comvar.cbcodart = 'LAV-PL-FRUTTI' 
-</cfquery>
-<cfdump var="#k#">
-<cfabort>
 
 <cfquery name="j" datasource="verticale">
     SELECT

@@ -5,6 +5,7 @@ NM.kendo.dataSource = function (config = {}) {
 
     var defaults = {
         data: config.data ? config.data : [],
+        params: config.params ? config.params : {},
         pageSize: config.count ? config.count : 15,
         serverSorting: config?.serverSorting,
 
@@ -27,6 +28,9 @@ NM.kendo.dataSource = function (config = {}) {
         defaults.transport.read.url = config.url;
 
         defaults.transport.parameterMap = function (params, type ) {
+
+            // merge
+            Object.assign(params, config.params);
 
             params.count = params.pageSize;
             delete params.pageSize;

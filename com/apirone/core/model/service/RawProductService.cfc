@@ -78,7 +78,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var variants = getVariantService().list( rawProductId=record.arcodart );
 			var colors = getColorService().list( rawProductId=record.arcodart );
 
-			/*
 			if( !variants.len() ) {
 				var variant =  super.bean("Variant");
 				
@@ -98,7 +97,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				colors.add( color );
 
 			}
-			*/
 
 			for( var thisVariant in variants ) {
 				thisVariant.setColors( colors )

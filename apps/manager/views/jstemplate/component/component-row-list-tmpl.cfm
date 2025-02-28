@@ -9,7 +9,7 @@
             </td>
             <td class="text-center">
 
-                #iconButton( bind="click:openVariants", size="sm", icon="chevron-right", variant="default" )#
+                #iconButton( bind="click:openVariants", size="sm", icon="chevron-right", variant="primary" )#
             
             </td>
         </tr>
