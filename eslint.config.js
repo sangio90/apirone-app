@@ -27,6 +27,7 @@ module.exports = {
 		"wrap-iife": "warn",
 		"comma-style": "warn",
 		"dot-notation": "warn",
+		"prefer-const": "warn",
 		"block-spacing": "warn",
 		"comma-spacing": "warn",
 		"spaced-comment": "warn",

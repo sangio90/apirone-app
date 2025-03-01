@@ -435,6 +435,18 @@ h2 {
 /* TODO: spostare inclusione dei file CSS in controller */
 /* SEZIONE PER LA PAGINA: plate/designer */
 
+#plate-designer-root {
+	width: 100%;
+	display: grid;
+	grid-template-rows: minmax(0, 30px) minmax(0, auto);
+	grid-template-columns: minmax(0, 100px) minmax(0, auto);
+}
+
+.plate-designer {
+	grid-row: 2 / 3;
+	grid-column: 2 / 3;
+}
+
 .plate-background {
 	text-align: center;
 	background-color: #ECECEC;
@@ -542,5 +554,7 @@ h2 {
 .draggable-fruit:hover.is-dragging.is-in-prohibited-position {
 	cursor: no-drop;
 }
+
+/* END SEZIONE PER LA PAGINA: plate/designer */
 
 .numeric { width: 100px; text-align: right; }

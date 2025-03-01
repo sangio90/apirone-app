@@ -6,13 +6,10 @@ AP.plate.fields = {
 
 $(document).ready(function () {
 	if (AP.plate.fields.designerRoot.length) {
-		AP.plate.designer.init();
-		AP.plate.designer.run();
+		AP.plate.designer.init(AP.plate.fields.designerRoot);
 	}
 });
 
-let PLATE_WIDTH;
-let PLATE_HEIGHT;
 let FREE_CELL_WIDTH;
 let FREE_CELL_HEIGHT;
 
@@ -67,7 +64,7 @@ const utils = {
 
 		for (let row = 0; row < grid.length; row++) {
 			for (let column = 0; column < grid[row].length; column++) {
-				let cell = grid[row][column];
+				const cell = grid[row][column];
 
 				if ((newPositionDirection & MOVE_DIRECTION.RIGHT) == MOVE_DIRECTION.RIGHT) {
 					if (cell.left <= fruitPosition.right && fruitPosition.right <= cell.right) {
@@ -211,6 +208,8 @@ class Plate extends Rectangle {
 	 * Creates HTML nodes and inserts them in the DOM to visualize grid property
 	 */
 	drawGridWithin($rootNode) {
+		$rootNode.empty();
+
 		const $plateBackground = $("<div/>", {
 			"class": "plate-background",
 			"css": {
@@ -843,86 +842,209 @@ AP.plate.designer = (function () {
 		fruitsController: null,
 	};
 
-	pub.init = function () {
-		PLATE_WIDTH = pageData.PLATE.WIDTH;
-		PLATE_HEIGHT = pageData.PLATE.HEIGHT;
-		FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
-		FREE_CELL_HEIGHT = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
-
-		if (pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].ORIENTATION == ORIENTATION.VERTICAL) {
-			const tmp = FREE_CELL_WIDTH;
-			FREE_CELL_WIDTH = FREE_CELL_HEIGHT;
-			FREE_CELL_HEIGHT = tmp;
-		}
-
-		const grid = [];
-
-		for (let iRow = 0; iRow < pageData.PLATE.GRID.length; iRow++) {
-			const row = [];
-
-			for (let iCol = 0; iCol < pageData.PLATE.GRID[iRow].length; iCol++) {
-				const cellType = pageData.PLATE.GRID[iRow][iCol];
-
-				const cell = new Cell(
-					pageData.GRID_CELL_DIMENSIONS[cellType].WIDTH,
-					pageData.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
-					pageData.GRID_CELL_DIMENSIONS[cellType].ORIENTATION,
-					cellType,
-				);
-
-				row.push(cell);
-			}
-
-			grid.push(row);
-		}
-
-		const plate = new Plate({
-			width: pageData.PLATE.WIDTH,
-			height: pageData.PLATE.HEIGHT,
-			orientation: pageData.PLATE.ORIENTATION,
-			uuid: pageData.PLATE.UUID,
-			code: pageData.PLATE.CODE,
-			img: pageData.PLATE.IMG,
-			grid: grid,
-			isSpecial: false,
-		});
-
-		const fruits = [];
-
-		for (const fruit of Object.values(pageData.FRUITS)) {
-			const fruitObj = new Fruit({
-				width: fruit.width,
-				height: fruit.height,
-				orientation: fruit.orientation,
-				uuid: fruit.uuid,
-				code: fruit.code,
-				name: fruit.name,
-				img: fruit.img,
-			});
-
-			fruits.push(fruitObj);
-		}
-
-		pub.fruitsController = new FruitsController({
-			plate: plate,
-			fruits: fruits,
-		});
+	const priv = {
+		container: null,
 	};
 
-	pub.run = function () {
-		pub.fruitsController.plate.drawGridWithin($(".plate-designer"));
+	priv.vm = new kendo.data.ObservableObject({
+		// DATA
+		plates: new kendo.data.DataSource({
+			data: [
+				{
+					UUID: "100",
+					CODE: "508",
+					IMG: "/assets/main/img/508.jpg",
+					WIDTH: 1200, // in px
+					HEIGHT: 500, // in px
+					ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
+					GRID: [
+						// LEGEND:
+						// "_" - empty free space
+						// "0" - prohibited space
+						["_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_",],
+						// ["_", "_", "_", "_",],
+						// ["0", "0", "0", "0",],
+						// ["_", "_", "_", "_",],
+					]
+				}
+			],
+			schema: {
+				model: {
+					id: "UUID",
+				},
+			},
+		}),
+		selectedPlate: "100",
+		plateFruits: [
+			{
+				row: 0,
+				column: 6,
+				width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
+				height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+				orientation: "H",
+				uuid: "A",
+				code: "schuko",
+				name: "SCHK 2P + 1T",
+				img: "/assets/main/img/foto_frutto_schuko.png",
+			},
+			// {
+			// 	"row": 0,
+			// 	"column": 6,
+			// 	"width": pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
+			// 	"height": pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+			// 	"orientation": "V",
+			// 	"uuid": "A2",
+			// 	"code": "schuko",
+			// 	"name": "SCHK 2P + 1T",
+			// 	"img": "/assets/main/img/foto_frutto_schuko.png",
+			// },
+			{
+				row: 0,
+				column: 0,
+				width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+				height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+				orientation: "H",
+				uuid: "B",
+				code: "bipasso",
+				name: "BIPAS.",
+				img: "/assets/main/img/foto_frutto_bipasso.png",
+			},
+			{
+				row: 0,
+				column: 2,
+				width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+				height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+				orientation: "H",
+				uuid: "C",
+				code: "cat6",
+				name: "CAT 6",
+				img: "/assets/main/img/foto_frutto_cat6.png",
+			},
+			// {
+			// 	"row": 0,
+			// 	"column": 10,
+			// 	"width": pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+			// 	"height": pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+			// 	"orientation": "H",
+			// 	"uuid": "I",
+			// 	"code": "switch",
+			// 	"name": "INT. Sottile",
+			// 	"img": "/assets/main/img/foto_frutto_interruttore.png",
+			// },
+		],
+		fruits: new kendo.data.DataSource({
+			data: [
+				{ name: "Schuko", value: "schuko", },
+				{ name: "Bipasso", value: "bipasso", },
+				{ name: "Usb", value: "usb", },
+			],
+		}),
+		// selectedFruit: "schuko",
+		// CONDITIONS
+		// ACTIONS
+		// GETTERS
+		// EVENTS
+		onSelectFruit: function (event) {
+			event.preventDefault();
+		},
+		onClickGenerali: function (event) {
 
-		for (const fruit of Object.values(pageData.FRUITS)) {
-			const fruitObj = pub.fruitsController.fruits.find(x => x.uuid == fruit.uuid);
+		},
+		onClickCercaFrutto: function (event) {
 
-			fruitObj.gridPosition = new FruitGridPosition(
-				fruit.row,
-				fruit.column,
-			);
-		}
+		},
+		onClickImmagine: function (event) {
 
-		pub.fruitsController.drawFruitsWithin($("#plate-layers"));
-		pub.fruitsController.makeFruitsDraggable();
+		},
+		onClickConfigura: function (event) {
+			const selectedPlate = this.plates.get(this.get("selectedPlate"));
+
+			FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
+			FREE_CELL_HEIGHT = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
+
+			if (pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].ORIENTATION == ORIENTATION.VERTICAL) {
+				const tmp = FREE_CELL_WIDTH;
+				FREE_CELL_WIDTH = FREE_CELL_HEIGHT;
+				FREE_CELL_HEIGHT = tmp;
+			}
+
+			const grid = [];
+
+			for (let iRow = 0; iRow < selectedPlate.GRID.length; iRow++) {
+				const row = [];
+
+				for (let iCol = 0; iCol < selectedPlate.GRID[iRow].length; iCol++) {
+					const cellType = selectedPlate.GRID[iRow][iCol];
+
+					const cell = new Cell(
+						pageData.GRID_CELL_DIMENSIONS[cellType].WIDTH,
+						pageData.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
+						pageData.GRID_CELL_DIMENSIONS[cellType].ORIENTATION,
+						cellType,
+					);
+
+					row.push(cell);
+				}
+
+				grid.push(row);
+			}
+
+			const plate = new Plate({
+				width: selectedPlate.WIDTH,
+				height: selectedPlate.HEIGHT,
+				orientation: selectedPlate.ORIENTATION,
+				uuid: selectedPlate.UUID,
+				code: selectedPlate.CODE,
+				img: selectedPlate.IMG,
+				grid: grid,
+				isSpecial: false,
+			});
+
+			const fruits = [];
+
+			for (const fruit of this.get("plateFruits")) {
+				const fruitObj = new Fruit({
+					width: fruit.width,
+					height: fruit.height,
+					orientation: fruit.orientation,
+					uuid: fruit.uuid,
+					code: fruit.code,
+					name: fruit.name,
+					img: fruit.img,
+				});
+
+				fruits.push(fruitObj);
+			}
+
+			pub.fruitsController = new FruitsController({
+				plate: plate,
+				fruits: fruits,
+			});
+
+			pub.fruitsController.plate.drawGridWithin($(".plate-designer"));
+
+			for (const fruit of this.get("plateFruits")) {
+				const fruitObj = pub.fruitsController.fruits.find(x => x.uuid == fruit.uuid);
+
+				fruitObj.gridPosition = new FruitGridPosition(
+					fruit.row,
+					fruit.column,
+				);
+			}
+
+			pub.fruitsController.drawFruitsWithin($("#plate-layers"));
+			pub.fruitsController.makeFruitsDraggable();
+		},
+		// INITS
+	});
+
+	pub.init = function (setup) {
+		priv.container = setup.container;
+		kendo.bind(AP.plate.fields.designerRoot, priv.vm);
+	};
+
+	pub.getVM = function () {
+		return priv.vm;
 	};
 
 	return pub;
