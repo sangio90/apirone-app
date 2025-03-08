@@ -107,13 +107,13 @@ const utils = {
 		return result;
 	},
 	extractTopLeftPositionFrom(gridPosition) {
-		const fruitsController = AP.plate.designer.fruitsController;
-		const grid = fruitsController.plate.grid;
-
 		const result = {
 			top: null,
 			left: null,
 		};
+
+		const fruitsController = AP.plate.designer.fruitsController;
+		const grid = fruitsController.plate.grid;
 
 		const cell = grid[gridPosition.row][gridPosition.column];
 
@@ -122,6 +122,58 @@ const utils = {
 
 		return result;
 	},
+	findFirstFreePosition(fruit) {
+		const result = {
+			row: null,
+			column: null,
+		};
+
+		const fruitsController = AP.plate.designer.fruitsController;
+		const grid = fruitsController.plate.grid;
+
+		for (let y = 0; y < grid.length; y++) {
+			const row = grid[y];
+
+			let columnCount = 0;
+			for (let x = 0; x < row.length; x++) {
+				const cell = row[x];
+				const cellHasFruit = utils.cellHasFruit(x);
+
+				if (cell.type == CELL_TYPE.PROHIBITED || cellHasFruit) {
+					columnCount = 0;
+				} else {
+					columnCount++;
+				}
+
+				if (columnCount == fruit.columnSpan) {
+					result.row = y; // per ora sono supportati solo i frutti che occupano una riga
+					result.column = x - columnCount + 1;
+
+					return result;
+				}
+			}
+		}
+
+		return result;
+	},
+	cellHasFruit(column) {
+		let result = false;
+
+		const fruitsController = AP.plate.designer.fruitsController;
+		const fruits = fruitsController.fruits;
+
+		for (const fruit of fruits) {
+			const fruitPosition = fruit.gridPosition;
+
+			if (fruitPosition.column <= column && column <= fruitPosition.column + fruit.columnSpan - 1) {
+				result = true;
+
+				break;
+			}
+		}
+
+		return result;
+	}
 };
 
 class FruitGridPosition {
@@ -277,6 +329,11 @@ class Plate extends Rectangle {
 			"appendTo": $plateLayers
 		});
 
+		const $fruits = $("<div/>", {
+			"id": "fruits",
+			"appendTo": $plateLayers
+		});
+
 		for (let y = 1; y <= this.grid.length; y++) {
 			const row = this.grid[y - 1];
 
@@ -357,6 +414,9 @@ class Fruit extends Rectangle {
 	constructor(args) {
 		super(args.width, args.height, args.orientation);
 
+		this.rowSpan = args.rowSpan;
+		this.columnSpan = args.columnSpan;
+
 		this.uuid = args.uuid;
 		this.code = args.code;
 		this.name = args.name;
@@ -435,7 +495,7 @@ class Fruit extends Rectangle {
 	}
 
 	fitsWithin(containmentGrid) {
-		const colSpan = {
+		const columnSpan = {
 			start: this.gridPosition.column,
 			end: this.gridPosition.column + (this.width / FREE_CELL_WIDTH),
 		};
@@ -445,7 +505,7 @@ class Fruit extends Rectangle {
 			end: this.gridPosition.row + (this.height / FREE_CELL_HEIGHT),
 		};
 
-		return 0 <= colSpan.start && colSpan.end <= containmentGrid[0].length
+		return 0 <= columnSpan.start && columnSpan.end <= containmentGrid[0].length
 			&& 0 <= rowSpan.start && rowSpan.end <= containmentGrid.length;
 	}
 
@@ -518,6 +578,46 @@ class Fruit extends Rectangle {
 		this.$element.removeClass("is-in-prohibited-position");
 	}
 
+	drawWithin($rootNode) {
+		const $fruit = $("<div/>", {
+			"id": this.uuid,
+			"class": "draggable-fruit",
+			"css": {
+				"top": `${this.top}px`,
+				"left": `${this.left}px`,
+				"width": `${this.width}px`,
+				"height": `${this.height}px`,
+			},
+			"appendTo": $rootNode,
+		});
+
+		const imgCSS = {
+			"width": `${this.width}px`,
+			"height": `${this.height}px`,
+		};
+
+		if (this.orientation == ORIENTATION.VERTICAL) {
+			const tmp = imgCSS.width;
+			imgCSS.width = imgCSS.height;
+			imgCSS.height = tmp;
+
+			if (this.isSquare()) {
+				imgCSS.transform = "rotate(90deg)";
+			} else {
+				imgCSS.transform = "rotate(90deg) translate(-50%, 0%)";
+			}
+		}
+
+		const $img = $("<img/>", {
+			"src": this.img,
+			"class": "fruit-img",
+			"css": imgCSS,
+			"appendTo": $fruit,
+		});
+
+		this.$element = $fruit;
+	}
+
 	/**
 	 * Renders Fruit based on current position
 	 */
@@ -539,51 +639,8 @@ class FruitsController {
 	 *	Creates HTML nodes and inserts them in the DOM to visualize fruits on the grid
 	 */
 	drawFruitsWithin($rootNode) {
-		const $fruits = $("<div/>", {
-			"id": "fruits",
-			"appendTo": $rootNode
-		});
-
-		for (let i = 0; i < this.fruits.length; i++) {
-			const fruit = this.fruits[i];
-
-			const $fruit = $("<div/>", {
-				"id": fruit.uuid,
-				"class": "draggable-fruit",
-				"css": {
-					"top": `${fruit.top}px`,
-					"left": `${fruit.left}px`,
-					"width": `${fruit.width}px`,
-					"height": `${fruit.height}px`,
-				},
-				"appendTo": $fruits,
-			});
-
-			const imgCSS = {
-				"width": `${fruit.width}px`,
-				"height": `${fruit.height}px`,
-			};
-
-			if (fruit.orientation == ORIENTATION.VERTICAL) {
-				const tmp = imgCSS.width;
-				imgCSS.width = imgCSS.height;
-				imgCSS.height = tmp;
-
-				if (fruit.isSquare()) {
-					imgCSS.transform = "rotate(90deg)";
-				} else {
-					imgCSS.transform = "rotate(90deg) translate(-50%, 0%)";
-				}
-			}
-
-			const $img = $("<img/>", {
-				"src": fruit.img,
-				"class": "fruit-img",
-				"css": imgCSS,
-				"appendTo": $fruit,
-			});
-
-			fruit.$element = $fruit;
+		for (const fruit of this.fruits) {
+			fruit.drawWithin($rootNode);
 		}
 	}
 
@@ -723,6 +780,31 @@ class FruitsController {
 
 		return !this.isFruitInProhibitedPosition(fruitRectangle)
 			&& fruit.fitsWithin(this.plate.grid);
+	}
+
+	onSelectFruit(selectedFruit) {
+		const freePosition = utils.findFirstFreePosition(selectedFruit);
+
+		if (freePosition.row != null && freePosition.column != null) {
+			const fruitObj = new Fruit({
+				width: selectedFruit.width,
+				height: selectedFruit.height,
+				rowSpan: selectedFruit.rowSpan,
+				columnSpan: selectedFruit.columnSpan,
+				orientation: "H",
+				uuid: selectedFruit.uuid,
+				code: selectedFruit.code,
+				name: selectedFruit.name,
+				img: selectedFruit.img,
+			});
+
+			fruitObj.gridPosition = new FruitGridPosition(freePosition.row, freePosition.column);
+
+			this.fruits.push(fruitObj);
+
+			fruitObj.drawWithin($("#fruits"));
+			fruitObj.initDraggableWidget(this);
+		}
 	}
 
 	/**
@@ -875,82 +957,68 @@ AP.plate.designer = (function () {
 			},
 		}),
 		selectedPlate: "100",
-		plateFruits: [
-			{
-				row: 0,
-				column: 6,
-				width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
-				height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
-				orientation: "H",
-				uuid: "A",
-				code: "schuko",
-				name: "SCHK 2P + 1T",
-				img: "/assets/main/img/foto_frutto_schuko.png",
-			},
-			// {
-			// 	"row": 0,
-			// 	"column": 6,
-			// 	"width": pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
-			// 	"height": pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
-			// 	"orientation": "V",
-			// 	"uuid": "A2",
-			// 	"code": "schuko",
-			// 	"name": "SCHK 2P + 1T",
-			// 	"img": "/assets/main/img/foto_frutto_schuko.png",
-			// },
-			{
-				row: 0,
-				column: 0,
-				width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-				height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
-				orientation: "H",
-				uuid: "B",
-				code: "bipasso",
-				name: "BIPAS.",
-				img: "/assets/main/img/foto_frutto_bipasso.png",
-			},
-			{
-				row: 0,
-				column: 2,
-				width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-				height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
-				orientation: "H",
-				uuid: "C",
-				code: "cat6",
-				name: "CAT 6",
-				img: "/assets/main/img/foto_frutto_cat6.png",
-			},
-			// {
-			// 	"row": 0,
-			// 	"column": 10,
-			// 	"width": pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-			// 	"height": pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
-			// 	"orientation": "H",
-			// 	"uuid": "I",
-			// 	"code": "switch",
-			// 	"name": "INT. Sottile",
-			// 	"img": "/assets/main/img/foto_frutto_interruttore.png",
-			// },
-		],
 		fruits: new kendo.data.DataSource({
 			data: [
-				{ name: "Schuko", value: "schuko", },
-				{ name: "Bipasso", value: "bipasso", },
-				{ name: "Usb", value: "usb", },
+				{
+					width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
+					height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+					columnSpan: 4,
+					rowSpan: 1,
+					uuid: "A",
+					code: "schuko",
+					name: "SCHK 2P + 1T",
+					img: "/assets/main/img/foto_frutto_schuko.png",
+				},
+				{
+					width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+					height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+					columnSpan: 2,
+					rowSpan: 1,
+					uuid: "B",
+					code: "bipasso",
+					name: "BIPAS.",
+					img: "/assets/main/img/foto_frutto_bipasso.png",
+				},
+				{
+					width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+					height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+					columnSpan: 2,
+					rowSpan: 1,
+					uuid: "C",
+					code: "cat6",
+					name: "CAT 6",
+					img: "/assets/main/img/foto_frutto_cat6.png",
+				},
+				{
+					width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+					height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+					columnSpan: 2,
+					rowSpan: 1,
+					uuid: "I",
+					code: "switch",
+					name: "INT. Sottile",
+					img: "/assets/main/img/foto_frutto_interruttore.png",
+				},
 			],
 		}),
-		// selectedFruit: "schuko",
 		// CONDITIONS
+		isPlateDefined: false,
 		// ACTIONS
 		// GETTERS
 		// EVENTS
 		onSelectFruit: function (event) {
 			event.preventDefault();
+
+			if (this.get("isPlateDefined")) {
+				pub.fruitsController.onSelectFruit(event.dataItem);
+			} else {
+				alert("Spingi prima 'Configura'");
+			}
 		},
 		onClickGenerali: function (event) {
 
 		},
-		onClickCercaFrutto: function (event) {
+		onClickListaFrutti: function (event) {
 
 		},
 		onClickImmagine: function (event) {
@@ -1000,40 +1068,14 @@ AP.plate.designer = (function () {
 				isSpecial: false,
 			});
 
-			const fruits = [];
-
-			for (const fruit of this.get("plateFruits")) {
-				const fruitObj = new Fruit({
-					width: fruit.width,
-					height: fruit.height,
-					orientation: fruit.orientation,
-					uuid: fruit.uuid,
-					code: fruit.code,
-					name: fruit.name,
-					img: fruit.img,
-				});
-
-				fruits.push(fruitObj);
-			}
-
 			pub.fruitsController = new FruitsController({
 				plate: plate,
-				fruits: fruits,
+				fruits: [],
 			});
 
 			pub.fruitsController.plate.drawGridWithin($(".plate-designer"));
 
-			for (const fruit of this.get("plateFruits")) {
-				const fruitObj = pub.fruitsController.fruits.find(x => x.uuid == fruit.uuid);
-
-				fruitObj.gridPosition = new FruitGridPosition(
-					fruit.row,
-					fruit.column,
-				);
-			}
-
-			pub.fruitsController.drawFruitsWithin($("#plate-layers"));
-			pub.fruitsController.makeFruitsDraggable();
+			this.set("isPlateDefined", true);
 		},
 		// INITS
 	});

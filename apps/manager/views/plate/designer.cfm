@@ -16,7 +16,7 @@
 
 <cfoutput>
 	<div id="plate-designer-root">
-		<div style="grid-column: 1 / 1; grid-row: 1 / 3; display: flex; flex-direction: column; width: 100%; align-items: center;">
+		<div style="grid-column: 1 / 1; grid-row: 1 / 3; display: flex; flex-direction: column; width: 100%; align-items: stretch; z-index: 1;">
 			<button
 				type="button"
 				data-bind="click: onClickGenerali">
@@ -26,15 +26,18 @@
 				Generali
 			</button>
 
-			<label>Lista placche</label>
 
-			<input
-				data-role="dropdownlist"
-				data-value-field="UUID"
-				data-text-field="CODE"
-				data-bind="source: plates,
-						   value: selectedPlate"
-				style="width: 100px"/>
+			<label style="display: none;">Lista placche</label>
+
+			<div style="display: none;">
+				<input
+					data-role="dropdownlist"
+					data-value-field="UUID"
+					data-text-field="CODE"
+					data-bind="source: plates,
+							   value: selectedPlate"
+				/>
+			</div>
 
 			<button
 				type="button"
@@ -45,17 +48,14 @@
 				Configura
 			</button>
 
-			<label>Lista frutti</label>
-
-			<input
-				data-role="dropdownlist"
-				data-value-field="value"
-				data-text-field="name"
-				data-bind="source: fruits,
-						   events: {
-						       select: onSelectFruit
-						   }"
-				style="width: 100px"/>
+			<button
+				type="button"
+				data-bind="click: onClickListaFrutti">
+				<div>
+					<i class="fas fa-list"></i>
+				</div>
+				Lista frutti
+			</button>
 
 			<button
 				type="button"
@@ -67,13 +67,18 @@
 			</button>
 		</div>
 
-		<div style="grid-column: 2 / 3; grid-row: 1 / 2; display: flex; width: 100%; align-items: center; justify-content: flex-end;">
-			<input type="text" placeholder="Cerca frutto">
-			<button
-				type="button"
-				data-bind="click: onClickCercaFrutto">
-				🔍
-			</button>
+		<div style="grid-column: 2 / 3; grid-row: 1 / 2; display: flex; width: 100%; align-items: center; justify-content: flex-end; z-index: 1;">
+			<input
+				data-role="dropdownlist"
+				data-value-field="uuid"
+				data-text-field="name"
+				data-filter="contains"
+				data-bind="source: fruits,
+						   events: {
+						       select: onSelectFruit
+						   }"
+				data-option-label="🔍 Cerca frutto..."
+				style="width: 200px"/>
 		</div>
 
 		<!--- Dynamically populated container --->
