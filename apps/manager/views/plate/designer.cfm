@@ -4,12 +4,12 @@
 		"_" = { // FREE
 			"WIDTH" = 45,
 			"HEIGHT" = 180,
-			"ORIENTATION" = "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION
+			"ORIENTATION" = "V", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION
 		},
 		"0" = { // PROHIBITED
 			"WIDTH" = 52,
 			"HEIGHT" = 105,
-			"ORIENTATION" = "H", // "V" - VERTICAL, "H" - HORIZONTAL
+			"ORIENTATION" = "V", // "V" - VERTICAL, "H" - HORIZONTAL
 		},
 	};
 </cfscript>
@@ -27,9 +27,9 @@
 			</button>
 
 
-			<label style="display: none;">Lista placche</label>
+			<label>Lista placche</label>
 
-			<div style="display: none;">
+			<div>
 				<input
 					data-role="dropdownlist"
 					data-value-field="UUID"
@@ -90,7 +90,8 @@
 	</div>
 
 	<script>
-		pageData = {};
-		pageData.GRID_CELL_DIMENSIONS = #serializeJSON(GRID_CELL_DIMENSIONS)#;
+		pageData = {
+			GRID_CELL_DIMENSIONS: #serializeJSON(GRID_CELL_DIMENSIONS)#,
+		};
 	</script>
 </cfoutput>

@@ -30,7 +30,6 @@ const CELL_TYPE = {
 };
 
 const MOVE_DIRECTION = {
-	STILL: 0,
 	LEFT: 1,
 	RIGHT: 2,
 	TOP: 4,
@@ -39,12 +38,12 @@ const MOVE_DIRECTION = {
 
 const utils = {
 	convertAbsolutePositionToGridPosition(ui, fruitPosition) {
-		let newPositionDirection = MOVE_DIRECTION.STILL;
+		let newPositionDirection = 0;
 		const deltaLeft = Math.sign(ui.position.left - ui.originalPosition.left);
 		if (deltaLeft > 0) {
-			newPositionDirection = MOVE_DIRECTION.RIGHT;
+			newPositionDirection |= MOVE_DIRECTION.RIGHT;
 		} else if (deltaLeft < 0) {
-			newPositionDirection = MOVE_DIRECTION.LEFT;
+			newPositionDirection |= MOVE_DIRECTION.LEFT;
 		}
 
 		const deltaTop = Math.sign(ui.position.top - ui.originalPosition.top);
@@ -72,7 +71,11 @@ const utils = {
 
 						result.column = (column - (fruitWidth / FREE_CELL_WIDTH)) + 1;
 					}
-				} else { // MOVE_DIRECTION.LEFT
+				} else if ((newPositionDirection & MOVE_DIRECTION.LEFT) == MOVE_DIRECTION.LEFT) {
+					if (cell.left <= fruitPosition.left && fruitPosition.left <= cell.right) {
+						result.column = column;
+					}
+				} else { // STILL
 					if (cell.left <= fruitPosition.left && fruitPosition.left <= cell.right) {
 						result.column = column;
 					}
@@ -80,9 +83,15 @@ const utils = {
 
 				if ((newPositionDirection & MOVE_DIRECTION.BOTTOM) == MOVE_DIRECTION.BOTTOM) {
 					if (cell.top <= fruitPosition.bottom && fruitPosition.bottom <= cell.bottom) {
+						const fruitHeight = Math.abs(fruitPosition.top - fruitPosition.bottom);
+
+						result.row = (row - (fruitHeight / FREE_CELL_HEIGHT)) + 1;
+					}
+				} else if ((newPositionDirection & MOVE_DIRECTION.TOP) == MOVE_DIRECTION.TOP) {
+					if (cell.top <= fruitPosition.top && fruitPosition.top <= cell.bottom) {
 						result.row = row;
 					}
-				} else { // MOVE_DIRECTION.TOP
+				} else { // STILL
 					if (cell.top <= fruitPosition.top && fruitPosition.top <= cell.bottom) {
 						result.row = row;
 					}
@@ -137,7 +146,7 @@ const utils = {
 			let columnCount = 0;
 			for (let x = 0; x < row.length; x++) {
 				const cell = row[x];
-				const cellHasFruit = utils.cellHasFruit(x);
+				const cellHasFruit = utils.cellHasFruit(y, x);
 
 				if (cell.type == CELL_TYPE.PROHIBITED || cellHasFruit) {
 					columnCount = 0;
@@ -146,7 +155,7 @@ const utils = {
 				}
 
 				if (columnCount == fruit.columnSpan) {
-					result.row = y; // per ora sono supportati solo i frutti che occupano una riga
+					result.row = y;
 					result.column = x - columnCount + 1;
 
 					return result;
@@ -156,7 +165,7 @@ const utils = {
 
 		return result;
 	},
-	cellHasFruit(column) {
+	cellHasFruit(row, column) {
 		let result = false;
 
 		const fruitsController = AP.plate.designer.fruitsController;
@@ -165,7 +174,10 @@ const utils = {
 		for (const fruit of fruits) {
 			const fruitPosition = fruit.gridPosition;
 
-			if (fruitPosition.column <= column && column <= fruitPosition.column + fruit.columnSpan - 1) {
+			if (
+				fruitPosition.column <= column && column <= fruitPosition.column + fruit.columnSpan - 1
+				&& fruitPosition.row <= row && row <= fruitPosition.row + fruit.rowSpan - 1
+			) {
 				result = true;
 
 				break;
@@ -173,7 +185,7 @@ const utils = {
 		}
 
 		return result;
-	}
+	},
 };
 
 class FruitGridPosition {
@@ -414,8 +426,8 @@ class Fruit extends Rectangle {
 	constructor(args) {
 		super(args.width, args.height, args.orientation);
 
-		this.rowSpan = args.rowSpan;
-		this.columnSpan = args.columnSpan;
+		this.rowSpan = this.orientation == ORIENTATION.VERTICAL ? args.columnSpan : args.rowSpan;
+		this.columnSpan = this.orientation == ORIENTATION.VERTICAL ? args.rowSpan : args.columnSpan;
 
 		this.uuid = args.uuid;
 		this.code = args.code;
@@ -783,21 +795,21 @@ class FruitsController {
 	}
 
 	onSelectFruit(selectedFruit) {
-		const freePosition = utils.findFirstFreePosition(selectedFruit);
+		const fruitObj = new Fruit({
+			width: selectedFruit.width,
+			height: selectedFruit.height,
+			rowSpan: selectedFruit.rowSpan,
+			columnSpan: selectedFruit.columnSpan,
+			orientation: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].ORIENTATION,
+			uuid: selectedFruit.uuid,
+			code: selectedFruit.code,
+			name: selectedFruit.name,
+			img: selectedFruit.img,
+		});
+
+		const freePosition = utils.findFirstFreePosition(fruitObj);
 
 		if (freePosition.row != null && freePosition.column != null) {
-			const fruitObj = new Fruit({
-				width: selectedFruit.width,
-				height: selectedFruit.height,
-				rowSpan: selectedFruit.rowSpan,
-				columnSpan: selectedFruit.columnSpan,
-				orientation: "H",
-				uuid: selectedFruit.uuid,
-				code: selectedFruit.code,
-				name: selectedFruit.name,
-				img: selectedFruit.img,
-			});
-
 			fruitObj.gridPosition = new FruitGridPosition(freePosition.row, freePosition.column);
 
 			this.fruits.push(fruitObj);
@@ -948,7 +960,36 @@ AP.plate.designer = (function () {
 						// ["0", "0", "0", "0",],
 						// ["_", "_", "_", "_",],
 					]
-				}
+				},
+				{
+					UUID: "200",
+					CODE: "508V",
+					IMG: "/assets/main/img/508VERTICALE.jpg",
+					WIDTH: 1200, // in px
+					HEIGHT: 500, // in px
+					ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
+					GRID: [
+						// LEGEND:
+						// "_" - empty free space
+						// "0" - prohibited space
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+						["_"],
+					],
+				},
 			],
 			schema: {
 				model: {
@@ -956,7 +997,7 @@ AP.plate.designer = (function () {
 				},
 			},
 		}),
-		selectedPlate: "100",
+		selectedPlate: "200",
 		fruits: new kendo.data.DataSource({
 			data: [
 				{
