@@ -4,12 +4,10 @@
 		"_" = { // FREE
 			"WIDTH" = 45,
 			"HEIGHT" = 180,
-			"ORIENTATION" = "V", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION
 		},
 		"0" = { // PROHIBITED
 			"WIDTH" = 52,
 			"HEIGHT" = 105,
-			"ORIENTATION" = "V", // "V" - VERTICAL, "H" - HORIZONTAL
 		},
 	};
 </cfscript>

@@ -266,6 +266,7 @@ class Plate extends Rectangle {
 		this.img = args.img;
 		this.grid = args.grid;
 		this.isSpecial = args.isSpecial;
+		this.cellOrientation = args.cellOrientation;
 	}
 
 	/**
@@ -800,7 +801,7 @@ class FruitsController {
 			height: selectedFruit.height,
 			rowSpan: selectedFruit.rowSpan,
 			columnSpan: selectedFruit.columnSpan,
-			orientation: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].ORIENTATION,
+			orientation: this.plate.cellOrientation,
 			uuid: selectedFruit.uuid,
 			code: selectedFruit.code,
 			name: selectedFruit.name,
@@ -951,15 +952,13 @@ AP.plate.designer = (function () {
 					WIDTH: 1200, // in px
 					HEIGHT: 500, // in px
 					ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
+					CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
 					GRID: [
 						// LEGEND:
 						// "_" - empty free space
 						// "0" - prohibited space
 						["_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_",],
-						// ["_", "_", "_", "_",],
-						// ["0", "0", "0", "0",],
-						// ["_", "_", "_", "_",],
-					]
+					],
 				},
 				{
 					UUID: "200",
@@ -968,6 +967,7 @@ AP.plate.designer = (function () {
 					WIDTH: 1200, // in px
 					HEIGHT: 500, // in px
 					ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
+					CELL_ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
 					GRID: [
 						// LEGEND:
 						// "_" - empty free space
@@ -988,6 +988,53 @@ AP.plate.designer = (function () {
 						["_"],
 						["_"],
 						["_"],
+					],
+				},
+				{
+					UUID: "300",
+					CODE: "SPECIAL1",
+					IMG: "/assets/main/img/508.jpg",
+					WIDTH: 1200, // in px
+					HEIGHT: 500, // in px
+					ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
+					CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+					GRID: [
+						// LEGEND:
+						// "_" - empty free space
+						// "0" - prohibited space
+						["_", "_", "_", "_", "0", "_", "_",],
+					],
+				},
+				{
+					UUID: "400",
+					CODE: "SPECIAL2",
+					IMG: "/assets/main/img/508VERTICALE.jpg",
+					WIDTH: 1200, // in px
+					HEIGHT: 500, // in px
+					ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
+					CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+					GRID: [
+						// LEGEND:
+						// "_" - empty free space
+						// "0" - prohibited space
+						["0", "0", "_", "_",],
+						["_", "_", "0", "0",],
+						["_", "_", "_", "_",],
+					],
+				},
+				{
+					UUID: "500",
+					CODE: "SPECIAL3",
+					IMG: "/assets/main/img/508.jpg",
+					WIDTH: 1200, // in px
+					HEIGHT: 500, // in px
+					ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
+					CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+					GRID: [
+						// LEGEND:
+						// "_" - empty free space
+						// "0" - prohibited space
+						["_", "_", "_", "_", "0", "_", "_", "0", "0", "0", "0",],
 					],
 				},
 			],
@@ -1071,7 +1118,7 @@ AP.plate.designer = (function () {
 			FREE_CELL_WIDTH = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
 			FREE_CELL_HEIGHT = pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
 
-			if (pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].ORIENTATION == ORIENTATION.VERTICAL) {
+			if (selectedPlate.CELL_ORIENTATION == ORIENTATION.VERTICAL) {
 				const tmp = FREE_CELL_WIDTH;
 				FREE_CELL_WIDTH = FREE_CELL_HEIGHT;
 				FREE_CELL_HEIGHT = tmp;
@@ -1088,7 +1135,7 @@ AP.plate.designer = (function () {
 					const cell = new Cell(
 						pageData.GRID_CELL_DIMENSIONS[cellType].WIDTH,
 						pageData.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
-						pageData.GRID_CELL_DIMENSIONS[cellType].ORIENTATION,
+						selectedPlate.CELL_ORIENTATION,
 						cellType,
 					);
 
@@ -1102,6 +1149,7 @@ AP.plate.designer = (function () {
 				width: selectedPlate.WIDTH,
 				height: selectedPlate.HEIGHT,
 				orientation: selectedPlate.ORIENTATION,
+				cellOrientation: selectedPlate.CELL_ORIENTATION,
 				uuid: selectedPlate.UUID,
 				code: selectedPlate.CODE,
 				img: selectedPlate.IMG,
