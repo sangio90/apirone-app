@@ -1063,7 +1063,7 @@ AP.plate.designer = (function () {
 				},
 			},
 		}),
-		selectedPlate: "200",
+		selectedPlate: "100",
 		fruits: new kendo.data.DataSource({
 			data: [
 				{
