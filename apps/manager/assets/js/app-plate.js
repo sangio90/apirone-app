@@ -961,6 +961,25 @@ AP.plate.designer = (function () {
 					],
 				},
 				{
+					UUID: "111",
+					CODE: "1X3",
+					IMG: "/assets/main/img/1X3.jpg",
+					WIDTH: 1200, // in px
+					HEIGHT: 500, // in px
+					ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
+					CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+					GRID: [
+						// LEGEND:
+						// "_" - empty free space
+						// "0" - prohibited space
+						["_", "_",],
+						["0", "0",],
+						["_", "_",],
+						["0", "0",],
+						["_", "_",],
+					],
+				},
+				{
 					UUID: "200",
 					CODE: "508V",
 					IMG: "/assets/main/img/508VERTICALE.jpg",
