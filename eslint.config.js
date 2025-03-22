@@ -16,6 +16,7 @@ module.exports = {
 			"bootbox": "readonly",
 			"document": "readonly",
 			"pageData": "readonly",
+			"markerjs3": "readonly",
 			"setTimeout": "readonly",
 			"localStorage": "readonly",
 		}

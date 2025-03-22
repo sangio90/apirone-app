@@ -41,4 +41,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setView( "plate/designer" );
 	}
 
+	function map(
+		event,
+		rc,
+		prc
+	){
+		prc.title = "Mappa placche";
+
+		prc.jsScripts.add("app-plate");
+
+		event.setView( "plate/map" );
+	}
+
 }

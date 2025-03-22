@@ -1,0 +1,20 @@
+{
+  "name": "@markerjs/markerjs3",
+  "version": "3.1.0",
+  "description": "marker.js 3",
+  "main": "umd/markerjs3.js",
+  "module": "markerjs3.js",
+  "types": "markerjs3.d.ts",
+  "author": "Alan Mendelevich",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ailon/markerjs3"
+  },
+  "keywords": [
+    "image",
+    "annotation",
+    "web components"
+  ],
+  "scripts": {}
+}

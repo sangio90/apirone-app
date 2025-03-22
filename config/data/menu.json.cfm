@@ -15,6 +15,12 @@
 				icon: "fas fa-cogs",
 				title: "Designer",
 				roles: "ADM"
+			},
+			{
+				href: "/manager/plate/map",
+				icon: "fas fa-cogs",
+				title: "Mappa",
+				roles: "ADM"
 			}
 		]
 	},
