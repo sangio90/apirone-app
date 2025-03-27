@@ -16,6 +16,7 @@
 
 		get( "/dashboard" ).to( "MainController.dashboard" ).end();
 		get( "/plate/designer" ).to( "PlateController.designer" ).end();
+		get( "/plate/map" ).to( "PlateController.map" ).end();
 
 
 		/*
