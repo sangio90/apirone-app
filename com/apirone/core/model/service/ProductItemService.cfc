@@ -30,18 +30,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.ProductItem[] function getTree(
-            required String combinationId,
+					 String fruitId,
+            		 String combinationId,
             required Numeric parentId=NullValue(),
             required String level=1, 
             required String orderBy=""
     ) {
-		
+
         var result = [];
 
+        var fruitId = arguments.fruitId;
         var combinationId = arguments.combinationId;
 
         var items = list( 
             combinationId = arguments.combinationId,
+            fruitId = arguments.fruitId,
             parentId = arguments.parentId
         )
 
@@ -57,9 +60,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             result.add( item );
 			
-            var rows = getTree( combinationId, item.getId(), thisLevel+1, thisOrderBy );
+            var rows = getTree( fruitId, combinationId, item.getId(), thisLevel+1, thisOrderBy );
 
-            cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# - [ combId:#combinationId#, itemId:#item.getId()#, level:#thisLevel+1#, itemLen:#items.len()#, orderBy:#thisOrderBy# ] #rows.len()#");
+            cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# - [ combId:#combinationId#, fruitId:#fruitId#, itemId:#item.getId()#, level:#thisLevel+1#, itemLen:#items.len()#, orderBy:#thisOrderBy# ] #rows.len()#");
 
             result = result.merge( rows );
 
@@ -73,10 +76,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public com.apirone.core.model.bean.ProductItem[] function list(
-        required String combinationId
+         	String fruitId
+         	String combinationId
     ) {
 		arguments["limit"] = -1;
-		
+
 		return search(argumentCollection = arguments).getData();
 	
 	}
@@ -107,9 +111,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
     public com.apirone.core.model.bean.Result function search(
-            String lineId
+			String fruitId,
+            String combinationId
         ){
 
+		dump( arguments );
+
+		// solo uno dei due
+		if ( ! ( IsNull( arguments.combinationId ) XOR IsNull( arguments.fruitId ) ) ) {
+			throw( type="ApirOne.errors.AtLeastOneParameterIsRequired", message="At least one parameter is required: combinationId or fruitId" );
+		}
+	
 	    var rows = [];
     	var result = super.getResult();
 

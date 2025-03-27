@@ -21,6 +21,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var obj = build( arguments.fileId );
+
 		cm.put( key, obj );
 	
         return obj;
@@ -40,7 +41,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     public com.apirone.core.model.bean.Result function search(
 					 String typeId,
 					 String combinationId,
-					 String roductItemId,
+					 String productItemId,
 			required Numeric limit = 20,
 			required Numeric offset = 0
     	){

@@ -38,6 +38,8 @@ AP.fruit.detail = (function () {
 
 		openComponentsList: function (event) {
 
+			console.log("openComponentsList", event);
+
 			var element = $( event.currentTarget );
 
 			if ( !element.attr("data-type") ) {
@@ -81,7 +83,57 @@ AP.fruit.detail = (function () {
             return false;
 		},
 
+		removeAttributes: function (event) {
+
+			var checks = $("#combination-items-grid").find("[name=selected]:checked");
+
+			if (checks.length) {
+
+				var values = [];
+
+				checks.each(function (){
+					values.push($(this).val());
+				});
+
+				var ids = values.toString();
+
+				NM.util.ajax({
+					method: "DELETE",
+					url: "/manager/ajax/fruits/" + AP.page.fruitId + "/items",
+					data: { items: ids },
+					callback: {
+						done: function (xhr) {
+
+							AP.widget.notify("success", xhr.data.message.text);
+
+							viewModel.items.read();
+
+						}
+					}
+				});
+
+			} else {
+
+				AP.widget.notify("warning", "Seleziona almeno un attributo");
+
+			}
+
+		},
+
 		searchAttributes: function (event) {
+
+			var thisForm = fields.attributeSearchForm;
+			var params = thisForm.serialize();
+
+			var dataSource = NM.kendo.dataSource({ url: "/manager/ajax/attributes?" + params });
+
+			viewModel.set("attributesList", dataSource);
+
+            return false;
+
+		},
+
+		openImagesList: function (event) {
 
 			var thisForm = fields.attributeSearchForm;
 			var params = thisForm.serialize();
@@ -100,6 +152,9 @@ AP.fruit.detail = (function () {
 
 			var itemId = element.attr("data-parent-id");
 
+			console.log("openAttributesList:element", element);
+			console.log("openAttributesList:itemId", itemId);
+
 			viewModel.set( "itemForAttributes.id", itemId );
 
 			NM.util.openModal( fields.attributeModal );
@@ -113,6 +168,8 @@ AP.fruit.detail = (function () {
 		selectAttribute: function (event) {
 
 			console.log( "selectAttribute:event", event );
+			console.log( "selectAttribute:event.data.id", event.data.id );
+			console.log( "selectAttribute:itemForAttributes.id", viewModel.get("itemForAttributes.id") );
 
 			NM.util.ajax({
 				method: "POST",
@@ -148,4 +205,3 @@ AP.fruit.detail = (function () {
 
 	return pub;
 }());
-

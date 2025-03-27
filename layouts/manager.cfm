@@ -143,12 +143,14 @@
                     </div>
                 </header>
 
-                <div class="row">
+                <div class="row" id="page-content">
                     <div class="col-lg-12 mb-3">
                         #view()#
                     </div>
+                    <div class="col-lg-12 mb-3">
+                        <div>#event.getCurrentEvent()# > #event.getCurrentView()#</div>
+                    </div>
                 </div>
-
             </section>
 
     </section>
@@ -175,6 +177,7 @@
         </cfif>
 
         <iframe src="/manager/live" style="display:none;"></iframe> 
+
     </body>
 </html>
 </cfoutput>

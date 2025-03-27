@@ -4,7 +4,7 @@ AP.fields.my = AP.fields.my || {};
 AP.fields.my.detail = {
     detailRoot: $("#my-account-root"),
     pwdForm: $("#my-account-detail-form"),
-};   
+};
 
 
 $(document).ready(function (){

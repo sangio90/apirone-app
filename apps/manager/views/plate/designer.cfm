@@ -24,7 +24,6 @@
 				Generali
 			</button>
 
-
 			<label>Lista placche</label>
 
 			<div>

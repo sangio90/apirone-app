@@ -89,8 +89,15 @@
                                         <div class="status float-end me-3" id="status-delete"></div>
                                     </div>
         
-                                </div>                                
+                                </div>     
+                                
+                                <form id="combination-grid-form">
 
+                                    #productAttributesList( id="combination-items-grid", type="combination" )#
+                                
+                                </form>                                
+
+                                <!----
                                 <form id="combination-grid-form">
 
                                     #grid(
@@ -115,6 +122,7 @@
                                     )#
 
                                 </form>
+                                ---->
 
                             </div>
 

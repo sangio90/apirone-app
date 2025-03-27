@@ -20,6 +20,4 @@ Created at #now()# */">
 
 <p>File created in <a href="#filePath#" target="_blank">#filePath#</a></p>
 
-<cfdump var="#classes#">
-
 </cfoutput>

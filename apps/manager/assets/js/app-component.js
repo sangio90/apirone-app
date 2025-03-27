@@ -40,7 +40,7 @@ AP.component.list = (function () {
 
 		return false;
 
-	}
+	};
 
 	var getCurrentConfig = function() {
 
@@ -104,11 +104,9 @@ AP.component.list = (function () {
 
 		}
 
-		//console.log("getCurrentConfig:result", result)
-
 		return result;
 
-	}
+	};
 
 	var createId = function( row ) {
 
@@ -120,7 +118,7 @@ AP.component.list = (function () {
 
 		return id;
 
-	}
+	};
 
 	var viewModel = kendo.observable({
 
@@ -140,7 +138,7 @@ AP.component.list = (function () {
 		showSearchResult: function () {
 
 			return viewModel.get("components")?.total() > 0;
-		
+
 		},
 
 		resetFilterSelected: function () {

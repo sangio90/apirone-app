@@ -35,18 +35,20 @@ component extends="com.apirone.core.controller.AbsController" {
                 break;
         }
 
-        var  items = super.fire( "component.list", params );
+        var items = super.fire( "component.list", params );
 
         for( var item in items ) {
+
+            var product = item.getRawProduct();
 
             var row = {
                 "quantity" = item.getQuantity(),
                 "rawProduct" = {
-                    "id" = item.getProduct().getId(),
-                    "name" = item.getProduct().getName(),
+                    "id" = product.getId(),
+                    "name" = product.getName(),
                     "processingType" = {
-                        "id" = item.getProduct().getProcessingType().getId(),
-                        "name" = item.getProduct().getProcessingType().getName()
+                        "id" = product.getProcessingType().getId(),
+                        "name" = product.getProcessingType().getName()
                     }
                 },
                 "variant" = {

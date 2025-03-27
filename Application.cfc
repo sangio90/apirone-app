@@ -31,6 +31,8 @@ component extends="com.apirone.core.root.Application" {
 
 		SetLocale("italian (italy)");
 
+		
+
 		request.isDev = super.isDev;
 
         if ( !StructKeyExists( session, "user" ) ) {
@@ -45,7 +47,6 @@ component extends="com.apirone.core.root.Application" {
 
 		}
 		
-
 		application.cbBootstrap.onRequestStart( arguments.targetPage );
 
 		return true;

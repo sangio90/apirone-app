@@ -1,4 +1,6 @@
-﻿<cfoutput>
+﻿<cfimport prefix="ap" taglib="/apps/utils/ctags">
+
+<cfoutput>
 
     <div id="combination-detail-root">
 
@@ -104,6 +106,13 @@
                                                 data-bind="click:openReorderingModal">
                                                 Riordina attributi &raquo;
                                             </a>
+                                            <br>
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="combination" 
+                                                data-bind="click:openFruitItemsImagesModal">
+                                                Tutte le combinazioni &raquo;
+                                            </a>
                                         </p>
         
                                         <!---
@@ -134,31 +143,16 @@
                                         <div class="status float-end me-3" id="status-delete"></div>
                                     </div>
         
-                                </div>                                
+                                </div>
+
+                                <!---- <ap:productItemList grid="#variables.grid#"> ---->
 
                                 <form id="combination-grid-form">
 
-                                    #grid(
-                                        id      = "combination-items-grid",
-                                        class   = "no-pager",
-                                        columns = "[
-                                            { 'field':'Id', 'title':'ID', width: '60px' },
-                                            { 'field':'name', 'title':'Attributo' },
-                                            { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
-                                            { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
-                                            { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
-                                            { 
-                                                'field'           :'', 
-                                                'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                                'width'           :'40px',
-                                                'headerAttributes': { 'class': 'text-center' }
-                                            }
-                                        ]",
-                                        source: "items",
-                                        rowTemplate = "combination/combination-item-row-tmpl"
-                                    )#
-
+                                    #productAttributesList( id="combination-items-grid", type="combination" )#
+                                
                                 </form>
+
 
                             </div>
 
@@ -186,7 +180,10 @@
         
     </div>
 
+    
     #view("attribute/detail-modal")#
     #view("component/list-modal")#
-
+    <!---
+    #view("fruit/fruit-items-combinations-images-modal")#
+    ---->
 </cfoutput>

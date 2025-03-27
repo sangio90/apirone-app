@@ -40,12 +40,12 @@ component extends="com.apirone.core.controller.AbsController" {
             <cfquery datasource="apirone">
                 DELETE FROM product_items
                 WHERE 
-                    combination_id = '#rc.id#'
+                    combination_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
                     AND attribute_value_id IN 
                         ( 
                             SELECT attribute_value_id 
                             FROM attribute_values 
-                            WHERE attribute_id = '#rc.attributeId#'
+                            WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#rc.attributeId#">::uuid
                         )
             </cfquery>
 

@@ -23,6 +23,7 @@
 
         prc.jsScripts.add( "app-component" );
         prc.jsScripts.add( "app-attribute-detail" );
+        prc.jsScripts.add( "app-product-attribute-list" );
         prc.jsScripts.add( "app-fruit-detail" );
 
         prc.page["fruitId"] = prc.fruit.getId();

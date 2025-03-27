@@ -21,6 +21,7 @@
 
 	<cffunction name="find" returntype="Query">
 
+        <cfargument name="fruitId" type="String">
         <cfargument name="combinationId" type="String">
         <cfargument name="parentId" type="Numeric">
 
@@ -30,15 +31,20 @@
 			FROM
 				product_items
 			WHERE 1=1
-                
-                <cfif IsNull( arguments.parentId ) >
-                    AND parent_id IS NULL
-                <cfelse>
-                    AND parent_id = <cfqueryparam cfsqltype="Integer" value="#arguments.parentId#">
-                </cfif>
+
+				AND parent_id
+					<cfif IsNull( arguments.parentId ) >
+						IS NULL
+					<cfelse>
+						= <cfqueryparam cfsqltype="Integer" value="#arguments.parentId#">
+					</cfif>
 
                 <cfif !IsNull( arguments.combinationId )>
                     AND combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationId#">::uuid
+                </cfif>
+        
+                <cfif !IsNull( arguments.fruitId )>
+                    AND fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruitId#">::uuid
                 </cfif>
         
             ORDER BY 

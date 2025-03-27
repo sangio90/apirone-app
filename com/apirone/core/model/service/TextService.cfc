@@ -238,8 +238,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		throw( type="apirone.errors.textWithoutEntity", message="No entity linked to this translation. Text Id: [#record.text_id#]" );
 		
-		//return NullValue()
-
   	}
 
 }

@@ -172,7 +172,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         ```
 
-        var message = completeMessage( "fruit.itemsAdded" );
+        var message = super.completeMessage( "fruit.itemsAdded" );
 
         result.setData( { "message" = message } );
 
@@ -191,12 +191,12 @@ component extends="com.apirone.core.controller.AbsController" {
         <!--- TODO: better than this --->
         <cfquery datasource="apirone">
             DELETE FROM product_items
-            WHERE product_item_id IN ( #rc.items# )
+            WHERE fruit_id IN ( #rc.items# )
         </cfquery>
 
         ```
 
-        var message = completeMessage( "combination.itemsDeleted" );
+        var message = completeMessage( "fruit.itemsDeleted" );
 
         result.setData( { "message" = message } );
 
@@ -209,7 +209,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var  items = super.fire("ProductItem.getTree", { combinationId = rc.id } );
+        var  items = super.fire("ProductItem.getTree", { fruitId = rc.id } );
 
         for( var item in items ) {
 

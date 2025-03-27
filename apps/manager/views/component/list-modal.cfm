@@ -1,4 +1,5 @@
 ﻿<cfoutput>
+	
 	<div id="component-list-modal" class="modal fade">
 
 		<section class="modal-dialog modal-xl">
@@ -118,7 +119,7 @@
 
 								</div>
 							
-							</div>
+							</form>
 
 						</div>
 

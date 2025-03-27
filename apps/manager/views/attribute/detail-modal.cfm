@@ -180,6 +180,13 @@
                                     </div>
                                 </div>
 
+                                <div class="row mb-3">
+                                    <label for="newValueStatus" class="col-sm-2 text-end mt-2">Modifica l'immagine</label>
+                                    <div class="col-sm-10 mt-2">
+                                        <input type="checkbox" class="form-check-input">
+                                    </div>
+                                </div>
+
                             </form>
                             
                         </div>

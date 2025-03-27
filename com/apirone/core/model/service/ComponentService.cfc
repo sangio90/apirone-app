@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.ComponentDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="productService" type="com.apirone.core.model.service.ProductService";
+	property name="rawProductService" type="com.apirone.core.model.service.RawProductService";
 	property name="variantService" type="com.apirone.core.model.service.VariantService";
 	property name="colorService" type="com.apirone.core.model.service.ColorService";
     /*
@@ -158,7 +158,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.component_id );
 
-			bean.setProduct( getProductService().get( record.raw_product_id ) );
+			bean.setRawProduct( getRawProductService().get( record.raw_product_id ) );
+			
 			bean.setVariant( getVariantService().get( record.variant_id ) );
 			bean.setColor( getColorService().get( record.color_id ) );
 
