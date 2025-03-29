@@ -1213,7 +1213,7 @@ AP.plate.designer = (function () {
 }());
 
 AP.plate.map = (function () {
-	const { MarkerArea, ArrowMarker, MarkerView, Renderer } = markerjs3;
+	const { MarkerArea, CustomImageMarker } = markerjs3;
 
 	const pub = {};
 	const priv = {
@@ -1226,23 +1226,27 @@ AP.plate.map = (function () {
 		// ACTIONS
 		// GETTERS
 		// EVENTS
-		onClickAddArrow: function (event) {
-			priv.markerArea.createMarker(ArrowMarker);
+		onClickAddPin: function (event) {
+			const markerEditor = priv.markerArea.createMarker(CustomImageMarker);
+			markerEditor.marker.defaultSize = { width: 32, height: 32 };
+			markerEditor.marker.imageSrc = "../../../../assets/main/img/pin.png";
 		},
-		onClickSave: function (event) {
-			// get marker area state (annotation)
-			const state = priv.markerArea.getState();
-
-			// display the state in the viewer
-			priv.markerView.style.display = '';
-			priv.markerView.show(state);
-
-			const renderer = new Renderer();
-			renderer.targetImage = priv.targetImg;
-			renderer.rasterize(state).then((dataUrl) => {
-				priv.rasterImage.src = dataUrl;
-				priv.rasterImage.style.display = '';
-			});
+		onClickZoomIn: function (event) {
+			priv.markerArea.zoomLevel += 0.1;
+		},
+		onClickZoomOut: function (event) {
+			if (priv.markerArea.zoomLevel > 0.2) {
+				priv.markerArea.zoomLevel -= 0.1;
+			}
+		},
+		onClickZoomReset: function (event) {
+			priv.markerArea.zoomLevel = 1;
+		},
+		onClickExport: function (event) {
+			priv.state = JSON.stringify(priv.markerArea.getState());
+		},
+		onClickImport: function (event) {
+			priv.markerArea.restoreState(JSON.parse(priv.state));
 		},
 		// INITS
 	});
@@ -1254,20 +1258,11 @@ AP.plate.map = (function () {
 		priv.targetImg = document.createElement("img");
 		priv.targetImg.src = "../../../../assets/main/img/planimetria.jpg";
 
-		const app = document.querySelector(".plate-map");
+		const plateMap = document.querySelector(".plate-map");
 
 		priv.markerArea = new MarkerArea();
 		priv.markerArea.targetImage = priv.targetImg;
-		app.appendChild(priv.markerArea);
-
-		priv.markerView = new MarkerView();
-		priv.markerView.targetImage = priv.targetImg;
-		app.appendChild(priv.markerView);
-		priv.markerView.style.display = "none";
-
-		priv.rasterImage = document.createElement('img');
-		app.appendChild(priv.rasterImage);
-		priv.rasterImage.style.display = 'none';
+		plateMap.appendChild(priv.markerArea);
 	};
 
 	return pub;
