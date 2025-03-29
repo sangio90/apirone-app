@@ -1241,8 +1241,8 @@ AP.plate.map = (function () {
 		// EVENTS
 		onClickAddPin(event) {
 			const markerEditor = priv.markerArea.createMarker(CustomImageMarker);
-			markerEditor.marker.defaultSize = { width: 32, height: 32 };
-			markerEditor.marker.imageSrc = "../../../../assets/main/img/pin.png";
+			markerEditor.marker.defaultSize = { width: 32, height: 32 }; // TODO: rendere dinamico
+			markerEditor.marker.imageSrc = "../../../../assets/main/img/pin.png"; // TODO: rendere dinamico
 		},
 		onClickRemovePin(event) {
 			priv.markerArea.deleteSelectedMarkers();
@@ -1282,7 +1282,7 @@ AP.plate.map = (function () {
 		kendo.bind(setup.container, priv.vm);
 
 		priv.targetImg = document.createElement("img");
-		priv.targetImg.src = "../../../../assets/main/img/planimetria.jpg";
+		priv.targetImg.src = pageData.plateMap.img;
 
 		const plateMap = document.querySelector(".plate-map-body");
 

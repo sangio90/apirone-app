@@ -1,4 +1,10 @@
 <cfscript>
+	// Data from backend
+	plateMap = {
+		"img" = "../../../../assets/main/img/planimetria.jpg",
+		"width" = 856, // in px
+		"height" = 582, // in px
+	};
 </cfscript>
 
 <cfoutput>
@@ -68,6 +74,7 @@
 
 	<script>
 		pageData = {
+			plateMap: #serializeJSON(plateMap)#,
 		};
 	</script>
 </cfoutput>
