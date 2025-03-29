@@ -560,8 +560,42 @@ h2 {
 
 /* START SEZIONE PER LA PAGINA: plate/map */
 
-.plate-map {
-	background-color: #4482e824;
+#plate-map-root {
+	--border-radius: 0.75em;
+	--padding: 0.75em;
+	--toolbar-background-color: white;
+	--container-background-color: #e0e0e0;
+	--container-border-color: #c0c0c0;
+
+	.header-toolbar {
+		display: flex;
+		align-items: center;
+		background-color: var(--toolbar-background-color);
+		padding: var(--padding);
+		border: 0 solid var(--container-border-color);
+		border-width: 1px 1px 0 1px;
+		border-top-left-radius: var(--border-radius);
+		border-top-right-radius: var(--border-radius);
+	}
+
+	.plate-map-body {
+		height: 500px;
+		background-color: var(--container-background-color);
+		border: 0 solid var(--container-border-color);
+		border-width: 0 1px;
+	}
+
+	.footer-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		background-color: var(--toolbar-background-color);
+		padding: var(--padding);
+		border: 0 solid var(--container-border-color);
+		border-width: 0px 1px 1px 1px;
+		border-bottom-left-radius: var(--border-radius);
+		border-bottom-right-radius: var(--border-radius);
+	}
 }
 
 /* END SEZIONE PER LA PAGINA: plate/map */

@@ -1284,7 +1284,7 @@ AP.plate.map = (function () {
 		priv.targetImg = document.createElement("img");
 		priv.targetImg.src = "../../../../assets/main/img/planimetria.jpg";
 
-		const plateMap = document.querySelector(".plate-map");
+		const plateMap = document.querySelector(".plate-map-body");
 
 		priv.markerArea = new MarkerArea();
 		priv.markerArea.targetImage = priv.targetImg;
