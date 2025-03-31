@@ -105,7 +105,6 @@
 
 									</div>
 
-
 									<table class="table table-hover pt-5">
 										<tbody data-bind="source:selected" data-template="component-selected-row-tmpl">
 										</tbody>
@@ -114,8 +113,6 @@
 									<div class="pt-5" data-bind="invisible: showSelectedTable">
 										<p class="text-center">Nessun componente ancora selezionato</p>
 									</div>
-
-									<p>#saveButton( bind="click:save", size="sm" )#</p>
 
 								</div>
 							

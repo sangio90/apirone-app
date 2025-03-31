@@ -21,7 +21,20 @@ AP.component.list = (function () {
 	var fields = AP.component.fields;
 
 	var dataSources = {
-		selected: new kendo.data.DataSource({ data: [] })
+		selected: new kendo.data.DataSource(
+			{
+				data: [],
+				// calculates an id every time the ds is modified
+				change: function( event ) {
+					var data = this.data();
+
+					for( var item of data ) {
+						item.id = createId( item );
+					}
+
+				}
+			}
+		)
 	};
 
 	var selectedExists = function( row ) {
@@ -110,11 +123,7 @@ AP.component.list = (function () {
 
 	var createId = function( row ) {
 
-		console.log("createId:row", row);
-
-		var id = row.product.id + "$$$" + row.color.id + "$$$" + row.variant.id;
-
-		console.log("createId:id", id);
+		var id = row.rawProduct.id + "$$$" + row.color.id + "$$$" + row.variant.id;
 
 		return id;
 
@@ -166,11 +175,11 @@ AP.component.list = (function () {
             var filters = [];
 
             if ( str.length ) {
-                filters.push( { field: "product.name", operator: "contains", value: str } );
+                filters.push( { field: "rawProduct.name", operator: "contains", value: str } );
             };
 
             if ( typeId.length ) {
-                filters.push( { field: "product.processingType.id", operator: "eq", value: typeId } );
+                filters.push( { field: "rawProduct.processingType.id", operator: "eq", value: typeId } );
             };
 
             dataSource.filter( filters );
@@ -203,7 +212,7 @@ AP.component.list = (function () {
 			var row = {
 				//id: createId( comp ),
 				quantity: 1,
-				product: {
+				rawProduct: {
 					id: product.id,
 					name: product.name,
 					processingType: {
@@ -308,7 +317,7 @@ AP.component.list = (function () {
             return false;
 		},
 
-        backToComponents: function (event) {
+        showComponentsList: function (event) {
 
 			viewModel.set("showSearchPanel", true);
 
@@ -367,13 +376,10 @@ AP.component.list = (function () {
 
 		viewModel.set( "currentItem", item );
 
-		//var current = viewModel.get( "currentItem" );
-
-		//console.log("component:open:curr", current );
-		//console.log("component:open:getCurrentConfig", getCurrentConfig() );
-
 		viewModel.set( "colors", [] );
 		viewModel.set( "variants", [] );
+
+		viewModel.showComponentsList();
 
 		NM.util.ajax({
 			method: "GET",

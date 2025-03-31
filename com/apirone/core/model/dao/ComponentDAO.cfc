@@ -80,11 +80,11 @@
 
 		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
 
-        <cfquery name="local.q" datasource="apirone">
+        <cfquery name="local.q" datasource="apirone" result="result">
 			DELETE FROM 
 				components
 			WHERE 1=1
-				AND raw_product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getProduct().getId()#">
+				AND raw_product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getRawProduct().getId()#">
 				AND variant_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">
 				AND color_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getColor().getId()#">
 				AND
@@ -141,7 +141,7 @@
 
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getProduct().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getRawProduct().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getColor().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.component.getQuantity()#">,

@@ -5,6 +5,26 @@
 
 <h3>Articolo</h3>
 <cfquery name="n" datasource="verticale" result="result">
+    SELECT
+        TOP 5
+        arcodart,
+        arsemlav,
+        artipmat,
+        arcodart,
+        ardesart,
+        artipmat
+    FROM
+        azapi_artico a
+    WHERE 1=1
+        AND arcodart LIKE ' %'
+</cfquery>
+
+<cfdump var="#n#">
+<cfdump var="#result#">
+
+<cfabort>
+
+<cfquery name="n" datasource="verticale" result="result">
 <!------
     SELECT *
     FROM

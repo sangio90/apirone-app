@@ -37,9 +37,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var items = super.fire( "component.list", params );
 
+        dump(items.len());
+
+
         for( var item in items ) {
 
             var product = item.getRawProduct();
+
+            dump(DESerializeJSON(SerializeJSON(( product ))));
 
             var row = {
                 "quantity" = item.getQuantity(),
@@ -129,15 +134,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
         for( var thisComponent in components ) {
 
-            var color   = super.bean("Color");
-            var product = super.bean("RawProduct");
-            var variant = super.bean("Variant");
+            var color      = super.bean("Color");
+            var rawProduct = super.bean("RawProduct");
+            var variant    = super.bean("Variant");
 
             variant.setId( thisComponent.variant.id )
             color.setId( thisComponent.color.id )
-            product.setId( thisComponent.product.id )
+            rawProduct.setId( thisComponent.rawProduct.id )
 
-            component.setProduct( product );
+            component.setRawProduct( rawProduct );
             component.setColor( color );
             component.setVariant( variant );
             component.setQuantity( thisComponent.quantity );

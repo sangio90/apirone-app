@@ -425,14 +425,14 @@ AP.combination.list = (function () {
 
 	pub.init = function () {
 
-		console.log("combination:init")
+		console.log("combination:init");
 
 		kendo.bind(fields.rootDetail, viewModel);
 
 		viewModel.loadFinishes();
 
 		initSort();
-		
+
 	};
 
 	var initUpload = function() {
@@ -441,7 +441,7 @@ AP.combination.list = (function () {
 
 		var thisUrl = viewModel.get("currentUploadUrl");
 
-		NM.util.openModal( fields.imagesModal );		
+		NM.util.openModal( fields.imagesModal );
 
 		console.log("total", images.total() );
 
@@ -451,9 +451,9 @@ AP.combination.list = (function () {
 			if( images.total() > 0 ) {
 
 				console.log("total:in", images.total())
-	
+
 				for ( var image of images.data() ) {
-			
+
 					var uid = image.uid;
 
 					console.log("image", image)
@@ -465,11 +465,11 @@ AP.combination.list = (function () {
 						url: thisUrl,
 						add: function (event, data) { 
 							var uid = $(event.target).data("uid");
-							
+
 							var status = $("#image-upload-status-" + uid );
-							
+
 							status.html("");
-							
+
 							//TODO: get list form configuration
 							if (!(/\.(jpg|jpeg|png|pdf)$/i).test(data.files[0].name)) {
 								status.html("<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>");
