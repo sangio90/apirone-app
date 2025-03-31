@@ -155,6 +155,14 @@ declare class SvgHelper {
      * @returns SVG image element
      */
     static createSvgFromString(stringSvg: string): SVGSVGElement;
+    /**
+     * Creates an SVG filter element.
+     * @param id filter id
+     * @param attributes other filter element attributes
+     * @param innerHTML filter definition as string
+     * @returns filter element
+     */
+    static createFilter(id: string, attributes?: Array<[string, string]>, innerHTML?: string): SVGFilterElement;
 }
 
 /**
@@ -245,6 +253,13 @@ interface AnnotationState {
      */
     height: number;
     /**
+     * Default SVG filter to apply to markers in the annotation.
+     * (e.g. drop shadow, outline, glow)
+     *
+     * @since 3.2.0
+     */
+    defaultFilter?: string;
+    /**
      * Array of marker states for markers in the annotation.
      */
     markers: MarkerBaseState[];
@@ -279,6 +294,16 @@ declare class MarkerBase {
      */
     get typeName(): string;
     /**
+     * Marker type title (display name) used for accessibility and other attributes.
+     */
+    static title: string;
+    /**
+     * When true, the default filter is applied to the marker's visual.
+     *
+     * @since 3.2.0
+     */
+    static applyDefaultFilter: boolean;
+    /**
      * SVG container object holding the marker's visual.
      *
      * It is created and passed to the constructor by marker editor or viewer when creating the marker.
@@ -302,10 +327,6 @@ declare class MarkerBase {
      * The default marker size when the marker is created with a click (without dragging).
      */
     defaultSize: ISize;
-    /**
-     * Marker type title (display name) used for accessibility and other attributes.
-     */
-    static title: string;
     /**
      * Marker lifecycle stage.
      *
@@ -854,6 +875,7 @@ declare class PolygonMarker extends MarkerBase {
     selectorVisualLines: SVGLineElement[];
     visibleVisual: SVGGraphicsElement | undefined;
     protected applyStrokeColor(): void;
+    protected applyFillColor(): void;
     protected applyStrokeWidth(): void;
     protected applyStrokeDasharray(): void;
     protected applyOpacity(): void;
@@ -909,6 +931,7 @@ interface FreehandMarkerState extends MarkerBaseState {
 declare class FreehandMarker extends MarkerBase {
     static typeName: string;
     static title: string;
+    static applyDefaultFilter: boolean;
     /**
      * Points of the freehand line.
      */
@@ -1250,6 +1273,7 @@ declare class TextMarker extends RectangularBoxMarkerBase {
 declare class CoverMarker extends ShapeMarkerBase {
     static typeName: string;
     static title: string;
+    static applyDefaultFilter: boolean;
     constructor(container: SVGGElement);
     protected getPath(width?: number, height?: number): string;
 }
@@ -1263,6 +1287,7 @@ declare class CoverMarker extends ShapeMarkerBase {
 declare class HighlightMarker extends ShapeMarkerBase {
     static typeName: string;
     static title: string;
+    static applyDefaultFilter: boolean;
     constructor(container: SVGGElement);
     protected getPath(width?: number, height?: number): string;
 }
@@ -1591,6 +1616,32 @@ declare class CurveMarker extends LineMarker {
 }
 
 /**
+ * Highlighter marker imitates a freeform highlighter pen.
+ *
+ * @summary Semi-transparent freeform marker.
+ * @group Markers
+ * @since 3.2.0
+ */
+declare class HighlighterMarker extends FreehandMarker {
+    static typeName: string;
+    static title: string;
+    static applyDefaultFilter: boolean;
+    constructor(container: SVGGElement);
+}
+
+/**
+ * A set of common SVG filters that can be used to make markers more legible
+ * or just for visual effect.
+ */
+declare class SvgFilters {
+    /**
+     * Returns a set of default filters that can be used to make markers more legible.
+     * @returns array of SVG filters.
+     */
+    static getDefaultFilterSet(): SVGFilterElement[];
+}
+
+/**
  * Properties for marker editor.
  */
 interface MarkerEditorProperties<TMarkerType extends MarkerBase = MarkerBase> {
@@ -1804,27 +1855,31 @@ declare class MarkerBaseEditor<TMarkerType extends MarkerBase = MarkerBase> {
      *
      * @param point - event coordinates.
      * @param target - direct event target element.
+     * @param ev - pointer event.
      */
-    pointerDown(point: IPoint, target?: EventTarget): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
     /**
      * Handles pointer (mouse, touch, stylus, etc.) double click event.
      *
      * @param point - event coordinates.
      * @param target - direct event target element.
+     * @param ev - pointer event.
      */
-    dblClick(point: IPoint, target?: EventTarget): void;
+    dblClick(point: IPoint, target?: EventTarget, ev?: MouseEvent): void;
     /**
      * Handles marker manipulation (move, resize, rotate, etc.).
      *
      * @param point - event coordinates.
+     * @param ev - pointer event.
      */
-    manipulate(point: IPoint): void;
+    manipulate(point: IPoint, ev?: PointerEvent): void;
     /**
      * Handles pointer (mouse, touch, stylus, etc.) up event.
      *
      * @param point - event coordinates.
+     * @param ev - pointer event.
      */
-    pointerUp(point: IPoint): void;
+    pointerUp(point: IPoint, ev?: PointerEvent): void;
     /**
      * Disposes the marker and clean's up.
      */
@@ -2055,15 +2110,43 @@ declare class MarkerArea extends HTMLElement {
     private prevPanPoint;
     private panTo;
     private undoRedoManager;
+    private _defaultFilter?;
+    /**
+     * Returns the default SVG filter for the created markers.
+     *
+     * @since 3.2.0
+     */
+    get defaultFilter(): string | undefined;
+    /**
+     * Sets the default SVG filter for the created markers.
+     *
+     * @remarks
+     * The filter should be a valid SVG filter string.
+     *
+     * In Chromium-based browsers and Firefox, you can use CSS filter strings
+     *  e.g. "drop-shadow(2px 2px 2px black)". Unfortunately, at the time of
+     * the implementation this doesn't work in Safari (meaning any browser on iOS as well).
+     *
+     * For cross-browser compatibility, version 3.3 introduces a set of default filters.
+     * These are dropShadow, outline, and glow. You can use them by setting the defaultFilter
+     * to "url(#dropShadow)", "url(#outline)", or "url(#glow)" respectively.
+     *
+     * @since 3.2.0
+     */
+    set defaultFilter(value: string | undefined);
+    private _defsElement?;
+    private _defs;
     constructor();
     private connectedCallback;
     private disconnectedCallback;
     private createLayout;
     private addMainCanvas;
+    private addDefsToMainCanvas;
     private setMainCanvasSize;
     private setEditingTargetSize;
     private initOverlay;
     private addTargetImage;
+    private addDefaultFilterDefs;
     /**
      * Registers a marker type and its editor to be available in the marker area.
      * @param markerType
@@ -2107,8 +2190,10 @@ declare class MarkerArea extends HTMLElement {
      */
     deselectEditor(editor?: MarkerBaseEditor): void;
     private touchPoints;
+    private leadPointerId?;
     private isDragging;
     private isSelecting;
+    private isPanning;
     private _marqueeSelectOutline;
     private _marqueeSelectRect;
     private _manipulationStartX;
@@ -2177,6 +2262,14 @@ declare class MarkerArea extends HTMLElement {
      */
     redo(): void;
     private redoStep;
+    /**
+     * Adds "defs" to main canvas SVG.
+     * Useful for filters, custom fonts and potentially other scenarios.
+     *
+     * @param nodes
+     * @since 3.3.0
+     */
+    addDefs(...nodes: (string | Node)[]): void;
     addEventListener<T extends keyof MarkerAreaEventMap>(type: T, listener: (this: MarkerArea, ev: MarkerAreaEventMap[T]) => void, options?: boolean | AddEventListenerOptions): void;
     addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => void, options?: boolean | AddEventListenerOptions | undefined): void;
     removeEventListener<T extends keyof MarkerAreaEventMap>(type: T, listener: (this: MarkerArea, ev: MarkerAreaEventMap[T]) => void, options?: boolean | EventListenerOptions): void;
@@ -2305,14 +2398,14 @@ declare class RectangularBoxMarkerBaseEditor<TMarkerType extends RectangularBoxM
     private disableRotation;
     constructor(properties: MarkerEditorProperties<TMarkerType>);
     ownsTarget(el: EventTarget): boolean;
-    pointerDown(point: IPoint, target?: EventTarget): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
     /**
      * When set to true marker created event will not be triggered.
      */
     protected _suppressMarkerCreateEvent: boolean;
-    pointerUp(point: IPoint): void;
-    manipulate(point: IPoint): void;
-    protected resize(point: IPoint): void;
+    pointerUp(point: IPoint, ev?: PointerEvent): void;
+    manipulate(point: IPoint, ev?: PointerEvent): void;
+    protected resize(point: IPoint, preserveAspectRatio?: boolean): void;
     /**
      * Sets control box size and location.
      */
@@ -2366,9 +2459,9 @@ declare class RectangularBoxMarkerBaseEditor<TMarkerType extends RectangularBoxM
  */
 declare class ShapeOutlineMarkerEditor<TMarkerType extends ShapeOutlineMarkerBase = ShapeOutlineMarkerBase> extends RectangularBoxMarkerBaseEditor<TMarkerType> {
     constructor(properties: MarkerEditorProperties<TMarkerType>);
-    pointerDown(point: IPoint, target?: EventTarget): void;
-    protected resize(point: IPoint): void;
-    pointerUp(point: IPoint): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
+    protected resize(point: IPoint, preserveAspectRatio?: boolean): void;
+    pointerUp(point: IPoint, ev?: PointerEvent): void;
 }
 
 /**
@@ -2421,9 +2514,9 @@ declare class LinearMarkerEditor<TMarkerType extends LinearMarkerBase = LinearMa
     protected activeGrip?: ResizeGrip;
     constructor(properties: MarkerEditorProperties<TMarkerType>);
     ownsTarget(el: EventTarget): boolean;
-    pointerDown(point: IPoint, target?: EventTarget): void;
-    pointerUp(point: IPoint): void;
-    manipulate(point: IPoint): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
+    pointerUp(point: IPoint, ev?: PointerEvent): void;
+    manipulate(point: IPoint, ev?: PointerEvent): void;
     protected resize(point: IPoint): void;
     /**
      * Creates control box for manipulation controls.
@@ -2491,14 +2584,14 @@ declare class PolygonMarkerEditor<TMarkerType extends PolygonMarker = PolygonMar
     protected activeGrip?: ResizeGrip;
     constructor(properties: MarkerEditorProperties<TMarkerType>);
     ownsTarget(el: EventTarget): boolean;
-    pointerDown(point: IPoint, target?: EventTarget): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
     private startCreation;
     private addNewPointWhileCreating;
     private finishCreation;
-    pointerUp(point: IPoint): void;
-    manipulate(point: IPoint): void;
+    pointerUp(point: IPoint, ev?: PointerEvent): void;
+    manipulate(point: IPoint, ev?: PointerEvent): void;
     protected resize(point: IPoint): void;
-    dblClick(point: IPoint, target?: EventTarget | undefined): void;
+    dblClick(point: IPoint, target?: EventTarget, ev?: MouseEvent): void;
     /**
      * Creates control box for manipulation controls.
      */
@@ -2550,12 +2643,12 @@ declare class FreehandMarkerEditor<TMarkerType extends FreehandMarker = Freehand
     private controlRect?;
     constructor(properties: MarkerEditorProperties<TMarkerType>);
     ownsTarget(el: EventTarget): boolean;
-    pointerDown(point: IPoint, target?: EventTarget): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
     private startCreation;
     private addNewPointWhileCreating;
     private finishCreation;
-    pointerUp(point: IPoint): void;
-    manipulate(point: IPoint): void;
+    pointerUp(point: IPoint, ev?: PointerEvent): void;
+    manipulate(point: IPoint, ev?: PointerEvent): void;
     /**
      * Creates control box for manipulation controls.
      */
@@ -2731,11 +2824,11 @@ declare class TextMarkerEditor<TMarkerType extends TextMarker = TextMarker> exte
     constructor(properties: MarkerEditorProperties<TMarkerType>);
     private _pointerDownTime;
     private _pointerDownPoint;
-    pointerDown(point: IPoint, target?: EventTarget): void;
-    dblClick(point: IPoint, target?: EventTarget): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
+    dblClick(point: IPoint, target?: EventTarget, ev?: MouseEvent): void;
     protected setSize(): void;
-    protected resize(point: IPoint): void;
-    pointerUp(point: IPoint): void;
+    protected resize(point: IPoint, preserveAspectRatio?: boolean): void;
+    pointerUp(point: IPoint, ev?: PointerEvent): void;
     private showEditor;
     private hideEditor;
     private markerSizeChanged;
@@ -2773,8 +2866,8 @@ declare class CalloutMarkerEditor<TMarkerType extends CalloutMarker = CalloutMar
     private createTipGrip;
     protected positionGrips(): void;
     ownsTarget(el: EventTarget): boolean;
-    pointerDown(point: IPoint, target?: EventTarget): void;
-    protected resize(point: IPoint): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
+    protected resize(point: IPoint, preserveAspectRatio?: boolean): void;
 }
 
 /**
@@ -2785,8 +2878,8 @@ declare class CalloutMarkerEditor<TMarkerType extends CalloutMarker = CalloutMar
  */
 declare class ImageMarkerEditor<TMarkerType extends ImageMarkerBase = ImageMarkerBase> extends RectangularBoxMarkerBaseEditor<TMarkerType> {
     constructor(properties: MarkerEditorProperties<TMarkerType>);
-    pointerDown(point: IPoint, target?: EventTarget): void;
-    pointerUp(point: IPoint): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
+    pointerUp(point: IPoint, ev?: PointerEvent): void;
 }
 
 /**
@@ -2810,9 +2903,9 @@ declare class CurveMarkerEditor<TMarkerType extends CurveMarker = CurveMarker> e
     private curveControlLine1?;
     private curveControlLine2?;
     ownsTarget(el: EventTarget): boolean;
-    pointerDown(point: IPoint, target?: EventTarget): void;
+    pointerDown(point: IPoint, target?: EventTarget, ev?: PointerEvent): void;
     protected resize(point: IPoint): void;
-    manipulate(point: IPoint): void;
+    manipulate(point: IPoint, ev?: PointerEvent): void;
     protected setupControlBox(): void;
     protected adjustControlBox(): void;
     protected addControlGrips(): void;
@@ -2956,21 +3049,46 @@ declare class MarkerView extends HTMLElement {
      * Sets the current zoom level.
      */
     set zoomLevel(value: number);
+    private _defaultFilter?;
+    /**
+     * Returns the default SVG filter for the created markers.
+     *
+     * @since 3.2.0
+     */
+    get defaultFilter(): string | undefined;
+    /**
+     * Sets the default SVG filter for the created markers
+     * (e.g. "drop-shadow(2px 2px 2px black)").
+     *
+     * @since 3.2.0
+     */
+    set defaultFilter(value: string | undefined);
     private _isInitialized;
+    private _defsElement?;
+    private _defs;
+    private prevPanPoint;
     constructor();
     private connectedCallback;
     private disconnectedCallback;
     private createLayout;
     private addMainCanvas;
+    private addDefsToMainCanvas;
     private setMainCanvasSize;
     private setEditingTargetSize;
     private addTargetImage;
+    private addDefaultFilterDefs;
     private addNewMarker;
     private attachMarkerEvents;
     private attachEvents;
     private attachWindowEvents;
     private detachEvents;
     private detachWindowEvents;
+    private touchPoints;
+    private leadPointerId?;
+    private onCanvasPointerDown;
+    private onPointerMove;
+    private onPointerUp;
+    private onPointerOut;
     private getMarkerTypeByName;
     /**
      * Adds a new marker type to be available in the viewer.
@@ -2984,6 +3102,7 @@ declare class MarkerView extends HTMLElement {
      */
     show(state: AnnotationState): void;
     private scaleMarkers;
+    private panTo;
     /**
      * NOTE:
      *
@@ -2996,6 +3115,12 @@ declare class MarkerView extends HTMLElement {
     private addLogo;
     private removeLogo;
     private positionLogo;
+    /**
+     * Adds "defs" to main canvas SVG.
+     * Useful for filters, custom fonts and potentially other scenarios.
+     * @since 3.3.0
+     */
+    addDefs(...nodes: (string | Node)[]): void;
     addEventListener<T extends keyof MarkerViewEventMap>(type: T, listener: (this: MarkerView, ev: MarkerViewEventMap[T]) => void, options?: boolean | AddEventListenerOptions): void;
     addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => void, options?: boolean | AddEventListenerOptions | undefined): void;
     removeEventListener<T extends keyof MarkerViewEventMap>(type: T, listener: (this: MarkerView, ev: MarkerViewEventMap[T]) => void, options?: boolean | EventListenerOptions): void;
@@ -3103,12 +3228,30 @@ declare class Renderer {
      * Both `width` and `height` have to be set for this to take effect.
      */
     height?: number;
+    private _defaultFilter?;
+    /**
+     * Returns the default SVG filter for the created markers.
+     *
+     * @since 3.2.0
+     */
+    get defaultFilter(): string | undefined;
+    /**
+     * Sets the default SVG filter for the created markers
+     * (e.g. "drop-shadow(2px 2px 2px black)").
+     *
+     * @since 3.2.0
+     */
+    set defaultFilter(value: string | undefined);
+    private _defsElement?;
+    private _defs;
     constructor();
     private init;
     private addMainCanvas;
+    private addDefsToMainCanvas;
     private setMainCanvasSize;
     private setEditingTargetSize;
     private addTargetImage;
+    private addDefaultFilterDefs;
     private addNewMarker;
     private getMarkerTypeByName;
     /**
@@ -3129,6 +3272,12 @@ declare class Renderer {
      * @returns
      */
     rasterize(state: AnnotationState, targetCanvas?: HTMLCanvasElement): Promise<string>;
+    /**
+     * Adds "defs" to main canvas SVG.
+     * Useful for filters, custom fonts and potentially other scenarios.
+     * @since 3.3.0
+     */
+    addDefs(...nodes: (string | Node)[]): void;
 }
 
-export { Activator, type AnnotationState, ArrowMarker, ArrowMarkerEditor, type ArrowMarkerState, type ArrowType, type BlurHandler, CalloutMarker, CalloutMarkerEditor, type CalloutMarkerState, CaptionFrameMarker, CaptionFrameMarkerEditor, type CaptionFrameMarkerState, CheckImageMarker, CoverMarker, CurveMarker, CurveMarkerEditor, type CurveMarkerState, CustomImageMarker, EllipseFrameMarker, EllipseMarker, type FontSize, FrameMarker, FreehandMarker, FreehandMarkerEditor, type FreehandMarkerState, Grip, type GripLocation, HighlightMarker, type IPoint, type ISize, type ITransformMatrix, ImageMarkerBase, type ImageMarkerBaseState, ImageMarkerEditor, type ImageType, LineMarker, LinearMarkerBase, type LinearMarkerBaseState, LinearMarkerEditor, MarkerArea, type MarkerAreaEventData, type MarkerAreaEventMap, type MarkerAreaMode, MarkerBase, MarkerBaseEditor, type MarkerBaseState, type MarkerCreationStyle, type MarkerEditorEventData, type MarkerEditorProperties, type MarkerEditorState, type MarkerEventData, type MarkerStage, MarkerView, type MarkerViewEventData, type MarkerViewEventMap, MeasurementMarker, PolygonMarker, PolygonMarkerEditor, type PolygonMarkerState, RectangularBoxMarkerBase, type RectangularBoxMarkerBaseState, Renderer, ResizeGrip, RotateGrip, ShapeMarkerBase, type ShapeMarkerBaseState, ShapeMarkerEditor, ShapeOutlineMarkerBase, type ShapeOutlineMarkerBaseState, ShapeOutlineMarkerEditor, SvgHelper, TextBlock, TextBlockEditor, type TextChangedHandler, TextMarker, TextMarkerEditor, type TextMarkerState, XImageMarker };
+export { Activator, type AnnotationState, ArrowMarker, ArrowMarkerEditor, type ArrowMarkerState, type ArrowType, type BlurHandler, CalloutMarker, CalloutMarkerEditor, type CalloutMarkerState, CaptionFrameMarker, CaptionFrameMarkerEditor, type CaptionFrameMarkerState, CheckImageMarker, CoverMarker, CurveMarker, CurveMarkerEditor, type CurveMarkerState, CustomImageMarker, EllipseFrameMarker, EllipseMarker, type FontSize, FrameMarker, FreehandMarker, FreehandMarkerEditor, type FreehandMarkerState, Grip, type GripLocation, HighlightMarker, HighlighterMarker, type IPoint, type ISize, type ITransformMatrix, ImageMarkerBase, type ImageMarkerBaseState, ImageMarkerEditor, type ImageType, LineMarker, LinearMarkerBase, type LinearMarkerBaseState, LinearMarkerEditor, MarkerArea, type MarkerAreaEventData, type MarkerAreaEventMap, type MarkerAreaMode, MarkerBase, MarkerBaseEditor, type MarkerBaseState, type MarkerCreationStyle, type MarkerEditorEventData, type MarkerEditorProperties, type MarkerEditorState, type MarkerEventData, type MarkerStage, MarkerView, type MarkerViewEventData, type MarkerViewEventMap, MeasurementMarker, PolygonMarker, PolygonMarkerEditor, type PolygonMarkerState, RectangularBoxMarkerBase, type RectangularBoxMarkerBaseState, Renderer, ResizeGrip, RotateGrip, ShapeMarkerBase, type ShapeMarkerBaseState, ShapeMarkerEditor, ShapeOutlineMarkerBase, type ShapeOutlineMarkerBaseState, ShapeOutlineMarkerEditor, SvgFilters, SvgHelper, TextBlock, TextBlockEditor, type TextChangedHandler, TextMarker, TextMarkerEditor, type TextMarkerState, XImageMarker };

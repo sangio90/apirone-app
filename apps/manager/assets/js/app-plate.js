@@ -1213,36 +1213,66 @@ AP.plate.designer = (function () {
 }());
 
 AP.plate.map = (function () {
-	const { MarkerArea, ArrowMarker, MarkerView, Renderer } = markerjs3;
+	const { MarkerArea, CustomImageMarker } = markerjs3;
 
 	const pub = {};
 	const priv = {
 		container: null,
+		markerArea: null,
 	};
 
 	priv.vm = new kendo.data.ObservableObject({
 		// DATA
+		isEnabledUndo: false,
+		isEnabledRedo: false,
+		isEnabledRemovePin: false,
 		// CONDITIONS
 		// ACTIONS
+		updateUndoRedoButtons(event) {
+			this.set("isEnabledUndo", priv.markerArea.isUndoPossible);
+			this.set("isEnabledRedo", priv.markerArea.isRedoPossible);
+		},
+		updateRemovePinButton(event) {
+			setTimeout(() => { // TODO: togliere quando la libreria avra' il fix
+				this.set("isEnabledRemovePin", priv.markerArea.selectedMarkerEditors.length > 0);
+			}, 10);
+		},
 		// GETTERS
 		// EVENTS
-		onClickAddArrow: function (event) {
-			priv.markerArea.createMarker(ArrowMarker);
+		onClickAddPin(event) {
+			const markerEditor = priv.markerArea.createMarker(CustomImageMarker);
+			markerEditor.marker.defaultSize = { width: 32, height: 32 }; // TODO: rendere dinamico
+			markerEditor.marker.imageSrc = "../../../../assets/main/img/pin.png"; // TODO: rendere dinamico
 		},
-		onClickSave: function (event) {
-			// get marker area state (annotation)
-			const state = priv.markerArea.getState();
-
-			// display the state in the viewer
-			priv.markerView.style.display = '';
-			priv.markerView.show(state);
-
-			const renderer = new Renderer();
-			renderer.targetImage = priv.targetImg;
-			renderer.rasterize(state).then((dataUrl) => {
-				priv.rasterImage.src = dataUrl;
-				priv.rasterImage.style.display = '';
-			});
+		onClickRemovePin(event) {
+			priv.markerArea.deleteSelectedMarkers();
+		},
+		onClickUndo(event) {
+			if (priv.markerArea.isUndoPossible) {
+				priv.markerArea.undo();
+			}
+		},
+		onClickRedo(event) {
+			if (priv.markerArea.isRedoPossible) {
+				priv.markerArea.redo();
+			}
+		},
+		onClickZoomIn(event) {
+			priv.markerArea.zoomLevel += 0.1;
+		},
+		onClickZoomOut(event) {
+			if (priv.markerArea.zoomLevel > 0.2) {
+				priv.markerArea.zoomLevel -= 0.1;
+			}
+		},
+		onClickZoomReset(event) {
+			priv.markerArea.zoomLevel = 1;
+		},
+		onClickExport(event) {
+			priv.state = JSON.stringify(priv.markerArea.getState());
+		},
+		onClickImport(event) {
+			priv.markerArea.restoreState(JSON.parse(priv.state));
 		},
 		// INITS
 	});
@@ -1252,22 +1282,18 @@ AP.plate.map = (function () {
 		kendo.bind(setup.container, priv.vm);
 
 		priv.targetImg = document.createElement("img");
-		priv.targetImg.src = "../../../../assets/main/img/planimetria.jpg";
+		priv.targetImg.src = pageData.plateMap.img;
 
-		const app = document.querySelector(".plate-map");
+		const plateMap = document.querySelector(".plate-map-body");
 
 		priv.markerArea = new MarkerArea();
 		priv.markerArea.targetImage = priv.targetImg;
-		app.appendChild(priv.markerArea);
+		plateMap.appendChild(priv.markerArea);
 
-		priv.markerView = new MarkerView();
-		priv.markerView.targetImage = priv.targetImg;
-		app.appendChild(priv.markerView);
-		priv.markerView.style.display = "none";
-
-		priv.rasterImage = document.createElement('img');
-		app.appendChild(priv.rasterImage);
-		priv.rasterImage.style.display = 'none';
+		priv.markerArea.addEventListener("areastatechange", priv.vm.updateUndoRedoButtons.bind(priv.vm));
+		priv.markerArea.addEventListener("markerselect", priv.vm.updateRemovePinButton.bind(priv.vm));
+		priv.markerArea.addEventListener("markerdeselect", priv.vm.updateRemovePinButton.bind(priv.vm));
+		priv.markerArea.addEventListener("markerdelete", priv.vm.updateRemovePinButton.bind(priv.vm));
 	};
 
 	return pub;
