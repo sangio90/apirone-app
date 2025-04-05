@@ -4,7 +4,8 @@
 		{
 			"uuid" = createUUID(),
 			"img" = "../../../../assets/main/img/plate1.png",
-			"quantity" = 1,
+			"totalQuantity" = 1,
+			"availableQuantity" = 1,
 			"marker" = {
 				"img" = "../../../../assets/main/img/red_pin.png",
 				"size" = {
@@ -16,7 +17,8 @@
 		{
 			"uuid" = createUUID(),
 			"img" = "../../../../assets/main/img/plate2.png",
-			"quantity" = 10,
+			"totalQuantity" = 10,
+			"availableQuantity" = 10,
 			"marker" = {
 				"img" = "../../../../assets/main/img/green_pin.png",
 				"size" = {
@@ -28,7 +30,8 @@
 		{
 			"uuid" = createUUID(),
 			"img" = "../../../../assets/main/img/plate3.png",
-			"quantity" = 100,
+			"totalQuantity" = 100,
+			"availableQuantity" = 100,
 			"marker" = {
 				"img" = "../../../../assets/main/img/blue_pin.png",
 				"size" = {

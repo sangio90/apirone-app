@@ -1248,7 +1248,7 @@ AP.plate.map = (function () {
 			const selectedPlate = this.get("selectedPlate");
 
 			if (plate) {
-				const oldQuantity = plate.get("quantity");
+				const oldQuantity = plate.get("availableQuantity");
 
 				let newQuantity = oldQuantity;
 
@@ -1261,11 +1261,37 @@ AP.plate.map = (function () {
 				}
 
 				if (newQuantity != oldQuantity) {
-					plate.set("quantity", newQuantity);
+					plate.set("availableQuantity", newQuantity);
 
 					if (selectedPlate === plate) {
 						this.set("selectedPlateMarkersQuantity", newQuantity);
 					}
+				}
+			}
+		},
+		postUndoRedo() { // TODO: redo non funziona perche' va persa la property plateUUID
+			const selectedPlate = this.get("selectedPlate");
+			const plateAvailableQuantitiesMap = new Map();
+
+			for (const plate of this.get("plates")) {
+				plate.set("availableQuantity", plate.totalQuantity);
+
+				plateAvailableQuantitiesMap.set(plate.uuid, plate.availableQuantity);
+			}
+
+			for (const marker of priv.markerArea.editors) {
+				const currentPlateAvailableQuantity = plateAvailableQuantitiesMap.get(marker.plateUUID);
+
+				plateAvailableQuantitiesMap.set(marker.plateUUID, currentPlateAvailableQuantity - 1);
+			}
+
+			for (const plate of this.get("plates")) {
+				const newQuantity = plateAvailableQuantitiesMap.get(plate.uuid);
+
+				plate.set("availableQuantity", newQuantity);
+
+				if (selectedPlate === plate) {
+					this.set("selectedPlateMarkersQuantity", newQuantity);
 				}
 			}
 		},
@@ -1299,11 +1325,15 @@ AP.plate.map = (function () {
 		onClickUndo(event) {
 			if (priv.markerArea.isUndoPossible) {
 				priv.markerArea.undo();
+
+				this.postUndoRedo();
 			}
 		},
 		onClickRedo(event) {
 			if (priv.markerArea.isRedoPossible) {
 				priv.markerArea.redo();
+
+				this.postUndoRedo();
 			}
 		},
 		onClickZoomIn(event) {
@@ -1324,7 +1354,7 @@ AP.plate.map = (function () {
 			priv.markerArea.restoreState(JSON.parse(priv.state));
 		},
 		onSelectPlate(event) {
-			this.set("selectedPlateMarkersQuantity", event.dataItem.quantity);
+			this.set("selectedPlateMarkersQuantity", event.dataItem.availableQuantity);
 		},
 		// INITS
 	});
