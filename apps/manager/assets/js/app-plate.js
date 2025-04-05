@@ -2,7 +2,7 @@ AP.plate = AP.plate || {};
 
 AP.plate.fields = {
 	designerRoot: $("#plate-designer-root"),
-	mapRoot: $("#plate-map-root"),
+	mapRoot: $("#plates-map-root"),
 };
 
 $(document).ready(function () {
@@ -1223,28 +1223,77 @@ AP.plate.map = (function () {
 
 	priv.vm = new kendo.data.ObservableObject({
 		// DATA
+		plates: [],
+		selectedPlate: null,
+		selectedPlateMarkersQuantity: 0,
+		// CONDITIONS
 		isEnabledUndo: false,
 		isEnabledRedo: false,
-		isEnabledRemovePin: false,
-		// CONDITIONS
+		isEnabledRemoveMarker: false,
+		isEnabledAddMarker() {
+			return this.get("selectedPlateMarkersQuantity") > 0;
+		},
 		// ACTIONS
 		updateUndoRedoButtons(event) {
 			this.set("isEnabledUndo", priv.markerArea.isUndoPossible);
 			this.set("isEnabledRedo", priv.markerArea.isRedoPossible);
 		},
-		updateRemovePinButton(event) {
+		updateRemoveMarkerButton(event) {
 			setTimeout(() => { // TODO: togliere quando la libreria avra' il fix
-				this.set("isEnabledRemovePin", priv.markerArea.selectedMarkerEditors.length > 0);
+				this.set("isEnabledRemoveMarker", priv.markerArea.selectedMarkerEditors.length > 0);
 			}, 10);
 		},
-		// GETTERS
-		// EVENTS
-		onClickAddPin(event) {
-			const markerEditor = priv.markerArea.createMarker(CustomImageMarker);
-			markerEditor.marker.defaultSize = { width: 32, height: 32 }; // TODO: rendere dinamico
-			markerEditor.marker.imageSrc = "../../../../assets/main/img/pin.png"; // TODO: rendere dinamico
+		updatePlateMarkersQuantity(event) {
+			const plate = this.plates.find(x => x.uuid == event.detail.markerEditor.plateUUID);
+			const selectedPlate = this.get("selectedPlate");
+
+			if (plate) {
+				const oldQuantity = plate.get("quantity");
+
+				let newQuantity = oldQuantity;
+
+				if (event.type == "markerdelete") {
+					newQuantity = oldQuantity + 1;
+				} else if (event.type == "markercreate") {
+					if (oldQuantity > 0) {
+						newQuantity = oldQuantity - 1;
+					}
+				}
+
+				if (newQuantity != oldQuantity) {
+					plate.set("quantity", newQuantity);
+
+					if (selectedPlate === plate) {
+						this.set("selectedPlateMarkersQuantity", newQuantity);
+					}
+				}
+			}
 		},
-		onClickRemovePin(event) {
+		// GETTERS
+		getSelectedPlateMarkerImg(event) {
+			let result = "../../../../assets/main/img/red_pin.png";
+
+			const selectedPlate = this.get("selectedPlate");
+
+			if (selectedPlate != null) {
+				result = selectedPlate.marker.img;
+			}
+
+			return result;
+		},
+		// EVENTS
+		onClickAddMarker(event) {
+			const selectedPlate = this.get("selectedPlate");
+
+			if (selectedPlate != null) {
+				const markerEditor = priv.markerArea.createMarker(CustomImageMarker);
+				markerEditor.plateUUID = selectedPlate.uuid;
+
+				markerEditor.marker.defaultSize = selectedPlate.marker.size;
+				markerEditor.marker.imageSrc = selectedPlate.marker.img;
+			}
+		},
+		onClickRemoveMarker(event) {
 			priv.markerArea.deleteSelectedMarkers();
 		},
 		onClickUndo(event) {
@@ -1274,26 +1323,36 @@ AP.plate.map = (function () {
 		onClickImport(event) {
 			priv.markerArea.restoreState(JSON.parse(priv.state));
 		},
+		onSelectPlate(event) {
+			this.set("selectedPlateMarkersQuantity", event.dataItem.quantity);
+		},
 		// INITS
 	});
 
 	pub.init = function (setup) {
 		priv.container = setup.container;
+
+		priv.vm.set("plates", pageData.plates);
+
 		kendo.bind(setup.container, priv.vm);
 
 		priv.targetImg = document.createElement("img");
-		priv.targetImg.src = pageData.plateMap.img;
+		priv.targetImg.src = pageData.platesMap.img;
 
-		const plateMap = document.querySelector(".plate-map-body");
+		const platesMap = document.querySelector(".plates-map-body");
 
 		priv.markerArea = new MarkerArea();
 		priv.markerArea.targetImage = priv.targetImg;
-		plateMap.appendChild(priv.markerArea);
+		platesMap.appendChild(priv.markerArea);
 
 		priv.markerArea.addEventListener("areastatechange", priv.vm.updateUndoRedoButtons.bind(priv.vm));
-		priv.markerArea.addEventListener("markerselect", priv.vm.updateRemovePinButton.bind(priv.vm));
-		priv.markerArea.addEventListener("markerdeselect", priv.vm.updateRemovePinButton.bind(priv.vm));
-		priv.markerArea.addEventListener("markerdelete", priv.vm.updateRemovePinButton.bind(priv.vm));
+
+		priv.markerArea.addEventListener("markerdelete", priv.vm.updateRemoveMarkerButton.bind(priv.vm));
+		priv.markerArea.addEventListener("markerselect", priv.vm.updateRemoveMarkerButton.bind(priv.vm));
+		priv.markerArea.addEventListener("markerdeselect", priv.vm.updateRemoveMarkerButton.bind(priv.vm));
+
+		priv.markerArea.addEventListener("markerdelete", priv.vm.updatePlateMarkersQuantity.bind(priv.vm));
+		priv.markerArea.addEventListener("markercreate", priv.vm.updatePlateMarkersQuantity.bind(priv.vm));
 	};
 
 	return pub;
