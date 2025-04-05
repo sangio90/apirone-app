@@ -2228,8 +2228,9 @@ declare class MarkerArea extends HTMLElement {
     /**
      * Restores the annotation from the previously saved state.
      * @param state
+     * @param addUndoStep if true (default) or omitted, an undo step is added after restoring the state
      */
-    restoreState(state: AnnotationState): void;
+    restoreState(state: AnnotationState, addUndoStep?: boolean): void;
     private scaleMarkers;
     /**
      * NOTE:
