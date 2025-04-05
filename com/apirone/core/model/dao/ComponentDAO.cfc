@@ -78,12 +78,16 @@
     
 	<cffunction name="delete" returntype="Boolean">
 
-		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
+		<!--- <cfargument name="component" type="com.apirone.core.model.bean.Component" required="true"> --->
+		<cfargument name="componentId" type="Numeric" required="true">
 
         <cfquery name="local.q" datasource="apirone" result="result">
 			DELETE FROM 
 				components
-			WHERE 1=1
+			WHERE 
+				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.componentId#">
+				
+				<!---
 				AND raw_product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getRawProduct().getId()#">
 				AND variant_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">
 				AND color_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getColor().getId()#">
@@ -104,8 +108,11 @@
 
 				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentFruit" )>
 					fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getFruit().getId()#">::uuid
-				</cfif>				
+				</cfif>		
+				---->
 		</cfquery>
+
+		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# DELETE #result.sql#">
 
 		<cfreturn true>
 

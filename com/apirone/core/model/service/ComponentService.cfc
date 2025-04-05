@@ -46,7 +46,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	
 	}
 
-
+	/*
     public com.apirone.core.model.bean.CombinationComponent[] function listComponents(
             required Numeric componentId,
         ){
@@ -70,6 +70,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         return true;
 
     }
+	*/
 
     public com.apirone.core.model.bean.Result function search(
             String lineId
@@ -94,15 +95,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
-    public com.smartvillage.core.model.bean.Outcome function delete(
+    public com.apirone.core.model.bean.Outcome function delete(
 			required String componentId
 		){
 
 		var outcome = super.bean("Outcome");
 
-        var obj = get( arguments.combinationId );
+        var obj = get( arguments.componentId );
 
-		outcome.setData( { combinationId: arguments.combinationId } );
+		outcome.setData( { componentId: arguments.componentId } );
 
 		transaction {
 		
@@ -110,9 +111,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 var cm = getCacheManager();
 
-                getDao().delete( arguments.combinationId );
+                getDao().delete( arguments.componentId );
         
-                cm.remove( "combination_#obj.getId()#" );
+                cm.remove( "component_#obj.getId()#" );
                 
 			} catch ( any error ) {
 
@@ -133,7 +134,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.Component component
 		){
 
-		getDao().delete( arguments.component );
+		if( Len( arguments.component.getId() ) ) {
+			getDao().delete( arguments.component.getId() );
+		}
+
 		var newId = getDao().insert( arguments.component );
 
 		return newId;

@@ -13,7 +13,7 @@
 				<div class="card-body">
 					<div class="row">
 
-						<div class="col-6">
+						<div class="col-5">
 
 							<div data-bind="visible: showSearchPanel">
 
@@ -71,7 +71,7 @@
 						
 						</div>
 
-						<div class="col-6">
+						<div class="col-7">
 
 							<form id="component-list-selected-form" class="row">
 
@@ -105,10 +105,14 @@
 
 									</div>
 
+									#table( source="selected", rowTemplate="component-selected-row-tmpl" )#
+
+									<!---
 									<table class="table table-hover pt-5">
 										<tbody data-bind="source:selected" data-template="component-selected-row-tmpl">
 										</tbody>
 									</table>
+									---->
 
 									<div class="pt-5" data-bind="invisible: showSelectedTable">
 										<p class="text-center">Nessun componente ancora selezionato</p>

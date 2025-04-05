@@ -5,12 +5,12 @@
         <tr>
             <td width="10">
                 <b data-bind="text: rawProduct.processingType.id"></b>
+                <span data-bind="text: id"></span>
+                
             </td>
             <td>
                 <b data-bind="text: rawProduct.id"></b><br>
                 <span data-bind="text: rawProduct.name"></span>
-                <br>
-                <span data-bind="text: id"></span>
             </td>
             <td>
                 <b data-bind="text: variant.id"></b><br>
@@ -20,11 +20,11 @@
                 <b data-bind="text: color.id"></b><br>
                 <span data-bind="text: color.name"></span>
             </td>
-            <td width="100">
-                <input data-bind="value: quantity" class="form-control text-end">
+            <td width="70">
+                <input data-bind="value: quantity" class="form-control text-end" style="width:45px">
             </td>
             <td width="40" class="text-end">
-                #iconButton( icon="trash", bind="click:removeComponent" )#
+                #iconButton( icon="trash", bind="click:remove" )#
             </td>
         </tr>
     </nmscript>

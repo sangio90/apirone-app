@@ -9,44 +9,16 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var params = {};
 
-        switch ( rc.by ) {
-            case "combination":
-                params = { combinationId = rc.combinationId };
-                break;
-
-            case "item":
-                params = { roductItemId = rc.itemId };
-                break;
-                
-            case "lineSize":
-                params = { lineId = rc.lineId, sizeId = rc.sizeId };
-                break;
-
-            case "fruit":
-                params = { fruitId = rc.fruitId };
-                break;
-
-            case "fruitItem":
-                params = { fruitProductItemId = rc.itemId };
-                break;
-
-            default: 
-                throw (type="apirone.error.TypeSearchNotValid", message="Type search [#rc.by#] not valid");
-                break;
-        }
+        var params = getParams( typeId = rc.by, rc = rc );
 
         var items = super.fire( "component.list", params );
-
-        dump(items.len());
-
 
         for( var item in items ) {
 
             var product = item.getRawProduct();
 
-            dump(DESerializeJSON(SerializeJSON(( product ))));
-
             var row = {
+                "id" = item.getId(),
                 "quantity" = item.getQuantity(),
                 "rawProduct" = {
                     "id" = product.getId(),
@@ -124,15 +96,26 @@ component extends="com.apirone.core.controller.AbsController" {
                 break;
 
             case "fruitItem":
-                params = { fruitProductItemId = rc.itemId };
-                break;
+                //params = { fruitProductItemId = rc.itemId };
+                //break;
 
             default: 
-                throw (type="apirone.error.TypeSaveNotValid", message="Type save [#rc.typeId#] not valid");
+                throw( type="apirone.error.TypeSaveNotValid", message="Type save [#rc.typeId#] not valid" );
                 break;
         }
 
+        var params = getParams( typeId = rc.by, rc = rc );
+        var oldItems = super.fire( "component.list", params );
+
+        cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# currentItems: #oldItems.len()#");
+
+        var itemExists = [];
+
         for( var thisComponent in components ) {
+
+            if ( thisComponent.id != "" ) {
+                ArrayAppend( itemExists, thisComponent.id );
+            }
 
             var color      = super.bean("Color");
             var rawProduct = super.bean("RawProduct");
@@ -142,13 +125,30 @@ component extends="com.apirone.core.controller.AbsController" {
             color.setId( thisComponent.color.id )
             rawProduct.setId( thisComponent.rawProduct.id )
 
+            component.setId( thisComponent.id );
             component.setRawProduct( rawProduct );
             component.setColor( color );
             component.setVariant( variant );
             component.setQuantity( thisComponent.quantity );
 
-            super.fire( "Component.create", [ component ] );
+            super.fire( "component.create", [ component ] );
 
+        }
+
+        cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: #oldItems.len()#");
+        cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# itemExists: #ArrayToList( itemExists )#");
+
+        for( var oldItem in oldItems ) {
+
+            cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: this: #oldItem.getId()#");
+            
+            if( !itemExists.find( oldItem.getId() ) ) {
+
+                cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: delete: #oldItem.getId()#");
+
+                super.fire( "component.delete", { componentId = oldItem.getId() } );
+            }
+        
         }
 
         var message = completeMessage( "combination.componentAdded" );
@@ -156,6 +156,40 @@ component extends="com.apirone.core.controller.AbsController" {
         result.setData( { "message" = message } );
 
         event.setValue( "result", result );
+
+    }
+
+    function getParams( required String typeId, required Struct rc ){
+
+        var params = {}
+
+        switch ( arguments.typeId ) {
+            case "combination":
+                params = { combinationId = rc.combinationId };
+                break;
+
+            case "item":
+                params = { roductItemId = rc.itemId };
+                break;
+                
+            case "lineSize":
+                params = { lineId = rc.lineId, sizeId = rc.sizeId };
+                break;
+
+            case "fruit":
+                params = { fruitId = rc.fruitId };
+                break;
+
+            case "fruitItem":
+                params = { fruitProductItemId = rc.itemId };
+                break;
+
+            default: 
+                throw (type="apirone.error.TypeSearchNotValid", message="Type search [#rc.by#] not valid");
+                break;
+        }
+
+        return params;
 
     }
 

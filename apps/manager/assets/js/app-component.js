@@ -29,7 +29,7 @@ AP.component.list = (function () {
 					var data = this.data();
 
 					for( var item of data ) {
-						item.id = createId( item );
+						item.code = createCode( item );
 					}
 
 				}
@@ -39,14 +39,12 @@ AP.component.list = (function () {
 
 	var selectedExists = function( row ) {
 
-		var id = createId( row );
-
-		console.log("selectedExists:id", id);
+		var code = createCode( row );
 
 		var dataSource = viewModel.get("selected");
 
 		for( var item of dataSource.data() ) {
-			if ( item.id == id ) {
+			if ( item.code == code ) {
 				return true;
 			}
 		}
@@ -121,11 +119,11 @@ AP.component.list = (function () {
 
 	};
 
-	var createId = function( row ) {
+	var createCode = function( row ) {
 
-		var id = row.rawProduct.id + "$$$" + row.color.id + "$$$" + row.variant.id;
+		var code = row.rawProduct.id + "$$$" + row.color.id + "$$$" + row.variant.id;
 
-		return id;
+		return code;
 
 	};
 
@@ -172,17 +170,21 @@ AP.component.list = (function () {
             var str = thisForm.find( "input[name=str]" ).val();
             var typeId = thisForm.find( "select[name=processingTypeId]" ).val();
 
-            var filters = [];
+            var filter = {
+				logic: "or",
+				filters: []
+			};
 
             if ( str.length ) {
-                filters.push( { field: "rawProduct.name", operator: "contains", value: str } );
+                filter.filters.push( { field: "rawProduct.id", operator: "contains", value: str } );
+                filter.filters.push( { field: "rawProduct.name", operator: "contains", value: str } );
             };
 
             if ( typeId.length ) {
-                filters.push( { field: "rawProduct.processingType.id", operator: "eq", value: typeId } );
+                filter.filters.push( { field: "rawProduct.processingType.id", operator: "eq", value: typeId } );
             };
 
-            dataSource.filter( filters );
+            dataSource.filter( filter );
 
             dataSource.view();
 
@@ -206,11 +208,11 @@ AP.component.list = (function () {
 			var product = viewModel.get("currentProduct");
 			var variant = viewModel.get("currentVariant");
 
-			console.log( "addColor:product", product );
-			console.log( "addColor:variant", variant );
+			//console.log( "addColor:product", product );
+			//console.log( "addColor:variant", variant );
 
 			var row = {
-				//id: createId( comp ),
+				id: "",
 				quantity: 1,
 				rawProduct: {
 					id: product.id,
@@ -230,14 +232,14 @@ AP.component.list = (function () {
 				}
 			};
 
-			row.id = createId( row );
+			row.code = createCode( row );
 
 			var exists = selectedExists( row );
 
 			console.log( "addColor:exists", exists );
 
 			if( exists ) {
-				AP.widget.autoClearMessage( "status-selected", "<span class='red'>È stato già aggiunto</span>" );
+				AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status error'>È stato già aggiunto</span>" );
 			} else {
 				viewModel.get("selected").add( row );
 			}
@@ -285,7 +287,7 @@ AP.component.list = (function () {
 					done: function (xhr) {
 
 						if(xhr.status == "SUCCESS") {
-							AP.widget.autoClearMessage( "status-selected", "<span class='green'>Configurazione salvata</span>" );
+							AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status success'>Configurazione salvata</span>" );
 						}
 
 					}
@@ -345,12 +347,12 @@ AP.component.list = (function () {
 
 		},
 
-		removeComponent: function (event) {
+		remove: function (event) {
 
 			var dataSource = viewModel.get("selected");
 
-			console.log("removeComponent:event", event);
-			console.log("removeComponent:event.data.uid", event.data.uid);
+			console.log("remove:event", event);
+			console.log("remove:event.data.uid", event.data.uid);
 
 			var row = dataSource.getByUid( event.data.uid );
 

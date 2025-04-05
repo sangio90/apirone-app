@@ -157,6 +157,29 @@
 
 </cffunction>
 
+<cffunction name="table">
+
+    <cfargument name="id" type="String" required="true" default="table-#CreateUUID()#">
+    <cfargument name="rowTemplate" type="String" required="true">
+    <cfargument name="source" type="String" default="rows">
+    <cfargument name="class" type="String" default="">
+
+    <cfsavecontent variable="local.html">
+        <cfoutput>
+
+            <table class="table table-hover #arguments.class#" id="#arguments.id#">
+                <tbody data-bind="source:#arguments.source#" data-template="#arguments.rowTemplate#">
+                </tbody>
+            </table>
+            
+            <div class="white-small">jstemplate/#arguments.rowTemplate#</div>
+        </cfoutput>
+    </cfsavecontent>
+
+    <cfreturn local.html>
+
+</cffunction>
+
 <cfinclude template="buttonHelper.cfm">
 
 <cfscript>
