@@ -1239,9 +1239,7 @@ AP.plate.map = (function () {
 			this.set("isEnabledRedo", priv.markerArea.isRedoPossible);
 		},
 		updateRemoveMarkerButton(event) {
-			setTimeout(() => { // TODO: togliere quando la libreria avra' il fix
-				this.set("isEnabledRemoveMarker", priv.markerArea.selectedMarkerEditors.length > 0);
-			}, 10);
+			this.set("isEnabledRemoveMarker", priv.markerArea.selectedMarkerEditors.length > 0);
 		},
 		updatePlateMarkersQuantity(event) {
 			const plate = this.plates.find(x => x.uuid == event.detail.markerEditor.plateUUID);
