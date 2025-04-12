@@ -1213,7 +1213,49 @@ AP.plate.designer = (function () {
 }());
 
 AP.plate.map = (function () {
-	const { MarkerArea, CustomImageMarker } = markerjs3;
+	const { MarkerArea, CustomImageMarker, ImageMarkerEditor } = markerjs3;
+
+	// Seguendo la guida: https://markerjs.com/docs-v3/documents/guides_and_tutorials.tutorials.custom_marker_types
+	// Estendo CustomImageMarker per sapere quale PlateMarker appartiene a quale Plate
+	class PlateMarker extends CustomImageMarker {
+		static typeName = "PlateMarker";
+		static title = "Plate marker";
+
+		#plateUUID = "";
+
+		get plateUUID() {
+			return this.#plateUUID;
+		}
+
+		set plateUUID(value) {
+			this.#plateUUID = value;
+		}
+
+		constructor(container) {
+			super(container);
+		}
+
+		getState() {
+			const result = Object.assign(
+				{
+					plateUUID: this.plateUUID,
+				},
+				super.getState(),
+			);
+
+			return result;
+		}
+
+		restoreState(state) {
+			const plateMarkerState = state;
+
+			if (plateMarkerState.plateUUID !== undefined) {
+				this.plateUUID = plateMarkerState.plateUUID;
+			}
+
+			super.restoreState(state);
+		}
+	}
 
 	const pub = {};
 	const priv = {
@@ -1242,7 +1284,7 @@ AP.plate.map = (function () {
 			this.set("isEnabledRemoveMarker", priv.markerArea.selectedMarkerEditors.length > 0);
 		},
 		updatePlateMarkersQuantity(event) {
-			const plate = this.plates.find(x => x.uuid == event.detail.markerEditor.plateUUID);
+			const plate = this.plates.find(x => x.uuid == event.detail.markerEditor.marker.plateUUID);
 			const selectedPlate = this.get("selectedPlate");
 
 			if (plate) {
@@ -1267,7 +1309,7 @@ AP.plate.map = (function () {
 				}
 			}
 		},
-		postUndoRedo() { // TODO: redo non funziona perche' va persa la property plateUUID
+		postUndoRedo() {
 			const selectedPlate = this.get("selectedPlate");
 			const plateAvailableQuantitiesMap = new Map();
 
@@ -1277,10 +1319,10 @@ AP.plate.map = (function () {
 				plateAvailableQuantitiesMap.set(plate.uuid, plate.availableQuantity);
 			}
 
-			for (const marker of priv.markerArea.editors) {
-				const currentPlateAvailableQuantity = plateAvailableQuantitiesMap.get(marker.plateUUID);
+			for (const editor of priv.markerArea.editors) {
+				const currentPlateAvailableQuantity = plateAvailableQuantitiesMap.get(editor.marker.plateUUID);
 
-				plateAvailableQuantitiesMap.set(marker.plateUUID, currentPlateAvailableQuantity - 1);
+				plateAvailableQuantitiesMap.set(editor.marker.plateUUID, currentPlateAvailableQuantity - 1);
 			}
 
 			for (const plate of this.get("plates")) {
@@ -1310,9 +1352,9 @@ AP.plate.map = (function () {
 			const selectedPlate = this.get("selectedPlate");
 
 			if (selectedPlate != null) {
-				const markerEditor = priv.markerArea.createMarker(CustomImageMarker);
-				markerEditor.plateUUID = selectedPlate.uuid;
+				const markerEditor = priv.markerArea.createMarker(PlateMarker);
 
+				markerEditor.marker.plateUUID = selectedPlate.uuid;
 				markerEditor.marker.defaultSize = selectedPlate.marker.size;
 				markerEditor.marker.imageSrc = selectedPlate.marker.img;
 			}
@@ -1370,6 +1412,7 @@ AP.plate.map = (function () {
 		const platesMap = document.querySelector(".plates-map-body");
 
 		priv.markerArea = new MarkerArea();
+		priv.markerArea.registerMarkerType(PlateMarker, ImageMarkerEditor);
 		priv.markerArea.targetImage = priv.targetImg;
 		platesMap.appendChild(priv.markerArea);
 
