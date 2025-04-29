@@ -5,8 +5,8 @@
         <tr>
             <td width="10">
                 <b data-bind="text: rawProduct.processingType.id"></b>
-                <span data-bind="text: id"></span>
-                
+                <br>
+                <i>(<span data-bind="text: id"></span>)</i>
             </td>
             <td>
                 <b data-bind="text: rawProduct.id"></b><br>

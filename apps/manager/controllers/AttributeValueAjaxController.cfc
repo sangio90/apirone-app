@@ -108,6 +108,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function order( event, rc, prc ){
 
+        dump(GetHTTPRequestData());
+        abort;
+
         var result = super.getResult();
 
         var service = super.service("AttributeValue")

@@ -79,7 +79,7 @@ component extends="com.apirone.core.controller.AbsController" {
         event.setValue( "result", result );
 
     }
-
+    
     function removeItems( event, rc, prc ){
 
         var result = super.getResult();

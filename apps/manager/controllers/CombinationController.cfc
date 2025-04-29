@@ -20,7 +20,11 @@ component extends="com.apirone.core.controller.AbsController" {
         
         prc.jsScripts.add( "app-attribute-detail" );
         prc.jsScripts.add( "app-component" );
+        
         prc.jsScripts.add( "app-combination" );
+        
+        //per astrarlo, in futuro quando lavoreremo sui frutti
+        //prc.jsScripts.add( "app-product-attribute-list" );
 
         prc.page["lineId"] = prc.line.getId();
 

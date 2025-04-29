@@ -1,4 +1,5 @@
-﻿AP.productAttribute = AP.productAttribute || {};
+﻿broken;
+AP.productAttribute = AP.productAttribute || {};
 
 AP.productAttribute.fields = {
     rootDetail: $("#combination-detail-root"),
@@ -16,13 +17,11 @@ $(document).ready(function (){
 });
 
 
-AP.combination.list = (function () {
+AP.productAttribute.list = (function () {
 
 	var pub = {};
 
-	var fields = AP.combination.fields;
-	var componentApp = AP.component.list;
-	var attributeApp = AP.attribute.detail;
+	var fields = AP.productAttribute.fields;
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" }),
@@ -66,7 +65,7 @@ AP.combination.list = (function () {
 	var viewModel = kendo.observable({
 
 		items: dataSources.items,
-		attributesList: dataSources.attributesList,
+		//attributesList: dataSources.attributesList,
 
 		itemForAttributes: undefined,
 
@@ -231,6 +230,7 @@ AP.combination.list = (function () {
 
 		openImagesList: function (event) {
 
+			console.log("openImagesList");
 
 			var element = $( event.currentTarget );
 
@@ -276,6 +276,7 @@ AP.combination.list = (function () {
 			viewModel.set( "images", dataSource );
 
 			initUpload();
+
 			return false;
 
 		},

@@ -51,7 +51,7 @@
 
                                 <div class="row d-flex align-items-center mb-2">
 
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-12">
 
                                         <p>
                                             - <a href=""
@@ -80,19 +80,6 @@
                                                 </a>
                                             <br>
 
-                                            - <a href=""
-                                                class="underline"
-                                                data-type="item" 
-
-                                                data-combination-id="0"
-                                                data-combination-name="Attributo radice"
-                                                
-                                                data-bind="click: openAttributesList">
-                                                    Aggiungi attributo di base &raquo;
-                                                </a>
-
-                                            <br>
-                                            <br>
                                             - <a href=""
                                                 class="underline"
                                                 data-type="combination" 
@@ -132,15 +119,25 @@
                                         ----->
         
                                     </div>
-                                    <div class="col-sm-3">
-                                        <div class="float-end">
-                                            #deleteButton(
-                                                bind  = "click:removeAttributes",
-                                                size  = "sm"
-                                            )#
-                                        </div>
-        
-                                        <div class="status float-end me-3" id="status-delete"></div>
+                                    <div class="col-sm-12 text-end">
+
+                                        <a href=""
+                                            class="underline"
+                                            data-type="item" 
+
+                                            data-combination-id="0"
+                                            data-combination-name="Attributo radice"
+                                        
+                                            data-bind="click: openAttributesList">
+                                            Aggiungi attributo di base
+                                        </a>
+
+                                        #deleteButton(
+                                            bind  = "click:removeAttributes",
+                                            size  = "sm",
+                                            class = "ms-2"
+                                        )#
+
                                     </div>
         
                                 </div>

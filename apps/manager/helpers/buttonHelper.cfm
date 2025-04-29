@@ -54,13 +54,13 @@
                  String type="submit", 
                  String variant="primary", 
                  String icon="",
-                 String classes="" 
+                 String class="" 
     ){ 
 
         ```
         <cfsavecontent variable="local.html">
             <cfoutput>
-                <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size# #classes#"  
+                <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size# #arguments.class#"  
                     #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#>
                     <i class="fas fa-#arguments.icon#"></i> #arguments.label#
                 </button>

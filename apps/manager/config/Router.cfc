@@ -133,6 +133,7 @@
 			combinations
 		*/
 		post( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.addItem" ).end();
+		//post( "/ajax/combinations/:id/items/order" ).to( "CombinationAjaxController.orderItems" ).end();
 		get( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.listItems" ).end();
 		delete( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.removeItems" ).end();
 

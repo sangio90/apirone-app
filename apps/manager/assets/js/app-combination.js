@@ -236,7 +236,60 @@ AP.combination.list = (function () {
 
 		openImagesList: function (event) {
 
+			/*
+			console.log("openImagesList");
+
 			productAttributeApp.openImagesList();
+
+			return false;
+			*/
+
+			console.log("openImagesList");
+
+			var element = $( event.currentTarget );
+
+			if ( !element.attr("data-type") ) {
+				console.error("ERROR. Set data-type attribute in currentTarget");
+				return;
+			}
+
+			var type = element.data("type");
+
+			switch( type ) {
+
+				case "combinationItem":
+
+					var value = {
+						type: "item",
+						id: event.data.id
+					};
+
+					var thisUrl = "/manager/ajax/combination-items/" + event.data.id + "/images";
+
+					break;
+
+				case "combination":
+
+					var value = {
+						type: "combination",
+						id: AP.page.combinationId
+					};
+
+					var thisUrl = "/manager/ajax/combinations/" + AP.page.combinationId + "/images";
+
+					break;
+
+				default:
+					console.error("ERROR. Type [" + type + "] for image not found");
+			};
+
+			var dataSource = NM.kendo.dataSource({ url: thisUrl });
+
+			viewModel.set( "currentImageEntity", value );
+			viewModel.set( "currentUploadUrl", thisUrl );
+			viewModel.set( "images", dataSource );
+
+			initUpload();
 
 			return false;
 
@@ -450,13 +503,13 @@ AP.combination.list = (function () {
 
 			if( images.total() > 0 ) {
 
-				console.log("total:in", images.total())
+				console.log("total:in", images.total() );
 
 				for ( var image of images.data() ) {
 
 					var uid = image.uid;
 
-					console.log("image", image)
+					console.log( "image", image );
 
 					$("#image-upload-" + uid ).fileupload({
 						dropZone: $("#image-upload-dropzone-" + uid),
@@ -475,9 +528,9 @@ AP.combination.list = (function () {
 								status.html("<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>");
 								return false;
 							}
-	
+
 							data.submit();
-	
+
 						},
 
 						success: function( event, data ) {
@@ -488,36 +541,36 @@ AP.combination.list = (function () {
 
 						progressall: function( event, data ) {
 
-							console.log("progressall:event", event)
-							console.log("progressall:data", data)
-	
+							console.log("progressall:event", event);
+							console.log("progressall:data", data);
+
 							var status = $( "#image-upload-status-" + uid );
 							status.html("");
-	
+
 							var uid = $(event.target).data("uid");
-							
+
 							var progress = parseInt(data.loaded / data.total * 100, 10);
 							$("#image-upload-progress-" + uid + " .upload-bar").css("width", progress + "%");
-							
+
 							status.html("Fatto!");
-							
+
 							var row = viewModel.get("images").getByUid( uid );
-	
+
 							setTimeout(() => {
+
 								initUpload();
+
 							}, "1000");
-							  
-							
 
 						}
-					});		
-	
-				}				
-	
-			}			
+					});
+
+				}
+
+			}
 
 		} )
-			.catch( error => { console.error( error ) } )
+			.catch( error => { console.error( error ) } );
 	};
 
 	var initSort = function() {
@@ -551,9 +604,26 @@ AP.combination.list = (function () {
 				console.log("event.oldIndex", event.oldIndex);
 				console.log("event.newIndex", event.newIndex);
 
-				$("#combination-reordering-status").html("<span class='green'>Salvato!</span>")
+				var id = AP.page.combinationId;
+				var status = $("#combination-reordering-status");
+
+				//$("#combination-reordering-status").html("<span class='green'>Salvato!</span>");
+
+				NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
 
 				if(event.newIndex != event.oldIndex) {
+
+					NM.util.ajax({
+						method: "POST",
+						url: "/manager/ajax/attributes/" + id + "/values/order",
+						data: JSON.stringify( viewModel.get("detailForm.data.values").data() ),
+						callback: {
+							done: function (xhr) {
+
+								NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
+							}
+						}
+					});
 
 					/*
 					var values = viewModel.get("detailForm.data.values").data();
