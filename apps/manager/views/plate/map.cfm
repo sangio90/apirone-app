@@ -49,6 +49,8 @@
 </cfscript>
 
 <cfoutput>
+	<!--- TODO: se lo metto in jsFiles.json.cfm non funziona... --->
+	<script src="/assets/main/js/vendor/markerjs3/umd/markerjs3.js"></script>
 	<div id="plates-map-root">
 		<div>
 			<div class="header-toolbar">
