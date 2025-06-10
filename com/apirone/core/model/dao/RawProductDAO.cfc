@@ -13,6 +13,7 @@
 				arcodart, 
 				ardesart, 
 				artipmat,
+				arunmis1,
 				IIF (artipmat = 'LAV', 'LV', 'MP') AS processiong_type_id
 			FROM
 				#variables.companyId#_artico a
@@ -43,18 +44,19 @@
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="arcodart">
 
-
         <cfquery name="local.q" datasource="verticale">
 			SELECT
 				arcodart, 
 				ardesart,
 				arsemlav,
 				artipmat,
+				arunmis1,
 				COUNT(arcodart) OVER() AS total,
 				IIF (artipmat = 'LAV', 'LV', 'MT') AS processiong_type_id
 			FROM
 				#super.sanitizeSQL( "#variables.companyId#_artico" )# artico
 			WHERE 1=1
+				AND arobsole <> 'S' 
 			
 			<cfif !isNull( arguments.typeId )>
 				AND codtip = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">

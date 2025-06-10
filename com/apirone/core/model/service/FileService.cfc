@@ -28,13 +28,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
-	public com.apirone.core.model.bean.Result function list(
+	public com.apirone.core.model.bean.File[] function list(
 		String typeId,
 		String combinationId,
-		String roductItemId,
+		String productItemId,
 	) {
-		arguments['limit'] = -1;
-		return search(argumentCollection = arguments)
+		arguments["limit"] = -1;
+		return search( argumentCollection = arguments ).getData();
 	}
 
 

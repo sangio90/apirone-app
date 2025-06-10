@@ -28,6 +28,12 @@
 
     }
 
+    public Any function getDataMapper(){
+
+        return model().getInstance("DataMapper");
+
+    }      
+
     public com.apirone.core.model.bean.Error function getError(){
 
     	return CreateObject("component", "com.apirone.core.model.bean.Error");
@@ -84,7 +90,8 @@
             
             for ( var column in columns ) {
 
-                records.setCell( column_name="#column#", value="#trim(record[ column ])#", row_number=index );
+                //records.setCell( column_name="#column#", value="#Replace( Trim( record[ column ]), ",", "$" )#", row_number=index );
+                records.setCell( column_name="#column#", value="#Trim( record[ column ])#", row_number=index );
 
             }
 

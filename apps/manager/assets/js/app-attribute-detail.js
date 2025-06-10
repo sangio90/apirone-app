@@ -37,6 +37,7 @@ AP.attribute.detail = (function () {
 				},
 				id: "",
 				orderBy: 0,
+				categories: [],
 				selectedCategories: [],
 				mainText: {
 					id: "",
@@ -94,11 +95,11 @@ AP.attribute.detail = (function () {
 
 
 			if ( data.id ) {
-				
+
 				return "Modifica valore < " + data.id + " >";
-			
+
 			} else {
-				
+
 				if ( values?.total() == 0 ) {
 					
 					return "Carica il primo valore";
@@ -222,6 +223,8 @@ AP.attribute.detail = (function () {
 			var thisForm = fields.detailForm;
 			var status = thisForm.find(".status");
 
+			console.log("save:status", status);
+
 			status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
 
 			if(thisForm.valid()) {
@@ -241,7 +244,7 @@ AP.attribute.detail = (function () {
 
 							console.log("save:id", data.get("id") );
 							console.log("save:callback", callback);
-							
+
 							setTimeout(() => {
 
 								if ( !viewModel.isUpdate() ) {
@@ -250,7 +253,7 @@ AP.attribute.detail = (function () {
 
 									tab.removeClass("disabled");
 									tab.tab("show");
-	
+
                                     loadAttribute( { id: xhr.data.payload.id } );
 
 								}
@@ -349,12 +352,19 @@ AP.attribute.detail = (function () {
 					viewModel.set("detailForm.title", "Modifica attributo <" + xhr.data.name + " >");
 					//viewModel.set("detailForm.labelButton", "Aggiorna");
 
+					/* 
+						load suggest for values
+					*/
+
+					//initSuggest();
 
 					AP.util.fireCallback( "onLoad", viewModel.get("callback") );
 
 					NM.util.openModal($("#attribute-detail-modal"));
 
 					var table = $("#attribute-values-grid .k-grid-container .k-table");
+
+					initSuggest();
 
 					table.kendoSortable({
 						axis: "y",
@@ -380,6 +390,7 @@ AP.attribute.detail = (function () {
 
 						end: function (event) {
 
+							console.log("attribute-detail");
 							console.log("event.oldIndex", event.oldIndex);
 							console.log("event.newIndex", event.newIndex);
 
@@ -442,7 +453,69 @@ AP.attribute.detail = (function () {
 				}
 			}
 		});
+
 	};
+
+	var initSuggest = function () {
+
+		var suggest = $("#attribute-values-suggest-form #search-values");
+
+		var autocomplete = suggest.data("kendoAutoComplete");
+		var suggestTemplate = $("#suggest-row-value-tmpl").html();
+
+		if ( autocomplete ) {
+			autocomplete.destroy();
+		}
+
+		suggest.kendoAutoComplete({
+			dataTextField: "name",
+			highlightFirst: true,
+			minLength: 3,
+			dataSource: new kendo.data.DataSource({
+				transport: {
+					read: {
+						url: "/manager/ajax/values/search?str=" + '',
+						data: {
+							str: function () {
+								return suggest.data("kendoAutoComplete").value();
+							},
+						},
+					},
+				},
+				schema: {
+					data: function( xhr ) {
+						return xhr.data;
+					}
+				},
+			}),
+			select: function( event ) {
+				var dataItem = this.dataItem( event.item.index() );
+
+				var data = viewModel.get("suggest.data");
+
+				data.push( dataItem );
+
+				/*
+				viewModel.set( "itemForm.year", dataItem.year );
+				viewModel.set( "itemForm.strength", dataItem.strength );
+				viewModel.set( "itemForm.alcoholType", dataItem.alcoholType );
+				*/
+
+			},
+			template: kendo.template( suggestTemplate ),
+			noDataTemplate: ""
+		});
+
+		// open the suggest by default with last records
+		suggest.on( "focus", function( e ) {
+
+			var value = suggest.val();
+			var autocomplete = suggest.data("kendoAutoComplete");
+
+			autocomplete.search( value );
+		});
+
+	}
 
     pub.new = function ( { callback } ) {
 
@@ -453,7 +526,7 @@ AP.attribute.detail = (function () {
 		viewModel.resetValueForm();
 		viewModel.resetDetailForm();
 
-		$("#attribute-nav-values-but").addClass("disabled");
+		//$("#attribute-nav-values-but").addClass("disabled");
 
 		NM.util.openModal( $("#attribute-detail-modal") );
 
@@ -467,6 +540,8 @@ AP.attribute.detail = (function () {
         if( callback ) {
             viewModel.set("callback.onUpdate", callback.onUpdate );
         }
+
+		console.log("AP.attribute.detail:edit", id);
 
 		loadAttribute( { id: id  });
 

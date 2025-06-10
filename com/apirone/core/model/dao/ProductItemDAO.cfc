@@ -33,7 +33,7 @@
 			WHERE 1=1
 
 				AND parent_id
-					<cfif IsNull( arguments.parentId ) >
+					<cfif IsNull( arguments.parentId )>
 						IS NULL
 					<cfelse>
 						= <cfqueryparam cfsqltype="Integer" value="#arguments.parentId#">
@@ -62,7 +62,7 @@
 
         <cfquery name="local.q" datasource="apirone">
 			INSERT INTO product_items (
-                attribute_value_id,
+                attribute_raw_value_id,
                 combination_id
 			)
 			VALUES (
@@ -81,12 +81,11 @@
         <cfargument name="fruitId" type="String">
         <cfargument name="attributeId" type="String">
         <cfargument name="combinationId" type="String">
-        <cfargument name="roductItemId" type="String">
+        <cfargument name="productItemId" type="String">
 
-		<cfif IsNull( arguments.roductItemId )
+		<cfif IsNull( arguments.productItemId )
 			AND IsNull( arguments.combinationId )
 			AND IsNull( arguments.attributeId )
-			AND IsNull( arguments.roductItemId )
 			AND IsNull( arguments.fruitId )>
 
 			<cfthrow type="ApirOne.errors.NoArgumentsPassed" message="At least one parameter is required to delete">
@@ -98,8 +97,8 @@
 			FROM product_items
 			WHERE 1=1
 				
-				<cfif !IsNull( arguments.roductItemId )>
-					AND product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.roductItemId#">
+				<cfif !IsNull( arguments.productItemId )>
+					AND product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItemId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.combinationId )>
@@ -107,9 +106,9 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.attributeId )>
-					AND attribute_value_id IN (
-						SELECT attribute_value_id 
-						FROM attribute_values 
+					AND attribute_raw_value_id IN (
+						SELECT attribute_raw_value_id 
+						FROM attributes_raw_values 
 						WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
 					)
 				</cfif>
@@ -120,7 +119,7 @@
 			DELETE 
             FROM product_items 
             WHERE
-                product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.roductItemId#">
+                product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItemId#">
 		</cfquery>
 		---->
 
@@ -131,12 +130,12 @@
 
 	<cffunction name="deleteComponents" returntype="Boolean">
 
-		<cfargument name="roductItemId" type="Numeric" required="true">
+		<cfargument name="productItemId" type="Numeric" required="true">
 
         <cfquery name="local.q" datasource="apirone">
 			DELETE FROM components 
 			WHERE
-				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.roductItemId#">
+				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItemId#">
 		</cfquery>
 
 		<cfreturn true>

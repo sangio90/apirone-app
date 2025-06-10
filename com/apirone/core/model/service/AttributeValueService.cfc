@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.AttributeValueDAO";
     property name="textService" type="com.apirone.core.model.service.TextService";
+    property name="rawValueService" type="com.apirone.core.model.service.rawValueService";
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
     property name="langService" type="com.apirone.core.model.service.LangService";
 
@@ -46,7 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {
-			rows.add( get( attributeValueId = record.attribute_value_id ) );
+			rows.add( get( attributeValueId = record.attribute_raw_value_id ) );
 		});
 
 	    result.setData( rows );
@@ -114,6 +115,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     
 	}
 
+	/*
 	public Boolean function codeExists(
 		required String code,
 				 String excludedId = ""
@@ -122,13 +124,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if (
 			record.recordCount
-			&& record.attribute_value_id != arguments.excludedId
+			&& record.attribute_raw_value_id != arguments.excludedId
 		) {
 			return record.code == arguments.code;
 		}
 
 		return false;
 	}
+	*/
 
 	public com.apirone.core.model.bean.Outcome function delete(
 		required Numeric attributeValueId
@@ -175,15 +178,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             var bean = super.bean( "AttributeValue" );
 
-            bean.setId( record.attribute_value_id );
-			bean.setCode( record.code );
+            bean.setId( record.attribute_raw_value_id );
+			//bean.setCode( record.code );
 			bean.setAttributeId( record.attribute_id );
 
 			bean.setCreatedAt( record.created_at );
 			bean.setOrderBy( record.orderby );
 			
 			bean.setStatus( getStatusService().get( record.status_id ) );
-            bean.setTexts( getTextService().list( attributeValueId = record.attribute_value_id ) );
+            //bean.setTexts( getTextService().list( attributeValueId = record.attribute_raw_value_id ) );
+            
+			bean.setRawValue( getRawValueService().get( record.raw_value_id ) );
             
             return bean;
 

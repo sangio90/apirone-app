@@ -15,7 +15,7 @@ component extends="com.apirone.core.controller.AbsController" {
         }
 
         if( rc.by == "combination-items" ) {
-            var params = { roductItemId = rc.id }
+            var params = { productItemId = rc.id }
             var config = getConfiguration().get("imagesConfig")[ "combinationItem" ];
         }
 
@@ -26,9 +26,9 @@ component extends="com.apirone.core.controller.AbsController" {
             var images = super.fire( "file.list", params );
 
             // esiste l'immagine
-            if( images.getCount() ) {
+            if( images.len() ) {
 
-                var image = images.getData()[1];
+                var image = images[1];
 
                 var json = DESerializeJSON( SerializeJSON( image ) );
 
@@ -53,7 +53,6 @@ component extends="com.apirone.core.controller.AbsController" {
                 json["complete"] = false;
                 json["uri"] = "";
                 json["shortId"] = "";
-
 
             }
 

@@ -5,6 +5,9 @@
     <cfinclude template="/coldbox/system/exceptions/BugReport.cfm">
 </cfsavecontent>
 
+<!--- remove stacktrace from report --->
+<cfset report = REReplace(report,'<div class="stacktrace">(.*)<br></div>',"- Stack Trace removed -")>
+
 <cfset path = ExpandPath("/../repository/private/errors/#dayPath#")>
 <cfset DirectoryCreate( path, true, true )>
 

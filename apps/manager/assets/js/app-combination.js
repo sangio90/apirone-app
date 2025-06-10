@@ -297,6 +297,8 @@ AP.combination.list = (function () {
 
 		openAttributeValues: function (event) {
 
+			console.log("openAttributeValues");
+
 			attributeApp.edit({
 				id: event.data.id,
 				callback: {
@@ -411,31 +413,36 @@ AP.combination.list = (function () {
 
 		},
 
-		loadFinishes: function () {
+		loadSizes: function () {
 
-			console.log("loadFinishes");
+			console.log("loadFinishes:x");
 
 			var thisForm  = AP.combination.fields.configRow;
+
 			var finishEle = thisForm.find("[name=finishId]");
 			var sizeEle = thisForm.find("[name=sizeId]");
 
+			console.log("finishEle", finishEle);
+
 			var lineId = AP.page.lineId;
 			var sizeId = sizeEle.val();
+			var finishId = finishEle.val();
+
 			var combinations = AP.page.combinations;
 			var combinationId = AP.page.combinationId;
 
-			finishEle.empty("");
+			sizeEle.empty("");
 
-			finishEle.append($("<option>", {
-					value: "",
-					text : "-- seleziona"
-				}));
+			sizeEle.append($("<option>", {
+				value: "",
+				text : "-- seleziona"
+			}));
 
-			finishEle.val("");
+			sizeEle.val("");
 
 			var found = false;
 
-			combinations.forEach(function (combination) {
+			combinations.forEach( function(combination) {
 
 				if( lineId == combination.line.id && sizeId == combination.size.id ) {
 
@@ -445,16 +452,16 @@ AP.combination.list = (function () {
 
 					var opt = $("<option>", {
 						value: combination.id,
-						text : AP.util.getMainText(combination.finish.texts).name
+						text : AP.util.getMainText( combination.size.texts ).name
 					});
 
-					finishEle.append(opt);
+					sizeEle.append( opt );
 
 				}
 
 			});
 
-			found ? finishEle.val(AP.page.combinationId) : "";
+			found ? sizeEle.val( AP.page.combinationId ) : "";
 
             return false;
 
@@ -482,7 +489,7 @@ AP.combination.list = (function () {
 
 		kendo.bind(fields.rootDetail, viewModel);
 
-		viewModel.loadFinishes();
+		viewModel.loadSizes();
 
 		initSort();
 
@@ -541,9 +548,6 @@ AP.combination.list = (function () {
 
 						progressall: function( event, data ) {
 
-							console.log("progressall:event", event);
-							console.log("progressall:data", data);
-
 							var status = $( "#image-upload-status-" + uid );
 							status.html("");
 
@@ -601,8 +605,12 @@ AP.combination.list = (function () {
 
 			end: function (event) {
 
+				console.log("combination");
+
 				console.log("event.oldIndex", event.oldIndex);
 				console.log("event.newIndex", event.newIndex);
+
+				console.log("end:event", event);
 
 				var id = AP.page.combinationId;
 				var status = $("#combination-reordering-status");
@@ -611,12 +619,14 @@ AP.combination.list = (function () {
 
 				NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
 
+				//console.log("data", viewModel.get("items").data() );
+
 				if(event.newIndex != event.oldIndex) {
 
 					NM.util.ajax({
 						method: "POST",
 						url: "/manager/ajax/attributes/" + id + "/values/order",
-						data: JSON.stringify( viewModel.get("detailForm.data.values").data() ),
+						data: JSON.stringify( viewModel.get("items").data() ),
 						callback: {
 							done: function (xhr) {
 

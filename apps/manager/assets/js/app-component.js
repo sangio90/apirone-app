@@ -201,6 +201,8 @@ AP.component.list = (function () {
 			return !viewModel.get("showSearchPanel");
 		},
 
+
+
 		addColor: function (event) {
 
 			var color = event.data;
@@ -208,8 +210,7 @@ AP.component.list = (function () {
 			var product = viewModel.get("currentProduct");
 			var variant = viewModel.get("currentVariant");
 
-			//console.log( "addColor:product", product );
-			//console.log( "addColor:variant", variant );
+			console.log("addColor:product", product);
 
 			var row = {
 				id: "",
@@ -220,6 +221,10 @@ AP.component.list = (function () {
 					processingType: {
 						id: product.processingType.id,
 						name: product.processingType.name
+					},
+					measurementUnit: {
+						id: product.measurementUnit.id,
+						name: product.measurementUnit.name
 					}
 				},
 				color: {
@@ -231,6 +236,8 @@ AP.component.list = (function () {
 					name: variant.name
 				}
 			};
+
+			console.log("product:row", row);
 
 			row.code = createCode( row );
 
@@ -374,7 +381,7 @@ AP.component.list = (function () {
 
 	pub.open = function ( item ) {
 
-		console.log("component:open:item", item);
+		//console.log("component:open:item", item);
 
 		viewModel.set( "currentItem", item );
 

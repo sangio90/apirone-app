@@ -82,7 +82,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if( record.recordCount ) { 
 
-			var record = trimQueryFields( record );
+			var record = super.trimQueryFields( record );
 
             bean.setId( record.varcod );
 			bean.setName( record.vardes );
@@ -97,7 +97,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "Variant_#arguments.id#";
+  		return "Variant_#Hash(arguments.id)#";
 
   	}
 

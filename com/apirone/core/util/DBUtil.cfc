@@ -21,4 +21,19 @@
         return fields[ arguments.field ];
     }
 
+    public String function getCompleteSQL( required String sql, required Array params=[] ) {
+
+        var result = arguments.sql;
+
+        var i = 1;
+        for( var item in arguments.params ) {
+            result = Replace( result, "?", "'#item#'", i );
+            i++;
+        }
+
+        return result;
+            
+    }
+
 }
+

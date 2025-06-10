@@ -49,7 +49,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Combination[] function list() {
 		arguments["limit"] = -1;
-		
+
 		return search(argumentCollection = arguments).getData();
 	
 	}
@@ -61,7 +61,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    var rows = [];
     	var result = super.getResult();
-
+		
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {

@@ -6,7 +6,7 @@
     },
 
     "attributeValue.id": {
-        "name": "attribute_value_id",
+        "name": "attribute_raw_value_id",
         "type": "Integer"
     },
 
@@ -87,6 +87,11 @@
 
     "combinationItem.id": {
         "name": "product_item_id",
+        "type": "Integer"
+    },
+
+    "rawValue.id": {
+        "name": "raw_value_id",
         "type": "Integer"
     },
 

@@ -30,6 +30,40 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.ProductItem[] function getTree(
+		String fruitId,
+		String combinationId
+    ) {
+
+		if ( ! ( IsNull( arguments.combinationId ) XOR IsNull( arguments.fruitId ) ) ) {
+			throw( type="ApirOne.errors.OneParameterIsRequired", message="One param is required: fruitId or combinationId" );
+		}
+
+        var result = [];
+
+        var fruitId = arguments.fruitId;
+        var combinationId = arguments.combinationId;
+
+        var baseItems = list( 
+            combinationId = arguments.combinationId,
+            fruitId = arguments.fruitId
+        );
+
+        for( var item in baseItems ) {
+
+            var rows = getRecursiveTree( parentId=item.getId(), rows=[] )
+			item.setChildren( rows );
+
+            result.add( item );
+            
+        }
+
+		//printTree( DESerializeJSON(SerializeJSON(result)) )
+
+		return result;
+	
+	}	
+
+	public com.apirone.core.model.bean.ProductItem[] function getFlatTree(
 					 String fruitId,
             		 String combinationId,
             required Numeric parentId=NullValue(),
@@ -46,7 +80,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             combinationId = arguments.combinationId,
             fruitId = arguments.fruitId,
             parentId = arguments.parentId
-        )
+        );
 
         var thisLevel = arguments.level;
 
@@ -60,9 +94,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             result.add( item );
 			
-            var rows = getTree( fruitId, combinationId, item.getId(), thisLevel+1, thisOrderBy );
-
-            cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# - [ combId:#combinationId#, fruitId:#fruitId#, itemId:#item.getId()#, level:#thisLevel+1#, itemLen:#items.len()#, orderBy:#thisOrderBy# ] #rows.len()#");
+            var rows = getFlatTree( fruitId, combinationId, item.getId(), thisLevel+1, thisOrderBy );
 
             result = result.merge( rows );
 
@@ -76,8 +108,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public com.apirone.core.model.bean.ProductItem[] function list(
-         	String fruitId
-         	String combinationId
+         	String fruitId,
+         	String combinationId,
+			Numeric parentId
     ) {
 		arguments["limit"] = -1;
 
@@ -112,15 +145,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     public com.apirone.core.model.bean.Result function search(
 			String fruitId,
-            String combinationId
+            String combinationId,
+            Numeric parentId
         ){
 
-		dump( arguments );
 
-		// solo uno dei due
-		if ( ! ( IsNull( arguments.combinationId ) XOR IsNull( arguments.fruitId ) ) ) {
-			throw( type="ApirOne.errors.AtLeastOneParameterIsRequired", message="At least one parameter is required: combinationId or fruitId" );
+		// solo uno dei tre NON VA E NON HA SENSO xor di 3
+		/*
+		if ( ! ( IsNull( arguments.combinationId ) XOR IsNull( arguments.fruitId ) XOR IsNull( arguments.parentId ) ) ) {
+			throw( type="ApirOne.errors.AtLeastOneParameterIsRequired", message="One param is required: combinationId or fruitId or parentId" );
 		}
+		*/
 	
 	    var rows = [];
     	var result = super.getResult();
@@ -194,6 +229,44 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	private Void function printTree(required array items, numeric level="0") {
+		for ( var item in arguments.items ) {
+			var indent = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", arguments.level );
+			
+			//  Stampa il nome della categoria con l'indentazione 
+			echo("#indent# - #item.id# #item.attributeValue.texts[1].name# <br>");
+
+			//  Se la categoria ha dei figli, chiama ricorsivamente la funzione 
+			if ( StructKeyExists( item, "items" ) && arrayLen(item.items) > 0 ) {
+				printTree(item.items, arguments.level + 1);
+			}
+		}
+	}
+
+	private Array function getRecursiveTree(
+		required Numeric parentId
+    ) {
+
+		var result = [];
+
+		var items = list( parentId = arguments.parentId );
+
+        for( var item in items ) {
+
+            var itemRows = getRecursiveTree( parentId=item.getId() );
+
+			if( ArrayLen( itemRows ) ) {
+				item.setChildren( itemRows );
+			}
+
+			ArrayAppend( result, item );
+
+        }
+
+		return result;
+		
+	}	
+
 	private com.apirone.core.model.bean.ProductItem function build(
     		required String productItemId
     	){
@@ -212,10 +285,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setStatus( getStatusService().get( record.status_id ) );
 
-			var attributeValue = getAttributeValueService().get( record.attribute_value_id );
+			var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id );
             
 			bean.setAttributeValue( attributeValue );
             bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
+            bean.setChildren( [] );
 			
             return bean;
 
@@ -227,7 +301,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "combinationItem_#arguments.id#";
+  		return "ProductItem_#arguments.id#";
 
   	}
 

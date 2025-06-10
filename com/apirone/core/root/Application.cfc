@@ -64,7 +64,7 @@ component {
 
         //variables.settings = new config.Settings();
 
-        cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - CORE:onApplicationStart" );
+        //cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - CORE:onApplicationStart" );
 
         startFramework();
 
@@ -86,7 +86,7 @@ component {
 
     private function startFramework(){
 
-        cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - CORE:startFramework" );
+        //cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - CORE:startFramework" );
 
         new com.apirone.core.loading.Bootstrapper();
 

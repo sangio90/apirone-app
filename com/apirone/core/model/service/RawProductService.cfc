@@ -11,20 +11,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     		required String rawProductId
         ){
 
-    	var cm = getCacheManager();
+    	var cm = super.getCacheManager();
 
     	var key = getCacheKey( arguments.rawProductId );
 
 	   	var cache = cm.get( key ) ;
 
 	    if ( cache.status ) {
-	    
+
 	      	return cache.data;
 	    
 	    } 
 	    
 		var bean = build( arguments.rawProductId );
-		
+
 		cm.put( key, bean );
         
 		return bean;
@@ -32,9 +32,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
     public com.apirone.core.model.bean.Result function search(
+					String typeId,
+					String processingTypeId,
+					String str,
 			required Numeric limit = 20,
 			required Numeric offset = 0
     	){
+
+		if( !ListFind( "LV,MP", arguments.processingTypeId ) ) {
+			throw( type="ApirOne.errors.valueNotAllowed", message="For processingTypeId the allowed values are LV=lavorazioni or MP=materie prime" );
+		}
 
 	    var rows = [];
     	var result = super.getResult();
@@ -66,16 +73,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    if( record.recordCount ) { 
 
-			var record = trimQueryFields( record );
+			var record = super.trimQueryFields( record );
 
             var bean = super.bean( "RawProduct" );
 
             bean.setId( record.arcodart );
 			bean.setName( record.ardesart );
 			bean.setType( getRawProductTypeService().get( record.artipmat )  );
-			bean.setProcessingType( getLookupService().get( "processingType", record.processiong_type_id )  );
+			bean.setProcessingType( getLookupService().get( "processingType", record.processiong_type_id ) );
+			bean.setMeasurementUnit( getLookupService().get( "measurementUnit", trim( record.arunmis1 ) ) );
 
 			var variants = getVariantService().list( rawProductId=record.arcodart );
+			
 			var colors = getColorService().list( rawProductId=record.arcodart );
 
 			if( !variants.len() ) {
@@ -98,11 +107,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			}
 
+			var colorVariants = []
+
 			for( var thisVariant in variants ) {
-				thisVariant.setColors( colors )
+
+				// remove reference
+				var newVariant = Duplicate( thisVariant );
+
+				newVariant.setColors( colors );
+				colorVariants.add( newVariant );
 			}
 
-			bean.setVariants( variants );
+			bean.setVariants( colorVariants );
 			
             return bean;
 

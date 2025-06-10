@@ -88,6 +88,12 @@
 				roles: "ADM"
 			},
 			{
+				href: "/manager/raw-values",
+				icon: "fas fa-palette",
+				title: "Valori base",
+				roles: "ADM"
+			},
+			{
 				href: "/manager/attributes",
 				icon: "fas fa-external-link-square-alt",
 				title: "Attributi e valori",

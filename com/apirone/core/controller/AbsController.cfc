@@ -16,12 +16,12 @@
         return errors
                 .map( (error ) => {
                     return {
-                        "field": error.getField(),
-                        "type": error.getValidationType(),
+                        "field"   : error.getField(),
+                        "type"    : error.getValidationType(),
                         "expected": error.getValidationData(),
-                        "found": error.getRejectedValue(),
-                        "message": error.getMessage(),
-                        "details": error.getValidationData()
+                        "found"   : error.getRejectedValue(),
+                        "message" : error.getMessage(),
+                        "details" : error.getValidationData()
                     }
                 })
     }
@@ -265,7 +265,7 @@
     // only message
     public String function message( required String id, required String lang="it" ){ //id is a dotted path
 
-		var messages = DeserializeJSON( FileRead(expandPath("/config/assets/messages-#LCase(arguments.lang)#.json.cfm") ) );
+		var messages = DeserializeJSON( FileRead( ExpandPath("/config/assets/messages-#LCase(arguments.lang)#.json.cfm") ) );
 
         return StructGet( "messages.#id#" );
 
@@ -274,15 +274,16 @@
     // message and id
     public Struct function completeMessage( required String id, required String langId="it" ){ //id is a dotted path
 
-		var messages = DeserializeJSON( FileRead(expandPath("/config/assets/messages-#LCase(arguments.langId)#.json.cfm") ) );
+		var messages = DeserializeJSON( FileRead( ExpandPath("/config/assets/messages-#LCase(arguments.langId)#.json.cfm") ) );
 
-        var result = StructGet("messages.#id#");
+        var text = StructGet("messages.#arguments.id#");
 
-        if( !IsSimpleValue( result ) ) {
+        if( !IsSimpleValue( text ) ) {
             FileAppend( file=ExpandPath("/message-not-found.log"), data="#now()#;messageIdNotFound:#arguments.id#;langId:#arguments.langId# #Chr(13)##Chr(10)#" );
+
         }
 
-        return { "id" : arguments.id, "text" = result };
+        return { "id" : arguments.id, "text" = IsSimpleValue( text ) ? text : "String not found" };
 
     }
 

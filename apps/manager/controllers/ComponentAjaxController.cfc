@@ -26,6 +26,10 @@ component extends="com.apirone.core.controller.AbsController" {
                     "processingType" = {
                         "id" = product.getProcessingType().getId(),
                         "name" = product.getProcessingType().getName()
+                    },
+                    "measurementUnit" = {
+                        "id" = product.getMeasurementUnit().getId(),
+                        "name" = product.getMeasurementUnit().getName()
                     }
                 },
                 "variant" = {
@@ -169,7 +173,7 @@ component extends="com.apirone.core.controller.AbsController" {
                 break;
 
             case "item":
-                params = { roductItemId = rc.itemId };
+                params = { productItemId = rc.itemId };
                 break;
                 
             case "lineSize":

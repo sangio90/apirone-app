@@ -39,17 +39,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required Numeric offset = 0
     	){
 
-	    var rows = [];
+		//cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# colorService:search()");
+
+		var rows = [];
     	var result = super.getResult();
 
     	var records = getDao().find( argumentCollection=arguments );
 
-		records.each(function(record) {
+		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# colorService:search();recordCount:#records.recordCount#;rawProductId:'#arguments.rawProductId#'");
+
+		records.each(function( record, index ) {
+
+			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# colorService:search();index:#index#;clcodice:'#record.clcodice#'");
+
 			rows.add( get( colorId = record.clcodice ) );
+		
 		});
 
 	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
+	    result.setCount( Val( records.recordCount ) );
 	    result.setTotal( Val( records.total ) );
 
         return result;
@@ -95,7 +103,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "Color_#arguments.id#";
+		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# colorService:getCacheKey();colorId:'#arguments.id#'");
+
+		return "Color_#Hash(arguments.id)#";
 
   	}
 

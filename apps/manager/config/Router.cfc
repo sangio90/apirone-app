@@ -9,6 +9,8 @@
 			return "v. #settings( "app.version" )# Ok!";
 		} );
 
+		get( "/tmp" ).to( "MainController.tmp" ).end();
+
 		route( "/live", function(event, rc, prc){
 			return "<meta http-equiv='refresh' content='60'>
 				Live #now()#";
@@ -34,6 +36,18 @@
 		post( "/ajax/finishes" ).to( "FinishAjaxController.save" ).end();
 		get( "/finishes" ).to( "FinishController.list" ).end();
 
+
+		/*
+			raw value
+		*/
+		//get( "/ajax/raw-value" ).to( "RawValueAjaxController.new" ).end();
+		//get( "/ajax/raw-value/:id" ).to( "RawValueAjaxController.get" ).end();
+		get( "/ajax/raw-values/code-exists" ).to( "RawValueAjaxController.codeExists" ).end();
+		get( "/ajax/raw-values/:id" ).to( "RawValueAjaxController.get" ).end();
+		post( "/ajax/raw-values" ).to( "RawValueAjaxController.save" ).end();
+		delete( "/ajax/raw-values" ).to( "RawValueAjaxController.delete" ).end();
+		get( "/ajax/raw-values" ).to( "RawValueAjaxController.list" ).end();
+		get( "/raw-values" ).to( "RawValueController.list" ).end();
 
 		/*
 			products
@@ -141,6 +155,7 @@
 		post( "/ajax/:by-regex:(combinations|combination-items)/:id/images" ).to( "FileAjaxController.upload" ).end();
 
 		get( "/combinations/:id" ).to( "CombinationController.detail" ).end();
+		get( "/comb/:id/items" ).to( "CombinationController.items" ).end();
 
 
 		/*

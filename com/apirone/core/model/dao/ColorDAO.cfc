@@ -32,7 +32,7 @@
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="colori.clcodice">
 
-        <cfquery name="local.q" datasource="verticale">
+        <cfquery name="local.q" datasource="verticale" result="local.result">
 			SELECT
 				clcodice,
 				COUNT(clcodice) OVER() AS total
@@ -57,6 +57,8 @@
 				FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY;
 			</cfif>
 		</cfquery>
+
+		<cfset var sql = super.getCompleteSQL( local.result.sql, local.result.sqlparameters )>
 
 		<cfreturn local.q>
 

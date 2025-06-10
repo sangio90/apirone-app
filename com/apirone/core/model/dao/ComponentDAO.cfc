@@ -22,7 +22,7 @@
 		<cfargument name="lineId" type="String">
 		<cfargument name="sizeId" type="String">
 		<cfargument name="combinationId" type="String">
-		<cfargument name="roductItemId" type="Numeric">
+		<cfargument name="productItemId" type="Numeric">
 		<cfargument name="fruitId" type="String">
 		<cfargument name="fruitCombinationitemId" type="String">
 
@@ -31,15 +31,15 @@
 		<cfargument name="orderby" required="true" type="String" default="created_at desc">
 
         <cfquery name="local.q" datasource="apirone">
-			SELECT
+			SELECT	
                 component_id,
 				COUNT(component_id) OVER() AS total
 			FROM
             	components
 			WHERE 1=1
 			
-			<cfif !isNull( arguments.roductItemId )>
-				AND product_item_id = <cfqueryparam value="#arguments.roductItemId#" cfsqltype="Integer">
+			<cfif !isNull( arguments.productItemId )>
+				AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
 			</cfif>
 
 			<cfif !isNull( arguments.fruitId )>

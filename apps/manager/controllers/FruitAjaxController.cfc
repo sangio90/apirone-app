@@ -141,10 +141,10 @@ component extends="com.apirone.core.controller.AbsController" {
                 DELETE FROM product_items
                 WHERE 
                     fruit_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
-                    AND attribute_value_id IN 
+                    AND attribute_raw_value_id IN 
                         ( 
-                            SELECT attribute_value_id 
-                            FROM attribute_values 
+                            SELECT attribute_raw_value_id 
+                            FROM attributes_raw_values 
                             WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#rc.attributeId#">::uuid
                         )
             </cfquery>
@@ -209,7 +209,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var  items = super.fire("ProductItem.getTree", { fruitId = rc.id } );
+        var  items = super.fire("ProductItem.getFlatTree", { fruitId = rc.id } );
 
         for( var item in items ) {
 

@@ -395,6 +395,7 @@ AP.productAttribute.list = (function () {
 
 		},
 
+		/*
 		loadFinishes: function () {
 
 			console.log("loadFinishes");
@@ -443,6 +444,7 @@ AP.productAttribute.list = (function () {
             return false;
 
 		},
+		*/
 
 		change: function (event) {
 

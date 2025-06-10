@@ -41,7 +41,7 @@
                                 <div class="mb-3 row">
                                     <label for="attr" class="col-sm-2 col-form-label text-end">Descrizione (it)</label>
                                     <div class="col-sm-10">
-                                        <input type="text" required class="form-control col-sm-4" id="attr" name="attr"
+                                        <input type="text" required class="form-control col-sm-4 uppercase" id="attr" name="attr"
                                             data-bind="value: detailForm.data.mainText.name"
                                         >
                                     </div>
@@ -87,7 +87,7 @@
                                 <div class="row">
                                     <div class="col-md-12 d-flex justify-content-end">
                                         <div class="status errors-counter mt-1 me-3"></div>
-                                        <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
+                                        <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudix</button>
                                         #saveButton(bind="click:save", size="sm")#
                                     </div>
                                 </div>
@@ -101,6 +101,26 @@
                     <div class="tab-pane fade" id="attribute-nav-values-tab" role="tabpanel" aria-labelledby="attribute-nav-values-but">
 
                         <div class="card-body">
+
+                            <div class="col-12">
+
+                                <div class="divider mb-3">aggiungi valore</div>
+
+                                <form id="attribute-values-suggest-form" method="POST" name="attribute-values-suggest-form">
+
+                                    <div class="col-sm-7 col-sx-12 mb-3">
+
+                                        <input type="text" name="search-values" class="form-control" id="search-values" maxlength="150" placeholder="Cerca e aggiungi valore"
+                                            data-bind="value: itemForm.name"
+                                            data-rule-required="true"
+                                            data-msg-required="Valore richiesto">
+
+                                    </div>
+                                    
+                                </form>
+
+                            </div>
+
 
                             <div data-bind="invisible: isValuesGridVisible" class="mb-3 alert alert-warning">
                                 <span>Nessun valore ancora caricato</span>
@@ -152,7 +172,7 @@
                                 <div class="row mb-3">
                                     <label for="newValueName" class="col-sm-2 text-end mt-2">Descrizione (it)</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="newValueName" name="newValueName" 
+                                        <input type="text" class="form-control uppercase" id="newValueName" name="newValueName"
                                             required
                                             data-bind="value: valueForm.data.mainText.name">
                                     </div>
@@ -197,7 +217,7 @@
                                     
                                     <div class="status errors-counter mt-1 float-end me-3" id="attribute-values-add-form-status"></div>
                                     
-                                    <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
+                                    <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudiy</button>
 
                                     #saveButton( bind="click:saveValue", size="sm" )#
 
@@ -210,7 +230,9 @@
 
             </div>
         </selection>
-    
+
     </div>
+
+    #template( view="jstemplate/raw-value/raw-value-suggest-row-tmpl" )#
 
 </cfoutput>

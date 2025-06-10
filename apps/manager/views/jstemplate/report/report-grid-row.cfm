@@ -26,7 +26,7 @@
                 <div>
                     <input type="checkbox" class="form-check-input"
                         name="selected"
-                        data-bind="value:id" 
+                        value="##: id ##"
                     >
                 </div>
             </td>

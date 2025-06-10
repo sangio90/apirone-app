@@ -108,13 +108,13 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function order( event, rc, prc ){
 
-        dump(GetHTTPRequestData());
-        abort;
-
+        var json = DESerializeJSON( GetHTTPRequestData().content );
         var result = super.getResult();
 
+        dump(json);
+        abort;
+
         var service = super.service("AttributeValue")
-        var json = DESerializeJSON( GetHTTPRequestData().content );
 
         var message = super.completeMessage( "attributeValue.ordered" );
 

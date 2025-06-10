@@ -209,6 +209,12 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "attributeService", ref = "AttributeService" )
             .parent("AbsService");
 
+        map("ProductItemCombinationService").to( "com.apirone.core.model.service.ProductItemCombinationService" )
+            .asSingleton()
+            .property( name = "dao", ref = "ProductItemCombinationDAO" )
+            .property( name = "statusService", ref = "statusService" )
+            .property( name = "ProductItemService", ref = "ProductItemService" )
+            .parent("AbsService");
 
         map("LangService").to( "com.apirone.core.model.service.LangService" )
             .asSingleton()
@@ -255,7 +261,14 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "dao", ref = "AttributeValueDAO" )
             .property( name = "StatusService", ref = "StatusService" )
             .property( name = "TextService", ref = "TextService" )
-            .property( name = "LangService", ref = "LangService" )
+            .property( name = "RawValueService", ref = "RawValueService" )
+            .parent("AbsService");
+            
+        map("RawValueService").to( "com.apirone.core.model.service.RawValueService" )
+            .asSingleton()
+            .property( name = "dao", ref = "RawValueDAO" )
+            .property( name = "StatusService", ref = "StatusService" )
+            .property( name = "TextService", ref = "TextService" )
             .parent("AbsService");
             
         map("ReportService").to( "com.apirone.core.model.service.ReportService" )
@@ -276,6 +289,12 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton();
          
         map("SizeDAO").to( "com.apirone.core.model.dao.SizeDAO" )
+            .asSingleton();
+         
+        map("RawValueDAO").to( "com.apirone.core.model.dao.RawValueDAO" )
+            .asSingleton();
+         
+        map("ProductItemCombinationDAO").to( "com.apirone.core.model.dao.ProductItemCombinationDAO" )
             .asSingleton();
          
         map("ComponentDAO").to( "com.apirone.core.model.dao.ComponentDAO" )

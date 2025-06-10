@@ -9,7 +9,11 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
     property name="attributeValue" type="com.apirone.core.model.bean.AttributeValue";
     property name="attribute" type="com.apirone.core.model.bean.Attribute";
     
+    property name="children" type="com.apirone.core.model.bean.ProductItem[]";
+    
     public ProductItem function init(){
+
+        setChildren( [] );
 
         return this;
         

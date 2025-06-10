@@ -436,6 +436,10 @@ h2 {
 	width: 200px !important;
 }
 
+.w-250 {
+	width: 250px !important;
+}
+
 .small-code {
 	color: #878787;
 	font-style: italic;
@@ -624,3 +628,7 @@ h2 {
 /* END SEZIONE PER LA PAGINA: plate/map */
 
 .numeric { width: 100px; text-align: right; }
+
+.value-suggest-row {
+	
+}

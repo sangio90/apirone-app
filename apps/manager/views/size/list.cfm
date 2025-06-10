@@ -1,12 +1,16 @@
 <cfoutput>
 	<div id="size-list-root">
-		#pageTitle()#
+
+        <div class="row">
+            <div class="col-8">
+                #pageTitle()#
+            </div>
+            <div class="col-4 text-end pt-3">
+                #addButton( bind="click:new", size="sm" )#
+            </div>
+        </div>
 
 		<div class="row">
-			<div class="col-lg-12 text-end pb-3">
-				#addButton( bind = "click:new", size = "sm" )#
-			</div>
-
 			<div class="col-lg-12">
 				<section class="card">
 					<div class="card-body">

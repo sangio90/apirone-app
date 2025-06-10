@@ -185,16 +185,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if( Len( record.attribute_id ) ) {
 
 			entity.setKey( "attribute.id" );
-			entity.setValue( record.attribute_id );
+			entity.setValue( record.attribute_id.toString() );
 
 			return entity;
 
 		}
 
-		if( Len( record.attribute_value_id ) ) {
+		if( Len( record.raw_value_id ) ) {
 
-			entity.setKey( "attributeValue.id" );
-			entity.setValue( record.attribute_value_id );
+			entity.setKey( "rawValue.id" );
+			entity.setValue( record.raw_value_id );
 
 			return entity;
 			
@@ -236,7 +236,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 		}
 
-		throw( type="apirone.errors.textWithoutEntity", message="No entity linked to this translation. Text Id: [#record.text_id#]" );
+		//dump( record );
+		//abort;
+
+		//throw( type="apirone.errors.textWithoutEntity", message="No entity linked to this translation. Text Id: [#record.text_id#]" );
 		
   	}
 

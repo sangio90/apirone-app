@@ -37,13 +37,28 @@
         <map from="categories" to="categories" ref="ProductCategory" type="Array" />
     </mapper>
 
-    <mapper id="AttributeValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
+    <mapper id="RawValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.RawValue">
         <map from="id" to="id" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
-        <map from="orderBy" to="orderBy" type="cf:Numeric" />
         <map from="name" to="name" type="cf:String" />
         <map from="status" to="status" ref="Status" />
         <map from="mainText" to="mainText" ref="Text" />
+    </mapper>
+
+    <mapper id="AttributeValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
+        <map from="id" to="id" type="cf:String" />
+        <!-- <map from="code" to="code" type="cf:String" /> -->
+        <map from="orderBy" to="orderBy" type="cf:Numeric" />
+        <!-- <map from="name" to="name" type="cf:String" /> -->
+        <map from="status" to="status" ref="Status" />
+        <!-- <map from="mainText" to="mainText" ref="Text" /> -->
+        <map from="rawValue" to="rawValue" ref="RawValue" />
+    </mapper>
+
+    <mapper id="AttributeValueTree" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
+        <map from="id" to="id" type="cf:String" />
+        <map from="code" to="code" type="cf:String" />
+        <map from="mainText" to="mainText" ref="MainText" />
     </mapper>
 
     <mapper id="AttributeForProductItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Attribute">
@@ -56,8 +71,15 @@
         <map from="id" to="id" type="cf:String" />
         <map from="attributeValue" to="attributeValue" ref="AttributeValue" />
         <map from="attribute" to="Attribute" ref="AttributeForProductItem" />
+        <map from="parent" to="parent" ref="ProductItem" />
+        <!-- <map from="children" to="children" type="Array" ref="ProductItem" /> -->
         <map from="status" to="status" ref="Status" />
         <map from="level" to="level" type="cf:String" />
+    </mapper>   
+
+    <mapper id="ProductItemTree" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductItem">
+        <map from="id" to="id" type="cf:String" />
+        <map from="attributeValue" to="attributeValue" ref="AttributeValueTree" />
     </mapper>   
 
     <mapper id="Text" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Text">
@@ -65,6 +87,12 @@
         <map from="name" to="name" type="cf:String" />
         <map from="lang" to="lang" ref="Lang" />
         <map from="status" to="status" ref="Status" />
+    </mapper>
+
+    <mapper id="MainText" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Text">
+        <map from="id" to="id" type="cf:String" />
+        <map from="name" to="name" type="cf:String" />
+        <map from="lang" to="lang" ref="Lang" />
     </mapper>
 
     <mapper id="Lang" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Lang">

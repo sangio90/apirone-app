@@ -4,7 +4,14 @@
 
     <div id="combination-detail-root">
 
-        #pageTitle()#
+        <div class="row">
+            <div class="col-8">
+                #pageTitle()#
+            </div>
+            <div class="col-4 text-end pt-3">
+                #addButton( bind="click:new", size="sm" )#
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-md-12">
@@ -20,23 +27,29 @@
                         <div class="col-md-8 mb-4" id="combination-config-row">
 
                             <form class="d-flex align-items-center justify-content-end" id="combination-change-form">
-
-                                <label class="me-2">Dimensione:</label>
-
-                                <select name="sizeId" class="form-control w-auto me-4" data-bind="events: { change: loadFinishes }">
-                                    <cfloop array="#prc.sizes#" item="item">
-                                        <option value="#item.getId()#" 
-                                            <cfif item.getId() EQ prc.size.getId()>SELECTED</cfif>
-                                        >
-                                            #item.getCode()#
-                                        </option>
-                                    </cfloop>
-                                </select>
                                 
                                 <label class="me-2">Finitura:</label>
 
-                                <select name="finishId" class="form-control w-200" data-bind="events: { change: change }" >
+                                <select name="finishId" class="form-control w-250 me-4" 
+                                    data-bind="events: { change: loadSizes }"
+                                        <!--- data-bind="events: { change: change }" ---->
+                                    >
+
+                                    <cfloop array="#prc.finishes#" item="item">
+                                        <option value="#item.getId()#" 
+                                            <cfif item.getId() EQ prc.finish.getId()>SELECTED</cfif>
+                                        >
+                                            #item.getName()#
+                                        </option>
+                                    </cfloop>
+
                                 </select>
+
+                                <label class="me-2">Dimensione:</label>
+
+                                <select name="sizeId" class="form-control w-auto " data-bind="events: { change: change }">
+                                </select>
+
                             </form>
 
                         </div>

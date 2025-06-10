@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var  items = super.fire("CombinationComponent.list", { roductItemId = rc.id } );
+        var  items = super.fire("CombinationComponent.list", { productItemId = rc.id } );
 
         for( var item in items ) {
 
@@ -17,6 +17,10 @@ component extends="com.apirone.core.controller.AbsController" {
                     "processingType" = {
                         "id" = item.getProduct().getProcessingType().getId(),
                         "name" = item.getProduct().getProcessingType().getName()
+                    },
+                    "measumentUnit" = {
+                        "id" = item.getProduct().getMeasumentUnit().getId(),
+                        "name" = item.getProduct().getMeasumentUnit().getName()
                     }
                 },
                 "variant" = {
@@ -66,7 +70,7 @@ component extends="com.apirone.core.controller.AbsController" {
             combinationComponent.setVariant( variant );
             combinationComponent.setQuantity( thisComponent.quantity );
             
-            super.fire( "ProductItem.addComponent", { roductItemId = itemId, combinationComponent = combinationComponent } );
+            super.fire( "ProductItem.addComponent", { productItemId = itemId, combinationComponent = combinationComponent } );
 
         }
 

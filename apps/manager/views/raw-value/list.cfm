@@ -1,0 +1,84 @@
+﻿<cfoutput>
+
+    <div id="raw-value-list-root">
+
+        #pageTitle()#
+
+        <div class="row">
+            <div class="col-lg-12 text-end mb-3">
+                #addButton( bind="click:new", size="sm" )#
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-lg-12">
+
+                <section class="card">
+                    
+                    <div class="card-body">
+
+                        <div class="row d-flex align-items-center mb-3">
+
+                            <div class=" box-search-small col-8">
+
+                                <form id="raw-value-grid-search-form" 
+                                    class="d-flex align-items-center justify-content-end" 
+                                    data-bind:'events: { submit: search }'
+                                >
+
+                                    <input name="str" placeholder="Cerca" class="form-control me-3" type="text">
+
+                                    <select class="form-control me-3" name="statusId">
+                                        <option value="">-- status</option>
+                                        <cfloop array="#prc.page.statusList#" item="thisStatus">
+                                            <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
+                                        </cfloop>
+                                    </select>
+
+                                    #searchButton(bind="click:search")#
+                                    
+                                </form>
+                            
+                            </div>
+
+                            <div class="col-sm-4 text-end">
+
+                                <div class="float-end">
+                                    #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
+                                </div>
+
+                            </div>
+
+                        </div>
+                        
+                        <form name="raw-value-grid-form" id="raw-value-grid-form" method="post">
+
+                            #grid( 
+                                id="raw-value-grid",
+                                columns="[
+                                    { 'field':'shortId', 'title':'ID', width: '80px' },
+                                    { 'field':'name', 'title':'Codice', width: '150px' },
+                                    { 'field':'name', 'title':'Descrizione'},
+                                    { 'field':'', 'title':'', width: '55px'},
+                                    { 
+                                        'field':'', 
+                                        'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                        'width':'40px',
+                                        'headerAttributes': { 'class': 'text-center' }
+                                    }
+                                ]",
+                                rowTemplate="raw-value/raw-value-grid-row-tmpl"
+                            )#
+
+                        </form>
+                                        
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </div>
+
+    #view("raw-value/detail-modal")#
+
+</cfoutput>

@@ -28,7 +28,7 @@
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="combinationId" type="String">
-		<cfargument name="roductItemId" type="Numeric">
+		<cfargument name="productItemId" type="Numeric">
 		<cfargument name="typeId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
@@ -46,8 +46,8 @@
 				AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
 			</cfif>
 
-			<cfif !isNull( arguments.roductItemId )>
-				AND product_item_id = <cfqueryparam value="#arguments.roductItemId#" cfsqltype="Integer">
+			<cfif !isNull( arguments.productItemId )>
+				AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
 			</cfif>
 
 			<cfif !isNull( arguments.typeId )>

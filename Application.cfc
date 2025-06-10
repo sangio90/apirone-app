@@ -6,7 +6,7 @@ component extends="com.apirone.core.root.Application" {
 
 	public Boolean function onApplicationStart() {
 
-		cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:onApplicationStart" );
+		//cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:onApplicationStart" );
 
 		super.onApplicationStart();
 
@@ -62,7 +62,7 @@ component extends="com.apirone.core.root.Application" {
 
 	public Void function loadColdbox(){
 		
-		cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:loadColdbox" );
+		//cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:loadColdbox" );
 
 		var COLDBOX_APP_ROOT_PATH = GetDirectoryFromPath( GetCurrentTemplatePath() );
 		var COLDBOX_APP_MAPPING   = "";

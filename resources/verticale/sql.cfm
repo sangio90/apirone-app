@@ -3,24 +3,56 @@
 <cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
-<h3>Articolo</h3>
-<cfquery name="n" datasource="verticale" result="result">
-    SELECT
-        TOP 5
-        arcodart,
-        arsemlav,
-        artipmat,
-        arcodart,
-        ardesart,
-        artipmat
-    FROM
-        azapi_artico a
-    WHERE 1=1
-        AND arcodart LIKE ' %'
-</cfquery>
+<cfset art = "MATLASOTTGREZZO,MATLASOTTCRUDO,MATLASFENIX,MATLASPLAPOLIST,LAV-PULSATINA">
 
-<cfdump var="#n#">
-<cfdump var="#result#">
+<cfoutput>
+    <cfloop list="#art#" item="item">
+
+        <h3>Articolo #item#</h3>
+        <cfquery name="n" datasource="verticale" result="result">
+            SELECT
+                TOP 5
+                arcodart,
+                arsemlav,
+                artipmat,
+                arcodart,
+                ardesart,
+                artipmat,
+                *
+            FROM
+                azapi_artico a
+            WHERE 1=1
+                AND arcodart = '#item#'
+        </cfquery>
+
+        <cfdump var="#n#">
+        <cfdump var="#result#">
+
+        <h3>Varianti</h3>
+        <cfquery name="j" datasource="verticale">
+            SELECT *
+            FROM azapi_codvar AS codvar 
+                INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod 
+            WHERE 1=1 
+                AND comvar.cbcodart = '#item#' 
+            --ORDER BY arcodart 
+        </cfquery>
+
+        <cfdump var="#j#">
+
+        <h3>Colori</h3>
+        <cfquery name="k" datasource="verticale">
+            SELECT *
+            FROM azapi_colori AS colori
+                INNER JOIN azapi_comcol AS comcol ON comcol.clcodcol = colori.clcodice
+            WHERE 1=1
+                AND comcol.clcodart = '#item#' 
+        </cfquery>
+        <cfdump var="#k#">
+
+    </cfloop>
+</cfoutput>
+
 
 <cfabort>
 

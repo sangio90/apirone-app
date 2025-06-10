@@ -23,7 +23,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
 
         var params = super.paramsFromUrl();
-        
+
         var rows = super.fire( "attribute.search", params );
 
         for ( var row in rows.getData() ) {

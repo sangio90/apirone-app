@@ -108,12 +108,11 @@ AP.util.swapElementsOfTwoArrays = function (arr1, arr2) {
 	}
 };
 
-AP.util.fireCallback = function (func, callbacks) {
+AP.util.fireCallback = function( func, callbacks ) {
 
 	var callbackList = callbacks;
 
 	console.log("callbackList", callbackList);
-
 
 	var exists = callbackList?.hasOwnProperty(func);
 
