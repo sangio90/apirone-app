@@ -69,14 +69,12 @@
 			INSERT INTO attributes_raw_values (
 				status_id,
 				orderby,
-				attribute_id,
-				code
+				attribute_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getAttributeId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getCode()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getAttributeId()#">::uuid
 			) RETURNING attribute_raw_value_id
 		</cfquery>
 
@@ -85,6 +83,7 @@
 	</cffunction>
 
 
+	<!---
 	<cffunction name="update" returntype="Numeric">
 
 		<cfargument name="value" type="com.apirone.core.model.bean.AttributeValue" required="true">
@@ -104,6 +103,7 @@
 		<cfreturn arguments.value.getId()>
 
 	</cffunction>
+	---->
 
 	<cffunction name="delete" returntype="Numeric">
 		
@@ -113,7 +113,8 @@
 			DELETE FROM
 				attributes_raw_values
 			WHERE
-			attribute_raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
+				attribute_raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
+			
 			RETURNING attribute_raw_value_id
 		</cfquery>
 

@@ -625,10 +625,27 @@ h2 {
 	content: unset;
 }
 
+.k-popup .k-focus {
+    background-color: #ffe993;
+    border-bottom: 1px solid #cecece !important;
+}
+
+.k-popup .k-list-item {
+    border-bottom: 1px solid #cecece;
+}
+
+
 /* END SEZIONE PER LA PAGINA: plate/map */
 
 .numeric { width: 100px; text-align: right; }
 
-.value-suggest-row {
-	
+.label-item-col-big {
+    float: left;
+    width: 210px;
+    text-overflow: ellipsis;
+}
+
+.label-item-col {
+    float: left;
+    width: 70px;
 }

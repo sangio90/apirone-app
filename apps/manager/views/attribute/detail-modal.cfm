@@ -87,7 +87,7 @@
                                 <div class="row">
                                     <div class="col-md-12 d-flex justify-content-end">
                                         <div class="status errors-counter mt-1 me-3"></div>
-                                        <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudix</button>
+                                        <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
                                         #saveButton(bind="click:save", size="sm")#
                                     </div>
                                 </div>
@@ -110,8 +110,9 @@
 
                                     <div class="col-sm-7 col-sx-12 mb-3">
 
-                                        <input type="text" name="search-values" class="form-control" id="search-values" maxlength="150" placeholder="Cerca e aggiungi valore"
-                                            data-bind="value: itemForm.name"
+                                        <input type="text" name="attribute-suggest-raw-values" class="form-control" id="attribute-suggest-raw-values" 
+                                            maxlength="150" placeholder="Cerca e aggiungi valore"
+                                            data-bind="value: suggestForm.data.name"
                                             data-rule-required="true"
                                             data-msg-required="Valore richiesto">
 
@@ -217,7 +218,7 @@
                                     
                                     <div class="status errors-counter mt-1 float-end me-3" id="attribute-values-add-form-status"></div>
                                     
-                                    <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudiy</button>
+                                    <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
 
                                     #saveButton( bind="click:saveValue", size="sm" )#
 

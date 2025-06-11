@@ -45,10 +45,18 @@ AP.attribute.detail = (function () {
 					lang: {
 						id: "IT"
 					}
-				}
+				},
 			},
 			title: "Carica attributo",
 			action: "create"
+		},
+
+		suggestForm: {
+			data: {
+				id: "",
+				name: "",
+				code: "",
+			}
 		},
 
 		valueForm: {
@@ -76,6 +84,7 @@ AP.attribute.detail = (function () {
 
 		detailForm: defaults.detailForm,
 		valueForm: defaults.valueForm,
+		suggestForm: defaults.suggestForm,
 
 		categories: AP.page.categories,
 		statusList: AP.page.attributeStatusList,
@@ -149,6 +158,8 @@ AP.attribute.detail = (function () {
 
 			var values = viewModel.get("detailForm.data.values");
 
+			console.log("isValuesGridVisible:values", values);
+
 			if (values?.total()) {
 				return true;
 			}
@@ -194,7 +205,7 @@ AP.attribute.detail = (function () {
 							var id = viewModel.get("detailForm.data.id");
 							//console.log("id", id);
 
-							loadAttribute({ id: viewModel.get("detailForm.data.id") });
+							loadAttribute( viewModel.get("detailForm.data.id") );
 
 						}
 					}
@@ -254,7 +265,7 @@ AP.attribute.detail = (function () {
 									tab.removeClass("disabled");
 									tab.tab("show");
 
-                                    loadAttribute( { id: xhr.data.payload.id } );
+                                    loadAttribute( xhr.data.payload.id );
 
 								}
 
@@ -323,7 +334,7 @@ AP.attribute.detail = (function () {
 
     });
 
-	loadAttribute = function ({ id }) {
+	loadAttribute = function ( id ) {
 
 		NM.util.ajax({
 			method: "GET",
@@ -355,8 +366,6 @@ AP.attribute.detail = (function () {
 					/* 
 						load suggest for values
 					*/
-
-					//initSuggest();
 
 					AP.util.fireCallback( "onLoad", viewModel.get("callback") );
 
@@ -458,10 +467,12 @@ AP.attribute.detail = (function () {
 
 	var initSuggest = function () {
 
-		var suggest = $("#attribute-values-suggest-form #search-values");
+		var suggest = $("#attribute-suggest-raw-values");
+
+		console.log("initSuggest:suggest", suggest);
 
 		var autocomplete = suggest.data("kendoAutoComplete");
-		var suggestTemplate = $("#suggest-row-value-tmpl").html();
+		var suggestTemplate = $("#raw-value-suggest-row-tmpl").html();
 
 		if ( autocomplete ) {
 			autocomplete.destroy();
@@ -472,15 +483,17 @@ AP.attribute.detail = (function () {
 			highlightFirst: true,
 			minLength: 3,
 			dataSource: new kendo.data.DataSource({
+				serverFiltering: true,
 				transport: {
 					read: {
-						url: "/manager/ajax/values/search?str=" + '',
+						url: "/manager/ajax/attributes/raw-values",
 						data: {
 							str: function () {
 								return suggest.data("kendoAutoComplete").value();
 							},
 						},
 					},
+
 				},
 				schema: {
 					data: function( xhr ) {
@@ -491,21 +504,30 @@ AP.attribute.detail = (function () {
 			select: function( event ) {
 				var dataItem = this.dataItem( event.item.index() );
 
-				var data = viewModel.get("suggest.data");
+				var exists = false;
 
-				data.push( dataItem );
+				if( !exists ) {
 
-				/*
-				viewModel.set( "itemForm.year", dataItem.year );
-				viewModel.set( "itemForm.strength", dataItem.strength );
-				viewModel.set( "itemForm.alcoholType", dataItem.alcoholType );
-				*/
+					NM.util.ajax({
+						method: "POST",
+						url: "/manager/ajax/attributes/raw-values",
+						data: JSON.stringify( { id: dataItem.id, attributeId: viewModel.get("detailForm.data.id")} ),
+						callback: {
+							done: function (xhr) {
+								AP.widget.notify("success", "Valore aggiunto con successo");
+								loadAttribute( viewModel.get("detailForm.data.id") );
 
+							}
+						}
+					});
+
+				}
 			},
 			template: kendo.template( suggestTemplate ),
-			noDataTemplate: ""
+			noDataTemplate: "<div>NESSUN RECORD</div>"
 		});
 
+		/*
 		// open the suggest by default with last records
 		suggest.on( "focus", function( e ) {
 
@@ -514,13 +536,14 @@ AP.attribute.detail = (function () {
 
 			autocomplete.search( value );
 		});
+		*/
 
 	}
 
-    pub.new = function ( { callback } ) {
+    pub.new = function ( onCreate ) {
 
-        if( callback ) {
-            viewModel.set("callback.onCreate", callback.onCreate );
+        if( onCreate ) {
+            viewModel.set("callback.onCreate", onCreate );
         }
 
 		viewModel.resetValueForm();
@@ -543,7 +566,7 @@ AP.attribute.detail = (function () {
 
 		console.log("AP.attribute.detail:edit", id);
 
-		loadAttribute( { id: id  });
+		loadAttribute( id );
 
     };
 

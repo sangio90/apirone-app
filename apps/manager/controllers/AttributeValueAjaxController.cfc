@@ -60,43 +60,22 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var result = super.getResult();
     
-        var thisId = "";
-        var messageId = "";
-        var texts = [];
-
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
-        var attrValue = super.bean("AttributeValue");
-        
-        var text = super.bean("Text");
-        var lang = super.bean("Lang");
         var status = super.bean("Status");
-        var valueStatus = super.bean("Status");
+        var bean = super.bean("AttributeValue");
+        var value = super.bean("RawValue");
 
-        text.setLang( lang.setId( json.value.mainText.lang.id ) );
-        text.setStatus( status.setId( json.value.mainText.id ) );
+        bean.setStatus( status.setId( "ACT" ) );
 
-        text.setId( json.value.mainText.id );
-        text.setName( json.value.mainText.name );
+        //bean.setId( json.value?.id );
+        //bean.setTexts( [ text ] );
+        bean.setAttributeId( json.attributeId );
+        bean.setOrderBy( 100 );
+        bean.setRawValue( value.setId( json.id ) );
 
-        attrValue.setId( json.value?.id );
-        attrValue.setTexts( [ text ] );
-        attrValue.setStatus( valueStatus.setId( json.value.status.id ) );
-        attrValue.setAttributeId( json.attributeId );
-        attrValue.setOrderBy( json.value.orderBy );
-        attrValue.setCode( json.value.code );
-
-        if( !Len( json.value.id ) ) {
-            
-            messageId = "attributeValue.created";
-            thisId = super.fire( "attributeValue.create", [ attrValue ] )
-            
-        } else {
-
-            messageId = "attributeValue.updated";
-            thisId = super.fire( "attributeValue.update", [ attrValue ] )
-            
-        }
+        var messageId = "attributeValue.created";
+        var thisId = super.fire( "attributeValue.create", [ bean ] )
 
         var message = super.completeMessage( messageId );
 

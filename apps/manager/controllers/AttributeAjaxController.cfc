@@ -41,6 +41,31 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
+    function listRawValues( event, rc, prc ){
+
+        var data = [];
+        var dm = getDataMapper();
+        var result = super.getResult();
+
+        var params = super.paramsFromUrl();
+
+        var rows = super.fire( "rawValue.search", params );
+
+        for ( var row in rows.getData() ) {
+
+            var obj = dm.convert( row, "RawValue", true );
+            data.add( obj );
+        
+        }
+
+        result.setCount( rows.getCount() );
+        result.setTotal( rows.getTotal() );
+        result.setData( data );
+
+        event.setValue("result", result );
+        
+    }
+
     function get( event, rc, prc ){
 
         var result = super.getResult();
