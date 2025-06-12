@@ -79,7 +79,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var message = super.completeMessage( messageId );
 
-        result.setData( { "message" = message, "payload" = { id = thisId }  } );
+        result.setData( { "message" = message, "payload" = { "id" = thisId }  } );
         
         event.setValue( "result", result );
         
@@ -89,9 +89,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var json = DESerializeJSON( GetHTTPRequestData().content );
         var result = super.getResult();
-
-        dump(json);
-        abort;
 
         var service = super.service("AttributeValue")
 

@@ -92,9 +92,7 @@ AP.attribute.detail = (function () {
 		callback: {
 			onCreate: undefined,
 			onUpdate: undefined,
-			onLoad: undefined,
-			onUpdateValue: undefined,
-			onCreateValue: undefined
+			onLoad: undefined
 		},
 
 		getFormValueTitle: function() {
@@ -143,22 +141,9 @@ AP.attribute.detail = (function () {
 
 		},
 
-		resetValueForm: function () {
-
-			var thisForm = fields.valueForm;
-
-			viewModel.set("valueForm", defaults.detailForm);
-
-			thisForm.find(".status").html("");
-			thisForm.data("validator").resetForm();
-
-		},
-
 		isValuesGridVisible: function () {
 
 			var values = viewModel.get("detailForm.data.values");
-
-			console.log("isValuesGridVisible:values", values);
 
 			if (values?.total()) {
 				return true;
@@ -187,7 +172,7 @@ AP.attribute.detail = (function () {
 
 				NM.util.ajax({
 					method: "DELETE",
-					url: "/manager/ajax/attributes/values",
+					url: "/manager/ajax/attributes/raw-values",
 					data: ids,
 					callback: {
 						done: function (xhr) {
@@ -203,7 +188,6 @@ AP.attribute.detail = (function () {
 							}
 
 							var id = viewModel.get("detailForm.data.id");
-							//console.log("id", id);
 
 							loadAttribute( viewModel.get("detailForm.data.id") );
 
@@ -249,12 +233,7 @@ AP.attribute.detail = (function () {
 					callback: {
 						done: function (xhr) {
 
-							var callback = viewModel.isUpdate() ? "onUpdate" : "onCreate";
-
 							NM.util.autoHideMessage(status, "<span class='green'>" + xhr.data.message.text + "</span>");
-
-							console.log("save:id", data.get("id") );
-							console.log("save:callback", callback);
 
 							setTimeout(() => {
 
@@ -269,8 +248,7 @@ AP.attribute.detail = (function () {
 
 								}
 
-								console.log("save:callback:name", callback );
-
+								var callback = viewModel.isUpdate() ? "onUpdate" : "onCreate";
 								AP.util.fireCallback( callback, viewModel.get("callback") );
 
 							}, 700);
@@ -334,7 +312,7 @@ AP.attribute.detail = (function () {
 
     });
 
-	loadAttribute = function ( id ) {
+	var loadAttribute = function ( id ) {
 
 		NM.util.ajax({
 			method: "GET",
@@ -399,10 +377,6 @@ AP.attribute.detail = (function () {
 
 						end: function (event) {
 
-							console.log("attribute-detail");
-							console.log("event.oldIndex", event.oldIndex);
-							console.log("event.newIndex", event.newIndex);
-
 							if(event.newIndex != event.oldIndex) {
 
 								var values = viewModel.get("detailForm.data.values").data();
@@ -445,11 +419,10 @@ AP.attribute.detail = (function () {
 
 								NM.util.ajax({
 									method: "POST",
-									url: "/manager/ajax/attributes/" + id + "/values/order",
+									url: "/manager/ajax/attributes/" + id + "/raw-values/order",
 									data: JSON.stringify(viewModel.get("detailForm.data.values").data()),
 									callback: {
 										done: function (xhr) {
-
 											NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
 										}
 									}
@@ -468,14 +441,11 @@ AP.attribute.detail = (function () {
 	var initSuggest = function () {
 
 		var suggest = $("#attribute-suggest-raw-values");
-
-		console.log("initSuggest:suggest", suggest);
-
 		var autocomplete = suggest.data("kendoAutoComplete");
 		var suggestTemplate = $("#raw-value-suggest-row-tmpl").html();
 
 		if ( autocomplete ) {
-			autocomplete.destroy();
+			return;
 		}
 
 		suggest.kendoAutoComplete({
@@ -493,7 +463,11 @@ AP.attribute.detail = (function () {
 							},
 						},
 					},
-
+					parameterMap : function (data, type) {
+						if (type === "read") {
+							return { "str": data.str() };
+						}
+					}
 				},
 				schema: {
 					data: function( xhr ) {
@@ -504,6 +478,7 @@ AP.attribute.detail = (function () {
 			select: function( event ) {
 				var dataItem = this.dataItem( event.item.index() );
 
+				//TODO: add check if value already exists
 				var exists = false;
 
 				if( !exists ) {
@@ -515,7 +490,17 @@ AP.attribute.detail = (function () {
 						callback: {
 							done: function (xhr) {
 								AP.widget.notify("success", "Valore aggiunto con successo");
-								loadAttribute( viewModel.get("detailForm.data.id") );
+
+								suggest.data("kendoAutoComplete").value("");
+
+								setTimeout(() => {
+
+									loadAttribute( viewModel.get("detailForm.data.id") );
+
+									var callback = viewModel.isUpdate() ? "onUpdate" : "onCreate";
+									AP.util.fireCallback( callback, viewModel.get("callback") );
+
+								}, 700);
 
 							}
 						}
@@ -527,17 +512,6 @@ AP.attribute.detail = (function () {
 			noDataTemplate: "<div>NESSUN RECORD</div>"
 		});
 
-		/*
-		// open the suggest by default with last records
-		suggest.on( "focus", function( e ) {
-
-			var value = suggest.val();
-			var autocomplete = suggest.data("kendoAutoComplete");
-
-			autocomplete.search( value );
-		});
-		*/
-
 	}
 
     pub.new = function ( onCreate ) {
@@ -546,10 +520,7 @@ AP.attribute.detail = (function () {
             viewModel.set("callback.onCreate", onCreate );
         }
 
-		viewModel.resetValueForm();
 		viewModel.resetDetailForm();
-
-		//$("#attribute-nav-values-but").addClass("disabled");
 
 		NM.util.openModal( $("#attribute-detail-modal") );
 
@@ -558,10 +529,10 @@ AP.attribute.detail = (function () {
 	};
 
 
-    pub.edit = function ({ id, callback }) {
+    pub.edit = function ( id, onUpdate ) {
 
-        if( callback ) {
-            viewModel.set("callback.onUpdate", callback.onUpdate );
+        if( onUpdate ) {
+            viewModel.set("callback.onUpdate", onUpdate );
         }
 
 		console.log("AP.attribute.detail:edit", id);
@@ -572,11 +543,7 @@ AP.attribute.detail = (function () {
 
 	pub.init = function () {
 
-		//console.log("AP.attribute.detail:init");
-
 		kendo.bind( fields.detailRoot, viewModel);
-
-        //console.log("fields", fields)
 
 		var valueForm = fields.valueForm;
 		var detailForm = fields.detailForm;
@@ -597,8 +564,6 @@ AP.attribute.detail = (function () {
 			},
 
 		});
-
-		// console.log("valueForm", valueForm);
 
 		valueForm.validate({
 			onfocusout: function (element) {

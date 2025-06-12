@@ -58,37 +58,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
-	public String function create(
+	public Numeric function create(
 			required com.apirone.core.model.bean.AttributeValue attributeValue
 		){
 
-		transaction{
+		var newId = getDao().insert( arguments.attributeValue );
 
-			var newId = getDao().insert( arguments.attributeValue );
-
-			for ( var text in arguments.attributeValue.getTexts() ) {
-
-				var entity = super.bean("Entity");
-
-				entity.setKey( "attributeValue.id" );
-				entity.setValue( newId );
-
-				text.setEntity( entity );
-
-			}
-
-			getTextService().bulkCreate( arguments.attributeValue.getTexts() );
-
-		}
-
-		getCacheManager().remove( "attribute_" & arguments.attributeValue.getAttributeId() );
+		getCacheManager().remove( "attribute_#attributeValue.getAttributeId()#" );
 
 		return newId;
 
 	}
 
 	
-	public String function update(
+	public Numeric function update(
 			required com.apirone.core.model.bean.AttributeValue attributeValue
 		){
 		
@@ -96,42 +79,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getDao().update( arguments.attributeValue );
 
-		for ( var text in arguments.attributeValue.getTexts() ) {
-
-			var entity = super.bean("Entity")
-			entity.setKey( "attributeValue.id" );
-			entity.setValue( id );
-
-			text.setEntity( entity );
-
-			getTextService().update( text );
-
-		}
-
 		getCacheManager().remove( getCachekey( id ) );
 		getCacheManager().remove( "attribute_#attributeValue.getAttributeId()#" );
 		
 		return id;
     
 	}
-
-	/*
-	public Boolean function codeExists(
-		required String code,
-				 String excludedId = ""
-	){
-		var record = getDao().readByCode( arguments.code );
-
-		if (
-			record.recordCount
-			&& record.attribute_raw_value_id != arguments.excludedId
-		) {
-			return record.code == arguments.code;
-		}
-
-		return false;
-	}
-	*/
 
 	public com.apirone.core.model.bean.Outcome function delete(
 		required Numeric attributeValueId

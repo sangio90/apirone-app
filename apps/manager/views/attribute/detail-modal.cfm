@@ -74,6 +74,11 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-3 row" data-bind="visible: isUpdate">
+                                    <label for="statusId" class="col-sm-2 col-form-label text-end">ID</label>
+                                    <div class="col-sm-10 mt-1" data-bind="text: detailForm.data.id"></div>
+                                </div>
+
                                 <div class="row mb-3" data-bind="invisible: isUpdate">
                                     <label class="col-sm-2">&nbsp;</label>
                                     <div class="col-sm-10 grey">
@@ -108,10 +113,10 @@
 
                                 <form id="attribute-values-suggest-form" method="POST" name="attribute-values-suggest-form">
 
-                                    <div class="col-sm-7 col-sx-12 mb-3">
+                                    <div class="col-sm-7 col-sx-12 mb-3  box-search-small">
 
                                         <input type="text" name="attribute-suggest-raw-values" class="form-control" id="attribute-suggest-raw-values" 
-                                            maxlength="150" placeholder="Cerca e aggiungi valore"
+                                            maxlength="150" placeholder="Cerca e aggiungi un valore..."
                                             data-bind="value: suggestForm.data.name"
                                             data-rule-required="true"
                                             data-msg-required="Valore richiesto">
@@ -145,10 +150,9 @@
                                     id="attribute-values-grid",
                                     class="no-pager",
                                     columns="[
-                                        { 'field':'id', 'title':'ID', width: '50px' },
-                                        { 'field':'code', 'title':'Codice', width: '80px' },
+                                        { 'field':'id', 'title':'ID', width: '60px' },
+                                        { 'field':'code', 'title':'Codice', width: '100px' },
                                         { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
-                                        { 'field':'', 'title':'', width: '55px'},
                                         { 
                                             'field':'', 
                                             'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
@@ -162,69 +166,7 @@
                             
                             </form>
 
-                            <div class="text-end mt-4 mb-2">
-                                #button(label="Azzera", bind="click:newValue", size="sm", variant="default")#
-                            </div>
-
-                            <div class="divider mb-3" data-bind="text: getFormValueTitle"></div>
-
-                            <form id="attribute-values-add-form" method="POST" name="attribute-values-add-form">
-
-                                <div class="row mb-3">
-                                    <label for="newValueName" class="col-sm-2 text-end mt-2">Descrizione (it)</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control uppercase" id="newValueName" name="newValueName"
-                                            required
-                                            data-bind="value: valueForm.data.mainText.name">
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-3">
-                                    <label for="code" class="col-sm-2 text-end mt-2">Codice</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="code" name="code"  maxlength="5"
-                                            required
-                                            data-bind="value: valueForm.data.code"
-                                            onkeyup="this.value = this.value.toUpperCase();">
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-3">
-                                    <label for="newValueStatus" class="col-sm-2 text-end mt-2">Stato</label>
-                                    <div class="col-sm-10">
-                                        <select type="text" class="form-control" name="newValueStatus" id="newValueStatus"
-                                            required
-                                            data-bind="value: valueForm.data.status.id, source: statusList"
-                                            data-value-field="id"
-                                            data-text-field="name">
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <label for="newValueStatus" class="col-sm-2 text-end mt-2">Modifica l'immagine</label>
-                                    <div class="col-sm-10 mt-2">
-                                        <input type="checkbox" class="form-check-input">
-                                    </div>
-                                </div>
-
-                            </form>
-                            
                         </div>
-
-                        <footer class="card-footer">
-                            <div class="row">
-                                <div class="col-md-12 d-flex justify-content-end">
-                                    
-                                    <div class="status errors-counter mt-1 float-end me-3" id="attribute-values-add-form-status"></div>
-                                    
-                                    <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
-
-                                    #saveButton( bind="click:saveValue", size="sm" )#
-
-                                </div>
-                            </div>
-                        </footer>
 
                     </div>
                 </div>

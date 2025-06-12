@@ -69,12 +69,14 @@
 			INSERT INTO attributes_raw_values (
 				status_id,
 				orderby,
-				attribute_id
+				attribute_id,
+				raw_value_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getAttributeId()#">::uuid
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.value.getAttributeId()#">::uuid,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.value.getRawValue().getId()#">
 			) RETURNING attribute_raw_value_id
 		</cfquery>
 
@@ -83,7 +85,6 @@
 	</cffunction>
 
 
-	<!---
 	<cffunction name="update" returntype="Numeric">
 
 		<cfargument name="value" type="com.apirone.core.model.bean.AttributeValue" required="true">
@@ -92,18 +93,14 @@
 			UPDATE attributes_raw_values 
 			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.value.getStatus().getId()#">,
-				orderby = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">,
-				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.value.getCode()#">
+				orderby = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">
 			WHERE
 				attribute_raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getId()#">
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# #arguments.value.getcode()# = #arguments.value.getOrderBy()# ">
-
 		<cfreturn arguments.value.getId()>
 
 	</cffunction>
-	---->
 
 	<cffunction name="delete" returntype="Numeric">
 		

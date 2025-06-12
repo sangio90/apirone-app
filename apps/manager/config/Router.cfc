@@ -108,6 +108,7 @@
 		
 		post( "/ajax/attributes/raw-values" ).to( "AttributeValueAjaxController.save" ).end();
 		delete( "/ajax/attributes/raw-values" ).to( "AttributeValueAjaxController.delete" ).end();
+		post( "/ajax/attributes/:id/raw-values/order" ).to( "AttributeValueAjaxController.order" ).end();
 
 
 		/*

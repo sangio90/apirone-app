@@ -7,20 +7,22 @@
                 <span data-bind="text: id"></span>
             </td>
             <td>
-                <span data-bind="text: code"></span>
+                <span data-bind="text:rawValue.code"></span>
             </td>
             <td class="sortable">
-                <span data-bind="text:mainText.name"></span>
+                <span data-bind="text:rawValue.name"></span>
             </td>
+            <!----
             <td class="text-center">
                 <button type="button" class="btn btn-default btn-sm" data-bind="click:editValue">
                     <i class="fas fa-edit"></i>
                 </button>
             </td>
+            ---->
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"
                     name="selected"
-                    data-bind="value:id" 
+                    value="##=id##"
                 >
             </td>
         </tr>

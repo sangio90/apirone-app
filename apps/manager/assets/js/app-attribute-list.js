@@ -35,14 +35,12 @@ AP.attribute.list = (function () {
 
 		new: function () {
 
-			detailApp.new({
-				callback: {
-					onCreate: function () {
-						viewModel.rows.read();
-						console.log("new: AGGIORNO LE RIGHE");
-					}
-				}
-			});
+			var onCreate = function () {
+				viewModel.rows.read();
+				console.log("new: AGGIORNO LE RIGHE");
+			};
+
+			detailApp.new( onCreate );
 
 			return false;
 
@@ -50,15 +48,14 @@ AP.attribute.list = (function () {
 
 		edit: function (event) {
 
-			detailApp.edit({
-				id: event.data.id,
-				callback: {
-					onUpdate: function () {
-						viewModel.rows.read();
-						console.log("edit: AGGIORNO LE RIGHE");
-					}
-				}
-			});
+			var onUpdate = function () {
+				viewModel.rows.read();
+				console.log("new: AGGIORNO LE RIGHE");
+			};
+
+			console.log("edit: ", event.data.id);
+
+			detailApp.edit( event.data.id, onUpdate );
 
 			return false;
 

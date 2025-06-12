@@ -188,6 +188,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
             bean.setTexts( getTextService().list( attributeId = record.attribute_id ) )
 			bean.setStatus( getStatusService().get( record.status_id ) );
+
 			bean.setValues( getAttributeValueService().list( attributeId = record.attribute_id ) );
 			
 			var categories = super.getCategoriesBeanFromIds( record.categories );
