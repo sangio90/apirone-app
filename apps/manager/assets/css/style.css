@@ -369,7 +369,7 @@ h2 {
 }
 
 .sortable-placeholder {
-	background-color: #e0e0e0;
+	background-color: #FAA094;
 }
 
 /*
@@ -396,6 +396,7 @@ h2 {
 .page-title h4,
 .page-title h2 {
 	margin: 0px;
+	line-height: 30px;
 }
 
 
@@ -648,4 +649,37 @@ h2 {
 .label-item-col {
     float: left;
     width: 70px;
+}
+
+
+.table.table-hover {
+	line-height: 17px;
+}
+
+.hand {
+	cursor: pointer;
+}
+
+.handler {
+	opacity: 0.5;
+    display: inline-block;
+    width: 20px;
+    margin-left: 10px;
+    background-size: contain;
+    background-image: url('/assets/main/img/sort-up-down.png');
+	background-repeat: no-repeat;
+    cursor: move;
+}
+
+.sortable-placeholder-unavailable {
+	background-color: #FAA094;	
+}
+
+.sortable-placeholder-available {
+	background-color: #CCFAB7;	
+}
+
+.tab-status {
+	margin-left: auto;
+	margin-right: 30px;
 }

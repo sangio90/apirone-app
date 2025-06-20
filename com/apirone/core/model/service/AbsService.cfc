@@ -7,7 +7,7 @@
  component output="false" accessors="true" {
 
     property name="logger" type="com.apirone.core.util.Logger";
-    property name="factory" type="com.apirone.core.model.factory.Factory";
+    //property name="factory" type="com.apirone.core.model.factory.Factory";
     //ROB: removed because it generates errors when business logic is reloaded.
     //property name="cacheManager" type="com.apirone.core.util.CacheManager"; 
 	//property name="configuration" type="com.apirone.core.model.bean.Configuration" ;
@@ -19,12 +19,11 @@
      * @param values - dati inuna struttura
      */
 
-    public Struct function bean(
-        required String type, 
-                 Struct values={} 
-    	){
+    public Struct function bean( required String type, Struct values={} ){
 
-        return getFactory().createInstance( argumentCollection = arguments );
+        var factory = new com.apirone.core.model.factory.Factory();
+
+        return factory.createInstance( argumentCollection = arguments );
 
     }
 
@@ -143,10 +142,7 @@
     }
     
     private Struct function getCacheManager() {
-        var DBUtil = new com.apirone.core.util.DBUtil();
-        
         return model().getInstance("CacheManager");
-    
     }
     
     private Struct function getConfiguration() {

@@ -56,10 +56,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         //var result = convertTree( items=items );
 
-        dump( result );
-
-        abort;
-
         event.setView( "combination/items" );
 
     }

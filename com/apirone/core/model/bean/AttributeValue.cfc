@@ -6,6 +6,10 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true"{
     
     property name="attributeId" type="String";
 
+    //NOTE: Attribute ha già AttributeValue all'interno,
+    //questo crea una ricorsione: StackOverflow
+    //property name="attribute" type="com.apirone.core.model.bean.Attribute";
+
     public AttributeValue function init(){
 
         return this;

@@ -35,12 +35,7 @@ module.exports = {
 		"no-nested-ternary": "warn",
 		"no-trailing-spaces": "warn",
 		"array-bracket-spacing": "warn",
-		"space-before-function-paren": [
-			"warn", {
-				"anonymous": "always",
-				"named": "never"
-			}
-		],
+		"space-before-function-paren":"never",
 		"function-paren-newline": "off",
 		"no-multiple-empty-lines": "warn",
 		"newline-per-chained-call": [

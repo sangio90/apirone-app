@@ -144,7 +144,7 @@
 
         #view("combination/attributes-list-modal")#
         #view("combination/images-list-modal")#
-        #view("combination/reordering-modal")#
+        #view("combination/sorting-modal")#
         
     </div>
 

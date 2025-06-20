@@ -68,10 +68,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             		 String combinationId,
             required Numeric parentId=NullValue(),
             required String level=1, 
-            required String orderBy=""
+            required String orderBy="",
+			required Boolean includeMissingValues=true,
     ) {
 
         var result = [];
+		var rows = [];
 
         var fruitId = arguments.fruitId;
         var combinationId = arguments.combinationId;
@@ -82,23 +84,53 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             parentId = arguments.parentId
         );
 
+		if( arguments.includeMissingValues ) {
+			rows = listWithMissingValues( items );
+		} else {
+			rows = items;
+		}
+
+		//dump("=============================================================================================================================================")
+		//dump("=========#arguments.level#")
+
+		//dump( arguments );
+
+		//dump(attrs);
+
+		/*
+        for( var item in items ) {
+            dump( "#item.getOrderBy()# - #item.getId()# - #item.getAttribute().getName()# : #item.getAttributeValue().getRawValue().getName()#" );
+        }
+		dump("<br>");
+		*/
+
+        //for( var row in rows ) {
+            //dump( "#arguments.level# - #row.getOrderBy()# - #row.getId()# - #row.getAttribute().getName()# : #row.getAttributeValue().getRawValue().getName()#" );
+        //}
+
         var thisLevel = arguments.level;
+        var includeMissingValues = arguments.includeMissingValues;
 
         var n = 1;
 
-        for( var item in items ) {
+        for( var row in rows ) {
 
-            var thisOrderBy = "#arguments.orderBy#.#n#";
+			//if( item.getId() > 0 ) {
 
-            item.setLevel( arguments.level );
+				var thisOrderBy = "#arguments.orderBy#.#n#";
+        		var parentId = row.getId();
 
-            result.add( item );
+				row.setLevel( arguments.level );
+
+				result.add( row );
+				
+				var rows = getFlatTree( fruitId, combinationId, parentId, thisLevel+1, thisOrderBy, includeMissingValues );
+
+				result = result.merge( rows );
+
+				n++;
 			
-            var rows = getFlatTree( fruitId, combinationId, item.getId(), thisLevel+1, thisOrderBy );
-
-            result = result.merge( rows );
-
-            n++;
+			//}
 
         }
 
@@ -214,10 +246,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create(
-			required com.apirone.core.model.bean.ProductItem combinationItem
+			required com.apirone.core.model.bean.ProductItem ProductItem
 		){
 
-		var newId = getDao().insert( arguments.combinationItem );
+		var newId = getDao().insert( arguments.ProductItem );
+
+		return newId;
+
+	}
+
+
+	public String function update(
+			required com.apirone.core.model.bean.ProductItem ProductItem
+		){
+
+		var newId = getDao().update( arguments.ProductItem );
+
+		super.getCacheManager().remove( getCacheKey( arguments.ProductItem.getId() ) );
 
 		return newId;
 
@@ -267,6 +312,104 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		
 	}	
 
+	private Array function calcultateAttributes(
+		required Array rows
+    ) {
+
+		var attrs = [];
+
+		Boolean function exists( required attributeId, required attrs ) {
+
+			for( var attr in arguments.attrs ) {
+				if( attr.getId() == arguments.attributeId ) {
+					return true;
+				}
+			}
+
+			return false
+		}
+
+		for( var row in rows ) {
+
+			if( !exists( row.getAttribute().getId(), attrs ) ) {
+
+				//attribute with all values
+				attrs.add( getAttributeService().get( row.getAttribute().getId() ) );
+
+			}
+
+
+		}
+
+		return attrs;
+		
+	}	
+
+	private Array function listWithMissingValues(
+		required Array productItems
+    ) {
+
+		var values = [];
+
+		var items = Duplicate( arguments.productItems );
+
+		//1. calcolo gli attributi dei valori recuperati
+		var attrs = calcultateAttributes( arguments.productItems );
+
+		for( var thisAttr in attrs ) {
+
+			for( var thisValue in thisAttr.getValues() ) {
+
+				//2. cerco i valori mancanti per ogni attributo
+
+				var found = false;
+
+				var index = 1;
+
+				for( var thisProduct in arguments.productItems ) {
+
+					if( thisAttr.getId() == thisProduct.getAttribute().getId() ) {
+
+						if( thisValue.getRawValue().getId() == thisProduct.getAttributeValue().getRawValue().getId() ) {
+
+							var found = true;
+							//dump( "trovato: #thisAttr.getName()#: #thisValue.getRawValue().getName()# == #thisProduct.getAttributeValue().getRawValue().getName()#" );
+
+						}
+
+						var lastOrderby = thisProduct.getOrderBy();
+						var lastAttribute = thisAttr;
+
+						index++;
+
+					}
+
+				}
+
+				if ( !found ) {
+
+					var bean = super.bean( "ProductItem" );
+
+					bean.setId( -1 );
+					bean.setAttributeValue( thisValue );
+					bean.setAttribute( lastAttribute );
+					bean.setStatus( getStatusService().get( "DEA" ) );
+
+					//attributeValue
+					bean.setOrderBy( lastOrderby + 10 );
+
+					items.insertAt( index, bean );
+
+				}
+
+			}
+
+		}
+
+		return items;
+
+	}	
+
 	private com.apirone.core.model.bean.ProductItem function build(
     		required String productItemId
     	){
@@ -285,11 +428,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setStatus( getStatusService().get( record.status_id ) );
 
-			var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id );
-            
+			var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id )
+			
 			bean.setAttributeValue( attributeValue );
+
             bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
-            bean.setChildren( [] );
+            
+			bean.setChildren( [] );
 			
             return bean;
 

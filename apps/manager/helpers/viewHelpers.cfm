@@ -13,7 +13,7 @@
     <cfsavecontent variable="local.html">
         <cfoutput>
             <div class="row mb-3 page-title">
-                <div class="col-lg-8">
+                <div class="col-12">
                     <cfif Len(prc.title)>
                         <h2>#prc.title#</h2>
                     </cfif>

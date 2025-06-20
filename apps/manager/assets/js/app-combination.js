@@ -6,7 +6,7 @@ AP.combination.fields = {
 	attributeSearchForm: $("#attributes-search-form"),
 	attributeModal: $("#combination-attributes-list-modal"),
 	imagesModal: $("#combination-images-list-modal"),
-	reorderingModal: $("#combination-reordering-modal"),
+	reorderingModal: $("#combination-sorting-modal"),
 	fruitItemsImagesModal: $("#fruit-items-combinations-images-modal")
 };
 
@@ -31,6 +31,8 @@ AP.combination.list = (function () {
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" }),
+		orderingItems: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items/order" }),
+		orderingAttributes: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/attributes/order" }),
 		attributesList: undefined
 	};
 
@@ -71,7 +73,9 @@ AP.combination.list = (function () {
 	var viewModel = kendo.observable({
 
 		items: dataSources.items,
+		orderingItems: dataSources.orderingItems,
 		attributesList: dataSources.attributesList,
+		orderingAttributes: dataSources.orderingAttributes,
 
 		itemForAttributes: undefined,
 
@@ -108,7 +112,7 @@ AP.combination.list = (function () {
 			var uri = event.uri;
 
 			if( event.uri != "" ) {
-				console.log("event.uri", event.uri);
+				//console.log("event.uri", event.uri);
 				return uri;
 			}
 
@@ -117,11 +121,6 @@ AP.combination.list = (function () {
 		},
 
 		selectAttribute: function (event) {
-
-			//console.log("selectAttribute");
-
-			//var item = viewModel.get("itemForAttributes");
-			//var parentId = viewModel.get("itemForAttributes.id");
 
 			NM.util.ajax({
 				method: "POST",
@@ -204,7 +203,7 @@ AP.combination.list = (function () {
 
 		openAttributesList: function (event) {
 
-			console.log("openAttributesList");
+			//console.log("openAttributesList");
 
 			var item = normalizeComponentItem( event.data );
 
@@ -213,6 +212,31 @@ AP.combination.list = (function () {
 			NM.util.openModal( fields.attributeModal );
 
 			this.searchAttributes();
+
+			return false;
+
+		},
+
+		addValue: function (event) {
+
+			//console.log("addValue", event.data );
+
+			NM.util.ajax({
+				method: "POST",
+				url: "/manager/ajax/combinations/" + AP.page.combinationId + "/values",
+				data: JSON.stringify( event.data ),
+				callback: {
+					done: function (xhr) {
+
+						viewModel.get("items").read();
+
+						//setTimeout(() => fields.attributeModal.modal("hide"), 600);
+
+						AP.widget.notify("success", xhr.data.message.text );
+
+					},
+				}
+			});
 
 			return false;
 
@@ -244,7 +268,7 @@ AP.combination.list = (function () {
 			return false;
 			*/
 
-			console.log("openImagesList");
+			//console.log("openImagesList");
 
 			var element = $( event.currentTarget );
 
@@ -297,7 +321,7 @@ AP.combination.list = (function () {
 
 		openAttributeValues: function (event) {
 
-			console.log("openAttributeValues");
+			//console.log("openAttributeValues");
 
 			attributeApp.edit({
 				id: event.data.id,
@@ -394,7 +418,7 @@ AP.combination.list = (function () {
 				default:
 			};
 
-			console.log("openComponentsList:item", value );
+			//console.log("openComponentsList:item", value );
 
 			componentApp.open( value );
 
@@ -415,14 +439,14 @@ AP.combination.list = (function () {
 
 		loadSizes: function () {
 
-			console.log("loadFinishes:x");
+			//console.log("loadFinishes:x");
 
 			var thisForm  = AP.combination.fields.configRow;
 
 			var finishEle = thisForm.find("[name=finishId]");
 			var sizeEle = thisForm.find("[name=sizeId]");
 
-			console.log("finishEle", finishEle);
+			//console.log("finishEle", finishEle);
 
 			var lineId = AP.page.lineId;
 			var sizeId = sizeEle.val();
@@ -444,7 +468,7 @@ AP.combination.list = (function () {
 
 			combinations.forEach( function(combination) {
 
-				if( lineId == combination.line.id && sizeId == combination.size.id ) {
+				if( lineId == combination.line.id && finishId == combination.finish.id ) {
 
 					if (combination.id == combinationId) {
 						found = true;
@@ -452,7 +476,8 @@ AP.combination.list = (function () {
 
 					var opt = $("<option>", {
 						value: combination.id,
-						text : AP.util.getMainText( combination.size.texts ).name
+						//text : AP.util.getMainText( combination.size.texts ).name
+						text : combination.size.code
 					});
 
 					sizeEle.append( opt );
@@ -485,13 +510,13 @@ AP.combination.list = (function () {
 
 	pub.init = function () {
 
-		console.log("combination:init");
+		//console.log("combination:init");
 
 		kendo.bind(fields.rootDetail, viewModel);
 
 		viewModel.loadSizes();
 
-		initSort();
+		initSorts();
 
 	};
 
@@ -503,20 +528,20 @@ AP.combination.list = (function () {
 
 		NM.util.openModal( fields.imagesModal );
 
-		console.log("total", images.total() );
+		//console.log("total", images.total() );
 
 		// it shouldn't be needed "fetch"
 		images.fetch().then( function() {
 
 			if( images.total() > 0 ) {
 
-				console.log("total:in", images.total() );
+				//console.log("total:in", images.total() );
 
 				for ( var image of images.data() ) {
 
 					var uid = image.uid;
 
-					console.log( "image", image );
+					//console.log( "image", image );
 
 					$("#image-upload-" + uid ).fileupload({
 						dropZone: $("#image-upload-dropzone-" + uid),
@@ -577,118 +602,236 @@ AP.combination.list = (function () {
 			.catch( error => { console.error( error ) } );
 	};
 
-	var initSort = function() {
+	var initSorts = function() {
+
+		initItemsSort();
+		initAttributesSort();
+
+	}
+
+	var getSortablePlaceholder = function(  element ) {
+
+		return element.clone()
+			.addClass("sortable-placeholder")
+			.height(element.height())
+			.width(element.width());		
+
+	}
+
+	var getSortableHint = function(  element ) {
+		var ele = $("<div>");
+		var text = $(element).find("td.sortable").text();
+
+		ele.text(text)
+			.height( element.height() )
+			.width( element.width() )
+			.addClass("sortable-hint");
+
+		return ele;
+	}
+
+	var refreshDatasources = function(  element ) {
+		viewModel.get("items").read();
+		viewModel.get("orderingItems").read();
+		viewModel.get("orderingAttributes").read();
+	}
+
+	var sortableChanged = function( entity, widget ) {
+		var status = $(".tab-status");
+		status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+
+		var items = widget.items();
+		var ids = [];
+
+		for( var item of items ) {
+			var id = $(item).data("id");
+			ids.push( $(item).data("id") );
+		}
+
+		NM.util.ajax({
+			method: "POST",
+			url: "/manager/ajax/combinations/" + AP.page.combinationId + "/" + entity + "/order",
+			data: JSON.stringify( ids ),
+			callback: {
+				done: function(xhr) {
+					refreshDatasources();
+					NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
+				}
+			}
+		});
+	}
+
+	var initAttributesSort = function() {
+
+		var table = $("#combination-ordering-attributes-grid table");
+
+		table.kendoSortable({
+			axis: "y",
+			filter: ">tbody >tr",
+			hint: function(element) {
+
+				return getSortableHint( element );
+
+			},
+			placeholder: function(element) {
+
+				return getSortablePlaceholder( element );
+			
+			},
+
+			move: function (event) {
+
+				var item = {};
+				var target = {};
+
+				var itemEle = $(event.item);
+				var targetEle = $(event.target);
+
+				console.log("event:target", event.target);
+
+				var place = $(".sortable-placeholder");
+
+				item.id = itemEle.data("id");
+				item.level = itemEle.data("level");
+
+				target.id = targetEle.data("id");
+				target.level = targetEle.data("level");
+
+				if( item.level == target.level ) {
+					
+					place
+						.removeClass("sortable-placeholder-unavailable")
+						.addClass("sortable-placeholder-available")
+				
+				} else {
+					
+					place
+						.removeClass("sortable-placeholder-available")
+						.addClass("sortable-placeholder-unavailable")
+				}
+
+				return;
+
+			},
+
+			change: function() {
+
+				sortableChanged( "attributes", this );
+
+			},
+
+			end: function (event) {
+
+				var items = viewModel.get("orderingItems");
+
+				var item = items.at( event.oldIndex );
+				var target = items.at( event.newIndex );
+
+				//var k = $("#combination-ordering-items-grid table").data("kendoSortable");
+
+				//TODO: better than this
+				if( item.attribute.id == target.attribute.id 
+						&& item.level == target.level 
+						&& event.newIndex != event.oldIndex
+					) {
+
+					//console.log("puoi");
+
+				} else {
+
+					//console.log("NON puoi");
+					event.preventDefault();
+
+				}
+
+				return;
+
+			}
+		});
+
+	}
+
+	var initItemsSort = function() {
 
 		var table = $("#combination-ordering-items-grid table");
 
 		table.kendoSortable({
 			axis: "y",
 			filter: ">tbody >tr",
-			hint: function (element) {
-				var ele = $("<div>");
-				var text = $(element).find("td.sortable").text();
+			hint: function(element) {
+				return getSortableHint( element );
+			},
+			placeholder: function(element) {
+				return getSortablePlaceholder( element )
+			},
 
-				ele.text(text)
-					.height( element.height() )
-					.width( element.width() )
-					.addClass("sortable-hint");
+			move: function (event) {
 
-				return ele;
+				var item = {};
+				var target = {};
+
+				var itemEle = $(event.item);
+				var targetEle = $(event.target);
+
+				var place = $(".sortable-placeholder");
+
+				item.id = itemEle.data("id");
+				item.attribute = itemEle.data("attribute");
+				item.level = itemEle.data("level");
+
+				target.id = targetEle.data("id");
+				target.attribute = targetEle.data("attribute");
+				target.level = targetEle.data("level");
+
+				if( item.attribute == target.attribute && item.level == target.level ) {
+					
+					place
+						.removeClass("sortable-placeholder-unavailable")
+						.addClass("sortable-placeholder-available")
+				
+				} else {
+					
+					place
+						.removeClass("sortable-placeholder-available")
+						.addClass("sortable-placeholder-unavailable")
+				}
+
+				return;
 
 			},
-			placeholder: function (element) {
-				return element.clone()
-					.addClass("sortable-placeholder")
-					.height(element.height())
-					.width(element.width());
+
+			change: function() {
+
+				sortableChanged( "items", this );
+
 			},
 
 			end: function (event) {
 
-				console.log("combination");
+				var items = viewModel.get("orderingItems");
 
-				console.log("event.oldIndex", event.oldIndex);
-				console.log("event.newIndex", event.newIndex);
+				var item = items.at( event.oldIndex );
+				var target = items.at( event.newIndex );
 
-				console.log("end:event", event);
+				//var k = $("#combination-ordering-items-grid table").data("kendoSortable");
 
-				var id = AP.page.combinationId;
-				var status = $("#combination-reordering-status");
+				//TODO: better than this
+				if( item.attribute.id == target.attribute.id 
+						&& item.level == target.level 
+						&& event.newIndex != event.oldIndex
+					) {
 
-				//$("#combination-reordering-status").html("<span class='green'>Salvato!</span>");
+					//console.log("puoi");
 
-				NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
+				} else {
 
-				//console.log("data", viewModel.get("items").data() );
-
-				if(event.newIndex != event.oldIndex) {
-
-					NM.util.ajax({
-						method: "POST",
-						url: "/manager/ajax/attributes/" + id + "/values/order",
-						data: JSON.stringify( viewModel.get("items").data() ),
-						callback: {
-							done: function (xhr) {
-
-								NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
-							}
-						}
-					});
-
-					/*
-					var values = viewModel.get("detailForm.data.values").data();
-					var thisForm = $("#attribute-values-form");
-					var status = thisForm.find(".status");
-
-					console.log("values", values.length);
-
-					// INFO: kendo send an extra item to remove accordingly to direction of d&d
-					if (event.oldIndex < event.newIndex) {
-						var removeItem = event.oldIndex;
-					} else {
-						var removeItem = event.oldIndex+1;
-					}
-
-					status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
-
-					var count = 1;
-
-					table.find("tr").each(function (index) {
-
-						if (index != removeItem) {
-
-							var ele = $(this);
-							var uid = ele.data("uid");
-
-							for(var value of values) {
-
-								if (value.get("uid") == uid) {
-
-									value.set("orderBy", count*10);
-								}
-							}
-
-							count++;
-
-						}
-
-					});
-
-					NM.util.ajax({
-						method: "POST",
-						url: "/manager/ajax/attributes/" + id + "/values/order",
-						data: JSON.stringify( viewModel.get("detailForm.data.values").data() ),
-						callback: {
-							done: function (xhr) {
-
-								NM.util.autoHideMessage(status, "<span class='green'>Ordinamento salvato.</span>");
-							}
-						}
-					});
-
-					*/
+					//console.log("NON puoi");
+					event.preventDefault();
 
 				}
+
+				return;
+
 			}
 
 		});

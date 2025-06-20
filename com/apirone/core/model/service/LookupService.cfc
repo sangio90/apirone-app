@@ -84,13 +84,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     public Array function list( required String entity ) {
 
         var result = [];
+        var factory = new com.apirone.core.model.factory.Factory();
 
         var list = getData()[ arguments.entity ];
         var config = variables.config[ arguments.entity ];
 
         list.each( function( item ) {
             result.add( 
-                getFactory().createInstance( config.bean, item )
+                factory.createInstance( config.bean, item )
             )
         });
 

@@ -150,8 +150,12 @@
 		/*
 			combinations
 		*/
+		post( "/ajax/combinations/:id/items/order" ).to( "CombinationAjaxController.sortItems" ).end();
+		get( "/ajax/combinations/:id/items/order" ).to( "CombinationAjaxController.listItemsForSort" ).end();
+		get( "/ajax/combinations/:id/attributes/order" ).to( "CombinationAjaxController.listAttributesForSort" ).end();
+		post( "/ajax/combinations/:id/attributes/order" ).to( "CombinationAjaxController.sortAttributes" ).end();
 		post( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.addItem" ).end();
-		//post( "/ajax/combinations/:id/items/order" ).to( "CombinationAjaxController.orderItems" ).end();
+		post( "/ajax/combinations/:id/values" ).to( "CombinationAjaxController.addValue" ).end();
 		get( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.listItems" ).end();
 		delete( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.removeItems" ).end();
 

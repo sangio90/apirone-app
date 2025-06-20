@@ -27,9 +27,10 @@
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT 
-                product_item_id, parent_id
+                product_item_id, parent_id, orderby
 			FROM
 				product_items
+					--INNER JOIN attributes_raw_values USING ( attribute_raw_value_id )
 			WHERE 1=1
 
 				AND parent_id
@@ -48,7 +49,7 @@
                 </cfif>
         
             ORDER BY 
-                orderby
+                orderby ASC
 		</cfquery>
 
 		<cfreturn local.q>
@@ -56,22 +57,45 @@
 	</cffunction>
 
     
-	<cffunction name="insert" returntype="String">
+	<cffunction name="insert" returntype="Numeric">
 
-		<cfargument name="combinationItem" type="com.apirone.core.model.bean.ProductItem" required="true">
+		<cfargument name="ProductItem" type="com.apirone.core.model.bean.ProductItem" required="true">
 
         <cfquery name="local.q" datasource="apirone">
 			INSERT INTO product_items (
                 attribute_raw_value_id,
-                combination_id
+                combination_id,
+				orderby,
+				status_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationItem.getAttributeValue().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationItem.getCombinationId()#">
+				<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getAttributeValue().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductItem.getCombinationId()#">::uuid,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getOrderBy()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductItem.getStatus().getId()#">
 			) RETURNING product_item_id
 		</cfquery>
 
 		<cfreturn local.q.product_item_id>
+
+	</cffunction>
+
+
+	<cffunction name="update" returntype="Numeric">
+
+		<cfargument name="ProductItem" type="com.apirone.core.model.bean.ProductItem" required="true">
+
+        <cfquery name="local.q" datasource="apirone">
+			UPDATE 
+				product_items 
+			SET 
+				orderby = <cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getOrderBy()#">,
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.ProductItem.getStatus().getId()#">
+			WHERE
+				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getId()#">
+		</cfquery>
+
+		<cfreturn arguments.ProductItem.getId()>
 
 	</cffunction>
 

@@ -5,7 +5,7 @@
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                <form id="combination-reordering-modal-form" name="combination-reordering-modal-form" autocomplete="off">
+                <form id="combination-sorting-modal-form" name="combination-sorting-modal-form" autocomplete="off">
                 
                     <header class="card-header">
                         <h2 class="card-title">Tutte le combinazioni degli attributi</h2>

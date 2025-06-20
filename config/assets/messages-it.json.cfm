@@ -13,7 +13,8 @@
 
     "combination": {
         "itemsDeleted": "Ho cancellato tutti gli attributi",
-        "itemsAdded": "Attributi aggiunti con successo"
+        "itemsAdded": "Attributi aggiunti con successo",
+        "valueAdded": "Valore aggiunto",
     },
 
     "fruit": {

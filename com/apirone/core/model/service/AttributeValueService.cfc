@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.AttributeValueDAO";
     property name="textService" type="com.apirone.core.model.service.TextService";
-    property name="rawValueService" type="com.apirone.core.model.service.rawValueService";
+    property name="rawValueService" type="com.apirone.core.model.service.RawValueService";
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
     property name="langService" type="com.apirone.core.model.service.LangService";
 
@@ -132,15 +132,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             var bean = super.bean( "AttributeValue" );
 
             bean.setId( record.attribute_raw_value_id );
-			//bean.setCode( record.code );
-			bean.setAttributeId( record.attribute_id );
+			bean.setAttributeId( record.attribute_id.toString() );
 
 			bean.setCreatedAt( record.created_at );
 			bean.setOrderBy( record.orderby );
-			
 			bean.setStatus( getStatusService().get( record.status_id ) );
-            //bean.setTexts( getTextService().list( attributeValueId = record.attribute_raw_value_id ) );
-            
 			bean.setRawValue( getRawValueService().get( record.raw_value_id ) );
             
             return bean;

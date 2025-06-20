@@ -68,10 +68,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         bean.setStatus( status.setId( "ACT" ) );
 
-        //bean.setId( json.value?.id );
-        //bean.setTexts( [ text ] );
         bean.setAttributeId( json.attributeId );
-        bean.setOrderBy( 100 );
+        bean.setOrderBy( getMaxOrderBy( json.attributeId ) + 10 );
         bean.setRawValue( value.setId( json.id ) );
 
         var messageId = "attributeValue.created";
@@ -107,6 +105,26 @@ component extends="com.apirone.core.controller.AbsController" {
         result.setData( message );
 
         event.setValue("result", result );
+        
+    }
+
+    private Numeric function getMaxOrderBy( attributeId ){
+
+        var service = super.service("Attribute")
+
+        var bean = service.get( attributeId );
+
+        var max = 0;
+
+        for( var thisValue in bean.getValues() ) {
+
+            if( IsNumeric( thisValue.getOrderBy() ) && thisValue.getOrderBy() > max ) {
+                max = thisValue.getOrderBy();
+            }
+
+        }   
+
+        return max;
         
     }
 

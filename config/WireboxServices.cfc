@@ -18,7 +18,7 @@ component extends="coldbox.system.ioc.config.Binder" {
         map("AbsService").to( "com.apirone.core.model.service.AbsService" )
             .asSingleton()
             .property( name = "Logger", ref = "Logger" )
-            .property( name = "Factory", ref = "Factory" )
+            //.property( name = "Factory", ref = "Factory" )
             .property( name = "DBUtil", ref = "DBUtil" )
             .property( name = "CacheManager", ref = "CacheManager" )
             .property( name = "Configuration", ref = "Configuration");
@@ -262,6 +262,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "StatusService", ref = "StatusService" )
             .property( name = "TextService", ref = "TextService" )
             .property( name = "RawValueService", ref = "RawValueService" )
+            //.property( name = "AttributeService", ref = "AttributeService" )
             .parent("AbsService");
             
         map("RawValueService").to( "com.apirone.core.model.service.RawValueService" )
@@ -405,8 +406,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             factory
         */
 
-        map("factory").to( "com.apirone.core.model.factory.factory" )
-            .asSingleton()
+        //map("factory").to( "com.apirone.core.model.factory.Factory" ).asSingleton()
 
 
         /*

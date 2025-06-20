@@ -74,6 +74,7 @@
         <map from="parent" to="parent" ref="ProductItem" />
         <!-- <map from="children" to="children" type="Array" ref="ProductItem" /> -->
         <map from="status" to="status" ref="Status" />
+        <map from="orderby" to="orderby" type="cf:Numeric" />
         <map from="level" to="level" type="cf:String" />
     </mapper>   
 

@@ -5,11 +5,8 @@
     <div id="combination-detail-root">
 
         <div class="row">
-            <div class="col-8">
+            <div class="col-10">
                 #pageTitle()#
-            </div>
-            <div class="col-4 text-end pt-3">
-                #addButton( bind="click:new", size="sm" )#
             </div>
         </div>
 
@@ -47,7 +44,7 @@
 
                                 <label class="me-2">Dimensione:</label>
 
-                                <select name="sizeId" class="form-control w-auto " data-bind="events: { change: change }">
+                                <select name="sizeId" class="form-control w-auto" data-bind="events: { change: change }">
                                 </select>
 
                             </form>
@@ -186,7 +183,7 @@
 
         #view("combination/attributes-list-modal")#
         #view("combination/images-list-modal")#
-        #view("combination/reordering-modal")#
+        #view("combination/sorting-modal")#
         
     </div>
 
