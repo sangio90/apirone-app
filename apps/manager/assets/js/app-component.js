@@ -287,10 +287,9 @@ AP.component.list = (function () {
 					done: function (xhr) {
 
 						if(xhr.status == "SUCCESS") {
-							//AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status success'>Configurazione salvata</span>" );
-							//AP.widget.notify("success", "Configurazione salvata");
-
-							refreshDatasource()
+							
+							AP.widget.notify("success", "Configurazione salvata");
+							refreshSelectedComponents();
 
 						}
 
@@ -373,14 +372,9 @@ AP.component.list = (function () {
 
 	});
 
-	pub.open = function ( item ) {
+	var refreshSelectedComponents = function( onDone ) {
 
-		viewModel.set( "currentItem", item );
-
-		viewModel.set( "colors", [] );
-		viewModel.set( "variants", [] );
-
-		viewModel.showComponentsList();
+		console.log("refreshSelectedComponents:onDone", onDone);
 
 		NM.util.ajax({
 			method: "GET",
@@ -390,11 +384,31 @@ AP.component.list = (function () {
 
 					viewModel.get("selected").data( xhr.data );
 
-					NM.util.openModal( $("#component-list-modal") );
+					if( onDone ) {
+						onDone()
+					}
 
 				}
 			}
 		});
+
+	}
+
+	pub.open = function ( item ) {
+
+		viewModel.set( "currentItem", item );
+
+		viewModel.set( "colors", [] );
+		viewModel.set( "variants", [] );
+
+		viewModel.showComponentsList();
+
+		var onDone = function() {
+			NM.util.openModal( $("#component-list-modal") );
+			console.log("done")
+		}
+
+		refreshSelectedComponents( onDone=onDone )
 
 	};
 
