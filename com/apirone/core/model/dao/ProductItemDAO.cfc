@@ -24,12 +24,17 @@
         <cfargument name="fruitId" type="String">
         <cfargument name="combinationId" type="String">
         <cfargument name="parentId" type="Numeric">
+        <cfargument name="attributeId" type="String">
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT 
-                product_item_id, parent_id, orderby
+                product_item_id, parent_id
 			FROM
 				product_items
+				<cfif !IsNull( arguments.attributeId )>
+					INNER JOIN attributes_raw_values USING ( attribute_raw_value_id )
+						INNER JOIN attributes USING ( attribute_id )
+				</cfif>
 					--INNER JOIN attributes_raw_values USING ( attribute_raw_value_id )
 			WHERE 1=1
 
@@ -48,8 +53,12 @@
                     AND fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruitId#">::uuid
                 </cfif>
         
+                <cfif !IsNull( arguments.attributeId )>
+                    AND attributes.attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
+                </cfif>
+        
             ORDER BY 
-                orderby ASC
+                product_items.orderby ASC
 		</cfquery>
 
 		<cfreturn local.q>

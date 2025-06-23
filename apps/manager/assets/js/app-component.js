@@ -58,8 +58,6 @@ AP.component.list = (function () {
 		var current = viewModel.get("currentItem");
 		var baseUrl = "/manager/ajax/components";
 
-		console.log("current", current);
-
 		var result = {
 			modalTitle: "",
 			modifyUrl: "",
@@ -106,6 +104,14 @@ AP.component.list = (function () {
 
 					result.modalTitle = "Componenti base per combinazione: " + current.combination.name;
 					result.readUrl = baseUrl + "?by=combination&combinationId=" + current.combination.id;
+					result.modifyUrl = result.readUrl;
+
+					break;
+
+				case "attributeValue":
+
+					result.modalTitle = "Componenti base per il valore: " + current.attribute.name + " / " + current.rawValue.name;
+					result.readUrl = baseUrl + "?by=attributeValue&attributeValueId=" + current.attributeValue.id;
 					result.modifyUrl = result.readUrl;
 
 					break;
@@ -193,11 +199,6 @@ AP.component.list = (function () {
 
 		showVariants: function () {
 
-			console.log("showVariants");
-
-			//viewModel.set("variants", []);
-			//viewModel.set("colors", []);
-
 			return !viewModel.get("showSearchPanel");
 		},
 
@@ -209,8 +210,6 @@ AP.component.list = (function () {
 
 			var product = viewModel.get("currentProduct");
 			var variant = viewModel.get("currentVariant");
-
-			console.log("addColor:product", product);
 
 			var row = {
 				id: "",
@@ -237,13 +236,9 @@ AP.component.list = (function () {
 				}
 			};
 
-			console.log("product:row", row);
-
 			row.code = createCode( row );
 
 			var exists = selectedExists( row );
-
-			console.log( "addColor:exists", exists );
 
 			if( exists ) {
 				AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status error'>È stato già aggiunto</span>" );
@@ -269,8 +264,6 @@ AP.component.list = (function () {
 
             var params = thisForm.serializeJSON();
 
-			console.log("params", params);
-
 			var dataSource = NM.kendo.dataSource({ 
 				url: "/manager/ajax/raw-products",
 				params: params,
@@ -294,7 +287,11 @@ AP.component.list = (function () {
 					done: function (xhr) {
 
 						if(xhr.status == "SUCCESS") {
-							AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status success'>Configurazione salvata</span>" );
+							//AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status success'>Configurazione salvata</span>" );
+							//AP.widget.notify("success", "Configurazione salvata");
+
+							refreshDatasource()
+
 						}
 
 					}
@@ -358,9 +355,6 @@ AP.component.list = (function () {
 
 			var dataSource = viewModel.get("selected");
 
-			console.log("remove:event", event);
-			console.log("remove:event.data.uid", event.data.uid);
-
 			var row = dataSource.getByUid( event.data.uid );
 
 			dataSource.remove( row );
@@ -380,8 +374,6 @@ AP.component.list = (function () {
 	});
 
 	pub.open = function ( item ) {
-
-		//console.log("component:open:item", item);
 
 		viewModel.set( "currentItem", item );
 
@@ -407,8 +399,6 @@ AP.component.list = (function () {
 	};
 
 	pub.init = function () {
-
-		console.log("component:init");
 
 		kendo.bind(fields.rootList, viewModel);
 

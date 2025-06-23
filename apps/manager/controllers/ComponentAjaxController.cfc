@@ -99,6 +99,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
                 break;
 
+            case "attributeValue":
+                
+                var component = super.bean("ComponentAttributeValue");
+                var value = super.bean("AttributeValue");
+
+                component.setAttributeValue( value.setId( rc.attributeValueId ) );
+
+                break;
+
             case "fruitItem":
                 //params = { fruitProductItemId = rc.itemId };
                 //break;
@@ -139,16 +148,16 @@ component extends="com.apirone.core.controller.AbsController" {
 
         }
 
-        cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: #oldItems.len()#");
-        cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# itemExists: #ArrayToList( itemExists )#");
+        //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: #oldItems.len()#");
+        //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# itemExists: #ArrayToList( itemExists )#");
 
         for( var oldItem in oldItems ) {
 
-            cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: this: #oldItem.getId()#");
+            //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: this: #oldItem.getId()#");
             
             if( !itemExists.find( oldItem.getId() ) ) {
 
-                cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: delete: #oldItem.getId()#");
+                //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: delete: #oldItem.getId()#");
 
                 super.fire( "component.delete", { componentId = oldItem.getId() } );
             }
@@ -186,6 +195,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
             case "fruitItem":
                 params = { fruitProductItemId = rc.itemId };
+                break;
+
+            case "attributeValue":
+                params = { attributeValueId = rc.attributeValueId };
                 break;
 
             default: 

@@ -39,6 +39,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	String sizeId,
     	String combinationId,
     	Numeric productItemId
+    	Numeric attributeValueId
     ) {
 		arguments["limit"] = -1;
 		

@@ -90,4 +90,6 @@
 
     #view("attribute/detail-modal")#
 
+    #view("component/list-modal")#
+
 </cfoutput>

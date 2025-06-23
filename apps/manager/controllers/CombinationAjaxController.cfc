@@ -18,8 +18,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function listAttributesForSort( event, rc, prc ) {
 
-		var attrs = [];
-
 		private Boolean function exists( required attributeId, required attrs ) {
 
 			for( var attr in arguments.attrs ) {
@@ -30,6 +28,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			return false;
 		}
+
+        var attrs = [];
 
         var rows = getFlatTree( combinationId=rc.id, includeMissingValues=false );
 
@@ -49,11 +49,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 		}
-
-        for( var thisAttr in attrs ) {
-            dump("#thisAttr.level# #thisAttr.id# #thisAttr.name#")
-        }
-
 
         event.setValue("result", attrs);
 
@@ -176,9 +171,6 @@ component extends="com.apirone.core.controller.AbsController" {
         var list = ReplaceList( GetHTTPRequestData().content, "[,]", "" ); //string: [1,2,3] with brackets.
         var items = ListToArray( list );
         
-        //dump(items);
-        //abort;
-
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
         var orderby = 10;
@@ -190,7 +182,41 @@ component extends="com.apirone.core.controller.AbsController" {
             
             super.fire("ProductItem.update", { productItem = bean } );
 
-            orderby = orderby+10;
+            orderby+=10;
+
+        }
+
+        var message = completeMessage( "combination.valuesReordered" );
+
+        result.setData( { "message" = message } );
+
+        event.setValue("result", result);
+
+    }
+
+    function sortAttributes( event, rc, prc ){
+
+        var result = super.getResult();
+
+        var list = ReplaceList( GetHTTPRequestData().content, '[,],"', '' ); //string: [1,2,3] with brackets.
+        var attrs = ListToArray( list );
+        
+        var orderby = 10;
+
+        for( var attr in attrs ) {
+
+            var items = super.fire("ProductItem.list", { combinationId = rc.id, attributeId = attr } );
+
+            for( var item in items ) {
+
+                var bean = super.fire("ProductItem.get", { productItemId = item.getId() } );
+                bean.setOrderBy( orderby );
+                
+                super.fire("ProductItem.update", { productItem = bean } );
+
+                orderby+=10;
+
+            }
 
         }
 

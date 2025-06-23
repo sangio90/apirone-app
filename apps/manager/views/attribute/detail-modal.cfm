@@ -153,6 +153,7 @@
                                         { 'field':'id', 'title':'ID', width: '60px' },
                                         { 'field':'code', 'title':'Codice', width: '100px' },
                                         { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
+                                        { 'field':'', 'width':'50px', 'title':'', 'sortable': ''},
                                         { 
                                             'field':'', 
                                             'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',

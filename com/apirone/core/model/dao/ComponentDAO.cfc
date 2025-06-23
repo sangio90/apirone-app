@@ -25,6 +25,7 @@
 		<cfargument name="productItemId" type="Numeric">
 		<cfargument name="fruitId" type="String">
 		<cfargument name="fruitCombinationitemId" type="String">
+		<cfargument name="attributeValueId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -38,29 +39,33 @@
             	components
 			WHERE 1=1
 			
-			<cfif !isNull( arguments.productItemId )>
-				AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
-			</cfif>
+				<cfif !isNull( arguments.productItemId )>
+					AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
+				</cfif>
 
-			<cfif !isNull( arguments.fruitId )>
-				AND fruit_id = <cfqueryparam value="#arguments.fruitId#" cfsqltype="Varchar">::uuid
-			</cfif>
+				<cfif !isNull( arguments.fruitId )>
+					AND fruit_id = <cfqueryparam value="#arguments.fruitId#" cfsqltype="Varchar">::uuid
+				</cfif>
 
-			<cfif !isNull( arguments.fruitProductItemId )>
-				AND fruit_product_item_id = <cfqueryparam value="#arguments.fruitProductItemId#" cfsqltype="Integer">
-			</cfif>
+				<cfif !isNull( arguments.fruitProductItemId )>
+					AND fruit_product_item_id = <cfqueryparam value="#arguments.fruitProductItemId#" cfsqltype="Integer">
+				</cfif>
 
-			<cfif !isNull( arguments.combinationId )>
-				AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
-			</cfif>
+				<cfif !isNull( arguments.combinationId )>
+					AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
+				</cfif>
 
-			<cfif !isNull( arguments.lineId )>
-				AND line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">::uuid
-			</cfif>
+				<cfif !isNull( arguments.lineId )>
+					AND line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">::uuid
+				</cfif>
 
-			<cfif !isNull( arguments.sizeId )>
-				AND size_id = <cfqueryparam value="#arguments.sizeId#" cfsqltype="Varchar">::uuid
-			</cfif>
+				<cfif !isNull( arguments.sizeId )>
+					AND size_id = <cfqueryparam value="#arguments.sizeId#" cfsqltype="Varchar">::uuid
+				</cfif>
+
+				<cfif !isNull( arguments.attributeValueId )>
+					AND attribute_raw_value_id = <cfqueryparam value="#arguments.attributeValueId#" cfsqltype="Integer">
+				</cfif>
 
 			ORDER BY 
 				#super.sanitizeSQL( arguments.orderby )#
@@ -122,6 +127,48 @@
 
 		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
 
+		<cfset fields = []>
+		<cfset values = []>
+
+		<cfset var meta = GetMetadata( arguments.component )>
+
+		<cfswitch expression="#meta.fullname#">
+			
+			<cfcase value="com.apirone.core.model.bean.ComponentLineSize">
+				<cfset fields = ["line_id", "size_id"]>
+				<cfset values = [ 
+					{ value = arguments.component.getLine().getId(), type = "uuid" }, 
+					{ value = arguments.component.getSize().getId(), type = "uuid" }
+				]>
+			</cfcase>
+
+			<cfcase value="com.apirone.core.model.bean.ComponentProductItem">
+				<cfset fields = [ "product_item_id" ]>
+				<cfset values = [ { value = arguments.component.ProductItem().getId(), type = "Integer" } ]>
+			</cfcase>
+
+			<cfcase value="com.apirone.core.model.bean.ComponentCombination">
+				<cfset fields = [ "combination_id" ]>
+				<cfset values = [ { value = arguments.component.getCombination().getId(), type = "uuid" } ]>
+			</cfcase>
+
+			<cfcase value="com.apirone.core.model.bean.ComponentFruit">
+				<cfset fields = [ "fruit_id" ]>
+				<cfset values = [ { value = arguments.component.getFruit().getId(), type = "uuid" } ]>
+			</cfcase>
+
+			<cfcase value="com.apirone.core.model.bean.ComponentAttributeValue">
+				<cfset fields = [ "attribute_raw_value_id" ]>
+				<cfset values = [ { value = arguments.component.getAttributeValue().getId(), type = "Integer" } ]>
+			</cfcase>
+
+			<cfdefaultcase>
+				<cfset var meta = GetMetadata( component )>
+				<cfthrow type="apirone.error.ComponentNotValid" message="Component [#meta.fullname#] not valid">
+			</cfdefaultcase>
+
+		</cfswitch>
+
         <cfquery name="local.q" datasource="apirone">
 			INSERT INTO components (
 				raw_product_id,
@@ -129,22 +176,7 @@
 				variant_id,
 				quantity,
 
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentLineSize" )>
-					line_id,
-					size_id
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentProductItem" )>
-					product_item_id
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombination" )>
-					combination_id
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentFruit" )>
-					fruit_id
-				</cfif>
+				#ArrayToList( fields )#
 
 			)
 			VALUES (
@@ -153,6 +185,20 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.component.getQuantity()#">,
 
+				<cfset var index = 1>
+				<cfloop array="#values#" item="item">
+					<cfif item.type IS "uuid">
+						<cfqueryparam cfsqltype="Varchar" value="#item.value#">::uuid
+					<cfelse>
+						<cfqueryparam cfsqltype="#item.type#" value="#item.value#">
+					</cfif>
+					<cfif Len( values ) NEQ index>
+						,
+					</cfif>
+					<cfset index++>
+				</cfloop>
+
+				<!---
 				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentLineSize" )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getLine().getId()#">::uuid,
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getSize().getId()#">::uuid
@@ -169,6 +215,11 @@
 				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentFruit" )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getFruit().getId()#">::uuid
 				</cfif>
+
+				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentAttributeValue" )>
+					<cfqueryparam cfsqltype="Integer" value="#arguments.component.getAttributeValue().getId()#">
+				</cfif>
+				---->
 
 			) RETURNING component_id
 		</cfquery>

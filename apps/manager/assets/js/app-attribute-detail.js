@@ -28,6 +28,8 @@ AP.attribute.detail = (function () {
 
     var fields = AP.fields.attribute.detail;
 
+	var componentApp = AP.component.list;
+	
 	var defaults = {
 
 		detailForm: {
@@ -127,6 +129,34 @@ AP.attribute.detail = (function () {
 			return viewModel.get("detailForm.data.id").length;
 		},
 
+		openComponentsList: function (event) {
+
+			var attr = viewModel.get("detailForm.data");
+			var rawValue = event.data.rawValue;
+			var attributeValueId = event.data.id;
+
+			var value = {
+				type: "attributeValue",
+				attributeValue: {
+					id: attributeValueId,
+				},
+				attribute: {
+					id: attr.id,
+					name: attr.name,
+				},
+				rawValue: {
+					id: rawValue.id,
+					name: rawValue.name,
+				},
+			};
+
+			console.log("componentApp", componentApp);
+
+			componentApp.open( value );
+
+			return false;
+		},		
+
 		// TODO: only one "resetForm"
 		resetDetailForm: function () {
 
@@ -166,9 +196,6 @@ AP.attribute.detail = (function () {
 				});
 
 				var ids = values.toString();
-
-				//console.log("values", values);
-				//console.log("ids", ids);
 
 				NM.util.ajax({
 					method: "DELETE",
@@ -527,7 +554,6 @@ AP.attribute.detail = (function () {
 		return;
 
 	};
-
 
     pub.edit = function ( id, onUpdate ) {
 

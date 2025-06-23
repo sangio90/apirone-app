@@ -12,13 +12,11 @@
             <td class="sortable">
                 <span data-bind="text:rawValue.name"></span>
             </td>
-            <!----
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:editValue">
-                    <i class="fas fa-edit"></i>
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:openComponentsList" data-type="attributeValue"> 
+                    <i class="fas fa-window-restore"></i> 
                 </button>
             </td>
-            ---->
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"
                     name="selected"
