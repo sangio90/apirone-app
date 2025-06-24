@@ -16,7 +16,6 @@
 
 	</cffunction>
 
-	
 	<cffunction returntype="Query" name="find">
 
 		<cfargument name="lineId" type="String">
@@ -144,7 +143,7 @@
 
 			<cfcase value="com.apirone.core.model.bean.ComponentProductItem">
 				<cfset fields = [ "product_item_id" ]>
-				<cfset values = [ { value = arguments.component.ProductItem().getId(), type = "Integer" } ]>
+				<cfset values = [ { value = arguments.component.getProductItem().getId(), type = "Integer" } ]>
 			</cfcase>
 
 			<cfcase value="com.apirone.core.model.bean.ComponentCombination">
@@ -197,29 +196,6 @@
 					</cfif>
 					<cfset index++>
 				</cfloop>
-
-				<!---
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentLineSize" )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getLine().getId()#">::uuid,
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getSize().getId()#">::uuid
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentProductItem" )>
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.component.getProductItem().getId()#">
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombination" )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getCombination().getId()#">::uuid
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentFruit" )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getFruit().getId()#">::uuid
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentAttributeValue" )>
-					<cfqueryparam cfsqltype="Integer" value="#arguments.component.getAttributeValue().getId()#">
-				</cfif>
-				---->
 
 			) RETURNING component_id
 		</cfquery>

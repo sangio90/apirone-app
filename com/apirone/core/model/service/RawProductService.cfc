@@ -77,11 +77,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             var bean = super.bean( "RawProduct" );
 
+			var misurementValue = Len( record.arunmis1 ) ? record.arunmis1 : "PZ";
+
             bean.setId( record.arcodart );
 			bean.setName( record.ardesart );
 			bean.setType( getRawProductTypeService().get( record.artipmat )  );
 			bean.setProcessingType( getLookupService().get( "processingType", record.processiong_type_id ) );
-			bean.setMeasurementUnit( getLookupService().get( "measurementUnit", trim( record.arunmis1 ) ) );
+			bean.setMeasurementUnit( getLookupService().get( "measurementUnit", misurementValue ) );
 
 			var variants = getVariantService().list( rawProductId=record.arcodart );
 			

@@ -15,7 +15,7 @@ AP.widget.notify = function (type, message, title) {
 
         case "info":
             icon = "fas fa-info-circle";
-            title = title ? title : "Informazioni";
+            title = title ? title : "Info";
             break;
 
         case "warning":
@@ -25,7 +25,7 @@ AP.widget.notify = function (type, message, title) {
 
         case "success":
             icon = "fas fa-check-circle";
-            title = title ? title : "Ok";
+            title = title ? title : "Completato";
             break;
 
         default:

@@ -651,9 +651,12 @@ h2 {
     width: 70px;
 }
 
-
 .table.table-hover {
 	line-height: 17px;
+}
+
+.table.table-hover tr:hover td {  
+	background-color: #F4F0E5;
 }
 
 .hand {
@@ -682,4 +685,46 @@ h2 {
 .tab-status {
 	margin-left: auto;
 	margin-right: 30px;
+}
+
+/*
+	badget numerici nei bottoni
+*/
+
+.button-badge {
+    font-size: 11px;
+    font-style: normal;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    color: White;
+    line-height: 12px;
+    position: absolute;
+    margin-top: -6px;
+    margin-left: 5px;
+	padding-top: 1px;
+}
+
+.button-badge.info {
+	background-color: #0088cc;
+}
+
+.button-badge.error {
+	background-color: red;
+}
+
+.button-badge.warning {
+	background-color: rgb(199, 113, 0);
+}
+
+/*
+	// badget numerici nei bottoni
+*/
+
+
+.bg-blue {
+	background-color: #d2e0f5;
 }

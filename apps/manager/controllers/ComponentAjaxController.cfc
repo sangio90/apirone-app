@@ -7,41 +7,36 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var params = {};
-
         var params = getParams( typeId = rc.by, rc = rc );
 
         var items = super.fire( "component.list", params );
 
-        for( var item in items ) {
+        if ( rc.by == "item" ) {
 
-            var product = item.getRawProduct();
+            //search base component for attributeValue of ProductItem
 
-            var row = {
-                "id" = item.getId(),
-                "quantity" = item.getQuantity(),
-                "rawProduct" = {
-                    "id" = product.getId(),
-                    "name" = product.getName(),
-                    "processingType" = {
-                        "id" = product.getProcessingType().getId(),
-                        "name" = product.getProcessingType().getName()
-                    },
-                    "measurementUnit" = {
-                        "id" = product.getMeasurementUnit().getId(),
-                        "name" = product.getMeasurementUnit().getName()
-                    }
-                },
-                "variant" = {
-                    "id" = item.getVariant().getId(),
-                    "name" = item.getVariant().getName()
-                },
-                "color" = {
-                    "id" = item.getColor().getId(),
-                    "name" = item.getColor().getName()
+            var productItem = super.service("productItem").get( rc.itemId );
+
+            if ( len( productItem.getAttributeValue().getId() ) ) {
+                
+                var components = super.fire( "component.list", { attributeValueId = productItem.getAttributeValue().getId() } );
+
+                for( var thisComponent in components ) {
+                    
+                    var row = convertComponent( thisComponent );
+                    row["type"] = "base";
+                    data.add( row );
+
                 }
+
             }
 
+        };
+
+        for( var item in items ) {
+
+            var row = convertComponent( item );
+            row["type"] = "custom";
             data.add( row );
 
         }
@@ -120,7 +115,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var params = getParams( typeId = rc.by, rc = rc );
         var oldItems = super.fire( "component.list", params );
 
-        cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# currentItems: #oldItems.len()#");
+        //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# currentItems: #oldItems.len()#");
 
         var itemExists = [];
 
@@ -172,7 +167,45 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
-    function getParams( required String typeId, required Struct rc ){
+
+    /*
+        private methods
+    */
+
+    private function convertComponent( required Struct component ){
+
+        var product = component.getRawProduct();
+
+        var row = {
+            "id" = component.getId(),
+            "quantity" = component.getQuantity(),
+            "rawProduct" = {
+                "id" = product.getId(),
+                "name" = product.getName(),
+                "processingType" = {
+                    "id" = product.getProcessingType().getId(),
+                    "name" = product.getProcessingType().getName()
+                },
+                "measurementUnit" = {
+                    "id" = product.getMeasurementUnit().getId(),
+                    "name" = product.getMeasurementUnit().getName()
+                }
+            },
+            "variant" = {
+                "id" = component.getVariant().getId(),
+                "name" = component.getVariant().getName()
+            },
+            "color" = {
+                "id" = component.getColor().getId(),
+                "name" = component.getColor().getName()
+            }
+        }
+
+        return row;
+
+    }
+
+    private function getParams( required String typeId, required Struct rc ){
 
         var params = {}
 

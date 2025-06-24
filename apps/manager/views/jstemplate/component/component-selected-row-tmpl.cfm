@@ -2,7 +2,7 @@
 
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="component-selected-row-tmpl">
-        <tr>
+        <tr  ##if (type == 'base') {## class="bg-blue" ##}## >
             <td width="10">
                 <b data-bind="text: rawProduct.processingType.id"></b>
                 <br>

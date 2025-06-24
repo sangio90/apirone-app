@@ -1,4 +1,4 @@
-﻿<cfset code = DateTimeFormat(now(), 'yyyy-mm-dd_HH-nn-ss') & '_' & RandRange(0, 99999)>
+﻿<cfset code = DateTimeFormat(now(), 'yyyy-mm-dd_HH-nn-ss-lll') & '_' & Right( CreateUUID(), 5)>
 <cfset dayPath = DateTimeFormat(now(), 'yyyy/mm')>
 
 <cfsavecontent variable="report">

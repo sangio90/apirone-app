@@ -5,6 +5,18 @@
 
 <cfset art = "MATLASOTTGREZZO,MATLASOTTCRUDO,MATLASFENIX,MATLASPLAPOLIST,LAV-PULSATINA">
 
+        <cfquery name="n" datasource="verticale" result="result">
+            SELECT DISTINCT arunmis1
+            FROM
+                azapi_artico
+            WHERE 1=1
+                --AND trim(arunmis1) = '1'
+            ORDER BY 1
+        </cfquery>
+
+        <cfdump var="#n#">
+
+
 <cfoutput>
     <cfloop list="#art#" item="item">
 

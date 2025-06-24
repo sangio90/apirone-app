@@ -11,6 +11,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
     
     property name="children" type="com.apirone.core.model.bean.ProductItem[]";
     
+    property name="componentCount" type="Numeric" default=0;
+    
     public ProductItem function init(){
 
         setChildren( [] );

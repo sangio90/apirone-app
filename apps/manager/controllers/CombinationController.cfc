@@ -25,8 +25,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var combinations = super.fire( "combination.list", { lineId = prc.line.getId() } );
 
-        prc.jsScripts.add( "app-attribute-detail" );
         prc.jsScripts.add( "app-component" );
+        prc.jsScripts.add( "app-attribute-detail" );
         
         prc.jsScripts.add( "app-combination" );
         

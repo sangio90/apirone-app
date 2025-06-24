@@ -38,8 +38,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	String lineId,
     	String sizeId,
     	String combinationId,
-    	Numeric productItemId
-    	Numeric attributeValueId
+    	Numeric productItemId,
+    	Numeric attributeValueId,
+		Boolean includeBaseAttributeComponents=false
     ) {
 		arguments["limit"] = -1;
 		
@@ -47,34 +48,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	
 	}
 
-	/*
-    public com.apirone.core.model.bean.CombinationComponent[] function listComponents(
-            required Numeric componentId,
-        ){
+	public Numeric function count(
+    	String lineId,
+    	String sizeId,
+    	String combinationId,
+    	Numeric productItemId,
+    	Numeric attributeValueId,
+    ) {
+		
+		var result = getDao().find( argumentCollection = arguments );
 
-		var result = getCombinationComponentService().list( componentId = componentId );
+		return Val( result.total );
 
-        return result;
-
-    }
-
-    public Boolean function addComponent(
-            required Numeric componentId,
-            required com.apirone.core.model.bean.CombinationComponent combinationComponent
-        ){
-
-		transaction {
-			getDao().deleteComponent( argumentCollection=arguments );
-			getDao().insertComponent( argumentCollection=arguments );
-		}
-
-        return true;
-
-    }
-	*/
+	}
 
     public com.apirone.core.model.bean.Result function search(
             String lineId
+
         ){
 
 	    var rows = [];
@@ -112,6 +102,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 var cm = getCacheManager();
 
+
+
                 getDao().delete( arguments.componentId );
         
                 cm.remove( "component_#obj.getId()#" );
@@ -144,7 +136,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 
 	}
-
 
 
     /*

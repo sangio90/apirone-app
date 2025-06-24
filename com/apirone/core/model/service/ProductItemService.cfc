@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
 	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 	property name="combinationComponentService" type="com.apirone.core.model.service.CombinationComponentService";
+	property name="componentService" type="com.apirone.core.model.service.ComponentService";
 
     public com.apirone.core.model.bean.ProductItem function get(
     		required String productItemId
@@ -433,6 +434,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setAttributeValue( attributeValue );
 
             bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
+            bean.setComponentCount( getComponentService().count( productItemId=record.product_item_id ) );
             
 			bean.setChildren( [] );
 			

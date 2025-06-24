@@ -49,6 +49,7 @@
         <map from="id" to="id" type="cf:String" />
         <!-- <map from="code" to="code" type="cf:String" /> -->
         <map from="orderBy" to="orderBy" type="cf:Numeric" />
+        <map from="componentCount" to="componentCount" type="cf:Numeric" />
         <!-- <map from="name" to="name" type="cf:String" /> -->
         <map from="status" to="status" ref="Status" />
         <!-- <map from="mainText" to="mainText" ref="Text" /> -->
@@ -75,6 +76,7 @@
         <!-- <map from="children" to="children" type="Array" ref="ProductItem" /> -->
         <map from="status" to="status" ref="Status" />
         <map from="orderby" to="orderby" type="cf:Numeric" />
+        <map from="componentCount" to="componentCount" type="cf:Numeric" />
         <map from="level" to="level" type="cf:String" />
     </mapper>   
 

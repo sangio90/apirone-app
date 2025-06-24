@@ -262,6 +262,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "StatusService", ref = "StatusService" )
             .property( name = "TextService", ref = "TextService" )
             .property( name = "RawValueService", ref = "RawValueService" )
+            .property( name = "ComponentService", ref = "ComponentService" )
             //.property( name = "AttributeService", ref = "AttributeService" )
             .parent("AbsService");
             

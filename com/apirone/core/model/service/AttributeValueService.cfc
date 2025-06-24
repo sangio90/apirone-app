@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="rawValueService" type="com.apirone.core.model.service.RawValueService";
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
     property name="langService" type="com.apirone.core.model.service.LangService";
+    property name="componentService" type="com.apirone.core.model.service.ComponentService";
 
     public com.apirone.core.model.bean.AttributeValue function get(
     		required String attributeValueId
@@ -138,6 +139,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setOrderBy( record.orderby );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setRawValue( getRawValueService().get( record.raw_value_id ) );
+			
+			bean.setComponentCount( getComponentService().count( attributeValueId = record.attribute_raw_value_id ) );
             
             return bean;
 

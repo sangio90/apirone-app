@@ -46,4 +46,14 @@
 
 	</cffunction>	
 
+	<cffunction name="getConfig" returntype="Struct">
+    
+        <cfset var result =  {
+            datasource = request.datasource 
+        }>
+    
+        <cfreturn result>
+
+	</cffunction>	
+
 </cfcomponent>

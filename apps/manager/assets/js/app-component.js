@@ -202,8 +202,6 @@ AP.component.list = (function () {
 			return !viewModel.get("showSearchPanel");
 		},
 
-
-
 		addColor: function (event) {
 
 			var color = event.data;
@@ -213,6 +211,7 @@ AP.component.list = (function () {
 
 			var row = {
 				id: "",
+				type: "custom",
 				quantity: 1,
 				rawProduct: {
 					id: product.id,
@@ -374,7 +373,7 @@ AP.component.list = (function () {
 
 	var refreshSelectedComponents = function( onDone ) {
 
-		console.log("refreshSelectedComponents:onDone", onDone);
+		//console.log("refreshSelectedComponents:onDone", onDone);
 
 		NM.util.ajax({
 			method: "GET",
@@ -405,7 +404,7 @@ AP.component.list = (function () {
 
 		var onDone = function() {
 			NM.util.openModal( $("#component-list-modal") );
-			console.log("done")
+			//console.log("done")
 		}
 
 		refreshSelectedComponents( onDone=onDone )

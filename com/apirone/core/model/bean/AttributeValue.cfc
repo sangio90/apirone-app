@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true"{
     property name="rawValue" type="com.apirone.core.model.bean.RawValue";
     
     property name="attributeId" type="String";
+    property name="componentCount" type="Numeric";
 
     //NOTE: Attribute ha già AttributeValue all'interno,
     //questo crea una ricorsione: StackOverflow
