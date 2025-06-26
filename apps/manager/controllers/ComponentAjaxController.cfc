@@ -11,36 +11,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var items = super.fire( "component.list", params );
 
-        if ( rc.by == "item" ) {
-
-            //search base component for attributeValue of ProductItem
-
-            var productItem = super.service("productItem").get( rc.itemId );
-
-            if ( len( productItem.getAttributeValue().getId() ) ) {
-                
-                var components = super.fire( "component.list", { attributeValueId = productItem.getAttributeValue().getId() } );
-
-                for( var thisComponent in components ) {
-                    
-                    var row = convertComponent( thisComponent );
-                    row["type"] = "base";
-                    data.add( row );
-
-                }
-
-            }
-
-        };
-
-        for( var item in items ) {
-
-            var row = convertComponent( item );
-            row["type"] = "custom";
-            data.add( row );
-
-        }
-
         result.setTotal( items.len() );
         result.setCount( items.len() );
         result.setData( data );

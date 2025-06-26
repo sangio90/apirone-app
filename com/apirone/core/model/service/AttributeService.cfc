@@ -98,6 +98,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+	public Boolean function codeExists(
+		required String code,
+				 String excludedId = ""
+	){
+		var record = getDao().readByCode( arguments.code );
+
+		if (
+			record.recordCount
+			&& record.attribute_id != arguments.excludedId
+		) {
+			return record.code == arguments.code;
+		}
+
+		return false;
+	}
 	
 	public String function update(
 			required com.apirone.core.model.bean.Attribute attribute

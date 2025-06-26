@@ -48,6 +48,15 @@
                                 </div>
 
                                 <div class="mb-3 row">
+                                    <label for="attr" class="col-sm-2 col-form-label text-end">Codice</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" required class="form-control col-sm-4 uppercase" id="code" name="code" maxlength="5"
+                                            data-bind="value: detailForm.data.code"
+                                        >
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 row">
                                     <label for="categories" class="col-sm-2 col-form-label text-end">Disponili per</label>
                                     <div class="col-sm-10">
                                         <select id="categories" 

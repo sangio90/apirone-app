@@ -38,6 +38,7 @@ AP.attribute.detail = (function () {
 					id: "ACT"
 				},
 				id: "",
+				code: "",
 				orderBy: 0,
 				categories: [],
 				selectedCategories: [],
@@ -581,16 +582,36 @@ AP.attribute.detail = (function () {
 			rules: {
 				attr: {
 					required: true
-				}
+				},
+				code: {
+					checkCode: true,
+					required: true,
+					maxlength: 5,
+					remote: {
+						url: "/manager/ajax/attributes/values/code-exists",
+						data: { id: function () { return  viewModel.get("valueForm.data.id"); } },
+						dataFilter: function (xhr) {
+							var json = JSON.parse(xhr);
+							return json.data == false;
+						}
+					}
+				},
 			},
 			messages: {
 				attr: {
 					required: "Descrizione principale richiesta",
 				},
+				code: {
+					required: "Codice richiesto",
+					checkCode: "Solo numeri, lettere, trattino o trattino basso",
+					remote: "Il codice esiste",
+					max: "Al massimo 5 caratteri"
+				},
 			},
 
 		});
 
+		/*
 		valueForm.validate({
 			onfocusout: function (element) {
 				$(element).valid();
@@ -632,6 +653,7 @@ AP.attribute.detail = (function () {
 			},
 
 		});
+		*/
 
 	};
 

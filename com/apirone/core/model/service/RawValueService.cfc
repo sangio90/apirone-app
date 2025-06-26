@@ -93,6 +93,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getDao().update( arguments.rawValue );
 
+		for ( var text in arguments.rawValue.getTexts() ) {
+
+			var entity = super.bean("Entity")
+			
+			entity.setKey( "rawValue.id" );
+			entity.setValue( id );
+
+			text.setEntity( entity );
+
+			if ( Len( text.getId() ) ) {
+				
+				getTextService().update( text );
+			
+			} else {
+				
+				getTextService().create( text );
+
+			}
+
+		}
+
 		getCacheManager().remove( getCachekey( id ) );
 		
 		return id;

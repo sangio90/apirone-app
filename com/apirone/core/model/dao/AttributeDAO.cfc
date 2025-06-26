@@ -18,6 +18,22 @@
 
 	</cffunction>
 
+	<cffunction name="readByCode" output="false">
+		<cfargument name="code" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				attribute_id::varchar, 
+				code
+			FROM
+				attributes
+			WHERE
+				code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="str" type="String">
@@ -60,10 +76,12 @@
         <cfquery name="local.q" datasource="apirone">
 			INSERT INTO attributes (
 				status_id,
+				code,
 				categories
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getCode()#">,
 				'#SerializeJSON(categories)#'
 			) RETURNING attribute_id::varchar
 		</cfquery>
@@ -84,6 +102,7 @@
 				attributes 
 			SET 
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">,
+				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getCode()#">,
 				categories = '#SerializeJSON(categories)#'
 			WHERE
 				attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getId()#">::uuid

@@ -20,18 +20,27 @@ NM.kendo.dataSource = function (config = {}) {
 
     if (config.url != undefined) {
 
-        defaults.serverPaging = true;
+        defaults.transport = {
+            serverPaging: true,
+            read: {
+                url: config.url
+            }
+        };
 
+
+        /*
+        defaults.serverPaging = true;
         defaults.transport = {};
         defaults.transport.read = {};
-
         defaults.transport.read.url = config.url;
+        */
 
         defaults.transport.parameterMap = function (params, type ) {
 
             // merge
-            Object.assign(params, config.params);
+            Object.assign( params, config.params );
 
+            // remove default value from datasource
             params.count = params.pageSize;
             delete params.pageSize;
             delete params.skip;

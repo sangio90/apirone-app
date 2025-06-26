@@ -86,13 +86,15 @@ component extends="com.apirone.core.controller.AbsController" {
                         combination_id,
                         attribute_raw_value_id,
                         orderby,
-                        parent_id
+                        parent_id,
+                        status_id
                     )
                     VALUES (
                         '#rc.id#',
                         '#item.getId()#',
                         #item.getOrderBy()#,
-                        #( Val(rc.parentId) ? rc.parentId : 'NULL' )#
+                        #( Val(rc.parentId) ? rc.parentId : 'NULL' )#,
+                        'ACT'
                     )
                 </cfquery>
                 
@@ -238,7 +240,9 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var items = super.fire("ProductItem.getFlatTree", { combinationId = arguments.combinationId, includeMissingValues=arguments.includeMissingValues } );
+        var params = { combinationId = arguments.combinationId, includeMissingValues=arguments.includeMissingValues };
+
+        var items = super.fire("ProductItem.getFlatTree", params );
 
         for( var item in items ) {
 

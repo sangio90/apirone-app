@@ -90,24 +90,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		} else {
 			rows = items;
 		}
-
-		//dump("=============================================================================================================================================")
-		//dump("=========#arguments.level#")
-
-		//dump( arguments );
-
-		//dump(attrs);
-
+		
 		/*
-        for( var item in items ) {
-            dump( "#item.getOrderBy()# - #item.getId()# - #item.getAttribute().getName()# : #item.getAttributeValue().getRawValue().getName()#" );
-        }
-		dump("<br>");
-		*/
 
-        //for( var row in rows ) {
-            //dump( "#arguments.level# - #row.getOrderBy()# - #row.getId()# - #row.getAttribute().getName()# : #row.getAttributeValue().getRawValue().getName()#" );
-        //}
+        for( var item in items ) {
+			dump( "#item.getOrderBy()# - #item.getId()# - #item.getAttribute().getName()# : #item.getAttributeValue().getRawValue().getName()#" );
+		}
+					
+		dump("=============================================================================================================================================")
+		dump("=========#arguments.level#")
+
+		dump( arguments );
+
+		dump("<br>");
+
+        for( var row in rows ) {
+        	dump( "#arguments.level# - #row.getOrderBy()# - #row.getId()# - #row.getAttribute().getName()# : #row.getAttributeValue().getRawValue().getName()#" );
+        }
+		*/
 
         var thisLevel = arguments.level;
         var includeMissingValues = arguments.includeMissingValues;

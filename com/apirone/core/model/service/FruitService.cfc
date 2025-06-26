@@ -111,7 +111,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		}
 
-
 		super.getCacheManager().remove( "Fruit_#arguments.fruit.getId()#" );
 
 		return arguments.fruit.getId();

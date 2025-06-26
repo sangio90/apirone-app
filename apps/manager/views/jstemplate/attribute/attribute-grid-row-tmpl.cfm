@@ -7,6 +7,9 @@
                 <span data-bind="text: shortId"></span>
             </td>
             <td>
+                <span data-bind="text: code"></span>
+            </td>
+            <td>
                 <span data-bind="text: name"></span>
             </td>
             <td>

@@ -5,8 +5,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="rawProductService" type="com.apirone.core.model.service.RawProductService";
 	property name="variantService" type="com.apirone.core.model.service.VariantService";
 	property name="colorService" type="com.apirone.core.model.service.ColorService";
+	property name="productItemService" type="com.apirone.core.model.service.ProductItemService";
     /*
-	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
 	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 	property name="combinationComponentService" type="com.apirone.core.model.service.CombinationComponentService";
     */
@@ -40,7 +40,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	String combinationId,
     	Numeric productItemId,
     	Numeric attributeValueId,
-		Boolean includeBaseAttributeComponents=false
+		Boolean includeBaseAttributeComponents=false //only for product productItemId
     ) {
 		arguments["limit"] = -1;
 		
@@ -63,24 +63,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
     public com.apirone.core.model.bean.Result function search(
-            String lineId
+    	String lineId,
+    	String sizeId,
+    	String combinationId,
+    	Numeric productItemId,
+    	Numeric attributeValueId,
+		Boolean includeBaseAttributeComponents=false //only for product productItemId
+    ){
 
-        ){
+		var rows = [];
+		var result = super.getResult();
 
-	    var rows = [];
-    	var result = super.getResult();
+		if( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
+			
+			rows = searchByProductItemId( arguments.productItemId );
+		
+		} else {
 
-    	var records = getDao().find( argumentCollection=arguments );
+			var records = getDao().find( argumentCollection=arguments );
 
-		records.each(function(record) {
-			rows.add( 
-                get( record.component_id ) 
-            );
-		});
+			records.each(function(record) {
+				rows.add( 
+					get( record.component_id ) 
+				);
+			});
 
-	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
-	    result.setTotal( Val( records.recordcount ) );
+		}
+
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.recordcount ) );
 
         return result;
 
@@ -141,6 +153,45 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     /*
     	private method
 	*/
+
+    private com.apirone.core.model.bean.Result function searchByProductItemId(
+            required String productItemId
+        ){
+
+		var data = [];
+		var result = getResult();
+
+		// components custom per productItem
+		var itemComponents = list( productItemId=arguments.productItemId );
+
+        for( var item in itemComponents ) {
+			item.setTypeId("custom");
+			data.add( item );
+        }
+		
+		// valori base per l'attributo di productItem
+		var productItem = getProductItemService().get( arguments.productItemId );
+
+		if ( len( productItem.getAttributeValue().getId() ) ) {
+			
+			var attrComponents = list( attributeValueId = productItem.getAttributeValue().getId() );
+
+			for( var thisComponent in attrComponents ) {
+				thisComponent.setTypeId("base");
+				data.add( thisComponent );
+			}
+
+		}
+
+	    result.setData( data );
+	    result.setCount( data.len() );
+	    result.setTotal( data.len() );
+
+        return result;
+
+    }
+
+
 
 	private com.apirone.core.model.bean.Component function build(
     		required String componentId
