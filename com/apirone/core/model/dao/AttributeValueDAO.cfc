@@ -93,7 +93,9 @@
 			UPDATE attributes_raw_values 
 			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.value.getStatus().getId()#">,
-				orderby = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">
+				orderby = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getOrderBy()#">,
+				allow_note = <cfqueryparam cfsqltype="Boolean" value="#arguments.value.getAllowNote()#">,
+				affect_to_image = <cfqueryparam cfsqltype="Boolean" value="#arguments.value.getAffectToImage()#">
 			WHERE
 				attribute_raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.value.getId()#">
 		</cfquery>

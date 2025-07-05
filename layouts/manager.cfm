@@ -9,7 +9,7 @@
 <html  class="fixed sidebar-left-collapsed sidebar-left-with-menu no-overflowscrolling" data-dev="#prc.isDev#">
 <head>
 
-    <title><cfif Len( prc.title )>#prc.title# - </cfif><cfif Len( prc.subtitle )>#prc.subtitle# - </cfif> ApirOne</title>
+    <title><cfif prc.isDev>*</cfif><cfif Len( prc.title )>#prc.title# - </cfif><cfif Len( prc.subtitle )>#prc.subtitle# - </cfif> ApirOne</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -163,7 +163,7 @@
 
         <script src="/assets/main/js/vendor/js.cookie.min.js"></script> <!--- TODO: add to jsScripts --->
         <script src="/assets/main/js/nimesia-kendo.js"></script>
-        <script src="/assets/main/js/nimesia-util.js"></script>
+        <script src="/assets/#prc.staticVersion#/main/js/nimesia-util.js"></script>
 
         <script src="/assets/#prc.staticVersion#/manager/js/app.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/ondomready.js"></script>

@@ -97,16 +97,6 @@
 
                             </div>
 
-                            <footer class="card-footer">
-                                <div class="row">
-                                    <div class="col-md-12 d-flex justify-content-end">
-                                        <div class="status errors-counter mt-1 me-3"></div>
-                                        <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
-                                        #saveButton(bind="click:save", size="sm")#
-                                    </div>
-                                </div>
-                            </footer>
-
                         </form>
 
                     </div>
@@ -136,7 +126,6 @@
 
                             </div>
 
-
                             <div data-bind="invisible: isValuesGridVisible" class="mb-3 alert alert-warning">
                                 <span>Nessun valore ancora caricato</span>
                             </div>
@@ -162,7 +151,9 @@
                                         { 'field':'id', 'title':'ID', width: '60px' },
                                         { 'field':'code', 'title':'Codice', width: '100px' },
                                         { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
-                                        { 'field':'', 'width':'50px', 'title':'', 'sortable': ''},
+                                        { 'field':'', 'width':'40px', 'title':'Attiva note' },
+                                        { 'field':'', 'width':'40px', 'title':'Questo valore modifica l\'immagine' },
+                                        { 'field':'', 'width':'50px', 'title':'Numeri di componenti'},
                                         { 
                                             'field':'', 
                                             'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
@@ -173,13 +164,23 @@
                                     source="detailForm.data.values",
                                     rowTemplate="attribute/attribute-values-list-row-tmpl"
                                 )#
-                            
+
                             </form>
 
                         </div>
 
                     </div>
                 </div>
+
+                <footer class="card-footer">
+                    <div class="row">
+                        <div class="col-md-12 d-flex justify-content-end">
+                            <div class="status errors-counter mt-1 me-3"></div>
+                            <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
+                            #saveButton(bind="click:save", size="sm")#
+                        </div>
+                    </div>
+                </footer>
 
             </div>
         </selection>

@@ -3,6 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.FruitDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="textService" type="com.apirone.core.model.service.TextService";
+	
+	property name="cacheScope" type="String" default="Fruit.bean";
 
     public com.apirone.core.model.bean.Fruit function get(
     		required String fruitId
@@ -10,9 +12,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = super.getCacheManager();
 
-    	var key = getCacheKey( arguments.fruitId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.fruitId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -21,7 +21,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.fruitId );
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.fruitId, bean );
         
 		return bean;
 
@@ -111,7 +111,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		}
 
-		super.getCacheManager().remove( "Fruit_#arguments.fruit.getId()#" );
+		super.getCacheManager().remove( getCacheScope(), arguments.fruit.getId() );
 
 		return arguments.fruit.getId();
 	}
@@ -148,7 +148,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.fruitId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( "Fruit_#arguments.fruitId#" );
+				getCacheManager().remove( getCacheScope(), arguments.fruitId );
 
 			} catch ( any error ) {
 				
@@ -193,12 +193,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "Fruit_#arguments.id#";
 
   	}
 

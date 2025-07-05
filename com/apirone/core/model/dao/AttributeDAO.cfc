@@ -6,8 +6,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT 
-				attribute_id::varchar, 
-				*
+				attribute_id::varchar, *
 			FROM
 				attributes
 			WHERE

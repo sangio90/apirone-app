@@ -2,6 +2,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function notifyChange( event, rc, prc ){
 
+        param rc.rawProductId = "_NOT_EXISTS";
+
         var content = GetHttpRequestData().content;
         var result = super.getResult();
 
@@ -46,6 +48,13 @@ component extends="com.apirone.core.controller.AbsController" {
             }
 
         }
+
+        if( result.getStatus() == "SUCCESS" ) {
+            super.getCacheManager().remove( "RawProduct.bean", rc.rawProductId );
+            result.setData( { "message": "Product [#rc.rawProductId#] updated", "type": "ProductUpdated" } );
+        }
+
+        cffile( action="APPEND" file="#ExpandPath('/../repository/private/logs/verticale-notify.log')#" output="#now()# rawProductId:[#rc.rawProductId#]; status:#result.getStatus()#; type:#result.getData().type#; message:#result.getData().message#");
 
         event.setValue( "result",  result );
         

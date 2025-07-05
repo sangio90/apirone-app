@@ -90,33 +90,9 @@
 				components
 			WHERE 
 				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.componentId#">
-				
-				<!---
-				AND raw_product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getRawProduct().getId()#">
-				AND variant_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">
-				AND color_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getColor().getId()#">
-				AND
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentLineSize" )>
-					line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getLine().getId()#">::uuid
-					AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getSize().getId()#">::uuid
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentProductItem" )>
-					product_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.component.getProductItem().getId()#">
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentCombination" )>
-					combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getCombination().getId()#">::uuid
-				</cfif>
-
-				<cfif IsInstanceOf( component, "com.apirone.core.model.bean.ComponentFruit" )>
-					fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.component.getFruit().getId()#">::uuid
-				</cfif>		
-				---->
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# DELETE #result.sql#">
+		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# delete method: #result.sql#">
 
 		<cfreturn true>
 
@@ -126,10 +102,80 @@
 
 		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
 
-		<cfset fields = []>
-		<cfset values = []>
+		<cfset var meta = getFieldsAndValues( arguments.component )>
+
+        <cfquery name="local.q" datasource="apirone">
+			INSERT INTO components (
+				raw_product_id,
+				color_id,
+				variant_id,
+				quantity,
+
+				#ArrayToList( meta.fields )#
+
+			)
+			VALUES (
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getRawProduct().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getColor().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.component.getQuantity()#">,
+
+				<cfset var index = 1>
+				<cfloop array="#meta.values#" item="item">
+					<cfif item.type IS "uuid">
+						<cfqueryparam cfsqltype="Varchar" value="#item.value#">::uuid
+					<cfelse>
+						<cfqueryparam cfsqltype="#item.type#" value="#item.value#">
+					</cfif>
+					<cfif Len( meta.values ) NEQ index>
+						,
+					</cfif>
+					<cfset index++>
+				</cfloop>
+
+			) RETURNING component_id
+		</cfquery>
+
+		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ComponentDAO: create">
+
+		<cfreturn local.q.component_id>
+
+	</cffunction>
+
+
+	<cffunction name="update" returntype="Numeric">
+
+		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
+
+		<!--- <cfset var meta = getFieldsAndValues( arguments.component )> --->
+
+        <cfquery name="local.q" datasource="apirone">
+			UPDATE components 
+			SET 
+				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.component.getQuantity()#">
+			WHERE 
+				component_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.component.getId()#">
+		</cfquery>
+
+		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ComponentDAO: update">
+
+		<cfreturn arguments.component.getId()>
+
+	</cffunction>	
+
+	
+	<!--- 
+		private methods
+	--->
+
+	<cffunction name="getFieldsAndValues" returntype="Struct" access="private">
+
+		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
 
 		<cfset var meta = GetMetadata( arguments.component )>
+
+		<cfset var field = []>
+		<cfset var values = []>
 
 		<cfswitch expression="#meta.fullname#">
 			
@@ -167,41 +213,9 @@
 			</cfdefaultcase>
 
 		</cfswitch>
+		
+		<cfreturn { "fields" = fields, "values" = values }>
 
-        <cfquery name="local.q" datasource="apirone">
-			INSERT INTO components (
-				raw_product_id,
-				color_id,
-				variant_id,
-				quantity,
-
-				#ArrayToList( fields )#
-
-			)
-			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getRawProduct().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getColor().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.component.getQuantity()#">,
-
-				<cfset var index = 1>
-				<cfloop array="#values#" item="item">
-					<cfif item.type IS "uuid">
-						<cfqueryparam cfsqltype="Varchar" value="#item.value#">::uuid
-					<cfelse>
-						<cfqueryparam cfsqltype="#item.type#" value="#item.value#">
-					</cfif>
-					<cfif Len( values ) NEQ index>
-						,
-					</cfif>
-					<cfset index++>
-				</cfloop>
-
-			) RETURNING component_id
-		</cfquery>
-
-		<cfreturn local.q.component_id>
-
-	</cffunction>
+	</cffunction>	
 
 </cfcomponent>

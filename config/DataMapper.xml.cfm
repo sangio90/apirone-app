@@ -48,13 +48,12 @@
 
     <mapper id="AttributeValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
         <map from="id" to="id" type="cf:String" />
-        <!-- <map from="code" to="code" type="cf:String" /> -->
         <map from="orderBy" to="orderBy" type="cf:Numeric" />
         <map from="componentCount" to="componentCount" type="cf:Numeric" />
-        <!-- <map from="name" to="name" type="cf:String" /> -->
         <map from="status" to="status" ref="Status" />
-        <!-- <map from="mainText" to="mainText" ref="Text" /> -->
         <map from="rawValue" to="rawValue" ref="RawValue" />
+        <map from="affectToImage" to="affectToImage" type="cf:Boolean" />
+        <map from="allowNote" to="allowNote" type="cf:Boolean" />
     </mapper>
 
     <mapper id="AttributeValueTree" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">

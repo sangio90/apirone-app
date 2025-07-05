@@ -20,8 +20,8 @@ NM.kendo.dataSource = function (config = {}) {
 
     if (config.url != undefined) {
 
+        defaults.serverPaging = true;
         defaults.transport = {
-            serverPaging: true,
             read: {
                 url: config.url
             }

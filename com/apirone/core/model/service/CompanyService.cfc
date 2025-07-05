@@ -5,6 +5,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="locationService" type="com.apirone.core.model.service.LocationService";
 	property name="accountService" type="com.apirone.core.model.service.AccountService";
 	property name="companyTypeService" type="com.apirone.core.model.service.CompanyTypeService";
+	
+	property name="cacheScope" type="String" default="Company.bean";
 
     public com.apirone.core.model.bean.Company function get(
     		required String companyId
@@ -12,9 +14,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.companyId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.companyId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -24,7 +24,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var company = build( arguments.companyId );
 
-		cm.put( key, company );
+		cm.put( getCacheScope(), arguments.companyId, company );
         return company;
 
 	}
@@ -115,7 +115,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				.update(  location = arguments.company.getLocation() );
 					
 			getCacheManager()
-				.remove( getCachekey( id ) );
+				.remove( getCacheScope(), id );
 
 			return id;
 		}
@@ -128,7 +128,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var result = getDao().delete( arguments.companyId );
         
-		getCacheManager().remove( getCachekey( arguments.companyId ) );
+		getCacheManager().remove( getCacheScope(), arguments.companyId );
 
 		return result;
 
@@ -172,12 +172,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "Company_#arguments.id#";
 
   	}
 

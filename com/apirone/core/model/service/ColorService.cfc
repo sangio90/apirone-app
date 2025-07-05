@@ -3,15 +3,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.ColorDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
+	property name="cacheScope" type="String" default="Color.bean";
+
     public com.apirone.core.model.bean.Color function get(
     		required String colorId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.colorId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.colorId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -20,7 +20,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.colorId );
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.colorId, bean );
         
 		return bean;
 
@@ -98,14 +98,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# colorService:getCacheKey();colorId:'#arguments.id#'");
-
-		return "Color_#Hash(arguments.id)#";
 
   	}
 

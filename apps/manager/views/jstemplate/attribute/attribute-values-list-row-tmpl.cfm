@@ -13,16 +13,19 @@
                 <span data-bind="text:rawValue.name"></span>
             </td>
             <td class="text-center">
+                <input type="checkbox" data-bind="checked: allowNote" name="allowNote" class="form-check-input">
+            </td>
+            <td class="text-center">
+                <input type="checkbox" data-bind="checked: affectToImage" name="affectToImage" class="form-check-input">
+            </td>
+            <td class="text-center">
                 <button type="button" class="btn btn-default btn-sm" data-bind="click:openComponentsList" data-type="attributeValue"> 
                     <i class="fas fa-window-restore"></i> 
                     <i class="button-badge info" data-bind="text: componentCount"></i> 
                 </button>
             </td>
             <td class="text-center">
-                <input type="checkbox" class="form-check-input"
-                    name="selected"
-                    value="##=id##"
-                >
+                <input type="checkbox" class="form-check-input" name="selected" value="##=id##">
             </td>
         </tr>
     </nmscript>

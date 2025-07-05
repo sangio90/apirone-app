@@ -6,10 +6,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="variantService" type="com.apirone.core.model.service.VariantService";
 	property name="colorService" type="com.apirone.core.model.service.ColorService";
 	property name="productItemService" type="com.apirone.core.model.service.ProductItemService";
-    /*
+	property name="cacheScope" type="String" default="Component.bean";
+
+	/*
+	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
 	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 	property name="combinationComponentService" type="com.apirone.core.model.service.CombinationComponentService";
     */
+
+	property name="cacheScope" type="String" default="Component.bean";
 
     public com.apirone.core.model.bean.Component function get(
     		required String componentId
@@ -17,9 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.componentId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.componentId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -28,7 +31,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.componentId );
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.componentId, bean );
         
 		return bean;
 
@@ -68,33 +71,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	String combinationId,
     	Numeric productItemId,
     	Numeric attributeValueId,
-		Boolean includeBaseAttributeComponents=false //only for product productItemId
+		Boolean includeBaseAttributeComponents=false hint="Only for product productItemId" 
     ){
+
+		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# search: start: #arguments.productItemId#");
+
+		if( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
+
+			return searchByProductItemId( arguments.productItemId );
+			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# search: searchByProductItemId: #arguments.productItemId#");
+		
+		} 
 
 		var rows = [];
 		var result = super.getResult();
 
-		if( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
-			
-			rows = searchByProductItemId( arguments.productItemId );
-		
-		} else {
+		var records = getDao().find( argumentCollection=arguments );
 
-			var records = getDao().find( argumentCollection=arguments );
-
-			records.each(function(record) {
-				rows.add( 
-					get( record.component_id ) 
-				);
-			});
-
-		}
+		records.each(function(record) {
+			rows.add( 
+				get( record.component_id ) 
+			);
+		});
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.recordcount ) );
 
-        return result;
+		return result;
 
     }
 
@@ -112,13 +116,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		
 		    try  {
 
-                var cm = getCacheManager();
-
-
-
                 getDao().delete( arguments.componentId );
         
-                cm.remove( "component_#obj.getId()#" );
+                super.getCacheManager().remove( "Component_#obj.getId()#" );
                 
 			} catch ( any error ) {
 
@@ -139,13 +139,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.Component component
 		){
 
+			/*
 		if( Len( arguments.component.getId() ) ) {
+			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# create: delete component: #arguments.component.getId()#");
 			getDao().delete( arguments.component.getId() );
 		}
+			*/
 
 		var newId = getDao().insert( arguments.component );
 
 		return newId;
+
+	}
+
+
+	public String function update(
+			required com.apirone.core.model.bean.Component component
+		){
+
+		getDao().update( arguments.component );
+
+		super.getCacheManager().remove( getCacheScope(), component.getId() );
+
+		return arguments.component.getId();
 
 	}
 
@@ -158,18 +174,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             required String productItemId
         ){
 
+		dump(productItemId);
+		abort;
+
 		var data = [];
 		var result = getResult();
 
-		// components custom per productItem
+		// components of productItem
 		var itemComponents = list( productItemId=arguments.productItemId );
 
         for( var item in itemComponents ) {
-			item.setTypeId("custom");
+			item.setTypeId( "own" );
 			data.add( item );
         }
 		
-		// valori base per l'attributo di productItem
+		// components of attribute of productItem
 		var productItem = getProductItemService().get( arguments.productItemId );
 
 		if ( len( productItem.getAttributeValue().getId() ) ) {
@@ -177,7 +196,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var attrComponents = list( attributeValueId = productItem.getAttributeValue().getId() );
 
 			for( var thisComponent in attrComponents ) {
+				
 				thisComponent.setTypeId("base");
+				thisComponent.setBaseQuantity( thisComponent.getQuantity() );
+				
 				data.add( thisComponent );
 			}
 
@@ -220,12 +242,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "component_#arguments.id#";
 
   	}
 

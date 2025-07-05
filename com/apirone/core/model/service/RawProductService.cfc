@@ -6,6 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="ColorService" type="com.apirone.core.model.service.ColorService";
     property name="VariantService" type="com.apirone.core.model.service.VariantService";
     property name="LookupService" type="com.apirone.core.model.service.LookupService";
+    
+	property name="cacheScope" type="String" default="RawProduct.bean";
 
     public com.apirone.core.model.bean.RawProduct function get(
     		required String rawProductId
@@ -13,9 +15,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = super.getCacheManager();
 
-    	var key = getCacheKey( arguments.rawProductId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.rawProductId ) ;
 
 	    if ( cache.status ) {
 
@@ -25,7 +25,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var bean = build( arguments.rawProductId );
 
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.rawProductId, bean );
         
 		return bean;
 
@@ -127,12 +127,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "RawProduct_#arguments.id#";
 
   	}
 

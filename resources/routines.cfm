@@ -15,6 +15,7 @@
 
 <div class="button">
 	<a href="?action=cache.empty">Svuota cache</a>
+	<a href="?action=cache.emptyText">Svuota cache (text.bean)</a>
 	<a href="?action=cache.list">Lista cache</a>
 	<a href="/resources/errors/list.cfm">Errori</a>
 	<a href="?action=info.read">Info</a>
@@ -60,6 +61,12 @@
 	<cfset cm.removeAll()>
 
 	<p>Rimosse [#count#] chiavi.</p>
+</cfif>
+
+<cfif action IS "cache.emptyText">
+
+	<cfset cm.removeByScope( "text.bean" )>
+
 </cfif>
 
 <cfdump var="#GetApplicationMetadata().datasources#">

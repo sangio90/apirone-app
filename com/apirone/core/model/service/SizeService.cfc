@@ -4,15 +4,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="textService" type="com.apirone.core.model.service.TextService";
 
+	property name="cacheScope" type="String" default="Size.bean";
+
     public com.apirone.core.model.bean.Size function get(
     		required String sizeId
         ){
 
     	var cm = super.getCacheManager();
 
-    	var key = getCacheKey( arguments.sizeId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.sizeId );
 
 	    if ( cache.status ) {
 	    
@@ -21,7 +21,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.sizeId );
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.sizeId, bean );
         
 		return bean;
 
@@ -109,8 +109,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		}
 
-
-		super.getCacheManager().remove( "Size_#arguments.size.getId()#" );
+		super.getCacheManager().remove( getCacheScope(), arguments.size.getId() );
 
 		return arguments.size.getId();
 	}
@@ -147,7 +146,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.sizeId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( "Size_#arguments.sizeId#" );
+				super.getCacheManager().remove( getCacheSciope(), arguments.sizeId );
 
 			} catch ( any error ) {
 				
@@ -194,12 +193,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "Size_#arguments.id#";
 
   	}
 

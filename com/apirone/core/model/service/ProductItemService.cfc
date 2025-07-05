@@ -6,6 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
 	property name="combinationComponentService" type="com.apirone.core.model.service.CombinationComponentService";
 	property name="componentService" type="com.apirone.core.model.service.ComponentService";
+	
+	property name="cacheScope" type="String" default="ProductItem.bean";
 
     public com.apirone.core.model.bean.ProductItem function get(
     		required String productItemId
@@ -13,9 +15,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.productItemId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.productItemId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -24,7 +24,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.productItemId );
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.productItemId, bean );
         
 		return bean;
 
@@ -227,7 +227,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 var cm = getCacheManager();
 
-                getDao().delete( arguments.combinationId );
+                getDao().delete( getCacheScope(), arguments.combinationId );
         
                 cm.remove( "combination_#obj.getId()#" );
                 
@@ -258,12 +258,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public String function update(
-			required com.apirone.core.model.bean.ProductItem ProductItem
+			required com.apirone.core.model.bean.ProductItem productItem
 		){
 
-		var newId = getDao().update( arguments.ProductItem );
+		var newId = getDao().update( arguments.productItem );
 
-		super.getCacheManager().remove( getCacheKey( arguments.ProductItem.getId() ) );
+		super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
 
 		return newId;
 
@@ -443,12 +443,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "ProductItem_#arguments.id#";
 
   	}
 

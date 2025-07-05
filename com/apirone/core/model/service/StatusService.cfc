@@ -2,6 +2,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.StatusDAO";
 	property name="systemColorService" type="com.apirone.core.model.service.systemColorService";
+	
+	property name="scopeCache" type="String" default="Status.bean";
 
     public com.apirone.core.model.bean.Status function get(
     		required String statusId
@@ -9,9 +11,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = super.getCacheManager();
 
-    	var key = getCacheKey( arguments.statusId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getScopeCache(), arguments.statusId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -20,8 +20,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var obj = build( arguments.statusId );
+
+		dump( Len( statusId) );
 		
-		cm.put( key, obj );
+		cm.put( getScopeCache(), statusId, obj );
         
 		return obj;
 
@@ -66,12 +68,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
     	return NullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "Status_#arguments.id#";
 
   	}
 

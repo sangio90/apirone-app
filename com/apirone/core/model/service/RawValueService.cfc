@@ -3,6 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.RawValueDAO";
     property name="textService" type="com.apirone.core.model.service.TextService";
     property name="statusService" type="com.apirone.core.model.service.StatusServive";
+    
+	property name="cacheScope" type="String" default="RawValue.bean";
 
     public com.apirone.core.model.bean.RawValue function get(
     		required String rawValueId
@@ -10,9 +12,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.rawValueId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.rawValueId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -22,7 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var bean = build( arguments.rawValueId );
 		
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.rawValueId, bean );
         
 		return bean;
 
@@ -114,7 +114,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		}
 
-		getCacheManager().remove( getCachekey( id ) );
+		super.getCacheManager().remove( getCacheScope(), id );
 		
 		return id;
     
@@ -151,8 +151,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.rawValueId );
 				outcome.setData( { "deletedCount" = result } )
 
-				//getCacheManager().remove( "attribute_#obj.getAttributeId()#" );
-				getCacheManager().remove( getCacheKey( obj.getId() ) );
+				getCacheManager().remove( getScopeCache(), arguments.rawValueId );
 			
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -193,12 +192,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "rawValue_#arguments.id#";
 
   	}
 

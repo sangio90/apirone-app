@@ -1,6 +1,8 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.VariantTypeDAO";
+	
+	property name="scopeCache" type="String" default="VariantType.bean";
 
     public com.apirone.core.model.bean.VariantType function get(
     		required String variantTypeId
@@ -8,9 +10,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = super.getCacheManager();
 
-    	var key = getCacheKey( arguments.variantTypeId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getScopeCache(), arguments.variantTypeId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -19,7 +19,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var obj = build( arguments.variantTypeId );
-		cm.put( key, obj );
+		cm.put( getScopeCache(), arguments.variantTypeId, obj );
         
 		return obj;
 
@@ -29,10 +29,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             required com.apirone.core.model.bean.VariantType variantType
 		){	
 			
-		return getDao()
-				.insert( 
-					variantType = arguments.variantType
-				);
+		return getDao().insert( variantType = arguments.variantType );
 
 	}
 
@@ -80,12 +77,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
     	return NullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "VariantType#arguments.id#";
 
   	}
 

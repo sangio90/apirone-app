@@ -70,32 +70,11 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
             .parent("AbsService");
 
-        /*
-        map("VariantTypeService").to( "com.apirone.core.model.service.VariantTypeService" )
-            .asSingleton()
-            .property( name = "dao", ref = "VariantTypeDAO" )
-            .parent("AbsService");
-        */
-
-        map("CompanyService").to( "com.apirone.core.model.service.CompanyService" )
-            .asSingleton()
-            .property( name = "dao", ref = "CompanyDAO" )
-            .property( name = "StatusService", ref = "StatusService" )
-            .property( name = "AccountService", ref = "AccountService" )
-            .property( name = "CompanyTypeService", ref = "CompanyTypeService" )
-            .property( name = "LocationService", ref = "LocationService" )
-            .parent("AbsService");
-                        
         map("PriceService").to( "com.apirone.core.model.service.PriceService" )
             .asSingleton()
             .property( name = "dao", ref = "PriceDAO" )
             .parent("AbsService");
             
-        map("CompanyTypeService").to( "com.apirone.core.model.service.CompanyTypeService" )
-            .asSingleton()
-            .property( name = "dao", ref = "CompanyTypeDAO" )
-            .parent("AbsService");
-
         map("GeoService").to( "com.apirone.core.model.service.GeoService" )
             .asSingleton()
             .property( name = "cityDao", ref = "CityDAO" )
@@ -182,6 +161,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "VariantService", ref = "VariantService" )
             .property( name = "ColorService", ref = "ColorService" )
             .property( name = "StatusService", ref = "StatusService" )
+            .property( name = "productItemService", ref = "productItemService" )
             .parent("AbsService");
 
         map("ProductCategoryService").to( "com.apirone.core.model.service.ProductCategoryService" )
@@ -437,6 +417,10 @@ component extends="coldbox.system.ioc.config.Binder" {
 
         map("CacheManager").to( "com.apirone.core.util.CacheManager" )
             .asSingleton()
+            .initArg( 
+                name="keys", 
+                value=DeserializeJSON( fileRead( expandPath( "/config/cacheScopes.json.cfm" ) ) )
+            )
 
         map("DBUtil").to( "com.apirone.core.util.DBUtil" )
             .asSingleton()

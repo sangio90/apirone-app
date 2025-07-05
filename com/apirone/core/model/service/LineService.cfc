@@ -5,15 +5,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lookupService" type="com.apirone.core.model.service.LookupService";
 	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
 
+	property name="cacheScope" type="String" default="Line.bean";
+
     public com.apirone.core.model.bean.Line function get(
     		required String lineId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.lineId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.lineId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -22,7 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.lineId );
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.lineId, bean );
         
 		return bean;
 
@@ -79,7 +79,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var dm = getCacheManager();
 
-		dm.remove( getCacheKey ( arguments.line.getId() ) );
+		dm.remove( getCacheScope(), arguments.line.getId() );
 
 		return arguments.line.getId();
 	}
@@ -115,7 +115,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.lineId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( "line_#arguments.lineId#" );
+				dm.remove( getCacheScope(), arguments.line.getId() );
 
 			} catch ( any error ) {
 				
@@ -149,6 +149,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCode( record.code );
 			bean.setName( record.line );
 			bean.setCreatedAt( record.created_at );
+			
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
@@ -158,12 +159,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "line_#arguments.id#";
 
   	}
 

@@ -4,25 +4,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="langService" type="com.apirone.core.model.service.LangService";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
+	property name="cacheScope" type="String" default="Text.bean";
+
 	public com.apirone.core.model.bean.Text function get(
 			required String textId
     	){
 
 			var cm = getCacheManager();
 
-			var key = getCacheKey( arguments.textId );
-	
-			   var cache = cm.get( key ) ;
+			var cache = cm.get( getCacheScope(), arguments.textId ) ;
 	
 			if ( cache.status ) {
 			
-				  return cache.data;
+				return cache.data;
 			
 			}
 			
 			var bean = build( arguments.textId );
 			
-            cm.put( key, bean );
+            cm.put( getCacheScope(), arguments.textId, bean );
 			
             return bean;
 
@@ -137,7 +137,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		
         var id = getDao().update( arguments.text );
             
-		getCacheManager().remove( getCachekey( id ) );
+		getCacheManager().remove( getCacheScope(), id );
 			
 		return id;
     
@@ -172,12 +172,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 	  
-  	private String function getCacheKey( required Numeric id ) {
-
-  		return "Text_#arguments.id#";
-
-  	}
-
   	private com.apirone.core.model.bean.Entity function getEntity( required record ) {
 
 		var entity = super.bean( "Entity" );

@@ -16,6 +16,16 @@
     </rule>
 
     <rule>
+        <from>/assets/([0-9]*){0,}/main/js/(.*)</from>
+        <to qsappend="true">/assets/main/js/$2</to>
+    </rule>
+
+    <rule>
+        <from>/assets/([0-9]*){0,}/{0,}(manager|public)/js/(.*)</from>
+        <to qsappend="true">/apps/$2/assets/js/$3</to>
+    </rule>
+
+    <rule>
         <from>/assets/([0-9]*){0,}/{0,}(manager|public)/img/(.*)</from>
         <to qsappend="true">/apps/$2/assets/img/$3</to>
     </rule>

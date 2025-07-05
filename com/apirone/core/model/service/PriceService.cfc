@@ -127,7 +127,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	private String function getCacheKey( required String id ) {
 
-  		return "Price_#arguments.id#";
+		Throw( "Use cache manager and scope" );
 
   	}
 

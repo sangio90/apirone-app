@@ -3,6 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="dao" type="com.apirone.core.model.dao.ReportDAO";
     property name="statusService" type="com.apirone.core.model.service.StatusService";
     property name="lookupService" type="com.apirone.core.model.service.LookupService";
+    
+	property name="scopeCache" type="String" default="Report.bean";
 
     public com.apirone.core.model.bean.Report function get(
     		required String reportId
@@ -10,9 +12,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.reportId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getScopeCache(), arguments.reportId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -20,7 +20,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    } 
 	    
-        var bean = build( arguments.reportId );
+        var bean = build( getScopeCache(), arguments.reportId );
         cm.put( key, bean );
         
 		return bean;
@@ -44,7 +44,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	
 		var result = getDao().delete( arguments.reportId );
 
-		getCacheManager().remove( getCacheKey( arguments.reportId ) );
+		getCacheManager().remove( getScopeCache(), arguments.reportId );
 
 		return result;
 
@@ -103,12 +103,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 		return NullValue();
 		
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "Report_#arguments.id#";
-
   	}
 
 }

@@ -62,10 +62,6 @@ component {
 
     public Boolean function onApplicationStart(){
 
-        //variables.settings = new config.Settings();
-
-        //cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - CORE:onApplicationStart" );
-
         startFramework();
 
         return true;
@@ -86,9 +82,10 @@ component {
 
     private function startFramework(){
 
-        //cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - CORE:startFramework" );
+        //new com.apirone.core.loading.Bootstrapper();
+        var wirebox = new coldbox.system.ioc.Injector("config.WireboxServices");
 
-        new com.apirone.core.loading.Bootstrapper();
+        cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# reload framework");
 
     }
 

@@ -5,21 +5,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="lookupService" type="com.apirone.core.model.service.LookupService";
 
+	property name="cacheScope" type="String" default="Account.bean";
+
 	public com.apirone.core.model.bean.Account function get(
 		required String accountId
 	){
 		var cm = getCacheManager();
 
-		var key = getCacheKey( arguments.accountId );
-
-		var cache = cm.get( key );
+		var cache = cm.get( getCacheScope(), arguments.accountId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
 		var account = build( arguments.accountId );
-		cm.put( key, account );
+		cm.put( getCacheScope(), arguments.accountId, account );
 
 		return account;
 	}
@@ -51,7 +51,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = getDao().update( argumentCollection = arguments );
 
-		getCacheManager().remove( getCacheKey( arguments.account.getId() ));
+		getCacheManager().remove( getCacheScope(), arguments.account.getId() );
 
 		return id;
 	}
@@ -81,7 +81,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.accountId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getCacheKey( arguments.accountId ) );
+				getCacheManager().remove( getCacheScope(), arguments.accountId );
 
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -116,7 +116,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getDao().updatePassword( arguments.accountId, pwd );
 
-		getCacheManager().remove( getCacheKey( arguments.accountId ) );
+		getCacheManager().remove( getCacheScope(), arguments.accountId );
 
 		return true;
 	}
@@ -186,12 +186,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		arguments.pwd;
 
 		return hash( token, "SHA-512" );
-	}
-
-	private String function getCacheKey(
-		required String id
-	){
-		return "Account_#arguments.id#";
 	}
 
 	/**

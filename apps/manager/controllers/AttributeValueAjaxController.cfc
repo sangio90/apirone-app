@@ -11,21 +11,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
-	function codeExists( event, rc, prc ){
-		param rc.id   = "_";
-		param rc.code = "";
+	function deleteValues( event, rc, prc ){
 
-        var result = super.getResult();
-    
-		var exist = super.fire( "AttributeValue.codeExists", { code = rc.code, excludedId = rc.id } );
-
-        result.setData( exist );
-
-		event.setValue( "result", result );
-	}
-
-	function delete( event, rc, prc ){
-        
         var result = super.getResult();
         var list = GetHTTPRequestData().content;
         var messageId = "attributeValue.deletedAllRecords";
@@ -56,7 +43,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-    function save( event, rc, prc ){
+    function addValue( event, rc, prc ){
 
         var result = super.getResult();
     
@@ -68,8 +55,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
         bean.setStatus( status.setId( "ACT" ) );
 
-        bean.setAttributeId( json.attributeId );
-        bean.setOrderBy( getMaxOrderBy( json.attributeId ) + 10 );
+        bean.setAttributeId( rc.id );
+        bean.setOrderBy( getMaxOrderBy( rc.id ) + 10 );
         bean.setRawValue( value.setId( json.id ) );
 
         var messageId = "attributeValue.created";
@@ -83,7 +70,7 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
-    function order( event, rc, prc ){
+    function sort( event, rc, prc ){
 
         var json = DESerializeJSON( GetHTTPRequestData().content );
         var result = super.getResult();

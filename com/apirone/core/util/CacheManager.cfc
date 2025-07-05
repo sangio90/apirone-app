@@ -1,44 +1,84 @@
 component accessors="true"{
 
+    property name="keys" type="Struct";
+
+    public CacheManager function init( required Struct keys ){
+
+        setKeys( arguments.keys );
+
+        return this;
+
+    }    
+
     public Struct function get(
-            required String key
+            required String scope, 
+            required Any key
         ){
+            
+        var cacheKey = createCacheKey( arguments.scope, arguments.key );
+        var ret = {};
+        
+        ret.status = false;
 
-        var ret.status = false;
-
-        var exists = CacheIdExists( arguments.key );
+        var exists = CacheIdExists( cacheKey );
 
         if( exists ) {
             ret = {
-                data   = CacheGet( arguments.key ),
+                data   = CacheGet( cacheKey ),
                 status = true
             }
         }
-
+        
         return ret;
 
     }
 
     public Void function put(
-            required String key,
+            required String scope,
+            required Any key,
             required Any value
         ){
 
-        if ( !isNull( arguments.value ) ) {
+        var cacheKey = createCacheKey( arguments.scope, arguments.key)
 
-            CachePut( arguments.key, arguments.value );
+        CachePut( cacheKey, arguments.value );
+
+    }
+
+
+    public Void function remove(
+            required String scope,
+            required Any key
+        ){
+
+        CacheRemove( 
+            createCacheKey( arguments.scope, arguments.key) 
+        );
+
+    }
+
+    public Void function removeByScope(
+            required String scope,
+        ){
+
+        if( !scopeExists( arguments.scope ) ) {
+            throw( message = "The scope [#arguments.scope#] not exists.", type = "CacheManager.Errors.ScopeNotExists" );
+        }
+
+        var keys = CacheGetAllIds();
+
+        for( var cacheKey in keys ) {
+
+            if ( left( cacheKey, len( arguments.scope ) + 1 ) == "#arguments.scope#_" ) {
+
+                CacheRemove( cacheKey );
+
+            }
 
         }
 
     }
-
-    public Void function remove(
-            required String key
-        ){
-
-        CacheRemove( arguments.key );
-
-    }
+    
 
     public Void function removeAll() {
 
@@ -51,5 +91,31 @@ component accessors="true"{
         return CacheGetAll();
 
     }
+
+    private String function scopeExists( required String scope ) {
+
+        if ( IsNull( keys[ arguments.scope ] ) ) {
+
+            return false;
+
+        }
+
+		return true;
+	}
+
+
+    private String function createCacheKey( required String scope, required Any key ) {
+
+        if ( IsNull( keys[ arguments.scope ] ) ) {
+
+            throw( message = "The scope [#arguments.scope#] not exists. Add it to configuration.", type = "CacheManager.Errors.ScopeNotExists" );
+
+        }
+
+        var thisKey = IsSimpleValue( arguments.key ) ? arguments.key : arguments.key.toString();
+
+		return "#arguments.scope#_#Hash( thisKey )#"
+	}
+
 
 }

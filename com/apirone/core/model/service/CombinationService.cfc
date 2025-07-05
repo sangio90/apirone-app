@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="LineService" type="com.apirone.core.model.dao.LineService";
 	property name="FinishService" type="com.apirone.core.model.dao.FinishService";
 	property name="StatusService" type="com.apirone.core.model.dao.StatusService";
+	property name="cacheScope" type="String" default="Combination.bean";
 
     public com.apirone.core.model.bean.Combination function get(
     		required String combinationId
@@ -12,9 +13,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.combinationId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.combinationId );
 
 	    if ( cache.status ) {
 	    
@@ -23,7 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.combinationId );
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.combinationId, bean );
         
 		return bean;
 
@@ -94,7 +93,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 getDao().delete( arguments.combinationId );
         
-                cm.remove( "combination_#obj.getId()#" );
+                cm.remove( getCacheScope(), arguments.combinationId );
                 
 			} catch ( any error ) {
 
@@ -133,7 +132,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 getDao().delete( obj.getId() );
         
-                cm.remove( "combination_#obj.getId()#" );
+                cm.remove( getCacheScope(), arguments.obj.getId() );
                 
 			} catch ( any error ) {
 
@@ -198,12 +197,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "Combination_#arguments.id#";
 
   	}
 

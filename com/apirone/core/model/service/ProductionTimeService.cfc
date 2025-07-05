@@ -2,16 +2,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.ProductionTimeDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
+	
+	property name="cacheScope" type="String" default="productionTime.bean";
 
-    public com.apirone.core.model.bean.RawProductionTime function get(
+    public com.apirone.core.model.bean.ProductionTime function get(
     		required String productionTimeId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.productionTimeId );
-
-	   	var cache = cm.get( key ) ;
+   		var cache = cm.get( getCacheScope(), arguments.productionTimeId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -20,12 +20,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var product = build( arguments.productionTimeId );
-		cm.put( key, product );
-        
+		cm.put( getCacheScope(), arguments.productionTimeId, product );
+
 		return product;
 
 	}
-
+        
 	public Boolean function codeExists(
 		required String code,
 		String excludeId =  ""
@@ -71,7 +71,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.RawProductionTime function build(
+	private com.apirone.core.model.bean.ProductionTime function build(
     		required String productionTimeId
     	){
 
@@ -91,12 +91,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "ProductionTime_#arguments.id#";
 
   	}
 

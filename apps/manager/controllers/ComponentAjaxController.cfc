@@ -9,7 +9,16 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var params = getParams( typeId = rc.by, rc = rc );
 
+        dump(params);
+
         var items = super.fire( "component.list", params );
+
+        for( var item in items ) {
+
+            var row = convertComponent( item );
+            data.add( row );
+
+        }        
 
         result.setTotal( items.len() );
         result.setCount( items.len() );
@@ -85,8 +94,6 @@ component extends="com.apirone.core.controller.AbsController" {
         var params = getParams( typeId = rc.by, rc = rc );
         var oldItems = super.fire( "component.list", params );
 
-        //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# currentItems: #oldItems.len()#");
-
         var itemExists = [];
 
         for( var thisComponent in components ) {
@@ -109,12 +116,13 @@ component extends="com.apirone.core.controller.AbsController" {
             component.setVariant( variant );
             component.setQuantity( thisComponent.quantity );
 
-            super.fire( "component.create", [ component ] );
+            if( Len( component.getId() ) ) {
+                super.fire( "component.update", [ component ] );
+            } else {
+                super.fire( "component.create", [ component ] );
+            }
 
         }
-
-        //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: #oldItems.len()#");
-        //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# itemExists: #ArrayToList( itemExists )#");
 
         for( var oldItem in oldItems ) {
 
@@ -122,9 +130,9 @@ component extends="com.apirone.core.controller.AbsController" {
             
             if( !itemExists.find( oldItem.getId() ) ) {
 
-                //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: delete: #oldItem.getId()#");
-
+                cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: delete: #oldItem.getId()#");
                 super.fire( "component.delete", { componentId = oldItem.getId() } );
+            
             }
         
         }
@@ -148,7 +156,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var row = {
             "id" = component.getId(),
+            "typeId" = component.getTypeId(),
             "quantity" = component.getQuantity(),
+            "baseQuantity" = component.getBaseQuantity(),
+            "totalQuantity" = component.getTotalQuantity(),
             "rawProduct" = {
                 "id" = product.getId(),
                 "name" = product.getName(),
@@ -185,7 +196,7 @@ component extends="com.apirone.core.controller.AbsController" {
                 break;
 
             case "item":
-                params = { productItemId = rc.itemId };
+                params = { productItemId = rc.itemId, includeBaseAttributeComponents = true };
                 break;
                 
             case "lineSize":
@@ -201,11 +212,11 @@ component extends="com.apirone.core.controller.AbsController" {
                 break;
 
             case "attributeValue":
-                params = { attributeValueId = rc.attributeValueId };
+                params = { attributeValueId = rc.attributeValueId, includeBaseAttributeComponents = false };
                 break;
 
             default: 
-                throw (type="apirone.error.TypeSearchNotValid", message="Type search [#rc.by#] not valid");
+                throw( type="apirone.error.TypeSearchNotValid", message="Type search [#rc.by#] not valid" );
                 break;
         }
 

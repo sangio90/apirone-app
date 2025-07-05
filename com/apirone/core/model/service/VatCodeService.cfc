@@ -1,6 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     property name="dao" type="com.apirone.core.model.dao.VatCodeDAO";
+    property name="cacheScope" type="String" default="VatCode.bean";
 
     public com.apirone.core.model.bean.VatCode function get(
     		required String vatCodeId
@@ -8,9 +9,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.vatCodeId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.vatCodeId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -19,7 +18,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 
         var vatCode = build( arguments.vatCodeId );
-        cm.put( key, vatCode );
+        cm.put( getCacheScope(), arguments.vatCodeId, vatCode );
         
 		return vatCode;
 
@@ -81,12 +80,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 		return bean;
 		
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "VatCode_#arguments.id#";
-
   	}
 
 }

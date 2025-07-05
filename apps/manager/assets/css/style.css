@@ -242,13 +242,11 @@ h2 {
 }
 
 
-/*
-@media (min-width: 1200px) {
+@media (min-width: 1400px) {
     .modal-xl {
-        max-width: 1350px;
+        max-width: 1550px;
 	}
 }
-*/
 
 .content-body {
 	padding: 20px !important;
@@ -431,6 +429,27 @@ h2 {
 .profile-info .description {
 	color: #878787;
 	font-size: 11px;
+}
+
+.similar-to-form-control {
+	border: 1px solid #cccccc !important;
+	padding: 6px 12px;
+	background-color: #d8d8d8;
+	border-radius: 4px;
+	height: 39.1406px;
+	line-height: 25px;
+}
+
+.fs-10 {
+	font-size: 10px;
+}
+
+.w-40 {
+	width: 40px !important;
+}
+
+.w-70 {
+	width: 70px !important;
 }
 
 .w-200 {

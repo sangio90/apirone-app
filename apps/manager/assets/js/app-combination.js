@@ -387,9 +387,15 @@ AP.combination.list = (function () {
 						},
 						attributeValue: {
 							id: event.data.attributeValue.id,
-							name: event.data.attributeValue.name,
+							//name: event.data.attributeValue.name,
+							rawValue: {
+								id: event.data.attributeValue.rawValue.id,
+								name: event.data.attributeValue.rawValue.name,
+							}
 						},
 					};
+
+					console.log("value", value);
 
 					break;
 

@@ -7,15 +7,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
     property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
 
+	property name="cacheScope" type="String" default="Attribute.bean";
+
     public com.apirone.core.model.bean.Attribute function get(
     		required String attributeId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.attributeId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.attributeId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -25,7 +25,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var bean = build( arguments.attributeId );
 		
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.attributeId, bean );
         
 		return bean;
 
@@ -143,7 +143,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	
 			}
 
-			getCacheManager().remove( getCachekey( id ) );
+			if( !IsNull( attribute.getValues() ) ) {
+
+				for ( var value in attribute.getValues() ) {
+
+					if( Len( value.getId() ) ) {
+
+						// The bare minimum, only update value
+						getAttributeValueService().update( value );
+
+					}
+		
+				}
+
+			}
+
+			getCacheManager().remove( getCacheScope(), id );
 			
 			return id;
     
@@ -163,7 +178,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.attributeId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getCacheKey( arguments.attributeId ) );
+				getCacheManager().remove( getCacheScope() arguments.attributeId );
 
 			} catch ( any error ) {
 				
@@ -178,12 +193,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-
-	public String function getCacheKey( required String id ) {
-
-		return "attribute_#arguments.id#";
-
-	}
 
     /*
     	private method
@@ -201,7 +210,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.attribute_id );
 			bean.setCreatedAt( record.created_at );
-            bean.setTexts( getTextService().list( attributeId = record.attribute_id ) )
+			bean.setcode( record.code );
+
+			bean.setTexts( getTextService().list( attributeId = record.attribute_id ) )
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
 			bean.setValues( getAttributeValueService().list( attributeId = record.attribute_id ) );

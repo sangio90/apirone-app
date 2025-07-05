@@ -4,22 +4,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService"       type="com.apirone.core.model.service.StatusService";
 	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
 	property name="textService"         type="com.apirone.core.model.service.TextService";
+	property name="cacheScope" type="String" default="Finish.bean";
 
 	public com.apirone.core.model.bean.Finish function get(
 		required String finishId
 	){
 		var cm = getCacheManager();
 
-		var key = getCacheKey( arguments.finishId );
-
-		var cache = cm.get( key );
+		var cache = cm.get( getCacheScope(), arguments.finishId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
 		var bean = build( arguments.finishId );
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.finishId, bean );
 
 		return bean;
 	}
@@ -77,7 +76,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		getDao().update( arguments.finish );
 
-		getCacheManager().remove( getCacheKey( arguments.finish.getId() ));
+		super.getCacheManager().remove( getCacheScope(), arguments.finish.getId() );
 
 		return arguments.finish.getId();
 	}
@@ -112,7 +111,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.finishId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getCacheKey( arguments.finishId ) );
+				getCacheManager().remove( getCacheScope(), arguments.finishId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -139,6 +138,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.finish_id );
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
+			
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( finishId = record.finish_id ) );
 
@@ -150,12 +150,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return nullValue();
-	}
-
-	private String function getCacheKey(
-		required String id
-	){
-		return "Finish_#arguments.id#";
 	}
 
 }

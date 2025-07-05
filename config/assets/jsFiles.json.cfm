@@ -40,6 +40,7 @@
         { file: "/modules/assets/template-admin/js/theme.init.js" },
         { file: "/modules/assets/template-admin/js/examples/examples.dashboard.js" },
 
+        { file: "/assets/main/js/vendor/math.js" },
         { file: "/assets/main/js/vendor/jquery-validate/jquery.validate.js" },
         { file: "/assets/main/js/vendor/jquery-validate/additional-methods.js" },
         { file: "/assets/main/js/vendor/jquery.serializejson.js" },

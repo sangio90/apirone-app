@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/style.css">
+  </head>
+  <body>
+    <div id="mydiv" style="background-color: Red; height: 500px; width: 500px;">Ciao</div>
+  </body>
+</html>
+
+<script>
+
+if (document.readyState === "complete") {
+
+    ready()
+
+} else {
+    // Add event listener for DOMContentLoaded (fires when document is fully loaded)
+    document.addEventListener("DOMContentLoaded", ready);
+}
+
+function ready() {
+    var ele = document.getElementById('mydiv');
+    var coo = ele.getBoundingClientRect();
+
+    console.log(coo);    
+
+}
+
+</script>
+
+<style>
+    #mydiv {
+        margin-top: 97px;
+    }
+</style>

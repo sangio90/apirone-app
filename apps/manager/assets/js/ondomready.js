@@ -40,8 +40,7 @@ $.validator.setDefaults({
 		var count = validator.numberOfInvalids();
 		var thisForm = $(event.currentTarget);
 
-		// console.log("invalidHandler:count", count);
-		// console.log("invalidHandler:thisForm", thisForm);
+		console.log("thisForm", thisForm);
 
 		if (count == 1) {
 			var message = "<span class='error'>C'è un errore.</span>";
@@ -49,9 +48,15 @@ $.validator.setDefaults({
 			var message = "<span class='error'>Ci sono " + count + " errori.</span>";
 		}
 
-		console.log("ele-error-status", thisForm.find(".errors-counter"));
+		var status = thisForm.find(".errors-counter");
 
-		thisForm.find(".errors-counter").html(message);
+		console.log("status.length", status.length);
+
+		if( status.length == 0 ) {
+			var status = $(".errors-counter");
+		}
+
+		status.html(message);
 
 	},
 
@@ -69,7 +74,16 @@ $.validator.setDefaults({
 			message = "Ci sono " + errors + " errori.";
 		}
 
+		var status = thisForm.find(".errors-counter");
+
+
 		thisForm.find(".errors-counter").html(message);
+
+		if( status.length == 0 ) {
+			var status = $(".errors-counter");
+		}
+
+		status.html(message);
 
 		this.defaultShowErrors();
 

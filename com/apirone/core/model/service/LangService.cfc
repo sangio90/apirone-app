@@ -8,9 +8,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var cm = getCacheManager();
 
-			var key = getCacheKey( arguments.langId );
-	
-			   var cache = cm.get( key ) ;
+			var cache = cm.get( getCacheScope(), arguments.langId ) ;
 	
 			if ( cache.status ) {
 			
@@ -20,7 +18,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 			var bean = build( arguments.langId );
 			
-            cm.put( key, bean );
+            cm.put( getCacheScope(), arguments.langId, bean );
 			
             return bean;
 
@@ -81,9 +79,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 	  
-  	private String function getCacheKey( required String id ) {
+  	private String function getCacheScope() {
 
-  		return "Lang_#arguments.id#";
+  		return "Lang.bean";
 
   	}
 

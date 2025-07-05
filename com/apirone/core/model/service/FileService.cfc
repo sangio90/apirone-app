@@ -4,15 +4,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="lookupService" type="com.apirone.core.model.service.LookupService";
     property name="fileTypeService" type="com.apirone.core.model.service.FileTypeService";
 
+	variables.acheScope = "file";
+
     public com.apirone.core.model.bean.file function get(
     		required String fileId
     	){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.fileId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.fileId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -22,7 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var obj = build( arguments.fileId );
 
-		cm.put( key, obj );
+		cm.put( getCacheScope(), arguments.fileId, obj );
 	
         return obj;
 
@@ -72,7 +72,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
                         .update( file = arguments.file, entity = arguments.entity )
                         .toString();
             
-			getCacheManager().remove( getCachekey( id ) );
+			getCacheManager().remove( getCacheScope(), arguments.fileId );
 			
 			return id;
     
@@ -84,7 +84,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getDao().delete( arguments.fileId );
 		
-		getCacheManager().remove( getCachekey( arguments.fileId ) );
+		getCacheManager().remove( getCacheScope(), arguments.fileId );
 
 	}
 
@@ -98,14 +98,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var thisFile = "";
 
-		dump(arguments);
-
-		dump(super.getConfiguration());
-
 		var config = super.getConfiguration().get("imagesConfig")[ arguments.kindId ];
-
-		dump(config);
-
 
 		var bean = super.bean("File");
 		var type = super.bean("FileType");
@@ -225,12 +218,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "file_#arguments.id#";
 
   	}
 

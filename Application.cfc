@@ -9,6 +9,7 @@ component extends="com.apirone.core.root.Application" {
 		//cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:onApplicationStart" );
 
 		super.onApplicationStart();
+		//abort;
 
 		if ( !StructKeyExists( application, "cbBootstrap" ) OR StructKeyExists( url, "reinit" )) {
 
@@ -30,8 +31,6 @@ component extends="com.apirone.core.root.Application" {
 	public Boolean function onRequestStart( string targetPage ) {
 
 		SetLocale("italian (italy)");
-
-		
 
 		request.isDev = super.isDev;
 

@@ -59,11 +59,15 @@ AP.attribute.detail = (function () {
 				id: "",
 				name: "",
 				code: "",
+				allowNote: false,
+				affectToImage: false
 			}
 		},
 
 		valueForm: {
 			data: {
+				allowNote: false,
+				affectToImage: false,
 				status: {
 					id: "ACT"
 				},
@@ -103,7 +107,6 @@ AP.attribute.detail = (function () {
 			var data = viewModel.get("valueForm.data");
 			var values = viewModel.get("detailForm.data.values");
 
-
 			if ( data.id ) {
 
 				return "Modifica valore < " + data.id + " >";
@@ -124,9 +127,6 @@ AP.attribute.detail = (function () {
 
 
 		isUpdate: function() {
-
-			//console.log("isUpdate", viewModel.get("detailForm.data.id").length)
-
 			return viewModel.get("detailForm.data.id").length;
 		},
 
@@ -150,8 +150,6 @@ AP.attribute.detail = (function () {
 					name: rawValue.name,
 				},
 			};
-
-			console.log("componentApp", componentApp);
 
 			componentApp.open( value );
 
@@ -197,17 +195,18 @@ AP.attribute.detail = (function () {
 				});
 
 				var ids = values.toString();
+				var id = viewModel.get("detailForm.data.id");
 
 				NM.util.ajax({
 					method: "DELETE",
-					url: "/manager/ajax/attributes/raw-values",
+					url: "/manager/ajax/attributes/" + id + "/raw-values",
 					data: ids,
 					callback: {
 						done: function (xhr) {
 
 							if(xhr.data.payload.hasOwnProperty("errors")) {
 
-								AP.widget.notify("error", "Non sonosciuto a cancellare tutti i valori");
+								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
 
 							} else {
 
@@ -215,9 +214,7 @@ AP.attribute.detail = (function () {
 
 							}
 
-							var id = viewModel.get("detailForm.data.id");
-
-							loadAttribute( viewModel.get("detailForm.data.id") );
+							loadAttribute( id );
 
 						}
 					}
@@ -231,9 +228,32 @@ AP.attribute.detail = (function () {
 
 		},
 
-		editValue: function (event) {
+		updateValues: function (event) {
 
-			//console.log("editValue:event", event);
+			//var ids = values.toString();
+
+			var values = viewModel.get("detailForm.data.values");
+			var id = viewModel.get("detailForm.data.id");
+
+			NM.util.ajax({
+				method: "POST",
+				url: "/manager/ajax/attributes/" + id + "/raw-values",
+				data: JSON.stringify( values ),
+				callback: {
+					done: function (xhr) {
+
+						AP.widget.notify("success", "Aggiornamento avvenuto con successo");
+
+						loadAttribute( id );
+
+					}
+				}
+			});
+
+		},
+
+
+		editValue: function (event) {
 
 			viewModel.set("valueForm.data", event.data);
 			viewModel.set("valueForm.title", "Modifica valore < " + event.data.id + " >");
@@ -243,12 +263,10 @@ AP.attribute.detail = (function () {
 
 		save: function () {
 
+			var detailRoot = fields.detailRoot;
+			var status = detailRoot.find(".status.errors-counter");
+			
 			var thisForm = fields.detailForm;
-			var status = thisForm.find(".status");
-
-			console.log("save:status", status);
-
-			status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
 
 			if(thisForm.valid()) {
 
@@ -297,7 +315,6 @@ AP.attribute.detail = (function () {
 
 		},
 
-
 		saveValue: function () {
 
 			var thisForm = fields.valueForm;
@@ -322,7 +339,6 @@ AP.attribute.detail = (function () {
 							NM.util.autoHideMessage(status, "<span class='green'>Valore salvato</span>");
 
 							var id = viewModel.get("detailForm.data.id");
-							console.log("id", id);
 
 							loadAttribute({id: id});
 
@@ -447,7 +463,7 @@ AP.attribute.detail = (function () {
 
 								NM.util.ajax({
 									method: "POST",
-									url: "/manager/ajax/attributes/" + id + "/raw-values/order",
+									url: "/manager/ajax/attributes/" + id + "/raw-values/sort",
 									data: JSON.stringify(viewModel.get("detailForm.data.values").data()),
 									callback: {
 										done: function (xhr) {
@@ -479,7 +495,7 @@ AP.attribute.detail = (function () {
 		suggest.kendoAutoComplete({
 			dataTextField: "name",
 			highlightFirst: true,
-			minLength: 3,
+			minLength: 2,
 			dataSource: new kendo.data.DataSource({
 				serverFiltering: true,
 				transport: {
@@ -513,8 +529,8 @@ AP.attribute.detail = (function () {
 
 					NM.util.ajax({
 						method: "POST",
-						url: "/manager/ajax/attributes/raw-values",
-						data: JSON.stringify( { id: dataItem.id, attributeId: viewModel.get("detailForm.data.id")} ),
+						url: "/manager/ajax/attributes/" + viewModel.get("detailForm.data.id") + "/raw-values/add",
+						data: JSON.stringify( { id: dataItem.id } ),
 						callback: {
 							done: function (xhr) {
 								AP.widget.notify("success", "Valore aggiunto con successo");
@@ -562,7 +578,7 @@ AP.attribute.detail = (function () {
             viewModel.set("callback.onUpdate", onUpdate );
         }
 
-		console.log("AP.attribute.detail:edit", id);
+		viewModel.resetDetailForm();
 
 		loadAttribute( id );
 
@@ -572,7 +588,7 @@ AP.attribute.detail = (function () {
 
 		kendo.bind( fields.detailRoot, viewModel);
 
-		var valueForm = fields.valueForm;
+		//var valueForm = fields.valueForm;
 		var detailForm = fields.detailForm;
 
 		detailForm.validate({
@@ -588,8 +604,8 @@ AP.attribute.detail = (function () {
 					required: true,
 					maxlength: 5,
 					remote: {
-						url: "/manager/ajax/attributes/values/code-exists",
-						data: { id: function () { return  viewModel.get("valueForm.data.id"); } },
+						url: "/manager/ajax/attributes/code-exists",
+						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
 						dataFilter: function (xhr) {
 							var json = JSON.parse(xhr);
 							return json.data == false;
@@ -610,50 +626,6 @@ AP.attribute.detail = (function () {
 			},
 
 		});
-
-		/*
-		valueForm.validate({
-			onfocusout: function (element) {
-				$(element).valid();
-			},
-			rules: {
-				newValueName: {
-					required: true,
-				},
-				code: {
-					checkCode: true,
-					required: true,
-					maxlength: 5,
-					remote: {
-						url: "/manager/ajax/attributes/values/code-exists",
-						data: { id: function () { return  viewModel.get("valueForm.data.id"); } },
-						dataFilter: function (xhr) {
-							var json = JSON.parse(xhr);
-							return json.data == false;
-						}
-					}
-				},
-				newValueStatus: {
-					required: true
-				}
-			},
-			messages: {
-				newValueName: {
-					required: "Descrizione richiesta",
-				},
-				code: {
-					required: "Codice richiesto",
-					checkCode: "Solo numeri, lettere, trattino o trattino basso",
-					remote: "Il codice esiste",
-					max: "Al massimo 5 caratteri"
-				},
-				newValueStatus: {
-					required: "Stato richiesto",
-				},
-			},
-
-		});
-		*/
 
 	};
 

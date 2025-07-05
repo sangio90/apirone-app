@@ -262,6 +262,11 @@
 
     }
 
+    public Struct function getCacheManager() {
+        return model().getInstance("CacheManager");
+    }
+
+
     // only message
     public String function message( required String id, required String lang="it" ){ //id is a dotted path
 

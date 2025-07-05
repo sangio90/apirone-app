@@ -105,6 +105,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var thisId = "";
         var messageId = "";
         var texts = [];
+        var values = NullValue();
 
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
@@ -124,9 +125,34 @@ component extends="com.apirone.core.controller.AbsController" {
         texts.add( text );
     
         attr.setId( json.id );
+        attr.setCode( json.code );
         attr.setTexts( texts );
         attr.setStatus( status.setId( json.status.id ) );
         attr.setCategories( categories );
+
+        if( !IsNull( json.values ) 
+            AND !IsNull(json.values._data ) ){
+
+            values = [];
+
+            for( var value in json.values._data ) {
+
+                var bean = super.bean("AttributeValue");
+                var status = super.bean("Status");
+                
+                bean.setId( value.id );
+                bean.setAllowNote( value.allowNote );
+                bean.setAffectToImage( value.affectToImage );
+                bean.setOrderBy( value.orderBy );
+                
+                bean.setStatus( status.setId( value.status.id ) );
+
+                values.add( bean );
+            }
+            
+        }
+
+        attr.setValues( values );
 
         if( !Len( json.id )  ) {
 
@@ -144,22 +170,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         event.setValue( "result", { "message": message, "payload" = { "id" = thisId }  } );
         
-    }
-
-    function idExists( event, rc, prc ){
-
-        param rc.attrId="__";
-
-        var result = getResult();
-
-        var result = super.getResult();
-
-        var check = super.fire( "attribute.idExists", [ rc.attrId ] );
-
-        result.setData( check );
-
-        event.setValue("result", result );
-
     }
 
 	function delete( event, rc, prc ){

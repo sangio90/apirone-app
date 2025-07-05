@@ -92,9 +92,11 @@ AP.component.list = (function () {
 
 					break;
 
-				case "item":
+				case "item": //productItem
 
-					result.modalTitle = "Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.name;
+					console.log("curr", current);
+
+					result.modalTitle = "Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.rawValue.name;
 					result.readUrl = baseUrl + "?by=item&&itemId=" + current.item.id;
 					result.modifyUrl = result.readUrl;
 
@@ -211,7 +213,7 @@ AP.component.list = (function () {
 
 			var row = {
 				id: "",
-				type: "custom",
+				typeId: "own",
 				quantity: 1,
 				rawProduct: {
 					id: product.id,
@@ -276,6 +278,12 @@ AP.component.list = (function () {
 
 		},
 
+		fake: function (event) {
+
+			NM.util.openModal( $("#fake-modal") );
+
+		},
+
 		save: function (event) {
 
 			NM.util.ajax({
@@ -326,6 +334,20 @@ AP.component.list = (function () {
 			viewModel.set("showSearchPanel", true);
 
             return false;
+		},
+
+		calcTotalQuantity: function( event ) {
+
+			var dataSource = viewModel.get("selected");
+			
+			var item = dataSource.getByUid( event.data.uid );
+
+			var totalQuantity = math.add( item.get("baseQuantity"), item.get("quantity") );
+
+			item.set( "totalQuantity", totalQuantity );
+			
+			return false;
+
 		},
 
         showVariantsForCount: function (event) {

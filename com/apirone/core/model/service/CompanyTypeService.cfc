@@ -1,6 +1,8 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" inject="com.apirone.core.model.dao.CompanyTypeDAO";
+	property name="dao" type="com.apirone.core.model.dao.CompanyTypeDAO";
+	
+	property name="cacheScope" type="String" default="CompanyType.bean";
 
     public com.apirone.core.model.bean.CompanyType function get(
     		required String companyTypeId
@@ -8,9 +10,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = super.getCacheManager();
 
-    	var key = getCacheKey( arguments.companyTypeId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.companyTypeId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -20,7 +20,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var obj = build( arguments.companyTypeId );
 		
-		cm.put( key, obj );
+		cm.put( getCacheScope(), arguments.companyTypeId, obj );
         
 		return obj;
 
@@ -90,12 +90,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
     	return NullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "CompanyType_#arguments.id#";
 
   	}
 

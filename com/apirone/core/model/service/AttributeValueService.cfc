@@ -7,15 +7,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="langService" type="com.apirone.core.model.service.LangService";
     property name="componentService" type="com.apirone.core.model.service.ComponentService";
 
+	property name="cacheScope" type="String" default="AttributeValue.bean";
+    
     public com.apirone.core.model.bean.AttributeValue function get(
     		required String attributeValueId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.attributeValueId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.attributeValueId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -25,7 +25,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var bean = build( arguments.attributeValueId );
 		
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.attributeValueId, bean );
         
 		return bean;
 
@@ -65,7 +65,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var newId = getDao().insert( arguments.attributeValue );
 
-		getCacheManager().remove( "attribute_#attributeValue.getAttributeId()#" );
+		getCacheManager().remove( "Attribute", arguments.attributeValue.getAttributeId() );
 
 		return newId;
 
@@ -80,8 +80,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getDao().update( arguments.attributeValue );
 
-		getCacheManager().remove( getCachekey( id ) );
-		getCacheManager().remove( "attribute_#attributeValue.getAttributeId()#" );
+		removeCache();
 		
 		return id;
     
@@ -102,8 +101,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.attributeValueId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( "attribute_#obj.getAttributeId()#" );
-				getCacheManager().remove( getCacheKey( obj.getId() ) );
+				removeCache();
 			
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -121,6 +119,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     /*
     	private method
 	*/
+
+	private Void function removeCache( com.apirone.core.model.bean.AttributeValue attributeValue ){ {
+		
+		super.getCacheManager().remove( getCacheScope(), arguments.attributeValue.getId() );
+		super.getCacheManager().remove( "Attribute", arguments.attributeValue.getAttributeId() );
+
+	}
 
 	private com.apirone.core.model.bean.AttributeValue function build(
     		required String attributeValueId
@@ -140,19 +145,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setRawValue( getRawValueService().get( record.raw_value_id ) );
 			
+			bean.setAllowNote( record.allow_note ? true : false );
+			bean.setAffectToImage( record.affect_to_image ? true : false );
+			
 			bean.setComponentCount( getComponentService().count( attributeValueId = record.attribute_raw_value_id ) );
-            
+
             return bean;
 
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "attributeValue_#arguments.id#";
 
   	}
 

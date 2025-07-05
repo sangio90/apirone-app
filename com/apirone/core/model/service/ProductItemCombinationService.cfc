@@ -3,6 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.ProductItemCombinationDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="productItemService" type="com.apirone.core.model.service.ProductItemService";
+	
+	property name="scopeCache" type="String" default="ProductItemCombination.bean";
 
     public com.apirone.core.model.bean.ProductItemCombination function get(
     		required String productItemCombinationId
@@ -10,9 +12,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.productItemCombinationId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getScopeCache(), arguments.productItemCombinationId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -21,7 +21,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.productItemCombinationId );
-		cm.put( key, bean );
+		cm.put( getScopeCache(), arguments.productItemCombinationId, bean );
         
 		return bean;
 
@@ -245,7 +245,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 getDao().delete( arguments.combinationId );
         
-                cm.remove( "combination_#obj.getId()#" );
+                cm.remove( getCacheScope(), obj.getId() );
                 
 			} catch ( any error ) {
 
@@ -308,12 +308,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
 		return nullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "productItemCombination_#arguments.id#";
 
   	}
 

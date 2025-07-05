@@ -8,8 +8,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.paymentTypeId );
-
 	   	var cache = cm.get( key ) ;
 
 	    if ( cache.status ) {
@@ -81,12 +79,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 		return bean;
 		
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "VatCode_#arguments.id#";
-
   	}
 
 }

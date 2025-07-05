@@ -3,16 +3,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.ProductCategoryDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="textService" type="com.apirone.core.model.service.TextService";
+	
+	property name="cacheScope" type="String" default="ProductCategory.bean";
 
     public com.apirone.core.model.bean.ProductCategory function get(
-    		required String ProductCategoryId
+    		required String productCategoryId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.ProductCategoryId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.productCategoryId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -20,8 +20,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    }
 	    
-		var bean = build( arguments.ProductCategoryId );
-		cm.put( key, bean );
+		var bean = build( arguments.productCategoryId );
+		cm.put( getCacheScope(), arguments.productCategoryId, bean );
         
 		return bean;
 
@@ -46,7 +46,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    for( var record in records ){
 
 	    	rows.add( 
-	    		get( ProductCategoryId = record.product_category_id )
+	    		get( productCategoryId = record.product_category_id )
 	    	);
 
 	    }
@@ -135,7 +135,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		}
 
-        cm.remove( getCacheKey( arguments.ProductCategory.getId() ) );
+        cm.remove( getScopeCache(), arguments.ProductCategory.getId() );
 
 		return id;
 
@@ -155,7 +155,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.productCategoryId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getCacheKey( arguments.productCategoryId ) );
+				getCacheManager().remove( getScopeCache(), arguments.productCategoryId );
 
 			} catch ( any error ) {
 				
@@ -213,12 +213,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
     	return NullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "ProductCategory_#arguments.id#";
 
   	}
 

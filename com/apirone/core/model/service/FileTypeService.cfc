@@ -3,6 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="textService" type="com.apirone.core.model.service.TextService";
     property name="statusService" type="com.apirone.core.model.service.StatusService";
     property name="langService" type="com.apirone.core.model.service.LangService";
+	
+	property name="cacheScope" type="String" default="FileType.bean";
 
     public com.apirone.core.model.bean.FileType function get(
     		required String fileTypeId
@@ -10,9 +12,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.fileTypeId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.fileTypeId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -22,7 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var bean = build( arguments.fileTypeId );
 		
-		cm.put( key, bean );
+		cm.put( getCacheScope(), arguments.fileTypeId, bean );
         
 		return bean;
 
@@ -102,12 +102,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 		
   		return texts;
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "FileType_#arguments.id#";
 
   	}
 

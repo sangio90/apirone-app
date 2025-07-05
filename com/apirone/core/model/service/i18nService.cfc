@@ -1,5 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" name="i18nService" accessors="true" singleton {
 
+    property name="cacheScope" type="String" default="i18n.bean";
+
 	public String function get(
 		required String key,
 		required String langId="it",
@@ -8,11 +10,7 @@ component extends="com.apirone.core.model.service.AbsService" name="i18nService"
 
     	var cm = getCacheManager();
 
-        var cacheKey = "get_" & arguments.toString();
-
-        var key = getCacheKey( cacheKey );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.toString() ) ;
 
         if ( cache.status ) {
 
@@ -30,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" name="i18nService"
     
             }
 
-            cm.put( key, result ) ;
+            cm.put( getCacheScope(), arguments.toString(), result ) ;
 
         }
 
@@ -47,9 +45,7 @@ component extends="com.apirone.core.model.service.AbsService" name="i18nService"
 
         var cacheKey = arguments.toString();
 
-        var key = getCacheKey( cacheKey );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCasceScope(), arguments.toString() ) ;
 
         if ( cache.status ) {
 
@@ -79,7 +75,7 @@ component extends="com.apirone.core.model.service.AbsService" name="i18nService"
 
             result = convert( result );
 
-            cm.put( key, result ) ;
+            cm.put( getCasceScope() , arguments.toString(), result ) ;
 
         }
 
@@ -106,12 +102,5 @@ component extends="com.apirone.core.model.service.AbsService" name="i18nService"
         return result;
 
     }
-
-
-  	private String function getCacheKey( required String key ) {
-
-  		return "i18n_#arguments.key#";
-
-  	}
 
 }

@@ -1,14 +1,14 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
+	property name="scopeCache" type="String" default="SystemColor.bean";
+
     public com.apirone.core.model.bean.SystemColor function get(
     		required String systemColorId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.systemColorId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getScopeCache(), arguments.systemColorId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -17,9 +17,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.systemColorId );
-		cm.put( key, bean );
+		cm.put( getScopeCache(), arguments.systemColorId, bean );
         
 		return bean;
+
+	}
+
+
+    public com.apirone.core.model.bean.SystemColor[] function list(
+    		required String systemColorId
+        ){
+
+		var rows = [];
+
+        var colors = this.find();
+
+        for( var color in colors ) {
+
+			rows.add( get( systemColorId = color.id ) );
+
+        }
+        
+		return rows;
 
 	}
 
@@ -32,7 +51,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     		required String systemColorId
     	){
 
-        var colors = DESerializeJSON( FileRead( ExpandPath("/config/data/systemColors.json.cfm") ) );
+        var colors = this.find();
 
         for( var color in colors ) {
 
@@ -55,9 +74,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
   	}
 
-  	private String function getCacheKey( required String id ) {
+	private Array function find(){
 
-  		return "SystemColor_#arguments.id#";
+        var colors = DESerializeJSON( FileRead( ExpandPath("/config/data/systemColors.json.cfm") ) );
+
+		return colors;
 
   	}
 

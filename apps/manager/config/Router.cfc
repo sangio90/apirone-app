@@ -106,14 +106,16 @@
 		//post( "/ajax/attributes/values" ).to( "AttributeValueAjaxController.save" ).end();
 		//post( "/ajax/attributes/:id/values/order" ).to( "AttributeValueAjaxController.order" ).end();
 		
-		post( "/ajax/attributes/raw-values" ).to( "AttributeValueAjaxController.save" ).end();
-		delete( "/ajax/attributes/raw-values" ).to( "AttributeValueAjaxController.delete" ).end();
-		post( "/ajax/attributes/:id/raw-values/order" ).to( "AttributeValueAjaxController.order" ).end();
+		post( "/ajax/attributes/:id/raw-values/add" ).to( "AttributeValueAjaxController.addValue" ).end();
+		post( "/ajax/attributes/:id/raw-values/sort" ).to( "AttributeValueAjaxController.sort" ).end();
+		//post( "/ajax/attributes/:id/raw-values" ).to( "AttributeValueAjaxController.updateValues" ).end();
+		delete( "/ajax/attributes/:id/raw-values" ).to( "AttributeValueAjaxController.deleteValues" ).end();
 
 
 		/*
 			attributes
 		*/
+		get( "/ajax/attributes/code-exists" ).to( "AttributeAjaxController.codeExists" ).end();
 		get( "/ajax/attributes/raw-values" ).to( "AttributeAjaxController.listRawValues" ).end();
 		get( "/ajax/attributes/new" ).to( "AttributeAjaxController.new" ).end();
 		get( "/ajax/attributes/:id" ).to( "AttributeAjaxController.get" ).end();

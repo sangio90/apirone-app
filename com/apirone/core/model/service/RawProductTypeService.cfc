@@ -3,15 +3,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.RawProductTypeDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 
+	property name="cacheScope" type="String" default="RawProductType.bean";
+
     public com.apirone.core.model.bean.RawProductType function get(
     		required String rawProductTypeId
         ){
 
     	var cm = getCacheManager();
 
-    	var key = getCacheKey( arguments.rawProductTypeId );
-
-	   	var cache = cm.get( key ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.rawProductTypeId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -21,7 +21,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var bean = build( arguments.rawProductTypeId );
 		
-        cm.put( key, bean );
+        cm.put( getCacheScope(), arguments.rawProductTypeId, bean );
         
         return bean;
 
@@ -105,12 +105,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    }
 
     	return NullValue();
-
-  	}
-
-  	private String function getCacheKey( required String id ) {
-
-  		return "RawProductType_#arguments.id#";
 
   	}
 

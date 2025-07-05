@@ -5,28 +5,29 @@ NM.util.openModal = function( ele ) {
     var dialogs = $(".modal.show"); //opened dialog
     var currentId = ele.attr("id");
 
-    var currentTop = 0;
-    var currentLeft = 0;
+	var currentTop = 0;
+	var currentLeft = 0;
 
-    var n=1;
+	var n=1;
 
-    for ( var dialog of dialogs ) {
-        
-        var $dialog = $(dialog)
+	for ( var dialog of dialogs ) {
+		
+		var $dialog = $(dialog)
 
-        if( currentId !=  $dialog.attr("id") ) {
+		if( currentId !=  $dialog.attr("id") ) {
 
-            currentTop = 20*n;
-            currentLeft = 20*n;
+			currentTop = 20*n;
+			currentLeft = 20*n;
 
-            n++;
+			n++;
 
-        }
+		}
 
-    }
+	}
 
-    ele.modal("show");
+	ele.modal("show");
 
+	ele.css({ left: 0, top: 0 });
 	ele.offset({ left: currentLeft, top: currentTop });
 
 };
