@@ -278,12 +278,6 @@ AP.component.list = (function () {
 
 		},
 
-		fake: function (event) {
-
-			NM.util.openModal( $("#fake-modal") );
-
-		},
-
 		save: function (event) {
 
 			NM.util.ajax({
@@ -296,6 +290,7 @@ AP.component.list = (function () {
 						if(xhr.status == "SUCCESS") {
 							
 							AP.widget.notify("success", "Configurazione salvata");
+
 							refreshSelectedComponents();
 
 						}
@@ -310,13 +305,13 @@ AP.component.list = (function () {
 
         openColors: function (event) {
 
-			viewModel.set("currentVariant", event.data);
-			viewModel.set("colors", event.data.colors);
+			viewModel.set( "currentVariant", event.data );
+			viewModel.set( "colors", event.data.colors );
 
             return false;
 		},
 
-        openVariants: function (event) {
+        openVariants: function( event ) {
 
 			viewModel.set("currentProduct", event.data);
 
@@ -338,11 +333,17 @@ AP.component.list = (function () {
 
 		calcTotalQuantity: function( event ) {
 
+			console.log("calcTotalQuantity", event);
+			
 			var dataSource = viewModel.get("selected");
 			
 			var item = dataSource.getByUid( event.data.uid );
+			
+			var quantityVariation = item.get("variation.quantity") ? item.get("variation.quantity") : 0; 
+			
+			console.log("quantityVariation", quantityVariation);
 
-			var totalQuantity = math.add( item.get("baseQuantity"), item.get("quantity") );
+			var totalQuantity = math.add( quantityVariation, item.get("quantity") );
 
 			item.set( "totalQuantity", totalQuantity );
 			

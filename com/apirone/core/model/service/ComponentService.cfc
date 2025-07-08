@@ -6,7 +6,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="variantService" type="com.apirone.core.model.service.VariantService";
 	property name="colorService" type="com.apirone.core.model.service.ColorService";
 	property name="productItemService" type="com.apirone.core.model.service.ProductItemService";
-	property name="ComponentVariationService" type="com.apirone.core.model.service.ComponentVariationService";
+	property name="ComponentOverrideService" type="com.apirone.core.model.service.ComponentOverrideService";
 	
 	property name="cacheScope" type="String" default="Component.bean";
 
@@ -194,16 +194,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			for( var thisComponent in attrComponents ) {
 
-				thisComponent.setTypeId( "base" );
+				var bean = Duplicate( thisComponent)
 
-				var variation = getComponentVariationService().list( productItem.getId(), thisComponent.getId() );
+				bean.setTypeId( "base" );
+
+				var variation = getComponentOverrideService().list( productItem.getId(), thisComponent.getId() );
 
 				if ( variation.len() ) { //TODO: should be only one variation. Add check? db guarantees uniqueness
 					
-					thisComponent.setVariation( variation[1] );	
+					bean.setVariation( variation[1] );	
 				}
 
-				data.add( thisComponent );
+				data.add( bean );
 			}
 
 		}
@@ -215,8 +217,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         return result;
 
     }
-
-
 
 	private com.apirone.core.model.bean.Component function build(
     		required String componentId
@@ -239,6 +239,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 
             bean.setStatus( getStatusService().get( record.status_id ) );
+
+			// changes to Variation are updated at runtime
+			bean.setVariation( super.bean( "ComponentOverride" ) );
 
             return bean;
 

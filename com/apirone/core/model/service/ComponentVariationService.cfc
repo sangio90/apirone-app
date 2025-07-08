@@ -1,16 +1,16 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.ComponentVariationDAO";
+	property name="dao" type="com.apirone.core.model.dao.ComponentOverrideDAO";
 	
-	property name="cacheScope" type="String" default="ComponentVariation.bean";
+	property name="cacheScope" type="String" default="ComponentOverride.bean";
 
     public com.apirone.core.model.bean.Component function get(
-    		required String componentVariationId
+    		required String ComponentOverrideId
         ){
 
     	var cm = getCacheManager();
 
-	   	var cache = cm.get( getCacheScope(), arguments.componentVariationId ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.ComponentOverrideId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -18,8 +18,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    } 
 	    
-		var bean = build( arguments.componentVariationId );
-		cm.put( getCacheScope(), arguments.componentVariationId, bean );
+		var bean = build( arguments.ComponentOverrideId );
+		cm.put( getCacheScope(), arguments.ComponentOverrideId, bean );
         
 		return bean;
 
@@ -47,7 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		records.each(function(record) {
 			rows.add( 
-				get( record.component_variation_id ) 
+				get( record.component_override_id ) 
 			);
 		});
 
@@ -60,20 +60,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
     public com.apirone.core.model.bean.Outcome function delete(
-			required String componentVariationId
+			required String ComponentOverrideId
 		){
 
 		var outcome = super.bean("Outcome");
 
-        var obj = get( arguments.componentVariationId );
+        var obj = get( arguments.ComponentOverrideId );
 
-		outcome.setData( { componentVariationId: arguments.componentVariationId } );
+		outcome.setData( { ComponentOverrideId: arguments.ComponentOverrideId } );
 
 		transaction {
 		
 		    try  {
 
-                getDao().delete( arguments.componentVariationId );
+                getDao().delete( arguments.ComponentOverrideId );
         
                 super.getCacheManager().remove( getCacheScope(), obj.getId() );
                 
@@ -81,8 +81,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteComponentVariation" );
-				outcome.setMessage( "Cannot delete ComponentVariation [#arguments.componentVariationId#]" );
+				outcome.setType( "ApirOne.CannotDeleteComponentOverride" );
+				outcome.setMessage( "Cannot delete ComponentOverride [#arguments.ComponentOverrideId#]" );
 				
 			}
 			
@@ -116,14 +116,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	private com.apirone.core.model.bean.Component function build(
-    		required String componentVariationId
+    		required String ComponentOverrideId
     	){
 
-	    var record = getDao().read( arguments.componentVariationId );
+	    var record = getDao().read( arguments.ComponentOverrideId );
 
 	    if( record.recordCount ) { 
 
-            var bean = super.bean( "ComponentVariation" );
+            var bean = super.bean( "ComponentOverride" );
 
             bean.setId( record.component_id );
 

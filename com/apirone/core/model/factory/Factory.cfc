@@ -2,7 +2,7 @@ component output="false" accessors="true" {
 
 	public Any function createInstance( required String type, Struct values={} ){
 
-        var obj = CreateObject( "component", 'com.apirone.core.model.bean.#arguments.type#' );
+        var obj = CreateObject( "component", "com.apirone.core.model.bean.#arguments.type#" ).init();
 
         if ( !StructIsEmpty( arguments.values ) ){
 

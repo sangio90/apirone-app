@@ -2,14 +2,14 @@
 
 	<cffunction name="read">
 
-		<cfargument name="componentVariationId" type="Numeric" required="true">
+		<cfargument name="ComponentOverrideId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
-                component_variations
+                component_overrides
 			WHERE
-				component_variation_id  <cfqueryparam cfsqltype="Integer" value="#arguments.componentVariationId#">
+				component_override_id = <cfqueryparam cfsqltype="Integer" value="#arguments.ComponentOverrideId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -27,10 +27,10 @@
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT	
-                component_variation_id,
-				COUNT(component_variation_id) OVER() AS total
+                component_override_id,
+				COUNT(component_override_id) OVER() AS total
 			FROM
-            	component_variations
+            	component_overrides
 			WHERE 1=1
 			
 				<cfif !isNull( arguments.productItemId )>
@@ -38,7 +38,7 @@
 				</cfif>
 
 				<cfif !isNull( arguments.componentId )>
-					AND component_variation_id = <cfqueryparam value="#arguments.componentId#" cfsqltype="Integer">
+					AND component_id = <cfqueryparam value="#arguments.componentId#" cfsqltype="Integer">
 				</cfif>
 
                 <!----
@@ -86,13 +86,13 @@
 	<cffunction name="delete" returntype="Boolean">
 
 		<!--- <cfargument name="component" type="com.apirone.core.model.bean.Component" required="true"> --->
-		<cfargument name="componentVariationId" type="Numeric" required="true">
+		<cfargument name="ComponentOverrideId" type="Numeric" required="true">
 
         <cfquery name="local.q" datasource="apirone" result="result">
 			DELETE FROM 
-				component_variations
+				component_overrides
 			WHERE 
-				component_variation_id  <cfqueryparam cfsqltype="Integer" value="#arguments.componentVariationId#">
+				component_override_id  <cfqueryparam cfsqltype="Integer" value="#arguments.ComponentOverrideId#">
 		</cfquery>
 
 		<cfreturn true>
@@ -101,45 +101,45 @@
 
 	<cffunction name="insert" returntype="Numeric">
 
-		<cfargument name="ComponentVariation" type="com.apirone.core.model.bean.ComponentVariation" required="true">
+		<cfargument name="ComponentOverride" type="com.apirone.core.model.bean.ComponentOverride" required="true">
 
 		<cfset var meta = getFieldsAndValues( arguments.component )>
 
         <cfquery name="local.q" datasource="apirone">
-			INSERT INTO component_variations (
+			INSERT INTO component_overrides (
                 component_id,
                 product_item_id,
 				quantity,
                 deleted
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentVariation.getComponentId()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentVariation.getProductItemId()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentVariation.getQuatity()#">,
-				<cfqueryparam cfsqltype="Boolean" value="#arguments.ComponentVariation.getDeleted()#">
-			) RETURNING component_variation_id
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getComponentId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getProductItemId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getQuatity()#">,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.ComponentOverride.getDeleted()#">
+			) RETURNING component_override_id
 		</cfquery>
 
-		<cfreturn local.q.component_variation_id>
+		<cfreturn local.q.component_override_id>
 
 	</cffunction>
 
 
 	<cffunction name="update" returntype="Numeric">
 
-		<cfargument name="componentVariation" type="com.apirone.core.model.bean.ComponentVariation" required="true">
+		<cfargument name="ComponentOverride" type="com.apirone.core.model.bean.ComponentOverride" required="true">
 
         <cfquery name="local.q" datasource="apirone">
 			UPDATE 
-                component_variations 
+                component_overrides 
 			SET 
-				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.componentVariation.getQuantity()#">,
-				deleted =  <cfqueryparam cfsqltype="Boolean" value="#arguments.componentVariation.getDeleted()#">
+				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getQuantity()#">,
+				deleted =  <cfqueryparam cfsqltype="Boolean" value="#arguments.ComponentOverride.getDeleted()#">
 			WHERE 
-				component_variation_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.componentVariation.getId()#">
+				component_override_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getId()#">
 		</cfquery>
 
-		<cfreturn arguments.componentVariation.getId()>
+		<cfreturn arguments.ComponentOverride.getId()>
 
 	</cffunction>	
 

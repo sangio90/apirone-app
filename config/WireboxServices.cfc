@@ -162,12 +162,12 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "ColorService", ref = "ColorService" )
             .property( name = "StatusService", ref = "StatusService" )
             .property( name = "productItemService", ref = "productItemService" )
-            .property( name = "ComponentVariationService", ref = "ComponentVariationService" )
+            .property( name = "ComponentOverrideService", ref = "ComponentOverrideService" )
             .parent("AbsService");
 
-        map("ComponentVariationService").to( "com.apirone.core.model.service.ComponentVariationService" )
+        map("ComponentOverrideService").to( "com.apirone.core.model.service.ComponentOverrideService" )
             .asSingleton()
-            .property( name = "dao", ref = "ComponentVariationDAO" )
+            .property( name = "dao", ref = "ComponentOverrideDAO" )
             .parent("AbsService");
 
         map("ProductCategoryService").to( "com.apirone.core.model.service.ProductCategoryService" )
@@ -281,7 +281,7 @@ component extends="coldbox.system.ioc.config.Binder" {
         map("SizeDAO").to( "com.apirone.core.model.dao.SizeDAO" )
             .asSingleton();
          
-        map("ComponentVariationDAO").to( "com.apirone.core.model.dao.ComponentVariationDAO" )
+        map("ComponentOverrideDAO").to( "com.apirone.core.model.dao.ComponentOverrideDAO" )
             .asSingleton();
          
         map("RawValueDAO").to( "com.apirone.core.model.dao.RawValueDAO" )

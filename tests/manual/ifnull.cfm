@@ -1,4 +1,9 @@
-﻿<cfdump var="#IsEmpty('h')#">
+﻿<cfset exception = "a">
+
+<cfdump var="#exception#">
+<cfabort>
+
+<cfdump var="#IsEmpty('h')#">
 <cfparam name="notExists" default="">
 
 <cfquery datasource="apirone" result="d">

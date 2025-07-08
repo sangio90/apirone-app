@@ -33,7 +33,7 @@
                             <span class="fs-10" data-bind="text: rawProduct.measurementUnit.id"></span>
                         </td>
                         <td class="ps-1">
-                            <div data-bind="text: baseQuantity" class="d-inline-block w-40 text-end similar-to-form-control "></div>
+                            <div data-bind="text: variation.quantity" class="d-inline-block w-40 text-end similar-to-form-control "></div>
                             <br>
                             <span class="fs-10">ATTR.</span>
                             
