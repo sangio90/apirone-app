@@ -7,24 +7,21 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
     //property name="baseQuantity" type="Numeric"; //from attributeValue
 
-    property name="variation" type="com.apirone.core.model.bean.ComponentVariation";
     property name="status" type="com.apirone.core.model.bean.Status";
     property name="typeId" type="String" default="own"; //own or base
+    
+    property name="variation" type="com.apirone.core.model.bean.ComponentVariation";
 
     public Component function init(){
 
-        //this.setBaseQuantity( 0 );
+        this.setBaseQuantity( 0 );
         return this;
         
     }
     
     public Numeric function getTotalQuantity(){
 
-        if( IsNull( this.getVariation() )) {
-            return this.getQuantity();
-        }
-
-        return Val( this.getQuantity() ) + Val( this?.getVariation()?.getQuantity() );
+        return Val( this.getQuantity() + this.getBaseQuantity() );
 
     }
 

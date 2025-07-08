@@ -424,12 +424,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             bean.setId( record.product_item_id );
             bean.setCombinationId( record.combination_id );
 			bean.setCreatedAt( record.created_at );
-			bean.setParent( get( record.parent_id ) );
+
+			bean.setParent( IsNull( record.parent_id ) ? NullValue() : get( record.parent_id ) );
+
 			bean.setOrderBy( record.orderby );
 
             bean.setStatus( getStatusService().get( record.status_id ) );
 
-			var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id )
+			var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id );
 			
 			bean.setAttributeValue( attributeValue );
 

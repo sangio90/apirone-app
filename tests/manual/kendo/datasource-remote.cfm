@@ -11,7 +11,6 @@
 </head>
 <body>
   
-
 <div id="root">
 
     <h4 data-bind="text: title"></h4>

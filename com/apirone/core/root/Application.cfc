@@ -82,8 +82,8 @@ component {
 
     private function startFramework(){
 
-        //new com.apirone.core.loading.Bootstrapper();
-        var wirebox = new coldbox.system.ioc.Injector("config.WireboxServices");
+        new com.apirone.core.loading.Bootstrapper();
+        //var wirebox = new coldbox.system.ioc.Injector("config.WireboxServices");
 
         cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# reload framework");
 

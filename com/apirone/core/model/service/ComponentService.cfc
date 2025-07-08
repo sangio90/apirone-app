@@ -6,6 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="variantService" type="com.apirone.core.model.service.VariantService";
 	property name="colorService" type="com.apirone.core.model.service.ColorService";
 	property name="productItemService" type="com.apirone.core.model.service.ProductItemService";
+	property name="ComponentVariationService" type="com.apirone.core.model.service.ComponentVariationService";
+	
 	property name="cacheScope" type="String" default="Component.bean";
 
 	/*
@@ -79,7 +81,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
 
 			return searchByProductItemId( arguments.productItemId );
-			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# search: searchByProductItemId: #arguments.productItemId#");
+			//cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# search: searchByProductItemId: #arguments.productItemId#");
 		
 		} 
 
@@ -139,16 +141,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.Component component
 		){
 
-			/*
 		if( Len( arguments.component.getId() ) ) {
-			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# create: delete component: #arguments.component.getId()#");
-			getDao().delete( arguments.component.getId() );
+			var id = getDao().update( arguments.component.getId() );
+		} else {
+			var id = getDao().insert( arguments.component );
 		}
-			*/
 
-		var newId = getDao().insert( arguments.component );
-
-		return newId;
+		return id;
 
 	}
 
@@ -170,20 +169,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-    private com.apirone.core.model.bean.Result function searchByProductItemId(
+	//TODO: di fatto avrebbe più senso sia searchByAttributeValueId, ma per ora lo lascio così
+    private com.apirone.core.model.bean.Result function searchByProductItemId( 
             required String productItemId
         ){
-
-		dump(productItemId);
-		abort;
 
 		var data = [];
 		var result = getResult();
 
 		// components of productItem
-		var itemComponents = list( productItemId=arguments.productItemId );
+		var componentItems = list( productItemId=arguments.productItemId );
 
-        for( var item in itemComponents ) {
+        for( var item in componentItems ) {
 			item.setTypeId( "own" );
 			data.add( item );
         }
@@ -196,10 +193,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var attrComponents = list( attributeValueId = productItem.getAttributeValue().getId() );
 
 			for( var thisComponent in attrComponents ) {
-				
-				thisComponent.setTypeId("base");
-				thisComponent.setBaseQuantity( thisComponent.getQuantity() );
-				
+
+				thisComponent.setTypeId( "base" );
+
+				var variation = getComponentVariationService().list( productItem.getId(), thisComponent.getId() );
+
+				if ( variation.len() ) { //TODO: should be only one variation. Add check? db guarantees uniqueness
+					
+					thisComponent.setVariation( variation[1] );	
+				}
+
 				data.add( thisComponent );
 			}
 

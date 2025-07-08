@@ -1,10 +1,10 @@
 component accessors="true"{
 
-    property name="keys" type="Struct";
+    property name="scopes" type="Struct";
 
-    public CacheManager function init( required Struct keys ){
+    public CacheManager function init( required Struct scopes ){
 
-        setKeys( arguments.keys );
+        setScopes( arguments.scopes );
 
         return this;
 
@@ -14,7 +14,7 @@ component accessors="true"{
             required String scope, 
             required Any key
         ){
-            
+
         var cacheKey = createCacheKey( arguments.scope, arguments.key );
         var ret = {};
         
@@ -92,9 +92,9 @@ component accessors="true"{
 
     }
 
-    private String function scopeExists( required String scope ) {
+    private Boolean function scopeExists( required String scope ) {
 
-        if ( IsNull( keys[ arguments.scope ] ) ) {
+        if ( IsNull( getScopes()[ arguments.scope ] ) ) {
 
             return false;
 
@@ -106,10 +106,8 @@ component accessors="true"{
 
     private String function createCacheKey( required String scope, required Any key ) {
 
-        if ( IsNull( keys[ arguments.scope ] ) ) {
-
+        if ( !scopeExists( arguments.scope ) ) {
             throw( message = "The scope [#arguments.scope#] not exists. Add it to configuration.", type = "CacheManager.Errors.ScopeNotExists" );
-
         }
 
         var thisKey = IsSimpleValue( arguments.key ) ? arguments.key : arguments.key.toString();

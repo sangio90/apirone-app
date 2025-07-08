@@ -8,8 +8,8 @@ component extends="coldbox.system.ioc.config.Binder" {
             scopeRegistration = {
                 enabled = true,
                 scope   = "server",
-                key     = settings.get("app.wirebox.key"),
-            }
+                key     = settings.get("app.wirebox.key")
+            },
         };
 
         /*
@@ -162,6 +162,12 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "ColorService", ref = "ColorService" )
             .property( name = "StatusService", ref = "StatusService" )
             .property( name = "productItemService", ref = "productItemService" )
+            .property( name = "ComponentVariationService", ref = "ComponentVariationService" )
+            .parent("AbsService");
+
+        map("ComponentVariationService").to( "com.apirone.core.model.service.ComponentVariationService" )
+            .asSingleton()
+            .property( name = "dao", ref = "ComponentVariationDAO" )
             .parent("AbsService");
 
         map("ProductCategoryService").to( "com.apirone.core.model.service.ProductCategoryService" )
@@ -268,10 +274,14 @@ component extends="coldbox.system.ioc.config.Binder" {
         /*
             dao
         */
+
         map("AbsDAO").to( "com.apirone.core.model.dao.AbsDAO" )
             .asSingleton();
          
         map("SizeDAO").to( "com.apirone.core.model.dao.SizeDAO" )
+            .asSingleton();
+         
+        map("ComponentVariationDAO").to( "com.apirone.core.model.dao.ComponentVariationDAO" )
             .asSingleton();
          
         map("RawValueDAO").to( "com.apirone.core.model.dao.RawValueDAO" )
@@ -408,6 +418,9 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
         */
 
+        /*
+            utils
+        */
         map("AccessManager").to( "com.apirone.core.util.accessManager.AccessManager" )
             .asSingleton()
             .initArg( 
@@ -418,7 +431,7 @@ component extends="coldbox.system.ioc.config.Binder" {
         map("CacheManager").to( "com.apirone.core.util.CacheManager" )
             .asSingleton()
             .initArg( 
-                name="keys", 
+                name="scopes", 
                 value=DeserializeJSON( fileRead( expandPath( "/config/cacheScopes.json.cfm" ) ) )
             )
 

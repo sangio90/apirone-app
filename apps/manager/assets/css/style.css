@@ -269,7 +269,7 @@ h2 {
 }
 
 .card-body {
-	padding: 1rem 2rem 2rem 2rem !important;
+	padding: 1rem 2rem 1rem 2rem !important;
 }
 
 .card-footer {
@@ -467,7 +467,7 @@ h2 {
 }
 
 .btn {
-	white-space: nowrap !important;
+	/* white-space: nowrap !important; */
 }
 
 .underline {
@@ -742,7 +742,6 @@ h2 {
 /*
 	// badget numerici nei bottoni
 */
-
 
 .bg-blue {
 	background-color: #d2e0f5;

@@ -130,7 +130,7 @@
                                 <span>Nessun valore ancora caricato</span>
                             </div>
 
-                            <form id="attribute-values-form" method="POST" name="attribute-values-form"  class="mb-3" data-bind="visible: isValuesGridVisible">
+                            <form id="attribute-values-form" method="POST" name="attribute-values-form" data-bind="visible: isValuesGridVisible">
 
                                 <div class="row mb-2">
                                     <div class="status col-6">

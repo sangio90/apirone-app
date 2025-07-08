@@ -9,7 +9,6 @@
     <script src="/assets/main/js/nimesia-kendo.js"></script>
 </head>
 <body>
-  
 
 <div id="root">
 

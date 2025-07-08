@@ -69,9 +69,11 @@
 			ORDER BY 
 				#super.sanitizeSQL( arguments.orderby )#
 
-			<cfif arguments.limit GT 0>
-				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS
-				FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY;
+			<cfif arguments.limit GTE 0>
+				LIMIT 
+					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
+				OFFSET
+					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
 			</cfif>
 		</cfquery>
 

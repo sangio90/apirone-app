@@ -1,8 +1,5 @@
 ﻿component output="false" accessors="true" {
 
-    /*
-        [ROB] invoca direttamente il servizio
-    */
     public Any function fire( required String action, Any payload ){
 
         var service = ListFirst( arguments.action, "." );
@@ -27,14 +24,8 @@
 
     }
 
-    /*
-        [ROB] facciamo "model" invece di "getModel" altrimenti si sovrascrive con le possibili proprietà dell'oggetto
-    */
     public Any function model(){
 
-        /*
-            [ROB] questo andrebbe caricato al boot. ci pensiamo un attimo
-        */
         return server[ "wireBox-apirone" ];
 
     }    

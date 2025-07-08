@@ -39,9 +39,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-    public com.apirone.core.model.bean.Result function search(
-        required String attributeId
-    ){
+    public com.apirone.core.model.bean.Result function search( required String attributeId ){
 	    var rows = [];
     	var result = super.getResult();
 
@@ -59,9 +57,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     }
 
-	public Numeric function create(
-			required com.apirone.core.model.bean.AttributeValue attributeValue
-		){
+	public Numeric function create( required com.apirone.core.model.bean.AttributeValue attributeValue ){
 
 		var newId = getDao().insert( arguments.attributeValue );
 
@@ -72,9 +68,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	
-	public Numeric function update(
-			required com.apirone.core.model.bean.AttributeValue attributeValue
-		){
+	public Numeric function update( required com.apirone.core.model.bean.AttributeValue attributeValue ){
 		
 		var id = arguments.attributeValue.getId();
 
@@ -86,9 +80,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete(
-		required Numeric attributeValueId
-	){
+	public com.apirone.core.model.bean.Outcome function delete( required Numeric attributeValueId ){
 		var outcome = super.bean( "Outcome" );
 
 		var obj = get( arguments.attributeValueId );
@@ -120,16 +112,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private Void function removeCache( com.apirone.core.model.bean.AttributeValue attributeValue ){ {
+	private Void function removeCache( 
+		com.apirone.core.model.bean.AttributeValue attributeValue 
+	){
+
+		var cm = super.getCacheManager();
 		
-		super.getCacheManager().remove( getCacheScope(), arguments.attributeValue.getId() );
-		super.getCacheManager().remove( "Attribute", arguments.attributeValue.getAttributeId() );
+		cm.remove( getCacheScope(), arguments.attributeValue.getId() );
+		cm.remove( "Attribute.bean", arguments.attributeValue.getAttributeId() );
 
 	}
 
-	private com.apirone.core.model.bean.AttributeValue function build(
-    		required String attributeValueId
-    	){
+	private com.apirone.core.model.bean.AttributeValue function build( required String attributeValueId ){
 
 	    var record = getDao().read( arguments.attributeValueId );
 

@@ -18,9 +18,9 @@
                     
                     <div class="card-body">
 
-                        <div class="row d-flex align-items-center mb-3">
+                        <div class="row align-items-center">
 
-                            <div class=" box-search-small col-8">
+                            <div class="box-search-small col-sm-8 mb-3">
 
                                 <form id="attribute-grid-search-form" 
                                     class="d-flex align-items-center justify-content-end" 
@@ -49,7 +49,7 @@
                             
                             </div>
 
-                            <div class="col-sm-4 text-end">
+                            <div class="col-sm-4 text-end mb-3">
 
                                 <div class="float-end">
                                     #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
@@ -57,31 +57,34 @@
 
                             </div>
 
+                            <div class="col-sm-12">
+
+                                <form name="attribute-grid-form" id="attribute-grid-form" method="post">
+
+                                    #grid( 
+                                        id="attribute-grid",
+                                        columns="[
+                                            { 'field':'shortId', 'title':'ID', width: '80px' },
+                                            { 'field':'code', 'title':'Codice', width: '100px' },
+                                            { 'field':'name', 'title':'Descrizione'},
+                                            { 'field':'category.name', 'title':'Categorie'},
+                                            { 'field':'', 'title':'Numero di valori', width: '55px'},
+                                            { 'field':'', 'title':'', width: '55px'},
+                                            { 
+                                                'field':'', 
+                                                'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                                'width':'40px',
+                                                'headerAttributes': { 'class': 'text-center' }
+                                            }
+                                        ]",
+                                        rowTemplate="attribute/attribute-grid-row-tmpl"
+                                    )#
+
+                                </form>
+
+                            </div>
+
                         </div>
-                        
-                        <form name="attribute-grid-form" id="attribute-grid-form" method="post">
-
-                            #grid( 
-                                id="attribute-grid",
-                                columns="[
-                                    { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'code', 'title':'Codice', width: '100px' },
-                                    { 'field':'name', 'title':'Descrizione'},
-                                    { 'field':'category.name', 'title':'Categorie'},
-                                    { 'field':'', 'title':'Numero di valori', width: '55px'},
-                                    { 'field':'', 'title':'', width: '55px'},
-                                    { 
-                                        'field':'', 
-                                        'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                        'width':'40px',
-                                        'headerAttributes': { 'class': 'text-center' }
-                                    }
-                                ]",
-                                rowTemplate="attribute/attribute-grid-row-tmpl"
-                            )#
-
-                        </form>
-                                        
                     </div>
                 </section>
             </div>

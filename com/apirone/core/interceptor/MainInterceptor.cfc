@@ -2,13 +2,11 @@ component extends="coldbox.system.Interceptor"{
 
     function preProcess( event, data, buffer, rc, prc ){
 
-        if ( !structKeyExists( prc, 'currentRoutedModule') ) {
+        cfheader( name="Access-Control-Allow-Origin", value="*" );
+        cfheader( name="Access-Control-Allow-Methods", value="GET, POST, OPTIONS" );
+        cfheader( name="Access-Control-Allow-Headers", value="Content-Type, X-Requested-With" );
 
-            cflocation( url="/manager/login", addtoken="false" );
-
-        }
-
-        event.prc.eventId = LCase( CreateUUID() );
+        event.prc.eventId = CreateUUID()
 
         canAccess( event );
 

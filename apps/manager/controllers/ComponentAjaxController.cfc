@@ -9,8 +9,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var params = getParams( typeId = rc.by, rc = rc );
 
-        dump(params);
-
         var items = super.fire( "component.list", params );
 
         for( var item in items ) {
@@ -152,13 +150,19 @@ component extends="com.apirone.core.controller.AbsController" {
 
     private function convertComponent( required Struct component ){
 
+        //TODO: move to DataMapper
+
         var product = component.getRawProduct();
 
         var row = {
             "id" = component.getId(),
             "typeId" = component.getTypeId(),
             "quantity" = component.getQuantity(),
-            "baseQuantity" = component.getBaseQuantity(),
+            "variation" = {
+                "id" = component?.getVariation()?.getId(),
+                "deleted" = component?.getVariation()?.getDeleted(),
+                "quantity" = component?.getVariation()?.getQuantity()
+            },
             "totalQuantity" = component.getTotalQuantity(),
             "rawProduct" = {
                 "id" = product.getId(),

@@ -20,6 +20,7 @@
 
         return fields[ arguments.field ];
     }
+    
 
     public String function getCompleteSQL( required String sql, required Array params=[] ) {
 

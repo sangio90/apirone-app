@@ -178,7 +178,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.attributeId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getCacheScope() arguments.attributeId );
+				getCacheManager().remove( getCacheScope(), arguments.attributeId );
 
 			} catch ( any error ) {
 				
