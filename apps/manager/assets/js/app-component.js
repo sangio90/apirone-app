@@ -387,8 +387,11 @@ AP.component.list = (function () {
 		deactivate: function (event) {
 
 			var dataSource = viewModel.get("selected");
+
 			var row = dataSource.getByUid( event.data.uid );
-			row.set("override.deleted", true);
+			var value = row.get("override.deleted");
+
+			row.set("override.deleted", value ? false : true );
 
 			return false;
 

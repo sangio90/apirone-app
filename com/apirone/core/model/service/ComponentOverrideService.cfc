@@ -127,7 +127,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             var bean = super.bean( "ComponentOverride" );
 
-            bean.setId( record.component_id );
+            bean.setId( record.component_override_id );
 
 			bean.setDeleted( record.deleted );
 			bean.setQuantity( record.quantity );

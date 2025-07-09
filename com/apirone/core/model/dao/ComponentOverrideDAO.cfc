@@ -126,7 +126,7 @@
 
 		<cfargument name="ComponentOverride" type="com.apirone.core.model.bean.ComponentOverride" required="true">
 
-        <cfquery name="local.q" datasource="apirone">
+        <cfquery name="local.q" datasource="apirone" result="result">
 			UPDATE 
                 component_overrides
 			SET 

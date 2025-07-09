@@ -57,9 +57,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var list = fire( "attributes.search", params );
 
-        dump(list);
-        abort;
-
         result = list;
 
         event.setValue("result", result);

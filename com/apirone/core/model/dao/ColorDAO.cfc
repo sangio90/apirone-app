@@ -58,8 +58,6 @@
 			</cfif>
 		</cfquery>
 
-		<cfset var sql = super.getCompleteSQL( local.result.sql, local.result.sqlparameters )>
-
 		<cfreturn local.q>
 
 	</cffunction>	

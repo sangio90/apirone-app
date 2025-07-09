@@ -2,7 +2,7 @@
 
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="component-selected-row-tmpl">
-        <tr ##if (typeId == "base") {## class="bg-blue" ##}##>
+        <tr ##if (typeId == "base") {## class="bg-blue" ##}## data-bind="css:{ strike: override.deleted }">
             <td width="10">
                 <b data-bind="text: rawProduct.processingType.id"></b> ##:typeId##
                 <br>
@@ -23,7 +23,7 @@
             
             ##if (typeId == 'base') {## 
 
-                <td width="160" data-bind="css:{ strike: override.deleted }">
+                <td width="160">
 
                     <table cellpadding="0" cellspacing="0">
                     <tr>

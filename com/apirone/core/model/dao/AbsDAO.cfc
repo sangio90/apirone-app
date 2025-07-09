@@ -37,12 +37,11 @@
 
 	<cffunction name="getCompleteSQL" returntype="String">
 
-		<cfargument name="sql" type="String" required="true">
-		<cfargument name="params" type="Array" required="true">
-
+		<cfargument name="queryResult" type="Struct" required="true">
+		
 		<cfset var DBUtil = new com.apirone.core.util.DBUtil()>
-
-	    <cfreturn DBUtil.getCompleteSQL( argumentCollection = arguments )>
+	    
+		<cfreturn DBUtil.getCompleteSQL( sql=arguments.queryResult.sql, params=arguments.queryResult.sqlparameters )>
 
 	</cffunction>	
 
