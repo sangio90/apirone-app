@@ -23,7 +23,7 @@
             
             ##if (typeId == 'base') {## 
 
-                <td width="160">
+                <td width="160" data-bind="css:{ strike: override.deleted }">
 
                     <table cellpadding="0" cellspacing="0">
                     <tr>

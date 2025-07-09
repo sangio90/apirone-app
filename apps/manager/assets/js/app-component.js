@@ -384,6 +384,16 @@ AP.component.list = (function () {
 
 		},
 
+		deactivate: function (event) {
+
+			var dataSource = viewModel.get("selected");
+			var row = dataSource.getByUid( event.data.uid );
+			row.set("override.deleted", true);
+
+			return false;
+
+		},
+
         getModalTitle: function ( event ) {
 
 			var name = getCurrentConfig().modalTitle;

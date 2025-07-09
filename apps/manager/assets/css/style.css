@@ -759,6 +759,10 @@ h2 {
 	width: 250px !important;
 }
 
+.strike {
+	text-decoration: line-through !important;
+}
+
 /* 
 	// shorthands
 */
