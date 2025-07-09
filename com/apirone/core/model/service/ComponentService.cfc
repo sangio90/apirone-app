@@ -198,11 +198,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				bean.setTypeId( "base" );
 
-				var variation = getComponentOverrideService().list( productItem.getId(), thisComponent.getId() );
+				var override = getComponentOverrideService().list( productItem.getId(), thisComponent.getId() );
 
-				if ( variation.len() ) { //TODO: should be only one variation. Add check? db guarantees uniqueness
+				if ( override.len() ) { //TODO: should be only one override. Add check? db guarantees uniqueness
 					
-					bean.setVariation( variation[1] );	
+					bean.setOverride( override[1] );	
 				}
 
 				data.add( bean );
@@ -240,8 +240,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setStatus( getStatusService().get( record.status_id ) );
 
-			// changes to Variation are updated at runtime
-			bean.setVariation( super.bean( "ComponentOverride" ) );
+			// changes to Override are updated at runtime
+			bean.setOverride( super.bean( "ComponentOverride" ) );
 
             return bean;
 

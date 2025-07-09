@@ -94,30 +94,52 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var itemExists = [];
 
+        dump( components )
+        abort;
+
         for( var thisComponent in components ) {
 
-            if ( thisComponent.id != "" ) {
-                ArrayAppend( itemExists, thisComponent.id );
-            }
+            if( Val( thisComponent.override.quantity) > 0 ) {
 
-            var color      = super.bean("Color");
-            var rawProduct = super.bean("RawProduct");
-            var variant    = super.bean("Variant");
+                var override = super.bean("ComponentOverride");
+                
+                override.setId( thisComponent.override.id );
+                override.setDeleted( thisComponent.override.deleted );  
+                override.setComponentId( thisComponent.id );  
+                override.setProductItemId( thisComponent.id );  
+                
+                if( Len( thisComponent.override.id ) ) {
+                    super.fire( "ComponentOvverride.update", [ override ] );
+                } else {
+                    super.fire( "ComponentOvverride.create", [ override ] );
+                }                
 
-            variant.setId( thisComponent.variant.id )
-            color.setId( thisComponent.color.id )
-            rawProduct.setId( thisComponent.rawProduct.id )
-
-            component.setId( thisComponent.id );
-            component.setRawProduct( rawProduct );
-            component.setColor( color );
-            component.setVariant( variant );
-            component.setQuantity( thisComponent.quantity );
-
-            if( Len( component.getId() ) ) {
-                super.fire( "component.update", [ component ] );
             } else {
-                super.fire( "component.create", [ component ] );
+
+                if ( thisComponent.id != "" ) {
+                    ArrayAppend( itemExists, thisComponent.id );
+                }
+
+                var color      = super.bean("Color");
+                var rawProduct = super.bean("RawProduct");
+                var variant    = super.bean("Variant");
+
+                variant.setId( thisComponent.variant.id )
+                color.setId( thisComponent.color.id )
+                rawProduct.setId( thisComponent.rawProduct.id )
+
+                component.setId( thisComponent.id );
+                component.setRawProduct( rawProduct );
+                component.setColor( color );
+                component.setVariant( variant );
+                component.setQuantity( thisComponent.quantity );
+
+                if( Len( component.getId() ) ) {
+                    super.fire( "component.update", [ component ] );
+                } else {
+                    super.fire( "component.create", [ component ] );
+                }                
+
             }
 
         }
@@ -158,10 +180,10 @@ component extends="com.apirone.core.controller.AbsController" {
             "id" = component.getId(),
             "typeId" = component.getTypeId(),
             "quantity" = component.getQuantity(),
-            "variation" = {
-                "id" = component?.getVariation()?.getId(),
-                "deleted" = component?.getVariation()?.getDeleted(),
-                "quantity" = component?.getVariation()?.getQuantity()
+            "override" = {
+                "id" = component?.getOverride()?.getId(),
+                "deleted" = component?.getOverride()?.getDeleted(),
+                "quantity" = component?.getOverride()?.getQuantity()
             },
             "totalQuantity" = component.getTotalQuantity(),
             "rawProduct" = {

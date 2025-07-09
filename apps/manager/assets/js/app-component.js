@@ -339,7 +339,7 @@ AP.component.list = (function () {
 			
 			var item = dataSource.getByUid( event.data.uid );
 			
-			var quantityVariation = item.get("variation.quantity") ? item.get("variation.quantity") : 0; 
+			var quantityOverride = item.get("override.quantity") ? item.get("override.quantity") : 0; 
 			
 			console.log("quantityVariation", quantityVariation);
 

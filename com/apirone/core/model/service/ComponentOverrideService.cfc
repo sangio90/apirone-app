@@ -44,6 +44,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var records = getDao().find( argumentCollection=arguments );
 
+		//TODO: should be only one override with productItemId and componentId. 
+		// Add check? DB guarantees uniqueness
+
 		records.each(function(record) {
 			rows.add( 
 				get( record.component_override_id ) 
@@ -52,7 +55,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
-		result.setTotal( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
 		return result;
 
@@ -126,9 +129,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
             bean.setId( record.component_id );
 
-			bean.setBaseQuantity( record.quantity );
-			bean.setCreatedAt( record.created_at );
 			bean.setDeleted( record.deleted );
+			bean.setQuantity( record.quantity );
+			bean.setCreatedAt( record.created_at );
 
             return bean;
 
