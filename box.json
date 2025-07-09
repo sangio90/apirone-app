@@ -31,9 +31,9 @@
     "location":"ForgeboxStorage",
     "private":false,
     "scripts":{
-        "build:devel":"task run taskFile=tasks/Build.cfc target=deploy :env=devel",
-        "build:prod":"task run taskFile=tasks/Build.cfc target=deploy :env=prod",
-        "build:test":"task run taskFile=tasks/Build.cfc target=deploy :env=test",
+        "build:devel":"task run taskFile=tasks/Build.cfc target=install :env=devel",
+        "build:prod":"task run taskFile=tasks/Build.cfc target=install :env=prod",
+        "build:test":"task run taskFile=tasks/Build.cfc target=install :env=test",
         "createZip":"task run taskFile=tasks/Build.cfc target=createZip"
     },
     "testbox":{

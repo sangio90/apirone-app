@@ -16,9 +16,9 @@
 
 	}
 
-	function deploy( required String env ) {
+	function install( required String env ) {
 
-		print.greenLine( "Start deploy for [ #arguments.env# ] start..." );
+		print.greenLine( "Start install for [ #arguments.env# ] start..." );
 
 		print.greenLine( 'Stop server...' );
 		command("server stop").run();
