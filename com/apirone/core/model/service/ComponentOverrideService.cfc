@@ -1,7 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" type="com.apirone.core.model.dao.ComponentOverrideDAO";
-	
 	property name="cacheScope" type="String" default="ComponentOverride.bean";
 
     public com.apirone.core.model.bean.Component function get(
