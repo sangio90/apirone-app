@@ -56,7 +56,6 @@
 
                 <td width="160">
                     <input data-bind="value: quantity" class="form-control text-end w-70">
-                    <br>
                     <span data-bind="text: rawProduct.measurementUnit.id"></span>
                 </td>
                 <td width="40" class="text-end">

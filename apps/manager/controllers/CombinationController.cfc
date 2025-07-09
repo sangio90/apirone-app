@@ -15,10 +15,14 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.subtitle="Linea #combination.getLine().getName()#";
 
         prc.sizes = super.fire("size.list", { lineId = prc.line.getId() } );
-        //prc.finishes = super.fire("size.finish", { lineId = prc.line.getId() } );
 
-        //dump( DESerializeJSON(SerializeJSON( prc.sizes )) )
-        //abort;
+        /*
+        for( var s in prc.sizes  ) {
+            dump( s.getId() )
+            dump( s.getCode() )
+        }
+        abort;
+        */
 
         prc.statusList = super.fire( "status.list", ["line"] );
         prc.finishes = super.fire( "finish.list" );
@@ -30,9 +34,6 @@ component extends="com.apirone.core.controller.AbsController" {
         
         prc.jsScripts.add( "app-combination" );
         
-        //per astrarlo, in futuro quando lavoreremo sui frutti
-        //prc.jsScripts.add( "app-product-attribute-list" );
-
         prc.page["lineId"] = prc.line.getId();
 
         prc.page["combinationId"] = combination.getId();

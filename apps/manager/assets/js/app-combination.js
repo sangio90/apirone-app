@@ -457,27 +457,39 @@ AP.combination.list = (function () {
 			sizeEle.val("");
 
 			var found = false;
+			var opts = [];
 
 			combinations.forEach(function (combination) {
 				if (
 					lineId == combination.line.id &&
 					finishId == combination.finish.id
 				) {
+
+					console.log("combination.size.code", combination.size.code);
+
 					if (combination.id == combinationId) {
 						found = true;
 					}
 
-					var opt = $("<option>", {
-						value: combination.id,
-						//text : AP.util.getMainText( combination.size.texts ).name
-						text: combination.size.code,
-					});
+					opts.push( { "combinatioId": combination.id, "sizeCode": combination.size.code  } );
 
-					sizeEle.append(opt);
 				}
 			});
 
 			found ? sizeEle.val(AP.page.combinationId) : "";
+
+			//sort by alpha
+			opts.sort( (a, b) => a.sizeCode.localeCompare(b.sizeCode, 'it', { sensitivity: 'base' } ) );
+
+			for( var opt of opts ) {
+
+				var html = $("<option>", {
+					value: opt.combinationId,
+					text: opt.sizeCode,
+				});
+
+				sizeEle.append(html);
+			}
 
 			return false;
 		},
@@ -494,7 +506,7 @@ AP.combination.list = (function () {
 	});
 
 	pub.init = function () {
-		//console.log("combination:init");
+		console.log("combination:init");
 
 		kendo.bind(fields.rootDetail, viewModel);
 

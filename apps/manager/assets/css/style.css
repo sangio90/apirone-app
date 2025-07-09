@@ -64,7 +64,6 @@ label.error {
 
 .form-group:not(:first-child) {
 	padding-top: 0rem !important;
-	/* border-top: 1px solid #f3f3f3 !important; */
 }
 
 h2 {
@@ -447,11 +446,7 @@ h2 {
 }
 
 .btn {
-	/* white-space: nowrap !important; */
-}
-
-.underline {
-	text-decoration: underline !important;
+	white-space: nowrap !important;
 }
 
 /* TODO: spostare inclusione dei file CSS in controller */
@@ -762,6 +757,11 @@ h2 {
 .strike {
 	text-decoration: line-through !important;
 }
+
+.underline {
+	text-decoration: underline !important;
+}
+
 
 /* 
 	// shorthands
