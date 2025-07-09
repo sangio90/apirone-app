@@ -101,9 +101,7 @@
 
 	<cffunction name="insert" returntype="Numeric">
 
-		<cfargument name="ComponentOverride" type="com.apirone.core.model.bean.ComponentOverride" required="true">
-
-		<cfset var meta = getFieldsAndValues( arguments.component )>
+		<cfargument name="componentOverride" type="com.apirone.core.model.bean.ComponentOverride" required="true">
 
         <cfquery name="local.q" datasource="apirone">
 			INSERT INTO component_overrides (
@@ -113,17 +111,16 @@
                 deleted
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getComponentId()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getProductItemId()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getQuatity()#">,
-				<cfqueryparam cfsqltype="Boolean" value="#arguments.ComponentOverride.getDeleted()#">
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.componentOverride.getComponentId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.componentOverride.getProductItemId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.componentOverride.getQuantity()#">,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.componentOverride.getDeleted()#">
 			) RETURNING component_override_id
 		</cfquery>
 
 		<cfreturn local.q.component_override_id>
 
 	</cffunction>
-
 
 	<cffunction name="update" returntype="Numeric">
 
@@ -134,7 +131,7 @@
                 component_overrides
 			SET 
 				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getQuantity()#">,
-				deleted =  <cfqueryparam cfsqltype="Boolean" value="#arguments.ComponentOverride.getDeleted()#">
+				deleted = <cfqueryparam cfsqltype="Boolean" value="#arguments.ComponentOverride.getDeleted()#">
 			WHERE 
 				component_override_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getId()#">
 		</cfquery>

@@ -341,9 +341,9 @@ AP.component.list = (function () {
 			
 			var quantityOverride = item.get("override.quantity") ? item.get("override.quantity") : 0; 
 			
-			console.log("quantityVariation", quantityVariation);
+			console.log("quantityOverride", quantityOverride);
 
-			var totalQuantity = math.add( quantityVariation, item.get("quantity") );
+			var totalQuantity = math.add( quantityOverride, item.get("quantity") );
 
 			item.set( "totalQuantity", totalQuantity );
 			

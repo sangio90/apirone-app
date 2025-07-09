@@ -20,20 +20,21 @@
                 <b data-bind="text: color.id"></b><br>
                 <span data-bind="text: color.name"></span>
             </td>
-            <td width="160">
+            
+            ##if (typeId == 'base') {## 
 
-                ##if (typeId == 'base') {## 
+                <td width="160">
 
                     <table cellpadding="0" cellspacing="0">
                     <tr>
                         <td>
-                            <input data-bind="value: quantity, events: { keyup: calcTotalQuantity }" 
+                            <input data-bind="value: override.quantity, events: { keyup: calcTotalQuantity }" 
                                 class="form-control text-end d-inline-block" style="width:45px" data-value-update="keyup" maxlength="2">
                             <br>
                             <span class="fs-10" data-bind="text: rawProduct.measurementUnit.id"></span>
                         </td>
                         <td class="ps-1">
-                            <div data-bind="text: override.quantity" class="d-inline-block w-40 text-end similar-to-form-control "></div>
+                            <div data-bind="text: quantity" class="d-inline-block w-40 text-end similar-to-form-control "></div>
                             <br>
                             <span class="fs-10">ATTR.</span>
                             
@@ -46,18 +47,24 @@
                     </tr>
                     </table>
 
-                ##} else {##
+                </td>
+                <td width="40" class="text-end">
+                    #iconButton( icon="trash", bind="click:deactivate" )#
+                </td>                    
 
+            ##} else {##
+
+                <td width="160">
                     <input data-bind="value: quantity" class="form-control text-end w-70">
                     <br>
                     <span data-bind="text: rawProduct.measurementUnit.id"></span>
+                </td>
+                <td width="40" class="text-end">
+                    #iconButton( icon="trash", bind="click:remove" )#
+                </td>                    
 
-                ##}##
+            ##}##
 
-            </td>
-            <td width="40" class="text-end">
-                #iconButton( icon="trash", bind="click:remove" )#
-            </td>
         </tr>
     </nmscript>
 </cfoutput>

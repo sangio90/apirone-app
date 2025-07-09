@@ -7,4 +7,10 @@ component accessors="true"  extends="com.apirone.core.model.bean.AbsBean" {
     property name="type" type="String"; // Tipo-di-errore
     property name="data";
 
+    public Outcome function init(){
+
+        return this;
+        
+    }
+
 }

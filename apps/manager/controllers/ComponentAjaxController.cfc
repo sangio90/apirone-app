@@ -94,31 +94,33 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var itemExists = [];
 
-        dump( components )
-        abort;
-
         for( var thisComponent in components ) {
 
-            if( Val( thisComponent.override.quantity) > 0 ) {
+            if ( thisComponent.id != "" ) {
+                ArrayAppend( itemExists, thisComponent.id );
+            }
+
+            if( thisComponent.typeId == "base" ) {
 
                 var override = super.bean("ComponentOverride");
                 
                 override.setId( thisComponent.override.id );
                 override.setDeleted( thisComponent.override.deleted );  
+                override.setQuantity( thisComponent.override.quantity );  
                 override.setComponentId( thisComponent.id );  
-                override.setProductItemId( thisComponent.id );  
+                override.setProductItemId( component.getProductItem().getId() );  
+
+                cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# override: #thisComponent.override.id#");
                 
                 if( Len( thisComponent.override.id ) ) {
-                    super.fire( "ComponentOvverride.update", [ override ] );
+                    super.fire( "ComponentOverride.update", [ override ] );
+                    cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# override: create: #thisComponent.override.id#");
                 } else {
-                    super.fire( "ComponentOvverride.create", [ override ] );
+                    super.fire( "ComponentOverride.create", [ override ] );
+                    cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# override: update: #thisComponent.override.id#");
                 }                
 
             } else {
-
-                if ( thisComponent.id != "" ) {
-                    ArrayAppend( itemExists, thisComponent.id );
-                }
 
                 var color      = super.bean("Color");
                 var rawProduct = super.bean("RawProduct");
@@ -146,13 +148,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
         for( var oldItem in oldItems ) {
 
-            //cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: this: #oldItem.getId()#");
-            
             if( !itemExists.find( oldItem.getId() ) ) {
-
-                cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# oldItems: delete: #oldItem.getId()#");
                 super.fire( "component.delete", { componentId = oldItem.getId() } );
-            
+                cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# delete oldItems: this: #oldItem.getId()#");
+
             }
         
         }

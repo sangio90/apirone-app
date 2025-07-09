@@ -94,13 +94,8 @@ component accessors="true"{
 
     private Boolean function scopeExists( required String scope ) {
 
-        if ( IsNull( getScopes()[ arguments.scope ] ) ) {
+        return getScopes().keyExists( arguments.scope );
 
-            return false;
-
-        }
-
-		return true;
 	}
 
 

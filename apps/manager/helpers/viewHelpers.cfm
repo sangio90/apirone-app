@@ -167,12 +167,12 @@
     <cfsavecontent variable="local.html">
         <cfoutput>
 
-            <table class="table table-hover #arguments.class#" id="#arguments.id#">
+            <table class="table table-hover #arguments.class# mb-0" id="#arguments.id#">
                 <tbody data-bind="source:#arguments.source#" data-template="#arguments.rowTemplate#">
                 </tbody>
             </table>
             
-            <div class="white-small">jstemplate/#arguments.rowTemplate#</div>
+            <div class="white-small mb-1">jstemplate/#arguments.rowTemplate#</div>
         </cfoutput>
     </cfsavecontent>
 

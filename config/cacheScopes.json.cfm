@@ -5,6 +5,7 @@
     "Color.bean": {},
     "Combination.bean": {},
     "Component.bean": {},
+    "ComponentOverride.bean": {},
     "Finish.bean": {},
     "Lang.bean": {},
     "Line.bean": {},

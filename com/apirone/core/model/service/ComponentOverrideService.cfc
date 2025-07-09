@@ -3,7 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.ComponentOverrideDAO";
 	property name="cacheScope" type="String" default="ComponentOverride.bean";
 
-    public com.apirone.core.model.bean.Component function get(
+    public com.apirone.core.model.bean.ComponentOverride function get(
     		required String ComponentOverrideId
         ){
 
@@ -24,7 +24,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public com.apirone.core.model.bean.Component[] function list(
+	public com.apirone.core.model.bean.ComponentOverride[] function list(
     	required Numeric productItemId,
     	required Numeric componentId,
     ) {
@@ -95,10 +95,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create(
-			required com.apirone.core.model.bean.ComponentVariantion ComponentVariantion
+			required com.apirone.core.model.bean.ComponentOverride ComponentOverride
 		){
 
-		var id = getDao().insert( arguments.component );
+		var id = getDao().insert( arguments.ComponentOverride );
 
 		return id;
 
@@ -106,18 +106,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public String function update(
-			required com.apirone.core.model.bean.Component component
+			required com.apirone.core.model.bean.ComponentOverride ComponentOverride
 		){
 
-		getDao().update( arguments.component );
+		getDao().update( arguments.ComponentOverride );
 
-		super.getCacheManager().remove( getCacheScope(), component.getId() );
+		super.getCacheManager().remove( getCacheScope(), ComponentOverride.getId() );
 
-		return arguments.component.getId();
+		return arguments.ComponentOverride.getId();
 
 	}
 
-	private com.apirone.core.model.bean.Component function build(
+	private com.apirone.core.model.bean.ComponentOverride function build(
     		required String ComponentOverrideId
     	){
 
