@@ -131,7 +131,7 @@
 
         <cfquery name="local.q" datasource="apirone">
 			UPDATE 
-                component_overrides 
+                component_overrides
 			SET 
 				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.ComponentOverride.getQuantity()#">,
 				deleted =  <cfqueryparam cfsqltype="Boolean" value="#arguments.ComponentOverride.getDeleted()#">
