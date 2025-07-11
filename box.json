@@ -9,10 +9,11 @@
         "dataMapper":"http+cached://www.coridalia.cc/repository/dataMapper/dataMapper-1.7.zip",
         "accessManager":"http+cached://www.coridalia.cc/repository/accessManager/accessManager-1.0.0.zip",
         "coldbox":"7.2.1+13",
-        "cbvalidation":"4.4.0"
+        "cbvalidation":"4.4.0",
     },
     "devDependencies":{
-        "testbox":"5.1.0+2"
+        "testbox":"5.1.0+2",
+        "commandbox-cfformat":"*"
     },
     "ignore":[
         "**/.*",
@@ -34,30 +35,12 @@
         "setup:devel":"task run taskFile=tasks/Build.cfc target=setup :env=devel",
         "setup:prod":"task run taskFile=tasks/Build.cfc target=setup :env=prod",
         "setup:test":"task run taskFile=tasks/Build.cfc target=setup :env=test",
-        "format": "cfformat run cfformat watch /apps/**/controllers/**,/com/** --overwrite",
+        "format": "cfformat run /apps/**/controllers/**,/com/** --overwrite",
         "format:watch": "cfformat watch /apps/**/controllers/**,/com/**",
         "format:check": "cfformat check /apps/**/controllers/**,/com/**",
         "createZip":"task run taskFile=tasks/Build.cfc target=createZip"
     },
     "testbox":{
-        "bundles":"",
-        "directory":"tests.com",
-        "excludes":"",
-        "labels":"",
-        "options":{},
-        "recurse":true,
-        "reporter":"",
-        "runner":[
-            {
-                "default":""
-            }
-        ],
-        "testBundles":"",
-        "testSpecs":"",
-        "testSuites":"",
-        "verbose":true,
-        "watchDelay":500,
-        "watchPaths":"**.cfc"
     },
     "type":"modules",
     "version":"107"

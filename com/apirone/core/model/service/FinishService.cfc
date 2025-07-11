@@ -43,8 +43,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		} );
 
 		result.setData( rows );
-		result.setCount( val( records.recordcount ) );
-		result.setTotal( val( records.total ) );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
 		return result;
 	}
@@ -137,7 +137,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return bean;
 		}
 
-		return nullValue();
+		return NullValue();
 	}
 
 }

@@ -1,10 +1,6 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function list(
-		event,
-		rc,
-		prc
-	){
+	function list( event, rc, cccccccccccc ){
 		var data   = [];
 		var result = super.getResult();
 
@@ -26,11 +22,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function codeExists(
-		event,
-		rc,
-		prc
-	){
+	function codeExists( event, rc, prc ){
 		param rc.id   = "_";
 		param rc.code = "";
 
@@ -39,11 +31,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function save(
-		event,
-		rc,
-		prc
-	){
+	function save( event, rc, prc ){
 		var result     = super.getResult();
 		var finish     = super.bean( "Finish" );
 		var status     = super.bean( "Status" );
@@ -53,7 +41,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "";
 		var texts     = [];
 
-		var json = deserializeJSON( getHTTPRequestData().content );
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		finish.setId( json.id );
 		finish.setCode( json.code );
@@ -78,7 +66,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		finish.setTexts( texts );
 
-		if ( !len( json.id ) ) {
+		if ( !Len( json.id ) ) {
 			messageId = "finish.created";
 			thisId    = super.fire( "finish.create", [ finish ] )
 		} else {
