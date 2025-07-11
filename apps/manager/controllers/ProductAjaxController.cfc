@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function listItems( event, rc, prc ){
 
-        var result = getFlatTree( combinationId=rc.id, includeMissingValues=true );
+        var result = getFlatTree( productId=rc.id, includeMissingValues=true );
 
         event.setValue("result", result);
 
@@ -10,7 +10,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function listItemsForSort( event, rc, prc ){
 
-        var result = getFlatTree( combinationId=rc.id, includeMissingValues=false );
+        var result = getFlatTree( productId=rc.id, includeMissingValues=false );
 
         event.setValue("result", result);
 
@@ -31,7 +31,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var attrs = [];
 
-        var rows = getFlatTree( combinationId=rc.id, includeMissingValues=false );
+        var rows = getFlatTree( productId=rc.id, includeMissingValues=false );
 
 		for( var row in rows.getData() ) {
 
@@ -60,7 +60,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
         var attribute = super.fire( "attribute.get", [ rc.attributeId ] );
 
-        param rc.id = '_';          //Current combination
+        param rc.id = '_';          //Current product
         param rc.parentId = 0;      //Parent item, if exists
         param rc.attributeId = 0;   //To add values ​​to this attribute
 
@@ -70,7 +70,7 @@ component extends="com.apirone.core.controller.AbsController" {
             <cfquery datasource="apirone">
                 DELETE FROM product_items
                 WHERE 
-                    combination_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
+                    product_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
                     AND attribute_raw_value_id IN 
                         ( 
                             SELECT attribute_raw_value_id 
@@ -83,7 +83,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
                 <cfquery datasource="apirone">
                     INSERT INTO product_items (
-                        combination_id,
+                        product_id,
                         attribute_raw_value_id,
                         orderby,
                         parent_id,
@@ -104,7 +104,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         ```
 
-        var message = completeMessage( "combination.itemsAdded" );
+        var message = completeMessage( "product.itemsAdded" );
 
         result.setData( { "message" = message } );
 
@@ -128,7 +128,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         ```
 
-        var message = completeMessage( "combination.itemsDeleted" );
+        var message = completeMessage( "product.itemsDeleted" );
 
         result.setData( { "message" = message } );
 
@@ -152,13 +152,13 @@ component extends="com.apirone.core.controller.AbsController" {
         
         item.setOrderBy( json.orderBy );
 
-        item.setCombinationId( rc.id );
+        item.setProductId( rc.id );
         item.setAttributeValue( value );
         item.setStatus( status );
 
         var newId = super.fire("ProductItem.create", { productItem = item } );
 
-        var message = completeMessage( "combination.valueAdded" );
+        var message = completeMessage( "product.valueAdded" );
 
         result.setData( { "message" = message, "payload" = { "id": newId } } );
 
@@ -188,7 +188,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         }
 
-        var message = completeMessage( "combination.valuesReordered" );
+        var message = completeMessage( "product.valuesReordered" );
 
         result.setData( { "message" = message } );
 
@@ -207,7 +207,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         for( var attr in attrs ) {
 
-            var items = super.fire("ProductItem.list", { combinationId = rc.id, attributeId = attr } );
+            var items = super.fire("ProductItem.list", { productId = rc.id, attributeId = attr } );
 
             for( var item in items ) {
 
@@ -222,7 +222,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
         }
 
-        var message = completeMessage( "combination.valuesReordered" );
+        var message = completeMessage( "product.valuesReordered" );
 
         result.setData( { "message" = message } );
 
@@ -235,12 +235,12 @@ component extends="com.apirone.core.controller.AbsController" {
         private methods
     */
 
-    private function getFlatTree( combinationId, includeMissingValues=true ){
+    private function getFlatTree( productId, includeMissingValues=true ){
 
         var data = [];
         var result = super.getResult();
 
-        var params = { combinationId = arguments.combinationId, includeMissingValues=arguments.includeMissingValues };
+        var params = { productId = arguments.productId, includeMissingValues=arguments.includeMissingValues };
 
         var items = super.fire("ProductItem.getFlatTree", params );
 

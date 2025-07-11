@@ -21,8 +21,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 		var obj = build( arguments.statusId );
 
-		dump( Len( statusId) );
-		
 		cm.put( getScopeCache(), statusId, obj );
         
 		return obj;

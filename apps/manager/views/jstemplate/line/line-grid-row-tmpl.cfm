@@ -22,7 +22,7 @@
                 #iconButton(bind="click:edit", icon="edit")#
             </td>
             <td class="text-center">
-                #iconButton(bind="click:combinations", icon="cogs")#
+                #iconButton(bind="click:products", icon="cogs")#
             </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#

@@ -4,7 +4,7 @@
 --->
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="combination-images-item-tmpl">
+    <nmscript type="text/x-kendo-template" id="product-images-item-tmpl">
 
         <div class="col-12 mb-2">
 

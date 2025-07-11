@@ -1,14 +1,12 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao"                 type="com.apirone.core.model.dao.FinishDAO";
-	property name="statusService"       type="com.apirone.core.model.service.StatusService";
+	property name="dao" type="com.apirone.core.model.dao.FinishDAO";
+	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
-	property name="textService"         type="com.apirone.core.model.service.TextService";
+	property name="textService" type="com.apirone.core.model.service.TextService";
 	property name="cacheScope" type="String" default="Finish.bean";
 
-	public com.apirone.core.model.bean.Finish function get(
-		required String finishId
-	){
+	public com.apirone.core.model.bean.Finish function get( required String finishId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.finishId );
@@ -30,12 +28,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Result function search(
-		required Array orderBy = [ { field='finish.code' } ],
+		String lineId,
+		required Array orderBy = [ { field = "finish.code" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
 
-		arguments['orderby'] = super.createOrderBy( arguments["orderby"], "finish" );
+		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby, "finish" );
 
 		var records = getDao().find( argumentCollection = arguments );
 
@@ -45,14 +44,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		result.setData( rows );
 		result.setCount( val( records.recordcount ) );
-		result.setTotal( val( records.recordcount ) );
+		result.setTotal( val( records.total ) );
 
 		return result;
 	}
 
-	public String function create(
-		required com.apirone.core.model.bean.Finish finish
-	){
+	public String function create( required com.apirone.core.model.bean.Finish finish ){
 		transaction {
 			var newId = getDao().insert( arguments.finish );
 
@@ -71,9 +68,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public String function update(
-		required com.apirone.core.model.bean.Finish finish
-	){
+	public String function update( required com.apirone.core.model.bean.Finish finish ){
 		getDao().update( arguments.finish );
 
 		super.getCacheManager().remove( getCacheScope(), arguments.finish.getId() );
@@ -81,10 +76,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.finish.getId();
 	}
 
-	public Boolean function codeExists(
-		required String code,
-		String excludedId = ""
-	){
+	public Boolean function codeExists( required String code, String excludedId = "" ){
 		var record = getDao().readByCode( arguments.code );
 
 		if (
@@ -97,9 +89,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return false;
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete(
-		required String finishId
-	){
+	public com.apirone.core.model.bean.Outcome function delete( required String finishId ){
 		var outcome = super.bean( "Outcome" );
 
 		var obj = get( arguments.finishId );
@@ -127,9 +117,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Finish function build(
-		required String finishId
-	){
+	private com.apirone.core.model.bean.Finish function build( required String finishId ){
 		var record = getDao().read( arguments.finishId );
 
 		if ( record.recordCount ) {
@@ -138,7 +126,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.finish_id );
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
-			
+
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( finishId = record.finish_id ) );
 

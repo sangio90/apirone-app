@@ -76,6 +76,7 @@ AP.component.list = (function () {
 
 					break;
 
+					/*
 				case "fruit":
 
 					result.modalTitle = "Componenti base per frutto: " + current.fruit.code;
@@ -91,6 +92,7 @@ AP.component.list = (function () {
 					result.modifyUrl = result.readUrl;
 
 					break;
+					*/
 
 				case "item": //productItem
 
@@ -102,10 +104,10 @@ AP.component.list = (function () {
 
 					break;
 
-				case "combination":
+				case "product":
 
-					result.modalTitle = "Componenti base per combinazione: " + current.combination.name;
-					result.readUrl = baseUrl + "?by=combination&combinationId=" + current.combination.id;
+					result.modalTitle = "Componenti base per il prodotto: " + current.product.name;
+					result.readUrl = baseUrl + "?by=product&productId=" + current.product.id;
 					result.modifyUrl = result.readUrl;
 
 					break;

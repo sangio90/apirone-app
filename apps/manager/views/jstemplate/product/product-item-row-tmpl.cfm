@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding='UTF-8'>
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="combination-item-row-tmpl">
+    <nmscript type="text/x-kendo-template" id="product-item-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td style="border-left: 4px solid ##=status.color.hex##">
                 <span data-bind="text: id"></span>
@@ -16,7 +16,7 @@
             ##if (status.id == 'ACT') {## 
 
                 <td class="text-center">
-                    <button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList" data-type="combinationItem">
+                    <button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList" data-type="productItem">
                         <i class="fas fa-image"></i> 
                     </button>
                 </td>

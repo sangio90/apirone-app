@@ -88,6 +88,7 @@
 		/*
 			fruits
 		*/
+		/*
 		get( "/ajax/fruits/code-exists" ).to( "FruitAjaxController.codeExists" ).end();
 		post( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.addItem" ).end();
 		get( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.listItems" ).end();
@@ -97,18 +98,14 @@
 		delete( "/ajax/fruits" ).to( "FruitAjaxController.delete" ).end();
 		get( "/fruits/:id/detail" ).to( "FruitController.detail" ).end();
 		get( "/fruits" ).to( "FruitController.list" ).end();
+		*/
 
 
 		/*
 			attribute values
 		*/
-		//get( "/ajax/attributes/values/code-exists" ).to( "AttributeValueAjaxController.codeExists" ).end();
-		//post( "/ajax/attributes/values" ).to( "AttributeValueAjaxController.save" ).end();
-		//post( "/ajax/attributes/:id/values/order" ).to( "AttributeValueAjaxController.order" ).end();
-		
 		post( "/ajax/attributes/:id/raw-values/add" ).to( "AttributeValueAjaxController.addValue" ).end();
 		post( "/ajax/attributes/:id/raw-values/sort" ).to( "AttributeValueAjaxController.sort" ).end();
-		//post( "/ajax/attributes/:id/raw-values" ).to( "AttributeValueAjaxController.updateValues" ).end();
 		delete( "/ajax/attributes/:id/raw-values" ).to( "AttributeValueAjaxController.deleteValues" ).end();
 
 
@@ -132,7 +129,7 @@
 		get( "/ajax/reports" ).toHandler( "ReportAjaxController.list" );
 		get( "/reports/:id" ).toHandler( "ReportController.get" );
 		get( "/reports" ).toHandler( "ReportController.list" );
-
+		
 
 		/*
 			texts
@@ -150,22 +147,23 @@
 		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end();
 
 		/*
-			combinations
+			products
 		*/
-		post( "/ajax/combinations/:id/items/order" ).to( "CombinationAjaxController.sortItems" ).end();
-		get( "/ajax/combinations/:id/items/order" ).to( "CombinationAjaxController.listItemsForSort" ).end();
-		get( "/ajax/combinations/:id/attributes/order" ).to( "CombinationAjaxController.listAttributesForSort" ).end();
-		post( "/ajax/combinations/:id/attributes/order" ).to( "CombinationAjaxController.sortAttributes" ).end();
-		post( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.addItem" ).end();
-		post( "/ajax/combinations/:id/values" ).to( "CombinationAjaxController.addValue" ).end();
-		get( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.listItems" ).end();
-		delete( "/ajax/combinations/:id/items" ).to( "CombinationAjaxController.removeItems" ).end();
+		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
+		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();
+		get( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.listAttributesForSort" ).end();
+		post( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.sortAttributes" ).end();
+		post( "/ajax/products/:id/items" ).to( "ProductAjaxController.addItem" ).end();
+		post( "/ajax/products/:id/values" ).to( "ProductAjaxController.addValue" ).end();
+		get( "/ajax/products/:id/items" ).to( "ProductAjaxController.listItems" ).end();
+		delete( "/ajax/products/:id/items" ).to( "ProductAjaxController.removeItems" ).end();
 
-		get( "/ajax/:by-regex:(combinations|combination-items)/:id/images" ).to( "FileAjaxController.list" ).end();
-		post( "/ajax/:by-regex:(combinations|combination-items)/:id/images" ).to( "FileAjaxController.upload" ).end();
+		get( "/ajax/:by-regex:(products|product-items)/:id/images" ).to( "FileAjaxController.list" ).end();
+		post( "/ajax/:by-regex:(products|product-items)/:id/images" ).to( "FileAjaxController.upload" ).end();
 
-		get( "/combinations/:id" ).to( "CombinationController.detail" ).end();
-		get( "/comb/:id/items" ).to( "CombinationController.items" ).end();
+		get( "/products/:id" ).to( "ProductController.detail" ).end();
+		//get( "/comb/:id/items" ).to( "ProductController.items" ).end();
+		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();
 
 
 		/*
@@ -182,14 +180,14 @@
 			lines
 		*/
 		get( "/ajax/lines/code-exists" ).to( "LineAjaxController.codeExists" ).end();
-		delete( "/ajax/lines/:id/combinations" ).to( "LineAjaxController.deleteCombination" ).end();
-		post( "/ajax/lines/:id/combinations" ).to( "LineAjaxController.createCombination" ).end();
+		delete( "/ajax/lines/:id/products" ).to( "LineAjaxController.deleteProduct" ).end();
+		post( "/ajax/lines/:id/products" ).to( "LineAjaxController.createProduct" ).end();
 		get( "/ajax/lines/attributes" ).to( "LineAjaxController.attributes" ).end();
 		get( "/ajax/lines/:id" ).to( "LineAjaxController.get" ).end();
 		get( "/ajax/lines" ).to( "LineAjaxController.list" ).end();
 		post( "/ajax/lines" ).to( "LineAjaxController.save" ).end();
 		delete( "/ajax/lines" ).to( "LineAjaxController.delete" ).end();
-		get( "/lines/:id/combinations" ).to( "LineController.combinations" ).end();
+		get( "/lines/:id/products" ).to( "LineController.products" ).end();
 		get( "/lines/:id/attributes" ).to( "LineController.attributes" ).end();
 		get( "/lines" ).to( "LineController.list" ).end();
 

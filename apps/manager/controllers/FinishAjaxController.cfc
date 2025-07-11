@@ -1,28 +1,36 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function list( event, rc, prc ){
+	function list(
+		event,
+		rc,
+		prc
+	){
 		var data   = [];
 		var result = super.getResult();
 
-		var dm = getDataMapper();
+		var dm = super.getDataMapper();
 
-		var params = super.paramsFromUrl( "finish" );
+		var params = super.paramsFromUrl();
 
-		var rows = super.fire( "finish.list", params );
+		var rows = super.fire( "finish.search", params );
 
-		for ( var row in rows ) {
+		for ( var row in rows.getData() ) {
 			var obj = dm.convert( row, "Finish", true );
 			data.add( obj );
 		}
 
-		result.setTotal( data.len() );
+		result.setTotal( rows.getTotal() );
 		result.setCount( data.len() );
 		result.setData( data );
 
 		event.setValue( "result", result );
 	}
 
-	function codeExists( event, rc, prc ){
+	function codeExists(
+		event,
+		rc,
+		prc
+	){
 		param rc.id   = "_";
 		param rc.code = "";
 
@@ -31,7 +39,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function save( event, rc, prc ){
+	function save(
+		event,
+		rc,
+		prc
+	){
 		var result     = super.getResult();
 		var finish     = super.bean( "Finish" );
 		var status     = super.bean( "Status" );
@@ -41,14 +53,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "";
 		var texts     = [];
 
-		var json = DeserializeJSON( getHTTPRequestData().content );
+		var json = deserializeJSON( getHTTPRequestData().content );
 
 		finish.setId( json.id );
 		finish.setCode( json.code );
 
 		for ( var thisCategory in json.selectedCategories ) {
-
-			var category   = super.bean( "ProductCategory" );
+			var category = super.bean( "ProductCategory" );
 
 			category.setId( thisCategory.id );
 			categories.add( category );
@@ -57,11 +68,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		finish.setCategories( categories );
 		finish.setStatus( status.setId( json.status.id ) );
 
-		var text = super.bean("Text");
-		var lang = super.bean("Lang");
+		var text = super.bean( "Text" );
+		var lang = super.bean( "Lang" );
 
 		text.setName( json.name )
-		text.setLang( lang.setId( "IT" ) ); //FIXME: this, get lang from json
+		text.setLang( lang.setId( "IT" ) ); // FIXME: this, get lang from json
 
 		texts.add( text );
 

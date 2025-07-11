@@ -3,7 +3,7 @@
     "Attribute.bean": {},
     "AttributeValue.bean": {},
     "Color.bean": {},
-    "Combination.bean": {},
+    "Product.bean": {},
     "Component.bean": {},
     "ComponentOverride.bean": {},
     "Finish.bean": {},

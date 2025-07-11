@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="combination-sorting-modal" class="modal fade">
+    <div id="product-sorting-modal" class="modal fade">
         
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -14,14 +14,14 @@
 
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item active">
-                            <a class="nav-link active" id="combination-sorting-nav-values-but" data-bs-toggle="tab" 
-                                href="##combination-sorting-nav-values-tab" role="tab" aria-controls="tab1" aria-selected="true">
+                            <a class="nav-link active" id="product-sorting-nav-values-but" data-bs-toggle="tab" 
+                                href="##product-sorting-nav-values-tab" role="tab" aria-controls="tab1" aria-selected="true">
                                 Valori
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="combination-sorting-nav-attributes-but" data-bs-toggle="tab" 
-                                href="##combination-sorting-nav-attributes-tab" role="tab" aria-controls="tab2" aria-selected="true">
+                            <a class="nav-link" id="product-sorting-nav-attributes-but" data-bs-toggle="tab" 
+                                href="##product-sorting-nav-attributes-tab" role="tab" aria-controls="tab2" aria-selected="true">
                                 Attributi
                             </a>
                         </li>
@@ -35,17 +35,17 @@
 
                     <div class="tab-content" id="nav-tabContent">
 
-                        <div class="tab-pane fade show active" id="combination-sorting-nav-values-tab" role="tabpanel" aria-labelledby="combination-sorting-nav-values-tab">              
+                        <div class="tab-pane fade show active" id="product-sorting-nav-values-tab" role="tabpanel" aria-labelledby="product-sorting-nav-values-tab">              
                     
-                            <form id="combination-sorting-modal-form" name="combination-sorting-modal-form" autocomplete="off">
+                            <form id="product-sorting-modal-form" name="product-sorting-modal-form" autocomplete="off">
                             
-                                <div class="col-12 text-end mb-2" id="combination-sorting-status">
+                                <div class="col-12 text-end mb-2" id="product-sorting-status">
                                 </div>
                                 
                                 <div class="col-12">
 
                                     #grid(
-                                        id      = "combination-ordering-items-grid",
+                                        id      = "product-ordering-items-grid",
                                         class   = "no-pager",
                                         columns = "[
                                             { 'field':'Id', 'title':'ID', width: '60px' },
@@ -53,7 +53,7 @@
                                             { 'field':'', 'title':'Riordina', width: '55px'},
                                         ]",
                                         source: "orderingItems",
-                                        rowTemplate = "combination/combination-ordering-item-row-tmpl"
+                                        rowTemplate = "product/product-ordering-item-row-tmpl"
                                     )#
 
                                 </div>
@@ -62,17 +62,17 @@
 
                         </div>
                         
-                        <div class="tab-pane fade show" id="combination-sorting-nav-attributes-tab" role="tabpanel" aria-labelledby="combination-sorting-nav-values-tab">              
+                        <div class="tab-pane fade show" id="product-sorting-nav-attributes-tab" role="tabpanel" aria-labelledby="product-sorting-nav-values-tab">              
 
-                            <form id="combination-sorting-attribute-modal-form" name="combination-sorting-attribute-modal-form" autocomplete="off">
+                            <form id="product-sorting-attribute-modal-form" name="product-sorting-attribute-modal-form" autocomplete="off">
                             
-                                <div class="col-12 text-end mb-2" id="combination-sorting-attribute-status">
+                                <div class="col-12 text-end mb-2" id="product-sorting-attribute-status">
                                 </div>
                                 
                                 <div class="col-12">
 
                                     #grid(
-                                        id      = "combination-ordering-attributes-grid",
+                                        id      = "product-ordering-attributes-grid",
                                         class   = "no-pager",
                                         columns = "[
                                             { 'field':'Id', 'title':'ID', width: '60px' },
@@ -80,7 +80,7 @@
                                             { 'field':'', 'title':'Riordina', width: '55px'},
                                         ]",
                                         source: "orderingAttributes",
-                                        rowTemplate = "combination/combination-ordering-attribute-row-tmpl"
+                                        rowTemplate = "product/product-ordering-attribute-row-tmpl"
                                     )#
 
                                 </div>

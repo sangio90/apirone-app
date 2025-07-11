@@ -16,7 +16,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.jsScripts.add( "app-attribute-detail" );
         prc.jsScripts.add( "tests/app-attribute-test" );
         //prc.jsScripts.add( "app-component" );
-        //prc.jsScripts.add( "app-combination-test" );
+        //prc.jsScripts.add( "app-product-test" );
 
         event.setView( "util/tmp" );
 

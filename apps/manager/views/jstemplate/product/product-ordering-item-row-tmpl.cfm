@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding='UTF-8'>
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="combination-ordering-item-row-tmpl">
+    <nmscript type="text/x-kendo-template" id="product-ordering-item-row-tmpl">
         <tr class="k-master-row id-##: id ##" data-uid="##: uid ##" data-id="##: id ##" data-level="##: level ##" data-attribute="##: attribute.id ##">
             <td style="border-left: 4px solid ##=status.color.hex##">
                 <span data-bind="text: id"></span>

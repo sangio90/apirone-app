@@ -1,6 +1,6 @@
 {
-    combination: {
-        dir: "combination",
+    product: {
+        dir: "product",
         sizes: {
             horizontal: {
                 dir: "horizontal"

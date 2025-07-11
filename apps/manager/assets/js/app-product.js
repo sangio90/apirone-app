@@ -1,45 +1,44 @@
-AP.combination = AP.combination || {};
+AP.product = AP.product || {};
 
-AP.combination.fields = {
-	rootDetail: $("#combination-detail-root"),
-	configRow: $("#combination-config-row"),
+AP.product.fields = {
+	rootDetail: $("#product-detail-root"),
+	configRow: $("#product-config-row"),
 	attributeSearchForm: $("#attributes-search-form"),
-	attributeModal: $("#combination-attributes-list-modal"),
-	imagesModal: $("#combination-images-list-modal"),
-	reorderingModal: $("#combination-sorting-modal"),
-	fruitItemsImagesModal: $("#fruit-items-combinations-images-modal"),
+	attributeModal: $("#product-attributes-list-modal"),
+	imagesModal: $("#product-images-list-modal"),
+	reorderingModal: $("#product-sorting-modal")
 };
 
 $(document).ready(function () {
-	if (AP.combination.fields.rootDetail.length) {
-		AP.combination.list.init();
+	if (AP.product.fields.rootDetail.length) {
+		AP.product.list.init();
 	}
 });
 
-AP.combination.list = (function () {
+AP.product.list = (function () {
 	var pub = {};
 
-	var fields = AP.combination.fields;
+	var fields = AP.product.fields;
 	var componentApp = AP.component.list;
 	var attributeApp = AP.attribute.detail;
 
 	var dataSources = {
 		items: NM.kendo.dataSource({
 			url:
-				"/manager/ajax/combinations/" +
-				AP.page.combinationId +
+				"/manager/ajax/products/" +
+				AP.page.productId +
 				"/items",
 		}),
 		orderingItems: NM.kendo.dataSource({
 			url:
-				"/manager/ajax/combinations/" +
-				AP.page.combinationId +
+				"/manager/ajax/products/" +
+				AP.page.productId +
 				"/items/order",
 		}),
 		orderingAttributes: NM.kendo.dataSource({
 			url:
-				"/manager/ajax/combinations/" +
-				AP.page.combinationId +
+				"/manager/ajax/products/" +
+				AP.page.productId +
 				"/attributes/order",
 		}),
 		attributesList: undefined,
@@ -125,8 +124,8 @@ AP.combination.list = (function () {
 			NM.util.ajax({
 				method: "POST",
 				url:
-					"/manager/ajax/combinations/" +
-					AP.page.combinationId +
+					"/manager/ajax/products/" +
+					AP.page.productId +
 					"/items",
 				data: {
 					attributeId: event.data.id,
@@ -164,7 +163,7 @@ AP.combination.list = (function () {
 		},
 
 		removeAttributes: function (event) {
-			var checks = $("#combination-items-grid").find(
+			var checks = $("#product-items-grid").find(
 				"[name=selected]:checked"
 			);
 
@@ -180,8 +179,8 @@ AP.combination.list = (function () {
 				NM.util.ajax({
 					method: "DELETE",
 					url:
-						"/manager/ajax/combinations/" +
-						AP.page.combinationId +
+						"/manager/ajax/products/" +
+						AP.page.productId +
 						"/items",
 					data: { items: ids },
 					callback: {
@@ -217,8 +216,8 @@ AP.combination.list = (function () {
 			NM.util.ajax({
 				method: "POST",
 				url:
-					"/manager/ajax/combinations/" +
-					AP.page.combinationId +
+					"/manager/ajax/products/" +
+					AP.page.productId +
 					"/values",
 				data: JSON.stringify(event.data),
 				callback: {
@@ -237,12 +236,6 @@ AP.combination.list = (function () {
 
 		openReorderingModal: function (event) {
 			NM.util.openModal(fields.reorderingModal);
-
-			return false;
-		},
-
-		openFruitItemsImagesModal: function (event) {
-			NM.util.openModal(fields.fruitItemsImagesModal);
 
 			return false;
 		},
@@ -270,28 +263,28 @@ AP.combination.list = (function () {
 			var type = element.data("type");
 
 			switch (type) {
-				case "combinationItem":
+				case "productItem":
 					var value = {
 						type: "item",
 						id: event.data.id,
 					};
 
 					var thisUrl =
-						"/manager/ajax/combination-items/" +
+						"/manager/ajax/product-items/" +
 						event.data.id +
 						"/images";
 
 					break;
 
-				case "combination":
+				case "product":
 					var value = {
-						type: "combination",
-						id: AP.page.combinationId,
+						type: "product",
+						id: AP.page.productId,
 					};
 
 					var thisUrl =
-						"/manager/ajax/combinations/" +
-						AP.page.combinationId +
+						"/manager/ajax/products/" +
+						AP.page.productId +
 						"/images";
 
 					break;
@@ -399,12 +392,12 @@ AP.combination.list = (function () {
 
 					break;
 
-				case "combination":
+				case "product":
 					var value = {
-						type: "combination",
-						combination: {
-							id: element.data("combination-id"),
-							name: element.data("combination-name"),
+						type: "product",
+						product: {
+							id: element.data("product-id"),
+							name: element.data("product-name"),
 						},
 					};
 
@@ -425,13 +418,13 @@ AP.combination.list = (function () {
 		},
 
 		showImagesList: function () {
-			NM.util.openModal($("#combination-images-list-modal"));
+			NM.util.openModal($("#product-images-list-modal"));
 		},
 
 		loadSizes: function () {
 			//console.log("loadFinishes:x");
 
-			var thisForm = AP.combination.fields.configRow;
+			var thisForm = AP.product.fields.configRow;
 
 			var finishEle = thisForm.find("[name=finishId]");
 			var sizeEle = thisForm.find("[name=sizeId]");
@@ -442,8 +435,8 @@ AP.combination.list = (function () {
 			var sizeId = sizeEle.val();
 			var finishId = finishEle.val();
 
-			var combinations = AP.page.combinations;
-			var combinationId = AP.page.combinationId;
+			var products = AP.page.products;
+			var productId = AP.page.productId;
 
 			sizeEle.empty("");
 
@@ -459,37 +452,48 @@ AP.combination.list = (function () {
 			var found = false;
 			var opts = [];
 
-			combinations.forEach(function (combination) {
+			products.forEach(function (product) {
 				if (
-					lineId == combination.line.id &&
-					finishId == combination.finish.id
+					lineId == product.line.id &&
+					finishId == product.finish.id
 				) {
 
-					console.log("combination.size.code", combination.size.code);
+					console.log("product.size.code", product.size.code);
 
-					if (combination.id == combinationId) {
+					if (product.id == productId) {
 						found = true;
 					}
 
-					opts.push( { "combinatioId": combination.id, "sizeCode": combination.size.code  } );
+					opts.push( { "combinatioId": product.id, "sizeCode": product.size.code } )
 
+					/*
+					var opt = $("<option>", {
+						value: product.id,
+						text: product.size.code,
+					});
+					*/
+
+					sizeEle.append(opt);
 				}
 			});
 
-			found ? sizeEle.val(AP.page.combinationId) : "";
-
 			//sort by alpha
-			opts.sort( (a, b) => a.sizeCode.localeCompare(b.sizeCode, 'it', { sensitivity: 'base' } ) );
+			opts.sort((a, b) =>
+				a.sizeCode.localeCompare( b.sizeCode, "it-IT" )
+			);
 
-			for( var opt of opts ) {
+			for ( var thisOpt of opts ) {
 
-				var html = $("<option>", {
-					value: opt.combinationId,
-					text: opt.sizeCode,
+				var opt = $("<option>", {
+					value: thisOpt.combinatioId,
+					text: thisOpt.sizeCode,
 				});
 
-				sizeEle.append(html);
+				sizeEle.append( opt );
+			
 			}
+
+			found ? sizeEle.val(AP.page.productId) : "";
 
 			return false;
 		},
@@ -497,8 +501,8 @@ AP.combination.list = (function () {
 		change: function (event) {
 			var thisId = $(event.currentTarget).val();
 
-			if (thisId != AP.page.combinationId && thisId.length) {
-				window.location.href = "/manager/combinations/" + thisId;
+			if (thisId != AP.page.productId && thisId.length) {
+				window.location.href = "/manager/products/" + thisId;
 			}
 
 			return false;
@@ -506,7 +510,7 @@ AP.combination.list = (function () {
 	});
 
 	pub.init = function () {
-		console.log("combination:init");
+		console.log("product:init");
 
 		kendo.bind(fields.rootDetail, viewModel);
 
@@ -653,8 +657,8 @@ AP.combination.list = (function () {
 		NM.util.ajax({
 			method: "POST",
 			url:
-				"/manager/ajax/combinations/" +
-				AP.page.combinationId +
+				"/manager/ajax/products/" +
+				AP.page.productId +
 				"/" +
 				entity +
 				"/order",
@@ -672,7 +676,7 @@ AP.combination.list = (function () {
 	};
 
 	var initItemsSort = function () {
-		var table = $("#combination-ordering-items-grid table");
+		var table = $("#product-ordering-items-grid table");
 
 		table.kendoSortable({
 			axis: "y",
@@ -749,7 +753,7 @@ AP.combination.list = (function () {
 	};
 
 	var initAttributesSort = function () {
-		var table = $("#combination-ordering-attributes-grid table");
+		var table = $("#product-ordering-attributes-grid table");
 
 		table.kendoSortable({
 			axis: "y",

@@ -2,7 +2,7 @@
 
 <cfoutput>
 
-    <div id="combination-detail-items-root">
+    <div id="product-detail-items-root">
 
         <div class="row">
             <div class="col-8">

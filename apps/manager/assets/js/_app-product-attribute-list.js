@@ -2,13 +2,13 @@
 AP.productAttribute = AP.productAttribute || {};
 
 AP.productAttribute.fields = {
-    rootDetail: $("#combination-detail-root"),
-	imagesModal: $("#combination-images-list-modal")
+    rootDetail: $("#product-detail-root"),
+	imagesModal: $("#product-images-list-modal")
 };
 
 $(document).ready(function (){
 
-	if (AP.combination.fields.rootDetail.length) {
+	if (AP.product.fields.rootDetail.length) {
 
 		AP.productAttribute.list.init();
 
@@ -24,7 +24,7 @@ AP.productAttribute.list = (function () {
 	var fields = AP.productAttribute.fields;
 
 	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items" }),
+		items: NM.kendo.dataSource({ url: "/manager/ajax/products/" + AP.page.productId + "/items" }),
 		attributesList: undefined
 	};
 
@@ -119,7 +119,7 @@ AP.productAttribute.list = (function () {
 
 			NM.util.ajax({
 				method: "POST",
-				url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
+				url: "/manager/ajax/products/" + AP.page.productId + "/items",
 				data: {
 					attributeId: event.data.id,
 					parentId: viewModel.get("itemForAttributes.id")
@@ -161,7 +161,7 @@ AP.productAttribute.list = (function () {
 
 		removeAttributes: function (event) {
 
-			var checks = $("#combination-items-grid").find("[name=selected]:checked");
+			var checks = $("#product-items-grid").find("[name=selected]:checked");
 
 			if (checks.length) {
 
@@ -175,7 +175,7 @@ AP.productAttribute.list = (function () {
 
 				NM.util.ajax({
 					method: "DELETE",
-					url: "/manager/ajax/combinations/" + AP.page.combinationId + "/items",
+					url: "/manager/ajax/products/" + AP.page.productId + "/items",
 					data: { items: ids },
 					callback: {
 						done: function (xhr) {
@@ -243,25 +243,25 @@ AP.productAttribute.list = (function () {
 
 			switch( type ) {
 
-				case "combinationItem":
+				case "productItem":
 
 					var value = {
 						type: "item",
 						id: event.data.id
 					};
 
-					var thisUrl = "/manager/ajax/combination-items/" + event.data.id + "/images";
+					var thisUrl = "/manager/ajax/product-items/" + event.data.id + "/images";
 
 					break;
 
-				case "combination":
+				case "product":
 
 					var value = {
-						type: "combination",
-						id: AP.page.combinationId
+						type: "product",
+						id: AP.page.productId
 					};
 
-					var thisUrl = "/manager/ajax/combinations/" + AP.page.combinationId + "/images";
+					var thisUrl = "/manager/ajax/products/" + AP.page.productId + "/images";
 
 					break;
 
@@ -361,13 +361,13 @@ AP.productAttribute.list = (function () {
 
 					break;
 
-				case "combination":
+				case "product":
 
 					var value = {
-						type: "combination",
-						combination: {
-							id: element.data("combination-id"),
-							name: element.data("combination-name")
+						type: "product",
+						product: {
+							id: element.data("product-id"),
+							name: element.data("product-name")
 						},
 					};
 			  
@@ -391,7 +391,7 @@ AP.productAttribute.list = (function () {
 
 		showImagesList: function () {
 
-			NM.util.openModal($("#combination-images-list-modal"));
+			NM.util.openModal($("#product-images-list-modal"));
 
 		},
 
@@ -400,14 +400,14 @@ AP.productAttribute.list = (function () {
 
 			console.log("loadFinishes");
 
-			var thisForm  = AP.combination.fields.configRow;
+			var thisForm  = AP.product.fields.configRow;
 			var finishEle = thisForm.find("[name=finishId]");
 			var sizeEle = thisForm.find("[name=sizeId]");
 
 			var lineId = AP.page.lineId;
 			var sizeId = sizeEle.val();
-			var combinations = AP.page.combinations;
-			var combinationId = AP.page.combinationId;
+			var products = AP.page.products;
+			var productId = AP.page.productId;
 
 			finishEle.empty("");
 
@@ -420,17 +420,17 @@ AP.productAttribute.list = (function () {
 
 			var found = false;
 
-			combinations.forEach(function (combination) {
+			products.forEach(function (product) {
 
-				if( lineId == combination.line.id && sizeId == combination.size.id ) {
+				if( lineId == product.line.id && sizeId == product.size.id ) {
 
-					if (combination.id == combinationId) {
+					if (product.id == productId) {
 						found = true;
 					}
 
 					var opt = $("<option>", {
-						value: combination.id,
-						text : AP.util.getMainText(combination.finish.texts).name
+						value: product.id,
+						text : AP.util.getMainText(product.finish.texts).name
 					});
 
 					finishEle.append(opt);
@@ -439,7 +439,7 @@ AP.productAttribute.list = (function () {
 
 			});
 
-			found ? finishEle.val(AP.page.combinationId) : "";
+			found ? finishEle.val(AP.page.productId) : "";
 
             return false;
 
@@ -450,9 +450,9 @@ AP.productAttribute.list = (function () {
 
 			var thisId = $(event.currentTarget).val();
 
-			if(thisId != AP.page.combinationId && thisId.length) {
+			if(thisId != AP.page.productId && thisId.length) {
 
-            	window.location.href = "/manager/combinations/" + thisId;
+            	window.location.href = "/manager/products/" + thisId;
 
 			}
 
@@ -464,7 +464,7 @@ AP.productAttribute.list = (function () {
 
 	pub.init = function () {
 
-		console.log("combination:init")
+		console.log("product:init")
 
 		kendo.bind(fields.rootDetail, viewModel);
 

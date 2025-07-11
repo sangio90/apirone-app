@@ -13,7 +13,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
 	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
 	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
-	property name="combinationComponentService" type="com.apirone.core.model.service.CombinationComponentService";
+	property name="productComponentService" type="com.apirone.core.model.service.ProductComponentService";
     */
 
 	property name="cacheScope" type="String" default="Component.bean";
@@ -42,7 +42,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Component[] function list(
     	String lineId,
     	String sizeId,
-    	String combinationId,
+    	String productId,
     	Numeric productItemId,
     	Numeric attributeValueId,
 		Boolean includeBaseAttributeComponents=false //only for product productItemId
@@ -56,7 +56,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Numeric function count(
     	String lineId,
     	String sizeId,
-    	String combinationId,
+    	String productId,
     	Numeric productItemId,
     	Numeric attributeValueId,
     ) {
@@ -70,7 +70,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     public com.apirone.core.model.bean.Result function search(
     	String lineId,
     	String sizeId,
-    	String combinationId,
+    	String productId,
     	Numeric productItemId,
     	Numeric attributeValueId,
 		Boolean includeBaseAttributeComponents=false hint="Only for product productItemId" 

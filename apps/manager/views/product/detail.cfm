@@ -2,7 +2,7 @@
 
 <cfoutput>
 
-    <div id="combination-detail-root">
+    <div id="product-detail-root">
 
         <div class="row">
             <div class="col-10">
@@ -21,9 +21,9 @@
                             <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
                         </div>
                         
-                        <div class="col-md-8 mb-4" id="combination-config-row">
+                        <div class="col-md-8 mb-4" id="product-config-row">
 
-                            <form class="d-flex align-items-center justify-content-end" id="combination-change-form">
+                            <form class="d-flex align-items-center justify-content-end" id="product-change-form">
                                 
                                 <label class="me-2">Finitura:</label>
 
@@ -80,10 +80,10 @@
                                             <br>
                                             - <a href=""
                                                 class="underline"
-                                                data-type="combination" 
+                                                data-type="product" 
 
-                                                data-combination-id="#rc.id#"
-                                                data-combination-name="#prc.subtitle# / #prc.title#"
+                                                data-product-id="#rc.id#"
+                                                data-product-name="#prc.subtitle# / #prc.title#"
                                                 
                                                 data-bind="click: openComponentsList">
                                                     Componenti base per questa placca &raquo;
@@ -92,21 +92,21 @@
 
                                             - <a href=""
                                                 class="underline"
-                                                data-type="combination" 
+                                                data-type="product" 
                                                 data-bind="click:openImagesList">
                                                 Aggiungi immagini per questa placca &raquo;
                                             </a>
                                             <br>
                                             - <a href=""
                                                 class="underline"
-                                                data-type="combination" 
+                                                data-type="product" 
                                                 data-bind="click:openReorderingModal">
                                                 Riordina attributi &raquo;
                                             </a>
                                             <br>
                                             - <a href=""
                                                 class="underline"
-                                                data-type="combination" 
+                                                data-type="product" 
                                                 data-bind="click:openFruitItemsImagesModal">
                                                 Tutte le combinazioni &raquo;
                                             </a>
@@ -135,8 +135,8 @@
                                             class="underline"
                                             data-type="item" 
 
-                                            data-combination-id="0"
-                                            data-combination-name="Attributo radice"
+                                            data-product-id="0"
+                                            data-product-name="Attributo radice"
                                         
                                             data-bind="click: openAttributesList">
                                             Aggiungi attributo di base
@@ -154,9 +154,9 @@
 
                                 <!---- <ap:productItemList grid="#variables.grid#"> ---->
 
-                                <form id="combination-grid-form">
+                                <form id="product-grid-form">
 
-                                    #productAttributesList( id="combination-items-grid", type="combination" )#
+                                    #productAttributesList( id="product-items-grid", type="product" )#
                                 
                                 </form>
 
@@ -181,9 +181,9 @@
             </div>
         </div>
 
-        #view("combination/attributes-list-modal")#
-        #view("combination/images-list-modal")#
-        #view("combination/sorting-modal")#
+        #view("product/attributes-list-modal")#
+        #view("product/images-list-modal")#
+        #view("product/sorting-modal")#
         
     </div>
 
@@ -191,6 +191,6 @@
     #view("attribute/detail-modal")#
     #view("component/list-modal")#
     <!---
-    #view("fruit/fruit-items-combinations-images-modal")#
+    #view("fruit/fruit-items-products-images-modal")#
     ---->
 </cfoutput>

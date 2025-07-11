@@ -8,6 +8,7 @@
 		"tests/**",
 		"*.log",
 		"*.code-workspace",
+		".cfformat.json",
 		".gitignore",
 		".cflintrc",
 		".editorconfig",

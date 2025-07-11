@@ -1,6 +1,6 @@
 <cfoutput>
 
-    <div id="line-combinations-root">
+    <div id="line-products-root">
 
         <div class="row">
             <div class="col-8">
@@ -23,10 +23,10 @@
                             <div class="col-9">
                                 <span class="red">Non tutte le combinazioni possono essere rimosse se sono state movimentate.</span>
                             </div>
-                            <div id="line-combinations-status" class="col-3 text-end h-20"></div>
+                            <div id="line-products-status" class="col-3 text-end h-20"></div>
                         </div>
 
-                        <form name="line-combinations-form" id="line-combinations-form" method="post">
+                        <form name="line-products-form" id="line-products-form" method="post">
 
                             <table class="table table-hover">
                                 <thead>
@@ -47,7 +47,7 @@
                                         <cfloop array="#prc.sizes#" item="size">
                                             <td>
 
-                                                <cfset exists = combinationExists( size.getId(), finish.getId() )>
+                                                <cfset exists = productExists( size.getId(), finish.getId() )>
 
                                                 <button class="btn btn-danger btn-sm active" data-bind="click:deactivate" 
                                                     data-values="#size.getId()#__#finish.getId()#"

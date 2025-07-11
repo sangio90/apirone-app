@@ -16,16 +16,16 @@
 
 	}
 
-	function install( required String env ) {
+	function setup( required String env ) {
 
-		print.greenLine( "Start install for [ #arguments.env# ] start..." );
+		print.greenLine( "Ssetup for [ #arguments.env# ] starting..." );
 
 		print.greenLine( 'Stop server...' );
 		command("server stop").run();
 
 		createEnv( env=arguments.env );
 
-		command("install").run();
+		command("setup").run();
 	
 		print.greenLine( 'Start server...' );
 		command("server start").run();
@@ -243,7 +243,7 @@
 		}
 
 		FileAppend( 
-			file=dir & "/install.log", data="#now()#;#type#;#msg##chr(9)##chr(13)#" 
+			file=dir & "/setup.log", data="#now()#;#type#;#msg##chr(9)##chr(13)#" 
 		);
 
 	}	

@@ -11,15 +11,10 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
-    "combination": {
+    "product": {
         "itemsDeleted": "Ho cancellato tutti gli attributi",
         "itemsAdded": "Attributi aggiunti con successo",
         "valueAdded": "Valore aggiunto",
-    },
-
-    "fruit": {
-        "itemsDeleted": "Ho cancellato tutti gli attributi",
-        "itemsAdded": "Attributi aggiunti con successo"
     },
 
     "line": {

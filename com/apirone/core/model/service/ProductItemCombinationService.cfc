@@ -1,18 +1,18 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.ProductItemCombinationDAO";
+	property name="dao" type="com.apirone.core.model.dao.ProductItemProductDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="productItemService" type="com.apirone.core.model.service.ProductItemService";
 	
-	property name="scopeCache" type="String" default="ProductItemCombination.bean";
+	property name="scopeCache" type="String" default="ProductItemProduct.bean";
 
-    public com.apirone.core.model.bean.ProductItemCombination function get(
-    		required String productItemCombinationId
+    public com.apirone.core.model.bean.ProductItemProduct function get(
+    		required String productItemProductId
         ){
 
     	var cm = getCacheManager();
 
-	   	var cache = cm.get( getScopeCache(), arguments.productItemCombinationId ) ;
+	   	var cache = cm.get( getScopeCache(), arguments.productItemProductId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -20,8 +20,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    } 
 	    
-		var bean = build( arguments.productItemCombinationId );
-		cm.put( getScopeCache(), arguments.productItemCombinationId, bean );
+		var bean = build( arguments.productItemProductId );
+		cm.put( getScopeCache(), arguments.productItemProductId, bean );
         
 		return bean;
 
@@ -48,15 +48,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
 
-	public com.apirone.core.model.bean.ProductItemCombination[] function calculate(
+	public com.apirone.core.model.bean.ProductItemProduct[] function calculate(
 		String fruitId,
-		String combinationId,
+		String productId,
 	) {
 
 		var result = [];
 
 		var baseTree = getProductItemService().getTree(
-			combinationId = arguments.combinationId,
+			productId = arguments.productId,
 			fruitId = arguments.fruitId
 		);
 
@@ -141,10 +141,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	private Struct function getBaseAttributes( required String combinationId, required String fruitId ) {
+	private Struct function getBaseAttributes( required String productId, required String fruitId ) {
 
 		var items = getProductItemService().getFlatTree(
-			combinationId = arguments.combinationId,
+			productId = arguments.productId,
 			fruitId = arguments.fruitId
 		);
 
@@ -185,7 +185,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
 	public com.apirone.core.model.bean.ProductItem[] function list(
          	String fruitId,
-         	String combinationId
+         	String productId
     ) {
 		arguments["limit"] = -1;
 
@@ -196,14 +196,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     public com.apirone.core.model.bean.Result function search(
 			String fruitId,
-            String combinationId
+            String productId
         ){
 
 		//dump( arguments );
 
 		// solo uno dei due
-		if ( ! ( IsNull( arguments.combinationId ) XOR IsNull( arguments.fruitId ) ) ) {
-			throw( type="ApirOne.errors.AtLeastOneParameterIsRequired", message="At least one parameter is required: combinationId or fruitId" );
+		if ( ! ( IsNull( arguments.productId ) XOR IsNull( arguments.fruitId ) ) ) {
+			throw( type="ApirOne.errors.AtLeastOneParameterIsRequired", message="At least one parameter is required: productId or fruitId" );
 		}
 	
 	    var rows = [];
@@ -226,16 +226,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
     public com.smartvillage.core.model.bean.Outcome function delete(
-			String combinationId,
+			String productId,
 			String attributeId,
 			String fruitId
 		){
 
 		var outcome = super.bean("Outcome");
 
-        var obj = get( arguments.combinationId );
+        var obj = get( arguments.productId );
 
-		outcome.setData( { combinationId: arguments.combinationId } );
+		outcome.setData( { productId: arguments.productId } );
 
 		transaction {
 		
@@ -243,7 +243,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 var cm = getCacheManager();
 
-                getDao().delete( arguments.combinationId );
+                getDao().delete( arguments.productId );
         
                 cm.remove( getCacheScope(), obj.getId() );
                 
@@ -252,7 +252,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteEvent" );
-				outcome.setMessage( "Cannot delete combination [#arguments.combinationId#]" );
+				outcome.setMessage( "Cannot delete product [#arguments.productId#]" );
 				
 			}
 			
@@ -263,10 +263,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create(
-			required com.apirone.core.model.bean.ProductItem combinationItem
+			required com.apirone.core.model.bean.ProductItem productItem
 		){
 
-		var newId = getDao().insert( arguments.combinationItem );
+		var newId = getDao().insert( arguments.productItem );
 
 		return newId;
 
@@ -278,19 +278,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.ProductItemCombination function build(
-    		required String productItemCombinationId
+	private com.apirone.core.model.bean.ProductItemProduct function build(
+    		required String productItemProductId
     	){
 
-	    var record = getDao().read( arguments.productItemCombinationId );
+	    var record = getDao().read( arguments.productItemProductId );
 
 	    if( record.recordCount ) { 
 
-            var bean = super.bean( "ProductItemCombination" );
+            var bean = super.bean( "ProductItemProduct" );
 
 			/*
             bean.setId( record.product_item_id );
-            bean.setCombinationId( record.combination_id );
+            bean.setProductId( record.product_id );
 			bean.setCreatedAt( record.created_at );
 			bean.setParent( get( record.parent_id ) );
 			bean.setOrderBy( record.orderby );

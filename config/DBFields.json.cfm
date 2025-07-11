@@ -50,23 +50,23 @@
         "type": "uuid"
     },
 
-    "fruit.id": {
-        "name": "fruit_id",
+    "product.id": {
+        "name": "product_id",
         "type": "uuid"
     },
 
-    "fruit.code": {
+    "product.code": {
         "name": "code",
         "type": "String"
     },
 
-    "fruit.created": {
+    "product.created": {
         "name": "created_at",
         "type": "date"
     },
 
     "finish.code": {
-        "name": "code",
+        "name": "finishes.code",
         "type": "Varchar"
     },
 
@@ -85,7 +85,7 @@
         "type": "Varchar"
     },
 
-    "combinationItem.id": {
+    "productItem.id": {
         "name": "product_item_id",
         "type": "Integer"
     },
@@ -93,11 +93,6 @@
     "rawValue.id": {
         "name": "raw_value_id",
         "type": "Integer"
-    },
-
-    "combination.id": {
-        "name": "combination_id",
-        "type": "uuid"
-    },
-
+    }
+ 
 }

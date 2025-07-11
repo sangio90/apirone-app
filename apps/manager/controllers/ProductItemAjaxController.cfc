@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var data = [];
         var result = super.getResult();
 
-        var  items = super.fire("CombinationComponent.list", { productItemId = rc.id } );
+        var  items = super.fire("ProductComponent.list", { productItemId = rc.id } );
 
         for( var item in items ) {
 
@@ -57,7 +57,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var product = super.bean("RawProduct");
         var variant = super.bean("Variant");
 
-        var combinationComponent = super.bean("Combination");
+        var productComponent = super.bean("Product");
 
         for( var thisComponent in components ) {
 
@@ -65,16 +65,16 @@ component extends="com.apirone.core.controller.AbsController" {
             color.setId( thisComponent.color.id )
             product.setId( thisComponent.comp.id )
 
-            combinationComponent.setProduct( product );
-            combinationComponent.setColor( color );
-            combinationComponent.setVariant( variant );
-            combinationComponent.setQuantity( thisComponent.quantity );
+            productComponent.setProduct( product );
+            productComponent.setColor( color );
+            productComponent.setVariant( variant );
+            productComponent.setQuantity( thisComponent.quantity );
             
-            super.fire( "ProductItem.addComponent", { productItemId = itemId, combinationComponent = combinationComponent } );
+            super.fire( "ProductItem.addComponent", { productItemId = itemId, productComponent = productComponent } );
 
         }
 
-        var message = completeMessage( "combination.componentAdded" );
+        var message = completeMessage( "product.componentAdded" );
 
         result.setData( { "message" = message } );
 

@@ -48,10 +48,10 @@
 
     <cfargument name="type" type="String" required="true">
     
-    <cfargument name="id" type="String" required="true" default="combination-grid-form">
+    <cfargument name="id" type="String" required="true" default="product-grid-form">
     <cfargument name="class" type="String" default="no-pager">
     <cfargument name="source" type="String" default="items">
-    <cfargument name="rowTemplate" type="String" default="combination/combination-item-row-tmpl">
+    <cfargument name="rowTemplate" type="String" default="product/product-item-row-tmpl">
 
     <cfset local.columns = "[
         { 'field':'Id', 'title':'ID', width: '60px' },

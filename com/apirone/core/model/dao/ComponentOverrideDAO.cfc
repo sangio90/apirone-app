@@ -18,7 +18,7 @@
 
 	<cffunction name="find" returntype="Query">
 
-		<cfargument name="combinationId" type="String">
+		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
@@ -40,32 +40,6 @@
 				<cfif !isNull( arguments.componentId )>
 					AND component_id = <cfqueryparam value="#arguments.componentId#" cfsqltype="Integer">
 				</cfif>
-
-                <!----
-				<cfif !isNull( arguments.fruitId )>
-					AND fruit_id = <cfqueryparam value="#arguments.fruitId#" cfsqltype="Varchar">::uuid
-				</cfif>
-
-				<cfif !isNull( arguments.fruitProductItemId )>
-					AND fruit_product_item_id = <cfqueryparam value="#arguments.fruitProductItemId#" cfsqltype="Integer">
-				</cfif>
-
-				<cfif !isNull( arguments.combinationId )>
-					AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
-				</cfif>
-
-				<cfif !isNull( arguments.lineId )>
-					AND line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">::uuid
-				</cfif>
-
-				<cfif !isNull( arguments.sizeId )>
-					AND size_id = <cfqueryparam value="#arguments.sizeId#" cfsqltype="Varchar">::uuid
-				</cfif>
-
-				<cfif !isNull( arguments.attributeValueId )>
-					AND attribute_raw_value_id = <cfqueryparam value="#arguments.attributeValueId#" cfsqltype="Integer">
-				</cfif>
-                ---->
 
 			ORDER BY 
 				#super.sanitizeSQL( arguments.orderby )#

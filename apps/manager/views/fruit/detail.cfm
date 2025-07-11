@@ -44,7 +44,7 @@
                                             <br>
                                             - <a href=""
                                                 class="underline"
-                                                data-type="combination" 
+                                                data-type="product" 
                                                 data-bind="click:openImagesList">
                                                 Aggiungi immagini per questo frutto &raquo;
                                             </a>
@@ -62,7 +62,7 @@
                                             <br>
                                             - <a href=""
                                                 class="underline"
-                                                data-type="combination" 
+                                                data-type="product" 
                                                 data-bind="click:openReorderingModal">
                                                 Riordina attributi &raquo;
                                             </a>
@@ -98,17 +98,17 @@
         
                                 </div>     
                                 
-                                <form id="combination-grid-form">
+                                <form id="product-grid-form">
 
-                                    #productAttributesList( id="combination-items-grid", type="combination" )#
+                                    #productAttributesList( id="product-items-grid", type="product" )#
                                 
                                 </form>                                
 
                                 <!----
-                                <form id="combination-grid-form">
+                                <form id="product-grid-form">
 
                                     #grid(
-                                        id      = "combination-items-grid",
+                                        id      = "product-items-grid",
                                         class   = "no-pager",
 
                                         columns = "[
@@ -125,7 +125,7 @@
                                             }
                                         ]",
                                         source: "items",
-                                        rowTemplate = "combination/combination-item-row-tmpl"
+                                        rowTemplate = "product/product-item-row-tmpl"
                                     )#
 
                                 </form>
@@ -142,9 +142,9 @@
             </div>
         </div>
 
-        #view("combination/attributes-list-modal")#
-        #view("combination/images-list-modal")#
-        #view("combination/sorting-modal")#
+        #view("product/attributes-list-modal")#
+        #view("product/images-list-modal")#
+        #view("product/sorting-modal")#
         
     </div>
 

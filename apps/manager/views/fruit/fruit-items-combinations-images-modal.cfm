@@ -1,11 +1,11 @@
 ﻿<cfoutput>
 
-    <div id="fruit-items-combinations-images-modal" class="modal fade">
+    <div id="fruit-items-products-images-modal" class="modal fade">
         
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                <form id="combination-sorting-modal-form" name="combination-sorting-modal-form" autocomplete="off">
+                <form id="product-sorting-modal-form" name="product-sorting-modal-form" autocomplete="off">
                 
                     <header class="card-header">
                         <h2 class="card-title">Tutte le combinazioni degli attributi</h2>
@@ -13,10 +13,10 @@
                     
                     <div class="card-body">                
                         
-                        <div class="col-12 text-end mb-2" id="fruit-items-combinations-status">
+                        <div class="col-12 text-end mb-2" id="fruit-items-products-status">
                         </div>
 
-                        <cfset combinations = [
+                        <cfset products = [
                             "LED per levetta: BIANCO - Tipo led: 230 V",
                             "LED per levetta: BIANCO - Tipo led: 12-24Vcc/ca",
                             "LED per levetta: ROSSO - Tipo led: 230 V",
@@ -36,7 +36,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <cfloop array="#combinations#" item="item">
+                                    <cfloop array="#products#" item="item">
                                         <tr>
                                             <td>
                                                 #item#
@@ -61,7 +61,7 @@
 
                             <!---
                             #grid(
-                                id      = "combination-ordering-items-grid",
+                                id      = "product-ordering-items-grid",
                                 class   = "no-pager",
                                 columns = "[
                                     { 'field':'Id', 'title':'ID', width: '60px' },
@@ -69,7 +69,7 @@
                                     { 'field':'', 'title':'Riordina', width: '55px'},
                                 ]",
                                 source: "items",
-                                rowTemplate = "combination/combination-ordering-item-row-tmpl"
+                                rowTemplate = "product/product-ordering-item-row-tmpl"
                             )#
                             --->
 

@@ -221,10 +221,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 		}
 
-		if( Len( record.fruit_id ) ) {
+		if( Len( record.product_it ) ) {
 
-			entity.setKey( "fruit.id" );
-			entity.setValue( record.fruit_id );
+			entity.setKey( "product.id" );
+			entity.setValue( record.product_id );
 
 			return entity;
 			

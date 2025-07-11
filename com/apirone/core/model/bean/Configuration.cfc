@@ -16,8 +16,8 @@ component output="true" accessors="true" {
 			},
 			"filesHost": "#settings.get("files.host")#",
 			"imagesConfig" = {
-				"combinationItem" = {
-					"path" = "combination-items",
+				"productItem" = {
+					"path" = "product-items",
 					"types" = {
 						"horizontal" = {
 							"sizes" = [
@@ -35,8 +35,8 @@ component output="true" accessors="true" {
 						}
 					}
 				},
-				"combination" = {
-					"path" = "combinations",
+				"product" = {
+					"path" = "products",
 					"types" = {
 						"horizontal" = {
 							"sizes" = [

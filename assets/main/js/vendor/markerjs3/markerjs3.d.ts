@@ -1522,9 +1522,9 @@ interface CaptionFrameMarkerState extends TextMarkerState, ShapeMarkerBaseState 
 }
 
 /**
- * Caption frame marker is a combination of a frame (rectangle) and a text caption that goes with it.
+ * Caption frame marker is a product of a frame (rectangle) and a text caption that goes with it.
  *
- * @summary A combination of a frame (rectangle) and a text caption that goes with it.
+ * @summary A product of a frame (rectangle) and a text caption that goes with it.
  *
  * @group Markers
  */

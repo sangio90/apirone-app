@@ -83,5 +83,3 @@ AP.my.detail = (function () {
 
     return pub;
 }());
-
-

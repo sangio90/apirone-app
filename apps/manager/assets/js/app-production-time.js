@@ -5,7 +5,7 @@ AP.productionTime.fields = {
     detailRoot: $("#production-time-detail-modal"),
     detailForm: $("#production-time-detail-form"),
     searchListForm: $("#production-time-grid-search-form"),
-    combinationsRoot: $("#production-time-combinations-root")
+    productsRoot: $("#production-time-products-root")
 };
 
 $(document).ready(function (){

@@ -20,10 +20,8 @@
 
 		<cfargument name="lineId" type="String">
 		<cfargument name="sizeId" type="String">
-		<cfargument name="combinationId" type="String">
+		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
-		<cfargument name="fruitId" type="String">
-		<cfargument name="fruitCombinationitemId" type="String">
 		<cfargument name="attributeValueId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
@@ -42,16 +40,8 @@
 					AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
 				</cfif>
 
-				<cfif !isNull( arguments.fruitId )>
-					AND fruit_id = <cfqueryparam value="#arguments.fruitId#" cfsqltype="Varchar">::uuid
-				</cfif>
-
-				<cfif !isNull( arguments.fruitProductItemId )>
-					AND fruit_product_item_id = <cfqueryparam value="#arguments.fruitProductItemId#" cfsqltype="Integer">
-				</cfif>
-
-				<cfif !isNull( arguments.combinationId )>
-					AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
+				<cfif !isNull( arguments.productId )>
+					AND product_id = <cfqueryparam value="#arguments.productId#" cfsqltype="Varchar">::uuid
 				</cfif>
 
 				<cfif !isNull( arguments.lineId )>
@@ -194,14 +184,9 @@
 				<cfset values = [ { value = arguments.component.getProductItem().getId(), type = "Integer" } ]>
 			</cfcase>
 
-			<cfcase value="com.apirone.core.model.bean.ComponentCombination">
-				<cfset fields = [ "combination_id" ]>
-				<cfset values = [ { value = arguments.component.getCombination().getId(), type = "uuid" } ]>
-			</cfcase>
-
-			<cfcase value="com.apirone.core.model.bean.ComponentFruit">
-				<cfset fields = [ "fruit_id" ]>
-				<cfset values = [ { value = arguments.component.getFruit().getId(), type = "uuid" } ]>
+			<cfcase value="com.apirone.core.model.bean.ComponentProduct">
+				<cfset fields = [ "product_id" ]>
+				<cfset values = [ { value = arguments.component.getProduct().getId(), type = "uuid" } ]>
 			</cfcase>
 
 			<cfcase value="com.apirone.core.model.bean.ComponentAttributeValue">

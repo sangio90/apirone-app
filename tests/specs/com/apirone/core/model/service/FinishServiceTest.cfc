@@ -111,6 +111,15 @@ component extends="testbox.system.BaseSpec"{
                 
     }
 
+   function listByLineId_test(){
+
+        var lineId = "c0fb8f55-40e1-4eb2-8ae2-58f27ffb872f"; //PLACCA MOD. BAROCCA
+
+        var list = variables.svc.list( lineId = lineId );
+
+        $assert.isTrue( list.len() == 8 ); 
+                
+    }
 
 
     function get(){

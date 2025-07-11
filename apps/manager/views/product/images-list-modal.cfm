@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="combination-images-list-modal" class="modal fade">
+    <div id="product-images-list-modal" class="modal fade">
         
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -15,7 +15,7 @@
                         
                         <div class="row"
                             data-bind="source: images" 
-                            data-template="combination-images-item-tmpl">
+                            data-template="product-images-item-tmpl">
                         </div>
                     
                     </div>
@@ -33,7 +33,7 @@
             </div>
         </section>
 
-        #template("jstemplate/combination/combination-images-item-tmpl")#
+        #template("jstemplate/product/product-images-item-tmpl")#
     
     </div>
 

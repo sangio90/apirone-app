@@ -63,43 +63,43 @@ component extends="com.apirone.core.controller.AbsController" {
         
     }
 
-    function createCombination( event, rc, prc ){
+    function createProduct( event, rc, prc ){
 
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
         var line = super.bean("Line");
         var size = super.bean("Size");
         var finish = super.bean("Finish");
-        var combination = super.bean("Combination");
+        var product = super.bean("Product");
 
-        combination.setLine( line.setId( rc.id ) );
-        combination.setFinish( finish.setId( json.finishId ) );
-        combination.setSize( size.setId( json.sizeId ) );
+        product.setLine( line.setId( rc.id ) );
+        product.setFinish( finish.setId( json.finishId ) );
+        product.setSize( size.setId( json.sizeId ) );
         
-        var newId = super.fire( "combination.create", [ combination ] );
+        var newId = super.fire( "product.create", [ product ] );
 
-        var message = super.completeMessage( "combination.created" );
+        var message = super.completeMessage( "product.created" );
 
-        var obj = super.fire( "combination.get", [ newId ] );
+        var obj = super.fire( "product.get", [ newId ] );
 
         event.setValue( "result", { 
             "message": message, 
-            "payload" = { "combinationId" = newId, "finishId" = obj.getFinish().getId(), "sizeId" = obj.getSize().getId() }
+            "payload" = { "productId" = newId, "finishId" = obj.getFinish().getId(), "sizeId" = obj.getSize().getId() }
         } );
         
     }
 
-    function deleteCombination( event, rc, prc ){
+    function deleteProduct( event, rc, prc ){
 
         var json = DESerializeJSON( GetHTTPRequestData().content );
 
-        super.fire( "combination.deleteByParams", { sizeId = json.sizeId, lineId = rc.id, finishId = json.finishId } );
+        super.fire( "product.deleteByParams", { sizeId = json.sizeId, lineId = rc.id, finishId = json.finishId } );
 
-        var message = super.completeMessage( "combination.deleted" );
+        var message = super.completeMessage( "product.deleted" );
 
         event.setValue( "result", { 
             "message": message, 
-            //"payload" = { "combinationId" = newId, "finishId" = obj.getFinish().getId(), "sizeId" = obj.getSize().getId() }
+            //"payload" = { "productId" = newId, "finishId" = obj.getFinish().getId(), "sizeId" = obj.getSize().getId() }
         } );
         
     }

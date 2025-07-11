@@ -30,7 +30,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.File[] function list(
 		String typeId,
-		String combinationId,
+		String productId,
 		String productItemId,
 	) {
 		arguments["limit"] = -1;
@@ -40,7 +40,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     public com.apirone.core.model.bean.Result function search(
 					 String typeId,
-					 String combinationId,
+					 String productId,
 					 String productItemId,
 			required Numeric limit = 20,
 			required Numeric offset = 0

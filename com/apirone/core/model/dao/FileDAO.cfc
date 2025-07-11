@@ -27,7 +27,7 @@
 
 	<cffunction name="find" returntype="Query">
 
-		<cfargument name="combinationId" type="String">
+		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
 		<cfargument name="typeId" type="String">
 
@@ -42,8 +42,8 @@
 				files
 			WHERE 1=1
 	
-			<cfif !isNull( arguments.combinationId )>
-				AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
+			<cfif !isNull( arguments.productId )>
+				AND product_id = <cfqueryparam value="#arguments.productId#" cfsqltype="Varchar">::uuid
 			</cfif>
 
 			<cfif !isNull( arguments.productItemId )>

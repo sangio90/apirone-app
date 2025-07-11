@@ -1,7 +1,5 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
 	<cffunction name="read">
-
 		<cfargument name="sizeId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
@@ -13,7 +11,6 @@
 		</cfquery>
 
 		<cfreturn local.q>
-
 	</cffunction>
 
 	<cffunction name="readByCode" output="false">
@@ -33,58 +30,53 @@
 		<cfreturn local.q>
 	</cffunction>
 
-    
 	<cffunction returntype="Query" name="find">
-
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
-		<cfargument name="orderby" required="true" type="String" default="code">
+		<cfargument name="orderby" required="true" type="String" default="sizes.code">
 		<cfargument name="limit" required="true" type="Numeric" default="0">
-        <cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="offset" required="true" type="Numeric" default="0">
 
-        <cfquery name="local.q" datasource="apirone">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
-				size_id::varchar, 
-				code,
+				size_id::varchar,
+				sizes.code,
 				orderby,
 				COUNT(size_id) OVER() AS total
 			FROM
 				sizes
-					<cfif !IsNull( arguments.lineId )>
-						INNER JOIN combinations USING ( size_id )
+					<cfif !isNull( arguments.lineId )>
+						INNER JOIN products USING ( size_id )
 					</cfif>
 
 			WHERE 1=1
-				
-				<cfif !IsNull( arguments.lineId )>
-                    AND combinations.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
-                </cfif>
 
-				<cfif !IsNull( arguments.str )>
+				<cfif !isNull( arguments.lineId )>
+					AND products.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
+				</cfif>
+
+				<cfif !isNull( arguments.str )>
 					AND sizes.code ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
 				</cfif>
 
-				<cfif !IsNull( arguments.categoryId )>
+				<cfif !isNull( arguments.categoryId )>
 					AND categories @> ANY ('{[#arguments.categoryId#]}')
 				</cfif>
 
-			ORDER BY 
+			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GTE 0>
-				LIMIT 
+				LIMIT
 					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
 				OFFSET
 					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
 			</cfif>
-
 		</cfquery>
 
 		<cfreturn local.q>
-
-	</cffunction>	
-
+	</cffunction>
 
 	<cffunction name="insert" returntype="String" output="false">
 		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
@@ -111,11 +103,10 @@
 		<cfreturn local.q.size_id.toString()>
 	</cffunction>
 
-
 	<cffunction name="update" returntype="String">
 		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
 
-		<cfset var categories = SerializeJSON( super.getCategoriesAsArray( size.getCategories() ) )>
+		<cfset var categories = serializeJSON( super.getCategoriesAsArray( size.getCategories() ) )>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
@@ -129,11 +120,9 @@
 			WHERE
 				size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getId()#">::uuid
 		</cfquery>
-		
+
 		<cfreturn arguments.size.getId()>
-	
 	</cffunction>
-	
 
 	<cffunction name="delete" returntype="Numeric">
 		<cfargument name="sizeId" type="String" required="true">
@@ -147,6 +136,5 @@
 		</cfquery>
 
 		<cfreturn local.q.recordCount>
-	</cffunction>	
-
+	</cffunction>
 </cfcomponent>

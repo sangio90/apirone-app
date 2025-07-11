@@ -33,12 +33,12 @@ component extends="com.apirone.core.controller.AbsController" {
         var components = DeserializeJSON( GetHTTPRequestData().content );
 
         switch ( rc.by ) {
-            case "combination":
+            case "product":
 
-                var component = super.bean("ComponentCombination");
-                var combination = super.bean("Combination");
+                var component = super.bean("ComponentProduct");
+                var product = super.bean("Product");
 
-                component.setCombination( combination.setId( rc.combinationId ) );
+                component.setProduct( product.setId( rc.productId ) );
 
                 break;
 
@@ -62,6 +62,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
                 break;
 
+                /*
             case "fruit":
                 
                 var component = super.bean("ComponentFruit");
@@ -70,6 +71,7 @@ component extends="com.apirone.core.controller.AbsController" {
                 component.setFruit( fruit.setId( rc.fruitId ) );
 
                 break;
+                */
 
             case "attributeValue":
                 
@@ -156,7 +158,7 @@ component extends="com.apirone.core.controller.AbsController" {
         
         }
 
-        var message = completeMessage( "combination.componentAdded" );
+        var message = completeMessage( "product.componentAdded" );
 
         result.setData( { "message" = message } );
 
@@ -216,8 +218,8 @@ component extends="com.apirone.core.controller.AbsController" {
         var params = {}
 
         switch ( arguments.typeId ) {
-            case "combination":
-                params = { combinationId = rc.combinationId };
+            case "product":
+                params = { productId = rc.productId };
                 break;
 
             case "item":

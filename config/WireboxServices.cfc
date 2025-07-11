@@ -177,9 +177,9 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "TextService", ref = "TextService" )
             .parent("AbsService");
 
-        map("CombinationService").to( "com.apirone.core.model.service.CombinationService" )
+        map("ProductService").to( "com.apirone.core.model.service.ProductService" )
             .asSingleton()
-            .property( name = "dao", ref = "CombinationDAO" )
+            .property( name = "dao", ref = "ProductDAO" )
             .property( name = "SizeService", ref = "SizeService" )
             .property( name = "LineService", ref = "LineService" )
             .property( name = "FinishService", ref = "FinishService" )
@@ -196,9 +196,9 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "attributeService", ref = "AttributeService" )
             .parent("AbsService");
 
-        map("ProductItemCombinationService").to( "com.apirone.core.model.service.ProductItemCombinationService" )
+        map("ProductItemProductService").to( "com.apirone.core.model.service.ProductItemProductService" )
             .asSingleton()
-            .property( name = "dao", ref = "ProductItemCombinationDAO" )
+            .property( name = "dao", ref = "ProductItemProductDAO" )
             .property( name = "statusService", ref = "statusService" )
             .property( name = "ProductItemService", ref = "ProductItemService" )
             .parent("AbsService");
@@ -287,7 +287,7 @@ component extends="coldbox.system.ioc.config.Binder" {
         map("RawValueDAO").to( "com.apirone.core.model.dao.RawValueDAO" )
             .asSingleton();
          
-        map("ProductItemCombinationDAO").to( "com.apirone.core.model.dao.ProductItemCombinationDAO" )
+        map("ProductItemProductDAO").to( "com.apirone.core.model.dao.ProductItemProductDAO" )
             .asSingleton();
          
         map("ComponentDAO").to( "com.apirone.core.model.dao.ComponentDAO" )
@@ -302,7 +302,7 @@ component extends="coldbox.system.ioc.config.Binder" {
         map("ProductCategoryDAO").to( "com.apirone.core.model.dao.ProductCategoryDAO" )
             .asSingleton();
          
-        map("CombinationDAO").to( "com.apirone.core.model.dao.CombinationDAO" )
+        map("ProductDAO").to( "com.apirone.core.model.dao.ProductDAO" )
             .asSingleton();
          
         map("ReportDAO").to( "com.apirone.core.model.dao.ReportDAO" )

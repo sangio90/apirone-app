@@ -61,7 +61,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var newId = getDao().insert( arguments.attributeValue );
 
-		getCacheManager().remove( "Attribute", arguments.attributeValue.getAttributeId() );
+		removeCache( arguments.attributeValue );
 
 		return newId;
 
@@ -74,7 +74,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getDao().update( arguments.attributeValue );
 
-		removeCache();
+		removeCache( arguments.attributeValue );
 		
 		return id;
     
@@ -93,7 +93,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.attributeValueId );
 				outcome.setData( { "deletedCount" = result } )
 
-				removeCache();
+				removeCache( obj );
 			
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -113,7 +113,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	*/
 
 	private Void function removeCache( 
-		com.apirone.core.model.bean.AttributeValue attributeValue 
+		required com.apirone.core.model.bean.AttributeValue attributeValue 
 	){
 
 		var cm = super.getCacheManager();

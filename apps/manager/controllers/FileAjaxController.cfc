@@ -9,14 +9,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var file = super.bean("File");
 
-        if( rc.by == "combinations" ) {
-            var params = { combinationId = rc.id }
-            var config = getConfiguration().get("imagesConfig")[ "combination" ];
+        if( rc.by == "products" ) {
+            var params = { productId = rc.id }
+            var config = getConfiguration().get("imagesConfig")[ "product" ];
         }
 
-        if( rc.by == "combination-items" ) {
+        if( rc.by == "product-items" ) {
             var params = { productItemId = rc.id }
-            var config = getConfiguration().get("imagesConfig")[ "combinationItem" ];
+            var config = getConfiguration().get("imagesConfig")[ "productItem" ];
         }
 
         for( var typeId in config.types  ) {
@@ -69,14 +69,14 @@ component extends="com.apirone.core.controller.AbsController" {
         var tmpDir = getTempDir();
         var entity = super.bean("Entity");
 
-        if( rc.by == "combination-items" ) {
-            entity.setKey( "combinationItem.id" );
-            var kindId = "combinationItem";
+        if( rc.by == "product-items" ) {
+            entity.setKey( "productItem.id" );
+            var kindId = "productItem";
         }
 
-        if( rc.by == "combinations" ) {
-            entity.setKey( "combination.id" );
-            var kindId = "combination";
+        if( rc.by == "products" ) {
+            entity.setKey( "product.id" );
+            var kindId = "product";
         }
 
         entity.setValue( rc.id );

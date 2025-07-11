@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
 	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
-	property name="combinationComponentService" type="com.apirone.core.model.service.CombinationComponentService";
+	property name="productComponentService" type="com.apirone.core.model.service.ProductComponentService";
 	property name="componentService" type="com.apirone.core.model.service.ComponentService";
 	
 	property name="cacheScope" type="String" default="ProductItem.bean";
@@ -31,22 +31,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.ProductItem[] function getTree(
-		String fruitId,
-		String combinationId
+		required String productId
     ) {
-
-		if ( ! ( IsNull( arguments.combinationId ) XOR IsNull( arguments.fruitId ) ) ) {
-			throw( type="ApirOne.errors.OneParameterIsRequired", message="One param is required: fruitId or combinationId" );
-		}
 
         var result = [];
 
-        var fruitId = arguments.fruitId;
-        var combinationId = arguments.combinationId;
+        var productId = arguments.productId;
 
         var baseItems = list( 
-            combinationId = arguments.combinationId,
-            fruitId = arguments.fruitId
+            productId = arguments.productId
         );
 
         for( var item in baseItems ) {
@@ -65,8 +58,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}	
 
 	public com.apirone.core.model.bean.ProductItem[] function getFlatTree(
-					 String fruitId,
-            		 String combinationId,
+            required String productId,
             required Numeric parentId=NullValue(),
             required String level=1, 
             required String orderBy="",
@@ -76,12 +68,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         var result = [];
 		var rows = [];
 
-        var fruitId = arguments.fruitId;
-        var combinationId = arguments.combinationId;
+        var productId = arguments.productId;
 
         var items = list( 
-            combinationId = arguments.combinationId,
-            fruitId = arguments.fruitId,
+            productId = arguments.productId,
             parentId = arguments.parentId
         );
 
@@ -125,7 +115,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				result.add( row );
 				
-				var rows = getFlatTree( fruitId, combinationId, parentId, thisLevel+1, thisOrderBy, includeMissingValues );
+				var rows = getFlatTree( productId, parentId, thisLevel+1, thisOrderBy, includeMissingValues );
 
 				result = result.merge( rows );
 
@@ -141,8 +131,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public com.apirone.core.model.bean.ProductItem[] function list(
-         	String fruitId,
-         	String combinationId,
+         	String productId,
 			Numeric parentId
     ) {
 		arguments["limit"] = -1;
@@ -152,11 +141,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-    public com.apirone.core.model.bean.CombinationComponent[] function listComponents(
+    public com.apirone.core.model.bean.ProductComponent[] function listComponents(
             required Numeric productItemId,
         ){
 
-		var result = getCombinationComponentService().list( productItemId = productItemId );
+		var result = getProductComponentService().list( productItemId = productItemId );
 
         return result;
 
@@ -164,7 +153,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     public Boolean function addComponent(
             required Numeric productItemId,
-            required com.apirone.core.model.bean.CombinationComponent combinationComponent
+            required com.apirone.core.model.bean.ProductComponent productComponent
         ){
 
 		transaction {
@@ -177,19 +166,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
     public com.apirone.core.model.bean.Result function search(
-			String fruitId,
-            String combinationId,
+            String productId,
             Numeric parentId
         ){
 
-
-		// solo uno dei tre NON VA E NON HA SENSO xor di 3
-		/*
-		if ( ! ( IsNull( arguments.combinationId ) XOR IsNull( arguments.fruitId ) XOR IsNull( arguments.parentId ) ) ) {
-			throw( type="ApirOne.errors.AtLeastOneParameterIsRequired", message="One param is required: combinationId or fruitId or parentId" );
-		}
-		*/
-	
 	    var rows = [];
     	var result = super.getResult();
 
@@ -210,16 +190,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
     public com.smartvillage.core.model.bean.Outcome function delete(
-			String combinationId,
-			String attributeId,
-			String fruitId
+			String productId,
+			String attributeId
 		){
 
 		var outcome = super.bean("Outcome");
 
-        var obj = get( arguments.combinationId );
+        var obj = get( arguments.productId );
 
-		outcome.setData( { combinationId: arguments.combinationId } );
+		outcome.setData( { productId: arguments.productId } );
 
 		transaction {
 		
@@ -227,16 +206,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 var cm = getCacheManager();
 
-                getDao().delete( getCacheScope(), arguments.combinationId );
+                getDao().delete( getCacheScope(), arguments.productId );
         
-                cm.remove( "combination_#obj.getId()#" );
+                cm.remove( "product_#obj.getId()#" );
                 
 			} catch ( any error ) {
 
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteEvent" );
-				outcome.setMessage( "Cannot delete combination [#arguments.combinationId#]" );
+				outcome.setMessage( "Cannot delete product [#arguments.productId#]" );
 				
 			}
 			
@@ -422,7 +401,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             var bean = super.bean( "ProductItem" );
 
             bean.setId( record.product_item_id );
-            bean.setCombinationId( record.combination_id );
+            bean.setProductId( record.product_id );
 			bean.setCreatedAt( record.created_at );
 
 			bean.setParent( IsNull( record.parent_id ) ? NullValue() : get( record.parent_id ) );

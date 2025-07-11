@@ -5,7 +5,7 @@ AP.fields.fruit = {
 	detailRoot: $("#fruit-detail-root"),
 
 	attributeSearchForm: $("#attributes-search-form"),
-	attributeModal: $("#combination-attributes-list-modal"),
+	attributeModal: $("#product-attributes-list-modal"),
 
 };
 
@@ -85,7 +85,7 @@ AP.fruit.detail = (function () {
 
 		removeAttributes: function (event) {
 
-			var checks = $("#combination-items-grid").find("[name=selected]:checked");
+			var checks = $("#product-items-grid").find("[name=selected]:checked");
 
 			if (checks.length) {
 

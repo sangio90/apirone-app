@@ -1,6 +1,6 @@
 {
-    "name":"apirone",
-    "slug":"apirone-site",
+    "name":"ApirOne for Apir Srl",
+    "slug":"apirone",
     "author":"",
     "contributors":[],
     "dependencies":{
@@ -31,9 +31,12 @@
     "location":"ForgeboxStorage",
     "private":false,
     "scripts":{
-        "install:devel":"task run taskFile=tasks/Build.cfc target=install :env=devel",
-        "install:prod":"task run taskFile=tasks/Build.cfc target=install :env=prod",
-        "install:test":"task run taskFile=tasks/Build.cfc target=install :env=test",
+        "setup:devel":"task run taskFile=tasks/Build.cfc target=setup :env=devel",
+        "setup:prod":"task run taskFile=tasks/Build.cfc target=setup :env=prod",
+        "setup:test":"task run taskFile=tasks/Build.cfc target=setup :env=test",
+        "format": "cfformat run cfformat watch /apps/**/controllers/**,/com/** --overwrite",
+        "format:watch": "cfformat watch /apps/**/controllers/**,/com/**",
+        "format:check": "cfformat check /apps/**/controllers/**,/com/**",
         "createZip":"task run taskFile=tasks/Build.cfc target=createZip"
     },
     "testbox":{

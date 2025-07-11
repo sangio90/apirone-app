@@ -1,8 +1,8 @@
 component extends="com.apirone.core.model.bean.Component" accessors="true"{
 
-    property name="combination" type="com.apirone.core.model.bean.Combination";
+    property name="product" type="com.apirone.core.model.bean.Product";
     
-    public ComponentCombination function init(){
+    public ComponentProduct function init(){
 
         return this;
         

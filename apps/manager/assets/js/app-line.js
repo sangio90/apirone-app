@@ -5,7 +5,7 @@ AP.line.fields = {
     detailRoot: $("#line-detail-modal"),
     detailForm: $("#line-detail-form"),
     searchListForm: $("#line-grid-search-form"),
-    combinationsRoot: $("#line-combinations-root")
+    productsRoot: $("#line-products-root")
 };
 
 $(document).ready(function (){
@@ -16,9 +16,9 @@ $(document).ready(function (){
 
 	}
 
-	if (AP.line.fields.combinationsRoot.length) {
+	if (AP.line.fields.productsRoot.length) {
 
-	    AP.line.combinations.init();
+	    AP.line.products.init();
 
 	}
 
@@ -300,10 +300,10 @@ AP.line.list = (function () {
 
         },
 
-		combinations: function (event) {
+		products: function (event) {
 
             var id = event.data.id;
-            window.open("/manager/lines/" + id + "/combinations", "_blank").focus();
+            window.open("/manager/lines/" + id + "/products", "_blank").focus();
 
             return false;
 		},
@@ -312,7 +312,7 @@ AP.line.list = (function () {
 		attributes: function (event) {
 
             /*
-                note: redirect in controller to first combination
+                note: redirect in controller to first product
             */
 
             var id = event.data.id;
@@ -336,7 +336,7 @@ AP.line.list = (function () {
 }());
 
 
-AP.line.combinations = (function () {
+AP.line.products = (function () {
 
     var pub = {};
     var fields = AP.line.fields;
@@ -357,7 +357,7 @@ AP.line.combinations = (function () {
             message = "Combinazione rimossa";
         }
 
-        var status = $("#line-combinations-status");
+        var status = $("#line-products-status");
         var values = $(event.currentTarget).data("values");
 
         status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
@@ -367,7 +367,7 @@ AP.line.combinations = (function () {
 
         NM.util.ajax({
             method: method,
-            url: "/manager/ajax/lines/" + AP.page.line.id + "/combinations",
+            url: "/manager/ajax/lines/" + AP.page.line.id + "/products",
             data: JSON.stringify({
                     sizeId: size,
                     finishId: finish
@@ -420,7 +420,7 @@ AP.line.combinations = (function () {
 
             bootbox.confirm({
                 title: "Conferma eliminazione",
-                message: "Sei sicuro di voler cancellare questa combinazione?",
+                message: "Sei sicuro di voler cancellare questo prodotto?",
                 buttons: {
                     confirm: {
                         label: "Si, confermo",
@@ -444,7 +444,7 @@ AP.line.combinations = (function () {
 
 	pub.init = function () {
 
-		kendo.bind( fields.combinationsRoot, viewModel);
+		kendo.bind( fields.productsRoot, viewModel);
 
 	};
 

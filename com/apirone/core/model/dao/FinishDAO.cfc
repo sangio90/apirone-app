@@ -1,5 +1,4 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
 	<cffunction name="read" returntype="Query">
 		<cfargument name="finishId" type="String" required="true">
 
@@ -37,13 +36,17 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
-		<cfargument name="orderBy" type="String" default="code asc, taxcode desc">
+		<cfargument name="orderBy" type="String" default="finishes.code asc">
+
+		<cfargument name="limit" required="true" type="Numeric" default="0">
+		<cfargument name="offset" required="true" type="Numeric" default="0">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
 				finish_id::varchar,
 				categories::varchar,
-				*
+				finishes.code,
+				COUNT(finish_id) OVER() AS total
 			FROM
 				finishes
 
@@ -51,11 +54,19 @@
 					INNER JOIN texts USING ( finish_id )
 				</cfif>
 
+				<cfif !isNull( arguments.lineId )>
+					INNER JOIN products USING ( finish_id )
+				</cfif>
+
 			WHERE 1=1
 
 				<cfif !isNull( arguments.categoryId )>
 					<!--- INFO: with cfqueryparam not works --->
-					AND categories @> ANY ('{[#super.sanitizeSQL(arguments.categoryId)#]}')
+					AND categories @> ANY ('{[#super.sanitizeSQL( arguments.categoryId )#]}')
+				</cfif>
+
+				<cfif !isNull( arguments.lineId )>
+					AND products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				</cfif>
 
 				<cfif !isNull( arguments.str )>
@@ -67,6 +78,13 @@
 
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderBy )#
+
+			<cfif arguments.limit GTE 0>
+				LIMIT
+					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
+				OFFSET
+					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
+			</cfif>
 		</cfquery>
 
 		<cfreturn local.q>
@@ -104,7 +122,7 @@
 			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getCode()#">,
-				categories = <cfqueryparam cfsqltype="Other" value="#SerializeJSON( categories )#">
+				categories = <cfqueryparam cfsqltype="Other" value="#serializeJSON( categories )#">
 			WHERE
 				finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getId()#">::uuid
 		</cfquery>
@@ -125,5 +143,4 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
-
 </cfcomponent>

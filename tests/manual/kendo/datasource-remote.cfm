@@ -35,7 +35,7 @@
     function getDS() {
 
         var dataSource = NM.kendo.dataSource({ 
-            url: "/manager/ajax/combinations/c3d8a2f9-09cc-4814-8971-0398819ecd7a/items?start=1"
+            url: "/manager/ajax/products/c3d8a2f9-09cc-4814-8971-0398819ecd7a/items?start=1"
         });
 
         return dataSource;

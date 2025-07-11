@@ -2,12 +2,12 @@
 
 	<cffunction returntype="Query" name="read">
 
-		<cfargument name="categoryId" type="String" required="true">
+		<cfargument name="statusId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
-			FROM status
-			WHERE status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.categoryId#">
+			FROM statuses
+			WHERE status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.statusId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -24,7 +24,7 @@
 				status_id,
 				COUNT(status_id) OVER() AS total
 			FROM
-                status
+                statuses
 			WHERE 1=1
                 
             <cfif !IsNull(arguments.entityId)>

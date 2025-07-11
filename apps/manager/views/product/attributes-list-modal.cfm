@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="combination-attributes-list-modal" class="modal fade">
+    <div id="product-attributes-list-modal" class="modal fade">
         
         <section class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -36,15 +36,15 @@
 
                                 <div class="col-12">
                                     #grid( 
-                                        id="combination-attributes-grid",
+                                        id="product-attributes-grid",
                                         columns="[
                                             { 'field':'id', 'title':'ID', width: '100px' },
                                             { 'field':'name', 'title':'Descrizione'},
-                                            { 'field':'', 'title':'Aggiungi attributo alla combinazione', width: '50px'},
+                                            { 'field':'', 'title':'Aggiungi attributo al prodotto', width: '50px'},
                                             { 'field':'', 'title':'Modifica attributo', width: '50px'}
                                         ]",
                                         source="attributesList",
-                                        rowTemplate="combination/combination-attributes-list-row-tmpl"
+                                        rowTemplate="product/product-attributes-list-row-tmpl"
                                     )#
                                 </div>
             

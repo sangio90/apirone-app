@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="combination-detail-root">
+    <div id="product-detail-root">
 
         #pageTitle()#
 
@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        #view("combination/attributes-list-modal")#
+        #view("product/attributes-list-modal")#
         
     </div>
 

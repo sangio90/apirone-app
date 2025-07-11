@@ -26,6 +26,7 @@
 		<cfargument name="rawValueId" type="Numeric">
 		<cfargument name="productCategoryId" type="Numeric">
 		<cfargument name="sizeId" type="String">
+		<cfargument name="productId" type="String">
 
 		<cfargument name="fromDate" type="Date">
 		<cfargument name="toDate" type="Date">
@@ -95,8 +96,8 @@
 				AND finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 			</cfif>
 
-			<cfif !isNull( arguments.fruitId ) >
-				AND fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.fruitId#">::uuid
+			<cfif !isNull( arguments.productId ) >
+				AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
 			</cfif>
 
 			<cfif !isNull( arguments.fromDate ) >

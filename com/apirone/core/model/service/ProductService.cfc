@@ -1,19 +1,19 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.CombinationsDAO";
+	property name="dao" type="com.apirone.core.model.dao.ProductsDAO";
 	property name="SizeService" type="com.apirone.core.model.dao.SizeService";
 	property name="LineService" type="com.apirone.core.model.dao.LineService";
 	property name="FinishService" type="com.apirone.core.model.dao.FinishService";
 	property name="StatusService" type="com.apirone.core.model.dao.StatusService";
-	property name="cacheScope" type="String" default="Combination.bean";
+	property name="cacheScope" type="String" default="Product.bean";
 
-    public com.apirone.core.model.bean.Combination function get(
-    		required String combinationId
+    public com.apirone.core.model.bean.Product function get(
+    		required String productId
         ){
 
     	var cm = getCacheManager();
 
-	   	var cache = cm.get( getCacheScope(), arguments.combinationId );
+	   	var cache = cm.get( getCacheScope(), arguments.productId );
 
 	    if ( cache.status ) {
 	    
@@ -21,14 +21,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    
 	    } 
 	    
-		var bean = build( arguments.combinationId );
-		cm.put( getCacheScope(), arguments.combinationId, bean );
+		var bean = build( arguments.productId );
+		cm.put( getCacheScope(), arguments.productId, bean );
         
 		return bean;
 
 	}
 
-    public com.apirone.core.model.bean.Combination function getByParams(
+    public com.apirone.core.model.bean.Product function getByParams(
 			required String lineId,
 			required String finishId,
 			required String sizeId
@@ -38,7 +38,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( record.recordcount == 1) {
 
-			return get( record.combination_id );
+			return get( record.product_id );
 
 		}
 
@@ -46,7 +46,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	public com.apirone.core.model.bean.Combination[] function list() {
+	public com.apirone.core.model.bean.Product[] function list() {
 		arguments["limit"] = -1;
 
 		return search(argumentCollection = arguments).getData();
@@ -64,7 +64,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var records = getDao().find( argumentCollection=arguments );
 
 		records.each(function(record) {
-			rows.add( get( combinationId = record.Combination_id ) );
+			rows.add( get( productId = record.Product_id ) );
 		});
 
 	    result.setData( rows );
@@ -76,14 +76,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     }
 
     public com.smartvillage.core.model.bean.Outcome function delete(
-			required String combinationId
+			required String productId
 		){
 
 		var outcome = super.bean("Outcome");
 
-        var obj = get( arguments.combinationId );
+        var obj = get( arguments.productId );
 
-		outcome.setData( { combinationId: arguments.combinationId } );
+		outcome.setData( { productId: arguments.productId } );
 
 		transaction {
 		
@@ -91,16 +91,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
                 var cm = getCacheManager();
 
-                getDao().delete( arguments.combinationId );
+                getDao().delete( arguments.productId );
         
-                cm.remove( getCacheScope(), arguments.combinationId );
+                cm.remove( getCacheScope(), arguments.productId );
                 
 			} catch ( any error ) {
 
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteEvent" );
-				outcome.setMessage( "Cannot delete combination [#arguments.combinationId#]" );
+				outcome.setMessage( "Cannot delete product [#arguments.productId#]" );
 				
 			}
 			
@@ -122,7 +122,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var combId = obj.getId()
 
-		outcome.setData( { combinationId: combId } );
+		outcome.setData( { productId: combId } );
 
 		transaction {
 		
@@ -142,8 +142,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteCombination" );
-				outcome.setMessage( "Cannot delete combination [#combId#]" );
+				outcome.setType( "ApirOne.CannotDeleteProduct" );
+				outcome.setMessage( "Cannot delete product [#combId#]" );
 				
 			}
 			
@@ -155,10 +155,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public String function create(
-			required com.apirone.core.model.bean.Combination combination
+			required com.apirone.core.model.bean.Product product
 		){
 
-		var newId = getDao().insert( arguments.combination );
+		var newId = getDao().insert( arguments.product );
 
 		return newId;
 
@@ -170,17 +170,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Combination function build(
-    		required String combinationId
+	private com.apirone.core.model.bean.Product function build(
+    		required String productId
     	){
 
-	    var record = getDao().read( arguments.combinationId );
+	    var record = getDao().read( arguments.productId );
 
 	    if( record.recordCount ) { 
 
-            var bean = super.bean( "Combination" );
+            var bean = super.bean( "Product" );
 
-            bean.setId( record.combination_id );
+            bean.setId( record.product_id );
 			bean.setName( "" );
 			bean.setCreatedAt( record.created_at );
 
