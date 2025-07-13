@@ -38,15 +38,11 @@
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="orderBy" type="String" default="finishes.code asc">
 
-		<cfargument name="limit" required="true" type="Numeric" default="0">
-		<cfargument name="offset" required="true" type="Numeric" default="0">
-
 		<cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
 				finish_id::varchar,
 				categories::varchar,
-				finishes.code,
-				COUNT(finish_id) OVER() AS total
+				finishes.code
 			FROM
 				finishes
 
@@ -55,7 +51,7 @@
 				</cfif>
 
 				<cfif !isNull( arguments.lineId )>
-					INNER JOIN products USING ( finish_id )
+					INNER JOIN combinations USING ( finish_id )
 				</cfif>
 
 			WHERE 1=1
@@ -78,13 +74,6 @@
 
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderBy )#
-
-			<cfif arguments.limit GTE 0>
-				LIMIT
-					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
-				OFFSET
-					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
-			</cfif>
 		</cfquery>
 
 		<cfreturn local.q>
