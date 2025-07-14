@@ -6,8 +6,9 @@
 /.vscode
 /.env
 /modules/*
-/tasks/local.properties
+/tasks/envs/local.properties
 /*.log
 /modules
 /userdata
-./_data
+_data
+.DS_Store
