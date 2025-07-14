@@ -6,111 +6,91 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="Text.bean";
 
-	public com.apirone.core.model.bean.Text function get(
-			required String textId
-    	){
+	public com.apirone.core.model.bean.Text function get( required String textId ){
+		var cm = getCacheManager();
 
-			var cm = getCacheManager();
+		var cache = cm.get( getCacheScope(), arguments.textId );
 
-			var cache = cm.get( getCacheScope(), arguments.textId ) ;
-	
-			if ( cache.status ) {
-			
-				return cache.data;
-			
-			}
-			
-			var bean = build( arguments.textId );
-			
-            cm.put( getCacheScope(), arguments.textId, bean );
-			
-            return bean;
+		if ( cache.status ) {
+			return cache.data;
+		}
 
-	} 
-    
-    public com.apirone.core.model.bean.Text[] function list(
-		String statusId,
-	) {
-		arguments["limit"] = -1;
-		return search(argumentCollection = arguments).getData()
+		var bean = build( arguments.textId );
+
+		cm.put( getCacheScope(), arguments.textId, bean );
+
+		return bean;
 	}
 
-    public com.apirone.core.model.bean.Result function search(
-                     String statusId,
-                     String attributeId,
-                     Numeric attributeValueId,
-                     Numeric ProductCategoryId,
-                     String finishId,
-                     String langId,
-            required Numeric limit = 20,
-			required Numeric offset = 0,
-			required Array orderBy = [ { field="lang.orderBy", dir="asc" } ]
-    	){
+	public Array function list(){
+		arguments[ "limit" ] = -1;
+		return search( argumentCollection = arguments ).getData()
+	}
 
-	    var rows = [];
-    	var result = super.getResult();
+	public com.apirone.core.model.bean.Result function search(
+		String statusId,
+		String attributeId,
+		Numeric attributeValueId,
+		Numeric ProductCategoryId,
+		String finishId,
+		String langId,
+		String productId,
+		required Numeric limit  = 20,
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "lang.orderBy", dir = "asc" } ]
+	){
+		var rows   = [];
+		var result = super.getResult();
 
-		arguments["orderby"] = super.createOrderBy( arguments["orderby"] );
+		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-    	var records = getDao().find( argumentCollection=arguments );
+		var records = getDao().find( argumentCollection = arguments );
 
-		records.each(function(record) {
+		records.each( function( record ){
 			rows.add( get( textId = record.text_id ) );
-		});
+		} );
 
-	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
-	    result.setTotal( Val( records.total ) );
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
-        return result;
+		return result;
+	}
 
-    }
-
-	public String function create(
-			required com.apirone.core.model.bean.Text text
-		){
-
+	public String function create( required com.apirone.core.model.bean.Text text ){
 		var newId = getDao().insert( arguments.text );
 
 		return newId;
-
 	}
 
 
-	public Array function bulkCreate(
-			required com.apirone.core.model.bean.Text[] texts
-		){
-
+	public Array function bulkCreate( required com.apirone.core.model.bean.Text[] texts ){
 		/*
 			all translations of a same entity
 		*/
 
-		var langs = getLangService().list( statusId="ACT" );
+		var langs = getLangService().list( statusId = "ACT" );
 
-		var ids = [];
+		var ids      = [];
 		var langDone = [];
 
 		// one at least
-		var entity = arguments.texts[1].getEntity();
+		var entity = arguments.texts[ 1 ].getEntity();
 
-		for( var thisText in arguments.texts ) {
-
+		for ( var thisText in arguments.texts ) {
 			var newId = getDao().insert( thisText );
 			langDone.add( thisText.getLang().getId() );
 
 			ids.add( newId );
-
 		}
 
 		for ( var thisLang in langs ) {
+			if ( !ArrayFind( langDone, thisLang.getId() ) ) {
+				var text   = super.bean( "Text" );
+				var lang   = super.bean( "Lang" );
+				var status = super.bean( "Status" );
 
-			if( !ArrayFind( langDone, thisLang.getId() ) ) {
-
-				var text   = super.bean("Text");
-				var lang   = super.bean("Lang");
-				var status = super.bean("Status");
-
-				text.setName("** To translate");
+				text.setName( "** To translate" );
 
 				lang.setId( thisLang.getId() );
 				status.setId( "TOT" );
@@ -122,38 +102,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var newId = getDao().insert( text );
 
 				ids.add( newId );
-
 			}
-
 		}
 
 		return ids;
-
 	}
 
-	public String function update(
-			required com.apirone.core.model.bean.Text text
-		){
-		
-        var id = getDao().update( arguments.text );
-            
+	public String function update( required com.apirone.core.model.bean.Text text ){
+		var id = getDao().update( arguments.text );
+
 		getCacheManager().remove( getCacheScope(), id );
-			
-		return id;
-    
-	}
-    
-    /**
-     * @private
-     */
-    private com.apirone.core.model.bean.Text function build(
-		required String textId
-	){
 
+		return id;
+	}
+
+	/**
+	 * @private
+	 */
+	private com.apirone.core.model.bean.Text function build( required String textId ){
 		var record = getDao().read( textId = arguments.textId );
 
-		if( record.RecordCount ) { 
-			
+		if ( record.RecordCount ) {
 			var bean = super.bean( "Text" );
 
 			bean.setId( record.text_id );
@@ -163,78 +132,62 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setEntity( getEntity( record ) );
 
 			getStatusService().get( record.status_id )
-			
+
 			return bean;
-			
 		}
 
 		return NullValue();
-
 	}
-	  
-  	private com.apirone.core.model.bean.Entity function getEntity( required record ) {
 
+	private com.apirone.core.model.bean.Entity function getEntity( required record ){
 		var entity = super.bean( "Entity" );
 
-		if( Len( record.attribute_id ) ) {
-
+		if ( Len( record.attribute_id ) ) {
 			entity.setKey( "attribute.id" );
 			entity.setValue( record.attribute_id.toString() );
 
 			return entity;
-
 		}
 
-		if( Len( record.raw_value_id ) ) {
-
+		if ( Len( record.raw_value_id ) ) {
 			entity.setKey( "rawValue.id" );
 			entity.setValue( record.raw_value_id );
 
 			return entity;
-			
 		}
-		
-		if( Len( record.finish_id ) ) {
 
+		if ( Len( record.finish_id ) ) {
 			entity.setKey( "finish.id" );
 			entity.setValue( record.finish_id );
 
 			return entity;
-			
 		}
-		
-		if( Len( record.size_id ) ) {
 
+		if ( Len( record.size_id ) ) {
 			entity.setKey( "size.id" );
 			entity.setValue( record.size_id );
 
 			return entity;
-			
 		}
 
-		if( Len( record.product_category_id ) ) {
-
+		if ( Len( record.product_category_id ) ) {
 			entity.setKey( "productCategory.id" );
 			entity.setValue( record.product_category_id );
 
 			return entity;
-			
 		}
 
-		if( Len( record.product_it ) ) {
-
+		if ( Len( record.product_id ) ) {
 			entity.setKey( "product.id" );
 			entity.setValue( record.product_id );
 
 			return entity;
-			
 		}
 
-		//dump( record );
-		//abort;
+		// dump( record );
+		// abort;
 
-		//throw( type="apirone.errors.textWithoutEntity", message="No entity linked to this translation. Text Id: [#record.text_id#]" );
-		
-  	}
+		// throw( type="apirone.errors.textWithoutEntity", message="No entity linked to this translation. Text Id: [#record.text_id#]" );
+	}
 
 }

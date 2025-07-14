@@ -268,7 +268,7 @@ h2 {
 }
 
 .card-body {
-	padding: 1rem 2rem 1rem 2rem !important;
+	padding: 1rem 1rem 1rem 1rem !important;
 }
 
 .card-footer {
@@ -761,7 +761,6 @@ h2 {
 .underline {
 	text-decoration: underline !important;
 }
-
 
 /* 
 	// shorthands

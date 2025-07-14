@@ -1,11 +1,11 @@
 ﻿<cfoutput>
 
-    <div id="fruit-detail-modal" class="modal fade">
+    <div id="product-detail-modal" class="modal fade">
         
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                <form id="fruit-detail-form" method="POST" name="fruit-detail-form">
+                <form id="product-detail-form" method="POST" name="product-detail-form">
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:detailForm.title"></h2>

@@ -149,6 +149,7 @@
 		/*
 			products
 		*/
+		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
 		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();
 		get( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.listAttributesForSort" ).end();
@@ -157,13 +158,17 @@
 		post( "/ajax/products/:id/values" ).to( "ProductAjaxController.addValue" ).end();
 		get( "/ajax/products/:id/items" ).to( "ProductAjaxController.listItems" ).end();
 		delete( "/ajax/products/:id/items" ).to( "ProductAjaxController.removeItems" ).end();
+		get( "/ajax/products/:id" ).to( "ProductAjaxController.get" ).end();
+		delete( "/ajax/products" ).to( "ProductAjaxController.delete" ).end();
+		post( "/ajax/products" ).to( "ProductAjaxController.save" ).end();
+		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
 
 		get( "/ajax/:by-regex:(products|product-items)/:id/images" ).to( "FileAjaxController.list" ).end();
 		post( "/ajax/:by-regex:(products|product-items)/:id/images" ).to( "FileAjaxController.upload" ).end();
 
+		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();
 		get( "/products/:id" ).to( "ProductController.detail" ).end();
 		//get( "/comb/:id/items" ).to( "ProductController.items" ).end();
-		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();
 
 
 		/*

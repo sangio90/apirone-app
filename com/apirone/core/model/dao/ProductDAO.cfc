@@ -18,28 +18,53 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<cffunction name="readByCode" output="false">
+		<cfargument name="code" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				product_id::varchar,
+				*
+			FROM
+				products
+			WHERE
+				code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="lineId" type="String">
 		<cfargument name="sizeId" type="String">
 		<cfargument name="finishId" type="String">
 
-		<cfquery name="local.q" datasource="apirone">
+		<cfargument name="excludedIds" type="Array">
+
+		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT product_id::varchar
 			FROM
 				products
 			WHERE 1=1
 
-				<cfif !isNull( arguments.lineId )>
+				<cfif !IsNull( arguments.lineId )>
 					AND line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				</cfif>
 
-				<cfif !isNull( arguments.finishId )>
+				<cfif !IsNull( arguments.finishId )>
 					AND finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 				</cfif>
 
-				<cfif !isNull( arguments.sizeId )>
+				<cfif !IsNull( arguments.sizeId )>
 					AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
 				</cfif>
+
+				<cfif !IsNull( arguments.excludedCategoryIds ) AND ArrayLen( arguments.excludedCategoryIds )>
+					AND product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">)
+				</cfif>
+
+			ORDER BY
+				created_at
 
 			<cfif arguments.limit GTE 0>
 				LIMIT
@@ -47,9 +72,6 @@
 				OFFSET
 					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
 			</cfif>
-
-			ORDER BY
-				created_at
 		</cfquery>
 
 		<cfreturn local.q>
@@ -62,16 +84,95 @@
 			INSERT INTO products (
 				size_id,
 				line_id,
-				finish_id
+				finish_id,
+				code,
+				product_category_id,
+				status_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getSize().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getLine().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getFinish().getId()#">::uuid
+				<cfif !IsNull( arguments.product.getSize() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getSize()?.getId()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>
+				,
+				<cfif !IsNull( arguments.product.getLine() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getLine()?.getId()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>
+				,
+				<cfif !IsNull( arguments.product.getFinish() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getFinish()?.getId()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>
+				,
+				<cfif Len( arguments.product.getCode() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getCode()#">
+				<cfelse>
+					NULL
+				</cfif>
+				,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
 			) RETURNING product_id
 		</cfquery>
 
 		<cfreturn local.q.product_id.toString()>
+	</cffunction>
+
+	<cffunction name="update" returntype="String">
+		<cfargument name="product" type="com.apirone.core.model.bean.Product" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE products
+			SET
+				size_id =
+					<cfif !IsNull( arguments.product.getSize() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getSize()?.getId()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>
+				,
+
+				line_id =
+					<cfif !IsNull( arguments.product.getLine() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getLine()?.getId()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>
+				,
+
+				finish_id =
+					<cfif !IsNull( arguments.product.getFinish() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getFinish()?.getId()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>
+				,
+
+				code =
+					<cfif Len( arguments.product.getCode() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getCode()#">
+					<cfelse>
+						NULL
+					</cfif>
+				,
+				position_count =
+					<cfif Val( arguments.product.getPositionCount() )>
+						<cfqueryparam cfsqltype="Integer" value="#arguments.product.getPositionCount()#">
+					<cfelse>
+						NULL
+					</cfif>
+				,
+				product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
+			WHERE
+					product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid
+		</cfquery>
+
+		<cfreturn arguments.product.getId()>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">

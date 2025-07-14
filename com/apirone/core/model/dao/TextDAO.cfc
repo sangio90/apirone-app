@@ -1,26 +1,26 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
 	<cffunction name="read" returntype="Query">
-
 		<cfargument name="textId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT
+				text_id,
+				product_id::varchar,
+				finish_id::varchar,
+				attribute_id::varchar,
+				*
 			FROM texts
 			WHERE text_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.textId#">
 		</cfquery>
 
 		<cfreturn local.q>
-
 	</cffunction>
 
-
 	<cffunction name="find" returntype="Query">
-
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
 		<cfargument name="langId" type="String">
-		
+
 		<cfargument name="attributeId" type="String">
 		<cfargument name="attributeValueId" type="String">
 		<cfargument name="rawValueId" type="Numeric">
@@ -33,7 +33,7 @@
 		<cfargument name="entity" type="com.apirone.core.model.bean.Entity">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
-        <cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="texts.created_at DESC">
 
 		<cfif !IsNull( arguments.entity )>
@@ -41,18 +41,16 @@
 			<cfset value = arguments.entity.getValue()>
 		</cfif>
 
-
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-             	text_id, 
+				 text_id,
 				COUNT( text_id ) OVER() AS total
 			FROM texts
-                INNER JOIN langs USING ( lang_id )
+				INNER JOIN langs USING ( lang_id )
 			WHERE 1=1
 
-			<cfif !isNull( arguments.entity ) >
-				
-				AND #field.name# = 
+			<cfif !IsNull( arguments.entity )>
+				AND #field.name# =
 					<cfif field.type == "uuid">
 						<cfqueryparam cfsqltype="Varchar" value="#value#">::uuid
 					<cfelse>
@@ -60,72 +58,69 @@
 					</cfif>
 			</cfif>
 
-			<cfif !isNull( arguments.str ) >
+			<cfif !IsNull( arguments.str )>
 				AND text ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 			</cfif>
 
-			<cfif !isNull( arguments.statusId ) >
+			<cfif !IsNull( arguments.statusId )>
 				AND texts.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
 			</cfif>
 
-			<cfif !isNull( arguments.langId ) >
+			<cfif !IsNull( arguments.langId )>
 				AND lang_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.langId#">
 			</cfif>
 
-			<cfif !isNull( arguments.attributeId ) >
+			<cfif !IsNull( arguments.attributeId )>
 				AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
 			</cfif>
 
-			<cfif !isNull( arguments.sizeId ) >
+			<cfif !IsNull( arguments.sizeId )>
 				AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
 			</cfif>
 
-			<cfif !isNull( arguments.rawValueId ) >
+			<cfif !IsNull( arguments.rawValueId )>
 				AND raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.rawValueId#">
 			</cfif>
 
-			<cfif !isNull( arguments.attributeValueId ) >
+			<cfif !IsNull( arguments.attributeValueId )>
 				AND attribute_raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeValueId#">
 			</cfif>
 
-			<cfif !isNull( arguments.ProductCategoryId ) >
+			<cfif !IsNull( arguments.ProductCategoryId )>
 				AND product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.ProductCategoryId#">
 			</cfif>
 
-			<cfif !isNull( arguments.finishId ) >
+			<cfif !IsNull( arguments.finishId )>
 				AND finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 			</cfif>
 
-			<cfif !isNull( arguments.productId ) >
+			<cfif !IsNull( arguments.productId )>
 				AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
 			</cfif>
 
-			<cfif !isNull( arguments.fromDate ) >
+			<cfif !IsNull( arguments.fromDate )>
 				AND texts.created_at >= <cfqueryparam cfsqltype="Date" value="#arguments.fromDate#">
 			</cfif>
 
-			<cfif !isNull( arguments.toDate ) >
+			<cfif !IsNull( arguments.toDate )>
 				AND texts.created_at <= <cfqueryparam cfsqltype="Date" value="#arguments.toDate#">
 			</cfif>
 
-			ORDER BY 
+			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
-				LIMIT  
+				LIMIT
 					<cfqueryparam value="#arguments.limit#" cfsqltype="integer">
-				OFFSET 
+				OFFSET
 					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 		</cfquery>
 
 		<cfreturn local.q>
-
 	</cffunction>
 
-
 	<cffunction name="insert" returntype="Numeric">
-
 		<cfargument name="text" type="com.apirone.core.model.bean.Text" required="true">
 
 		<cfset field = super.getDBField( arguments.text.getEntity().getKey() )>
@@ -140,7 +135,7 @@
 			(
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getLang().getId()#">,
-				
+
 				<cfif field.type == "uuid">
 					<cfqueryparam cfsqltype="varchar" value="#arguments.text.getEntity().getValue()#">::uuid
 				<cfelse>
@@ -151,37 +146,37 @@
 		</cfquery>
 
 		<cfreturn local.q.text_id>
-
 	</cffunction>
 
-
 	<cffunction name="update" returntype="Numeric">
-
 		<cfargument name="text" type="com.apirone.core.model.bean.Text" required="true">
 
 		<cfset field = getDBField( arguments.text.getEntity().getKey() )>
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE texts 
+			UPDATE texts
 			SET
 				text	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getName()#">,
 				lang_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
-				#field.name# = 
+				#field.name# =
 
 					<cfif field.type == "uuid">
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getEntity().getValue()#">::uuid
 					<cfelse>
 						<cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
 					</cfif>
-				
-			WHERE 
+
+			WHERE
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# field: #field.name# - value:#arguments.text.getEntity().getValue()#">
+		<cffile
+			action="APPEND"
+			file  ="#ExpandPath( "/debug.log" )#"
+			output="#Now()# field: #field.name# - value:#arguments.text.getEntity().getValue()#"
+		>
 
 		<cfreturn arguments.text.getId()>
-
 	</cffunction>
-
 </cfcomponent>
+ent>

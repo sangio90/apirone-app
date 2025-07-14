@@ -18,14 +18,14 @@
 
 	function setup( required String env ) {
 
-		print.greenLine( "Ssetup for [ #arguments.env# ] starting..." );
+		print.greenLine( "Start deploy for [ #arguments.env# ] start..." );
 
 		print.greenLine( 'Stop server...' );
 		command("server stop").run();
 
 		createEnv( env=arguments.env );
 
-		command("setup").run();
+		command("install").run();
 	
 		print.greenLine( 'Start server...' );
 		command("server start").run();

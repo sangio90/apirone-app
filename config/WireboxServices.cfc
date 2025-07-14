@@ -184,7 +184,9 @@ component extends="coldbox.system.ioc.config.Binder" {
             .property( name = "LineService", ref = "LineService" )
             .property( name = "FinishService", ref = "FinishService" )
             .property( name = "StatusService", ref = "StatusService" )
+            .property( name = "ProductCategoryService", ref = "ProductCategoryService" )
             .property( name = "ProductItemService", ref = "ProductItemService" )
+            .property( name = "TextService", ref = "TextService" )
             .parent("AbsService");
 
         map("ProductItemService").to( "com.apirone.core.model.service.ProductItemService" )

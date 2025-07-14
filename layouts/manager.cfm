@@ -173,7 +173,7 @@
         #includeJsFiles()#
 
         <cfif prc.isDev>
-            <style>.page-header{ box-shadow: 1px 3px 0 1px Red !important }</style>
+            <style>.header{ border-top: 3px solid Red !important }</style>
         </cfif>
 
         <iframe src="/manager/live" style="display:none;"></iframe> 

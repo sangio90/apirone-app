@@ -1,6 +1,6 @@
 ﻿<cfscript>
 
-    function button( String bind, required String label="" ){ 
+    function button( String bind, required String label="", required String class="" ){ 
 
         return getButton( argumentCollection = arguments );
     
@@ -9,6 +9,14 @@
     function addButton( String bind, required String label="Carica" ){ 
 
         arguments["icon"] = "plus";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
+    function printButton( String bind, required String label="Stampa", class="" ){ 
+
+        arguments["icon"] = "print";
 
         return getButton( argumentCollection = arguments );
     

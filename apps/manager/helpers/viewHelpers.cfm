@@ -48,7 +48,7 @@
 
     <cfargument name="type" type="String" required="true">
     
-    <cfargument name="id" type="String" required="true" default="product-grid-form">
+    <cfargument name="id" type="String" required="true" default="product-items-grid">
     <cfargument name="class" type="String" default="no-pager">
     <cfargument name="source" type="String" default="items">
     <cfargument name="rowTemplate" type="String" default="product/product-item-row-tmpl">

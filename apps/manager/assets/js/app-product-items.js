@@ -2,6 +2,7 @@ AP.product = AP.product || {};
 
 AP.product.fields = {
 	rootDetail: $("#product-detail-root"),
+	//rootList: $("#product-list-root"),
 	configRow: $("#product-config-row"),
 	attributeSearchForm: $("#attributes-search-form"),
 	attributeModal: $("#product-attributes-list-modal"),
@@ -10,12 +11,12 @@ AP.product.fields = {
 };
 
 $(document).ready(function () {
-	if (AP.product.fields.rootDetail.length) {
-		AP.product.list.init();
+	if ( AP.product.fields.rootDetail.length ) {
+		AP.product.items.init();
 	}
 });
 
-AP.product.list = (function () {
+AP.product.items = (function () {
 	var pub = {};
 
 	var fields = AP.product.fields;
@@ -452,7 +453,7 @@ AP.product.list = (function () {
 			var found = false;
 			var opts = [];
 
-			products.forEach(function (product) {
+			products?.forEach(function (product) {
 				if (
 					lineId == product.line.id &&
 					finishId == product.finish.id
@@ -507,6 +508,7 @@ AP.product.list = (function () {
 
 			return false;
 		},
+
 	});
 
 	pub.init = function () {
@@ -728,15 +730,6 @@ AP.product.list = (function () {
 
 				var item = items.at(event.oldIndex);
 				var target = items.at(event.newIndex);
-
-				console.log("item", item);
-				console.log("target", target);
-
-				console.log("item.level", item.level);
-				console.log("target.level", target.level);
-
-				console.log("event.newIndex", event.newIndex);
-				console.log("event.oldIndex", event.oldIndex);
 
 				if (
 					item.attribute.id != target.attribute.id ||

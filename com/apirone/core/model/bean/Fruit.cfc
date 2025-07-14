@@ -1,14 +1,12 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true"{
+component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-    property name="code" type="String";
-    property name="positionsCount" type="Numeric";
+	property name="code" type="String";
+	property name="positionCount" type="Numeric";
 
-    property name="status" type="com.apirone.core.model.bean.Status";
+	property name="status" type="com.apirone.core.model.bean.Status";
 
-    public Fruit function init(){
-
-        return this;
-        
-    }
+	public Fruit function init(){
+		return this;
+	}
 
 }

@@ -36,41 +36,45 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
-		<cfargument name="orderBy" type="String" default="finishes.code asc">
+		<cfargument name="orderBy" type="String" default="finishes.code asc, finishes.finish_id">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
 				finish_id::varchar,
 				categories::varchar,
-				finishes.code
+				finishes.code,
+				COUNT( finish_id ) AS total
 			FROM
 				finishes
 
-				<cfif !isNull( arguments.str )>
+				<cfif !IsNull( arguments.str )>
 					INNER JOIN texts USING ( finish_id )
 				</cfif>
 
-				<cfif !isNull( arguments.lineId )>
-					INNER JOIN combinations USING ( finish_id )
+				<cfif !IsNull( arguments.lineId )>
+					INNER JOIN products USING ( finish_id )
 				</cfif>
 
 			WHERE 1=1
 
-				<cfif !isNull( arguments.categoryId )>
+				<cfif !IsNull( arguments.categoryId )>
 					<!--- INFO: with cfqueryparam not works --->
 					AND categories @> ANY ('{[#super.sanitizeSQL( arguments.categoryId )#]}')
 				</cfif>
 
-				<cfif !isNull( arguments.lineId )>
+				<cfif !IsNull( arguments.lineId )>
 					AND products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				</cfif>
 
-				<cfif !isNull( arguments.str )>
+				<cfif !IsNull( arguments.str )>
 					AND (
 						finishes.code ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 						OR texts.text ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 					)
 				</cfif>
+
+			GROUP BY
+				finishes.code, finishes.finish_id
 
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderBy )#
@@ -93,7 +97,7 @@
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Other" value="#serializeJSON( categories )#">
+				<cfqueryparam cfsqltype="Other" value="#SerializeJSON( categories )#">
 			) RETURNING finish_id
 		</cfquery>
 
@@ -111,7 +115,7 @@
 			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getStatus().getId()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getCode()#">,
-				categories = <cfqueryparam cfsqltype="Other" value="#serializeJSON( categories )#">
+				categories = <cfqueryparam cfsqltype="Other" value="#SerializeJSON( categories )#">
 			WHERE
 				finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finish.getId()#">::uuid
 		</cfquery>

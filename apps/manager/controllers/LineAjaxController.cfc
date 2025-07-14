@@ -1,108 +1,118 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = getDataMapper();
 
-        var data = [];
-        var result = super.getResult();
-        var dm = getDataMapper();
+		var params = super.paramsFromUrl();
 
-        var params = super.paramsFromUrl();
+		var rows = super.fire( "line.search", params );
 
-        var rows = super.fire( "line.search", params );
+		for ( var row in rows.getData() ) {
+			var obj = dm.convert( row, "Line", true );
+			data.add( obj );
+		}
 
-        for ( var row in rows.getData() ) {
-            var obj = dm.convert( row, "Line", true );
-            data.add( obj );
-        }
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
 
-        result.setTotal( rows.getTotal() );
-        result.setCount( rows.getCount() );
-        result.setData( data );
+		event.setValue( "result", result );
+	}
 
-        event.setValue("result", result);
+	function get( event, rc, prc ){
+		param rc.id = "___";
+		var result  = super.getResult();
 
-    }
+		if ( !super.isUuid( rc.id ) ) {
+			return event.setValue( "result", "No UUID" );
+		}
 
-    function get( event, rc, prc ){
+		var bean = super.fire( "line.get", [ rc.id ] );
 
-        param rc.id = "___";
-        var result = super.getResult();
+		var obj = super.getDataMapper().convert( bean, "Line", true );
 
-        if ( !super.isUuid( rc.id ) ) {
-            return event.setValue("result", "No UUID");
-        }
+		if ( !obj.keyExists( "thickness" ) ) {
+			obj[ "thickness" ] = { "id" = "", "name" = "" }
+		}
 
-        var bean = super.fire( "line.get", [ rc.id ] );
+		result.setData( obj );
 
-        var obj = super.getDataMapper().convert( bean, "Line", true );
+		event.setValue( "result", result );
+	}
 
-        if( !obj.keyExists( "thickness" ) ) {
-            obj["thickness"] = { "id" = "", "name" = "" }
-        }
+	function attributes( event, rc, prc ){
+		param rc.str = "";
+		var result   = super.getResult();
 
-        result.setData( obj );
+		var params = {}
 
-        event.setValue("result", result);
+		params.str = Len( rc.str ) ? rc.str : NullValue();
 
-    }
+		var list = fire( "attributes.search", params );
 
-    function attributes( event, rc, prc ){
+		result = list;
 
-        param rc.str="";
-        var result = super.getResult();
+		event.setValue( "result", result );
+	}
 
-        var params = {}
+	function createProduct( event, rc, prc ){
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-        params.str = Len( rc.str ) ? rc.str : NullValue();
+		var line    = super.bean( "Line" );
+		var size    = super.bean( "Size" );
+		var finish  = super.bean( "Finish" );
+		var product = super.bean( "Product" );
+		var status  = super.bean( "Status" );
 
-        var list = fire( "attributes.search", params );
+		product.setLine( line.setId( rc.id ) );
+		product.setFinish( finish.setId( json.finishId ) );
+		product.setSize( size.setId( json.sizeId ) );
+		product.setCategory( category.setId( 22 ) ); // TODO: check if this value is ok here
+		product.setStatus( status.setId( "ACT" ) ); // TODO: check if this value is ok here
 
-        result = list;
+		var newId = super.fire( "product.create", [ product ] );
 
-        event.setValue("result", result);
-        
-    }
+		var message = super.completeMessage( "product.created" );
 
-    function createProduct( event, rc, prc ){
+		var obj = super.fire( "product.get", [ newId ] );
 
-        var json = DESerializeJSON( GetHTTPRequestData().content );
+		event.setValue(
+			"result",
+			{
+				"message" = message,
+				"payload" = {
+					"productId" = newId,
+					"finishId"  = obj.getFinish().getId(),
+					"sizeId"    = obj.getSize().getId()
+				}
+			}
+		);
+	}
 
-        var line = super.bean("Line");
-        var size = super.bean("Size");
-        var finish = super.bean("Finish");
-        var product = super.bean("Product");
+	function deleteProduct( event, rc, prc ){
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-        product.setLine( line.setId( rc.id ) );
-        product.setFinish( finish.setId( json.finishId ) );
-        product.setSize( size.setId( json.sizeId ) );
-        
-        var newId = super.fire( "product.create", [ product ] );
+		super.fire(
+			"product.deleteByParams",
+			{
+				sizeId   = json.sizeId,
+				lineId   = rc.id,
+				finishId = json.finishId
+			}
+		);
 
-        var message = super.completeMessage( "product.created" );
+		var message = super.completeMessage( "product.deleted" );
 
-        var obj = super.fire( "product.get", [ newId ] );
-
-        event.setValue( "result", { 
-            "message": message, 
-            "payload" = { "productId" = newId, "finishId" = obj.getFinish().getId(), "sizeId" = obj.getSize().getId() }
-        } );
-        
-    }
-
-    function deleteProduct( event, rc, prc ){
-
-        var json = DESerializeJSON( GetHTTPRequestData().content );
-
-        super.fire( "product.deleteByParams", { sizeId = json.sizeId, lineId = rc.id, finishId = json.finishId } );
-
-        var message = super.completeMessage( "product.deleted" );
-
-        event.setValue( "result", { 
-            "message": message, 
-            //"payload" = { "productId" = newId, "finishId" = obj.getFinish().getId(), "sizeId" = obj.getSize().getId() }
-        } );
-        
-    }
+		event.setValue(
+			"result",
+			{
+				"message" = message,
+				 // "payload" = { "productId" = newId, "finishId" = obj.getFinish().getId(), "sizeId" = obj.getSize().getId() }
+			}
+		);
+	}
 
 	function codeExists( event, rc, prc ){
 		param rc.id   = "_";
@@ -114,17 +124,17 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result     = super.getResult();
+		var result = super.getResult();
 
-        var line       = super.bean( "Line" );
-		var status     = super.bean( "Status" );
-		var thickness  = super.bean( "Thickness" );
-		var category   = super.bean( "ProductCategory" );
+		var line      = super.bean( "Line" );
+		var status    = super.bean( "Status" );
+		var thickness = super.bean( "Thickness" );
+		var category  = super.bean( "ProductCategory" );
 
 		var thisId    = "";
 		var messageId = "";
 
-		var json = deserializeJSON( getHTTPRequestData().content );
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		line.setId( json.id );
 		line.setCode( json.code );
@@ -134,7 +144,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		line.setCategory( category.setId( json?.category?.id ) );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
 
-		if ( !len( json.id ) ) {
+		if ( !Len( json.id ) ) {
 			messageId = "line.created";
 			thisId    = super.fire( "line.create", [ line ] )
 		} else {
@@ -151,35 +161,33 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 	function delete( event, rc, prc ){
-        
-        var result = super.getResult();
-        var list = GetHTTPRequestData().content;
-        var messageId = "line.deletedAllRecords";
+		var result    = super.getResult();
+		var list      = GetHTTPRequestData().content;
+		var messageId = "line.deletedAllRecords";
 
-        var errors = [];
-        var payload = "";
+		var errors  = [];
+		var payload = "";
 
-        var ids = ListToArray( list );
+		var ids = ListToArray( list );
 
-        for( var id in ids ) {
-            var outcome = super.fire( "line.delete", [ id ] );
+		for ( var id in ids ) {
+			var outcome = super.fire( "line.delete", [ id ] );
 
-            if( outcome.getStatus() == "ERROR"  ) {
-                errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
-            }
+			if ( outcome.getStatus() == "ERROR" ) {
+				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+			}
+		}
 
-        }
+		if ( errors.len() ) {
+			messageId = "line.deletedNotAllRecords"
+			payload   = { "errors" = errors };
+		}
 
-        if( errors.len() ) {
-            messageId = "line.deletedNotAllRecords"
-            payload = { "errors": errors } ;
-        }
+		var message = super.completeMessage( messageId );
 
-        var message = super.completeMessage( messageId );
+		result.setData( { "message" = message, "payload" = payload } );
 
-        result.setData( { "message" = message, "payload" =  payload } );
-        
 		event.setValue( "result", result );
-	}    
+	}
 
 }
