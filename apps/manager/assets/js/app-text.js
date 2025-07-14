@@ -65,6 +65,8 @@ AP.text.list = (function () {
 
             viewModel.set("rows", dataSource);
 
+            return false;
+
         }
 
 

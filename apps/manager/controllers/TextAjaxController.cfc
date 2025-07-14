@@ -1,116 +1,101 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    // all texts by entity
-    function all( event, rc, prc ){
+	function list( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = getDataMapper();
 
-        var data = [];
-        var result = super.getResult();
-        var dm = getDataMapper();
+		var params = paramsFromUrl();
 
-        var text = super.fire( "text.get", [ rc.id ] );
+		var rows = super.fire( "text.search", params );
 
-        var rows = super.fire( "text.list", { entity = text.getEntity() } );
+		for ( var row in rows.getData() ) {
+			var obj = dm.convert( row, "Text", true );
+			data.add( obj );
+		}
 
-        
-        for( var row in rows ) {
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
 
-            var bean = dm.convert( row, "Text", true );
+		result.setData( data );
 
-            data.add( bean );
+		event.setValue( "result", result );
+	}
 
-        }
-        
-        result.setData( data );
+	// all texts by entity
+	function all( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = getDataMapper();
 
-        event.setValue("result", result );
-        
-    }
+		var text = super.fire( "text.get", [ rc.id ] );
 
-    function get( event, rc, prc ){
+		var rows = super.fire( "text.list", { entity = text.getEntity() } );
 
-        var data = [];
-        var result = super.getResult();
-        var dm = getDataMapper();
-        
-        var obj = super.fire( "text.get", [ rc.id ] );
+		for ( var row in rows ) {
+			var bean = dm.convert( row, "Text", true );
 
-        var bean = dm.convert( obj, "Text", true );
-        
-        result.setData( bean );
+			data.add( bean );
+		}
 
-        event.setValue("result", result );
-        
-    }
+		result.setData( data );
 
-    function list( event, rc, prc ){
+		event.setValue( "result", result );
+	}
 
-        var data = [];
-        var result = super.getResult();
-        var dm = getDataMapper();
+	function get( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = getDataMapper();
 
-        var params = paramsFromUrl();
-        
-        var rows = super.fire( "text.search", params );
+		var obj = super.fire( "text.get", [ rc.id ] );
 
-        for ( var row in rows.getData() ) {
-            var obj = dm.convert( row, "Text", true );
-            data.add( obj );
-        }
+		var bean = dm.convert( obj, "Text", true );
 
-        result.setTotal( rows.getTotal() );
-        result.setCount( rows.getCount() );
-        
-        result.setData( data );
+		result.setData( bean );
 
-        event.setValue("result", result );
-        
-    }
+		event.setValue( "result", result );
+	}
 
-    function save( event, rc, prc ){
+	function save( event, rc, prc ){
+		var result = super.getResult();
+		var attr   = super.bean( "Attribute" );
 
-        var result = super.getResult();
-        var attr = super.bean("Attribute");
+		var text   = super.bean( "Text" );
+		var lang   = super.bean( "Lang" );
+		var status = super.bean( "Status" );
 
-        var text = super.bean("Text");
-        var lang = super.bean("Lang");
-        var status = super.bean("Status");
-        
-        var thisId = "";
-        var messageId = "";
-        var texts = [];
+		var thisId    = "";
+		var messageId = "";
+		var texts     = [];
 
-        var json = DESerializeJSON( GetHTTPRequestData().content );
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-        var mainText = json.data.mainText;
+		var mainText = json.data.mainText;
 
-        text.setId( mainText.id )
-        text.setName( mainText.name )
-        text.setLang( lang.setId( mainText.lang.id ) );
+		text.setId( mainText.id )
+		text.setName( mainText.name )
+		text.setLang( lang.setId( mainText.lang.id ) );
 
-        texts.add( text );
-    
-        attr.setId( json.data.id );
-        attr.setTexts( texts );
-        attr.setStatus( status.setId( json.data.status.id ) );
+		texts.add( text );
 
-        if( json.action == "create"  ) {
+		attr.setId( json.data.id );
+		attr.setTexts( texts );
+		attr.setStatus( status.setId( json.data.status.id ) );
 
-            messageId = "attribute.created";
-            thisId = super.fire( "attribute.create", [ attr ] )
-            
-        } else {
+		if ( json.action == "create" ) {
+			messageId = "attribute.created";
+			thisId    = super.fire( "attribute.create", [ attr ] )
+		} else {
+			messageId = "attribute.updated";
+			thisId    = super.fire( "attribute.update", [ attr ] )
+		}
 
-            messageId = "attribute.updated";
-            thisId = super.fire( "attribute.update", [ attr ] )
-            
-        }
+		var message = completeMessage( messageId );
 
-        var message = completeMessage( messageId );
+		result.setData( message, { payload = { id = thisId } } );
 
-        result.setData(  message, { payload = { id = thisId }  } );
-        
-        event.setValue( "result", result );
-        
-    }
+		event.setValue( "result", result );
+	}
 
 }

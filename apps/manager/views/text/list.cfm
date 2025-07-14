@@ -14,7 +14,7 @@
                 <section class="card">
                     <section class="card-body box-search">
     
-                        <form name="text-search-form" id="text-search-form" method="post">
+                        <form name="text-search-form" id="text-search-form" method="post" data-bind="events: { submit: search }">
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group row mb-2">
