@@ -324,6 +324,22 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function combinations( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var dm     = super.getDataMapper();
+		var params = super.paramsFromUrl();
+
+		var result = getFlatTree( productId = rc.id, includeMissingValues = false );
+		dump(result.getData());abort;
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
 
 	/*
         private methods

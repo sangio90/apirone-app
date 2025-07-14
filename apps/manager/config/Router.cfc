@@ -150,6 +150,7 @@
 			products
 		*/
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
+		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
 		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();
 		get( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.listAttributesForSort" ).end();
@@ -162,6 +163,7 @@
 		delete( "/ajax/products" ).to( "ProductAjaxController.delete" ).end();
 		post( "/ajax/products" ).to( "ProductAjaxController.save" ).end();
 		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
+		get( "/products/:id/combinations" ).to( "ProductController.combinations" ).end();
 
 		get( "/ajax/:by-regex:(products|product-items)/:id/images" ).to( "FileAjaxController.list" ).end();
 		post( "/ajax/:by-regex:(products|product-items)/:id/images" ).to( "FileAjaxController.upload" ).end();

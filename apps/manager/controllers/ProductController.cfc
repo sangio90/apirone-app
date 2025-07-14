@@ -82,6 +82,21 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setView( "product/list" );
 	}
 
+	function combinations( event, rc, prc ){
+		param rc.id = "";
+
+		var product = super.fire( "product.get", [ rc.id ] );
+		prc.statuses = super.fire( "status.list", [ "PRODUCT" ] );
+		// var product = super.service( "Product" ).get( rc.id );
+
+		prc.title    = product.getName();
+		prc.page[ "productId" ] = product.getId();
+		
+		prc.jsScripts.add( "app-product-combinations" );
+		prc.page[ "statuses" ] = prc.statuses;
+		event.setView( "product/combinations" );
+	}
+
 	private Array function convertTree( required Array items ){
 		var result = [];
 

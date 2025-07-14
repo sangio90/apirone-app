@@ -145,7 +145,7 @@
 
 	}
 
-	private function createEnv( required String env ) {
+	public function createEnv( required String env ) {
 
 		print.greenLine( 'Create env [ #arguments.env# ]...' );
 

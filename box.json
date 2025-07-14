@@ -38,7 +38,8 @@
         "format": "cfformat run /apps/**/controllers/**,/com/** --overwrite",
         "format:watch": "cfformat watch /apps/**/controllers/**,/com/**",
         "format:check": "cfformat check /apps/**/controllers/**,/com/**",
-        "createZip":"task run taskFile=tasks/Build.cfc target=createZip"
+        "createZip":"task run taskFile=tasks/Build.cfc target=createZip",
+        "createEnv:devel":"task run taskFile=tasks/Build.cfc target=createEnv :env=devel",
     },
     "testbox":{
     },
