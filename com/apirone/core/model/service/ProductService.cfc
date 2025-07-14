@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.ProductsDAO";
+	property name="dao" type="com.apirone.core.model.dao.ProductDAO";
 	property name="SizeService" type="com.apirone.core.model.service.SizeService";
 	property name="LineService" type="com.apirone.core.model.service.LineService";
 	property name="FinishService" type="com.apirone.core.model.service.FinishService";
@@ -134,12 +134,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public String function create( required com.apirone.core.model.bean.Product product ){
-		
 		var newId = getDao().insert( arguments.product );
 
-		if( !IsNull( arguments.product.getTexts() ) ) {
+		if ( !IsNull( arguments.product.getTexts() ) ) {
 			transaction {
-				
 				for ( var text in arguments.product.getTexts() ) {
 					var entity = super.bean( "Entity" );
 
@@ -151,7 +149,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				getTextService().bulkCreate( arguments.product.getTexts() );
 			}
-
 		}
 
 		return newId;
@@ -163,8 +160,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = arguments.product.getId();
 
-		if( !IsNull( arguments.product.getTexts() ) ) {
-
+		if ( !IsNull( arguments.product.getTexts() ) ) {
 			for ( var text in arguments.product.getTexts() ) {
 				var entity = super.bean( "Entity" )
 
@@ -179,7 +175,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					getTextService().create( text );
 				}
 			}
-
 		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.product.getId() );

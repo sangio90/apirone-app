@@ -34,9 +34,9 @@
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
-		
+
 		<cfargument name="orderby" required="true" type="String" default="sizes.code">
-		<cfargument name="limit" required="true" type="Numeric" default="0">
+		<cfargument name="limit" required="true" type="Numeric" default="15">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 
 		<cfquery name="local.q" datasource="apirone">
@@ -47,21 +47,21 @@
 				COUNT(size_id) OVER() AS total
 			FROM
 				sizes
-					<cfif !isNull( arguments.lineId )>
+					<cfif !IsNull( arguments.lineId )>
 						INNER JOIN products USING ( size_id )
 					</cfif>
 
 			WHERE 1=1
 
-				<cfif !isNull( arguments.lineId )>
+				<cfif !IsNull( arguments.lineId )>
 					AND products.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
 				</cfif>
 
-				<cfif !isNull( arguments.str )>
+				<cfif !IsNull( arguments.str )>
 					AND sizes.code ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
 				</cfif>
 
-				<cfif !isNull( arguments.categoryId )>
+				<cfif !IsNull( arguments.categoryId )>
 					AND categories @> ANY ('{[#arguments.categoryId#]}')
 				</cfif>
 
@@ -96,7 +96,7 @@
 				<cfqueryparam cfsqltype="varchar" value="#arguments.size.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Other" value="#serializeJSON( categories )#">,
+				<cfqueryparam cfsqltype="Other" value="#SerializeJSON( categories )#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.size.getFruitsCount()#">
 			) RETURNING size_id
 		</cfquery>
@@ -107,7 +107,7 @@
 	<cffunction name="update" returntype="String">
 		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
 
-		<cfset var categories = serializeJSON( super.getCategoriesAsArray( size.getCategories() ) )>
+		<cfset var categories = SerializeJSON( super.getCategoriesAsArray( size.getCategories() ) )>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE

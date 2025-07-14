@@ -31,10 +31,6 @@
             se è un valore piano, viene convertito in array
         */
 
-        //arguments.payload = IsSimpleValue( arguments.payload ) ? [ arguments.payload ] : arguments.payload;
-        //dump(arguments.payload);
-        //abort;
-        
         var dotPath = "#getControllerPath()#.#controller#";
         var filePath = "/" & Replace( dotPath, ".", "/", "ALL" ) & ".cfc";
 
