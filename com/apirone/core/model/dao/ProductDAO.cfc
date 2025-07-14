@@ -38,8 +38,11 @@
 		<cfargument name="lineId" type="String">
 		<cfargument name="sizeId" type="String">
 		<cfargument name="finishId" type="String">
-
 		<cfargument name="excludedIds" type="Array">
+
+		<cfargument name="orderby" required="true" type="String" default="product.product_id">
+		<cfargument name="limit" required="true" type="Numeric" default="0">
+		<cfargument name="offset" required="true" type="Numeric" default="0">
 
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT product_id::varchar

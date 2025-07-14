@@ -172,7 +172,6 @@
 		} else {
 
 			var envItems = getStructFromPropFile( envConfig );
-
 		}
 
 		if ( FileExists( mainConfig ) ) {

@@ -110,9 +110,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var obj = getByParams( argumentCollection = arguments );
 
-		var combId = obj.getId()
+		var productId = obj.getId()
 
-		outcome.setData( { productId = combId } );
+		outcome.setData( { productId = productId } );
 
 		transaction {
 			try {
@@ -122,14 +122,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				cm.remove( getCacheScope(), arguments.obj.getId() );
 			} catch ( any error ) {
-				/*
-					set an error 500?
-				*/
-
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteProduct" );
-				outcome.setMessage( "Cannot delete product [#combId#]" );
+				outcome.setMessage( "Cannot delete product [#productId#]" );
 			}
 		}
 
@@ -138,19 +134,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public String function create( required com.apirone.core.model.bean.Product product ){
+		
 		var newId = getDao().insert( arguments.product );
 
-		transaction {
-			for ( var text in arguments.product.getTexts() ) {
-				var entity = super.bean( "Entity" );
+		if( !IsNull( arguments.product.getTexts() ) ) {
+			transaction {
+				
+				for ( var text in arguments.product.getTexts() ) {
+					var entity = super.bean( "Entity" );
 
-				entity.setKey( "product.id" );
-				entity.setValue( newId );
+					entity.setKey( "product.id" );
+					entity.setValue( newId );
 
-				text.setEntity( entity );
+					text.setEntity( entity );
+				}
+
+				getTextService().bulkCreate( arguments.product.getTexts() );
 			}
 
-			getTextService().bulkCreate( arguments.product.getTexts() );
 		}
 
 		return newId;
@@ -162,19 +163,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = arguments.product.getId();
 
-		for ( var text in arguments.product.getTexts() ) {
-			var entity = super.bean( "Entity" )
+		if( !IsNull( arguments.product.getTexts() ) ) {
 
-			entity.setKey( "product.id" );
-			entity.setValue( id );
+			for ( var text in arguments.product.getTexts() ) {
+				var entity = super.bean( "Entity" )
 
-			text.setEntity( entity );
+				entity.setKey( "product.id" );
+				entity.setValue( id );
 
-			if ( Len( text.getId() ) ) {
-				getTextService().update( text );
-			} else {
-				getTextService().create( text );
+				text.setEntity( entity );
+
+				if ( Len( text.getId() ) ) {
+					getTextService().update( text );
+				} else {
+					getTextService().create( text );
+				}
 			}
+
 		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.product.getId() );
