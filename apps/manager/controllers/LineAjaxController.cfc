@@ -60,12 +60,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	function createProduct( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		var line    = super.bean( "Line" );
-		var size    = super.bean( "Size" );
-		var finish  = super.bean( "Finish" );
-		var product = super.bean( "Product" );
-		var status  = super.bean( "Status" );
-		var category  = super.bean( "ProductCategory" );
+		var line     = super.bean( "Line" );
+		var size     = super.bean( "Size" );
+		var finish   = super.bean( "Finish" );
+		var product  = super.bean( "Product" );
+		var status   = super.bean( "Status" );
+		var category = super.bean( "ProductCategory" );
 
 		product.setLine( line.setId( rc.id ) );
 		product.setFinish( finish.setId( json.finishId ) );
@@ -106,13 +106,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var message = super.completeMessage( "product.deleted" );
 
-		event.setValue(
-			"result",
-			{
-				"message" = message,
-				 // "payload" = { "productId" = newId, "finishId" = obj.getFinish().getId(), "sizeId" = obj.getSize().getId() }
-			}
-		);
+		event.setValue( "result", { "message" = message } );
 	}
 
 	function codeExists( event, rc, prc ){
