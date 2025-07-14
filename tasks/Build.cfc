@@ -162,7 +162,7 @@
 
 		var mainConfig  = "#dir#/tasks/main.properties";
 		var envConfig   = "#dir#/tasks/envs/#arguments.env#.properties"; // develop / prod
-		var localConfig = "#dir#/tasks/local.properties";
+		var localConfig = "#dir#/tasks/envs/local.properties";
 
 		if ( !FileExists( envConfig ) ) {
 
