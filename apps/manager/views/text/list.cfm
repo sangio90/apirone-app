@@ -95,6 +95,7 @@
                                     { 'field':'id', 'title':'ID', width: '50px' },
                                     { 'field':'name', 'title':'Traduzione'},
                                     { 'field':'name', 'title':'Lingua'},
+                                    { 'field':'entity', 'title':'Categoria'},
                                     { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 

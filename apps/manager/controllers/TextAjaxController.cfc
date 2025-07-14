@@ -9,9 +9,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var rows = super.fire( "text.search", params );
 
-		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Text", true );
-			data.add( obj );
+		for ( var obj in rows.getData() ) {
+			var row = dm.convert( obj, "Text", true );
+
+			row[ "entity" ] = getEntityName( obj.getEntity().getKey() );
+			data.add( row );
 		}
 
 		result.setTotal( rows.getTotal() );
@@ -96,6 +98,42 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( message, { payload = { id = thisId } } );
 
 		event.setValue( "result", result );
+	}
+
+	private function getEntityName( id ){
+		// TODO: consider to move into DBFields.json
+
+		var result = "";
+
+		switch ( arguments.id ) {
+			case "attribute.id":
+				WriteOutput( "I like apples!" );
+				result = "Attributo";
+				break;
+			case "attributeValue.id":
+				result = "Valore attributo";
+				break;
+			case "productCategory.id":
+				result = "Categoria prodotto";
+				break;
+			case "finish.id":
+				result = "Finitura";
+				break;
+			case "size.id":
+				result = "Dimensione";
+				break;
+			case "product.id":
+				result = "Prodotto";
+				break;
+			case "rawValue.id":
+				result = "Valore base";
+				break;
+			default:
+				result = "** Entity not found";
+				break;
+		}
+
+		return result;
 	}
 
 }

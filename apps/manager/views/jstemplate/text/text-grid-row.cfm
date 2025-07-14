@@ -12,6 +12,9 @@
             <td>
                 <span data-bind="text: lang.name"></span>
             </td>
+            <td>
+                <span data-bind="text: entity"></span>
+            </td>
             <td class="text-center">
                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
                     <i class="fas fa-edit"></i>

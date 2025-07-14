@@ -1,5 +1,4 @@
 ﻿{
-    
     "attribute.id": {
         "name": "attribute_id",
         "type": "uuid"
