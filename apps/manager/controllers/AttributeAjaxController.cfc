@@ -1,207 +1,185 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function get( event, rc, prc ){
+	function get( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = getDataMapper();
 
-        var data = [];
-        var result = super.getResult();
-        var dm = getDataMapper();
-        
-        var obj = super.fire( "attribute.get", [ rc.id ] );
+		var obj = super.fire( "attribute.get", [ rc.id ] );
 
-        var attr = dm.convert( obj, "attribute", true );
-        
-        result.setData( attr );
+		var attr = dm.convert( obj, "attribute", true );
 
-        event.setValue("result", result );
-        
-    }
+		result.setData( attr );
+
+		event.setValue( "result", result );
+	}
 
 	function codeExists( event, rc, prc ){
 		param rc.id   = "_";
 		param rc.code = "";
 
-        var result = super.getResult();
+		var result = super.getResult();
 
 		var exist = super.fire( "Attribute.codeExists", { code = rc.code, excludedId = rc.id } );
 
-        result.setData( exist );
+		result.setData( exist );
 
 		event.setValue( "result", result );
 	}
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		var data   = [];
+		var dm     = getDataMapper();
+		var result = super.getResult();
 
-        var data = [];
-        var dm = getDataMapper();
-        var result = super.getResult();
+		var params = super.paramsFromUrl();
 
-        var params = super.paramsFromUrl();
+		var rows = super.fire( "attribute.search", params );
 
-        var rows = super.fire( "attribute.search", params );
+		for ( var row in rows.getData() ) {
+			var obj = dm.convert( row, "Attribute", true );
+			data.add( obj );
+		}
 
-        for ( var row in rows.getData() ) {
+		result.setCount( rows.getCount() );
+		result.setTotal( rows.getTotal() );
+		result.setData( data );
 
-            var obj = dm.convert( row, "Attribute", true );
-            data.add( obj );
-        
-        }
+		event.setValue( "result", result );
+	}
 
-        result.setCount( rows.getCount() );
-        result.setTotal( rows.getTotal() );
-        result.setData( data );
+	function listRawValues( event, rc, prc ){
+		var data   = [];
+		var dm     = getDataMapper();
+		var result = super.getResult();
 
-        event.setValue("result", result );
-        
-    }
+		var params = super.paramsFromUrl();
 
-    function listRawValues( event, rc, prc ){
+		var rows = super.fire( "rawValue.search", params );
 
-        var data = [];
-        var dm = getDataMapper();
-        var result = super.getResult();
+		for ( var row in rows.getData() ) {
+			var obj = dm.convert( row, "RawValue", true );
+			data.add( obj );
+		}
 
-        var params = super.paramsFromUrl();
+		result.setCount( rows.getCount() );
+		result.setTotal( rows.getTotal() );
+		result.setData( data );
 
-        var rows = super.fire( "rawValue.search", params );
+		event.setValue( "result", result );
+	}
 
-        for ( var row in rows.getData() ) {
+	function get( event, rc, prc ){
+		var result = super.getResult();
 
-            var obj = dm.convert( row, "RawValue", true );
-            data.add( obj );
-        
-        }
+		var row = super.fire( "attribute.get", [ rc.id ] );
 
-        result.setCount( rows.getCount() );
-        result.setTotal( rows.getTotal() );
-        result.setData( data );
+		var obj = getDataMapper().convert( row, "Attribute", true );
 
-        event.setValue("result", result );
-        
-    }
+		result.setTotal( 1 );
+		result.setData( 1 );
 
-    function get( event, rc, prc ){
+		event.setValue( "result", obj );
+	}
 
-        var result = super.getResult();
-        
-        var row = super.fire( "attribute.get", [ rc.id ] );
+	function save( event, rc, prc ){
+		var attr = super.bean( "Attribute" );
 
-        var obj = getDataMapper().convert( row, "Attribute", true );
+		var text   = super.bean( "Text" );
+		var lang   = super.bean( "Lang" );
+		var status = super.bean( "Status" );
 
-        result.setTotal( 1 );
-        result.setData( 1 );
+		var thisId    = "";
+		var messageId = "";
+		var texts     = [];
+		var values    = NullValue();
 
-        event.setValue("result", obj );
-        
-    }
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-    function save( event, rc, prc ){
+		var categories = [];
 
-        var attr = super.bean("Attribute");
+		for ( var thisCategory in json.selectedCategories ) {
+			var category = super.bean( "ProductCategory" );
 
-        var text = super.bean("Text");
-        var lang = super.bean("Lang");
-        var status = super.bean("Status");
-        
-        var thisId = "";
-        var messageId = "";
-        var texts = [];
-        var values = NullValue();
+			category.setId( thisCategory.id )
+			categories.add( category );
+		}
 
-        var json = DESerializeJSON( GetHTTPRequestData().content );
+		text.setMemento( json.mainText )
 
-        var categories = [];
+		texts.add( text );
 
-        for( var thisCategory in json.selectedCategories ) {
+		attr.setId( json.id );
+		attr.setCode( json.code );
+		attr.setTexts( texts );
+		attr.setStatus( status.setId( json.status.id ) );
+		attr.setCategories( categories );
 
-            var category = super.bean("ProductCategory");
-            
-            category.setId( thisCategory.id )
-            categories.add( category );
+		if (
+			!IsNull( json.values )
+			AND !IsNull( json.values._data )
+		) {
+			values = [];
 
-        }
+			for ( var value in json.values._data ) {
+				var bean   = super.bean( "AttributeValue" );
+				var status = super.bean( "Status" );
 
-        text.setMemento( json.mainText )
+				bean.setAttributeId( json.id ); // TODO: better than this
+				bean.setId( value.id );
+				bean.setAllowNote( value.allowNote );
+				bean.setAffectToImage( value.affectToImage );
+				bean.setOrderBy( value.orderBy );
 
-        texts.add( text );
-    
-        attr.setId( json.id );
-        attr.setCode( json.code );
-        attr.setTexts( texts );
-        attr.setStatus( status.setId( json.status.id ) );
-        attr.setCategories( categories );
+				bean.setStatus( status.setId( value.status.id ) );
 
-        if( !IsNull( json.values ) 
-            AND !IsNull(json.values._data ) ){
+				values.add( bean );
+			}
+		}
 
-            values = [];
+		attr.setValues( values );
 
-            for( var value in json.values._data ) {
+		if ( !Len( json.id ) ) {
+			messageId = "attribute.created";
+			thisId    = super.fire( "attribute.create", [ attr ] )
+		} else {
+			messageId = "attribute.updated";
+			thisId    = super.fire( "attribute.update", [ attr ] )
+		}
 
-                var bean = super.bean("AttributeValue");
-                var status = super.bean("Status");
-                
-                bean.setId( value.id );
-                bean.setAllowNote( value.allowNote );
-                bean.setAffectToImage( value.affectToImage );
-                bean.setOrderBy( value.orderBy );
-                
-                bean.setStatus( status.setId( value.status.id ) );
+		var message = completeMessage( messageId );
 
-                values.add( bean );
-            }
-            
-        }
-
-        attr.setValues( values );
-
-        if( !Len( json.id )  ) {
-
-            messageId = "attribute.created";
-            thisId = super.fire( "attribute.create", [ attr ] )
-            
-        } else {
-
-            messageId = "attribute.updated";
-            thisId = super.fire( "attribute.update", [ attr ] )
-            
-        }
-
-        var message = completeMessage( messageId );
-
-        event.setValue( "result", { "message": message, "payload" = { "id" = thisId }  } );
-        
-    }
+		event.setValue( "result", { "message" = message, "payload" = { "id" = thisId } } );
+	}
 
 	function delete( event, rc, prc ){
-        
-        var result = super.getResult();
-        var list = GetHTTPRequestData().content;
-        var messageId = "attribute.deletedAllRecords";
+		var result    = super.getResult();
+		var list      = GetHTTPRequestData().content;
+		var messageId = "attribute.deletedAllRecords";
 
-        var errors = [];
-        var payload = "";
+		var errors  = [];
+		var payload = "";
 
-        var ids = ListToArray( list );
+		var ids = ListToArray( list );
 
-        for( var id in ids ) {
-            var outcome = super.fire( "attribute.delete", [ id ] );
+		for ( var id in ids ) {
+			var outcome = super.fire( "attribute.delete", [ id ] );
 
-            if( outcome.getStatus() == "ERROR"  ) {
-                errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
-            }
+			if ( outcome.getStatus() == "ERROR" ) {
+				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+			}
+		}
 
-        }
+		if ( errors.len() ) {
+			messageId = "attribute.deletedNotAllRecords"
+			payload   = { "errors" = errors };
+		}
 
-        if( errors.len() ) {
-            messageId = "attribute.deletedNotAllRecords"
-            payload = { "errors": errors } ;
-        }
+		var message = super.completeMessage( messageId );
 
-        var message = super.completeMessage( messageId );
+		result.setData( { "message" = message, "payload" = payload } );
 
-        result.setData( { "message" = message, "payload" =  payload } );
-        
 		event.setValue( "result", result );
-	}        
+	}
 
 }
