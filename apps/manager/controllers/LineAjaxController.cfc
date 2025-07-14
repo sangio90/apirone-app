@@ -65,12 +65,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var finish  = super.bean( "Finish" );
 		var product = super.bean( "Product" );
 		var status  = super.bean( "Status" );
+		var category  = super.bean( "ProductCategory" );
 
 		product.setLine( line.setId( rc.id ) );
 		product.setFinish( finish.setId( json.finishId ) );
 		product.setSize( size.setId( json.sizeId ) );
 		product.setCategory( category.setId( 22 ) ); // TODO: check if this value is ok here
-		product.setStatus( status.setId( "ACT" ) ); // TODO: check if this value is ok here
+		product.setStatus( status.setId( "ACT" ) );
 
 		var newId = super.fire( "product.create", [ product ] );
 

@@ -34,6 +34,7 @@
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
+		
 		<cfargument name="orderby" required="true" type="String" default="sizes.code">
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">

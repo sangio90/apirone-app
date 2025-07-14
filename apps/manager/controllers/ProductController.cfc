@@ -30,7 +30,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.jsScripts.add( "app-product-items" );
 
 
-		prc.page[ "productId" ]           = product.getId();
+		prc.page[  "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = super.fire( "status.list", [ "attribute" ] );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
