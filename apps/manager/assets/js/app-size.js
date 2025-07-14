@@ -116,8 +116,6 @@ AP.size.list = (function () {
 
 		edit: function (event) {
 
-			console.log("edit");
-
 			viewModel.set("detailForm.data", event.data);
 			viewModel.set("detailForm.title", "Modifica dimensione < " + event.data.code + " >");
 

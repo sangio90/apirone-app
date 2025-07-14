@@ -57,17 +57,9 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Stato</label>
-                            <div class="col-sm-10">
-                                <select 
-                                    required
-                                    id="statusId" 
-                                    class="form-control"
-                                    data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
-                                    data-value-field="id"
-                                    data-text-field="name"
-                                    >
-                                </select>
+                            <label class="col-sm-2 col-form-label text-end">ID: </label>
+                            <div class="col-sm-10 mt-1">
+                                <span data-bind="text: detailForm.data.id"></span>
                             </div>
                         </div>
 
