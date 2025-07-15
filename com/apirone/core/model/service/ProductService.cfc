@@ -64,7 +64,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Array excludedCategoryIds = [],
 		required Numeric limit    = 15,
 		required Numeric offset   = 0,
-		required Array orderBy    = [ { field = "category.name" } ]
+		required Array orderBy    = [ { field = "product.id" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
