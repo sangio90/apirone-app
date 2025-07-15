@@ -43,7 +43,7 @@
 				finish_id::varchar,
 				categories::varchar,
 				finishes.code,
-				COUNT( finish_id ) AS total
+				COUNT( finish_id ) OVER() AS total
 			FROM
 				finishes
 
@@ -78,6 +78,13 @@
 
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderBy )#
+
+			<cfif arguments.limit GTE 0>
+				LIMIT
+					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
+				OFFSET
+					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
+			</cfif>
 		</cfquery>
 
 		<cfreturn local.q>

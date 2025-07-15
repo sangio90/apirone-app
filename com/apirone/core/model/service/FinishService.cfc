@@ -38,7 +38,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function(record){
+		records.each( function( record ){
 			rows.add( get( finishId = record.finish_id ) );
 		} );
 
