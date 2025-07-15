@@ -19,7 +19,7 @@
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4" 
                                     name="code"
-                                    maxlength="10"
+                                    maxlength="20"
                                     data-bind="value: detailForm.data.code"
                                     onkeyup="this.value = this.value.toUpperCase();">
                             </div>
