@@ -1,113 +1,91 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-    property name="dao" type="com.apirone.core.model.dao.FileDAO";
-    property name="lookupService" type="com.apirone.core.model.service.LookupService";
-    property name="fileTypeService" type="com.apirone.core.model.service.FileTypeService";
+	property name="dao" type="com.apirone.core.model.dao.FileDAO";
+	property name="lookupService" type="com.apirone.core.model.service.LookupService";
+	property name="fileTypeService" type="com.apirone.core.model.service.FileTypeService";
 
-	variables.acheScope = "file";
+	property name="cacheScope" type="String" default="File.bean";
 
-    public com.apirone.core.model.bean.file function get(
-    		required String fileId
-    	){
+	public com.apirone.core.model.bean.file function get( required String fileId ){
+		var cm = getCacheManager();
 
-    	var cm = getCacheManager();
+		var cache = cm.get( getCacheScope(), arguments.fileId );
 
-	   	var cache = cm.get( getCacheScope(), arguments.fileId ) ;
+		if ( cache.status ) {
+			return cache.data;
+		}
 
-	    if ( cache.status ) {
-	    
-	      return cache.data;
-	    
-	    } 
-	    
 		var obj = build( arguments.fileId );
 
 		cm.put( getCacheScope(), arguments.fileId, obj );
-	
-        return obj;
 
-    }
+		return obj;
+	}
 
-	public com.apirone.core.model.bean.File[] function list(
-		String typeId,
-		String productId,
-		String productItemId,
-	) {
-		arguments["limit"] = -1;
+	public Array function list(){
+		arguments[ "limit" ] = -1;
 		return search( argumentCollection = arguments ).getData();
 	}
 
+	public com.apirone.core.model.bean.Result function search(
+		String typeId,
+		String productId,
+		String productItemId,
+		required Numeric limit  = 20,
+		required Numeric offset = 0
+	){
+		var rows   = [];
+		var result = super.getResult();
 
-    public com.apirone.core.model.bean.Result function search(
-					 String typeId,
-					 String productId,
-					 String productItemId,
-			required Numeric limit = 20,
-			required Numeric offset = 0
-    	){
+		var records = getDao().find( argumentCollection = arguments );
 
-	    var rows = [];
-    	var result = super.getResult();
-
-    	var records = getDao().find( argumentCollection=arguments );
-
-		records.each(function(record) {
+		records.each( function( record ){
 			rows.add( get( fileId = record.file_id ) );
-		});
+		} );
 
-	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
-	    result.setTotal( Val( records.total ) );
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
-        return result;
-
-    }
-
-	public String function update(
-			required com.apirone.core.model.bean.File file,
-            required com.apirone.core.model.bean.Entity entity
-		){
-		
-            var id = getDao()
-                        .update( file = arguments.file, entity = arguments.entity )
-                        .toString();
-            
-			getCacheManager().remove( getCacheScope(), arguments.fileId );
-			
-			return id;
-    
+		return result;
 	}
 
-	public void function delete(
-		required String fileId
+	public String function update(
+		required com.apirone.core.model.bean.File file,
+		required com.apirone.core.model.bean.Entity entity
 	){
+		var id = getDao().update( file = arguments.file, entity = arguments.entity ).toString();
 
-		getDao().delete( arguments.fileId );
-		
 		getCacheManager().remove( getCacheScope(), arguments.fileId );
 
+		return id;
+	}
+
+	public void function delete( required String fileId ){
+		getDao().delete( arguments.fileId );
+
+		getCacheManager().remove( getCacheScope(), arguments.fileId );
 	}
 
 
 	public String function create(
-		required String filePath, //full path of file, from /tmp for example
+		required String filePath, // full path of file, from /tmp for example
 		required String typeId,
 		required String kindId,
-				 Struct entity,
+		Struct entity
 	){
-
 		var thisFile = "";
 
-		var config = super.getConfiguration().get("imagesConfig")[ arguments.kindId ];
+		var config = super.getConfiguration().get( "imagesConfig" )[ arguments.kindId ];
 
-		var bean = super.bean("File");
-		var type = super.bean("FileType");
-		var kind = super.bean("FileKind");
+		var bean = super.bean( "File" );
+		var type = super.bean( "FileType" );
+		var kind = super.bean( "FileKind" );
 
 		var root = ExpandPath( "/../repository/public/media/" );
 
-		var dayPath = DateFormat( now(), "yyyy/mm" )
-		
+		var dayPath = DateFormat( Now(), "yyyy/mm" )
+
 		var destination = root & "/#config.path#/" & "_ori/" & dayPath;
 
 		DirectoryCreate( destination, true, true );
@@ -116,14 +94,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var fileExt  = ListLast( arguments.filePath, "." );
 
 		var unique = Left( LCase( Replace( CreateUUID(), "-", "", "ALL" ) ), 5 );
-        var name = prettyString( fileName ) & "_" & unique & "." & LCase( fileExt );
-        
-		cffile( source="#arguments.filePath#", destination="#destination#/#name#", action="RENAME" );
+		var name   = prettyString( fileName ) & "_" & unique & "." & LCase( fileExt );
 
-		var fileInfo = FileInfo( "#destination#/#name#" );
-	
+		cffile(
+			source      = "#arguments.filePath#",
+			destination = "#destination#/#name#",
+			action      = "RENAME"
+		);
+
+		var fileInfo = fileInfo( "#destination#/#name#" );
+
 		bean.setName( name );
-		bean.setDescription("");
+		bean.setDescription( "" );
 		bean.setDirectory( dayPath );
 		bean.setSize( fileInfo.size );
 
@@ -131,94 +113,82 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setKind( kind.setId( arguments.kindId ) );
 
 		if ( IsImageFile( "#destination#/#name#" ) ) {
-
 			var info = ImageInfo( "#destination#/#name#" );
 
 			bean.setHeight( info.height );
 			bean.setWidth( info.width );
-			bean.setAlt("");
-			bean.setExtension("");
-		
+			bean.setAlt( "" );
+			bean.setExtension( "" );
 		}
 
-        var newId = getDao()
-			.insert( file = bean, entity = arguments.entity )
-			.toString();
+		var newId = getDao().insert( file = bean, entity = arguments.entity ).toString();
 
-		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# image inserted");
+		cffile(
+			action = "APPEND",
+			file   = "#ExpandPath( "/debug.log" )#",
+			output = "#Now()# image inserted"
+		);
 
 		var imageType = config.types[ typeId ];
 
-		if( imageType.keyExists( "sizes" ) ) {
-
-			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# key sizes exists");
+		if ( imageType.keyExists( "sizes" ) ) {
+			cffile(
+				action = "APPEND",
+				file   = "#ExpandPath( "/debug.log" )#",
+				output = "#Now()# key sizes exists"
+			);
 
 			var thisFile = get( newId );
 
-			for( var size in imageType.sizes ) {
-
+			for ( var size in imageType.sizes ) {
 				resize( thisFile.getPath(), size.width );
-
 			}
-
 		}
 
 		return newId;
-
 	}
 
-    public Void function resize(
-    		required String filePath,
-    		required Numeric size
-        ){
-  
-        var sizePath = Replace( filePath, "_ori", size );
+	public Void function resize( required String filePath, required Numeric size ){
+		var sizePath = Replace( filePath, "_ori", size );
 
-        var directory = getDirectoryFromPath( sizePath );
+		var directory = GetDirectoryFromPath( sizePath );
 
-        var file = ImageNew( arguments.filePath );
+		var file = ImageNew( arguments.filePath );
 
 		DirectoryCreate( directory, true, true );
 		ImageResize( file, size );
 
 		file.write( sizePath, true );
-
 	}
 
 
-    /**
-     * @private
-     */
-  	private com.apirone.core.model.bean.file function build(
-    		required String fileId
-    	){
+	/**
+	 * @private
+	 */
+	private com.apirone.core.model.bean.file function build( required String fileId ){
+		var record = getDao().read( fileId = arguments.fileId );
 
-	    var record = getDao().read( fileId = arguments.fileId );
+		if ( record.RecordCount ) {
+			var obj  = super.bean( "File" );
+			var kind = super.bean( "FileKind" );
 
-	    if( record.RecordCount ) { 
+			obj.setId( record.file_id.toString() );
+			obj.setName( record.name );
 
-	    	var obj = super.bean( "File" );
-	    	var kind = super.bean( "FileKind" );
-
-		    obj.setId( record.file_id.toString() );
-            obj.setName( record.name );
-
-        	obj.setType( getFileTypeService().get( record.type_id ) );
-        	obj.setKind( kind.setId( record.kind_id ) );
-            obj.setSize( record.size );
-            obj.setWidth( record.width );
-            obj.setHeight( record.height );
-            obj.setAlt( record.alt );
-            obj.setDescription( record.description );
-            obj.setExtension( record.extension );
-            obj.setDirectory( record.directory );
+			obj.setType( getFileTypeService().get( record.type_id ) );
+			obj.setKind( kind.setId( record.kind_id ) );
+			obj.setSize( record.size );
+			obj.setWidth( record.width );
+			obj.setHeight( record.height );
+			obj.setAlt( record.alt );
+			obj.setDescription( record.description );
+			obj.setExtension( record.extension );
+			obj.setDirectory( record.directory );
 
 			return obj;
-		
 		}
 
-		return nullValue();
-
-  	}
+		return NullValue();
+	}
 
 }
