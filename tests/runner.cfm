@@ -1,11 +1,175 @@
-<cfsetting showdebugoutput="false">
-<cfparam name="url.reporter" default="simple"> <!--- simple --->
-<cfparam name="url.directory" default="tests.specs.com.apirone">
-<cfparam name="url.recurse"	default="true" type="boolean">
-<cfparam name="url.bundles"	default="">
-<cfparam name="url.labels" 	default="">
-<cfparam name="url.reportpath" default="#ExpandPath( "/test/results" )#">
-<cfparam name="url.propertiesFilename" default="TEST.properties">
-<cfparam name="url.propertiesSummary" default="false" type="boolean">
+﻿<cfscript>
+	// No cf debugging
+	cfsetting( showdebugoutput="false" );
+	// Path Navigation
+	param name="url.path" default="";
+	// Root Tests Directory
+	rootMapping = "/tests/specs";
+	rootPath 	= expandPath( rootMapping );
+	targetPath 	= rootPath;
 
-<cfinclude template="/testbox/system/runners/HTMLRunner.cfm" >
+	// Append navigation path
+	if( len( url.path ) ){
+		targetPath = getCanonicalPath( rootpath & "/" & url.path );
+		// Avoid traversals
+		if( !findNoCase( rootpath, targetPath ) ){
+			targetPath = rootpath;
+		}
+	}
+
+	// Get the actual execution path
+	executePath = rootMapping & ( len( url.path ) ? "/#url.path#" : "/" );
+
+	// Directory Runner
+	if( !isNull( url.action ) ){
+		if( directoryExists( targetPath ) ){
+			writeOutput( "#new testbox.system.TestBox( directory=executePath ).run()#" );
+		} else {
+			writeOutput( "<h2>Invalid Directory: #encodeForHTML( targetPath )#</h2>" );
+		}
+		abort;
+	}
+
+	// Get target path listing
+	qResults = directoryList( targetPath, false, "query", "", "name" );
+	// Get the back path
+	if( len( url.path ) ){
+		backPath = url.path.listToArray( "/\" );
+		backPath.pop();
+		backPath = backPath.toList( "/" );
+	}
+	// TestBox Assets
+	ASSETS_DIR = expandPath( "/testbox/system/reports/assets" );
+	TESTBOX_VERSION = new testBox.system.TestBox().getVersion();
+</cfscript>
+
+<cfoutput>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="generator" content="TestBox v#TESTBOX_VERSION#">
+	<title>TestBox Browser</title>
+	<style>
+		legend span { font-size: 12px }
+		#fileRead( '#ASSETS_DIR#/css/main.css' )#
+	</style>
+	<script>#fileRead( '#ASSETS_DIR#/js/jquery-3.3.1.min.js' )#</script>
+</head>
+
+<body>
+
+<div id="tb-runner" class="container">
+
+	<!--- Header --->
+	<div class="row mt-5">
+		<div class="col-md-2 text-center mx-auto">
+			<img src="http://www.ortussolutions.com/__media/testbox-185.png" alt="TestBox" id="tb-logo" style="width: 100px"/>
+			<br>
+			v#TESTBOX_VERSION#
+			<br>
+			<a
+				href="runner.cfm?action=runTestBox&path=#URLEncodedFormat( url.path )#"
+				target="_blank"
+			>
+				<button
+					class="btn btn-primary btn-sm my-1"
+					type="button">
+					Run All
+				</button>
+			</a>
+		</div>
+		<div class="col-md-10">
+
+			<div class="row">
+				<div class="col-12">
+
+					<h2>Availble Test Runners: </h2>
+					<p>
+						Below is a listing of the runners matching the "runner*.cfm" pattern.
+					</p>
+		
+					<cfset runners = directoryList( expandPath( "./" ), false, "query", "runner*.cfm" )>
+					
+					<cfoutput query="runners">
+						<a href="#runners.name#" target="_blank" class="btn btn-secondary btn-sm my-1 mx-1">#runners.name#</a>
+					</cfoutput>
+
+					<hr>
+
+					<form name="runnerForm" id="runnerForm">
+						
+						<input type="hidden" name="opt_run" id="opt_run" value="true">
+						
+						<h2>TestBox Test Browser: </h2>
+						<p>
+							Below is a listing of the files and folders starting from your root <code>#rootMapping#</code>.  You can click on individual tests in order to execute them
+							or click on the <strong>Run All</strong> button on your left and it will execute a directory runner from the visible folder.
+						</p>
+		
+						<fieldset>
+							<legend><span>path:</span> #targetPath.replace( rootPath, "" )#</legend>
+		
+							<!--- Show Back If we are traversing --->
+							<cfif len( url.path )>
+								<a href="runner.cfm?path=#URLEncodedFormat( backPath )#">
+									<button type="button" class="btn btn-secondary btn-sm my-1">&##xAB; Back</button>
+								</a>
+								<br>
+								<hr>
+							</cfif>
+		
+							<cfloop query="qResults">
+								<!--- Skip . folder file names --->
+								<cfif refind( "^\.", qResults.name )>
+									<cfcontinue>
+								</cfif>
+		
+								<cfif qResults.type eq "Dir">
+									<a
+										class="btn btn-secondary btn-sm my-1"
+										href="runner.cfm?path=#urlEncodedFormat( url.path & "/" & qResults.name )#"
+									>
+										&##x271A; #qResults.name#
+									</a>
+									<br />
+								<cfelseif listLast( qresults.name, ".") eq "cfm">
+									<a
+										class="btn btn-primary btn-sm my-1"
+										href="#executePath & "/" & qResults.name#"
+										target="_blank"
+									>
+										#qResults.name#
+									</a>
+									<br />
+								<cfelseif listLast( qresults.name, ".") eq "cfc" and qresults.name neq "Application.cfc">
+									<a
+										class="btn btn-primary btn-sm my-1"
+										href="#executePath & "/" & qResults.name#?method=runRemote"
+										target="_blank"
+									>
+										#qResults.name#
+									</a>
+									<br />
+								<cfelse>
+									#qResults.name#
+									<br/>
+								</cfif>
+		
+							</cfloop>
+						</fieldset>
+					</form>
+		
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+
+</cfoutput>

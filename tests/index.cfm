@@ -1,0 +1,1 @@
+﻿<cflocation addToken="false" url="/tests/runner.cfm">
