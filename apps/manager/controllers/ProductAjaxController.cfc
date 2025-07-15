@@ -332,7 +332,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 
 		var result = getFlatTree( productId = rc.id, includeMissingValues = false );
-		dump(result.getData());abort;
+		
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
 		result.setData( data );

@@ -67,8 +67,6 @@ AP.product.list = (function () {
 
 			var params = thisForm.serializeJSON();
 
-			console.log("searchListForm:params", params);
-
 			viewModel.rows.read( params );
 
 			return false;

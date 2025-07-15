@@ -39,6 +39,7 @@
 		<cfargument name="sizeId" type="String">
 		<cfargument name="finishId" type="String">
 		<cfargument name="excludedIds" type="Array">
+		<cfargument name="str" type="String">
 
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -48,26 +49,35 @@
 			SELECT product_id::varchar
 			FROM
 				products
+					<cfif !IsNull( arguments.str )>
+						INNER JOIN texts USING ( product_id )
+					</cfif>
+
 			WHERE 1=1
 
+				<cfif !IsNull( arguments.str )>
+					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+				</cfif>
+
 				<cfif !IsNull( arguments.lineId )>
-					AND line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+					AND products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.finishId )>
-					AND finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
+					AND products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.sizeId )>
-					AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
+					AND products.size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.excludedCategoryIds ) AND ArrayLen( arguments.excludedCategoryIds )>
-					AND product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">)
+					AND products.product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">)
 				</cfif>
 
 			ORDER BY
-				created_at
+				<!--- #super.sanitizeSQL( arguments.orderBy )# - ---> <!--- TODO: dovrei fare la inner se l'ordinamento prevede product.name --->
+				products.code
 
 			<cfif arguments.limit GTE 0>
 				LIMIT

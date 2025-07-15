@@ -59,6 +59,11 @@
         "type": "String"
     },
 
+    "product.name": {
+        "name": "texts.text",
+        "type": "String"
+    },
+
     "product.created": {
         "name": "created_at",
         "type": "date"
