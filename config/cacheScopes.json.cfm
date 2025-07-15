@@ -20,5 +20,7 @@
     "Status.bean": {},
     "SystemColor.bean": {},
     "Text.bean": {},
+    "FileType.bean": {},
+    "File.bean": {},
     "Variant.bean": {},
 }
