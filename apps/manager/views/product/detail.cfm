@@ -17,7 +17,7 @@
                     
                     <div class="card-body row">
 
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-3">
                             <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
                         </div>
                         
@@ -63,9 +63,30 @@
 
                                     <div class="col-sm-12">
 
-                                        <cfif prc.product.getCategory().getId() == 22>
+                                        <p>
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="product" 
 
-                                            <p>
+                                                data-product-id="#rc.id#"
+                                                data-product-name="#prc.subtitle# / #prc.title#"
+                                                
+                                                data-bind="click: openComponentsList">
+                                                    Componenti base per questo articolo &raquo;
+                                                </a>
+                                            <br>                                            
+
+                                            - <a href=""
+                                                class="underline"
+                                                data-type="product" 
+                                                data-bind="click:openReorderingModal">
+                                                Riordina attributi &raquo;
+                                            </a>
+                                            
+                                            <br>                                            
+                                            
+                                            <cfif prc.product.getCategory().getId() == 22>
+
                                                 - <a href=""
                                                     class="underline"
                                                     data-type="lineSize" 
@@ -80,17 +101,6 @@
                                                         Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
                                                     </a>
                                                 <br>
-                                                - <a href=""
-                                                    class="underline"
-                                                    data-type="product" 
-
-                                                    data-product-id="#rc.id#"
-                                                    data-product-name="#prc.subtitle# / #prc.title#"
-                                                    
-                                                    data-bind="click: openComponentsList">
-                                                        Componenti base per questa placca &raquo;
-                                                    </a>
-                                                <br>
 
                                                 - <a href=""
                                                     class="underline"
@@ -98,13 +108,7 @@
                                                     data-bind="click:openImagesList">
                                                     Aggiungi immagini per questa placca &raquo;
                                                 </a>
-                                                <br>
-                                                - <a href=""
-                                                    class="underline"
-                                                    data-type="product" 
-                                                    data-bind="click:openReorderingModal">
-                                                    Riordina attributi &raquo;
-                                                </a>
+
                                                 <br>
                                                 - <a href=""
                                                     class="underline"
@@ -112,9 +116,10 @@
                                                     data-bind="click:openFruitItemsImagesModal">
                                                     Tutte le combinazioni &raquo;
                                                 </a>
-                                            </p>
 
-                                        </cfif>
+                                            </cfif>
+                                        
+                                        </p>
         
                                     </div>
                                     <div class="col-sm-12 text-end">
