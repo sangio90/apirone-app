@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" type="com.apirone.core.model.dao.ProductCategoryDAO";
 	property name="statusService" type="com.apirone.core.model.service.StatusService";
 	property name="textService" type="com.apirone.core.model.service.TextService";
+	property name="ProductCategoryTypeService" type="com.apirone.core.model.service.ProductCategoryTypeService";
 	
 	property name="cacheScope" type="String" default="ProductCategory.bean";
 
@@ -206,7 +207,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setCreatedAt( record.created_at );
 
-            bean.setTexts( getTextService().list( ProductCategoryId = record.product_category_id ) );
+        	bean.setType( getProductCategoryTypeService().get( productCategoryTypeId = record.product_category_type_id ) );
+            
+			bean.setTexts( getTextService().list( productCategoryId = record.product_category_id ) );
 
 			return bean;
 			

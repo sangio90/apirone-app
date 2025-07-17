@@ -148,12 +148,20 @@
         <map from="name" to="name" type="cf:String" />
     </mapper>
 
+    <mapper id="ProductCategoryType" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductCategoryType">
+        <map from="id" to="id" type="cf:String" />
+        <map from="name" to="name" type="cf:String" />
+        <map from="status" to="status" ref="Status" />
+        <map from="orderBy" to="orderBy" type="cf:Integer" />
+    </mapper>
+
     <mapper id="ProductCategory" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductCategory">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
         <map from="status" to="status" ref="Status" />
         <map from="mainText" to="mainText" ref="Text" />
+        <map from="type" to="type" ref="ProductCategoryType" />
     </mapper>
 
     <mapper id="Account" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Account">

@@ -66,6 +66,7 @@
                                     { 'field':'id', 'title':'ID', width: '50px' },
                                     { 'field':'id', 'title':'Codice', width: '150px' },
                                     { 'field':'mainText.name', 'title':'Descrizione'},
+                                    { 'field':'type.name', 'title':'Tipo'},
                                     { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 

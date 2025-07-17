@@ -23,4 +23,5 @@
     "FileType.bean": {},
     "File.bean": {},
     "Variant.bean": {},
+    "ProductCategoryType.bean": {},
 }

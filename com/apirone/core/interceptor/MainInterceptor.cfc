@@ -91,7 +91,8 @@ component extends="coldbox.system.Interceptor" {
 			prc.subtitle = "";
 
 			prc.config        = getGlobalConfiguration(); // js global config
-			prc.staticVersion = prc.isDev ? randRange( 1000, 9999 ) : dateFormat( now(), "yyyymmdd" );
+			prc.staticVersion = prc.isDev ? 100 : DateFormat( now(), "yyyymmdd" );
+			prc.staticVersion = url.keyExists( "reinit" ) ? prc.staticVersion + 1 : prc.staticVersion;
 		}
 	}
 
@@ -261,14 +262,8 @@ component extends="coldbox.system.Interceptor" {
 		required prefix  = "api",
 		required service = "apirone"
 	){
-		var code = "#arguments.prefix#_" & dateTimeFormat( now(), "yyyy-mm-dd_HH-nn-ss" ) & "_" & randRange(
-			0,
-			99999
-		);
-		var rc.uuid = "#arguments.prefix#_" & dateTimeFormat( now(), "yyyy-mm-dd_HH-nn-ss" ) & "_" & randRange(
-			0,
-			99999
-		);
+		var code = "#arguments.prefix#_" & dateTimeFormat( now(), "yyyy-mm-dd_HH-nn-ss" ) & "_" & randRange( 0, 99999 );
+		
 		var dayPath  = dateTimeFormat( now(), "yyyy/mm" );
 		var response = "";
 
