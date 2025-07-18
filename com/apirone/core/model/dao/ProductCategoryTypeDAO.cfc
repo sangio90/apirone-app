@@ -1,11 +1,11 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction returntype="Query" name="read">
-		<cfargument name="categoryTypeId" type="String" required="true">
+		<cfargument name="productCategoryTypeId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM product_category_types
-			WHERE product_category_type_id = <cfqueryparam cfsqltype="String" value="#arguments.categoryTypeId#">
+			WHERE product_category_type_id = <cfqueryparam cfsqltype="String" value="#arguments.productCategoryTypeId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -20,8 +20,8 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT 
-                product_category_type_id
-				COUNT(product_category_id) OVER() AS total
+                product_category_type_id,
+				COUNT(product_category_type_id) OVER() AS total
 			FROM
 				product_category_types
 			WHERE 1=1

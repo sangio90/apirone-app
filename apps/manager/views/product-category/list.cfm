@@ -17,7 +17,7 @@
                     <div class="card-body">
 
 						<div class="row d-flex align-items-center mb-3">
-							<div class="col-sm-8">
+							<div class="col-sm-9">
 								<div class="box-search-small">
 									<form
 										id   ="product-category-grid-search-form"
@@ -33,6 +33,13 @@
                                             </cfloop>
                                         </select>
 
+										<select class="form-control me-2" name="typeId">
+											<option value="">-- tutti i tipi</option>
+                                            <cfloop array="#prc.types#" item="item">
+    											<option value="#item.getId()#">#item.getName()#</option>
+                                            </cfloop>
+										</select>
+
 										<select class="form-control me-2" name="orderBy">
 											<option value="productCategory.id-asc">ID [A-Z]</option>
 											<option value="productCategory.id-desc">ID [Z-A]</option>
@@ -41,13 +48,13 @@
 											<option value="text.text-asc">Descrizione [A-Z]</option>
 											<option value="text.text-desc">Descrizione [Z-A]</option>
 										</select>
-
+                                        
 										#searchButton( bind = "click:search" )#
 									</form>
 								</div>
 							</div>
 
-							<div class="col-sm-4">
+							<div class="col-sm-3">
 								<div class="float-end">
 									#deleteButton(
 										bind  = "click:delete",
@@ -64,7 +71,7 @@
                                 id="product-category-grid",
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '50px' },
-                                    { 'field':'id', 'title':'Codice', width: '150px' },
+                                    { 'field':'id', 'title':'Codice', width: '100px' },
                                     { 'field':'mainText.name', 'title':'Descrizione'},
                                     { 'field':'type.name', 'title':'Tipo'},
                                     { 'field':'', 'title':'', width: '55px'},

@@ -97,6 +97,11 @@
     "rawValue.id": {
         "name": "raw_value_id",
         "type": "Integer"
+    },
+ 
+    "productCategoryType.orderby": {
+        "name": "orderby",
+        "type": "Integer"
     }
  
 }
