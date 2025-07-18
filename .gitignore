@@ -12,3 +12,5 @@
 /userdata
 _data
 .DS_Store
+docker-compose.yml
+.idea
