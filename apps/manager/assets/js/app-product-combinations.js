@@ -43,18 +43,25 @@ AP.product.combination = (function () {
 			return false;
 
 		},
+		calculateCombinations: function (event) {
+			var id = event.data.id;
 
-		attributes: function (event) {
-
-            var id = event.data.id;
-            window.open("/manager/products/" + id + "/detail", "_blank").focus();
-
-            return false;
-		},
+			NM.util.ajax({
+				method: "GET",
+				url: "/manager/ajax/products/" + AP.page.productId + "/calculatecombinations",
+				callback: {
+					done: function (xhr) {
+						debugger
+						NM.util.autoHideMessage(status, "<span class='green'>Combinazioni generate</span>");
+					}
+				}
+			});
+			return false;
+		}
 	});
 
 	pub.init = function () {
-		debugger
+
 		kendo.bind(AP.fields.combination.listRoot, viewModel);
 
 	};

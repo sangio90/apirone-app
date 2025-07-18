@@ -21,4 +21,6 @@
     "SystemColor.bean": {},
     "Text.bean": {},
     "Variant.bean": {},
+    "Combination.bean": {},
+    "CombinationProductItem.bean": {},
 }

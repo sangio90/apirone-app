@@ -129,7 +129,7 @@
 		get( "/ajax/reports" ).toHandler( "ReportAjaxController.list" );
 		get( "/reports/:id" ).toHandler( "ReportController.get" );
 		get( "/reports" ).toHandler( "ReportController.list" );
-		
+
 
 		/*
 			texts
@@ -150,6 +150,7 @@
 			products
 		*/
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
+		get( "/ajax/products/:id/calculatecombinations" ).to( "ProductAjaxController.calculateCombinations" ).end();
 		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
 		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();

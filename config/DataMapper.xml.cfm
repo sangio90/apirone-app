@@ -3,13 +3,13 @@
     <mapper id="State" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.State">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
-    </mapper>   
+    </mapper>
 
     <mapper id="ProductionTime" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.RawProductionTime">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="status" to="status" ref="Status" />
-    </mapper>   
+    </mapper>
 
     <mapper id="Finish" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.State">
         <map from="id" to="id" type="cf:String" />
@@ -20,7 +20,7 @@
         <map from="mainText" to="mainText" ref="Text" />
         <map from="status" to="status" ref="Status" />
         <map from="texts" to="texts" ref="Text" type="Array" />
-    </mapper>   
+    </mapper>
 
     <mapper id="Country" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Country">
         <map from="id" to="id" type="cf:String" />
@@ -78,7 +78,7 @@
         <map from="orderby" to="orderby" type="cf:Numeric" />
         <map from="componentCount" to="componentCount" type="cf:Numeric" />
         <map from="level" to="level" type="cf:String" />
-    </mapper>   
+    </mapper>
 
     <mapper id="Product" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Product">
         <map from="id" to="id" type="cf:String" />
@@ -86,12 +86,23 @@
         <map from="status" to="status" ref="Status" />
         <map from="name" to="name" type="cf:String" />
         <map from="positionCount" to="positionCount" type="cf:Numeric" />
-    </mapper>   
+    </mapper>
+
+    <mapper id="Combination" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Combination">
+		<map from="productId" to="productId" type="cf:String" />
+		<map from="id" to="id" type="cf:String" />
+    </mapper>
+
+    <mapper id="CombinationProductItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.CombinationProductItem">
+		<map from="productItemId" to="productItemId" type="cf:String" />
+		<map from="combinationId" to="combinationId" type="cf:String" />
+		<map from="id" to="id" type="cf:String" />
+    </mapper>
 
     <mapper id="ProductItemTree" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductItem">
         <map from="id" to="id" type="cf:String" />
         <map from="attributeValue" to="attributeValue" ref="AttributeValueTree" />
-    </mapper>   
+    </mapper>
 
     <mapper id="Text" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Text">
         <map from="id" to="id" type="cf:String" />
@@ -141,7 +152,7 @@
         <map from="createdAt" to="createdAt" type="cf:Date" />
         <map from="mainText" to="mainText" ref="Text" />
         <map from="category" to="category" ref="ProductCategory" />
-    </mapper>   
+    </mapper>
 
     <mapper id="Thickness" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Thickness">
         <map from="id" to="id" type="cf:String" />
@@ -200,14 +211,14 @@
         <map from="directory" to="directory" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
     </mapper>
-    
+
     <mapper id="Price" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Price">
         <map from="id" to="id" type="cf:String" />
         <map from="value" to="value" type="cf:Numeric" />
         <map from="discount" to="discount" type="cf:Numeric" />
         <map from="discountType" to="discountType" type="cf:String" />
     </mapper>
-    
+
     <mapper id="VariantType" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.VariantType">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />

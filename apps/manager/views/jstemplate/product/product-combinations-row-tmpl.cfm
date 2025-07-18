@@ -4,10 +4,10 @@
     <nmscript type="text/x-kendo-template" id="product-combinations-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td style="border-left: 4px solid ##=status.color.hex##">
-                <span data-bind="text: shortId"></span>
+                <span data-bind="text: id"></span>
             </td>
             <td>
-                <span data-bind="text: name"></span>
+                <span data-bind="text: descrizioneProductItems"></span>
             </td>
             <td class="text-center">
                 #iconButton(bind="click:image", icon="external-link-square-alt")#

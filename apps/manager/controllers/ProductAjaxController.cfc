@@ -331,12 +331,23 @@ component extends="com.apirone.core.controller.AbsController" {
 		var dm     = super.getDataMapper();
 		var params = super.paramsFromUrl();
 
-		var result = getFlatTree( productId = rc.id, includeMissingValues = false );
-		
+		var rows = super.service( "Combination" ).getByProductId( rc.id );
+
+		for ( var row in rows.getData() ) {
+			var obj = dm.convert( row, "Combination", true );
+			data.add( row );
+		}
+
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
 		result.setData( data );
 
+		event.setValue( "result", result );
+	}
+
+	function calculateCombinations( event, rc, prc ){
+		var result = super.getResult();
+		super.service( "Combination" ).calculateCombinations( rc.id );
 		event.setValue( "result", result );
 	}
 
