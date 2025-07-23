@@ -2,13 +2,16 @@
 
     <div id="product-category-list-root">
 
-        #pageTitle()#
-
         <div class="row">
-
-			<div class="col-lg-12 text-end pb-3">
-				#addButton( bind = "click:new", size = "sm" )#
-			</div>
+            <div class="col-6">
+				#pageTitle()#
+            </div>
+			<div class="col-6 text-end pb-3">
+                #addButton( bind = "click:new", size = "sm" )#
+            </div>
+        </div>
+        
+        <div class="row">
 
             <div class="col-lg-12">
 

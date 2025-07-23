@@ -12,8 +12,13 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
+            <!---
             <td>
                 <span data-bind="text: category.name"></span>
+            </td>
+            ---->
+            <td>
+                <div data-bind="source: categories" data-template="product-category-row-tmpl"></div>
             </td>
             <td>
                 <span data-bind="text: thickness.name"></span>
@@ -35,4 +40,7 @@
             </td>
         </tr>
     </nmscript>
+
+    #template( view="jstemplate/product-category/product-category-row-tmpl" )#
+
 </cfoutput>

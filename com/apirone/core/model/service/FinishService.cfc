@@ -130,7 +130,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( finishId = record.finish_id ) );
 
-			var categories = getCategoriesBeanFromIds( record.categories )
+			var categories = getCategoriesBeanByIds( record.categories )
 
 			bean.setCategories( categories );
 

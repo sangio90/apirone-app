@@ -1,11 +1,9 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
 	<cffunction name="read" returntype="Query">
-
 		<cfargument name="attributeId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT 
+			SELECT
 				attribute_id::varchar, *
 			FROM
 				attributes
@@ -14,7 +12,6 @@
 		</cfquery>
 
 		<cfreturn local.q>
-
 	</cffunction>
 
 	<cffunction name="readByCode" output="false">
@@ -22,7 +19,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				attribute_id::varchar, 
+				attribute_id::varchar,
 				code
 			FROM
 				attributes
@@ -34,17 +31,17 @@
 	</cffunction>
 
 	<cffunction name="find" returntype="Query">
-
 		<cfargument name="str" type="String">
 
-        <cfquery name="local.q" datasource="apirone">
-			SELECT 
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
 				attribute_id::varchar
 			FROM
 				attributes
 					<cfif !IsNull( arguments.str )>
 						INNER JOIN texts USING ( attribute_id )
 					</cfif>
+
 			WHERE 1=1
 				<cfif !IsNull( arguments.str )>
 					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
@@ -55,24 +52,21 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.categoryId )>
-					<!--- INFO: with cfqueryparam not works --->
-					AND categories @> ANY ('{[#sanitizeSQL(arguments.categoryId)#]}')
+					AND categories @> ANY ('{[#sanitizeSQL( arguments.categoryId )#]}')
 				</cfif>
-            ORDER BY 
-                attribute_id
+			ORDER BY
+				attribute_id
 		</cfquery>
 
 		<cfreturn local.q>
-
 	</cffunction>
 
 	<cffunction name="insert" returntype="String">
-
 		<cfargument name="attribute" type="com.apirone.core.model.bean.Attribute" required="true">
 
 		<cfset var categories = super.getCategoriesAsArray( attribute.getCategories() )>
 
-        <cfquery name="local.q" datasource="apirone">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO attributes (
 				status_id,
 				code,
@@ -81,34 +75,30 @@
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getCode()#">,
-				'#SerializeJSON(categories)#'
+				'#SerializeJSON( categories )#'
 			) RETURNING attribute_id::varchar
 		</cfquery>
 
 		<cfreturn local.q.attribute_id>
-
 	</cffunction>
 
-
 	<cffunction name="update" returntype="String">
-
 		<cfargument name="attribute" type="com.apirone.core.model.bean.Attribute" required="true">
 
 		<cfset var categories = super.getCategoriesAsArray( attribute.getCategories() )>
 
-        <cfquery name="local.q" datasource="apirone">
-			UPDATE 
-				attributes 
-			SET 
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE
+				attributes
+			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getStatus().getId()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getCode()#">,
-				categories = '#SerializeJSON(categories)#'
+				categories = '#SerializeJSON( categories )#'
 			WHERE
 				attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attribute.getId()#">::uuid
 		</cfquery>
 
 		<cfreturn arguments.attribute.getId()>
-
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">
@@ -124,6 +114,4 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
-
-
 </cfcomponent>

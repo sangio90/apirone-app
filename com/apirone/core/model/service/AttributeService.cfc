@@ -171,7 +171,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setValues( getAttributeValueService().list( attributeId = record.attribute_id ) );
 
-			var categories = super.getCategoriesBeanFromIds( record.categories );
+			var categories = super.getCategoriesBeanByIds( record.categories );
 
 			bean.setCategories( categories );
 

@@ -84,7 +84,7 @@
 			{
 				href: "/manager/sizes",
 				icon: "fas fa-expand-alt",
-				title: "Dimensioni",
+				title: "Dimensioni / modelli",
 				roles: "ADM"
 			},
 			{

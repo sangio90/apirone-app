@@ -119,24 +119,32 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result = super.getResult();
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
+		var thisId     = "";
+		var messageId  = "";
+		var categories = [];
+
+		var result    = super.getResult();
 		var line      = super.bean( "Line" );
 		var status    = super.bean( "Status" );
 		var thickness = super.bean( "Thickness" );
 		var category  = super.bean( "ProductCategory" );
 
-		var thisId    = "";
-		var messageId = "";
+		for ( var thisCategory in json.selectedCategories ) {
+			var category = super.bean( "ProductCategory" );
 
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+			category.setId( thisCategory.id )
+			categories.add( category );
+		}
 
 		line.setId( json.id );
 		line.setCode( json.code );
 		line.setName( json.name );
 
 		line.setStatus( status.setId( json.status.id ) );
-		line.setCategory( category.setId( json?.category?.id ) );
+		// line.setCategory( category.setId( json?.category?.id ) );
+		line.setCategories( categories );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
 
 		if ( !Len( json.id ) ) {

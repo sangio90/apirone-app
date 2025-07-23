@@ -42,6 +42,7 @@ AP.line.detail = (function () {
 			id: "",
 			code: "",
 			name: "",
+            selectedCategories: [],
 			category: {
                 id: ""
             },
@@ -148,7 +149,16 @@ AP.line.detail = (function () {
 
                     if(xhr.status == "SUCCESS") {
 
+                        var selectedCategories = [];
+
+                        if( xhr.data?.categories ) {
+                            for (var category of xhr.data.categories )  {
+                                selectedCategories.push(category);
+                            }
+                        }
+
                         viewModel.set("detailForm.data", xhr.data);
+                        viewModel.set("detailForm.data.selectedCategories", selectedCategories);
                         viewModel.set("detailForm.title", "Modifica linea");
 
                         NM.util.openModal(AP.line.fields.detailRoot);

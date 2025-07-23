@@ -6,66 +6,52 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="Size.bean";
 
-    public com.apirone.core.model.bean.Size function get(
-    		required String sizeId
-        ){
+	public com.apirone.core.model.bean.Size function get( required String sizeId ){
+		var cm = super.getCacheManager();
 
-    	var cm = super.getCacheManager();
+		var cache = cm.get( getCacheScope(), arguments.sizeId );
 
-	   	var cache = cm.get( getCacheScope(), arguments.sizeId );
+		if ( cache.status ) {
+			return cache.data;
+		}
 
-	    if ( cache.status ) {
-	    
-	      	return cache.data;
-	    
-	    } 
-	    
 		var bean = build( arguments.sizeId );
 		cm.put( getCacheScope(), arguments.sizeId, bean );
-        
+
 		return bean;
-
 	}
 
-	public com.apirone.core.model.bean.Size[] function list(
+	public Array function list(){
+		arguments[ "limit" ] = -1;
+		return search( argumentCollection = arguments ).getData();
+	}
+
+	public com.apirone.core.model.bean.Result function search(
 		String lineId,
-	) {
-		arguments["limit"] = -1;
-		return search(argumentCollection = arguments).getData();
+		String str,
+		required Numeric limit  = 20,
+		required Numeric offset = 0
+	){
+		var rows   = [];
+		var result = super.getResult();
+
+		var records = getDao().find( argumentCollection = arguments );
+
+		records.each( function( record ){
+			rows.add( get( sizeId = record.size_id ) );
+		} );
+
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
+
+		return result;
 	}
 
-    public com.apirone.core.model.bean.Result function search(
-		             String lineId,
-		             String str,
-			required Numeric limit = 20,
-			required Numeric offset = 0
-    	){
-
-	    var rows = [];
-    	var result = super.getResult();
-
-    	var records = getDao().find( argumentCollection=arguments );
-
-		records.each(function( record ) {
-			rows.add( get( sizeId = record.size_id ) );
-		});
-
-	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
-	    result.setTotal( Val( records.total ) );
-
-        return result;
-
-    }
-
-	public String function create(
-		required com.apirone.core.model.bean.Size size
-	){
-
+	public String function create( required com.apirone.core.model.bean.Size size ){
 		var newId = getDao().insert( arguments.size );
 
 		transaction {
-		
 			for ( var text in arguments.size.getTexts() ) {
 				var entity = super.bean( "Entity" );
 
@@ -81,32 +67,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public String function update(
-		required com.apirone.core.model.bean.Size size
-	){
+	public String function update( required com.apirone.core.model.bean.Size size ){
 		getDao().update( arguments.size );
 
 		var id = arguments.size.getId();
 
 		for ( var text in arguments.size.getTexts() ) {
+			var entity = super.bean( "Entity" )
 
-			var entity = super.bean("Entity")
-			
 			entity.setKey( "size.id" );
 			entity.setValue( id );
 
 			text.setEntity( entity );
 
 			if ( Len( text.getId() ) ) {
-				
 				getTextService().update( text );
-			
 			} else {
-				
 				getTextService().create( text );
-
 			}
-
 		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.size.getId() );
@@ -115,10 +93,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public Boolean function codeExists(
-		required String code,
-		String excludedId = ""
-	){
+	public Boolean function codeExists( required String code, String excludedId = "" ){
 		var record = getDao().readByCode( arguments.code );
 
 		if (
@@ -132,9 +107,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public com.apirone.core.model.bean.Outcome function delete(
-		required String sizeId
-	){
+	public com.apirone.core.model.bean.Outcome function delete( required String sizeId ){
 		var outcome = super.bean( "Outcome" );
 
 		var obj = get( arguments.sizeId );
@@ -147,14 +120,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setData( { "deletedCount" = result } )
 
 				super.getCacheManager().remove( getCacheSciope(), arguments.sizeId );
-
 			} catch ( any error ) {
-				
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteSize" );
 				outcome.setMessage( "Cannot delete size [#arguments.sizeId#]" );
-			
 			}
 		}
 
@@ -163,37 +133,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 
-    /*
+	/*
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Size function build(
-    		required String sizeId
-    	){
+	private com.apirone.core.model.bean.Size function build( required String sizeId ){
+		var record = getDao().read( arguments.sizeId );
 
-	    var record = getDao().read( arguments.sizeId );
+		if ( record.recordCount ) {
+			var bean = super.bean( "Size" );
 
-	    if( record.recordCount ) { 
-
-            var bean = super.bean( "Size" );
-
-            bean.setId( record.size_id );
+			bean.setId( record.size_id );
 			bean.setName( record.size );
 			bean.setCode( record.code );
 			bean.setFruitsCount( record.fruits_count );
-			
-			bean.setCategories( getCategoriesBeanFromIds( record.categories ) );
+
+			bean.setCategories( getCategoriesBeanByIds( record.categories ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( sizeId = record.size_id ) );
-			
+
 			bean.setCreatedAt( record.created_at );
-			
-            return bean;
 
-	    }
+			return bean;
+		}
 
-		return nullValue();
-
-  	}
+		return NullValue();
+	}
 
 }

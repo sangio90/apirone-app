@@ -5,7 +5,7 @@
             <div class="col-8">
                 #pageTitle()#
             </div>
-            <div class="col-4 text-end pt-3">
+            <div class="col-4 text-end">
                 #addButton( bind="click:new", size="sm" )#
             </div>
         </div>
@@ -15,7 +15,7 @@
 				<section class="card">
 					<div class="card-body">
 						<div class="row d-flex align-items-center mb-3">
-							<div class="box-search-small col-6">
+							<div class="box-search-small col-8">
 								<form
 									name  ="size-grid-search-form" id="size-grid-search-form"
 									method="get"
@@ -45,7 +45,7 @@
 								</form>
 							</div>
 
-							<div class="col-6 text-end">
+							<div class="col-4 text-end">
 								<div class="float-end">
 									#deleteButton(
 										bind  = "click:delete",
