@@ -70,7 +70,8 @@
 								id      = "size-grid",
 								columns = "[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'code', 'title':'Codice', width: '120px' },
+                                    { 'field':'code', 'title':'Codice', width: '80px' },
+                                    { 'field':'type.id', 'title':'Tipo', width: '60px' },
                                     { 'field':'mainText.name', 'title':'Descrizione'},
                                     { 'field':'categories', 'title':'Categorie'},
                                     { 'field':'fruitsCount', 'title':'Frutti', width: '100px'},

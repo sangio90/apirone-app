@@ -69,6 +69,10 @@
 	}
 
 	public String function update( required com.apirone.core.model.bean.Size size ){
+
+        //dump(getDao() );
+        //abort;
+
 		getDao().update( arguments.size );
 
 		var id = arguments.size.getId();

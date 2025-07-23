@@ -33,25 +33,27 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		
-		var result = super.getResult();
 
-		var size   = super.bean( "Size" );
-		var status = super.bean( "Status" );
-		var text   = super.bean("Text");
-		var lang   = super.bean("Lang");
+		var json = deserializeJSON( getHTTPRequestData().content );
 
-		var categories = [];
+        var categories = [];
 
 		var thisId    = "";
 		var messageId = "";
 		var texts     = [];
+		
+		var result = super.getResult();
 
-		var json = deserializeJSON( getHTTPRequestData().content );
+		var size   = super.bean( "Size" );
+		var type   = super.bean( "SizeType" );
+		var status = super.bean( "Status" );
+		var text   = super.bean("Text");
+		var lang   = super.bean("Lang");
+
 
 		size.setId( json.id );
 		size.setCode( json.code );
-		//size.setName( json.name );
+        size.setType( type.setId( json.type.id ) );
 
         if ( Len( json?.selectedCategories ) ) {
 

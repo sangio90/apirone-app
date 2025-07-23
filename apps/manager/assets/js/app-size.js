@@ -194,6 +194,9 @@ AP.size.list = (function () {
 				name: {
 					required: true,
 				},
+				typeId: {
+					required: true,
+				},
 				fruitsCount: {
 					required: true
 				},
@@ -214,6 +217,9 @@ AP.size.list = (function () {
 			messages: {
 				name: {
 					required: "Descrizione richiesta",
+				},
+				typeId: {
+					required: "Tipo richiesto",
 				},
 				fruitsCount: {
 					required: "Numero di moduli ricghiesto (0 per modello)",

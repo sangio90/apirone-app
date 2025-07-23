@@ -10,6 +10,9 @@
                 <span data-bind="text: code"></span>
             </td>
             <td>
+                <span data-bind="text: type.id"></span>
+            </td>
+            <td>
                 <span data-bind="text: mainText.name"></span>
             </td>
             <td>
