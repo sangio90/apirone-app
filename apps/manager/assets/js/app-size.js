@@ -30,6 +30,9 @@ AP.size.list = (function () {
 			code: "",
 			fruitsCount: "",
 			selectedCategories: [],
+			type: {
+				id: ""
+			},
 			mainText: {
 				id: "",
 				name: "",
@@ -43,6 +46,7 @@ AP.size.list = (function () {
 		},
 		statuses: AP.page.statuses,
 		categories: AP.page.categories,
+		types: AP.page.types,
 
 		title: "Carica dimensione"
 	};
@@ -59,11 +63,7 @@ AP.size.list = (function () {
 
 			var thisForm = AP.size.fields.searchListForm;
 
-			console.log("searchListForm", thisForm)
-			
 			var params = thisForm.serializeJSON();
-			
-			console.log("params", params)
 
 			viewModel.rows.read(params);
 
@@ -191,6 +191,12 @@ AP.size.list = (function () {
 				$(element).valid();
 			},
 			rules: {
+				name: {
+					required: true,
+				},
+				fruitsCount: {
+					required: true
+				},
 				code: {
 					required: true,
 					maxlength: 3,
@@ -206,6 +212,12 @@ AP.size.list = (function () {
 				}
 			},
 			messages: {
+				name: {
+					required: "Descrizione richiesta",
+				},
+				fruitsCount: {
+					required: "Numero di moduli ricghiesto (0 per modello)",
+				},
 				code: {
 					required: "Codice richiesto",
 					maxlength: "Al massimo 3 caratteri",

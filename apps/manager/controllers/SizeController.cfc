@@ -16,6 +16,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.page[ "categories" ] = categories;
 		prc.page[ "statuses" ]   = prc.statuses;
+		prc.page[ "types" ]   = prc.types;
 
 		prc.jsScripts.add( "app-size" );
 

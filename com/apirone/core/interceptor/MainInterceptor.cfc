@@ -91,8 +91,8 @@ component extends="coldbox.system.Interceptor" {
 			prc.subtitle = "";
 
 			prc.config        = getGlobalConfiguration(); // js global config
-			prc.staticVersion = prc.isDev ? 100 : DateFormat( now(), "yyyymmdd" );
-			prc.staticVersion = url.keyExists( "reinit" ) ? prc.staticVersion + 1 : prc.staticVersion;
+			prc.staticVersion = prc.isDev ? RandRange( 1000, 9999 ) : DateFormat( now(), "yyyymmdd" );
+			//prc.staticVersion = url.keyExists( "reinit" ) ? prc.staticVersion + 1 : prc.staticVersion;
 		}
 	}
 

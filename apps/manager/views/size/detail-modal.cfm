@@ -36,11 +36,11 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Tipo</label>
                             <div class="col-sm-10">
-                                <select class="form-control" name="typeId">
-                                    <option value="">-- tutti i tipi</option>
-                                    <cfloop array="#prc.types#" item="item">
-                                        <option value="#item.getId()#">#item.getName()#</option>
-                                    </cfloop>
+                                <select name="typeId" id="typeId" class="form-control"
+                                    data-bind="value: detailForm.data.type.id, source: detailForm.types"
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                >
                                 </select>
                             </div>
                         </div>
@@ -68,7 +68,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row">
+                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
                             <label class="col-sm-2 col-form-label text-end">ID</label>
                             <div class="col-sm-10 mt-1">
                                 <span data-bind="text: detailForm.data.id"></span>

@@ -59,7 +59,7 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.typeId )>
-					AND products.size_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">
+					AND sizes.size_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>

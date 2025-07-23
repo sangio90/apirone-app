@@ -2,7 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
     function list( event, rc, prc ){
 
-        prc.title = "Categorie";
+        prc.title = "Categorie prodotti";
 
         prc.statuses = super.fire( "status.list", ["PRODUCT_CATEGORY"] );
         prc.types = super.fire( "productCategoryType.list" );

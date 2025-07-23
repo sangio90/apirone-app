@@ -24,14 +24,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Array function list(){
 		var rows = [];
 
-		dump( getDao() );
-
-		var lk = super.service( "Lookup" );
-		dump( lk );
-		abort;
-
 		var records = getDao().find( argumentCollection = arguments );
-		abort;
 
 		records.each( function( record ){
 			rows.add( get( record.status_id ) );
