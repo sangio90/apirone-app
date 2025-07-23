@@ -1,51 +1,38 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-    property name="dao" type="com.apirone.core.model.dao.VatCodeDAO";
+	property name="dao" inject="VatCodeDAO";
 
-    public com.apirone.core.model.bean.PaymentType function get(
-    		required String paymentTypeId
-    	){
+	public com.apirone.core.model.bean.PaymentType function get( required String paymentTypeId ){
+		var cm = getCacheManager();
 
-    	var cm = getCacheManager();
+		var cache = cm.get( key );
 
-	   	var cache = cm.get( key ) ;
+		if ( cache.status ) {
+			return cache.data;
+		}
 
-	    if ( cache.status ) {
-	    
-	      	return cache.data;
-	    
-	    } 
+		var bean = build( arguments.paymentTypeId );
+		cm.put( key, bean );
 
-        var bean = build( arguments.paymentTypeId );
-        cm.put( key, bean );
-        
 		return bean;
+	}
 
-    }
-
-    public com.apirone.core.model.bean.PaymentType[] function list(
-		String str,
-	) {
-		arguments["limit"] = -1;
-		return search(argumentCollection = arguments).getData();
+	public com.apirone.core.model.bean.PaymentType(){
+		arguments[ "limit" ] = -1;
+		return search( argumentCollection = arguments ).getData();
 	}
 
 	public com.apirone.core.model.bean.Result function search(
-		required Numeric limit=50,
-		required Numeric offset=0
+		required Numeric limit  = 50,
+		required Numeric offset = 0
 	){
-
-		var rows = [];
+		var rows   = [];
 		var result = super.getResult();
 
-		var records = getDao().find( argumentCollection=arguments );
+		var records = getDao().find( argumentCollection = arguments );
 
-		for( var record in records ){
-
-			rows.add( 
-				get( paymentTypeId = record.pagcod )
-			)
-
+		for ( var record in records ) {
+			rows.add( get( paymentTypeId = record.pagcod ) )
 		}
 
 		result.setData( rows );
@@ -53,32 +40,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
-
 	}
 
-    /**
-     * @private
-     */
-  	private com.apirone.core.model.bean.PaymentType function build(
-    		required String paymentTypeId
-    	){
+	/**
+	 * @private
+	 */
+	private com.apirone.core.model.bean.PaymentType function build( required String paymentTypeId ){
+		var record = getDao().read( paymentTypeId = arguments.paymentTypeId );
 
-	    var record = getDao().read( paymentTypeId = arguments.paymentTypeId );
+		var bean = NullValue();
 
-		var bean = nullValue();
+		if ( record.RecordCount ) {
+			var bean = super.bean( "VatCode" );
 
-	    if( record.RecordCount ) { 
+			bean.setId( record.pagcod );
+			bean.setName( record.pagdes );
+			// bean.setValue( record.ivaper );
+		}
 
-	    	var bean = super.bean( "VatCode" );
-
-		    bean.setId( record.pagcod );
-		    bean.setName( record.pagdes );
-		    //bean.setValue( record.ivaper );
-
-	    } 
-			
 		return bean;
-		
-  	}
+	}
 
 }

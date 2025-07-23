@@ -1,88 +1,70 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.LangDAO";
+	property name="dao" inject="LangDAO";
 
-	public com.apirone.core.model.bean.Lang function get(
-			required String langId
-    	){
+	public com.apirone.core.model.bean.Lang function get( required String langId ){
+		var cm = getCacheManager();
 
-			var cm = getCacheManager();
+		var cache = cm.get( getCacheScope(), arguments.langId );
 
-			var cache = cm.get( getCacheScope(), arguments.langId ) ;
-	
-			if ( cache.status ) {
-			
-				  return cache.data;
-			
-			}
-			
-			var bean = build( arguments.langId );
-			
-            cm.put( getCacheScope(), arguments.langId, bean );
-			
-            return bean;
+		if ( cache.status ) {
+			return cache.data;
+		}
 
-	} 
-    
-    public com.apirone.core.model.bean.Lang[] function list(
-		String statusId,
-	) {
-		arguments["limit"] = -1;
-		return search( argumentCollection = arguments).getData()
+		var bean = build( arguments.langId );
+
+		cm.put( getCacheScope(), arguments.langId, bean );
+
+		return bean;
+	}
+
+	public Array function list(){
+		arguments[ "limit" ] = -1;
+		return search( argumentCollection = arguments ).getData()
 	}
 
 
-    private com.apirone.core.model.bean.Result function search(
-                     String statusId,
-            required Numeric limit = 20,
-			required Numeric offset = 0,
-    	){
-
-	    var rows = [];
-    	var result = super.getResult();
-
-    	var records = getDao().find( argumentCollection=arguments );
-
-		records.each(function(record) {
-			rows.add( get( langId = record.lang_id ) );
-		});
-
-	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
-	    result.setTotal( Val( records.total ) );
-
-        return result;
-
-    }
-
-    
-    /**
-     * @private
-     */
-    private com.apirone.core.model.bean.Lang function build(
-		required String langId
+	private com.apirone.core.model.bean.Result function search(
+		String statusId,
+		required Numeric limit  = 20,
+		required Numeric offset = 0
 	){
+		var rows   = [];
+		var result = super.getResult();
 
+		var records = getDao().find( argumentCollection = arguments );
+
+		records.each( function( record ){
+			rows.add( get( langId = record.lang_id ) );
+		} );
+
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
+
+		return result;
+	}
+
+
+	/**
+	 * @private
+	 */
+	private com.apirone.core.model.bean.Lang function build( required String langId ){
 		var record = getDao().read( langId = arguments.langId );
 
-		if( record.RecordCount ) { 
-			
+		if ( record.RecordCount ) {
 			var bean = super.bean( "Lang" );
 			bean.setId( record.lang_id );
-			bean.setName( record.lang );	
-			
+			bean.setName( record.lang );
+
 			return bean;
-			
 		}
 
 		return NullValue();
-
 	}
-	  
-  	private String function getCacheScope() {
 
-  		return "Lang.bean";
-
-  	}
+	private String function getCacheScope(){
+		return "Lang.bean";
+	}
 
 }

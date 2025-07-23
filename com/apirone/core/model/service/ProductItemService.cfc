@@ -1,92 +1,68 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.ProductItemDAO";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="attributeService" type="com.apirone.core.model.service.AttributeService";
-	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
-	property name="productComponentService" type="com.apirone.core.model.service.ProductComponentService";
-	property name="componentService" type="com.apirone.core.model.service.ComponentService";
-	
+	property name="dao" inject="ProductItemDAO";
+	property name="statusService" inject="StatusService";
+	property name="attributeService" inject="AttributeService";
+	property name="attributeValueService" inject="AttributeValueService";
+	property name="productComponentService" inject="ProductComponentService";
+	property name="componentService" inject="ComponentService";
+
 	property name="cacheScope" type="String" default="ProductItem.bean";
 
-    public com.apirone.core.model.bean.ProductItem function get(
-    		required String productItemId
-        ){
+	public com.apirone.core.model.bean.ProductItem function get( required String productItemId ){
+		var cm = getCacheManager();
 
-    	var cm = getCacheManager();
+		var cache = cm.get( getCacheScope(), arguments.productItemId );
 
-	   	var cache = cm.get( getCacheScope(), arguments.productItemId ) ;
+		if ( cache.status ) {
+			return cache.data;
+		}
 
-	    if ( cache.status ) {
-	    
-	      	return cache.data;
-	    
-	    } 
-	    
 		var bean = build( arguments.productItemId );
 		cm.put( getCacheScope(), arguments.productItemId, bean );
-        
-		return bean;
 
+		return bean;
 	}
 
-	public com.apirone.core.model.bean.ProductItem[] function getTree(
-		required String productId
-    ) {
+	public com.apirone.core.model.bean.ProductItem(){
+		var result = [];
 
-        var result = [];
+		var productId = arguments.productId;
 
-        var productId = arguments.productId;
+		var baseItems = list( productId = arguments.productId );
 
-        var baseItems = list( 
-            productId = arguments.productId
-        );
-
-        for( var item in baseItems ) {
-
-            var rows = getRecursiveTree( parentId=item.getId(), rows=[] )
+		for ( var item in baseItems ) {
+			var rows = getRecursiveTree( parentId = item.getId(), rows = [] )
 			item.setChildren( rows );
 
-            result.add( item );
-            
-        }
+			result.add( item );
+		}
 
-		//printTree( DESerializeJSON(SerializeJSON(result)) )
+		// printTree( DESerializeJSON(SerializeJSON(result)) )
 
 		return result;
-	
-	}	
+	}
 
-	public com.apirone.core.model.bean.ProductItem[] function getFlatTree(
-            required String productId,
-            required Numeric parentId=NullValue(),
-            required String level=1, 
-            required String orderBy="",
-			required Boolean includeMissingValues=true,
-    ) {
+	public com.apirone.core.model.bean.ProductItem(){
+		var result = [];
+		var rows   = [];
 
-        var result = [];
-		var rows = [];
+		var productId = arguments.productId;
 
-        var productId = arguments.productId;
+		var items = list( productId = arguments.productId, parentId = arguments.parentId );
 
-        var items = list( 
-            productId = arguments.productId,
-            parentId = arguments.parentId
-        );
-
-		if( arguments.includeMissingValues ) {
+		if ( arguments.includeMissingValues ) {
 			rows = listWithMissingValues( items );
 		} else {
 			rows = items;
 		}
-		
+
 		/*
 
         for( var item in items ) {
 			dump( "#item.getOrderBy()# - #item.getId()# - #item.getAttribute().getName()# : #item.getAttributeValue().getRawValue().getName()#" );
 		}
-					
+
 		dump("=============================================================================================================================================")
 		dump("=========#arguments.level#")
 
@@ -99,209 +75,166 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         }
 		*/
 
-        var thisLevel = arguments.level;
-        var includeMissingValues = arguments.includeMissingValues;
+		var thisLevel            = arguments.level;
+		var includeMissingValues = arguments.includeMissingValues;
 
-        var n = 1;
+		var n = 1;
 
-        for( var row in rows ) {
+		for ( var row in rows ) {
+			// if( item.getId() > 0 ) {
 
-			//if( item.getId() > 0 ) {
+			var thisOrderBy = "#arguments.orderBy#.#n#";
+			var parentId    = row.getId();
 
-				var thisOrderBy = "#arguments.orderBy#.#n#";
-        		var parentId = row.getId();
+			row.setLevel( arguments.level );
 
-				row.setLevel( arguments.level );
+			result.add( row );
 
-				result.add( row );
-				
-				var rows = getFlatTree( productId, parentId, thisLevel+1, thisOrderBy, includeMissingValues );
+			var rows = getFlatTree(
+				productId,
+				parentId,
+				thisLevel + 1,
+				thisOrderBy,
+				includeMissingValues
+			);
 
-				result = result.merge( rows );
+			result = result.merge( rows );
 
-				n++;
-			
-			//}
+			n++;
 
-        }
-
-		return result;
-	
-	}
-
-
-	public com.apirone.core.model.bean.ProductItem[] function list(
-         	String productId,
-			Numeric parentId
-    ) {
-		arguments["limit"] = -1;
-
-		return search(argumentCollection = arguments).getData();
-	
-	}
-
-
-    public com.apirone.core.model.bean.ProductComponent[] function listComponents(
-            required Numeric productItemId,
-        ){
-
-		var result = getProductComponentService().list( productItemId = productItemId );
-
-        return result;
-
-    }
-
-    public Boolean function addComponent(
-            required Numeric productItemId,
-            required com.apirone.core.model.bean.ProductComponent productComponent
-        ){
-
-		transaction {
-			getDao().deleteComponent( argumentCollection=arguments );
-			getDao().insertComponent( argumentCollection=arguments );
+			// }
 		}
 
-        return true;
+		return result;
+	}
 
-    }
 
-    public com.apirone.core.model.bean.Result function search(
-            String productId,
-            Numeric parentId
-        ){
+	public com.apirone.core.model.bean.ProductItem(){
+		arguments[ "limit" ] = -1;
 
-	    var rows = [];
-    	var result = super.getResult();
+		return search( argumentCollection = arguments ).getData();
+	}
 
-    	var records = getDao().find( argumentCollection=arguments );
 
-		records.each(function(record) {
-			rows.add( 
-                get( record.product_item_id ) 
-            );
-		});
+	public com.apirone.core.model.bean.ProductComponent(){
+		var result = getProductComponentService().list( productItemId = productItemId );
 
-	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
-	    result.setTotal( Val( records.recordcount ) );
+		return result;
+	}
 
-        return result;
+	public Boolean function addComponent(
+		required Numeric productItemId,
+		required com.apirone.core.model.bean.ProductComponent productComponent
+	){
+		transaction {
+			getDao().deleteComponent( argumentCollection = arguments );
+			getDao().insertComponent( argumentCollection = arguments );
+		}
 
-    }
+		return true;
+	}
 
-    public com.smartvillage.core.model.bean.Outcome function delete(
-			String productId,
-			String attributeId
-		){
+	public com.apirone.core.model.bean.Result function search( String productId, Numeric parentId ){
+		var rows   = [];
+		var result = super.getResult();
 
-		var outcome = super.bean("Outcome");
+		var records = getDao().find( argumentCollection = arguments );
 
-        var obj = get( arguments.productId );
+		records.each( function( record ){
+			rows.add( get( record.product_item_id ) );
+		} );
 
-		outcome.setData( { productId: arguments.productId } );
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.recordcount ) );
+
+		return result;
+	}
+
+	public com.smartvillage.core.model.bean.Outcome function delete( String productId, String attributeId ){
+		var outcome = super.bean( "Outcome" );
+
+		var obj = get( arguments.productId );
+
+		outcome.setData( { productId = arguments.productId } );
 
 		transaction {
-		
-		    try  {
+			try {
+				var cm = getCacheManager();
 
-                var cm = getCacheManager();
+				getDao().delete( getCacheScope(), arguments.productId );
 
-                getDao().delete( getCacheScope(), arguments.productId );
-        
-                cm.remove( "product_#obj.getId()#" );
-                
+				cm.remove( "product_#obj.getId()#" );
 			} catch ( any error ) {
-
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteEvent" );
 				outcome.setMessage( "Cannot delete product [#arguments.productId#]" );
-				
 			}
-			
 		}
 
 		return outcome;
-
 	}
 
-	public String function create(
-			required com.apirone.core.model.bean.ProductItem ProductItem
-		){
-
+	public String function create( required com.apirone.core.model.bean.ProductItem ProductItem ){
 		var newId = getDao().insert( arguments.ProductItem );
 
 		return newId;
-
 	}
 
 
-	public String function update(
-			required com.apirone.core.model.bean.ProductItem productItem
-		){
-
+	public String function update( required com.apirone.core.model.bean.ProductItem productItem ){
 		var newId = getDao().update( arguments.productItem );
 
 		super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
 
 		return newId;
-
 	}
 
 
 
-    /*
+	/*
     	private method
 	*/
 
-	private Void function printTree(required array items, numeric level="0") {
+	private Void function printTree( required array items, numeric level = "0" ){
 		for ( var item in arguments.items ) {
 			var indent = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", arguments.level );
-			
-			//  Stampa il nome della categoria con l'indentazione 
-			echo("#indent# - #item.id# #item.attributeValue.texts[1].name# <br>");
 
-			//  Se la categoria ha dei figli, chiama ricorsivamente la funzione 
-			if ( StructKeyExists( item, "items" ) && arrayLen(item.items) > 0 ) {
-				printTree(item.items, arguments.level + 1);
+			//  Stampa il nome della categoria con l'indentazione
+			Echo( "#indent# - #item.id# #item.attributeValue.texts[ 1 ].name# <br>" );
+
+			//  Se la categoria ha dei figli, chiama ricorsivamente la funzione
+			if ( StructKeyExists( item, "items" ) && ArrayLen( item.items ) > 0 ) {
+				printTree( item.items, arguments.level + 1 );
 			}
 		}
 	}
 
-	private Array function getRecursiveTree(
-		required Numeric parentId
-    ) {
-
+	private Array function getRecursiveTree( required Numeric parentId ){
 		var result = [];
 
 		var items = list( parentId = arguments.parentId );
 
-        for( var item in items ) {
+		for ( var item in items ) {
+			var itemRows = getRecursiveTree( parentId = item.getId() );
 
-            var itemRows = getRecursiveTree( parentId=item.getId() );
-
-			if( ArrayLen( itemRows ) ) {
+			if ( ArrayLen( itemRows ) ) {
 				item.setChildren( itemRows );
 			}
 
 			ArrayAppend( result, item );
-
-        }
+		}
 
 		return result;
-		
-	}	
+	}
 
-	private Array function calcultateAttributes(
-		required Array rows
-    ) {
-
+	private Array function calcultateAttributes( required Array rows ){
 		var attrs = [];
 
-		Boolean function exists( required attributeId, required attrs ) {
-
-			for( var attr in arguments.attrs ) {
-				if( attr.getId() == arguments.attributeId ) {
+		Boolean function exists( required attributeId, required attrs ){
+			for ( var attr in arguments.attrs ) {
+				if ( attr.getId() == arguments.attributeId ) {
 					return true;
 				}
 			}
@@ -309,65 +242,52 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return false
 		}
 
-		for( var row in rows ) {
-
-			if( !exists( row.getAttribute().getId(), attrs ) ) {
-
-				//attribute with all values
+		for ( var row in rows ) {
+			if ( !exists( row.getAttribute().getId(), attrs ) ) {
+				// attribute with all values
 				attrs.add( getAttributeService().get( row.getAttribute().getId() ) );
-
 			}
-
-
 		}
 
 		return attrs;
-		
-	}	
+	}
 
-	private Array function listWithMissingValues(
-		required Array productItems
-    ) {
-
+	private Array function listWithMissingValues( required Array productItems ){
 		var values = [];
 
 		var items = Duplicate( arguments.productItems );
 
-		//1. calcolo gli attributi dei valori recuperati
+		// 1. calcolo gli attributi dei valori recuperati
 		var attrs = calcultateAttributes( arguments.productItems );
 
-		for( var thisAttr in attrs ) {
-
-			for( var thisValue in thisAttr.getValues() ) {
-
-				//2. cerco i valori mancanti per ogni attributo
+		for ( var thisAttr in attrs ) {
+			for ( var thisValue in thisAttr.getValues() ) {
+				// 2. cerco i valori mancanti per ogni attributo
 
 				var found = false;
 
 				var index = 1;
 
-				for( var thisProduct in arguments.productItems ) {
-
-					if( thisAttr.getId() == thisProduct.getAttribute().getId() ) {
-
-						if( thisValue.getRawValue().getId() == thisProduct.getAttributeValue().getRawValue().getId() ) {
-
+				for ( var thisProduct in arguments.productItems ) {
+					if ( thisAttr.getId() == thisProduct.getAttribute().getId() ) {
+						if (
+							thisValue.getRawValue().getId() == thisProduct
+								.getAttributeValue()
+								.getRawValue()
+								.getId()
+						) {
 							var found = true;
-							//dump( "trovato: #thisAttr.getName()#: #thisValue.getRawValue().getName()# == #thisProduct.getAttributeValue().getRawValue().getName()#" );
-
+							// dump( "trovato: #thisAttr.getName()#: #thisValue.getRawValue().getName()# == #thisProduct.getAttributeValue().getRawValue().getName()#" );
 						}
 
-						var lastOrderby = thisProduct.getOrderBy();
+						var lastOrderby   = thisProduct.getOrderBy();
 						var lastAttribute = thisAttr;
 
 						index++;
-
 					}
-
 				}
 
 				if ( !found ) {
-
 					var bean = super.bean( "ProductItem" );
 
 					bean.setId( -1 );
@@ -375,56 +295,46 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					bean.setAttribute( lastAttribute );
 					bean.setStatus( getStatusService().get( "DEA" ) );
 
-					//attributeValue
+					// attributeValue
 					bean.setOrderBy( lastOrderby + 10 );
 
 					items.insertAt( index, bean );
-
 				}
-
 			}
-
 		}
 
 		return items;
+	}
 
-	}	
+	private com.apirone.core.model.bean.ProductItem function build( required String productItemId ){
+		var record = getDao().read( arguments.productItemId );
 
-	private com.apirone.core.model.bean.ProductItem function build(
-    		required String productItemId
-    	){
+		if ( record.recordCount ) {
+			var bean = super.bean( "ProductItem" );
 
-	    var record = getDao().read( arguments.productItemId );
-
-	    if( record.recordCount ) { 
-
-            var bean = super.bean( "ProductItem" );
-
-            bean.setId( record.product_item_id );
-            bean.setProductId( record.product_id );
+			bean.setId( record.product_item_id );
+			bean.setProductId( record.product_id );
 			bean.setCreatedAt( record.created_at );
 
 			bean.setParent( IsNull( record.parent_id ) ? NullValue() : get( record.parent_id ) );
 
 			bean.setOrderBy( record.orderby );
 
-            bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setStatus( getStatusService().get( record.status_id ) );
 
 			var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id );
-			
+
 			bean.setAttributeValue( attributeValue );
 
-            bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
-            bean.setComponentCount( getComponentService().count( productItemId=record.product_item_id ) );
-            
+			bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
+			bean.setComponentCount( getComponentService().count( productItemId = record.product_item_id ) );
+
 			bean.setChildren( [] );
-			
-            return bean;
 
-	    }
+			return bean;
+		}
 
-		return nullValue();
-
-  	}
+		return NullValue();
+	}
 
 }

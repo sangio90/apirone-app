@@ -1,10 +1,10 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.SizeDAO";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="textService" type="com.apirone.core.model.service.TextService";
+	property name="dao" inject="SizeDAO";
+	property name="statusService" inject="StatusService";
+	property name="textService" inject="TextService";
 
-	property name="cacheScope" type="String" default="Size.bean";
+	property name="cacheScope" inject="String" default="Size.bean";
 
 	public com.apirone.core.model.bean.Size function get( required String sizeId ){
 		var cm = super.getCacheManager();
@@ -34,6 +34,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		var rows   = [];
 		var result = super.getResult();
+
+		dump( getDao() );
+		abort;
 
 		var records = getDao().find( argumentCollection = arguments );
 
@@ -148,6 +151,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCode( record.code );
 			bean.setFruitsCount( record.fruits_count );
 
+			bean.setType( getLookupService().get( "sizeType", record.size_type_id ) );
 			bean.setCategories( getCategoriesBeanByIds( record.categories ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( sizeId = record.size_id ) );

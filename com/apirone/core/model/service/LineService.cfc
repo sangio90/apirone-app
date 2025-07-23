@@ -1,9 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.LineDAO";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="lookupService" type="com.apirone.core.model.service.LookupService";
-	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
+	property name="dao" inject="LineDAO";
+	property name="statusService" inject="StatusService";
+	property name="lookupService" inject="LookupService";
+	property name="ProductCategoryService" inject="ProductCategoryService";
 
 	property name="cacheScope" type="String" default="Line.bean";
 

@@ -14,15 +14,15 @@
 			<div class="col-lg-12">
 				<section class="card">
 					<div class="card-body">
-						<div class="row d-flex align-items-center mb-3">
-							<div class="box-search-small col-8">
+						<div class="d-flex align-items-center mb-3">
+							<div class="box-search-small col-9">
 								<form
 									name  ="size-grid-search-form" id="size-grid-search-form"
 									method="get"
-									class ="d-flex align-items-center"
+									class ="row"
 									data-bind="events: { submit: search }"
 								>
-									<div class="col me-2">
+									<div class="col-md-3">
 										<input
 											class      ="form-control"
 											placeholder="Cerca..." id="attributes-search-input"
@@ -30,7 +30,7 @@
 										>
 									</div>
 
-									<div class="col-auto me-2 col-7">
+									<div class="col-md-4">
 										<select class="form-control" name="categoryId">
 											<option value="">-- tutte le categorie</option>
 											<cfloop array="#prc.categories#" item="item">
@@ -39,13 +39,22 @@
 										</select>
 									</div>
 
-									<div class="col-auto">
+									<div class="col-md-3">
+										<select class="form-control" name="typeId">
+											<option value="">-- tutti i tipi</option>
+											<cfloop array="#prc.types#" item="item">
+												<option value="#item.getId()#">#item.getName()#</option>
+											</cfloop>
+										</select>
+									</div>
+
+									<div class="col-md-2">
 										#searchButton( bind = "click:search" )#
 									</div>
 								</form>
 							</div>
 
-							<div class="col-4 text-end">
+							<div class="col-3 text-end">
 								<div class="float-end">
 									#deleteButton(
 										bind  = "click:delete",

@@ -34,6 +34,18 @@
                         </div>
 
                         <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Tipo</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="typeId">
+                                    <option value="">-- tutti i tipi</option>
+                                    <cfloop array="#prc.types#" item="item">
+                                        <option value="#item.getId()#">#item.getName()#</option>
+                                    </cfloop>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Numero di moduli</label>
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4" name="fruitsCount"

@@ -1,8 +1,8 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.FileDAO";
-	property name="lookupService" type="com.apirone.core.model.service.LookupService";
-	property name="fileTypeService" type="com.apirone.core.model.service.FileTypeService";
+	property name="dao" inject="FileDAO";
+	property name="lookupService" inject="LookupService";
+	property name="fileTypeService" inject="FileTypeService";
 
 	property name="cacheScope" type="String" default="File.bean";
 

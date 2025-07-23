@@ -1,9 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.ProductCategoryDAO";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="textService" type="com.apirone.core.model.service.TextService";
-	property name="ProductCategoryTypeService" type="com.apirone.core.model.service.ProductCategoryTypeService";
+	property name="dao" inject="ProductCategoryDAO";
+	property name="statusService" inject="StatusService";
+	property name="textService" inject="TextService";
+	property name="ProductCategoryTypeService" inject="ProductCategoryTypeService";
 
 	property name="cacheScope" type="String" default="ProductCategory.bean";
 

@@ -187,7 +187,13 @@
         <map from="mainText" to="mainText" ref="Text" />
         <map from="status" to="status" ref="Status" />
         <map from="categories" to="categories" ref="ProductCategory" type="Array" />
+        <map from="type" to="type" ref="SizeType" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
+    </mapper>
+
+    <mapper id="SizeType" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.SizeType">
+        <map from="id" to="id" type="cf:String" />
+        <map from="name" to="name" type="cf:String" />
     </mapper>
 
     <mapper id="Status" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Status">

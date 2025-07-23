@@ -1,11 +1,11 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.AttributeValueDAO";
-	property name="textService" type="com.apirone.core.model.service.TextService";
-	property name="rawValueService" type="com.apirone.core.model.service.RawValueService";
-	property name="statusService" type="com.apirone.core.model.service.StatusServive";
-	property name="langService" type="com.apirone.core.model.service.LangService";
-	property name="componentService" type="com.apirone.core.model.service.ComponentService";
+	property name="dao" inject="AttributeValueDAO";
+	property name="textService" inject="TextService";
+	property name="rawValueService" inject="RawValueService";
+	property name="statusService" inject="StatusServive";
+	property name="langService" inject="LangService";
+	property name="componentService" inject="ComponentService";
 
 	property name="cacheScope" type="String" default="AttributeValue.bean";
 
