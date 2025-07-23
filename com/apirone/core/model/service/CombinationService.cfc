@@ -51,15 +51,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		tree = buildTree(rows);
 		tree = parseTree(tree);
 		for (var node in tree) {
+			//Cerco se esiste già una combinazione per il prodotto
 			var combination = super.bean("Combination");
 			combination.setProductId(arguments.productId);
-			var combinationId = getDao().insert(combination);
+			combination.setStatus(getStatusService().get("ACT"));
+			var combinationId = create(combination);
 			for (var productItemId in node) {
 				var combinationProductItem = super.bean("CombinationProductItem");
 				combinationProductItem.setCombinationId(combinationId);
 				combinationProductItem.setProductItemId(productItemId);
-				//TODO sostituire con service
-				getCombinationProductItemDao().insert(combinationProductItem);
+				getCombinationProductItemService().create(combinationProductItem);
 			}
 		}
 		//Converto l'albero in un array di combinazioni uniche
@@ -157,7 +158,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.combination_id );
 			bean.setCreatedAt( record.created_at );
-			bean.setStatus( getStatusService().get( record.status_id ) );
+			if ( !IsNull( record.status_id ) ) {
+				bean.setStatus( getStatusService().get( record.status_id ) );
+			} else {
+				bean.setStatus( getStatusService().getDefault() );
+			}
 			bean.setProductId( record.product_id );
 			var combinationProductItems = getCombinationProductItemService().getByCombinationId(record.combination_id);
 			var combinationProductItemsBeans = [];

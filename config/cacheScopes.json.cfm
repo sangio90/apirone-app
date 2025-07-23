@@ -23,4 +23,6 @@
     "Variant.bean": {},
     "Combination.bean": {},
     "CombinationProductItem.bean": {},
+    "File.bean": {},
+    "FileType.bean": {},
 }

@@ -13,6 +13,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             "bean" = "fileType",
             "file" = "fileTypes.json.cfm"
         },
+        "fileKind" = {
+            "bean" = "fileKind",
+            "file" = "fileKinds.json.cfm"
+        },
         "priceType" = {
             "bean" = "priceType",
             "file" = "priceTypes.json.cfm"
@@ -46,9 +50,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         var data = {};
 
         for ( var item in variables.config ) {
-            
+
             var ent = variables.config[ item ];
-            
+
             if ( FileExists( ExpandPath('/config/data/#ent.file#') ) ) {
                 data[ item ] = createRowList( item );
             }
@@ -58,10 +62,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         setData( data );
 
         return this;
-    }	
+    }
 
-    public com.apirone.core.model.bean.AbsBean function get( 
-        required String entity, 
+    public com.apirone.core.model.bean.AbsBean function get(
+        required String entity,
         required String value
     ) {
 
@@ -74,7 +78,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             if ( item.getId() EQ thisValue ) {
 
                 result = item;
-            }   
+            }
         });
 
         return result;
@@ -90,7 +94,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         var config = variables.config[ arguments.entity ];
 
         list.each( function( item ) {
-            result.add( 
+            result.add(
                 factory.createInstance( config.bean, item )
             )
         });
@@ -98,7 +102,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
         return result;
 
     }
-    
+
 
     /*
         private

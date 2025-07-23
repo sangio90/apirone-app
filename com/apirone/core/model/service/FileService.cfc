@@ -3,8 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     property name="dao" type="com.apirone.core.model.dao.FileDAO";
     property name="lookupService" type="com.apirone.core.model.service.LookupService";
     property name="fileTypeService" type="com.apirone.core.model.service.FileTypeService";
-
-	variables.acheScope = "file";
+	property name="cacheScope" type="String" default="File.bean";
 
     public com.apirone.core.model.bean.file function get(
     		required String fileId
@@ -15,15 +14,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	   	var cache = cm.get( getCacheScope(), arguments.fileId ) ;
 
 	    if ( cache.status ) {
-	    
+
 	      return cache.data;
-	    
-	    } 
-	    
+
+	    }
+
 		var obj = build( arguments.fileId );
 
 		cm.put( getCacheScope(), arguments.fileId, obj );
-	
+
         return obj;
 
     }
@@ -32,6 +31,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String typeId,
 		String productId,
 		String productItemId,
+		String combinationId,
 	) {
 		arguments["limit"] = -1;
 		return search( argumentCollection = arguments ).getData();
@@ -42,6 +42,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					 String typeId,
 					 String productId,
 					 String productItemId,
+					 String combinationId,
 			required Numeric limit = 20,
 			required Numeric offset = 0
     	){
@@ -67,15 +68,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			required com.apirone.core.model.bean.File file,
             required com.apirone.core.model.bean.Entity entity
 		){
-		
+
             var id = getDao()
                         .update( file = arguments.file, entity = arguments.entity )
                         .toString();
-            
+
 			getCacheManager().remove( getCacheScope(), arguments.fileId );
-			
+
 			return id;
-    
+
 	}
 
 	public void function delete(
@@ -83,7 +84,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 
 		getDao().delete( arguments.fileId );
-		
+
 		getCacheManager().remove( getCacheScope(), arguments.fileId );
 
 	}
@@ -107,7 +108,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var root = ExpandPath( "/../repository/public/media/" );
 
 		var dayPath = DateFormat( now(), "yyyy/mm" )
-		
+
 		var destination = root & "/#config.path#/" & "_ori/" & dayPath;
 
 		DirectoryCreate( destination, true, true );
@@ -117,11 +118,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var unique = Left( LCase( Replace( CreateUUID(), "-", "", "ALL" ) ), 5 );
         var name = prettyString( fileName ) & "_" & unique & "." & LCase( fileExt );
-        
+
 		cffile( source="#arguments.filePath#", destination="#destination#/#name#", action="RENAME" );
 
 		var fileInfo = FileInfo( "#destination#/#name#" );
-	
+
 		bean.setName( name );
 		bean.setDescription("");
 		bean.setDirectory( dayPath );
@@ -138,7 +139,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setWidth( info.width );
 			bean.setAlt("");
 			bean.setExtension("");
-		
+
 		}
 
         var newId = getDao()
@@ -171,7 +172,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     		required String filePath,
     		required Numeric size
         ){
-  
+
         var sizePath = Replace( filePath, "_ori", size );
 
         var directory = getDirectoryFromPath( sizePath );
@@ -195,16 +196,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	    var record = getDao().read( fileId = arguments.fileId );
 
-	    if( record.RecordCount ) { 
+	    if( record.RecordCount ) {
 
 	    	var obj = super.bean( "File" );
-	    	var kind = super.bean( "FileKind" );
 
 		    obj.setId( record.file_id.toString() );
             obj.setName( record.name );
 
         	obj.setType( getFileTypeService().get( record.type_id ) );
-        	obj.setKind( kind.setId( record.kind_id ) );
+        	obj.setKind( getLookupService().get( "fileKind", record.kind_id ) );
             obj.setSize( record.size );
             obj.setWidth( record.width );
             obj.setHeight( record.height );
@@ -214,7 +214,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             obj.setDirectory( record.directory );
 
 			return obj;
-		
+
 		}
 
 		return nullValue();

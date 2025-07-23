@@ -166,8 +166,8 @@
 		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
 		get( "/products/:id/combinations" ).to( "ProductController.combinations" ).end();
 
-		get( "/ajax/:by-regex:(products|product-items)/:id/images" ).to( "FileAjaxController.list" ).end();
-		post( "/ajax/:by-regex:(products|product-items)/:id/images" ).to( "FileAjaxController.upload" ).end();
+		get( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.list" ).end();
+		post( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.upload" ).end();
 
 		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();
 		get( "/products/:id" ).to( "ProductController.detail" ).end();

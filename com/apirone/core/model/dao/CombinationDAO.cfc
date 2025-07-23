@@ -36,10 +36,12 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO combinations (
-				product_id
+				product_id,
+				status_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getProductId()#">::uuid
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getProductId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getStatus().getId()#">
 			) RETURNING combination_id
 		</cfquery>
 

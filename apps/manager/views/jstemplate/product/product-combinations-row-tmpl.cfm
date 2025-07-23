@@ -3,14 +3,13 @@
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="product-combinations-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
-            <td style="border-left: 4px solid ##=status.color.hex##">
-                <span data-bind="text: id"></span>
-            </td>
             <td>
                 <span data-bind="text: descrizioneProductItems"></span>
             </td>
             <td class="text-center">
-                #iconButton(bind="click:image", icon="external-link-square-alt")#
+				<button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList" data-type="combination">
+					<i class="fas fa-image"></i>
+				</button>
             </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"

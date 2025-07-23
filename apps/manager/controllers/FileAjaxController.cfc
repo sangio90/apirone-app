@@ -19,9 +19,14 @@ component extends="com.apirone.core.controller.AbsController" {
             var config = getConfiguration().get("imagesConfig")[ "productItem" ];
         }
 
+        if( rc.by == "combinations" ) {
+            var params = { combinationId = rc.id }
+            var config = getConfiguration().get("imagesConfig")[ "combination" ];
+        }
+
         for( var typeId in config.types  ) {
 
-            params.put("typeId", typeId )
+            params.put("typeId", typeId );
 
             var images = super.fire( "file.list", params );
 
@@ -43,7 +48,7 @@ component extends="com.apirone.core.controller.AbsController" {
                 var type = super.fire("fileType.get", [ typeId ] );
 
                 file.setType( type );
-                
+
                 file.setId( "" );
                 file.setName("");
                 file.setDirectory("");
@@ -61,7 +66,7 @@ component extends="com.apirone.core.controller.AbsController" {
         }
 
         event.setValue( "result", data );
-        
+
     }
 
     function upload( event, rc, prc ){
@@ -90,22 +95,22 @@ component extends="com.apirone.core.controller.AbsController" {
         var fileId = super.fire( "file.create", { filePath = "#tmpDir#/#cffile.ServerFile#", entity = entity, typeId=rc.typeId, kindId=kindId } );
 
         var result = super.getResult();
-        
+
         var file = super.fire( "file.get", [ fileId ] );
 
         var message = super.completeMessage( "file.imageCreated" );
 
-        result.setData( 
-            { 
-                "message" = message, 
+        result.setData(
+            {
+                "message" = message,
                 "payload" = {
                     "imageId" = file.getId()
                 }
             }
         );
-        
+
         event.setValue( "result", result );
-        
+
     }
 
 }

@@ -1,11 +1,11 @@
 component output="true" accessors="true" {
-			
+
 	property name="keys" type="Struct";
 
 	public Configuration function init(){
 
 		var settings = new config.Settings();
-		
+
 		var keys = {
 			"appName"    = settings.get("app.name"),
 			"appVersion" = settings.get("app.version"),
@@ -31,7 +31,7 @@ component output="true" accessors="true" {
 								{
 									"width" = "500"
 								}
-							]							
+							]
 						}
 					}
 				},
@@ -50,7 +50,45 @@ component output="true" accessors="true" {
 								{
 									"width" = "500"
 								}
-							]							
+							]
+						}
+					}
+				},
+				"combination" = {
+					"path" = "combinations",
+					"types" = {
+						"horizontal" = {
+							"sizes" = [
+								{
+									"width" = "500"
+								}
+							]
+						},
+						"vertical" = {
+							"sizes" = [
+								{
+									"width" = "500"
+								}
+							]
+						}
+					}
+				},
+				"combinationItem" = {
+					"path" = "combination_items",
+					"types" = {
+						"horizontal" = {
+							"sizes" = [
+								{
+									"width" = "500"
+								}
+							]
+						},
+						"vertical" = {
+							"sizes" = [
+								{
+									"width" = "500"
+								}
+							]
 						}
 					}
 				},
@@ -63,7 +101,7 @@ component output="true" accessors="true" {
 		return this;
 
 	}
-	
+
 	public Any function get( required String path="" ){
 
 		if ( Len( arguments.path ) ) {
@@ -72,7 +110,7 @@ component output="true" accessors="true" {
 
 			return StructGet( "keys.#arguments.path#" );
 
-		} 
+		}
 
 		return getKeys();
 

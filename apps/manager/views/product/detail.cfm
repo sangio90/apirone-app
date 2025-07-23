@@ -14,28 +14,28 @@
             <div class="col-md-12">
 
                 <section class="card">
-                    
+
                     <div class="card-body row">
 
                         <div class="col-md-4">
                             <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
                         </div>
-                        
+
                         <div class="col-md-8 mb-4" id="product-config-row">
 
                             <cfif prc.product.getCategory().getId() == 22>
 
                                 <form class="d-flex align-items-center justify-content-end" id="product-change-form">
-                                    
+
                                     <label class="me-2">Finitura:</label>
 
-                                    <select name="finishId" class="form-control w-250 me-4" 
+                                    <select name="finishId" class="form-control w-250 me-4"
                                         data-bind="events: { change: loadSizes }"
                                             <!--- data-bind="events: { change: change }" ---->
                                         >
 
                                         <cfloop array="#prc.finishes#" item="item">
-                                            <option value="#item.getId()#" 
+                                            <option value="#item.getId()#"
                                                 <cfif item.getId() EQ prc.finish.getId()>SELECTED</cfif>
                                             >
                                                 #item.getName()#
@@ -68,25 +68,25 @@
                                             <p>
                                                 - <a href=""
                                                     class="underline"
-                                                    data-type="lineSize" 
+                                                    data-type="lineSize"
 
                                                     data-size-id="#prc.size.getId()#"
                                                     data-size-name="#prc.size.getCode()#"
 
                                                     data-line-id="#prc.line.getId()#"
                                                     data-line-name="#prc.line.getName()#"
-                                                    
+
                                                     data-bind="click: openComponentsList">
                                                         Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
                                                     </a>
                                                 <br>
                                                 - <a href=""
                                                     class="underline"
-                                                    data-type="product" 
+                                                    data-type="product"
 
                                                     data-product-id="#rc.id#"
                                                     data-product-name="#prc.subtitle# / #prc.title#"
-                                                    
+
                                                     data-bind="click: openComponentsList">
                                                         Componenti base per questa placca &raquo;
                                                     </a>
@@ -94,38 +94,38 @@
 
                                                 - <a href=""
                                                     class="underline"
-                                                    data-type="product" 
+                                                    data-type="product"
                                                     data-bind="click:openImagesList">
                                                     Aggiungi immagini per questa placca &raquo;
                                                 </a>
                                                 <br>
                                                 - <a href=""
                                                     class="underline"
-                                                    data-type="product" 
+                                                    data-type="product"
                                                     data-bind="click:openReorderingModal">
                                                     Riordina attributi &raquo;
                                                 </a>
                                                 <br>
-                                                - <a href=""
+                                                - <a href="/manager/products/#rc.id#/combinations"
                                                     class="underline"
-                                                    data-type="product" 
-                                                    data-bind="click:openFruitItemsImagesModal">
+                                                    data-type="product"
+                                                    data-bind="click:open">
                                                     Tutte le combinazioni &raquo;
                                                 </a>
                                             </p>
 
                                         </cfif>
-        
+
                                     </div>
                                     <div class="col-sm-12 text-end">
 
                                         <a href=""
                                             class="underline"
-                                            data-type="item" 
+                                            data-type="item"
 
                                             data-product-id="0"
                                             data-product-name="Attributo radice"
-                                        
+
                                             data-bind="click:openAttributesList">
                                             Aggiungi attributo di base
                                         </a>
@@ -137,7 +137,7 @@
                                         )#
 
                                     </div>
-        
+
                                 </div>
 
                                 <!---- <ap:productItemList grid="#variables.grid#"> ---->
@@ -145,16 +145,16 @@
                                 <form id="product-grid-form">
 
                                     #productAttributesList( id="product-items-grid", type="product" )#
-                                
+
                                 </form>
 
 
                             </div>
 
                         </div>
-    
+
                     </div>
-            
+
                 </section>
 
             </div>
@@ -163,7 +163,7 @@
         #view("product/attributes-list-modal")#
         #view("product/images-list-modal")#
         #view("product/sorting-modal")#
-        
+
     </div>
 
     #view("attribute/detail-modal")#

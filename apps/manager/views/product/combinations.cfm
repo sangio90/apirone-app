@@ -50,7 +50,6 @@
 								#grid(
 									id      = "product-combinations",
 									columns = "[
-                                        { 'field':'id', 'title':'Comb' },
                                         { 'field':'descrizioneProductItems', 'title':'Descrizione' },
                                         { 'field':'', 'title':'Immagini', width: '55px'},
                                         {
@@ -69,6 +68,8 @@
 				</section>
 			</div>
 		</div>
+
+		#view("product/images-list-modal")#
 
 	</div>
 
