@@ -4,10 +4,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="attributeService" inject="AttributeService";
 	property name="attributeValueService" inject="AttributeValueService";
-	property name="productComponentService" inject="ProductComponentService";
 	property name="componentService" inject="ComponentService";
 
-	property name="cacheScope" type="String" default="ProductItem.bean";
+	property name="cacheScope" default="ProductItem.bean";
 
 	public com.apirone.core.model.bean.ProductItem function get( required String productItemId ){
 		var cm = getCacheManager();
@@ -24,7 +23,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.ProductItem(){
+	public Array function getTree(
+		// com.apirone.core.model.bean.ProductItem[]
+		required String productId
+	){
 		var result = [];
 
 		var productId = arguments.productId;
@@ -38,12 +40,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			result.add( item );
 		}
 
-		// printTree( DESerializeJSON(SerializeJSON(result)) )
-
 		return result;
 	}
 
-	public com.apirone.core.model.bean.ProductItem(){
+	public Array function list(){
 		var result = [];
 		var rows   = [];
 
@@ -56,24 +56,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		} else {
 			rows = items;
 		}
-
-		/*
-
-        for( var item in items ) {
-			dump( "#item.getOrderBy()# - #item.getId()# - #item.getAttribute().getName()# : #item.getAttributeValue().getRawValue().getName()#" );
-		}
-
-		dump("=============================================================================================================================================")
-		dump("=========#arguments.level#")
-
-		dump( arguments );
-
-		dump("<br>");
-
-        for( var row in rows ) {
-        	dump( "#arguments.level# - #row.getOrderBy()# - #row.getId()# - #row.getAttribute().getName()# : #row.getAttributeValue().getRawValue().getName()#" );
-        }
-		*/
 
 		var thisLevel            = arguments.level;
 		var includeMissingValues = arguments.includeMissingValues;
@@ -109,14 +91,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public com.apirone.core.model.bean.ProductItem(){
+	public Array function list( String productId, Numeric parentId ){
 		arguments[ "limit" ] = -1;
 
 		return search( argumentCollection = arguments ).getData();
 	}
 
 
-	public com.apirone.core.model.bean.ProductComponent(){
+	public Array function listComponents( required Numeric productItemId ){
 		var result = getProductComponentService().list( productItemId = productItemId );
 
 		return result;

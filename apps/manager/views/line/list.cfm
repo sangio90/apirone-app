@@ -75,7 +75,6 @@
                                         { 'field':'code', 'title':'Codice', width: '90px' },
                                         { 'field':'name', 'title':'Descrizione' },
                                         { 'field':'category.name', 'title':'Categorie',  width: '230px'},
-                                        { 'field':'thickness.name', 'title':'Spessore', width: '110px'},
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
                                         { 'field':'', 'title':'Attributi per le combinazioni', width: '55px'},

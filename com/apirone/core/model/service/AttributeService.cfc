@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="AttributeDAO";
 	property name="textService" inject="TextService";
-	property name="statusService" inject="StatusServive";
+	property name="statusService" inject="statusService";
 	property name="langService" inject="LangService";
 	property name="attributeValueService" inject="AttributeValueService";
 	property name="ProductCategoryService" inject="ProductCategoryService";

@@ -33,7 +33,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.Component(){
+	public Array function list(){
 		arguments[ "limit" ] = -1;
 
 		return search( argumentCollection = arguments ).getData();

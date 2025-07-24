@@ -3,7 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="AttributeValueDAO";
 	property name="textService" inject="TextService";
 	property name="rawValueService" inject="RawValueService";
-	property name="statusService" inject="StatusServive";
+	property name="statusService" inject="statusService";
 	property name="langService" inject="LangService";
 	property name="componentService" inject="ComponentService";
 
@@ -128,9 +128,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setAllowNote( record.allow_note ? true : false );
 			bean.setAffectToImage( record.affect_to_image ? true : false );
 
-			bean.setComponentCount(
-				getComponentService().count( attributeValueId = record.attribute_raw_value_id )
-			);
+			bean.setComponentCount( record.component_count );
 
 			return bean;
 		}

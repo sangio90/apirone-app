@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="RawValueDAO";
 	property name="textService" inject="TextService";
-	property name="statusService" inject="StatusServive";
+	property name="statusService" inject="statusService";
 
 	property name="cacheScope" type="String" default="RawValue.bean";
 
@@ -22,7 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.RawValue(){
+	public Array function list(){
 		arguments[ "limit" ] = -1;
 
 		return search( argumentCollection = arguments ).getData();

@@ -20,9 +20,11 @@
             <td>
                 <div data-bind="source: categories" data-template="product-category-row-tmpl"></div>
             </td>
+            <!----
             <td>
                 <span data-bind="text: thickness.name"></span>
             </td>
+            ---->
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
             </td>

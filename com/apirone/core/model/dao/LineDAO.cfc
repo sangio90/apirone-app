@@ -86,7 +86,7 @@
 				line,
 				status_id,
 				<!--- product_category_id, --->
-				thickness_id,
+				<!--- thickness_id, --->
 				orderby,
 				categories
 			)
@@ -94,8 +94,8 @@
 				<cfqueryparam cfsqltype="varchar" value="#arguments.line.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
-				<!--- <cfqueryparam cfsqltype="Integer" value="#arguments.line.getCategory().getId()#">, --->
-				<cfqueryparam cfsqltype="Integer" value="#arguments.line?.getTickness()?.getId()#">,
+				<!--- <cfqueryparam cfsqltype="Integer" value="#arguments.line.getCategory().getId()#"> --->
+				<!--- <cfqueryparam cfsqltype="Integer" value="#arguments.line?.getTickness()?.getId()#"> --->
 				10,
 				'#SerializeJSON( categories )#'
 			) RETURNING line_id
@@ -116,7 +116,10 @@
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
 				line = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getCode()#">,
-				thickness_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line?.getThickness()?.getId()#">,
+				<!---
+			thickness_id =
+			<cfqueryparam cfsqltype="Varchar" value="#arguments.line?.getThickness()?.getId()#">,
+		--->
 				orderby = 20,
 				categories = '#SerializeJSON( categories )#'
 			WHERE

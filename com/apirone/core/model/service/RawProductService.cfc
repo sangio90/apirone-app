@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" inject="ProductDAO";
+	property name="dao" inject="RawProductDAO";
 	property name="statusService" inject="StatusService";
 	property name="rawProductTypeService" inject="RawProductTypeService";
 	property name="ColorService" inject="ColorService";
