@@ -74,7 +74,7 @@
                                     { 'field':'type.id', 'title':'Tipo', width: '60px' },
                                     { 'field':'mainText.name', 'title':'Descrizione'},
                                     { 'field':'categories', 'title':'Categorie'},
-                                    { 'field':'fruitsCount', 'title':'Frutti', width: '100px'},
+                                    { 'field':'fruitsCount', 'title':'Frutti', width: '80px'},
                                     { 'field':'', 'title':'', width: '50px'},
                                     { 
                                         'field'           :'', 

@@ -29,6 +29,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String statusId,
+		String lineId,
 		String attributeId,
 		Numeric attributeValueId,
 		Numeric ProductCategoryId,

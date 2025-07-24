@@ -50,7 +50,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var text   = super.bean("Text");
 		var lang   = super.bean("Lang");
 
-
 		size.setId( json.id );
 		size.setCode( json.code );
         size.setType( type.setId( json.type.id ) );

@@ -84,6 +84,11 @@
         "type": "Varchar"
     },
 
+    "line.id": {
+        "name": "line_id",
+        "type": "uuid"
+    },
+
     "line.name": {
         "name": "line",
         "type": "Varchar"

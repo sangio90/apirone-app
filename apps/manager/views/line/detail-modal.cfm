@@ -30,7 +30,7 @@
                                 <input type="text" required class="form-control col-sm-4 uppercase" name="name"
                                     data-msg-required="Descrizione richiesto"
                                     maxlength="125"
-                                    data-bind="value: detailForm.data.name">
+                                    data-bind="value: detailForm.data.mainText.name">
                             </div>
                         </div>
 
@@ -45,23 +45,6 @@
                                 </select>
                             </div>
                         </div>
-
-                        <!------
-                        <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Categoria</label>
-                            <div class="col-sm-10">
-                                <select id="category" 
-                                    required
-                                    data-msg-required="Categoria richiesta"
-                                    class="form-control"
-                                    data-bind="source: detailForm.categories, value: detailForm.data.category.id" 
-                                    data-value-field="id"
-                                    data-text-field="name"
-                                    >
-                                </select>
-                            </div>
-                        </div>
-                        ---->
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Disponibile per</label>

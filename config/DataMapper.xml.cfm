@@ -117,7 +117,7 @@
         <map from="code" to="code" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="thickness" to="thickness" ref="Thickness" />
-        <!-- <map from="category" to="category" ref="ProductCategory" /> -->
+        <map from="mainText" to="mainText" ref="Text" />
         <map from="categories" to="categories" ref="ProductCategory" type="Array" />
         <map from="status" to="status" ref="Status" />
         <map from="createdAt" to="createdAt" type="cf:Date" />

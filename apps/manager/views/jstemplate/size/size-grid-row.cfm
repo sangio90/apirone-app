@@ -9,7 +9,7 @@
             <td>
                 <span data-bind="text: code"></span>
             </td>
-            <td>
+            <td class="text-center">
                 <span data-bind="text: type.id"></span>
             </td>
             <td>

@@ -57,15 +57,18 @@ ALTER TABLE public.lines
 ALTER TABLE public.lines
     RENAME COLUMN product_category_id TO _product_category_id;
 
--- **
--- 2025-07-23
--- **
+/*
+  2025-07-23
+*/
 
 -- add translation to line
 
+-- ** ATTENTION **
+-- eseguire resources/scripts/create-line-names.cfm to move name to translations
+-- ** ATTENTION **
+
 ALTER TABLE public.texts
   ADD COLUMN line_id UUID;
-
 
 -- add model concept to size
 

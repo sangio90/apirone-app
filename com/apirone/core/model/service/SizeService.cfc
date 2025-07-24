@@ -77,18 +77,20 @@
 
 		var id = arguments.size.getId();
 
-		for ( var text in arguments.size.getTexts() ) {
-			var entity = super.bean( "Entity" )
+		transaction {
+			for ( var text in arguments.size.getTexts() ) {
+				var entity = super.bean( "Entity" )
 
-			entity.setKey( "size.id" );
-			entity.setValue( id );
+				entity.setKey( "size.id" );
+				entity.setValue( id );
 
-			text.setEntity( entity );
+				text.setEntity( entity );
 
-			if ( Len( text.getId() ) ) {
-				getTextService().update( text );
-			} else {
-				getTextService().create( text );
+				if ( Len( text.getId() ) ) {
+					getTextService().update( text );
+				} else {
+					getTextService().create( text );
+				}
 			}
 		}
 

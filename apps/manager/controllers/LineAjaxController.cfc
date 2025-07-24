@@ -130,6 +130,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var status    = super.bean( "Status" );
 		var thickness = super.bean( "Thickness" );
 		var category  = super.bean( "ProductCategory" );
+		var text      = super.bean( "Text" );
+		var lang      = super.bean( "Lang" );
 
 		for ( var thisCategory in json.selectedCategories ) {
 			var category = super.bean( "ProductCategory" );
@@ -143,9 +145,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		line.setName( json.name );
 
 		line.setStatus( status.setId( json.status.id ) );
-		// line.setCategory( category.setId( json?.category?.id ) );
 		line.setCategories( categories );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
+
+		text.setLang( lang.setId( json.mainText.lang.id ) );
+
+		text.setId( json.mainText.id );
+		text.setName( json.mainText.name );
+
+		line.setTexts( [ text ] );
 
 		if ( !Len( json.id ) ) {
 			messageId = "line.created";

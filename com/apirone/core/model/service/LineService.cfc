@@ -4,6 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="lookupService" inject="LookupService";
 	property name="ProductCategoryService" inject="ProductCategoryService";
+	property name="textService" inject="TextService";
 
 	property name="cacheScope" type="String" default="Line.bean";
 
@@ -58,15 +59,44 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function create( required com.apirone.core.model.bean.Line line ){
 		var newId = getDao().insert( arguments.line );
 
+		transaction {
+			for ( var text in arguments.line.getTexts() ) {
+				var entity = super.bean( "Entity" );
+
+				entity.setKey( "line.id" );
+				entity.setValue( newId );
+
+				text.setEntity( entity );
+			}
+
+			getTextService().bulkCreate( arguments.line.getTexts() );
+		}
+
+
 		return newId;
 	}
 
 	public String function update( required com.apirone.core.model.bean.Line line ){
 		getDao().update( arguments.line );
 
-		var dm = getCacheManager();
+		var id = arguments.line.getId();
 
-		dm.remove( getCacheScope(), arguments.line.getId() );
+		for ( var text in arguments.line.getTexts() ) {
+			var entity = super.bean( "Entity" )
+
+			entity.setKey( "line.id" );
+			entity.setValue( id );
+
+			text.setEntity( entity );
+
+			if ( Len( text.getId() ) ) {
+				getTextService().update( text );
+			} else {
+				getTextService().create( text );
+			}
+		}
+
+		super.getCacheManager().remove( getCacheScope(), arguments.line.getId() );
 
 		return arguments.line.getId();
 	}
@@ -127,8 +157,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
-			// bean.setCategories( getProductCategoryService().list( lineId = record.line_id ) );
 			bean.setCategories( getCategoriesBeanByIds( record.categories ) );
+			bean.setTexts( getTextService().list( lineId = record.line_id ) );
 
 			return bean;
 		}

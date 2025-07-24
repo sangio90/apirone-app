@@ -46,6 +46,13 @@ AP.line.detail = (function () {
 			category: {
                 id: ""
             },
+			mainText: {
+				id: "",
+				name: "",
+				lang: {
+					id: "IT"
+				}
+			},
 			thickness: {
                 id: ""
             },

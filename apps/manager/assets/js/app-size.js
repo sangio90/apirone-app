@@ -186,6 +186,8 @@ AP.size.list = (function () {
 
 		var detailForm = AP.size.fields.detailForm;
 
+		AP.page.types.unshift({ id: "", name: "-- Seleziona il tipo" });
+
 		detailForm.validate({
 			onfocusout: function (element) {
 				$(element).valid();
