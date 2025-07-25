@@ -64,7 +64,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.page[ "line" ] = prc.line;
 
-		prc.title = "Combinazioni per < #prc.category.getName()# linea #prc.line.getName()# >";
+		prc.title = "Combinazioni per < categoria #prc.category.getName()# linea #prc.line.getName()# >";
 
 		prc.sizes    = super.fire( "size.list", { categoryId = prc.category.getId() } );
 		prc.finishes = super.fire( "finish.list", { categoryId = prc.category.getId() } );
