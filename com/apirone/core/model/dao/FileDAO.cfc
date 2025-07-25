@@ -29,6 +29,7 @@
 
 		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
+		<cfargument name="combinationId" type="String">
 		<cfargument name="typeId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
@@ -41,7 +42,7 @@
 			FROM
 				files
 			WHERE 1=1
-	
+
 			<cfif !isNull( arguments.productId )>
 				AND product_id = <cfqueryparam value="#arguments.productId#" cfsqltype="Varchar">::uuid
 			</cfif>
@@ -50,18 +51,22 @@
 				AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
 			</cfif>
 
+			<cfif !isNull( arguments.combinationId )>
+				AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
+			</cfif>
+
 			<cfif !isNull( arguments.typeId )>
 				AND type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
 			</cfif>
 
 			<cfif arguments.limit GT 0>
-				LIMIT  
+				LIMIT
 					<cfqueryparam value="#arguments.limit#" cfsqltype="integer">
-				OFFSET 
+				OFFSET
 					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 
-            ORDER BY 
+            ORDER BY
                 created_at
 		</cfquery>
 
@@ -87,7 +92,7 @@
                 alt,
                 description,
                 directory,
-                extension, 
+                extension,
                 #dbField.name#
 			)
 			VALUES (
@@ -106,7 +111,7 @@
 		</cfquery>
 
 		<cfreturn q.file_id>
-	
+
 	</cffunction>
 
 </cfcomponent>

@@ -13,12 +13,12 @@
         "name": "product_category_id",
         "type": "Integer"
     },
-    
+
     "productCategory.code": {
         "name": "code",
         "type": "Varchar"
     },
-    
+
     "productCategory.code": {
         "name": "code",
         "type": "Varchar"
@@ -94,9 +94,14 @@
         "type": "Integer"
     },
 
+    "combination.id": {
+        "name": "combination_id",
+        "type": "uuid"
+    },
+
     "rawValue.id": {
         "name": "raw_value_id",
         "type": "Integer"
     }
- 
+
 }

@@ -84,6 +84,11 @@ component extends="com.apirone.core.controller.AbsController" {
             var kindId = "product";
         }
 
+        if( rc.by == "combinations" ) {
+            entity.setKey( "combination.id" );
+            var kindId = "combination";
+        }
+
         entity.setValue( rc.id );
 
 		cffile( filefield=rc.files[1], nameconflict="MAKEUNIQUE", destination=tmpDir, action="UPLOAD" );
