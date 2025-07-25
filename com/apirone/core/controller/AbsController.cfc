@@ -1,16 +1,16 @@
 ﻿component output="false" accessors="true" {
 
 	//property name="dataMapper" type="dataMapper.DataMapper";
-	//property name="configuration" type="com.apirone.core.model.bean.Configuration";
+	property name="configuration" type="com.apirone.core.model.bean.Configuration";
 	//property name="accessManager" type="com.apirone.core.util.accessManager.AccessManager";
 
-    //public Any function init(){
+    public Any function init(){
 
         //setDataMapper( getModel().getInstance("DataMapper") );
         //setAccessManager( getModel().getInstance("AccessManager") );
-        //setConfiguration( getModel().getInstance("Configuration") );
+        setConfiguration( getModel().getInstance("Configuration") );
 
-    //}    
+    }
 
     public Array function convertCbErrors( required Array errors ) {
         return errors
@@ -41,13 +41,13 @@
     }
 
 
-    public Struct function getConstraints( 
+    public Struct function getConstraints(
 		required String entity,
 		String profile = 'default'
 	) {
-		
+
 		var constraints = deserializeJSON( FileRead( ExpandPath("/apps/api/constraints/#arguments.entity#.json") ) );
-		
+
 		return constraints[profile]
 
 	}
@@ -57,7 +57,7 @@
         var user = bean("User");
 
         user.setAccount( arguments.account );
-        
+
         user.setId( arguments.account.getId() );
         user.setName( arguments.account.getEmail() );
         user.setRole( arguments.account.getRoles()[1] );
@@ -76,18 +76,18 @@
 
         return true;
 
-    }      
+    }
 
     public Any function getResult(){
 
         var bean = bean("AjaxResult");
-        
+
         bean.setUuid( LCase( CreateUUID() ) );
         bean.setStatus( "SUCCESS" );
 
         return bean;
 
-    }      
+    }
 
     public Any function service( required String servicex ){
 
@@ -122,25 +122,25 @@
 
 
     public Any function fire( required String action, payload=NullValue() ){
-        
+
 		if ( ListLen( action, "." ) != 2 ) {
 			throw( type = "apirone.AbsController.ActionNotHasTwoPart", message = "Action [#arguments.action#] must have two part: controller.method." );
 		};
 
         var user = application.cbController.getRequestService().getContext().getPrivateValue("user");
-        
+
         var result = getAccessManager().exec( action=arguments.action, user=user, payload=arguments.payload );
         getModel().getInstance("CacheManager");
 
         return result;
 
-    }      
-    
+    }
+
     public Any function toStruct( required obj ){
 
         return DESerializeJSON( SerializeJSON( arguments.obj ) );
 
-    }    
+    }
 
 
     public Boolean function isUuid( required String uuid ) {
@@ -150,18 +150,18 @@
         }
 
         return true;
-    
+
     }
 
     public String function getTempDir() {
 
 		var tempDir = ExpandPath( "/../repository/private/_tmp" );
-        
+
         DirectoryCreate( tempDir, true, true );
 
         return tempDir;
 
-    }    
+    }
 
     public Struct function paramsFromUrl(){
 
@@ -216,16 +216,16 @@
             params["limit"] = url.count;
 
             if( url.keyExists("page") ){
-                
+
                 params["offset"] = ( url.page - 1 ) * url.count;
-            
+
             }
 
         }
 
         return params;
 
-    }    
+    }
 
     public Any function bean( required String type ){
 
@@ -240,11 +240,11 @@
         var categories = this.service("ProductCategory").list();
 
         for( var thisCategory in categories ) {
-            
+
             var category = getDataMapper().convert( thisCategory, "ProductCategory", true );
-            
+
             data.add( category );
-        
+
         }
 
         return data;
@@ -289,15 +289,15 @@
 
         return getModel().getInstance("DataMapper");
 
-    }      
-    
+    }
+
     public Struct function getAccessManager(){
 
         return getModel().getInstance("AccessManager");
 
-    }      
+    }
 
-    
+
     /*
         private methods
     */
@@ -308,6 +308,6 @@
 
         return server[ "wireBox-apirone" ];
 
-    }    
+    }
 
 }

@@ -1,11 +1,11 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.CombinationDAO";
-	property name="combinationProductItemDao" type="com.apirone.core.model.dao.CombinationProductItemDAO";
-	property name="ProductItemService" type="com.apirone.core.model.service.ProductItemService";
-	property name="CombinationProductItemService" type="com.apirone.core.model.service.CombinationProductItemService";
-	property name="ProductService" type="com.apirone.core.model.service.ProductService";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
+	property name="dao" inject="CombinationDAO";
+	property name="combinationProductItemDao" inject="CombinationProductItemDAO";
+	property name="ProductItemService" inject="ProductItemService";
+	property name="CombinationProductItemService" inject="CombinationProductItemService";
+	property name="ProductService" inject="ProductService";
+	property name="statusService" inject="StatusService";
 	property name="cacheScope" type="String" default="Combination.bean";
 
 	public com.apirone.core.model.bean.Combination function get( required String combinationId ){
@@ -21,6 +21,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		cm.put( getCacheScope(), arguments.combinationId, bean );
 
 		return bean;
+	}
+
+	public com.apirone.core.model.bean.Result function getByProductId(
+		required String productId,
+		){
+		var rows   = [];
+		var result = super.getResult();
+
+		var records = getDao().getByProductId( arguments.productId );
+
+		records.each( function( record ){
+			rows.add( get( record.combination_id ) );
+		} );
+
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.recordcount ) );
+
+		return result;
 	}
 
 	public com.apirone.core.model.bean.Result function getByProductId(

@@ -21,11 +21,11 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				combination_id::varchar
+			combination_id::varchar
 			FROM
-				combinations
+			combinations
 			WHERE
-				product_id = <cfqueryparam cfsqltype="varchar" value="#arguments.productId#">::uuid
+			product_id = <cfqueryparam cfsqltype="varchar" value="#arguments.productId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -36,12 +36,12 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO combinations (
-				product_id,
-				status_id
+			product_id,
+			status_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getProductId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getStatus().getId()#">
+			<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getProductId()#">::uuid,
+			<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getStatus().getId()#">
 			) RETURNING combination_id
 		</cfquery>
 
@@ -56,7 +56,7 @@
 			DELETE
 			FROM combinations
 			WHERE
-				combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+			combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
 		</cfquery>
 
 		<cfreturn true>

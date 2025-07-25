@@ -45,7 +45,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	private com.apirone.core.model.bean.Text(){
+	public array function createTexts( required struct record ){
 		var langs = getLangService().list();
 
 		var texts = [];

@@ -1,9 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.CombinationProductItemDAO";
-	property name="ProductItemService" type="com.apirone.core.model.service.ProductItemService";
-	property name="CombinationService" type="com.apirone.core.model.service.CombinationService";
-	property name="ProductService" type="com.apirone.core.model.service.ProductService";
+	property name="dao" inject="CombinationProductItemDAO";
+	property name="ProductItemService" inject="ProductItemService";
+	property name="CombinationService" inject="CombinationService";
+	property name="ProductService" inject="ProductService";
 	property name="cacheScope" type="String" default="CombinationProductItem.bean";
 
 	public com.apirone.core.model.bean.CombinationProductItem function get( required String combinationId ){
