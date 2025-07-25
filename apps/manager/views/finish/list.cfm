@@ -6,7 +6,7 @@
             <div class="col-8">
                 #pageTitle()#
             </div>
-            <div class="col-4 text-end pt-3">
+            <div class="col-4 text-end">
                 #addButton( bind="click:new", size="sm" )#
             </div>
         </div>
@@ -78,7 +78,7 @@
                                 id="finish-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'code', 'title':'Codice', width: '80px'},
+                                    { 'field':'code', 'title':'Codice', width: '100px'},
                                     { 'field':'name', 'title':'Descrizione'},
                                     { 'field':'category.name', 'title':'Categorie'},
                                     { 'field':'', 'title':'', width: '55px'},

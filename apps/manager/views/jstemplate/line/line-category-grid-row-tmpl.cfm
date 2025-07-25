@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding='UTF-8'>
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="line-grid-row-tmpl">
+    <nmscript type="text/x-kendo-template" id="line-category-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td style="border-left: 4px solid ##=status.color.hex##">
                 <span data-bind="text: shortId"></span>
@@ -12,20 +12,12 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
-            <td>
-                <div data-bind="source: categories" data-template="product-category-row-tmpl"></div>
-            </td>
-            <td class="text-center">
-                #iconButton(bind="click:edit", icon="edit")#
-            </td>
-            <!---
             <td class="text-center">
                 #iconButton(bind="click:products", icon="cogs")#
             </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
-            ---->
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"
                     name="selected"

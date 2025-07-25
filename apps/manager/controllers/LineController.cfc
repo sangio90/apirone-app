@@ -1,10 +1,6 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function list(
-		event,
-		rc,
-		prc
-	){
+	function list( event, rc, prc ){
 		prc.title = "Linee";
 
 		prc.statuses       = super.fire( "status.list", [ "LINE" ] );
@@ -21,12 +17,33 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setView( "line/list" );
 	}
 
+	function listByCategoryId( event, rc, prc ){
+		if ( !rc.keyExists( "categoryId" ) ) {
+			// move to most used category: plates
+			cflocation( url = "/manager/lines/categories/22", addToken = "false" );
 
-	function attributes(
-		event,
-		rc,
-		prc
-	){
+			abort;
+		}
+
+		prc.category   = super.fire( "ProductCategory.get", [ rc.categoryId ] );
+		prc.categories = super.fire( "ProductCategory.list" );
+
+		prc.title = "Linee per < #prc.category.getName()# >";
+
+		prc.statuses       = super.fire( "status.list", [ "LINE" ] );
+		// prc.thicknesses    = super.fire( "lookup.list", [ "thickness" ] );
+		prc.lineCategories = super.fire( "ProductCategory.list" );
+
+		prc.jsScripts.add( "app-line-category" );
+
+		prc.page[ "statuses" ]   = prc.statuses;
+		prc.page[ "categoryId" ] = prc.category.getId();
+
+		event.setView( "line/list-category" );
+	}
+
+
+	function attributes( event, rc, prc ){
 		var products = super.fire( "product.list", { lineId = rc.id } );
 
 		if ( products.len() ) {
@@ -39,21 +56,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 	}
 
-
-	function products(
-		event,
-		rc,
-		prc
-	){
+	function products( event, rc, prc ){
 		prc.existingProducts = [];
-		prc.line             = super.fire( "line.get", [ rc.id ] );
+
+		prc.line     = super.fire( "line.get", [ rc.id ] );
+		prc.category = super.fire( "productCategory.get", [ rc.categoryId ] );
 
 		prc.page[ "line" ] = prc.line;
 
-		prc.title = "Combinazioni per la linea < #prc.line.getName()# >";
+		prc.title = "Combinazioni per < #prc.category.getName()# linea #prc.line.getName()# >";
 
-		prc.sizes    = super.fire( "size.list", { categoryId = prc.line.getCategory().getId() } );
-		prc.finishes = super.fire( "finish.list", { categoryId = prc.line.getCategory().getId() } );
+		prc.sizes    = super.fire( "size.list", { categoryId = prc.category.getId() } );
+		prc.finishes = super.fire( "finish.list", { categoryId = prc.category.getId() } );
 
 		var productsList = super.fire( "product.list", { lineId = rc.id } );
 

@@ -86,22 +86,6 @@
 
 
 		/*
-			fruits
-		*/
-		/*
-		get( "/ajax/fruits/code-exists" ).to( "FruitAjaxController.codeExists" ).end();
-		post( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.addItem" ).end();
-		get( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.listItems" ).end();
-		get( "/ajax/fruits/:id" ).to( "FruitAjaxController.get" ).end();
-		get( "/ajax/fruits" ).to( "FruitAjaxController.list" ).end();
-		post( "/ajax/fruits" ).to( "FruitAjaxController.save" ).end();
-		delete( "/ajax/fruits" ).to( "FruitAjaxController.delete" ).end();
-		get( "/fruits/:id/detail" ).to( "FruitController.detail" ).end();
-		get( "/fruits" ).to( "FruitController.list" ).end();
-		*/
-
-
-		/*
 			attribute values
 		*/
 		post( "/ajax/attributes/:id/raw-values/add" ).to( "AttributeValueAjaxController.addValue" ).end();
@@ -174,7 +158,7 @@
 
 
 		/*
-			lines category
+			product category
 		*/
 		get( "/ajax/product-categories/code-exists" ).to( "ProductCategoryAjaxController.codeExists" ).end();
 		get( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.list" ).end();
@@ -187,6 +171,7 @@
 			lines
 		*/
 		get( "/ajax/lines/code-exists" ).to( "LineAjaxController.codeExists" ).end();
+		get( "/ajax/lines/categories/:categoryId" ).to( "LineAjaxController.listByCategoryId" ).end();
 		delete( "/ajax/lines/:id/products" ).to( "LineAjaxController.deleteProduct" ).end();
 		post( "/ajax/lines/:id/products" ).to( "LineAjaxController.createProduct" ).end();
 		get( "/ajax/lines/attributes" ).to( "LineAjaxController.attributes" ).end();
@@ -194,7 +179,10 @@
 		get( "/ajax/lines" ).to( "LineAjaxController.list" ).end();
 		post( "/ajax/lines" ).to( "LineAjaxController.save" ).end();
 		delete( "/ajax/lines" ).to( "LineAjaxController.delete" ).end();
-		get( "/lines/:id/products" ).to( "LineController.products" ).end();
+		
+		get( "/lines/categories/:categoryId" ).to( "LineController.listByCategoryId" ).end();
+		get( "/lines/categories" ).to( "LineController.listByCategoryId" ).end();
+		get( "/lines/:id/categories/:categoryId/products" ).to( "LineController.products" ).end(); //TODO: better naming
 		get( "/lines/:id/attributes" ).to( "LineController.attributes" ).end();
 		get( "/lines" ).to( "LineController.list" ).end();
 

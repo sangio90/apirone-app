@@ -27,14 +27,6 @@ NM.kendo.dataSource = function (config = {}) {
             }
         };
 
-
-        /*
-        defaults.serverPaging = true;
-        defaults.transport = {};
-        defaults.transport.read = {};
-        defaults.transport.read.url = config.url;
-        */
-
         defaults.transport.parameterMap = function (params, type ) {
 
             // merge

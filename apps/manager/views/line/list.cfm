@@ -72,12 +72,10 @@
 									id      = "line-grid",
 									columns = "[
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
-                                        { 'field':'code', 'title':'Codice', width: '90px' },
+                                        { 'field':'code', 'title':'Codice', width: '100px' },
                                         { 'field':'name', 'title':'Descrizione' },
-                                        { 'field':'category.name', 'title':'Categorie',  width: '230px'},
+                                        { 'field':'category.name', 'title':'Categorie' },
                                         { 'field':'', 'title':'Modifica', width: '55px'},
-                                        { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
-                                        { 'field':'', 'title':'Attributi per le combinazioni', width: '55px'},
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

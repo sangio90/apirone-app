@@ -21,6 +21,30 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	// TODO: potrei usare solo list
+	function listByCategoryId( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = getDataMapper();
+
+		var params = super.paramsFromUrl();
+
+		var params[ "categoryId" ] = rc.categoryId;
+
+		var rows = super.fire( "line.search", params );
+
+		for ( var row in rows.getData() ) {
+			var obj = dm.convert( row, "Line", true );
+			data.add( obj );
+		}
+
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
 	function get( event, rc, prc ){
 		param rc.id = "___";
 		var result  = super.getResult();
