@@ -48,7 +48,6 @@ ALTER TABLE public.product_items
 ALTER TABLE public.products
   DROP CONSTRAINT products_pkey2 RESTRICT;
 
-
 -- RICOSTRUITO
 ALTER TABLE public.components
   RENAME COLUMN combination_id TO product_id;
@@ -109,7 +108,6 @@ ALTER TABLE public.texts
 ALTER TABLE public.products
   ADD COLUMN code VARCHAR(15) UNIQUE;
 
-
 ALTER TABLE public.products
   ADD CONSTRAINT products_product_category_id_fk FOREIGN KEY (product_category_id)
     REFERENCES public.product_categories(product_category_id)
@@ -148,7 +146,7 @@ ALTER TABLE public.products
 
 -- 2025-07-15
 
-create table combinations
+CREATE TABLE combinations
 (
     combination_id uuid      default uuid_generate_v4(),
     product_id     uuid not null

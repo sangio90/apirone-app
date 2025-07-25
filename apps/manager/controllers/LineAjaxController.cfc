@@ -94,7 +94,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		product.setLine( line.setId( rc.id ) );
 		product.setFinish( finish.setId( json.finishId ) );
 		product.setSize( size.setId( json.sizeId ) );
-		product.setCategory( category.setId( 22 ) ); // TODO: check if this value is ok here
+		// product.setCategory( category.setId( 22 ) ); // TODO: check if this value is ok here
+		product.setCategory( category.setId( json.categoryId ) );
 		product.setStatus( status.setId( "ACT" ) );
 
 		var newId = super.fire( "product.create", [ product ] );
