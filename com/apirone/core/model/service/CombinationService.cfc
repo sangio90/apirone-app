@@ -51,6 +51,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		tree = buildTree(rows);
 		tree = parseTree(tree);
 		for (var node in tree) {
+			combinationAlreadyExists = getCombinationProductItemDao().combinationAlreadyExists(node);
+			if (combinationAlreadyExists) {
+				//loggo che la combinazione esiste già
+				getLogger().info("Combination already exists for node: " & serializeJSON(node));
+				continue; // Se la combinazione esiste già, salto al prossimo nodo
+			}
 			//Cerco se esiste già una combinazione per il prodotto
 			var combination = super.bean("Combination");
 			combination.setProductId(arguments.productId);

@@ -84,4 +84,27 @@
 
 		<cfreturn true>
 	</cffunction>
+
+	<cffunction name="combinationAlreadyExists" access="public" returntype="boolean">
+		<cfargument name="productItemIds" type="array" required="true">
+
+		<cfset var whereClauses = []>
+
+		<cfloop array="#arguments.productItemIds#" index="id">
+			<cfset arrayAppend(whereClauses,
+					"EXISTS (SELECT 1 FROM combination_product_items WHERE combination_id = c1.combination_id AND product_item_id = " & val(id) & ")"
+				)>
+		</cfloop>
+
+		<cfset var whereSQL = arrayToList(whereClauses, " AND ")>
+
+		<cfquery name="qCheck" datasource="apirone">
+			SELECT c1.combination_id
+			FROM combinations c1
+			WHERE #preserveSingleQuotes(whereSQL)#
+			LIMIT 1
+		</cfquery>
+
+		<cfreturn qCheck.recordCount GT 0>
+	</cffunction>
 </cfcomponent>

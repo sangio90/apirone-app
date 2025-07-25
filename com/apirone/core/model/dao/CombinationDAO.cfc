@@ -4,13 +4,13 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				combination_id::varchar,
-				product_id::varchar,
-				*
+			combination_id::varchar,
+			product_id::varchar,
+			*
 			FROM
-				combinations
+			combinations
 			WHERE
-				combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationId#">::uuid
+			combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
