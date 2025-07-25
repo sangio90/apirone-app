@@ -7,11 +7,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"file" = "customerTypes.json.cfm"
 		},
 		"fileType"     = { "bean" = "fileType", "file" = "fileTypes.json.cfm" },
-		"fileKind" = {
-            "bean" = "fileKind",
-            "file" = "fileKinds.json.cfm"
-        },
-        "priceType"    = { "bean" = "priceType", "file" = "priceTypes.json.cfm" },
+		"fileKind"     = { "bean" = "fileKind", "file" = "fileKinds.json.cfm" },
+		"priceType"    = { "bean" = "priceType", "file" = "priceTypes.json.cfm" },
 		"role"         = { "bean" = "role", "file" = "roles.json.cfm" },
 		"documentType" = {
 			"bean" = "documentType",
@@ -34,11 +31,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.service.LookupService function init(){
 		var data = {};
 
-        for ( var item in variables.config ) {
+		for ( var item in variables.config ) {
+			var ent = variables.config[ item ];
 
-            var ent = variables.config[ item ];
-
-            if ( FileExists( ExpandPath("/config/data/#ent.file#" ) ) ) {
+			if ( FileExists( ExpandPath( "/config/data/#ent.file#" ) ) ) {
 				data[ item ] = createRowList( item );
 			}
 		}
@@ -48,12 +44,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return this;
 	}
 
-    public com.apirone.core.model.bean.AbsBean function get(
-        required String entity,
-        required String value
-    ) {
-
-        var result = NullValue();
+	public com.apirone.core.model.bean.AbsBean function get( required String entity, required String value ){
+		var result = NullValue();
 
 		var thisValue = arguments.value;
 
@@ -73,9 +65,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var list   = getData()[ arguments.entity ];
 		var config = variables.config[ arguments.entity ];
 
-        list.each( function( item ) {
-            result.add(
-                factory.createInstance( config.bean, item ))
+		list.each( function( item ){
+			result.add( factory.createInstance( config.bean, item ) )
 		} );
 
 		return result;

@@ -23,9 +23,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.Result function getByProductId(
-		required String productId,
-		){
+	public com.apirone.core.model.bean.Result function getByProductId( required String productId ){
 		var rows   = [];
 		var result = super.getResult();
 
@@ -42,9 +40,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public com.apirone.core.model.bean.Result function getByProductId(
-		required String productId,
-		){
+	public com.apirone.core.model.bean.Result function getByProductId( required String productId ){
 		var rows   = [];
 		var result = super.getResult();
 
@@ -61,34 +57,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public array function calculateCombinations(required String productId) {
-		var items = getProductItemService().getFlatTree(productId=arguments.productId);
-		//Trasformo il flat tree in un array di righe
-		var rows = flattenTreeToRows(items);
+	public array function calculateCombinations( required String productId ){
+		var items = getProductItemService().getFlatTree( productId = arguments.productId );
+		// Trasformo il flat tree in un array di righe
+		var rows  = flattenTreeToRows( items );
 
-		//Costruisco l'albero delle combinazioni di prodotti cartesiani ricorsivi
-		tree = buildTree(rows);
-		tree = parseTree(tree);
-		for (var node in tree) {
-			combinationAlreadyExists = getCombinationProductItemDao().combinationAlreadyExists(node);
-			if (combinationAlreadyExists) {
-				//loggo che la combinazione esiste già
-				getLogger().info("Combination already exists for node: " & serializeJSON(node));
+		// Costruisco l'albero delle combinazioni di prodotti cartesiani ricorsivi
+		tree = buildTree( rows );
+		tree = parseTree( tree );
+		for ( var node in tree ) {
+			combinationAlreadyExists = getCombinationProductItemDao().combinationAlreadyExists( node );
+			if ( combinationAlreadyExists ) {
+				// loggo che la combinazione esiste già
+				getLogger().info( "Combination already exists for node: " & SerializeJSON( node ) );
 				continue; // Se la combinazione esiste già, salto al prossimo nodo
 			}
-			//Cerco se esiste già una combinazione per il prodotto
-			var combination = super.bean("Combination");
-			combination.setProductId(arguments.productId);
-			combination.setStatus(getStatusService().get("ACT"));
-			var combinationId = create(combination);
-			for (var productItemId in node) {
-				var combinationProductItem = super.bean("CombinationProductItem");
-				combinationProductItem.setCombinationId(combinationId);
-				combinationProductItem.setProductItemId(productItemId);
-				getCombinationProductItemService().create(combinationProductItem);
+			// Cerco se esiste già una combinazione per il prodotto
+			var combination = super.bean( "Combination" );
+			combination.setProductId( arguments.productId );
+			combination.setStatus( getStatusService().get( "ACT" ) );
+			var combinationId = create( combination );
+			for ( var productItemId in node ) {
+				var combinationProductItem = super.bean( "CombinationProductItem" );
+				combinationProductItem.setCombinationId( combinationId );
+				combinationProductItem.setProductItemId( productItemId );
+				getCombinationProductItemService().create( combinationProductItem );
 			}
 		}
-		//Converto l'albero in un array di combinazioni uniche
+		// Converto l'albero in un array di combinazioni uniche
 
 		var combinations = [];
 		return combinations;
@@ -189,17 +185,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setStatus( getStatusService().getDefault() );
 			}
 			bean.setProductId( record.product_id );
-			var combinationProductItems = getCombinationProductItemService().getByCombinationId(record.combination_id);
+			var combinationProductItems = getCombinationProductItemService().getByCombinationId(
+				record.combination_id
+			);
 			var combinationProductItemsBeans = [];
 			for ( var combinationProductItem in combinationProductItems.getData() ) {
-				combinationProductItemsBeans.add( getCombinationProductItemService().get( combinationProductItem.getId() ) );
+				combinationProductItemsBeans.add(
+					getCombinationProductItemService().get( combinationProductItem.getId() )
+				);
 			}
 			bean.setCombinationProductItems( combinationProductItemsBeans );
 			var descrizioneProductItems = "";
 			for ( var combinationProductItem in combinationProductItems.getData() ) {
-				descrizioneProductItems &= combinationProductItem.getProductItem().getAttribute().getName();
+				descrizioneProductItems &= combinationProductItem
+					.getProductItem()
+					.getAttribute()
+					.getName();
 				descrizioneProductItems &= ": ";
-				descrizioneProductItems &= combinationProductItem.getProductItem().getAttributeValue().getRawValue().getName();
+				descrizioneProductItems &= combinationProductItem
+					.getProductItem()
+					.getAttributeValue()
+					.getRawValue()
+					.getName();
 				descrizioneProductItems &= " --- ";
 			}
 			bean.setDescrizioneProductItems( descrizioneProductItems );
@@ -225,78 +232,78 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	//Inizio helper per calcolo ricorsione
-	private function buildTree(rows) {
-		var tree = [];
+	// Inizio helper per calcolo ricorsione
+	private function buildTree( rows ){
+		var tree  = [];
 		var stack = [];
 
-		for (row in rows) {
+		for ( row in rows ) {
 			var node = {
-				id = row.id,
-				attr = row.attr,
-				value = row.value,
-				level = row.level,
+				id       = row.id,
+				attr     = row.attr,
+				value    = row.value,
+				level    = row.level,
 				children = []
 			};
 
-// Pulisce lo stack oltre il livello corrente
-			if (arrayLen(stack) >= node.level) {
-				for (i = arrayLen(stack); i >= node.level; i--) {
-					arrayDeleteAt(stack, i);
+			// Pulisce lo stack oltre il livello corrente
+			if ( ArrayLen( stack ) >= node.level ) {
+				for ( i = ArrayLen( stack ); i >= node.level; i-- ) {
+					ArrayDeleteAt( stack, i );
 				}
 			}
 
-			if (node.level == 1) {
-				arrayAppend(tree, node);
+			if ( node.level == 1 ) {
+				ArrayAppend( tree, node );
 			} else {
-				var parent = stack[node.level - 1];
-				arrayAppend(parent.children, node);
+				var parent = stack[ node.level - 1 ];
+				ArrayAppend( parent.children, node );
 			}
 
-			stack[node.level] = node;
+			stack[ node.level ] = node;
 		}
 
 		return tree;
 	}
 
-// Ricorsione: genera tutte le combinazioni per un nodo e i suoi figli
-	private function expandCombinations(node) {
+	// Ricorsione: genera tutte le combinazioni per un nodo e i suoi figli
+	private function expandCombinations( node ){
 		var combinations = [];
 
-		if (arrayLen(node.children) == 0) {
-// Nessun figlio → solo il nodo stesso
-			combinations = [[node.id]];
+		if ( ArrayLen( node.children ) == 0 ) {
+			// Nessun figlio → solo il nodo stesso
+			combinations = [ [ node.id ] ];
 		} else {
 			var childCombos = [];
-			for (child in node.children) {
-				childCombos.append(expandCombinations(child), true);
+			for ( child in node.children ) {
+				childCombos.append( expandCombinations( child ), true );
 			}
 
-// Aggiunge il nodo attuale a ogni combinazione figlia
-			for (combo in childCombos) {
-				arrayPrepend(combo, node.id);
-				arrayAppend(combinations, combo);
+			// Aggiunge il nodo attuale a ogni combinazione figlia
+			for ( combo in childCombos ) {
+				ArrayPrepend( combo, node.id );
+				ArrayAppend( combinations, combo );
 			}
 		}
 
 		return combinations;
 	}
 
-// Combina le combinazioni da nodi con attributi diversi
-	private function combineIndependentTrees(groups) {
-		if (arrayLen(groups) == 0) return [];
+	// Combina le combinazioni da nodi con attributi diversi
+	private function combineIndependentTrees( groups ){
+		if ( ArrayLen( groups ) == 0 ) return [];
 
-		var result = groups[1];
+		var result = groups[ 1 ];
 
-		for (i = 2; i <= arrayLen(groups); i++) {
+		for ( i = 2; i <= ArrayLen( groups ); i++ ) {
 			var newResult = [];
-			for (a in result) {
-				for (b in groups[i]) {
-					var combined = duplicate(a);
-					for (id in b) {
-						arrayAppend(combined, id);
+			for ( a in result ) {
+				for ( b in groups[ i ] ) {
+					var combined = Duplicate( a );
+					for ( id in b ) {
+						ArrayAppend( combined, id );
 					}
-					arrayAppend(newResult, combined);
+					ArrayAppend( newResult, combined );
 				}
 			}
 			result = newResult;
@@ -305,59 +312,63 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	private function flattenTreeToRows(nodes, level = 1, rows = []) {
-		for (node in nodes) {
+	private function flattenTreeToRows(
+		nodes,
+		level = 1,
+		rows  = []
+	){
+		for ( node in nodes ) {
 			var row = {
-				id = node.getId(),
-				attr = node.getAttribute().getId(),
+				id    = node.getId(),
+				attr  = node.getAttribute().getId(),
 				value = node.getAttributeValue().getId(),
 				level = node.getLevel()
 			};
 
-			arrayAppend(rows, row);
+			ArrayAppend( rows, row );
 		}
 
 		return rows;
 	}
 
-	private function parseTree(tree) {
+	private function parseTree( tree ){
 		// 1. Raggruppa i nodi di livello 1 per ATTR
-		var groupedLevel1 = structNew();
-		for (node in tree) {
-			if (!structKeyExists(groupedLevel1, node.attr)) {
-				groupedLevel1[node.attr] = [];
+		var groupedLevel1 = StructNew();
+		for ( node in tree ) {
+			if ( !StructKeyExists( groupedLevel1, node.attr ) ) {
+				groupedLevel1[ node.attr ] = [];
 			}
-			arrayAppend(groupedLevel1[node.attr], node);
+			ArrayAppend( groupedLevel1[ node.attr ], node );
 		}
 
 		// 2. Per ogni gruppo (ATTR diverso), espandi tutte le combinazioni valide
 		var perAttrCombinations = [];
-		for (attr in groupedLevel1) {
+		for ( attr in groupedLevel1 ) {
 			var attrCombinations = [];
 
-			for (node in groupedLevel1[attr]) {
-				attrCombinations.append(expandCombinations(node), true);
+			for ( node in groupedLevel1[ attr ] ) {
+				attrCombinations.append( expandCombinations( node ), true );
 			}
 
-			arrayAppend(perAttrCombinations, attrCombinations);
+			ArrayAppend( perAttrCombinations, attrCombinations );
 		}
 
 		// 3. Combina tutte le combinazioni tra ATTR diversi
-		validCombinations = combineIndependentTrees(perAttrCombinations);
+		validCombinations = combineIndependentTrees( perAttrCombinations );
 
 		// 4. Rimuove duplicati
-		uniqueSet = structNew();
+		uniqueSet          = StructNew();
 		uniqueCombinations = [];
 
-		for (combo in validCombinations) {
-			var key = arrayToList(combo, ",");
-			if (!structKeyExists(uniqueSet, key)) {
-				structInsert(uniqueSet, key, true);
-				arrayAppend(uniqueCombinations, combo);
+		for ( combo in validCombinations ) {
+			var key = ArrayToList( combo, "," );
+			if ( !StructKeyExists( uniqueSet, key ) ) {
+				StructInsert( uniqueSet, key, true );
+				ArrayAppend( uniqueCombinations, combo );
 			}
 		}
 		return uniqueCombinations;
 	}
-	//Fine helper per calcolo ricorsione
+	// Fine helper per calcolo ricorsione
 
 }

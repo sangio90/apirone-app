@@ -22,12 +22,12 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-			combination_product_item_id::varchar,
-			*
+				combination_product_item_id::varchar,
+				*
 			FROM
-			combination_product_items
+				combination_product_items
 			WHERE
-			combination_id = <cfqueryparam cfsqltype="varchar" value="#arguments.combinationId#">::uuid
+				combination_id = <cfqueryparam cfsqltype="varchar" value="#arguments.combinationId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -41,8 +41,9 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
-				FROM product_items
-				LEFT JOIN attributes_raw_values ON product_items.attribute_raw_value_id = attributes_raw_values.attribute_raw_value_id
+			FROM
+				product_items
+			LEFT JOIN attributes_raw_values ON product_items.attribute_raw_value_id = attributes_raw_values.attribute_raw_value_id
 				WHERE
 					product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid and
 					product_item_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.productItemId#">::uuid and
@@ -55,7 +56,11 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="String">
-		<cfargument name="combinationProductItem" type="com.apirone.core.model.bean.CombinationProductItem" required="true">
+		<cfargument
+			name    ="combinationProductItem"
+			type    ="com.apirone.core.model.bean.CombinationProductItem"
+			required="true"
+		>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO combination_product_items (
@@ -70,7 +75,6 @@
 
 		<cfreturn local.q.combination_product_item_id.toString()>
 	</cffunction>
-
 
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="combinationProductItemId" type="String">
@@ -91,17 +95,23 @@
 		<cfset var whereClauses = []>
 
 		<cfloop array="#arguments.productItemIds#" index="id">
-			<cfset arrayAppend(whereClauses,
-					"EXISTS (SELECT 1 FROM combination_product_items WHERE combination_id = c1.combination_id AND product_item_id = " & val(id) & ")"
-				)>
+			<cfset ArrayAppend(
+				whereClauses,
+				"EXISTS (SELECT 1 FROM combination_product_items WHERE combination_id = c1.combination_id AND product_item_id = " & Val(
+					id
+				) & ")"
+			)>
 		</cfloop>
 
-		<cfset var whereSQL = arrayToList(whereClauses, " AND ")>
+		<cfset var whereSQL = ArrayToList( whereClauses, " AND " )>
 
 		<cfquery name="qCheck" datasource="apirone">
-			SELECT c1.combination_id
-			FROM combinations c1
-			WHERE #preserveSingleQuotes(whereSQL)#
+			SELECT
+				c1.combination_id
+			FROM
+				combinations c1
+			WHERE
+				#PreserveSingleQuotes( whereSQL )#
 			LIMIT 1
 		</cfquery>
 

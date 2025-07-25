@@ -85,10 +85,10 @@ component extends="com.apirone.core.controller.AbsController" {
 	function combinations( event, rc, prc ){
 		param rc.id = "";
 
-		prc.statuses = super.fire( "status.list", [ "PRODUCT" ] );
-	    var product = super.service( "Product" ).get( rc.id );
-		prc.title    = "Combinazioni #product.getSize().getCode()#, finitura #product.getFinish().getName()#";
-		prc.subtitle = "Linea #product.getLine().getName()#";
+		prc.statuses            = super.fire( "status.list", [ "PRODUCT" ] );
+		var product             = super.service( "Product" ).get( rc.id );
+		prc.title               = "Combinazioni #product.getSize().getCode()#, finitura #product.getFinish().getName()#";
+		prc.subtitle            = "Linea #product.getLine().getName()#";
 		prc.page[ "productId" ] = product.getId();
 
 		prc.jsScripts.add( "app-product-combinations" );

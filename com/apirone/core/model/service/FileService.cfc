@@ -10,10 +10,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var cache = cm.get( getCacheScope(), arguments.fileId );
 
-	    if ( cache.status ) {
-
-	      return cache.data;
-}
+		if ( cache.status ) {
+			return cache.data;
+		}
 
 		var obj = build( arguments.fileId );
 
@@ -28,14 +27,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-    public com.apirone.core.model.bean.Result function search(
-					 String typeId,
-					 String productId,
-					 String productItemId,
-					 String combinationId,
-			required Numeric limit = 20,
-			required Numeric offset = 0
-
+	public com.apirone.core.model.bean.Result function search(
+		String typeId,
+		String productId,
+		String productItemId,
+		String combinationId,
+		required Numeric limit  = 20,
+		required Numeric offset = 0
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -54,17 +52,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function update(
-			required com.apirone.core.model.bean.File file,
-            required com.apirone.core.model.bean.Entity entity
-		){
+		required com.apirone.core.model.bean.File file,
+		required com.apirone.core.model.bean.Entity entity
+	){
+		var id = getDao().update( file = arguments.file, entity = arguments.entity ).toString();
 
-            var id = getDao()
-                        .update( file = arguments.file, entity = arguments.entity )
-                        .toString();
+		getCacheManager().remove( getCacheScope(), arguments.fileId );
 
-			getCacheManager().remove( getCacheScope(), arguments.fileId );
-
-			return id;
+		return id;
 	}
 
 	public void function delete( required String fileId ){
@@ -90,7 +85,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var root = ExpandPath( "/../repository/public/media/" );
 
-		var dayPath = DateFormat( Now(), "yyyy/mm" )
+		var dayPath     = DateFormat( Now(), "yyyy/mm" )
 		var destination = root & "/#config.path#/" & "_ori/" & dayPath;
 
 		DirectoryCreate( destination, true, true );
@@ -121,8 +116,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setHeight( info.height );
 			bean.setWidth( info.width );
-			bean.setAlt("");
-			bean.setExtension("");
+			bean.setAlt( "" );
+			bean.setExtension( "" );
 		}
 
 		var newId = getDao().insert( file = bean, entity = arguments.entity ).toString();
@@ -152,12 +147,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-    public Void function resize(
-    		required String filePath,
-    		required Numeric size
-        ){
-
-        var sizePath = Replace( filePath, "_ori", size );
+	public Void function resize( required String filePath, required Numeric size ){
+		var sizePath = Replace( filePath, "_ori", size );
 
 		var directory = GetDirectoryFromPath( sizePath );
 
@@ -176,9 +167,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	private com.apirone.core.model.bean.file function build( required String fileId ){
 		var record = getDao().read( fileId = arguments.fileId );
 
-	    if( record.RecordCount ) {
-
-	    	var obj = super.bean( "File" );
+		if ( record.RecordCount ) {
+			var obj = super.bean( "File" );
 
 			obj.setId( record.file_id.toString() );
 			obj.setName( record.name );
@@ -194,7 +184,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			obj.setDirectory( record.directory );
 
 			return obj;
-
 		}
 
 		return NullValue();

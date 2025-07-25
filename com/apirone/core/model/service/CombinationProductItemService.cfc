@@ -35,7 +35,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.recordcount ) );
 
-		return result;;
+		return result;
+		;
 	}
 
 	public Array function list(){
@@ -72,7 +73,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public String function create( required com.apirone.core.model.bean.CombinationProductItem combinationProductItem ){
+	public String function create(
+		required com.apirone.core.model.bean.CombinationProductItem combinationProductItem
+	){
 		var newId = getDao().insert( arguments.combinationProductItem );
 
 		if ( !IsNull( arguments.combinationProductItem.getTexts() ) ) {
@@ -94,7 +97,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public String function update( required com.apirone.core.model.bean.CombinationProductItem combinationProductItem ){
+	public String function update(
+		required com.apirone.core.model.bean.CombinationProductItem combinationProductItem
+	){
 		getDao().update( arguments.combinationProductItem );
 
 		var id = arguments.combinationProductItem.getId();
@@ -126,7 +131,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.CombinationProductItem function build( required String combinationProductItemId ){
+	private com.apirone.core.model.bean.CombinationProductItem function build(
+		required String combinationProductItemId
+	){
 		var record = getDao().read( arguments.combinationProductItemId );
 
 		if ( record.recordCount ) {
@@ -145,4 +152,5 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return NullValue();
 	}
+
 }

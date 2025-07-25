@@ -1,121 +1,121 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		param rc.by = "____";
+		var data    = [];
 
-        param rc.by = "____";
-        var data = [];
+		var item = {};
 
-        var item = {};
+		var file = super.bean( "File" );
 
-        var file = super.bean("File");
+		if ( rc.by == "products" ) {
+			var params = { productId = rc.id }
+			var config = getConfiguration().get( "imagesConfig" )[ "product" ];
+		}
 
-        if( rc.by == "products" ) {
-            var params = { productId = rc.id }
-            var config = getConfiguration().get("imagesConfig")[ "product" ];
-        }
+		if ( rc.by == "product-items" ) {
+			var params = { productItemId = rc.id }
+			var config = getConfiguration().get( "imagesConfig" )[ "productItem" ];
+		}
 
-        if( rc.by == "product-items" ) {
-            var params = { productItemId = rc.id }
-            var config = getConfiguration().get("imagesConfig")[ "productItem" ];
-        }
+		if ( rc.by == "combinations" ) {
+			var params = { combinationId = rc.id }
+			var config = getConfiguration().get( "imagesConfig" )[ "combination" ];
+		}
 
-        if( rc.by == "combinations" ) {
-            var params = { combinationId = rc.id }
-            var config = getConfiguration().get("imagesConfig")[ "combination" ];
-        }
+		for ( var typeId in config.types ) {
+			params.put( "typeId", typeId );
 
-        for( var typeId in config.types  ) {
+			var images = super.fire( "file.list", params );
 
-            params.put("typeId", typeId );
+			// esiste l'immagine
+			if ( images.len() ) {
+				var image = images[ 1 ];
 
-            var images = super.fire( "file.list", params );
+				var json = DeserializeJSON( SerializeJSON( image ) );
 
-            // esiste l'immagine
-            if( images.len() ) {
-
-                var image = images[1];
-
-                var json = DESerializeJSON( SerializeJSON( image ) );
-
-                json["complete"] = true;
-                json["uri"] = image.getUri();
-                json["shortId"] = Right( image.getId(), 5 );
+				json[ "complete" ] = true;
+				json[ "uri" ]      = image.getUri();
+				json[ "shortId" ]  = Right( image.getId(), 5 );
 
 
-            // se non esiste, servo un'immagine vuota
-            } else {
+				// se non esiste, servo un'immagine vuota
+			} else {
+				var type = super.fire( "fileType.get", [ typeId ] );
 
-                var type = super.fire("fileType.get", [ typeId ] );
+				file.setType( type );
 
-                file.setType( type );
+				file.setId( "" );
+				file.setName( "" );
+				file.setDirectory( "" );
 
-                file.setId( "" );
-                file.setName("");
-                file.setDirectory("");
+				var json = DeserializeJSON( SerializeJSON( file ) );
 
-                var json = DESerializeJSON( SerializeJSON( file ) );
+				json[ "complete" ] = false;
+				json[ "uri" ]      = "";
+				json[ "shortId" ]  = "";
+			}
 
-                json["complete"] = false;
-                json["uri"] = "";
-                json["shortId"] = "";
+			data.add( json );
+		}
 
-            }
+		event.setValue( "result", data );
+	}
 
-            data.add( json );
+	function upload( event, rc, prc ){
+		var tmpDir = getTempDir();
+		var entity = super.bean( "Entity" );
 
-        }
+		if ( rc.by == "product-items" ) {
+			entity.setKey( "productItem.id" );
+			var kindId = "productItem";
+		}
 
-        event.setValue( "result", data );
+		if ( rc.by == "products" ) {
+			entity.setKey( "product.id" );
+			var kindId = "product";
+		}
 
-    }
+		if ( rc.by == "combinations" ) {
+			entity.setKey( "combination.id" );
+			var kindId = "combination";
+		}
 
-    function upload( event, rc, prc ){
+		entity.setValue( rc.id );
 
-        var tmpDir = getTempDir();
-        var entity = super.bean("Entity");
+		cffile(
+			filefield    = rc.files[ 1 ],
+			nameconflict = "MAKEUNIQUE",
+			destination  = tmpDir,
+			action       = "UPLOAD"
+		);
 
-        if( rc.by == "product-items" ) {
-            entity.setKey( "productItem.id" );
-            var kindId = "productItem";
-        }
+		if ( Len( rc.imageId ) ) {
+			super.fire( "file.delete", { fileId = rc.imageId } );
+		}
 
-        if( rc.by == "products" ) {
-            entity.setKey( "product.id" );
-            var kindId = "product";
-        }
+		var fileId = super.fire(
+			"file.create",
+			{
+				filePath = "#tmpDir#/#cffile.ServerFile#",
+				entity   = entity,
+				typeId   = rc.typeId,
+				kindId   = kindId
+			}
+		);
 
-        if( rc.by == "combinations" ) {
-            entity.setKey( "combination.id" );
-            var kindId = "combination";
-        }
+		var result = super.getResult();
 
-        entity.setValue( rc.id );
+		var file = super.fire( "file.get", [ fileId ] );
 
-		cffile( filefield=rc.files[1], nameconflict="MAKEUNIQUE", destination=tmpDir, action="UPLOAD" );
+		var message = super.completeMessage( "file.imageCreated" );
 
-        if( Len( rc.imageId ) ) {
-            super.fire( "file.delete", { fileId = rc.imageId } );
-        }
+		result.setData( {
+			"message" = message,
+			"payload" = { "imageId" = file.getId() }
+		} );
 
-        var fileId = super.fire( "file.create", { filePath = "#tmpDir#/#cffile.ServerFile#", entity = entity, typeId=rc.typeId, kindId=kindId } );
-
-        var result = super.getResult();
-
-        var file = super.fire( "file.get", [ fileId ] );
-
-        var message = super.completeMessage( "file.imageCreated" );
-
-        result.setData(
-            {
-                "message" = message,
-                "payload" = {
-                    "imageId" = file.getId()
-                }
-            }
-        );
-
-        event.setValue( "result", result );
-
-    }
+		event.setValue( "result", result );
+	}
 
 }

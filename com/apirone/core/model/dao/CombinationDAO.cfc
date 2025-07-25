@@ -48,7 +48,6 @@
 		<cfreturn local.q.combination_id.toString()>
 	</cffunction>
 
-
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="combinationId" type="String">
 

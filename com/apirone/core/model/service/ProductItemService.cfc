@@ -319,55 +319,47 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	public com.apirone.core.model.bean.ProductItem[] function getFlatTree(
-		required String productId,
-		required Numeric parentId=NullValue(),
-		required String level=1,
-		required String orderBy="",
-		required Boolean includeMissingValues=true,
-	) {
-
+	public com.apirone.core.model.bean.ProductItem(){
 		var result = [];
-		var rows = [];
+		var rows   = [];
 
 		var productId = arguments.productId;
 
-		var items = list(
-			productId = arguments.productId,
-			parentId = arguments.parentId
-		);
+		var items = list( productId = arguments.productId, parentId = arguments.parentId );
 
-		if( arguments.includeMissingValues ) {
+		if ( arguments.includeMissingValues ) {
 			rows = listWithMissingValues( items );
 		} else {
 			rows = items;
 		}
 
-		var thisLevel = arguments.level;
+		var thisLevel            = arguments.level;
 		var includeMissingValues = arguments.includeMissingValues;
 
 		var n = 1;
 
-		for( var row in rows ) {
-
+		for ( var row in rows ) {
 			var thisOrderBy = "#arguments.orderBy#.#n#";
-			var parentId = row.getId();
+			var parentId    = row.getId();
 
 			row.setLevel( arguments.level );
 
 			result.add( row );
 
-			var rows = getFlatTree( productId, parentId, thisLevel+1, thisOrderBy, includeMissingValues );
+			var rows = getFlatTree(
+				productId,
+				parentId,
+				thisLevel + 1,
+				thisOrderBy,
+				includeMissingValues
+			);
 
 			result = result.merge( rows );
 
 			n++;
-
 		}
 
 		return result;
-
 	}
-
 
 }
