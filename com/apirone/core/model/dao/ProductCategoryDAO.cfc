@@ -27,6 +27,7 @@
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
 		<cfargument name="lineId" type="Numeric">
+		<cfargument name="typeId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -58,6 +59,10 @@
 
 				<cfif Len( Trim( arguments.statusId ) )>
 					AND product_categories.status_id = <cfqueryparam value="#arguments.statusId#" cfsqltype="Varchar">
+				</cfif>
+
+				<cfif Len( Trim( arguments.typeId ) )>
+					AND product_categories.product_category_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.lineId )>

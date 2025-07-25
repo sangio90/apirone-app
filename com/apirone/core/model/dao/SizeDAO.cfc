@@ -34,6 +34,7 @@
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
+		<cfargument name="typeId" type="String">
 
 		<cfargument name="orderby" required="true" type="String" default="sizes.code">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -55,6 +56,10 @@
 
 				<cfif !IsNull( arguments.lineId )>
 					AND products.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
+				</cfif>
+
+				<cfif !IsNull( arguments.typeId )>
+					AND sizes.size_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
@@ -89,6 +94,7 @@
 				code,
 				size,
 				status_id,
+				size_type_id,
 				categories,
 				fruits_count
 			)
@@ -96,6 +102,7 @@
 				<cfqueryparam cfsqltype="varchar" value="#arguments.size.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getType().getId()#">,
 				<cfqueryparam cfsqltype="Other" value="#SerializeJSON( categories )#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.size.getFruitsCount()#">
 			) RETURNING size_id
@@ -117,6 +124,7 @@
 				size = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getName()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getCode()#">,
 				categories = <cfqueryparam cfsqltype="Other" value="#categories#">,
+				size_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getType().getId()#">,
 				fruits_count = <cfqueryparam cfsqltype="Integer" value="#arguments.size.getFruitsCount()#">
 			WHERE
 				size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getId()#">::uuid

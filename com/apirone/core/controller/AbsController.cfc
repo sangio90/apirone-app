@@ -1,16 +1,16 @@
 ﻿component output="false" accessors="true" {
 
-	property name="dataMapper" type="dataMapper.DataMapper";
-	property name="configuration" type="com.apirone.core.model.bean.Configuration";
-	property name="accessManager" type="com.apirone.core.util.accessManager.AccessManager";
+	//property name="dataMapper" type="dataMapper.DataMapper";
+	//property name="configuration" type="com.apirone.core.model.bean.Configuration";
+	//property name="accessManager" type="com.apirone.core.util.accessManager.AccessManager";
 
-    public Any function init(){
+    //public Any function init(){
 
-        setDataMapper( model().getInstance("DataMapper") );
-        setAccessManager( model().getInstance("AccessManager") );
-        setConfiguration( model().getInstance("Configuration") );
+        //setDataMapper( getModel().getInstance("DataMapper") );
+        //setAccessManager( getModel().getInstance("AccessManager") );
+        //setConfiguration( getModel().getInstance("Configuration") );
 
-    }
+    //}    
 
     public Array function convertCbErrors( required Array errors ) {
         return errors
@@ -26,7 +26,7 @@
                 })
     }
 
-    public Void function setErrorResult( required Any event,  required Array errors = [] ) {
+    public Void function setErrorResult( required Any event, required Array errors = [] ) {
 
         var result = getResult();
 
@@ -46,7 +46,7 @@
 		String profile = 'default'
 	) {
 		
-		var constraints = deserializeJSON( fileRead(expandPath('/apps/api/constraints/#arguments.entity#.json') ) );
+		var constraints = deserializeJSON( FileRead( ExpandPath("/apps/api/constraints/#arguments.entity#.json") ) );
 		
 		return constraints[profile]
 
@@ -89,9 +89,9 @@
 
     }      
 
-    public Any function service( required String service ){
+    public Any function service( required String servicex ){
 
-        var bean = model().getInstance("#service#Service");
+        var bean = getModel().getInstance("#arguments.servicex#Service");
 
         return bean;
 
@@ -130,23 +130,12 @@
         var user = application.cbController.getRequestService().getContext().getPrivateValue("user");
         
         var result = getAccessManager().exec( action=arguments.action, user=user, payload=arguments.payload );
+        getModel().getInstance("CacheManager");
 
         return result;
 
     }      
     
-    public Any function getDataMapper(){
-
-        return model().getInstance("DataMapper");
-
-    }      
-    
-    public Any function model(){
-
-        return server[ "wireBox-apirone" ];
-
-    }    
-
     public Any function toStruct( required obj ){
 
         return DESerializeJSON( SerializeJSON( arguments.obj ) );
@@ -263,9 +252,8 @@
     }
 
     public Struct function getCacheManager() {
-        return model().getInstance("CacheManager");
+        return getModel().getInstance("CacheManager");
     }
-
 
     // only message
     public String function message( required String id, required String lang="it" ){ //id is a dotted path
@@ -291,5 +279,35 @@
         return { "id" : arguments.id, "text" = IsSimpleValue( text ) ? text : "String not found" };
 
     }
+
+
+    /*
+        some shorthads
+    */
+
+    public Struct function getDataMapper(){
+
+        return getModel().getInstance("DataMapper");
+
+    }      
+    
+    public Struct function getAccessManager(){
+
+        return getModel().getInstance("AccessManager");
+
+    }      
+
+    
+    /*
+        private methods
+    */
+
+    public Struct function getModel(){
+
+        //TODO: use GetSystemPropOrEnvVar from Lucee 6.2.1
+
+        return server[ "wireBox-apirone" ];
+
+    }    
 
 }

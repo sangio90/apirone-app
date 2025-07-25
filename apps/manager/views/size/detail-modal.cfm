@@ -34,6 +34,18 @@
                         </div>
 
                         <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Tipo</label>
+                            <div class="col-sm-10">
+                                <select name="typeId" id="typeId" class="form-control"
+                                    data-bind="value: detailForm.data.type.id, source: detailForm.types"
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Numero di moduli</label>
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4" name="fruitsCount"
@@ -56,7 +68,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row">
+                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
                             <label class="col-sm-2 col-form-label text-end">ID</label>
                             <div class="col-sm-10 mt-1">
                                 <span data-bind="text: detailForm.data.id"></span>

@@ -1,15 +1,13 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao"           type="com.apirone.core.model.dao.AccountDAO";
-	property name="langService"   type="com.apirone.core.model.service.LangService";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="lookupService" type="com.apirone.core.model.service.LookupService";
+	property name="dao" inject="AccountDAO";
+	property name="langService" inject="LangService";
+	property name="statusService" inject="StatusService";
+	property name="lookupService" inject="LookupService";
 
 	property name="cacheScope" type="String" default="Account.bean";
 
-	public com.apirone.core.model.bean.Account function get(
-		required String accountId
-	){
+	public com.apirone.core.model.bean.Account function get( required String accountId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.accountId );
@@ -24,15 +22,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return account;
 	}
 
-	public String function create(
-		required com.apirone.core.model.bean.Account account
-	){
-		if ( !len( arguments.account.getEmail() ) ) {
-			throw( type = "apirone.accountService.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
+	public String function create( required com.apirone.core.model.bean.Account account ){
+		if ( !Len( arguments.account.getEmail() ) ) {
+			Throw(
+				type    = "apirone.accountService.EmailNotProvided",
+				message = "Account [#arguments.accountId#] not exists"
+			);
 		};
 
-		if ( !len( arguments.account.getPwd() ) ) {
-			throw( type = "apirone.accountService.PasswordNotProvided", message = "Password is required" );
+		if ( !Len( arguments.account.getPwd() ) ) {
+			Throw( type = "apirone.accountService.PasswordNotProvided", message = "Password is required" );
 		};
 
 		var id = getDao().insert( argumentCollection = arguments );
@@ -42,11 +41,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return id;
 	}
 
-	public String function update(
-		required com.apirone.core.model.bean.Account account
-	){
-		if ( !len( arguments.account.getEmail() ) ) {
-			throw( type = "apirone.accountService.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
+	public String function update( required com.apirone.core.model.bean.Account account ){
+		if ( !Len( arguments.account.getEmail() ) ) {
+			Throw(
+				type    = "apirone.accountService.EmailNotProvided",
+				message = "Account [#arguments.accountId#] not exists"
+			);
 		};
 
 		var id = getDao().update( argumentCollection = arguments );
@@ -67,9 +67,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 	*/
 
-	public com.apirone.core.model.bean.Outcome function delete(
-		required String accountId
-	){
+	public com.apirone.core.model.bean.Outcome function delete( required String accountId ){
 		var outcome = super.bean( "Outcome" );
 
 		var obj = get( arguments.accountId );
@@ -82,7 +80,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setData( { "deletedCount" = result } )
 
 				getCacheManager().remove( getCacheScope(), arguments.accountId );
-
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -97,19 +94,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
 		TODO: replace name with updatePassword
 	*/
-	public Boolean function setPassword(
-		required String accountId,
-		required String newPwd
-	){
-
+	public Boolean function setPassword( required String accountId, required String newPwd ){
 		var obj = get( arguments.accountId )
 
-		if( IsNull( obj ) ) {
-			throw( type = "apirone.accountService.AccountNotExists", message = "Account id [#arguments.accountId#] not exists" );
+		if ( IsNull( obj ) ) {
+			Throw(
+				type    = "apirone.accountService.AccountNotExists",
+				message = "Account id [#arguments.accountId#] not exists"
+			);
 		}
 
-		if ( !len( arguments.newPwd ) ) {
-			throw( type = "apirone.accountService.PasswordNotProvided", message = "Password is required" );
+		if ( !Len( arguments.newPwd ) ) {
+			Throw( type = "apirone.accountService.PasswordNotProvided", message = "Password is required" );
 		};
 
 		var pwd = createPassword( arguments.accountId, arguments.newPwd );
@@ -121,10 +117,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return true;
 	}
 
-	public Boolean function emailExists(
-		required String email,
-		String excludedId = ""
-	){
+	public Boolean function emailExists( required String email, String excludedId = "" ){
 		var record = getDao().readByEmail( arguments.email );
 
 		if (
@@ -138,20 +131,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public com.apirone.core.model.bean.Account function getByEmail(
-		required String email
-	){
-		if ( !len( arguments.email ) ) {
-			throw( type = "apirone.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
+	public com.apirone.core.model.bean.Account function getByEmail( required String email ){
+		if ( !Len( arguments.email ) ) {
+			Throw( type = "apirone.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
 		};
 
 		var accounts = search( email = arguments.email ).getData();
 
-		if ( !isNull( accounts[ 1 ] ) ) {
+		if ( !IsNull( accounts[ 1 ] ) ) {
 			return get( accountId = accounts[ 1 ].getId() );
 		}
 
-		return nullValue();
+		return NullValue();
 	}
 
 	public com.apirone.core.model.bean.Result function search(
@@ -169,39 +160,33 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		result.setData( rows );
-		result.setCount( val( records.recordcount ) );
-		result.setTotal( val( records.total ) );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
 		return result;
 	}
 
-	public String function createPassword(
-		required String accountId,
-		required String pwd
-	){
+	public String function createPassword( required String accountId, required String pwd ){
 		var token =
 		"jbGM,xxJJaJX-ol@@5m88" &
 		arguments.accountId &
 		"HTt,Tgajiawsui7,9iR09" &
 		arguments.pwd;
 
-		return hash( token, "SHA-512" );
+		return Hash( token, "SHA-512" );
 	}
 
 	/**
 	 * @private
 	 */
-	private com.apirone.core.model.bean.Account function build(
-		required String accountId
-	){
+	private com.apirone.core.model.bean.Account function build( required String accountId ){
 		var record = getDao().read( accountId = arguments.accountId );
 
-		var account = nullValue();
+		var account = NullValue();
 
 		if ( record.RecordCount ) {
-
 			var account = super.bean( "Account" );
-			var roles = [];
+			var roles   = [];
 
 			account.setId( record.account_id );
 			account.setEmail( record.email );
@@ -215,29 +200,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setStatus( getStatusService().get( record.status_id ) );
 			account.setRole( getLookupService().get( "role", record.role_id ) );
 
-			// INFO: 
+			// INFO:
 			// roles::varchar converts null value to "null" word. I didn't find anything better.
 			// I didn't want to bring the org.postgresql.util.PGobject object into the service.
-	
-			//if( !IsNull( record.roles ) AND IsJSON( record.roles.toString() != 'null' ) {
+
+			// if( !IsNull( record.roles ) AND IsJSON( record.roles.toString() != 'null' ) {
 
 			var thisRoles = DeserializeJSON( record.roles );
 
-			if( !IsNull( thisRoles ) ) {
-
+			if ( !IsNull( thisRoles ) ) {
 				thisRoles.each( function( item ){
-				
 					var role = getLookupService().get( "role", item );
 					roles.add( role );
-				
-				});
-			
+				} );
 			}
 
 			account.setRoles( roles );
 
 			account.setLang( getLangService().get( record.lang_id ) );
-
 		}
 
 		return account;

@@ -5,7 +5,7 @@
 		<cfargument name="fileId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT file_id::varchar, *
 			FROM files
 			WHERE file_id = <cfqueryparam cfsqltype="varchar" value="#arguments.fileId#">::uuid
 		</cfquery>
@@ -37,7 +37,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				file_id,
+				file_id::varchar,
 				COUNT(file_id) OVER() AS total
 			FROM
 				files

@@ -1,8 +1,8 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.TextDAO";
-	property name="langService" type="com.apirone.core.model.service.LangService";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
+	property name="dao" inject="TextDAO";
+	property name="langService" inject="LangService";
+	property name="statusService" inject="StatusService";
 
 	property name="cacheScope" type="String" default="Text.bean";
 
@@ -29,6 +29,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String statusId,
+		String lineId,
 		String attributeId,
 		Numeric attributeValueId,
 		Numeric ProductCategoryId,

@@ -166,7 +166,7 @@ AP.product.detail = (function () {
 			rules: {
 				code: {
 					required: true,
-					maxlength: 10,
+					maxlength: 20,
 					checkCode: true,
 					remote: {
 						url: "/manager/ajax/products/code-exists",
@@ -191,7 +191,7 @@ AP.product.detail = (function () {
 			messages: {
 				code: {
 					required: "Codice richiesto",
-					maxlength: "Al massimo 3 caratteri",
+					maxlength: "Al massimo 20 caratteri",
 					checkCode: "Solo numeri, lettere, trattino o trattino basso",
 					remote: "Il codice esiste"
 				},

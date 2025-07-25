@@ -8,13 +8,17 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var params = super.paramsFromUrl();
 
+        if( rc.keyExists("typeId") ) {
+            params[ "typeId" ] = rc.typeId
+        }
+
         var rows = super.fire( "ProductCategory.search", params );
 
         for ( var row in rows.getData() ) {
             var obj = dm.convert( row, "ProductCategory", true );
             data.add( obj );
         }
-
+ 
         result.setTotal( rows.getTotal() );
         result.setCount( rows.getCount() );
         result.setData( data );
@@ -26,13 +30,13 @@ component extends="com.apirone.core.controller.AbsController" {
 	function delete( event, rc, prc ){
         
         var result = super.getResult();
-        var list = GetHTTPRequestData().content;
+        var content = GetHTTPRequestData().content;
         var messageId = "productCategory.deletedAllRecords";
 
         var errors = [];
         var payload = "";
 
-        var ids = ListToArray( list );
+        var ids = ListToArray( content   );
 
         for( var id in ids ) {
             var outcome = super.fire( "productCategory.delete", [ id ] );

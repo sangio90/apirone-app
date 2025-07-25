@@ -21,6 +21,30 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	// TODO: potrei usare solo list
+	function listByCategoryId( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = getDataMapper();
+
+		var params = super.paramsFromUrl();
+
+		var params[ "categoryId" ] = rc.categoryId;
+
+		var rows = super.fire( "line.search", params );
+
+		for ( var row in rows.getData() ) {
+			var obj = dm.convert( row, "Line", true );
+			data.add( obj );
+		}
+
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
 	function get( event, rc, prc ){
 		param rc.id = "___";
 		var result  = super.getResult();
@@ -70,7 +94,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		product.setLine( line.setId( rc.id ) );
 		product.setFinish( finish.setId( json.finishId ) );
 		product.setSize( size.setId( json.sizeId ) );
-		product.setCategory( category.setId( 22 ) ); // TODO: check if this value is ok here
+		// product.setCategory( category.setId( 22 ) ); // TODO: check if this value is ok here
+		product.setCategory( category.setId( json.categoryId ) );
 		product.setStatus( status.setId( "ACT" ) );
 
 		var newId = super.fire( "product.create", [ product ] );
@@ -119,25 +144,41 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result = super.getResult();
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
+		var thisId     = "";
+		var messageId  = "";
+		var categories = [];
+
+		var result    = super.getResult();
 		var line      = super.bean( "Line" );
 		var status    = super.bean( "Status" );
 		var thickness = super.bean( "Thickness" );
 		var category  = super.bean( "ProductCategory" );
+		var text      = super.bean( "Text" );
+		var lang      = super.bean( "Lang" );
 
-		var thisId    = "";
-		var messageId = "";
+		for ( var thisCategory in json.selectedCategories ) {
+			var category = super.bean( "ProductCategory" );
 
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+			category.setId( thisCategory.id )
+			categories.add( category );
+		}
 
 		line.setId( json.id );
 		line.setCode( json.code );
 		line.setName( json.name );
 
 		line.setStatus( status.setId( json.status.id ) );
-		line.setCategory( category.setId( json?.category?.id ) );
+		line.setCategories( categories );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
+
+		text.setLang( lang.setId( json.mainText.lang.id ) );
+
+		text.setId( json.mainText.id );
+		text.setName( json.mainText.name );
+
+		line.setTexts( [ text ] );
 
 		if ( !Len( json.id ) ) {
 			messageId = "line.created";

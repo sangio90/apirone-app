@@ -1,11 +1,11 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.AttributeDAO";
-	property name="textService" type="com.apirone.core.model.service.TextService";
-	property name="statusService" type="com.apirone.core.model.service.StatusServive";
-	property name="langService" type="com.apirone.core.model.service.LangService";
-	property name="attributeValueService" type="com.apirone.core.model.service.AttributeValueService";
-	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
+	property name="dao" inject="AttributeDAO";
+	property name="textService" inject="TextService";
+	property name="statusService" inject="statusService";
+	property name="langService" inject="LangService";
+	property name="attributeValueService" inject="AttributeValueService";
+	property name="ProductCategoryService" inject="ProductCategoryService";
 	property name="cacheScope" type="String" default="Attribute.bean";
 
 
@@ -171,7 +171,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setValues( getAttributeValueService().list( attributeId = record.attribute_id ) );
 
-			var categories = super.getCategoriesBeanFromIds( record.categories );
+			var categories = super.getCategoriesBeanByIds( record.categories );
 
 			bean.setCategories( categories );
 

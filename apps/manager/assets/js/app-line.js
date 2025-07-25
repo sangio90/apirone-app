@@ -42,9 +42,17 @@ AP.line.detail = (function () {
 			id: "",
 			code: "",
 			name: "",
+            selectedCategories: [],
 			category: {
                 id: ""
             },
+			mainText: {
+				id: "",
+				name: "",
+				lang: {
+					id: "IT"
+				}
+			},
 			thickness: {
                 id: ""
             },
@@ -148,7 +156,16 @@ AP.line.detail = (function () {
 
                     if(xhr.status == "SUCCESS") {
 
+                        var selectedCategories = [];
+
+                        if( xhr.data?.categories ) {
+                            for (var category of xhr.data.categories )  {
+                                selectedCategories.push(category);
+                            }
+                        }
+
                         viewModel.set("detailForm.data", xhr.data);
+                        viewModel.set("detailForm.data.selectedCategories", selectedCategories);
                         viewModel.set("detailForm.title", "Modifica linea");
 
                         NM.util.openModal(AP.line.fields.detailRoot);
@@ -357,10 +374,13 @@ AP.line.products = (function () {
             message = "Combinazione rimossa";
         }
 
-        var status = $("#line-products-status");
-        var values = $(event.currentTarget).data("values");
+        var ele = $(event.currentTarget);
 
-        status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
+        var status = $("#line-products-status");
+        var values = ele.data("values");
+        var category = ele.data("category");
+
+        status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
 
         var size = values.split("__")[0];
         var finish = values.split("__")[1];
@@ -370,7 +390,8 @@ AP.line.products = (function () {
             url: "/manager/ajax/lines/" + AP.page.line.id + "/products",
             data: JSON.stringify({
                     sizeId: size,
-                    finishId: finish
+                    finishId: finish,
+                    categoryId: category,
                 }),
             callback: {
                 done: function (xhr) {

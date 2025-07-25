@@ -1,12 +1,12 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.ProductDAO";
-	property name="SizeService" type="com.apirone.core.model.service.SizeService";
-	property name="LineService" type="com.apirone.core.model.service.LineService";
-	property name="FinishService" type="com.apirone.core.model.service.FinishService";
-	property name="StatusService" type="com.apirone.core.model.service.StatusService";
-	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
-	property name="TextService" type="com.apirone.core.model.service.TextService";
+	property name="dao" inject="ProductDAO";
+	property name="SizeService" inject="SizeService";
+	property name="LineService" inject="LineService";
+	property name="FinishService" inject="FinishService";
+	property name="StatusService" inject="StatusService";
+	property name="ProductCategoryService" inject="ProductCategoryService";
+	property name="TextService" inject="TextService";
 	property name="cacheScope" type="String" default="Product.bean";
 
 	public com.apirone.core.model.bean.Product function get( required String productId ){

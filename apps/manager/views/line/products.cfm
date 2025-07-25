@@ -7,7 +7,7 @@
                 #pageTitle()#
             </div>
             <div class="col-4 text-end">
-                #button( label="Dimensioni e finiture &raquo;", bind="click:attributes", size="sm" )#
+                #button( label="Attributi e valori &raquo;", bind="click:attributes", size="sm" )#
             </div>
         </div>
 
@@ -50,6 +50,7 @@
                                                 <cfset exists = productExists( size.getId(), finish.getId() )>
 
                                                 <button class="btn btn-danger btn-sm active" data-bind="click:deactivate" 
+                                                    data-category="#prc.category.getId()#"
                                                     data-values="#size.getId()#__#finish.getId()#"
                                                     <cfif !exists>style="display: none"</cfif>
                                                     >
@@ -57,6 +58,7 @@
                                                 </button>
 
                                                 <button class="btn btn-primary btn-sm deactive" data-bind="click:activate" 
+                                                data-category="#prc.category.getId()#"
                                                     data-values="#size.getId()#__#finish.getId()#"
                                                     <cfif exists>style="display: none"</cfif>
                                                     >

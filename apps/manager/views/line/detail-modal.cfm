@@ -11,7 +11,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>                
                         
-                    <div class="card-body">
+                    <div class="card-body" style="border: 1px solid Red;">
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Codice</label>
@@ -30,10 +30,11 @@
                                 <input type="text" required class="form-control col-sm-4 uppercase" name="name"
                                     data-msg-required="Descrizione richiesto"
                                     maxlength="125"
-                                    data-bind="value: detailForm.data.name">
+                                    data-bind="value: detailForm.data.mainText.name">
                             </div>
                         </div>
 
+                        <!----
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Spessore</label>
                             <div class="col-sm-10">
@@ -45,15 +46,15 @@
                                 </select>
                             </div>
                         </div>
+                        ---->
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Categoria</label>
+                            <label class="col-sm-2 col-form-label text-end">Disponibile per</label>
                             <div class="col-sm-10">
-                                <select id="category" 
-                                    required
-                                    data-msg-required="Categoria richiesta"
-                                    class="form-control"
-                                    data-bind="source: detailForm.categories, value: detailForm.data.category.id" 
+                                <select id="categories" 
+                                    data-placeholder="-- Seleziona le categorie"
+                                    data-role="multiselect" 
+                                    data-bind="source: detailForm.categories, value: detailForm.data.selectedCategories" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -71,6 +72,13 @@
                                     data-text-field="name"
                                     >
                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
+                            <label class="col-sm-2 col-form-label text-end">ID</label>
+                            <div class="col-sm-10 mt-1">
+                                <span data-bind="text: detailForm.data.id"></span>
                             </div>
                         </div>
 

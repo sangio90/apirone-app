@@ -21,6 +21,7 @@
 		<cfargument name="statusId" type="String">
 		<cfargument name="langId" type="String">
 
+		<cfargument name="lineId" type="String">
 		<cfargument name="attributeId" type="String">
 		<cfargument name="attributeValueId" type="String">
 		<cfargument name="rawValueId" type="Numeric">
@@ -49,14 +50,14 @@
 				INNER JOIN langs USING ( lang_id )
 			WHERE 1=1
 
-			<cfif !IsNull( arguments.entity )>
-				AND #field.name# =
-					<cfif field.type == "uuid">
-						<cfqueryparam cfsqltype="Varchar" value="#value#">::uuid
-					<cfelse>
-						<cfqueryparam cfsqltype="#field.type#" value="#value#">
-					</cfif>
-			</cfif>
+				<cfif !IsNull( arguments.entity )>
+					AND #field.name# =
+						<cfif field.type == "uuid">
+							<cfqueryparam cfsqltype="Varchar" value="#value#">::uuid
+						<cfelse>
+							<cfqueryparam cfsqltype="#field.type#" value="#value#">
+						</cfif>
+				</cfif>
 
 			<cfif !IsNull( arguments.str )>
 				AND text ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
@@ -64,6 +65,10 @@
 
 			<cfif !IsNull( arguments.statusId )>
 				AND texts.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
+			</cfif>
+
+			<cfif !IsNull( arguments.lineId )>
+				AND texts.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 			</cfif>
 
 			<cfif !IsNull( arguments.langId )>
@@ -87,7 +92,7 @@
 			</cfif>
 
 			<cfif !IsNull( arguments.ProductCategoryId )>
-				AND product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.ProductCategoryId#">
+				AND product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productCategoryId#">
 			</cfif>
 
 			<cfif !IsNull( arguments.finishId )>

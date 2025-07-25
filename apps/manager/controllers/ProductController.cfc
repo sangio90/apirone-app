@@ -9,10 +9,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.finish = product.getFinish();
 		prc.line   = product.getLine();
 
-		if ( product.getCategory().getId() == 22 ) {
-			// TODO: set correct title by category
+		// frutti
+		if ( product.getCategory().getId() == 167 ) {
+			prc.title    = product.getName();
+			prc.subtitle = product.getCategory().getName();
+		} else {
 			prc.title    = "Dimensione #product.getSize().getCode()#, finitura #product.getFinish().getName()#";
-			prc.subtitle = "Linea #product.getLine().getName()#";
+			prc.subtitle = "#product.getCategory().getName()#, Linea #product.getLine().getName()#";
 
 			prc.sizes      = super.fire( "size.list", { lineId = prc.line.getId() } );
 			prc.statusList = super.fire( "status.list", [ "line" ] );
@@ -20,9 +23,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			prc.page[ "lineId" ]   = prc.line.getId();
 			prc.page[ "products" ] = super.fire( "product.list", { lineId = prc.line.getId() } );
-		} else {
-			prc.title    = product.getName();
-			prc.subtitle = product.getCategory().getName();
 		}
 
 		prc.jsScripts.add( "app-component" );
@@ -30,7 +30,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.jsScripts.add( "app-product-items" );
 
 
-		prc.page[  "productId" ]           = product.getId();
+		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = super.fire( "status.list", [ "attribute" ] );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();

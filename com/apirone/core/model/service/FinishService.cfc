@@ -1,9 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.FinishDAO";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
-	property name="textService" type="com.apirone.core.model.service.TextService";
+	property name="dao" inject="FinishDAO";
+	property name="statusService" inject="StatusService";
+	property name="ProductCategoryService" inject="ProductCategoryService";
+	property name="textService" inject="TextService";
 	property name="cacheScope" type="String" default="Finish.bean";
 
 	public com.apirone.core.model.bean.Finish function get( required String finishId ){
@@ -130,7 +130,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( finishId = record.finish_id ) );
 
-			var categories = getCategoriesBeanFromIds( record.categories )
+			var categories = getCategoriesBeanByIds( record.categories )
 
 			bean.setCategories( categories );
 

@@ -13,20 +13,19 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
-                <span data-bind="text: category.name"></span>
-            </td>
-            <td>
-                <span data-bind="text: thickness.name"></span>
+                <div data-bind="source: categories" data-template="product-category-row-tmpl"></div>
             </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
             </td>
+            <!---
             <td class="text-center">
                 #iconButton(bind="click:products", icon="cogs")#
             </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
+            ---->
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"
                     name="selected"
@@ -35,4 +34,7 @@
             </td>
         </tr>
     </nmscript>
+
+    #template( view="jstemplate/product-category/product-category-row-tmpl" )#
+
 </cfoutput>

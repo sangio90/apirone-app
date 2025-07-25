@@ -16,8 +16,6 @@
 
     </cffunction>
 
-
-
     <cffunction name="getCities">
 		
         <cfargument name="limit" required="false" type="Numeric" default="5">

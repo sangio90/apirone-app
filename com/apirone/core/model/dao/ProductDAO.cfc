@@ -99,6 +99,7 @@
 				line_id,
 				finish_id,
 				code,
+				position_count,
 				product_category_id,
 				status_id
 			)
@@ -123,6 +124,12 @@
 				,
 				<cfif Len( arguments.product.getCode() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getCode()#">
+				<cfelse>
+					NULL
+				</cfif>
+				,
+				<cfif !IsNull( arguments.product.getPositionCount() )>
+					<cfqueryparam cfsqltype="Integer" value="#arguments.product.getPositionCount()#">
 				<cfelse>
 					NULL
 				</cfif>

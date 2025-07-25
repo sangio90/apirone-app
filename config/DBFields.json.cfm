@@ -84,6 +84,11 @@
         "type": "Varchar"
     },
 
+    "line.id": {
+        "name": "line_id",
+        "type": "uuid"
+    },
+
     "line.name": {
         "name": "line",
         "type": "Varchar"
@@ -101,6 +106,11 @@
 
     "rawValue.id": {
         "name": "raw_value_id",
+        "type": "Integer"
+    },
+ 
+    "productCategoryType.orderby": {
+        "name": "orderby",
         "type": "Integer"
     }
 

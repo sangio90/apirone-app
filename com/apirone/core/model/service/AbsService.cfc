@@ -45,12 +45,12 @@ component output="false" accessors="true" {
 		var n      = 1;
 
 		for ( var i in arguments.fields ) {
-			if ( !structKeyExists( i, "dir" ) ) {
+			if ( !StructKeyExists( i, "dir" ) ) {
 				i.dir = "ASC";
 			}
 
-			if ( !listFindNoCase( "ASC,DESC", i.dir ) ) {
-				throw(
+			if ( !ListFindNoCase( "ASC,DESC", i.dir ) ) {
+				Throw(
 					message = "Direction [#i.dir#] not valid for field [#i.field#]. Only accepted values are ASC or DESC",
 					type    = "apirone.errors.AbsService.SortValueNotValid"
 				);
@@ -77,7 +77,7 @@ component output="false" accessors="true" {
 				// records.setCell( column_name="#column#", value="#Replace( Trim( record[ column ]), ",", "$" )#", row_number=index );
 				records.setCell(
 					column_name = "#column#",
-					value       = "#trim( record[ column ] )#",
+					value       = "#Trim( record[ column ] )#",
 					row_number  = index
 				);
 			}
@@ -94,25 +94,25 @@ component output="false" accessors="true" {
 		return util.prettyString( arguments.str );
 	}
 
-	private Array function getCategoriesBeanFromIds( required String categories ){
+	private Array function getCategoriesBeanByIds( required String categories ){
 		// [2,3,4,5]
 
 		var result     = [];
-		var categories = deserializeJSON( arguments.categories );
+		var categories = DeserializeJSON( arguments.categories );
 
-		if ( !isNull( categories ) AND len( categories ) ) {
+		if ( !IsNull( categories ) AND Len( categories ) ) {
 			var listCategories = [];
 
 			for ( var thisCategory in categories ) {
 				var beanCategory = this.service( "ProductCategory" ).get( thisCategory );
 
-				if ( !isNull( beanCategory ) ) {
+				if ( !IsNull( beanCategory ) ) {
 					result.add( beanCategory );
 				}
 			}
 		}
 
-		return result.len() ? result : nullValue();
+		return result.len() ? result : NullValue();
 	}
 
 	private Struct function getDBField( required String field ){

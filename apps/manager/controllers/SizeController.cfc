@@ -1,26 +1,26 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		var categories = [];
 
-        prc.title = "Dimensioni";
+		prc.title = "Dimensioni e modelli";
 
-        prc.statuses = super.fire( "status.list", ["SIZE"] );
-        prc.categories = super.fire( "ProductCategory.list" );
+		prc.statuses   = super.fire( "status.list", [ "SIZE" ] );
+		prc.categories = super.fire( "ProductCategory.list" );
+		prc.types      = super.fire( "lookup.list", [ "sizeType" ] );
 
-        var categories = [];
+		for ( var thisCategory in prc.categories ) {
+			var row = super.getDataMapper().convert( thisCategory, "ProductCategory", true );
+			categories.add( row );
+		}
 
-        for( var thisCategory in prc.categories ) {
-            var row = super.getDataMapper().convert( thisCategory, "ProductCategory", true );
-            categories.add( row );
-        }
+		prc.page[ "categories" ] = categories;
+		prc.page[ "statuses" ]   = prc.statuses;
+		prc.page[ "types" ]   = prc.types;
 
-        prc.page["categories"] = categories;
-        prc.page["statuses"] = prc.statuses;
+		prc.jsScripts.add( "app-size" );
 
-        prc.jsScripts.add( "app-size" );
+		event.setView( "size/list" );
+	}
 
-        event.setView("size/list");
-
-    }
-    
 }

@@ -70,7 +70,13 @@
 				roles: "ADM",
 			},
 			{
-				href: "/manager/products/category/167",
+				href: "/manager/lines/categories",
+				icon: "fas fa-vector-square",
+				title: "Linee per categoria",
+				roles: "ADM",
+			},
+			{
+				href: "/manager/products/categories/167",
 				icon: "fas fa-apple-alt",
 				title: "Frutti",
 				roles: "ADM"
@@ -84,7 +90,7 @@
 			{
 				href: "/manager/sizes",
 				icon: "fas fa-expand-alt",
-				title: "Dimensioni",
+				title: "Dimensioni e modelli",
 				roles: "ADM"
 			},
 			{

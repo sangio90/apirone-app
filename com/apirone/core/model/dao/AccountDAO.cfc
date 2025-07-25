@@ -1,6 +1,6 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 
-	<cfproperty name="Configuration" type="com.apirone.core.model.bean.Configuration"/>
+	<cfproperty name="Configuration" inject="bean:Configuration"/>
 
 	<cffunction name="read" returntype="Query">
 

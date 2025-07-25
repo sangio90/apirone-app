@@ -25,4 +25,5 @@
     "CombinationProductItem.bean": {},
     "File.bean": {},
     "FileType.bean": {},
+    "ProductCategoryType.bean": {},
 }

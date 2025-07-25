@@ -1,94 +1,108 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" type="com.apirone.core.model.dao.LineDAO";
-	property name="statusService" type="com.apirone.core.model.service.StatusService";
-	property name="lookupService" type="com.apirone.core.model.service.LookupService";
-	property name="ProductCategoryService" type="com.apirone.core.model.service.ProductCategoryService";
+	property name="dao" inject="LineDAO";
+	property name="statusService" inject="StatusService";
+	property name="lookupService" inject="LookupService";
+	property name="ProductCategoryService" inject="ProductCategoryService";
+	property name="textService" inject="TextService";
 
 	property name="cacheScope" type="String" default="Line.bean";
 
-    public com.apirone.core.model.bean.Line function get(
-    		required String lineId
-        ){
+	public com.apirone.core.model.bean.Line function get( required String lineId ){
+		var cm = getCacheManager();
 
-    	var cm = getCacheManager();
+		var cache = cm.get( getCacheScope(), arguments.lineId );
 
-	   	var cache = cm.get( getCacheScope(), arguments.lineId ) ;
+		if ( cache.status ) {
+			return cache.data;
+		}
 
-	    if ( cache.status ) {
-	    
-	      	return cache.data;
-	    
-	    } 
-	    
 		var bean = build( arguments.lineId );
 		cm.put( getCacheScope(), arguments.lineId, bean );
-        
+
 		return bean;
-
 	}
 
-	public com.apirone.core.model.bean.Line[] function list() {
-		arguments["limit"] = -1;
-		
-		return search(argumentCollection = arguments).getData();
-	
+	public Array function list(){
+		arguments[ "limit" ] = -1;
+
+		return search( argumentCollection = arguments ).getData();
 	}
 
 
-    public com.apirone.core.model.bean.Result function search(
-				String str,
-				String categoryId,
-				String statusId,
-		required Numeric limit = 20,
+	public com.apirone.core.model.bean.Result function search(
+		String str,
+		String categoryId,
+		String statusId,
+		required Numeric limit  = 20,
 		required Numeric offset = 0,
-		required Array orderBy = [ { field="line.code" } ],
+		required Array orderBy  = [ { field = "line.code" } ]
 	){
-	    var rows = [];
-    	var result = super.getResult();
+		var rows   = [];
+		var result = super.getResult();
 
-		arguments["orderby"] = super.createOrderBy( arguments["orderby"] );
+		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-    	var records = getDao().find( argumentCollection=arguments );
+		var records = getDao().find( argumentCollection = arguments );
 
-		records.each(function(record) {
+		records.each( function( record ){
 			rows.add( get( lineId = record.line_id ) );
-		});
+		} );
 
-	    result.setData( rows );
-	    result.setCount( Val( records.recordcount ) );
-	    result.setTotal( Val( records.total ) );
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
-        return result;
+		return result;
+	}
 
-    }
-
-	public String function create(
-		required com.apirone.core.model.bean.Line line
-	){
-
+	public String function create( required com.apirone.core.model.bean.Line line ){
 		var newId = getDao().insert( arguments.line );
+
+		transaction {
+			for ( var text in arguments.line.getTexts() ) {
+				var entity = super.bean( "Entity" );
+
+				entity.setKey( "line.id" );
+				entity.setValue( newId );
+
+				text.setEntity( entity );
+			}
+
+			getTextService().bulkCreate( arguments.line.getTexts() );
+		}
+
 
 		return newId;
 	}
 
-	public String function update(
-		required com.apirone.core.model.bean.Line line
-	){
+	public String function update( required com.apirone.core.model.bean.Line line ){
 		getDao().update( arguments.line );
 
-		var dm = getCacheManager();
+		var id = arguments.line.getId();
 
-		dm.remove( getCacheScope(), arguments.line.getId() );
+		for ( var text in arguments.line.getTexts() ) {
+			var entity = super.bean( "Entity" )
+
+			entity.setKey( "line.id" );
+			entity.setValue( id );
+
+			text.setEntity( entity );
+
+			if ( Len( text.getId() ) ) {
+				getTextService().update( text );
+			} else {
+				getTextService().create( text );
+			}
+		}
+
+		super.getCacheManager().remove( getCacheScope(), arguments.line.getId() );
 
 		return arguments.line.getId();
 	}
 
 
-	public Boolean function codeExists(
-		required String code,
-		String excludedId = ""
-	){
+	public Boolean function codeExists( required String code, String excludedId = "" ){
 		var record = getDao().readByCode( arguments.code );
 
 		if (
@@ -101,9 +115,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return false;
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete(
-		required String lineId
-	){
+	public com.apirone.core.model.bean.Outcome function delete( required String lineId ){
 		var outcome = super.bean( "Outcome" );
 
 		var obj = get( arguments.lineId );
@@ -116,50 +128,42 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setData( { "deletedCount" = result } )
 
 				dm.remove( getCacheScope(), arguments.line.getId() );
-
 			} catch ( any error ) {
-				
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteLine" );
 				outcome.setMessage( "Cannot delete line [#arguments.lineId#]" );
-			
 			}
 		}
 
 		return outcome;
-	}	
+	}
 
 
-    /*
+	/*
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Line function build(
-    		required String lineId
-    	){
+	private com.apirone.core.model.bean.Line function build( required String lineId ){
+		var record = getDao().read( arguments.lineId );
 
-	    var record = getDao().read( arguments.lineId );
+		if ( record.recordCount ) {
+			var bean = super.bean( "Line" );
 
-	    if( record.recordCount ) { 
-
-            var bean = super.bean( "Line" );
-
-            bean.setId( record.line_id );
+			bean.setId( record.line_id );
 			bean.setCode( record.code );
 			bean.setName( record.line );
 			bean.setCreatedAt( record.created_at );
-			
+
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
+			bean.setCategories( getCategoriesBeanByIds( record.categories ) );
+			bean.setTexts( getTextService().list( lineId = record.line_id ) );
 
-            return bean;
+			return bean;
+		}
 
-	    }
-
-		return nullValue();
-
-  	}
+		return NullValue();
+	}
 
 }

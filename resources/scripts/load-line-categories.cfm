@@ -1,4 +1,4 @@
-﻿--
+﻿-- remove cfabort
 <cfabort>
 <cfscript>
     model = server["wirebox-apirone"];
@@ -12,11 +12,6 @@
         name = listLast( line, ";" );
 
         category = new com.apirone.core.model.bean.ProductCategory();
-        /*
-        status = new com.apirone.core.model.bean.Status();
-        text = new com.apirone.core.model.bean.Text();
-        lang = new com.apirone.core.model.bean.Lang();
-        */
     
         row = {
             code: code,
