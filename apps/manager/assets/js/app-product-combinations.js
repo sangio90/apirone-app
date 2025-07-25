@@ -43,6 +43,35 @@ AP.product.combination = (function () {
 			return false;
 
 		},
+
+		getImageTypeText: function (event) {
+			var text = AP.util.getMainText(event.type.texts.toJSON());
+
+			return text.name + " " + event.shortId;
+		},
+
+		getImageSrc: function (event) {
+			var uri = event.uri;
+
+			if (event.uri != "") {
+				var replaced = uri.replace("_ori", "500");
+
+				return replaced;
+			}
+
+			return "/assets/main/img/img-not-found.png";
+		},
+
+		getImageHref: function (event) {
+			var uri = event.uri;
+
+			if (event.uri != "") {
+				return uri;
+			}
+
+			// TODO: not work with target=_blank
+			return "javascript:void(0)";
+		},
 		calculateCombinations: function (event) {
 			var id = event.data.id;
 			var thisList = AP.fields.combination.listRoot;

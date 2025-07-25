@@ -69,7 +69,7 @@
 			</div>
 		</div>
 
-		#view("product/images-list-modal")#
+		#view("product/combinations-images-list-modal")#
 
 	</div>
 
