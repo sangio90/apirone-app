@@ -1,0 +1,33 @@
+services:
+  commandbox:
+    image: ortussolutions/commandbox:latest
+    container_name: commandbox
+    ports:
+      - "YOURWEBPORT:8080"
+    restart: unless-stopped
+    volumes:
+      - commandbox_repo:/repository
+      - ./:/app:rw
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "YOURDBPORT:5432"
+    volumes:
+      - ./_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=YOURPASSWORD
+      - POSTGRES_USER=YOURUSER
+      - POSTGRES_DB=YOURDB
+    container_name: pgsql
+    restart: unless-stopped
+  public-web:
+    image: nginx:alpine
+    container_name: public-web
+    restart: unless-stopped
+    ports:
+      - "7112:80"
+    volumes:
+      - commandbox_repo:/usr/share/nginx/html:ro
+      - ./nginx_foto.conf:/etc/nginx/nginx_foto.conf:ro
+volumes:
+  commandbox_repo:
