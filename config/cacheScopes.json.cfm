@@ -26,4 +26,5 @@
     "File.bean": {},
     "FileType.bean": {},
     "ProductCategoryType.bean": {},
+    "SizeConfig.bean": {},
 }

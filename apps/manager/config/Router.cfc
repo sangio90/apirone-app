@@ -180,12 +180,17 @@
 		get( "/ajax/lines" ).to( "LineAjaxController.list" ).end();
 		post( "/ajax/lines" ).to( "LineAjaxController.save" ).end();
 		delete( "/ajax/lines" ).to( "LineAjaxController.delete" ).end();
-		
+
 		get( "/lines/categories/:categoryId" ).to( "LineController.listByCategoryId" ).end();
 		get( "/lines/categories" ).to( "LineController.listByCategoryId" ).end();
 		get( "/lines/:id/categories/:categoryId/products" ).to( "LineController.products" ).end(); //TODO: better naming
 		get( "/lines/:id/attributes" ).to( "LineController.attributes" ).end();
 		get( "/lines" ).to( "LineController.list" ).end();
+
+		/*
+			size configs
+		*/
+		post( "/ajax/size_config" ).to( "SizeConfigAjaxController.save" ).end();
 
 
 		/*

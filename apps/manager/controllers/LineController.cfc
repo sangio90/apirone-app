@@ -66,8 +66,16 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.title = "Combinazioni per < categoria #prc.category.getName()# linea #prc.line.getName()# >";
 
-		prc.sizes    = super.fire( "size.list", { categoryId = prc.category.getId() } );
+		sizes = super.fire( "size.list", { categoryId = prc.category.getId() } );
+		prc.sizes    = sizes;
 		prc.finishes = super.fire( "finish.list", { categoryId = prc.category.getId() } );
+		for ( var size in sizes ) {
+			existingSizeConfig = super.fire( "sizeConfig.list", { sizeId = size.getId(), productCategoryId = int(rc.categoryId), lineId = rc.id  } );
+			size.sizeConfig = NullValue();
+			if (existingSizeConfig.len() ) {
+				size.sizeConfig = existingSizeConfig[ 1 ];
+			}
+		}
 
 		var productsList = super.fire( "product.list", { lineId = rc.id } );
 

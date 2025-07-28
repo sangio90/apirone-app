@@ -5,7 +5,9 @@ AP.line.fields = {
     detailRoot: $("#line-detail-modal"),
     detailForm: $("#line-detail-form"),
     searchListForm: $("#line-grid-search-form"),
-    productsRoot: $("#line-products-root")
+    productsRoot: $("#line-products-root"),
+	sizeConfigModal: $("#size-config-modal"),
+	sizeConfigForm: $("#size-config-form"),
 };
 
 $(document).ready(function (){
@@ -67,7 +69,6 @@ AP.line.detail = (function () {
 
 		title: "Carica linea"
 	};
-
 	var viewModel = kendo.observable({
 
         detailForm: defaultDetailForm,
@@ -113,7 +114,7 @@ AP.line.detail = (function () {
 								setTimeout( () => $("#line-detail-modal").modal("hide"), 1000 );
 
                                 AP.util.fireCallback( "onSave", viewModel.get("callback") );
-                                
+
 							}
 
 						}
@@ -358,6 +359,14 @@ AP.line.products = (function () {
     var pub = {};
     var fields = AP.line.fields;
 
+	var defaultSizeConfigModal = {
+		title: "Configura dimensioni",
+		data: {
+			height: "",
+			width: ""
+		}
+	}
+
     var changeStatus = function (status, event) {
 
         // active
@@ -416,13 +425,14 @@ AP.line.products = (function () {
     };
 
 	var viewModel = kendo.observable({
+		sizeConfigModal: defaultSizeConfigModal,
 
         attributes: function (event) {
 
             var lineId = window.location.href.split("/")[5];
-            
+
             window.open("/manager/lines/" + lineId + "/attributes", "_blank").focus();
-            
+
             return false;
 
 		},
@@ -460,12 +470,97 @@ AP.line.products = (function () {
             });
         },
 
+		showSizeConfigModal: function ( event ) {
+			NM.util.openModal(fields.sizeConfigModal);
+
+			let lineId = $(event.currentTarget).data('line-id');
+			let productCategoryId = $(event.currentTarget).data('product-category-id');
+			let sizeId = $(event.currentTarget).data('size-id');
+			let sizeConfigId = $(event.currentTarget).data('size-config-id');
+			let width = $(event.currentTarget).data('width');
+			let height = $(event.currentTarget).data('height');
+
+			viewModel.set("sizeConfigModal.data.sizeId", sizeId);
+			viewModel.set("sizeConfigModal.data.productCategoryId", productCategoryId);
+			viewModel.set("sizeConfigModal.data.sizeConfigId", sizeConfigId);
+			viewModel.set("sizeConfigModal.data.lineId", lineId);
+			viewModel.set("sizeConfigModal.data.width", width);
+			viewModel.set("sizeConfigModal.data.height", height);
+
+			return false;
+		},
+
+		saveSizeConfig: function ( event ) {
+
+			var sizeConfigForm = AP.line.fields.sizeConfigForm;
+			var status = sizeConfigForm.find(".status");
+
+			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+
+			if(sizeConfigForm.valid()) {
+
+				let sizeConfigFormData = viewModel.get("sizeConfigModal.data");
+				NM.util.ajax({
+					method: "POST",
+					url: "/manager/ajax/size_config",
+					data: JSON.stringify(sizeConfigFormData),
+					callback: {
+						done: function (xhr) {
+
+							if(xhr.status == "SUCCESS") {
+
+								NM.util.autoHideMessage(status, "<span class='green'>Dimensioni salvate</span>");
+
+								setTimeout( () => $("#size-config-modal").modal("hide"), 1000 );
+
+								AP.util.fireCallback( "onSave", viewModel.get("callback") );
+
+								setTimeout(() => window.location.reload(), 1000);
+
+							}
+
+						}
+					}
+				});
+
+			}
+
+			return false;
+
+		}
+
 
 	});
 
 	pub.init = function () {
-
+		console.log(viewModel.get("sizeConfigModal.title"));
 		kendo.bind( fields.productsRoot, viewModel);
+
+		var sizeConfigForm = fields.sizeConfigForm;
+
+		sizeConfigForm.validate({
+			rules: {
+				width: {
+					required: true,
+					number: true,
+				},
+				height: {
+					required: true,
+					number: true,
+				},
+			},
+			messages: {
+				width: {
+					required: "Larghezza richiesta.",
+					number: "Please enter a valid number.",
+				},
+				height: {
+					required: "Altezza richiesta.",
+					number: "Please enter a valid number.",
+				},
+			},
+
+		});
 
 	};
 

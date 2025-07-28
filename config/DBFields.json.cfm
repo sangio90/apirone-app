@@ -108,10 +108,15 @@
         "name": "raw_value_id",
         "type": "Integer"
     },
- 
+
     "productCategoryType.orderby": {
         "name": "orderby",
         "type": "Integer"
-    }
+    },
+
+	"sizeConfig.id": {
+		"name": "size_config_id",
+		"type": "uuid"
+	},
 
 }
