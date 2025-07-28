@@ -37,29 +37,31 @@
 											#size.getCode()#
 												<br>
 												<br>
-											<cfif NOT isNull(size.sizeConfig)>
-												<button class="btn btn-primary btn-xs" data-bind="click:showSizeConfigModal"
-													data-product-category-id="#prc.category.getId()#"
-													data-line-id="#prc.line.getId()#"
-													data-size-id="#size.getId()#"
-													data-size-config-id="#size.sizeConfig.getId()#"
-													data-width="#size.sizeConfig.getWidth()#"
-													data-height="#size.sizeConfig.getheight()#"
-												>
+											<cfif NOT isNull(size.getType()) && size.getType().getId() EQ "S">
+												<cfif NOT isNull(size.sizeConfig)>
+													<button class="btn btn-primary btn-xs" data-bind="click:showSizeConfigModal"
+														data-product-category-id="#prc.category.getId()#"
+														data-line-id="#prc.line.getId()#"
+														data-size-id="#size.getId()#"
+														data-size-config-id="#size.sizeConfig.getId()#"
+														data-width="#size.sizeConfig.getWidth()#"
+														data-height="#size.sizeConfig.getheight()#"
+													>
+														<i class="fa fa-ruler"></i>
+													</button>
+													<div style="font-size: .6em; font-style: italic; color: gray;">
+														#size.sizeConfig.getWidth()# x #size.sizeConfig.getHeight()#
+													</div>
+												<cfelse>
+													<button class="btn btn-default btn-xs" data-bind="click:showSizeConfigModal"
+														data-product-category-id="#prc.category.getId()#"
+														data-line-id="#prc.line.getId()#"
+														data-size-id="#size.getId()#"
+													>
 													<i class="fa fa-ruler"></i>
-												</button>
-												<div style="font-size: .6em; font-style: italic; color: gray;">
-													#size.sizeConfig.getWidth()# x #size.sizeConfig.getHeight()#
-												</div>
-											<cfelse>
-												<button class="btn btn-default btn-xs" data-bind="click:showSizeConfigModal"
-													data-product-category-id="#prc.category.getId()#"
-													data-line-id="#prc.line.getId()#"
-													data-size-id="#size.getId()#"
-												>
-												<i class="fa fa-ruler"></i>
-												</button>
-												<div style="height: 1.4em;">&nbsp;</div>
+													</button>
+													<div style="height: 1.4em;">&nbsp;</div>
+												</cfif>
 											</cfif>
 										</th>
                                     </cfloop>
