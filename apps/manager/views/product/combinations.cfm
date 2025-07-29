@@ -49,6 +49,7 @@
 							<div class="col-12">
 								#grid(
 									id      = "product-combinations",
+									pageSizes = "false",
 									columns = "[
                                         { 'field':'descrizioneProductItems', 'title':'Descrizione' },
                                         { 'field':'', 'title':'Immagini', width: '55px'},

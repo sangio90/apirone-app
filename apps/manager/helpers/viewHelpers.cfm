@@ -106,7 +106,6 @@
 
 </cffunction>
 
-
 <cffunction name="grid">
 
     <cfargument name="id" type="String" required="true">
@@ -114,7 +113,7 @@
     <cfargument name="sortable" type="String" required="true" default="false">
     <cfargument name="source" type="String" required="true" default="rows">
     <cfargument name="columns" type="String" required="true" default="[]">
-    <cfargument name="pageSizes" type="String" required="true" default="['15', '50', '100' ]">
+    <cfargument name="pageSizes" type="String" required="true" default="[ '15', '50', '100' ]"> <!--- "false" for mute paging --->
     <cfargument name="class" type="String" required="false" default="">
 
     <cfsavecontent variable="local.html">
@@ -128,7 +127,9 @@
                 data-sortable="#arguments.sortable#" 
                 data-reorderable=""
                 data-bind="source: #arguments.source#"
-                data-pageable="{ 'pageSizes': #arguments.pageSizes# }"
+                <cfif arguments.pageSizes NEQ "false">
+                    data-pageable="{ 'pageSizes': #arguments.pageSizes# }"
+                </cfif>
                 data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
                 data-no-records="{ template : '<div class=grid-no-data><br>Nessun record trovato.<br><br></div>'}">
             </div>
