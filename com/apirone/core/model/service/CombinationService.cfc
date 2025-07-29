@@ -314,12 +314,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var result = groups[ 1 ];
 
-		for ( i = 2; i <= ArrayLen( groups ); i++ ) {
+		for ( var i = 2; i <= ArrayLen( groups ); i++ ) {
 			var newResult = [];
-			for ( a in result ) {
-				for ( b in groups[ i ] ) {
+			for ( var a in result ) {
+				for ( var b in groups[ i ] ) {
 					var combined = Duplicate( a );
-					for ( id in b ) {
+					for ( var id in b ) {
 						ArrayAppend( combined, id );
 					}
 					ArrayAppend( newResult, combined );
@@ -336,7 +336,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		level = 1,
 		rows  = []
 	){
-		for ( node in nodes ) {
+		for ( var node in nodes ) {
 			var row = {
 				id    = node.getId(),
 				attr  = node.getAttribute().getId(),
@@ -353,7 +353,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	private function parseTree( tree ){
 		// 1. Raggruppa i nodi di livello 1 per ATTR
 		var groupedLevel1 = StructNew();
-		for ( node in tree ) {
+		for ( var node in tree ) {
 			if ( !StructKeyExists( groupedLevel1, node.attr ) ) {
 				groupedLevel1[ node.attr ] = [];
 			}
@@ -362,10 +362,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		// 2. Per ogni gruppo (ATTR diverso), espandi tutte le combinazioni valide
 		var perAttrCombinations = [];
-		for ( attr in groupedLevel1 ) {
+		for ( var attr in groupedLevel1 ) {
 			var attrCombinations = [];
 
-			for ( node in groupedLevel1[ attr ] ) {
+			for ( var node in groupedLevel1[ attr ] ) {
 				attrCombinations.append( expandCombinations( node ), true );
 			}
 
@@ -373,13 +373,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		// 3. Combina tutte le combinazioni tra ATTR diversi
-		validCombinations = combineIndependentTrees( perAttrCombinations );
+		var validCombinations = combineIndependentTrees( perAttrCombinations );
 
 		// 4. Rimuove duplicati
-		uniqueSet          = StructNew();
-		uniqueCombinations = [];
+		var uniqueSet          = StructNew();
+		var uniqueCombinations = [];
 
-		for ( combo in validCombinations ) {
+		for ( var combo in validCombinations ) {
 			var key = ArrayToList( combo, "," );
 			if ( !StructKeyExists( uniqueSet, key ) ) {
 				StructInsert( uniqueSet, key, true );
