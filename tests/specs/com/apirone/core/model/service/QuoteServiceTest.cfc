@@ -3,11 +3,15 @@ component extends="tests.utils.AbsSpec" {
 	function run( testResults, testBox ){
 		describe( "Quote", function(){
 			beforeEach( function(){
-				svc    = getModel().getInstance( "QuoteService" );
+				svc    = getModel().getInstance( "ProductService" );
 				helper = super.getHelperData();
 			} );
 
 			it( "Create booking quote", function(){
+
+
+				helper.createCompany();
+
 				var bean = helper.createQuote()
 
 				var newId = svc.create( bean.obj );

@@ -2,6 +2,11 @@ component extends="testbox.system.BaseSpec"{
 
     public Struct function createCompany( required startWith="**" ) {
 
+        var mock = new modules.cbMockData.models.MockData();
+
+        dump(mock.baconLorem());
+        abort;
+
         var raw = {};
     
         var util = new com.apirone.core.util.String();
