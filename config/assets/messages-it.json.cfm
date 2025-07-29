@@ -11,6 +11,13 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
+    "combination": {
+        "created": "Valore caricato",
+        "updated": "Valore aggiornato",
+        "deletedAllRecords": "Combinazioni cancellate",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutte le combinazioni",
+    },
+
     "product": {
         "itemsDeleted": "Ho cancellato tutti gli attributi",
         "itemsAdded": "Attributi aggiunti con successo",
