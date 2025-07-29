@@ -5,11 +5,12 @@
 
 	public Boolean function OnRequestStart( string targetPage ) {
 
-        var allowedIPs = "127.0.0.1,185.6.241.249,79.19.179.30,194.183.87.112,185.52.113.41,192.168.158.1";
+        var allowedIPs = "127.0.0.*,185.6.241.249,79.19.179.30,194.183.87.112,185.52.113.41,192.168.158.1";
 
         var ip = getRealIP();
-
-        if ( !ListFind( allowedIPs, ip ) ) {
+       
+        
+        if ( !IsIPInRange( allowedIPs, getRealIP() ) ) {
 
             cfheader(statuscode="404", statustext="Not Found");
             echo("Not allowed");
