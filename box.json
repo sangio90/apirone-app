@@ -9,11 +9,12 @@
         "dataMapper":"http+cached://www.coridalia.cc/repository/dataMapper/dataMapper-1.7.zip",
         "accessManager":"http+cached://www.coridalia.cc/repository/accessManager/accessManager-1.0.0.zip",
         "coldbox":"7.2.1+13",
-        "cbvalidation":"4.4.0",
+        "cbvalidation":"4.4.0"
     },
     "devDependencies":{
         "testbox":"5.1.0+2",
-        "commandbox-cfformat":"*"
+        "commandbox-cfformat":"*",
+        "cbMockData":"^4.1.0+3"
     },
     "ignore":[
         "**/.*",
@@ -27,7 +28,8 @@
         "accessManager":"modules/external/accessManager/",
         "coldbox":"modules/coldbox/",
         "cbvalidation":"modules/cbvalidation/",
-        "testbox":"modules/testbox/"
+        "testbox":"modules/testbox/",
+        "cbMockData":"modules/cbMockData/"
     },
     "location":"ForgeboxStorage",
     "private":false,
@@ -35,14 +37,13 @@
         "setup:devel":"task run taskFile=tasks/Build.cfc target=setup :env=devel",
         "setup:prod":"task run taskFile=tasks/Build.cfc target=setup :env=prod",
         "setup:test":"task run taskFile=tasks/Build.cfc target=setup :env=test",
-        "format": "cfformat run /apps/**/controllers/**,/com/** --overwrite",
-        "format:watch": "cfformat watch /apps/**/controllers/**,/com/**",
-        "format:check": "cfformat check /apps/**/controllers/**,/com/**",
+        "format":"cfformat run /apps/**/controllers/**,/com/** --overwrite",
+        "format:watch":"cfformat watch /apps/**/controllers/**,/com/**",
+        "format:check":"cfformat check /apps/**/controllers/**,/com/**",
         "createZip":"task run taskFile=tasks/Build.cfc target=createZip",
-        "createEnv:devel":"task run taskFile=tasks/Build.cfc target=createEnv :env=devel",
+        "createEnv:devel":"task run taskFile=tasks/Build.cfc target=createEnv :env=devel"
     },
-    "testbox":{
-    },
+    "testbox":{},
     "type":"modules",
     "version":"107"
 }
