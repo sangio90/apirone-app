@@ -110,46 +110,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function create( required com.apirone.core.model.bean.Combination combination ){
 		var newId = getDao().insert( arguments.combination );
 
-		if ( !IsNull( arguments.combination.getTexts() ) ) {
-			transaction {
-				for ( var text in arguments.combination.getTexts() ) {
-					var entity = super.bean( "Entity" );
-
-					entity.setKey( "combination.id" );
-					entity.setValue( newId );
-
-					text.setEntity( entity );
-				}
-
-				getTextService().bulkCreate( arguments.combination.getTexts() );
-			}
-		}
-
 		return newId;
 	}
 
 
 	public String function update( required com.apirone.core.model.bean.Combination combination ){
 		getDao().update( arguments.combination );
-
-		var id = arguments.combination.getId();
-
-		if ( !IsNull( arguments.combination.getTexts() ) ) {
-			for ( var text in arguments.combination.getTexts() ) {
-				var entity = super.bean( "Entity" )
-
-				entity.setKey( "combination.id" );
-				entity.setValue( id );
-
-				text.setEntity( entity );
-
-				if ( Len( text.getId() ) ) {
-					getTextService().update( text );
-				} else {
-					getTextService().create( text );
-				}
-			}
-		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.combination.getId() );
 

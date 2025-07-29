@@ -320,12 +320,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.ProductItem[] function getFlatTree(
-    required String productId,
-    required Numeric parentId=NullValue(),
-    required String level=1,
-    required String orderBy="",
-    required Boolean includeMissingValues=true,
-  ) {
+		required String productId,
+		required Numeric parentId=NullValue(),
+		required String level=1,
+		required String orderBy="",
+		required Boolean includeMissingValues=true,
+	) {
 		var result = [];
 		var rows   = [];
 
