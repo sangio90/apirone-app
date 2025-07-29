@@ -4,6 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="ProductItemService" inject="ProductItemService";
 	property name="CombinationService" inject="CombinationService";
 	property name="ProductService" inject="ProductService";
+    
 	property name="cacheScope" type="String" default="CombinationProductItem.bean";
 
 	public com.apirone.core.model.bean.CombinationProductItem function get( required String combinationId ){

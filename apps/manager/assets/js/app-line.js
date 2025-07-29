@@ -69,6 +69,7 @@ AP.line.detail = (function () {
 
 		title: "Carica linea"
 	};
+
 	var viewModel = kendo.observable({
 
         detailForm: defaultDetailForm,
@@ -114,7 +115,7 @@ AP.line.detail = (function () {
 								setTimeout( () => $("#line-detail-modal").modal("hide"), 1000 );
 
                                 AP.util.fireCallback( "onSave", viewModel.get("callback") );
-
+                                
 							}
 
 						}
@@ -430,9 +431,9 @@ AP.line.products = (function () {
         attributes: function (event) {
 
             var lineId = window.location.href.split("/")[5];
-
+            
             window.open("/manager/lines/" + lineId + "/attributes", "_blank").focus();
-
+            
             return false;
 
 		},

@@ -1,4 +1,5 @@
 ﻿AP.product = AP.product || {};
+AP.fields.combination = AP.fields.combination || {};
 
 AP.fields.combination = {
 	listRoot: $("#product-combinations-root"),

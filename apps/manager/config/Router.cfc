@@ -113,7 +113,7 @@
 		get( "/ajax/reports" ).toHandler( "ReportAjaxController.list" );
 		get( "/reports/:id" ).toHandler( "ReportController.get" );
 		get( "/reports" ).toHandler( "ReportController.list" );
-
+		
 
 		/*
 			texts
@@ -180,7 +180,7 @@
 		get( "/ajax/lines" ).to( "LineAjaxController.list" ).end();
 		post( "/ajax/lines" ).to( "LineAjaxController.save" ).end();
 		delete( "/ajax/lines" ).to( "LineAjaxController.delete" ).end();
-
+		
 		get( "/lines/categories/:categoryId" ).to( "LineController.listByCategoryId" ).end();
 		get( "/lines/categories" ).to( "LineController.listByCategoryId" ).end();
 		get( "/lines/:id/categories/:categoryId/products" ).to( "LineController.products" ).end(); //TODO: better naming

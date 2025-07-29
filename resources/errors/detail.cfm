@@ -14,7 +14,6 @@
         <cffile action="read" file="#path#" variable="report">
     
         <cfoutput>
-            <h1><span style="font-size:18px">Error:</span> #title#</h1>
             #report#
         </cfoutput>
 
