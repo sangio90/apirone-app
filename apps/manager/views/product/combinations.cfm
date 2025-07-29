@@ -22,7 +22,7 @@
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
 
-                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text" style="max-width: 200px;">
+                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
 										<select class="form-control me-2" name="statusId">
 											<option value="">-- tutti gli stati</option>
