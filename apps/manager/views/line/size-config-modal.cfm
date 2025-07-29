@@ -11,7 +11,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>
 
-                    <div class="card-body" style="border: 1px solid Red;">
+                    <div class="card-body">
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Larghezza</label>
