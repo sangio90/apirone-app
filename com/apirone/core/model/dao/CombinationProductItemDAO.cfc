@@ -33,6 +33,7 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!----
 	<cffunction name="read1" returntype="Query">
 		<cfargument name="productId" type="String" required="true">
 		<cfargument name="productItemId" type="String" required="true">
@@ -54,6 +55,7 @@
 
 		<cfreturn local.q>
 	</cffunction>
+	---->
 
 	<cffunction name="insert" returntype="String">
 		<cfargument
@@ -105,7 +107,7 @@
 
 		<cfset var whereSQL = ArrayToList( whereClauses, " AND " )>
 
-		<cfquery name="qCheck" datasource="apirone">
+		<cfquery name="check" datasource="apirone">
 			SELECT
 				c1.combination_id
 			FROM
@@ -115,6 +117,7 @@
 			LIMIT 1
 		</cfquery>
 
-		<cfreturn qCheck.recordCount GT 0>
+		<cfreturn check.recordCount GT 0>
 	</cffunction>
+
 </cfcomponent>

@@ -765,3 +765,7 @@ h2 {
 /* 
 	// shorthands
 */
+
+.ui-pnotify.stack-bar-top .notification-warning, .ui-pnotify.stack-bar-bottom .notification-warning {
+	background-color: #e18f1d !important;
+}

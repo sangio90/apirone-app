@@ -15,7 +15,7 @@
 					<div class="card-body">
 
 						<div class="row d-flex align-items-center mb-3">
-							<div class="col-sm-10">
+							<div class="col-sm-8">
 								<div class="box-search-small">
 									<form
 										id   ="product-combinations-search-form"
@@ -39,9 +39,12 @@
 										</select>
 
 										#searchButton( bind = "click:search" )#
-										#button(icon="list", label="Calcola combinazioni", class="k-ml-2", bind = "click:calculateCombinations" )#
 									</form>
 								</div>
+							</div>
+							<div class="col-sm-4 text-end">
+								#button(icon="list", label="Calcola combinazioni", class="k-ml-2", bind = "click:calculate" )#
+								#deleteButton(label="Cancella", class="k-ml-2", bind = "click:delete" )#
 							</div>
 						</div>
 
@@ -51,7 +54,7 @@
 									id      = "product-combinations",
 									pageSizes = "false",
 									columns = "[
-                                        { 'field':'descrizioneProductItems', 'title':'Descrizione' },
+                                        { 'field':'name', 'title':'Descrizione' },
                                         { 'field':'', 'title':'Immagini', width: '55px'},
                                         {
                                             'field'           :'',

@@ -3,6 +3,7 @@ AP.fields.combination = AP.fields.combination || {};
 
 AP.fields.combination = {
 	listRoot: $("#product-combinations-root"),
+	listForm: $("#product-combinations-form"),
 	imagesModal: $("#product-images-list-modal"),
 };
 
@@ -17,6 +18,8 @@ $(document).ready(function (){
 AP.product.combination = (function () {
 
 	var pub = {};
+
+	var fields = AP.fields.combination;
 
 	var dataSources = {
 		items: NM.kendo.dataSource({ url: "/manager/ajax/products/" + AP.page.productId + "/combinations" })
@@ -73,24 +76,68 @@ AP.product.combination = (function () {
 			// TODO: not work with target=_blank
 			return "javascript:void(0)";
 		},
-		calculateCombinations: function (event) {
+
+		calculate: function (event) {
 			var id = event.data.id;
 			var thisList = AP.fields.combination.listRoot;
+			
 			var status = thisList.find(".status");
 			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
 
 			NM.util.ajax({
 				method: "GET",
-				url: "/manager/ajax/products/" + AP.page.productId + "/calculatecombinations",
+				url: "/manager/ajax/products/" + AP.page.productId + "/combinations/calculate",
 				callback: {
 					done: function (xhr) {
 						AP.widget.notify( "success", "Combinazioni generate con successo.", "Ok!" );
-						viewModel.rows.read(  );
+						viewModel.rows.read();
 					}
 				}
 			});
 			return false;
 		},
+
+        delete: function (event) {
+
+			var checks = fields.listForm.find("[name=selected]:checked");
+
+			if (checks.length) {
+
+				var values = [];
+
+				checks.each(function (){
+					values.push($(this).val());
+				});
+
+				var ids = values.toString();
+
+				NM.util.ajax({
+					method: "DELETE",
+					url: "/manager/ajax/products/" + AP.page.productId + "/combinations",
+					data: ids,
+					callback: {
+						done: function (xhr) {
+
+							if(xhr.data.payload.hasOwnProperty("errors")) {
+								AP.widget.notify("error", "Non riesco a cancellare tutte le combinazioni");
+							} else {
+								AP.widget.notify("success", "Cancellazione avvenuta con successo");
+							}
+
+							viewModel.rows.read();
+
+						}
+					}
+				});
+
+			} else {
+
+				AP.widget.notify("warning", "Seleziona almeno una combinazione");
+
+			}
+
+        },
+		
 		openImagesList: function (event) {
 			var element = $(event.currentTarget);
 

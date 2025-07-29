@@ -134,7 +134,8 @@
 			products
 		*/
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
-		get( "/ajax/products/:id/calculatecombinations" ).to( "ProductAjaxController.calculateCombinations" ).end();
+		get( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();
+		delete( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.deleteCombinations" ).end();
 		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
 		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();

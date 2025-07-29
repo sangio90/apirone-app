@@ -6,7 +6,7 @@
 
 component output="false" accessors="true" {
 
-	property name="logger" type="com.apirone.core.util.Logger";
+	property name="logger" inject="Logger";
 	// property name="factory" type="com.apirone.core.model.factory.Factory";
 	// ROB: removed because it generates errors when business logic is reloaded.
 	// property name="cacheManager" type="com.apirone.core.util.CacheManager";

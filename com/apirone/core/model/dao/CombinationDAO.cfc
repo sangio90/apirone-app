@@ -49,14 +49,14 @@
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">
-		<cfargument name="combinationId" type="String">
+		<cfargument name="combinationId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE 
             FROM 
                 combinations
 			WHERE
-		    	combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+		    	combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationId#">::uuid
 		</cfquery>
 
 		<cfreturn true>
