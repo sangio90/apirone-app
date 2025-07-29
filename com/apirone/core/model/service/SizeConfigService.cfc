@@ -35,6 +35,41 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		super.getCacheManager().remove( getCacheScope(), arguments.sizeConfig.getId() );
 		return arguments.sizeConfig.getId();
 	}
+    
+
+	public Array function list(){
+		arguments[ "limit" ] = -1;
+
+		return search( argumentCollection = arguments ).getData();
+	}
+
+
+	public com.apirone.core.model.bean.Result function search(
+    		String sizeId,
+	    	Number productCategoryId,
+		    String lineId,
+    		required Numeric limit  = 20,
+	    	required Numeric offset = 0,
+		    required Array orderBy  = [ ]
+		){
+        
+		var rows   = [];
+		var result = super.getResult();
+
+		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
+
+		var records = getDao().find( argumentCollection = arguments );
+
+		records.each( function( record ){
+			rows.add( get( sizeConfigId = record.size_config_id ) );
+		} );
+
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.recordcount ) );
+
+		return result;
+	}    
 
 
 	/*
@@ -57,40 +92,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return NullValue();
-	}
-
-
-	public Array function list(){
-		arguments[ "limit" ] = -1;
-
-		return search( argumentCollection = arguments ).getData();
-	}
-
-
-	public com.apirone.core.model.bean.Result function search(
-		String sizeId,
-		Number productCategoryId,
-		String lineId,
-		required Numeric limit  = 20,
-		required Numeric offset = 0,
-		required Array orderBy  = [ ]
-		){
-		var rows   = [];
-		var result = super.getResult();
-
-		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
-
-		var records = getDao().find( argumentCollection = arguments );
-
-		records.each( function( record ){
-			rows.add( get( sizeConfigId = record.size_config_id ) );
-		} );
-
-		result.setData( rows );
-		result.setCount( Val( records.recordcount ) );
-		result.setTotal( Val( records.recordcount ) );
-
-		return result;
 	}
 
 }

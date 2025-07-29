@@ -7,6 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="StatusService" inject="StatusService";
 	property name="ProductCategoryService" inject="ProductCategoryService";
 	property name="TextService" inject="TextService";
+
 	property name="cacheScope" type="String" default="Product.bean";
 
 	public com.apirone.core.model.bean.Product function get( required String productId ){
