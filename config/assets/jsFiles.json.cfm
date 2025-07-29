@@ -45,6 +45,7 @@
         { file: "/assets/main/js/vendor/jquery-validate/additional-methods.js" },
         { file: "/assets/main/js/vendor/jquery.serializejson.js" },
         { file: "/assets/main/js/vendor/bootbox/bootbox.all.min.js" },
+        { file: "/assets/main/js/vendor/js.cookie.min.js" },
 
         { file: "/assets/main/js/vendor/jQuery-File-Upload/js/jquery.fileupload.js" },
         { file: "/assets/main/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process.js" },
