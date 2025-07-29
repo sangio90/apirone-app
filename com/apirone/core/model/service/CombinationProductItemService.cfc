@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="ProductItemService" inject="ProductItemService";
 	property name="CombinationService" inject="CombinationService";
 	property name="ProductService" inject="ProductService";
-    
+
 	property name="cacheScope" type="String" default="CombinationProductItem.bean";
 
 	public com.apirone.core.model.bean.CombinationProductItem function get( required String combinationId ){
@@ -140,7 +140,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "CombinationProductItem" );
 
-			bean.setId( record.combination_id );
+			// bean.setId( record.combination_id );
+			bean.setId( record.combination_product_item_id );
 			bean.setCreatedAt( record.created_at );
 			bean.setProductItemId( record.product_item_id );
 			bean.setCombinationId( record.combination_id );
