@@ -2,11 +2,6 @@ component extends="testbox.system.BaseSpec"{
 
     public Struct function createCompany( required startWith="**" ) {
 
-        var mock = new modules.cbMockData.models.MockData();
-
-        dump(mock.baconLorem());
-        abort;
-
         var raw = {};
     
         var util = new com.apirone.core.util.String();
@@ -76,10 +71,13 @@ component extends="testbox.system.BaseSpec"{
     }
 
     public Struct function createProfile( required startWith="**" ) {
-        var mock = new modules.cbMockData.models.MockData();
+        
+        var mock = getMockData();
+        
         var util = new com.apirone.core.util.String();
         var factory = new com.apirone.core.model.factory.Factory();
-        var random = new tests.utils.RandomData();
+        var random = new tests.utils.DBRandomData();
+
         var raw = mock.mock(
             $returnType = "struct",
             firstName = "fname",
@@ -96,6 +94,7 @@ component extends="testbox.system.BaseSpec"{
             },
             createdAt = "datetime"
         );
+        
         raw.country = { id = random.getCountries(limit=1).country_id.toString() };
 
         var bean = factory.createInstance( "Profile", raw );
@@ -244,6 +243,16 @@ component extends="testbox.system.BaseSpec"{
             "raw" = raw
         }
 
+    }
+
+    /*
+        private
+    */
+
+    private Struct function getMockData() {
+
+        return new modules.cbMockData.models.MockData();
+    
     }
     
 }
