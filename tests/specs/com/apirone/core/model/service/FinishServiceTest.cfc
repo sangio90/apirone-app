@@ -1,4 +1,4 @@
-component extends="testbox.system.BaseSpec"{
+component extends="tests.utils.AbsSpec"{
 
     function setup(){
 
