@@ -40,23 +40,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public com.apirone.core.model.bean.Result function getByProductId( required String productId ){
-		var rows   = [];
-		var result = super.getResult();
-
-		var records = getDao().getByProductId( arguments.productId );
-
-		records.each( function( record ){
-			rows.add( get( record.combination_id ) );
-		} );
-
-		result.setData( rows );
-		result.setCount( Val( records.recordcount ) );
-		result.setTotal( Val( records.recordcount ) );
-
-		return result;
-	}
-
 	public array function calculateCombinations( required String productId ){
 		var items = getProductItemService().getFlatTree( productId = arguments.productId );
 		// Trasformo il flat tree in un array di righe
@@ -65,26 +48,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// Costruisco l'albero delle combinazioni di prodotti cartesiani ricorsivi
 
 		var tree = buildTree( rows );
-		tree = parseTree( tree );
+		tree     = parseTree( tree );
 
 		for ( var node in tree ) {
-			combinationAlreadyExists = getCombinationProductItemDao().combinationAlreadyExists( node );
-            
+			var combinationAlreadyExists = getCombinationProductItemDao().combinationAlreadyExists( node );
+
 			if ( combinationAlreadyExists ) {
 				// loggo che la combinazione esiste già
 				getLogger().info( "Combination already exists for node: " & SerializeJSON( node ) );
 				continue; // Se la combinazione esiste già, salto al prossimo nodo
 			}
-            
+
 			// Cerco se esiste già una combinazione per il prodotto
-			
-            var combination = super.bean( "Combination" );
+
+			var combination = super.bean( "Combination" );
 			combination.setProductId( arguments.productId );
 			combination.setStatus( getStatusService().get( "ACT" ) );
-			
-            var combinationId = create( combination );
-			
-            for ( var productItemId in node ) {
+
+			var combinationId = create( combination );
+
+			for ( var productItemId in node ) {
 				var combinationProductItem = super.bean( "CombinationProductItem" );
 				combinationProductItem.setCombinationId( combinationId );
 				combinationProductItem.setProductItemId( productItemId );
@@ -98,7 +81,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String combinationId ){
-		var combination = super.bean( "Combination" );
+		var outcome = super.bean( "Outcome" );
 
 		var obj = get( arguments.combinationId );
 
@@ -177,64 +160,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
     	private method
 	*/
-
-	private com.apirone.core.model.bean.Combination function build( required String combinationId ){
-		var record = getDao().read( arguments.combinationId );
-
-		if ( record.recordCount ) {
-			var bean = super.bean( "Combination" );
-
-			bean.setId( record.combination_id );
-			bean.setCreatedAt( record.created_at );
-            
-			if ( !IsNull( record.status_id ) ) {
-				bean.setStatus( getStatusService().get( record.status_id ) );
-			} else {
-				bean.setStatus( getStatusService().getDefault() );
-			}
-			
-            bean.setProductId( record.product_id );
-			
-            var combinationProductItems = getCombinationProductItemService().getByCombinationId(
-				record.combination_id
-			);
-            
-			var combinationProductItemsBeans = [];
-			for ( var combinationProductItem in combinationProductItems.getData() ) {
-				combinationProductItemsBeans.add(
-					getCombinationProductItemService().get( combinationProductItem.getId() )
-				);
-			}
-			
-            bean.setCombinationProductItems( combinationProductItemsBeans );
-			
-            var descrizioneProductItems = "";
-			
-            for ( var combinationProductItem in combinationProductItems.getData() ) {
-				descrizioneProductItems &= combinationProductItem
-					.getProductItem()
-					.getAttribute()
-					.getName();
-                    
-				descrizioneProductItems &= ": ";
-				
-                descrizioneProductItems &= combinationProductItem
-					.getProductItem()
-					.getAttributeValue()
-					.getRawValue()
-					.getName();
-				
-                descrizioneProductItems &= " - ";
-			}
-			
-            bean.setDescrizioneProductItems( descrizioneProductItems );
-			
-            return bean;
-		}
-
-		return NullValue();
-	}
-
 
 	private com.apirone.core.model.bean.Combination function buildByProductId( required String productId ){
 		var record = getDao().getByProductId( arguments.productId );
@@ -389,5 +314,61 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return uniqueCombinations;
 	}
 	// Fine helper per calcolo ricorsione
+
+	private com.apirone.core.model.bean.Combination function build( required String combinationId ){
+		var record = getDao().read( arguments.combinationId );
+
+		if ( record.recordCount ) {
+			var bean = super.bean( "Combination" );
+
+			bean.setId( record.combination_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setProductId( record.product_id );
+			bean.setStatus( getStatusService().get( record.status_id ) );
+
+			var combinationProductItems = getCombinationProductItemService().getByCombinationId(
+				record.combination_id
+			);
+
+			var productItemsData = combinationProductItems.getData();
+
+			/*
+			var combinationProductItemsBeans = [];
+
+			for ( var combinationProductItem in productItemsData ) {
+				combinationProductItemsBeans.add(
+					getCombinationProductItemService().get( combinationProductItem.getId() )
+				);
+			}
+			*/
+
+			bean.setCombinationProductItems( productItemsData );
+
+			var name = "";
+
+			productItemsData.each( function( combinationProductItem, index ){
+				name &= combinationProductItem
+					.getProductItem()
+					.getAttribute()
+					.getName();
+
+				name &= ": ";
+
+				name &= combinationProductItem
+					.getProductItem()
+					.getAttributeValue()
+					.getRawValue()
+					.getName();
+
+				name &= productItemsData.len() == index ? "" : " - ";
+			} );
+
+			bean.setName( name );
+
+			return bean;
+		}
+
+		return NullValue();
+	}
 
 }
