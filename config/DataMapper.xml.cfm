@@ -89,8 +89,11 @@
     </mapper>
 
     <mapper id="Combination" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Combination">
-		<map from="productId" to="productId" type="cf:String" />
 		<map from="id" to="id" type="cf:String" />
+		<map from="name" to="name" type="cf:String" />
+		<map from="productId" to="productId" type="cf:String" />
+		<map from="shortId" to="shortId" type="cf:String" />
+        <map from="status" to="status" ref="Status" />
     </mapper>
 
     <mapper id="CombinationProductItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.CombinationProductItem">

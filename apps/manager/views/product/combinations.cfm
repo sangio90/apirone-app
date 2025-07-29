@@ -15,14 +15,14 @@
 					<div class="card-body">
 
 						<div class="row d-flex align-items-center mb-3">
-							<div class="col-sm-8">
+							<div class="col-sm-6">
 								<div class="box-search-small">
 									<form
 										id   ="product-combinations-search-form"
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
 
-                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text" style="max-width: 200px;">
 
 										<select class="form-control me-2" name="statusId">
 											<option value="">-- tutti gli stati</option>
@@ -31,18 +31,11 @@
 											</cfloop>
 										</select>
 
-										<select class="form-control me-2" name="orderBy">
-											<option value="product.code-asc" SELECTED>Codice [A-Z]</option>
-											<option value="product.code-desc">Codice [Z-A]</option>
-											<option value="product.name-asc">Descrizione [A-Z]</option>
-											<option value="product.name-desc">Descrizione [Z-A]</option>
-										</select>
-
 										#searchButton( bind = "click:search" )#
 									</form>
 								</div>
 							</div>
-							<div class="col-sm-4 text-end">
+							<div class="col-sm-6 text-end">
 								#button(icon="list", label="Calcola combinazioni", class="k-ml-2", bind = "click:calculate" )#
 								#deleteButton(label="Cancella", class="k-ml-2", bind = "click:delete" )#
 							</div>
@@ -54,6 +47,7 @@
 									id      = "product-combinations",
 									pageSizes = "false",
 									columns = "[
+                                        { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'name', 'title':'Descrizione' },
                                         { 'field':'', 'title':'Immagini', width: '55px'},
                                         {

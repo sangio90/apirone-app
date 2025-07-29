@@ -340,7 +340,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		for ( var row in rows.getData() ) {
 			var obj = dm.convert( row, "Combination", true );
-			data.add( row );
+			data.add( obj );
 		}
 
 		result.setTotal( rows.getTotal() );

@@ -5,24 +5,25 @@ AP.fields.combination = {
 	listRoot: $("#product-combinations-root"),
 	listForm: $("#product-combinations-form"),
 	imagesModal: $("#product-images-list-modal"),
+	searchForm: $("#product-combinations-search-form"),
 };
 
-$(document).ready(function (){
-
+$(document).ready(function () {
 	if (AP.fields.combination.listRoot.length) {
 		AP.product.combination.init();
 	}
-
 });
 
 AP.product.combination = (function () {
-
 	var pub = {};
 
 	var fields = AP.fields.combination;
 
 	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/products/" + AP.page.productId + "/combinations" })
+		items: NM.kendo.dataSource({
+			url:
+				"/manager/ajax/products/" + AP.page.productId + "/combinations",
+		}),
 	};
 
 	var viewModel = kendo.observable({
@@ -33,19 +34,39 @@ AP.product.combination = (function () {
 		},
 
 		search: function (event) {
-
-			var thisForm = AP.fields.product.searchListForm;
-
-			console.log("searchListForm", thisForm);
-
+			var thisForm = fields.searchForm;
 			var params = thisForm.serializeJSON();
+			var filters = [];
 
-			console.log("searchListForm:params", params);
+			console.log("params", params);
 
-			viewModel.rows.read( params );
+			var dataSource = viewModel.get("rows");
+
+			var filterDataSource = new kendo.data.DataSource({
+				data: dataSource.data().toJSON(),
+			});
+
+			if (params.statusId.length) {
+				filters.push({
+					field: "status.id",
+					operator: "equal",
+					value: params.statusId,
+				});
+			}
+
+			if (params.str.length) {
+				filters.push({
+					field: "name",
+					operator: "contains",
+					value: params.str,
+				});
+			}
+
+			filterDataSource.filter(filters);
+
+			viewModel.set("rows", filterDataSource);
 
 			return false;
-
 		},
 
 		getImageTypeText: function (event) {
@@ -80,32 +101,39 @@ AP.product.combination = (function () {
 		calculate: function (event) {
 			var id = event.data.id;
 			var thisList = AP.fields.combination.listRoot;
-			
+
 			var status = thisList.find(".status");
-			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+			status.html(
+				"<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>"
+			);
 
 			NM.util.ajax({
 				method: "GET",
-				url: "/manager/ajax/products/" + AP.page.productId + "/combinations/calculate",
+				url:
+					"/manager/ajax/products/" +
+					AP.page.productId +
+					"/combinations/calculate",
 				callback: {
 					done: function (xhr) {
-						AP.widget.notify( "success", "Combinazioni generate con successo.", "Ok!" );
+						AP.widget.notify(
+							"success",
+							"Combinazioni generate con successo.",
+							"Ok!"
+						);
 						viewModel.rows.read();
-					}
-				}
+					},
+				},
 			});
 			return false;
 		},
 
-        delete: function (event) {
-
+		delete: function (event) {
 			var checks = fields.listForm.find("[name=selected]:checked");
 
 			if (checks.length) {
-
 				var values = [];
 
-				checks.each(function (){
+				checks.each(function () {
 					values.push($(this).val());
 				});
 
@@ -113,31 +141,37 @@ AP.product.combination = (function () {
 
 				NM.util.ajax({
 					method: "DELETE",
-					url: "/manager/ajax/products/" + AP.page.productId + "/combinations",
+					url:
+						"/manager/ajax/products/" +
+						AP.page.productId +
+						"/combinations",
 					data: ids,
 					callback: {
 						done: function (xhr) {
-
-							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutte le combinazioni");
+							if (xhr.data.payload.hasOwnProperty("errors")) {
+								AP.widget.notify(
+									"error",
+									"Non riesco a cancellare tutte le combinazioni"
+								);
 							} else {
-								AP.widget.notify("success", "Cancellazione avvenuta con successo");
+								AP.widget.notify(
+									"success",
+									"Cancellazione avvenuta con successo"
+								);
 							}
 
 							viewModel.rows.read();
-
-						}
-					}
+						},
+					},
 				});
-
 			} else {
-
-				AP.widget.notify("warning", "Seleziona almeno una combinazione");
-
+				AP.widget.notify(
+					"warning",
+					"Seleziona almeno una combinazione"
+				);
 			}
+		},
 
-        },
-		
 		openImagesList: function (event) {
 			var element = $(event.currentTarget);
 
@@ -185,9 +219,7 @@ AP.product.combination = (function () {
 	});
 
 	pub.init = function () {
-
 		kendo.bind(AP.fields.combination.listRoot, viewModel);
-
 	};
 
 	var initUpload = function () {
@@ -259,8 +291,8 @@ AP.product.combination = (function () {
 								);
 								$(
 									"#image-upload-progress-" +
-									uid +
-									" .upload-bar"
+										uid +
+										" .upload-bar"
 								).css("width", progress + "%");
 
 								status.html("Fatto!");
@@ -281,4 +313,4 @@ AP.product.combination = (function () {
 	};
 
 	return pub;
-}());
+})();
