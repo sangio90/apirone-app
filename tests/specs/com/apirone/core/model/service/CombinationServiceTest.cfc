@@ -23,7 +23,6 @@ component extends="testbox.system.BaseSpec"{
         var rows = variables.svc.calculateCombinations( productId = "67860a46-44e8-4c8e-9582-c62e24c5bfcb" );
         $assert.isTrue( isArray( rows ), "rows is an array" );
         console(rows.len()); 
-        //$assert.isTrue( product.getCode() EQ data.raw.code, "code: #product.getCode()# EQ codeRaw: #data.raw.code#" ); 
                 
     }
   
