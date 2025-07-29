@@ -5,4 +5,4 @@ ApirOne: product configurator software for Apir Srl.
 ## Getting started
 
 Use CommandBox for install.
-run-script install:$ENV
+run-script setup:$ENV

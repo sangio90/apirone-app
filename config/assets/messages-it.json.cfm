@@ -12,8 +12,8 @@
     },
 
     "combination": {
-        "created": "Valore caricato",
-        "updated": "Valore aggiornato",
+        "created": "Combinazione caricata",
+        "updated": "Combinazione aggiornata",
         "deletedAllRecords": "Combinazioni cancellate",
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutte le combinazioni",
     },

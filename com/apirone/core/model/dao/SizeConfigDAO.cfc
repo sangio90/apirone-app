@@ -78,12 +78,12 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-			size_config_id::varchar,
-			size_id::varchar,
-			product_category_id,
-			line_id::varchar
+				size_config_id::varchar,
+				size_id::varchar,
+				product_category_id,
+				line_id::varchar
 			FROM
-			size_configs
+				size_configs
 			WHERE
 			1=1
 			<cfif !IsNull( arguments.sizeId )>
@@ -96,6 +96,7 @@
 				AND size_configs.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 			</cfif>
 		</cfquery>
+
 		<cfreturn local.q>
 	</cffunction>
 </cfcomponent>
