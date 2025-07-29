@@ -119,4 +119,8 @@
 		"type": "uuid"
 	},
 
+    "profile.id": {
+        "name": "profile_id",
+        "type": "uuid"
+    },
 }

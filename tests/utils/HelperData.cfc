@@ -75,6 +75,37 @@ component extends="testbox.system.BaseSpec"{
 
     }
 
+    public Struct function createProfile( required startWith="**" ) {
+        var mock = new modules.cbMockData.models.MockData();
+        var util = new com.apirone.core.util.String();
+        var factory = new com.apirone.core.model.factory.Factory();
+        var random = new tests.utils.RandomData();
+        var raw = mock.mock(
+            $returnType = "struct",
+            firstName = "fname",
+            lastName = "lname",
+            company = "name",
+            vatNumber = "string-number:11",
+            email = "email",
+            phone = "tel",
+            state = "words:1",
+            city = "words:1",
+            postalCode = "string-number:5",
+            street = function(param) {
+                return mock.lastName() & ' street, ' & mock.num(1, 100);
+            },
+            createdAt = "datetime"
+        );
+        raw.country = { id = random.getCountries(limit=1).country_id.toString() };
+
+        var bean = factory.createInstance( "Profile", raw );
+
+        return  {
+            "obj" = bean,
+            "raw" = raw
+        }
+    }
+
     public Struct function createCard(  ) {
 
         var raw = {};

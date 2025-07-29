@@ -68,6 +68,12 @@
         <map from="mainText" to="mainText" ref="Text" />
     </mapper>
 
+    <mapper id="Profile" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Profile">
+        <map from="id" to="id" type="cf:String" />
+        <map from="firstName" to="firstName" type="cf:String" />
+        <map from="lastName" to="lastName" type="cf:String" />
+    </mapper>
+
     <mapper id="ProductItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductItem">
         <map from="id" to="id" type="cf:String" />
         <map from="attributeValue" to="attributeValue" ref="AttributeValue" />

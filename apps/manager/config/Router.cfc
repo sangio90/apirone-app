@@ -206,6 +206,13 @@
 
 
 		/*
+			profiles
+		*/
+		get( "/ajax/profiles/:id" ).to( "ProfileAjaxController.get" ).end();
+		get( "/ajax/profiles" ).to( "ProfileAjaxController.list" ).end();
+
+
+		/*
 			roles
 		*/
 		get( "/roles/:id" ).to( "RoleController.get" ).end();

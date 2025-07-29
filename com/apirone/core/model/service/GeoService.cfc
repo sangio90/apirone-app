@@ -1,26 +1,12 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="cityDao" inject="CityDAO";
 	property name="countyDao" inject="CountyDAO";
 	property name="countryDao" inject="CountryDAO";
 	property name="stateDao" inject="StateDAO";
 
-	public com.apirone.core.model.bean.City function getCity( required String cityId ){
-		var cm = getCacheManager();
-
-		var key = getCacheKey( "City_#arguments.cityId#" );
-
-		var cache = cm.get( key );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var obj = buildCity( arguments.cityId );
-		cm.put( key, obj );
-
-		return obj;
-	}
+	property name="cacheScopeCountry" type="String" default="Country.bean";
+	property name="cacheScopeCounty" type="String" default="County.bean";
+	property name="cacheScopeState" type="String" default="State.bean";
 
 	public com.apirone.core.model.bean.County function getCounty( required String countyId ){
 		var cm = getCacheManager();
@@ -59,81 +45,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Country function getCountry( required String countryId ){
 		var cm = getCacheManager();
 
-		var key = getCacheKey( "Country_#arguments.countryId#" );
-
-		var cache = cm.get( key );
+		var cache = cm.get( getCacheScopeCountry(), arguments.countryId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
-		var obj = buildCountry( arguments.countryId );
-		cm.put( key, obj );
-		return obj
-	}
+		var bean = buildCountry( arguments.countryId );
+		cm.put( getCacheScopeCountry(), arguments.countryId, bean );
 
-	public com.apirone.core.model.bean.City function getCity( required String cityId ){
-		var cm = getCacheManager();
-
-		var key = getCacheKey( "City_#arguments.cityId#" );
-
-		var cache = cm.get( key );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var obj = buildCity( arguments.cityId );
-		cm.put( key, obj );
-
-		return obj
-	}
-
-	public com.apirone.core.model.bean.Result function searchCities(
-		required Numeric limit  = 50,
-		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "city.name" } ],
-		String str,
-		String countyId,
-		String countryId,
-		String stateId
-	){
-		var result             = super.getResult();
-		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
-
-		var records = getCityDao().find( argumentCollection = arguments );
-
-		var rows = [];
-
-		records.each( function( record ){
-			rows.push( getCity( cityId = record.city_id ) );
-		} );
-
-		result.setData( rows );
-		result.setCount( Val( records.recordcount ) );
-		result.setTotal( Val( records.total ) );
-
-		return result;
-	}
-
-
-	/**
-	 * @private
-	 */
-	private com.apirone.core.model.bean.City function buildCity( required String cityId ){
-		var record = getCityDao().read( cityId = arguments.cityId );
-
-		if ( record.RecordCount ) {
-			var obj = super.bean( "City" );
-			obj.setId( record.city_id.toString() );
-
-			obj.setName( record.city );
-			obj.setCounty( getCounty( countyId = record.county_id ) );
-
-			return obj;
-		}
-
-		return NullValue();
+		return bean
 	}
 
 	private com.apirone.core.model.bean.County function buildCounty( required String countyId ){
