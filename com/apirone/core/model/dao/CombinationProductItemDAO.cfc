@@ -33,30 +33,6 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<!----
-	<cffunction name="read1" returntype="Query">
-		<cfargument name="productId" type="String" required="true">
-		<cfargument name="productItemId" type="String" required="true">
-		<cfargument name="parentId" type="String" required="true">
-		<cfargument name="attributeId" type="String" required="true">
-
-		<cfquery name="local.q" datasource="apirone">
-			SELECT *
-			FROM
-				product_items
-			LEFT JOIN attributes_raw_values ON product_items.attribute_raw_value_id = attributes_raw_values.attribute_raw_value_id
-				WHERE
-					product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid and
-					product_item_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.productItemId#">::uuid and
-					parent_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.parentId#">::uuid and
-					attribute_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
-				ORDER BY product_item_id
-		</cfquery>
-
-		<cfreturn local.q>
-	</cffunction>
-	---->
-
 	<cffunction name="insert" returntype="String">
 		<cfargument
 			name    ="combinationProductItem"
@@ -70,7 +46,7 @@
 				combination_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.combinationProductItem.getProductItemId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.combinationProductItem.getProductItem().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.combinationProductItem.getCombinationId()#">::uuid
 			) RETURNING combination_product_item_id
 		</cfquery>
@@ -91,7 +67,7 @@
 		<cfreturn true>
 	</cffunction>
 
-	<cffunction name="combinationAlreadyExists" access="public" returntype="boolean">
+	<cffunction name="exists" access="public" returntype="boolean">
 		<cfargument name="productItemIds" type="array" required="true">
 
 		<cfset var whereClauses = []>

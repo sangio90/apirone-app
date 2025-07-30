@@ -291,8 +291,8 @@ AP.product.combination = (function () {
 								);
 								$(
 									"#image-upload-progress-" +
-										uid +
-										" .upload-bar"
+									uid +
+									" .upload-bar"
 								).css("width", progress + "%");
 
 								status.html("Fatto!");

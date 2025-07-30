@@ -138,13 +138,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.combinationProductItemId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "CombinationProductItem" );
 
-			// bean.setId( record.combination_id );
+			var bean = super.bean( "CombinationProductItem" );
+			//var combination = super.bean( "Combination" );
+			//var productItem = super.bean( "CombinationProductItem" );
+
 			bean.setId( record.combination_product_item_id );
 			bean.setCreatedAt( record.created_at );
-			bean.setProductItemId( record.product_item_id );
 			bean.setCombinationId( record.combination_id );
+
+			bean.setProductItem( getProductItemService().get( record.product_item_id ) );
 
 			var productItem = getProductItemService().get( record.product_item_id );
 			bean.setProductItem( productItem );
