@@ -1,6 +1,5 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-	property name="name" type="String";
 	property name="quotationItem" type="com.apirone.core.model.bean.QuotationItem";
 	property name="parent" type="com.apirone.core.model.bean.QuotationItemZone";
 
