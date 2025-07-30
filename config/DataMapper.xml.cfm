@@ -74,6 +74,27 @@
         <map from="lastName" to="lastName" type="cf:String" />
     </mapper>
 
+    <mapper id="Quotation" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Quotation">
+        <map from="id" to="id" type="cf:String" />
+        <map from="description" to="description" type="cf:String" />
+        <map from="quotationNumber" to="quotationNumber" type="cf:String" />
+        <map from="quotationDate" to="quotationDate" type="cf:Date" />
+        <map from="notes" to="notes" type="cf:String" />
+        <map from="validityDate" to="validityDate" type="cf:Date" />
+        <map from="opportunityName" to="opportunityName" type="cf:String" />
+        <map from="leadName" to="leadName" type="cf:String" />
+        <map from="pricelistId" to="pricelist" ref="Pricelist" />
+        <map from="paymentMethodId" to="paymentMethod" ref="PaymentMethod" />
+        <map from="customPaymentMethod" to="customPaymentMethod" type="cf:String" />
+        <map from="currency" to="currency" ref="Currency" />
+        <map from="status" to="status" ref="Status" />
+        <map from="lang" to="lang" ref="Lang" />
+        <map from="billingProfile" to="billingProfile" ref="BillingProfile" />
+        <map from="shippingProfile" to="shippingProfile" ref="ShippingProfile" />
+        <map from="salesAgentAccount" to="salesAgentAccount" ref="Account" />
+        <map from="graphicTechnicianAccount" to="graphicTechnicianAccount" ref="Account" />
+    </mapper>
+
     <mapper id="ProductItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductItem">
         <map from="id" to="id" type="cf:String" />
         <map from="attributeValue" to="attributeValue" ref="AttributeValue" />

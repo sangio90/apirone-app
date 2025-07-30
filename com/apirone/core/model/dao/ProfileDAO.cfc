@@ -16,6 +16,7 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="countryId" type="String" required="false">
+		<cfargument name="type" type="String">
 		<cfargument name="str" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="profiles.last_name, profiles.first_name">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
@@ -36,7 +37,11 @@
 				)
 			</cfif>
 
-			<cfif Len(Trim(arguments.countryId))>
+			<cfif !IsNull( arguments.type )>
+				AND type = <cfqueryparam value="#arguments.type#" cfsqltype="varchar">
+			</cfif>
+
+			<cfif !isNull(arguments.countryId)>
 				AND country_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.countryId#">::uuid
 			</cfif>
 
@@ -69,6 +74,7 @@
 				city,
 				street,
 				postal_code,
+				type,
 				country_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.profile.getFirstName()#">,
@@ -81,6 +87,7 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.profile.getCity()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.profile.getStreet()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.profile.getPostalCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.profile.getType().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.profile.getCountry().getId()#">::uuid
 			)
 			RETURNING profile_id
@@ -113,6 +120,8 @@
 				city = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.profile.getCity()#">
 				,
 				postal_code = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.profile.getPostalCode()#">
+				,
+				type = <cfqueryparam cfsqltype="CHAR" value="#arguments.profile.getType().getId()#">
 				,
 				street = <cfqueryparam cfsqltype="TEXT" value="#arguments.profile.getStreet()#">
 

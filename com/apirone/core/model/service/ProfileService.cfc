@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ProfileDAO";
 	property name="GeoService" inject="GeoService";
+	property name="LookupService" inject="LookupService";
 	property name="cacheScope" type="String" default="Profile.bean";
 
 	public com.apirone.core.model.bean.Profile function get( required String profileId ){
@@ -98,9 +99,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var record = getDao().read( arguments.profileId );
 
 		if (record.recordCount) {
-			var bean = super.bean( "Profile" );
-
+			switch ( record.type ) {
+				case "B":
+					var bean = super.bean( "BillingProfile" );
+					break;
+				case "S":
+					var bean = super.bean( "ShippingProfile" );
+					break;
+				case "G":
+					var bean = super.bean( "Profile" );
+					break;
+				default:
+					throw ( "Unknown profile type [#record.type#]" );
+			}
+			
 			bean.setId( record.profile_id );
+			bean.setType( getLookupService().get( "profileType", record.type ) );
 			bean.setFirstName( record.first_name );
 			bean.setLastName( record.last_name );
 			bean.setCompany( record.company );

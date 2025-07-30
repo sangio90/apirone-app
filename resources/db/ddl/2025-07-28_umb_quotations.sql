@@ -17,7 +17,7 @@ INSERT INTO statuses (
 
 CREATE TABLE public.quotations (
   quotation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  quotation_description TEXT,
+  description TEXT,
   quotation_number VARCHAR(100) UNIQUE NOT NULL,
   status_id VARCHAR(3) NOT NULL,
   lang_id VARCHAR(2),
@@ -72,7 +72,7 @@ CREATE TABLE public.quotation_items (
 
 CREATE TABLE public.quotation_item_zones (
   quotation_item_zone_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  zone_name VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
   quotation_item_id UUID,
   parent_id UUID NULL,
   created_at timestamp default now()

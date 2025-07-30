@@ -123,4 +123,9 @@
         "name": "profile_id",
         "type": "uuid"
     },
+
+    "quotation.id": {
+        "name": "quotation_id",
+        "type": "uuid"
+    },
 }

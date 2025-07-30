@@ -77,7 +77,10 @@ component extends="testbox.system.BaseSpec"{
         var util = new com.apirone.core.util.String();
         var factory = new com.apirone.core.model.factory.Factory();
         var random = new tests.utils.DBRandomData();
-
+        var lookupService = new com.apirone.core.model.service.LookupService();
+        var profileTypes = lookupService.list( "profileType" );
+        var randomIndex = randRange(1, arrayLen(profileTypes));
+        var randomProfileType = profileTypes[randomIndex];
         var raw = mock.mock(
             $returnType = "struct",
             firstName = "fname",
@@ -96,8 +99,48 @@ component extends="testbox.system.BaseSpec"{
         );
         
         raw.country = { id = random.getCountries(limit=1).country_id.toString() };
-
+        raw.type = { id = randomProfileType.getId() };
+        
         var bean = factory.createInstance( "Profile", raw );
+
+        return  {
+            "obj" = bean,
+            "raw" = raw
+        }
+    }
+
+    public Struct function createQuotation( required startWith="**" ) {
+        var mock = new modules.cbMockData.models.MockData();
+        var util = new com.apirone.core.util.String();
+        var factory = new com.apirone.core.model.factory.Factory();
+        var random = new tests.utils.DBRandomData();
+        var raw = mock.mock(
+            $returnType = "struct",
+            description = "words:4",
+            quotationNumber = "string-number:5",
+            quotationDate = "date",
+            notes = "words:10",
+            validityDate = "date",
+            opportunityName = function(param) {
+                return mock.firstName() & ' ' & mock.lastName();
+            },
+            leadName = function() {
+                return mock.firstName() & ' ' & mock.lastName();
+            },
+            customPaymentMethod = "words:2",
+            createdAt = "datetime"
+        );
+        raw.pricelist = { id = random.getRandomByTableName(limit=1, tableName='pricelists').pricelist_id.toString() };
+        raw.paymentMethod = { id = random.getRandomByTableName(limit=1, tableName='payment_methods').payment_method_id.toString() };
+        raw.currency = { id = random.getRandomByTableName(limit=1, tableName='currencies').currency_id.toString() };
+        raw.status = { id = random.getStatuses(limit=1, entity='QUOTATIONS').status_id.toString() };
+        raw.lang = { id = random.getRandomByTableName(limit=1, tableName='langs').lang_id.toString() };
+        raw.billingProfile = { id = random.getRandomProfilesByType(limit=1, type='B').profile_id.toString() };
+        raw.shippingProfile = { id = random.getRandomProfilesByType(limit=1, type='S').profile_id.toString() };
+        raw.salesAgentAccount = { id = random.getRandomByTableName(limit=1, tableName='accounts').account_id.toString() };
+        raw.graphicTechnicianAccount = { id = random.getRandomByTableName(limit=1, tableName='accounts').account_id.toString() };
+
+        var bean = factory.createInstance( "Quotation", raw );
 
         return  {
             "obj" = bean,
