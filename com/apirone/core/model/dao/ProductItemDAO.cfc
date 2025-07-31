@@ -2,7 +2,7 @@
 
 	<cffunction name="read" returntype="Query">
 
-		<cfargument name="roductItemId" type="String" required="true">
+		<cfargument name="productItemId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT 
