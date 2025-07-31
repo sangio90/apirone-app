@@ -6,82 +6,70 @@ AP.line.fields = {
     detailForm: $("#line-detail-form"),
     searchListForm: $("#line-grid-search-form"),
     productsRoot: $("#line-products-root"),
-	sizeConfigModal: $("#size-config-modal"),
-	sizeConfigForm: $("#size-config-form"),
+    sizeConfigModal: $("#size-config-modal"),
+    sizeConfigForm: $("#size-config-form"),
 };
 
-$(document).ready(function (){
+$(document).ready(function () {
+    if (AP.line.fields.listRoot.length) {
+        AP.line.list.init();
+    }
 
-	if (AP.line.fields.listRoot.length) {
+    if (AP.line.fields.productsRoot.length) {
+        AP.line.products.init();
+    }
 
-	    AP.line.list.init();
-
-	}
-
-	if (AP.line.fields.productsRoot.length) {
-
-	    AP.line.products.init();
-
-	}
-
-	if (AP.line.fields.detailRoot.length) {
-
-	    AP.line.detail.init();
-
-	}
-
+    if (AP.line.fields.detailRoot.length) {
+        AP.line.detail.init();
+    }
 });
 
-
 AP.line.detail = (function () {
-
-	var pub = {};
+    var pub = {};
 
     // console.log("categories", AP.page.categories);
 
-	var defaultDetailForm = {
-		data: {
-			id: "",
-			code: "",
-			name: "",
+    var defaultDetailForm = {
+        data: {
+            id: "",
+            code: "",
+            name: "",
             selectedCategories: [],
-			category: {
-                id: ""
+            category: {
+                id: "",
             },
-			mainText: {
-				id: "",
-				name: "",
-				lang: {
-					id: "IT"
-				}
-			},
-			thickness: {
-                id: ""
+            mainText: {
+                id: "",
+                name: "",
+                lang: {
+                    id: "IT",
+                },
             },
-			status: {
-				id: "ACT"
-			}
-		},
+            thickness: {
+                id: "",
+            },
+            status: {
+                id: "ACT",
+            },
+        },
 
         statuses: AP.page.statuses,
-		categories: AP.page.categories,
-		thicknesses: AP.page.thicknesses,
+        categories: AP.page.categories,
+        thicknesses: AP.page.thicknesses,
 
-		title: "Carica linea"
-	};
+        title: "Carica linea",
+    };
 
-	var viewModel = kendo.observable({
-
+    var viewModel = kendo.observable({
         detailForm: defaultDetailForm,
 
         callback: {
-			onCreate: undefined,
-			onUpdate: undefined,
-			onLoad: undefined
-		},
+            onCreate: undefined,
+            onUpdate: undefined,
+            onLoad: undefined,
+        },
 
-		resetForm: function () {
-
+        resetForm: function () {
             var detailForm = AP.line.fields.detailForm;
 
             var validator = detailForm.validate();
@@ -89,49 +77,50 @@ AP.line.detail = (function () {
 
             detailForm.find(".status").html("");
 
-			viewModel.set("detailForm", defaultDetailForm);
-		},
-
-        save: function (event) {
-
-			var detailForm = AP.line.fields.detailForm;
-			var status = detailForm.find(".status");
-
-		    status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
-
-			if(detailForm.valid()) {
-
-				NM.util.ajax({
-					method: "POST",
-					url: "/manager/ajax/lines",
-					data: JSON.stringify(viewModel.get("detailForm.data")),
-					callback: {
-						done: function (xhr) {
-
-							if(xhr.status == "SUCCESS") {
-
-								NM.util.autoHideMessage(status, "<span class='green'>Linea salvata</span>");
-
-								setTimeout( () => $("#line-detail-modal").modal("hide"), 1000 );
-
-                                AP.util.fireCallback( "onSave", viewModel.get("callback") );
-                                
-							}
-
-						}
-					}
-				});
-
-			}
-
-            return false;
-
+            viewModel.set("detailForm", defaultDetailForm);
         },
 
-	});
+        save: function (event) {
+            var detailForm = AP.line.fields.detailForm;
+            var status = detailForm.find(".status");
 
-	pub.new = function ({ onSave }) {
+            status.html(
+                "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
+            );
 
+            if (detailForm.valid()) {
+                NM.util.ajax({
+                    method: "POST",
+                    url: "/manager/ajax/lines",
+                    data: JSON.stringify(viewModel.get("detailForm.data")),
+                    callback: {
+                        done: function (xhr) {
+                            if (xhr.status == "SUCCESS") {
+                                NM.util.autoHideMessage(
+                                    status,
+                                    "<span class='green'>Linea salvata</span>",
+                                );
+
+                                setTimeout(
+                                    () => $("#line-detail-modal").modal("hide"),
+                                    1000,
+                                );
+
+                                AP.util.fireCallback(
+                                    "onSave",
+                                    viewModel.get("callback"),
+                                );
+                            }
+                        },
+                    },
+                });
+            }
+
+            return false;
+        },
+    });
+
+    (pub.new = function ({ onSave }) {
         if (onSave) {
             viewModel.set("callback.onSave", onSave);
         }
@@ -139,105 +128,104 @@ AP.line.detail = (function () {
         viewModel.resetForm();
 
         NM.util.openModal(AP.line.fields.detailRoot);
-
-    },
-
-	pub.edit = function ({ id, onSave }) {
-
-        if (onSave) {
-            viewModel.set("callback.onSave", onSave);
-        }
-
-        viewModel.resetForm();
-
-        NM.util.ajax({
-            method: "GET",
-            url: "/manager/ajax/lines/" + id,
-            callback: {
-                done: function (xhr) {
-
-                    if(xhr.status == "SUCCESS") {
-
-                        var selectedCategories = [];
-
-                        if( xhr.data?.categories ) {
-                            for (var category of xhr.data.categories )  {
-                                selectedCategories.push(category);
-                            }
-                        }
-
-                        viewModel.set("detailForm.data", xhr.data);
-                        viewModel.set("detailForm.data.selectedCategories", selectedCategories);
-                        viewModel.set("detailForm.title", "Modifica linea");
-
-                        NM.util.openModal(AP.line.fields.detailRoot);
-
-                    }
-
-                }
+    }),
+        (pub.edit = function ({ id, onSave }) {
+            if (onSave) {
+                viewModel.set("callback.onSave", onSave);
             }
+
+            viewModel.resetForm();
+
+            NM.util.ajax({
+                method: "GET",
+                url: "/manager/ajax/lines/" + id,
+                callback: {
+                    done: function (xhr) {
+                        if (xhr.status == "SUCCESS") {
+                            var selectedCategories = [];
+
+                            if (xhr.data?.categories) {
+                                for (var category of xhr.data.categories) {
+                                    selectedCategories.push(category);
+                                }
+                            }
+
+                            viewModel.set("detailForm.data", xhr.data);
+                            viewModel.set(
+                                "detailForm.data.selectedCategories",
+                                selectedCategories,
+                            );
+                            viewModel.set("detailForm.title", "Modifica linea");
+
+                            NM.util.openModal(AP.line.fields.detailRoot);
+                        }
+                    },
+                },
+            });
+        }),
+        (pub.init = function () {
+            kendo.bind(AP.line.fields.detailRoot, viewModel);
+
+            AP.page.categories.unshift({
+                id: "",
+                name: "-- Seleziona una categoria",
+            });
+            AP.page.thicknesses.unshift({
+                id: "",
+                name: "-- Seleziona uno spessore",
+            });
+
+            var detailForm = AP.line.fields.detailForm;
+
+            detailForm.validate({
+                onfocusout: function (element) {
+                    $(element).valid();
+                },
+                rules: {
+                    code: {
+                        required: true,
+                        checkCode: true,
+                        remote: {
+                            url: "/manager/ajax/lines/code-exists",
+                            data: {
+                                id: function () {
+                                    return viewModel.get("detailForm.data.id");
+                                },
+                            },
+                            dataFilter: function (xhr) {
+                                var json = JSON.parse(xhr);
+                                return json.data == false;
+                            },
+                        },
+                    },
+                },
+                messages: {
+                    code: {
+                        required: "Codice richiesto",
+                        checkCode:
+                            "Solo numeri, lettere, trattino o trattino basso",
+                        remote: "Il codice esiste",
+                    },
+                },
+            });
         });
 
-    },
-
-	pub.init = function () {
-
-        kendo.bind(AP.line.fields.detailRoot, viewModel);
-
-        AP.page.categories.unshift({ id: "", name: "-- Seleziona una categoria" });
-        AP.page.thicknesses.unshift({ id: "", name: "-- Seleziona uno spessore" });
-
-		var detailForm = AP.line.fields.detailForm;
-
-		detailForm.validate({
-			onfocusout: function (element) {
-				$(element).valid();
-			},
-			rules: {
-				code: {
-					required: true,
-					checkCode: true,
-					remote: {
-						url: "/manager/ajax/lines/code-exists",
-						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
-						dataFilter: function (xhr) {
-							var json = JSON.parse(xhr);
-							return json.data == false;
-						}
-					}
-				}
-			},
-			messages: {
-				code: {
-					required: "Codice richiesto",
-					checkCode: "Solo numeri, lettere, trattino o trattino basso",
-					remote: "Il codice esiste"
-				}
-			},
-
-		});
-
-	};
-
     return pub;
-}());
-
+})();
 
 AP.line.list = (function () {
-
-	var pub = {};
+    var pub = {};
 
     var detailApp = AP.line.detail;
 
-	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/lines" })
-	};
+    var dataSources = {
+        items: NM.kendo.dataSource({ url: "/manager/ajax/lines" }),
+    };
 
-	var viewModel = kendo.observable({
-		rows: dataSources.items,
+    var viewModel = kendo.observable({
+        rows: dataSources.items,
 
         search: function (event) {
-
             var thisForm = AP.line.fields.searchListForm;
 
             var params = thisForm.serializeJSON();
@@ -245,11 +233,9 @@ AP.line.list = (function () {
             viewModel.rows.read(params);
 
             return false;
-
         },
 
         new: function (event) {
-
             console.log("detailApp", detailApp);
 
             var onSave = function () {
@@ -260,11 +246,9 @@ AP.line.list = (function () {
             detailApp.new({ onSave: onSave });
 
             return false;
-
         },
 
         edit: function (event) {
-
             var onSave = function () {
                 viewModel.get("rows").read();
             };
@@ -272,104 +256,93 @@ AP.line.list = (function () {
             detailApp.edit({ id: event.data.id, onSave: onSave });
 
             return false;
-
         },
 
         delete: function (event) {
+            var checks = $("#line-grid").find("[name=selected]:checked");
 
-			var checks = $("#line-grid").find("[name=selected]:checked");
+            if (checks.length) {
+                var values = [];
 
-			if (checks.length) {
+                checks.each(function () {
+                    values.push($(this).val());
+                });
 
-				var values = [];
+                var ids = values.toString();
 
-				checks.each(function (){
-					values.push($(this).val());
-				});
+                NM.util.ajax({
+                    method: "DELETE",
+                    url: "/manager/ajax/lines",
+                    data: ids,
+                    callback: {
+                        done: function (xhr) {
+                            if (xhr.data.payload.hasOwnProperty("errors")) {
+                                AP.widget.notify(
+                                    "error",
+                                    "Non riesco a cancellare tutti i valori",
+                                );
+                            } else {
+                                AP.widget.notify(
+                                    "success",
+                                    "Cancellazione avvenuta con successo",
+                                );
+                            }
 
-				var ids = values.toString();
+                            var id = viewModel.get("detailForm.data.id");
+                            console.log("id", id);
 
-				NM.util.ajax({
-					method: "DELETE",
-					url: "/manager/ajax/lines",
-					data: ids,
-					callback: {
-						done: function (xhr) {
-
-							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
-							} else {
-								AP.widget.notify("success", "Cancellazione avvenuta con successo");
-							}
-
-							var id = viewModel.get("detailForm.data.id");
-							console.log("id", id);
-
-							viewModel.rows.read();
-
-						}
-					}
-				});
-
-			} else {
-
+                            viewModel.rows.read();
+                        },
+                    },
+                });
+            } else {
                 AP.widget.notify("warning", "Seleziona almeno un valore");
-
-			}
-
+            }
         },
 
-		products: function (event) {
-
+        products: function (event) {
             var id = event.data.id;
             window.open("/manager/lines/" + id + "/products", "_blank").focus();
 
             return false;
-		},
+        },
 
-
-		attributes: function (event) {
-
+        attributes: function (event) {
             /*
                 note: redirect in controller to first product
             */
 
             var id = event.data.id;
-            window.open("/manager/lines/" + id + "/attributes", "_blank").focus();
+            window
+                .open("/manager/lines/" + id + "/attributes", "_blank")
+                .focus();
 
             return false;
-		},
+        },
+    });
 
-
-	});
-
-	pub.init = function () {
-
+    pub.init = function () {
         console.log("list:init");
 
         kendo.bind(AP.line.fields.listRoot, viewModel);
-
-	};
+    };
 
     return pub;
-}());
-
+})();
 
 AP.line.products = (function () {
-
     var pub = {};
     var fields = AP.line.fields;
 
-	var defaultSizeConfigModal = {
-		title: "Configura dimensioni",
-		data: {
-			height: "",
-			width: ""
-		}
-	}
+    var defaultSizeConfigModal = {
+        title: "Configura dimensioni",
+        data: {
+            height: "",
+            width: "",
+        },
+    };
 
     var changeStatus = function (status, event) {
-
         // active
         var method = "POST";
         var classToShow = "active";
@@ -390,7 +363,9 @@ AP.line.products = (function () {
         var values = ele.data("values");
         var category = ele.data("category");
 
-        status.html("<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>");
+        status.html(
+            "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>",
+        );
 
         var size = values.split("__")[0];
         var finish = values.split("__")[1];
@@ -399,55 +374,49 @@ AP.line.products = (function () {
             method: method,
             url: "/manager/ajax/lines/" + AP.page.line.id + "/products",
             data: JSON.stringify({
-                    sizeId: size,
-                    finishId: finish,
-                    categoryId: category,
-                }),
+                sizeId: size,
+                finishId: finish,
+                categoryId: category,
+            }),
             callback: {
                 done: function (xhr) {
-
-                    if(xhr.status == "SUCCESS") {
-
-                        var button = $("button[data-values='" + values +"']");
+                    if (xhr.status == "SUCCESS") {
+                        var button = $("button[data-values='" + values + "']");
 
                         button.filter("." + classToShow).show();
                         button.filter("." + classToHide).hide();
 
-                        status.html("<span class='green'>" + message + "</span> ");
-
+                        status.html(
+                            "<span class='green'>" + message + "</span> ",
+                        );
                     }
-
-                }
-            }
+                },
+            },
         });
 
         return false;
-
     };
 
-	var viewModel = kendo.observable({
-		sizeConfigModal: defaultSizeConfigModal,
+    var viewModel = kendo.observable({
+        sizeConfigModal: defaultSizeConfigModal,
 
         attributes: function (event) {
-
             var lineId = window.location.href.split("/")[5];
-            
-            window.open("/manager/lines/" + lineId + "/attributes", "_blank").focus();
-            
-            return false;
 
-		},
+            window
+                .open("/manager/lines/" + lineId + "/attributes", "_blank")
+                .focus();
+
+            return false;
+        },
 
         activate: function (event) {
-
             event.preventDefault();
 
             changeStatus("active", event);
-
-		},
+        },
 
         deactivate: function (event) {
-
             event.preventDefault();
 
             bootbox.confirm({
@@ -456,115 +425,121 @@ AP.line.products = (function () {
                 buttons: {
                     confirm: {
                         label: "Si, confermo",
-                        className: "btn-primary"
+                        className: "btn-primary",
                     },
                     cancel: {
                         label: "No, chiudi",
-                        className: "btn-danger"
-                    }
+                        className: "btn-danger",
+                    },
                 },
                 callback: function (result) {
-                    if(result) {
+                    if (result) {
                         changeStatus("deactive", event);
                     }
-                }
+                },
             });
         },
 
-		showSizeConfigModal: function ( event ) {
-			NM.util.openModal(fields.sizeConfigModal);
+        showSizeConfigModal: function (event) {
+            NM.util.openModal(fields.sizeConfigModal);
 
-			let lineId = $(event.currentTarget).data('line-id');
-			let productCategoryId = $(event.currentTarget).data('product-category-id');
-			let sizeId = $(event.currentTarget).data('size-id');
-			let sizeConfigId = $(event.currentTarget).data('size-config-id');
-			let width = $(event.currentTarget).data('width');
-			let height = $(event.currentTarget).data('height');
+            let lineId = $(event.currentTarget).data("line-id");
+            let productCategoryId = $(event.currentTarget).data(
+                "product-category-id",
+            );
+            let sizeId = $(event.currentTarget).data("size-id");
+            let sizeConfigId = $(event.currentTarget).data("size-config-id");
+            let width = $(event.currentTarget).data("width");
+            let height = $(event.currentTarget).data("height");
 
-			viewModel.set("sizeConfigModal.data.sizeId", sizeId);
-			viewModel.set("sizeConfigModal.data.productCategoryId", productCategoryId);
-			viewModel.set("sizeConfigModal.data.sizeConfigId", sizeConfigId);
-			viewModel.set("sizeConfigModal.data.lineId", lineId);
-			viewModel.set("sizeConfigModal.data.width", width);
-			viewModel.set("sizeConfigModal.data.height", height);
+            viewModel.set("sizeConfigModal.data.sizeId", sizeId);
+            viewModel.set(
+                "sizeConfigModal.data.productCategoryId",
+                productCategoryId,
+            );
+            viewModel.set("sizeConfigModal.data.sizeConfigId", sizeConfigId);
+            viewModel.set("sizeConfigModal.data.lineId", lineId);
+            viewModel.set("sizeConfigModal.data.width", width);
+            viewModel.set("sizeConfigModal.data.height", height);
 
-			return false;
-		},
+            return false;
+        },
 
-		saveSizeConfig: function ( event ) {
+        saveSizeConfig: function (event) {
+            var sizeConfigForm = AP.line.fields.sizeConfigForm;
+            var status = sizeConfigForm.find(".status");
 
-			var sizeConfigForm = AP.line.fields.sizeConfigForm;
-			var status = sizeConfigForm.find(".status");
+            status.html(
+                "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
+            );
 
-			status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+            if (sizeConfigForm.valid()) {
+                let sizeConfigFormData = viewModel.get("sizeConfigModal.data");
+                NM.util.ajax({
+                    method: "POST",
+                    url: "/manager/ajax/size_config",
+                    data: JSON.stringify(sizeConfigFormData),
+                    callback: {
+                        done: function (xhr) {
+                            if (xhr.status == "SUCCESS") {
+                                NM.util.autoHideMessage(
+                                    status,
+                                    "<span class='green'>Dimensioni salvate</span>",
+                                );
 
-			if(sizeConfigForm.valid()) {
+                                setTimeout(
+                                    () => $("#size-config-modal").modal("hide"),
+                                    1000,
+                                );
 
-				let sizeConfigFormData = viewModel.get("sizeConfigModal.data");
-				NM.util.ajax({
-					method: "POST",
-					url: "/manager/ajax/size_config",
-					data: JSON.stringify(sizeConfigFormData),
-					callback: {
-						done: function (xhr) {
+                                AP.util.fireCallback(
+                                    "onSave",
+                                    viewModel.get("callback"),
+                                );
 
-							if(xhr.status == "SUCCESS") {
+                                setTimeout(
+                                    () => window.location.reload(),
+                                    1000,
+                                );
+                            }
+                        },
+                    },
+                });
+            }
 
-								NM.util.autoHideMessage(status, "<span class='green'>Dimensioni salvate</span>");
+            return false;
+        },
+    });
 
-								setTimeout( () => $("#size-config-modal").modal("hide"), 1000 );
+    pub.init = function () {
+        console.log(viewModel.get("sizeConfigModal.title"));
+        kendo.bind(fields.productsRoot, viewModel);
 
-								AP.util.fireCallback( "onSave", viewModel.get("callback") );
+        var sizeConfigForm = fields.sizeConfigForm;
 
-								setTimeout(() => window.location.reload(), 1000);
-
-							}
-
-						}
-					}
-				});
-
-			}
-
-			return false;
-
-		}
-
-
-	});
-
-	pub.init = function () {
-		console.log(viewModel.get("sizeConfigModal.title"));
-		kendo.bind( fields.productsRoot, viewModel);
-
-		var sizeConfigForm = fields.sizeConfigForm;
-
-		sizeConfigForm.validate({
-			rules: {
-				width: {
-					required: true,
-					number: true,
-				},
-				height: {
-					required: true,
-					number: true,
-				},
-			},
-			messages: {
-				width: {
-					required: "Larghezza richiesta.",
-					number: "Please enter a valid number.",
-				},
-				height: {
-					required: "Altezza richiesta.",
-					number: "Please enter a valid number.",
-				},
-			},
-
-		});
-
-	};
+        sizeConfigForm.validate({
+            rules: {
+                width: {
+                    required: true,
+                    number: true,
+                },
+                height: {
+                    required: true,
+                    number: true,
+                },
+            },
+            messages: {
+                width: {
+                    required: "Larghezza richiesta.",
+                    number: "Please enter a valid number.",
+                },
+                height: {
+                    required: "Altezza richiesta.",
+                    number: "Please enter a valid number.",
+                },
+            },
+        });
+    };
 
     return pub;
-
-}());
+})();
