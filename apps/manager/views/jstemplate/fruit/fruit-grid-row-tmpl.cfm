@@ -16,9 +16,7 @@
                 <span data-bind="text: positionCount"></span>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:attributes">
-                    <i class="fas fa-window-restore"></i> 
-                </button>
+                #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
