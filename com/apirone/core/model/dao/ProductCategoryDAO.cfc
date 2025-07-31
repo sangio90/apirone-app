@@ -91,11 +91,15 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO product_categories (
 				code,
-				status_id
+				status_id,
+				product_category_type_id,
+				mode_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getCode()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getStatus().getId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.productCategory.getType().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.productCategory.getMode().getId()#">
 			) RETURNING product_category_id
 		</cfquery>
 
@@ -110,7 +114,11 @@
 				product_categories
 			SET
 				code = <cfqueryparam cfsqltype="Varchar" value="#Trim( arguments.ProductCategory.getCode() )#">,
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getStatus().getId()#">
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategory.getStatus().getId()#">,
+				product_category_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productCategory.getType().getId()#">
+				<!---
+			mode_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productCategory.getMode().getId()#">
+		--->
 			WHERE
 				product_category_id = <cfqueryparam cfsqltype="Integer" value="#Trim( arguments.ProductCategory.getId() )#">
 		</cfquery>

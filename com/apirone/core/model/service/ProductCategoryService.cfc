@@ -3,7 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="ProductCategoryDAO";
 	property name="statusService" inject="StatusService";
 	property name="textService" inject="TextService";
-	property name="ProductCategoryTypeService" inject="ProductCategoryTypeService";
+	property name="lookupService" inject="LookupService";
+	property name="productCategoryTypeService" inject="ProductCategoryTypeService";
 
 	property name="cacheScope" type="String" default="ProductCategory.bean";
 
@@ -25,6 +26,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		);
 
 		return bean;
+	}
+
+	public Array function list(
+		String str,
+		String rawProductId,
+		required Array orderBy = [ { field = "ProductCategory.code" } ]
+	){
+		arguments[ "limit" ] = -1;
+
+		return search( argumentCollection = arguments ).getData();
 	}
 
 	public com.apirone.core.model.bean.Result function search(
@@ -51,16 +62,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setData( rows );
 
 		return result;
-	}
-
-	public Array function list(
-		String str,
-		String rawProductId,
-		required Array orderBy = [ { field = "ProductCategory.code" } ]
-	){
-		arguments[ "limit" ] = -1;
-
-		return search( argumentCollection = arguments ).getData();
 	}
 
 	public String function create( required com.apirone.core.model.bean.ProductCategory ProductCategory ){
@@ -120,7 +121,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getTextService().update( text );
 		}
 
-		cm.remove( getScopeCache(), arguments.ProductCategory.getId() );
+		cm.remove( getCacheScope(), arguments.ProductCategory.getId() );
 
 		return id;
 	}
@@ -137,7 +138,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.productCategoryId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getScopeCache(), arguments.productCategoryId );
+				getCacheManager().remove( getCacheScope(), arguments.productCategoryId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -181,6 +182,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setType(
 				getProductCategoryTypeService().get( productCategoryTypeId = record.product_category_type_id )
 			);
+
+			bean.setMode( getLookupService().get( "ProductCategoryMode", record.mode_id ) );
 
 			bean.setTexts( getTextService().list( productCategoryId = record.product_category_id ) );
 

@@ -1,92 +1,92 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = super.getDataMapper();
 
-        var data = [];
-        var result = super.getResult();
-        var dm = super.getDataMapper();
+		var params = super.paramsFromUrl();
 
-        var params = super.paramsFromUrl();
+		if ( rc.keyExists( "typeId" ) ) {
+			params[ "typeId" ] = rc.typeId
+		}
 
-        if( rc.keyExists("typeId") ) {
-            params[ "typeId" ] = rc.typeId
-        }
+		var rows = super.fire( "ProductCategory.search", params );
 
-        var rows = super.fire( "ProductCategory.search", params );
+		for ( var row in rows.getData() ) {
+			var obj = dm.convert( row, "ProductCategory", true );
+			data.add( obj );
+		}
 
-        for ( var row in rows.getData() ) {
-            var obj = dm.convert( row, "ProductCategory", true );
-            data.add( obj );
-        }
- 
-        result.setTotal( rows.getTotal() );
-        result.setCount( rows.getCount() );
-        result.setData( data );
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
 
-        event.setValue("result", result);
-
-    }
+		event.setValue( "result", result );
+	}
 
 	function delete( event, rc, prc ){
-        
-        var result = super.getResult();
-        var content = GetHTTPRequestData().content;
-        var messageId = "productCategory.deletedAllRecords";
+		var result    = super.getResult();
+		var content   = GetHTTPRequestData().content;
+		var messageId = "productCategory.deletedAllRecords";
 
-        var errors = [];
-        var payload = "";
+		var errors  = [];
+		var payload = "";
 
-        var ids = ListToArray( content   );
+		var ids = ListToArray( content );
 
-        for( var id in ids ) {
-            var outcome = super.fire( "productCategory.delete", [ id ] );
+		for ( var id in ids ) {
+			var outcome = super.fire( "productCategory.delete", [ id ] );
 
-            if( outcome.getStatus() == "ERROR"  ) {
-                errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
-            }
+			if ( outcome.getStatus() == "ERROR" ) {
+				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+			}
+		}
 
-        }
+		if ( errors.len() ) {
+			messageId = "productCategory.deletedNotAllRecords"
+			payload   = { "errors" = errors };
+		}
 
-        if( errors.len() ) {
-            messageId = "productCategory.deletedNotAllRecords"
-            payload = { "errors": errors } ;
-        }
+		var message = super.completeMessage( messageId );
 
-        var message = super.completeMessage( messageId );
+		result.setData( { "message" = message, "payload" = payload } );
 
-        result.setData( { "message" = message, "payload" =  payload } );
-        
 		event.setValue( "result", result );
 	}
 
 
 	function save( event, rc, prc ){
-		var result     = super.getResult();
+		var result = super.getResult();
 
 		var text     = super.bean( "Text" );
 		var lang     = super.bean( "Lang" );
 		var status   = super.bean( "Status" );
+		var status   = super.bean( "Status" );
+		var mode     = super.bean( "ProductCategoryMode" );
+		var type     = super.bean( "ProductCategoryType" );
 		var category = super.bean( "ProductCategory" );
 
 		var thisId    = "";
 		var messageId = "";
 
-		var json = DeserializeJSON( getHTTPRequestData().content );
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		category.setId( json.id );
 		category.setCode( json.code );
 
+		category.setType( type.setId( json.type.id ) );
+		category.setMode( mode.setId( json.mode.id ) );
 		category.setStatus( status.setId( json.status.id ) );
 
-        text.setLang( lang.setId( json.mainText.lang.id ) );
-        //text.setStatus( status.setId( json.mainText.status.id ) );
+		text.setLang( lang.setId( json.mainText.lang.id ) );
 
-        text.setId( json.mainText.id );
-        text.setName( json.mainText.name );
+		text.setId( json.mainText.id );
+		text.setName( json.mainText.name );
 
-        category.setTexts( [ text ] );
-        
-		if ( !len( json.id ) ) {
+		category.setTexts( [ text ] );
+
+		if ( !Len( json.id ) ) {
 			messageId = "productCategory.created";
 			thisId    = super.fire( "productCategory.create", [ category ] )
 		} else {

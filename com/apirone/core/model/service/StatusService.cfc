@@ -3,12 +3,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="StatusDAO";
 	property name="systemColorService" inject="systemColorService";
 
-	property name="scopeCache" type="String" default="Status.bean";
+	property name="CacheScope" type="String" default="Status.bean";
 
 	public com.apirone.core.model.bean.Status function get( required String statusId ){
 		var cm = super.getCacheManager();
 
-		var cache = cm.get( getScopeCache(), arguments.statusId );
+		var cache = cm.get( getCacheScope(), arguments.statusId );
 
 		if ( cache.status ) {
 			return cache.data;
@@ -16,7 +16,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var obj = build( arguments.statusId );
 
-		cm.put( getScopeCache(), statusId, obj );
+		cm.put( getCacheScope(), statusId, obj );
 
 		return obj;
 	}
