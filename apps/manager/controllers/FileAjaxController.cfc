@@ -3,24 +3,25 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		param rc.by = "____";
 		var data    = [];
+		var item    = {};
 
-		var item = {};
+		var imageConfigs = getConfiguration().get( "imagesConfig" );
 
 		var file = super.bean( "File" );
 
 		if ( rc.by == "products" ) {
 			var params = { productId = rc.id }
-			var config = getConfiguration().get( "imagesConfig" )[ "product" ];
+			var config = imageConfigs[ "product" ];
 		}
 
 		if ( rc.by == "product-items" ) {
 			var params = { productItemId = rc.id }
-			var config = getConfiguration().get( "imagesConfig" )[ "productItem" ];
+			var config = imageConfigs[ "productItem" ];
 		}
 
 		if ( rc.by == "combinations" ) {
 			var params = { combinationId = rc.id }
-			var config = getConfiguration().get( "imagesConfig" )[ "combination" ];
+			var config = imageConfigs[ "combination" ];
 		}
 
 		for ( var typeId in config.types ) {
@@ -28,16 +29,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var images = super.fire( "file.list", params );
 
-			// esiste l'immagine
+			// esiste l'immagine la servo
 			if ( images.len() ) {
 				var image = images[ 1 ];
 
-				var json = DeserializeJSON( SerializeJSON( image ) );
+				var json = image.toStruct();
 
 				json[ "complete" ] = true;
 				json[ "uri" ]      = image.getUri();
 				json[ "shortId" ]  = Right( image.getId(), 5 );
-
 
 				// se non esiste, servo un'immagine vuota
 			} else {
@@ -49,7 +49,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				file.setName( "" );
 				file.setDirectory( "" );
 
-				var json = DeserializeJSON( SerializeJSON( file ) );
+				var json = file.toStruct();
 
 				json[ "complete" ] = false;
 				json[ "uri" ]      = "";
@@ -114,6 +114,19 @@ component extends="com.apirone.core.controller.AbsController" {
 			"message" = message,
 			"payload" = { "imageId" = file.getId() }
 		} );
+
+		event.setValue( "result", result );
+	}
+
+
+	function delete( event, rc, prc ){
+		var result = super.getResult();
+
+		super.fire( "file.delete", { fileId = rc.id } );
+
+		var message = super.completeMessage( "file.imageDeleted" );
+
+		result.setData( { "message" = message, "payload" = { "imageId" = rc.id } } );
 
 		event.setValue( "result", result );
 	}

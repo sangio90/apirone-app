@@ -16,9 +16,25 @@
 				Live #now()#";
 		} );
 
+		/*
+			dashboard
+		*/
 		get( "/dashboard" ).to( "MainController.dashboard" ).end();
 		get( "/plate/designer" ).to( "PlateController.designer" ).end();
 		get( "/plate/map" ).to( "PlateController.map" ).end();
+
+
+		/*
+			fruits
+		*/
+		get( "/ajax/fruits/code-exists" ).to( "FruitAjaxController.codeExists" ).end();
+		post( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.addItem" ).end();
+		get( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.listItems" ).end();
+		get( "/ajax/fruits/:id" ).to( "FruitAjaxController.get" ).end();
+		get( "/ajax/fruits" ).to( "FruitAjaxController.list" ).end();
+		post( "/ajax/fruits" ).to( "FruitAjaxController.save" ).end();
+		delete( "/ajax/fruits" ).to( "FruitAjaxController.delete" ).end();
+		get( "/fruits" ).to( "FruitController.list" ).end();
 
 
 		/*
@@ -130,9 +146,14 @@
 		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
 		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end();
 
+
 		/*
 			products
 		*/
+		get( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.list" ).end();
+		post( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.upload" ).end();
+		delete( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.delete" ).end();
+
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
 		get( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();
 		delete( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.deleteCombinations" ).end();
@@ -150,9 +171,6 @@
 		post( "/ajax/products" ).to( "ProductAjaxController.save" ).end();
 		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
 		get( "/products/:id/combinations" ).to( "ProductController.combinations" ).end();
-
-		get( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.list" ).end();
-		post( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.upload" ).end();
 
 		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();
 		get( "/products/:id" ).to( "ProductController.detail" ).end();
@@ -210,14 +228,6 @@
 		*/
 		get( "/ajax/profiles/:id" ).to( "ProfileAjaxController.get" ).end();
 		get( "/ajax/profiles" ).to( "ProfileAjaxController.list" ).end();
-
-		
-		/*
-			quotations
-		*/
-		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
-		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
-		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 
 
 		/*
