@@ -95,15 +95,28 @@
         <map from="graphicTechnicianAccount" to="graphicTechnicianAccount" ref="Account" />
     </mapper>
 
+    <mapper id="QuotationItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.QuotationItem">
+        <map from="id" to="id" type="cf:String" />
+        <map from="price" to="price" type="cf:Numeric" />
+        <map from="quantity" to="quantity" type="cf:Numeric" />
+        <map from="quotation" to="quotation" ref="Quotation" />
+        <map from="zone" to="zone" ref="QuotationItemZone" />
+        <map from="position" to="position" ref="QuotationItemPosition" />
+        <map from="product" to="product" ref="QuotationItemProduct" />
+    </mapper>
+
+    <mapper id="QuotationItemProduct" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.QuotationItemProduct">
+        <map from="id" to="id" type="cf:String" />
+        <map from="quotationItem" to="quotationItem" ref="QuotationItem" />
+        <map from="product" to="product" ref="Product" />
+        <map from="parent" to="parent" ref="QuotationItemProduct" />
+    </mapper>    
+
     <mapper id="Pricelist" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Pricelist">
         <map from="id" to="id" type="cf:String" />
     </mapper>
 
     <mapper id="PaymentMethod" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.PaymentMethod">
-        <map from="id" to="id" type="cf:String" />
-    </mapper>
-
-    <mapper id="Currency" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Currency">
         <map from="id" to="id" type="cf:String" />
     </mapper>
 

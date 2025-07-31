@@ -93,17 +93,21 @@
     <cffunction name="getRandomByTableName">
         <cfargument name="tableName" required="true" type="String">
         <cfargument name="limit" required="false" type="Numeric" default="5">
+        <cfargument name="primaryKey" required="false" type="String">
+        <cfargument name="escluso" required="false" type="String">
 
         <cfset var safeTable = REReplace(arguments.tableName, "[^A-Za-z0-9_]", "", "all")>
-
+        <cfset var whereClause = "">
+        <cfset var hasWhere = !isNull(arguments.primaryKey) and !isNull(arguments.escluso)>
+        
         <cfquery datasource="apirone" name="local.q">
-            SELECT * 
-            FROM
-                public.#safeTable# 
-            ORDER BY 
-                RANDOM() 
-            LIMIT 
-                #arguments.limit#
+            SELECT *
+            FROM public.#safeTable#
+            <cfif hasWhere>
+                WHERE #arguments.primaryKey# != <cfqueryparam cfsqltype="Varchar" value="#arguments.escluso#">::uuid
+            </cfif>
+            ORDER BY RANDOM()
+            LIMIT #arguments.limit#
         </cfquery>
         <cfreturn local.q>
     </cffunction>

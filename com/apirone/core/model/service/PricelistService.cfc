@@ -24,10 +24,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.RecordCount ) {
 			var obj = super.bean( "Pricelist" );
 			obj.setId( record.pricelist_id.toString() );
-			obj.setName( record.name );
+			obj.setName( record.pricelist );
 			return obj;
 		}
 
 		return NullValue();
 	}
+
 }

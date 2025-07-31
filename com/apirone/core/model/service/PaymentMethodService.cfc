@@ -13,7 +13,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var bean = build( arguments.paymentMethodId );
-		cm.put( getCacheScope(), arguments.paymentMethodId, bean );
+		cm.put(
+			getCacheScope(),
+			arguments.paymentMethodId,
+			bean
+		);
 
 		return bean;
 	}
@@ -23,8 +27,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( record.RecordCount ) {
 			var obj = super.bean( "PaymentMethod" );
+
 			obj.setId( record.payment_method_id.toString() );
-			obj.setName( record.name );
+			obj.setName( record.payment_method );
+
 			return obj;
 		}
 

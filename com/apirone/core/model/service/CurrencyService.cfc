@@ -23,11 +23,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( record.RecordCount ) {
 			var obj = super.bean( "Currency" );
+
 			obj.setId( record.currency_id.toString() );
-			obj.setName( record.name );
+			obj.setName( record.currency );
+
 			return obj;
 		}
 
 		return NullValue();
 	}
+
 }
