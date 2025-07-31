@@ -174,7 +174,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			obj.setName( record.name );
 
 			obj.setType( getFileTypeService().get( record.type_id ) );
-			obj.setKind( getLookupService().get( "fileKind", record.kind_id ) );
+
+			var kind = getLookupService().get( "fileKind", record.kind_id );
+
+			// TODO add arguments "throwOnNull" to lookup.get()
+			if ( IsNull( kind ) ) {
+				Throw(
+					type    = "apirone.errors.fileKindNotFound",
+					message = "File kind [#record.kind_id#] not found for fileId [#record.file_id#]"
+				);
+			}
+
+			obj.setKind( kind );
 			obj.setSize( record.size );
 			obj.setWidth( record.width );
 			obj.setHeight( record.height );

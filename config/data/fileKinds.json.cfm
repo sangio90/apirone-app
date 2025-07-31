@@ -7,5 +7,8 @@
     },
     {
         id: "combination",
+    },
+    {
+        id: "product",
     }
 ]
