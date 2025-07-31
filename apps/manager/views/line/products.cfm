@@ -6,7 +6,7 @@
             <div class="col-8">
                 #pageTitle()#
             </div>
-            <div class="col-4 text-end">
+            <div class="col-4 text-end pt-2">
                 #button( label="Attributi e valori &raquo;", bind="click:attributes", size="sm" )#
             </div>
         </div>

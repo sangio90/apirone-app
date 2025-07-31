@@ -58,7 +58,7 @@
                             <label class="col-sm-2 col-form-label text-end">Disponibile per</label>
                             <div class="col-sm-10">
                                 <select id="categories" 
-                                    data-placeholder="Seleziona le categorie"
+                                    data-placeholder="-- Seleziona le categorie"
                                     data-role="multiselect" 
                                     data-bind="source: detailForm.categories, value: detailForm.data.selectedCategories" 
                                     data-value-field="id"

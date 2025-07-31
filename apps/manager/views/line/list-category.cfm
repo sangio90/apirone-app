@@ -28,7 +28,7 @@
                                         { 'field':'code', 'title':'Codice', width: '90px' },
                                         { 'field':'name', 'title':'Descrizione' },
                                         { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
-                                        { 'field':'', 'title':'Attributi per le combinazioni', width: '55px'},
+                                        { 'field':'', 'title':'Tutti gli attributi', width: '55px'},
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

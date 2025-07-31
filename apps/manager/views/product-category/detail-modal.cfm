@@ -19,7 +19,7 @@
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4" 
                                     name="code"
-                                    maxlength="5"
+                                    maxlength="2"
                                     data-bind="value: detailForm.data.code"
                                     onkeyup="this.value = this.value.toUpperCase()">
                             </div>
@@ -41,6 +41,32 @@
                                 <select id="statusId" class="form-control"
                                     required
                                     data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                    >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Tipo</label>
+                            <div class="col-sm-10">
+                                <select id="typeId" class="form-control" name="typeId"
+                                    required
+                                    data-bind="source: detailForm.types, value: detailForm.data.type.id" 
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                    >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Modalità</label>
+                            <div class="col-sm-10">
+                                <select id="modeId" class="form-control"
+                                    required
+                                    data-bind="source: detailForm.modes, value: detailForm.data.mode.id" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
