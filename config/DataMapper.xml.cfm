@@ -83,8 +83,8 @@
         <map from="validityDate" to="validityDate" type="cf:Date" />
         <map from="opportunityName" to="opportunityName" type="cf:String" />
         <map from="leadName" to="leadName" type="cf:String" />
-        <map from="pricelistId" to="pricelist" ref="Pricelist" />
-        <map from="paymentMethodId" to="paymentMethod" ref="PaymentMethod" />
+        <map from="pricelist" to="pricelist" ref="Pricelist" />
+        <map from="paymentMethod" to="paymentMethod" ref="PaymentMethod" />
         <map from="customPaymentMethod" to="customPaymentMethod" type="cf:String" />
         <map from="currency" to="currency" ref="Currency" />
         <map from="status" to="status" ref="Status" />
@@ -93,6 +93,30 @@
         <map from="shippingProfile" to="shippingProfile" ref="ShippingProfile" />
         <map from="salesAgentAccount" to="salesAgentAccount" ref="Account" />
         <map from="graphicTechnicianAccount" to="graphicTechnicianAccount" ref="Account" />
+    </mapper>
+
+    <mapper id="Pricelist" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Pricelist">
+        <map from="id" to="id" type="cf:String" />
+    </mapper>
+
+    <mapper id="PaymentMethod" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.PaymentMethod">
+        <map from="id" to="id" type="cf:String" />
+    </mapper>
+
+    <mapper id="Currency" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Currency">
+        <map from="id" to="id" type="cf:String" />
+    </mapper>
+
+    <mapper id="BillingProfile" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.BillingProfile">
+        <map from="id" to="id" type="cf:String" />
+    </mapper>
+
+    <mapper id="ShippingProfile" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ShippingProfile">
+        <map from="id" to="id" type="cf:String" />
+    </mapper>
+
+    <mapper id="Currency" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Currency">
+        <map from="id" to="id" type="cf:String" />
     </mapper>
 
     <mapper id="ProductItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductItem">

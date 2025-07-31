@@ -211,6 +211,14 @@
 		get( "/ajax/profiles/:id" ).to( "ProfileAjaxController.get" ).end();
 		get( "/ajax/profiles" ).to( "ProfileAjaxController.list" ).end();
 
+		
+		/*
+			quotations
+		*/
+		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
+		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
+		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
+
 
 		/*
 			roles
