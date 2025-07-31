@@ -71,12 +71,11 @@
                                         { 'field':'', 'title':'Attributi', width: '55px'},
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 
-                                            'field'           :'', 
-                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                            'width'           :'40px',
+                                            'field':'', 
+                                            'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                            'width':'40px',
                                             'headerAttributes': { 'class': 'text-center' }
                                         }
-
                                     ]",
 									rowTemplate = "product/product-grid-row-tmpl"
 								)#

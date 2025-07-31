@@ -76,7 +76,7 @@
 				roles: "ADM",
 			},
 			{
-				href: "/manager/products/categories/167",
+				href: "/manager/fruits",
 				icon: "fas fa-apple-alt",
 				title: "Frutti",
 				roles: "ADM"

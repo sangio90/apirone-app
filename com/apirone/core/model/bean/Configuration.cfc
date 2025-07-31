@@ -37,7 +37,7 @@ component output="true" accessors="true" {
 					}
 				},
 				"combinationItem" = {
-					"path"  = "combination_items",
+					"path"  = "combination-items",
 					"types" = {
 						"horizontal" = { "sizes" = [ { "width" = "500" } ] },
 						"vertical"   = { "sizes" = [ { "width" = "500" } ] }

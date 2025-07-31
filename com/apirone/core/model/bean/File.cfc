@@ -21,7 +21,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		var config      = new com.apirone.core.model.bean.Configuration();
 		var imageConfig = config.get( "imagesConfig" )[ getKind().getId() ];
 
-		var path = "#ExpandPath( "/" )#/../repository/public/#getRelativePath( arguments.size )#";
+		var path = ExpandPath( "/../repository/public" ) & getRelativePath( arguments.size );
 
 		return ExpandPath( path );
 	}
