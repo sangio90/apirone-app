@@ -9,7 +9,7 @@
 			FROM
 				product_items
 			WHERE
-				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.roductItemId#">
+				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItemId#">
 		</cfquery>
 
 		<cfreturn local.q>

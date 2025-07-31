@@ -39,6 +39,7 @@
 		<cfargument name="sizeId" type="String">
 		<cfargument name="finishId" type="String">
 		<cfargument name="excludedIds" type="Array">
+		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="str" type="String">
 
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
@@ -73,6 +74,10 @@
 
 				<cfif !IsNull( arguments.excludedCategoryIds ) AND ArrayLen( arguments.excludedCategoryIds )>
 					AND products.product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">)
+				</cfif>
+
+				<cfif !IsNull( arguments.categoryId )>
+					AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
 				</cfif>
 
 			ORDER BY
