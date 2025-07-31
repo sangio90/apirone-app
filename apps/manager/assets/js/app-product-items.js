@@ -11,7 +11,7 @@ AP.product.fields = {
 };
 
 $(document).ready(function () {
-	if ( AP.product.fields.rootDetail.length ) {
+	if (AP.product.fields.rootDetail.length) {
 		AP.product.items.init();
 	}
 });
@@ -109,16 +109,42 @@ AP.product.items = (function () {
 			return "/assets/main/img/img-not-found.png";
 		},
 
+		deleteImage: function (event) {
+
+			NM.util.ajax({
+				method: "DELETE",
+				url:
+					"/manager/ajax/products/" +
+					AP.page.productId +
+					"/images",
+				callback: {
+					done: function (xhr) {
+						//viewModel.get("items").read();
+
+						refreshDatasources()
+
+						setTimeout(
+							() => fields.attributeModal.modal("hide"),
+							600
+						);
+					},
+				},
+			});
+
+		},
+
 		getImageHref: function (event) {
+
 			var uri = event.uri;
 
 			if (event.uri != "") {
-				//console.log("event.uri", event.uri);
-				return uri;
+				var replaced = uri.replace("_ori", "500");
+
+				return replaced;
 			}
 
-			// TODO: not work with target=_blank
-			return "javascript:void(0)";
+			return "/assets/main/img/img-not-found.png";
+
 		},
 
 		selectAttribute: function (event) {
@@ -134,7 +160,9 @@ AP.product.items = (function () {
 				},
 				callback: {
 					done: function (xhr) {
-						viewModel.get("items").read();
+						//viewModel.get("items").read();
+
+						refreshDatasources()
 
 						setTimeout(
 							() => fields.attributeModal.modal("hide"),
@@ -188,7 +216,8 @@ AP.product.items = (function () {
 						done: function (xhr) {
 							AP.widget.notify("success", xhr.data.message.text);
 
-							viewModel.items.read();
+							//viewModel.items.read();
+							refreshDatasources();
 						},
 					},
 				});
@@ -242,15 +271,6 @@ AP.product.items = (function () {
 		},
 
 		openImagesList: function (event) {
-			/*
-			console.log("openImagesList");
-
-			productAttributeApp.openImagesList();
-
-			return false;
-			*/
-
-			//console.log("openImagesList");
 
 			var element = $(event.currentTarget);
 
@@ -465,7 +485,7 @@ AP.product.items = (function () {
 						found = true;
 					}
 
-					opts.push( { "combinatioId": product.id, "sizeCode": product.size.code } )
+					opts.push({ "combinatioId": product.id, "sizeCode": product.size.code })
 
 					/*
 					var opt = $("<option>", {
@@ -480,18 +500,18 @@ AP.product.items = (function () {
 
 			//sort by alpha
 			opts.sort((a, b) =>
-				a.sizeCode.localeCompare( b.sizeCode, "it-IT" )
+				a.sizeCode.localeCompare(b.sizeCode, "it-IT")
 			);
 
-			for ( var thisOpt of opts ) {
+			for (var thisOpt of opts) {
 
 				var opt = $("<option>", {
 					value: thisOpt.combinatioId,
 					text: thisOpt.sizeCode,
 				});
 
-				sizeEle.append( opt );
-			
+				sizeEle.append(opt);
+
 			}
 
 			found ? sizeEle.val(AP.page.productId) : "";
@@ -590,8 +610,8 @@ AP.product.items = (function () {
 								);
 								$(
 									"#image-upload-progress-" +
-										uid +
-										" .upload-bar"
+									uid +
+									" .upload-bar"
 								).css("width", progress + "%");
 
 								status.html("Fatto!");
@@ -802,7 +822,7 @@ AP.product.items = (function () {
 				return;
 			},
 		});
-	};	
+	};
 
 	return pub;
 })();

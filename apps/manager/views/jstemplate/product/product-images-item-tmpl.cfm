@@ -17,7 +17,11 @@
                         <div class="col-3"> 
                             <div class="text-end mb-1"> 
                                 <span data-bind="invisible: complete" class="text-end"><span class="badge bg-secondary" style="font-size:13px">Da caricare</span></span>
-                                <span data-bind="visible: complete" class="text-end"><span class="badge bg-success" style="font-size:13px">Caricato</span></span>
+                                <span data-bind="visible: complete" class="text-end">
+                                    <span class="badge bg-success" style="font-size:13px">Caricato</span>
+                                    <br>
+                                    <a class="underline hand" data-bind="click:deleteImage">cancella</a>
+                                </span>
                             </div>
                         </div>
             

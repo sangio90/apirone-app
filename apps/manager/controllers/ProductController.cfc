@@ -48,21 +48,6 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 
-	/*
-    function list( event, rc, prc ){
-
-        prc.title = "Frutti";
-        prc.statuses = super.fire( "status.list", ["PRODUCT"] );
-
-        prc.jsScripts.add( "app-fruit-list" );
-
-        prc.page["statuses"] = prc.statuses;
-
-        event.setView("fruit/list");
-
-    }
-    */
-
 	function listByCategoryId( event, rc, prc ){
 		param rc.id = "";
 

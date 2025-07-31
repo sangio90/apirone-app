@@ -33,13 +33,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var bean = super.fire( "Product.get", [ rc.id ] );
 
-		// dump( bean );
-		// abort;
-
 		var obj = super.getDataMapper().convert( bean, "Product", true );
-
-		// dump( obj );
-		// abort;
 
 		result.setData( obj );
 
@@ -99,6 +93,21 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		```
 		<cftransaction>
+			<!--- aggiungo tutto in coda --->
+
+			<cfquery datasource="apirone" name="orderBy">
+				SELECT MAX( orderby ) AS max_orderby
+				FROM
+					product_items
+				WHERE product_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
+			</cfquery>
+
+			<cfif orderBy.recordCount>
+				<cfset startOrderBy = orderBy.max_orderby>
+			<cfelse>
+				<cfset startOrderBy = 10>
+			</cfif>
+
 			<cfquery datasource="apirone">
 				DELETE FROM product_items
 				WHERE
@@ -123,7 +132,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					VALUES (
 						'#rc.id#',
 						'#item.getId()#',
-						#item.getOrderBy()#,
+						#startOrderBy + item.getOrderBy()#,
 						#( Val( rc.parentId ) ? rc.parentId : "NULL" )#,
 						'ACT'
 					)

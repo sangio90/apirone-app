@@ -17,7 +17,7 @@ component extends="coldbox.system.Interceptor" {
         }
         */
 
-		event.prc.eventId = createUUID()
+		event.prc.eventId = CreateUUID()
 
 		canAccess( event );
 
@@ -39,7 +39,7 @@ component extends="coldbox.system.Interceptor" {
 			var svc = model.getInstance( "APIService" );
 
 			try {
-				var authToken = trim( getHTTPRequestData().Headers.authorization.replace( "Bearer", "" ) );
+				var authToken = Trim( GetHTTPRequestData().Headers.authorization.replace( "Bearer", "" ) );
 
 				// verticale
 				if ( authToken != "9e39d8edd05940ddab24411338e9def857679e76978041e29a1d7f956aa0be5d" ) {
@@ -70,7 +70,7 @@ component extends="coldbox.system.Interceptor" {
 			var allowedEvents = "manager:AuthController.login,manager:AuthController.checkLogin,manager:AuthController.logout";
 
 			// se non sono loggato, e non un evento ammesso
-			if ( !session.user.isLogged() AND !listFindNoCase( allowedEvents, event.getContext().event ) ) {
+			if ( !session.user.isLogged() AND !ListFindNoCase( allowedEvents, event.getContext().event ) ) {
 				flash.put( "message", "Sessione scaduta. Fai il login." );
 				relocate(
 					uri               = "/manager/login",
@@ -91,8 +91,8 @@ component extends="coldbox.system.Interceptor" {
 			prc.subtitle = "";
 
 			prc.config        = getGlobalConfiguration(); // js global config
-			prc.staticVersion = prc.isDev ? RandRange( 1000, 9999 ) : DateFormat( now(), "yyyymmdd" );
-			//prc.staticVersion = url.keyExists( "reinit" ) ? prc.staticVersion + 1 : prc.staticVersion;
+			prc.staticVersion = prc.isDev ? RandRange( 1000, 9999 ) : DateFormat( Now(), "yyyymmdd" ) & 11;
+			// prc.staticVersion = url.keyExists( "reinit" ) ? prc.staticVersion + 1 : prc.staticVersion;
 		}
 	}
 
@@ -120,10 +120,10 @@ component extends="coldbox.system.Interceptor" {
                 ATTENZIONE:
                 non c'è result se il nome dell'hanlder nel router è sbagliato
             */
-			if ( isSimpleValue( result ) AND result == "result-not-found" ) {
+			if ( IsSimpleValue( result ) AND result == "result-not-found" ) {
 				event.renderData( data = "Result key not found", statusCode = "400" ).noExecution();
 			} else {
-				if ( isInstanceOf( result, path ) ) {
+				if ( IsInstanceOf( result, path ) ) {
 					var code = 200;
 
 					if ( result.getStatus() == "ERROR" ) {
@@ -146,7 +146,7 @@ component extends="coldbox.system.Interceptor" {
 
 					bean.setData( result );
 
-					if ( !isSimpleValue( result ) ) {
+					if ( !IsSimpleValue( result ) ) {
 						bean.setTotal( result.len() );
 						bean.setCount( result.len() );
 					}
@@ -195,10 +195,10 @@ component extends="coldbox.system.Interceptor" {
 	}
 
 	private function hostCanAccess(){
-		var host            = listFirst( cgi.http_host, ":" );
+		var host            = ListFirst( cgi.http_host, ":" );
 		var authorizedHosts = "test.apirone.cc,www.apirone.cc,apirone.cc,www.apirone.local,apirone.local,127.0.0.1";
 
-		if ( !listFind( authorizedHosts, host ) ) {
+		if ( !ListFind( authorizedHosts, host ) ) {
 			setUnauthorizedMessage( message = "Unauthorized host [#host#]" );
 		}
 	}
@@ -216,42 +216,38 @@ component extends="coldbox.system.Interceptor" {
 		}
 	}
 
-	private function setUnauthorizedMessage(
-		required String message
-	){
-		echo( arguments.message );
+	private function setUnauthorizedMessage( required String message ){
+		Echo( arguments.message );
 		cfheader( statusCode = "404", statusText = "Not found" );
 
-		fileAppend(
-			expandPath( "/../repository/private/logs/secure.log" ),
-			"#now()# - #arguments.message# #chr( 13 )##chr( 10 )#"
+		FileAppend(
+			ExpandPath( "/../repository/private/logs/secure.log" ),
+			"#Now()# - #arguments.message# #Chr( 13 )##Chr( 10 )#"
 		);
 		abort;
 	}
 
-	private function canAccess(
-		event
-	){
+	private function canAccess( event ){
 		hostCanAccess();
 		userAgentCanAccess();
 
 		var currentEvent = arguments.event.getContext().event;
 
-		var allowedEvents = deserializeJSON( fileRead( expandPath( "/config/allowedEvents.json.cfm" ) ) );
+		var allowedEvents = DeserializeJSON( FileRead( ExpandPath( "/config/allowedEvents.json.cfm" ) ) );
 
 		var allowedEventsForUnlogged = allowedEvents.forUnlogged;
-		var allowedEventsForCustomer = arrayMerge( allowedEvents.forUnlogged, allowedEvents.forCustomer );
+		var allowedEventsForCustomer = ArrayMerge( allowedEvents.forUnlogged, allowedEvents.forCustomer );
 
 		if ( event.getCurrentModule() == "manager" ) {
 			if ( session.user.isLogged() ) {
 				if ( session.user.getRole().getId() == "CST" ) {
-					if ( !arrayFindNoCase( allowedEventsForCustomer, currentEvent ) ) {
-						location( "/manager/dashboard?msg=page-not-auth&event=#currentEvent#", false );
+					if ( !ArrayFindNoCase( allowedEventsForCustomer, currentEvent ) ) {
+						Location( "/manager/dashboard?msg=page-not-auth&event=#currentEvent#", false );
 					}
 				}
 			} else {
-				if ( !arrayFindNoCase( allowedEventsForUnlogged, currentEvent ) ) {
-					location( "/manager/login?msg=not-auth", false );
+				if ( !ArrayFindNoCase( allowedEventsForUnlogged, currentEvent ) ) {
+					Location( "/manager/login?msg=not-auth", false );
 				}
 			}
 		}
@@ -262,12 +258,15 @@ component extends="coldbox.system.Interceptor" {
 		required prefix  = "api",
 		required service = "apirone"
 	){
-		var code = "#arguments.prefix#_" & dateTimeFormat( now(), "yyyy-mm-dd_HH-nn-ss" ) & "_" & randRange( 0, 99999 );
-		
-		var dayPath  = dateTimeFormat( now(), "yyyy/mm" );
+		var code = "#arguments.prefix#_" & DateTimeFormat( Now(), "yyyy-mm-dd_HH-nn-ss" ) & "_" & RandRange(
+			0,
+			99999
+		);
+
+		var dayPath  = DateTimeFormat( Now(), "yyyy/mm" );
 		var response = "";
 
-		var thisRequest = getHTTPRequestData();
+		var thisRequest = GetHTTPRequestData();
 
 		var body = thisRequest.keyExists( "content" ) ? thisRequest.content : "not-exists";
 
@@ -281,8 +280,8 @@ component extends="coldbox.system.Interceptor" {
 
 		if ( thisRequest.keyExists( "headers" ) ) {
 			if ( thisRequest.headers.keyExists( "authorization" ) ) {
-				meta.apiKey = trim(
-					replace(
+				meta.apiKey = Trim(
+					Replace(
 						thisRequest.headers.authorization,
 						"Bearer",
 						""
@@ -293,32 +292,32 @@ component extends="coldbox.system.Interceptor" {
 
 		cffile(
 			action = "append",
-			file   = "#expandPath( "/../repository/private/logs/api.log" )#",
-			output = "#now()#;#cgi.REMOTE_ADDR#;#cgi.HTTP_USER_AGENT#;#meta.route#;#meta.eventName#;#meta.method#;#meta.apiKey#"
+			file   = "#ExpandPath( "/../repository/private/logs/api.log" )#",
+			output = "#Now()#;#cgi.REMOTE_ADDR#;#cgi.HTTP_USER_AGENT#;#meta.route#;#meta.eventName#;#meta.method#;#meta.apiKey#"
 		);
 
 		// TODO: nalla path "service" o "api"?
-		var thisPath = expandPath( "/../repository/private/api/#arguments.service#/#dayPath#" );
+		var thisPath = ExpandPath( "/../repository/private/api/#arguments.service#/#dayPath#" );
 
-		directoryCreate( thisPath, true, true );
+		DirectoryCreate( thisPath, true, true );
 
 		savecontent variable="report" {
-			echo( "<h2>ID: #code#</h2><br>Data: #now()#" );
+			Echo( "<h2>ID: #code#</h2><br>Data: #Now()#" );
 
-			echo( "<h3>Meta</h3>" );
+			Echo( "<h3>Meta</h3>" );
 			cfdump( var = "#meta#", label = "meta" );
 
-			echo( "<h3>Request</h3>" );
+			Echo( "<h3>Request</h3>" );
 			cfdump( var = "#body#", label = "Request body" );
 
-			echo( "<h3>Response</h3>" );
+			Echo( "<h3>Response</h3>" );
 			cfdump( var = "#response#", label = "Response" );
 
-			echo( "<h3>CGI</h3>" );
+			Echo( "<h3>CGI</h3>" );
 			cfdump( var = "#cgi#", label = "CGI" );
 		}
 
-		fileWrite( "#thisPath#/#code#.html", report );
+		FileWrite( "#thisPath#/#code#.html", report );
 
 		return code;
 	}
