@@ -64,16 +64,26 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.page[ "line" ] = prc.line;
 
-		prc.title = "Combinazioni per < categoria #prc.category.getName()# linea #prc.line.getName()# >";
+		prc.title    = "Categoria #prc.category.getName()# linea #prc.line.getName()#";
+		prc.subtitle = "Prodotti disponibili";
 
-		sizes = super.fire( "size.list", { categoryId = prc.category.getId() } );
+		sizes        = super.fire( "size.list", { categoryId = prc.category.getId() } );
 		prc.sizes    = sizes;
-		prc.finishes = super.fire( "finish.list", { categoryId = prc.category.getId() } );
-        
+		prc.finishes = super.fire( "finish.list" );
+
 		for ( var size in sizes ) {
-			existingSizeConfig = super.fire( "sizeConfig.list", { sizeId = size.getId(), productCategoryId = int(rc.categoryId), lineId = rc.id  } );
+			var existingSizeConfig = super.fire(
+				"sizeConfig.list",
+				{
+					sizeId            = size.getId(),
+					productCategoryId = Int( rc.categoryId ),
+					lineId            = rc.id
+				}
+			);
+
 			size.sizeConfig = NullValue();
-			if (existingSizeConfig.len() ) {
+
+			if ( existingSizeConfig.len() ) {
 				size.sizeConfig = existingSizeConfig[ 1 ];
 			}
 		}
