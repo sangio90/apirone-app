@@ -11,15 +11,6 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction returntype="Void" name="delete">
-		<cfargument name="fileId" type="String" required="true">
-		<cfquery name="local.q" datasource="apirone">
-			DELETE
-			FROM files
-			WHERE file_id = <cfqueryparam cfsqltype="varchar" value="#arguments.fileId#">::uuid
-		</cfquery>
-	</cffunction>
-
 	<cffunction name="find" returntype="Query">
 		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
@@ -103,5 +94,14 @@
 		</cfquery>
 
 		<cfreturn q.file_id>
+	</cffunction>
+
+	<cffunction returntype="Void" name="delete">
+		<cfargument name="fileId" type="String" required="true">
+		<cfquery name="local.q" datasource="apirone" result="result">
+			DELETE
+			FROM files
+			WHERE file_id = <cfqueryparam cfsqltype="varchar" value="#arguments.fileId#">::uuid
+		</cfquery>
 	</cffunction>
 </cfcomponent>
