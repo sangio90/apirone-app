@@ -35,9 +35,9 @@
                                     <cfloop array="#prc.sizes#" item="size">
                                         <th>
 											#size.getCode()#
-												<br>
-												<br>
-											<cfif NOT isNull(size.getType()) && size.getType().getId() EQ "S">
+                                            <br>
+                                            <br>
+											<cfif NOT IsNull(size.getType()) && size.getType().getId() EQ "S">
 												<cfif NOT isNull(size.sizeConfig)>
 													<button class="btn btn-primary btn-xs" data-bind="click:showSizeConfigModal"
 														data-product-category-id="#prc.category.getId()#"
@@ -69,10 +69,9 @@
                                 </thead>
                                 <tbody>
                                 <cfloop array="#prc.finishes#" item="finish">
-                                    <cfset  finishName = finish.getMainText().getName()>
                                     <tr>
                                         <td>
-                                            #finish.getMainText().getName()# <span class="small-code">(#finish.getShortId()#)</span>
+                                            #finish.getName()# <span class="small-code">(#finish.getShortId()#)</span>
                                         </td>
                                         <cfloop array="#prc.sizes#" item="size">
                                             <td>

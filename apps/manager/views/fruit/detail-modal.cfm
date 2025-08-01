@@ -45,7 +45,6 @@
                             </div>
                         </div>
 
-
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Stato</label>
                             <div class="col-sm-10">
@@ -60,12 +59,26 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Disponibile per</label>
+                            <label class="col-sm-2 col-form-label text-end">Linee</label>
                             <div class="col-sm-10">
-                                <select id="categories" 
+                                <select id="lines" 
                                     data-placeholder="-- Seleziona le linee"
                                     data-role="multiselect" 
                                     data-bind="source: detailForm.lines, value: detailForm.data.selectedLines" 
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                    >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Categoria</label>
+                            <div class="col-sm-10">
+                                <select id="category" 
+                                    name="categoryId"
+                                    data-placeholder="-- Seleziona la categoria"
+                                    data-bind="source: detailForm.categories, value: detailForm.data.category.id" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >

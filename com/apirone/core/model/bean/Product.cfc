@@ -8,6 +8,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	property name="finish" type="com.apirone.core.model.bean.Finish";
 	property name="status" type="com.apirone.core.model.bean.Status";
 
+
 	/*
 		simple (fruit)
 	*/
@@ -15,8 +16,9 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	property name="positionCount" type="Numeric";
 	property name="lines" type="com.apirone.core.model.bean.Line[]";
 
+	
 	/*
-		same field
+		same fields
 	*/
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="category" type="com.apirone.core.model.bean.ProductCategory";
