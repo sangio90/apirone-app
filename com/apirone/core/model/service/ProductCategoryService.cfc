@@ -41,6 +41,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		String lineId,
+		String modeId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "productCategory.id" } ]
@@ -66,13 +67,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create( required com.apirone.core.model.bean.ProductCategory ProductCategory ){
 		if ( !Len( arguments.ProductCategory.getCode() ) ) {
-			Throw( type = "apirone.errors.createProductCategory.codeNotProvided", message = "Code required" );
+			Throw( type = "apirone.errors.codeNotProvided", message = "Code required" );
 		};
 
 		if ( !Len( arguments.ProductCategory.getTexts() ) ) {
 			Throw(
-				type    = "apirone.errors.createLineTexts.noTexsProvided",
-				message = "At least one description required"
+				type = "apirone.errors.noTexsProvided", message = "At least one description required"
 			);
 		};
 
@@ -96,13 +96,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.ProductCategory ProductCategory ){
 		if ( !Len( arguments.ProductCategory.getCode() ) ) {
-			Throw( type = "apirone.errors.updateProductCategory.codeNotProvided", message = "Code required" );
+			Throw( type = "apirone.errors.codeNotProvided", message = "Code required" );
 		};
 
 		if ( !Len( arguments.ProductCategory.getTexts() ) ) {
 			Throw(
-				type    = "apirone.errors.updateProductCategory.noTexsProvided",
-				message = "At least one description required"
+				type = "apirone.errors.noTexsProvided", message = "At least one description required"
 			);
 		};
 

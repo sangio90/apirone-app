@@ -15,6 +15,9 @@
             <td>
                 <span data-bind="text: type.name"></span>
             </td>
+            <td>
+                <span data-bind="text: mode.name"></span>
+            </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
             </td>

@@ -204,7 +204,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean = super.bean( "Product" );
 
 			bean.setId( record.product_id );
-			// bean.setName( "" );
 			bean.setCreatedAt( record.created_at );
 			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
 
@@ -220,7 +219,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 			/*
-				simple (fruit)
+				base (fruit)
 			*/
 			bean.setCode( record.code );
 			bean.setPositionCount( record.position_count );
