@@ -69,6 +69,10 @@
 					AND l.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">
 				</cfif>
 
+				<cfif !IsNull( arguments.modeId )>
+					AND product_categories.mode_id = <cfqueryparam value="#arguments.modeId#" cfsqltype="Varchar">
+				</cfif>
+
 			GROUP BY
 				product_category_id, texts.text, lang_id
 			ORDER BY

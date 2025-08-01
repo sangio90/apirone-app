@@ -21,18 +21,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( !rc.keyExists( "categoryId" ) ) {
 			// move to most used category: plates
 			cflocation( url = "/manager/lines/categories/22", addToken = "false" );
-
 			abort;
 		}
 
 		prc.category   = super.fire( "ProductCategory.get", [ rc.categoryId ] );
-		prc.categories = super.fire( "ProductCategory.list" );
-
-		prc.title = "Linee per < #prc.category.getName()# >";
-
-		prc.statuses       = super.fire( "status.list", [ "LINE" ] );
-		// prc.thicknesses    = super.fire( "lookup.list", [ "thickness" ] );
-		prc.lineCategories = super.fire( "ProductCategory.list" );
+		prc.categories = super.fire( "ProductCategory.list", { modeId = "COM" } );
+		prc.title      = "Linee per < #prc.category.getName()# >";
+		prc.statuses   = super.fire( "status.list", [ "LINE" ] );
 
 		prc.jsScripts.add( "app-line-category" );
 

@@ -19,6 +19,26 @@
 				<section class="card">
 					<div class="card-body">
 
+                        <div class="row d-flex align-items-center mb-2">
+
+                            <div class="col-sm-8">
+
+                                <div class="box-search-small"> 
+
+                                    <form id="line-category-search-form" 
+                                        class="d-flex justify-content-end" 
+                                        submit="return false;"
+                                        >
+
+                                        <input name="str" placeholder="Filtra..." class="form-control me-2" type="text" data-bind="events: { keyup: search }">
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+                        </div>						
+
 						<form name="line-category-grid-form" id="line-category-grid-form" method="post">
 							<div class="col-12">
 								#grid(

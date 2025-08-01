@@ -1,10 +1,10 @@
 [
     {
-        id: "SIM",
-		name: "Semplice"
+        id: "BAS",
+		name: "Base"
     },
     {
         id: "COM",
-        name: "Complesso",
+        name: "Per linea",
     },
 ]

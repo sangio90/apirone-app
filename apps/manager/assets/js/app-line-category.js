@@ -2,53 +2,73 @@ AP.lineCategory = AP.lineCategory || {};
 
 AP.lineCategory.fields = {
     listRoot: $("#line-category-list-root"),
-    search: $("#line-category-search-form")
+    searchForm: $("#line-category-search-form"),
 };
 
-$(document).ready(function (){
-
-	if (AP.lineCategory.fields.listRoot.length) {
-	    AP.lineCategory.list.init();
-	}
-
+$(document).ready(function () {
+    if (AP.lineCategory.fields.listRoot.length) {
+        AP.lineCategory.list.init();
+    }
 });
 
 AP.lineCategory.list = (function () {
+    var pub = {};
+    var fields = AP.lineCategory.fields;
 
-	var pub = {};
-
-	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/lines/categories/" + AP.page.categoryId })
-	};
+    var dataSources = {
+        items: NM.kendo.dataSource({ url: "/manager/ajax/lines/categories/" + AP.page.categoryId }),
+    };
 
     var fields = AP.lineCategory.fields;
 
-	var viewModel = kendo.observable({
-		rows: dataSources.items,
+    var viewModel = kendo.observable({
+        rows: dataSources.items,
 
-        change: function (event) {
+        search: function (event) {
+            var thisForm = fields.searchForm;
 
-            //TODO: modificare la url corrente con l'id gisto
-            ///     manager/lines/categories/NUOVO_ID
+            var params = thisForm.serializeJSON();
+            var filters = [];
 
-            var select     = $(event.currentTarget);
+            var dataSource = viewModel.get("rows");
 
-            var categoryId = select.val();
-            var category   = select.find("option:selected").data("name");
+            var filterDataSource = new kendo.data.DataSource({
+                data: dataSource.data().toJSON(),
+            });
 
-            fields.listRoot.find("h2").text( "Linee per < " + category + " >" );
+            if (params.str.length) {
+                filters.push({
+                    field: "name",
+                    operator: "contains",
+                    value: params.str,
+                });
+            }
 
-            viewModel.set( 
-                "rows", 
-                NM.kendo.dataSource({ url: "/manager/ajax/lines/categories/" + categoryId })
-            )
+            filterDataSource.filter(filters);
+
+            viewModel.set("rows", filterDataSource);
 
             return false;
-
         },
 
-		products: function (event) {
+        change: function (event) {
+            var select = $(event.currentTarget);
+            var categoryId = select.val();
+            var category = select.find("option:selected").data("name");
+            var title = "Linee per < " + category + " >";
 
+            // change url and title
+            window.history.pushState({}, "", categoryId);
+            document.title = title;
+
+            fields.listRoot.find("h2").text(title);
+
+            viewModel.set("rows", NM.kendo.dataSource({ url: "/manager/ajax/lines/categories/" + categoryId }));
+
+            return false;
+        },
+
+        products: function (event) {
             console.log("fields.listRoot", fields.listRoot);
 
             var id = event.data.id;
@@ -57,11 +77,9 @@ AP.lineCategory.list = (function () {
             window.open("/manager/lines/" + id + "/categories/" + categoryId + "/products", "_blank").focus();
 
             return false;
-		},
+        },
 
-
-		attributes: function (event) {
-
+        attributes: function (event) {
             /*
                 note: redirect in controller to first product
             */
@@ -70,18 +88,14 @@ AP.lineCategory.list = (function () {
             window.open("/manager/lines/" + id + "/attributes", "_blank").focus();
 
             return false;
-		},
+        },
+    });
 
-
-	});
-
-	pub.init = function () {
-
+    pub.init = function () {
         console.log("listCategory:init");
 
         kendo.bind(AP.lineCategory.fields.listRoot, viewModel);
-
-	};
+    };
 
     return pub;
-}());
+})();
