@@ -27,10 +27,15 @@
 
                                     <form id="line-category-search-form" 
                                         class="d-flex justify-content-end" 
-                                        submit="return false;"
+                                        data-bind="events: { submit: search }"
                                         >
 
-                                        <input name="str" placeholder="Filtra..." class="form-control me-2" type="text" data-bind="events: { keyup: search }">
+                                        <input name="str" placeholder="Filtra..." class="form-control me-2" type="text">
+
+                                        <div style="align-self: flex-end;">
+                                            #searchButton( bind="click:search" )#
+                                        </div>
+
 
                                     </form>
 

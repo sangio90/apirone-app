@@ -28,25 +28,10 @@ AP.lineCategory.list = (function () {
             var thisForm = fields.searchForm;
 
             var params = thisForm.serializeJSON();
-            var filters = [];
 
-            var dataSource = viewModel.get("rows");
+            params.categoryId = fields.listRoot.find("[name=categoryId]").val();
 
-            var filterDataSource = new kendo.data.DataSource({
-                data: dataSource.data().toJSON(),
-            });
-
-            if (params.str.length) {
-                filters.push({
-                    field: "name",
-                    operator: "contains",
-                    value: params.str,
-                });
-            }
-
-            filterDataSource.filter(filters);
-
-            viewModel.set("rows", filterDataSource);
+            viewModel.get("rows").read(params);
 
             return false;
         },
