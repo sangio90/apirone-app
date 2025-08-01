@@ -61,7 +61,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		} );
 
 		getLogger().debug( "LookupService.get: value [#arguments.value#] for entity [#entity#] not found. Adding it to config?" );
-		getLogger().debug( "LookupService.get: value [#arguments.value#] for entity [#entity#] not found. Adding it to config?" );
 		return result;
 	}
 

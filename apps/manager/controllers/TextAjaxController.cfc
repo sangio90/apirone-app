@@ -12,7 +12,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		for ( var obj in rows.getData() ) {
 			var row = dm.convert( obj, "Text", true );
 
-			row[ "entity" ] = getEntityName( obj.getEntity().getKey() );
+			row[ "entity" ] = "generale";
+
 			data.add( row );
 		}
 
