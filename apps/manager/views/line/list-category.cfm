@@ -2,11 +2,14 @@
 	<div id="line-category-list-root">
 
         <div class="row">
-            <div class="col-8" id="page-title">
+            <div class="col-6" id="page-title">
 				#pageTitle()#
             </div>
-            <div class="col-4">
-				<select class="form-control me-2" name="categoryId" data-bind="events: { change: change }">
+            <div class="col-6 d-flex align-items-center text-end mb-2">
+                <div class="text-end text-nowrap">
+                    Cambia categoria: 
+                </div>
+				<select class="form-control ms-2" name="categoryId" data-bind="events: { change: change }">
 					<cfloop array="#prc.categories#" item="item">
 						<option data-name="#item.getName()#" value="#item.getId()#" <cfif item.getId() == prc.category.getId()>SELECTED</cfif>>#item.getName()#</option>
 					</cfloop>
@@ -35,7 +38,6 @@
                                         <div style="align-self: flex-end;">
                                             #searchButton( bind="click:search" )#
                                         </div>
-
 
                                     </form>
 
