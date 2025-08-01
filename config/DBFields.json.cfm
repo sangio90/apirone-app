@@ -49,6 +49,16 @@
         "type": "Varchar"
     },
 
+    "fruit.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+
+    "fruit.name": {
+        "name": "texts.text",
+        "type": "Varchar"
+    },
+
     "fileKind.id": {
         "name": "file_kind_id",
         "type": "Varchar"
