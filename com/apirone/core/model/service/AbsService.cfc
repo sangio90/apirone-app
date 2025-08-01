@@ -101,13 +101,28 @@ component output="false" accessors="true" {
 		var categories = DeserializeJSON( arguments.categories );
 
 		if ( !IsNull( categories ) AND Len( categories ) ) {
-			var listCategories = [];
-
 			for ( var thisCategory in categories ) {
 				var beanCategory = this.service( "ProductCategory" ).get( thisCategory );
 
 				if ( !IsNull( beanCategory ) ) {
 					result.add( beanCategory );
+				}
+			}
+		}
+
+		return result.len() ? result : NullValue();
+	}
+
+	private Array function getLinesBeanByIds( required String lines ){
+		var result = [];
+		var lines  = DeserializeJSON( arguments.lines );
+
+		if ( !IsNull( lines ) AND Len( lines ) ) {
+			for ( var thisLine in lines ) {
+				var beanLine = this.service( "Line" ).get( thisLine );
+
+				if ( !IsNull( beanLine ) ) {
+					result.add( beanLine );
 				}
 			}
 		}
