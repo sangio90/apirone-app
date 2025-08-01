@@ -12,6 +12,9 @@
             <td>
                 <span data-bind="text: mainText.name"></span>
             </td>
+            <td>
+                <div data-bind="source: lines" data-template="fruit-line-row-tmpl"></div>
+            </td>
             <td class="text-end">
                 <span data-bind="text: positionCount"></span>
             </td>
@@ -29,4 +32,7 @@
             </td>
         </tr>
     </nmscript>
+
+    #template( view="jstemplate/fruit/fruit-line-row-tmpl" )#
+    
 </cfoutput>

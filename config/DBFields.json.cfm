@@ -39,6 +39,11 @@
         "type": "uuid"
     },
 
+    "finish.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+
     "fileKind.id": {
         "name": "file_kind_id",
         "type": "Varchar"

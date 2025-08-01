@@ -209,6 +209,7 @@
         <map from="positionCount" to="positionCount" type="cf:Integer" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
         <map from="mainText" to="mainText" ref="Text" />
+        <map from="lines" to="lines" ref="Line" type="Array" />
     </mapper>
 
     <mapper id="Product" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Product">

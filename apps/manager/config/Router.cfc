@@ -50,6 +50,7 @@
 		get( "/ajax/finishes/code-exists" ).to( "FinishAjaxController.codeExists" ).end();
 		get( "/ajax/finishes" ).to( "FinishAjaxController.list" ).end();
 		post( "/ajax/finishes" ).to( "FinishAjaxController.save" ).end();
+		delete( "/ajax/finishes" ).to( "FinishAjaxController.delete" ).end();
 		get( "/finishes" ).to( "FinishController.list" ).end();
 
 

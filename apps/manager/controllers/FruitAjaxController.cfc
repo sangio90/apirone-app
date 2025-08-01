@@ -51,6 +51,7 @@
 
 	function save( event, rc, prc ){
 		var result = super.getResult();
+		var lines  = [];
 
 		var fruit      = super.bean( "Product" );
 		var category   = super.bean( "ProductCategory" );
@@ -66,6 +67,17 @@
 
 		fruit.setStatus( status.setId( json.status.id ) );
 		fruit.setPositionCount( json.positionCount )
+
+		if ( Len( json?.selectedLines ) ) {
+			for ( var thisLine in json.selectedLines ) {
+				var line = super.bean( "Line" );
+
+				line.setId( thisLine.id );
+				lines.add( line );
+			}
+		}
+
+		fruit.setLines( lines );
 
 		text.setLang( lang.setId( json.mainText.lang.id ) );
 		text.setStatus( statusText.setId( "ACT" ) );

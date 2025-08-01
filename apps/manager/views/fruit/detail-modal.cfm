@@ -59,6 +59,20 @@
                             </div>
                         </div>
 
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Disponibile per</label>
+                            <div class="col-sm-10">
+                                <select id="categories" 
+                                    data-placeholder="-- Seleziona le linee"
+                                    data-role="multiselect" 
+                                    data-bind="source: detailForm.lines, value: detailForm.data.selectedLines" 
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                    >
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
 
                     <footer class="card-footer">

@@ -204,11 +204,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean = super.bean( "Product" );
 
 			bean.setId( record.product_id );
-			bean.setName( "" );
+			// bean.setName( "" );
 			bean.setCreatedAt( record.created_at );
-			bean.setCode( record.code );
-			bean.setPositionCount( record.position_count );
+			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
 
+			/*
+				complex (plates)
+			*/
 			bean.setSize( !IsNull( record.size_id ) ? getSizeService().get( record.size_id ) : NullValue() );
 			bean.setLine( !IsNull( record.line_id ) ? getLineService().get( record.line_id ) : NullValue() );
 			bean.setFinish(
@@ -216,7 +218,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			);
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
-			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
+
+			/*
+				simple (fruit)
+			*/
+			bean.setCode( record.code );
+			bean.setPositionCount( record.position_count );
+
+			var lines = super.getLinesBeanByIds( record.lines );
+			bean.setLines( lines );
+
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
 			return bean;

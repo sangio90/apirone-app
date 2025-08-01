@@ -1,12 +1,14 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function list( event, rc, cccccccccccc ){
+	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
 
 		var dm = super.getDataMapper();
 
 		var params = super.paramsFromUrl();
+
+		params[ "orderBy" ] = [ { field = "finish.code" } ];
 
 		var rows = super.fire( "finish.search", params );
 
@@ -77,6 +79,36 @@ component extends="com.apirone.core.controller.AbsController" {
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+
+		event.setValue( "result", result );
+	}
+
+	function delete( event, rc, prc ){
+		var result    = super.getResult();
+		var list      = GetHTTPRequestData().content;
+		var messageId = "finish.deletedAllRecords";
+
+		var errors  = [];
+		var payload = "";
+
+		var ids = ListToArray( list );
+
+		for ( var id in ids ) {
+			var outcome = super.fire( "finish.delete", [ id ] );
+
+			if ( outcome.getStatus() == "ERROR" ) {
+				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+			}
+		}
+
+		if ( errors.len() ) {
+			messageId = "finish.deletedNotAllRecords"
+			payload   = { "errors" = errors };
+		}
+
+		var message = super.completeMessage( messageId );
+
+		result.setData( { "message" = message, "payload" = payload } );
 
 		event.setValue( "result", result );
 	}
