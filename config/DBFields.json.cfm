@@ -44,6 +44,11 @@
         "type": "Varchar"
     },
 
+    "finish.name": {
+        "name": "texts.text",
+        "type": "Varchar"
+    },
+
     "fileKind.id": {
         "name": "file_kind_id",
         "type": "Varchar"

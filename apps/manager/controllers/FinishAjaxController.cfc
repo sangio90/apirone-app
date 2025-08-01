@@ -8,7 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var params = super.paramsFromUrl();
 
-		params[ "orderBy" ] = [ { field = "finish.code" } ];
+		//params[ "orderBy" ] = [ { field = "finish.code" } ];
 
 		var rows = super.fire( "finish.search", params );
 

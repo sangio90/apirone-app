@@ -36,26 +36,31 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
+		<cfargument name="langId" type="String" default="IT">
 		<cfargument name="orderBy" type="String" default="finishes.code asc, finishes.finish_id">
 
-		<cfquery name="local.q" datasource="apirone">
+		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT DISTINCT
+				<cfif arguments.orderBy CONTAINS "texts.text">
+					texts.text,
+				</cfif>
 				finish_id::varchar,
 				categories::varchar,
 				finishes.code,
 				COUNT( finish_id ) OVER() AS total
 			FROM
 				finishes
-
-				<cfif !IsNull( arguments.str )>
 					INNER JOIN texts USING ( finish_id )
-				</cfif>
 
 				<cfif !IsNull( arguments.lineId )>
 					INNER JOIN products USING ( finish_id )
 				</cfif>
 
 			WHERE 1=1
+
+				<cfif !IsNull( arguments.langId )>
+					AND texts.lang_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.langId#">
+				</cfif>
 
 				<cfif !IsNull( arguments.categoryId )>
 					<!--- INFO: with cfqueryparam not works --->
@@ -66,15 +71,16 @@
 					AND products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				</cfif>
 
+				<cfif !IsNull( arguments.statusId )>
+					AND finishes.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
+				</cfif>
+
 				<cfif !IsNull( arguments.str )>
 					AND (
 						finishes.code ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 						OR texts.text ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 					)
 				</cfif>
-
-			GROUP BY
-				finishes.code, finishes.finish_id
 
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderBy )#

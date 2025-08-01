@@ -46,10 +46,10 @@
                                         </select>
 
                                         <select class="form-control me-2" name="orderBy">
-                                            <option value="code-asc">Codice [A-Z]</option>
-                                            <option value="code-desc">Codice [Z-A]</option>
-                                            <option value="name-asc">Descrizione [A-Z]</option>
-                                            <option value="name-desc">Descrizione [Z-A]</option>
+                                            <option value="finish.code-asc">Codice [A-Z]</option>
+                                            <option value="finish.code-desc">Codice [Z-A]</option>
+                                            <option value="finish.name-asc">Descrizione [A-Z]</option>
+                                            <option value="finish.name-desc">Descrizione [Z-A]</option>
                                         </select>
 
                                         #searchButton( bind="click:search" )#
