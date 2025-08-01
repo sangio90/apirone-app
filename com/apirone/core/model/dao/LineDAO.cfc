@@ -72,9 +72,6 @@
 			</cfif>
 		</cfquery>
 
-		<cfdump var="#local.q#">
-		<cfdump var="#arguments#">
-
 		<cfreturn local.q>
 	</cffunction>
 
