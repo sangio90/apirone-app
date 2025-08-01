@@ -72,6 +72,9 @@
                                     >
                                 </select>
                             </div>
+                            <div class="col-sm-10 offset-sm-2">
+                                <span class="field-note">La modalità non è modificabile</span>
+                            </div>
                         </div>
 
                     </div>
