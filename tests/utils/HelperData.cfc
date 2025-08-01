@@ -238,6 +238,61 @@ component extends="testbox.system.BaseSpec"{
         }
     }
     
+    public Struct function createQuotationItemZoneParent( required startWith="**" ) {
+        var mock = new modules.cbMockData.models.MockData();
+        var util = new com.apirone.core.util.String();
+        var factory = new com.apirone.core.model.factory.Factory();
+        var random = new tests.utils.DBRandomData();
+        var quotationItemId = structKeyExists(arguments, "quotationItemId") ? arguments.quotationItemId : null;
+
+        var raw = mock.mock(
+            $returnType = "struct",
+            name = "words:1",
+            createdAt = "datetime"
+        );
+
+        if (IsNull(quotationItemId)) {
+            raw.quotationItem = { id = random.getRandomByTableName(limit=1, tableName='quotation_items').quotation_item_id.toString() };
+        }   else {
+            raw.quotationItem = { id = quotationItemId };
+        }
+
+        var bean = factory.createInstance( "QuotationItemZone", raw );
+
+        return  {
+            "obj" = bean,
+            "raw" = raw
+        }
+    }
+    
+    public Struct function createQuotationItemZone( required startWith="**" ) {
+        var mock = new modules.cbMockData.models.MockData();
+        var util = new com.apirone.core.util.String();
+        var factory = new com.apirone.core.model.factory.Factory();
+        var random = new tests.utils.DBRandomData();
+        var quotationItemId = structKeyExists(arguments, "quotationItemId") ? arguments.quotationItemId : null;
+        var quotationItemZoneParentId = structKeyExists(arguments, "quotationItemZoneParentId") ? arguments.quotationItemZoneParentId : null;
+
+        var raw = mock.mock(
+            $returnType = "struct",
+            name = "words:1",
+            createdAt = "datetime"
+        );
+        if (IsNull(quotationItemId)) {
+            raw.quotationItem = { id = random.getRandomByTableName(limit=1, tableName='quotation_items').quotation_item_id.toString() };
+        }   else {
+            raw.quotationItem = { id = quotationItemId };
+        }
+        raw.parent = { id = quotationItemZoneParentId };
+
+        var bean = factory.createInstance( "QuotationItemZone", raw );
+
+        return  {
+            "obj" = bean,
+            "raw" = raw
+        }
+    }
+    
     public Struct function createQuotationItemProductItemParent( required startWith="**" ) {
         var mock = new modules.cbMockData.models.MockData();
         var util = new com.apirone.core.util.String();
