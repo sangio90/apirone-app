@@ -52,43 +52,6 @@
                                 </div>
                             </div>
 
-                            <!----
-                            <cfloop array="#prc.priceLists#" item="item">
-                                <div class="form-group row pb-3 ">
-                                    <div class="col-sm-3 offset-md-3">
-                                        <b>#item.name#</b>
-                                    </div>
-                                </div>
-                            
-                                <div class="form-group row pb-3">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Prezzo</label>
-                                    <div class="col-sm-9">
-                                        <div class="input-group">
-                                            <input type="number" name="price" class="form-control" placeholder="" value="#item.price#" />
-                                            <span class="input-group-text">
-                                                <i class="fa fa-euro text-4"></i>
-                                            </span>
-                                        </div>
-                                        <div id="price-error"></div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row pb-3">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Costo</label>
-                                    <div class="col-sm-9">
-                                        <div class="input-group">
-                                            <input type="number" name="price" class="form-control" placeholder="" value="#item.cost#" />
-                                            <span class="input-group-text">
-                                                <i class="fa fa-euro text-4"></i>
-                                            </span>
-                                        </div>
-                                        <div id="price-error"></div>
-                                    </div>
-                                </div>                                
-            
-                            </cfloop>
-                            ---->
-
                         </div>
 
                         <footer class="card-footer">

@@ -5,9 +5,11 @@
             <div class="col-8">
                 #pageTitle()#
             </div>
+			<!---
             <div class="col-4 text-end pt-3">
                 #addButton( bind="click:new", size="sm" )#
             </div>
+			---->
         </div>
 
 		<div class="row">
