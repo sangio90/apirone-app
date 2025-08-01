@@ -237,6 +237,33 @@ component extends="testbox.system.BaseSpec"{
             "raw" = raw
         }
     }
+    
+    public Struct function createQuotationItemProductItemParent( required startWith="**" ) {
+        var mock = new modules.cbMockData.models.MockData();
+        var util = new com.apirone.core.util.String();
+        var factory = new com.apirone.core.model.factory.Factory();
+        var random = new tests.utils.DBRandomData();
+        var quotationItemProductId = structKeyExists(arguments, "quotationItemProductId") ? arguments.quotationItemProductId : null;
+
+        var raw = mock.mock(
+            $returnType = "struct",
+            createdAt = "datetime"
+        );
+
+        if (IsNull(quotationItemProductId)) {
+            raw.quotationItemProduct = { id = random.getRandomByTableName(limit=1, tableName='quotation_item_products').quotation_item_product_id.toString() };
+        }   else {
+            raw.quotationItemProduct = { id = quotationItemProductId };
+        }
+        raw.productItem = { id = random.getRandomByTableName(limit=1, tableName='product_items').product_item_id.toString() };
+
+        var bean = factory.createInstance( "QuotationItemProductItem", raw );
+
+        return  {
+            "obj" = bean,
+            "raw" = raw
+        }
+    }
 
     public Struct function createCard(  ) {
 
