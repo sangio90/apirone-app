@@ -1,4 +1,5 @@
 /cache.properties
+/node_modules
 /*.sublime-project
 /*.code-workspace
 /.vscode/settings.json
