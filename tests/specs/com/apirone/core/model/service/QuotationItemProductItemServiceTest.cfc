@@ -30,10 +30,10 @@ component extends="tests.utils.AbsSpec" {
                 expect( newId == result.getId() ).toBeTrue();
                 expect( IsInstanceOf( result, "com.apirone.core.model.bean.QuotationItemProductItem" ) ).toBeTrue();
 
-                //svc.delete( newId );
-                //quotationItemProductSvc.delete( newQuotationItemProductId );
-                //quotationItemSvc.delete( newQuotationItemId );
-                //quotationSvc.delete( newQuotationId );
+                svc.delete( newId );
+                quotationItemProductSvc.delete( newQuotationItemProductId );
+                quotationItemSvc.delete( newQuotationItemId );
+                quotationSvc.delete( newQuotationId );
 			} );
 
             it( "Update quotation item product item", function(){
@@ -83,7 +83,7 @@ component extends="tests.utils.AbsSpec" {
                 result = quotationItemProductSvc.delete( newQuotationItemProductId );
                 result = quotationItemSvc.delete( newQuotationItemId );
                 result = quotationSvc.delete( newQuotationId );
-                
+
                 expect( result.hasError() ).toBe( false );
             } );
 

@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-	property name="zone" type="com.apirone.core.model.bean.QuotationItemZone";
+	property name="quotationItemZone" type="com.apirone.core.model.bean.QuotationItemZone";
 	property name="positionCoordinateX" type="String";
 	property name="positionCoordinateY" type="String";
 

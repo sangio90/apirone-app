@@ -293,6 +293,32 @@ component extends="testbox.system.BaseSpec"{
         }
     }
     
+    public Struct function createQuotationItemPosition( required startWith="**" ) {
+        var mock = new modules.cbMockData.models.MockData();
+        var util = new com.apirone.core.util.String();
+        var factory = new com.apirone.core.model.factory.Factory();
+        var quotationItemZoneId = structKeyExists(arguments, "quotationItemZoneId") ? arguments.quotationItemZoneId : null;
+
+        var raw = mock.mock(
+            $returnType = "struct",
+            positionCoordinateX = function(param) {
+                return randRange(0, 99) & '.' & randRange(0, 99999);
+            },
+            positionCoordinateY = function(param) {
+                return randRange(0, 99) & '.' & randRange(0, 99999);
+            },
+            createdAt = "datetime"
+        );
+        raw.quotationItemZone = { id = quotationItemZoneId };
+
+        var bean = factory.createInstance( "QuotationItemPosition", raw );
+
+        return  {
+            "obj" = bean,
+            "raw" = raw
+        }
+    }
+    
     public Struct function createQuotationItemProductItemParent( required startWith="**" ) {
         var mock = new modules.cbMockData.models.MockData();
         var util = new com.apirone.core.util.String();
