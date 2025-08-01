@@ -21,45 +21,59 @@
 
                         <div class="row d-flex align-items-center mb-3">
 
-                            <div class="col-sm-9">
+                            <div class="col-sm-10">
 
                                 <div class="mb-3 box-search-small"> 
 
                                     <form id="finish-grid-search-form" 
-                                        class="d-flex align-items-center justify-content-end" 
+                                        class="d-flex justify-content-end" 
                                         data-bind:'events: { submit: search }'>
 
-                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+                                        <div class="col">
+                                            <span>cerca</cerca>
+                                            <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+                                        </div>
 
-                                        <select class="form-control me-2" name="categoryId">
-                                            <option value="">-- tutte le categorie</option>
-                                            <cfloop array="#prc.lineCategories#" item="thisLine">
-                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
-                                            </cfloop>
-                                        </select>
+                                        <div class="col">
+                                            <span>Categoria</cerca>
+                                            <select class="form-control me-2" name="categoryId">
+                                                <option value="">-- tutte</option>
+                                                <cfloop array="#prc.lineCategories#" item="thisLine">
+                                                    <option value="#thisLine.getId()#">#thisLine.getName()#</option>
+                                                </cfloop>
+                                            </select>
+                                        </div>
                                     
-                                        <select class="form-control me-2" name="statusId">
-                                            <option value="">-- status</option>
-                                            <cfloop array="#prc.statuses#" item="thisStatus">
-                                                <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
-                                            </cfloop>
-                                        </select>
+                                        <div class="col">
+                                            <span>Status</cerca>
+                                            <select class="form-control me-2" name="statusId">
+                                                <option value="">-- tutti</option>
+                                                <cfloop array="#prc.statuses#" item="thisStatus">
+                                                    <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
+                                                </cfloop>
+                                            </select>
+                                        </div>
 
-                                        <select class="form-control me-2" name="orderBy">
-                                            <option value="finish.code-asc">Codice [A-Z]</option>
-                                            <option value="finish.code-desc">Codice [Z-A]</option>
-                                            <option value="finish.name-asc">Descrizione [A-Z]</option>
-                                            <option value="finish.name-desc">Descrizione [Z-A]</option>
-                                        </select>
+                                        <div class="col">
+                                            <span>Ordina</cerca>
+                                            <select class="form-control me-2" name="orderBy">
+                                                <option value="finish.code-asc">Codice [A-Z]</option>
+                                                <option value="finish.code-desc">Codice [Z-A]</option>
+                                                <option value="finish.name-asc">Descrizione [A-Z]</option>
+                                                <option value="finish.name-desc">Descrizione [Z-A]</option>
+                                            </select>
+                                        </div>
 
+                                    <div style="align-self: flex-end;">
                                         #searchButton( bind="click:search" )#
+                                    </div>
                                     
                                     </form>
 
                                 </div>
 
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="float-end">
                                     #deleteButton(
                                         bind  = "click:delete",

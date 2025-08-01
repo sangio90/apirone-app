@@ -87,6 +87,17 @@ h2 {
     padding: 10px;
 }
 
+.box-search-small .col {
+    padding: 0px 5px;
+}
+
+.box-search-small .col span {
+    font-weight: bold;
+    color: #9c9c9c;
+    text-transform: uppercase;
+    font-size: 9px;
+}
+
 /*
 	sidebar and topbar
 */
