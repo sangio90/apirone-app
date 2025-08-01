@@ -127,7 +127,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.lineId );
 				outcome.setData( { "deletedCount" = result } )
 
-				dm.remove( getCacheScope(), arguments.line.getId() );
+				getCacheManager().remove( getCacheScope(), arguments.lineId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -157,7 +157,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setCategories( getCategoriesBeanByIds( record.categories ) );
+			bean.setCategories( super.getCategoriesBeanByIds( record.categories ) );
 			bean.setTexts( getTextService().list( lineId = record.line_id ) );
 
 			return bean;
