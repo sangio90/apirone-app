@@ -1,243 +1,213 @@
 AP.size = AP.size || {};
 
 AP.size.fields = {
-	listRoot: $("#size-list-root"),
-	detailForm: $("#size-detail-form"),
-	searchListForm: $("#size-grid-search-form")
+    listRoot: $("#size-list-root"),
+    detailForm: $("#size-detail-form"),
+    searchListForm: $("#size-grid-search-form"),
 };
 
-$(document).ready(function (){
-
-	if (AP.size.fields.listRoot.length) {
-
-		AP.size.list.init();
-
-	}
-
+$(document).ready(function () {
+    if (AP.size.fields.listRoot.length) {
+        AP.size.list.init();
+    }
 });
 
 AP.size.list = (function () {
+    var pub = {};
 
-	var pub = {};
+    var dataSources = {
+        items: NM.kendo.dataSource({ url: "/manager/ajax/sizes" }),
+    };
 
-	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/sizes" })
-	};
+    var defaultDetailForm = {
+        data: {
+            id: "",
+            code: "",
+            fruitsCount: "",
+            selectedCategories: [],
+            type: {
+                id: "",
+            },
+            mainText: {
+                id: "",
+                name: "",
+                lang: {
+                    id: "IT",
+                },
+            },
+            status: {
+                id: "ACT",
+            },
+        },
+        statuses: AP.page.statuses,
+        categories: AP.page.categories,
+        types: AP.page.types,
 
-	var defaultDetailForm = {
-		data: {
-			id: "",
-			code: "",
-			fruitsCount: "",
-			selectedCategories: [],
-			type: {
-				id: ""
-			},
-			mainText: {
-				id: "",
-				name: "",
-				lang: {
-					id: "IT"
-				}
-			},
-			status: {
-				id: "ACT"
-			}
-		},
-		statuses: AP.page.statuses,
-		categories: AP.page.categories,
-		types: AP.page.types,
+        title: "Carica dimensione",
+    };
 
-		title: "Carica dimensione"
-	};
+    var viewModel = kendo.observable({
+        rows: dataSources.items,
+        detailForm: defaultDetailForm,
 
-	var viewModel = kendo.observable({
-		rows: dataSources.items,
-		detailForm: defaultDetailForm,
+        resetForm: function () {
+            viewModel.set("detailForm", defaultDetailForm);
+        },
 
-		resetForm: function () {
-			viewModel.set("detailForm", defaultDetailForm);
-		},
+        search: function (event) {
+            var thisForm = AP.size.fields.searchListForm;
 
-		search: function (event) {
+            var params = thisForm.serializeJSON();
 
-			var thisForm = AP.size.fields.searchListForm;
+            viewModel.rows.read(params);
 
-			var params = thisForm.serializeJSON();
+            return false;
+        },
 
-			viewModel.rows.read(params);
+        save: function (event) {
+            var thisForm = AP.size.fields.detailForm;
+            var status = thisForm.find(".status");
 
-			return false;
+            status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
 
-		},
+            if (thisForm.valid()) {
+                NM.util.ajax({
+                    method: "POST",
+                    url: "/manager/ajax/sizes",
+                    data: JSON.stringify(viewModel.get("detailForm.data")),
+                    callback: {
+                        done: function (xhr) {
+                            if (xhr.status == "SUCCESS") {
+                                viewModel.get("rows").read();
+                                NM.util.autoHideMessage(status, "<span class='green'>Dimensione salvata</span>");
 
-		save: function (event) {
+                                setTimeout(() => $("#size-detail-modal").modal("hide"), 1500);
+                            }
+                        },
+                    },
+                });
+            }
 
-			var thisForm = AP.size.fields.detailForm;
-			var status = thisForm.find(".status");
+            return false;
+        },
 
-			status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+        new: function (event) {
+            this.resetForm();
 
-			if(thisForm.valid()) {
+            NM.util.openModal($("#size-detail-modal"));
+        },
 
-				NM.util.ajax({
-					method: "POST",
-					url: "/manager/ajax/sizes",
-					data: JSON.stringify(viewModel.get("detailForm.data")),
-					callback: {
-						done: function (xhr) {
-							
-							if( xhr.status == "SUCCESS" ) {
+        edit: function (event) {
+            viewModel.set("detailForm.data", event.data);
+            viewModel.set("detailForm.title", "Modifica dimensione < " + event.data.code + " >");
 
-								viewModel.get("rows").read();
-								NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
+            var selectedCategories = [];
 
-								setTimeout( () => $("#size-detail-modal").modal("hide"), 1500 );
+            if (event.data.categories) {
+                for (var category of event?.data?.categories) {
+                    selectedCategories.push(category);
+                }
+            }
 
-							}
+            viewModel.set("detailForm.data.selectedCategories", selectedCategories);
 
-						}
-					}
-				});
-
-			}
-
-			return false;
-
-		},
-
-		new: function (event) {
-
-			this.resetForm();
-
-			NM.util.openModal($("#size-detail-modal"));
-
-		},
-
-		edit: function (event) {
-
-			viewModel.set("detailForm.data", event.data);
-			viewModel.set("detailForm.title", "Modifica dimensione < " + event.data.code + " >");
-
-			var selectedCategories = [];
-
-			if( event.data.categories ) {
-				
-				for (var category of event?.data?.categories)  {
-					selectedCategories.push( category );
-				}
-	
-			}
-
-			viewModel.set("detailForm.data.selectedCategories", selectedCategories);
-
-			NM.util.openModal( $("#size-detail-modal") );
-
-		},
+            NM.util.openModal($("#size-detail-modal"));
+        },
 
         delete: function (event) {
+            var checks = $("#size-grid").find("[name=selected]:checked");
 
-			var checks = $("#size-grid").find("[name=selected]:checked");
+            if (checks.length) {
+                var values = [];
 
-			if (checks.length) {
+                checks.each(function () {
+                    values.push($(this).val());
+                });
 
-				var values = [];
+                var ids = values.toString();
 
-				checks.each(function (){
-					values.push($(this).val());
-				});
+                NM.util.ajax({
+                    method: "DELETE",
+                    url: "/manager/ajax/sizes",
+                    data: ids,
+                    callback: {
+                        done: function (xhr) {
+                            if (xhr.data.payload.hasOwnProperty("errors")) {
+                                AP.widget.notify("error", "Non riesco a cancellare tutte le dimensioni");
+                            } else {
+                                AP.widget.notify("success", "Cancellazione avvenuta con successo");
+                            }
 
-				var ids = values.toString();
+                            var id = viewModel.get("detailForm.data.id");
 
-				NM.util.ajax({
-					method: "DELETE",
-					url: "/manager/ajax/sizes",
-					data: ids,
-					callback: {
-						done: function (xhr) {
+                            viewModel.rows.read();
+                        },
+                    },
+                });
+            } else {
+                AP.widget.notify("warning", "Selezionare almeno una dimensione");
+            }
+        },
+    });
 
-							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutte le dimensioni");
-							} else {
-								AP.widget.notify("success", "Cancellazione avvenuta con successo");
-							}
+    pub.init = function () {
+        kendo.bind(AP.size.fields.listRoot, viewModel);
 
-							var id = viewModel.get("detailForm.data.id");
+        var detailForm = AP.size.fields.detailForm;
 
-							viewModel.rows.read();
+        AP.page.types.unshift({ id: "", name: "-- Seleziona il tipo" });
 
-						}
-					}
-				});
+        detailForm.validate({
+            onfocusout: function (element) {
+                $(element).valid();
+            },
+            rules: {
+                name: {
+                    required: true,
+                },
+                typeId: {
+                    required: true,
+                },
+                fruitsCount: {
+                    required: true,
+                },
+                code: {
+                    required: true,
+                    maxlength: 3,
+                    checkCode: true,
+                    remote: {
+                        url: "/manager/ajax/sizes/code-exists",
+                        data: {
+                            id: function () {
+                                return viewModel.get("detailForm.data.id");
+                            },
+                        },
+                        dataFilter: function (xhr) {
+                            var json = JSON.parse(xhr);
+                            return json.data == false;
+                        },
+                    },
+                },
+            },
+            messages: {
+                name: {
+                    required: "Descrizione richiesta",
+                },
+                typeId: {
+                    required: "Tipo richiesto",
+                },
+                fruitsCount: {
+                    required: "Numero di moduli ricghiesto (0 per modello)",
+                },
+                code: {
+                    required: "Codice richiesto",
+                    maxlength: "Al massimo 3 caratteri",
+                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
+                    remote: "Il codice esiste",
+                },
+            },
+        });
+    };
 
-			} else {
-
-				AP.widget.notify("warning", "Selezionare almeno una dimensione");
-
-			}
-
-        },		
-
-	});
-
-	pub.init = function () {
-
-		kendo.bind(AP.size.fields.listRoot, viewModel);
-
-		var detailForm = AP.size.fields.detailForm;
-
-		AP.page.types.unshift({ id: "", name: "-- Seleziona il tipo" });
-
-		detailForm.validate({
-			onfocusout: function (element) {
-				$(element).valid();
-			},
-			rules: {
-				name: {
-					required: true,
-				},
-				typeId: {
-					required: true,
-				},
-				fruitsCount: {
-					required: true
-				},
-				code: {
-					required: true,
-					maxlength: 3,
-					checkCode: true,
-					remote: {
-						url: "/manager/ajax/sizes/code-exists",
-						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
-						dataFilter: function (xhr) {
-							var json = JSON.parse(xhr);
-							return json.data == false;
-						}
-					}
-				}
-			},
-			messages: {
-				name: {
-					required: "Descrizione richiesta",
-				},
-				typeId: {
-					required: "Tipo richiesto",
-				},
-				fruitsCount: {
-					required: "Numero di moduli ricghiesto (0 per modello)",
-				},
-				code: {
-					required: "Codice richiesto",
-					maxlength: "Al massimo 3 caratteri",
-					checkCode: "Solo numeri, lettere, trattino o trattino basso",
-					remote: "Il codice esiste"
-				}
-			},
-
-		});
-
-	};
-
-	return pub;
-}());
-
+    return pub;
+})();
