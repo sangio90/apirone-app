@@ -32,25 +32,24 @@
 	},
 	{
 		href: "#",
-		icon: "far fa-user",
-		title: "Utenze",
+		icon: "fas fa-plug",
+		title: "Prodotti",
 		roles: "ADM",
 		items: [
 			{
-				href: "/manager/accounts",
-				icon: "fas fa-user",
-				title: "Lista degli utenti",
+				href: "/manager/fruits",
+				icon: "fas fa-apple-alt",
+				title: "Prodotti base",
 				roles: "ADM"
 			},
 			{
-				href: "/manager/roles",
-				icon: "fas fa-users",
-				title: "Lista dei ruoli",
-				roles: "ADM"
-			}
+				href: "/manager/lines/categories",
+				icon: "fas fa-vector-square",
+				title: "Prodotti per linea",
+				roles: "ADM",
+			},
 		]
-
-	},
+	},	
 	{
 		href: "#",
 		icon: "fas fa-cogs",
@@ -68,18 +67,6 @@
 				icon: "fas fa-layer-group",
 				title: "Linee",
 				roles: "ADM",
-			},
-			{
-				href: "/manager/lines/categories",
-				icon: "fas fa-vector-square",
-				title: "Linee per categoria",
-				roles: "ADM",
-			},
-			{
-				href: "/manager/fruits",
-				icon: "fas fa-apple-alt",
-				title: "Frutti",
-				roles: "ADM"
 			},
 			{
 				href: "/manager/finishes",
@@ -121,6 +108,27 @@
 				href: "/manager/reports",
 				icon: "fas fa-print",
 				title: "Lista dei report",
+				roles: "ADM"
+			}
+		]
+
+	},
+	{
+		href: "#",
+		icon: "fas fa-users",
+		title: "Utenze",
+		roles: "ADM",
+		items: [
+			{
+				href: "/manager/accounts",
+				icon: "fas fa-user",
+				title: "Lista degli utenti",
+				roles: "ADM"
+			},
+			{
+				href: "/manager/roles",
+				icon: "fa fa-user-tie",
+				title: "Lista dei ruoli",
 				roles: "ADM"
 			}
 		]
