@@ -98,6 +98,8 @@
 	<cffunction name="insert" returntype="String">
 		<cfargument name="product" type="com.apirone.core.model.bean.Product" required="true">
 
+		<cfset var lines = super.getLinesAsArray( product.getLines() )>
+
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO products (
 				size_id,
@@ -106,7 +108,8 @@
 				code,
 				position_count,
 				product_category_id,
-				status_id
+				status_id,
+				lines
 			)
 			VALUES (
 				<cfif !IsNull( arguments.product.getSize() )>
@@ -140,7 +143,8 @@
 				</cfif>
 				,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="Other" value="#SerializeJSON( lines )#">
 			) RETURNING product_id
 		</cfquery>
 
@@ -150,8 +154,11 @@
 	<cffunction name="update" returntype="String">
 		<cfargument name="product" type="com.apirone.core.model.bean.Product" required="true">
 
+		<cfset var lines = super.getLinesAsArray( product.getLines() )>
+
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE products
+			UPDATE
+				products
 			SET
 				size_id =
 					<cfif !IsNull( arguments.product.getSize() )>
@@ -184,6 +191,7 @@
 						NULL
 					</cfif>
 				,
+
 				position_count =
 					<cfif Val( arguments.product.getPositionCount() )>
 						<cfqueryparam cfsqltype="Integer" value="#arguments.product.getPositionCount()#">
@@ -191,6 +199,7 @@
 						NULL
 					</cfif>
 				,
+				lines = <cfqueryparam cfsqltype="Other" value="#SerializeJSON( lines )#">,
 				product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
 			WHERE
