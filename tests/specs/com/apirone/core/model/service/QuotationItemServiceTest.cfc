@@ -3,12 +3,15 @@
 	function run( testResults, testBox ){
 		describe( "QuotationItemService", function(){
 			beforeEach( function(){
-				var svc    = getModel().getInstance( "QuotationItemService" );
-				var helper = super.getHelperData();
+                quotationSvc = getModel().getInstance( "QuotationService" );
+				svc    = getModel().getInstance( "QuotationItemService" );
+				helper = super.getHelperData();
 			} );
 
 			it( "Create quotation item", function(){
-				var bean = helper.createQuotationItem();
+				var quotationBean = helper.createQuotation();
+				var newQuotationId = quotationSvc.create( quotationBean.obj );
+				var bean = helper.createQuotationItem( quotationId=newQuotationId );
 				var newId = svc.create( bean.obj );
 				var result = svc.get( newId );
 				
@@ -16,10 +19,13 @@
 				expect( IsInstanceOf( result, "com.apirone.core.model.bean.QuotationItem" ) ).toBeTrue();
 				
 				svc.delete( newId );
+				quotationSvc.delete( newQuotationId );
 			} );
 
 			it( "Update quotation item", function(){
-				var bean = helper.createQuotationItem();
+				var quotationBean = helper.createQuotation();
+				var newQuotationId = quotationSvc.create( quotationBean.obj );
+				var bean = helper.createQuotationItem( quotationId=newQuotationId );
 				var obj = bean.obj;
 				var newId = svc.create( obj );
 				var newPrice = val(randRange(1, 20) & '.' & randRange(0, 10));
@@ -37,9 +43,12 @@
 			} );
 
 			it( "Delete quotation item", function(){
-				var bean = helper.createQuotationItem();
+				var quotationBean = helper.createQuotation();
+				var newQuotationId = quotationSvc.create( quotationBean.obj );
+				var bean = helper.createQuotationItem( quotationId=newQuotationId );
 				var newId  = svc.create( bean.obj );
 				var result = svc.delete( newId );
+				result = quotationSvc.delete( newQuotationId );
 				
 				expect( result.hasError() ).toBe( false );
 			} );

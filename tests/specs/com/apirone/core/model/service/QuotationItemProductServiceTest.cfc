@@ -3,11 +3,11 @@
 	function run( testResults, testBox ){
 		describe( "QuotationItemProductService", function(){
 			beforeEach( function(){
-                var quotationSvc = getModel().getInstance( "QuotationService" );
-				var quotationItemSvc = getModel().getInstance( "QuotationItemService" );
-				var svc = getModel().getInstance( "QuotationItemProductService" );
-				var productSvc = getModel().getInstance( "ProductService" );
-				var helper = super.getHelperData();
+                quotationSvc = getModel().getInstance( "QuotationService" );
+				quotationItemSvc = getModel().getInstance( "QuotationItemService" );
+				svc = getModel().getInstance( "QuotationItemProductService" );
+				productSvc = getModel().getInstance( "ProductService" );
+				helper = super.getHelperData();
 			} );
 
 			it( "Create quotation item product", function(){
