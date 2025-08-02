@@ -18,14 +18,14 @@
 
 	<div class="container is-fluid mt-3 mb-3">	
 
-		<h1 class="title">Routine 
+		<h1 class="title">Routines 
 			<a href="?fwreinit=1">FwReinit</a>
 		</h1>
 		
 		<div class="columns">
 			<div class="column">
-			<b>Sistema</b>: Lucee #server.lucee.version#<br>
-			<b>Locale</b>: #GetLocaleInfo().name#<br>
+				<b>Sistema</b>: Lucee #server.lucee.version#<br>
+				<b>Locale</b>: #GetLocaleInfo().name#<br>
 			</div>
 		</div>
 
