@@ -4,10 +4,11 @@
 		prc.title    = "Prodotti base";
 		prc.statuses = super.fire( "status.list", [ "PRODUCT" ] );
 
-		prc.jsScripts.add( "app-fruit-list" );
+		prc.page[ "statuses" ]   = prc.statuses;
+		prc.page[ "lines" ]      = super.fire( "line.list" );
+		prc.page[ "categories" ] = super.fire( "ProductCategory.list", { modeId = "BAS" } );
 
-		prc.page[ "statuses" ] = prc.statuses;
-		prc.page[ "lines" ]    = super.fire( "line.list" );
+		prc.jsScripts.add( "app-fruit-list" );
 
 		event.setView( "fruit/list" );
 	}

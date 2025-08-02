@@ -7,7 +7,7 @@
 
 		var params = super.paramsFromUrl();
 
-		params[ "categoryId" ] = 167;
+		params[ "categoryModeId" ] = "BAS";
 
 		var rows = super.fire( "product.search", params );
 
@@ -86,7 +86,7 @@
 		text.setName( json.mainText.name );
 
 		fruit.setTexts( [ text ] );
-		fruit.setCategory( category.setId( 167 ) );
+		fruit.setCategory( category.setId( json.category.id ) );
 
 		if ( !Len( json.id ) ) {
 			var messageId = "fruit.created";

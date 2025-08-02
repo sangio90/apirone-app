@@ -40,6 +40,7 @@
 		<cfargument name="finishId" type="String">
 		<cfargument name="excludedIds" type="Array">
 		<cfargument name="categoryId" type="Numeric">
+		<cfargument name="categoryModeId" type="String">
 		<cfargument name="str" type="String">
 
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
@@ -50,6 +51,7 @@
 			SELECT product_id::varchar
 			FROM
 				products
+					INNER JOIN product_categories USING ( product_category_id )
 					<cfif !IsNull( arguments.str )>
 						INNER JOIN texts USING ( product_id )
 					</cfif>
@@ -78,6 +80,10 @@
 
 				<cfif !IsNull( arguments.categoryId )>
 					AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.categoryModeId )>
+					AND product_categories.mode_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.categoryModeId#">
 				</cfif>
 
 			ORDER BY

@@ -13,6 +13,9 @@
                 <span data-bind="text: mainText.name"></span>
             </td>
             <td>
+                <span data-bind="text: category.name"></span>
+            </td>
+            <td>
                 <div data-bind="source: lines" data-template="fruit-line-row-tmpl"></div>
             </td>
             <td class="text-end">

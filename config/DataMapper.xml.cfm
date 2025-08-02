@@ -209,6 +209,7 @@
         <map from="positionCount" to="positionCount" type="cf:Integer" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
         <map from="mainText" to="mainText" ref="Text" />
+        <map from="category" to="category" ref="ProductCategory" />
         <map from="lines" to="lines" ref="Line" type="Array" />
     </mapper>
 

@@ -2,25 +2,25 @@
 AP.fields.fruit = AP.fields.fruit || {};
 
 AP.fields.fruit = {
-    listRoot: $("#fruit-list-root"),
-    detailRoot: $("#fruit-detail-modal"),
-    attributesRoot: $("#fruit-detail-root"),
-    detailForm: $("#fruit-detail-form"),
-    searchListForm: $("#fruit-grid-search-form"),
+    listRoot: $( "#fruit-list-root" ),
+    detailRoot: $( "#fruit-detail-modal" ),
+    attributesRoot: $( "#fruit-detail-root" ),
+    detailForm: $( "#fruit-detail-form" ),
+    searchListForm: $( "#fruit-grid-search-form" ),
 };
 
-$(document).ready(function () {
-    if (AP.fields.fruit.listRoot.length) {
+$( document ).ready( function() {
+    if ( AP.fields.fruit.listRoot.length ) {
         AP.fruit.list.init();
     }
-});
+} );
 
-AP.fruit.list = (function () {
+AP.fruit.list = ( function() {
     var pub = {};
     var fields = AP.fields.fruit;
 
     var dataSources = {
-        items: NM.kendo.dataSource({ url: "/manager/ajax/fruits" }),
+        items: NM.kendo.dataSource( { url: "/manager/ajax/fruits" } ),
     };
 
     var defaultDetailForm = {
@@ -39,138 +39,147 @@ AP.fruit.list = (function () {
             status: {
                 id: "ACT",
             },
+            category: {
+                id: "",
+            },
         },
         statuses: AP.page.statuses,
         lines: AP.page.lines,
+        categories: AP.page.categories,
 
         title: "Carica frutto",
     };
 
-    var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         rows: dataSources.items,
         detailForm: defaultDetailForm,
 
-        resetForm: function () {
-            viewModel.set("detailForm", defaultDetailForm);
+        resetForm: function() {
+            viewModel.set( "detailForm", defaultDetailForm );
         },
 
-        search: function (event) {
+        search: function( event ) {
             var thisForm = AP.fields.fruit.searchListForm;
-
-            console.log("searchListForm", thisForm);
 
             var params = thisForm.serializeJSON();
 
-            console.log("searchListForm:params", params);
-
-            viewModel.rows.read(params);
+            viewModel.rows.read( params );
 
             return false;
         },
 
-        attributes: function (event) {
+        attributes: function( event ) {
             var id = event.data.id;
-            window.open("/manager/products/" + id + "/detail", "_blank").focus();
+            window.open( "/manager/products/" + id + "/detail", "_blank" ).focus();
 
             return false;
         },
 
-        save: function (event) {
+        save: function( event ) {
             var thisForm = AP.fields.fruit.detailForm;
-            var status = thisForm.find(".status");
+            var status = thisForm.find( ".status" );
 
-            status.html("<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>");
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
-            if (thisForm.valid()) {
-                NM.util.ajax({
+            if ( thisForm.valid() ) {
+                NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/fruits",
-                    data: JSON.stringify(viewModel.get("detailForm.data")),
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
-                        done: function (xhr) {
-                            if (xhr.status == "SUCCESS") {
-                                viewModel.get("rows").read();
-                                NM.util.autoHideMessage(status, "<span class='green'>Dimensione salvata</span>");
+                        done: function( xhr ) {
+                            if ( xhr.status == "SUCCESS" ) {
+                                viewModel.get( "rows" ).read();
+                                NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
 
-                                setTimeout(() => fields.detailRoot.modal("hide"), 1500);
+                                setTimeout( () => fields.detailRoot.modal( "hide" ), 1500 );
+
                             }
                         },
                     },
-                });
+                } );
             }
 
             return false;
         },
 
-        new: function (event) {
+        new: function() {
             this.resetForm();
 
-            NM.util.openModal(fields.detailRoot);
+            NM.util.openModal( fields.detailRoot );
         },
 
-        edit: function (event) {
+        edit: function( event ) {
+
+            console.log( "event", event );
+
             var selectedLines = [];
 
-            viewModel.set("detailForm.data", event.data);
-            viewModel.set("detailForm.title", "Modifica frutto < " + event.data.code + " >");
+            viewModel.set( "detailForm.data", event.data );
+            viewModel.set( "detailForm.title", "Modifica prodotto < " + event.data.code + " >" );
 
-            if (event.data.lines) {
-                for (var line of event?.data?.lines) {
-                    selectedLines.push(line);
+            if ( event.data.lines ) {
+                for ( var line of event?.data?.lines ) {
+                    selectedLines.push( line );
                 }
             }
 
-            viewModel.set("detailForm.data.selectedLines", selectedLines);
+            viewModel.set( "detailForm.data.selectedLines", selectedLines );
 
-            NM.util.openModal(fields.detailRoot);
+            NM.util.openModal( fields.detailRoot );
 
             return false;
         },
 
-        delete: function (event) {
-            var checks = $("#fruit-grid").find("[name=selected]:checked");
+        delete: function( event ) {
+            var checks = $( "#fruit-grid" ).find( "[name=selected]:checked" );
 
-            if (checks.length) {
+            if ( checks.length ) {
                 var values = [];
 
-                checks.each(function () {
-                    values.push($(this).val());
-                });
+                checks.each( function() {
+                    values.push( $( this ).val() );
+                } );
 
                 var ids = values.toString();
 
-                NM.util.ajax({
+                NM.util.ajax( {
                     method: "DELETE",
                     url: "/manager/ajax/fruits",
                     data: ids,
                     callback: {
-                        done: function (xhr) {
-                            if (xhr.data.payload.hasOwnProperty("errors")) {
-                                AP.widget.notify("error", "Non riesco a cancellare tutti i frutti");
+                        done: function( xhr ) {
+                            if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
+                                AP.widget.notify( "error", "Non riesco a cancellare tutti i frutti" );
                             } else {
-                                AP.widget.notify("success", "Cancellazione avvenuta con successo");
+                                AP.widget.notify( "success", "Cancellazione avvenuta con successo" );
                             }
 
-                            var id = viewModel.get("detailForm.data.id");
+                            var id = viewModel.get( "detailForm.data.id" );
 
                             viewModel.rows.read();
                         },
                     },
-                });
+                } );
             } else {
-                AP.widget.notify("warning", "Selezionare almeno un frutto");
+                AP.widget.notify( "warning", "Selezionare almeno un frutto" );
             }
         },
-    });
+    } );
 
-    pub.init = function () {
-        kendo.bind(AP.fields.fruit.listRoot, viewModel);
+    pub.init = function() {
+        kendo.bind( AP.fields.fruit.listRoot, viewModel );
 
         var detailForm = AP.fields.fruit.detailForm;
 
-        detailForm.validate({
-            onfocusout: function (element) {
-                $(element).valid();
+        AP.page.categories.unshift( {
+            id: "",
+            name: "-- Seleziona una categoria",
+        } );
+
+        detailForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
             },
             rules: {
                 code: {
@@ -180,12 +189,12 @@ AP.fruit.list = (function () {
                     remote: {
                         url: "/manager/ajax/fruits/code-exists",
                         data: {
-                            id: function () {
-                                return viewModel.get("detailForm.data.id");
+                            id: function() {
+                                return viewModel.get( "detailForm.data.id" );
                             },
                         },
-                        dataFilter: function (xhr) {
-                            var json = JSON.parse(xhr);
+                        dataFilter: function( xhr ) {
+                            var json = JSON.parse( xhr );
                             return json.data == false;
                         },
                     },
@@ -198,6 +207,9 @@ AP.fruit.list = (function () {
                     required: true,
                 },
                 statusId: {
+                    required: true,
+                },
+                categoryId: {
                     required: true,
                 },
             },
@@ -218,9 +230,12 @@ AP.fruit.list = (function () {
                 statusId: {
                     required: "Status richiesto",
                 },
+                categoryId: {
+                    required: "Categoria richiesta",
+                },
             },
-        });
+        } );
     };
 
     return pub;
-})();
+} () );

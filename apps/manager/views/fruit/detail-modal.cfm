@@ -75,14 +75,20 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Categoria</label>
                             <div class="col-sm-10">
-                                <select id="category" 
-                                    name="categoryId"
+                                <select id="category" class="form-control" name="categoryId"
                                     data-placeholder="-- Seleziona la categoria"
                                     data-bind="source: detailForm.categories, value: detailForm.data.category.id" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
+                            <label class="col-sm-2 col-form-label text-end">ID</label>
+                            <div class="col-sm-10 mt-1">
+                                <span data-bind="text: detailForm.data.id"></span>
                             </div>
                         </div>
 
