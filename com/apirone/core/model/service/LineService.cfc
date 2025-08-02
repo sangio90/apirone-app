@@ -150,15 +150,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "Line" );
 
+			bean.setTexts( getTextService().list( lineId = record.line_id ) );
+
+			// after setTexts()
+			bean.setName( bean.getName() );
+
 			bean.setId( record.line_id );
 			bean.setCode( record.code );
-			bean.setName( record.line );
 			bean.setCreatedAt( record.created_at );
 
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setCategories( super.getCategoriesBeanByIds( record.categories ) );
-			bean.setTexts( getTextService().list( lineId = record.line_id ) );
+
 
 			return bean;
 		}
