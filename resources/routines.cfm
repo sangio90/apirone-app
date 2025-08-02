@@ -1,118 +1,88 @@
 ﻿<cfset wirebox = server['wireBox-apirone']>
 <cfset cm = wirebox.getInstance( "CacheManager" )>
-
-<cfoutput>
-<title>ApirOne - Routines</title>
-	
 <cfparam name="action" default="">
 
-<h1>Routine <a href="?fwreinit=1">FwReinit</a></h1>
-<div class="info">
-	<b>Sistema</b>: Lucee #server.lucee.version#<br>
-	<b>Locale</b>: #GetLocaleInfo().name#<br>
-	<!--- <b>Memoria</b>: #(GetSystemTotalMemory()-GetSystemFreeMemory())/1000000# MB di #GetSystemTotalMemory()/1000000# MB totali --->
-</div>
+<cfoutput>
 
-<div class="button">
-	<a href="?action=cache.empty">Svuota cache</a>
-	<a href="?action=cache.list">Lista cache</a>
-	<a href="/resources/errors/list.cfm">Errori</a>
-	<a href="?action=info.read">Info</a>
-</div>
-
-<cfif action IS "cache.list">
-
-	<cfset list = cm.list()>
+<html class="theme-dark">
+<head>
+	<title>ApirOne - Routines</title>
+	<meta name=”viewport” content=”width=device-width, initial-scale=1″>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+	<style>
+		h1 a { text-decoration: underline; font-size: 12px; }
+	</style>
+</head>
 	
-	<p>Hai [#list.len()#] chiavi.</p>
+<body>
 
-	<!--- list keys --->
-	<cfloop collection="#list#" item="key">
-		<cfdump var="#key#">
-	</cfloop>
+	<div class="container is-fluid mt-3 mb-3">	
 
-</cfif>
+		<h1 class="title">Routine 
+			<a href="?fwreinit=1">FwReinit</a>
+		</h1>
+		
+		<div class="columns">
+			<div class="column">
+			<b>Sistema</b>: Lucee #server.lucee.version#<br>
+			<b>Locale</b>: #GetLocaleInfo().name#<br>
+			</div>
+		</div>
 
-<cfif action IS "info.read">
+		<div class="columns is-gapless">
+			<a href="?action=cache.empty" class="button is-primary mr-2">Svuota cache</a>
+			<a href="?action=cache.list" class="button is-primary mr-2">Lista cache</a>
+			<a href="/resources/errors/list.cfm" class="button is-primary mr-2">Errori</a>
+			<a href="?action=info.read" class="button is-primary mr-2">Info</a>
+		</div>
 
-	<cfset list = cm.list()>
-	<cfset count = cm.list().len()>
-	<cfset size = 0>
+		<cfif action IS "cache.list">
 
-	<cfset total= 0>
+			<cfset list = cm.list()>
+			
+			<p>Hai [#list.len()#] chiavi.</p>
 
-	<cfloop collection="#list#" item="key">
-		<cfset size = CacheGetMetadata( key ).size>
-		<cfset total = total = size>
-	</cfloop>
-	
-	<p>
-		Dimensione della cache: <b>#total/1000# kB</b> su <b>#count#</b> oggetti<br>
-		Dimensione del model: <b>#SizeOf( wirebox )/1000# kB</b><br>
-	</p>
+			<!--- list keys --->
+			<cfloop collection="#list#" item="key">
+				<cfdump var="#key#">
+			</cfloop>
 
-</cfif>
+		</cfif>
 
-<cfif action IS "cache.empty">
+		<cfif action IS "info.read">
 
-	<cfset count = cm.list().len()>
+			<cfset list = cm.list()>
+			<cfset count = cm.list().len()>
+			<cfset size = 0>
 
-	<cfset cm.removeAll()>
+			<cfset total= 0>
 
-	<p>Rimosse [#count#] chiavi.</p>
-</cfif>
+			<cfloop collection="#list#" item="key">
+				<cfset size = CacheGetMetadata( key ).size>
+				<cfset total = total = size>
+			</cfloop>
+			
+			<p>
+				Dimensione della cache: <b>#total/1000# kB</b> su <b>#count#</b> oggetti<br>
+				Dimensione del model: <b>#SizeOf( wirebox )/1000# kB</b><br>
+			</p>
 
-<cfdump var="#GetApplicationMetadata().datasources#">
+		</cfif>
+
+		<cfif action IS "cache.empty">
+
+			<cfset count = cm.list().len()>
+
+			<cfset cm.removeAll()>
+
+			<p>Rimosse [#count#] chiavi.</p>
+		</cfif>
+
+		<cfdump var="#GetApplicationMetadata().datasources#">
+		
+	</div>
+
+</body>
+</html>
 
 </cfoutput>
-
-<style>
-	body {
-		padding: 20px;
-		font-family: "Verdana"
-	}
-
-	h1 { 
-		font-family: 'Georgia', sans-serif; 
-		font-size: 45px; 
-		line-height: 48px; 
-		margin-bottom: 10px;
-	}
-
-	h1 a {
-		text-decoration: underline;
-		font-family: "Verdana";
-		font-size: 12px;
-		color: black;
-	}
-
-	.button a {
-		margin-right: 10px;
-		background-color: red;
-	  	box-shadow: 0 5px 0 darkred;
-	  	color: white;
-	  	padding: 0.7em 1.2em;
-	  	position: relative;
-	  	text-decoration: none;
-	  	text-transform: uppercase;
-	}
-
-	.button a:hover {
-	 	background-color: #ce0606;
-	  	cursor: pointer;
-	}
-
-	.button a:active {
-	 	box-shadow: none;
-	  	top: 5px;
-	}
-
-	.button { padding-bottom: 20px; }
-
-	.info {
-		font-size: 11px;
-		margin-bottom: 10px;
-		padding-bottom: 25px;
-	}
-
-</style>
