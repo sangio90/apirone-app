@@ -34,15 +34,20 @@ component extends="com.apirone.core.root.Application" {
 
 		request.isDev = super.isDev;
 
+		if( !application.keyExists( "counter" ) ) {
+			application.counter = 100;
+		}
+
+
         if ( !StructKeyExists( session, "user" ) ) {
             startUser()
         }
 
 		if ( super.isDev() OR url.keyExists("reinit") ) {
 
-			//url.fwreinit = 1;
-
 			onApplicationStart();
+			
+			application.counter++;
 
 		}
 		

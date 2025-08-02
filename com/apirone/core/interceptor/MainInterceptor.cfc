@@ -41,7 +41,7 @@ component extends="coldbox.system.Interceptor" {
 			try {
 				var authToken = Trim( GetHTTPRequestData().Headers.authorization.replace( "Bearer", "" ) );
 
-				// verticale
+				// used by Verticale
 				if ( authToken != "9e39d8edd05940ddab24411338e9def857679e76978041e29a1d7f956aa0be5d" ) {
 					return arguments.event
 						.renderData(
@@ -91,7 +91,8 @@ component extends="coldbox.system.Interceptor" {
 			prc.subtitle = "";
 
 			prc.config        = getGlobalConfiguration(); // js global config
-			prc.staticVersion = prc.isDev ? RandRange( 1000, 9999 ) : DateFormat( Now(), "yyyymmdd" ) & 11;
+			prc.staticVersion = ( prc.isDev ? RandRange( 1000, 9999 ) : DateFormat( Now(), "yyyymmdd" ) ) & application.counter;
+			// prc.staticVersion = prc.staticVersion & application.counter;
 			// prc.staticVersion = url.keyExists( "reinit" ) ? prc.staticVersion + 1 : prc.staticVersion;
 		}
 	}
