@@ -94,6 +94,23 @@ component output="false" accessors="true" {
 		return util.prettyString( arguments.str );
 	}
 
+	/*
+	private String function getNameByTexts( required Array texts ){
+		var name   = "";
+		var langId = "IT";
+
+		if ( !IsNull( arguments.texts ) ) {
+			for ( var text in arguments.texts ) {
+				if ( text.getLang().getId() == "IT" ) {
+					return text.getName();
+				}
+			}
+		}
+
+		return name;
+	}
+	*/
+
 	private Array function getCategoriesBeanByIds( required String categories ){
 		// [2,3,4,5]
 

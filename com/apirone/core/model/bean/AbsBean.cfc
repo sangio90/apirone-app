@@ -1,211 +1,169 @@
 component accessors="true" {
 
-    property name="id" type="String" default="";
+	property name="id" type="String" default="";
 	property name="name" type="String" default="";
-    property name="createdAt" type="Date";
+	property name="createdAt" type="Date";
 
 	public Struct function toStruct(){
-		
-		return DESerializeJSON( SerializeJSON( this ) );
-		
-	}	
+		return DeserializeJSON( SerializeJSON( this ) );
+	}
 
 	public String function getShortId(){
-		
 		return Right( this.getId(), 5 );
-		
 	}
 
 	public com.apirone.core.model.bean.Lang function getCurrentLang(){
-
-		if ( request.keyExists("lang") ) {
-			
+		if ( request.keyExists( "lang" ) ) {
 			return request.lang;
-		
 		} else {
-
 			var lang = new com.apirone.core.model.bean.Lang();
 			lang.setId( "IT" );
 
 			return lang;
-
 		}
-		
 	}
 
-	public Struct function getMetadataObject( required Struct metadata, required String name, String type="properties", Struct result={} ){
-		
+	public Struct function getMetadataObject(
+		required Struct metadata,
+		required String name,
+		String type   = "properties",
+		Struct result = {}
+	){
 		var i = 0;
 		var k = "";
-		
-		if( structKeyExists( arguments.metadata, arguments.type ) ){
-			
-			for( i=1; i<=arraylen( arguments.metadata[ arguments.type ] ); i++ ){
-				
-            	if( arguments.metadata[ arguments.type ][ i ][ 'name' ] eq arguments.name  ){
-					
+
+		if ( StructKeyExists( arguments.metadata, arguments.type ) ) {
+			for ( i = 1; i <= ArrayLen( arguments.metadata[ arguments.type ] ); i++ ) {
+				if ( arguments.metadata[ arguments.type ][ i ][ "name" ] eq arguments.name ) {
 					arguments.result = arguments.metadata[ arguments.type ][ i ];
-					
+
 					return arguments.result;
-					
 				}
-			
 			}
-			
 		}
-			
-		if( structKeyExists( arguments.metadata, 'extends' ) ){
-			
-			arguments.result = getMetadataObject( arguments.metadata[ 'extends' ], arguments.name, arguments.type, arguments.result );
-				
+
+		if ( StructKeyExists( arguments.metadata, "extends" ) ) {
+			arguments.result = getMetadataObject(
+				arguments.metadata[ "extends" ],
+				arguments.name,
+				arguments.type,
+				arguments.result
+			);
 		}
-		
+
 		return arguments.result;
-		
 	}
-	
-	public Any function setMemento( required Any data, metaData = getMetaData( this ) ){
-		
-		var k = "";
-		var i = 0;
-		var obj = "";
-		var class = "";
+
+	public Any function setMemento( required Any data, metaData = GetMetadata( this ) ){
+		var i       = 0;
+		var method  = "";
+		var obj     = "";
+		var class   = "";
 		var metaObj = {};
-		var myArr = createObject('java','java.util.ArrayList').init();
-		
-		for( k in arguments.data ){
-			
-			if( structKeyExists( getMetadataObject( metadata, "set#k#", 'functions' ), 'name' )  ){
-				
-				if( isArray( arguments.data[ k ] ) ){
-					
-					myArr = createObject('java','java.util.ArrayList').init();
-					
-					class = rePlaceNoCase( getMetadataObject( metadata, k ).type, "[]", '', 'all' );
-					
-					if( !listContainsNoCase( 'Struct,Array', class ) ){
-					
-						for( i=1; i<=arrayLen( arguments.data[ k ] ); i++ ){
-						
-							obj = createObject( 'component', class ).init();
-							
-							obj.setMemento( arguments.data[ k ][ i ] );
-							
+		var myArr   = CreateObject( "java", "java.util.ArrayList" ).init();
+
+		for ( method in arguments.data ) {
+			if ( StructKeyExists( getMetadataObject( metadata, "set#method#", "functions" ), "name" ) ) {
+				if ( IsArray( arguments.data[ method ] ) ) {
+					myArr = CreateObject( "java", "java.util.ArrayList" ).init();
+
+					class = ReplaceNoCase(
+						getMetadataObject( metadata, method ).type,
+						"[]",
+						"",
+						"all"
+					);
+
+					if ( !ListContainsNoCase( "Struct,Array", class ) ) {
+						for ( i = 1; i <= ArrayLen( arguments.data[ method ] ); i++ ) {
+							obj = CreateObject( "component", class ).init();
+
+							obj.setMemento( arguments.data[ method ][ i ] );
+
 							myArr.add( obj );
-							
-						}
-						
-						evaluate( "set#k#( myArr )" );
-					
-					}else{
-						
-						evaluate( "set#k#( arguments.data[ k ] )" );
-						
-					}
-					
-				}else if( isStruct( arguments.data[ k ] ) ){
-					
-					class = getMetadataObject( metadata, k ).type;
-					
-					if( !listContainsNoCase( 'Struct,Array', class ) ){
-						
-						obj = createObject( 'component', class ).init();
-							
-						obj.setMemento( arguments.data[ k ] );
-						
-						evaluate( "set#k#( obj )" );
-					
-					}else{
-						
-						evaluate( "set#k#( arguments.data[ k ] )" );
-						
-					}
-					
-				}else{
-					
-					evaluate( "set#k#( arguments.data[ k ] )" );
-				
-				}
-				
-				
-			}
-			
-		}
-			
-	}
-	
-	public Struct function getMemento( Struct metadata=getMetaData( this ) ){
-	
-		var memento = {};
-		var i = 1;
-		var c = 1;
-		
-		if( StructKeyExists( arguments.metadata, 'extends' ) ){
-		
-			memento = getMemento( arguments.metadata.extends );
-		
-		}
-		
-		if( StructKeyExists( arguments.metadata, 'properties' ) ){
-		
-			for( i=1; i<=arrayLen( arguments.metadata.properties ); i++ ){
-			
-				if( REFind("[\+[\+]]", arguments.metadata.properties[i].type ) ){
-				
-					memento[ arguments.metadata.properties[i].name ] = [];
-				
-					if( StructKeyExists( variables, arguments.metadata.properties[i].name ) ){
-					
-						if( ArrayLen( variables[ arguments.metadata.properties[i].name ] ) ){
-						
-							for( c=1; c<=arrayLen( variables[ arguments.metadata.properties[i].name ] ); c++ ){
-							
-								if( StructKeyExists( variables[ arguments.metadata.properties[i].name ][c], "getMemento" ) ){
-								
-									memento[ arguments.metadata.properties[i].name ].add( variables[ arguments.metadata.properties[i].name ][c].getMemento() );
-								
-								}
-							
-							}
-						
-						}
-						
-					}
-					
-				
-				}else{
-				
-					if( StructKeyExists( variables, arguments.metadata.properties[i].name ) ){
-					
-						if( IsObject( variables[ arguments.metadata.properties[i].name ] ) ){
-						
-							if( StructKeyExists( variables[ arguments.metadata.properties[i].name ], 'getMemento' ) ){
-							
-								memento[ arguments.metadata.properties[i].name ] = variables[ arguments.metadata.properties[i].name ].getMemento();
-							
-							
-							}else{
-							
-								memento[ arguments.metadata.properties[i].name ] = variables[ arguments.metadata.properties[i].name ];
-							
-							}
-						
-						}else{
-						
-							memento[ arguments.metadata.properties[i].name ] = variables[ arguments.metadata.properties[i].name ];
-						
 						}
 
+						Evaluate( "set#method#( myArr )" );
+					} else {
+						Evaluate( "set#method#( arguments.data[ method ] )" );
 					}
-				
+				} else if ( IsStruct( arguments.data[ method ] ) ) {
+					class = getMetadataObject( metadata, method ).type;
+
+					if ( !ListContainsNoCase( "Struct,Array", class ) ) {
+						obj = CreateObject( "component", class ).init();
+
+						obj.setMemento( arguments.data[ method ] );
+
+						Evaluate( "set#method#( obj )" );
+					} else {
+						Evaluate( "set#method#( arguments.data[ method ] )" );
+					}
+				} else {
+					Evaluate( "set#method#( arguments.data[ method ] )" );
 				}
-				
 			}
-		
 		}
-		
-		return memento;		
-		
+	}
+
+	public Struct function getMemento( Struct metadata = GetMetadata( this ) ){
+		var memento = {};
+		var i       = 1;
+		var c       = 1;
+
+		if ( StructKeyExists( arguments.metadata, "extends" ) ) {
+			memento = getMemento( arguments.metadata.extends );
+		}
+
+		if ( StructKeyExists( arguments.metadata, "properties" ) ) {
+			for ( i = 1; i <= ArrayLen( arguments.metadata.properties ); i++ ) {
+				if ( ReFind( "[\+[\+]]", arguments.metadata.properties[ i ].type ) ) {
+					memento[ arguments.metadata.properties[ i ].name ] = [];
+
+					if ( StructKeyExists( variables, arguments.metadata.properties[ i ].name ) ) {
+						if ( ArrayLen( variables[ arguments.metadata.properties[ i ].name ] ) ) {
+							for ( c = 1; c <= ArrayLen( variables[ arguments.metadata.properties[ i ].name ] ); c++ ) {
+								if (
+									StructKeyExists(
+										variables[ arguments.metadata.properties[ i ].name ][ c ],
+										"getMemento"
+									)
+								) {
+									memento[ arguments.metadata.properties[ i ].name ].add(
+										variables[ arguments.metadata.properties[ i ].name ][ c ].getMemento()
+									);
+								}
+							}
+						}
+					}
+				} else {
+					if ( StructKeyExists( variables, arguments.metadata.properties[ i ].name ) ) {
+						if ( IsObject( variables[ arguments.metadata.properties[ i ].name ] ) ) {
+							if (
+								StructKeyExists(
+									variables[ arguments.metadata.properties[ i ].name ],
+									"getMemento"
+								)
+							) {
+								memento[ arguments.metadata.properties[ i ].name ] = variables[
+									arguments.metadata.properties[ i ].name
+								].getMemento();
+							} else {
+								memento[ arguments.metadata.properties[ i ].name ] = variables[
+									arguments.metadata.properties[ i ].name
+								];
+							}
+						} else {
+							memento[ arguments.metadata.properties[ i ].name ] = variables[
+								arguments.metadata.properties[ i ].name
+							];
+						}
+					}
+				}
+			}
+		}
+
+		return memento;
 	}
 
 }

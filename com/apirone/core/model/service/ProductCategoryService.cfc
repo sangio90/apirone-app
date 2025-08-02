@@ -71,9 +71,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		};
 
 		if ( !Len( arguments.ProductCategory.getTexts() ) ) {
-			Throw(
-				type = "apirone.errors.noTexsProvided", message = "At least one description required"
-			);
+			Throw( type = "apirone.errors.noTexsProvided", message = "At least one description required" );
 		};
 
 		transaction {
@@ -100,9 +98,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		};
 
 		if ( !Len( arguments.ProductCategory.getTexts() ) ) {
-			Throw(
-				type = "apirone.errors.noTexsProvided", message = "At least one description required"
-			);
+			Throw( type = "apirone.errors.noTexsProvided", message = "At least one description required" );
 		};
 
 		var cm = getCacheManager();
@@ -173,9 +169,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.RecordCount ) {
 			var bean = super.bean( "ProductCategory" );
 
+			var texts = getTextService().list( productCategoryId = record.product_category_id );
+			bean.setTexts( texts );
+
+			// after setTexts()
+			bean.setName( bean.getName() );
+
 			bean.setId( record.product_category_id );
 			bean.setCode( record.code );
 			bean.setStatus( getStatusService().get( record.status_id ) );
+
 			bean.setCreatedAt( record.created_at );
 
 			bean.setType(
@@ -184,7 +187,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setMode( getLookupService().get( "ProductCategoryMode", record.mode_id ) );
 
-			bean.setTexts( getTextService().list( productCategoryId = record.product_category_id ) );
 
 			return bean;
 		}

@@ -2,65 +2,65 @@
 AP.fields.combination = AP.fields.combination || {};
 
 AP.fields.combination = {
-    listRoot: $("#product-combinations-root"),
-    listForm: $("#product-combinations-form"),
-    imagesModal: $("#product-images-list-modal"),
-    searchForm: $("#product-combinations-search-form"),
+    listRoot: $( "#product-combinations-root" ),
+    listForm: $( "#product-combinations-form" ),
+    imagesModal: $( "#product-images-list-modal" ),
+    searchForm: $( "#product-combinations-search-form" ),
 };
 
-$(document).ready(function () {
-    if (AP.fields.combination.listRoot.length) {
+$( document ).ready( function() {
+    if ( AP.fields.combination.listRoot.length ) {
         AP.product.combination.init();
     }
-});
+} );
 
-AP.product.combination = (function () {
+AP.product.combination = ( function() {
     var pub = {};
 
     var fields = AP.fields.combination;
 
     var dataSources = {
-        items: NM.kendo.dataSource({
+        items: NM.kendo.dataSource( {
             url:
                 "/manager/ajax/products/" + AP.page.productId + "/combinations",
-        }),
+        } ),
     };
 
-    var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         rows: dataSources.items,
 
-        search: function (event) {
+        search: function( event ) {
             var thisForm = fields.searchForm;
             var params = thisForm.serializeJSON();
             var filters = [];
 
-            console.log("params", params);
+            console.log( "params", params );
 
-            var dataSource = viewModel.get("rows");
+            var dataSource = viewModel.get( "rows" );
 
-            var filterDataSource = new kendo.data.DataSource({
+            var filterDataSource = new kendo.data.DataSource( {
                 data: dataSource.data().toJSON(),
-            });
+            } );
 
-            if (params.statusId.length) {
-                filters.push({
+            if ( params.statusId.length ) {
+                filters.push( {
                     field: "status.id",
                     operator: "equal",
                     value: params.statusId,
-                });
+                } );
             }
 
-            if (params.str.length) {
-                filters.push({
+            if ( params.str.length ) {
+                filters.push( {
                     field: "name",
                     operator: "contains",
                     value: params.str,
-                });
+                } );
             }
 
-            filterDataSource.filter(filters);
+            filterDataSource.filter( filters );
 
-            viewModel.set("rows", filterDataSource);
+            viewModel.set( "rows", filterDataSource );
 
             return false;
         },
@@ -68,51 +68,51 @@ AP.product.combination = (function () {
         /*
 				getImageTypeText: function (event) {
 					var text = AP.util.getMainText(event.type.texts.toJSON());
-		
+
 					return text.name + " " + event.shortId;
 				},
-		
+
 				getImageSrc: function (event) {
 					var uri = event.uri;
-		
+
 					if (event.uri != "") {
 						var replaced = uri.replace("_ori", "500");
-		
+
 						return replaced;
 					}
-		
+
 					return "/assets/main/img/img-not-found.png";
 				},
-		
+
 				getImageHref: function (event) {
 					var uri = event.uri;
-		
+
 					if (event.uri != "") {
 						return uri;
 					}
-		
+
 					// TODO: not work with target=_blank
 					return "javascript:void(0)";
 				},
 				*/
 
-        calculate: function (event) {
+        calculate: function( event ) {
             var id = event.data.id;
             var thisList = AP.fields.combination.listRoot;
 
-            var status = thisList.find(".status");
+            var status = thisList.find( ".status" );
             status.html(
                 "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
             );
 
-            NM.util.ajax({
+            NM.util.ajax( {
                 method: "GET",
                 url:
                     "/manager/ajax/products/" +
                     AP.page.productId +
                     "/combinations/calculate",
                 callback: {
-                    done: function (xhr) {
+                    done: function( xhr ) {
                         AP.widget.notify(
                             "success",
                             "Combinazioni generate con successo.",
@@ -121,23 +121,23 @@ AP.product.combination = (function () {
                         viewModel.rows.read();
                     },
                 },
-            });
+            } );
             return false;
         },
 
-        delete: function (event) {
-            var checks = fields.listForm.find("[name=selected]:checked");
+        delete: function( event ) {
+            var checks = fields.listForm.find( "[name=selected]:checked" );
 
-            if (checks.length) {
+            if ( checks.length ) {
                 var values = [];
 
-                checks.each(function () {
-                    values.push($(this).val());
-                });
+                checks.each( function() {
+                    values.push( $( this ).val() );
+                } );
 
                 var ids = values.toString();
 
-                NM.util.ajax({
+                NM.util.ajax( {
                     method: "DELETE",
                     url:
                         "/manager/ajax/products/" +
@@ -145,8 +145,8 @@ AP.product.combination = (function () {
                         "/combinations",
                     data: ids,
                     callback: {
-                        done: function (xhr) {
-                            if (xhr.data.payload.hasOwnProperty("errors")) {
+                        done: function( xhr ) {
+                            if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
                                 AP.widget.notify(
                                     "error",
                                     "Non riesco a cancellare tutte le combinazioni",
@@ -161,7 +161,7 @@ AP.product.combination = (function () {
                             viewModel.rows.read();
                         },
                     },
-                });
+                } );
             } else {
                 AP.widget.notify(
                     "warning",
@@ -170,90 +170,90 @@ AP.product.combination = (function () {
             }
         },
 
-        openImagesList: function (event) {
-            var element = $(event.currentTarget);
+        openImagesList: function( event ) {
+            var element = $( event.currentTarget );
             var id = event.data.id;
 
-            if (!element.attr("data-type")) {
+            if ( !element.attr( "data-type" ) ) {
                 console.error(
                     "ERROR. Set data-type attribute in currentTarget",
                 );
                 return;
             }
 
-            var type = element.data("type");
+            var type = element.data( "type" );
 
-            switch (type) {
-                case "combination":
-                    var value = {
-                        type: "combination",
-                        id: id,
-                    };
+            switch ( type ) {
+            case "combination":
+                var value = {
+                    type: "combination",
+                    id: id,
+                };
 
-                    var thisUrl =
+                var thisUrl =
                         "/manager/ajax/combinations/" + id + "/images";
 
-                    break;
+                break;
 
-                default:
-                    console.error(
-                        "ERROR. Type [" + type + "] for image not found",
-                    );
+            default:
+                console.error(
+                    "ERROR. Type [" + type + "] for image not found",
+                );
             }
 
-            var dataSource = NM.kendo.dataSource({ url: thisUrl });
+            var dataSource = NM.kendo.dataSource( { url: thisUrl } );
 
-            viewModel.set("currentImageEntity", value);
-            viewModel.set("currentUploadUrl", thisUrl);
-            if (dataSource) {
-                viewModel.set("images", dataSource);
+            viewModel.set( "currentImageEntity", value );
+            viewModel.set( "currentUploadUrl", thisUrl );
+            if ( dataSource ) {
+                viewModel.set( "images", dataSource );
             }
 
             initUpload();
 
             return false;
         },
-    });
+    } );
 
-    pub.init = function () {
-        kendo.bind(AP.fields.combination.listRoot, viewModel);
+    pub.init = function() {
+        kendo.bind( AP.fields.combination.listRoot, viewModel );
     };
 
-    //TODO: implement an only one "initUpload()"
-    var initUpload = function () {
-        var images = viewModel.get("images");
+    // TODO: implement an only one "initUpload()"
+    var initUpload = function() {
+        var images = viewModel.get( "images" );
 
-        var thisUrl = viewModel.get("currentUploadUrl");
+        var thisUrl = viewModel.get( "currentUploadUrl" );
 
-        NM.util.openModal(AP.fields.combination.imagesModal);
+        NM.util.openModal( AP.fields.combination.imagesModal );
 
         images
             .fetch()
-            .then(function () {
-                if (images.total() > 0) {
-                    //console.log("total:in", images.total() );
+            .then( function() {
+                if ( images.total() > 0 ) {
+                    // console.log("total:in", images.total() );
 
-                    for (var image of images.data()) {
+                    for ( var image of images.data() ) {
                         var uid = image.uid;
 
-                        //console.log( "image", image );
+                        // console.log( "image", image );
 
-                        $("#image-upload-" + uid).fileupload({
-                            dropZone: $("#image-upload-dropzone-" + uid),
+                        $( "#image-upload-" + uid ).fileupload( {
+                            dropZone: $( "#image-upload-dropzone-" + uid ),
                             autoUpload: true,
                             formData: {
                                 typeId: image.type.id,
                                 imageId: image.id,
                             },
                             url: thisUrl,
-                            add: function (event, data) {
-                                var uid = $(event.target).data("uid");
+                            add: function( event, data ) {
+                                var uid = $( event.target ).data( "uid" );
 
-                                var status = $("#image-upload-status-" + uid);
+                                var status = $( "#image-upload-status-" + uid );
 
-                                status.html("");
+                                status.html( "" );
 
-                                //TODO: get list form configuration
+                                // TODO: get list form configuration
                                 if (
                                     !/\.(jpg|jpeg|png|pdf)$/i.test(
                                         data.files[0].name,
@@ -268,44 +268,40 @@ AP.product.combination = (function () {
                                 data.submit();
                             },
 
-                            success: function (event, data) {
-                                //TODO
-                                console.log("success");
-                                console.log("success", data);
+                            success: function( event, data ) {
+                                // TODO
+                                console.log( "success" );
+                                console.log( "success", data );
                             },
 
-                            progressall: function (event, data) {
-                                var status = $("#image-upload-status-" + uid);
-                                status.html("");
+                            progressall: function( event, data ) {
+                                var status = $( "#image-upload-status-" + uid );
+                                status.html( "" );
 
-                                var uid = $(event.target).data("uid");
+                                var uid = $( event.target ).data( "uid" );
 
                                 var progress = parseInt(
-                                    (data.loaded / data.total) * 100,
+                                    ( data.loaded / data.total ) * 100,
                                     10,
                                 );
-                                $(
-                                    "#image-upload-progress-" +
-                                        uid +
-                                        " .upload-bar",
-                                ).css("width", progress + "%");
+                                $( "#image-upload-progress-" + uid + " .upload-bar", ).css( "width", progress + "%" );
 
-                                status.html("Fatto!");
+                                status.html( "Fatto!" );
 
-                                var row = viewModel.get("images").getByUid(uid);
+                                var row = viewModel.get( "images" ).getByUid( uid );
 
-                                setTimeout(() => {
+                                setTimeout( () => {
                                     initUpload();
-                                }, "1000");
+                                }, "1000" );
                             },
-                        });
+                        } );
                     }
                 }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            } )
+            .catch( ( error ) => {
+                console.error( error );
+            } );
     };
 
     return pub;
-})();
+} () );

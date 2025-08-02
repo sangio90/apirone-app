@@ -1,33 +1,31 @@
 AP.line = AP.line || {};
 
 AP.line.fields = {
-    listRoot: $("#line-list-root"),
-    detailRoot: $("#line-detail-modal"),
-    detailForm: $("#line-detail-form"),
-    searchListForm: $("#line-grid-search-form"),
-    productsRoot: $("#line-products-root"),
-    sizeConfigModal: $("#size-config-modal"),
-    sizeConfigForm: $("#size-config-form"),
+    listRoot: $( "#line-list-root" ),
+    detailRoot: $( "#line-detail-modal" ),
+    detailForm: $( "#line-detail-form" ),
+    searchListForm: $( "#line-grid-search-form" ),
+    productsRoot: $( "#line-products-root" ),
+    sizeConfigModal: $( "#size-config-modal" ),
+    sizeConfigForm: $( "#size-config-form" ),
 };
 
-$(document).ready(function () {
-    if (AP.line.fields.listRoot.length) {
+$( document ).ready( function() {
+    if ( AP.line.fields.listRoot.length ) {
         AP.line.list.init();
     }
 
-    if (AP.line.fields.productsRoot.length) {
+    if ( AP.line.fields.productsRoot.length ) {
         AP.line.products.init();
     }
 
-    if (AP.line.fields.detailRoot.length) {
+    if ( AP.line.fields.detailRoot.length ) {
         AP.line.detail.init();
     }
-});
+} );
 
-AP.line.detail = (function () {
+AP.line.detail = ( function() {
     var pub = {};
-
-    // console.log("categories", AP.page.categories);
 
     var defaultDetailForm = {
         data: {
@@ -60,7 +58,7 @@ AP.line.detail = (function () {
         title: "Carica linea",
     };
 
-    var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
 
         callback: {
@@ -69,214 +67,216 @@ AP.line.detail = (function () {
             onLoad: undefined,
         },
 
-        resetForm: function () {
+        resetForm: function() {
             var detailForm = AP.line.fields.detailForm;
 
             var validator = detailForm.validate();
             validator.resetForm();
 
-            detailForm.find(".status").html("");
+            detailForm.find( ".status" ).html( "" );
 
-            viewModel.set("detailForm", defaultDetailForm);
+            viewModel.set( "detailForm", defaultDetailForm );
         },
 
-        save: function (event) {
+        save: function( event ) {
             var detailForm = AP.line.fields.detailForm;
-            var status = detailForm.find(".status");
+            var status = detailForm.find( ".status" );
 
             status.html(
                 "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
             );
 
-            if (detailForm.valid()) {
-                NM.util.ajax({
+            if ( detailForm.valid() ) {
+                NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/lines",
-                    data: JSON.stringify(viewModel.get("detailForm.data")),
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
-                        done: function (xhr) {
-                            if (xhr.status == "SUCCESS") {
+                        done: function( xhr ) {
+                            if ( xhr.status == "SUCCESS" ) {
                                 NM.util.autoHideMessage(
                                     status,
                                     "<span class='green'>Linea salvata</span>",
                                 );
 
                                 setTimeout(
-                                    () => $("#line-detail-modal").modal("hide"),
+                                    () => $( "#line-detail-modal" ).modal( "hide" ),
                                     1000,
                                 );
 
                                 AP.util.fireCallback(
                                     "onSave",
-                                    viewModel.get("callback"),
+                                    viewModel.get( "callback" ),
                                 );
                             }
                         },
                     },
-                });
+                } );
             }
 
             return false;
         },
-    });
+    } );
 
-    (pub.new = function ({ onSave }) {
-        if (onSave) {
-            viewModel.set("callback.onSave", onSave);
+    pub.new = function( { onSave } ) {
+        if ( onSave ) {
+            viewModel.set( "callback.onSave", onSave );
         }
 
         viewModel.resetForm();
 
-        NM.util.openModal(AP.line.fields.detailRoot);
-    }),
-        (pub.edit = function ({ id, onSave }) {
-            if (onSave) {
-                viewModel.set("callback.onSave", onSave);
-            }
+        NM.util.openModal( AP.line.fields.detailRoot );
+    };
 
-            viewModel.resetForm();
+    pub.edit = function( { id, onSave } ) {
+        if ( onSave ) {
+            viewModel.set( "callback.onSave", onSave );
+        }
 
-            NM.util.ajax({
-                method: "GET",
-                url: "/manager/ajax/lines/" + id,
-                callback: {
-                    done: function (xhr) {
-                        if (xhr.status == "SUCCESS") {
-                            var selectedCategories = [];
+        viewModel.resetForm();
 
-                            if (xhr.data?.categories) {
-                                for (var category of xhr.data.categories) {
-                                    selectedCategories.push(category);
-                                }
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/lines/" + id,
+            callback: {
+                done: function( xhr ) {
+                    if ( xhr.status == "SUCCESS" ) {
+                        var selectedCategories = [];
+
+                        if ( xhr.data?.categories ) {
+                            for ( var category of xhr.data.categories ) {
+                                selectedCategories.push( category );
                             }
-
-                            viewModel.set("detailForm.data", xhr.data);
-                            viewModel.set(
-                                "detailForm.data.selectedCategories",
-                                selectedCategories,
-                            );
-                            viewModel.set("detailForm.title", "Modifica linea");
-
-                            NM.util.openModal(AP.line.fields.detailRoot);
                         }
-                    },
+
+                        viewModel.set( "detailForm.data", xhr.data );
+                        viewModel.set(
+                            "detailForm.data.selectedCategories",
+                            selectedCategories,
+                        );
+                        viewModel.set( "detailForm.title", "Modifica linea" );
+
+                        NM.util.openModal( AP.line.fields.detailRoot );
+                    }
                 },
-            });
-        }),
-        (pub.init = function () {
-            kendo.bind(AP.line.fields.detailRoot, viewModel);
+            },
+        } );
+    };
 
-            AP.page.categories.unshift({
-                id: "",
-                name: "-- Seleziona una categoria",
-            });
-            AP.page.thicknesses.unshift({
-                id: "",
-                name: "-- Seleziona uno spessore",
-            });
+    pub.init = function() {
+        kendo.bind( AP.line.fields.detailRoot, viewModel );
 
-            var detailForm = AP.line.fields.detailForm;
+        AP.page.categories.unshift( {
+            id: "",
+            name: "-- Seleziona una categoria",
+        } );
 
-            detailForm.validate({
-                onfocusout: function (element) {
-                    $(element).valid();
-                },
-                rules: {
-                    code: {
-                        required: true,
-                        checkCode: true,
-                        remote: {
-                            url: "/manager/ajax/lines/code-exists",
-                            data: {
-                                id: function () {
-                                    return viewModel.get("detailForm.data.id");
-                                },
+        AP.page.thicknesses.unshift( {
+            id: "",
+            name: "-- Seleziona uno spessore",
+        } );
+
+        var detailForm = AP.line.fields.detailForm;
+
+        detailForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
+            },
+            rules: {
+                code: {
+                    required: true,
+                    checkCode: true,
+                    remote: {
+                        url: "/manager/ajax/lines/code-exists",
+                        data: {
+                            id: function() {
+                                return viewModel.get( "detailForm.data.id" );
                             },
-                            dataFilter: function (xhr) {
-                                var json = JSON.parse(xhr);
-                                return json.data == false;
-                            },
+                        },
+                        dataFilter: function( xhr ) {
+                            var json = JSON.parse( xhr );
+                            return json.data == false;
                         },
                     },
                 },
-                messages: {
-                    code: {
-                        required: "Codice richiesto",
-                        checkCode:
-                            "Solo numeri, lettere, trattino o trattino basso",
-                        remote: "Il codice esiste",
-                    },
+            },
+            messages: {
+                code: {
+                    required: "Codice richiesto",
+                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
+                    remote: "Il codice esiste",
                 },
-            });
-        });
+            },
+        } );
+    };
 
     return pub;
-})();
+} () );
 
-AP.line.list = (function () {
+AP.line.list = ( function() {
     var pub = {};
 
     var detailApp = AP.line.detail;
 
     var dataSources = {
-        items: NM.kendo.dataSource({ url: "/manager/ajax/lines" }),
+        items: NM.kendo.dataSource( { url: "/manager/ajax/lines" } ),
     };
 
-    var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         rows: dataSources.items,
 
-        search: function (event) {
+        search: function( event ) {
             var thisForm = AP.line.fields.searchListForm;
 
             var params = thisForm.serializeJSON();
 
-            viewModel.rows.read(params);
+            viewModel.rows.read( params );
 
             return false;
         },
 
-        new: function (event) {
-            console.log("detailApp", detailApp);
+        new: function( event ) {
+            console.log( "detailApp", detailApp );
 
-            var onSave = function () {
-                console.log("onSave");
-                viewModel.get("rows").read();
+            var onSave = function() {
+                console.log( "onSave" );
+                viewModel.get( "rows" ).read();
             };
 
-            detailApp.new({ onSave: onSave });
+            detailApp.new( { onSave: onSave } );
 
             return false;
         },
 
-        edit: function (event) {
-            var onSave = function () {
-                viewModel.get("rows").read();
+        edit: function( event ) {
+            var onSave = function() {
+                viewModel.get( "rows" ).read();
             };
 
-            detailApp.edit({ id: event.data.id, onSave: onSave });
+            detailApp.edit( { id: event.data.id, onSave: onSave } );
 
             return false;
         },
 
-        delete: function (event) {
-            var checks = $("#line-grid").find("[name=selected]:checked");
+        delete: function( event ) {
+            var checks = $( "#line-grid" ).find( "[name=selected]:checked" );
 
-            if (checks.length) {
+            if ( checks.length ) {
                 var values = [];
 
-                checks.each(function () {
-                    values.push($(this).val());
-                });
+                checks.each( function() {
+                    values.push( $( this ).val() );
+                } );
 
                 var ids = values.toString();
 
-                NM.util.ajax({
+                NM.util.ajax( {
                     method: "DELETE",
                     url: "/manager/ajax/lines",
                     data: ids,
                     callback: {
-                        done: function (xhr) {
-                            if (xhr.data.payload.hasOwnProperty("errors")) {
+                        done: function( xhr ) {
+                            if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
                                 AP.widget.notify(
                                     "error",
                                     "Non riesco a cancellare tutti i valori",
@@ -288,49 +288,49 @@ AP.line.list = (function () {
                                 );
                             }
 
-                            var id = viewModel.get("detailForm.data.id");
-                            console.log("id", id);
+                            var id = viewModel.get( "detailForm.data.id" );
+                            console.log( "id", id );
 
                             viewModel.rows.read();
                         },
                     },
-                });
+                } );
             } else {
-                AP.widget.notify("warning", "Seleziona almeno un valore");
+                AP.widget.notify( "warning", "Seleziona almeno un valore" );
             }
         },
 
-        products: function (event) {
+        products: function( event ) {
             var id = event.data.id;
-            window.open("/manager/lines/" + id + "/products", "_blank").focus();
+            window.open( "/manager/lines/" + id + "/products", "_blank" ).focus();
 
             return false;
         },
 
-        attributes: function (event) {
+        attributes: function( event ) {
             /*
                 note: redirect in controller to first product
             */
 
             var id = event.data.id;
             window
-                .open("/manager/lines/" + id + "/attributes", "_blank")
+                .open( "/manager/lines/" + id + "/attributes", "_blank" )
                 .focus();
 
             return false;
         },
-    });
+    } );
 
-    pub.init = function () {
-        console.log("list:init");
+    pub.init = function() {
+        console.log( "list:init" );
 
-        kendo.bind(AP.line.fields.listRoot, viewModel);
+        kendo.bind( AP.line.fields.listRoot, viewModel );
     };
 
     return pub;
-})();
+} () );
 
-AP.line.products = (function () {
+AP.line.products = ( function() {
     var pub = {};
     var fields = AP.line.fields;
 
@@ -342,7 +342,7 @@ AP.line.products = (function () {
         },
     };
 
-    var changeStatus = function (status, event) {
+    var changeStatus = function( status, event ) {
         // active
         var method = "POST";
         var classToShow = "active";
@@ -350,41 +350,41 @@ AP.line.products = (function () {
         var message = "Combinazione salvata";
 
         // deactive
-        if (status == "deactive") {
+        if ( status == "deactive" ) {
             method = "DELETE";
             classToShow = "deactive";
             classToHide = "active";
             message = "Combinazione rimossa";
         }
 
-        var ele = $(event.currentTarget);
+        var ele = $( event.currentTarget );
 
-        var status = $("#line-products-status");
-        var values = ele.data("values");
-        var category = ele.data("category");
+        var status = $( "#line-products-status" );
+        var values = ele.data( "values" );
+        var category = ele.data( "category" );
 
         status.html(
             "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>",
         );
 
-        var size = values.split("__")[0];
-        var finish = values.split("__")[1];
+        var size = values.split( "__" )[0];
+        var finish = values.split( "__" )[1];
 
-        NM.util.ajax({
+        NM.util.ajax( {
             method: method,
             url: "/manager/ajax/lines/" + AP.page.line.id + "/products",
-            data: JSON.stringify({
+            data: JSON.stringify( {
                 sizeId: size,
                 finishId: finish,
                 categoryId: category,
-            }),
+            } ),
             callback: {
-                done: function (xhr) {
-                    if (xhr.status == "SUCCESS") {
-                        var button = $("button[data-values='" + values + "']");
+                done: function( xhr ) {
+                    if ( xhr.status == "SUCCESS" ) {
+                        var button = $( "button[data-values='" + values + "']" );
 
-                        button.filter("." + classToShow).show();
-                        button.filter("." + classToHide).hide();
+                        button.filter( "." + classToShow ).show();
+                        button.filter( "." + classToHide ).hide();
 
                         status.html(
                             "<span class='green'>" + message + "</span> ",
@@ -392,34 +392,34 @@ AP.line.products = (function () {
                     }
                 },
             },
-        });
+        } );
 
         return false;
     };
 
-    var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         sizeConfigModal: defaultSizeConfigModal,
 
-        attributes: function (event) {
-            var lineId = window.location.href.split("/")[5];
+        attributes: function( event ) {
+            var lineId = window.location.href.split( "/" )[5];
 
             window
-                .open("/manager/lines/" + lineId + "/attributes", "_blank")
+                .open( "/manager/lines/" + lineId + "/attributes", "_blank" )
                 .focus();
 
             return false;
         },
 
-        activate: function (event) {
+        activate: function( event ) {
             event.preventDefault();
 
-            changeStatus("active", event);
+            changeStatus( "active", event );
         },
 
-        deactivate: function (event) {
+        deactivate: function( event ) {
             event.preventDefault();
 
-            bootbox.confirm({
+            bootbox.confirm( {
                 title: "Conferma eliminazione",
                 message: "Sei sicuro di voler cancellare questo prodotto?",
                 buttons: {
@@ -432,69 +432,69 @@ AP.line.products = (function () {
                         className: "btn-danger",
                     },
                 },
-                callback: function (result) {
-                    if (result) {
-                        changeStatus("deactive", event);
+                callback: function( result ) {
+                    if ( result ) {
+                        changeStatus( "deactive", event );
                     }
                 },
-            });
+            } );
         },
 
-        showSizeConfigModal: function (event) {
-            NM.util.openModal(fields.sizeConfigModal);
+        showSizeConfigModal: function( event ) {
+            NM.util.openModal( fields.sizeConfigModal );
 
-            let lineId = $(event.currentTarget).data("line-id");
-            let productCategoryId = $(event.currentTarget).data(
+            const lineId = $( event.currentTarget ).data( "line-id" );
+            const productCategoryId = $( event.currentTarget ).data(
                 "product-category-id",
             );
-            let sizeId = $(event.currentTarget).data("size-id");
-            let sizeConfigId = $(event.currentTarget).data("size-config-id");
-            let width = $(event.currentTarget).data("width");
-            let height = $(event.currentTarget).data("height");
+            const sizeId = $( event.currentTarget ).data( "size-id" );
+            const sizeConfigId = $( event.currentTarget ).data( "size-config-id" );
+            const width = $( event.currentTarget ).data( "width" );
+            const height = $( event.currentTarget ).data( "height" );
 
-            viewModel.set("sizeConfigModal.data.sizeId", sizeId);
+            viewModel.set( "sizeConfigModal.data.sizeId", sizeId );
             viewModel.set(
                 "sizeConfigModal.data.productCategoryId",
                 productCategoryId,
             );
-            viewModel.set("sizeConfigModal.data.sizeConfigId", sizeConfigId);
-            viewModel.set("sizeConfigModal.data.lineId", lineId);
-            viewModel.set("sizeConfigModal.data.width", width);
-            viewModel.set("sizeConfigModal.data.height", height);
+            viewModel.set( "sizeConfigModal.data.sizeConfigId", sizeConfigId );
+            viewModel.set( "sizeConfigModal.data.lineId", lineId );
+            viewModel.set( "sizeConfigModal.data.width", width );
+            viewModel.set( "sizeConfigModal.data.height", height );
 
             return false;
         },
 
-        saveSizeConfig: function (event) {
+        saveSizeConfig: function( event ) {
             var sizeConfigForm = AP.line.fields.sizeConfigForm;
-            var status = sizeConfigForm.find(".status");
+            var status = sizeConfigForm.find( ".status" );
 
             status.html(
                 "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
             );
 
-            if (sizeConfigForm.valid()) {
-                let sizeConfigFormData = viewModel.get("sizeConfigModal.data");
-                NM.util.ajax({
+            if ( sizeConfigForm.valid() ) {
+                const sizeConfigFormData = viewModel.get( "sizeConfigModal.data" );
+                NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/size_config",
-                    data: JSON.stringify(sizeConfigFormData),
+                    data: JSON.stringify( sizeConfigFormData ),
                     callback: {
-                        done: function (xhr) {
-                            if (xhr.status == "SUCCESS") {
+                        done: function( xhr ) {
+                            if ( xhr.status == "SUCCESS" ) {
                                 NM.util.autoHideMessage(
                                     status,
                                     "<span class='green'>Dimensioni salvate</span>",
                                 );
 
                                 setTimeout(
-                                    () => $("#size-config-modal").modal("hide"),
+                                    () => $( "#size-config-modal" ).modal( "hide" ),
                                     1000,
                                 );
 
                                 AP.util.fireCallback(
                                     "onSave",
-                                    viewModel.get("callback"),
+                                    viewModel.get( "callback" ),
                                 );
 
                                 setTimeout(
@@ -504,20 +504,20 @@ AP.line.products = (function () {
                             }
                         },
                     },
-                });
+                } );
             }
 
             return false;
         },
-    });
+    } );
 
-    pub.init = function () {
-        console.log(viewModel.get("sizeConfigModal.title"));
-        kendo.bind(fields.productsRoot, viewModel);
+    pub.init = function() {
+        console.log( viewModel.get( "sizeConfigModal.title" ) );
+        kendo.bind( fields.productsRoot, viewModel );
 
         var sizeConfigForm = fields.sizeConfigForm;
 
-        sizeConfigForm.validate({
+        sizeConfigForm.validate( {
             rules: {
                 width: {
                     required: true,
@@ -538,8 +538,8 @@ AP.line.products = (function () {
                     number: "Please enter a valid number.",
                 },
             },
-        });
+        } );
     };
 
     return pub;
-})();
+} () );

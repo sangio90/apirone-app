@@ -21,10 +21,11 @@ module.exports = {
             "localStorage": "readonly",
         }
     },
+    files: [ "**/*.js" ],
     rules: {
         "eqeqeq": "off",
-        "quotes": ["warn", "double"],
-        "one-var": ["warn", "never"],
+        "quotes": [ "warn", "double" ],
+        "one-var": [ "warn", "never" ],
         "wrap-iife": "warn",
         "comma-style": "warn",
         "dot-notation": "warn",
@@ -34,8 +35,6 @@ module.exports = {
         "spaced-comment": "warn",
         "no-nested-ternary": "warn",
         "no-trailing-spaces": "warn",
-        "array-bracket-spacing": "warn",
-        "space-before-function-paren": "never",
         "function-paren-newline": "off",
         "no-multiple-empty-lines": "warn",
         "newline-per-chained-call": [
@@ -66,12 +65,11 @@ module.exports = {
         "no-array-constructor": "error",
         "no-dupe-class-members": "error",
         "array-callback-return": "error",
-        "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
-        "space-before-function-paren": ["error", "never"],
-        "space-in-parens": ["error", "always"],
-        "array-bracket-spacing": ["error", "always"],
-        "object-curly-spacing": ["error", "always"],
-        "indent": ["error", 4]
+        "brace-style": [ "error", "1tbs", { "allowSingleLine": true } ],
+        "space-before-function-paren": [ "error", "never" ],
+        "space-in-parens": [ "error", "always" ],
+        "array-bracket-spacing": [ "error", "always" ],
+        "object-curly-spacing": [ "error", "always" ],
+        "indent": [ "error", 4 ]
     }
-}
-  
+};

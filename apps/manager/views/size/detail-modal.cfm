@@ -55,7 +55,7 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Disponibile per</label>
+                            <label class="col-sm-2 col-form-label text-end">Categorie</label>
                             <div class="col-sm-10">
                                 <select id="categories" 
                                     data-placeholder="-- Seleziona le categorie"
