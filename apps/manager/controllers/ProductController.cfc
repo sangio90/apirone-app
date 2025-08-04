@@ -10,7 +10,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.line   = product.getLine();
 
 		// frutti
-		if ( product.getCategory().getId() == 167 ) {
+		if ( product.getCategory().getMode().getId() == "BAS" ) {
 			prc.title    = product.getName();
 			prc.subtitle = product.getCategory().getName();
 		} else {
@@ -49,6 +49,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 	function listByCategoryId( event, rc, prc ){
+		//TODO: not used, remove?
+		getLogger().debug( "ProductController.listByCategoryId: someone use this method? CategoryId: #rc.id#" );
+		
 		param rc.id = "";
 
 		var category = super.fire( "productCategory.get", [ rc.id ] );
@@ -80,6 +83,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "statuses" ] = prc.statuses;
 		event.setView( "product/combinations" );
 	}
+
+
+	/*
+		private methods
+	*/
 
 	private Array function convertTree( required Array items ){
 		var result = [];
