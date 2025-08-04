@@ -108,7 +108,7 @@
                                                     class="underline"
                                                     data-type="product"
                                                     data-bind="click:openImagesList">
-                                                        Aggiungi immagini per questa placca &raquo;
+                                                        Aggiungi immagini per questo articolo &raquo;
                                                 </a>
 
                                                 <br>
