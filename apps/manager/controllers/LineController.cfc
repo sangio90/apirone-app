@@ -41,13 +41,18 @@ component extends="com.apirone.core.controller.AbsController" {
 	function attributes( event, rc, prc ){
 		var products = super.fire( "product.list", { lineId = rc.id } );
 
+		var destination = "/manager/lines/#rc.id#/products";
+
+		if( len( cgi.http_referer ) ) {
+			destination = cgi.http_referer;
+		}
+
 		if ( products.len() ) {
 			cflocation( url = "/manager/products/#products[ 1 ].getId()#", addToken = false );
 		} else {
 			setMessage( type = "warning", message = "Carica almeno un prodotto" );
 
-			// TODO: show message
-			cflocation( url = "/manager/lines/#rc.id#/products?msg=first-load-products", addToken = false );
+			relocate( uri="#destination#", postProcessExempt=false, addToken=false );
 		}
 	}
 
