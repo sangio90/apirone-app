@@ -108,6 +108,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				<cfset startOrderBy = 10>
 			</cfif>
 
+			<!---
 			<cfquery datasource="apirone">
 				DELETE FROM product_items
 				WHERE
@@ -119,6 +120,7 @@ component extends="com.apirone.core.controller.AbsController" {
 							WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#rc.attributeId#">::uuid
 						)
 			</cfquery>
+			---->
 
 			<cfloop array="#attribute.getValues()#" item="item">
 				<cfquery datasource="apirone">
