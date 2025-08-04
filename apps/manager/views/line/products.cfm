@@ -78,7 +78,7 @@
 
                                                 <cfset exists = productExists( size.getId(), finish.getId() )>
 
-                                                <button class="btn btn-danger btn-sm active" data-bind="click:deactivate"
+                                                <button class="btn btn-success btn-sm active" data-bind="click:deactivate"
                                                     data-category="#prc.category.getId()#"
                                                     data-values="#size.getId()#__#finish.getId()#"
                                                     <cfif !exists>style="display: none"</cfif>
