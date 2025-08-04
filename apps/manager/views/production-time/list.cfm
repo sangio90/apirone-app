@@ -1,5 +1,5 @@
 <cfoutput>
-	<div id="production-time-list-root">
+	<div id="production-times-list-root">
 		
         <div class="row">
             <div class="col-8">
@@ -21,7 +21,7 @@
 							<div class="col-sm-6">
 								<div class="mb-3 box-search-small">
 									<form
-										id   ="production-time-grid-search-form"
+										id   ="production-times-grid-search-form"
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search } '>
 										
@@ -44,10 +44,10 @@
 							</div>
 						</div>
 
-						<form name="production-time-grid-form" id="production-time-grid-form" method="post">
+						<form name="production-times-grid-form" id="production-times-grid-form" method="post">
 							<div class="col-12">
 								#grid(
-									id      = "line-grid",
+									id      = "production-times-grid",
 									columns = "[
                                         { 'field':'id', 'title':'ID', width: '100px' },
                                         { 'field':'name', 'title':'Descrizione' },
@@ -69,6 +69,6 @@
 		</div>
 	</div>
 
-	<!--- #view( "production-time/detail-modal" )# --->
+	#view( "production-time/detail-modal" )#
 
 </cfoutput>
