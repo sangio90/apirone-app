@@ -1,12 +1,8 @@
 ﻿component output="false" accessors="true" {
 
-	// property name="dataMapper" type="dataMapper.DataMapper";
 	property name="configuration" type="com.apirone.core.model.bean.Configuration";
-	// property name="accessManager" type="com.apirone.core.util.accessManager.AccessManager";
 
 	public Any function init(){
-		// setDataMapper( getModel().getInstance("DataMapper") );
-		// setAccessManager( getModel().getInstance("AccessManager") );
 		setConfiguration( getModel().getInstance( "Configuration" ) );
 	}
 
@@ -273,6 +269,10 @@
 
 	public Struct function getDataMapper(){
 		return getModel().getInstance( "DataMapper" );
+	}
+
+	public Struct function getLogger(){
+		return getModel().getInstance( "Logger" );
 	}
 
 	public Struct function getAccessManager(){
