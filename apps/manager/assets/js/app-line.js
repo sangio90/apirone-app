@@ -186,6 +186,7 @@ AP.line.detail = ( function() {
                 code: {
                     required: true,
                     checkCode: true,
+                    rangelength: [ 5, 5 ],
                     remote: {
                         url: "/manager/ajax/lines/code-exists",
                         data: {
@@ -203,6 +204,7 @@ AP.line.detail = ( function() {
             messages: {
                 code: {
                     required: "Codice richiesto",
+                    rangelength: "Sono richiesti 5 caratteri",
                     checkCode: "Solo numeri, lettere, trattino o trattino basso",
                     remote: "Il codice esiste",
                 },
