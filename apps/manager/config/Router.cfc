@@ -28,6 +28,7 @@
 			fruits
 		*/
 		get( "/ajax/fruits/code-exists" ).to( "FruitAjaxController.codeExists" ).end();
+		//TODO: consider to remove the 2 follow routes ("/items")
 		post( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.addItem" ).end();
 		get( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.listItems" ).end();
 		get( "/ajax/fruits/:id" ).to( "FruitAjaxController.get" ).end();
