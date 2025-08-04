@@ -16,23 +16,36 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Larghezza</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4"
-                                    name="width"
-                                    maxlength="5"
-                                    data-bind="value: sizeConfigModal.data.width"
-								>
+                                <div class="input-group">
+                                    <input type="text" required class="form-control col-sm-4"
+                                        name="width"
+                                        maxlength="5"
+                                        data-bind="value: sizeConfigModal.data.width"
+                                    >
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">mm</span>
+                                    </div>
+                                </div>
+                                <span id="width-error"></span>
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Altezza</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" name="height"
-                                    data-msg-required="height"
-                                    maxlength="125"
-                                    data-bind="value: sizeConfigModal.data.height">
+                                <div class="input-group">
+                                    <input type="text" required class="form-control col-sm-4" name="height"
+                                        data-msg-required="height"
+                                        maxlength="125"
+                                        data-bind="value: sizeConfigModal.data.height">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">mm</span>
+                                    </div>
+                                </div>
+                                <span id="height-error"></span>
                             </div>
                         </div>
+
 					</div>
 
                     <footer class="card-footer">
