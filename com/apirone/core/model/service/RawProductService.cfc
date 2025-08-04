@@ -32,10 +32,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required Numeric limit  = 20,
 		required Numeric offset = 0
 	){
-		if ( !ListFind( "LV,MP", arguments.processingTypeId ) ) {
+		
+		if ( Len( arguments.processingTypeId ) AND !ListFind( "LV,MP", arguments.processingTypeId ) ) {
 			Throw(
 				type    = "ApirOne.errors.valueNotAllowed",
-				message = "For processingTypeId the allowed values are LV=lavorazioni or MP=materie prime"
+				message = "The value [#arguments.processingTypeId#] for processingTypeId is not valid. The allowed values are LV=lavorazioni or MP=materie prime."
 			);
 		}
 
