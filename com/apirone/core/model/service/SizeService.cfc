@@ -28,8 +28,8 @@
 	}
 
 	public com.apirone.core.model.bean.Result function search(
-		String lineId,
 		String str,
+		String lineId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0
 	){

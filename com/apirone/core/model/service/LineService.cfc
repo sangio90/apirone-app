@@ -36,7 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String statusId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "line.code" } ]
+		required Array orderBy  = [ { field = "line.code", desc = "asc" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();

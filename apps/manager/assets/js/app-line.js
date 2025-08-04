@@ -365,9 +365,7 @@ AP.line.products = ( function() {
         var values = ele.data( "values" );
         var category = ele.data( "category" );
 
-        status.html(
-            "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>",
-        );
+        status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
         var size = values.split( "__" )[0];
         var finish = values.split( "__" )[1];
@@ -388,9 +386,7 @@ AP.line.products = ( function() {
                         button.filter( "." + classToShow ).show();
                         button.filter( "." + classToHide ).hide();
 
-                        status.html(
-                            "<span class='green'>" + message + "</span> ",
-                        );
+                        status.html( "<span class='green'>" + message + "</span> " );
                     }
                 },
             },

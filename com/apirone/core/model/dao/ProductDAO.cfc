@@ -87,7 +87,8 @@
 				</cfif>
 
 			ORDER BY
-				<!--- #super.sanitizeSQL( arguments.orderBy )# - ---> <!--- TODO: dovrei fare la inner se l'ordinamento prevede product.name --->
+				<!--- #super.sanitizeSQL( arguments.orderBy )# - --->
+				<!--- TODO: dovrei fare la inner se l'ordinamento prevede product.name --->
 				products.code
 
 			<cfif arguments.limit GTE 0>

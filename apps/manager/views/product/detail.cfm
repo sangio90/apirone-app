@@ -23,7 +23,7 @@
 
                         <div class="col-md-8 mb-4" id="product-config-row">
 
-                            <cfif prc.product.getCategory().getId() == 22>
+                            <cfif prc.product.getCategory().getMode().getId() <> "BAS">
 
                                 <form class="d-flex align-items-center justify-content-end" id="product-change-form">
 
