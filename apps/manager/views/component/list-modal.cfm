@@ -29,6 +29,7 @@
 										>
 
 										<select class="form-control me-3" name="processingTypeId" style="width:46%">
+											<option value="">-- tutte</option>
 											<option value="MP">Materie prime</option>
 											<option value="LV">Lavorazioni</option>
 										</select>
@@ -95,7 +96,7 @@
 										>
 
 										<select class="form-control me-3 form-control-sm" name="processingTypeId" style="width:46%">
-											<option value="">Tutte le tipologie</option>
+											<option value="">-- tutte le tipologie</option>
 											<option value="MP">Materie prime</option>
 											<option value="LV">Lavorazioni</option>
 										</select>

@@ -68,7 +68,7 @@ AP.size.list = ( function() {
             var thisForm = AP.size.fields.detailForm;
             var status = thisForm.find( ".status" );
 
-            status.html( "<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">" );
+            status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
 
             if ( thisForm.valid() ) {
                 NM.util.ajax( {

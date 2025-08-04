@@ -87,7 +87,7 @@
 
                                             <br>
 
-                                            <cfif prc.product.getCategory().getId() == 22>
+                                            <cfif prc.product.getCategory().getMode().getId() <> "BAS">
 
                                                 - <a href=""
                                                     class="underline"
@@ -101,25 +101,27 @@
                                                     data-bind="click:openComponentsList">
                                                         Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
                                                     </a>
+                                                
                                                 <br>
 
                                                 - <a href=""
                                                     class="underline"
                                                     data-type="product"
                                                     data-bind="click:openImagesList">
-                                                    Aggiungi immagini per questa placca &raquo;
+                                                        Aggiungi immagini per questa placca &raquo;
                                                 </a>
 
                                                 <br>
+
                                                 - <a href="/manager/products/#rc.id#/combinations"
                                                     class="underline"
                                                     data-type="product"
                                                     data-bind="click:open">
-                                                    Tutte le combinazioni &raquo;
+                                                        Tutte le combinazioni &raquo;
                                                 </a>
 
-                                        </cfif>
-</p>
+                                            </cfif>
+                                        </p>
 
                                     </div>
                                     <div class="col-sm-12 text-end">
@@ -132,7 +134,7 @@
                                             data-product-name="Attributo radice"
 
                                             data-bind="click:openAttributesList">
-                                            Aggiungi attributo di base
+                                                Aggiungi attributo di base
                                         </a>
 
                                         #deleteButton(

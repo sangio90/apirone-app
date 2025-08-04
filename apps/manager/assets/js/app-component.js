@@ -1,82 +1,82 @@
 AP.component = AP.component || {};
 
 AP.component.fields = {
-    rootList: $("#component-list-modal"),
+    rootList: $( "#component-list-modal" ),
 };
 
-$(document).ready(function (){
+$( document ).ready( function(){
 
-	if (AP.component.fields.rootList.length) {
+    if ( AP.component.fields.rootList.length ) {
 
-		AP.component.list.init();
+        AP.component.list.init();
 
-	}
+    }
 
-});
+} );
 
 
-AP.component.list = (function () {
+AP.component.list = ( function() {
 
-	var pub = {};
-	var fields = AP.component.fields;
+    var pub = {};
+    var fields = AP.component.fields;
 
-	var dataSources = {
-		selected: new kendo.data.DataSource(
-			{
-				data: [],
-				// calculates an id every time the ds is modified
-				change: function( event ) {
-					var data = this.data();
+    var dataSources = {
+        selected: new kendo.data.DataSource(
+            {
+                data: [],
+                // calculates an id every time the ds is modified
+                change: function( event ) {
+                    var data = this.data();
 
-					for( var item of data ) {
-						item.code = createCode( item );
-					}
+                    for( var item of data ) {
+                        item.code = createCode( item );
+                    }
 
-				}
-			}
-		)
-	};
+                }
+            }
+        )
+    };
 
-	var selectedExists = function( row ) {
+    var selectedExists = function( row ) {
 
-		var code = createCode( row );
+        var code = createCode( row );
 
-		var dataSource = viewModel.get("selected");
+        var dataSource = viewModel.get( "selected" );
 
-		for( var item of dataSource.data() ) {
-			if ( item.code == code ) {
-				return true;
-			}
-		}
+        for( var item of dataSource.data() ) {
+            if ( item.code == code ) {
+                return true;
+            }
+        }
 
-		return false;
+        return false;
 
-	};
+    };
 
-	var getCurrentConfig = function() {
+    var getCurrentConfig = function() {
 
-		var current = viewModel.get("currentItem");
-		var baseUrl = "/manager/ajax/components";
+        var current = viewModel.get( "currentItem" );
+        var baseUrl = "/manager/ajax/components";
 
-		var result = {
-			modalTitle: "",
-			modifyUrl: "",
-			readUrl: ""
-		};
+        var result = {
+            modalTitle: "",
+            modifyUrl: "",
+            readUrl: ""
+        };
 
-		if( current ) {
+        if( current ) {
 
-			switch( current.type ) {
+            switch( current.type ) {
 
-				case "lineSize":
+            case "lineSize":
 
-					result.modalTitle = "Componenti per linea a dimensione: " + current.line.name + " / " + current.size.name;
-					result.readUrl = baseUrl + "?by=linesize&lineId=" + current.line.id + "&sizeId=" + current.size.id;
-					result.modifyUrl = result.readUrl;
+                result.modalTitle = "Componenti per linea a dimensione: " + current.line.name + " / " + current.size.name;
+                result.readUrl = baseUrl + "?by=linesize&lineId=" + current.line.id + "&sizeId=" + current.size.id;
+                result.modifyUrl = result.readUrl;
 
-					break;
+                break;
 
-					/*
+                /*
 				case "fruit":
 
 					result.modalTitle = "Componenti base per frutto: " + current.fruit.code;
@@ -94,96 +94,96 @@ AP.component.list = (function () {
 					break;
 					*/
 
-				case "item": //productItem
+            case "item": // productItem
 
-					console.log("curr", current);
+                console.log( "curr", current );
 
-					result.modalTitle = "Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.rawValue.name;
-					result.readUrl = baseUrl + "?by=item&&itemId=" + current.item.id;
-					result.modifyUrl = result.readUrl;
+                result.modalTitle = "Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.rawValue.name;
+                result.readUrl = baseUrl + "?by=item&&itemId=" + current.item.id;
+                result.modifyUrl = result.readUrl;
 
-					break;
+                break;
 
-				case "product":
+            case "product":
 
-					result.modalTitle = "Componenti base per il prodotto: " + current.product.name;
-					result.readUrl = baseUrl + "?by=product&productId=" + current.product.id;
-					result.modifyUrl = result.readUrl;
+                result.modalTitle = "Componenti base per il prodotto: " + current.product.name;
+                result.readUrl = baseUrl + "?by=product&productId=" + current.product.id;
+                result.modifyUrl = result.readUrl;
 
-					break;
+                break;
 
-				case "attributeValue":
+            case "attributeValue":
 
-					result.modalTitle = "Componenti base per il valore: " + current.attribute.name + " / " + current.rawValue.name;
-					result.readUrl = baseUrl + "?by=attributeValue&attributeValueId=" + current.attributeValue.id;
-					result.modifyUrl = result.readUrl;
+                result.modalTitle = "Componenti base per il valore: " + current.attribute.name + " / " + current.rawValue.name;
+                result.readUrl = baseUrl + "?by=attributeValue&attributeValueId=" + current.attributeValue.id;
+                result.modifyUrl = result.readUrl;
 
-					break;
+                break;
 
-				default:
-			}
+            default:
+            }
 
-		}
+        }
 
-		return result;
+        return result;
 
-	};
+    };
 
-	var createCode = function( row ) {
+    var createCode = function( row ) {
 
-		var code = row.rawProduct.id + "$$$" + row.color.id + "$$$" + row.variant.id;
+        var code = row.rawProduct.id + "$$$" + row.color.id + "$$$" + row.variant.id;
 
-		return code;
+        return code;
 
-	};
+    };
 
-	var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
 
-		components: undefined,
-		variants: [],
-		selected: dataSources.selected,
+        components: undefined,
+        variants: [],
+        selected: dataSources.selected,
 
-		colors: [],
-		showColors: false,
-		showSearchPanel: true,
-		variantsTitle: "Varianti",
-		currentVariant: {},
-		currentProduct: {},
+        colors: [],
+        showColors: false,
+        showSearchPanel: true,
+        variantsTitle: "Varianti",
+        currentVariant: {},
+        currentProduct: {},
 
-		currentItem: undefined,
+        currentItem: undefined,
 
-		showSearchResult: function () {
+        showSearchResult: function() {
 
-			return viewModel.get("components")?.total() > 0;
+            return viewModel.get( "components" )?.total() > 0;
 
-		},
+        },
 
-		resetFilterSelected: function () {
+        resetFilterSelected: function() {
 
-			var dataSource = viewModel.get("selected");
+            var dataSource = viewModel.get( "selected" );
 
-            var thisForm = $("#component-list-selected-form");
+            var thisForm = $( "#component-list-selected-form" );
 
-            thisForm.find( "input[name=str]" ).val("");
+            thisForm.find( "input[name=str]" ).val( "" );
 
             dataSource.filter( [] );
             dataSource.view();
 
             return false;
-		},
+        },
 
-		filterSelected: function () {
+        filterSelected: function() {
 
-            var thisForm = $("#component-list-selected-form");
-			var dataSource = viewModel.get("selected");
+            var thisForm = $( "#component-list-selected-form" );
+            var dataSource = viewModel.get( "selected" );
 
             var str = thisForm.find( "input[name=str]" ).val();
             var typeId = thisForm.find( "select[name=processingTypeId]" ).val();
 
             var filter = {
-				logic: "or",
-				filters: []
-			};
+                logic: "or",
+                filters: []
+            };
 
             if ( str.length ) {
                 filter.filters.push( { field: "rawProduct.id", operator: "contains", value: str } );
@@ -199,262 +199,262 @@ AP.component.list = (function () {
             dataSource.view();
 
             return false;
-		},
+        },
 
-		showVariants: function () {
+        showVariants: function() {
 
-			return !viewModel.get("showSearchPanel");
-		},
+            return !viewModel.get( "showSearchPanel" );
+        },
 
-		addColor: function (event) {
+        addColor: function( event ) {
 
-			var color = event.data;
+            var color = event.data;
 
-			var product = viewModel.get("currentProduct");
-			var variant = viewModel.get("currentVariant");
+            var product = viewModel.get( "currentProduct" );
+            var variant = viewModel.get( "currentVariant" );
 
-			var row = {
-				id: "",
-				typeId: "own",
-				quantity: 1,
-				rawProduct: {
-					id: product.id,
-					name: product.name,
-					processingType: {
-						id: product.processingType.id,
-						name: product.processingType.name
-					},
-					measurementUnit: {
-						id: product.measurementUnit.id,
-						name: product.measurementUnit.name
-					}
-				},
-				color: {
-					id: color.id,
-					name: color.name
-				},
-				variant: {
-					id: variant.id,
-					name: variant.name
-				}
-			};
+            var row = {
+                id: "",
+                typeId: "own",
+                quantity: 1,
+                rawProduct: {
+                    id: product.id,
+                    name: product.name,
+                    processingType: {
+                        id: product.processingType.id,
+                        name: product.processingType.name
+                    },
+                    measurementUnit: {
+                        id: product.measurementUnit.id,
+                        name: product.measurementUnit.name
+                    }
+                },
+                color: {
+                    id: color.id,
+                    name: color.name
+                },
+                variant: {
+                    id: variant.id,
+                    name: variant.name
+                }
+            };
 
-			row.code = createCode( row );
+            row.code = createCode( row );
 
-			var exists = selectedExists( row );
+            var exists = selectedExists( row );
 
-			if( exists ) {
-				AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status error'>È stato già aggiunto</span>" );
-			} else {
-				viewModel.get("selected").add( row );
-			}
+            if( exists ) {
+                AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status error'>È stato già aggiunto</span>" );
+            } else {
+                viewModel.get( "selected" ).add( row );
+            }
 
-			return false;
-		},
+            return false;
+        },
 
-		search: function (event) {
+        search: function( event ) {
 
-			var thisForm = $("#component-list-search-form");
-			var status = thisForm.find(".status");
+            var thisForm = $( "#component-list-search-form" );
+            var status = thisForm.find( ".status" );
 
-			var requestStart = function() {
-				status.html("Sto cercando...");
-			};
+            var requestStart = function() {
+                status.html( "Sto cercando..." );
+            };
 
-			var requestEnd = function( xhr ) {
-				status.html("Ho trovato " + xhr.response.total + " componenti");
-			};
+            var requestEnd = function( xhr ) {
+                status.html( "Ho trovato " + xhr.response.total + " componenti" );
+            };
 
             var params = thisForm.serializeJSON();
 
-			var dataSource = NM.kendo.dataSource({ 
-				url: "/manager/ajax/raw-products",
-				params: params,
-				requestEnd: requestEnd, 
-				requestStart: requestStart
-			});
+            var dataSource = NM.kendo.dataSource( {
+                url: "/manager/ajax/raw-products",
+                params: params,
+                requestEnd: requestEnd,
+                requestStart: requestStart
+            } );
 
-			viewModel.set( "components", dataSource );
-
-            return false;
-
-		},
-
-		save: function (event) {
-
-			NM.util.ajax({
-				method: "POST",
-				url: getCurrentConfig().modifyUrl,
-				data: JSON.stringify( viewModel.get("selected").data() ),
-				callback: {
-					done: function (xhr) {
-
-						if(xhr.status == "SUCCESS") {
-							
-							AP.widget.notify("success", "Configurazione salvata");
-
-							refreshSelectedComponents();
-
-						}
-
-					}
-				}
-			});
+            viewModel.set( "components", dataSource );
 
             return false;
 
-		},
+        },
 
-        openColors: function (event) {
+        save: function( event ) {
 
-			viewModel.set( "currentVariant", event.data );
-			viewModel.set( "colors", event.data.colors );
+            NM.util.ajax( {
+                method: "POST",
+                url: getCurrentConfig().modifyUrl,
+                data: JSON.stringify( viewModel.get( "selected" ).data() ),
+                callback: {
+                    done: function( xhr ) {
+
+                        if( xhr.status == "SUCCESS" ) {
+
+                            AP.widget.notify( "success", "Configurazione salvata" );
+
+                            refreshSelectedComponents();
+
+                        }
+
+                    }
+                }
+            } );
 
             return false;
-		},
+
+        },
+
+        openColors: function( event ) {
+
+            viewModel.set( "currentVariant", event.data );
+            viewModel.set( "colors", event.data.colors );
+
+            return false;
+        },
 
         openVariants: function( event ) {
 
-			viewModel.set("currentProduct", event.data);
+            viewModel.set( "currentProduct", event.data );
 
-			viewModel.set("showSearchPanel", false);
-			viewModel.set("variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>");
-			viewModel.set("variants", event.data.variants);
+            viewModel.set( "showSearchPanel", false );
+            viewModel.set( "variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>" );
+            viewModel.set( "variants", event.data.variants );
 
-			viewModel.set("colors", []);
-
-            return false;
-		},
-
-        showComponentsList: function (event) {
-
-			viewModel.set("showSearchPanel", true);
+            viewModel.set( "colors", [] );
 
             return false;
-		},
+        },
 
-		calcTotalQuantity: function( event ) {
+        showComponentsList: function( event ) {
 
-			console.log("calcTotalQuantity", event);
-			
-			var dataSource = viewModel.get("selected");
-			
-			var item = dataSource.getByUid( event.data.uid );
-			
-			var quantityOverride = item.get("override.quantity") ? item.get("override.quantity") : 0; 
-			
-			console.log("quantityOverride", quantityOverride);
-
-			var totalQuantity = math.add( quantityOverride, item.get("quantity") );
-
-			item.set( "totalQuantity", totalQuantity );
-			
-			return false;
-
-		},
-
-        showVariantsForCount: function (event) {
-
-			return event.variants.length > 0;
-
-		},
-
-        showColorsResult: function (event) {
-
-			$("#components-colors-list-modal").modal("show");
+            viewModel.set( "showSearchPanel", true );
 
             return false;
-		},
+        },
 
-		showSelectedTable: function () {
+        calcTotalQuantity: function( event ) {
 
-			var dataSource = viewModel.get("selected");
+            console.log( "calcTotalQuantity", event );
 
-			return dataSource.total() > 0;
+            var dataSource = viewModel.get( "selected" );
 
-		},
+            var item = dataSource.getByUid( event.data.uid );
 
-		remove: function (event) {
+            var quantityOverride = item.get( "override.quantity" ) ? item.get( "override.quantity" ) : 0;
 
-			var dataSource = viewModel.get("selected");
+            console.log( "quantityOverride", quantityOverride );
 
-			var row = dataSource.getByUid( event.data.uid );
+            var totalQuantity = math.add( quantityOverride, item.get( "quantity" ) );
 
-			dataSource.remove( row );
+            item.set( "totalQuantity", totalQuantity );
 
-			return false;
+            return false;
 
-		},
+        },
 
-		deactivate: function (event) {
+        showVariantsForCount: function( event ) {
 
-			var dataSource = viewModel.get("selected");
+            return event.variants.length > 0;
 
-			var row = dataSource.getByUid( event.data.uid );
-			var value = row.get("override.deleted");
+        },
 
-			row.set("override.deleted", value ? false : true );
+        showColorsResult: function( event ) {
 
-			return false;
+            $( "#components-colors-list-modal" ).modal( "show" );
 
-		},
+            return false;
+        },
 
-        getModalTitle: function ( event ) {
+        showSelectedTable: function() {
 
-			var name = getCurrentConfig().modalTitle;
+            var dataSource = viewModel.get( "selected" );
 
-			return name;
+            return dataSource.total() > 0;
 
-		},
+        },
 
-	});
+        remove: function( event ) {
 
-	var refreshSelectedComponents = function( onDone ) {
+            var dataSource = viewModel.get( "selected" );
 
-		//console.log("refreshSelectedComponents:onDone", onDone);
+            var row = dataSource.getByUid( event.data.uid );
 
-		NM.util.ajax({
-			method: "GET",
-			url: getCurrentConfig().readUrl,
-			callback: {
-				done: function (xhr) {
+            dataSource.remove( row );
 
-					viewModel.get("selected").data( xhr.data );
+            return false;
 
-					if( onDone ) {
-						onDone()
-					}
+        },
 
-				}
-			}
-		});
+        deactivate: function( event ) {
 
-	}
+            var dataSource = viewModel.get( "selected" );
 
-	pub.open = function ( item ) {
+            var row = dataSource.getByUid( event.data.uid );
+            var value = row.get( "override.deleted" );
 
-		viewModel.set( "currentItem", item );
+            row.set( "override.deleted", value ? false : true );
 
-		viewModel.set( "colors", [] );
-		viewModel.set( "variants", [] );
+            return false;
 
-		viewModel.showComponentsList();
+        },
 
-		var onDone = function() {
-			NM.util.openModal( $("#component-list-modal") );
-			//console.log("done")
-		}
+        getModalTitle: function( event ) {
 
-		refreshSelectedComponents( onDone=onDone )
+            var name = getCurrentConfig().modalTitle;
 
-	};
+            return name;
 
-	pub.init = function () {
+        },
 
-		kendo.bind(fields.rootList, viewModel);
+    } );
 
-	};
+    var refreshSelectedComponents = function( onDone ) {
 
-	return pub;
+        // console.log("refreshSelectedComponents:onDone", onDone);
 
-}());
+        NM.util.ajax( {
+            method: "GET",
+            url: getCurrentConfig().readUrl,
+            callback: {
+                done: function( xhr ) {
+
+                    viewModel.get( "selected" ).data( xhr.data );
+
+                    if( onDone ) {
+                        onDone();
+                    }
+
+                }
+            }
+        } );
+
+    };
+
+    pub.open = function( item ) {
+
+        viewModel.set( "currentItem", item );
+
+        viewModel.set( "colors", [] );
+        viewModel.set( "variants", [] );
+
+        viewModel.showComponentsList();
+
+        var onDone = function() {
+            NM.util.openModal( $( "#component-list-modal" ) );
+            // console.log("done")
+        };
+
+        refreshSelectedComponents( onDone=onDone );
+
+    };
+
+    pub.init = function() {
+
+        kendo.bind( fields.rootList, viewModel );
+
+    };
+
+    return pub;
+
+}() );

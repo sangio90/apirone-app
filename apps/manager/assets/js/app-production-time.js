@@ -1,150 +1,154 @@
 AP.productionTime = AP.productionTime || {};
 
 AP.productionTime.fields = {
-    listRoot: $("#production-time-list-root"),
-    detailRoot: $("#production-time-detail-modal"),
-    detailForm: $("#production-time-detail-form"),
-    searchListForm: $("#production-time-grid-search-form"),
-    productsRoot: $("#production-time-products-root")
+    listRoot: $( "#production-times-list-root" ),
+    detailRoot: $( "#production-times-detail-modal" ),
+    detailForm: $( "#production-times-detail-form" ),
+    searchListForm: $( "#production-times-grid-search-form" ),
+    productsRoot: $( "#production-times-products-root" )
 };
 
-$(document).ready(function (){
+$( document ).ready( function(){
 
-	if (AP.productionTime.fields.listRoot.length) {
+    if ( AP.productionTime.fields.listRoot.length ) {
 
 	    AP.productionTime.list.init();
 
-	}
+    }
 
-	if (AP.productionTime.fields.detailRoot.length) {
+    if ( AP.productionTime.fields.detailRoot.length ) {
 
 	    AP.productionTime.detail.init();
 
-	}
+    }
 
-});
+} );
 
 
-AP.productionTime.detail = (function () {
+AP.productionTime.detail = ( function() {
 
-	var pub = {};
+    var pub = {};
 
     var fields = AP.productionTime.fields;
 
-	var defaultDetailForm = {
-		data: {
-			id: "",
-			code: "",
-			name: "",
-			category: {
+    var defaultDetailForm = {
+        data: {
+            id: "",
+            code: "",
+            name: "",
+            category: {
                 id: ""
             },
-			thickness: {
+            thickness: {
                 id: ""
             },
-			status: {
-				id: "ACT"
-			}
-		},
+            status: {
+                id: "ACT"
+            }
+        },
 
         statuses: AP.page.statuses,
 
-		title: "Carica tempo di produzione"
-	};
+        title: "Carica tempo di produzione"
+    };
 
 
-	var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
 
         detailForm: defaultDetailForm,
 
         callback: {
-			onCreate: undefined,
-			onUpdate: undefined,
-			onLoad: undefined
-		},
+            onCreate: undefined,
+            onUpdate: undefined,
+            onLoad: undefined
+        },
 
-		resetForm: function () {
+        resetForm: function() {
 
             var detailForm = fields.detailForm;
 
-            var validator = detailForm.validate();
-            validator.resetForm();
+            console.log( "resetForm", detailForm );
 
-            detailForm.find(".status").html("");
+            // var validator = detailForm.validate();
+            // validator.resetForm();
 
-			viewModel.set("detailForm", defaultDetailForm);
-		},
+            detailForm.find( ".status" ).html( "" );
 
-        save: function (event) {
+            viewModel.set( "detailForm", defaultDetailForm );
+        },
 
-			var detailForm = fields.detailForm;
-			var status = detailForm.find(".status");
+        save: function( event ) {
 
-		    status.html("<img src='assets/main/img/ajax-loading.svg' width=20 height=20>");
+            var detailForm = fields.detailForm;
+            var status = detailForm.find( ".status" );
 
-			if(detailForm.valid()) {
+		    status.html( "<img src='assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
-				NM.util.ajax({
-					method: "POST",
-					url: "/manager/ajax/lines",
-					data: JSON.stringify(viewModel.get("detailForm.data")),
-					callback: {
-						done: function (xhr) {
+            if( detailForm.valid() ) {
 
-							if(xhr.status == "SUCCESS") {
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/lines",
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
 
-								NM.util.autoHideMessage(status, "<span class='green'>Linea salvata</span>");
+                            if( xhr.status == "SUCCESS" ) {
 
-								setTimeout(() => $("#line-detail-modal").modal("hide"), 1000);
+                                NM.util.autoHideMessage( status, "<span class='green'>Linea salvata</span>" );
 
-                                //fireCallback("onSave");
+                                setTimeout( () => $( "#line-detail-modal" ).modal( "hide" ), 1000 );
 
-                                AP.util.fireCallback( "onSave", viewModel.get("callback") );
+                                // fireCallback("onSave");
 
-							}
+                                AP.util.fireCallback( "onSave", viewModel.get( "callback" ) );
 
-						}
-					}
-				});
+                            }
 
-			}
+                        }
+                    }
+                } );
+
+            }
 
             return false;
 
         },
 
-	});
+    } );
 
-	pub.new = function ({ onSave }) {
+    pub.new = function( { onSave } ) {
 
-        if (onSave) {
-            viewModel.set("callback.onSave", onSave);
+        if ( onSave ) {
+            viewModel.set( "callback.onSave", onSave );
         }
 
         viewModel.resetForm();
 
-        NM.util.openModal( fields.detailRoot);
+        NM.util.openModal( fields.detailRoot );
 
     },
 
-	pub.edit = function ({ id, onSave }) {
+    pub.edit = function( { id, onSave } ) {
 
-        if (onSave) {
-            viewModel.set("callback.onSave", onSave);
+        console.log( "edit production time", id );
+
+        if ( onSave ) {
+            viewModel.set( "callback.onSave", onSave );
         }
 
         viewModel.resetForm();
 
-        NM.util.ajax({
+        NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/production-times/" + id,
             callback: {
-                done: function (xhr) {
+                done: function( xhr ) {
 
-                    if(xhr.status == "SUCCESS") {
+                    if( xhr.status == "SUCCESS" ) {
 
-                        viewModel.set("detailForm.data", xhr.data);
-                        viewModel.set("detailForm.title", "Modifica tempo di produzione");
+                        viewModel.set( "detailForm.data", xhr.data );
+                        viewModel.set( "detailForm.title", "Modifica tempo di produzione" );
 
                         NM.util.openModal( fields.detailRoot );
 
@@ -152,162 +156,212 @@ AP.productionTime.detail = (function () {
 
                 }
             }
-        });
+        } );
 
     },
 
-	pub.init = function () {
+    pub.init = function() {
 
-        kendo.bind( fields.detailRoot, viewModel);
+        kendo.bind( fields.detailRoot, viewModel );
 
-		var detailForm = fields.detailForm;
+        var detailForm = fields.detailForm;
 
-		detailForm.validate({
-			onfocusout: function (element) {
-				$(element).valid();
-			},
-			rules: {
-				code: {
-					required: true,
-					checkCode: true,
-					remote: {
-						url: "/manager/ajax/production-times/code-exists",
-						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
-						dataFilter: function (xhr) {
-							var json = JSON.parse(xhr);
-							return json.data == false;
-						}
-					}
-				}
-			},
-			messages: {
-				code: {
-					required: "Codice richiesto",
-					checkCode: "Solo numeri, lettere, trattino o trattino basso",
-					remote: "Il codice esiste"
-				}
-			},
+        detailForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
+            },
+            rules: {
+                code: {
+                    required: true,
+                    checkCode: true,
+                    remote: {
+                        url: "/manager/ajax/production-times/code-exists",
+                        data: { id: function() { return  viewModel.get( "detailForm.data.id" ); } },
+                        dataFilter: function( xhr ) {
+                            var json = JSON.parse( xhr );
+                            return json.data == false;
+                        }
+                    }
+                }
+            },
+            messages: {
+                code: {
+                    required: "Codice richiesto",
+                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
+                    remote: "Il codice esiste"
+                }
+            },
 
-		});
+        } );
 
-	};
+    };
 
     return pub;
-}());
+}() );
 
 
-AP.productionTime.list = (function () {
+AP.productionTime.list = ( function() {
 
-	var pub = {};
+    var pub = {};
 
     var detailApp = AP.productionTime.detail;
     var fields = AP.productionTime.fields;
 
-	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/production-times" })
-	};
+    var dataSources = {
+        items: NM.kendo.dataSource( { url: "/manager/ajax/production-times" } )
+    };
 
-	var viewModel = kendo.observable({
-		rows: dataSources.items,
+    var viewModel = kendo.observable( {
+        rows: dataSources.items,
 
-        search: function (event) {
+        search: function( event ) {
 
             var thisForm = fields.searchListForm;
 
             var params = thisForm.serializeJSON();
 
-            viewModel.rows.read(params);
+            viewModel.rows.read( params );
 
             return false;
 
         },
 
-        new: function (event) {
+        new: function( event ) {
 
-            console.log("detailApp", detailApp);
+            console.log( "detailApp", detailApp );
 
-            var onSave = function () {
-                console.log("onSave");
-                viewModel.get("rows").read();
+            var onSave = function() {
+                console.log( "onSave" );
+                viewModel.get( "rows" ).read();
             };
 
-            detailApp.new({ onSave: onSave });
+            detailApp.new( { onSave: onSave } );
 
             return false;
 
         },
 
-        edit: function (event) {
+        edit: function( event ) {
 
-            var onSave = function () {
-                viewModel.get("rows").read();
+            var onSave = function() {
+                viewModel.get( "rows" ).read();
             };
 
-            detailApp.edit({ id: event.data.id, onSave: onSave });
+            detailApp.edit( { id: event.data.id, onSave: onSave } );
 
             return false;
 
         },
 
-        delete: function (event) {
+        delete: function( event ) {
 
-			var status = $("#status-delete");
-			var checks = $("#production-time-grid").find("[name=selected]:checked");
+            var status = $( "#status-delete" );
+            var checks = $( "#production-time-grid" ).find( "[name=selected]:checked" );
 
-            console.log("checks", checks);
+            console.log( "checks", checks );
 
-			if (checks.length) {
+            if ( checks.length ) {
 
-				var values = [];
+                var values = [];
 
-				checks.each(function (){
-					values.push($(this).val());
-				});
+                checks.each( function(){
+                    values.push( $( this ).val() );
+                } );
 
-				var ids = values.toString();
+                var ids = values.toString();
 
-				console.log("values", values);
-				console.log("ids", ids);
+                console.log( "values", values );
+                console.log( "ids", ids );
 
-				NM.util.ajax({
-					method: "DELETE",
-					url: "/manager/ajax/production-times",
-					data: ids,
-					callback: {
-						done: function (xhr) {
+                NM.util.ajax( {
+                    method: "DELETE",
+                    url: "/manager/ajax/production-times",
+                    data: ids,
+                    callback: {
+                        done: function( xhr ) {
 
-							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
-							} else {
-								AP.widget.notify("success", "Cancellazione avvenuta con successo");
-							}
+                            if( xhr.data.payload.hasOwnProperty( "errors" ) ) {
+                                AP.widget.notify( "error", "Non riesco a cancellare tutti i valori" );
+                            } else {
+                                AP.widget.notify( "success", "Cancellazione avvenuta con successo" );
+                            }
 
-							var id = viewModel.get("detailForm.data.id");
+                            var id = viewModel.get( "detailForm.data.id" );
 
-							viewModel.rows.read();
+                            viewModel.rows.read();
 
-						}
-					}
-				});
+                        }
+                    }
+                } );
 
-			} else {
+            } else {
 
-				NM.util.autoHideMessage(status, "<span class='red'>Seleziona almeno un valore</span>");
+                NM.util.autoHideMessage( status, "<span class='red'>Seleziona almeno un valore</span>" );
 
-			}
+            }
 
         },
 
-	});
+    } );
 
-	pub.init = function () {
-
-        console.log("production-times:list:init");
+    pub.init = function() {
 
         kendo.bind( fields.listRoot, viewModel );
 
-	};
+        var detailForm = AP.productionTime.fields.detailForm;
+
+        AP.page.types.unshift( { id: "", name: "-- Seleziona lo stato" } );
+
+        detailForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
+            },
+            rules: {
+                name: {
+                    required: true,
+                },
+                statusId: {
+                    required: true,
+                },
+                code: {
+                    required: true,
+                    maxlength: 3,
+                    checkCode: true,
+                    remote: {
+                        url: "/manager/ajax/production-times/code-exists",
+                        data: {
+                            id: function() {
+                                return viewModel.get( "detailForm.data.id" );
+                            },
+                        },
+                        dataFilter: function( xhr ) {
+                            var json = JSON.parse( xhr );
+                            return json.data == false;
+                        },
+                    },
+                },
+            },
+            messages: {
+                name: {
+                    required: "Descrizione richiesta",
+                },
+                typeId: {
+                    required: "Tipo richiesto",
+                },
+                fruitsCount: {
+                    required: "Numero di moduli ricghiesto (0 per modello)",
+                },
+                code: {
+                    required: "Codice richiesto",
+                    maxlength: "Al massimo 3 caratteri",
+                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
+                    remote: "Il codice esiste",
+                },
+            },
+        } );
+
+    };
 
     return pub;
-}());
+}() );
 
