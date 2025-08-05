@@ -55,12 +55,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var thisValue = arguments.value;
 
 		list( arguments.entity ).each( function( item ){
-			if ( item.getId() EQ thisValue ) {
+			if ( item.getId() == thisValue ) {
 				result = item;
 			}
 		} );
 
-		getLogger().debug( "LookupService.get: value [#arguments.value#] for entity [#entity#] not found. Adding it to config?" );
+		if ( IsNull( result ) ) {
+			getLogger().debug( "LookupService.get: value [#thisValue#] for entity [#entity#] not found. Adding it to config?" );
+		}
+
 		return result;
 	}
 
