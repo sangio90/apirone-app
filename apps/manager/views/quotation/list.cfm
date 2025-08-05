@@ -1,119 +1,70 @@
 <cfoutput>
+    <div id="quotation-list-root">
 
-    <div class="row mb-3">
-        <div class="col-lg-6">
-            <h2>Preventivi</h2>
-        </div>
-        <div class="col-lg-6">
-            <div class="float-end">
-                <a type="button" href="/manager/quotation" class="mt-4 me-1 btn btn-primary btn-sm">Carica preventivo &raquo;</a>
+        <div class="row">
+            <div class="col-6 pt-2">
+				#pageTitle()#
             </div>
+			<div class="col-6 text-end">
+				#addButton( bind = "click:new", size = "md" )#
+			</div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <section class="card">
-                <section class="card-body box-search">
+        <div class="row">
+			<div class="col-lg-12">
+				<section class="card">
+					<div class="card-body">
 
-                    <form name="estimate-search-form" id="estimate-search-form" method="post">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group row mb-2">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Cerca</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" name="str" class="form-control" placeholder="Cerca nel nome o nel codice">
-                                    </div>
+                        <div class="row d-flex align-items-center mb-2">
+                            <div class="col-sm-8">
+                                <div class="box-search-small"> 
+                                    <form 
+                                        id="quotation-search-form" 
+                                        class="d-flex justify-content-end" 
+                                        data-bind="events: { submit: search }">
+
+                                        <input name="str" placeholder="Filtra..." class="form-control me-2" type="text">
+
+										<select class="form-control me-2" name="statusId">
+											<option value="">-- tutti gli stati</option>
+											<cfloop array="#prc.statuses#" item="item">
+												<option value="#item.getId()#">#item.getName()#</option>
+											</cfloop>
+										</select>
+
+                                        <input type="date" name="fromDate" class="form-control" id="fromDate">
+
+                                        <input type="date" name="toDate" class="form-control me-2" id="toDate">
+
+                                        <div style="align-self: flex-end;">
+                                            #searchButton( bind="click:search" )#
+                                        </div>
+
+                                    </form>
+
                                 </div>
-                                <div class="form-group row mb-2">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Stato</label>
-                                    <div class="col-sm-9">
-                                        <select name="statusId" class="form-control">
-                                            <option value="">-- tutti</option>
-                                            <option value="ACP">Accettato</option>
-                                            <option value="CRE">Creato</option>
-                                            <option value="REF">Rifiutato</option>
-                                            <option value="REF">Convertito in ordine</option>
-                                        </select>
-                                    </div>
-                                </div>
+
                             </div>
-                            <div class="col-6">
-                                <div class="form-group row mb-2">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">Da da</label>
-                                    <div class="col-sm-9">
-                                        <input type="date" name="fromDate" class="form-control" placeholder="eg.: 20/05/2020">
-                                    </div>
-                                </div>
-                                <div class="form-group row mb-2">
-                                    <label class="col-sm-3 control-label text-sm-end pt-2">A data</label>
-                                    <div class="col-sm-9">
-                                        <input type="date" name="toDate" class="form-control" placeholder="eg.: 20/05/2020">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-9 offset-sm-3">
-                                        <button type="button" class="btn btn-primary btn-sm me-2" data-bind="click:search">
-                                        <i class="fas fa-search"></i> Cerca
-                                        </button>
-                                        <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:print">
-                                        <i class="fas fa-print"></i> Stampa
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>                    
+                        </div>						
 
-                </section>
-            </section>
+						<form name="quotation-grid-form" id="quotation-grid-form" method="get">
+							<div class="col-12">
+								#grid(
+									id      = "quotation-grid",
+									columns = "[
+                                        { 'field':'description', 'title':'Descrizione' },
+                                        { 'field':'quotation_number', 'title':'Numero', width: '15%' },
+                                        { 'field':'quotation_date', 'title':'Data', width: '15%'},
+                                        { 'field':'status', 'title':'Stato', width: '15%'}
+                                    ]",
+									rowTemplate = "quotation/quotation-grid-row-tmpl"
+								)#
+							</div>
 
-            <section class="card mt-1">
-                <section class="card-body">
-
-                    <div class="row">
-                        <div class="mb-3 d-flex justify-content-end col-12">
-                            <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:deleteAll">
-                                <i class="fas fa-remove"></i> Cancella selezionati
-                            </button>
-                            <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:print">
-                                <i class="fas fa-print"></i> Stampa
-                            </button>
-                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:saveAll">
-                                <i class="far fa-object-ungroup"></i> Unisci preventivi
-                            </button>
-                        </div>
-                    </div>
-
-                    <table class="table table-responsive-md table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Cliente</th>
-                                <th>Numero</th>
-                                <th>Status</th>
-                                <th>Creato il</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <cfloop array="#prc.list#" item="item">
-                                <tr>
-                                    <td>#item.id#</td>
-                                    <td><a href="/manager/quotations/#item.id#">#item.name#</a></td>
-                                    <td>#item.customer#</td>
-                                    <td>#item.code#</td>
-                                    <td>#item.status#</td>
-                                    <td>#item.createdAt#</td>
-                                    <td width="30"><input type="checkbox" name="checkboxRow1" class="checkbox-style-1 p-relative top-2" value="" /></td>
-                                </tr>
-                            </cfloop>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
+						</form>
+					</div>
+				</section>
+			</div>
+		</div>
     </div>
-
 </cfoutput>

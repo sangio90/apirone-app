@@ -1,117 +1,102 @@
 AP.quotation = AP.quotation || {};
 
 AP.quotation.fields = {
-    rootList: $("#quotation-list-root"),
-    rootDetail: $("#quotation-detail-root")
+    listRoot: $( "#quotation-list-root" ),
+    searchForm: $( "#quotation-search-form" ),
 };
 
-$(document).ready(function (){
-
-	if (AP.quotation.fields.rootList.length) {
-
-		// AP.quotation.list.init();
-
-	}
-
-	if (AP.quotation.fields.rootDetail.length) {
-
-        // console.log("qui");
-
-	    AP.quotation.detail.init();
-
-	}
-
-});
-
-AP.quotation.list = (function () {
-
-	var pub = {};
-
-	pub.init = function () {
-
-        kendo.bind(FW.account.fields.rootList, viewModel);
-
-	};
-
-    return pub;
-}());
+$( document ).ready( function() {
+    if ( AP.quotation.fields.listRoot.length ) {
+        AP.quotation.list.init();
+    }
+} );
 
 
-AP.quotation.detail = (function () {
-
+AP.quotation.list = ( function() {
     var pub = {};
+    
+    var dataSources = {
+        items: NM.kendo.dataSource({url: "/manager/ajax/quotations"}),
+    };
 
-    var roles = [{ id: "ADM", "name":  "Admin" }, { "id": "COM", "name": "Commerciale" }];
-    var statusList = [{ "id": "ACT", "name": "Attivo" }, { "id": "DEA", "name": "Disattivato" }];
-    var data = { "id": "1", "name": "Roberto", "email": "roberto@marzialetti.com", "surname": "Marzialetti", "role": { "id": "ADM", "name": "Admin" } };
+    var fields = AP.quotation.fields;
 
-	var viewModel = kendo.observable({
-        roles: roles,
-        statusList: statusList,
-        detailForm: {
-            data: data,
-            label: "",
-            title: "Dettaglio account",
-            action: "update"
-        },
+    var viewModel = kendo.observable({
+        rows: dataSources.items,
 
-		print: function (item) {
+        search: function( event ) {
+            var thisForm = fields.searchForm;
+            var params = thisForm.serializeJSON();
 
-            window.open("/manager/quotations/print", "_blank");
+            var filters = [];
 
-            return false;
-		},
+            console.log( "params", params );
 
+            var dataSource = viewModel.get( "rows" );
 
-	});
+            var filterDataSource = new kendo.data.DataSource( {
+                data: dataSource.data().toJSON(),
+            } );
 
-	pub.init = function () {
-
-        console.log("quotation:detail:init");
-
-        var suggest = $("#quotation-detail-form #company-name");
-
-        suggest.kendoAutoComplete({
-            dataSource: AP.config.customers,
-            dataTextField: "name",
-            select: function (event) {
-                console.log("event", event);
-                var item = event.dataItem;
-                // var text = item.text();
-
-                var thisForm = $("#quotation-detail-form");
-
-                thisForm.find("select[name=vatCodeId]").val(item.vatCode);
-                thisForm.find("select[name=paymentMethodId]").val(item.paymentMethod);
-                thisForm.find("select[name=priceListId]").val(item.priceList);
-                thisForm.find("select[name=currencyId]").val(item.currency);
-
-                /* The result can be observed in the DevTools(F12) console of the browser. */
-                // console.log(text);
-                // Use the selected item or its text
+            if ( params.statusId.length ) {
+                filters.push( {
+                    field: "status.id",
+                    operator: "equal",
+                    value: params.statusId,
+                } );
             }
 
+            if ( params.str.length ) {
+                filters.push( {
+                    field: "description",
+                    operator: "contains",
+                    value: params.str,
+                } );
+            }
+
+            if ( params.fromDate.length ) {
+                var fromDateObject = new Date(params.fromDate)
+                filters.push( {
+                    field: "quotationDate",
+                    operator: "gte",
+                    value: fromDateObject,
+                } );
+            }
+
+            if ( params.toDate.length ) {
+                var toDateObject = new Date(params.toDate)
+                filters.push( {
+                    field: "quotationDate",
+                    operator: "lte",
+                    value: toDateObject,
+                } );
+            }
+
+            filterDataSource.filter( filters );
+
+            viewModel.set( "rows", filterDataSource );
+
+            return false;
+        }
+    });
+
+    pub.init = function() {
+        kendo.bind( AP.quotation.fields.listRoot, viewModel );
+
+        dataSources.items.fetch(function () {
+            var rawData = dataSources.items.data();
+
+            rawData.forEach(function (q) {
+                if (q.quotationDate) {
+                    q.quotationDate = new Date(q.quotationDate);
+                }
+            });
+
+            viewModel.set("rows", new kendo.data.DataSource({
+                data: rawData
+            }));
         });
-
-        var autocomplete = suggest.data("kendoAutoComplete");
-
-        // autocomplete.suggest("Apples");
-
-		kendo.bind(AP.quotation.fields.rootDetail, viewModel);
-
-	};
+    };
 
     return pub;
-
-}());
-
-
-addZone = function () {
-    $("#add-zona-modal").modal("show");
-    return false;
-};
-
-addPlate = function () {
-    $("#add-plate-modal").modal("show");
-    return false;
-};
+}() );

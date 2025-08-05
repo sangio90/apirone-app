@@ -78,6 +78,7 @@
         <map from="id" to="id" type="cf:String" />
         <map from="description" to="description" type="cf:String" />
         <map from="quotationNumber" to="quotationNumber" type="cf:String" />
+        <map from="versionNumber" to="versionNumber" type="cf:Numeric" />
         <map from="quotationDate" to="quotationDate" type="cf:Date" />
         <map from="notes" to="notes" type="cf:String" />
         <map from="validityDate" to="validityDate" type="cf:Date" />
