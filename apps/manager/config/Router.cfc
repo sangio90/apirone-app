@@ -192,6 +192,7 @@
 		/*
 			lines
 		*/
+		post( "/ajax/lines/clone" ).to( "LineAjaxController.clone" ).end();
 		get( "/ajax/lines/code-exists" ).to( "LineAjaxController.codeExists" ).end();
 		get( "/ajax/lines/categories/:categoryId" ).to( "LineAjaxController.listByCategoryId" ).end();
 		delete( "/ajax/lines/:id/products" ).to( "LineAjaxController.deleteProduct" ).end();
