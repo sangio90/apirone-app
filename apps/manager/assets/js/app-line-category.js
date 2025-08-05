@@ -3,6 +3,8 @@ AP.lineCategory = AP.lineCategory || {};
 AP.lineCategory.fields = {
     listRoot: $( "#line-category-list-root" ),
     searchForm: $( "#line-category-search-form" ),
+    cloneModal: $( "#line-category-clone-modal" ),
+    cloneForm: $( "#line-category-clone-form" )
 };
 
 $( document ).ready( function() {
@@ -16,13 +18,24 @@ AP.lineCategory.list = ( function() {
     var fields = AP.lineCategory.fields;
 
     var dataSources = {
-        items: NM.kendo.dataSource( { url: "/manager/ajax/lines/categories/" + AP.page.categoryId } ),
+        items: NM.kendo.dataSource( { url: "/manager/ajax/lines/categories/" + AP.page.categoryId } )
     };
 
     var fields = AP.lineCategory.fields;
 
     var viewModel = kendo.observable( {
         rows: dataSources.items,
+        lines: dataSources.items,
+
+        cloneForm: {
+            fromLines: [],
+            toLines: [],
+            data: {
+                categoryId: AP.page.categoryId,
+                fromLineId: "",
+                toLineId: ""
+            }
+        },
 
         search: function( event ) {
             var thisForm = fields.searchForm;
@@ -33,6 +46,54 @@ AP.lineCategory.list = ( function() {
 
             viewModel.get( "rows" ).read( params );
 
+            return false;
+        },
+
+        showCloneModal: function( event ) {
+
+            var fromLines = viewModel.get( "lines" ).data().toJSON();
+            var toLines = viewModel.get( "lines" ).data().toJSON();
+
+            toLines.unshift( { id: "", name: "-- seleziona la linea di destinazione" } );
+
+            viewModel.set( "cloneForm.fromLines", fromLines );
+            viewModel.set( "cloneForm.toLines", toLines );
+
+            viewModel.set( "cloneForm.data.fromLineId", event.data.id );
+            viewModel.set( "cloneForm.data.categoryId", AP.page.categoryId );
+
+            NM.util.openModal( fields.cloneModal );
+            return false;
+        },
+
+        clone: function( event ) {
+
+            var thisForm = fields.cloneForm;
+
+            var status = thisForm.find( ".status" );
+
+            if ( thisForm.valid() ) {
+
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/lines/clone",
+                    data: JSON.stringify( viewModel.get( "cloneForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.status == "SUCCESS" ) {
+                                NM.util.autoHideMessage( status, "<span class='green'>Account salvato</span>" );
+
+                                setTimeout( () =>
+                                    $( fields.cloneModal ).modal( "hide" ), 1000
+                                );
+
+                            }
+                        },
+                    },
+                } );
+            }
             return false;
         },
 
@@ -54,8 +115,6 @@ AP.lineCategory.list = ( function() {
         },
 
         products: function( event ) {
-            console.log( "fields.listRoot", fields.listRoot );
-
             var id = event.data.id;
             var categoryId = fields.listRoot.find( "[name=categoryId]" ).val();
 
@@ -77,9 +136,32 @@ AP.lineCategory.list = ( function() {
     } );
 
     pub.init = function() {
-        console.log( "listCategory:init" );
 
         kendo.bind( AP.lineCategory.fields.listRoot, viewModel );
+
+        var thisForm = fields.cloneForm;
+
+        thisForm.validate( {
+            rules: {
+                fromLineId: {
+                    required: true
+                },
+                toLineId: {
+                    required: true,
+                    notEqualTo: "#fromLineId"
+                },
+            },
+            messages: {
+                fromLineId: {
+                    required: "Seleziona la linea di partenza.",
+                },
+                toLineId: {
+                    required: "Seleziona la linea di destinazione.",
+                    notEqualTo: "Le linee non possono essere le stesse."
+                },
+            },
+        } );
+
     };
 
     return pub;

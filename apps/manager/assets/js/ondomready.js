@@ -155,5 +155,9 @@ $( document ).ready( function() {
         return this.optional( element ) || re.test( value );
     }, "Deve contenere almeno un carattere maiuscolo, un numero e un carattere speciale." );
 
+    $.validator.addMethod( "notEqualTo", function( value, element, param ) {
+        return this.optional( element ) || value != $( param ).val();
+    }, "This two elements are the same, please change it." );
+
 
 } );

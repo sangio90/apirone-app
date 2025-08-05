@@ -46,10 +46,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function clone( event, rc, prc ){
+		var data = DeserializeJSON( GetHTTPRequestData().content );
+
 		var params = {
-			fromLineId = rc.fromLineId,
-			toLineId   = rc.toLineId,
-			categoryId = rc.categoryId
+			fromLineId = data.fromLineId,
+			toLineId   = data.toLineId,
+			categoryId = data.categoryId
 		}
 
 		var result = super.fire( "line.clone", params );

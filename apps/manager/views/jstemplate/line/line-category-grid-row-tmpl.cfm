@@ -13,6 +13,9 @@
                 <span data-bind="text: name"></span>
             </td>
             <td class="text-center">
+                #iconButton(bind="click:showCloneModal", icon="clone")#
+            </td>
+            <td class="text-center">
                 #iconButton(bind="click:products", icon="cogs")#
             </td>
             <td class="text-center">
