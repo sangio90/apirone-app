@@ -1,7 +1,7 @@
 ﻿var NM = {};
 NM.kendo = NM.kendo || {};
 
-NM.kendo.dataSource = function (config = {}) {
+NM.kendo.dataSource = function( config = {} ) {
 
     var defaults = {
         data: config.data ? config.data : [],
@@ -9,16 +9,17 @@ NM.kendo.dataSource = function (config = {}) {
         pageSize: config.count ? config.count : 15,
         serverSorting: config?.serverSorting,
 
-        change: function () {
-            $.each(this.data(), function (index, item) {
-                item.set("index", index+1);
-            });
+        change: function() {
+            $.each( this.data(), function( index, item ) {
+                item.set( "index", index+1 );
+            } );
+
         }
     };
 
     defaults.schema = { "data": "data", total: "total" };
 
-    if (config.url != undefined) {
+    if ( config.url != undefined ) {
 
         defaults.serverPaging = true;
         defaults.transport = {
@@ -27,7 +28,7 @@ NM.kendo.dataSource = function (config = {}) {
             }
         };
 
-        defaults.transport.parameterMap = function (params, type ) {
+        defaults.transport.parameterMap = function( params, type ) {
 
             // merge
             Object.assign( params, config.params );
@@ -52,7 +53,7 @@ NM.kendo.dataSource = function (config = {}) {
             defaults.requestEnd = config.requestEnd;
         }
 
-        if (config.model) {
+        if ( config.model ) {
             defaults.schema.model = config.model;
         }
 
@@ -71,23 +72,46 @@ NM.kendo.dataSource = function (config = {}) {
 /*
     remove scrollbar in grid
 */
-NM.kendo.toggleScrollbar = function (event) {
+NM.kendo.toggleScrollbar = function( event ) {
     var gridWrapper = event.sender.wrapper;
     var gridDataTable = event.sender.table;
-    var gridDataArea = gridDataTable.closest(".k-grid-content");
+    var gridDataArea = gridDataTable.closest( ".k-grid-content" );
 
-    gridWrapper.addClass("no-scrollbar");
+    var ele = event.sender.element.prop( "id" );
+
+    gridWrapper.addClass( "no-scrollbar" );
+
+    var $chkboxes = $( ".form-check-input" );
+    var lastChecked = null;
+
+    $( "#" + ele + " .form-check-input" ).click( function( e ) {
+        if ( !lastChecked ) {
+            lastChecked = this;
+            return;
+        }
+
+        if ( e.shiftKey ) {
+            var start = $chkboxes.index( this );
+            var end = $chkboxes.index( lastChecked );
+
+            $chkboxes.slice( Math.min( start, end ), Math.max( start, end )+ 1 ).prop( "checked", lastChecked.checked );
+        }
+
+        lastChecked = this;
+    } );
+
+
 };
 
-NM.kendo.formatDate = function (date, type="normal") {
+NM.kendo.formatDate = function( date, type="normal" ) {
     // example date, from server: July, 13 2022 10:50:39 +0200, culture: en-US
 
-    if (type == "normal") {
-        var ret = kendo.toString(kendo.parseDate(date, "MMMM, dd yyyy HH:mm:ss", "en-US"), "dd/MM/yyyy HH:mm");
+    if ( type == "normal" ) {
+        var ret = kendo.toString( kendo.parseDate( date, "MMMM, dd yyyy HH:mm:ss", "en-US" ), "dd/MM/yyyy HH:mm" );
     }
 
-    if (type == "short") {
-        var ret = kendo.toString(kendo.parseDate(date, "MMMM, dd yyyy HH:mm:ss", "en-US"), "dd/MM");
+    if ( type == "short" ) {
+        var ret = kendo.toString( kendo.parseDate( date, "MMMM, dd yyyy HH:mm:ss", "en-US" ), "dd/MM" );
     }
 
     return ret;
