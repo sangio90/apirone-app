@@ -83,7 +83,7 @@ h2 {
     background-repeat: no-repeat;
     border: 1px solid #eaeaea;
     border-radius: 5px;
-    background-color: #eeeeee;
+    background-color: #ECEDF0;
     padding: 10px;
 }
 
@@ -122,29 +122,33 @@ ul.nav-main li a {
     color: White !important;
 }
 
-html.no-overflowscrolling .nano > .nano-pane > .nano-slider {
+html.no-overflowscrolling .nano>.nano-pane>.nano-slider {
     background: #4482e8 !important;
 }
 
 .page-header {
     background: #2771e8 !important;
+    height: 30px !important;
 }
 
 .sidebar-left .sidebar-header .sidebar-title {
     background: #2771e8 !important;
     color: White !important;
+    height: 30px !important;
 }
 
 .sidebar-left .sidebar-header .sidebar-toggle {
     background: #2771e8 !important;
+    height: 30px !important;
 }
 
-ul.nav-main > li > a:hover,
-ul.nav-main > li > a:focus {
+ul.nav-main>li>a:hover,
+ul.nav-main>li>a:focus {
     background-color: #2771e8;
 }
 
 .sidebar-left .sidebar-header .sidebar-toggle i {
+    margin-top: -10px;
     color: white;
 }
 
@@ -153,11 +157,15 @@ ul.nav-main > li > a:focus {
     color: white;
 }
 
+.page-header .breadcrumbs {
+    line-height: 30px !important;
+}
+
 /*
 	// sidebar and topbar
 */
 
-.form-group + .form-group {
+.form-group+.form-group {
     border: 0 !important;
 }
 
@@ -209,7 +217,7 @@ ul.nav-main li .nav-children li a:focus {
     background: #2771e8 !important;
 }
 
-ul.nav-main > li.nav-expanded > a {
+ul.nav-main>li.nav-expanded>a {
     background: #2771e8 !important;
 }
 
