@@ -79,37 +79,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public String function clone(
+	public Struct function clone(
 		required String fromLineId,
 		required String toLineId,
 		required Numeric categoryId
 	){
-		var products = getProductService().list( lineId = fromLineId, categoryId = categoryId );
-
-		```
-		<cfquery name="q" datasource="apirone">
-			DELETE FROM products
-			WHERE line_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.toLineId#">::uuid
-				AND product_category_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.categoryId#">
-		</cfquery>
-		```
-
-		for ( var product in products ) {
-			var item = Duplicate( product );
-			item.getLine().setId( arguments.toLineId );
-
-			var newId        = getProductService().create( item );
-			var productItems = getProductItemService().getTree( productId = product.getId() );
-
-			for ( productItem in productItems ) {
-				createProductItem(
-					productItem = productItem,
-					level       = 1,
-					productId   = newId
-				);
-			}
-		}
-
+		// recursive function to create product items
 		function createProductItem(
 			required String productId,
 			required Struct productItem,
@@ -143,7 +118,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		return "OK";
+		getProductService().deleteAllByParams( lineId = arguments.toLineId, categoryId = arguments.categoryId );
+
+		var products = getProductService().list( lineId = fromLineId, categoryId = categoryId );
+
+		for ( var product in products ) {
+			var item = Duplicate( product );
+			item.getLine().setId( arguments.toLineId );
+
+			var newId        = getProductService().create( item );
+			var productItems = getProductItemService().getTree( productId = product.getId() );
+
+			for ( productItem in productItems ) {
+				createProductItem(
+					productItem = productItem,
+					level       = 1,
+					productId   = newId
+				);
+			}
+		}
+
+		return {
+			status  = "success",
+			payload = {
+				fromLineId = arguments.fromLineId,
+				toLineId   = arguments.toLineId,
+				categoryId = arguments.categoryId
+			}
+		};
 	}
 
 	public String function update( required com.apirone.core.model.bean.Line line ){
@@ -210,6 +212,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
+	public com.apirone.core.model.bean.Outcome function deleteByParams(
+		required String lineId,
+		required String categoryId
+	){
+		var outcome = super.bean( "Outcome" );
+
+		var obj = get( arguments.lineId );
+
+		outcome.setData( { lineId = arguments.lineId } );
+
+		transaction {
+			try {
+				var result = getDao().delete( lineId = arguments.lineId, categoryId = arguments.categoryId );
+				outcome.setData( { "deletedCount" = result } )
+
+				getCacheManager().remove( getCacheScope(), arguments.lineId );
+			} catch ( any error ) {
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteLine" );
+				outcome.setMessage( "Cannot delete line [#arguments.lineId#]" );
+			}
+		}
+
+		return outcome;
+	}
+
+
 	/*
     	private method
 	*/
@@ -232,7 +262,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setCategories( super.getCategoriesBeanByIds( record.categories ) );
-
 
 			return bean;
 		}

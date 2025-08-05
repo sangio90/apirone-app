@@ -142,6 +142,33 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+	public com.apirone.core.model.bean.Outcome function deleteAllByParams(
+		required String lineId,
+		required String categoryId
+	){
+		var outcome = super.bean( "Outcome" );
+
+		outcome.setData( arguments );
+
+		transaction {
+			try {
+				getDao().deleteAllByParams( lineId = arguments.lineId, categoryId = arguments.categoryId );
+
+				// cm.remove( getCacheScope(), arguments.obj.getId() );
+			} catch ( any error ) {
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteProduct" );
+				outcome.setMessage( "Cannot delete product [#productId#]" );
+			}
+		}
+
+		getCacheManager().removeAll()
+
+		return outcome;
+	}
+
+
 
 	public String function create( required com.apirone.core.model.bean.Product product ){
 		var newId = getDao().insert( arguments.product );

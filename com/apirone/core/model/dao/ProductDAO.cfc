@@ -228,4 +228,19 @@
 
 		<cfreturn true>
 	</cffunction>
+
+	<cffunction name="deleteAllByParams" returntype="Boolean">
+		<cfargument name="lineId" type="String" required="true">
+		<cfargument name="categoryId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			DELETE
+			FROM products
+			WHERE
+				line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+				AND product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
+		</cfquery>
+
+		<cfreturn true>
+	</cffunction>
 </cfcomponent>
