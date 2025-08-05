@@ -10,14 +10,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="Component.bean";
 
-	/*
-	property name="attributeService" inject="AttributeService";
-	property name="attributeValueService" inject="AttributeValueService";
-	property name="productComponentService" inject="ProductComponentService";
-    */
-
-	property name="cacheScope" type="String" default="Component.bean";
-
 	public com.apirone.core.model.bean.Component function get( required String componentId ){
 		var cm = getCacheManager();
 
@@ -181,6 +173,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( record.recordCount ) {
 			var bean = super.bean( "Component" );
+
+			// TODO: facrory for all Component*
+			if ( Len( record.product_item_id ) ) {
+				bean            = super.bean( "ComponentProductItem" );
+				var productItem = super.bean( "ProductItem" );
+
+				bean.setProductItem( getProductItemService().get( record.product_item_id ) );
+			}
 
 			bean.setId( record.component_id );
 

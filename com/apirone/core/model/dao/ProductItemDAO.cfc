@@ -62,13 +62,19 @@
 				attribute_raw_value_id,
 				product_id,
 				orderby,
-				status_id
+				status_id,
+				parent_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getAttributeValue().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductItem.getProductId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getOrderBy()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductItem.getStatus().getId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductItem.getStatus().getId()#">,
+				<cfif IsNull( arguments.ProductItem?.getParent()?.getId() )>
+					NULL
+				<cfelse>
+					<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getParent().getId()#">
+				</cfif>
 			) RETURNING product_item_id
 		</cfquery>
 

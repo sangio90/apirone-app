@@ -4,6 +4,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="lookupService" inject="LookupService";
 	property name="ProductCategoryService" inject="ProductCategoryService";
+	property name="ProductItemService" inject="ProductItemService";
+	property name="ProductService" inject="ProductService";
+	property name="ComponentService" inject="ComponentService";
 	property name="textService" inject="TextService";
 
 	property name="cacheScope" type="String" default="Line.bean";
@@ -74,6 +77,73 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 		return newId;
+	}
+
+	public String function clone(
+		required String fromLineId,
+		required String toLineId,
+		required Numeric categoryId
+	){
+		var products = getProductService().list( lineId = fromLineId, categoryId = categoryId );
+
+		```
+		<cfquery name="q" datasource="apirone">
+			DELETE FROM products
+			WHERE line_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.toLineId#">::uuid
+				AND product_category_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.categoryId#">
+		</cfquery>
+		```
+
+		for ( var product in products ) {
+			var item = Duplicate( product );
+			item.getLine().setId( arguments.toLineId );
+
+			var newId        = getProductService().create( item );
+			var productItems = getProductItemService().getTree( productId = product.getId() );
+
+			for ( productItem in productItems ) {
+				createProductItem(
+					productItem = productItem,
+					level       = 1,
+					productId   = newId
+				);
+			}
+		}
+
+		function createProductItem(
+			required String productId,
+			required Struct productItem,
+			required Numeric level = 1
+		){
+			arguments.productItem.setProductId( arguments.productId );
+
+			var components       = getComponentService().list( productItemId = productItem.getId() );
+			var newProductItemId = getProductItemService().create( arguments.productItem );
+
+			var productItem = getProductItemService().get( newProductItemId );
+
+			for ( component in components ) {
+				var newComponent = Duplicate( component );
+
+				newComponent.setId( "" );
+				newComponent.getProductItem().setId( newProductItemId );
+				getComponentService().create( newComponent );
+			}
+
+			if ( arguments.productItem.getChildren().len() ) {
+				for ( var child in arguments.productItem.getChildren() ) {
+					child.getParent().setId( newProductItemId );
+
+					createProductItem(
+						productItem = child,
+						level       = arguments.level + 1,
+						productId   = arguments.productId
+					);
+				}
+			}
+		}
+
+		return "OK";
 	}
 
 	public String function update( required com.apirone.core.model.bean.Line line ){

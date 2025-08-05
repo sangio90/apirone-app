@@ -45,6 +45,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function clone( event, rc, prc ){
+		var params = {
+			fromLineId = rc.fromLineId,
+			toLineId   = rc.toLineId,
+			categoryId = rc.categoryId
+		}
+
+		var result = super.fire( "line.clone", params );
+
+		event.setValue( "result", result );
+	}
+
 	function get( event, rc, prc ){
 		param rc.id = "___";
 		var result  = super.getResult();

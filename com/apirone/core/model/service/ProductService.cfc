@@ -146,7 +146,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function create( required com.apirone.core.model.bean.Product product ){
 		var newId = getDao().insert( arguments.product );
 
-		if ( !IsNull( arguments.product.getTexts() ) ) {
+		if (
+			!IsNull( arguments.product.getTexts() )
+			AND arguments.product.getTexts().len()
+		) {
 			transaction {
 				for ( var text in arguments.product.getTexts() ) {
 					var entity = super.bean( "Entity" );

@@ -23,10 +23,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public Array function getTree(
-		// com.apirone.core.model.bean.ProductItem[]
-		required String productId
-	){
+	public Array function getTree( required String productId ){
 		var result = [];
 
 		var productId = arguments.productId;
@@ -63,7 +60,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var n = 1;
 
 		for ( var row in rows ) {
-			// if( item.getId() > 0 ) {
 
 			var thisOrderBy = "#arguments.orderBy#.#n#";
 			var parentId    = row.getId();
@@ -84,7 +80,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			n++;
 
-			// }
 		}
 
 		return result;

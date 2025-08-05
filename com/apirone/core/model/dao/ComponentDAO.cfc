@@ -1,23 +1,19 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
 	<cffunction name="read">
-
 		<cfargument name="componentId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
-                components
+				components
 			WHERE
 				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.componentId#">
 		</cfquery>
 
 		<cfreturn local.q>
-
 	</cffunction>
 
 	<cffunction returntype="Query" name="find">
-
 		<cfargument name="lineId" type="String">
 		<cfargument name="sizeId" type="String">
 		<cfargument name="productId" type="String">
@@ -25,42 +21,42 @@
 		<cfargument name="attributeValueId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
-        <cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="created_at desc">
 
-        <cfquery name="local.q" datasource="apirone">
-			SELECT	
-                component_id,
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				component_id,
 				COUNT(component_id) OVER() AS total
 			FROM
-            	components
+				components
 			WHERE 1=1
-			
-				<cfif !isNull( arguments.productItemId )>
+
+				<cfif !IsNull( arguments.productItemId )>
 					AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
 				</cfif>
 
-				<cfif !isNull( arguments.productId )>
+				<cfif !IsNull( arguments.productId )>
 					AND product_id = <cfqueryparam value="#arguments.productId#" cfsqltype="Varchar">::uuid
 				</cfif>
 
-				<cfif !isNull( arguments.lineId )>
+				<cfif !IsNull( arguments.lineId )>
 					AND line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">::uuid
 				</cfif>
 
-				<cfif !isNull( arguments.sizeId )>
+				<cfif !IsNull( arguments.sizeId )>
 					AND size_id = <cfqueryparam value="#arguments.sizeId#" cfsqltype="Varchar">::uuid
 				</cfif>
 
-				<cfif !isNull( arguments.attributeValueId )>
+				<cfif !IsNull( arguments.attributeValueId )>
 					AND attribute_raw_value_id = <cfqueryparam value="#arguments.attributeValueId#" cfsqltype="Integer">
 				</cfif>
 
-			ORDER BY 
+			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GTE 0>
-				LIMIT 
+				LIMIT
 					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
 				OFFSET
 					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
@@ -68,35 +64,30 @@
 		</cfquery>
 
 		<cfreturn local.q>
+	</cffunction>
 
-	</cffunction>	
-
-    
 	<cffunction name="delete" returntype="Boolean">
-
 		<!--- <cfargument name="component" type="com.apirone.core.model.bean.Component" required="true"> --->
 		<cfargument name="componentId" type="Numeric" required="true">
 
-        <cfquery name="local.q" datasource="apirone" result="result">
-			DELETE FROM 
+		<cfquery name="local.q" datasource="apirone" result="result">
+			DELETE FROM
 				components
-			WHERE 
+			WHERE
 				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.componentId#">
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# delete method: #result.sql#">
+		<cffile action="APPEND" file="#ExpandPath( "/debug.log" )#" output="#Now()# delete method: #result.sql#">
 
 		<cfreturn true>
-
 	</cffunction>
 
 	<cffunction name="insert" returntype="Numeric">
-
 		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
 
 		<cfset var meta = getFieldsAndValues( arguments.component )>
 
-        <cfquery name="local.q" datasource="apirone">
+		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO components (
 				raw_product_id,
 				color_id,
@@ -112,8 +103,7 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.component.getVariant().getId()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.component.getQuantity()#">,
 
-				<cfset var index = 1>
-				<cfloop array="#meta.values#" item="item">
+				<cfloop array="#meta.values#" item="item" index="index">
 					<cfif item.type IS "uuid">
 						<cfqueryparam cfsqltype="Varchar" value="#item.value#">::uuid
 					<cfelse>
@@ -122,46 +112,35 @@
 					<cfif Len( meta.values ) NEQ index>
 						,
 					</cfif>
-					<cfset index++>
 				</cfloop>
 
 			) RETURNING component_id
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ComponentDAO: create">
-
 		<cfreturn local.q.component_id>
-
 	</cffunction>
 
-
 	<cffunction name="update" returntype="Numeric">
-
 		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
 
 		<!--- <cfset var meta = getFieldsAndValues( arguments.component )> --->
 
-        <cfquery name="local.q" datasource="apirone">
-			UPDATE components 
-			SET 
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE components
+			SET
 				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.component.getQuantity()#">
-			WHERE 
+			WHERE
 				component_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.component.getId()#">
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ComponentDAO: update">
+		<cffile action="APPEND" file="#ExpandPath( "/debug.log" )#" output="#Now()# ComponentDAO: update">
 
 		<cfreturn arguments.component.getId()>
+	</cffunction>
 
-	</cffunction>	
-
-	
-	<!--- 
-		private methods
-	--->
+	<!--- private methods --->
 
 	<cffunction name="getFieldsAndValues" returntype="Struct" access="private">
-
 		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
 
 		<cfset var meta = GetMetadata( arguments.component )>
@@ -170,39 +149,56 @@
 		<cfset var values = []>
 
 		<cfswitch expression="#meta.fullname#">
-			
 			<cfcase value="com.apirone.core.model.bean.ComponentLineSize">
-				<cfset fields = ["line_id", "size_id"]>
-				<cfset values = [ 
-					{ value = arguments.component.getLine().getId(), type = "uuid" }, 
-					{ value = arguments.component.getSize().getId(), type = "uuid" }
+				<cfset fields = [ "line_id", "size_id" ]>
+				<cfset values = [
+					{
+						value = arguments.component.getLine().getId(),
+						type  = "uuid"
+					},
+					{
+						value = arguments.component.getSize().getId(),
+						type  = "uuid"
+					}
 				]>
 			</cfcase>
 
 			<cfcase value="com.apirone.core.model.bean.ComponentProductItem">
 				<cfset fields = [ "product_item_id" ]>
-				<cfset values = [ { value = arguments.component.getProductItem().getId(), type = "Integer" } ]>
+				<cfset values = [
+					{
+						value = arguments.component.getProductItem().getId(),
+						type  = "Integer"
+					}
+				]>
 			</cfcase>
 
 			<cfcase value="com.apirone.core.model.bean.ComponentProduct">
 				<cfset fields = [ "product_id" ]>
-				<cfset values = [ { value = arguments.component.getProduct().getId(), type = "uuid" } ]>
+				<cfset values = [
+					{
+						value = arguments.component.getProduct().getId(),
+						type  = "uuid"
+					}
+				]>
 			</cfcase>
 
 			<cfcase value="com.apirone.core.model.bean.ComponentAttributeValue">
 				<cfset fields = [ "attribute_raw_value_id" ]>
-				<cfset values = [ { value = arguments.component.getAttributeValue().getId(), type = "Integer" } ]>
+				<cfset values = [
+					{
+						value = arguments.component.getAttributeValue().getId(),
+						type  = "Integer"
+					}
+				]>
 			</cfcase>
 
 			<cfdefaultcase>
 				<cfset var meta = GetMetadata( component )>
 				<cfthrow type="apirone.error.ComponentNotValid" message="Component [#meta.fullname#] not valid">
 			</cfdefaultcase>
-
 		</cfswitch>
-		
+
 		<cfreturn { "fields" = fields, "values" = values }>
-
-	</cffunction>	
-
+	</cffunction>
 </cfcomponent>
