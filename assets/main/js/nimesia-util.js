@@ -2,109 +2,109 @@ NM.util = NM.util || {};
 
 NM.util.openModal = function( ele ) {
 
-    var dialogs = $(".modal.show"); //opened dialog
-    var currentId = ele.attr("id");
+    var dialogs = $( ".modal.show" ); // opened dialog
+    var currentId = ele.attr( "id" );
 
-	var currentTop = 0;
-	var currentLeft = 0;
+    var currentTop = 0;
+    var currentLeft = 0;
 
-	var n=1;
+    var n=1;
 
-	for ( var dialog of dialogs ) {
-		
-		var $dialog = $(dialog)
+    for ( var dialog of dialogs ) {
 
-		if( currentId !=  $dialog.attr("id") ) {
+        var $dialog = $( dialog );
 
-			currentTop = 20*n;
-			currentLeft = 20*n;
+        if( currentId !=  $dialog.attr( "id" ) ) {
 
-			n++;
+            currentTop = 20*n;
+            currentLeft = 20*n;
 
-		}
+            n++;
 
-	}
+        }
 
-	ele.modal("show");
+    }
 
-	ele.css({ left: 0, top: 0 });
-	ele.offset({ left: currentLeft, top: currentTop });
+    ele.modal( "show" );
+
+    ele.css( { left: 0, top: 0 } );
+    ele.offset( { left: currentLeft, top: currentTop } );
 
 };
 
 
 NM.util.ajax = function( setup ) {
 
-	var defaults = {
-		url: "",
-		data: null,
-		method: "GET",
-		callback: {
-			done: undefined,
-			always: undefined,
-			fail: function( xhr ) {
-				AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
-			}
-		}
-	};
+    var defaults = {
+        url: "",
+        data: null,
+        method: "GET",
+        callback: {
+            done: undefined,
+            always: undefined,
+            fail: function( xhr ) {
+                AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
+            }
+        }
+    };
 
-	var settings = $.extend( true, defaults, setup );
+    var settings = $.extend( true, defaults, setup );
 
-	if ( settings.hasOwnProperty( "cache" ) ) {
+    if ( settings.hasOwnProperty( "cache" ) ) {
 
-		settings.cache = settings.cache;
+        settings.cache = settings.cache;
 
-		if ( !settings.cache ) {
-			settings.headers = {
-				"cache-control": "no-cache"
-			};
-		}
-	}
+        if ( !settings.cache ) {
+            settings.headers = {
+                "cache-control": "no-cache"
+            };
+        }
+    }
 
-	var data = 
+    var data =
 		$.ajax( {
-			url: settings.url, 
-			method: settings.method,
-			data: settings.data
+		    url: settings.url,
+		    method: settings.method,
+		    data: settings.data
 		} )
-		.done( function( xhr ) {
+		    .done( function( xhr ) {
 
-			if ( xhr.error === undefined ) { // dal proxy
-				if ( settings.callback.done !== undefined ) {
-					settings.callback.done.apply( null, [ xhr ] );
-				}
-			} else {
-				location.href = '/';
-			}
+		        if ( xhr.error === undefined ) { // dal proxy
+		            if ( settings.callback.done !== undefined ) {
+		                settings.callback.done.apply( null, [ xhr ] );
+		            }
+		        } else {
+		            location.href = "/";
+		        }
 
-		} )
-		.fail( settings.callback.fail )
-		.always( settings.callback.always );
+		    } )
+		    .fail( settings.callback.fail )
+		    .always( settings.callback.always );
 
-	return data;
+    return data;
 
 };
 
 NM.util.checkAll = function( button ) {
 
-	var thisForm = $( button.closest("form") );
+    var thisForm = $( button.closest( "form" ) );
 
-	var checks = thisForm.find("input[name=selected]:checkbox");
+    var checks = thisForm.find( "input[name=selected]:checkbox" );
 
-	var value = button.checked ? true : false;
+    var value = button.checked ? true : false;
 
-	checks.each(function() {
-		this.checked = value;
-	});
+    checks.each( function() {
+        this.checked = value;
+    } );
 
 };
 
 NM.util.autoHideMessage = function( ele, message ) {
 
-	ele.html( message );
+    ele.html( message );
 
-	setTimeout(function() {
-		ele.html("")
-	}, 1500 )
+    setTimeout( function() {
+        ele.html( "" );
+    }, 1500 );
 
 };

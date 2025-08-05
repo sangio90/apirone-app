@@ -97,7 +97,6 @@
 
                 <div class="sidebar-header">
                     <div class="sidebar-title">
-                        Menù
                     </div>
                     <div class="sidebar-toggle d-none d-md-block" 
                         id="sidebar-button"
