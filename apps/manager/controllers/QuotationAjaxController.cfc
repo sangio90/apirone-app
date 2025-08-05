@@ -2,9 +2,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
 		var data   = [];
-		var result = super.getResult();
-		var dm     = getDataMapper();
 
+		var result = super.getResult();
+        var dm = super.getDatamapper();
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "quotation.search", params );
@@ -37,11 +37,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setId( json.id );
 		quotation.setDescription( json.description );
 		quotation.setQuotationNumber( json.quotation_number );
+		quotation.setVersionNumber( json.version_number );
 		quotation.setQuotationDate( json.quotation_date );
 		quotation.setNotes( json.notes );
 		quotation.setValidityDate( json.validity_date );
 		quotation.setOpportunityName( json.opportunity_name );
 		quotation.setLeadName( json.lead_name );
+		quotation.setActive( json.active );
 		quotation.setCustomPaymentMethod( json.custom_payment_method );
 		quotation.setPricelist( type.setId( json.pricelist.id ) );
 		quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
@@ -57,8 +59,16 @@ component extends="com.apirone.core.controller.AbsController" {
 			messageId = "quotation.created";
 			thisId    = super.fire( "quotation.create", [ quotation ] )
 		} else {
-			messageId = "quotation.updated";
-			thisId    = super.fire( "quotation.update", [ quotation ] )
+			var bean = super.fire( "Quotation.get", [ rc.id ] );
+			if (json.status != bean.getStatus().getId()) {
+				quotation.setActive(0);
+				super.fire( "quotation.update", [ quotation ] )
+				thisId = super.fire( "quotation.clone", [ quotation ] );
+				messageId = "quotation.updated";
+			} else {
+				messageId = "quotation.updated";
+				thisId    = super.fire( "quotation.update", [ quotation ] )
+			}
 		}
 
 		var message = completeMessage( messageId );

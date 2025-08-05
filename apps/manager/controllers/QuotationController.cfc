@@ -2,11 +2,9 @@
 
     function list( event, rc, prc ){
 
-        var user = prc.user;
-
         prc.title = "Lista dei preventivi";
 
-        prc.list = DESerializeJSON( FileRead( '/config/data/fake/quotations.json.cfm' ) );
+        prc.statuses = super.fire("status.list", ["QUOTATIONS"] );
 
         prc.jsScripts.add( "app-quotation" );
 
