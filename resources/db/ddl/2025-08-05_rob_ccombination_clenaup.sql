@@ -1,0 +1,7 @@
+﻿ALTER TABLE public.components RENAME CONSTRAINT components_combination_item_id_fk TO components_product_item_id_fk;
+
+ALTER TABLE public.components
+DROP CONSTRAINT components_fruit_id_fk RESTRICT;
+
+ALTER TABLE public.components
+DROP CONSTRAINT components_fruit_combination_item_id_fk RESTRICT;
