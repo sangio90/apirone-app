@@ -205,7 +205,7 @@
 		get( "/lines/categories/:categoryId" ).to( "LineController.listByCategoryId" ).end();
 		get( "/lines/categories" ).to( "LineController.listByCategoryId" ).end();
 		get( "/lines/:id/categories/:categoryId/products" ).to( "LineController.products" ).end(); //TODO: better naming
-		get( "/lines/:id/attributes" ).to( "LineController.attributes" ).end();
+		get( "/lines/:id/categories/:categoryId/attributes" ).to( "LineController.attributes" ).end();
 		get( "/lines" ).to( "LineController.list" ).end();
 
 

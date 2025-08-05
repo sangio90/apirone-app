@@ -39,11 +39,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 	function attributes( event, rc, prc ){
-		var products = super.fire( "product.list", { lineId = rc.id } );
+		var products = super.fire( "product.list", { lineId = rc.id, categoryId = rc.categoryId } );
 
 		var destination = "/manager/lines/#rc.id#/products";
 
-		if( len( cgi.http_referer ) ) {
+		if ( Len( cgi.http_referer ) ) {
 			destination = cgi.http_referer;
 		}
 
@@ -52,7 +52,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		} else {
 			setMessage( type = "warning", message = "Carica almeno un prodotto" );
 
-			relocate( uri="#destination#", postProcessExempt=false, addToken=false );
+			relocate(
+				uri               = destination,
+				postProcessExempt = false,
+				addToken          = false
+			);
 		}
 	}
 
@@ -67,7 +71,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title    = "Categoria #prc.category.getName()# linea #prc.line.getName()#";
 		prc.subtitle = "Prodotti disponibili";
 
-		sizes        = super.fire( "size.list", { categoryId = prc.category.getId() } );
+		var sizes    = super.fire( "size.list", { categoryId = prc.category.getId() } );
 		prc.sizes    = sizes;
 		prc.finishes = super.fire( "finish.list" );
 

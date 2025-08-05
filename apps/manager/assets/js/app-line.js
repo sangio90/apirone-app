@@ -310,22 +310,15 @@ AP.line.list = ( function() {
         },
 
         attributes: function( event ) {
-            /*
-                note: redirect in controller to first product
-            */
 
             var id = event.data.id;
-            window
-                .open( "/manager/lines/" + id + "/attributes", "_blank" )
-                .focus();
+            window.open( "/manager/lines/" + id + "/attributes", "_blank" ).focus();
 
             return false;
         },
     } );
 
     pub.init = function() {
-        console.log( "list:init" );
-
         kendo.bind( AP.line.fields.listRoot, viewModel );
     };
 
@@ -400,10 +393,12 @@ AP.line.products = ( function() {
 
         attributes: function( event ) {
             var lineId = window.location.href.split( "/" )[5];
+            var categoryId = window.location.href.split( "/" )[7];
 
-            window
-                .open( "/manager/lines/" + lineId + "/attributes", "_blank" )
-                .focus();
+            console.log( "lineId", lineId );
+            console.log( "categoryId", categoryId );
+
+            window.open( "/manager/lines/" + lineId + "/categories/" + categoryId + "/attributes", "_blank" ).focus();
 
             return false;
         },
@@ -510,7 +505,9 @@ AP.line.products = ( function() {
     } );
 
     pub.init = function() {
-        console.log( viewModel.get( "sizeConfigModal.title" ) );
+
+        console.log( "qui" );
+
         kendo.bind( fields.productsRoot, viewModel );
 
         var sizeConfigForm = fields.sizeConfigForm;
