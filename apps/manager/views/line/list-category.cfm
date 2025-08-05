@@ -54,6 +54,7 @@
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '90px' },
                                         { 'field':'name', 'title':'Descrizione' },
+                                        { 'field':'', 'title':'Duplica', width: '55px'},
                                         { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
                                         { 'field':'', 'title':'Tutti gli attributi', width: '55px'},
                                         { 
@@ -72,6 +73,9 @@
 				</section>
 			</div>
 		</div>
+
+        #view("line/clone-modal")#;
+
 	</div>
 
 </cfoutput>
