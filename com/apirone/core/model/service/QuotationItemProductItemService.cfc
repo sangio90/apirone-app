@@ -7,7 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="cacheScope" type="String" default="QuotationItemProductItem.bean";
 
 	public com.apirone.core.model.bean.QuotationItemProductItem function get( required String productItemId ){
-		var cm = getCacheManager();
+		var cm    = getCacheManager();
 		var cache = cm.get( getCacheScope(), arguments.productItemId );
 		if ( cache.status ) {
 			return cache.data;
@@ -24,20 +24,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		required Numeric limit    = 15,
-		required Numeric offset   = 0,
-		required Array orderBy    = [ { field = "quotationItemProductItem.id" } ]
+		required Numeric limit  = 15,
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "quotationItemProductItem.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-		var rows   = [];
-		var result = super.getResult();
+		var rows    = [];
+		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
-		
+
 		records.each( function( record ){
 			rows.add( get( productItemId = record.quotation_item_product_item_id ) );
 		} );
-		
+
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );
@@ -47,7 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Outcome function delete( required String productItemId ){
 		var outcome = super.bean( "Outcome" );
-		var obj = get( arguments.productItemId );
+		var obj     = get( arguments.productItemId );
 
 		outcome.setData( { productItemId = arguments.productItemId } );
 		getDao().delete( arguments.productItemId );
@@ -79,20 +79,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.productItem.getId();
 	}
 
-	private com.apirone.core.model.bean.QuotationItemProductItem function build(required String productItemId) {
-    	var record = getDao().read( arguments.productItemId );
-		if (record.recordCount) {
+	private com.apirone.core.model.bean.QuotationItemProductItem function build( required String productItemId ){
+		var record = getDao().read( arguments.productItemId );
+		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemProductItem" );
 			bean.setId( record.quotation_item_product_item_id );
-			bean.setQuotationItemProduct( getQuotationItemProductService().get(record.quotation_item_product_id) );
-			bean.setProductItem( getProductItemService().get(record.product_item_id) );
+			bean.setQuotationItemProduct(
+				getQuotationItemProductService().get( record.quotation_item_product_id )
+			);
+			bean.setProductItem( getProductItemService().get( record.product_item_id ) );
 
-			bean.setParent( 
-				isNull(record.parent_id) ? NullValue() : getQuotationItemProductItemService().get(record.parent_id) 
+			bean.setParent(
+				IsNull( record.parent_id ) ? NullValue() : getQuotationItemProductItemService().get(
+					record.parent_id
+				)
 			);
 			return bean;
 		}
-    	return NullValue();
+		return NullValue();
 	}
 
 }

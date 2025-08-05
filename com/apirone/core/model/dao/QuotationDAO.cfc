@@ -33,7 +33,12 @@
 		<cfargument name="salesAgentAccountId" type="String" required="false">
 		<cfargument name="graphicTechnicianAccountId" type="String" required="false">
 		<cfargument name="str" type="String" required="false">
-		<cfargument name="orderBy" type="String" required="true" default="quotations.quotation_date, quotations.quotation_number">
+		<cfargument
+			name    ="orderBy"
+			type    ="String"
+			required="true"
+			default ="quotations.quotation_date, quotations.quotation_number"
+		>
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
 
@@ -53,46 +58,46 @@
 			FROM quotations
 			WHERE 1=1
 
-			<cfif !isNull( arguments.str )>
+			<cfif !IsNull( arguments.str )>
 				AND (
 					description ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
 					OR quotation_number ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
 				)
 			</cfif>
 
-			<cfif !isNull(arguments.statusId)>
+			<cfif !IsNull( arguments.statusId )>
 				AND status_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.statusId#">
 			</cfif>
 
-			<cfif !isNull(arguments.langId)>
+			<cfif !IsNull( arguments.langId )>
 				AND lang_id = <cfqueryparam cfsqltype="CHAR" value="#arguments.langId#">
 			</cfif>
 
-			<cfif !isNull(arguments.pricelistId)>
+			<cfif !IsNull( arguments.pricelistId )>
 				AND pricelist_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.pricelistId#">
 			</cfif>
 
-			<cfif !isNull(arguments.paymentMethodId)>
+			<cfif !IsNull( arguments.paymentMethodId )>
 				AND payment_method_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.paymentMethodId#">
 			</cfif>
 
-			<cfif !isNull(arguments.currencyId)>
+			<cfif !IsNull( arguments.currencyId )>
 				AND currency_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.currencyId#">
 			</cfif>
 
-			<cfif !isNull(arguments.billingProfileId)>
+			<cfif !IsNull( arguments.billingProfileId )>
 				AND billing_profile_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.billingProfileId#">::uuid
 			</cfif>
 
-			<cfif !isNull(arguments.shippingProfileId)>
+			<cfif !IsNull( arguments.shippingProfileId )>
 				AND shipping_profile_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.shippingProfileId#">::uuid
 			</cfif>
 
-			<cfif !isNull(arguments.salesAgentAccountId)>
+			<cfif !IsNull( arguments.salesAgentAccountId )>
 				AND sales_agent_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.salesAgentAccountId#">::uuid
 			</cfif>
 
-			<cfif !isNull(arguments.graphicTechnicianAccountId)>
+			<cfif !IsNull( arguments.graphicTechnicianAccountId )>
 				AND graphic_technician_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.graphicTechnicianAccountId#">::uuid
 			</cfif>
 
@@ -203,13 +208,12 @@
 				,
 				graphic_technician_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getGraphicTechnicianAccount().getId()#">::uuid
 
-			WHERE 
+			WHERE
 				quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getId()#">::uuid
 		</cfquery>
 
 		<cfreturn arguments.quotation.getId()>
 	</cffunction>
-
 
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="quotationId" type="String" required="true">

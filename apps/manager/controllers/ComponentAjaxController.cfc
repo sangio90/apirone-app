@@ -1,70 +1,61 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		param rc.by = "";
 
-        param rc.by = "";
+		var data   = [];
+		var result = super.getResult();
 
-        var data = [];
-        var result = super.getResult();
+		var params = getParams( typeId = rc.by, rc = rc );
 
-        var params = getParams( typeId = rc.by, rc = rc );
+		var items = super.fire( "component.list", params );
 
-        var items = super.fire( "component.list", params );
+		for ( var item in items ) {
+			var row = convertComponent( item );
+			data.add( row );
+		}
 
-        for( var item in items ) {
+		result.setTotal( items.len() );
+		result.setCount( items.len() );
+		result.setData( data );
 
-            var row = convertComponent( item );
-            data.add( row );
+		event.setValue( "result", result );
+	}
 
-        }        
+	function save( event, rc, prc ){
+		var result = super.getResult();
 
-        result.setTotal( items.len() );
-        result.setCount( items.len() );
-        result.setData( data );
+		var components = DeserializeJSON( GetHTTPRequestData().content );
 
-        event.setValue( "result", result );
+		switch ( rc.by ) {
+			case "product":
+				var component = super.bean( "ComponentProduct" );
+				var product   = super.bean( "Product" );
 
-    }
+				component.setProduct( product.setId( rc.productId ) );
 
-    function save( event, rc, prc ){
+				break;
+			case "item":
+				var component = super.bean( "ComponentProductItem" );
+				var item      = super.bean( "ProductItem" );
 
-        var result = super.getResult();
+				component.setProductItem( item.setId( rc.itemId ) );
 
-        var components = DeserializeJSON( GetHTTPRequestData().content );
+				break;
+			case "lineSize":
+				var component = super.bean( "ComponentLineSize" );
 
-        switch ( rc.by ) {
-            case "product":
+				var size = super.bean( "size" );
+				var line = super.bean( "line" );
 
-                var component = super.bean("ComponentProduct");
-                var product = super.bean("Product");
+				component.setLine( line.setId( rc.lineId ) );
+				component.setSize( size.setId( rc.sizeId ) );
 
-                component.setProduct( product.setId( rc.productId ) );
+				break;
 
-                break;
-
-            case "item":
-
-                var component = super.bean("ComponentProductItem");
-                var item = super.bean("ProductItem");
-
-                component.setProductItem( item.setId( rc.itemId ) );
-
-                break;
-                
-            case "lineSize":
-                var component = super.bean("ComponentLineSize");
-                
-                var size = super.bean("size");
-                var line = super.bean("line");
-
-                component.setLine( line.setId( rc.lineId ) );
-                component.setSize( size.setId( rc.sizeId ) );
-
-                break;
-
-                /*
+				/*
             case "fruit":
-                
+
                 var component = super.bean("ComponentFruit");
                 var fruit = super.bean("fruit");
 
@@ -72,183 +63,181 @@ component extends="com.apirone.core.controller.AbsController" {
 
                 break;
                 */
+			case "attributeValue":
+				var component = super.bean( "ComponentAttributeValue" );
+				var value     = super.bean( "AttributeValue" );
 
-            case "attributeValue":
-                
-                var component = super.bean("ComponentAttributeValue");
-                var value = super.bean("AttributeValue");
+				component.setAttributeValue( value.setId( rc.attributeValueId ) );
 
-                component.setAttributeValue( value.setId( rc.attributeValueId ) );
+				break;
+			case "fruitItem":
+				// params = { fruitProductItemId = rc.itemId };
+				// break;
+			default:
+				Throw( type = "apirone.error.TypeSaveNotValid", message = "Type save [#rc.typeId#] not valid" );
+				break;
+		}
 
-                break;
+		var params   = getParams( typeId = rc.by, rc = rc );
+		var oldItems = super.fire( "component.list", params );
 
-            case "fruitItem":
-                //params = { fruitProductItemId = rc.itemId };
-                //break;
+		var itemExists = [];
 
-            default: 
-                throw( type="apirone.error.TypeSaveNotValid", message="Type save [#rc.typeId#] not valid" );
-                break;
-        }
+		for ( var thisComponent in components ) {
+			if ( thisComponent.id != "" ) {
+				ArrayAppend( itemExists, thisComponent.id );
+			}
 
-        var params = getParams( typeId = rc.by, rc = rc );
-        var oldItems = super.fire( "component.list", params );
+			if ( thisComponent.typeId == "base" ) {
+				var override = super.bean( "ComponentOverride" );
 
-        var itemExists = [];
+				override.setId( thisComponent.override.id );
+				override.setDeleted( thisComponent.override.deleted );
+				override.setQuantity( thisComponent.override.quantity );
+				override.setComponentId( thisComponent.id );
+				override.setProductItemId( component.getProductItem().getId() );
 
-        for( var thisComponent in components ) {
+				cffile(
+					action = "APPEND",
+					file   = "#ExpandPath( "/debug.log" )#",
+					output = "#Now()# override: #thisComponent.override.id#"
+				);
 
-            if ( thisComponent.id != "" ) {
-                ArrayAppend( itemExists, thisComponent.id );
-            }
+				if ( Len( thisComponent.override.id ) ) {
+					super.fire( "ComponentOverride.update", [ override ] );
+					cffile(
+						action = "APPEND",
+						file   = "#ExpandPath( "/debug.log" )#",
+						output = "#Now()# override: create: #thisComponent.override.id#"
+					);
+				} else {
+					super.fire( "ComponentOverride.create", [ override ] );
+					cffile(
+						action = "APPEND",
+						file   = "#ExpandPath( "/debug.log" )#",
+						output = "#Now()# override: update: #thisComponent.override.id#"
+					);
+				}
+			} else {
+				var color      = super.bean( "Color" );
+				var rawProduct = super.bean( "RawProduct" );
+				var variant    = super.bean( "Variant" );
 
-            if( thisComponent.typeId == "base" ) {
+				variant.setId( thisComponent.variant.id )
+				color.setId( thisComponent.color.id )
+				rawProduct.setId( thisComponent.rawProduct.id )
 
-                var override = super.bean("ComponentOverride");
-                
-                override.setId( thisComponent.override.id );
-                override.setDeleted( thisComponent.override.deleted );  
-                override.setQuantity( thisComponent.override.quantity );  
-                override.setComponentId( thisComponent.id );  
-                override.setProductItemId( component.getProductItem().getId() );  
+				component.setId( thisComponent.id );
+				component.setRawProduct( rawProduct );
+				component.setColor( color );
+				component.setVariant( variant );
+				component.setQuantity( thisComponent.quantity );
 
-                cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# override: #thisComponent.override.id#");
-                
-                if( Len( thisComponent.override.id ) ) {
-                    super.fire( "ComponentOverride.update", [ override ] );
-                    cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# override: create: #thisComponent.override.id#");
-                } else {
-                    super.fire( "ComponentOverride.create", [ override ] );
-                    cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# override: update: #thisComponent.override.id#");
-                }                
+				if ( Len( component.getId() ) ) {
+					super.fire( "component.update", [ component ] );
+				} else {
+					super.fire( "component.create", [ component ] );
+				}
+			}
+		}
 
-            } else {
+		for ( var oldItem in oldItems ) {
+			if ( !itemExists.find( oldItem.getId() ) ) {
+				super.fire( "component.delete", { componentId = oldItem.getId() } );
+				cffile(
+					action = "APPEND",
+					file   = "#ExpandPath( "/debug.log" )#",
+					output = "#Now()# delete oldItems: this: #oldItem.getId()#"
+				);
+			}
+		}
 
-                var color      = super.bean("Color");
-                var rawProduct = super.bean("RawProduct");
-                var variant    = super.bean("Variant");
+		var message = completeMessage( "product.componentAdded" );
 
-                variant.setId( thisComponent.variant.id )
-                color.setId( thisComponent.color.id )
-                rawProduct.setId( thisComponent.rawProduct.id )
+		result.setData( { "message" = message } );
 
-                component.setId( thisComponent.id );
-                component.setRawProduct( rawProduct );
-                component.setColor( color );
-                component.setVariant( variant );
-                component.setQuantity( thisComponent.quantity );
-
-                if( Len( component.getId() ) ) {
-                    super.fire( "component.update", [ component ] );
-                } else {
-                    super.fire( "component.create", [ component ] );
-                }                
-
-            }
-
-        }
-
-        for( var oldItem in oldItems ) {
-
-            if( !itemExists.find( oldItem.getId() ) ) {
-                super.fire( "component.delete", { componentId = oldItem.getId() } );
-                cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# delete oldItems: this: #oldItem.getId()#");
-
-            }
-        
-        }
-
-        var message = completeMessage( "product.componentAdded" );
-
-        result.setData( { "message" = message } );
-
-        event.setValue( "result", result );
-
-    }
+		event.setValue( "result", result );
+	}
 
 
-    /*
+	/*
         private methods
     */
 
-    private function convertComponent( required Struct component ){
+	private function convertComponent( required Struct component ){
+		// TODO: move to DataMapper
 
-        //TODO: move to DataMapper
+		var product = component.getRawProduct();
 
-        var product = component.getRawProduct();
+		var row = {
+			"id"       = component.getId(),
+			"typeId"   = component.getTypeId(),
+			"quantity" = component.getQuantity(),
+			"override" = {
+				"id"       = component?.getOverride()?.getId(),
+				"deleted"  = component?.getOverride()?.getDeleted(),
+				"quantity" = component?.getOverride()?.getQuantity()
+			},
+			"totalQuantity" = component.getTotalQuantity(),
+			"rawProduct"    = {
+				"id"             = product.getId(),
+				"name"           = product.getName(),
+				"processingType" = {
+					"id"   = product.getProcessingType().getId(),
+					"name" = product.getProcessingType().getName()
+				},
+				"measurementUnit" = {
+					"id"   = product.getMeasurementUnit().getId(),
+					"name" = product.getMeasurementUnit().getName()
+				}
+			},
+			"variant" = {
+				"id"   = component.getVariant().getId(),
+				"name" = component.getVariant().getName()
+			},
+			"color" = {
+				"id"   = component.getColor().getId(),
+				"name" = component.getColor().getName()
+			}
+		}
 
-        var row = {
-            "id" = component.getId(),
-            "typeId" = component.getTypeId(),
-            "quantity" = component.getQuantity(),
-            "override" = {
-                "id" = component?.getOverride()?.getId(),
-                "deleted" = component?.getOverride()?.getDeleted(),
-                "quantity" = component?.getOverride()?.getQuantity()
-            },
-            "totalQuantity" = component.getTotalQuantity(),
-            "rawProduct" = {
-                "id" = product.getId(),
-                "name" = product.getName(),
-                "processingType" = {
-                    "id" = product.getProcessingType().getId(),
-                    "name" = product.getProcessingType().getName()
-                },
-                "measurementUnit" = {
-                    "id" = product.getMeasurementUnit().getId(),
-                    "name" = product.getMeasurementUnit().getName()
-                }
-            },
-            "variant" = {
-                "id" = component.getVariant().getId(),
-                "name" = component.getVariant().getName()
-            },
-            "color" = {
-                "id" = component.getColor().getId(),
-                "name" = component.getColor().getName()
-            }
-        }
+		return row;
+	}
 
-        return row;
+	private function getParams( required String typeId, required Struct rc ){
+		var params = {}
 
-    }
+		switch ( arguments.typeId ) {
+			case "product":
+				params = { productId = rc.productId };
+				break;
+			case "item":
+				params = {
+					productItemId                  = rc.itemId,
+					includeBaseAttributeComponents = true
+				};
+				break;
+			case "lineSize":
+				params = { lineId = rc.lineId, sizeId = rc.sizeId };
+				break;
+			case "fruit":
+				params = { fruitId = rc.fruitId };
+				break;
+			case "fruitItem":
+				params = { fruitProductItemId = rc.itemId };
+				break;
+			case "attributeValue":
+				params = {
+					attributeValueId               = rc.attributeValueId,
+					includeBaseAttributeComponents = false
+				};
+				break;
+			default:
+				Throw( type = "apirone.error.TypeSearchNotValid", message = "Type search [#rc.by#] not valid" );
+				break;
+		}
 
-    private function getParams( required String typeId, required Struct rc ){
-
-        var params = {}
-
-        switch ( arguments.typeId ) {
-            case "product":
-                params = { productId = rc.productId };
-                break;
-
-            case "item":
-                params = { productItemId = rc.itemId, includeBaseAttributeComponents = true };
-                break;
-                
-            case "lineSize":
-                params = { lineId = rc.lineId, sizeId = rc.sizeId };
-                break;
-
-            case "fruit":
-                params = { fruitId = rc.fruitId };
-                break;
-
-            case "fruitItem":
-                params = { fruitProductItemId = rc.itemId };
-                break;
-
-            case "attributeValue":
-                params = { attributeValueId = rc.attributeValueId, includeBaseAttributeComponents = false };
-                break;
-
-            default: 
-                throw( type="apirone.error.TypeSearchNotValid", message="Type search [#rc.by#] not valid" );
-                break;
-        }
-
-        return params;
-
-    }
+		return params;
+	}
 
 }

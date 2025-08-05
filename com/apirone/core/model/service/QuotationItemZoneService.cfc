@@ -6,16 +6,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="cacheScope" type="String" default="QuotationItemZone.bean";
 
 	public com.apirone.core.model.bean.QuotationItemZone function get( required String zoneId ){
-		var cm = getCacheManager();
+		var cm    = getCacheManager();
 		var cache = cm.get( getCacheScope(), arguments.zoneId );
-		
+
 		if ( cache.status ) {
 			return cache.data;
 		}
 
 		var bean = build( arguments.zoneId );
 		cm.put( getCacheScope(), arguments.zoneId, bean );
-		
+
 		return bean;
 	}
 
@@ -26,14 +26,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		required Numeric limit    = 15,
-		required Numeric offset   = 0,
-		required Array orderBy    = [ { field = "quotationItemZone.id" } ]
+		required Numeric limit  = 15,
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "quotationItemZone.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-		var rows   = [];
-		var result = super.getResult();
+		var rows    = [];
+		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
@@ -49,7 +49,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Outcome function delete( required String zoneId ){
 		var outcome = super.bean( "Outcome" );
-		var obj = get( arguments.zoneId );
+		var obj     = get( arguments.zoneId );
 
 		outcome.setData( { zoneId = arguments.zoneId } );
 		getDao().delete( arguments.zoneId );
@@ -80,21 +80,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.zone.getId();
 	}
 
-	private com.apirone.core.model.bean.QuotationItemZone function build(required String zoneId) {
-    	var record = getDao().read( arguments.zoneId );
-		if (record.recordCount) {
+	private com.apirone.core.model.bean.QuotationItemZone function build( required String zoneId ){
+		var record = getDao().read( arguments.zoneId );
+		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemZone" );
 			bean.setId( record.quotation_item_zone_id );
 			bean.setName( record.quotation_item_zone );
 			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
-			
+
 			bean.setParent(
 				IsNull( record.parent_id ) ? NullValue() : getQuotationItemZoneService().get( record.parent_id )
 			);
 
 			return bean;
 		}
-    	return NullValue();
+		return NullValue();
 	}
 
 }

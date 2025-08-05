@@ -5,7 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="cacheScope" type="String" default="QuotationItemPosition.bean";
 
 	public com.apirone.core.model.bean.QuotationItemPosition function get( required String positionId ){
-		var cm = getCacheManager();
+		var cm    = getCacheManager();
 		var cache = cm.get( getCacheScope(), arguments.positionId );
 
 		if ( cache.status ) {
@@ -14,7 +14,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var bean = build( arguments.positionId );
 		cm.put( getCacheScope(), arguments.positionId, bean );
-		
+
 		return bean;
 	}
 
@@ -25,30 +25,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		required Numeric limit    = 15,
-		required Numeric offset   = 0,
-		required Array orderBy    = [ { field = "quotationItemPosition.id" } ]
+		required Numeric limit  = 15,
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "quotationItemPosition.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-		var rows   = [];
-		var result = super.getResult();
+		var rows    = [];
+		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
-		
+
 		records.each( function( record ){
 			rows.add( get( positionId = record.quotation_item_position_id ) );
 		} );
-		
+
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );
-		
+
 		return result;
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String positionId ){
 		var outcome = super.bean( "Outcome" );
-		var obj = get( arguments.positionId );
+		var obj     = get( arguments.positionId );
 
 		outcome.setData( { positionId = arguments.positionId } );
 		getDao().delete( arguments.positionId );
@@ -79,17 +79,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.position.getId();
 	}
 
-	private com.apirone.core.model.bean.QuotationItemPosition function build(required String positionId) {
-    	var record = getDao().read( arguments.positionId );
-		if (record.recordCount) {
+	private com.apirone.core.model.bean.QuotationItemPosition function build( required String positionId ){
+		var record = getDao().read( arguments.positionId );
+		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemPosition" );
 			bean.setId( record.quotation_item_position_id );
-			bean.setQuotationItemZone( getQuotationItemZoneService().get(record.quotation_item_zone_id) );
+			bean.setQuotationItemZone( getQuotationItemZoneService().get( record.quotation_item_zone_id ) );
 			bean.setPositionCoordinateX( record.position_coordinate_x );
 			bean.setPositionCoordinateY( record.position_coordinate_y );
 			return bean;
 		}
-    	return NullValue();
+		return NullValue();
 	}
 
 }
