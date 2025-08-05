@@ -1,10 +1,10 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
-		var data   = [];
+		var data = [];
 
 		var result = super.getResult();
-        var dm = super.getDatamapper();
+		var dm     = super.getDatamapper();
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "quotation.search", params );
@@ -60,10 +60,10 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotation.create", [ quotation ] )
 		} else {
 			var bean = super.fire( "Quotation.get", [ rc.id ] );
-			if (json.status != bean.getStatus().getId()) {
-				quotation.setActive(0);
+			if ( json.status != bean.getStatus().getId() ) {
+				quotation.setActive( 0 );
 				super.fire( "quotation.update", [ quotation ] )
-				thisId = super.fire( "quotation.clone", [ quotation ] );
+				thisId    = super.fire( "quotation.clone", [ quotation ] );
 				messageId = "quotation.updated";
 			} else {
 				messageId = "quotation.updated";
