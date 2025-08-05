@@ -29,7 +29,7 @@
 		String str,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotation_item_product_id" } ]
+		required Array orderBy  = [ { field = "quotationItemProduct.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 

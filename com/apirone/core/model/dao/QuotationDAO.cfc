@@ -116,11 +116,13 @@
 			INSERT INTO quotations (
 				"description",
 				quotation_number,
+				version_number,
 				quotation_date,
 				notes,
 				validity_date,
 				opportunity_name,
 				lead_name,
+				active,
 				pricelist_id,
 				payment_method_id,
 				custom_payment_method,
@@ -134,11 +136,13 @@
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getDescription()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVersionNumber()#">,
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getQuotationDate()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNotes()#">,
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getValidityDate()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOpportunityName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLeadName()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getActive()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPricelist().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPaymentMethod().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomPaymentMethod()#">,
@@ -165,6 +169,8 @@
 				,
 				quotation_number = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getQuotationNumber()#">
 				,
+				version_number = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotation.getVersionNumber()#">
+				,
 				quotation_date = <cfqueryparam cfsqltype="DATE" value="#arguments.quotation.getQuotationDate()#">
 				,
 				notes = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getNotes()#">
@@ -174,6 +180,8 @@
 				opportunity_name = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getOpportunityName()#">
 				,
 				lead_name = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getLeadName()#">
+				,
+				active = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotation.getActive()#">
 				,
 				pricelist_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getPricelist().getId()#">::uuid
 				,

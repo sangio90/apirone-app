@@ -95,6 +95,7 @@
         <cfargument name="limit" required="false" type="Numeric" default="5">
         <cfargument name="primaryKey" required="false" type="String">
         <cfargument name="escluso" required="false" type="String">
+        <cfargument name="tipo" required="false" type="String">
 
         <cfset var safeTable = REReplace(arguments.tableName, "[^A-Za-z0-9_]", "", "all")>
         <cfset var whereClause = "">
@@ -104,7 +105,11 @@
             SELECT *
             FROM public.#safeTable#
             <cfif hasWhere>
-                WHERE #arguments.primaryKey# != <cfqueryparam cfsqltype="Varchar" value="#arguments.escluso#">::uuid
+                <cfif !isNull(arguments.tipo) and arguments.tipo EQ 'id'>
+                    WHERE #arguments.primaryKey# != <cfqueryparam cfsqltype="Numeric" value="#arguments.escluso#">
+                <cfelse>
+                    WHERE #arguments.primaryKey# != <cfqueryparam cfsqltype="Varchar" value="#arguments.escluso#">::uuid
+                </cfif>
             </cfif>
             ORDER BY RANDOM()
             LIMIT #arguments.limit#

@@ -27,7 +27,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String str,
 		required Numeric limit    = 15,
 		required Numeric offset   = 0,
-		required Array orderBy    = [ { field = "quotation_item_position_id" } ]
+		required Array orderBy    = [ { field = "quotationItemPosition.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 

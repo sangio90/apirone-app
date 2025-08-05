@@ -2,11 +2,13 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 
 	property name="description" type="String";
 	property name="quotationNumber" type="String";
+	property name="versionNumber" type="Numeric";
 	property name="quotationDate" type="Date";
 	property name="notes" type="String";
 	property name="validityDate" type="Date";
 	property name="opportunityName" type="String";
 	property name="leadName" type="String";
+	property name="active" type="Numeric";
 	property name="pricelist" type="com.apirone.core.model.bean.Pricelist";
 	property name="paymentMethod" type="com.apirone.core.model.bean.PaymentMethod";
 	property name="customPaymentMethod" type="String";

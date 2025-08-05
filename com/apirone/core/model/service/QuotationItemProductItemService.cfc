@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemProductItemDAO";
 	property name="QuotationItemProductService" inject="QuotationItemProductService";
+	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductItemService" inject="ProductItemService";
 	property name="cacheScope" type="String" default="QuotationItemProductItem.bean";
 
@@ -25,7 +26,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String str,
 		required Numeric limit    = 15,
 		required Numeric offset   = 0,
-		required Array orderBy    = [ { field = "quotation_item_product_item_id" } ]
+		required Array orderBy    = [ { field = "quotationItemProductItem.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
@@ -40,7 +41,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );
-		
+
 		return result;
 	}
 
@@ -87,7 +88,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setProductItem( getProductItemService().get(record.product_item_id) );
 
 			bean.setParent( 
-				isNull(record.parent_id) ? NullValue() : getQuotationItemProductService().get(record.parent_id) 
+				isNull(record.parent_id) ? NullValue() : getQuotationItemProductItemService().get(record.parent_id) 
 			);
 			return bean;
 		}

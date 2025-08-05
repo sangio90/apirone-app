@@ -1,6 +1,12 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationDAO";
+	property name="quotationSvc" inject="QuotationService";
+	property name="quotationItemSvc" inject="QuotationItemService";
+	property name="quotationItemProductSvc" inject="QuotationItemProductService";
+	property name="quotationItemProductItemSvc" inject="QuotationItemProductItemService";
+	property name="quotationItemZoneSvc" inject="QuotationItemZoneService";
+	property name="quotationItemPositionSvc" inject="QuotationItemPositionService";
 	property name="AccountService" inject="AccountService";
 	property name="ProfileService" inject="ProfileService";
 	property name="LangService" inject="LangService";
@@ -95,6 +101,188 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
+	public String function clone( required com.apirone.core.model.bean.Quotation quotation, required String status ){
+		var originalQuotation = arguments.quotation;
+		var clonedQuotation = duplicate(originalQuotation);
+		originalQuotation.setActive(0);
+		quotationSvc.update(originalQuotation);
+		clonedQuotation.setId( lcase(createUUID()));
+		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
+		var status = StatusService.get(status);
+		clonedQuotation.setStatus(status);
+
+		var newQuotationId = getDao().insert( clonedQuotation );
+		var quotationItems = quotationItemSvc.list(quotationId=originalQuotation.getId());
+		for (var quotationItem in quotationItems) {
+			var clonedItem = duplicate(quotationItem);
+			clonedItem.setQuotation(quotationSvc.get(newQuotationId));
+			clonedItem.setId(lcase(createUUID()));
+			var newQuotationItemId = quotationItemSvc.create( clonedItem );
+
+			//tutti i prodotti
+			var quotationProductItems = quotationItemProductSvc.list(quotationItemId=quotationItem.getId());
+			//solo i prodotti senza parent
+			var quotationItemProductsWithoutParent = ArrayFilter(quotationProductItems, function(quotationItemProduct) {
+				return IsNull(quotationItemProduct.getParent());
+			})
+			var quotationItemProductWithoutParentIdsMap = {};
+
+			//ciclo sui prodotti senza parent
+			for (var quotationItemProduct in quotationItemProductsWithoutParent) {
+				var clonedQuotationItemProduct = duplicate(quotationItemProduct);
+				clonedQuotationItemProduct.setId( javacast("null", "") );
+				clonedQuotationItemProduct.setQuotationItem(quotationItemSvc.get(newQuotationItemId));				
+				var newQuotationItemProductId = quotationItemProductSvc.create(clonedQuotationItemProduct);
+				clonedQuotationItemProduct = quotationItemProductSvc.get(newQuotationItemProductId);
+				//mappo l'id vecchio con l'id nuovo dei prodotti senza parent
+				quotationItemProductWithoutParentIdsMap[quotationItemProduct.getId()] = newQuotationItemProductId;
+
+				//tutti gli item del prodotto
+				var quotationItemProductItems = quotationItemProductItemSvc.list(quotationItemProductId=quotationItemProduct.getId());
+				//solo gli item senza parent del prodotto
+				var quotationItemProductItemsWithoutParent = ArrayFilter(quotationItemProductItems, function(quotationItemProductItem) {
+					return IsNull(quotationItemProductItem.getParent());
+				})
+				var quotationItemProductItemsWithoutParentIdsMap = {};
+
+				//ciclo sugli item senza parent del prodotto
+				for (var quotationItemProductItem in quotationItemProductItemsWithoutParent) {
+					var clonedQuotationItemProductItem = duplicate(quotationItemProductItem);
+					clonedQuotationItemProductItem.setId( javacast("null", "") );
+					clonedQuotationItemProductItem.setQuotationItemProduct(clonedQuotationItemProduct);
+					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(clonedQuotationItemProductItem);
+					clonedQuotationItemProductItem = quotationItemProductItemSvc.get(newQuotationItemProductItemId);
+					//mappo l'id vecchio con l'id nuovo degli item senza parent
+					quotationItemProductItemsWithoutParentIdsMap[quotationItemProductItem.getId()] = newQuotationItemProductItemId;
+				}
+
+				//solo gli item con parent del prodotto
+				var quotationItemProductItemsWithParent = ArrayFilter(quotationItemProductItems, function(quotationItemProductItem) {
+					return !IsNull(quotationItemProductItem.getParent());
+				})
+
+				//ciclo sugli item con parent del prodotto
+				for (var quotationItemProductItem in quotationItemProductItemsWithParent) {
+					var clonedQuotationItemProductItem = duplicate(quotationItemProductItem);
+					clonedQuotationItemProductItem.setId( javacast("null", "") );
+					clonedQuotationItemProductItem.setQuotationItemProduct(clonedQuotationItemProduct);
+					//recupero il nuovo id del parent dalla mappa
+					var newParentId = quotationItemProductItemsWithoutParentIdsMap[quotationItemProductItem.getParent().getId()];
+					clonedQuotationItemProductItem.setParent(quotationItemProductItemSvc.get(newParentId));
+					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(clonedQuotationItemProductItem);
+					clonedQuotationItemProductItem = quotationItemProductItemSvc.get(newQuotationItemProductItemId);
+				}
+			}
+
+			//solo i prodotti con parent
+			var quotationItemProductsWithParent = ArrayFilter(quotationProductItems, function(quotationItemProduct) {
+				return !IsNull(quotationItemProduct.getParent());
+			})
+
+			//ciclo sui prodotti con parent
+			for (var quotationItemProduct in quotationItemProductsWithParent) {
+				var clonedQuotationItemProduct = duplicate(quotationItemProduct);
+				clonedQuotationItemProduct.setId( javacast("null", "") );
+				clonedQuotationItemProduct.setQuotationItem(quotationItemSvc.get(newQuotationItemId));
+				//recupera il nuovo id del parent dalla mappa
+				var newParentId = quotationItemProductWithoutParentIdsMap[quotationItemProduct.getParent().getId()];
+				clonedQuotationItemProduct.setParent(quotationItemProductSvc.get(newParentId));
+				var newQuotationItemProductId = quotationItemProductSvc.create(clonedQuotationItemProduct);
+				clonedQuotationItemProduct = quotationItemProductSvc.get(newQuotationItemProductId);
+
+				//tutti gli item del prodotto
+				var quotationItemProductItems = quotationItemProductItemSvc.list(quotationItemProductId=quotationItemProduct.getId());
+				//solo gli item senza parent del prodotto
+				var quotationItemProductItemsWithoutParent = ArrayFilter(quotationItemProductItems, function(quotationItemProductItem) {
+					return IsNull(quotationItemProductItem.getParent());
+				})
+				var quotationItemProductItemsWithoutParentIdsMap = {};
+
+				//ciclo sugli item senza parent del prodotto
+				for (var quotationItemProductItem in quotationItemProductItemsWithoutParent) {
+					var clonedQuotationItemProductItem = duplicate(quotationItemProductItem);
+					clonedQuotationItemProductItem.setId( javacast("null", "") );
+					clonedQuotationItemProductItem.setQuotationItemProduct(clonedQuotationItemProduct);
+					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(clonedQuotationItemProductItem);
+					clonedQuotationItemProductItem = quotationItemProductItemSvc.get(newQuotationItemProductItemId);
+					//mappo l'id vecchio con l'id nuovo degli item senza parent
+					quotationItemProductItemsWithoutParentIdsMap[quotationItemProductItem.getId()] = newQuotationItemProductItemId;
+				}
+
+				//solo gli item con parent del prodotto
+				var quotationItemProductItemsWithParent = ArrayFilter(quotationItemProductItems, function(quotationItemProductItem) {
+					return !IsNull(quotationItemProductItem.getParent());
+				})
+
+				//ciclo sugli item con parent del prodotto
+				for (var quotationItemProductItem in quotationItemProductItemsWithParent) {
+					var clonedQuotationItemProductItem = duplicate(quotationItemProductItem);
+					clonedQuotationItemProductItem.setId( javacast("null", "") );
+					clonedQuotationItemProductItem.setQuotationItemProduct(clonedQuotationItemProduct);
+					//recupero il nuovo id del parent dalla mappa
+					var newParentId = quotationItemProductItemsWithoutParentIdsMap[quotationItemProductItem.getParent().getId()];
+					clonedQuotationItemProductItem.setParent(quotationItemProductItemSvc.get(newParentId));
+					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(clonedQuotationItemProductItem);
+					clonedQuotationItemProductItem = quotationItemProductItemSvc.get(newQuotationItemProductItemId);
+				}
+			}
+
+			//tutte le zone
+			var quotationItemZones = quotationItemZoneSvc.list(quotationItemId=quotationItem.getId());
+			//solo le zone senza parent
+			var quotationItemZonesWithoutParent = ArrayFilter(quotationItemZones, function(quotationItemZone) {
+				return IsNull(quotationItemZone.getParent());
+			})
+			var quotationZoneIdsMap = {};
+			for (var quotationItemZone in quotationItemZonesWithoutParent) {
+				var clonedQuotationItemZone = duplicate(quotationItemZone);
+				clonedQuotationItemZone.setId( javacast("null", "") );
+				clonedQuotationItemZone.setQuotationItem(quotationItemSvc.get(newQuotationItemId));				
+				var newQuotationItemZoneId = quotationItemZoneSvc.create(clonedQuotationItemZone);
+				clonedQuotationItemZone = quotationItemZoneSvc.get(newQuotationItemZoneId);
+				//mappo l'id vecchio con l'id nuovo delle zone senza parent
+				quotationZoneIdsMap[quotationItemZone.getId()] = newQuotationItemZoneId;
+
+				//clona le positions
+				var quotationItemPositions = quotationItemPositionSvc.list(zoneId=quotationItemZone.getId());
+				for (quotationItemPosition in quotationItemPositions) {
+					var clonedQuotationItemPosition = duplicate(quotationItemPosition);
+					clonedQuotationItemPosition.setQuotationItemZone(clonedQuotationItemZone);
+					quotationItemPositionSvc.create(clonedQuotationItemPosition);
+				}
+			}
+
+			//solo le zone con parent
+			var quotationItemZonesWithParent = ArrayFilter(quotationItemZones, function(quotationItemZone) {
+				return !IsNull(quotationItemZone.getParent());
+			})
+			for (var quotationItemZone in quotationItemZonesWithParent) {
+				var clonedQuotationItemZone = duplicate(quotationItemZone);
+				clonedQuotationItemZone.setId( javacast("null", "") );
+				clonedQuotationItemZone.setQuotationItem(quotationItemSvc.get(newQuotationItemId));
+				//recupera il nuovo id del parent dalla mappa
+				var newParentId = quotationZoneIdsMap[quotationItemZone.getParent().getId()];
+				clonedQuotationItemZone.setParent(quotationItemZoneSvc.get(newParentId));
+				var newQuotationItemZoneId = quotationItemZoneSvc.create(clonedQuotationItemZone);
+				clonedQuotationItemZone = quotationItemZoneSvc.get(newQuotationItemZoneId);
+				
+				//clona le positions
+				var quotationItemPositions = quotationItemPositionSvc.list(zoneId=quotationItemZone.getId());
+				for (quotationItemPosition in quotationItemPositions) {
+					var clonedQuotationItemPosition = duplicate(quotationItemPosition);
+					clonedQuotationItemPosition.setQuotationItemZone(clonedQuotationItemZone);
+					quotationItemPositionSvc.create(clonedQuotationItemPosition);
+				}
+			}
+		}
+
+		return newQuotationId;
+		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
+
+		return arguments.quotation;
+	}
+
+
 	/*
 		private method
 	*/
@@ -108,11 +296,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.quotation_id );
 			bean.setDescription( record.description );
 			bean.setQuotationNumber( record.quotation_number );
+			bean.setVersionNumber( record.version_number );
 			bean.setQuotationDate( record.quotation_date );
 			bean.setNotes( record.notes );
 			bean.setValidityDate( record.validity_date );
 			bean.setOpportunityName( record.opportunity_name );
 			bean.setLeadName( record.lead_name );
+			bean.setActive( record.active );
 			bean.setCustomPaymentMethod( record.custom_payment_method );
 
 			bean.setPricelist( 

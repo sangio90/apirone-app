@@ -148,4 +148,39 @@
         "name": "quotation_id",
         "type": "uuid"
     },
+
+    "quotationItem.id": {
+        "name": "quotation_item_id",
+        "type": "uuid"
+    },
+
+    "quotationItemProduct.id": {
+        "name": "quotation_item_product_id",
+        "type": "uuid"
+    },
+
+    "quotationItemProduct.productId": {
+        "name": "product_id",
+        "type": "uuid"
+    },
+
+    "quotationItemProductItem.id": {
+        "name": "quotation_item_product_item_id",
+        "type": "uuid"
+    },
+
+    "quotationItemProduct.parentId": {
+        "name": "parent_id",
+        "type": "uuid"
+    },
+
+    "quotationItemZone.id": {
+        "name": "quotation_item_zone_id",
+        "type": "uuid"
+    },
+
+    "quotationItemPosition.id": {
+        "name": "quotation_item_position_id",
+        "type": "uuid"
+    },
 }

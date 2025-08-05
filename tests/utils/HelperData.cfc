@@ -87,12 +87,12 @@ component extends="testbox.system.BaseSpec"{
             firstName = "fname",
             lastName = "lname",
             company = "name",
-            vatNumber = "string-number:11",
+            vatNumber = "string:11",
             email = "email",
             phone = "tel",
             state = "words:1",
             city = "words:1",
-            postalCode = "string-number:5",
+            postalCode = "string-numeric:5",
             street = function(param) {
                 return mock.lastName() & ' street, ' & mock.num(1, 100);
             },
@@ -119,7 +119,7 @@ component extends="testbox.system.BaseSpec"{
         var raw = mock.mock(
             $returnType = "struct",
             description = "words:4",
-            quotationNumber = "string-number:5",
+            quotationNumber = "string-numeric:5",
             quotationDate = "date",
             notes = "words:10",
             validityDate = "date",
@@ -133,6 +133,8 @@ component extends="testbox.system.BaseSpec"{
             createdAt = "datetime"
         );
 
+        raw.versionNumber = 1;
+        raw.active = 1;
         raw.pricelist = { id = random.getRandomByTableName(limit=1, tableName='pricelists').pricelist_id.toString() };
         raw.paymentMethod = { id = random.getRandomByTableName(limit=1, tableName='payment_methods').payment_method_id.toString() };
         raw.currency = { id = random.getRandomByTableName(limit=1, tableName='currencies').currency_id.toString() };
@@ -337,6 +339,33 @@ component extends="testbox.system.BaseSpec"{
             raw.quotationItemProduct = { id = quotationItemProductId };
         }
         raw.productItem = { id = random.getRandomByTableName(limit=1, tableName='product_items').product_item_id.toString() };
+
+        var bean = factory.createInstance( "QuotationItemProductItem", raw );
+
+        return  {
+            "obj" = bean,
+            "raw" = raw
+        }
+    }
+    
+    public Struct function createQuotationItemProductItem( required startWith="**" ) {
+        var mock = new modules.cbMockData.models.MockData();
+        var util = new com.apirone.core.util.String();
+        var factory = new com.apirone.core.model.factory.Factory();
+        var random = new tests.utils.DBRandomData();
+        var quotationItemProductId = structKeyExists(arguments, "quotationItemProductId") ? arguments.quotationItemProductId : null;
+        var quotationItemProductItemParentId = structKeyExists(arguments, "quotationItemProductItemParentId") ? arguments.quotationItemProductItemParentId : null;
+        var productItemEscluso = structKeyExists(arguments, "productItemEscluso") ? arguments.productItemEscluso : null;
+
+        var raw = mock.mock(
+            $returnType = "struct",
+            createdAt = "datetime"
+        );
+
+        raw.quotationItemProduct = { id = quotationItemProductId };
+        var productItemId = random.getRandomByTableName(limit=1, tableName='product_items', primaryKey='product_item_id', escluso=productItemEscluso, tipo='id').product_item_id.toString();
+        raw.productItem = { id = productItemId };
+        raw.parent = { id = quotationItemProductItemParentId };
 
         var bean = factory.createInstance( "QuotationItemProductItem", raw );
 

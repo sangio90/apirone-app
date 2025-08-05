@@ -40,7 +40,7 @@
                 <cfif !isNull( arguments.parentId )>
                     AND parent_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.parentId#">::uuid
                 </cfif>
-            ORDER BY #super.sanitizeSQL( arguments.orderB )#
+			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
 
             <cfif arguments.limit GT 0>
                 LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
