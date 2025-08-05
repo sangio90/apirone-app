@@ -8,7 +8,7 @@
 
         prc.jsScripts.add( "app-quotation" );
 
-        event.setView( "quotation/list-test" );
+        event.setView( "quotation/list" );
 
     }
 
