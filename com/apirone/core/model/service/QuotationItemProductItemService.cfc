@@ -77,7 +77,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.QuotationItemProductItem productItem ){
 		getDao().update( arguments.productItem );
 		super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
-		
+
 		return arguments.productItem.getId();
 	}
 

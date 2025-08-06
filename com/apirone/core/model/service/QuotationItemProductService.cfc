@@ -80,7 +80,7 @@
 	public String function update( required com.apirone.core.model.bean.QuotationItemProduct product ){
 		getDao().update( arguments.product );
 		super.getCacheManager().remove( getCacheScope(), arguments.product.getId() );
-		
+
 		return arguments.product.getId();
 	}
 
@@ -95,7 +95,7 @@
 			bean.setParent(
 				IsNull( record.parent_id ) ? NullValue() : getQuotationItemProductService().get( record.parent_id )
 			);
-			
+
 			return bean;
 		}
 		return NullValue();

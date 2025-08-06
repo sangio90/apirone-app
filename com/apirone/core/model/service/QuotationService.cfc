@@ -96,7 +96,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.Quotation quotation ){
 		getDao().update( arguments.quotation );
 		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
-		
+
 		return arguments.quotation.getId();
 	}
 
