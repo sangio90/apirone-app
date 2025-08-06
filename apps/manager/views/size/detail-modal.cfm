@@ -17,17 +17,16 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Codice</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" name="code"
+                                <input type="text" required class="form-control col-sm-4 uppercase" name="code"
                                     maxlength="3"
-                                    data-bind="value: detailForm.data.code"
-                                    onkeyup="this.value = this.value.toUpperCase()">
+                                    data-bind="value: detailForm.data.code">
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Descrizione</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control col-sm-4" name="name"
+                                <input type="text" class="form-control col-sm-4 uppercase" name="name"
                                     maxlength="125"
                                     data-bind="value: detailForm.data.mainText.name">
                             </div>
