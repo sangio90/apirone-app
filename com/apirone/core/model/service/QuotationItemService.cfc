@@ -75,11 +75,42 @@
 
 	public String function create( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 		var newId = getDao().insert( arguments.quotationItem );
+
+		transaction {
+			for ( var text in arguments.quotationItem.getTexts() ) {
+				var entity = super.bean( "Entity" );
+
+				entity.setKey( "quotationItem.id" );
+				entity.setValue( newId );
+
+				text.setEntity( entity );
+			}
+
+			getTextService().bulkCreate( arguments.quotationItem.getTexts() );
+		}
 		return newId;
 	}
 
 	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 		getDao().update( arguments.quotationItem );
+
+		var id = arguments.line.getId();
+
+		for ( var text in arguments.quotationItem.getTexts() ) {
+			var entity = super.bean( "Entity" )
+
+			entity.setKey( "quotationItem.id" );
+			entity.setValue( id );
+
+			text.setEntity( entity );
+
+			if ( Len( text.getId() ) ) {
+				getTextService().update( text );
+			} else {
+				getTextService().create( text );
+			}
+		}
+
 		super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
 		return arguments.quotationItem.getId();
 	}
@@ -94,6 +125,7 @@
 			bean.setPrice( record.price );
 			bean.setQuantity( record.quantity );
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
+			bean.setTexts( getTextService().list( quotationItemId = record.quotation_item_id ) );
 
 			return bean;
 		}

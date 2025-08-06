@@ -71,12 +71,44 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create( required com.apirone.core.model.bean.QuotationItemZone zone ){
 		var newId = getDao().insert( arguments.zone );
+
+		transaction {
+			for ( var text in arguments.zone.getTexts() ) {
+				var entity = super.bean( "Entity" );
+
+				entity.setKey( "quotationItemZone.id" );
+				entity.setValue( newId );
+
+				text.setEntity( entity );
+			}
+
+			getTextService().bulkCreate( arguments.zone.getTexts() );
+		}
 		return newId;
 	}
 
 	public String function update( required com.apirone.core.model.bean.QuotationItemZone zone ){
 		getDao().update( arguments.zone );
+
+		var id = arguments.line.getId();
+
+		for ( var text in arguments.zone.getTexts() ) {
+			var entity = super.bean( "Entity" )
+
+			entity.setKey( "quotationItemZone.id" );
+			entity.setValue( id );
+
+			text.setEntity( entity );
+
+			if ( Len( text.getId() ) ) {
+				getTextService().update( text );
+			} else {
+				getTextService().create( text );
+			}
+		}
+
 		super.getCacheManager().remove( getCacheScope(), arguments.zone.getId() );
+		
 		return arguments.zone.getId();
 	}
 
@@ -91,6 +123,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setParent(
 				IsNull( record.parent_id ) ? NullValue() : getQuotationItemZoneService().get( record.parent_id )
 			);
+			bean.setTexts( getTextService().list( zoneId = record.quotation_item_zone_id ) );
 
 			return bean;
 		}

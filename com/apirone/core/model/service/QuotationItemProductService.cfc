@@ -73,11 +73,43 @@
 
 	public String function create( required com.apirone.core.model.bean.QuotationItemProduct product ){
 		var newId = getDao().insert( arguments.product );
+
+		transaction {
+			for ( var text in arguments.product.getTexts() ) {
+				var entity = super.bean( "Entity" );
+
+				entity.setKey( "quotationItemProduct.id" );
+				entity.setValue( newId );
+
+				text.setEntity( entity );
+			}
+
+			getTextService().bulkCreate( arguments.product.getTexts() );
+		}
+
 		return newId;
 	}
 
 	public String function update( required com.apirone.core.model.bean.QuotationItemProduct product ){
 		getDao().update( arguments.product );
+
+		var id = arguments.line.getId();
+
+		for ( var text in arguments.product.getTexts() ) {
+			var entity = super.bean( "Entity" )
+
+			entity.setKey( "quotationItemProduct.id" );
+			entity.setValue( id );
+
+			text.setEntity( entity );
+
+			if ( Len( text.getId() ) ) {
+				getTextService().update( text );
+			} else {
+				getTextService().create( text );
+			}
+		}
+
 		super.getCacheManager().remove( getCacheScope(), arguments.product.getId() );
 		return arguments.product.getId();
 	}
@@ -93,6 +125,7 @@
 			bean.setParent(
 				IsNull( record.parent_id ) ? NullValue() : getQuotationItemProductService().get( record.parent_id )
 			);
+			bean.setTexts( getTextService().list( productId = record.quotation_item_product_id ) );
 			return bean;
 		}
 		return NullValue();
