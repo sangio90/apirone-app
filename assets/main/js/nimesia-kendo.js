@@ -81,25 +81,26 @@ NM.kendo.toggleScrollbar = function( event ) {
 
     gridWrapper.addClass( "no-scrollbar" );
 
-    var $chkboxes = $( ".form-check-input" );
+    var grid = $( "#" + ele );
+
+    var checkboxes = grid.find( ".form-check-input" );
     var lastChecked = null;
 
-    $( "#" + ele + " .form-check-input" ).click( function( e ) {
+    checkboxes.click( function( e ) {
         if ( !lastChecked ) {
             lastChecked = this;
             return;
         }
 
         if ( e.shiftKey ) {
-            var start = $chkboxes.index( this );
-            var end = $chkboxes.index( lastChecked );
+            var start = checkboxes.index( this );
+            var end = checkboxes.index( lastChecked );
 
-            $chkboxes.slice( Math.min( start, end ), Math.max( start, end )+ 1 ).prop( "checked", lastChecked.checked );
+            checkboxes.slice( Math.min( start, end ), Math.max( start, end )+ 1 ).prop( "checked", lastChecked.checked );
         }
 
         lastChecked = this;
     } );
-
 
 };
 

@@ -159,7 +159,7 @@
         salt="a1"
         type="js">
 
-        <script src="/assets/main/js/nimesia-kendo.js"></script>
+        <script src="/assets/#prc.staticVersion#/main/js/nimesia-kendo.js"></script>
         <script src="/assets/#prc.staticVersion#/main/js/nimesia-util.js"></script>
 
         <script src="/assets/#prc.staticVersion#/manager/js/app.js"></script>
