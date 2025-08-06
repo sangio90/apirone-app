@@ -64,61 +64,52 @@
                                     <div class="col-sm-12">
 
                                         <p>
-                                            - <a href=""
-                                                class="underline"
-                                                data-type="product"
-
+                                            - <a href="" class="underline" 
+                                                data-type="product" 
                                                 data-product-id="#rc.id#"
-                                                data-product-name="#prc.subtitle# / #prc.title#"
-
-                                                    data-bind="click: openComponentsList">
-                                                        Componenti base per questo articolo &raquo;
-                                                    </a>
+                                                data-product-name="#prc.textLink#"
+                                                data-bind="click: openComponentsList">
+                                                    #prc.textLink# &raquo;
+                                                </a>
+                                                
                                                 <br>
-                                                - <a href=""
-                                                    class="underline"
-                                                    data-type="product"
 
+                                                <cfif prc.product.getCategory().getMode().getId() <> "BAS">
+                                                    - <a href="" class="underline" data-type="lineSize"
+                                                        data-size-id="#prc.size.getId()#"
+                                                        data-size-name="#prc.size.getCode()#"
+                                                        data-line-id="#prc.line.getId()#"
+                                                        data-line-name="#prc.line.getName()#"
+                                                        data-bind="click:openComponentsList">
+                                                            Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
+                                                        </a>
+                                                    
+                                                    <br>
+                                                </cfif>
 
-
-                                                    data-bind="click: openReorderingModal">
-                                                Riordina attributi &raquo;
-                                            </a>
+                                            - <a href="" class="underline"
+                                                data-type="product"
+                                                data-bind="click: openReorderingModal">
+                                                    Riordina attributi &raquo;
+                                                </a>
 
                                             <br>
 
                                             <cfif prc.product.getCategory().getMode().getId() <> "BAS">
 
-                                                - <a href=""
-                                                    class="underline"
-                                                    data-type="lineSize"
-
-                                                    data-size-id="#prc.size.getId()#"
-                                                    data-size-name="#prc.size.getCode()#"
-
-                                                    data-line-id="#prc.line.getId()#"
-                                                    data-line-name="#prc.line.getName()#"
-                                                    data-bind="click:openComponentsList">
-                                                        Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
-                                                    </a>
-                                                
-                                                <br>
-
-                                                - <a href=""
-                                                    class="underline"
+                                                - <a href="" class="underline"
                                                     data-type="product"
                                                     data-bind="click:openImagesList">
                                                         Aggiungi immagini per questo articolo &raquo;
-                                                </a>
+                                                    </a>
 
                                                 <br>
 
-                                                - <a href="/manager/products/#rc.id#/combinations"
-                                                    class="underline"
+                                                - <a href="/manager/products/#rc.id#/combinations" class="underline"
                                                     data-type="product"
                                                     data-bind="click:open">
                                                         Tutte le combinazioni &raquo;
-                                                </a>
+                                                    </a>
 
                                             </cfif>
                                         </p>

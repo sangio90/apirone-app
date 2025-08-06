@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( IsNull( product ) ) {
 			// TODO: better than this
-			event.renderData( data = "<h2>Articolo non trovato</h2>" );
+			event.renderData( data = "<h3>Articolo non trovato</h3>" );
 			return;
 		}
 
@@ -24,9 +24,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		) {
 			prc.title    = product.getName();
 			prc.subtitle = product.getCategory().getName();
+			prc.textLink = product.getCategory().getName() & " / " & product.getName();
 		} else {
 			prc.title    = "Finitura #product.getFinish().getName()#, dimensione #product.getSize().getCode()#";
 			prc.subtitle = "#product.getCategory().getName()#, Linea #product.getLine().getName()#";
+			prc.textLink = "Componenti per #product.getLine().getName()# / #product.getSize().getCode()# / #product.getFinish().getName()#";
 
 			prc.sizes      = super.fire( "size.list", { lineId = prc.line.getId() } );
 			prc.statusList = super.fire( "status.list", [ "line" ] );

@@ -18,7 +18,7 @@
             <td>
                 <div data-bind="source: categories" data-template="product-category-row-tmpl"></div>
             </td>
-            <td>
+            <td class="text-end">
                 <span data-bind="text: fruitsCount"></span>
             </td>
             <td>
