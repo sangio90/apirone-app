@@ -71,18 +71,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function create( required com.apirone.core.model.bean.QuotationItemPosition position ){
 		var newId = getDao().insert( arguments.position );
 
-		transaction {
-			for ( var text in arguments.position.getTexts() ) {
-				var entity = super.bean( "Entity" );
-
-				entity.setKey( "quotationItemPosition.id" );
-				entity.setValue( newId );
-
-				text.setEntity( entity );
-			}
-
-			getTextService().bulkCreate( arguments.position.getTexts() );
-		}
 		return newId;
 	}
 
