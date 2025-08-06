@@ -52,17 +52,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				component.setSize( size.setId( rc.sizeId ) );
 
 				break;
-
-				/*
-            case "fruit":
-
-                var component = super.bean("ComponentFruit");
-                var fruit = super.bean("fruit");
-
-                component.setFruit( fruit.setId( rc.fruitId ) );
-
-                break;
-                */
 			case "attributeValue":
 				var component = super.bean( "ComponentAttributeValue" );
 				var value     = super.bean( "AttributeValue" );
@@ -105,18 +94,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				if ( Len( thisComponent.override.id ) ) {
 					super.fire( "ComponentOverride.update", [ override ] );
-					cffile(
-						action = "APPEND",
-						file   = "#ExpandPath( "/debug.log" )#",
-						output = "#Now()# override: create: #thisComponent.override.id#"
-					);
 				} else {
 					super.fire( "ComponentOverride.create", [ override ] );
-					cffile(
-						action = "APPEND",
-						file   = "#ExpandPath( "/debug.log" )#",
-						output = "#Now()# override: update: #thisComponent.override.id#"
-					);
 				}
 			} else {
 				var color      = super.bean( "Color" );
