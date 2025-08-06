@@ -198,32 +198,32 @@ INSERT INTO
     )
 VALUES
     (
-        E'ACC',
-        E'Accessori',
+        E 'ACC',
+        E 'Accessori',
         40,
-        E'2025-07-17 13:11:55',
-        E'ACT'
+        E '2025-07-17 13:11:55',
+        E 'ACT'
     ),
     (
-        E'FRU',
-        E'Frutti',
+        E 'FRU',
+        E 'Frutti',
         20,
-        E'2025-07-17 13:12:01',
-        E'ACT'
+        E '2025-07-17 13:12:01',
+        E 'ACT'
     ),
     (
-        E'PLA',
-        E'Placche',
+        E 'PLA',
+        E 'Placche',
         10,
-        E'2025-07-17 13:12:49',
-        E'ACT'
+        E '2025-07-17 13:12:49',
+        E 'ACT'
     ),
     (
-        E'SEG',
-        E'Segnaletica',
+        E 'SEG',
+        E 'Segnaletica',
         30,
-        E'2025-07-17 13:12:54',
-        E'ACT'
+        E '2025-07-17 13:12:54',
+        E 'ACT'
     );
 
 ALTER TABLE public.product_categories
