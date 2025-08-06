@@ -3,6 +3,40 @@
 <cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
+<cfquery name="j" datasource="verticale">
+    SELECT *
+    FROM azapi_codvar AS codvar 
+        INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod 
+    WHERE 1=1 
+        AND comvar.cbcodart = 'MATARMINO' 
+    --ORDER BY arcodart 
+</cfquery>
+<cfdump var="#j#">
+
+<cfabort>
+
+<cfquery name="k" datasource="verticale">
+    SELECT TOP 20
+      *
+    FROM
+    azapi_listin
+    order by 1
+</cfquery>
+
+<cfquery name="j" datasource="verticale">
+    SELECT TOP 20
+      *
+    FROM
+    azapi_deflis
+    order by 1
+</cfquery>
+
+<cfdump var="#j#">
+<cfdump var="#k#">
+<!--- listino acquisto in dollari  ---->
+<cfabort>
+
+
 <cfset art = "MATLASOTTGREZZO,MATLASOTTCRUDO,MATLASFENIX,MATLASPLAPOLIST,LAV-PULSATINA">
 
         <cfquery name="n" datasource="verticale" result="result">
