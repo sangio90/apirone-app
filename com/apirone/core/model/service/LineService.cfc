@@ -85,6 +85,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required Numeric categoryId
 	){
 		// recursive function to create product items
+
+		var productService   = getProductService();
+		var componentService = getComponentService();
+
 		function createProductItem(
 			required String productId,
 			required Struct productItem,
@@ -94,18 +98,42 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var newProductItemId = getProductItemService().create( arguments.productItem );
 
-			var components = getComponentService().list( productItemId = arguments.productItem.getId() );
-
-			// getLogger().debug( "createProductItem, clone: found components: #components.len()# for productItem [#arguments.productItem.getId()#]" );
-
+			// **
 			// duplicate components of productItem
-			for ( var component in components ) {
-				var newComponent = Duplicate( component );
+			// **
 
-				newComponent.setId( "" );
-				newComponent.getProductItem().setId( newProductItemId );
+			var components = componentService.list(
+				productItemId                  = arguments.productItem.getId(),
+				includeBaseAttributeComponents = true
+			);
 
-				getComponentService().create( newComponent );
+			// TODO: move this logic tu ComponentService
+			// We have in ComponentAjaxController too
+			for ( var thisComponent in components ) {
+				getLogger().debug( "Override [#thisComponent.getId()#] typeId [#thisComponent.getTypeId()#]" );
+
+				// **
+				// override components
+				// **
+
+				if ( thisComponent.getTypeId() == "base" ) {
+					var overrideBean = super.bean( "ComponentOverride" );
+
+					overrideBean.setId( "" );
+					overrideBean.setDeleted( thisComponent.getOverride().getDeleted() );
+					overrideBean.setQuantity( thisComponent.getOverride().getQuantity() );
+					overrideBean.setComponentId( thisComponent.getId() );
+					overrideBean.setProductItemId( newProductItemId );
+
+					getComponentOverrideService().create( overrideBean );
+				} else {
+					var newComponent = Duplicate( thisComponent );
+
+					newComponent.setId( "" );
+					newComponent.getProductItem().setId( newProductItemId );
+
+					componentService.create( newComponent );
+				}
 			}
 
 			if ( arguments.productItem.getChildren().len() ) {
@@ -121,7 +149,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		var productService = getProductService();
+
 
 		productService.deleteAllByParams( lineId = toLineId, categoryId = categoryId );
 
