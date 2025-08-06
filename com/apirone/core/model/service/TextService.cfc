@@ -192,6 +192,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return entity;
 		}
 
+		if ( Len( record.font_id ) ) {
+			entity.setKey( "font.id" );
+			entity.setValue( record.font_id );
+
+			return entity;
+		}
+
 		getLogger().error( "No entity linked to this translation. Text Id: [#record.text_id#]" );
 
 		/*
