@@ -29,7 +29,7 @@
 		<cfargument name="productCategoryId" type="Numeric">
 		<cfargument name="sizeId" type="String">
 		<cfargument name="productId" type="String">
-		<cfargument name="fontId" type="String">
+		<cfargument name="fontId" type="Numeric">
 
 		<cfargument name="fromDate" type="Date">
 		<cfargument name="toDate" type="Date">
