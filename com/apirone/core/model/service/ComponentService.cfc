@@ -5,8 +5,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="rawProductService" inject="RawProductService";
 	property name="variantService" inject="VariantService";
 	property name="colorService" inject="ColorService";
+	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
-	property name="ComponentOverrideService" inject="ComponentOverrideService";
+	property name="componentOverrideService" inject="ComponentOverrideService";
 
 	property name="cacheScope" type="String" default="Component.bean";
 
@@ -172,14 +173,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.componentId );
 
 		if ( record.recordCount ) {
+			// TODO: factory for all Component*
 			var bean = super.bean( "Component" );
 
-			// TODO: facrory for all Component*
 			if ( Len( record.product_item_id ) ) {
-				bean            = super.bean( "ComponentProductItem" );
-				var productItem = super.bean( "ProductItem" );
-
+				bean = super.bean( "ComponentProductItem" );
 				bean.setProductItem( getProductItemService().get( record.product_item_id ) );
+			}
+
+			if ( Len( record.product_id ) ) {
+				bean = super.bean( "ComponentProduct" );
+				bean.setProduct( getProductService().get( record.product_id ) );
+			}
+
+			if ( Len( record.line_id ) AND Len( record.size_id ) ) {
+				bean = super.bean( "ComponentLineSize" );
+
+				bean.setLine( getLineService().get( record.line_id ) );
+				bean.setSize( getSizeService().get( record.size_id ) );
 			}
 
 			bean.setId( record.component_id );
