@@ -128,8 +128,16 @@ AP.lineCategory.list = ( function() {
                 note: redirect in controller to first product
             */
 
+
             var id = event.data.id;
-            window.open( "/manager/lines/" + id + "/attributes", "_blank" ).focus();
+            var categoryId = fields.listRoot.find( "[name=categoryId]" ).val();
+
+            console.log( "attributes clicked", id, categoryId );
+
+
+            window.open( "/manager/lines/" + id + "/categories/" + categoryId + "/attributes", "_blank" ).focus();
+
+            // window.open( "/manager/lines/" + id + "/attributes", "_blank" ).focus();
 
             return false;
         },
