@@ -1,12 +1,10 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
 	<cffunction name="read">
-		
 		<cfargument name="fontId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT 
-				font_id::varchar, 
+			SELECT
+				font_id::varchar,
 				*
 			FROM
 				fonts
@@ -18,14 +16,13 @@
 	</cffunction>
 
 	<cffunction returntype="Query" name="find">
-
 		<cfargument name="str" type="String">
 		<cfargument name="orderby" required="true" type="String" default="fonts.code">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT 
+			SELECT
 				font_id::varchar,
 				COUNT(font_id) OVER() AS total
 			FROM
