@@ -10,6 +10,8 @@ CREATE TABLE fonts (
   created_at timestamp DEFAULT now()
 );
 
+ALTER TABLE fonts OWNER TO apiruser;
+
 ALTER TABLE texts
 ADD COLUMN font_id integer;
 
