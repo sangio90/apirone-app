@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 
-		var params = getParams( typeId = rc.by, rc = rc );
+		var params = convertParams( typeId = rc.by, rc = rc );
 
 		var items = super.fire( "component.list", params );
 
@@ -80,17 +80,12 @@ component extends="com.apirone.core.controller.AbsController" {
 			if ( thisComponent.typeId == "base" ) {
 				var override = super.bean( "ComponentOverride" );
 
+
 				override.setId( thisComponent.override.id );
 				override.setDeleted( thisComponent.override.deleted );
 				override.setQuantity( thisComponent.override.quantity );
 				override.setComponentId( thisComponent.id );
 				override.setProductItemId( component.getProductItem().getId() );
-
-				cffile(
-					action = "APPEND",
-					file   = "#ExpandPath( "/debug.log" )#",
-					output = "#Now()# override: #thisComponent.override.id#"
-				);
 
 				if ( Len( thisComponent.override.id ) ) {
 					super.fire( "ComponentOverride.update", [ override ] );
@@ -183,7 +178,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		return row;
 	}
 
-	private function getParams( required String typeId, required Struct rc ){
+	private function convertParams( required String typeId, required Struct rc ){
 		var params = {}
 
 		switch ( arguments.typeId ) {
@@ -201,9 +196,11 @@ component extends="com.apirone.core.controller.AbsController" {
 				break;
 			case "fruit":
 				params = { fruitId = rc.fruitId };
+				getLogger().debug( "ComponentAjaxController.convertParams: typeId: 'fruit'. Remove this line" );
 				break;
 			case "fruitItem":
 				params = { fruitProductItemId = rc.itemId };
+				getLogger().debug( "ComponentAjaxController.convertParams: typeId: 'fruitItem'. Remove this line" );
 				break;
 			case "attributeValue":
 				params = {
