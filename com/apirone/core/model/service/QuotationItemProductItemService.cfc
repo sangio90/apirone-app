@@ -71,43 +71,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function create( required com.apirone.core.model.bean.QuotationItemProductItem productItem ){
 		var newId = getDao().insert( arguments.productItem );
 
-		transaction {
-			for ( var text in arguments.productItem.getTexts() ) {
-				var entity = super.bean( "Entity" );
-
-				entity.setKey( "quotationItemProductItem.id" );
-				entity.setValue( newId );
-
-				text.setEntity( entity );
-			}
-
-			getTextService().bulkCreate( arguments.productItem.getTexts() );
-		}
-
 		return newId;
 	}
 
 	public String function update( required com.apirone.core.model.bean.QuotationItemProductItem productItem ){
 		getDao().update( arguments.productItem );
-
-		var id = arguments.line.getId();
-
-		for ( var text in arguments.productItem.getTexts() ) {
-			var entity = super.bean( "Entity" )
-
-			entity.setKey( "quotationItemProductItem.id" );
-			entity.setValue( id );
-
-			text.setEntity( entity );
-
-			if ( Len( text.getId() ) ) {
-				getTextService().update( text );
-			} else {
-				getTextService().create( text );
-			}
-		}
-
 		super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
+		
 		return arguments.productItem.getId();
 	}
 
@@ -126,7 +96,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					record.parent_id
 				)
 			);
-			bean.setTexts( getTextService().list( productItemId = record.quotation_item_product_item_id ) );
 			return bean;
 		}
 		return NullValue();

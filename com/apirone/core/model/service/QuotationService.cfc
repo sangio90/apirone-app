@@ -89,44 +89,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function create( required com.apirone.core.model.bean.Quotation quotation ){
 		var newId = getDao().insert( arguments.quotation );
 
-		transaction {
-			for ( var text in arguments.quotation.getTexts() ) {
-				var entity = super.bean( "Entity" );
-
-				entity.setKey( "quotation.id" );
-				entity.setValue( newId );
-
-				text.setEntity( entity );
-			}
-
-			getTextService().bulkCreate( arguments.quotation.getTexts() );
-		}
 		return newId;
 	}
 
 
 	public String function update( required com.apirone.core.model.bean.Quotation quotation ){
 		getDao().update( arguments.quotation );
-
-		var id = arguments.line.getId();
-
-		for ( var text in arguments.quotation.getTexts() ) {
-			var entity = super.bean( "Entity" )
-
-			entity.setKey( "quotation.id" );
-			entity.setValue( id );
-
-			text.setEntity( entity );
-
-			if ( Len( text.getId() ) ) {
-				getTextService().update( text );
-			} else {
-				getTextService().create( text );
-			}
-		}
-
 		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
-
+		
 		return arguments.quotation.getId();
 	}
 
@@ -371,7 +341,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setShippingProfile( getProfileService().get( record.shipping_profile_id ) );
 			bean.setSalesAgentAccount( getAccountService().get( record.sales_agent_account_id ) );
 			bean.setGraphicTechnicianAccount( getAccountService().get( record.graphic_technician_account_id ) );
-			bean.setTexts( getTextService().list( quotationId = record.quotation_id ) );
 
 			return bean;
 		}

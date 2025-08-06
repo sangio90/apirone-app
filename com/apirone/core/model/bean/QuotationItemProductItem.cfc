@@ -1,4 +1,4 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="quotationItemProduct" type="com.apirone.core.model.bean.QuotationItemProduct";
 	property name="productItem" type="com.apirone.core.model.bean.ProductItem";

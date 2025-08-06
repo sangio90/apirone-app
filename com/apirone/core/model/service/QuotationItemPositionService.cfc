@@ -89,23 +89,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.QuotationItemPosition position ){
 		getDao().update( arguments.position );
 
-		var id = arguments.line.getId();
-
-		for ( var text in arguments.position.getTexts() ) {
-			var entity = super.bean( "Entity" )
-
-			entity.setKey( "quotationItemPosition.id" );
-			entity.setValue( id );
-
-			text.setEntity( entity );
-
-			if ( Len( text.getId() ) ) {
-				getTextService().update( text );
-			} else {
-				getTextService().create( text );
-			}
-		}
-
 		super.getCacheManager().remove( getCacheScope(), arguments.position.getId() );
 		return arguments.position.getId();
 	}
@@ -118,7 +101,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setQuotationItemZone( getQuotationItemZoneService().get( record.quotation_item_zone_id ) );
 			bean.setPositionCoordinateX( record.position_coordinate_x );
 			bean.setPositionCoordinateY( record.position_coordinate_y );
-			bean.setTexts( getTextService().list( positionId = record.quotation_item_position_id ) );
 			return bean;
 		}
 		return NullValue();
