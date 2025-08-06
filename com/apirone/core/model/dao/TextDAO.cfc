@@ -8,6 +8,7 @@
 				product_id::varchar,
 				finish_id::varchar,
 				attribute_id::varchar,
+				font_id::varchar,
 				*
 			FROM texts
 			WHERE text_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.textId#">
@@ -28,6 +29,7 @@
 		<cfargument name="productCategoryId" type="Numeric">
 		<cfargument name="sizeId" type="String">
 		<cfargument name="productId" type="String">
+		<cfargument name="fontId" type="String">
 
 		<cfargument name="fromDate" type="Date">
 		<cfargument name="toDate" type="Date">
@@ -101,6 +103,10 @@
 
 			<cfif !IsNull( arguments.productId )>
 				AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+			</cfif>
+
+			<cfif !IsNull( arguments.fontId )>
+				AND font_id = <cfqueryparam cfsqltype="Integer" value="#arguments.fontId#">
 			</cfif>
 
 			<cfif !IsNull( arguments.fromDate )>

@@ -398,6 +398,28 @@ component extends="testbox.system.BaseSpec"{
 
     }
 
+    public Struct function createFont(  ) {
+        var mock = new modules.cbMockData.models.MockData();
+        var random = new tests.utils.DBRandomData();
+        var util = new com.apirone.core.util.String();
+        var factory = new com.apirone.core.model.factory.Factory();
+        var raw = mock.mock(
+            $returnType = "struct",
+            code = "string:5",
+            directory = "imageurl",
+            createdAt = "datetime"
+        );
+        var dimensionValue = randRange(100, 1000) / 100.0;
+        raw.dimension = dimensionValue;
+        var bean = factory.createInstance( "Font", raw );
+
+        return  {
+            "obj" = bean,
+            "raw" = raw
+        }
+
+    }
+
     public Struct function createFile(  ) {
 
         var raw = {};

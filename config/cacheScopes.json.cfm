@@ -4,6 +4,7 @@
     "AttributeValue.bean": {},
     "Country.bean": {},
     "Color.bean": {},
+    "Font.bean": {},
     "Product.bean": {},
     "Profile.bean": {},
     "Quotation.bean": {},
