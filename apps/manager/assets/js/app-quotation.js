@@ -14,14 +14,14 @@ $( document ).ready( function() {
 
 AP.quotation.list = ( function() {
     var pub = {};
-    
+
     var dataSources = {
-        items: NM.kendo.dataSource({url: "/manager/ajax/quotations"}),
+        items: NM.kendo.dataSource( { url: "/manager/ajax/quotations" } ),
     };
 
     var fields = AP.quotation.fields;
 
-    var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         rows: dataSources.items,
 
         search: function( event ) {
@@ -55,7 +55,7 @@ AP.quotation.list = ( function() {
             }
 
             if ( params.fromDate.length ) {
-                var fromDateObject = new Date(params.fromDate)
+                var fromDateObject = new Date( params.fromDate );
                 filters.push( {
                     field: "quotationDate",
                     operator: "gte",
@@ -64,7 +64,7 @@ AP.quotation.list = ( function() {
             }
 
             if ( params.toDate.length ) {
-                var toDateObject = new Date(params.toDate)
+                var toDateObject = new Date( params.toDate );
                 filters.push( {
                     field: "quotationDate",
                     operator: "lte",
@@ -78,24 +78,24 @@ AP.quotation.list = ( function() {
 
             return false;
         }
-    });
+    } );
 
     pub.init = function() {
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 
-        dataSources.items.fetch(function () {
+        dataSources.items.fetch( function() {
             var rawData = dataSources.items.data();
 
-            rawData.forEach(function (q) {
-                if (q.quotationDate) {
-                    q.quotationDate = new Date(q.quotationDate);
+            rawData.forEach( function( q ) {
+                if ( q.quotationDate ) {
+                    q.quotationDate = new Date( q.quotationDate );
                 }
-            });
+            } );
 
-            viewModel.set("rows", new kendo.data.DataSource({
+            viewModel.set( "rows", new kendo.data.DataSource( {
                 data: rawData
-            }));
-        });
+            } ) );
+        } );
     };
 
     return pub;

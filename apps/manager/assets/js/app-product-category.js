@@ -1,19 +1,19 @@
 AP.productCategory = AP.productCategory || {};
 
 AP.productCategory.fields = {
-    listRoot: $("#product-category-list-root"),
-    searchForm: $("#product-category-grid-search-form"),
-    detailRoot: $("#product-category-detail-modal"),
-    detailForm: $("#product-category-detail-form"),
+    listRoot: $( "#product-category-list-root" ),
+    searchForm: $( "#product-category-grid-search-form" ),
+    detailRoot: $( "#product-category-detail-modal" ),
+    detailForm: $( "#product-category-detail-form" ),
 };
 
-$(document).ready(function () {
-    if (AP.productCategory.fields.listRoot.length) {
+$( document ).ready( function() {
+    if ( AP.productCategory.fields.listRoot.length ) {
         AP.productCategory.list.init();
     }
-});
+} );
 
-AP.productCategory.list = (function () {
+AP.productCategory.list = ( function() {
     var pub = {};
     var fields = AP.productCategory.fields;
 
@@ -47,50 +47,50 @@ AP.productCategory.list = (function () {
     };
 
     var dataSources = {
-        items: NM.kendo.dataSource({ url: "/manager/ajax/product-categories" }),
+        items: NM.kendo.dataSource( { url: "/manager/ajax/product-categories" } ),
     };
 
-    var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
         rows: dataSources.items,
 
-        search: function (event) {
+        search: function( event ) {
             var thisForm = fields.searchForm;
 
             var params = thisForm.serializeJSON();
 
-            viewModel.rows.read(params);
+            viewModel.rows.read( params );
 
             return false;
         },
 
-        resetForm: function () {
+        resetForm: function() {
             var detailForm = fields.detailForm;
 
             var validator = detailForm.validate();
             validator.resetForm();
 
-            detailForm.find(".status").html("");
+            detailForm.find( ".status" ).html( "" );
 
-            viewModel.set("detailForm", defaultDetailForm);
+            viewModel.set( "detailForm", defaultDetailForm );
         },
 
-        save: function (event) {
+        save: function( event ) {
             var detailForm = fields.detailForm;
-            var status = detailForm.find(".status");
+            var status = detailForm.find( ".status" );
 
             status.html(
                 "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
             );
 
-            if (detailForm.valid()) {
-                NM.util.ajax({
+            if ( detailForm.valid() ) {
+                NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/product-categories",
-                    data: JSON.stringify(viewModel.get("detailForm.data")),
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
-                        done: function (xhr) {
-                            if (xhr.status == "SUCCESS") {
+                        done: function( xhr ) {
+                            if ( xhr.status == "SUCCESS" ) {
                                 viewModel.rows.read();
 
                                 NM.util.autoHideMessage(
@@ -99,60 +99,60 @@ AP.productCategory.list = (function () {
                                 );
 
                                 setTimeout(
-                                    () => $("#line-detail-modal").modal("hide"),
+                                    () => $( "#line-detail-modal" ).modal( "hide" ),
                                     1000,
                                 );
                             }
                         },
                     },
-                });
+                } );
             }
 
             return false;
         },
 
-        new: function () {
+        new: function() {
             viewModel.resetForm();
 
-            NM.util.openModal(fields.detailRoot);
+            NM.util.openModal( fields.detailRoot );
         },
 
-        edit: function (event) {
+        edit: function( event ) {
             viewModel.resetForm();
 
-            viewModel.set("detailForm.data", event.data);
+            viewModel.set( "detailForm.data", event.data );
             viewModel.set(
                 "detailForm.title",
                 "Modifica categoria <" + event.data.code + " >",
             );
 
-            NM.util.openModal(fields.detailRoot);
+            NM.util.openModal( fields.detailRoot );
 
             return false;
         },
 
-        delete: function (event) {
-            var checks = $("#product-category-grid").find(
+        delete: function( event ) {
+            var checks = $( "#product-category-grid" ).find(
                 "[name=selected]:checked",
             );
 
-            if (checks.length) {
+            if ( checks.length ) {
                 var values = [];
 
-                checks.each(function () {
-                    values.push($(this).val());
-                });
+                checks.each( function() {
+                    values.push( $( this ).val() );
+                } );
 
                 var ids = values.toString();
 
-                NM.util.ajax({
+                NM.util.ajax( {
                     method: "DELETE",
                     url: "/manager/ajax/product-categories",
                     data: ids,
                     callback: {
-                        done: function (xhr) {
-                            console.log(xhr);
-                            if (xhr.data.payload.hasOwnProperty("errors")) {
+                        done: function( xhr ) {
+                            console.log( xhr );
+                            if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
                                 AP.widget.notify(
                                     "error",
                                     "Non riesco a cancellare tutte le categorie",
@@ -167,7 +167,7 @@ AP.productCategory.list = (function () {
                             viewModel.rows.read();
                         },
                     },
-                });
+                } );
             } else {
                 AP.widget.notify(
                     "warning",
@@ -175,21 +175,21 @@ AP.productCategory.list = (function () {
                 );
             }
         },
-    });
+    } );
 
-    pub.init = function () {
-        kendo.bind(fields.listRoot, viewModel);
+    pub.init = function() {
+        kendo.bind( fields.listRoot, viewModel );
 
         var detailForm = fields.detailForm;
 
-        AP.page.types.unshift({
+        AP.page.types.unshift( {
             id: "",
             name: "-- Seleziona una tipologia",
-        });
+        } );
 
-        detailForm.validate({
-            onfocusout: function (element) {
-                $(element).valid();
+        detailForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
             },
             rules: {
                 typeId: {
@@ -204,12 +204,12 @@ AP.productCategory.list = (function () {
                     remote: {
                         url: "/manager/ajax/product-categories/code-exists",
                         data: {
-                            id: function () {
-                                return viewModel.get("detailForm.data.id");
+                            id: function() {
+                                return viewModel.get( "detailForm.data.id" );
                             },
                         },
-                        dataFilter: function (xhr) {
-                            var json = JSON.parse(xhr);
+                        dataFilter: function( xhr ) {
+                            var json = JSON.parse( xhr );
                             return json.data == false;
                         },
                     },
@@ -229,8 +229,8 @@ AP.productCategory.list = (function () {
                     remote: "Il codice esiste",
                 },
             },
-        });
+        } );
     };
 
     return pub;
-})();
+} () );

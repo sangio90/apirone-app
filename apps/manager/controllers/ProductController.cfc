@@ -3,6 +3,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	function detail( event, rc, prc ){
 		var product = super.fire( "product.get", [ rc.id ] );
 
+		if ( IsNull( product ) ) {
+			// TODO: better than this
+			event.renderData( data = "<h2>Articolo non trovato</h2>" );
+			return;
+		}
+
 		prc.product = product;
 
 		prc.size   = product.getSize();
@@ -10,11 +16,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.line   = product.getLine();
 
 		// frutti
-		if ( product.getCategory().getMode().getId() == "BAS" ) {
+		if (
+			product
+				.getCategory()
+				.getMode()
+				.getId() == "BAS"
+		) {
 			prc.title    = product.getName();
 			prc.subtitle = product.getCategory().getName();
 		} else {
-			prc.title    = "Dimensione #product.getSize().getCode()#, finitura #product.getFinish().getName()#";
+			prc.title    = "Finitura #product.getFinish().getName()#, dimensione #product.getSize().getCode()#";
 			prc.subtitle = "#product.getCategory().getName()#, Linea #product.getLine().getName()#";
 
 			prc.sizes      = super.fire( "size.list", { lineId = prc.line.getId() } );
@@ -49,9 +60,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 	function listByCategoryId( event, rc, prc ){
-		//TODO: not used, remove?
+		// TODO: not used, remove?
 		getLogger().debug( "ProductController.listByCategoryId: someone use this method? CategoryId: #rc.id#" );
-		
+
 		param rc.id = "";
 
 		var category = super.fire( "productCategory.get", [ rc.id ] );
