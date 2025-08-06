@@ -1,5 +1,6 @@
-alter table sizes_configs
-	rename to "size_configs";
+ALTER TABLE sizes_configs
+RENAME TO "size_configs";
 
-alter table size_configs
-	alter column size_config_id set default uuid_generate_v4();
+ALTER TABLE size_configs
+ALTER COLUMN size_config_id
+SET DEFAULT uuid_generate_v4 ();
