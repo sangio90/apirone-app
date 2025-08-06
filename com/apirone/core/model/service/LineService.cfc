@@ -97,7 +97,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var productItem = getProductItemService().get( newProductItemId );
 
-			for ( component in components ) {
+			for ( var component in components ) {
 				var newComponent = Duplicate( component );
 
 				newComponent.setId( "" );
@@ -138,6 +138,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				);
 			}
 		}
+
+		getCacheManager().removeAll();
 
 		return {
 			status  = "success",
