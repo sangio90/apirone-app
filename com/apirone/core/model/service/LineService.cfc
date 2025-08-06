@@ -3,10 +3,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="LineDAO";
 	property name="statusService" inject="StatusService";
 	property name="lookupService" inject="LookupService";
-	property name="ProductCategoryService" inject="ProductCategoryService";
-	property name="ProductItemService" inject="ProductItemService";
-	property name="ProductService" inject="ProductService";
-	property name="ComponentService" inject="ComponentService";
+	property name="productCategoryService" inject="ProductCategoryService";
+	property name="productItemService" inject="ProductItemService";
+	property name="productService" inject="ProductService";
+	property name="componentService" inject="ComponentService";
+	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="textService" inject="TextService";
 
 	property name="cacheScope" type="String" default="Line.bean";
@@ -75,7 +76,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getTextService().bulkCreate( arguments.line.getTexts() );
 		}
 
-
 		return newId;
 	}
 
@@ -92,11 +92,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		){
 			arguments.productItem.setProductId( arguments.productId );
 
-			var components       = getComponentService().list( productItemId = productItem.getId() );
 			var newProductItemId = getProductItemService().create( arguments.productItem );
 
-			var productItem = getProductItemService().get( newProductItemId );
+			var components = getComponentService().list( productItemId = arguments.productItem.getId() );
 
+			// getLogger().debug( "createProductItem, clone: found components: #components.len()# for productItem [#arguments.productItem.getId()#]" );
+
+			// duplicate components of productItem
 			for ( var component in components ) {
 				var newComponent = Duplicate( component );
 
@@ -119,18 +121,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		getProductService().deleteAllByParams( lineId = arguments.toLineId, categoryId = arguments.categoryId );
+		var productService = getProductService();
 
-		var products = getProductService().list( lineId = fromLineId, categoryId = categoryId );
+		productService.deleteAllByParams( lineId = toLineId, categoryId = categoryId );
+
+		var products = productService.list( lineId = fromLineId, categoryId = categoryId );
 
 		for ( var product in products ) {
-			var item = Duplicate( product );
-			item.getLine().setId( arguments.toLineId );
+			var newProduct = Duplicate( product );
+			newProduct.getLine().setId( arguments.toLineId );
 
-			var newId        = getProductService().create( item );
+			var newId = productService.create( newProduct );
+
+			// duplicate components of product
+			var productComponents = getComponentService().list( productId = product.getId() );
+
+			for ( var itemProductComponent in productComponents ) {
+				var newProductComponent = Duplicate( itemProductComponent );
+
+				newProductComponent.setId( "" );
+				newProductComponent.getProduct().setId( newId );
+
+				getComponentService().create( newProductComponent );
+			}
+
+			// duplicate productItems
 			var productItems = getProductItemService().getTree( productId = product.getId() );
 
-			for ( productItem in productItems ) {
+			for ( var productItem in productItems ) {
 				createProductItem(
 					productItem = productItem,
 					level       = 1,
