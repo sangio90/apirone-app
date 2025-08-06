@@ -163,7 +163,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		getCacheManager().removeAll()
+		getCacheManager().removeAll();
 
 		return outcome;
 	}

@@ -83,7 +83,7 @@ AP.lineCategory.list = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
-                                NM.util.autoHideMessage( status, "<span class='green'>Account salvato</span>" );
+                                NM.util.autoHideMessage( status, "<span class='green'>Dati salvati nella linea</span>" );
 
                                 setTimeout( () =>
                                     $( fields.cloneModal ).modal( "hide" ), 1000

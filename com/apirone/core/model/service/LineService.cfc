@@ -102,6 +102,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				newComponent.setId( "" );
 				newComponent.getProductItem().setId( newProductItemId );
+
 				getComponentService().create( newComponent );
 			}
 
