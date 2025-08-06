@@ -45,7 +45,7 @@ component{
 			// Application Aspects
 			handlerCaching           : false,
 			eventCaching             : false,
-			viewCaching              : false,
+			viewCaching              : true,
 			// Will automatically do a mapDirectory() on your `models` for you.
 			autoMapModels            : false,
 			// Auto converts a json body payload into the RC
