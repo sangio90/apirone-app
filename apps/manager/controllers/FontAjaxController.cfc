@@ -21,6 +21,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function codeExists( event, rc, prc ){
+		param rc.id   = -1;
+		param rc.code = "";
+
+		var result = super.fire( "font.codeExists", { code = rc.code, excludedId = rc.id } );
+
+		event.setValue( "result", result );
+	}
+
 	function save( event, rc, prc ){
 		var result = super.getResult();
 		var font   = super.bean( "Font" );
@@ -39,7 +48,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		font.setDimension( json.dimension );
 		font.setDirectory( "#LCase( json.code )#" )
 		text.setId( json.mainText.id )
-		text.setName( json.mainText.name )
+		text.setName( json.name )
 		text.setLang( lang.setId( json.mainText.lang.id, "IT" ) );
 		texts.add( text );
 

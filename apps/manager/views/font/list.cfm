@@ -64,11 +64,17 @@
                             #grid( 
                                 id="font-grid",
                                 columns="[
-                                    { 'field':'shortId', 'title':'ID', width: '5%' },
-                                    { 'field':'code', 'title':'Codice', width: '50%' },
-                                    { 'field':'dimension', 'title':'Ingombro (mm)', width: '30%' },
-                                    { 'field':'', 'title':'Modifica', width: '10%' },
-                                    { 'field':'', 'title':'', width: '5%' }
+                                    { 'field':'shortId', 'title':'ID', width: '80px' },
+                                    { 'field':'code', 'title':'Codice', width: '100px' },
+                                    { 'field':'name', 'title':'Nome'},
+                                    { 'field':'dimension', 'title':'Ingombro', width: '120px', 'headerAttributes': { 'class': 'text-center' } },
+                                    { 'field':'', 'title':'Modifica', width: '55px'},
+                                    { 
+                                        'field'           :'', 
+                                        'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                        'width'           :'40px',
+                                        'headerAttributes': { 'class': 'text-center' }
+                                    }
                                 ]",
                                 rowTemplate="font/font-grid-row-tmpl"
                             )#

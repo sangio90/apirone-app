@@ -34,7 +34,7 @@
 	){
 		var rows   = [];
 		var result = super.getResult();
-//dump(arguments);abort;
+
 		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby, "font" );
 
 		var records = getDao().find( argumentCollection = arguments );
@@ -48,6 +48,19 @@
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	public Boolean function codeExists( required String code, String excludedId = "" ){
+		var record = getDao().readByCode( arguments.code );
+
+		if (
+			record.recordCount
+			&& record.font_id != arguments.excludedId
+		) {
+			return record.code == arguments.code;
+		}
+
+		return false;
 	}
 
 	public String function create( required com.apirone.core.model.bean.Font font ){
@@ -113,8 +126,9 @@
 				var result = getDao().delete( arguments.fontId );
 				outcome.setData( { "deletedCount" = result } )
 
-				super.getCacheManager().remove( getCacheSciope(), arguments.fontId );
+				super.getCacheManager().remove( getCacheScope(), arguments.fontId );
 			} catch ( any error ) {
+
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteFont" );

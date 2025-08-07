@@ -4,7 +4,6 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				font_id::varchar,
 				*
 			FROM
 				fonts
@@ -15,9 +14,25 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<cffunction name="readByCode" output="false">
+		<cfargument name="code" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				font_id, code
+			FROM
+				fonts
+			WHERE
+				code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction returntype="Query" name="find">
 		<cfargument name="str" type="String">
-		<cfargument name="orderby" required="true" type="String" default="fonts.code">
+
+		<cfargument name="orderby" required="true" type="String" default="font_id desc">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 

@@ -82,6 +82,7 @@
 		/*
 			fonts
 		*/
+		get( "/ajax/fonts/code-exists" ).to( "FontAjaxController.codeExists" ).end();
 		get( "/ajax/fonts/:id" ).to( "FontAjaxController.get" ).end();
 		delete( "/ajax/fonts" ).to( "FontAjaxController.delete" ).end();
 		get( "/ajax/fonts").to("FontAjaxController.list").end();

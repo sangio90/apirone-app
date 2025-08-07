@@ -16,10 +16,21 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Codice</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" 
+                                <input type="text" required class="form-control col-sm-4 uppercase" 
                                     name="code"
                                     maxlength="5"
                                     data-bind="value: detailForm.data.code"
+                                    >
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Descrizione (it)</label>
+                            <div class="col-sm-10">
+                                <input type="text" required class="form-control col-sm-4 uppercase" 
+                                    name="name"
+                                    maxlength="50"
+                                    data-bind="value: detailForm.data.name"
                                     >
                             </div>
                         </div>
@@ -33,14 +44,14 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
+                        <div class="row" data-bind="visible: detailForm.data.id">
                             <label class="col-sm-2 col-form-label text-end">ID</label>
                             <div class="col-sm-10 mt-1">
                                 <span data-bind="text: detailForm.data.id"></span>
                             </div>
                         </div>
 
-                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
+                        <div class="row" data-bind="visible: detailForm.data.id">
                             <label class="col-sm-2 col-form-label text-end">Directory</label>
                             <div class="col-sm-10 mt-1">
                                 <span data-bind="text: detailForm.data.directory"></span>

@@ -33,7 +33,7 @@ AP.font.detail = ( function() {
                 },
             }
         },
-        
+
 
         title: "Carica font",
     };
@@ -121,12 +121,9 @@ AP.font.detail = ( function() {
             callback: {
                 done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
-                        if (!Object.keys(xhr.data).includes("mainText")) {
-                            xhr.data.mainText = defaultDetailForm.data.mainText
-                        }
-                        debugger
+
                         viewModel.set( "detailForm.data", xhr.data );
-                        viewModel.set( "detailForm.title", "Modifica font" );
+                        viewModel.set( "detailForm.title", "Modifica font < " + xhr.data.name + " >" );
 
                         NM.util.openModal( AP.font.fields.detailRoot );
                     }
@@ -145,22 +142,37 @@ AP.font.detail = ( function() {
                 $( element ).valid();
             },
             rules: {
+                name: {
+                    required: true,
+                    rangelength: [ 2, 100 ]
+                },
                 code: {
                     required: true,
-                    maxlength: 5
+                    checkCode: true,
+                    remote: {
+                        url: "/manager/ajax/fonts/code-exists",
+                        data: {
+                            id: function() {
+                                return viewModel.get( "detailForm.data.id" );
+                            },
+                        },
+                        dataFilter: function( xhr ) {
+                            var json = JSON.parse( xhr );
+                            return json.data == false;
+                        },
+                    },
                 },
-                dimension: {
-                    required: true,
-                }
             },
             messages: {
+                name: {
+                    required: "Nome richiesto",
+                    rangelength: "Sono richiesti tra 2 e 100 caratteri"
+                },
                 code: {
                     required: "Codice richiesto",
-                    maxlength: "Al massimo 5 caratteri"
+                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
+                    remote: "Il codice esiste",
                 },
-                dimension: {
-                    required: "Ingombro richiesto",
-                }
             },
         } );
     };
@@ -189,7 +201,7 @@ AP.font.list = ( function() {
 
             return false;
         },
-        
+
         new: function( event ) {
             var onSave = function() {
                 viewModel.get( "rows" ).read();
@@ -256,6 +268,7 @@ AP.font.list = ( function() {
 
     pub.init = function() {
         kendo.bind( AP.font.fields.listRoot, viewModel );
+
     };
 
     return pub;
