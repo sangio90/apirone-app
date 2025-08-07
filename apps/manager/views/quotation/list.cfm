@@ -6,7 +6,7 @@
 				#pageTitle()#
             </div>
 			<div class="col-6 text-end">
-				#addButton( bind = "click:new", size = "md" )#
+				#addButton( bind = "click:new", size = "md", label = "Aggiungi preventivo" )#
 			</div>
         </div>
 
@@ -23,7 +23,8 @@
                                         class="d-flex justify-content-end" 
                                         data-bind="events: { submit: search }">
 
-                                        <input name="str" placeholder="Filtra..." class="form-control me-2" type="text">
+                                        <input name="strDescription" placeholder="Cerca per nome" class="form-control me-2" type="text">
+                                        <input name="strNumber" placeholder="Cerca per numero" class="form-control me-2" type="text">
 
 										<select class="form-control me-2" name="statusId">
 											<option value="">-- tutti gli stati</option>
@@ -52,10 +53,12 @@
 								#grid(
 									id      = "quotation-grid",
 									columns = "[
-                                        { 'field':'description', 'title':'Descrizione' },
+                                        { 'field':'', 'title':'', width: '5%' },
+                                        { 'field':'description', 'title':'Nome' },
                                         { 'field':'quotation_number', 'title':'Numero', width: '15%' },
                                         { 'field':'quotation_date', 'title':'Data', width: '15%'},
-                                        { 'field':'status', 'title':'Stato', width: '15%'}
+                                        { 'field':'status', 'title':'Stato', width: '15%'},
+                                        { 'field':'', 'title':'Modifica', width: '10%' }
                                     ]",
 									rowTemplate = "quotation/quotation-grid-row-tmpl"
 								)#

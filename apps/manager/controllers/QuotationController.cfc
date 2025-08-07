@@ -1,7 +1,7 @@
 ﻿component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
-		prc.title = "Lista dei preventivi";
+		prc.title = "Preventivi";
 
 		prc.statuses = super.fire( "status.list", [ "QUOTATIONS" ] );
 

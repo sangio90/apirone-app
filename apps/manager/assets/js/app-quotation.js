@@ -44,11 +44,19 @@ AP.quotation.list = ( function() {
                 } );
             }
 
-            if ( params.str.length ) {
+            if ( params.strDescription.length ) {
                 filters.push( {
                     field: "description",
                     operator: "contains",
-                    value: params.str,
+                    value: params.strDescription,
+                } );
+            }
+
+            if ( params.strNumber.length ) {
+                filters.push( {
+                    field: "quotationNumber",
+                    operator: "contains",
+                    value: params.strNumber,
                 } );
             }
 

@@ -3,6 +3,12 @@
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="quotation-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
+            <td class="text-center">
+                <input type="checkbox" class="form-check-input"
+                    name="selected"
+                    value="##: id ##"
+                >
+            </td>
             <td>
                 <span data-bind="text: description"></span>
             </td>
@@ -14,6 +20,9 @@
             </td>
             <td>
                 <span data-bind="text: status.name"></span>
+            </td>
+            <td class="text-center">
+                #iconButton(bind="click:edit", icon="edit")#
             </td>
         </tr>
     </nmscript>
