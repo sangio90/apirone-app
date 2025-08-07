@@ -274,7 +274,7 @@
         <map from="lang" to="lang" ref="Lang" />
     </mapper>
 
-    <mapper id="Size" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Size">
+    <mapper id="Model" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Model">
         <map from="id" to="id" type="cf:String" />
         <map from="shortId" to="shortId" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
@@ -283,11 +283,11 @@
         <map from="mainText" to="mainText" ref="Text" />
         <map from="status" to="status" ref="Status" />
         <map from="categories" to="categories" ref="ProductCategory" type="Array" />
-        <map from="type" to="type" ref="SizeType" />
+        <map from="type" to="type" ref="ModelType" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
     </mapper>
 
-    <mapper id="SizeType" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.SizeType">
+    <mapper id="ModelType" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ModelType">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
     </mapper>

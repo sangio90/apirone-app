@@ -42,14 +42,14 @@ component extends="com.apirone.core.controller.AbsController" {
 				component.setProductItem( item.setId( rc.itemId ) );
 
 				break;
-			case "lineSize":
-				var component = super.bean( "ComponentLineSize" );
+			case "lineModel":
+				var component = super.bean( "ComponentLineModel" );
 
-				var size = super.bean( "size" );
+				var model = super.bean( "model" );
 				var line = super.bean( "line" );
 
 				component.setLine( line.setId( rc.lineId ) );
-				component.setSize( size.setId( rc.sizeId ) );
+				component.setModel( model.setId( rc.modelId ) );
 
 				break;
 			case "attributeValue":
@@ -191,8 +191,8 @@ component extends="com.apirone.core.controller.AbsController" {
 					includeBaseAttributeComponents = true
 				};
 				break;
-			case "lineSize":
-				params = { lineId = rc.lineId, sizeId = rc.sizeId };
+			case "lineModel":
+				params = { lineId = rc.lineId, modelId = rc.modelId };
 				break;
 			case "fruit":
 				params = { fruitId = rc.fruitId };

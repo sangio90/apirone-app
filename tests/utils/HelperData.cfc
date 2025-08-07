@@ -138,7 +138,7 @@ component extends="testbox.system.BaseSpec"{
         raw.pricelist = { id = random.getRandomByTableName(limit=1, tableName='pricelists').pricelist_id.toString() };
         raw.paymentMethod = { id = random.getRandomByTableName(limit=1, tableName='payment_methods').payment_method_id.toString() };
         raw.currency = { id = random.getRandomByTableName(limit=1, tableName='currencies').currency_id.toString() };
-        raw.status = { id = random.getStatuses(limit=1, entity='QUOTATIONS').status_id.toString() };
+        raw.status = { id = random.getStatuses(limit=1, entity='QUOTATION').status_id.toString() };
         raw.lang = { id = random.getRandomByTableName(limit=1, tableName='langs').lang_id.toString() };
         raw.billingProfile = { id = random.getRandomProfilesByType(limit=1, type='B').profile_id.toString() };
         raw.shippingProfile = { id = random.getRandomProfilesByType(limit=1, type='S').profile_id.toString() };
@@ -428,7 +428,7 @@ component extends="testbox.system.BaseSpec"{
         var factory = new com.apirone.core.model.factory.Factory();
 
         raw.type =  'M';
-        raw.size = randRange(10, 100);
+        raw.model = randRange(10, 100);
         raw.width = randRange(10, 100);
         raw.height = randRange(10, 100);
         raw.alt = UCase( util.createRandomCode( 16 ) );

@@ -220,20 +220,20 @@
 
 
 		/*
-			size configs
+			model configs
 		*/
-		post( "/ajax/size_config" ).to( "SizeConfigAjaxController.save" ).end();
+		post( "/ajax/model-config" ).to( "ModelConfigAjaxController.save" ).end();
 
 
 		/*
-			size
+			model
 		*/
-		get( "/ajax/sizes/code-exists" ).to( "SizeAjaxController.codeExists" ).end();
-		get( "/ajax/sizes" ).to( "SizeAjaxController.list" ).end();
-		post( "/ajax/sizes" ).to( "SizeAjaxController.save" ).end();
-		delete( "/ajax/sizes" ).to( "SizeAjaxController.delete" ).end();
-		get( "/sizes/print" ).to( "SizeController.print" ).end();
-		get( "/sizes" ).to( "SizeController.list" ).end();
+		get( "/ajax/models/code-exists" ).to( "ModelAjaxController.codeExists" ).end();
+		get( "/ajax/models" ).to( "ModelAjaxController.list" ).end();
+		post( "/ajax/models" ).to( "ModelAjaxController.save" ).end();
+		delete( "/ajax/models" ).to( "ModelAjaxController.delete" ).end();
+		get( "/models/print" ).to( "ModelController.print" ).end();
+		get( "/models" ).to( "ModelController.list" ).end();
 
 
 		/*
@@ -246,11 +246,12 @@
 		/*
 			quotations
 		*/
+		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		get( "/quotations" ).to( "QuotationController.list" ).end();
-		
+
 
 		/*
 			roles

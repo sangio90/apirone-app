@@ -120,7 +120,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			case "finish.id":
 				result = "Finitura";
 				break;
-			case "size.id":
+			case "model.id":
 				result = "Dimensione";
 				break;
 			case "product.id":

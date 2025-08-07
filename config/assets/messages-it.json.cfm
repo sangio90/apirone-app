@@ -36,7 +36,7 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
-    "size": {
+    "model": {
         "deletedAllRecords": "Valori cancellati",
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },

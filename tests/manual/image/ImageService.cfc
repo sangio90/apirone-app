@@ -9,7 +9,7 @@
 		<cfargument name="newWidth" required="Yes">
 
 		<cfset dimensioni = application.services.Image.getDimensions(imgPath="#arguments.imgPath#")>
-		<cfset sourceForResize = "#destination#"> 
+		<cfset sourceForRemodel = "#destination#"> 
 
 		<cfif dimensioni.width GTE dimensioni.height> 
 			<!--- orizzontale --->
@@ -37,7 +37,7 @@
 
 	</cffunction>
 
-	<cffunction name="resize">
+	<cffunction name="remodel">
 
 		<cfargument name="source" required="Yes">
 		<cfargument name="destination" required="Yes">

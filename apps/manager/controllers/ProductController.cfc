@@ -11,7 +11,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.product = product;
 
-		prc.size   = product.getSize();
+		prc.model   = product.getModel();
 		prc.finish = product.getFinish();
 		prc.line   = product.getLine();
 
@@ -26,11 +26,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.subtitle = product.getCategory().getName();
 			prc.textLink = "Componenti per #product.getCategory().getName()# / #product.getName()#";
 		} else {
-			prc.title    = "Finitura #product.getFinish().getName()#, dimensione #product.getSize().getCode()#";
-			prc.subtitle = "#product.getCategory().getName()#, Linea #product.getLine().getName()#";
-			prc.textLink = "Componenti per #product.getLine().getName()# / #product.getSize().getCode()# / #product.getFinish().getName()#";
+			prc.title    = "Finitura #product.getFinish().getName()#, modello #product.getModel().getCode()#";
+			prc.subtitle = "Categoria #product.getCategory().getName()#, linea #product.getLine().getName()#";
+			prc.textLink = "Componenti per #product.getLine().getName()# / #product.getModel().getCode()# / #product.getFinish().getName()#";
 
-			prc.sizes      = super.fire( "size.list", { lineId = prc.line.getId() } );
+			prc.models      = super.fire( "model.list", { lineId = prc.line.getId() } );
 			prc.statusList = super.fire( "status.list", [ "line" ] );
 			prc.finishes   = super.fire( "finish.list", { lineId = prc.line.getId() } );
 
@@ -88,7 +88,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.statuses            = super.fire( "status.list", [ "PRODUCT" ] );
 		var product             = super.service( "Product" ).get( rc.id );
-		prc.title               = "Combinazioni #product.getSize().getCode()#, finitura #product.getFinish().getName()#";
+		prc.title               = "Combinazioni #product.getModel().getCode()#, finitura #product.getFinish().getName()#";
 		prc.subtitle            = "Linea #product.getLine().getName()#";
 		prc.page[ "productId" ] = product.getId();
 

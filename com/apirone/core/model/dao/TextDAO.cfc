@@ -27,7 +27,7 @@
 		<cfargument name="attributeValueId" type="String">
 		<cfargument name="rawValueId" type="Numeric">
 		<cfargument name="productCategoryId" type="Numeric">
-		<cfargument name="sizeId" type="String">
+		<cfargument name="modelId" type="String">
 		<cfargument name="productId" type="String">
 		<cfargument name="fontId" type="Numeric">
 
@@ -81,8 +81,8 @@
 				AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
 			</cfif>
 
-			<cfif !IsNull( arguments.sizeId )>
-				AND size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
+			<cfif !IsNull( arguments.modelId )>
+				AND model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
 			</cfif>
 
 			<cfif !IsNull( arguments.rawValueId )>

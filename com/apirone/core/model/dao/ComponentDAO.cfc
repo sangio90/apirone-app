@@ -15,7 +15,7 @@
 
 	<cffunction returntype="Query" name="find">
 		<cfargument name="lineId" type="String">
-		<cfargument name="sizeId" type="String">
+		<cfargument name="modelId" type="String">
 		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
 		<cfargument name="attributeValueId" type="String">
@@ -44,8 +44,8 @@
 					AND line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">::uuid
 				</cfif>
 
-				<cfif !IsNull( arguments.sizeId )>
-					AND size_id = <cfqueryparam value="#arguments.sizeId#" cfsqltype="Varchar">::uuid
+				<cfif !IsNull( arguments.modelId )>
+					AND model_id = <cfqueryparam value="#arguments.modelId#" cfsqltype="Varchar">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.attributeValueId )>
@@ -149,15 +149,15 @@
 		<cfset var values = []>
 
 		<cfswitch expression="#meta.fullname#">
-			<cfcase value="com.apirone.core.model.bean.ComponentLineSize">
-				<cfset fields = [ "line_id", "size_id" ]>
+			<cfcase value="com.apirone.core.model.bean.ComponentLineModel">
+				<cfset fields = [ "line_id", "model_id" ]>
 				<cfset values = [
 					{
 						value = arguments.component.getLine().getId(),
 						type  = "uuid"
 					},
 					{
-						value = arguments.component.getSize().getId(),
+						value = arguments.component.getModel().getId(),
 						type  = "uuid"
 					}
 				]>

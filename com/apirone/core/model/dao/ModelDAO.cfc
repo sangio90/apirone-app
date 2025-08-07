@@ -1,13 +1,13 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction name="read">
-		<cfargument name="sizeId" type="String" required="true">
+		<cfargument name="modelId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT size_id::varchar, *
+			SELECT model_id::varchar, *
 			FROM
-				sizes
+				models
 			WHERE
-				size_id = <cfqueryparam cfsqltype="varchar" value="#arguments.sizeId#">::uuid
+				model_id = <cfqueryparam cfsqltype="varchar" value="#arguments.modelId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -18,11 +18,11 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				size_id::varchar,
+				model_id::varchar,
 				categories::varchar,
 				*
 			FROM
-				sizes
+				models
 			WHERE
 				code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
 		</cfquery>
@@ -36,20 +36,20 @@
 		<cfargument name="lineId" type="String">
 		<cfargument name="typeId" type="String">
 
-		<cfargument name="orderby" required="true" type="String" default="sizes.code">
+		<cfargument name="orderby" required="true" type="String" default="models.code">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
-				size_id::varchar,
-				sizes.code,
+				model_id::varchar,
+				models.code,
 				orderby,
-				COUNT(size_id) OVER() AS total
+				COUNT(model_id) OVER() AS total
 			FROM
-				sizes
+				models
 					<cfif !IsNull( arguments.lineId )>
-						INNER JOIN products USING ( size_id )
+						INNER JOIN products USING ( model_id )
 					</cfif>
 
 			WHERE 1=1
@@ -59,11 +59,11 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.typeId )>
-					AND sizes.size_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">
+					AND models.model_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
-					AND sizes.code ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+					AND models.code ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.categoryId )>
@@ -85,63 +85,63 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="String" output="false">
-		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
+		<cfargument name="model" type="com.apirone.core.model.bean.Model" required="true">
 
-		<cfset var categories = super.getCategoriesAsArray( size.getCategories() )>
+		<cfset var categories = super.getCategoriesAsArray( model.getCategories() )>
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO sizes (
+			INSERT INTO models (
 				code,
-				size,
+				model,
 				status_id,
-				size_type_id,
+				model_type_id,
 				categories,
 				fruits_count
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.size.getCode()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getName()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.size.getType().getId()#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.model.getCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.model.getName()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.model.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.model.getType().getId()#">,
 				<cfqueryparam cfsqltype="Other" value="#SerializeJSON( categories )#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.size.getFruitsCount()#">
-			) RETURNING size_id
+				<cfqueryparam cfsqltype="Integer" value="#arguments.model.getFruitsCount()#">
+			) RETURNING model_id
 		</cfquery>
 
-		<cfreturn local.q.size_id.toString()>
+		<cfreturn local.q.model_id.toString()>
 	</cffunction>
 
 	<cffunction name="update" returntype="String">
-		<cfargument name="size" type="com.apirone.core.model.bean.Size" required="true">
+		<cfargument name="model" type="com.apirone.core.model.bean.Model" required="true">
 
-		<cfset var categories = SerializeJSON( super.getCategoriesAsArray( size.getCategories() ) )>
+		<cfset var categories = SerializeJSON( super.getCategoriesAsArray( model.getCategories() ) )>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
-				sizes
+				models
 			SET
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getStatus().getId()#">,
-				size = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getName()#">,
-				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getCode()#">,
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.model.getStatus().getId()#">,
+				model = <cfqueryparam cfsqltype="Varchar" value="#arguments.model.getName()#">,
+				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.model.getCode()#">,
 				categories = <cfqueryparam cfsqltype="Other" value="#categories#">,
-				size_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getType().getId()#">,
-				fruits_count = <cfqueryparam cfsqltype="Integer" value="#arguments.size.getFruitsCount()#">
+				model_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.model.getType().getId()#">,
+				fruits_count = <cfqueryparam cfsqltype="Integer" value="#arguments.model.getFruitsCount()#">
 			WHERE
-				size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.size.getId()#">::uuid
+				model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.model.getId()#">::uuid
 		</cfquery>
 
-		<cfreturn arguments.size.getId()>
+		<cfreturn arguments.model.getId()>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">
-		<cfargument name="sizeId" type="String" required="true">
+		<cfargument name="modelId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM
-				sizes
+				models
 			WHERE
-				size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
-			RETURNING size_id
+				model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
+			RETURNING model_id
 		</cfquery>
 
 		<cfreturn local.q.recordCount>

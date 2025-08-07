@@ -98,7 +98,7 @@ component extends="tests.utils.AbsSpec" {
 					var quotationId = random.getRandomByTableName(limit=1, tableName='quotations').quotation_id.toString();
 					var quotationBean = quotationSvc.get( quotationId );
 
-					var statuses = random.getStatuses(limit=6, entity='QUOTATIONS');
+					var statuses = random.getStatuses(limit=6, entity='QUOTATION');
 					for (status in statuses) {
 						if (status.status_id EQ quotationBean.getStatus().getId()) {
 							continue;

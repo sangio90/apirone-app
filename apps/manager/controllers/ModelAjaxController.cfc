@@ -7,10 +7,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var params = super.paramsFromUrl();
 
-		var rows = super.fire( "size.search", params );
+		var rows = super.fire( "model.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Size", true );
+			var obj = dm.convert( row, "Model", true );
 			data.add( obj );
 		}
 
@@ -25,7 +25,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		param rc.id   = "_";
 		param rc.code = "";
 
-		var result = super.fire( "size.codeExists", { code = rc.code, excludedId = rc.id } );
+		var result = super.fire( "model.codeExists", { code = rc.code, excludedId = rc.id } );
 
 		event.setValue( "result", result );
 	}
@@ -41,15 +41,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 
-		var size   = super.bean( "Size" );
-		var type   = super.bean( "SizeType" );
+		var model   = super.bean( "Model" );
+		var type   = super.bean( "ModelType" );
 		var status = super.bean( "Status" );
 		var text   = super.bean( "Text" );
 		var lang   = super.bean( "Lang" );
 
-		size.setId( json.id );
-		size.setCode( json.code );
-		size.setType( type.setId( json.type.id ) );
+		model.setId( json.id );
+		model.setCode( json.code );
+		model.setType( type.setId( json.type.id ) );
 
 		if ( Len( json?.selectedCategories ) ) {
 			for ( var thisCategory in json.selectedCategories ) {
@@ -66,18 +66,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		text.setId( json.mainText.id );
 		text.setName( json.mainText.name );
 
-		size.setTexts( [ text ] );
+		model.setTexts( [ text ] );
 
-		size.setCategories( categories );
-		size.setStatus( status.setId( json.status.id ) );
-		size.setFruitsCount( Len( json.fruitsCount ) ? json.fruitsCount : NullValue() );
+		model.setCategories( categories );
+		model.setStatus( status.setId( json.status.id ) );
+		model.setFruitsCount( Len( json.fruitsCount ) ? json.fruitsCount : NullValue() );
 
 		if ( !Len( json.id ) ) {
-			messageId = "size.created";
-			thisId    = super.fire( "size.create", [ size ] )
+			messageId = "model.created";
+			thisId    = super.fire( "model.create", [ model ] )
 		} else {
-			messageId = "size.updated";
-			thisId    = super.fire( "size.update", [ size ] )
+			messageId = "model.updated";
+			thisId    = super.fire( "model.update", [ model ] )
 		}
 
 		var message = completeMessage( messageId );
@@ -90,7 +90,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function delete( event, rc, prc ){
 		var result    = super.getResult();
 		var list      = GetHTTPRequestData().content;
-		var messageId = "size.deletedAllRecords";
+		var messageId = "model.deletedAllRecords";
 
 		var errors  = [];
 		var payload = "";
@@ -98,7 +98,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var ids = ListToArray( list );
 
 		for ( var id in ids ) {
-			var outcome = super.fire( "size.delete", [ id ] );
+			var outcome = super.fire( "model.delete", [ id ] );
 
 			if ( outcome.getStatus() == "ERROR" ) {
 				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
@@ -106,7 +106,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		if ( errors.len() ) {
-			messageId = "size.deletedNotAllRecords"
+			messageId = "model.deletedNotAllRecords"
 			payload   = { "errors" = errors };
 		}
 

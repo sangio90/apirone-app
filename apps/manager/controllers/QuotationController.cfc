@@ -3,7 +3,7 @@
 	function list( event, rc, prc ){
 		prc.title = "Preventivi";
 
-		prc.statuses = super.fire( "status.list", [ "QUOTATIONS" ] );
+		prc.statuses = super.fire( "status.list", [ "QUOTATION" ] );
 
 		prc.jsScripts.add( "app-quotation" );
 
@@ -19,7 +19,7 @@
 		prc.pricelist     = super.service( "Pricelist" ).list();
 		var currencies    = super.service( "Currency" ).list();
 		prc.currency      = super.service( "Currency" ).list();
-		prc.statusList    = super.service( "Status" ).list( "QUOTATIONS" );
+		prc.statusList    = super.service( "Status" ).list( "QUOTATION" );
 		prc.langs         = super.service( "Lang" ).list();
 
 		prc.jsScripts.add( "app-quotation" );

@@ -32,31 +32,31 @@
                                 <thead>
                                 <tr>
                                     <th></th>
-                                    <cfloop array="#prc.sizes#" item="size">
+                                    <cfloop array="#prc.models#" item="model">
                                         <th>
-											#size.getCode()#
+											#model.getCode()#
                                             <br>
                                             <br>
-											<cfif NOT IsNull(size.getType()) && size.getType().getId() EQ "S">
-												<cfif NOT isNull(size.sizeConfig)>
-													<button class="btn btn-primary btn-xs" data-bind="click:showSizeConfigModal"
+											<cfif NOT IsNull(model.getType()) && model.getType().getId() EQ "S">
+												<cfif NOT isNull(model.modelConfig)>
+													<button class="btn btn-primary btn-xs" data-bind="click:showModelConfigModal"
 														data-product-category-id="#prc.category.getId()#"
 														data-line-id="#prc.line.getId()#"
-														data-size-id="#size.getId()#"
-														data-size-config-id="#size.sizeConfig.getId()#"
-														data-width="#size.sizeConfig.getWidth()#"
-														data-height="#size.sizeConfig.getheight()#"
+														data-model-id="#model.getId()#"
+														data-model-config-id="#model.modelConfig.getId()#"
+														data-width="#model.modelConfig.getWidth()#"
+														data-height="#model.modelConfig.getheight()#"
 													>
 														<i class="fa fa-ruler"></i>
 													</button>
-													<div style="font-size: .6em; font-style: italic; color: gray;">
-														#size.sizeConfig.getWidth()# x #size.sizeConfig.getHeight()#
+													<div style="font-model: .6em; font-style: italic; color: gray;">
+														#model.modelConfig.getWidth()# x #model.modelConfig.getHeight()#
 													</div>
 												<cfelse>
-													<button class="btn btn-default btn-xs" data-bind="click:showSizeConfigModal"
+													<button class="btn btn-default btn-xs" data-bind="click:showModelConfigModal"
 														data-product-category-id="#prc.category.getId()#"
 														data-line-id="#prc.line.getId()#"
-														data-size-id="#size.getId()#"
+														data-model-id="#model.getId()#"
 													>
 													<i class="fa fa-ruler"></i>
 													</button>
@@ -73,14 +73,14 @@
                                         <td>
                                             #finish.getName()# <span class="small-code">(#finish.getShortId()#)</span>
                                         </td>
-                                        <cfloop array="#prc.sizes#" item="size">
+                                        <cfloop array="#prc.models#" item="model">
                                             <td>
 
-                                                <cfset exists = productExists( size.getId(), finish.getId() )>
+                                                <cfset exists = productExists( model.getId(), finish.getId() )>
 
                                                 <button class="btn btn-success btn-sm active" data-bind="click:deactivate"
                                                     data-category="#prc.category.getId()#"
-                                                    data-values="#size.getId()#__#finish.getId()#"
+                                                    data-values="#model.getId()#__#finish.getId()#"
                                                     <cfif !exists>style="display: none"</cfif>
                                                     >
                                                     <i class="fa fa-minus"></i>
@@ -88,7 +88,7 @@
 
                                                 <button class="btn btn-primary btn-sm deactive" data-bind="click:activate"
                                                 data-category="#prc.category.getId()#"
-                                                    data-values="#size.getId()#__#finish.getId()#"
+                                                    data-values="#model.getId()#__#finish.getId()#"
                                                     <cfif exists>style="display: none"</cfif>
                                                     >
                                                     <i class="fa fa-plus"></i>
@@ -108,7 +108,7 @@
                 </section>
             </div>
         </div>
-		#view( "line/size-config-modal" )#
+		#view( "line/model-config-modal" )#
     </div>
 
 </cfoutput>

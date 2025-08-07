@@ -106,7 +106,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setName( name );
 		bean.setDescription( "" );
 		bean.setDirectory( dayPath );
-		bean.setSize( fileInfo.size );
+		bean.setModel( fileInfo.model );
 
 		bean.setType( type.setId( arguments.typeId ) );
 		bean.setKind( kind.setId( arguments.kindId ) );
@@ -130,34 +130,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var imageType = config.types[ typeId ];
 
-		if ( imageType.keyExists( "sizes" ) ) {
+		if ( imageType.keyExists( "models" ) ) {
 			cffile(
 				action = "APPEND",
 				file   = "#ExpandPath( "/debug.log" )#",
-				output = "#Now()# key sizes exists"
+				output = "#Now()# key models exists"
 			);
 
 			var thisFile = get( newId );
 
-			for ( var size in imageType.sizes ) {
-				resize( thisFile.getPath(), size.width );
+			for ( var model in imageType.models ) {
+				remodel( thisFile.getPath(), model.width );
 			}
 		}
 
 		return newId;
 	}
 
-	public Void function resize( required String filePath, required Numeric size ){
-		var sizePath = Replace( filePath, "_ori", size );
+	public Void function remodel( required String filePath, required Numeric model ){
+		var modelPath = Replace( filePath, "_ori", model );
 
-		var directory = GetDirectoryFromPath( sizePath );
+		var directory = GetDirectoryFromPath( modelPath );
 
 		var file = ImageNew( arguments.filePath );
 
 		DirectoryCreate( directory, true, true );
-		ImageResize( file, size );
+		imageRemodel( file, model );
 
-		file.write( sizePath, true );
+		file.write( modelPath, true );
 	}
 
 
@@ -186,7 +186,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			obj.setKind( kind );
-			obj.setSize( record.size );
+			obj.setModel( record.model );
 			obj.setWidth( record.width );
 			obj.setHeight( record.height );
 			obj.setAlt( record.alt );

@@ -99,7 +99,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		var line     = super.bean( "Line" );
-		var size     = super.bean( "Size" );
+		var model     = super.bean( "Model" );
 		var finish   = super.bean( "Finish" );
 		var product  = super.bean( "Product" );
 		var status   = super.bean( "Status" );
@@ -107,7 +107,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		product.setLine( line.setId( rc.id ) );
 		product.setFinish( finish.setId( json.finishId ) );
-		product.setSize( size.setId( json.sizeId ) );
+		product.setModel( model.setId( json.modelId ) );
 		// product.setCategory( category.setId( 22 ) ); // TODO: check if this value is ok here
 		product.setCategory( category.setId( json.categoryId ) );
 		product.setStatus( status.setId( "ACT" ) );
@@ -125,7 +125,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				"payload" = {
 					"productId" = newId,
 					"finishId"  = obj.getFinish().getId(),
-					"sizeId"    = obj.getSize().getId()
+					"modelId"    = obj.getModel().getId()
 				}
 			}
 		);
@@ -137,7 +137,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		super.fire(
 			"product.deleteByParams",
 			{
-				sizeId   = json.sizeId,
+				modelId   = json.modelId,
 				lineId   = rc.id,
 				finishId = json.finishId
 			}

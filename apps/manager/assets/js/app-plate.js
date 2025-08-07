@@ -1,25 +1,25 @@
 AP.plate = AP.plate || {};
 
 AP.plate.fields = {
-    designerRoot: $("#plate-designer-root"),
-    mapRoot: $("#plates-map-root"),
+    designerRoot: $( "#plate-designer-root" ),
+    mapRoot: $( "#plates-map-root" ),
 };
 
-$(document).ready(function () {
-    if (AP.plate.fields.designerRoot.length) {
-        AP.plate.designer.init({
+$( document ).ready( function() {
+    if ( AP.plate.fields.designerRoot.length ) {
+        AP.plate.designer.init( {
             container: AP.plate.fields.designerRoot,
-        });
+        } );
     }
 
-    if (AP.plate.fields.mapRoot.length) {
-        AP.plate.map.init({
+    if ( AP.plate.fields.mapRoot.length ) {
+        AP.plate.map.init( {
             container: AP.plate.fields.mapRoot,
-        });
+        } );
     }
-});
+} );
 
-AP.plate.designer = (function () {
+AP.plate.designer = ( function() {
     let FREE_CELL_WIDTH;
     let FREE_CELL_HEIGHT;
 
@@ -47,23 +47,23 @@ AP.plate.designer = (function () {
     };
 
     const utils = {
-        convertAbsolutePositionToGridPosition(ui, fruitPosition) {
+        convertAbsolutePositionToGridPosition( ui, fruitPosition ) {
             let newPositionDirection = 0;
             const deltaLeft = Math.sign(
                 ui.position.left - ui.originalPosition.left,
             );
-            if (deltaLeft > 0) {
+            if ( deltaLeft > 0 ) {
                 newPositionDirection |= MOVE_DIRECTION.RIGHT;
-            } else if (deltaLeft < 0) {
+            } else if ( deltaLeft < 0 ) {
                 newPositionDirection |= MOVE_DIRECTION.LEFT;
             }
 
             const deltaTop = Math.sign(
                 ui.position.top - ui.originalPosition.top,
             );
-            if (deltaTop > 0) {
+            if ( deltaTop > 0 ) {
                 newPositionDirection |= MOVE_DIRECTION.BOTTOM;
-            } else if (deltaTop < 0) {
+            } else if ( deltaTop < 0 ) {
                 newPositionDirection |= MOVE_DIRECTION.TOP;
             }
 
@@ -75,12 +75,12 @@ AP.plate.designer = (function () {
                 column: null,
             };
 
-            for (let row = 0; row < grid.length; row++) {
-                for (let column = 0; column < grid[row].length; column++) {
+            for ( let row = 0; row < grid.length; row++ ) {
+                for ( let column = 0; column < grid[row].length; column++ ) {
                     const cell = grid[row][column];
 
                     if (
-                        (newPositionDirection & MOVE_DIRECTION.RIGHT) ==
+                        ( newPositionDirection & MOVE_DIRECTION.RIGHT ) ==
                         MOVE_DIRECTION.RIGHT
                     ) {
                         if (
@@ -95,7 +95,7 @@ AP.plate.designer = (function () {
                                 column - fruitWidth / FREE_CELL_WIDTH + 1;
                         }
                     } else if (
-                        (newPositionDirection & MOVE_DIRECTION.LEFT) ==
+                        ( newPositionDirection & MOVE_DIRECTION.LEFT ) ==
                         MOVE_DIRECTION.LEFT
                     ) {
                         if (
@@ -115,7 +115,7 @@ AP.plate.designer = (function () {
                     }
 
                     if (
-                        (newPositionDirection & MOVE_DIRECTION.BOTTOM) ==
+                        ( newPositionDirection & MOVE_DIRECTION.BOTTOM ) ==
                         MOVE_DIRECTION.BOTTOM
                     ) {
                         if (
@@ -130,7 +130,7 @@ AP.plate.designer = (function () {
                                 row - fruitHeight / FREE_CELL_HEIGHT + 1;
                         }
                     } else if (
-                        (newPositionDirection & MOVE_DIRECTION.TOP) ==
+                        ( newPositionDirection & MOVE_DIRECTION.TOP ) ==
                         MOVE_DIRECTION.TOP
                     ) {
                         if (
@@ -153,7 +153,7 @@ AP.plate.designer = (function () {
 
             return result;
         },
-        doRectanglesCollide(rectA, rectB) {
+        doRectanglesCollide( rectA, rectB ) {
             let result = true;
 
             if (
@@ -167,7 +167,7 @@ AP.plate.designer = (function () {
 
             return result;
         },
-        extractTopLeftPositionFrom(gridPosition) {
+        extractTopLeftPositionFrom( gridPosition ) {
             const result = {
                 top: null,
                 left: null,
@@ -183,7 +183,7 @@ AP.plate.designer = (function () {
 
             return result;
         },
-        findFirstFreePosition(fruit) {
+        findFirstFreePosition( fruit ) {
             const result = {
                 row: null,
                 column: null,
@@ -192,21 +192,21 @@ AP.plate.designer = (function () {
             const fruitsController = AP.plate.designer.fruitsController;
             const grid = fruitsController.plate.grid;
 
-            for (let y = 0; y < grid.length; y++) {
+            for ( let y = 0; y < grid.length; y++ ) {
                 const row = grid[y];
 
                 let columnCount = 0;
-                for (let x = 0; x < row.length; x++) {
+                for ( let x = 0; x < row.length; x++ ) {
                     const cell = row[x];
-                    const cellHasFruit = utils.cellHasFruit(y, x);
+                    const cellHasFruit = utils.cellHasFruit( y, x );
 
-                    if (cell.type == CELL_TYPE.PROHIBITED || cellHasFruit) {
+                    if ( cell.type == CELL_TYPE.PROHIBITED || cellHasFruit ) {
                         columnCount = 0;
                     } else {
                         columnCount++;
                     }
 
-                    if (columnCount == fruit.columnSpan) {
+                    if ( columnCount == fruit.columnSpan ) {
                         result.row = y;
                         result.column = x - columnCount + 1;
 
@@ -217,13 +217,13 @@ AP.plate.designer = (function () {
 
             return result;
         },
-        cellHasFruit(row, column) {
+        cellHasFruit( row, column ) {
             let result = false;
 
             const fruitsController = AP.plate.designer.fruitsController;
             const fruits = fruitsController.fruits;
 
-            for (const fruit of fruits) {
+            for ( const fruit of fruits ) {
                 const fruitPosition = fruit.gridPosition;
 
                 if (
@@ -243,14 +243,14 @@ AP.plate.designer = (function () {
     };
 
     class FruitGridPosition {
-        constructor(row, column) {
+        constructor( row, column ) {
             this.row = row;
             this.column = column;
         }
     }
 
     class Rectangle {
-        constructor(width, height, orientation) {
+        constructor( width, height, orientation ) {
             this.orientation = orientation;
             this.width = orientation == ORIENTATION.VERTICAL ? height : width;
             this.height = orientation == ORIENTATION.VERTICAL ? width : height;
@@ -267,7 +267,7 @@ AP.plate.designer = (function () {
             return this._$element;
         }
 
-        set $element(value) {
+        set $element( value ) {
             this._$element = value;
         }
 
@@ -275,7 +275,7 @@ AP.plate.designer = (function () {
             return this._top;
         }
 
-        set top(value) {
+        set top( value ) {
             this._top = value;
 
             this._bottom = this._top + this.height;
@@ -289,7 +289,7 @@ AP.plate.designer = (function () {
             return this._left;
         }
 
-        set left(value) {
+        set left( value ) {
             this._left = value;
 
             this._right = this._left + this.width;
@@ -305,8 +305,8 @@ AP.plate.designer = (function () {
     }
 
     class Plate extends Rectangle {
-        constructor(args) {
-            super(args.width, args.height, args.orientation);
+        constructor( args ) {
+            super( args.width, args.height, args.orientation );
 
             this.uuid = args.uuid;
             this.code = args.code;
@@ -319,10 +319,10 @@ AP.plate.designer = (function () {
         /**
          * Creates HTML nodes and inserts them in the DOM to visualize grid property
          */
-        drawGridWithin($rootNode) {
+        drawGridWithin( $rootNode ) {
             $rootNode.empty();
 
-            const $plateBackground = $("<div/>", {
+            const $plateBackground = $( "<div/>", {
                 class: "plate-background",
                 css: {
                     width: `${this.width}px`,
@@ -330,17 +330,17 @@ AP.plate.designer = (function () {
                     "background-image": `url('${this.img}')`,
                 },
                 appendTo: $rootNode,
-            });
+            } );
 
             const platePosition = $plateBackground.position();
 
             this.top = platePosition.top;
             this.left = platePosition.left;
 
-            const $plateLayers = $("<div/>", {
+            const $plateLayers = $( "<div/>", {
                 id: "plate-layers",
                 appendTo: $plateBackground,
-            });
+            } );
 
             const plateCSS = {
                 "grid-template-rows": "",
@@ -350,61 +350,61 @@ AP.plate.designer = (function () {
             const gridTemplateRows = [];
             const gridTemplateColumns = [];
 
-            for (let i = 0; i < this.grid.length; i++) {
-                gridTemplateRows.push(0);
+            for ( let i = 0; i < this.grid.length; i++ ) {
+                gridTemplateRows.push( 0 );
             }
 
-            for (let i = 0; i < this.grid[0].length; i++) {
-                gridTemplateColumns.push(0);
+            for ( let i = 0; i < this.grid[0].length; i++ ) {
+                gridTemplateColumns.push( 0 );
             }
 
-            for (let i = 0; i < this.grid.length; i++) {
+            for ( let i = 0; i < this.grid.length; i++ ) {
                 const row = this.grid[i];
 
-                const maxCellHeight = Math.max(...row.map((x) => x.height));
+                const maxCellHeight = Math.max( ...row.map( ( x ) => x.height ) );
 
                 gridTemplateRows[i] = maxCellHeight;
             }
 
-            for (let i = 0; i < this.grid[0].length; i++) {
+            for ( let i = 0; i < this.grid[0].length; i++ ) {
                 const cells = [];
 
-                for (let j = 0; j < this.grid.length; j++) {
+                for ( let j = 0; j < this.grid.length; j++ ) {
                     const cell = this.grid[j][i];
 
-                    cells.push(cell);
+                    cells.push( cell );
                 }
 
-                const minCellWidth = Math.min(...cells.map((x) => x.width));
+                const minCellWidth = Math.min( ...cells.map( ( x ) => x.width ) );
 
                 gridTemplateColumns[i] = minCellWidth;
             }
 
             plateCSS["grid-template-rows"] = gridTemplateRows
-                .map((x) => `${x}px`)
-                .join(" ");
+                .map( ( x ) => `${x}px` )
+                .join( " " );
             plateCSS["grid-template-columns"] = gridTemplateColumns
-                .map((x) => `${x}px`)
-                .join(" ");
+                .map( ( x ) => `${x}px` )
+                .join( " " );
 
-            const $plateGrid = $("<div/>", {
+            const $plateGrid = $( "<div/>", {
                 id: "plate-grid",
                 css: plateCSS,
                 appendTo: $plateLayers,
-            });
+            } );
 
-            const $fruits = $("<div/>", {
+            const $fruits = $( "<div/>", {
                 id: "fruits",
                 appendTo: $plateLayers,
-            });
+            } );
 
-            for (let y = 1; y <= this.grid.length; y++) {
+            for ( let y = 1; y <= this.grid.length; y++ ) {
                 const row = this.grid[y - 1];
 
-                for (let x = 1; x <= row.length; x++) {
+                for ( let x = 1; x <= row.length; x++ ) {
                     const cell = row[x - 1];
 
-                    const $plateCell = $("<div/>", {
+                    const $plateCell = $( "<div/>", {
                         class: `grid-column p${x} ${
                             cell.type == CELL_TYPE.PROHIBITED
                                 ? "prohibited"
@@ -415,19 +415,19 @@ AP.plate.designer = (function () {
                             "grid-column": `${x} / ${x + 1}`,
                         },
                         appendTo: $plateGrid,
-                    });
+                    } );
 
                     cell.$element = $plateCell;
 
-                    if (cell.type != CELL_TYPE.PROHIBITED) {
-                        const $cellLabel = $("<span/>", {
+                    if ( cell.type != CELL_TYPE.PROHIBITED ) {
+                        const $cellLabel = $( "<span/>", {
                             text: `(${x}, ${y})`,
                             class: "position-label",
                             css: {
-                                "font-size": "8px",
+                                "font-model": "8px",
                             },
                             appendTo: $plateCell,
-                        });
+                        } );
                     }
 
                     cell.height = gridTemplateRows[y - 1];
@@ -443,8 +443,8 @@ AP.plate.designer = (function () {
     }
 
     class Cell extends Rectangle {
-        constructor(width, height, orientation, type) {
-            super(width, height, orientation);
+        constructor( width, height, orientation, type ) {
+            super( width, height, orientation );
 
             this.type = type;
             this._position = null;
@@ -454,19 +454,19 @@ AP.plate.designer = (function () {
             return this._position;
         }
 
-        set position(position) {
+        set position( position ) {
             this._position = position;
         }
 
-        setIsOverlapped(value) {
-            if (value) {
-                this.$element.addClass("overlapped");
+        setIsOverlapped( value ) {
+            if ( value ) {
+                this.$element.addClass( "overlapped" );
             } else {
-                this.$element.removeClass("overlapped");
+                this.$element.removeClass( "overlapped" );
             }
         }
 
-        setIfOverlappedBy(fruitPosition) {
+        setIfOverlappedBy( fruitPosition ) {
             const cellRectangle = {
                 top: this.top,
                 bottom: this.bottom,
@@ -475,14 +475,14 @@ AP.plate.designer = (function () {
             };
 
             this.setIsOverlapped(
-                utils.doRectanglesCollide(fruitPosition, cellRectangle),
+                utils.doRectanglesCollide( fruitPosition, cellRectangle ),
             );
         }
     }
 
     class Fruit extends Rectangle {
-        constructor(args) {
-            super(args.width, args.height, args.orientation);
+        constructor( args ) {
+            super( args.width, args.height, args.orientation );
 
             this.rowSpan =
                 this.orientation == ORIENTATION.VERTICAL
@@ -506,12 +506,12 @@ AP.plate.designer = (function () {
             return this._gridPosition;
         }
 
-        set gridPosition(value) {
+        set gridPosition( value ) {
             this._gridPosition = value;
 
             if (
-                Math.sign(this._gridPosition.row) >= 0 &&
-                Math.sign(this._gridPosition.column) >= 0
+                Math.sign( this._gridPosition.row ) >= 0 &&
+                Math.sign( this._gridPosition.column ) >= 0
             ) {
                 const { top, left } = utils.extractTopLeftPositionFrom(
                     this._gridPosition,
@@ -522,54 +522,54 @@ AP.plate.designer = (function () {
             }
         }
 
-        initDraggableWidget(controller) {
+        initDraggableWidget( controller ) {
             const self = this;
 
-            self._$element.draggable({
+            self._$element.draggable( {
                 containment: "#fruits",
                 distance: MIN_DISTANCE_BEFORE_DRAGGING,
                 // grid: [ATOMIC_WIDTH],
                 revertDuration: 250,
-                start: function (event, ui) {
-                    controller.onStartDragging(self, event, ui);
+                start: function( event, ui ) {
+                    controller.onStartDragging( self, event, ui );
                 },
-                drag: function (event, ui) {
-                    controller.onDragging(self, event, ui);
+                drag: function( event, ui ) {
+                    controller.onDragging( self, event, ui );
                 },
-                stop: function (event, ui) {
-                    controller.onStopDragging(self, event, ui);
+                stop: function( event, ui ) {
+                    controller.onStopDragging( self, event, ui );
                 },
-            });
+            } );
         }
 
-        isOverlappingWith(otherFruit) {
+        isOverlappingWith( otherFruit ) {
             let result = true;
 
-            const x5 = Math.max(this.left, otherFruit.left);
+            const x5 = Math.max( this.left, otherFruit.left );
             const x6 = Math.min(
                 this.left + this.width,
                 otherFruit.left + otherFruit.width,
             );
 
-            const y5 = Math.max(this.top, otherFruit.top);
+            const y5 = Math.max( this.top, otherFruit.top );
             const y6 = Math.min(
                 this.top + this.height,
                 otherFruit.top + otherFruit.height,
             );
 
-            if (x5 >= x6) {
+            if ( x5 >= x6 ) {
                 result = false;
             }
 
-            if (y5 >= y6) {
+            if ( y5 >= y6 ) {
                 result = false;
             }
 
             return result;
         }
 
-        canSwapWith(otherFruit) {
-            // Only if both are in the same position and are of equal size
+        canSwapWith( otherFruit ) {
+            // Only if both are in the same position and are of equal model
             return (
                 this.gridPosition.row == otherFruit.gridPosition.row &&
                 this.gridPosition.column == otherFruit.gridPosition.column &&
@@ -578,12 +578,12 @@ AP.plate.designer = (function () {
             );
         }
 
-        swapPositionWith(otherFruit) {
+        swapPositionWith( otherFruit ) {
             this.gridPosition = otherFruit.gridPosition;
             otherFruit.gridPosition = this._originalGridPosition;
         }
 
-        fitsWithin(containmentGrid) {
+        fitsWithin( containmentGrid ) {
             const columnSpan = {
                 start: this.gridPosition.column,
                 end: this.gridPosition.column + this.width / FREE_CELL_WIDTH,
@@ -607,8 +607,8 @@ AP.plate.designer = (function () {
          * @param {Array} otherFruit
          * @returns Array of two elements: [x, y]
          */
-        calculateSeparation(otherFruit) {
-            const result = [0, 0];
+        calculateSeparation( otherFruit ) {
+            const result = [ 0, 0 ];
 
             const thisCenterPoint = [
                 this.left + this.width / 2,
@@ -626,11 +626,11 @@ AP.plate.designer = (function () {
             ];
 
             const vectorLength = Math.sqrt(
-                Math.pow(separationVector[0], 2) +
-                    Math.pow(separationVector[1], 2),
+                Math.pow( separationVector[0], 2 ) +
+                    Math.pow( separationVector[1], 2 ),
             ); // Pythagorean theorem
 
-            if (vectorLength == 0) {
+            if ( vectorLength == 0 ) {
                 return result; // Avoid division by zero
             }
 
@@ -667,23 +667,23 @@ AP.plate.designer = (function () {
         }
 
         startDragging() {
-            this.$element.addClass("is-dragging");
+            this.$element.addClass( "is-dragging" );
         }
 
         stopDragging() {
-            this.$element.removeClass("is-dragging");
+            this.$element.removeClass( "is-dragging" );
         }
 
         onEnterInProhibitedPosition() {
-            this.$element.addClass("is-in-prohibited-position");
+            this.$element.addClass( "is-in-prohibited-position" );
         }
 
         onExitFromProhibitedPosition() {
-            this.$element.removeClass("is-in-prohibited-position");
+            this.$element.removeClass( "is-in-prohibited-position" );
         }
 
-        drawWithin($rootNode) {
-            const $fruit = $("<div/>", {
+        drawWithin( $rootNode ) {
+            const $fruit = $( "<div/>", {
                 id: this.uuid,
                 class: "draggable-fruit",
                 css: {
@@ -693,31 +693,31 @@ AP.plate.designer = (function () {
                     height: `${this.height}px`,
                 },
                 appendTo: $rootNode,
-            });
+            } );
 
             const imgCSS = {
                 width: `${this.width}px`,
                 height: `${this.height}px`,
             };
 
-            if (this.orientation == ORIENTATION.VERTICAL) {
+            if ( this.orientation == ORIENTATION.VERTICAL ) {
                 const tmp = imgCSS.width;
                 imgCSS.width = imgCSS.height;
                 imgCSS.height = tmp;
 
-                if (this.isSquare()) {
+                if ( this.isSquare() ) {
                     imgCSS.transform = "rotate(90deg)";
                 } else {
                     imgCSS.transform = "rotate(90deg) translate(-50%, 0%)";
                 }
             }
 
-            const $img = $("<img/>", {
+            const $img = $( "<img/>", {
                 src: this.img,
                 class: "fruit-img",
                 css: imgCSS,
                 appendTo: $fruit,
-            });
+            } );
 
             this.$element = $fruit;
         }
@@ -726,15 +726,15 @@ AP.plate.designer = (function () {
          * Renders Fruit based on current position
          */
         render() {
-            this.$element.css({
+            this.$element.css( {
                 left: this.left,
                 top: this.top,
-            });
+            } );
         }
     }
 
     class FruitsController {
-        constructor(args) {
+        constructor( args ) {
             this.plate = args.plate;
             this.fruits = args.fruits;
         }
@@ -742,9 +742,9 @@ AP.plate.designer = (function () {
         /**
          *	Creates HTML nodes and inserts them in the DOM to visualize fruits on the grid
          */
-        drawFruitsWithin($rootNode) {
-            for (const fruit of this.fruits) {
-                fruit.drawWithin($rootNode);
+        drawFruitsWithin( $rootNode ) {
+            for ( const fruit of this.fruits ) {
+                fruit.drawWithin( $rootNode );
             }
         }
 
@@ -752,27 +752,27 @@ AP.plate.designer = (function () {
          * Initializes jQuery UI Draggable Widget for each fruit
          */
         makeFruitsDraggable() {
-            for (const fruit of this.fruits) {
-                fruit.initDraggableWidget(this);
+            for ( const fruit of this.fruits ) {
+                fruit.initDraggableWidget( this );
             }
         }
 
         restoreAllFruitPositions() {
-            for (const fruit of this.fruits) {
+            for ( const fruit of this.fruits ) {
                 fruit.restorePositionToLastSnapshot();
             }
         }
 
-        isFruitInProhibitedPosition(fruitRectangle) {
+        isFruitInProhibitedPosition( fruitRectangle ) {
             let result = false;
 
-            for (const row of this.plate.grid) {
-                if (result) {
+            for ( const row of this.plate.grid ) {
+                if ( result ) {
                     break;
                 }
 
-                for (const cell of row) {
-                    if (cell.type == CELL_TYPE.PROHIBITED) {
+                for ( const cell of row ) {
+                    if ( cell.type == CELL_TYPE.PROHIBITED ) {
                         const cellRectangle = {
                             top: cell.top,
                             bottom: cell.top + cell.height,
@@ -798,55 +798,55 @@ AP.plate.designer = (function () {
         }
 
         renderFruits() {
-            for (const fruit of this.fruits) {
+            for ( const fruit of this.fruits ) {
                 fruit.render();
             }
         }
 
         hasOverlappedFruits() {
-            return this.fruits.some((fruit) => {
-                return this.fruits.some((otherFruit) =>
+            return this.fruits.some( ( fruit ) => {
+                return this.fruits.some( ( otherFruit ) =>
                     otherFruit != fruit
-                        ? fruit.isOverlappingWith(otherFruit)
+                        ? fruit.isOverlappingWith( otherFruit )
                         : false,
                 );
-            });
+            } );
         }
 
-        moveAwayAllFruitsFrom(targetFruit) {
+        moveAwayAllFruitsFrom( targetFruit ) {
             let result = true;
 
-            const filteredFruits = this.fruits.filter((f) => f != targetFruit);
+            const filteredFruits = this.fruits.filter( ( f ) => f != targetFruit );
 
             const MAX_ITERATIONS = 1000;
 
             let counter = 0;
-            while (this.hasOverlappedFruits()) {
-                if (counter > MAX_ITERATIONS) {
+            while ( this.hasOverlappedFruits() ) {
+                if ( counter > MAX_ITERATIONS ) {
                     result = false;
 
-                    console.error("DANGER! Potential infinite loop.");
+                    console.error( "DANGER! Potential infinite loop." );
 
                     return result;
                 }
 
                 const overlapVectors = [];
 
-                for (const fruit of filteredFruits) {
-                    const vector = this.generateNormalizedOverlapVector(fruit);
+                for ( const fruit of filteredFruits ) {
+                    const vector = this.generateNormalizedOverlapVector( fruit );
 
-                    if (vector[0] != 0 || vector[1] != 0) {
-                        overlapVectors.push([fruit, vector]);
+                    if ( vector[0] != 0 || vector[1] != 0 ) {
+                        overlapVectors.push( [ fruit, vector ] );
                     }
                 }
 
-                for (const [fruit, vector] of overlapVectors) {
+                for ( const [ fruit, vector ] of overlapVectors ) {
                     const isSuccess = this.translateFruitByVector(
                         fruit,
                         vector,
                     );
 
-                    if (!isSuccess) {
+                    if ( !isSuccess ) {
                         result = false;
 
                         return result;
@@ -859,14 +859,14 @@ AP.plate.designer = (function () {
             return result;
         }
 
-        generateNormalizedOverlapVector(fruit) {
-            const vector = [0, 0];
+        generateNormalizedOverlapVector( fruit ) {
+            const vector = [ 0, 0 ];
 
-            const filteredFruits = this.fruits.filter((f) => f != fruit);
+            const filteredFruits = this.fruits.filter( ( f ) => f != fruit );
 
-            for (const otherFruit of filteredFruits) {
-                if (fruit.isOverlappingWith(otherFruit)) {
-                    const innerVector = fruit.calculateSeparation(otherFruit);
+            for ( const otherFruit of filteredFruits ) {
+                if ( fruit.isOverlappingWith( otherFruit ) ) {
+                    const innerVector = fruit.calculateSeparation( otherFruit );
 
                     vector[0] += innerVector[0];
                     vector[1] += innerVector[1];
@@ -876,7 +876,7 @@ AP.plate.designer = (function () {
             return vector;
         }
 
-        translateFruitByVector(fruit, vector) {
+        translateFruitByVector( fruit, vector ) {
             const convertedGridPosition = {
                 column: vector[0] / FREE_CELL_WIDTH,
                 row: vector[1] / FREE_CELL_HEIGHT,
@@ -895,13 +895,13 @@ AP.plate.designer = (function () {
             };
 
             return (
-                !this.isFruitInProhibitedPosition(fruitRectangle) &&
-                fruit.fitsWithin(this.plate.grid)
+                !this.isFruitInProhibitedPosition( fruitRectangle ) &&
+                fruit.fitsWithin( this.plate.grid )
             );
         }
 
-        onSelectFruit(selectedFruit) {
-            const fruitObj = new Fruit({
+        onSelectFruit( selectedFruit ) {
+            const fruitObj = new Fruit( {
                 width: selectedFruit.width,
                 height: selectedFruit.height,
                 rowSpan: selectedFruit.rowSpan,
@@ -911,20 +911,20 @@ AP.plate.designer = (function () {
                 code: selectedFruit.code,
                 name: selectedFruit.name,
                 img: selectedFruit.img,
-            });
+            } );
 
-            const freePosition = utils.findFirstFreePosition(fruitObj);
+            const freePosition = utils.findFirstFreePosition( fruitObj );
 
-            if (freePosition.row != null && freePosition.column != null) {
+            if ( freePosition.row != null && freePosition.column != null ) {
                 fruitObj.gridPosition = new FruitGridPosition(
                     freePosition.row,
                     freePosition.column,
                 );
 
-                this.fruits.push(fruitObj);
+                this.fruits.push( fruitObj );
 
-                fruitObj.drawWithin($("#fruits"));
-                fruitObj.initDraggableWidget(this);
+                fruitObj.drawWithin( $( "#fruits" ) );
+                fruitObj.initDraggableWidget( this );
             }
         }
 
@@ -934,10 +934,10 @@ AP.plate.designer = (function () {
          * @param {Event} event
          * @param {object} ui
          */
-        onStartDragging(fruit, event, ui) {
+        onStartDragging( fruit, event, ui ) {
             fruit.startDragging();
 
-            for (const fruit of this.fruits) {
+            for ( const fruit of this.fruits ) {
                 fruit.makePositionSnapshot();
             }
         }
@@ -948,7 +948,7 @@ AP.plate.designer = (function () {
          * @param {Event} event
          * @param {object} ui The values may be changed to modify where the element will be positioned. This is useful for custom containment, snapping, etc
          */
-        onDragging(fruit, event, ui) {
+        onDragging( fruit, event, ui ) {
             let newFruitPosition = {
                 top: ui.position.top,
                 bottom: ui.position.top + fruit.height,
@@ -960,9 +960,9 @@ AP.plate.designer = (function () {
                 ui,
                 newFruitPosition,
             );
-            const gridPosition = new FruitGridPosition(row, column);
+            const gridPosition = new FruitGridPosition( row, column );
             const { top, left } =
-                utils.extractTopLeftPositionFrom(gridPosition);
+                utils.extractTopLeftPositionFrom( gridPosition );
             newFruitPosition = {
                 top: top,
                 bottom: top + fruit.height,
@@ -970,13 +970,13 @@ AP.plate.designer = (function () {
                 right: left + fruit.width,
             };
 
-            for (const row of this.plate.grid) {
-                for (const cell of row) {
-                    cell.setIfOverlappedBy(newFruitPosition);
+            for ( const row of this.plate.grid ) {
+                for ( const cell of row ) {
+                    cell.setIfOverlappedBy( newFruitPosition );
                 }
             }
 
-            if (this.isFruitInProhibitedPosition(newFruitPosition)) {
+            if ( this.isFruitInProhibitedPosition( newFruitPosition ) ) {
                 fruit.onEnterInProhibitedPosition();
             } else {
                 fruit.onExitFromProhibitedPosition();
@@ -989,10 +989,10 @@ AP.plate.designer = (function () {
          * @param {Event} event
          * @param {object} ui
          */
-        onStopDragging(fruit, event, ui) {
-            for (const row of this.plate.grid) {
-                for (const cell of row) {
-                    cell.setIsOverlapped(false);
+        onStopDragging( fruit, event, ui ) {
+            for ( const row of this.plate.grid ) {
+                for ( const cell of row ) {
+                    cell.setIsOverlapped( false );
                 }
             }
 
@@ -1007,7 +1007,7 @@ AP.plate.designer = (function () {
                 ui,
                 newFruitPosition,
             );
-            fruit.gridPosition = new FruitGridPosition(row, column);
+            fruit.gridPosition = new FruitGridPosition( row, column );
 
             const fruitPosition = {
                 top: fruit.top,
@@ -1016,21 +1016,21 @@ AP.plate.designer = (function () {
                 right: fruit.right,
             };
 
-            if (this.isFruitInProhibitedPosition(fruitPosition)) {
+            if ( this.isFruitInProhibitedPosition( fruitPosition ) ) {
                 fruit.restorePositionToLastSnapshot();
             } else {
-                if (fruit.hasChangedPosition()) {
-                    if (this.hasOverlappedFruits()) {
+                if ( fruit.hasChangedPosition() ) {
+                    if ( this.hasOverlappedFruits() ) {
                         const otherFruit = this.fruits.find(
-                            (f) =>
+                            ( f ) =>
                                 f != fruit &&
                                 f.gridPosition.row == fruit.gridPosition.row &&
                                 f.gridPosition.column ==
                                     fruit.gridPosition.column,
                         );
 
-                        if (otherFruit && fruit.canSwapWith(otherFruit)) {
-                            fruit.swapPositionWith(otherFruit);
+                        if ( otherFruit && fruit.canSwapWith( otherFruit ) ) {
+                            fruit.swapPositionWith( otherFruit );
                         } else {
                             const isOperationSuccessful =
                                 this.moveAwayAllFruitsFrom(
@@ -1038,7 +1038,7 @@ AP.plate.designer = (function () {
                                     this.plate.grid,
                                 );
 
-                            if (!isOperationSuccessful) {
+                            if ( !isOperationSuccessful ) {
                                 this.restoreAllFruitPositions();
                             }
                         }
@@ -1060,9 +1060,9 @@ AP.plate.designer = (function () {
         container: null,
     };
 
-    priv.vm = new kendo.data.ObservableObject({
+    priv.vm = new kendo.data.ObservableObject( {
         // DATA
-        plates: new kendo.data.DataSource({
+        plates: new kendo.data.DataSource( {
             data: [
                 {
                     UUID: "100",
@@ -1108,11 +1108,11 @@ AP.plate.designer = (function () {
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
-                        ["_", "_"],
-                        ["0", "0"],
-                        ["_", "_"],
-                        ["0", "0"],
-                        ["_", "_"],
+                        [ "_", "_" ],
+                        [ "0", "0" ],
+                        [ "_", "_" ],
+                        [ "0", "0" ],
+                        [ "_", "_" ],
                     ],
                 },
                 {
@@ -1127,22 +1127,22 @@ AP.plate.designer = (function () {
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
-                        ["_"],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
                     ],
                 },
                 {
@@ -1157,7 +1157,7 @@ AP.plate.designer = (function () {
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
-                        ["_", "_", "_", "_", "0", "_", "_"],
+                        [ "_", "_", "_", "_", "0", "_", "_" ],
                     ],
                 },
                 {
@@ -1172,9 +1172,9 @@ AP.plate.designer = (function () {
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
-                        ["0", "0", "_", "_"],
-                        ["_", "_", "0", "0"],
-                        ["_", "_", "_", "_"],
+                        [ "0", "0", "_", "_" ],
+                        [ "_", "_", "0", "0" ],
+                        [ "_", "_", "_", "_" ],
                     ],
                 },
                 {
@@ -1189,7 +1189,7 @@ AP.plate.designer = (function () {
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
-                        ["_", "_", "_", "_", "0", "_", "_", "0", "0", "0", "0"],
+                        [ "_", "_", "_", "_", "0", "_", "_", "0", "0", "0", "0" ],
                     ],
                 },
             ],
@@ -1198,37 +1198,37 @@ AP.plate.designer = (function () {
                     id: "UUID",
                 },
             },
-        }),
+        } ),
         selectedPlate: "100",
-        fruits: new kendo.data.DataSource({
+        fruits: new kendo.data.DataSource( {
             data: [],
-        }),
+        } ),
         // CONDITIONS
         isPlateDefined: false,
         // ACTIONS
         // GETTERS
         // EVENTS
-        onSelectFruit: function (event) {
+        onSelectFruit: function( event ) {
             event.preventDefault();
 
-            if (this.get("isPlateDefined")) {
-                pub.fruitsController.onSelectFruit(event.dataItem);
+            if ( this.get( "isPlateDefined" ) ) {
+                pub.fruitsController.onSelectFruit( event.dataItem );
             } else {
-                alert("Spingi prima 'Configura'");
+                alert( "Spingi prima 'Configura'" );
             }
         },
-        onClickGenerali: function (event) {},
-        onClickListaFrutti: function (event) {},
-        onClickImmagine: function (event) {},
-        onClickConfigura: function (event) {
-            const selectedPlate = this.plates.get(this.get("selectedPlate"));
+        onClickGenerali: function( event ) {},
+        onClickListaFrutti: function( event ) {},
+        onClickImmagine: function( event ) {},
+        onClickConfigura: function( event ) {
+            const selectedPlate = this.plates.get( this.get( "selectedPlate" ) );
 
             FREE_CELL_WIDTH =
                 pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
             FREE_CELL_HEIGHT =
                 pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
 
-            if (selectedPlate.CELL_ORIENTATION == ORIENTATION.VERTICAL) {
+            if ( selectedPlate.CELL_ORIENTATION == ORIENTATION.VERTICAL ) {
                 const tmp = FREE_CELL_WIDTH;
                 FREE_CELL_WIDTH = FREE_CELL_HEIGHT;
                 FREE_CELL_HEIGHT = tmp;
@@ -1236,7 +1236,7 @@ AP.plate.designer = (function () {
 
             const grid = [];
 
-            for (let iRow = 0; iRow < selectedPlate.GRID.length; iRow++) {
+            for ( let iRow = 0; iRow < selectedPlate.GRID.length; iRow++ ) {
                 const row = [];
 
                 for (
@@ -1253,13 +1253,13 @@ AP.plate.designer = (function () {
                         cellType,
                     );
 
-                    row.push(cell);
+                    row.push( cell );
                 }
 
-                grid.push(row);
+                grid.push( row );
             }
 
-            const plate = new Plate({
+            const plate = new Plate( {
                 width: selectedPlate.WIDTH,
                 height: selectedPlate.HEIGHT,
                 orientation: selectedPlate.ORIENTATION,
@@ -1269,24 +1269,24 @@ AP.plate.designer = (function () {
                 img: selectedPlate.IMG,
                 grid: grid,
                 isSpecial: false,
-            });
+            } );
 
-            pub.fruitsController = new FruitsController({
+            pub.fruitsController = new FruitsController( {
                 plate: plate,
                 fruits: [],
-            });
+            } );
 
-            pub.fruitsController.plate.drawGridWithin($(".plate-designer"));
+            pub.fruitsController.plate.drawGridWithin( $( ".plate-designer" ) );
 
-            this.set("isPlateDefined", true);
+            this.set( "isPlateDefined", true );
         },
         // INITS
-    });
+    } );
 
-    pub.init = function (setup) {
+    pub.init = function( setup ) {
         priv.container = setup.container;
 
-        priv.vm.set("fruits", [
+        priv.vm.set( "fruits", [
             {
                 width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
                 height:
@@ -1331,19 +1331,19 @@ AP.plate.designer = (function () {
                 name: "INT. Sottile",
                 img: "/assets/main/img/foto_frutto_interruttore.png",
             },
-        ]);
+        ] );
 
-        kendo.bind(priv.container, priv.vm);
+        kendo.bind( priv.container, priv.vm );
     };
 
-    pub.getVM = function () {
+    pub.getVM = function() {
         return priv.vm;
     };
 
     return pub;
-})();
+} () );
 
-AP.plate.map = (function () {
+AP.plate.map = ( function() {
     const { MarkerArea, CustomImageMarker, ImageMarkerEditor } = markerjs3;
 
     // Seguendo la guida: https://markerjs.com/docs-v3/documents/guides_and_tutorials.tutorials.custom_marker_types
@@ -1358,12 +1358,12 @@ AP.plate.map = (function () {
             return this.#plateUUID;
         }
 
-        set plateUUID(value) {
+        set plateUUID( value ) {
             this.#plateUUID = value;
         }
 
-        constructor(container) {
-            super(container);
+        constructor( container ) {
+            super( container );
         }
 
         getState() {
@@ -1377,14 +1377,14 @@ AP.plate.map = (function () {
             return result;
         }
 
-        restoreState(state) {
+        restoreState( state ) {
             const plateMarkerState = state;
 
-            if (plateMarkerState.plateUUID !== undefined) {
+            if ( plateMarkerState.plateUUID !== undefined ) {
                 this.plateUUID = plateMarkerState.plateUUID;
             }
 
-            super.restoreState(state);
+            super.restoreState( state );
         }
     }
 
@@ -1394,7 +1394,7 @@ AP.plate.map = (function () {
         markerArea: null,
     };
 
-    priv.vm = new kendo.data.ObservableObject({
+    priv.vm = new kendo.data.ObservableObject( {
         // DATA
         plates: [],
         selectedPlate: null,
@@ -1404,53 +1404,53 @@ AP.plate.map = (function () {
         isEnabledRedo: false,
         isEnabledRemoveMarker: false,
         isEnabledAddMarker() {
-            return this.get("selectedPlateMarkersQuantity") > 0;
+            return this.get( "selectedPlateMarkersQuantity" ) > 0;
         },
         // ACTIONS
-        updateUndoRedoButtons(event) {
-            this.set("isEnabledUndo", priv.markerArea.isUndoPossible);
-            this.set("isEnabledRedo", priv.markerArea.isRedoPossible);
+        updateUndoRedoButtons( event ) {
+            this.set( "isEnabledUndo", priv.markerArea.isUndoPossible );
+            this.set( "isEnabledRedo", priv.markerArea.isRedoPossible );
         },
-        updateRemoveMarkerButton(event) {
+        updateRemoveMarkerButton( event ) {
             this.set(
                 "isEnabledRemoveMarker",
                 priv.markerArea.selectedMarkerEditors.length > 0,
             );
         },
-        updatePlateMarkersQuantity(event) {
+        updatePlateMarkersQuantity( event ) {
             const plate = this.plates.find(
-                (x) => x.uuid == event.detail.markerEditor.marker.plateUUID,
+                ( x ) => x.uuid == event.detail.markerEditor.marker.plateUUID,
             );
-            const selectedPlate = this.get("selectedPlate");
+            const selectedPlate = this.get( "selectedPlate" );
 
-            if (plate) {
-                const oldQuantity = plate.get("availableQuantity");
+            if ( plate ) {
+                const oldQuantity = plate.get( "availableQuantity" );
 
                 let newQuantity = oldQuantity;
 
-                if (event.type == "markerdelete") {
+                if ( event.type == "markerdelete" ) {
                     newQuantity = oldQuantity + 1;
-                } else if (event.type == "markercreate") {
-                    if (oldQuantity > 0) {
+                } else if ( event.type == "markercreate" ) {
+                    if ( oldQuantity > 0 ) {
                         newQuantity = oldQuantity - 1;
                     }
                 }
 
-                if (newQuantity != oldQuantity) {
-                    plate.set("availableQuantity", newQuantity);
+                if ( newQuantity != oldQuantity ) {
+                    plate.set( "availableQuantity", newQuantity );
 
-                    if (selectedPlate === plate) {
-                        this.set("selectedPlateMarkersQuantity", newQuantity);
+                    if ( selectedPlate === plate ) {
+                        this.set( "selectedPlateMarkersQuantity", newQuantity );
                     }
                 }
             }
         },
         postUndoRedo() {
-            const selectedPlate = this.get("selectedPlate");
+            const selectedPlate = this.get( "selectedPlate" );
             const plateAvailableQuantitiesMap = new Map();
 
-            for (const plate of this.get("plates")) {
-                plate.set("availableQuantity", plate.totalQuantity);
+            for ( const plate of this.get( "plates" ) ) {
+                plate.set( "availableQuantity", plate.totalQuantity );
 
                 plateAvailableQuantitiesMap.set(
                     plate.uuid,
@@ -1458,9 +1458,9 @@ AP.plate.map = (function () {
                 );
             }
 
-            for (const editor of priv.markerArea.editors) {
+            for ( const editor of priv.markerArea.editors ) {
                 const currentPlateAvailableQuantity =
-                    plateAvailableQuantitiesMap.get(editor.marker.plateUUID);
+                    plateAvailableQuantitiesMap.get( editor.marker.plateUUID );
 
                 plateAvailableQuantitiesMap.set(
                     editor.marker.plateUUID,
@@ -1468,127 +1468,127 @@ AP.plate.map = (function () {
                 );
             }
 
-            for (const plate of this.get("plates")) {
-                const newQuantity = plateAvailableQuantitiesMap.get(plate.uuid);
+            for ( const plate of this.get( "plates" ) ) {
+                const newQuantity = plateAvailableQuantitiesMap.get( plate.uuid );
 
-                plate.set("availableQuantity", newQuantity);
+                plate.set( "availableQuantity", newQuantity );
 
-                if (selectedPlate === plate) {
-                    this.set("selectedPlateMarkersQuantity", newQuantity);
+                if ( selectedPlate === plate ) {
+                    this.set( "selectedPlateMarkersQuantity", newQuantity );
                 }
             }
         },
         // GETTERS
-        getSelectedPlateMarkerImg(event) {
+        getSelectedPlateMarkerImg( event ) {
             let result = "../../../../assets/main/img/red_pin.png";
 
-            const selectedPlate = this.get("selectedPlate");
+            const selectedPlate = this.get( "selectedPlate" );
 
-            if (selectedPlate != null) {
+            if ( selectedPlate != null ) {
                 result = selectedPlate.marker.img;
             }
 
             return result;
         },
         // EVENTS
-        onClickAddMarker(event) {
-            const selectedPlate = this.get("selectedPlate");
+        onClickAddMarker( event ) {
+            const selectedPlate = this.get( "selectedPlate" );
 
-            if (selectedPlate != null) {
-                const markerEditor = priv.markerArea.createMarker(PlateMarker);
+            if ( selectedPlate != null ) {
+                const markerEditor = priv.markerArea.createMarker( PlateMarker );
 
                 markerEditor.marker.plateUUID = selectedPlate.uuid;
-                markerEditor.marker.defaultSize = selectedPlate.marker.size;
+                markerEditor.marker.defaultModel = selectedPlate.marker.model;
                 markerEditor.marker.imageSrc = selectedPlate.marker.img;
             }
         },
-        onClickRemoveMarker(event) {
+        onClickRemoveMarker( event ) {
             priv.markerArea.deleteSelectedMarkers();
         },
-        onClickUndo(event) {
-            if (priv.markerArea.isUndoPossible) {
+        onClickUndo( event ) {
+            if ( priv.markerArea.isUndoPossible ) {
                 priv.markerArea.undo();
 
                 this.postUndoRedo();
             }
         },
-        onClickRedo(event) {
-            if (priv.markerArea.isRedoPossible) {
+        onClickRedo( event ) {
+            if ( priv.markerArea.isRedoPossible ) {
                 priv.markerArea.redo();
 
                 this.postUndoRedo();
             }
         },
-        onClickZoomIn(event) {
+        onClickZoomIn( event ) {
             priv.markerArea.zoomLevel += 0.1;
         },
-        onClickZoomOut(event) {
-            if (priv.markerArea.zoomLevel > 0.2) {
+        onClickZoomOut( event ) {
+            if ( priv.markerArea.zoomLevel > 0.2 ) {
                 priv.markerArea.zoomLevel -= 0.1;
             }
         },
-        onClickZoomReset(event) {
+        onClickZoomReset( event ) {
             priv.markerArea.zoomLevel = 1;
         },
-        onClickExport(event) {
-            priv.state = JSON.stringify(priv.markerArea.getState());
+        onClickExport( event ) {
+            priv.state = JSON.stringify( priv.markerArea.getState() );
         },
-        onClickImport(event) {
-            priv.markerArea.restoreState(JSON.parse(priv.state));
+        onClickImport( event ) {
+            priv.markerArea.restoreState( JSON.parse( priv.state ) );
         },
-        onSelectPlate(event) {
+        onSelectPlate( event ) {
             this.set(
                 "selectedPlateMarkersQuantity",
                 event.dataItem.availableQuantity,
             );
         },
         // INITS
-    });
+    } );
 
-    pub.init = function (setup) {
+    pub.init = function( setup ) {
         priv.container = setup.container;
 
-        priv.vm.set("plates", pageData.plates);
+        priv.vm.set( "plates", pageData.plates );
 
-        kendo.bind(setup.container, priv.vm);
+        kendo.bind( setup.container, priv.vm );
 
-        priv.targetImg = document.createElement("img");
+        priv.targetImg = document.createElement( "img" );
         priv.targetImg.src = pageData.platesMap.img;
 
-        const platesMap = document.querySelector(".plates-map-body");
+        const platesMap = document.querySelector( ".plates-map-body" );
 
         priv.markerArea = new MarkerArea();
-        priv.markerArea.registerMarkerType(PlateMarker, ImageMarkerEditor);
+        priv.markerArea.registerMarkerType( PlateMarker, ImageMarkerEditor );
         priv.markerArea.targetImage = priv.targetImg;
-        platesMap.appendChild(priv.markerArea);
+        platesMap.appendChild( priv.markerArea );
 
         priv.markerArea.addEventListener(
             "areastatechange",
-            priv.vm.updateUndoRedoButtons.bind(priv.vm),
+            priv.vm.updateUndoRedoButtons.bind( priv.vm ),
         );
 
         priv.markerArea.addEventListener(
             "markerdelete",
-            priv.vm.updateRemoveMarkerButton.bind(priv.vm),
+            priv.vm.updateRemoveMarkerButton.bind( priv.vm ),
         );
         priv.markerArea.addEventListener(
             "markerselect",
-            priv.vm.updateRemoveMarkerButton.bind(priv.vm),
+            priv.vm.updateRemoveMarkerButton.bind( priv.vm ),
         );
         priv.markerArea.addEventListener(
             "markerdeselect",
-            priv.vm.updateRemoveMarkerButton.bind(priv.vm),
+            priv.vm.updateRemoveMarkerButton.bind( priv.vm ),
         );
 
         priv.markerArea.addEventListener(
             "markerdelete",
-            priv.vm.updatePlateMarkersQuantity.bind(priv.vm),
+            priv.vm.updatePlateMarkersQuantity.bind( priv.vm ),
         );
         priv.markerArea.addEventListener(
             "markercreate",
-            priv.vm.updatePlateMarkersQuantity.bind(priv.vm),
+            priv.vm.updatePlateMarkersQuantity.bind( priv.vm ),
         );
     };
 
     return pub;
-})();
+} () );

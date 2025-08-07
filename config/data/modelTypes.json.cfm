@@ -5,6 +5,6 @@
     },
     {
         id: "M",
-        name: "Modello"
+        name: "Forma"
     }
 ]

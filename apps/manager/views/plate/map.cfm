@@ -8,7 +8,7 @@
 			"availableQuantity" = 1,
 			"marker" = {
 				"img" = "../../../../assets/main/img/red_pin.png",
-				"size" = {
+				"model" = {
 					"width" = 32,
 					"height" = 32,
 				},
@@ -21,7 +21,7 @@
 			"availableQuantity" = 10,
 			"marker" = {
 				"img" = "../../../../assets/main/img/green_pin.png",
-				"size" = {
+				"model" = {
 					"width" = 32,
 					"height" = 32,
 				},
@@ -34,7 +34,7 @@
 			"availableQuantity" = 100,
 			"marker" = {
 				"img" = "../../../../assets/main/img/blue_pin.png",
-				"size" = {
+				"model" = {
 					"width" = 32,
 					"height" = 32,
 				},

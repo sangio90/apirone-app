@@ -6,8 +6,8 @@ AP.line.fields = {
     detailForm: $( "#line-detail-form" ),
     searchListForm: $( "#line-grid-search-form" ),
     productsRoot: $( "#line-products-root" ),
-    sizeConfigModal: $( "#size-config-modal" ),
-    sizeConfigForm: $( "#size-config-form" ),
+    modelConfigModal: $( "#model-config-modal" ),
+    modelConfigForm: $( "#model-config-form" ),
 };
 
 $( document ).ready( function() {
@@ -329,7 +329,7 @@ AP.line.products = ( function() {
     var pub = {};
     var fields = AP.line.fields;
 
-    var defaultSizeConfigModal = {
+    var defaultModelConfigModal = {
         title: "Configura dimensioni",
         data: {
             height: "",
@@ -360,14 +360,14 @@ AP.line.products = ( function() {
 
         status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
-        var size = values.split( "__" )[0];
+        var model = values.split( "__" )[0];
         var finish = values.split( "__" )[1];
 
         NM.util.ajax( {
             method: method,
             url: "/manager/ajax/lines/" + AP.page.line.id + "/products",
             data: JSON.stringify( {
-                sizeId: size,
+                modelId: model,
                 finishId: finish,
                 categoryId: category,
             } ),
@@ -389,7 +389,7 @@ AP.line.products = ( function() {
     };
 
     var viewModel = kendo.observable( {
-        sizeConfigModal: defaultSizeConfigModal,
+        modelConfigModal: defaultModelConfigModal,
 
         attributes: function( event ) {
             var lineId = window.location.href.split( "/" )[5];
@@ -433,45 +433,45 @@ AP.line.products = ( function() {
             } );
         },
 
-        showSizeConfigModal: function( event ) {
-            NM.util.openModal( fields.sizeConfigModal );
+        showModelConfigModal: function( event ) {
+            NM.util.openModal( fields.modelConfigModal );
 
             const lineId = $( event.currentTarget ).data( "line-id" );
             const productCategoryId = $( event.currentTarget ).data(
                 "product-category-id",
             );
-            const sizeId = $( event.currentTarget ).data( "size-id" );
-            const sizeConfigId = $( event.currentTarget ).data( "size-config-id" );
+            const modelId = $( event.currentTarget ).data( "model-id" );
+            const modelConfigId = $( event.currentTarget ).data( "model-config-id" );
             const width = $( event.currentTarget ).data( "width" );
             const height = $( event.currentTarget ).data( "height" );
 
-            viewModel.set( "sizeConfigModal.data.sizeId", sizeId );
+            viewModel.set( "modelConfigModal.data.modelId", modelId );
             viewModel.set(
-                "sizeConfigModal.data.productCategoryId",
+                "modelConfigModal.data.productCategoryId",
                 productCategoryId,
             );
-            viewModel.set( "sizeConfigModal.data.sizeConfigId", sizeConfigId );
-            viewModel.set( "sizeConfigModal.data.lineId", lineId );
-            viewModel.set( "sizeConfigModal.data.width", width );
-            viewModel.set( "sizeConfigModal.data.height", height );
+            viewModel.set( "modelConfigModal.data.modelConfigId", modelConfigId );
+            viewModel.set( "modelConfigModal.data.lineId", lineId );
+            viewModel.set( "modelConfigModal.data.width", width );
+            viewModel.set( "modelConfigModal.data.height", height );
 
             return false;
         },
 
-        saveSizeConfig: function( event ) {
-            var sizeConfigForm = AP.line.fields.sizeConfigForm;
-            var status = sizeConfigForm.find( ".status" );
+        saveModelConfig: function( event ) {
+            var modelConfigForm = AP.line.fields.modelConfigForm;
+            var status = modelConfigForm.find( ".status" );
 
             status.html(
                 "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
             );
 
-            if ( sizeConfigForm.valid() ) {
-                const sizeConfigFormData = viewModel.get( "sizeConfigModal.data" );
+            if ( modelConfigForm.valid() ) {
+                const modelConfigFormData = viewModel.get( "modelConfigModal.data" );
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/size_config",
-                    data: JSON.stringify( sizeConfigFormData ),
+                    url: "/manager/ajax/model-config",
+                    data: JSON.stringify( modelConfigFormData ),
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
@@ -481,7 +481,7 @@ AP.line.products = ( function() {
                                 );
 
                                 setTimeout(
-                                    () => $( "#size-config-modal" ).modal( "hide" ),
+                                    () => $( "#model-config-modal" ).modal( "hide" ),
                                     1000,
                                 );
 
@@ -510,9 +510,9 @@ AP.line.products = ( function() {
 
         kendo.bind( fields.productsRoot, viewModel );
 
-        var sizeConfigForm = fields.sizeConfigForm;
+        var modelConfigForm = fields.modelConfigForm;
 
-        sizeConfigForm.validate( {
+        modelConfigForm.validate( {
             rules: {
                 width: {
                     required: true,

@@ -68,31 +68,13 @@ AP.component.list = ( function() {
 
             switch( current.type ) {
 
-            case "lineSize":
+            case "lineModel":
 
-                result.modalTitle = "Componenti per linea a dimensione: " + current.line.name + " / " + current.size.name;
-                result.readUrl = baseUrl + "?by=linesize&lineId=" + current.line.id + "&sizeId=" + current.size.id;
+                result.modalTitle = "Componenti per " + current.line.name + " / " + current.model.name;
+                result.readUrl = baseUrl + "?by=linemodel&lineId=" + current.line.id + "&modelId=" + current.model.id;
                 result.modifyUrl = result.readUrl;
 
                 break;
-
-                /*
-				case "fruit":
-
-					result.modalTitle = "Componenti base per frutto: " + current.fruit.code;
-					result.readUrl = baseUrl + "?by=fruit&fruitId=" + current.fruit.id;
-					result.modifyUrl = result.readUrl;
-
-					break;
-
-				case "fruitItem":
-
-					result.modalTitle =	"Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.name;
-					result.readUrl = baseUrl + "?by=fruitItem&&itemId=" + current.item.id;
-					result.modifyUrl = result.readUrl;
-
-					break;
-					*/
 
             case "item": // productItem
 

@@ -23,7 +23,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"bean" = "measurementUnit",
 			"file" = "measurementUnits.json.cfm"
 		},
-		"sizeType"            = { "bean" = "sizeType", "file" = "sizeTypes.json.cfm" },
+		"modelType"           = { "bean" = "modelType", "file" = "modelTypes.json.cfm" },
 		"profileType"         = { "bean" = "profileType", "file" = "profileTypes.json.cfm" },
 		"productCategoryMode" = {
 			"bean" = "productCategoryMode",

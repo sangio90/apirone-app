@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ProductDAO";
-	property name="SizeService" inject="SizeService";
+	property name="ModelService" inject="ModelService";
 	property name="LineService" inject="LineService";
 	property name="FinishService" inject="FinishService";
 	property name="StatusService" inject="StatusService";
@@ -28,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Product function getByParams(
 		required String lineId,
 		required String finishId,
-		required String sizeId
+		required String modelId
 	){
 		var record = getDao().find( argumentCollection = arguments );
 
@@ -114,7 +114,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Outcome function deleteByParams(
 		required String lineId,
 		required String finishId,
-		required String sizeId
+		required String modelId
 	){
 		var outcome = super.bean( "Outcome" );
 
@@ -238,7 +238,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			/*
 				complex (plates)
 			*/
-			bean.setSize( !IsNull( record.size_id ) ? getSizeService().get( record.size_id ) : NullValue() );
+			bean.setModel( !IsNull( record.model_id ) ? getModelService().get( record.model_id ) : NullValue() );
 			bean.setLine( !IsNull( record.line_id ) ? getLineService().get( record.line_id ) : NullValue() );
 			bean.setFinish(
 				!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()

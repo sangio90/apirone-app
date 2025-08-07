@@ -21,29 +21,29 @@ component output="true" accessors="true" {
 				"productItem" = {
 					"path"  = "product-items",
 					"types" = {
-						"horizontal" = { "sizes" = [ { "width" = "500" } ] },
-						"vertical"   = { "sizes" = [ { "width" = "500" } ] }
+						"horizontal" = { "models" = [ { "width" = "500" } ] },
+						"vertical"   = { "models" = [ { "width" = "500" } ] }
 					}
 				},
 				"product" = {
 					"path"  = "products",
 					"types" = {
-						"horizontal" = { "sizes" = [ { "width" = "500" } ] },
-						"vertical"   = { "sizes" = [ { "width" = "500" } ] }
+						"horizontal" = { "models" = [ { "width" = "500" } ] },
+						"vertical"   = { "models" = [ { "width" = "500" } ] }
 					}
 				},
 				"combination" = {
 					"path"  = "combinations",
 					"types" = {
-						"horizontal" = { "sizes" = [ { "width" = "500" } ] },
-						"vertical"   = { "sizes" = [ { "width" = "500" } ] }
+						"horizontal" = { "models" = [ { "width" = "500" } ] },
+						"vertical"   = { "models" = [ { "width" = "500" } ] }
 					}
 				},
 				"combinationItem" = {
 					"path"  = "combination-items",
 					"types" = {
-						"horizontal" = { "sizes" = [ { "width" = "500" } ] },
-						"vertical"   = { "sizes" = [ { "width" = "500" } ] }
+						"horizontal" = { "models" = [ { "width" = "500" } ] },
+						"vertical"   = { "models" = [ { "width" = "500" } ] }
 					}
 				}
 			},

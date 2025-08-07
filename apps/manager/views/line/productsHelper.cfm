@@ -1,7 +1,7 @@
 <cfscript>
-    function productExists( sizeId, finishId ){ 
+    function productExists( modelId, finishId ){ 
 
-        var result = ArrayContains( prc.existingProducts, "#sizeId#__#finishId#") > 0 ? true : false;
+        var result = ArrayContains( prc.existingProducts, "#modelId#__#finishId#") > 0 ? true : false;
 
         return result;
     }

@@ -164,9 +164,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return entity;
 		}
 
-		if ( Len( record.size_id ) ) {
-			entity.setKey( "size.id" );
-			entity.setValue( record.size_id );
+		if ( Len( record.model_id ) ) {
+			entity.setKey( "model.id" );
+			entity.setValue( record.model_id );
 
 			return entity;
 		}

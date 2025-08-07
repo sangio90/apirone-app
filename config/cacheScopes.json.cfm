@@ -28,7 +28,7 @@
     "RawProduct.bean": {},
     "RawProductType.bean": {},
     "RawValue.bean": {},
-    "Size.bean": {},
+    "Model.bean": {},
     "Status.bean": {},
     "SystemColor.bean": {},
     "Text.bean": {},
@@ -38,5 +38,5 @@
     "File.bean": {},
     "FileType.bean": {},
     "ProductCategoryType.bean": {},
-    "SizeConfig.bean": {},
+    "ModelConfig.bean": {},
 }

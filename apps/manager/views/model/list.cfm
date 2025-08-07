@@ -1,5 +1,5 @@
 <cfoutput>
-	<div id="size-list-root">
+	<div id="model-list-root">
 
         <div class="row">
             <div class="col-8">
@@ -17,7 +17,7 @@
 						<div class="d-flex align-items-center mb-3">
 							<div class="box-search-small col-9">
 								<form
-									name  ="size-grid-search-form" id="size-grid-search-form"
+									name  ="model-grid-search-form" id="model-grid-search-form"
 									method="get"
 									class ="row"
 									data-bind="events: { submit: search }"
@@ -65,9 +65,9 @@
 
 						</div>
 
-						<form name="size-grid-form" id="size-grid-form" method="post">
+						<form name="model-grid-form" id="model-grid-form" method="post">
 							#grid(
-								id      = "size-grid",
+								id      = "model-grid",
 								columns = "[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
                                     { 'field':'code', 'title':'Codice', width: '80px' },
@@ -83,7 +83,7 @@
                                         'headerAttributes': { 'class': 'text-center' }
                                     }
                                 ]",
-								rowTemplate = "size/size-grid-row"
+								rowTemplate = "model/model-grid-row"
 							)#
 						</form>
 					</div>
@@ -91,6 +91,6 @@
 			</div>
 		</div>
 
-		#view( "size/detail-modal" )#
+		#view( "model/detail-modal" )#
 	</div>
 </cfoutput>

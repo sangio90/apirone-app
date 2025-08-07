@@ -9,7 +9,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productItemService" inject="ProductItemService";
 	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="lineService" inject="LineService";
-	property name="sizeService" inject="SizeService";
+	property name="modelService" inject="ModelService";
 
 	property name="cacheScope" type="String" default="Component.bean";
 
@@ -36,7 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public Numeric function count(
 		String lineId,
-		String sizeId,
+		String modelId,
 		String productId,
 		Numeric productItemId,
 		Numeric attributeValueId
@@ -48,7 +48,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String lineId,
-		String sizeId,
+		String modelId,
 		String productId,
 		Numeric productItemId,
 		Numeric attributeValueId,
@@ -188,11 +188,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setProduct( getProductService().get( record.product_id ) );
 			}
 
-			if ( Len( record.line_id ) AND Len( record.size_id ) ) {
-				bean = super.bean( "ComponentLineSize" );
+			if ( Len( record.line_id ) AND Len( record.model_id ) ) {
+				bean = super.bean( "ComponentLineModel" );
 
 				bean.setLine( getLineService().get( record.line_id ) );
-				bean.setSize( getSizeService().get( record.size_id ) );
+				bean.setModel( getModelService().get( record.model_id ) );
 			}
 
 			bean.setId( record.component_id );

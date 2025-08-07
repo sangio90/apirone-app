@@ -71,31 +71,31 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title    = "Categoria #prc.category.getName()# linea #prc.line.getName()#";
 		prc.subtitle = "Prodotti disponibili";
 
-		var sizes    = super.fire( "size.list", { categoryId = prc.category.getId() } );
-		prc.sizes    = sizes;
+		var models    = super.fire( "model.list", { categoryId = prc.category.getId() } );
+		prc.models    = models;
 		prc.finishes = super.fire( "finish.list" );
 
-		for ( var size in sizes ) {
-			var existingSizeConfig = super.fire(
-				"sizeConfig.list",
+		for ( var model in models ) {
+			var existingModelConfig = super.fire(
+				"modelConfig.list",
 				{
-					sizeId            = size.getId(),
+					modelId            = model.getId(),
 					productCategoryId = Int( rc.categoryId ),
 					lineId            = rc.id
 				}
 			);
 
-			size.sizeConfig = NullValue();
+			model.modelConfig = NullValue();
 
-			if ( existingSizeConfig.len() ) {
-				size.sizeConfig = existingSizeConfig[ 1 ];
+			if ( existingModelConfig.len() ) {
+				model.modelConfig = existingModelConfig[ 1 ];
 			}
 		}
 
 		var productsList = super.fire( "product.list", { lineId = rc.id } );
 
 		for ( var product in productsList ) {
-			prc.existingProducts.add( "#product.getSize().getId()#__#product.getFinish().getId()#" );
+			prc.existingProducts.add( "#product.getModel().getId()#__#product.getFinish().getId()#" );
 		}
 
 		prc.jsScripts.add( "app-line" );

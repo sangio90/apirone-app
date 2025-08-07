@@ -5,7 +5,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				product_id::varchar,
-				size_id::varchar,
+				model_id::varchar,
 				line_id::varchar,
 				finish_id::varchar,
 				*
@@ -36,7 +36,7 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="lineId" type="String">
-		<cfargument name="sizeId" type="String">
+		<cfargument name="modelId" type="String">
 		<cfargument name="finishId" type="String">
 		<cfargument name="excludedIds" type="Array">
 		<cfargument name="categoryId" type="Numeric">
@@ -70,8 +70,8 @@
 					AND products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 				</cfif>
 
-				<cfif !IsNull( arguments.sizeId )>
-					AND products.size_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.sizeId#">::uuid
+				<cfif !IsNull( arguments.modelId )>
+					AND products.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.excludedCategoryIds ) AND ArrayLen( arguments.excludedCategoryIds )>
@@ -109,7 +109,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO products (
-				size_id,
+				model_id,
 				line_id,
 				finish_id,
 				code,
@@ -119,8 +119,8 @@
 				lines
 			)
 			VALUES (
-				<cfif !IsNull( arguments.product.getSize() )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getSize()?.getId()#">::uuid
+				<cfif !IsNull( arguments.product.getModel() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getModel()?.getId()#">::uuid
 				<cfelse>
 					NULL
 				</cfif>
@@ -167,9 +167,9 @@
 			UPDATE
 				products
 			SET
-				size_id =
-					<cfif !IsNull( arguments.product.getSize() )>
-						<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getSize()?.getId()#">::uuid
+				model_id =
+					<cfif !IsNull( arguments.product.getModel() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getModel()?.getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>

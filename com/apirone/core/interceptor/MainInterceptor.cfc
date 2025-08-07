@@ -182,9 +182,8 @@ component extends="coldbox.system.Interceptor" {
 		return result;
 	}
 
-	private Struct function getModel(){
+	private Struct function getContainer(){
 		return server[ "wireBox-apirone" ];
-		;
 	}
 
 	private Struct function loadDefaultLang(){

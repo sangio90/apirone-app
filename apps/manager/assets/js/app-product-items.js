@@ -331,12 +331,12 @@ AP.product.items = ( function() {
             var type = element.data( "type" );
 
             switch ( type ) {
-            case "lineSize":
+            case "lineModel":
                 var value = {
-                    type: "lineSize",
-                    size: {
-                        id: element.data( "size-id" ),
-                        name: element.data( "size-name" ),
+                    type: "lineModel",
+                    model: {
+                        id: element.data( "model-id" ),
+                        name: element.data( "model-name" ),
                     },
                     line: {
                         id: element.data( "line-id" ),
@@ -399,29 +399,29 @@ AP.product.items = ( function() {
             NM.util.openModal( $( "#product-images-list-modal" ) );
         },
 
-        loadSizes: function() {
+        loadModels: function() {
             var thisForm = AP.product.fields.configRow;
 
             var finishEle = thisForm.find( "[name=finishId]" );
-            var sizeEle = thisForm.find( "[name=sizeId]" );
+            var modelEle = thisForm.find( "[name=modelId]" );
 
             var lineId = AP.page.lineId;
-            var sizeId = sizeEle.val();
+            var modelId = modelEle.val();
             var finishId = finishEle.val();
 
             var products = AP.page.products;
             var productId = AP.page.productId;
 
-            sizeEle.empty( "" );
+            modelEle.empty( "" );
 
-            sizeEle.append(
+            modelEle.append(
                 $( "<option>", {
                     value: "",
                     text: "-- seleziona",
                 } ),
             );
 
-            sizeEle.val( "" );
+            modelEle.val( "" );
 
             var found = false;
             var opts = [];
@@ -433,25 +433,25 @@ AP.product.items = ( function() {
                         found = true;
                     }
 
-                    opts.push( { combinatioId: product.id, sizeCode: product.size.code } );
+                    opts.push( { combinatioId: product.id, modelCode: product.model.code } );
 
-                    sizeEle.append( opt );
+                    modelEle.append( opt );
                 }
             } );
 
             // sort by alpha
-            opts.sort( ( a, b ) => a.sizeCode.localeCompare( b.sizeCode, "it-IT" ) );
+            opts.sort( ( a, b ) => a.modelCode.localeCompare( b.modelCode, "it-IT" ) );
 
             for ( var thisOpt of opts ) {
                 var opt = $( "<option>", {
                     value: thisOpt.combinatioId,
-                    text: thisOpt.sizeCode,
+                    text: thisOpt.modelCode,
                 } );
 
-                sizeEle.append( opt );
+                modelEle.append( opt );
             }
 
-            found ? sizeEle.val( AP.page.productId ) : "";
+            found ? modelEle.val( AP.page.productId ) : "";
 
             return false;
         },
@@ -471,7 +471,7 @@ AP.product.items = ( function() {
 
         kendo.bind( fields.rootDetail, viewModel );
 
-        viewModel.loadSizes();
+        viewModel.loadModels();
 
         initSorts();
     };

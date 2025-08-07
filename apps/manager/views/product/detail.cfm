@@ -30,7 +30,7 @@
                                     <label class="me-2">Finitura:</label>
 
                                     <select name="finishId" class="form-control w-250 me-4"
-                                        data-bind="events: { change: loadSizes }"
+                                        data-bind="events: { change: loadModels }"
                                             <!--- data-bind="events: { change: change }" ---->
                                         >
 
@@ -46,7 +46,7 @@
 
                                     <label class="me-2">Dimensione:</label>
 
-                                    <select name="sizeId" class="form-control w-auto" data-bind="events: { change: change }">
+                                    <select name="modelId" class="form-control w-auto" data-bind="events: { change: change }">
                                     </select>
 
                                 </form>
@@ -66,13 +66,13 @@
                                         <p>
 
                                             <cfif prc.product.getCategory().getMode().getId() <> "BAS">
-                                                - <a href="" class="underline" data-type="lineSize"
-                                                    data-size-id="#prc.size.getId()#"
-                                                    data-size-name="#prc.size.getCode()#"
+                                                - <a href="" class="underline" data-type="lineModel"
+                                                    data-model-id="#prc.model.getId()#"
+                                                    data-model-name="#prc.model.getCode()#"
                                                     data-line-id="#prc.line.getId()#"
                                                     data-line-name="#prc.line.getName()#"
                                                     data-bind="click:openComponentsList">
-                                                        Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
+                                                        Componenti per #prc.line.getName()# / #prc.model.getCode()# &raquo;
                                                     </a>
                                                 
                                                 <br>

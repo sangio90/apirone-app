@@ -75,9 +75,9 @@
 				roles: "ADM"
 			},
 			{
-				href: "/manager/sizes",
+				href: "/manager/models",
 				icon: "fas fa-expand-alt",
-				title: "Dimensioni e modelli",
+				title: "Modelli",
 				roles: "ADM"
 			},
 			{

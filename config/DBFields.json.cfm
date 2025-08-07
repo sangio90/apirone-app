@@ -64,8 +64,8 @@
         "type": "Varchar"
     },
 
-    "size.id": {
-        "name": "size_id",
+    "model.id": {
+        "name": "model_id",
         "type": "uuid"
     },
 
@@ -134,8 +134,8 @@
         "type": "Integer"
     },
 
-	"sizeConfig.id": {
-		"name": "size_config_id",
+	"modelConfig.id": {
+		"name": "model_config_id",
 		"type": "uuid"
 	},
 

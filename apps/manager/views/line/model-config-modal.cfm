@@ -1,13 +1,13 @@
 ﻿<cfoutput>
-    <div id="size-config-modal" class="modal fade">
+    <div id="model-config-modal" class="modal fade">
 
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                <form id="size-config-form" method="POST" name="size-config-form">
+                <form id="model-config-form" method="POST" name="model-config-form">
 
                     <header class="card-header d-flex align-elements-center justify-content-between">
-                        <h2 class="card-title" data-bind="text:sizeConfigModal.title"></h2>
+                        <h2 class="card-title" data-bind="text:modelConfigModal.title"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>
 
@@ -20,7 +20,7 @@
                                     <input type="text" required class="form-control col-sm-4"
                                         name="width"
                                         maxlength="5"
-                                        data-bind="value: sizeConfigModal.data.width"
+                                        data-bind="value: modelConfigModal.data.width"
                                     >
                                     <div class="input-group-append">
                                         <span class="input-group-text">mm</span>
@@ -37,7 +37,7 @@
                                     <input type="text" required class="form-control col-sm-4" name="height"
                                         data-msg-required="height"
                                         maxlength="125"
-                                        data-bind="value: sizeConfigModal.data.height">
+                                        data-bind="value: modelConfigModal.data.height">
                                     <div class="input-group-append">
                                         <span class="input-group-text">mm</span>
                                     </div>
@@ -51,7 +51,7 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-12 float-end">
-                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:saveSizeConfig">
+                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:saveModelConfig">
                                     <i class="fas fa-save"></i> Salva
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>

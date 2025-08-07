@@ -70,7 +70,7 @@
                             <th align="center">##</th>
                             <th>Directory</th>
                             <th>File</th>
-                            <th>Size</th>
+                            <th>Model</th>
                             <th>Date</th>
                             <th width="30"><a href="javascript:selectAll()">All</a></th>
                         </tr>

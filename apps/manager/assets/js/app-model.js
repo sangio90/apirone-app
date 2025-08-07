@@ -1,22 +1,22 @@
-AP.size = AP.size || {};
+AP.model = AP.model || {};
 
-AP.size.fields = {
-    listRoot: $( "#size-list-root" ),
-    detailForm: $( "#size-detail-form" ),
-    searchListForm: $( "#size-grid-search-form" ),
+AP.model.fields = {
+    listRoot: $( "#model-list-root" ),
+    detailForm: $( "#model-detail-form" ),
+    searchListForm: $( "#model-grid-search-form" ),
 };
 
 $( document ).ready( function() {
-    if ( AP.size.fields.listRoot.length ) {
-        AP.size.list.init();
+    if ( AP.model.fields.listRoot.length ) {
+        AP.model.list.init();
     }
 } );
 
-AP.size.list = ( function() {
+AP.model.list = ( function() {
     var pub = {};
 
     var dataSources = {
-        items: NM.kendo.dataSource( { url: "/manager/ajax/sizes" } ),
+        items: NM.kendo.dataSource( { url: "/manager/ajax/models" } ),
     };
 
     var defaultDetailForm = {
@@ -43,7 +43,7 @@ AP.size.list = ( function() {
         categories: AP.page.categories,
         types: AP.page.types,
 
-        title: "Carica dimensione",
+        title: "Carica modello",
     };
 
     var viewModel = kendo.observable( {
@@ -55,7 +55,7 @@ AP.size.list = ( function() {
         },
 
         search: function( event ) {
-            var thisForm = AP.size.fields.searchListForm;
+            var thisForm = AP.model.fields.searchListForm;
 
             var params = thisForm.serializeJSON();
 
@@ -65,15 +65,15 @@ AP.size.list = ( function() {
         },
 
         save: function( event ) {
-            var thisForm = AP.size.fields.detailForm;
+            var thisForm = AP.model.fields.detailForm;
             var status = thisForm.find( ".status" );
 
-            status.html('<img src="/assets/main/img/ajax-loading.svg" width="20" height="20">');
+            status.html( "<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">" );
 
             if ( thisForm.valid() ) {
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/sizes",
+                    url: "/manager/ajax/models",
                     data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
                         done: function( xhr ) {
@@ -81,7 +81,7 @@ AP.size.list = ( function() {
                                 viewModel.get( "rows" ).read();
                                 NM.util.autoHideMessage( status, "<span class='green'>Dimensione salvata</span>" );
 
-                                setTimeout( () => $( "#size-detail-modal" ).modal( "hide" ), 1500 );
+                                setTimeout( () => $( "#model-detail-modal" ).modal( "hide" ), 1500 );
                             }
                         },
                     },
@@ -94,12 +94,12 @@ AP.size.list = ( function() {
         new: function( event ) {
             this.resetForm();
 
-            NM.util.openModal( $( "#size-detail-modal" ) );
+            NM.util.openModal( $( "#model-detail-modal" ) );
         },
 
         edit: function( event ) {
             viewModel.set( "detailForm.data", event.data );
-            viewModel.set( "detailForm.title", "Modifica dimensione < " + event.data.code + " >" );
+            viewModel.set( "detailForm.title", "Modifica modello < " + event.data.code + " >" );
 
             var selectedCategories = [];
 
@@ -111,11 +111,11 @@ AP.size.list = ( function() {
 
             viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
 
-            NM.util.openModal( $( "#size-detail-modal" ) );
+            NM.util.openModal( $( "#model-detail-modal" ) );
         },
 
         delete: function( event ) {
-            var checks = $( "#size-grid" ).find( "[name=selected]:checked" );
+            var checks = $( "#model-grid" ).find( "[name=selected]:checked" );
 
             if ( checks.length ) {
                 var values = [];
@@ -128,7 +128,7 @@ AP.size.list = ( function() {
 
                 NM.util.ajax( {
                     method: "DELETE",
-                    url: "/manager/ajax/sizes",
+                    url: "/manager/ajax/models",
                     data: ids,
                     callback: {
                         done: function( xhr ) {
@@ -151,9 +151,9 @@ AP.size.list = ( function() {
     } );
 
     pub.init = function() {
-        kendo.bind( AP.size.fields.listRoot, viewModel );
+        kendo.bind( AP.model.fields.listRoot, viewModel );
 
-        var detailForm = AP.size.fields.detailForm;
+        var detailForm = AP.model.fields.detailForm;
 
         AP.page.types.unshift( { id: "", name: "-- Seleziona il tipo" } );
 
@@ -176,7 +176,7 @@ AP.size.list = ( function() {
                     maxlength: 3,
                     checkCode: true,
                     remote: {
-                        url: "/manager/ajax/sizes/code-exists",
+                        url: "/manager/ajax/models/code-exists",
                         data: {
                             id: function() {
                                 return viewModel.get( "detailForm.data.id" );
