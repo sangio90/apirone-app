@@ -8,6 +8,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
 	property name="componentOverrideService" inject="ComponentOverrideService";
+	property name="lineService" inject="LineService";
+	property name="sizeService" inject="SizeService";
 
 	property name="cacheScope" type="String" default="Component.bean";
 
