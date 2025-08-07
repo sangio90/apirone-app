@@ -24,7 +24,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		) {
 			prc.title    = product.getName();
 			prc.subtitle = product.getCategory().getName();
-			prc.textLink = product.getCategory().getName() & " / " & product.getName();
+			prc.textLink = "Componenti per #product.getCategory().getName()# / #product.getName()#";
 		} else {
 			prc.title    = "Finitura #product.getFinish().getName()#, dimensione #product.getSize().getCode()#";
 			prc.subtitle = "#product.getCategory().getName()#, Linea #product.getLine().getName()#";
