@@ -13,6 +13,11 @@ component output="true" accessors="true" {
 				"vat"   = settings.get( "owner.namevat" ),
 				"email" = settings.get( "owner.nameemail" )
 			},
+			"font" = {
+				"directory" = {
+					"prefix" = settings.get( "font.prefix" )
+				}
+			},
 			"filesHost"    = "#settings.get( "files.host" )#",
 			"imagesConfig" = {
 				"productItem" = {

@@ -37,8 +37,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		font.setId( json.id );
 		font.setCode( json.code );
 		font.setDimension( json.dimension );
-		variables.settings = new config.Settings();
-		font.setDirectory("#variables.settings.get("font.prefix")##lcase(json.code)#")
+		font.setDirectory("#super.getConfiguration().get("font.directory.prefix")##lcase(json.code)#")
 		text.setId( json.mainText.id )
 		text.setName( json.mainText.name )
 		text.setLang( lang.setId( json.mainText.lang.id, 'IT' ) );
@@ -85,7 +84,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		for ( var id in ids ) {
 			var outcome = super.fire( "font.delete", [ id ] );
-dump(outcome);abort;
 			if ( outcome.getStatus() == "ERROR" ) {
 				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
 			}
