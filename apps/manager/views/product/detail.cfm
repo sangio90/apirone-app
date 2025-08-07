@@ -64,6 +64,20 @@
                                     <div class="col-sm-12">
 
                                         <p>
+
+                                            <cfif prc.product.getCategory().getMode().getId() <> "BAS">
+                                                - <a href="" class="underline" data-type="lineSize"
+                                                    data-size-id="#prc.size.getId()#"
+                                                    data-size-name="#prc.size.getCode()#"
+                                                    data-line-id="#prc.line.getId()#"
+                                                    data-line-name="#prc.line.getName()#"
+                                                    data-bind="click:openComponentsList">
+                                                        Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
+                                                    </a>
+                                                
+                                                <br>
+                                            </cfif>
+
                                             - <a href="" class="underline" 
                                                 data-type="product" 
                                                 data-product-id="#rc.id#"
@@ -72,20 +86,7 @@
                                                     #prc.textLink# &raquo;
                                                 </a>
                                                 
-                                                <br>
-
-                                                <cfif prc.product.getCategory().getMode().getId() <> "BAS">
-                                                    - <a href="" class="underline" data-type="lineSize"
-                                                        data-size-id="#prc.size.getId()#"
-                                                        data-size-name="#prc.size.getCode()#"
-                                                        data-line-id="#prc.line.getId()#"
-                                                        data-line-name="#prc.line.getName()#"
-                                                        data-bind="click:openComponentsList">
-                                                            Componenti per #prc.line.getName()# / #prc.size.getCode()# &raquo;
-                                                        </a>
-                                                    
-                                                    <br>
-                                                </cfif>
+                                            <br>
 
                                             - <a href="" class="underline"
                                                 data-type="product"
