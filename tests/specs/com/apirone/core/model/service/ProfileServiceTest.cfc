@@ -3,7 +3,7 @@ component extends="tests.utils.AbsSpec" {
 	function run( testResults, testBox ){
 		describe( "ProfileService", function(){
 			beforeEach( function(){
-				svc    = getModel().getInstance( "ProfileService" );
+				svc    = getContainer().getInstance( "ProfileService" );
 				helper = super.getHelperData();
 			} );
 

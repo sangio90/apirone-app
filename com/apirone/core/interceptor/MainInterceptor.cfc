@@ -22,7 +22,7 @@ component extends="coldbox.system.Interceptor" {
 		canAccess( event );
 
 		var module = prc.currentRoutedModule;
-		var model  = getModel();
+		var model  = getContainer();
 
 		prc.isDev = request.isDev();
 
@@ -172,7 +172,7 @@ component extends="coldbox.system.Interceptor" {
 		// Select keys from Configuration.cfc
 		// Not all keys, please!
 
-		var config = getModel().getInstance( "Configuration" ).get();
+		var config = getContainer().getInstance( "Configuration" ).get();
 
 		var result = {
 			"appName"    = config.get( "appName" ),

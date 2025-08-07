@@ -12,7 +12,7 @@
 		return new tests.utils.MockupData();
 	}
 
-	public function getModel(){
+	public function getContainer(){
 		return new coldbox.system.ioc.Injector( "config.WireboxServices" );
 	}
 

@@ -3,10 +3,10 @@ component extends="tests.utils.AbsSpec" {
 	function run( testResults, testBox ){
 		describe( "QuotationItemPositionService", function(){
 			beforeEach( function(){
-                quotationSvc = getModel().getInstance( "QuotationService" );
-                quotationItemSvc = getModel().getInstance( "QuotationItemService" );
-                quotationItemZoneSvc = getModel().getInstance( "QuotationItemZoneService" );
-                svc = getModel().getInstance( "QuotationItemPositionService" );
+                quotationSvc = getContainer().getInstance( "QuotationService" );
+                quotationItemSvc = getContainer().getInstance( "QuotationItemService" );
+                quotationItemZoneSvc = getContainer().getInstance( "QuotationItemZoneService" );
+                svc = getContainer().getInstance( "QuotationItemPositionService" );
                 helper = super.getHelperData();
 			} );
 

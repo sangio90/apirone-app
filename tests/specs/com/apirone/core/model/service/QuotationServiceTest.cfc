@@ -3,14 +3,14 @@ component extends="tests.utils.AbsSpec" {
 	function run( testResults, testBox ){
 		describe( "QuotationService", function(){
 			beforeEach( function(){
-				svc    = getModel().getInstance( "QuotationService" );
-				statusSvc    = getModel().getInstance( "StatusService" );
-                quotationSvc = getModel().getInstance( "QuotationService" );
-                quotationItemSvc = getModel().getInstance( "QuotationItemService" );
-                quotationItemProductSvc = getModel().getInstance( "QuotationItemProductService" );
-                quotationItemProductItemSvc = getModel().getInstance( "QuotationItemProductItemService" );
-                quotationItemZoneSvc = getModel().getInstance( "QuotationItemZoneService" );
-                quotationItemPositionSvc = getModel().getInstance( "QuotationItemPositionService" );
+				svc    = getContainer().getInstance( "QuotationService" );
+				statusSvc    = getContainer().getInstance( "StatusService" );
+                quotationSvc = getContainer().getInstance( "QuotationService" );
+                quotationItemSvc = getContainer().getInstance( "QuotationItemService" );
+                quotationItemProductSvc = getContainer().getInstance( "QuotationItemProductService" );
+                quotationItemProductItemSvc = getContainer().getInstance( "QuotationItemProductItemService" );
+                quotationItemZoneSvc = getContainer().getInstance( "QuotationItemZoneService" );
+                quotationItemPositionSvc = getContainer().getInstance( "QuotationItemPositionService" );
 				helper = super.getHelperData();
 			} );
 

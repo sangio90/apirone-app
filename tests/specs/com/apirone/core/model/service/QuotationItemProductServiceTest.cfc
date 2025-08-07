@@ -3,10 +3,10 @@
 	function run( testResults, testBox ){
 		describe( "QuotationItemProductService", function(){
 			beforeEach( function(){
-                quotationSvc = getModel().getInstance( "QuotationService" );
-				quotationItemSvc = getModel().getInstance( "QuotationItemService" );
-				svc = getModel().getInstance( "QuotationItemProductService" );
-				productSvc = getModel().getInstance( "ProductService" );
+                quotationSvc = getContainer().getInstance( "QuotationService" );
+				quotationItemSvc = getContainer().getInstance( "QuotationItemService" );
+				svc = getContainer().getInstance( "QuotationItemProductService" );
+				productSvc = getContainer().getInstance( "ProductService" );
 				helper = super.getHelperData();
 			} );
 

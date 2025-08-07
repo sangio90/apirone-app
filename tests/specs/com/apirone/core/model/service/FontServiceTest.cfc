@@ -3,7 +3,7 @@ component extends="tests.utils.AbsSpec" {
 	function run( testResults, testBox ){
 		describe( "FontService", function(){
 			beforeEach( function(){
-				svc    = getModel().getInstance( "FontService" );
+				svc    = getContainer().getInstance( "FontService" );
 				helper = super.getHelperData();
 			} );
 

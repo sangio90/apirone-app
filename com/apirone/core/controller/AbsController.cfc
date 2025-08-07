@@ -3,7 +3,7 @@
 	property name="configuration" type="com.apirone.core.model.bean.Configuration";
 
 	public Any function init(){
-		setConfiguration( getModel().getInstance( "Configuration" ) );
+		setConfiguration( getContainer().getInstance( "Configuration" ) );
 	}
 
 	public Array function convertCbErrors( required Array errors ){
@@ -72,8 +72,8 @@
 		return bean;
 	}
 
-	public Any function service( required String servicex ){
-		var bean = getModel().getInstance( "#arguments.servicex#Service" );
+	public Any function service( required String service ){
+		var bean = getContainer().getInstance( "#arguments.service#Service" );
 
 		return bean;
 	}
@@ -129,7 +129,7 @@
 			user    = user,
 			payload = arguments.payload
 		);
-		getModel().getInstance( "CacheManager" );
+		getContainer().getInstance( "CacheManager" );
 
 		return result;
 	}
@@ -225,7 +225,7 @@
 	}
 
 	public Struct function getCacheManager(){
-		return getModel().getInstance( "CacheManager" );
+		return getContainer().getInstance( "CacheManager" );
 	}
 
 	// only message
@@ -268,15 +268,15 @@
     */
 
 	public Struct function getDataMapper(){
-		return getModel().getInstance( "DataMapper" );
+		return getContainer().getInstance( "DataMapper" );
 	}
 
 	public Struct function getLogger(){
-		return getModel().getInstance( "Logger" );
+		return getContainer().getInstance( "Logger" );
 	}
 
 	public Struct function getAccessManager(){
-		return getModel().getInstance( "AccessManager" );
+		return getContainer().getInstance( "AccessManager" );
 	}
 
 
@@ -284,7 +284,7 @@
         private methods
     */
 
-	public Struct function getModel(){
+	public Struct function getContainer(){
 		// TODO: use GetSystemPropOrEnvVar from Lucee 6.2.1
 
 		return server[ "wireBox-apirone" ];

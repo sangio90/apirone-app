@@ -3,9 +3,9 @@
 	function run( testResults, testBox ){
 		describe( "QuotationItemZoneService", function(){
 			beforeEach( function(){
-                quotationSvc = getModel().getInstance( "QuotationService" );
-				quotationItemSvc = getModel().getInstance( "QuotationItemService" );
-				svc = getModel().getInstance( "QuotationItemZoneService" );
+                quotationSvc = getContainer().getInstance( "QuotationService" );
+				quotationItemSvc = getContainer().getInstance( "QuotationItemService" );
+				svc = getContainer().getInstance( "QuotationItemZoneService" );
 				helper = super.getHelperData();
 			} );
 
