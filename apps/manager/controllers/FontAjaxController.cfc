@@ -1,10 +1,10 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
-		var data   = [];
+		var data = [];
 
 		var result = super.getResult();
-		var dm = super.getDataMapper();
+		var dm     = super.getDataMapper();
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "font.search", params );
@@ -22,10 +22,10 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result     = super.getResult();
-		var font     = super.bean( "Font" );
-		var text = super.bean( "Text" );
-		var lang = super.bean( "Lang" );
+		var result = super.getResult();
+		var font   = super.bean( "Font" );
+		var text   = super.bean( "Text" );
+		var lang   = super.bean( "Lang" );
 
 
 		var thisId    = "";
@@ -37,10 +37,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		font.setId( json.id );
 		font.setCode( json.code );
 		font.setDimension( json.dimension );
-		font.setDirectory("#super.getConfiguration().get("font.directory.prefix")##lcase(json.code)#")
+		font.setDirectory( "#super.getConfiguration().get( "font.directory.prefix" )##LCase( json.code )#" )
 		text.setId( json.mainText.id )
 		text.setName( json.mainText.name )
-		text.setLang( lang.setId( json.mainText.lang.id, 'IT' ) );
+		text.setLang( lang.setId( json.mainText.lang.id, "IT" ) );
 		texts.add( text );
 
 		font.setTexts( texts );
@@ -61,7 +61,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function get( event, rc, prc ){
-		var result  = super.getResult();
+		var result = super.getResult();
 
 		var bean = super.fire( "font.get", [ rc.id ] );
 

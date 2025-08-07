@@ -16,11 +16,11 @@
 		prc.title = "Nuovo preventivo";
 
 		prc.paymentMethod = super.service( "PaymentMethod" ).list();
-		prc.pricelist = super.service( "Pricelist" ).list();
-		var currencies = super.service( "Currency" ).list();
-		prc.currency = super.service( "Currency" ).list();
-		prc.statusList  = super.service( "Status" ).list( "QUOTATIONS" );
-		prc.langs = super.service("Lang").list();
+		prc.pricelist     = super.service( "Pricelist" ).list();
+		var currencies    = super.service( "Currency" ).list();
+		prc.currency      = super.service( "Currency" ).list();
+		prc.statusList    = super.service( "Status" ).list( "QUOTATIONS" );
+		prc.langs         = super.service( "Lang" ).list();
 
 		prc.jsScripts.add( "app-quotation" );
 
