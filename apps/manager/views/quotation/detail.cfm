@@ -4,9 +4,12 @@
 
 
         <div class="row mb-3">
-            <div class="col-lg-8">
+            <div class="col-lg-6">
                 <h2>#prc.title#</h2>
             </div>
+			<div class="col-6 text-end">
+				#button( bind = "click:list", size = "md", label = "Torna ai preventivi" )#
+			</div>
         </div>
 
         <div class="row">
@@ -37,45 +40,39 @@
                                 <div class="tab-pane fade show active" id="nav-general" role="tabpanel">
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome preventivo <span class="required">*</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="quotation" class="form-control" id="quotation-name"
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end">Nome <span class="required">*</span></label>
+                                            <input type="text" name="description" class="form-control" id="description"
                                                 data-rule-required="true"
-                                                data-msg-required="Preventivo richiesto"
+                                                data-msg-required="Nome"
                                             >
                                         </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Lingua <span class="required">*</span></label>
-                                        <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end">Lingua <span class="required">*</span></label>
+                                            <select name="langId" class="form-control">
                                                 <option value="">-- selezionare</option>
-                                                <option value="ACP">Italiano</option>
-                                                <option value="CRE">Inglese</option>
-                                                <option value="REF">Francese</option>
-                                                <option value="REF">Tedesco</option>
+                                                <cfloop array="#prc.langs#" item="item">
+                                                    <option value="#item.getId()#">#item.getName()#</option>
+                                                </cfloop>
                                             </select>
                                         </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Data documento <span class="required">*</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control" value="#DateFormat( now(), 'dd/mm/yyyy' )#">
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end">Data documento</label>
+                                            <input type="text" class="form-control" value="#DateFormat( now(), 'dd/mm/yyyy' )#" disabled>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end">Data validità <span class="required">*</span></label>
+                                            <input type="text" name="validity_date" class="form-control" value="#DateFormat( DateAdd( 'm', 1, now() ), 'dd/mm/yyyy' )#">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Data validità <span class="required">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control" value="#DateFormat( DateAdd( 'm', 1, now() ), 'dd/mm/yyyy' )#">
+                                            <label class="control-label text-sm-end">Note</label>
+                                            <textarea name="note" class="form-control" rows="1"></textarea>
                                         </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Stato <span class="required">*</span></label>
-                                        <div class="col-sm-9">
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end">Stato <span class="required">*</span></label>
                                             <select name="statusId" class="form-control">
                                                 <option value="">-- selezionare</option>
                                                 <cfloop array="#prc.statusList#" item="item">
@@ -85,34 +82,17 @@
                                         </div>
                                     </div>
 
-                                    <!---
-                                        TODO: opportunity or lead required
-                                    --->
-
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome opportunità <span class="required">*</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="opportunity" class="form-control">
+                                        <div class="col-sm-5">
+                                            <label class="control-label text-sm-end">Nome opportunità <span class="required">*</span></label>
+                                            <input type="text" name="opportunity_name" class="form-control">
                                         </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome lead <span class="required">*</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="lead" class="form-control">
+                                        <div class="col-sm-5">
+                                            <label class="control-label text-sm-end">Nome lead <span class="required">*</span></label>
+                                            <input type="text" name="lead_name" class="form-control">
                                         </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Note</label>
-                                        <div class="col-sm-9">
-                                            <textarea name="note" class="form-control" rows="8"></textarea>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2 mt-2">
-                                        <div class="col-sm-9 offset-sm-3 float-end">
-                                           <button class="btn btn-primary">Successivo &raquo;</button>
+                                        <div class="col-sm-2 pt-4">
+                                           <button class="btn btn-primary changeTab" id="fiscal">Dati fiscali &raquo;</button>
                                         </div>
                                     </div>
 
@@ -123,77 +103,55 @@
                                     dati fiscali 
                                 --->
                                 <div class="tab-pane fade" id="nav-fiscal" role="tabpanel">
-                                    
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Ragione sociale</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="company" class="form-control" id="company-name">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Listino</label>
-                                        <div class="col-sm-9">
-                                            <select name="priceListId" class="form-control">
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end pt-2">Listino <span class="required">*</span></label>
+                                            <select name="pricelistId" class="form-control">
                                                 <option value="">-- selezionare</option>
-                                                <option value="A">Listino A</option>
-                                                <option value="B">Listino B</option>
-                                                <option value="C">Listino C</option>
-                                                <option value="D">Listino D</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Pagamento</label>
-                                        <div class="col-sm-9">
-                                            <select name="paymentMethodId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <option value="A">Pagamento A</option>
-                                                <option value="B">Pagamento B</option>
-                                                <option value="C">Pagamento C</option>
-                                                <option value="D">Pagamento D</option>
-
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Pagamento personalizzato</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Aliquota IVA</label>
-                                        <div class="col-sm-9">
-                                            <select name="vatCodeId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <cfloop array="#prc.vatCodeList#" item="item">
-                                                    <option value="#item.getId()#">#item.getName()# (#item.getValue()#%)</option>
+                                                <cfloop array="#prc.pricelist#" item="item">
+                                                    <option value="#item.getId()#">#item.getName()#</option>
                                                 </cfloop>
                                             </select>
                                         </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Valuta</label>
-                                        <div class="col-sm-9">
-                                            <select name="currencyId" class="form-control">
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end pt-2">Pagamento</label>
+                                            <select name="paymentMethodId" class="form-control">
                                                 <option value="">-- selezionare</option>
-                                                <option value="EUR">Euro</option>
-                                                <option value="USD">Dollari</option>
+                                                <cfloop array="#prc.paymentMethod#" item="item">
+                                                    <option value="#item.getId()#">#item.getName()#</option>
+                                                </cfloop>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-3 pt-2">
+                                            <label class="control-label text-sm-end pb-2">Pagamento personalizzato</label>
+                                            <input type="text" name="custom_payment_method" class="form-control" id="custom_payment_method">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end pt-2">Aliquota IVA</label>
+                                            <select name="vatCodeId" class="form-control">
+                                                <option value="">-- selezionare</option>
+                                                <option value="A">Iva A</option>
+                                                <option value="B">Iva B</option>
+                                                <option value="C">Iva C</option>
+                                                <option value="D">Iva D</option>
                                             </select>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <div class="col-sm-9 offset-sm-3">
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end">Valuta</label>
+                                            <select name="currencyId" class="form-control">
+                                                <option value="">-- selezionare</option>
+                                                <cfloop array="#prc.currency#" item="item">
+                                                    <option value="#item.getId()#">#item.getName()#</option>
+                                                </cfloop>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-3 pt-4">
 
-                                            <button class="btn btn-default">&laquo; Precedente &raquo;</button>
-                                            <button class="btn btn-primary">Successivo &raquo;</button>
-
+                                           <button class="btn btn-default changeTab" id="general">&laquo; Precedente &raquo;</button>
+                                            <button class="btn btn-primary changeTab" id="billing">Fatturazione &raquo;</button>
                                         </div>
                                     </div>
 
@@ -312,25 +270,6 @@
                                 --->
                                 <div class="tab-pane fade" id="nav-shipment" role="tabpanel">
 
-
-                                    <cfloop array="#prc.destinations#" item="item">
-
-                                        <div class="row" style="padding-bottom: 20px; margin-top: 20px; border-bottom: 1px solid ##EAEAEA">
-                                            
-                                            <label class="col-sm-3 control-label text-sm-end pt-2">
-                                                <input name="destionation" type="radio">
-                                            </label>
-                                            <div class="col-sm-9">
-                                                #item.name#<br>
-                                                #item.address#<br>
-                                                #item.zip# <b>#item.city#</b> (#item.state#)<br>
-                                                #item.country#<br>
-                                            </div>
-                                        
-                                        </div>
-                                        
-                                    </cfloop>
-
                                 </div>
 
 
@@ -417,18 +356,6 @@
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Tecnico / grafico</label>
-                                        <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <cfloop array="#prc.vatCodeList#" item="item">
-                                                    <option value="#item.getId()#">#item.getName()# (#item.getValue()#%)</option>
-                                                </cfloop>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
                                         <div class="col-sm-9 offset-sm-3">
 
                                             <button class="btn btn-default">&laquo; Precedente &raquo;</button>
@@ -453,3 +380,29 @@
     </div>
 
 </cfoutput>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Cerca tutti i bottoni con classe `changeTab`
+    document.querySelectorAll("button.changeTab").forEach(function (button) {
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            // Recupera l'id del bottone, es: "fiscal"
+            const targetName = this.id;
+
+            // Costruisce l'id del tab corrispondente
+            const targetTabId = `nav-${targetName}-tab`;
+
+            // Trova il pulsante di tab nella barra
+            const tabTrigger = document.getElementById(targetTabId);
+
+            if (tabTrigger) {
+                const tab = new bootstrap.Tab(tabTrigger);
+                tab.show();
+            } else {
+                console.warn(`Nessun tab trovato con id ${targetTabId}`);
+            }
+        });
+    });
+});
+</script>

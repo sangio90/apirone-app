@@ -8,7 +8,11 @@
 			SELECT *
 			FROM payment_methods
 			WHERE 
-				payment_method_id = <cfqueryparam cfsqltype="varchar" value="#arguments.paymentMethodId#">::uuid
+				<cfif !isNull(arguments.paymentMethodId)>
+					payment_method_id = <cfqueryparam cfsqltype="varchar" value="#arguments.paymentMethodId#">::uuid
+				<cfelse>
+					1=1
+				</cfif>
 		</cfquery>
 
 		<cfreturn local.q>

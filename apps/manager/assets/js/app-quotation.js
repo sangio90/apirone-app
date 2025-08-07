@@ -83,7 +83,11 @@ AP.quotation.list = ( function() {
             viewModel.set( "rows", filterDataSource );
 
             return false;
-        }
+        },
+
+        newQuotation: function( ) {
+            window.location.href = "/manager/quotations/new";
+		},
     } );
 
     pub.init = function() {

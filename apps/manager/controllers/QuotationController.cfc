@@ -15,11 +15,12 @@
 
 		prc.title = "Nuovo preventivo";
 
-		prc.vatCodeList = super.service( "VatCode" ).list();
-		prc.statusList  = super.service( "Status" ).list( "QUOTATION" );
-
-		prc.destinations          = DeserializeJSON( FileRead( "/config/data/fake/destinations.json.cfm" ) );
-		prc.config[ "customers" ] = DeserializeJSON( FileRead( "/config/data/fake/customers.json.cfm" ) );
+		prc.paymentMethod = super.service( "PaymentMethod" ).list();
+		prc.pricelist = super.service( "Pricelist" ).list();
+		var currencies = super.service( "Currency" ).list();
+		prc.currency = super.service( "Currency" ).list();
+		prc.statusList  = super.service( "Status" ).list( "QUOTATIONS" );
+		prc.langs = super.service("Lang").list();
 
 		prc.jsScripts.add( "app-quotation" );
 

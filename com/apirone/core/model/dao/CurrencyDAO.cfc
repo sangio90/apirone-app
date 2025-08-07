@@ -8,7 +8,11 @@
 			SELECT *
 			FROM currencies
 			WHERE 
-				currency_id = <cfqueryparam cfsqltype="varchar" value="#arguments.currencyId#">::uuid
+				<cfif !isNull(arguments.paymentMethodId)>
+					currency_id = <cfqueryparam cfsqltype="varchar" value="#arguments.currencyId#">::uuid
+				<cfelse>
+					1=1
+				</cfif>
 		</cfquery>
 
 		<cfreturn local.q>

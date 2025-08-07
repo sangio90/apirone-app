@@ -8,7 +8,11 @@
 			SELECT *
 			FROM pricelists
 			WHERE 
-				pricelist_id = <cfqueryparam cfsqltype="varchar" value="#arguments.pricelistId#">::uuid
+				<cfif !isNull(arguments.paymentMethodId)>
+					pricelist_id = <cfqueryparam cfsqltype="varchar" value="#arguments.pricelistId#">::uuid
+				<cfelse>
+					1=1
+				</cfif>
 		</cfquery>
 
 		<cfreturn local.q>

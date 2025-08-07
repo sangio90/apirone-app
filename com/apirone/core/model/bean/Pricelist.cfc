@@ -1,4 +1,4 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
 	public Pricelist function init(){
 		return this;

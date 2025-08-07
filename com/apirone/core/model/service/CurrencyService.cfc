@@ -18,6 +18,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
+	public Array function list(){
+		arguments[ "limit" ] = -1;
+		return read( argumentCollection = arguments ).getData()
+	}
+
+	private com.apirone.core.model.bean.Result function read(
+		String currencyId,
+		required Numeric limit  = 20,
+		required Numeric offset = 0
+	){
+		var rows   = [];
+		var result = super.getResult();
+
+		var records = getDao().read( argumentCollection = arguments );
+
+		records.each( function( record ){
+			rows.add( get( currencyId = record.currency_id ) );
+		} );
+
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+
+		return result;
+	}
+
 	private com.apirone.core.model.bean.Currency function build( required String currencyId ){
 		var record = getDao().read( arguments.currencyId );
 
