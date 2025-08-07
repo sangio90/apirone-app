@@ -18,6 +18,13 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutte le combinazioni",
     },
 
+    "font": {
+        "created": "Font caricato",
+        "updated": "Font aggiornato",
+        "deletedAllRecords": "Valori cancellati",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
+    },
+
     "product": {
         "itemsDeleted": "Ho cancellato tutti gli attributi",
         "itemsAdded": "Attributi aggiunti con successo",

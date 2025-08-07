@@ -99,6 +99,12 @@
 				roles: "ADM"
 			},
 			{
+				href: "/manager/fonts",
+				icon: "fas fa-font",
+				title: "Font",
+				roles: "ADM"
+			},
+			{
 				href: "/manager/texts",
 				icon: "fas fa-language",
 				title: "Traduzioni",

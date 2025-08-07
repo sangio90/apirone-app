@@ -79,6 +79,15 @@
 		get( "/ajax/production-times").to("ProductionTimeAjaxController.list").end();
 		get( "/production-times").to("ProductionTimeController.list").end();
 
+		/*
+			fonts
+		*/
+		get( "/ajax/fonts/:id" ).to( "FontAjaxController.get" ).end();
+		delete( "/ajax/fonts" ).to( "FontAjaxController.delete" ).end();
+		get( "/ajax/fonts").to("FontAjaxController.list").end();
+		post( "/ajax/fonts" ).to( "FontAjaxController.save" ).end();
+		get( "/fonts").to("FontController.list").end();
+
 
 		/*
 			auth // login

@@ -16,7 +16,7 @@ ALTER TABLE texts
 ADD COLUMN font_id integer;
 
 ALTER TABLE texts
-ADD CONSTRAINT texts_font_id_fk FOREIGN KEY (font_id) REFERENCES fonts (font_id);
+  ADD CONSTRAINT texts_font_id_fk FOREIGN KEY (font_id) REFERENCES fonts(font_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE texts
-ADD CONSTRAINT texts_line_id_fk FOREIGN KEY (line_id) REFERENCES lines (line_id);
+  ADD CONSTRAINT texts_line_id_fk FOREIGN KEY (line_id) REFERENCES lines(line_id) ON UPDATE CASCADE ON DELETE CASCADE;

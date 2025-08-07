@@ -30,8 +30,6 @@ AP.quotation.list = ( function() {
 
             var filters = [];
 
-            console.log( "params", params );
-
             var dataSource = viewModel.get( "rows" );
 
             var filterDataSource = new kendo.data.DataSource( {

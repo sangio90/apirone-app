@@ -144,6 +144,16 @@
         "type": "uuid"
     },
 
+    "font.id": {
+        "name": "font_id",
+        "type": "Integer"
+    },
+
+    "font.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+
     "quotation.id": {
         "name": "quotation_id",
         "type": "uuid"

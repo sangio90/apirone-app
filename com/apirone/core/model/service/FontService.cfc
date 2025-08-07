@@ -28,12 +28,14 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		String lineId,
-		required Numeric limit  = 20,
-		required Numeric offset = 0
+		required Numeric limit    = 15,
+		required Numeric offset   = 0,
+		required Array orderBy    = [ { field = "font.id" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
+//dump(arguments);abort;
+		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby, "font" );
 
 		var records = getDao().find( argumentCollection = arguments );
 
@@ -70,9 +72,6 @@
 	}
 
 	public String function update( required com.apirone.core.model.bean.Font font ){
-		// dump(getDao() );
-		// abort;
-
 		getDao().update( arguments.font );
 
 		var id = arguments.font.getId();

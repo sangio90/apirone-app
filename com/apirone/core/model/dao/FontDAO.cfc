@@ -67,8 +67,6 @@
 	<cffunction name="update" returntype="String">
 		<cfargument name="font" type="com.apirone.core.model.bean.Font" required="true">
 
-		<cfset var categories = SerializeJSON( super.getCategoriesAsArray( font.getCategories() ) )>
-
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
 				fonts
