@@ -249,7 +249,6 @@
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
-		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations" ).to( "QuotationController.list" ).end();
 		
 

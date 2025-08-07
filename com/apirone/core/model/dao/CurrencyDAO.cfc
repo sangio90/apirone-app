@@ -6,7 +6,7 @@
 			SELECT *
 			FROM currencies
 			WHERE
-				<cfif !IsNull( arguments.paymentMethodId )>
+				<cfif !IsNull( arguments.currencyId )>
 					currency_id = <cfqueryparam cfsqltype="varchar" value="#arguments.currencyId#">::uuid
 				<cfelse>
 					1=1

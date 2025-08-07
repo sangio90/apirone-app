@@ -4,7 +4,7 @@
     <nmscript type="text/x-kendo-template" id="component-selected-row-tmpl">
         <tr ##if (typeId == "base") {## class="bg-blue" ##}## data-bind="css:{ strike: override.deleted }">
             <td width="10">
-                <b data-bind="text: rawProduct.processingType.id"></b> ##:typeId##
+                <b data-bind="text: rawProduct.processingType.id"></b>
                 <br>
                 <i>(<span data-bind="text: id"></span>)</i>
             </td>
@@ -48,6 +48,9 @@
                     </table>
 
                 </td>
+                <td class="text-center">
+                    <input type="checkbox" value="##:id##" name="selected" class="form-check-input">
+                </td>
                 <td width="40" class="text-end">
                     #iconButton( icon="trash", bind="click:deactivate" )#
                 </td>                    
@@ -57,6 +60,9 @@
                 <td width="160">
                     <input data-bind="value: quantity" class="form-control text-end w-70">
                     <span data-bind="text: rawProduct.measurementUnit.id"></span>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" value="##:id##" name="selected" class="form-check-input">
                 </td>
                 <td width="40" class="text-end">
                     #iconButton( icon="trash", bind="click:remove" )#

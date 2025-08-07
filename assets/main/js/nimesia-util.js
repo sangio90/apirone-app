@@ -74,7 +74,7 @@ NM.util.ajax = function( setup ) {
 		                settings.callback.done.apply( null, [ xhr ] );
 		            }
 		        } else {
-		            location.href = "/";
+		            window.location.href = "/";
 		        }
 
 		    } )
@@ -91,7 +91,11 @@ NM.util.checkAll = function( button ) {
 
     var checks = thisForm.find( "input[name=selected]:checkbox" );
 
-    var value = button.checked ? true : false;
+    var value = true;
+
+    if ( button.checked ) {
+        value = button.checked ? true : false;
+    }
 
     checks.each( function() {
         this.checked = value;
@@ -106,5 +110,59 @@ NM.util.autoHideMessage = function( ele, message ) {
     setTimeout( function() {
         ele.html( "" );
     }, 1500 );
+
+};
+
+NM.util.copyText = function( text ) {
+
+    return new Promise( ( resolve, reject ) => {
+
+        // Prova prima l'API moderna
+        if ( typeof window !== "undefined" && typeof window.navigator !== "undefined" && window.navigator.clipboard && window.navigator.clipboard.writeText ) {
+            window.navigator.clipboard.writeText( text )
+                .then( () => {
+                    resolve( { "result": "success", "text": text } );
+                } )
+                .catch( ( err ) => {
+                    console.error( "Errore API moderna:", err );
+                    // Fallback a execCommand se l'API moderna fallisce
+                    fallbackCopyToClipboard( text, resolve, reject );
+                } );
+        } else {
+            // Fallback diretto se l'API moderna non è disponibile
+            fallbackCopyToClipboard( text, resolve, reject );
+        }
+
+        function fallbackCopyToClipboard( text, resolve, reject ) {
+
+            const textArea = document.createElement( "textarea" );
+
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+
+            document.body.appendChild( textArea );
+
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const success = document.execCommand( "copy" );
+                document.body.removeChild( textArea );
+
+                if ( success ) {
+                    resolve( { "result": "success", "text": text } );
+                } else {
+                    reject( { "result": "error" } );
+                }
+            } catch ( err ) {
+                console.error( "Fallback copy failed:", err );
+                document.body.removeChild( textArea );
+                reject( { "result": "error" } );
+            }
+        }
+
+    } );
 
 };

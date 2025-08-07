@@ -428,20 +428,12 @@ AP.product.items = ( function() {
 
             products?.forEach( function( product ) {
                 if ( lineId == product.line.id && finishId == product.finish.id ) {
-                    console.log( "product.size.code", product.size.code );
 
                     if ( product.id == productId ) {
                         found = true;
                     }
 
                     opts.push( { combinatioId: product.id, sizeCode: product.size.code } );
-
-                    /*
-					var opt = $("<option>", {
-						value: product.id,
-						text: product.size.code,
-					});
-					*/
 
                     sizeEle.append( opt );
                 }

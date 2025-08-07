@@ -77,25 +77,27 @@
 							<form id="component-list-selected-form" class="row">
 
 								<div class="col-12">
-
 									<div class="row">
 										<div class="col-6">
 											<h4>Componenti selezionati</h4>
 										</div>
-										<div class="col-6 mt-2 text-end" id="status-selected">
+										<div class="col-6 mt-2 text-end fs-11" id="components-status-selected">
 										</div>
 									</div>
+								</div>	
 
+								<div class="col-10">
 									<div class="pb-2 d-flex align-items-center justify-content-start mb-2">
 
 										<input
-											id="component-search-selected-input"
-											placeholder="Filtra..." 
-											class      ="form-control me-3 form-control-sm"
-											name       ="str"
+											id = "component-search-selected-input"
+											placeholder = "Filtra..." 
+											class = "form-control me-3 form-control-sm"
+											name = "str"
+											style = "width:50%"
 										>
 
-										<select class="form-control me-3 form-control-sm" name="processingTypeId" style="width:46%">
+										<select class="form-control me-3 form-control-sm" name="processingTypeId" style="width:53%">
 											<option value="">-- tutte le tipologie</option>
 											<option value="MP">Materie prime</option>
 											<option value="LV">Lavorazioni</option>
@@ -105,6 +107,16 @@
 										#iconButton( bind="click:resetFilterSelected", icon="times", variant="default", size="sm", class="ms-3" )#
 
 									</div>
+								</div>
+
+								<div class="col-2 text-end">
+									#iconButton( bind="click:copy", icon="copy", variant="default", size="sm", class="me-2", title="Copia le righe selezionate" )#
+									#iconButton( bind="click:paste", icon="paste", variant="default", size="sm", title="Incolla le righe selezionate" )#
+								</div>
+
+								<div class="col-12">
+
+									<div class="fs-11 text-end mb-1"><a href="##" data-bind="click:selectAll">Seleziona tutto</a></div>
 
 									#table( source="selected", rowTemplate="component-selected-row-tmpl" )#
 

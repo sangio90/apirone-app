@@ -172,6 +172,180 @@ AP.component.list = ( function() {
             return false;
         },
 
+        copy: function() {
+
+            var checks = $( "#component-list-selected-form input[name=selected]:checked" );
+
+            console.log( "checks", checks.length );
+
+            if ( !checks.length ) {
+                AP.widget.autoClearMessage(
+                    "components-status-selected",
+                    "<span class='auto-clear-status error'>Seleziona almeno un componente</span>"
+                );
+                return false;
+            }
+
+            var data = viewModel.get( "selected" ).data().toJSON();
+            var result = [];
+
+            for ( var row of data ) {
+
+                for ( var check of checks ) {
+                    check = $( check );
+                    if ( row.id == check.val() ) {
+                        result.push( row );
+                    }
+                }
+
+            }
+
+            NM.util.copyText( JSON.stringify( result ) );
+
+            AP.widget.autoClearMessage(
+                "components-status-selected",
+                "<span class='auto-clear-status success'>Hai copiato " + result.length +  " combinazioni.</span>"
+            );
+
+            return false;
+        },
+
+        paste: function() {
+
+            // Prova a leggere dal clipboard
+            if ( window.navigator.clipboard && window.navigator.clipboard.readText ) {
+                window.navigator.clipboard.readText()
+                    .then( clipboardText => {
+                        processPastedData( clipboardText );
+                    } )
+                    .catch( err => {
+                        console.error( "Errore nella lettura del clipboard:", err );
+                        fallbackPaste();
+                    } );
+            } else {
+                // Fallback per browser che non supportano clipboard API
+                fallbackPaste();
+            }
+
+            function processPastedData( clipboardText ) {
+                // try {
+                // Prova a parsare come JSON
+                var data = JSON.parse( clipboardText );
+
+                console.log( "Dati dal clipboard:", data );
+
+                // Aggiungi i dati al dataSource
+                var dataSource = viewModel.get( "selected" );
+
+                if ( Array.isArray( data ) ) {
+                    // Se è un array, aggiungi tutti gli elementi
+                    for ( var item of data ) {
+                        if ( item.typeId == "base" ) {
+                            item.override.id = "";
+                        } else {
+                            item.id = "";
+                        }
+
+                        if ( item.typeId == "base" ) {
+                            for ( var thisItem of dataSource.data() ) {
+                                if ( item.id == thisItem.id ) {
+                                    var dsItem = dataSource.getByUid( thisItem.uid );
+                                    dsItem.set( "override.quantity", item.override.quantity );
+                                    dsItem.set( "override.deleted", item.override.deleted );
+                                }
+                            }
+                        } else {
+                            dataSource.add( item );
+                        }
+
+                    }
+
+                    alert( "Aggiunti " + data.length + " elementi dal clipboard" );
+                }
+                /*
+                    } else {
+                        // Se è un singolo oggetto, aggiungilo
+                        if ( data.typeId == "base" ) {
+                            data.override.id = ""; // Resetta l'ID solo per typeId "base"
+                        }
+                        dataSource.add( data );
+                        alert( "Aggiunto 1 elemento dal clipboard" );
+                    }
+                    */
+
+                // } catch ( error ) {
+                // console.error( "Il testo nel clipboard non è un JSON valido:", error );
+                // alert( "Il contenuto del clipboard non è in formato JSON valido" );
+                // }
+            }
+
+            function fallbackPaste() {
+                // Crea un textarea temporaneo per il paste manuale
+                var textArea = document.createElement( "textarea" );
+                textArea.placeholder = "Incolla qui i dati JSON...";
+                textArea.style.width = "400px";
+                textArea.style.height = "200px";
+
+                var modal = document.createElement( "div" );
+                modal.style.position = "fixed";
+                modal.style.top = "50%";
+                modal.style.left = "50%";
+                modal.style.transform = "translate(-50%, -50%)";
+                modal.style.background = "white";
+                modal.style.padding = "20px";
+                modal.style.border = "2px solid #ccc";
+                modal.style.borderRadius = "5px";
+                modal.style.zIndex = "9999";
+                modal.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
+
+                var title = document.createElement( "h3" );
+                title.textContent = "Incolla dati manualmente";
+
+                var buttonContainer = document.createElement( "div" );
+                buttonContainer.style.marginTop = "10px";
+
+                var pasteBtn = document.createElement( "button" );
+                pasteBtn.textContent = "Incolla";
+                pasteBtn.className = "btn btn-primary";
+                pasteBtn.style.marginRight = "10px";
+                pasteBtn.onclick = function() {
+                    var text = textArea.value.trim();
+                    if ( text ) {
+                        processPastedData( text );
+                    }
+                    document.body.removeChild( modal );
+                };
+
+                var cancelBtn = document.createElement( "button" );
+                cancelBtn.textContent = "Annulla";
+                cancelBtn.className = "btn";
+                cancelBtn.onclick = function() {
+                    document.body.removeChild( modal );
+                };
+
+                buttonContainer.appendChild( pasteBtn );
+                buttonContainer.appendChild( cancelBtn );
+
+                modal.appendChild( title );
+                modal.appendChild( textArea );
+                modal.appendChild( buttonContainer );
+
+                document.body.appendChild( modal );
+                textArea.focus();
+            }
+
+            return false;
+        },
+
+        selectAll: function( event ) {
+
+            console.log( "event", event );
+
+            NM.util.checkAll( event.currentTarget );
+
+            return false;
+        },
+
         filterSelected: function() {
 
             var thisForm = $( "#component-list-selected-form" );
@@ -244,7 +418,7 @@ AP.component.list = ( function() {
             var exists = selectedExists( row );
 
             if( exists ) {
-                AP.widget.autoClearMessage( "status-selected", "<span class='auto-clear-status error'>È stato già aggiunto</span>" );
+                AP.widget.autoClearMessage( "components-status-selected", "<span class='auto-clear-status error'>È stato già aggiunto</span>" );
             } else {
                 viewModel.get( "selected" ).add( row );
             }

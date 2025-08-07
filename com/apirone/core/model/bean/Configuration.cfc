@@ -9,14 +9,12 @@ component output="true" accessors="true" {
 			"appName"    = settings.get( "app.name" ),
 			"appVersion" = settings.get( "app.version" ),
 			"owner"      = {
-				"name"  = settings.get( "owner.namename" ),
-				"vat"   = settings.get( "owner.namevat" ),
-				"email" = settings.get( "owner.nameemail" )
+				"name"  = settings.get( "owner.name" ),
+				"vat"   = settings.get( "owner.vat" ),
+				"email" = settings.get( "owner.email" )
 			},
 			"font" = {
-				"directory" = {
-					"prefix" = settings.get( "font.prefix" )
-				}
+				"directory" = { "prefix" = settings.get( "font.prefix" ) }
 			},
 			"filesHost"    = "#settings.get( "files.host" )#",
 			"imagesConfig" = {
