@@ -32,6 +32,15 @@
         <map from="mainText" to="mainText" ref="Text" />
     </mapper>
 
+    <mapper id="AuditEntry" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AuditEntry">
+        <map from="id" to="id" type="cf:String" />
+        <map from="message" to="message" type="cf:String" />
+        <map from="entity" to="entity" type="cf:String" />
+        <map from="action" to="action" type="cf:String" />
+        <map from="createdAt" to="createdAt" type="cf:Date" />
+        <map from="account" to="account" ref="Account" />
+    </mapper>
+
     <mapper id="Country" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Country">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />

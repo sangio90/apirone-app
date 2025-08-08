@@ -63,8 +63,8 @@ component extends="coldbox.system.ioc.config.Binder" {
                 value="apirone"
             )
             .initArg(
-                name="actions",
-                value=DeserializeJSON( fileRead( expandPath( "/config/auditActions.json.cfm" ) ) )
+                name="config",
+                value=DeserializeJSON( fileRead( expandPath( "/config/auditConfig.json.cfm" ) ) )
             );            
 
         map("Security").to( "com.apirone.core.util.Security" )

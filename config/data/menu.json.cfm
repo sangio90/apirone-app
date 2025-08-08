@@ -113,9 +113,15 @@
 			{
 				href: "/manager/reports",
 				icon: "fas fa-print",
-				title: "Lista dei report",
+				title: "Report",
 				roles: "ADM"
-			}
+			},
+			{
+				href: "/manager/audit-entries",
+				icon: "fas fa-folder-open",
+				title: "Log",
+				roles: "ADM"
+			},
 		]
 
 	},

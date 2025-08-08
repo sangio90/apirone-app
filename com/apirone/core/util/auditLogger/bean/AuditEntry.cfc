@@ -10,7 +10,7 @@ component accessors="true" {
 	property name="userAgent" type="string";
 	property name="payload" type="Any";
 
-	public LogEntry function init(){
+	public AuditEntry function init(){
 		return this;
 	}
 

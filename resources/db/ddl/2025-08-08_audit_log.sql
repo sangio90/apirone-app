@@ -16,3 +16,10 @@ ALTER TABLE public.audit_logs
 ADD COLUMN entity VARCHAR(64);
 
 ALTER SEQUENCE public.audit_logs_audit_log_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 RESTART 100 CACHE 1 NO CYCLE OWNED BY public.audit_logs.audit_log_id;
+
+-- object recreation
+ALTER TABLE public.texts
+DROP CONSTRAINT texts_line_id_fk RESTRICT;
+
+ALTER TABLE public.texts
+ADD CONSTRAINT texts_line_id_fk FOREIGN KEY (line_id) REFERENCES public.lines (line_id) ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE;

@@ -12,7 +12,7 @@
 		get( "/tmp" ).to( "MainController.tmp" ).end();
 
 		route( "/live", function(event, rc, prc){
-			return "<meta http-equiv='refresh' content='60'>
+			return "<meta http-equiv='refresh' content='120'>
 				Live #now()#";
 		} );
 
@@ -22,6 +22,13 @@
 		get( "/dashboard" ).to( "MainController.dashboard" ).end();
 		get( "/plate/designer" ).to( "PlateController.designer" ).end();
 		get( "/plate/map" ).to( "PlateController.map" ).end();
+
+
+		/*
+			audit entry
+		*/
+		get( "/audit-entries/:id" ).to( "AuditEntryAjaxController.get" ).end();
+		get( "/audit-entries" ).to( "AuditEntryController.list" ).end();
 
 
 		/*
