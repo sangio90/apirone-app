@@ -12,6 +12,10 @@ component accessors="true" {
 		return Right( this.getId(), 5 );
 	}
 
+	public Struct function getConfiguration(){
+		return new com.apirone.core.model.bean.Configuration();
+	}
+
 	public com.apirone.core.model.bean.Lang function getCurrentLang(){
 		if ( request.keyExists( "lang" ) ) {
 			return request.lang;
