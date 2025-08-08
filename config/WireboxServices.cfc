@@ -56,6 +56,17 @@ component extends="coldbox.system.ioc.config.Binder" {
                 value=ExpandPath("/../repository/private/logs/")
             );
 
+        map("AuditLogger").to( "auditLogger.AuditLogger" )
+            .asSingleton()
+            .initArg(
+                name="datasource",
+                value="apirone"
+            )
+            .initArg(
+                name="actions",
+                value=DeserializeJSON( fileRead( expandPath( "/config/auditActions.json.cfm" ) ) )
+            );            
+
         map("Security").to( "com.apirone.core.util.Security" )
             .asSingleton()
             .property( name = "key", value = "f3QqI43t/UGnoVRPsdpczw==")
@@ -68,6 +79,7 @@ component extends="coldbox.system.ioc.config.Binder" {
                 name="configFullPath",
                 value=ExpandPath( "/config/DataMapper.xml.cfm" )
             );
+
     }
 
 }

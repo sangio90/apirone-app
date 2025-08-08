@@ -1,23 +1,13 @@
 /**
  * AbsService class
  * @author Roberto Marzialetti <roberto@marzialetti.com>
- * @since 19/02/2020
+ * @since 19/02/2024
  */
 
 component output="false" accessors="true" {
 
-	property name="logger" inject="Logger";
-	// property name="factory" type="com.apirone.core.model.factory.Factory";
-	// ROB: removed because it generates errors when business logic is reloaded.
-	// property name="cacheManager" type="com.apirone.core.util.CacheManager";
-	// property name="configuration" type="com.apirone.core.model.bean.Configuration" ;
-	property name="DBUtil" type="com.apirone.core.model.util.DBUtil";
-
-	/**
-	 * @param type - il nome del bean
-	 * @param scope - la cartella
-	 * @param values - dati inuna struttura
-	 */
+	// property name="logger" inject="Logger";
+	// property name="DBUtil" type="com.apirone.core.model.util.DBUtil";
 
 	public Struct function bean( required String type, Struct values = {} ){
 		var factory = new com.apirone.core.model.factory.Factory();
@@ -26,7 +16,7 @@ component output="false" accessors="true" {
 	}
 
 	public Any function getDataMapper(){
-		return model().getInstance( "DataMapper" );
+		return getModel().getInstance( "DataMapper" );
 	}
 
 	public com.apirone.core.model.bean.Error function getError(){
@@ -154,7 +144,7 @@ component output="false" accessors="true" {
 	}
 
 	private Struct function getCacheManager(){
-		return model().getInstance( "CacheManager" );
+		return getModel().getInstance( "CacheManager" );
 	}
 
 	private Struct function getConfiguration(){
@@ -164,12 +154,49 @@ component output="false" accessors="true" {
 	}
 
 	private Struct function service( required String service ){
-		var bean = model().getInstance( "#service#Service" );
+		var bean = getModel().getInstance( "#service#Service" );
 
 		return bean;
 	}
 
-	private Struct function model(){
+	private Struct function logAction(
+		required String type,
+		required String message,
+		Any payload,
+		String severity = "INFO"
+	){
+		var logger = getModel().getInstance( "AuditLogger" );
+
+		// TODO: better than this
+		// var accountId = !IsNull( session.user.getAccount().getId() ) ? session.user.getAccount().getId() : "";
+		var accountId = session.user.getAccount().getId();
+
+		var result = logger.log(
+			action    = arguments.type,
+			message   = arguments.message,
+			accountId = accountId,
+			payload   = payload,
+			severity  = severity,
+			ipAddress = CGI.remote_addr,
+			userAgent = CGI.http_user_agent
+		)
+
+		return logger;
+	}
+
+	private Struct function getAudit( required String service ){
+		var bean = getModel().getInstance( "AuditLogger" );
+
+		return bean;
+	}
+
+	private Struct function getLogger(){
+		var bean = getModel().getInstance( "Logger" );
+
+		return bean;
+	}
+
+	private Struct function getModel(){
 		return server[ "wireBox-apirone" ];
 	}
 

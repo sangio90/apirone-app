@@ -76,6 +76,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getTextService().bulkCreate( arguments.line.getTexts() );
 		}
 
+		super.logAction( type = "LINE.CREATED", message = "Line [#newId#] created" )
+
 		return newId;
 	}
 
@@ -149,8 +151,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-
-
 		productService.deleteAllByParams( lineId = toLineId, categoryId = categoryId );
 
 		var products = productService.list( lineId = fromLineId, categoryId = categoryId );
@@ -187,6 +187,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getCacheManager().removeAll();
 
+		super.logAction(
+			type    = "LINE.CLONED",
+			message = "Line [#arguments.fromLineId#] cloned",
+			payload = arguments
+		)
+
 		return {
 			status  = "success",
 			payload = {
@@ -218,6 +224,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.line.getId() );
+
+		super.logAction(
+			type    = "LINE.UPDATED",
+			message = "Line [#arguments.line.getId()#] updated",
+			payload = { lineId = arguments.line.getId() }
+		)
 
 		return arguments.line.getId();
 	}
