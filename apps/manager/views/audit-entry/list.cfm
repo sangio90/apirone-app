@@ -15,7 +15,7 @@
                 <section class="card">
                     <section class="card-body box-search">
     
-                        <form name="text-search-form" id="text-search-form" method="post" data-bind="events: { submit: search }">
+                        <form name="audit-entry-search-form" id="audit-entry-search-form" method="post" data-bind="events: { submit: search }">
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group row mb-2">
@@ -91,8 +91,8 @@
                                     { 'field':'entity', 'title':'Sezione', width: '150px'},
                                     { 'field':'action', 'title':'Azione', width: '150px'},
                                     { 'field':'message', 'title':'Messagge'},
-                                    { 'field':'account.name', 'title':'Account', width: '150px' },
-                                    { 'field':'', 'title':'', width: '50px'}
+                                    { 'field':'account.name', 'title':'Account', width: '180px' },
+                                    { 'field':'', 'title':'', width: '55px'}
                                 ]",
                                 rowTemplate="audit-entry/audit-entry-grid-row-tmpl"
                             )#
@@ -104,8 +104,8 @@
             </div>
         </div>
 
-    </div>
+        #view("audit-entry/detail-modal")#
 
-    #view("audit-entry/detail-modal")#
+    </div>
 
 </cfoutput>

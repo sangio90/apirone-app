@@ -75,7 +75,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 			bean.setIpAddress( record.ip_address );
 			bean.setUserAgent( record.user_agent );
-			bean.setPayload( record.payload );
+			bean.setPayload( DeserializeJSON( record.payload.toString() ) );
 
 			return bean;
 		}

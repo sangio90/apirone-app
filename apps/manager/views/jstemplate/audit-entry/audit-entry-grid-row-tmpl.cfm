@@ -20,6 +20,7 @@
             </td>
             <td>
                 <span data-bind="text: account.name"></span>
+                (<span data-bind="text: account.shortId"></span>)
             </td>
             <td class="text-center">
                 #iconButton(bind="click:show", icon="eye")#

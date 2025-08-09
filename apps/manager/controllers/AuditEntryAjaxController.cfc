@@ -21,27 +21,16 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function get( event, rc, prc ){
-		param rc.id = "___";
+		param rc.id = -1;
 		var result  = super.getResult();
 
-		if ( !super.isUuid( rc.id ) ) {
-			return event.setValue( "result", "No UUID" );
-		}
+		var bean = super.fire( "auditEntry.get", [ rc.id ] );
 
-		var bean = super.fire( "line.get", [ rc.id ] );
-
-		var obj = super.getDataMapper().convert( bean, "Line", true );
-
-		if ( !obj.keyExists( "thickness" ) ) {
-			obj[ "thickness" ] = { "id" = "", "name" = "" }
-		}
+		var obj = super.getDataMapper().convert( bean, "AuditEntry", true );
 
 		result.setData( obj );
 
 		event.setValue( "result", result );
-	}
-
-	function delete( event, rc, prc ){
 	}
 
 }

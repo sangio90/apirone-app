@@ -3,8 +3,7 @@ AP.auditEntry = AP.auditEntry || {};
 AP.auditEntry.fields = {
     listRoot: $( "#audit-entry-list-root" ),
     detailRoot: $( "#audit-entry-detail-modal" ),
-    detailForm: $( "#audit-entry-detail-form" ),
-    searchListForm: $( "#audit-entry-grid-search-form" ),
+    searchListForm: $( "#audit-entry-search-form" ),
 };
 
 $( document ).ready( function() {
@@ -12,39 +11,10 @@ $( document ).ready( function() {
         AP.auditEntry.list.init();
     }
 
-    if ( AP.auditEntry.fields.detailRoot.length ) {
-        AP.auditEntry.detail.init();
-    }
 } );
-
-AP.auditEntry.detail = ( function() {
-    var pub = {};
-
-    var viewModel = kendo.observable( {
-        detailForm: {},
-    } );
-
-    pub.view = function( { onSave } ) {
-        if ( onSave ) {
-            viewModel.set( "callback.onSave", onSave );
-        }
-
-        viewModel.resetForm();
-
-        NM.util.openModal( AP.auditEntry.fields.detailRoot );
-    };
-
-    pub.init = function() {
-        kendo.bind( AP.auditEntry.fields.detailRoot, viewModel );
-    };
-
-    return pub;
-} () );
 
 AP.auditEntry.list = ( function() {
     var pub = {};
-
-    var detailApp = AP.auditEntry.detail;
 
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/audit-entries" } ),
@@ -52,6 +22,9 @@ AP.auditEntry.list = ( function() {
 
     var viewModel = kendo.observable( {
         rows: dataSources.items,
+        detailForm: {
+            data: undefined
+        },
 
         getCreatedAt: function( event ) {
             return NM.kendo.formatDate( event.createdAt );
@@ -67,15 +40,27 @@ AP.auditEntry.list = ( function() {
             return false;
         },
 
-        new: function( event ) {
-            console.log( "detailApp", detailApp );
+        show: function( event ) {
 
-            var onSave = function() {
-                console.log( "onSave" );
-                viewModel.get( "rows" ).read();
-            };
+            var id = event.data.id;
 
-            detailApp.new( { onSave: onSave } );
+            viewModel.set( "detailForm.title", "Dettaglio < " + id + " >" );
+
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/audit-entries/" + id,
+                callback: {
+                    done: function( xhr ) {
+                        if ( xhr.status == "SUCCESS" ) {
+
+                            viewModel.set( "detailForm.data", xhr.data );
+                            viewModel.set( "detailForm.data.payload", JSON.stringify( xhr.data.payload, null, 4 ) );
+
+                            NM.util.openModal( AP.auditEntry.fields.detailRoot );
+                        }
+                    },
+                },
+            } );
 
             return false;
         },

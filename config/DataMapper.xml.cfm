@@ -27,6 +27,7 @@
         <map from="shortId" to="shortId" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
+        <map from="severity" to="severity" type="cf:String" />
         <map from="directory" to="directory" type="cf:String" />
         <map from="dimension" to="dimension" type="cf:Numeric" />
         <map from="mainText" to="mainText" ref="Text" />
@@ -37,7 +38,11 @@
         <map from="message" to="message" type="cf:String" />
         <map from="entity" to="entity" type="cf:String" />
         <map from="action" to="action" type="cf:String" />
+        <map from="severity" to="severity" type="cf:String" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
+        <map from="ipAddress" to="ipAddress" type="cf:String" />
+        <map from="userAgent" to="userAgent" type="cf:String" />
+        <map from="payload" to="payload" type="cf:String" />
         <map from="account" to="account" ref="Account" />
     </mapper>
 

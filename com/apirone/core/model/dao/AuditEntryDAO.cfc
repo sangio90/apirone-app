@@ -26,7 +26,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				audit_log_id,
+				audit_log_id, created_at,
 				COUNT(audit_log_id) OVER() AS total
 			FROM
 				audit_logs
@@ -41,11 +41,11 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.fromDate )>
-					AND created_at >= <cfqueryparam cfsqltype="timestamp" value="#arguments.fromDate#">
+					AND created_at < <cfqueryparam cfsqltype="timestamp" value="#DateAdd( "d", 1, arguments.fromDate )#">
 				</cfif>
 
 				<cfif !IsNull( arguments.toDate )>
-					AND created_at <= <cfqueryparam cfsqltype="timestamp" value="#arguments.toDate#">
+					AND created_at >= <cfqueryparam cfsqltype="timestamp" value="#arguments.toDate#">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>

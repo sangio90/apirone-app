@@ -28,6 +28,24 @@
     border-color: #cccccc !important;
 }
 
+.form-control-static {
+    display: block;
+    width: 100%;
+    min-height: 38px;
+    /* Usa la stessa altezza dei tuoi input */
+    padding: 0.375rem 0.75rem;
+    /* Usa lo stesso padding dei tuoi input */
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #e9ecef;
+    /* Colore di sfondo per indicare che non è editabile */
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    box-sizing: border-box;
+}
+
 .card-title-sign {
     height: 68px;
 }
