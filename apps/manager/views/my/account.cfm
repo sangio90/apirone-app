@@ -114,7 +114,7 @@
                                     </div>
                                     
                                     <div class="col-12 mt-3 d-flex align-elements-baseline justify-content-start">
-                                        #saveButton( label="Modifica password", model="md", bind="click:save")#
+                                        #saveButton( label="Modifica password", size="md", bind="click:save")#
                                         <div class="status ms-2 mt-2"></div>
                                     </div>
 
