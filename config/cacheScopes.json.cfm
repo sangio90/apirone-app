@@ -39,4 +39,5 @@
     "FileType.bean": {},
     "ProductCategoryType.bean": {},
     "ModelConfig.bean": {},
+    "AuditEntry.bean": {},
 }

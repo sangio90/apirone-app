@@ -2,11 +2,11 @@
 
 	property name="datasource" type="String";
 	property name="x" type="String";
-	property name="actions" type="Struct";
+	property name="config" type="Struct";
 	property name="service" type="auditLogger.service.AuditLoggerService";
 
-	public function init( required string datasource, required Struct actions ){
-		this.setActions( arguments.actions )
+	public function init( required string datasource, required Struct config ){
+		this.setConfig( arguments.config )
 		this.setDatasource( arguments.datasource )
 
 		this.factory();
@@ -27,10 +27,23 @@
 
 		var result = parseAction( arguments.action );
 
+		var thisPayload = NullValue();
+
 		if ( !Len( arguments.ipAddress ) ) ipAddress = CGI.remote_addr;
 		if ( !Len( arguments.userAgent ) ) userAgent = CGI.http_user_agent;
 
-		var bean = new AuditLogger.bean.LogEntry();
+		if ( !IsNull( arguments.payload ) AND IsStruct( arguments.payload ) ) {
+			if ( !hasUppercaseOnlyKey( arguments.payload ) ) {
+				thisPayload = SerializeJSON( arguments.payload );
+			}
+		} else {
+			if ( Len( arguments.payload ) ) {
+				// Plain variable, but I need JSONB for db
+				thisPayload = SerializeJSON( { "description" = arguments.payload } );
+			}
+		}
+
+		var bean = new AuditLogger.bean.AuditEntry();
 
 		bean.setMessage( arguments.message );
 		bean.setAction( result.action );
@@ -40,7 +53,7 @@
 		bean.setCreatedAt( Now() );
 		bean.setIpAddress( arguments.ipAddress );
 		bean.setUserAgent( arguments.userAgent );
-		bean.setPayload( arguments.payload );
+		bean.setPayload( thisPayload );
 
 		return getService().log( bean );
 	}
@@ -49,6 +62,19 @@
 	/*
 		private methods
 	*/
+
+	private Boolean function hasUppercaseOnlyKey( required struct payload ){
+		for ( var key in payload ) {
+			if ( key === UCase( key ) ) {
+				Throw(
+					type    = "LoggerAudit.errors.invalidPayloadKey",
+					message = "Invalid key [#key#] format. Use lowercase format and double quotes for setting variable. E.g. ['myKey']."
+				)
+			}
+		}
+
+		return false;
+	}
 
 	private Struct function parseAction( required string action ){
 		var parts = ListToArray( arguments.action, "." );
@@ -63,14 +89,14 @@
 		var entity = UCase( parts[ 1 ] );
 		var action = UCase( parts[ 2 ] );
 
-		if ( !StructKeyExists( getActions(), entity ) ) {
+		if ( !StructKeyExists( getConfig().entities, entity ) ) {
 			Throw( type = "LoggerAudit.errors.unknownEntity", message = "Unknown entity: [#entity#]" );
 		}
 
-		if ( !StructKeyExists( getActions()[ entity ], action ) ) {
+		if ( !StructKeyExists( getConfig().actions, action ) ) {
 			Throw(
-				type    = "LoggerAudit.errors.invalidAction",
-				message = "Invalid action [#action#] for entity [#entity#]"
+				type    = "LoggerAudit.errors.unknownAction",
+				message = "Unknown action: [#action#] for entity [#entity#]"
 			);
 		}
 

@@ -28,6 +28,7 @@
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Sezione</label>
                                         <div class="col-sm-9">
                                             <select name="entityId" class="form-control">
+                                                <option value="">-- tutte</option>
                                                 <cfloop collection="#prc.entities#" item="item">
                                                     <option value="#item#">#item#</option>
                                                 </cfloop>
@@ -38,7 +39,7 @@
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Azione</label>
                                         <div class="col-sm-9">
                                             <select name="actionId" class="form-control">
-                                                <option value="">-- tutti</option>
+                                                <option value="">-- tutte</option>
                                                 <cfloop collection="#prc.actions#" item="item">
                                                     <option value="#item#">#item#</option>
                                                 </cfloop>
@@ -85,12 +86,12 @@
                             #grid( 
                                 id="audit-entry-grid",
                                 columns="[
-                                    { 'field':'shortId', 'title':'ID', width: '80px'},
-                                    { 'field':'entity', 'title':'Sezione'},
-                                    { 'field':'action', 'title':'Azione'},
-                                    { 'field':'message', 'title':'Messagge'},
-                                    { 'field':'account.name', 'title':'Account' },
+                                    { 'field':'shortId', 'title':'ID', width: '60px'},
                                     { 'field':'createdAt', 'title':'Creato il', width: '140px' },
+                                    { 'field':'entity', 'title':'Sezione', width: '150px'},
+                                    { 'field':'action', 'title':'Azione', width: '150px'},
+                                    { 'field':'message', 'title':'Messagge'},
+                                    { 'field':'account.name', 'title':'Account', width: '150px' },
                                     { 'field':'', 'title':'', width: '50px'}
                                 ]",
                                 rowTemplate="audit-entry/audit-entry-grid-row-tmpl"

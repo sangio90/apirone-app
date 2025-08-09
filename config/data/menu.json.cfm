@@ -116,12 +116,6 @@
 				title: "Report",
 				roles: "ADM"
 			},
-			{
-				href: "/manager/audit-entries",
-				icon: "fas fa-folder-open",
-				title: "Log",
-				roles: "ADM"
-			},
 		]
 
 	},
@@ -147,9 +141,24 @@
 
 	},
 	{
-		href: "/manager/system",
+		href: "#",
 		icon: "fab fa-redhat",
 		title: "Sistema",
-		roles: "ADM"
+		roles: "ADM",
+		items: [
+			{
+				href: "/manager/audit-entries",
+				icon: "fas fa-folder-open",
+				title: "Log",
+				roles: "ADM"
+			},
+			{
+				href: "/manager/system",
+				icon: "fas fa-cogs",
+				title: "Impostazioni",
+				roles: "ADM"
+			},
+
+		]
 	}
 ]

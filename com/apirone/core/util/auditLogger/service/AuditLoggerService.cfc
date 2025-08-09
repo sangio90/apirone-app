@@ -2,13 +2,8 @@
 
 	property name="dao" type="auditLogger.dao.AuditLoggerDAO";
 
-	public Struct function log( required auditLogger.bean.LogEntry logEntry ){
-		if ( !IsNull( logEntry.getPayload() ) OR IsStruct( logEntry.getPayload() ) ) {
-			var payload = SerializeJSON( logEntry.getPayload() );
-			logEntry.setPayload( payload );
-		}
-
-		var newId = getDao().insert( logEntry = logEntry );
+	public Struct function log( required auditLogger.bean.AuditEntry auditEntry ){
+		var newId = getDao().insert( auditEntry = auditEntry );
 
 		return { "id" = newId };
 	}

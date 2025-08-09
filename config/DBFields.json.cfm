@@ -193,4 +193,8 @@
         "name": "quotation_item_position_id",
         "type": "uuid"
     },
+    "auditEntry.id": {
+        "name": "audit_log_id",
+        "type": "Integer"
+    },
 }

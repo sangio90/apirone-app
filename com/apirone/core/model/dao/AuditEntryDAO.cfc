@@ -7,7 +7,7 @@
 			FROM
 				audit_logs
 			WHERE
-				audit_log_id = <cfqueryparam cfsqltype="Integer" value="#arguments.auditEntryId#">::uuid
+				audit_log_id = <cfqueryparam cfsqltype="Integer" value="#arguments.auditEntryId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -29,7 +29,7 @@
 				audit_log_id,
 				COUNT(audit_log_id) OVER() AS total
 			FROM
-				audit_log
+				audit_logs
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.actionId )>

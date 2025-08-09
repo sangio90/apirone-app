@@ -35,7 +35,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String actionId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "auditEntry.id", desc = "desc" } ]
+		required Array orderBy  = [ { field = "auditEntry.id", dir = "desc" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();

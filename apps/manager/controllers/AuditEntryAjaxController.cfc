@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var params = super.paramsFromUrl();
 
-		var rows = super.fire( "line.search", params );
+		var rows = super.fire( "auditEntry.search", params );
 
 		for ( var row in rows.getData() ) {
 			var obj = getDataMapper().convert( row, "AuditEntry", true );

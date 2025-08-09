@@ -3,33 +3,28 @@
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="audit-entry-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
-            <td style="border-left: 4px solid ##=status.color.hex##">
-                <span data-bind="text: shortId"></span>
+            <td>
+                <span data-bind="text: id"></span>
             </td>
             <td>
-                <span data-bind="text: code"></span>
+                <span data-bind="text: getCreatedAt"></span>
             </td>
             <td>
-                <span data-bind="text: name"></span>
+                <span data-bind="text: entity"></span>
+            </td>
+            <td>
+                <span data-bind="text: action"></span>
+            </td>
+            <td>
+                <span data-bind="text: message"></span>
+            </td>
+            <td>
+                <span data-bind="text: account.name"></span>
             </td>
             <td class="text-center">
-                #iconButton(bind="click:showCloneModal", icon="clone")#
-            </td>
-            <td class="text-center">
-                #iconButton(bind="click:products", icon="cogs")#
-            </td>
-            <td class="text-center">
-                #iconButton(bind="click:attributes", icon="external-link-square-alt")#
-            </td>
-            <td class="text-center">
-                <input type="checkbox" class="form-check-input"
-                    name="selected"
-                    value="##: id ##"
-                >
+                #iconButton(bind="click:show", icon="eye")#
             </td>
         </tr>
     </nmscript>
-
-    #template( view="jstemplate/product-category/product-category-row-tmpl" )#
 
 </cfoutput>

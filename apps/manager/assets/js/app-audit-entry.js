@@ -53,6 +53,10 @@ AP.auditEntry.list = ( function() {
     var viewModel = kendo.observable( {
         rows: dataSources.items,
 
+        getCreatedAt: function( event ) {
+            return NM.kendo.formatDate( event.createdAt );
+        },
+
         search: function( event ) {
             var thisForm = AP.auditEntry.fields.searchListForm;
 
