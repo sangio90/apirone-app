@@ -187,18 +187,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getCacheManager().removeAll();
 
-		super.logAction(
-			type    = "LINE.CLONED",
-			message = "Line [#arguments.fromLineId#] cloned",
-			payload = arguments
-		)
+		super.logAction( type = "LINE.CLONED", message = "Line [#arguments.fromLineId#] cloned" )
 
 		return {
-			status  = "success",
-			payload = {
-				fromLineId = arguments.fromLineId,
-				toLineId   = arguments.toLineId,
-				categoryId = arguments.categoryId
+			"status"  = "success",
+			"payload" = {
+				"fromLineId" = arguments.fromLineId,
+				"toLineId"   = arguments.toLineId,
+				"categoryId" = arguments.categoryId
 			}
 		};
 	}
@@ -225,11 +221,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		super.getCacheManager().remove( getCacheScope(), arguments.line.getId() );
 
-		super.logAction(
-			type    = "LINE.UPDATED",
-			message = "Line [#arguments.line.getId()#] updated",
-			payload = { lineId = arguments.line.getId() }
-		)
+		super.logAction( type = "LINE.UPDATED", message = "Line [#arguments.line.getId()#] updated" );
 
 		return arguments.line.getId();
 	}
@@ -261,7 +253,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setData( { "deletedCount" = result } )
 
 				getCacheManager().remove( getCacheScope(), arguments.lineId );
+
+				super.logAction( type = "LINE.DELETED", message = "Line [#arguments.lineId#] deleted" );
 			} catch ( any error ) {
+				dump( error );
+				abort;
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteLine" );

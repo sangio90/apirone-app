@@ -33,12 +33,14 @@
 		<cfargument name="salesAgentAccountId" type="String" required="false">
 		<cfargument name="graphicTechnicianAccountId" type="String" required="false">
 		<cfargument name="str" type="String" required="false">
+
 		<cfargument
 			name    ="orderBy"
 			type    ="String"
 			required="true"
 			default ="quotations.quotation_date, quotations.quotation_number"
 		>
+
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
 

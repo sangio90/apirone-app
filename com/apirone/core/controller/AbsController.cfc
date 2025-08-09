@@ -275,6 +275,10 @@
 		return getContainer().getInstance( "Logger" );
 	}
 
+	public Struct function getAuditLogger(){
+		return getContainer().getInstance( "AuditLogger" );
+	}
+
 	public Struct function getAccessManager(){
 		return getContainer().getInstance( "AccessManager" );
 	}

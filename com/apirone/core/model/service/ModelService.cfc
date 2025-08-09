@@ -65,6 +65,8 @@
 			getTextService().bulkCreate( arguments.model.getTexts() );
 		}
 
+		super.logAction( type = "MODEL.CREATED", message = "Model [#newId#] created" )
+
 		return newId;
 	}
 
@@ -95,6 +97,8 @@
 
 		super.getCacheManager().remove( getCacheScope(), arguments.model.getId() );
 
+		super.logAction( type = "MODEL.UPDATED", message = "Model [#arguments.model.getId()#] updated" )
+
 		return arguments.model.getId();
 	}
 
@@ -116,8 +120,6 @@
 	public com.apirone.core.model.bean.Outcome function delete( required String modelId ){
 		var outcome = super.bean( "Outcome" );
 
-		var obj = get( arguments.modelId );
-
 		outcome.setData( { modelId = arguments.modelId } );
 
 		transaction {
@@ -125,7 +127,8 @@
 				var result = getDao().delete( arguments.modelId );
 				outcome.setData( { "deletedCount" = result } )
 
-				super.getCacheManager().remove( getCacheSciope(), arguments.modelId );
+				super.getCacheManager().remove( getCacheScope(), arguments.modelId );
+				super.logAction( type = "MODEL.DELETED", message = "Model [#arguments.modelId#] deleted" )
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
