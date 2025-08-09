@@ -28,9 +28,9 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		required Numeric limit    = 15,
-		required Numeric offset   = 0,
-		required Array orderBy    = [ { field = "font.id" } ]
+		required Numeric limit  = 15,
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "font.id" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -128,7 +128,6 @@
 
 				super.getCacheManager().remove( getCacheScope(), arguments.fontId );
 			} catch ( any error ) {
-
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteFont" );
@@ -155,6 +154,7 @@
 			bean.setCode( record.code );
 			bean.setDirectory( record.directory );
 			bean.setDimension( record.dimension );
+			bean.setFamily( record.family );
 
 			bean.setTexts( getTextService().list( fontId = record.font_id ) );
 			bean.setCreatedAt( record.created_at );

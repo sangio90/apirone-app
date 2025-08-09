@@ -27,7 +27,7 @@
         <map from="shortId" to="shortId" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
-        <map from="severity" to="severity" type="cf:String" />
+        <map from="family" to="family" type="cf:String" />
         <map from="directory" to="directory" type="cf:String" />
         <map from="dimension" to="dimension" type="cf:Numeric" />
         <map from="mainText" to="mainText" ref="Text" />

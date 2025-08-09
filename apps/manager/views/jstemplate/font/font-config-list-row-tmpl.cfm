@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding='UTF-8'>
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="font-grid-row-tmpl">
+    <nmscript type="text/x-kendo-template" id="font-config-list-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td>
                 <span data-bind="text: shortId"></span>
@@ -11,9 +11,6 @@
             </td>
             <td>
                 <span data-bind="text: name"></span>
-            </td>
-            <td>
-                <span data-bind="text: family"></span>
             </td>
             <td class="text-end">
                 <span data-bind="text: dimension"></span> mm

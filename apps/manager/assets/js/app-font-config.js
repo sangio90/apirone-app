@@ -1,6 +1,6 @@
-AP.font = AP.font || {};
+﻿AP.fontConfig = AP.fontConfig || {};
 
-AP.font.fields = {
+AP.fontConfig.fields = {
     listRoot: $( "#font-list-root" ),
     searchListForm: $( "#font-grid-search-form" ),
     detailRoot: $( "#font-detail-modal" ),
@@ -8,15 +8,12 @@ AP.font.fields = {
 };
 
 $( document ).ready( function() {
-    if ( AP.font.fields.listRoot.length ) {
-        AP.font.list.init();
-    }
-    if ( AP.font.fields.detailRoot.length ) {
-        AP.font.detail.init();
+    if ( AP.fontConfig.fields.listRoot.length ) {
+        AP.fontConfig.list.init();
     }
 } );
 
-AP.font.detail = ( function() {
+AP.fontConfig.detail = ( function() {
     var pub = {};
 
     var defaultDetailForm = {
@@ -41,25 +38,8 @@ AP.font.detail = ( function() {
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
 
-        callback: {
-            onCreate: undefined,
-            onUpdate: undefined,
-            onLoad: undefined,
-        },
-
-        resetForm: function() {
-            var detailForm = AP.font.fields.detailForm;
-
-            var validator = detailForm.validate();
-            validator.resetForm();
-
-            detailForm.find( ".status" ).html( "" );
-
-            viewModel.set( "detailForm", defaultDetailForm );
-        },
-
         save: function( event ) {
-            var detailForm = AP.font.fields.detailForm;
+            var detailForm = AP.fontConfig.fields.detailForm;
             var status = detailForm.find( ".status" );
 
             status.html(
@@ -105,7 +85,7 @@ AP.font.detail = ( function() {
 
         viewModel.resetForm();
 
-        NM.util.openModal( AP.font.fields.detailRoot );
+        NM.util.openModal( AP.fontConfig.fields.detailRoot );
     };
 
     pub.edit = function( { id, onSave } ) {
@@ -125,7 +105,7 @@ AP.font.detail = ( function() {
                         viewModel.set( "detailForm.data", xhr.data );
                         viewModel.set( "detailForm.title", "Modifica font < " + xhr.data.name + " >" );
 
-                        NM.util.openModal( AP.font.fields.detailRoot );
+                        NM.util.openModal( AP.fontConfig.fields.detailRoot );
                     }
                 },
             },
@@ -133,9 +113,9 @@ AP.font.detail = ( function() {
     };
 
     pub.init = function() {
-        kendo.bind( AP.font.fields.detailRoot, viewModel );
+        kendo.bind( AP.fontConfig.fields.detailRoot, viewModel );
 
-        var detailForm = AP.font.fields.detailForm;
+        var detailForm = AP.fontConfig.fields.detailForm;
 
         detailForm.validate( {
             onfocusout: function( element ) {
@@ -143,10 +123,6 @@ AP.font.detail = ( function() {
             },
             rules: {
                 name: {
-                    required: true,
-                    rangelength: [ 2, 100 ]
-                },
-                family: {
                     required: true,
                     rangelength: [ 2, 100 ]
                 },
@@ -172,10 +148,6 @@ AP.font.detail = ( function() {
                     required: "Nome richiesto",
                     rangelength: "Sono richiesti tra 2 e 100 caratteri"
                 },
-                family: {
-                    required: "Font-family richiesto",
-                    rangelength: "Sono richiesti tra 2 e 100 caratteri"
-                },
                 code: {
                     required: "Codice richiesto",
                     checkCode: "Solo numeri, lettere, trattino o trattino basso",
@@ -188,10 +160,10 @@ AP.font.detail = ( function() {
     return pub;
 } () );
 
-AP.font.list = ( function() {
+AP.fontConfig.list = ( function() {
     var pub = {};
 
-    var detailApp = AP.font.detail;
+    var detailApp = AP.fontConfig.detail;
 
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/fonts" } ),
@@ -201,7 +173,7 @@ AP.font.list = ( function() {
         rows: dataSources.items,
 
         search: function( event ) {
-            var thisForm = AP.font.fields.searchListForm;
+            var thisForm = AP.fontConfig.fields.searchListForm;
 
             var params = thisForm.serializeJSON();
 
@@ -275,7 +247,7 @@ AP.font.list = ( function() {
     } );
 
     pub.init = function() {
-        kendo.bind( AP.font.fields.listRoot, viewModel );
+        kendo.bind( AP.fontConfig.fields.listRoot, viewModel );
 
     };
 

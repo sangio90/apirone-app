@@ -30,8 +30,24 @@
                                 <input type="text" required class="form-control col-sm-4 uppercase" 
                                     name="name"
                                     maxlength="50"
-                                    data-bind="value: detailForm.data.name"
+                                    data-bind="value: detailForm.data.mainText.name"
                                     >
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Font-family</label>
+                            <div class="col-sm-10">
+                                <input type="text" required class="form-control col-sm-4" 
+                                    name="family"
+                                    maxlength="100"
+                                    data-bind="value: detailForm.data.family"
+                                    >
+                            </div>
+                            <label class="col-sm-2 col-form-label"></label>
+                            <div class="field-note col-sm-10">
+                                Es. "Source Sans Pro", Arial, sans-serif<br>
+                                "Times New Roman", Georgia, serif
                             </div>
                         </div>
 

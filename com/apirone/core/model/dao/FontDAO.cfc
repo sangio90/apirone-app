@@ -45,6 +45,7 @@
 			WHERE 1=1
 				<cfif !IsNull( arguments.str )>
 					AND code ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+					OR family ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
 				</cfif>
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
@@ -67,12 +68,14 @@
 			INSERT INTO fonts (
 				code,
 				directory,
-				dimension
+				dimension,
+				family
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getDirectory()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.font.getDimension()#">
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.font.getDimension()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getFamily()#">
 			) RETURNING font_id
 		</cfquery>
 
@@ -88,7 +91,8 @@
 			SET
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getCode()#">,
 				directory = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getDirectory()#">,
-				dimension = <cfqueryparam cfsqltype="Numeric" value="#arguments.font.getDimension()#">
+				dimension = <cfqueryparam cfsqltype="Numeric" value="#arguments.font.getDimension()#">,
+				family = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getFamily()#">
 			WHERE
 				font_id = <cfqueryparam cfsqltype="Integer" value="#arguments.font.getId()#">
 		</cfquery>
