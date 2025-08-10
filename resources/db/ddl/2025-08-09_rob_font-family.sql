@@ -1,0 +1,2 @@
+﻿ALTER TABLE public.fonts
+ADD COLUMN family VARCHAR(125);
