@@ -65,6 +65,14 @@
 
                                         <p>
 
+                                            <cfif prc.product.getCategory().getType().getId() == "SEG">
+                                                - <a href="/manager/signs/fonts-config?lineId=#prc.line.getId()#&modelId=#prc.model.getId()#&categoryId=#prc.product.getCategory().getId()#" target="_blank" class="underline">
+                                                    Configurazione font #prc.line.getName()# / #prc.model.getCode()# &raquo;
+                                                    </a>
+
+                                                <br>
+                                            </cfif>
+
                                             <cfif prc.product.getCategory().getMode().getId() <> "BAS">
                                                 - <a href="" class="underline" data-type="lineModel"
                                                     data-model-id="#prc.model.getId()#"
