@@ -54,7 +54,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			categoryId = data.categoryId
 		}
 
-		var result = super.fire( "line.clone", params );
+	 	var result = super.fire( "line.clone", params );
+		// var result = super.service( "line" ).clone( argumentCollection = params );
 
 		event.setValue( "result", result );
 	}
@@ -99,7 +100,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		var line     = super.bean( "Line" );
-		var model     = super.bean( "Model" );
+		var model    = super.bean( "Model" );
 		var finish   = super.bean( "Finish" );
 		var product  = super.bean( "Product" );
 		var status   = super.bean( "Status" );
@@ -125,7 +126,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				"payload" = {
 					"productId" = newId,
 					"finishId"  = obj.getFinish().getId(),
-					"modelId"    = obj.getModel().getId()
+					"modelId"   = obj.getModel().getId()
 				}
 			}
 		);
@@ -137,7 +138,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		super.fire(
 			"product.deleteByParams",
 			{
-				modelId   = json.modelId,
+				modelId  = json.modelId,
 				lineId   = rc.id,
 				finishId = json.finishId
 			}

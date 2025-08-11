@@ -67,7 +67,7 @@
 		for ( var key in payload ) {
 			if ( key === UCase( key ) ) {
 				Throw(
-					type    = "LoggerAudit.errors.invalidPayloadKey",
+					type    = "AuditLogger.errors.invalidPayloadKey",
 					message = "Invalid key [#key#] format. Use lowercase format and double quotes for setting variable. E.g. ['myKey']."
 				)
 			}
@@ -81,7 +81,7 @@
 
 		if ( ArrayLen( parts ) != 2 ) {
 			Throw(
-				type    = "LoggerAudit.errors.invalidActionFormat",
+				type    = "AuditLogger.errors.invalidActionFormat",
 				message = "Invalid action format. Use 'ENTITY.ACTION' (e.g. PRODUCT.CREATED)."
 			);
 		}
@@ -90,12 +90,12 @@
 		var action = UCase( parts[ 2 ] );
 
 		if ( !StructKeyExists( getConfig().entities, entity ) ) {
-			Throw( type = "LoggerAudit.errors.unknownEntity", message = "Unknown entity: [#entity#]" );
+			Throw( type = "AuditLogger.errors.unknownEntity", message = "Unknown entity: [#entity#]" );
 		}
 
 		if ( !StructKeyExists( getConfig().actions, action ) ) {
 			Throw(
-				type    = "LoggerAudit.errors.unknownAction",
+				type    = "AuditLogger.errors.unknownAction",
 				message = "Unknown action: [#action#] for entity [#entity#]"
 			);
 		}

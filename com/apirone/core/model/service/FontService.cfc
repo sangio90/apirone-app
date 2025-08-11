@@ -63,6 +63,11 @@
 		return false;
 	}
 
+	/**
+	 * @audit font.created
+	 * @auditMessage Font created: [@return@]
+	 * @auditPayload { "id": "@return@" }
+	 */
 	public String function create( required com.apirone.core.model.bean.Font font ){
 		var newId = getDao().insert( arguments.font );
 
@@ -84,6 +89,11 @@
 		return newId;
 	}
 
+	/**
+	 * @audit font.updated
+	 * @auditMessage Font updated: [@font.id@]
+	 * @auditPayload { "id": "@font.id@" }
+	 */
 	public String function update( required com.apirone.core.model.bean.Font font ){
 		getDao().update( arguments.font );
 
@@ -113,7 +123,6 @@
 		return arguments.font.getId();
 	}
 
-
 	public com.apirone.core.model.bean.Outcome function delete( required String fontId ){
 		var outcome = super.bean( "Outcome" );
 
@@ -125,6 +134,12 @@
 			try {
 				var result = getDao().delete( arguments.fontId );
 				outcome.setData( { "deletedCount" = result } )
+
+				super.logAudit(
+					type    = "font.deleted",
+					message = "Font deleted: [#arguments.fontId#]",
+					payload = { "id" = arguments.fontId }
+				);
 
 				super.getCacheManager().remove( getCacheScope(), arguments.fontId );
 			} catch ( any error ) {

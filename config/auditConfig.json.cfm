@@ -1,27 +1,22 @@
 ﻿{
 	entities: {
-		"PRODUCT": {
-			"hex": '#FF5733'
-		},
-		"ACCOUNT": {
-			"hex": '#33A1FF'
-		},
-		"QUOTATION": {
-			"hex": '#28A745'
-		},
-		"LINE": {
-			"hex": '#FFC300'
-		},
-		"MODEL": {
-			"hex": '#8E44AD'
-		}
+		"PRODUCT": {},
+		"PRODUCT_ITEM": {},
+		"ACCOUNT": {},
+		"QUOTATION": {},
+		"LINE": {},
+		"FONT": {},
+		"ATTRIBUTE": {},
+		"RAW_VALUE": {},
+		"MODEL": {}
 	},
 	actions: {
-		"CREATED": true,
-		"UPDATED": true,
-		"DELETED": true,
-		"VIEWED": true,
-		"PAID": true,
-		"CLONED": true,
+		"CREATED": {},
+		"UPDATED": {},
+		"DELETED": {},
+		"VIEWED": {},
+		"PAID": {},
+		"CLONED": {},
+		"SEARCH": {},
 	}
 }

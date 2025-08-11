@@ -12,22 +12,42 @@ component extends="coldbox.system.ioc.config.Binder" {
             },
         };
 
-
         mapDirectory(packagePath="com.apirone.core.model.dao")
             .asSingleton();
 
+
         mapDirectory(packagePath="com.apirone.core.model.service")
+            .asSingleton();  
+
+
+        /* 
+            service with decorator 
+        */
+        map( "FontServiceBase" ).to( "com.apirone.core.model.service.FontService" )
             .asSingleton();
+        
+        map( "FontService" ).to( "com.apirone.core.decorator.LoggerServiceDecorator" )
+            .asSingleton()
+            .initArg( name="wrappedService", ref="FontServiceBase" );
+
+        map( "LineServiceBase" ).to( "com.apirone.core.model.service.LineService" )
+            .asSingleton();
+        
+        map( "LineService" ).to( "com.apirone.core.decorator.LoggerServiceDecorator" )
+            .asSingleton()
+            .initArg( name="wrappedService", ref="LineServiceBase" );
 
 
         /*
+        mapDirectory(packagePath="com.apirone.core.decorator")
+            .asSingleton();
+        */
+        
+        /*
             configuration
         */
-
         map("Configuration").to( "com.apirone.core.model.bean.Configuration" )
-            .asSingleton()
-
-
+            .asSingleton();
 
         /*
             utils

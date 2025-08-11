@@ -60,6 +60,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	/**
+	 * @audit line.created
+	 * @auditMessage Line created: [@return@]
+	 * @auditPayload { "id": "@return@" }
+	 */
 	public String function create( required com.apirone.core.model.bean.Line line ){
 		var newId = getDao().insert( arguments.line );
 
@@ -76,11 +81,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getTextService().bulkCreate( arguments.line.getTexts() );
 		}
 
-		super.logAction( type = "LINE.CREATED", message = "Line [#newId#] created" )
+		// super.logAction( type = "LINE.CREATED", message = "Line [#newId#] created" )
 
 		return newId;
 	}
 
+	/**
+	 * @audit line.cloned
+	 * @auditMessage Line cloned: [@fromLineId@]
+	 * @auditPayload { "fromLineId": "@fromLineId@", "toLineId": "@toLineId@", "categoryId": "@categoryId@" }
+	 */
 	public Struct function clone(
 		required String fromLineId,
 		required String toLineId,
@@ -187,7 +197,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getCacheManager().removeAll();
 
-		super.logAction( type = "LINE.CLONED", message = "Line [#arguments.fromLineId#] cloned" )
+		// super.logAction( type = "LINE.CLONED", message = "Line [#arguments.fromLineId#] cloned" )
 
 		return {
 			"status"  = "success",
@@ -199,6 +209,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		};
 	}
 
+	/**
+	 * @audit line.updated
+	 * @auditMessage Line updated: [@line.id@]
+	 * @auditPayload { "id": "@line.id@" }
+	 */
 	public String function update( required com.apirone.core.model.bean.Line line ){
 		getDao().update( arguments.line );
 
@@ -221,8 +236,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		super.getCacheManager().remove( getCacheScope(), arguments.line.getId() );
 
-		super.logAction( type = "LINE.UPDATED", message = "Line [#arguments.line.getId()#] updated" );
-
 		return arguments.line.getId();
 	}
 
@@ -240,6 +253,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return false;
 	}
 
+	/**
+	 * @audit line.deleted
+	 * @auditMessage Line deleted: [@lineId@]
+	 * @auditPayload { "id": "@lineId@" }
+	 */
 	public com.apirone.core.model.bean.Outcome function delete( required String lineId ){
 		var outcome = super.bean( "Outcome" );
 
@@ -254,7 +272,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				getCacheManager().remove( getCacheScope(), arguments.lineId );
 
-				super.logAction( type = "LINE.DELETED", message = "Line [#arguments.lineId#] deleted" );
+				// super.logAction( type = "LINE.DELETED", message = "Line [#arguments.lineId#] deleted" );
 			} catch ( any error ) {
 				dump( error );
 				abort;
@@ -267,7 +285,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return outcome;
 	}
-
 
 	public com.apirone.core.model.bean.Outcome function deleteByParams(
 		required String lineId,

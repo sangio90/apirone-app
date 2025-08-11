@@ -58,7 +58,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( !Len( json.id ) ) {
 			messageId = "font.created";
-			thisId    = super.fire( "font.create", [ font ] )
+			// thisId    = super.fire( "font.create", { font = font, userId = "00001" } )
+
+			super.service( "font" ).create( font );
 		} else {
 			messageId = "font.updated";
 			thisId    = super.fire( "font.update", [ font ] )
