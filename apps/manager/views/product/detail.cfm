@@ -44,7 +44,7 @@
 
                                     </select>
 
-                                    <label class="me-2">Dimensione:</label>
+                                    <label class="me-2">Modello:</label>
 
                                     <select name="modelId" class="form-control w-auto" data-bind="events: { change: change }">
                                     </select>
