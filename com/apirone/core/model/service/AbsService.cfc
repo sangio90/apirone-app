@@ -159,7 +159,7 @@ component output="false" accessors="true" {
 		return bean;
 	}
 
-	private Struct function logAction(
+	private Struct function logAudit(
 		required String type,
 		required String message,
 		Any payload,

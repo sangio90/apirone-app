@@ -61,7 +61,7 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction name="insert" returntype="String">
+	<cffunction name="insert" returntype="Numeric">
 		<cfargument name="font" type="com.apirone.core.model.bean.Font" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
@@ -79,10 +79,10 @@
 			) RETURNING font_id
 		</cfquery>
 
-		<cfreturn local.q.font_id.toString()>
+		<cfreturn local.q.font_id>
 	</cffunction>
 
-	<cffunction name="update" returntype="String">
+	<cffunction name="update" returntype="Numeric">
 		<cfargument name="font" type="com.apirone.core.model.bean.Font" required="true">
 
 		<cfquery name="local.q" datasource="apirone">

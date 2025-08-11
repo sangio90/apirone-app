@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="TextDAO";
 	property name="langService" inject="LangService";
 	property name="statusService" inject="StatusService";
+	property name="textKindService" inject="TextKindService";
 
 	property name="cacheScope" type="String" default="Text.bean";
 
@@ -131,6 +132,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setLang( getLangService().get( record.lang_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setEntity( getEntity( record ) );
+			// bean.setKind( getTextKindService().get( record.text_kind_id ) );
 
 			getStatusService().get( record.status_id )
 
