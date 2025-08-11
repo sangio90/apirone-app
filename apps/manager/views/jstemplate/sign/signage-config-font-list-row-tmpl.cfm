@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding='UTF-8'>
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="sign-config-font-list-row-tmpl">
+    <nmscript type="text/x-kendo-template" id="signage-config-font-list-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td>
                 <span data-bind="text: id"></span>

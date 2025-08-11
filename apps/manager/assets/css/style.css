@@ -109,11 +109,17 @@ h2 {
     padding: 0px 5px;
 }
 
-.box-search-small .col span {
+/* al momento nelle finiture */
+.box-search-small .col span,
+tr th.header-small {
     font-weight: bold;
     color: #538cc9;
     text-transform: uppercase;
     font-size: 9px;
+}
+
+table tr th {
+    padding: 0.5rem;
 }
 
 /*

@@ -1,9 +1,9 @@
 ﻿AP.signConfig = AP.signConfig || {};
 
 AP.signConfig.fields = {
-    detailRoot: $( "#sign-config-root" ),
-    selectedForm: $( "#sign-config-selected-form" ),
-    detailForm: $( "#sign-detail-form" ),
+    detailRoot: $( "#signage-config-root" ),
+    selectedForm: $( "#signage-config-selected-form" ),
+    detailForm: $( "#signage-detail-form" ),
 };
 
 $( document ).ready( function() {
@@ -16,7 +16,7 @@ AP.signConfig.detail = ( function() {
     var pub = {};
 
     var defaultSizeRow = {
-        id: "1",
+        id: "",
         height: "",
         heightInPx: "",
         charCount: "",
@@ -67,13 +67,44 @@ AP.signConfig.detail = ( function() {
 
         },
 
+        addSize: function( event ) {
+
+            console.log( "event", event.data );
+
+            var row = viewModel.get( "fontList" ).getByUid( event.data.uid );
+            row.sizes.push( defaultSizeRow );
+
+            return false;
+
+        },
+
         showSelectedList: function( event ){
             return viewModel.get( "fontSelected" ).data().length > 0;
         },
 
         delete: function( event ) {
 
-            console.log( "event", );
+
+            console.log( "event", event.data );
+            console.log( "event:parent", event.data.parent().parent() );
+
+            var font = event.data.parent().parent();
+
+            if ( font.sizes.length == 1 ) {
+
+                var dataItem = viewModel.get( "fontSelected" ).getByUid( event.data.uid );
+
+                var font = dataItem.parent();
+                console.log( "font", font );
+
+                viewModel.get( "fontSelected" ).remove( dataItem );
+
+            } else {
+
+                var row = viewModel.get( "fontList" ).getByUid( event.data.uid );
+                row.sizes.remove( event.data );
+
+            }
 
             return false;
 
@@ -90,32 +121,28 @@ AP.signConfig.detail = ( function() {
                     "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
                 );
 
-                if ( detailForm.valid() ) {
-                    NM.util.ajax( {
-                        method: "POST",
-                        url: "/manager/ajax/fonts",
-                        data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
-                        callback: {
-                            done: function( xhr ) {
-                                if ( xhr.status == "SUCCESS" ) {
-                                    NM.util.autoHideMessage(
-                                        status,
-                                        "<span class='green'>Font salvato</span>",
-                                    );
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/fonts",
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.status == "SUCCESS" ) {
+                                NM.util.autoHideMessage(
+                                    status,
+                                    "<span class='green'>Font salvato</span>",
+                                );
 
-                                    setTimeout(
-                                        () => $( "#sign-detail-modal" ).modal( "hide" ),
-                                        1000,
-                                    );
+                                setTimeout(
+                                    () => $( "#signage-detail-modal" ).modal( "hide" ),
+                                    1000,
+                                );
 
-                                }
-                            },
+                            }
                         },
-                    } );
-                }
-
+                    },
+                } );
             }
-
 
             return false;
         },

@@ -1,6 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="sign-config-root">
+    <div id="signage-config-root">
 
         <div class="row">
             <div class="col-10">
@@ -18,10 +18,10 @@
                         <div class="col-md-5">
                             <h3>Lista dei font</h3>
 
-                            <div class="sign-list">
+                            <div class="signage-list">
 
                                 #table(
-                                    rowTemplate="sign-config-font-list-row-tmpl",
+                                    rowTemplate="signage-config-font-list-row-tmpl",
                                     source="fontList"
                                 )#
 
@@ -32,14 +32,14 @@
                         <div class="col-md-7">
                             <h3>Font selezionati</h3>
 
-                            <form name="sign-config-selected-form" id="sign-config-selected-form">
+                            <form name="signage-config-selected-form" id="signage-config-selected-form">
 
                                 <div data-bind="visible: showSelectedList">
 
-                                    <div class="sign-list">
+                                    <div class="signage-list">
 
                                         <table class="table" style="margin:0;padding:0">
-                                            <tbody data-template="sign-config-font-selected-list-row-tmpl" data-bind="source: fontSelected">
+                                            <tbody data-template="signage-config-font-selected-list-row-tmpl" data-bind="source: fontSelected">
                                             </tbody>
                                         </table>
 
@@ -66,8 +66,8 @@
             </div>
         </div>
 
-        #template(view="jstemplate/sign/sign-config-font-list-row-tmpl")#
-        #template(view="jstemplate/sign/sign-config-font-selected-list-row-tmpl")#
+        #template(view="jstemplate/sign/signage-config-font-list-row-tmpl")#
+        #template(view="jstemplate/sign/signage-config-font-selected-list-row-tmpl")#
         
     </div>
     

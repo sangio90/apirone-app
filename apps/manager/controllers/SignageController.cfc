@@ -20,9 +20,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title    = "Configurazione dei font per < #prc.line.getName()#, #prc.model.getName()# >";
 		prc.subtitle = "#prc.category.getName()#";
 
-		prc.jsScripts.add( "app-sign-config" );
+		prc.jsScripts.add( "app-signage-config" );
 
-		event.setView( "sign/sign-config" );
+		event.setView( "sign/signage-config" );
 	}
 
 	function list( event, rc, prc ){
