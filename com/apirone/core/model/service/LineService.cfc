@@ -274,8 +274,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				// super.logAction( type = "LINE.DELETED", message = "Line [#arguments.lineId#] deleted" );
 			} catch ( any error ) {
-				dump( error );
-				abort;
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteLine" );

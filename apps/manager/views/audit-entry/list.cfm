@@ -91,7 +91,7 @@
                                     { 'field':'entity', 'title':'Sezione', width: '150px'},
                                     { 'field':'action', 'title':'Azione', width: '150px'},
                                     { 'field':'message', 'title':'Messagge'},
-                                    { 'field':'account.name', 'title':'Account', width: '180px' },
+                                    { 'field':'account.name', 'title':'Account', width: '200px' },
                                     { 'field':'', 'title':'', width: '55px'}
                                 ]",
                                 rowTemplate="audit-entry/audit-entry-grid-row-tmpl"

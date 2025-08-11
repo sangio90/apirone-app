@@ -149,7 +149,7 @@
 			{
 				href: "/manager/audit-entries",
 				icon: "fas fa-folder-open",
-				title: "Log",
+				title: "Audit log",
 				roles: "ADM"
 			},
 			{

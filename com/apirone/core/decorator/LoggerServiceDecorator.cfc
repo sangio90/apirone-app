@@ -8,7 +8,6 @@
 		return this;
 	}
 
-
 	public any function onMissingMethod( required String method, required Struct args ){
 		var metadata = GetMetadata( wrappedService );
 		var logger   = getLogger();
@@ -20,22 +19,21 @@
 			arguments.args
 		);
 
-		// l'args di onMissingMEhod perde la chiave come nome della struttura del metodo originale.
-		// dovrebbe essere: { "argName1": value1, "argName2": value2 }
-		// invece è solo: { "1": value1, "2": value2 }
-		// devo ricostruirli
-		var namedArgs = getNamedArgumentsFor( arguments.method, arguments.args );
-
-		cffile(
-			action = "APPEND",
-			file   = "#ExpandPath( "/debug.log" )#",
-			output = "#Now()# [LoggerServiceDecorator] Invoked method: [#arguments.method#] with args: #serializeValue( namedArgs )#"
-		);
+		/**
+		 * ATTENZIONE: l'args di onMissingMehod - A VOLTE - non ha come chiave
+		 * il nome del metodo della struttura del metodo originale.
+		 * https://www.bennadel.com/blog/868-learning-coldfusion-8-onmissingmethod-event-handler.htm
+		 * Dovrebbe essere: { "argName1": value1, "argName2": value2 }
+		 * Invece è: { "1": value1, "2": value2 }
+		 * getNamedArguments() ricostruisce gli argomenti.
+		 */
+		var namedArgs = getNamedArguments( arguments.method, arguments.args );
 
 		for ( var func in metadata.functions ) {
 			if ( func.name == arguments.method ) {
 				if ( func.keyExists( "audit" ) ) {
-					var params = { type = func.audit };
+					var params     = { type = func.audit };
+					params.payload = NullValue();
 
 					if ( func.keyExists( "auditMessage" ) ) {
 						params.message = parseTemplate(
@@ -45,9 +43,6 @@
 							false
 						);
 					}
-
-
-					params.payload = NullValue();
 
 					if ( func.keyExists( "auditPayload" ) ) {
 						var payloadString = parseTemplate(
@@ -63,6 +58,7 @@
 							logger.error( "LoggerServiceDecorator: Invalid JSON in auditPayload: #payloadString#" );
 						}
 					}
+
 					super.logAudit( argumentCollection = params );
 				}
 				break;
@@ -115,8 +111,9 @@
 				parts = [];
 			}
 		} else {
-			WriteDump( "Unknown token root: #root#" );
-			return "Unknown token: #token#";
+			getLogger().error( "LoggerServiceDecorator: Unknown token root: #root#" )
+			// WriteDump( "Unknown token root: #root#" );
+			return "Unknown token: " & token;
 		}
 
 		for ( var i = 1; i <= ArrayLen( parts ); i++ ) {
@@ -149,15 +146,16 @@
 				) {
 					value = value[ key ];
 				} else {
-					WriteDump( "Key not found: #key# in token #token#" );
-					return "[Key not found: " & token & "]";
+					getLogger().error( "LoggerServiceDecorator: Key not found: #key# in token #token#" )
+					return "Key not found: " & token;
 				}
 			} else if ( IsStruct( value ) ) {
 				if ( StructKeyExists( value, key ) ) {
 					value = value[ key ];
 				} else {
-					WriteDump( "Key not found: #key# in token #token#" );
-					return "[Key not found: " & token & "]";
+					// WriteDump( "Key not found: #key# in token #token#" );
+					getLogger().error( "LoggerServiceDecorator: Key not found: #key# in token #token#" )
+					return "Key not found: " & token;
 				}
 			} else if ( IsArray( value ) ) {
 				return serializeValue( value );
@@ -167,7 +165,6 @@
 		}
 		return serializeValue( value );
 	}
-
 
 	private string function toStringSafe( any val ){
 		if ( IsSimpleValue( val ) ) {
@@ -209,7 +206,7 @@
 		return SerializeJSON( arguments.value );
 	}
 
-	private Struct function getNamedArgumentsFor( required string methodName, required struct args ){
+	private Struct function getNamedArguments( required string methodName, required struct args ){
 		var meta = GetMetadata( getWrappedService() );
 
 		var methodMeta = meta.functions.reduce( ( acc, fn ) => {
@@ -217,11 +214,18 @@
 		}, {} );
 
 		var namedArgs    = {};
-		var isPositional = StructKeyExists( args, "arguments" ) && IsArray( args.arguments );
+		var isPositional = true;
+
+		for ( var key in args ) {
+			if ( !IsNumeric( key ) ) {
+				isPositional = false;
+				break;
+			}
+		}
 
 		// Se sono posizionali, fai il mapping manuale
 		if ( isPositional ) {
-			var posArgs = args.arguments;
+			var posArgs = arguments.args;
 			for ( var i = 1; i <= ArrayLen( methodMeta.parameters ); i++ ) {
 				var paramName          = methodMeta.parameters[ i ].name;
 				namedArgs[ paramName ] = i <= ArrayLen( posArgs ) ? posArgs[ i ] : Javacast( "null", "" );
@@ -230,6 +234,14 @@
 			// Altrimenti copia direttamente
 			namedArgs = Duplicate( args );
 		}
+
+		/*
+		if ( methodName == "update" ) {
+			dump( isPositional );
+			dump( namedArgs );
+			abort;
+		}
+		*/
 
 		return namedArgs;
 	}

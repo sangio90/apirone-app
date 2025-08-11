@@ -18,7 +18,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 
 
 	/*
-		same fields
+		common fields
 	*/
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="category" type="com.apirone.core.model.bean.ProductCategory";

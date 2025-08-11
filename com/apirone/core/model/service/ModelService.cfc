@@ -65,7 +65,7 @@
 			getTextService().bulkCreate( arguments.model.getTexts() );
 		}
 
-		super.logAction( type = "MODEL.CREATED", message = "Model [#newId#] created" )
+		// super.logAction( type = "MODEL.CREATED", message = "Model [#newId#] created" )
 
 		return newId;
 	}
@@ -97,7 +97,7 @@
 
 		super.getCacheManager().remove( getCacheScope(), arguments.model.getId() );
 
-		super.logAction( type = "MODEL.UPDATED", message = "Model [#arguments.model.getId()#] updated" )
+		// super.logAction( type = "MODEL.UPDATED", message = "Model [#arguments.model.getId()#] updated" )
 
 		return arguments.model.getId();
 	}
@@ -128,7 +128,7 @@
 				outcome.setData( { "deletedCount" = result } )
 
 				super.getCacheManager().remove( getCacheScope(), arguments.modelId );
-				super.logAction( type = "MODEL.DELETED", message = "Model [#arguments.modelId#] deleted" )
+				// super.logAction( type = "MODEL.DELETED", message = "Model [#arguments.modelId#] deleted" )
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
