@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
     property name="model" type="com.apirone.core.model.bean.Model";
     property name="category" type="com.apirone.core.model.bean.ProductCategory";
 
-    public LineModel function init(){
+    public CatalogSet function init(){
 
         return this;
     }
