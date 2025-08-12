@@ -47,6 +47,12 @@
 
                                     <div class="pt-3 pb-3 text-center">
                                         <button class="btn btn-primary" data-bind="click:save">Salva configurazione &raquo;</button>
+                                        <p class="mt-2">
+                                            <input type="hidden" name="findDuplicateHeights"
+                                                data-rule-findDuplicateHeights="true"
+                                                data-msg="Ho trovato altezze duplicate"
+                                            >  
+                                        </p>                                  
                                     </div>
 
                                 </div>

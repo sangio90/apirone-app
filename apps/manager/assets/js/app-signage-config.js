@@ -12,7 +12,54 @@ $( document ).ready( function() {
     }
 } );
 
+
 AP.signConfig.detail = ( function() {
+
+    $.validator.addMethod( "findDuplicateHeights", function( value, element ) {
+
+        const errors = [];
+
+        // var data = viewModel.get( "fontSelected" ).data().toJSON();
+
+        const fontConfigs = viewModel.get( "fontSelected" ).data();
+
+        // Itera su ogni configurazione di font
+        fontConfigs.forEach( fontConfig => {
+            const seenHeights = new Set();
+            const duplicateHeights = new Set();
+
+            // Estrae l'array di dati dal DataSource 'sizes' nidificato
+            const sizesData = fontConfig.sizes.data();
+
+            // Itera su ogni 'size' per il font corrente
+            sizesData.forEach( size => {
+                // Accede alla proprietà 'height'. Usiamo .get() per sicurezza,
+                // dato che 'size' è un ObservableObject.
+                const heightValue = size.get( "height" );
+
+                if ( seenHeights.has( heightValue ) ) {
+                    // Se l'altezza è già nel Set, è un duplicato
+                    duplicateHeights.add( heightValue );
+                } else {
+                    // Altrimenti, aggiungila al Set delle altezze viste
+                    seenHeights.add( heightValue );
+                }
+            } );
+
+            // Se sono stati trovati duplicati per questo font, aggiungili all'array degli errori
+            if ( duplicateHeights.size > 0 ) {
+                errors.push( {
+                    fontId: fontConfig.font.id, // L'oggetto font non è un DataSource, si accede direttamente
+                    duplicates: Array.from( duplicateHeights ) // Converte il Set in un array
+                } );
+            }
+        } );
+
+        return errors.length > 0 ? false : true;
+
+    } );
+
+
     var pub = {};
 
     var defaultSizeRow = {

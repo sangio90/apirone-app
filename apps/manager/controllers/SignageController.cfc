@@ -5,6 +5,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.model    = super.fire( "model.get", [ rc.modelId ] );
 		prc.category = super.fire( "productCategory.get", [ rc.categoryId ] );
 
+		var exists = super.service( "SignageConfig" ).exists( argumentCollection = rc )
+
+		if ( exists ) {
+		}
+
 		var fontData = []
 
 		var fonts = super.fire( "font.list" );
@@ -16,7 +21,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.page[ "fonts" ] = fontData;
 
-		prc.title    = "Configurazione dei font per < #prc.line.getName()#, #prc.model.getName()# >";
+		prc.title = "Configurazione per la linea < #prc.line.getName()#, #prc.model.getName()# >";
+
 		prc.subtitle = "#prc.category.getName()#";
 
 		prc.jsScripts.add( "app-signage-config" );
