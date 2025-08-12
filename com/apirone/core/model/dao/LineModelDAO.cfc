@@ -16,10 +16,10 @@
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="str" type="String">
-		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="statusId" type="Numeric">
 		<cfargument name="lineId" type="String">
 		<cfargument name="modelId" type="String">
+		<cfargument name="categoryId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -84,7 +84,7 @@
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.lineModel.getLine().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.lineModel.getModel().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.lineModel.getProductcategory().getId()#">
+				<cfqueryparam cfsqltype="Integer" value="#arguments.lineModel.getCategory().getId()#">
 			) RETURNING linemodel_id
 		</cfquery>
 
@@ -105,4 +105,3 @@
 		<cfreturn local.q.recordCount>
 	</cffunction>
 </cfcomponent>
-

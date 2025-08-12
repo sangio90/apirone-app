@@ -26,13 +26,52 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Array function list(){
 		var rows = [];
 
+		return search( argumentCollection = arguments ).getData();
+	}
+
+	public com.apirone.core.model.bean.Result function search(
+		String str,
+		String categoryId,
+		String modelId,
+		String lineId,
+		String statusId,
+		required Numeric limit  = 20,
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "line.code", desc = "asc" } ]
+	){
+		var rows   = [];
+		var result = super.getResult();
+
+		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
+
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
 			rows.add( get( record.linemodel_id ) );
 		} );
 
-		return rows;
+		result.setData( rows );
+		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
+
+		return result;
+	}
+
+	public Array function exists(
+		required String lineId,
+		required String modelId,
+		required String categoryId
+	){
+
+		var records = getDao().find( argumentCollection = arguments );
+
+		if( records.recordcount ) {
+
+			return true;
+
+		}
+
+		return false;
 	}
 
 	/*
@@ -49,7 +88,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			obj.setName( record.linemodel );
 			obj.setLine( getLineService().get( record.line_id ) );
 			obj.setModel( getModelService().get( record.model_id ) );
-			obj.setProductCategory( getProductCategoryService().get( record.product_category_id ) );
+			obj.setCategory( getProductCategoryService().get( record.product_category_id ) );
 
 			return obj;
 		}

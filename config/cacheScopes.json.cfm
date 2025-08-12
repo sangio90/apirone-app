@@ -40,6 +40,8 @@
     "SystemColor.bean": {},
     "Text.bean": {},
     "TextKind.bean": {},
-    "Variant.bean": {}
-    "LineModel.bean": {}
+    "Variant.bean": {},
+    "LineModel.bean": {},
+    "SignageConfig.bean": {},
+    "SignageConfigItem.bean": {}
 }
