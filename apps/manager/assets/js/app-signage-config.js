@@ -29,7 +29,7 @@ AP.signConfig.detail = ( function() {
             const duplicateHeights = new Set();
 
             // Estrae l'array di dati dal DataSource 'sizes' nidificato
-            const sizesData = fontConfig.sizes.data();
+            const sizesData = fontConfig.items.data();
 
             // Itera su ogni 'size' per il font corrente
             sizesData.forEach( size => {
@@ -78,7 +78,7 @@ AP.signConfig.detail = ( function() {
             name: "",
         },
         // sizes: new kendo.data.DataSource( { data: [] } )
-        sizes: []
+        items: []
     };
 
     var items = new kendo.data.DataSource();
@@ -107,16 +107,16 @@ AP.signConfig.detail = ( function() {
 
             var newRow = {
                 font: event.data,
-                sizes: new kendo.data.DataSource( { data: [ defaultSizeRow ] } )
+                items: new kendo.data.DataSource( { data: [ defaultSizeRow ] } )
             };
 
             viewModel.get( "fontSelected" ).add( newRow );
 
         },
 
-        addSize: function( event ) {
+        addItem: function( event ) {
             var row = viewModel.get( "fontSelected" ).getByUid( event.data.uid );
-            row.sizes.add( defaultSizeRow ); // Usa il metodo del DataSource
+            row.items.add( defaultSizeRow ); // Usa il metodo del DataSource
             return false;
         },
 
@@ -126,16 +126,16 @@ AP.signConfig.detail = ( function() {
 
         delete: function( event ) {
             var row = event.data.parent().parent();
-            var sizes = row.sizes; // DataSource delle sizes
+            var items = row.items; // DataSource delle sizes
 
-            if ( sizes.data().length === 1 ) {
+            if ( items.data().length === 1 ) {
                 // Se c'è solo una size, rimuovi tutto il font
                 var dataItem = viewModel.get( "fontSelected" ).getByUid( row.uid );
                 viewModel.get( "fontSelected" ).remove( dataItem );
             } else {
                 // Rimuovi solo la size selezionata
-                var sizeRow = sizes.getByUid( event.data.uid );
-                sizes.remove( sizeRow );
+                var sizeRow = items.getByUid( event.data.uid );
+                items.remove( sizeRow );
             }
             return false;
         },
@@ -146,27 +146,16 @@ AP.signConfig.detail = ( function() {
 
             if ( selectedForm.valid() ) {
 
-                status.html(
-                    "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
-                );
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/fonts",
-                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    url: "/manager/ajax/signages/rows-config",
+                    data: JSON.stringify( viewModel.get( "fontSelected" ).data() ),
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
-                                NM.util.autoHideMessage(
-                                    status,
-                                    "<span class='green'>Font salvato</span>",
-                                );
-
-                                setTimeout(
-                                    () => $( "#signage-detail-modal" ).modal( "hide" ),
-                                    1000,
-                                );
-
+                                NM.util.autoHideMessage( status, "<span class='green'>Font salvato</span>" );
                             }
                         },
                     },

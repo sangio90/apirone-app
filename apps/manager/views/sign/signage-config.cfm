@@ -50,7 +50,7 @@
                                         <p class="mt-2">
                                             <input type="hidden" name="findDuplicateHeights"
                                                 data-rule-findDuplicateHeights="true"
-                                                data-msg="Ho trovato altezze duplicate"
+                                                data-msg="Ho trovato altezze duplicate per lo stesso font."
                                             >  
                                         </p>                                  
                                     </div>

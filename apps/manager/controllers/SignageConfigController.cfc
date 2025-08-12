@@ -19,11 +19,17 @@ component extends="com.apirone.core.controller.AbsController" {
 			fontData.add( obj );
 		}
 
+		prc.title       = "Configurazione per la linea < #prc.line.getName()#, #prc.model.getName()# >";
+		prc.subtitle    = "#prc.category.getName()#";
+		var catalogSetId = 0;
+
 		prc.page[ "fonts" ] = fontData;
-
-		prc.title = "Configurazione per la linea < #prc.line.getName()#, #prc.model.getName()# >";
-
-		prc.subtitle = "#prc.category.getName()#";
+		prc.page[ "keys" ]  = {
+			"catalogSetId" = catalogSetId,
+			"lineId"      = rc.lineId,
+			"modelId"     = rc.modelId,
+			"categoryId"  = rc.categoryId
+		};
 
 		prc.jsScripts.add( "app-signage-config" );
 

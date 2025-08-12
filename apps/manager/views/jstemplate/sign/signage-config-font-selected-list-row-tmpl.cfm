@@ -36,14 +36,14 @@
                     <tr>
                         <td colspan="6">
                             <table class="table">
-                                <tbody data-template="signage-config-font-selected-size-list-row-tmpl" data-bind="source: sizes">
+                                <tbody data-template="signage-config-font-selected-size-list-row-tmpl" data-bind="source: items">
                                 </tbody>
                             </table>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="6" class="pb-3 text-center">
-                            <button class="btn btn-sm btn-default" data-bind="click:addSize">Aggiungi riga &raquo;</button>
+                            <button class="btn btn-sm btn-default" data-bind="click:addItem">Aggiungi riga &raquo;</button>
                         </td>
                     </tr>
                 </table>
