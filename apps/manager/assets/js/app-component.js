@@ -491,8 +491,6 @@ AP.component.list = ( function() {
 
         calcTotalQuantity: function( event ) {
 
-            console.log( "calcTotalQuantity", event );
-
             var dataSource = viewModel.get( "selected" );
 
             var item = dataSource.getByUid( event.data.uid );

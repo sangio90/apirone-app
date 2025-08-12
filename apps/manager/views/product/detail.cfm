@@ -66,7 +66,7 @@
                                         <p>
 
                                             <cfif prc.product.getCategory().getType().getId() == "SEG">
-                                                - <a href="/manager/signes/rows-config?lineId=#prc.line.getId()#&modelId=#prc.model.getId()#&categoryId=#prc.product.getCategory().getId()#" target="_blank" class="underline">
+                                                - <a href="/manager/signages/row-config?lineId=#prc.line.getId()#&modelId=#prc.model.getId()#&categoryId=#prc.product.getCategory().getId()#" target="_blank" class="underline">
                                                     Configurazione font #prc.line.getName()# / #prc.model.getCode()# &raquo;
                                                     </a>
 
