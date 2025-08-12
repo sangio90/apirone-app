@@ -235,14 +235,6 @@
 			namedArgs = Duplicate( args );
 		}
 
-		/*
-		if ( methodName == "update" ) {
-			dump( isPositional );
-			dump( namedArgs );
-			abort;
-		}
-		*/
-
 		return namedArgs;
 	}
 

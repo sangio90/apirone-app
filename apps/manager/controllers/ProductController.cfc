@@ -37,15 +37,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.page[ "lineId" ]   = prc.line.getId();
 			prc.page[ "products" ] = super.fire( "product.list", { lineId = prc.line.getId() } );
 
-			//prc.page["models"] = prc.models;
-			//prc.page["finishes"] = prc.finishes;
-
 		}
 
 		prc.jsScripts.add( "app-component" );
 		prc.jsScripts.add( "app-attribute-detail" );
 		prc.jsScripts.add( "app-product-items" );
-
 
 		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = super.fire( "status.list", [ "attribute" ] );
