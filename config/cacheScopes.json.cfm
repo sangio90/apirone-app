@@ -41,4 +41,5 @@
     "Text.bean": {},
     "TextKind.bean": {},
     "Variant.bean": {}
+    "LineModel.bean": {}
 }
