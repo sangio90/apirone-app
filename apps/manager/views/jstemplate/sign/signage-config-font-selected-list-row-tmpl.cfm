@@ -9,8 +9,8 @@
                     <tr>
                         <td colspan="6">
                             <div class="p-2">
-                                <b><span data-bind="text: name" class="fs-16"></span></b>
-                                (<span data-bind="text: id"></span>)
+                                <b><span data-bind="text: font.name" class="fs-16"></span></b>
+                                (<span data-bind="text: font.id"></span>)
                             </div>
                         </td>
                     </tr>

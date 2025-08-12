@@ -24,58 +24,53 @@ AP.signConfig.detail = ( function() {
     };
 
     var defaultRow = {
-        data: {
+        font: {
             id: "",
             code: "",
             directory: "",
             name: "",
-            sizes: []
-        }
+        },
+        // sizes: new kendo.data.DataSource( { data: [] } )
+        sizes: []
     };
 
     var items = new kendo.data.DataSource();
     var selected = new kendo.data.DataSource();
+    // selected.sizes = new kendo.data.DataSource();
 
     items.data( AP.page.fonts );
-    selected.data( [] );
+    // selected.data( [] );
 
     var viewModel = kendo.observable( {
         fontList: items,
         fontSelected: selected,
 
         add: function( event ) {
-            console.log( "add" );
 
             var selected = viewModel.get( "fontSelected" ).data();
 
-            for( var item of selected  ) {
-                if ( item.id == event.data.id ) {
+            for ( var item of selected ) {
+                console.log( "item", item );
+                console.log( "event.data", event.data );
+                if ( item.font.id == event.data.id ) {
                     AP.widget.notify( "warning", "Font già selezionato" );
                     return;
                 }
             }
 
-            var row = viewModel.get( "fontList" ).getByUid( event.data.uid );
-            row.sizes.push( defaultSizeRow );
+            var newRow = {
+                font: event.data,
+                sizes: new kendo.data.DataSource( { data: [ defaultSizeRow ] } )
+            };
 
-
-            // var row = event.data.sizes.da( defaultSizeRow );
-
-            // row.add( defaultSizeRow );
-
-            viewModel.get( "fontSelected" ).add( row );
+            viewModel.get( "fontSelected" ).add( newRow );
 
         },
 
         addSize: function( event ) {
-
-            console.log( "event", event.data );
-
-            var row = viewModel.get( "fontList" ).getByUid( event.data.uid );
-            row.sizes.push( defaultSizeRow );
-
+            var row = viewModel.get( "fontSelected" ).getByUid( event.data.uid );
+            row.sizes.add( defaultSizeRow ); // Usa il metodo del DataSource
             return false;
-
         },
 
         showSelectedList: function( event ){
@@ -83,32 +78,19 @@ AP.signConfig.detail = ( function() {
         },
 
         delete: function( event ) {
+            var row = event.data.parent().parent();
+            var sizes = row.sizes; // DataSource delle sizes
 
-
-            console.log( "event", event.data );
-            console.log( "event:parent", event.data.parent().parent() );
-
-            var font = event.data.parent().parent();
-
-            if ( font.sizes.length == 1 ) {
-
-                var dataItem = viewModel.get( "fontSelected" ).getByUid( event.data.uid );
-
-                var font = dataItem.parent();
-                console.log( "font", font );
-
+            if ( sizes.data().length === 1 ) {
+                // Se c'è solo una size, rimuovi tutto il font
+                var dataItem = viewModel.get( "fontSelected" ).getByUid( row.uid );
                 viewModel.get( "fontSelected" ).remove( dataItem );
-
             } else {
-
-                var row = viewModel.get( "fontList" ).getByUid( event.data.uid );
-                row.sizes.remove( event.data );
-
+                // Rimuovi solo la size selezionata
+                var sizeRow = sizes.getByUid( event.data.uid );
+                sizes.remove( sizeRow );
             }
-
             return false;
-
-            // return viewModel.get( "fontSelected" ).data().length > 0;
         },
 
         save: function( event ) {

@@ -1,6 +1,6 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function fontConfig( event, rc, prc ){
+	function rowConfig( event, rc, prc ){
 		prc.line     = super.fire( "line.get", [ rc.lineId ] );
 		prc.model    = super.fire( "model.get", [ rc.modelId ] );
 		prc.category = super.fire( "productCategory.get", [ rc.categoryId ] );
@@ -10,8 +10,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var fonts = super.fire( "font.list" );
 
 		for ( var item in fonts ) {
-			var obj        = getDataMapper().convert( item, "Font", true );
-			obj[ "sizes" ] = [];
+			var obj = getDataMapper().convert( item, "Font", true );
 			fontData.add( obj );
 		}
 

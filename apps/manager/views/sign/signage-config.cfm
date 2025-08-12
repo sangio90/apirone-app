@@ -42,7 +42,7 @@
                                             <tbody data-template="signage-config-font-selected-list-row-tmpl" data-bind="source: fontSelected">
                                             </tbody>
                                         </table>
-
+                                        <div class="white-small mb-1">jstemplate/signage/signage-config-font-selected-list-row-tmpl</div>
                                     </div>
 
                                     <div class="pt-3 pb-3 text-center">
@@ -73,4 +73,4 @@
     
     <!--- #view("attribute/detail-modal")# ---->
 
-</cfoutput>7
+</cfoutput>
