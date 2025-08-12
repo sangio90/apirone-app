@@ -399,14 +399,53 @@ AP.product.items = ( function() {
             NM.util.openModal( $( "#product-images-list-modal" ) );
         },
 
+        changeUri: function( event ) {
+
+            var thisButton = $( event.currentTarget );
+            console.log( "ele", thisButton.prop( "name" ) );
+
+            var thisForm = AP.product.fields.configRow;
+            var found = false;
+
+            var finishEle = thisForm.find( "[name=finishId]" );
+            var modelEle = thisForm.find( "[name=modelId]" );
+
+            finishEle.css( "border", "1px solid #ced4da" );
+            modelEle.css( "border", "1px solid #ced4da" );
+
+            var lineId = AP.page.lineId;
+            var modelId = modelEle.val();
+            var finishId = finishEle.val();
+
+            var products = AP.page.products;
+            var productId = AP.page.productId;
+
+            products?.forEach( function( product ) {
+
+                if ( lineId == product.line.id && finishId == product.finish.id && modelId == product.model.id ) {
+                    found = true;
+                    window.location.href = "/manager/products/" + product.id;
+                }
+            } );
+
+            if ( !found ) {
+                thisButton.val( "" );
+                thisButton.attr( "style", "border: 1px solid Red !Important" );
+            }
+
+        },
+
+        // TODO: not used
         loadModels: function() {
             var thisForm = AP.product.fields.configRow;
+
+            console.log( "loadModels" );
 
             var finishEle = thisForm.find( "[name=finishId]" );
             var modelEle = thisForm.find( "[name=modelId]" );
 
             var lineId = AP.page.lineId;
-            var modelId = modelEle.val();
+            // var modelId = modelEle.val();
             var finishId = finishEle.val();
 
             var products = AP.page.products;
@@ -433,7 +472,7 @@ AP.product.items = ( function() {
                         found = true;
                     }
 
-                    opts.push( { combinatioId: product.id, modelCode: product.model.code } );
+                    opts.push( { productId: product.id, modelCode: product.model.code, finishId: product.finish.id } );
 
                     modelEle.append( opt );
                 }
@@ -471,7 +510,7 @@ AP.product.items = ( function() {
 
         kendo.bind( fields.rootDetail, viewModel );
 
-        viewModel.loadModels();
+        //viewModel.loadModels();
 
         initSorts();
     };

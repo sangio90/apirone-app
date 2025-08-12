@@ -30,10 +30,8 @@
                                     <label class="me-2">Finitura:</label>
 
                                     <select name="finishId" class="form-control w-250 me-4"
-                                        data-bind="events: { change: loadModels }"
-                                            <!--- data-bind="events: { change: change }" ---->
-                                        >
-
+                                        data-bind="events: { change: changeUri }">
+                                        <option value="">-- non trovato</option>
                                         <cfloop array="#prc.finishes#" item="item">
                                             <option value="#item.getId()#"
                                                 <cfif item.getId() EQ prc.finish.getId()>SELECTED</cfif>
@@ -46,7 +44,20 @@
 
                                     <label class="me-2">Modello:</label>
 
+                                    <!----
                                     <select name="modelId" class="form-control w-auto" data-bind="events: { change: change }">
+                                    </select>
+                                    ---->
+                                    <select name="modelId" class="form-control w-auto" 
+                                        data-bind="events: { change: changeUri }">
+                                        <option value="">-- non trovato</option>
+                                        <cfloop array="#prc.models#" item="item">
+                                            <option value="#item.getId()#"
+                                                <cfif item.getId() EQ prc.model.getId()>SELECTED</cfif>
+                                            >
+                                                #item.getCode()#
+                                            </option>
+                                        </cfloop>
                                     </select>
 
                                 </form>
@@ -146,8 +157,6 @@
                                     </div>
 
                                 </div>
-
-                                <!---- <ap:productItemList grid="#variables.grid#"> ---->
 
                                 <form id="product-grid-form">
 
