@@ -41,7 +41,7 @@
     "Text.bean": {},
     "TextKind.bean": {},
     "Variant.bean": {},
-    "LineModel.bean": {},
+    "CatalogSet.bean": {},
     "SignageConfig.bean": {},
     "SignageConfigItem.bean": {}
 }

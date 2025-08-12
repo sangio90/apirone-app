@@ -331,9 +331,9 @@ AP.product.items = ( function() {
             var type = element.data( "type" );
 
             switch ( type ) {
-            case "lineModel":
+            case "catalogSet":
                 var value = {
-                    type: "lineModel",
+                    type: "catalogSet",
                     model: {
                         id: element.data( "model-id" ),
                         name: element.data( "model-name" ),
@@ -510,7 +510,7 @@ AP.product.items = ( function() {
 
         kendo.bind( fields.rootDetail, viewModel );
 
-        //viewModel.loadModels();
+        // viewModel.loadModels();
 
         initSorts();
     };

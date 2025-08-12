@@ -189,7 +189,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			if ( Len( record.line_id ) AND Len( record.model_id ) ) {
-				bean = super.bean( "ComponentLineModel" );
+				bean = super.bean( "ComponentCatalogSet" );
 
 				bean.setLine( getLineService().get( record.line_id ) );
 				bean.setModel( getModelService().get( record.model_id ) );

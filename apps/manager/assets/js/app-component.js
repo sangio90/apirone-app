@@ -68,10 +68,10 @@ AP.component.list = ( function() {
 
             switch( current.type ) {
 
-            case "lineModel":
+            case "catalogSet":
 
                 result.modalTitle = "Componenti per " + current.line.name + " / " + current.model.name;
-                result.readUrl = baseUrl + "?by=linemodel&lineId=" + current.line.id + "&modelId=" + current.model.id;
+                result.readUrl = baseUrl + "?by=line_model&lineId=" + current.line.id + "&modelId=" + current.model.id;
                 result.modifyUrl = result.readUrl;
 
                 break;

@@ -42,8 +42,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				component.setProductItem( item.setId( rc.itemId ) );
 
 				break;
-			case "lineModel":
-				var component = super.bean( "ComponentLineModel" );
+			case "catalogSet":
+				var component = super.bean( "ComponentCatalogSet" );
 
 				var model = super.bean( "model" );
 				var line = super.bean( "line" );
@@ -191,7 +191,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					includeBaseAttributeComponents = true
 				};
 				break;
-			case "lineModel":
+			case "catalogSet":
 				params = { lineId = rc.lineId, modelId = rc.modelId };
 				break;
 			case "fruit":
