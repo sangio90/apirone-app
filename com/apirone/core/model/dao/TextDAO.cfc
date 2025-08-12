@@ -181,13 +181,6 @@
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>
 
-		<cffile
-			action="APPEND"
-			file  ="#ExpandPath( "/debug.log" )#"
-			output="#Now()# field: #field.name# - value:#arguments.text.getEntity().getValue()#"
-		>
-
 		<cfreturn arguments.text.getId()>
 	</cffunction>
 </cfcomponent>
-ent>

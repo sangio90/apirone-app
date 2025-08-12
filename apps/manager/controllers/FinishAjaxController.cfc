@@ -8,7 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var params = super.paramsFromUrl();
 
-		//params[ "orderBy" ] = [ { field = "finish.code" } ];
+		// params[ "orderBy" ] = [ { field = "finish.code" } ];
 
 		var rows = super.fire( "finish.search", params );
 
@@ -34,9 +34,13 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result     = super.getResult();
-		var finish     = super.bean( "Finish" );
-		var status     = super.bean( "Status" );
+		var result = super.getResult();
+
+		var finish = super.bean( "Finish" );
+		var status = super.bean( "Status" );
+		var text   = super.bean( "Text" );
+		var lang   = super.bean( "Lang" );
+
 		var categories = [];
 
 		var thisId    = "";
@@ -58,10 +62,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		finish.setCategories( categories );
 		finish.setStatus( status.setId( json.status.id ) );
 
-		var text = super.bean( "Text" );
-		var lang = super.bean( "Lang" );
-
-		text.setName( json.name )
+		text.setId( json.mainText.id );
+		text.setName( json.name );
 		text.setLang( lang.setId( "IT" ) ); // FIXME: this, get lang from json
 
 		texts.add( text );

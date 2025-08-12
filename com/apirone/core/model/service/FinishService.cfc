@@ -53,6 +53,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			var newId = getDao().insert( arguments.finish );
 
+
 			for ( var text in arguments.finish.getTexts() ) {
 				var entity = super.bean( "Entity" );
 
@@ -70,6 +71,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.Finish finish ){
 		getDao().update( arguments.finish );
+
+		var id = arguments.finish.getId();
+
+		for ( var text in arguments.finish.getTexts() ) {
+			var entity = super.bean( "Entity" )
+
+			entity.setKey( "finish.id" );
+			entity.setValue( id );
+
+			text.setEntity( entity );
+
+			if ( Len( text.getId() ) ) {
+				getTextService().update( text );
+			} else {
+				getTextService().create( text );
+			}
+		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.finish.getId() );
 
