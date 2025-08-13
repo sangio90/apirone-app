@@ -52,6 +52,6 @@
         </tr>
     </nmscript>
 
-    #template(view="jstemplate/sign/signage-config-font-selected-size-list-row-tmpl")#
+    #template(view="jstemplate/signage/signage-config-font-selected-size-list-row-tmpl")#
 
 </cfoutput>

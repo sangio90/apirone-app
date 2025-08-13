@@ -38,7 +38,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			signageConfig.setFont( font.setId( thisConfig.font.id ) );
 
-			if ( json.catalogBundle.id.len() ) {
+			if ( json.catalogBundle.keyExists( "id" ) AND Len( json.catalogBundle.id ) ) {
 				signageConfig.getCatalogBundle().setId( json.catalogBundle.id );
 			} else {
 				var model    = super.bean( "Model" );
@@ -64,6 +64,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			signageConfig.setItems( sizes );
 
+			/*
 			if ( thisConfig.keyExists( "id" ) AND thisConfig.id.len() ) {
 				messageId = "signageConfig.updated";
 				thisId    = super.fire( "signageConfig.update", [ signageConfig ] )
@@ -73,6 +74,21 @@ component extends="com.apirone.core.controller.AbsController" {
 				thisId    = super.fire( "signageConfig.create", [ signageConfig ] )
 				newIds.add( thisId );
 			}
+			*/
+
+
+			// TODO: consider:
+			// - implementing update logic
+			// - set "id" to ''
+			transaction {
+				if ( thisConfig.keyExists( "id" ) AND Len( thisConfig.id ) ) {
+					super.fire( "signageConfig.delete", [ thisConfig.id ] );
+				}
+				thisId = super.fire( "signageConfig.create", [ signageConfig ] );
+			}
+
+			messageId = "signageConfig.created";
+			newIds.add( thisId );
 		}
 
 		var message = completeMessage( messageId );

@@ -140,7 +140,11 @@ AP.signConfig.detail = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
-                                NM.util.autoHideMessage( status, "<span class='green'>Font salvato</span>" );
+                                // viewModel.get( "selectedFonts" ).read();
+                                AP.widget.notify( "success", "Configurazione salvata correttamente" );
+                                setTimeout( function() {
+                                    window.location.reload();
+                                }, 1000 );
                             }
                         },
                     },
@@ -159,6 +163,7 @@ AP.signConfig.detail = ( function() {
 
         for ( var font of AP.page.selectedFonts ) {
             var newRow = {
+                id: font.id,
                 font: font.font,
                 items: new kendo.data.DataSource( { data: font.items } )
             };

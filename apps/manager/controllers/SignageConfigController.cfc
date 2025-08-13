@@ -62,7 +62,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.jsScripts.add( "app-signage-config" );
 
-		event.setView( "sign/signage-config" );
+		event.setView( "signage/signage-config" );
 	}
 
 	function list( event, rc, prc ){

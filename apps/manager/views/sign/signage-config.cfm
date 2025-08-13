@@ -72,8 +72,8 @@
             </div>
         </div>
 
-        #template(view="jstemplate/sign/signage-config-font-list-row-tmpl")#
-        #template(view="jstemplate/sign/signage-config-font-selected-list-row-tmpl")#
+        #template(view="jstemplate/signage/signage-config-font-list-row-tmpl")#
+        #template(view="jstemplate/signage/signage-config-font-selected-list-row-tmpl")#
         
     </div>
     
