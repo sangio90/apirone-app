@@ -1,6 +1,8 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function rowConfig( event, rc, prc ){
+		param rc.id = "";
+
 		prc.line     = super.fire( "line.get", [ rc.lineId ] );
 		prc.model    = super.fire( "model.get", [ rc.modelId ] );
 		prc.category = super.fire( "productCategory.get", [ rc.categoryId ] );
@@ -10,25 +12,25 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( exists ) {
 		}
 
-		var fontData = []
+		var fontRows = []
 
 		var fonts = super.fire( "font.list" );
 
 		for ( var item in fonts ) {
 			var obj = getDataMapper().convert( item, "Font", true );
-			fontData.add( obj );
+			fontRows.add( obj );
 		}
 
-		prc.title       = "Configurazione per la linea < #prc.line.getName()#, #prc.model.getName()# >";
-		prc.subtitle    = "#prc.category.getName()#";
-		var catalogSetId = 0;
+		prc.title    = "Configurazione per la linea < #prc.line.getName()#, #prc.model.getName()# >";
+		prc.subtitle = "#prc.category.getName()#";
 
-		prc.page[ "fonts" ] = fontData;
-		prc.page[ "keys" ]  = {
-			"catalogSetId" = catalogSetId,
-			"lineId"      = rc.lineId,
-			"modelId"     = rc.modelId,
-			"categoryId"  = rc.categoryId
+
+		prc.page[ "fonts" ]        = fontRows;
+		prc.page[ "catalogBundle" ] = {
+			"id"         = rc.id,
+			"lineId"     = rc.lineId,
+			"modelId"    = rc.modelId,
+			"categoryId" = rc.categoryId
 		};
 
 		prc.jsScripts.add( "app-signage-config" );

@@ -29,8 +29,8 @@
 				signage_configs
 			WHERE 1=1
 
-				<cfif !IsNull( arguments.catalogSetId )>
-					AND signage_configs.catalog_set_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogSetId#">
+				<cfif !IsNull( arguments.catalogBundleId )>
+					AND signage_configs.catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundleId#">
 				</cfif>
 
 			ORDER BY
@@ -54,11 +54,11 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO signage_configs (
-				catalog_set_id,
+				catalog_bundle_id,
 				font_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.line.getCatalogSet().getId()#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.line.getCatalogBundle().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getFont().getId()#">
 			) RETURNING signage_config_id
 		</cfquery>
