@@ -4,11 +4,15 @@ AP.fields.my = AP.fields.my || {};
 AP.fields.my.detail = {
     detailRoot: $( "#my-account-root" ),
     pwdForm: $( "#my-account-detail-form" ),
+    settingsRoot: $( "#my-settings-root" ),
 };
 
 $( document ).ready( function() {
     if ( AP.fields.my.detail.detailRoot.length ) {
         AP.my.detail.init();
+    }
+    if ( AP.fields.my.detail.settingsRoot.length ) {
+        AP.my.settings.init();
     }
 } );
 
@@ -59,6 +63,42 @@ AP.my.detail = ( function() {
                 $( element ).valid();
             },
         } );
+    };
+
+    return pub;
+} () );
+
+AP.my.settings = ( function() {
+    var pub = {};
+
+    var viewModel = kendo.observable( {
+        items: undefined,
+    } );
+
+    function getUserSettings( accountId ) {
+        const prefix = "apirOne:" + accountId + ":";
+        const settings = [];
+
+        for ( let i = 0; i < localStorage.length; i++ ) {
+            const key = localStorage.key( i );
+            if ( key.startsWith( prefix ) ) {
+                const name = key.substring( prefix.length );
+                const value = localStorage.getItem( key );
+                settings.push( { name, value } );
+            }
+        }
+
+        return settings;
+    }
+
+
+    pub.init = function() {
+
+        var settings = getUserSettings( AP.config.account.shortId );
+
+        viewModel.set( "items", settings );
+
+        kendo.bind( AP.fields.my.detail.settingsRoot, viewModel );
     };
 
     return pub;

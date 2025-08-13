@@ -81,6 +81,9 @@
                                 <a role="menuitem" tabindex="-1" href="/manager/my/account"><i class="bx bx-user-circle"></i> Il mio profilo</a>
                             </li>
                             <li>
+                                <a role="menuitem" tabindex="-1" href="/manager/my/settings"><i class="bx bx-cog"></i> Preferenze</a>
+                            </li>
+                            <li>
                                 <a role="menuitem" tabindex="-1" href="/manager/logout"><i class="bx bx-power-off"></i> Esci</a>
                             </li>
                         </ul>
