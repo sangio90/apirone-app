@@ -9,7 +9,7 @@ component accessors="true" {
 	}
 
 	public String function getShortId(){
-		return Right( this.getId(), 5 );
+		return Right( this.getId(), 6 );
 	}
 
 	public Struct function getConfiguration(){
