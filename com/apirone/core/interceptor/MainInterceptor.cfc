@@ -176,7 +176,10 @@ component extends="coldbox.system.Interceptor" {
 
 		var result = {
 			"appName"    = config.get( "appName" ),
-			"appVersion" = config.get( "appVersion" )
+			"appVersion" = config.get( "appVersion" ),
+			"account"    = {
+				"shortId" = session.user.getAccount()?.getShortId() ?: "not-exists"
+			}
 		};
 
 		return result;
