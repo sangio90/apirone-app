@@ -33,6 +33,20 @@
         <map from="mainText" to="mainText" ref="Text" />
     </mapper>
 
+    <mapper id="SignageConfig" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.SignageConfig">
+        <map from="id" to="id" type="cf:String" />
+        <map from="font" to="font" ref="Font" />
+        <map from="items" to="items" ref="SignageConfigItem" type="Array" />
+    </mapper>
+
+    <mapper id="SignageConfigItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.SignageConfigItem">
+        <map from="id" to="id" type="cf:Numeric" />
+        <map from="height" to="height" type="cf:Numeric" />
+        <map from="heightInPixels" to="heightInPixels" type="Integer" />
+        <map from="rowCount" to="rowCount" type="Integer" />
+        <map from="charCount" to="charCount" type="Integer" />
+    </mapper>
+
     <mapper id="AuditEntry" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AuditEntry">
         <map from="id" to="id" type="cf:String" />
         <map from="message" to="message" type="cf:String" />

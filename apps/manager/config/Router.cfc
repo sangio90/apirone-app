@@ -25,11 +25,13 @@
 
 
 		/*
-			signs
+			signages
 		*/
 		//get( "/ajax/audit-entries/:id" ).to( "AuditEntryAjaxController.get" ).end();
 		//get( "/ajax/audit-entries" ).to( "AuditEntryAjaxController.list" ).end();
-		get( "/signages/rows-config" ).to( "SignageController.rowConfig" ).end();
+		post( "/ajax/signages/rows-config" ).to( "SignageConfigAjaxController.save" ).end();
+		get( "/signages/rows-config/:id" ).to( "SignageConfigController.rowConfig" ).end();
+		get( "/signages/rows-config" ).to( "SignageConfigController.rowConfig" ).end();
 
 		/*
 			audit entry

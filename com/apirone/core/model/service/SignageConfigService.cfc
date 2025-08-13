@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="SignageConfigDAO";
 	property name="fontService" inject="fontService";
+	property name="catalogBundleService" inject="catalogBundleService";
 	property name="signageConfigItemService" inject="signageConfigItemService";
 
 	property name="cacheScope" type="String" default="SignageConfig.bean";
@@ -31,13 +32,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments ).getData();
 	}
 
-	public Boolean function exists(){
-		// arguments[ "limit" ] = -1;
-
-		return false;
-	}
-
-
 	public com.apirone.core.model.bean.Result function search(
 		String catalogBundleId,
 		required Numeric limit  = 20,
@@ -64,7 +58,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public Numeric function create( required com.apirone.core.model.bean.SignageConfig signageConfig ){
 		if ( !Len( signageConfig.getCatalogBundle().getId() ) ) {
-			var catalogBundle = getCatalogBundleService().getOrCreate( signageConfig.getCatalogBundle().getId() );
+			var catalogBundle = getCatalogBundleService().getOrCreate( signageConfig.getCatalogBundle() );
 
 			signageConfig.getCatalogBundle().setId( catalogBundle.getId() );
 		}
@@ -108,13 +102,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Line function build( required String signageConfigId ){
+	private com.apirone.core.model.bean.SignageConfig function build( required String signageConfigId ){
 		var record = getDao().read( arguments.signageConfigId );
 
 		if ( record.recordCount ) {
 			var bean = super.bean( "SignageConfig" );
 
-			bean.setId( record.line_id );
+			bean.setId( record.signage_config_id );
 			bean.setCreatedAt( record.created_at );
 
 			bean.setFont( getFontService().get( record.font_id ) );

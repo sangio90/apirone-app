@@ -14,7 +14,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var bean = build( arguments.signageConfigItemId );
-		cm.put( getCacheScope(), arguments.signageConfigItemId, bean );
+		cm.put(
+			getCacheScope(),
+			arguments.signageConfigItemId,
+			bean
+		);
 
 		return bean;
 	}
@@ -69,7 +73,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setData( { "deletedCount" = result } )
 
 				getCacheManager().remove( getCacheScope(), arguments.signageConfigItemId );
-
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -92,11 +95,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "SignageConfigItem" );
 
-			bean.setId( record.line_id );
+			bean.setId( record.signage_config_item_id );
 			bean.setCreatedAt( record.created_at );
 
 			bean.setHeight( record.height );
-			bean.setHeightInPixel( record.height_in_pixel );
+			bean.setHeightInPixels( record.height_in_pixel );
 			bean.setRowCount( record.row_count );
 			bean.setCharCount( record.char_count );
 

@@ -1,6 +1,6 @@
 ﻿CREATE TABLE public.catalog_bundles (
     catalog_bundle_id UUID STORAGE PLAIN DEFAULT uuid_generate_v4 () NOT NULL,
-    catalog_bundle VARCHAR(125) STORAGE PLAIN,
+    catalog_bundle VARCHAR(50) STORAGE PLAIN,
     line_id UUID STORAGE PLAIN NOT NULL,
     model_id UUID STORAGE PLAIN NOT NULL,
     product_category_id INTEGER STORAGE PLAIN NOT NULL,
@@ -45,3 +45,6 @@ CREATE TABLE public.signage_config_items (
 );
 
 ALTER TABLE public.signage_config_items OWNER TO apiruser;
+
+ALTER TABLE public.signage_configs
+ADD CONSTRAINT signage_configs_idx UNIQUE (catalog_bundle_id, font_id) NOT DEFERRABLE;

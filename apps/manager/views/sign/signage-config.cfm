@@ -39,7 +39,7 @@
                                     <div class="signage-list">
 
                                         <table class="table" style="margin:0;padding:0">
-                                            <tbody data-template="signage-config-font-selected-list-row-tmpl" data-bind="source: fontSelected">
+                                            <tbody data-template="signage-config-font-selected-list-row-tmpl" data-bind="source: selectedFonts">
                                             </tbody>
                                         </table>
                                         <div class="white-small mb-1">jstemplate/signage/signage-config-font-selected-list-row-tmpl</div>

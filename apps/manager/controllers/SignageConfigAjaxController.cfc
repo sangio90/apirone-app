@@ -24,13 +24,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		var thisId    = "";
-		var messageId = "";
+		var thisId     = "";
+		var messageId  = "";
+		var newIds     = [];
+		var updatedIds = [];
 
 		var result = super.getResult();
-
-		dump( json );
-		abort;
 
 		for ( var thisConfig in json.configs ) {
 			var sizes         = [];
@@ -51,12 +50,12 @@ component extends="com.apirone.core.controller.AbsController" {
 				signageConfig.setLine( line.setId( json.catalogBundle.lineId ) );
 			}
 
-			for ( var item in thisConfig.items ) {
+			for ( var item in thisConfig.items._data ) {
 				var bean = super.bean( "signageConfigItem" );
 
 				bean.setId( item.id );
 				bean.setHeight( item.height );
-				bean.setHeightInPx( item.heightInPx );
+				bean.setHeightInPixels( item.heightInPixels );
 				bean.setCharCount( item.charCount );
 				bean.setRowCount( item.rowCount );
 
@@ -64,19 +63,26 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 
 			signageConfig.setItems( sizes );
-		}
 
-		if ( !Len( json.id ) ) {
-			messageId = "signageConfig.created";
-			thisId    = super.fire( "signageConfig.create", [ signageConfig ] )
-		} else {
-			messageId = "signageConfig.updated";
-			thisId    = super.fire( "signageConfig.update", [ signageConfig ] )
+			if ( thisConfig.keyExists( "id" ) AND thisConfig.id.len() ) {
+				messageId = "signageConfig.updated";
+				thisId    = super.fire( "signageConfig.update", [ signageConfig ] )
+				updatedIds.add( thisId );
+			} else {
+				messageId = "signageConfig.created";
+				thisId    = super.fire( "signageConfig.create", [ signageConfig ] )
+				newIds.add( thisId );
+			}
 		}
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData(
+			{ "message" = message },
+			{
+				"payload" = { "updatedIds" = updatedIds, "newIds" = newIds }
+			}
+		);
 
 		event.setValue( "result", result );
 	}

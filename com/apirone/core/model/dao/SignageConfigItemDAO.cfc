@@ -59,9 +59,9 @@
 				char_count
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.signageConfigItem.getSignageConfigId()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSignageConfigId()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.signageConfigItem.getHeight()#" scale="2">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getHeightInPixel()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getHeightInPixels()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getRowCount()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getCharCount()#">
 			) RETURNING signage_config_item_id

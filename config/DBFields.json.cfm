@@ -197,4 +197,12 @@
         "name": "audit_log_id",
         "type": "Integer"
     },
+    "SignageConfig.id": {
+        "name": "signage_config_id",
+        "type": "Integer"
+    },
+    "SignageConfigItem.id": {
+        "name": "signage_config_item_id",
+        "type": "Integer"
+    },
 }

@@ -20,9 +20,9 @@
 		<cfargument name="modelId" type="String">
 		<cfargument name="categoryId" type="Numeric">
 
-		<cfargument name="limit" required="true" type="Numeric" default="0">
+		<cfargument name="limit" required="true" type="Numeric" default="20">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
-		<cfargument name="orderby" required="true" type="String" default="code">
+		<cfargument name="orderby" required="true" type="String" default="created_at desc">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -37,11 +37,11 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.modelId )>
-					AND catalog_bundles.model_id = <cfqueryparam cfsqltype="Integer" value="#arguments.modelId#">
+					AND catalog_bundles.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.lineId )>
-					AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Integer" value="#arguments.lineId#">
+					AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>
@@ -70,9 +70,7 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="String" output="false">
-		<cfargument name="catalogBundle" type="com.apirone.core.model.bean.Line" required="true">
-
-		<cfset var categories = super.getCategoriesAsArray( line.getCategories() )>
+		<cfargument name="catalogBundle" type="com.apirone.core.model.bean.CatalogBundle" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO catalog_bundles (

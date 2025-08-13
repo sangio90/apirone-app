@@ -12,7 +12,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var cache = cm.get( getCacheScope(), arguments.catalogBundleId );
 
-		if ( cache.catalogBundle ) {
+		if ( cache.status ) {
 			return cache.data;
 		}
 
@@ -27,6 +27,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows = [];
 
 		return search( argumentCollection = arguments ).getData();
+	}
+
+	public String function findId(
+		required String modelId,
+		required Numeric categoryId,
+		required String lineId
+	){
+		var record = getDao().find( argumentCollection = arguments );
+
+		return Len( record.catalog_bundle_id ) ? record.catalog_bundle_id : NullValue();
 	}
 
 	public com.apirone.core.model.bean.Result function search(
@@ -58,24 +68,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.CatalogBundle function getOrCreate(
-		required String lineId,
-		required String modelId,
-		required String categoryId
+		required com.apirone.core.model.bean.CatalogBundle catalogBundle
 	){
 		var record = getDao().find(
-			lineId     = arguments.lineId,
-			modelId    = arguments.modelId,
-			categoryId = arguments.categoryId
+			lineId     = arguments.catalogBundle.getLine().getId(),
+			modelId    = arguments.catalogBundle.getModel().getId(),
+			categoryId = arguments.catalogBundle.getCategory().getId()
 		);
 
 		if ( !record.recordCount ) {
 			var bean = super.bean( "CatalogBundle" );
 
-			bean.setLine( getLineService().get( arguments.lineId ) );
-			bean.setModel( getModelService().get( arguments.modelId ) );
-			bean.setCategory( getProductCategoryService().get( arguments.categoryId ) );
-
-			var newId = create( bean );
+			var newId = create( arguments.catalogBundle );
 
 			return get( newId );
 		}
@@ -83,20 +87,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return get( record.catalog_bundle_id );
 	}
 
+	public String function create( required com.apirone.core.model.bean.CatalogBundle catalogBundle ){
+		var newId = getDao().insert( arguments.catalogBundle );
 
-	public Array function exists(
-		required String lineId,
-		required String modelId,
-		required String categoryId
-	){
-		var records = getDao().find( argumentCollection = arguments );
-
-		if ( records.recordcount ) {
-			return true;
-		}
-
-		return false;
+		return newId;
 	}
+
 
 	/*
     	private method
@@ -109,7 +105,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var obj = super.bean( "CatalogBundle" );
 
 			obj.setId( record.catalog_bundle_id );
-			obj.setName( record.line_model );
+			obj.setName( record.catalog_bundle );
 			obj.setLine( getLineService().get( record.line_id ) );
 			obj.setModel( getModelService().get( record.model_id ) );
 			obj.setCategory( getProductCategoryService().get( record.product_category_id ) );
