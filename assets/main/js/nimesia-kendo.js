@@ -7,7 +7,9 @@ NM.kendo.dataSource = function( config = {} ) {
         data: config.data ? config.data : [],
         params: config.params ? config.params : {},
         pageSize: config.count ? config.count : 15,
-        serverSorting: config?.serverSorting,
+        serverSorting: config?.serverSorting ? config?.serverSorting : false,
+        serverFiltering: config?.serverFiltering ? config.serverFiltering : false,
+        serverPaging: config?.serverPaging ? config.serverPaging : true,
 
         change: function() {
             $.each( this.data(), function( index, item ) {
@@ -21,7 +23,7 @@ NM.kendo.dataSource = function( config = {} ) {
 
     if ( config.url != undefined ) {
 
-        defaults.serverPaging = true;
+        // defaults.serverPaging = true;
         defaults.transport = {
             read: {
                 url: config.url
@@ -57,11 +59,17 @@ NM.kendo.dataSource = function( config = {} ) {
             defaults.schema.model = config.model;
         }
 
-        if ( config.model ) {
-            defaults.schema.model = config.model;
-        }
-
     }
+
+    /*
+    if ( "serverFiltering" in config ) {
+        defaults.serverFiltering = config.serverFiltering;
+    }
+
+    if ( "serverPaging" in config ) {
+        defaults.serverPaging = config.serverPaging;
+    }
+    */
 
     var dataSource = new kendo.data.DataSource( defaults );
 

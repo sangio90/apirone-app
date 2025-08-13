@@ -24,15 +24,15 @@ AP.product.items = ( function() {
     var attributeApp = AP.attribute.detail;
 
     var dataSources = {
-        items: NM.kendo.dataSource( {
-            url: "/manager/ajax/products/" + AP.page.productId + "/items",
-        } ),
-        orderingItems: NM.kendo.dataSource( {
-            url: "/manager/ajax/products/" + AP.page.productId + "/items/order",
-        } ),
-        orderingAttributes: NM.kendo.dataSource( {
-            url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order",
-        } ),
+        items: NM.kendo.dataSource(
+            {
+                url: "/manager/ajax/products/" + AP.page.productId + "/items",
+                serverFiltering: false,
+                serverPaging: false
+            }
+        ),
+        orderingItems: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items/order" } ),
+        orderingAttributes: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order" } ),
         attributesList: undefined,
     };
 
@@ -67,6 +67,7 @@ AP.product.items = ( function() {
     };
 
     var viewModel = kendo.observable( {
+        isUnlinkedFilterActive: false,
         items: dataSources.items,
         orderingItems: dataSources.orderingItems,
         attributesList: dataSources.attributesList,
@@ -82,6 +83,24 @@ AP.product.items = ( function() {
         /*
 			attributes methods
 		*/
+
+        toggleUnlinked: function( event ) {
+            console.log( "toggleUnlinked", event );
+            var active = this.get( "isUnlinkedFilterActive" );
+
+            console.log( "active", active );
+
+            if ( active ) {
+                this.get( "items" ).filter( { field: "id", operator: "gt", value: 0 } );
+            } else {
+                this.get( "items" ).filter( {} );
+            }
+
+            this.set( "isUnlinkedFilterActive", !active );
+
+            return false;
+
+        },
 
         getImageTypeText: function( event ) {
             var text = AP.util.getMainText( event.type.texts.toJSON() );
@@ -137,10 +156,7 @@ AP.product.items = ( function() {
                 },
                 callback: {
                     done: function( xhr ) {
-                        // viewModel.get("items").read();
-
                         refreshDatasources();
-
                         setTimeout( () => fields.attributeModal.modal( "hide" ), 600 );
                     },
                 },
@@ -527,7 +543,6 @@ AP.product.items = ( function() {
             .fetch()
             .then( function() {
                 if ( images.total() > 0 ) {
-                    // console.log("total:in", images.total() );
 
                     for ( var image of images.data() ) {
                         var uid = image.uid;
