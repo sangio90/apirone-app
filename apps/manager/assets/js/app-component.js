@@ -71,14 +71,12 @@ AP.component.list = ( function() {
             case "catalogBundle":
 
                 result.modalTitle = "Componenti per " + current.line.name + " / " + current.model.name;
-                result.readUrl = baseUrl + "?by=line_model&lineId=" + current.line.id + "&modelId=" + current.model.id;
+                result.readUrl = baseUrl + "?by=catalogBundle&lineId=" + current.line.id + "&modelId=" + current.model.id;
                 result.modifyUrl = result.readUrl;
 
                 break;
 
             case "item": // productItem
-
-                console.log( "curr", current );
 
                 result.modalTitle = "Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.rawValue.name;
                 result.readUrl = baseUrl + "?by=item&&itemId=" + current.item.id;
