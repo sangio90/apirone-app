@@ -44,10 +44,6 @@
 
                                     <label class="me-2">Modello:</label>
 
-                                    <!----
-                                    <select name="modelId" class="form-control w-auto" data-bind="events: { change: change }">
-                                    </select>
-                                    ---->
                                     <select name="modelId" class="form-control w-auto" 
                                         data-bind="events: { change: changeUri }">
                                         <option value="">-- non trovato</option>
@@ -139,14 +135,18 @@
 
                                         <a href=""
                                             class="underline"
-                                            data-type="item"
-
-                                            data-product-id="0"
-                                            data-product-name="Attributo radice"
-
-                                            data-bind="click:openAttributesList">
-                                                Aggiungi attributo di base
+                                            id="toggle-unlinked-attributes"
+                                            data-bind="click:toggleUnlinked, text: textToggleLink">
                                         </a>
+
+                                        |
+
+                                        <a href="" class="underline" data-type="item" data-product-id="0" 
+                                            data-product-name="Attributo radice" 
+                                            data-bind="click:openAttributesList">
+                                            Aggiungi attributo di base
+                                        </a>
+
 
                                         #deleteButton(
                                             bind  = "click:removeAttributes",

@@ -51,7 +51,7 @@
 				<cfif !IsNull( arguments.str )>
 					AND
 					(
-						catalog_bundles.line_model ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
+						catalog_bundles.catalog_bundle ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 					)
 				</cfif>
 

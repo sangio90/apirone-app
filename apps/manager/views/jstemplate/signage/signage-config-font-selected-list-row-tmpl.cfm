@@ -15,7 +15,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th width="10%" class="align-end header-small">
+                        <th width="30" class="align-end header-small">
                             ID
                         </th>
                         <th width="20%" class="align-end header-small">
