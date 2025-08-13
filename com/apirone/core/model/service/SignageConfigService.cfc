@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="SignageConfigDAO";
 	property name="fontService" inject="fontService";
+	property name="signageConfigItemService" inject="signageConfigItemService";
 
 	property name="cacheScope" type="String" default="SignageConfig.bean";
 
@@ -38,7 +39,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public com.apirone.core.model.bean.Result function search(
-		String catalogSetId,
+		String catalogBundleId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "signageConfig.id", desc = "desc" } ]
@@ -62,7 +63,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Numeric function create( required com.apirone.core.model.bean.SignageConfig signageConfig ){
+		if ( !Len( signageConfig.getCatalogBundle().getId() ) ) {
+			var catalogBundle = getCatalogBundleService().getOrCreate( signageConfig.getCatalogBundle().getId() );
+
+			signageConfig.getCatalogBundle().setId( catalogBundle.getId() );
+		}
+
 		var newId = getDao().insert( arguments.signageConfig );
+
+		for ( var item in arguments.signageConfig.getItems() ) {
+			item.setSignageConfigId( newId );
+			getSignageConfigItemService().create( item );
+		}
 
 		return newId;
 	}
@@ -106,7 +118,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 
 			bean.setFont( getFontService().get( record.font_id ) );
-			bean.setCatalogSet( getCatalogSetService().get( record.catalog_set_id ) );
+			bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
 			bean.setItems( getSignageConfigItemService().list( record.signage_config_id ) );
 
 

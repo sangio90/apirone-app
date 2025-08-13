@@ -1,24 +1,24 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" inject="CatalogSetDAO";
+	property name="dao" inject="CatalogBundleDAO";
 	property name="lineService" inject="LineService";
 	property name="modelService" inject="ModelService";
 	property name="productCategoryService" inject="ProductCategoryService";
 
-	property name="CacheScope" type="String" default="CatalogSet.bean";
+	property name="CacheScope" type="String" default="CatalogBundle.bean";
 
-	public com.apirone.core.model.bean.CatalogSet function get( required String catalogSetId ){
+	public com.apirone.core.model.bean.CatalogBundle function get( required String catalogBundleId ){
 		var cm = super.getCacheManager();
 
-		var cache = cm.get( getCacheScope(), arguments.catalogSetId );
+		var cache = cm.get( getCacheScope(), arguments.catalogBundleId );
 
-		if ( cache.catalogSet ) {
+		if ( cache.catalogBundle ) {
 			return cache.data;
 		}
 
-		var obj = build( arguments.catalogSetId );
+		var obj = build( arguments.catalogBundleId );
 
-		cm.put( getCacheScope(), catalogSetId, obj );
+		cm.put( getCacheScope(), catalogBundleId, obj );
 
 		return obj;
 	}
@@ -47,7 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( record.catalog_set_id ) );
+			rows.add( get( record.catalog_bundle_id ) );
 		} );
 
 		result.setData( rows );
@@ -57,7 +57,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public com.apirone.core.model.bean.CatalogSet function getOrCreate(
+	public com.apirone.core.model.bean.CatalogBundle function getOrCreate(
 		required String lineId,
 		required String modelId,
 		required String categoryId
@@ -69,7 +69,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		);
 
 		if ( !record.recordCount ) {
-			var bean = super.bean( "CatalogSet" );
+			var bean = super.bean( "CatalogBundle" );
 
 			bean.setLine( getLineService().get( arguments.lineId ) );
 			bean.setModel( getModelService().get( arguments.modelId ) );
@@ -80,7 +80,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return get( newId );
 		}
 
-		return get( record.catalog_set_id );
+		return get( record.catalog_bundle_id );
 	}
 
 
@@ -102,13 +102,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.CatalogSet function build( required String catalogSetId ){
-		var record = getDao().read( arguments.catalogSetId );
+	private com.apirone.core.model.bean.CatalogBundle function build( required String catalogBundleId ){
+		var record = getDao().read( arguments.catalogBundleId );
 
 		if ( record.RecordCount ) {
-			var obj = super.bean( "CatalogSet" );
+			var obj = super.bean( "CatalogBundle" );
 
-			obj.setId( record.catalog_set_id );
+			obj.setId( record.catalog_bundle_id );
 			obj.setName( record.line_model );
 			obj.setLine( getLineService().get( record.line_id ) );
 			obj.setModel( getModelService().get( record.model_id ) );

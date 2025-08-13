@@ -151,7 +151,8 @@ AP.signConfig.detail = ( function() {
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/signages/rows-config",
-                    data: JSON.stringify( viewModel.get( "fontSelected" ).data() ),
+                    data: JSON.stringify( { configs: viewModel.get( "fontSelected" ).data(), catalogBundle: AP.page.catalogBundle } ),
+
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {

@@ -42,11 +42,11 @@ component extends="com.apirone.core.controller.AbsController" {
 				component.setProductItem( item.setId( rc.itemId ) );
 
 				break;
-			case "catalogSet":
-				var component = super.bean( "ComponentCatalogSet" );
+			case "catalogBundle":
+				var component = super.bean( "ComponentCatalogBundle" );
 
 				var model = super.bean( "model" );
-				var line = super.bean( "line" );
+				var line  = super.bean( "line" );
 
 				component.setLine( line.setId( rc.lineId ) );
 				component.setModel( model.setId( rc.modelId ) );
@@ -191,7 +191,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					includeBaseAttributeComponents = true
 				};
 				break;
-			case "catalogSet":
+			case "catalogBundle":
 				params = { lineId = rc.lineId, modelId = rc.modelId };
 				break;
 			case "fruit":

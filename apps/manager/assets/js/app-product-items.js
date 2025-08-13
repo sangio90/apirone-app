@@ -331,9 +331,9 @@ AP.product.items = ( function() {
             var type = element.data( "type" );
 
             switch ( type ) {
-            case "catalogSet":
+            case "catalogBundle":
                 var value = {
-                    type: "catalogSet",
+                    type: "catalogBundle",
                     model: {
                         id: element.data( "model-id" ),
                         name: element.data( "model-name" ),

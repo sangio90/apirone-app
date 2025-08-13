@@ -149,7 +149,7 @@
 		<cfset var values = []>
 
 		<cfswitch expression="#meta.fullname#">
-			<cfcase value="com.apirone.core.model.bean.ComponentCatalogSet">
+			<cfcase value="com.apirone.core.model.bean.ComponentCatalogBundle">
 				<cfset fields = [ "line_id", "model_id" ]>
 				<cfset values = [
 					{

@@ -85,7 +85,7 @@
                                             </cfif>
 
                                             <cfif prc.product.getCategory().getMode().getId() <> "BAS">
-                                                - <a href="" class="underline" data-type="catalogSet"
+                                                - <a href="" class="underline" data-type="catalogBundle"
                                                     data-model-id="#prc.model.getId()#"
                                                     data-model-name="#prc.model.getCode()#"
                                                     data-line-id="#prc.line.getId()#"
