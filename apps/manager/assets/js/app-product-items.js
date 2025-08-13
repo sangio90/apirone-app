@@ -28,7 +28,7 @@ AP.product.items = ( function() {
             {
                 url: "/manager/ajax/products/" + AP.page.productId + "/items",
                 serverFiltering: false,
-                serverPaging: false
+                serverPaging: false,
             }
         ),
         orderingItems: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items/order" } ),
@@ -66,13 +66,30 @@ AP.product.items = ( function() {
         return item;
     };
 
+    var fireFilter = function() {
+
+        var filterState = AP.getUserPref( "product.items.showUnlinked", false );
+
+        console.log( "fireFilter", filterState );
+
+        if ( !filterState ) {
+            viewModel.set( "textToggleLink", "Mostra attributi non collegati" );
+            viewModel.get( "items" ).filter( { field: "id", operator: "gt", value: 0 } );
+        } else {
+            viewModel.set( "textToggleLink", "Nascondi attributi non collegati" );
+            viewModel.get( "items" ).filter( {} );
+        }
+
+        AP.setUserPref( "product.items.showUnlinked", !filterState );
+
+    };
+
     var viewModel = kendo.observable( {
-        isUnlinkedFilterActive: false,
-        items: dataSources.items,
+        textToggleLink: "",
+        items: dataSources.items, // i need to run after user pref
         orderingItems: dataSources.orderingItems,
         attributesList: dataSources.attributesList,
         orderingAttributes: dataSources.orderingAttributes,
-        hideMissingValues: true,
 
         itemForAttributes: undefined,
 
@@ -85,18 +102,8 @@ AP.product.items = ( function() {
 		*/
 
         toggleUnlinked: function( event ) {
-            console.log( "toggleUnlinked", event );
-            var active = this.get( "isUnlinkedFilterActive" );
 
-            console.log( "active", active );
-
-            if ( active ) {
-                this.get( "items" ).filter( { field: "id", operator: "gt", value: 0 } );
-            } else {
-                this.get( "items" ).filter( {} );
-            }
-
-            this.set( "isUnlinkedFilterActive", !active );
+            fireFilter();
 
             return false;
 
@@ -223,14 +230,6 @@ AP.product.items = ( function() {
             return false;
         },
 
-        toggleMissingValues: function( event ) {
-            // viewModel.set( "itemForAttributes" );
-            // NM.util.openModal( fields.attributeModal );
-            // this.searchAttributes();
-
-            return false;
-        },
-
         addValue: function( event ) {
 
             NM.util.ajax( {
@@ -240,9 +239,6 @@ AP.product.items = ( function() {
                 callback: {
                     done: function( xhr ) {
                         viewModel.get( "items" ).read();
-
-                        // setTimeout(() => fields.attributeModal.modal("hide"), 600);
-
                         AP.widget.notify( "success", xhr.data.message.text );
                     },
                 },
@@ -524,9 +520,11 @@ AP.product.items = ( function() {
 
     pub.init = function() {
 
-        kendo.bind( fields.rootDetail, viewModel );
+        dataSources.items.one( "change", function() {
+            fireFilter();
+        } );
 
-        // viewModel.loadModels();
+        kendo.bind( fields.rootDetail, viewModel );
 
         initSorts();
     };

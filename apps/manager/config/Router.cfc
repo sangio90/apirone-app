@@ -60,6 +60,7 @@
 		*/
 		post( "/ajax/change-pwd" ).to( "CurrentUserAjaxController.changePwd" ).end();
 		get( "/my/account" ).to( "CurrentUserController.get" ).end();
+		get( "/my/settings" ).to( "CurrentUserController.settings" ).end();
 
 
 		/*

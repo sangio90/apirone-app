@@ -15,7 +15,6 @@ NM.kendo.dataSource = function( config = {} ) {
             $.each( this.data(), function( index, item ) {
                 item.set( "index", index+1 );
             } );
-
         }
     };
 
@@ -61,7 +60,6 @@ NM.kendo.dataSource = function( config = {} ) {
 
     }
 
-    /*
     if ( "serverFiltering" in config ) {
         defaults.serverFiltering = config.serverFiltering;
     }
@@ -69,7 +67,6 @@ NM.kendo.dataSource = function( config = {} ) {
     if ( "serverPaging" in config ) {
         defaults.serverPaging = config.serverPaging;
     }
-    */
 
     var dataSource = new kendo.data.DataSource( defaults );
 

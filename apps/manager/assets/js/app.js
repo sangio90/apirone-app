@@ -31,16 +31,22 @@ AP.core = ( function() {
 }() );
 
 AP.setUserPref = function( key, value ) {
+
+    console.log( "setUserPref", key, value );
+
     var user = AP.config.account.shortId;
-    NM.storage.set( key + "_" + user, value );
+    NM.storage.set( "apirOne:" + user + ":" + key, value );
 };
 
 AP.getUserPref = function( key, defaultValue ) {
+
+	 console.log( "getUserPref", key, defaultValue );
+
     var user = AP.config.account.shortId;
-    return NM.storage.get( key + "_" + user, defaultValue );
+    return NM.storage.get( "apirOne:" + user + ":" + key, defaultValue );
 };
 
 AP.deleteUserPref = function( key ) {
     var user = AP.config.account.shortId;
-    NM.storage.remove( key + "_" + user );
+    NM.storage.remove( "apirOne:" + user + ":" + key );
 };
