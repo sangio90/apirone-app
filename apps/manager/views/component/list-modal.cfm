@@ -118,7 +118,7 @@
 
 									<div class="fs-11 text-end mb-1"><a href="##" data-bind="click:selectAll">Seleziona tutto</a></div>
 
-									#table( source="selected", rowTemplate="component-selected-row-tmpl" )#
+									#table( source="selected", rowTemplate="component/component-selected-row-tmpl" )#
 
 									<div class="pt-5" data-bind="invisible: showSelectedTable">
 										<p class="text-center">Nessun componente ancora selezionato</p>
@@ -145,6 +145,6 @@
 		</section>
 	</div>
 
-	#template( "jstemplate/component/component-selected-row-tmpl" )#
+	<!--- #template( "jstemplate/component/component-selected-row-tmpl" )# ---->
 
 </cfoutput>

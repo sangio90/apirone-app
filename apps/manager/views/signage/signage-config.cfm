@@ -21,7 +21,7 @@
                             <div class="signage-list">
 
                                 #table(
-                                    rowTemplate="signage-config-font-list-row-tmpl",
+                                    rowTemplate="signage/signage-config-font-list-row-tmpl",
                                     source="fontList"
                                 )#
 
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        #template(view="jstemplate/signage/signage-config-font-list-row-tmpl")#
+        <!--- #template(view="jstemplate/signage/signage-config-font-list-row-tmpl")# ---->
         #template(view="jstemplate/signage/signage-config-font-selected-list-row-tmpl")#
         
     </div>

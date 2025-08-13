@@ -169,11 +169,15 @@
         <cfoutput>
 
             <table class="table table-hover #arguments.class# mb-0" id="#arguments.id#">
-                <tbody data-bind="source:#arguments.source#" data-template="#arguments.rowTemplate#">
+                <tbody data-bind="source:#arguments.source#" data-template="#ListLast( arguments.rowTemplate, "/" )#">
                 </tbody>
             </table>
             
             <div class="white-small mb-1">jstemplate/#arguments.rowTemplate#</div>
+
+            <!--- #template(view="jstemplate/#arguments.rowTemplate#")# ---->
+            #template( view="jstemplate/#arguments.rowTemplate#" )#
+
         </cfoutput>
     </cfsavecontent>
 
