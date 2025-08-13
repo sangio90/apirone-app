@@ -24,41 +24,54 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		dump( json )
-		abort;
+		var thisId    = "";
+		var messageId = "";
 
 		var result = super.getResult();
 
-		for ( var item in json ) {
-			var items         = [];
+		dump( json );
+		abort;
+
+		for ( var thisConfig in json.configs ) {
+			var sizes         = [];
 			var font          = super.bean( "Font" );
 			var signageConfig = super.bean( "SignageConfig" );
 
-			signageConfig.setFont( font.setId( json.font.id ) );
+			signageConfig.setFont( font.setId( thisConfig.font.id ) );
 
-			// var catalogSet = super.bean( "CatalogSet" );
-			// SignageConfig.setCatalogSet( catalogSet.setId( "" ) );
+			if ( json.catalogBundle.id.len() ) {
+				signageConfig.getCatalogBundle().setId( json.catalogBundle.id );
+			} else {
+				var model    = super.bean( "Model" );
+				var line     = super.bean( "Line" );
+				var category = super.bean( "ProductCategory" );
 
-			for ( var item in thisItem.items ) {
+				signageConfig.setModel( model.setId( json.catalogBundle.modelId ) );
+				signageConfig.setCategory( category.setId( json.catalogBundle.categoryId ) );
+				signageConfig.setLine( line.setId( json.catalogBundle.lineId ) );
+			}
+
+			for ( var item in thisConfig.items ) {
 				var bean = super.bean( "signageConfigItem" );
+
 				bean.setId( item.id );
 				bean.setHeight( item.height );
 				bean.setHeightInPx( item.heightInPx );
 				bean.setCharCount( item.charCount );
 				bean.setRowCount( item.rowCount );
-				thisSizes.add( bean );
+
+				sizes.add( bean );
 			}
 
-			signageConfig.setItems( thisSizes );
-
+			signageConfig.setItems( sizes );
 		}
 
 		if ( !Len( json.id ) ) {
-			messageId = "line.created";
-			thisId    = super.fire( "line.create", [ line ] )
+			messageId = "signageConfig.created";
+			thisId    = super.fire( "signageConfig.create", [ signageConfig ] )
 		} else {
-			messageId = "line.updated";
-			thisId    = super.fire( "line.update", [ line ] )
+			messageId = "signageConfig.updated";
+			thisId    = super.fire( "signageConfig.update", [ signageConfig ] )
 		}
 
 		var message = completeMessage( messageId );

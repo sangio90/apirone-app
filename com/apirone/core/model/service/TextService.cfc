@@ -3,7 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="TextDAO";
 	property name="langService" inject="LangService";
 	property name="statusService" inject="StatusService";
-	property name="textKindService" inject="TextKindService";
+	// property name="textKindService" inject="TextKindService";
 
 	property name="cacheScope" type="String" default="Text.bean";
 
