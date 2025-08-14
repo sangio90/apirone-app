@@ -29,6 +29,8 @@ component extends="coldbox.system.ioc.config.Binder" {
         map( "FontService" ).to( "com.apirone.core.decorator.LoggerServiceDecorator" )
             .asSingleton()
             .initArg( name="wrappedService", ref="FontServiceBase" );
+        
+            /**/
 
         map( "LineServiceBase" ).to( "com.apirone.core.model.service.LineService" )
             .asSingleton();
@@ -37,6 +39,23 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
             .initArg( name="wrappedService", ref="LineServiceBase" );
 
+            /**/
+
+        map( "ProductServiceBase" ).to( "com.apirone.core.model.service.ProductService" )
+            .asSingleton();
+        
+        map( "ProductService" ).to( "com.apirone.core.decorator.LoggerServiceDecorator" )
+            .asSingleton()
+            .initArg( name="wrappedService", ref="ProductServiceBase" );
+
+            /**/
+
+        map( "ModelServiceBase" ).to( "com.apirone.core.model.service.ModelService" )
+            .asSingleton();
+        
+        map( "ModelService" ).to( "com.apirone.core.decorator.LoggerServiceDecorator" )
+            .asSingleton()
+            .initArg( name="wrappedService", ref="ModelServiceBase" );
 
         /*
         mapDirectory(packagePath="com.apirone.core.decorator")
@@ -86,6 +105,9 @@ component extends="coldbox.system.ioc.config.Binder" {
                 name="config",
                 value=DeserializeJSON( fileRead( expandPath( "/config/auditConfig.json.cfm" ) ) )
             );            
+
+        map("AuditHelper").to( "com.apirone.core.util.helper.AuditHelper" )
+            .asSingleton();
 
         map("Security").to( "com.apirone.core.util.Security" )
             .asSingleton()

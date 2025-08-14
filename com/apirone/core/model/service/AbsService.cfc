@@ -16,7 +16,7 @@ component output="false" accessors="true" {
 	}
 
 	public Any function getDataMapper(){
-		return getModel().getInstance( "DataMapper" );
+		return getContainer().getInstance( "DataMapper" );
 	}
 
 	public com.apirone.core.model.bean.Error function getError(){
@@ -144,7 +144,7 @@ component output="false" accessors="true" {
 	}
 
 	private Struct function getCacheManager(){
-		return getModel().getInstance( "CacheManager" );
+		return getContainer().getInstance( "CacheManager" );
 	}
 
 	private Struct function getConfiguration(){
@@ -154,25 +154,30 @@ component output="false" accessors="true" {
 	}
 
 	private Struct function service( required String service ){
-		var bean = getModel().getInstance( "#service#Service" );
+		var bean = getContainer().getInstance( "#service#Service" );
 
 		return bean;
 	}
 
-	private Struct function logAudit(
-		required String type,
+	private Struct function logEvent(){
+		getAuditHelper().logEvent( argumentCollection = arguments );
+	}
+
+	/*
+	private Struct function logEvent(
+		required String event,
 		required String message,
 		Any payload,
 		String severity = "INFO"
 	){
-		var logger = getModel().getInstance( "AuditLogger" );
+		var logger = getContainer().getInstance( "AuditLogger" );
 
 		// TODO: better than this
 		// var accountId = !IsNull( session.user.getAccount().getId() ) ? session.user.getAccount().getId() : "";
 		var accountId = session.user.getAccount().getId();
 
 		var result = logger.log(
-			action    = arguments.type,
+			action    = arguments.event,
 			message   = arguments.message,
 			accountId = accountId,
 			payload   = payload,
@@ -183,20 +188,21 @@ component output="false" accessors="true" {
 
 		return logger;
 	}
+	*/
 
-	private Struct function getAudit( required String service ){
-		var bean = getModel().getInstance( "AuditLogger" );
+	private Struct function getAuditHelper(){
+		var bean = getContainer().getInstance( "AuditHelper" );
 
 		return bean;
 	}
 
 	private Struct function getLogger(){
-		var bean = getModel().getInstance( "Logger" );
+		var bean = getContainer().getInstance( "Logger" );
 
 		return bean;
 	}
 
-	private Struct function getModel(){
+	private Struct function getContainer(){
 		return server[ "wireBox-apirone" ];
 	}
 

@@ -61,8 +61,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * @audit line.created
-	 * @auditMessage Line created: [@return@]
+	 * @auditEvent line.created
+	 * @auditMessage Line [@return@] created
 	 * @auditPayload { "id": "@return@" }
 	 */
 	public String function create( required com.apirone.core.model.bean.Line line ){
@@ -87,8 +87,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * @audit line.cloned
-	 * @auditMessage Line cloned: [@fromLineId@]
+	 * @auditEvent line.cloned
+	 * @auditMessage Line [@fromLineId@] cloned to [@toLineId@]
 	 * @auditPayload { "fromLineId": "@fromLineId@", "toLineId": "@toLineId@", "categoryId": "@categoryId@" }
 	 */
 	public Struct function clone(
@@ -210,8 +210,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * @audit line.updated
-	 * @auditMessage Line updated: [@line.id@]
+	 * @auditEvent line.updated
+	 * @auditMessage Line [@line.id@] updated
 	 * @auditPayload { "id": "@line.id@" }
 	 */
 	public String function update( required com.apirone.core.model.bean.Line line ){
@@ -254,8 +254,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * @audit line.deleted
-	 * @auditMessage Line deleted: [@lineId@]
+	 * @auditEvent line.deleted
+	 * @auditMessage Line [@lineId@] deleted
 	 * @auditPayload { "id": "@lineId@" }
 	 */
 	public com.apirone.core.model.bean.Outcome function delete( required String lineId ){

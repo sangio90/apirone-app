@@ -64,8 +64,8 @@
 	}
 
 	/**
-	 * @audit font.created
-	 * @auditMessage Font created: [@return@]
+	 * @auditEvent font.created
+	 * @auditMessage Font [@return@] created
 	 * @auditPayload { "id": "@return@" }
 	 */
 	public String function create( required com.apirone.core.model.bean.Font font ){
@@ -90,8 +90,8 @@
 	}
 
 	/**
-	 * @audit font.updated
-	 * @auditMessage Font updated: [@font.id@]
+	 * @auditEvent font.updated
+	 * @auditMessage Font [@font.id@] updated
 	 * @auditPayload { "id": "@font.id@" }
 	 */
 	public String function update( required com.apirone.core.model.bean.Font font ){
@@ -135,9 +135,9 @@
 				var result = getDao().delete( arguments.fontId );
 				outcome.setData( { "deletedCount" = result } )
 
-				super.logAudit(
-					type    = "font.deleted",
-					message = "Font deleted: [#arguments.fontId#]",
+				super.logEvent(
+					event   = "font.deleted",
+					message = "Font [#arguments.fontId#] deleted",
 					payload = { "id" = arguments.fontId }
 				);
 
@@ -152,7 +152,6 @@
 
 		return outcome;
 	}
-
 
 
 	/*

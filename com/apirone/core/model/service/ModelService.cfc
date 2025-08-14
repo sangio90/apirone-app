@@ -49,6 +49,11 @@
 		return result;
 	}
 
+	/**
+	 * @auditEvent model.created
+	 * @auditMessage Model [@return@] created
+	 * @auditPayload { "id": "@return@" }
+	 */
 	public String function create( required com.apirone.core.model.bean.Model model ){
 		var newId = getDao().insert( arguments.model );
 
@@ -65,15 +70,15 @@
 			getTextService().bulkCreate( arguments.model.getTexts() );
 		}
 
-		// super.logAction( type = "MODEL.CREATED", message = "Model [#newId#] created" )
-
 		return newId;
 	}
 
+	/**
+	 * @auditEvent model.updated
+	 * @auditMessage Model [@model.id@] updated
+	 * @auditPayload { "id": "@model.id@" }
+	 */
 	public String function update( required com.apirone.core.model.bean.Model model ){
-		// dump(getDao() );
-		// abort;
-
 		getDao().update( arguments.model );
 
 		var id = arguments.model.getId();
@@ -96,8 +101,6 @@
 		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.model.getId() );
-
-		// super.logAction( type = "MODEL.UPDATED", message = "Model [#arguments.model.getId()#] updated" )
 
 		return arguments.model.getId();
 	}
@@ -128,7 +131,7 @@
 				outcome.setData( { "deletedCount" = result } )
 
 				super.getCacheManager().remove( getCacheScope(), arguments.modelId );
-				// super.logAction( type = "MODEL.DELETED", message = "Model [#arguments.modelId#] deleted" )
+				super.logEvent( event = "MODEL.DELETED", message = "Model [#arguments.modelId#] deleted" );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
