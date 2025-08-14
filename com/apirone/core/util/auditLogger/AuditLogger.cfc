@@ -1,7 +1,6 @@
 ﻿component accessors="true" {
 
 	property name="datasource" type="String";
-	property name="x" type="String";
 	property name="config" type="Struct";
 	property name="service" type="auditLogger.service.AuditLoggerService";
 
@@ -15,9 +14,9 @@
 	}
 
 	public Struct function log(
-		required string action,
-		required string message,
-		required string accountId,
+		required String event,
+		required String message,
+		required String accountId,
 		Any payload,
 		String severity  = "INFO",
 		String ipAddress = "",
@@ -25,7 +24,7 @@
 	){
 		arguments.message = Trim( arguments.message );
 
-		var result = parseAction( arguments.action );
+		var result = parseEvent( arguments.event );
 
 		var thisPayload = NullValue();
 
@@ -76,13 +75,13 @@
 		return false;
 	}
 
-	private Struct function parseAction( required string action ){
-		var parts = ListToArray( arguments.action, "." );
+	private Struct function parseEvent( required string event ){
+		var parts = ListToArray( arguments.event, "." );
 
 		if ( ArrayLen( parts ) != 2 ) {
 			Throw(
-				type    = "AuditLogger.errors.invalidActionFormat",
-				message = "Invalid action format. Use 'ENTITY.ACTION' (e.g. PRODUCT.CREATED)."
+				type    = "AuditLogger.errors.invalidEventFormat",
+				message = "Invalid event format. Use 'ENTITY.EVENT' (e.g. PRODUCT.CREATED)."
 			);
 		}
 
@@ -101,15 +100,6 @@
 		}
 
 		return { entity = entity, action = action };
-	}
-
-	private Boolean function isValid( required string action ){
-		try {
-			parseAction( arguments.actionString );
-			return true;
-		} catch ( any e ) {
-			return false;
-		}
 	}
 
 	private Void function factory(){

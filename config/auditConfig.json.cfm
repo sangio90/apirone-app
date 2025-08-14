@@ -1,19 +1,23 @@
 ﻿{
 	entities: {
+		"ACCOUNT": {},
+		"AUTH": {},
+		"ATTRIBUTE": {},
+		"FONT": {},
+		"LINE": {},
+		"MODEL": {},
 		"PRODUCT": {},
 		"PRODUCT_ITEM": {},
-		"ACCOUNT": {},
 		"QUOTATION": {},
-		"LINE": {},
-		"FONT": {},
-		"ATTRIBUTE": {},
-		"RAW_VALUE": {},
-		"MODEL": {}
+		"RAW_VALUE": {}
 	},
 	actions: {
 		"CREATED": {},
 		"UPDATED": {},
 		"DELETED": {},
+		"LOGIN": {},
+		"FAILED": {},
+		"LOGOUT": {},
 		"VIEWED": {},
 		"PAID": {},
 		"CLONED": {},

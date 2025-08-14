@@ -1,6 +1,4 @@
-﻿cfabort
-<cfabort>
-
+﻿
 <cfscript>
 
     model = server["wirebox-apirone"];
@@ -15,8 +13,8 @@
 
     account.setEmail( "apirone.serviceaccount@apir.com" );
     account.setName( "Service account" );
-    account.setPwd( "gHGar@aeW1z" );
-    account.setRole( role.setId( "ADM" ) );
+    account.setPwd( "BB!Ga1r@ae1W1z" );
+    account.setRoles( [role.setId( "ADM" )] );
     account.setStatus( status.setId( "ACT" ) );
 
     svc.create( account );

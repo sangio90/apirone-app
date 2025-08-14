@@ -31,8 +31,8 @@
 
 		for ( var func in metadata.functions ) {
 			if ( func.name == arguments.method ) {
-				if ( func.keyExists( "audit" ) ) {
-					var params     = { type = func.audit };
+				if ( func.keyExists( "auditEvent" ) ) {
+					var params     = { event = func.auditEvent };
 					params.payload = NullValue();
 
 					if ( func.keyExists( "auditMessage" ) ) {
@@ -59,7 +59,7 @@
 						}
 					}
 
-					super.logAudit( argumentCollection = params );
+					super.logEvent( argumentCollection = params );
 				}
 				break;
 			}

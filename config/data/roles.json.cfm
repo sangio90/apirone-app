@@ -4,6 +4,10 @@
         name: "Admin"
     },
     {
+        id: "SVA",
+        name: "Service account"
+    },
+    {
         id: "CST",
         name: "Customer"
     },

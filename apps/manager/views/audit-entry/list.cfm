@@ -86,10 +86,10 @@
                             #grid( 
                                 id="audit-entry-grid",
                                 columns="[
-                                    { 'field':'shortId', 'title':'ID', width: '60px'},
+                                    { 'field':'shortId', 'title':'ID', width: '50px'},
                                     { 'field':'createdAt', 'title':'Creato il', width: '140px' },
-                                    { 'field':'entity', 'title':'Sezione', width: '150px'},
-                                    { 'field':'action', 'title':'Azione', width: '150px'},
+                                    { 'field':'entity', 'title':'Sezione', width: '130px'},
+                                    { 'field':'action', 'title':'Azione', width: '130px'},
                                     { 'field':'message', 'title':'Messagge'},
                                     { 'field':'account.name', 'title':'Account', width: '200px' },
                                     { 'field':'', 'title':'', width: '55px'}
