@@ -1,3 +1,4 @@
+
 AP.line = AP.line || {};
 
 AP.line.fields = {
@@ -388,6 +389,17 @@ AP.line.products = ( function() {
         return false;
     };
 
+    var generateTableStyles = function() {
+        const maxColumns = 30; // o il numero che ti serve
+        let style = "";
+        for ( let n = 1; n <= maxColumns; n++ ) {
+            style += `.table-header-fixed:has(tbody tr > *:nth-child(${n}):hover) tr>*:nth-child(${n}):not(.no-highlight) { background: var(--col); }\n`;
+        }
+        const sheet = document.createElement( "style" );
+        sheet.innerHTML = style;
+        document.head.appendChild( sheet );
+    };
+
     var viewModel = kendo.observable( {
         modelConfigModal: defaultModelConfigModal,
 
@@ -507,6 +519,11 @@ AP.line.products = ( function() {
     pub.init = function() {
 
         console.log( "qui" );
+
+        var $table = $( ".table-header-fixed" );
+        $table.floatThead( { top: 94 } );
+
+        generateTableStyles();
 
         kendo.bind( fields.productsRoot, viewModel );
 

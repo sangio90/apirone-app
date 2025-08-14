@@ -832,3 +832,31 @@ h2 {
 .ui-pnotify.stack-bar-bottom .notification-warning {
     background-color: #e18f1d !important;
 }
+
+.table-header-fixed thead {
+    background-color: white;
+}
+
+/*
+    Generated dinamically in js:
+    .table-header-fixed:has(tr > *:nth-child(1):hover) tr>*:nth-child(1)
+*/
+
+.table-header-fixed {
+    --col: rgba(71, 71, 84, 0.267);
+    border-collapse: collapse;
+}
+
+.table-header-fixed.thead tr {
+    background: rgba(199, 199, 199, 0.2);
+}
+
+.table-header-fixed tr>* {
+    padding: 1em;
+    border: 1px solid #ced4da;
+    text-align: center;
+}
+
+.table-header-fixed .no-highlight {
+    text-align: left !important;
+}
