@@ -153,6 +153,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+	/*
+	
+	*/
+
 	public String function create( required com.apirone.core.model.bean.ProductItem ProductItem ){
 		var newId = getDao().insert( arguments.ProductItem );
 

@@ -73,4 +73,3 @@ AP.auditEntry.list = ( function() {
 
     return pub;
 } () );
-

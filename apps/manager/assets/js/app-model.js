@@ -169,6 +169,7 @@ AP.model.list = ( function() {
                     required: true,
                 },
                 fruitsCount: {
+                    number: true,
                     required: true,
                 },
                 code: {
@@ -197,7 +198,8 @@ AP.model.list = ( function() {
                     required: "Tipo richiesto",
                 },
                 fruitsCount: {
-                    required: "Numero di moduli ricghiesto (0 per modello)",
+                    number: "Richiesto un valore intero",
+                    required: "Valore richiesto",
                 },
                 code: {
                     required: "Codice richiesto",

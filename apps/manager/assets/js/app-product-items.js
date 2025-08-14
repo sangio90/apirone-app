@@ -2,7 +2,6 @@ AP.product = AP.product || {};
 
 AP.product.fields = {
     rootDetail: $( "#product-detail-root" ),
-    // rootList: $("#product-list-root"),
     configRow: $( "#product-config-row" ),
     attributeSearchForm: $( "#attributes-search-form" ),
     attributeModal: $( "#product-attributes-list-modal" ),
@@ -69,8 +68,6 @@ AP.product.items = ( function() {
     var fireFilter = function() {
 
         var filterState = AP.getUserPref( "product.items.showUnlinked", false );
-
-        console.log( "fireFilter", filterState );
 
         if ( !filterState ) {
             viewModel.set( "textToggleLink", "Mostra attributi non collegati" );
@@ -300,7 +297,6 @@ AP.product.items = ( function() {
         },
 
         openAttributeValues: function( event ) {
-            // console.log("openAttributeValues");
 
             attributeApp.edit( {
                 id: event.data.id,
@@ -378,8 +374,6 @@ AP.product.items = ( function() {
                     },
                 };
 
-                console.log( "value", value );
-
                 break;
 
             case "product":
@@ -395,8 +389,6 @@ AP.product.items = ( function() {
 
             default:
             }
-
-            // console.log("openComponentsList:item", value );
 
             componentApp.open( value );
 
@@ -414,7 +406,6 @@ AP.product.items = ( function() {
         changeUri: function( event ) {
 
             var thisButton = $( event.currentTarget );
-            console.log( "ele", thisButton.prop( "name" ) );
 
             var thisForm = AP.product.fields.configRow;
             var found = false;
@@ -447,11 +438,9 @@ AP.product.items = ( function() {
 
         },
 
-        // TODO: not used
+        // TODO: not used, to remove
         loadModels: function() {
             var thisForm = AP.product.fields.configRow;
-
-            console.log( "loadModels" );
 
             var finishEle = thisForm.find( "[name=finishId]" );
             var modelEle = thisForm.find( "[name=modelId]" );
@@ -573,8 +562,7 @@ AP.product.items = ( function() {
 
                             success: function( event, data ) {
                                 // TODO
-                                console.log( "success" );
-                                console.log( "success", data );
+                                console.log( "success" data);
                             },
 
                             progressall: function( event, data ) {

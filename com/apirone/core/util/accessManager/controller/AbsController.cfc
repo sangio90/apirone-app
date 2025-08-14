@@ -4,7 +4,7 @@
 		var service = ListFirst( arguments.action, "." );
 		var method  = ListLast( arguments.action, "." );
 
-		var instance = getModel().getInstance( "#service#Service" );
+		var instance = getContainer().getInstance( "#service#Service" );
 
 		return Invoke( instance, method, arguments.payload );
 	}
@@ -17,7 +17,7 @@
 		);
 	}
 
-	public Any function getModel(){
+	public Any function getContainer(){
 		return server[ "wireBox-apirone" ];
 	}
 

@@ -26,7 +26,7 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Descrizione</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control col-sm-4 uppercase" name="name"
+                                <input type="text" required class="form-control col-sm-4 uppercase" name="name"
                                     maxlength="125"
                                     data-bind="value: detailForm.data.mainText.name">
                             </div>
@@ -35,7 +35,7 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Tipo</label>
                             <div class="col-sm-10">
-                                <select name="typeId" id="typeId" class="form-control"
+                                <select name="typeId" required id="typeId" class="form-control"
                                     data-bind="value: detailForm.data.type.id, source: detailForm.types"
                                     data-value-field="id"
                                     data-text-field="name"
