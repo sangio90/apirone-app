@@ -79,11 +79,11 @@
 
 		fruit.setLines( lines );
 
-		text.setLang( lang.setId( json.textItem.lang.id ) );
+		text.setLang( lang.setId( json.nameItem.lang.id ) );
 		text.setStatus( statusText.setId( "ACT" ) );
 
-		text.setId( json.textItem.id );
-		text.setName( json.textItem.name );
+		text.setId( json.nameItem.id );
+		text.setName( json.nameItem.name );
 
 		fruit.setTexts( [ text ] );
 		fruit.setCategory( category.setId( json.category.id ) );

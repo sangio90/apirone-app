@@ -188,10 +188,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		line.setCategories( categories );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
 
-		text.setLang( lang.setId( json.textItem.lang.id ) );
+		text.setLang( lang.setId( json.nameItem.lang.id ) );
 
-		text.setId( json.textItem.id );
-		text.setName( json.textItem.name );
+		text.setId( json.nameItem.id );
+		text.setName( json.nameItem.name );
 
 		line.setTexts( [ text ] );
 

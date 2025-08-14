@@ -75,7 +75,7 @@
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '50px' },
                                     { 'field':'id', 'title':'Codice', width: '100px' },
-                                    { 'field':'textItem.name', 'title':'Descrizione'},
+                                    { 'field':'nameItem.name', 'title':'Descrizione'},
                                     { 'field':'type.name', 'title':'Tipo'},
                                     { 'field':'mode.id', 'title':'Modalità'},
                                     { 'field':'', 'title':'', width: '55px'},

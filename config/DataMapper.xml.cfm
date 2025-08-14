@@ -17,7 +17,7 @@
         <map from="code" to="code" type="cf:String" />
         <map from="categories" to="categories" ref="ProductCategory" type="Array" />
         <map from="name" to="name" type="cf:String" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" default="value" />
         <map from="status" to="status" ref="Status" />
         <map from="texts" to="texts" ref="Text" type="Array" />
     </mapper>
@@ -30,7 +30,7 @@
         <map from="family" to="family" type="cf:String" />
         <map from="directory" to="directory" type="cf:String" />
         <map from="dimension" to="dimension" type="cf:Numeric" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" />
     </mapper>
 
     <mapper id="SignageConfig" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.SignageConfig">
@@ -71,7 +71,7 @@
         <map from="code" to="code" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="status" to="status" ref="Status" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" />
         <map from="values" to="values" ref="AttributeValue" type="Array" />
         <map from="categories" to="categories" ref="ProductCategory" type="Array" />
     </mapper>
@@ -81,7 +81,7 @@
         <map from="code" to="code" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="status" to="status" ref="Status" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" />
     </mapper>
 
     <mapper id="AttributeValue" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
@@ -97,13 +97,13 @@
     <mapper id="AttributeValueTree" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.AttributeValue">
         <map from="id" to="id" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
-        <map from="textItem" to="textItem" ref="TextItem" />
+        <map from="nameItem" to="nameItem" ref="TextItem" />
     </mapper>
 
     <mapper id="AttributeForProductItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Attribute">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" />
     </mapper>
 
     <mapper id="Profile" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Profile">
@@ -235,8 +235,9 @@
         <map from="shortId" to="shortId" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
+        <map from="nameItem" to="nameItem" ref="Text" />
+        <map from="descriptionItem" to="descriptionItem" ref="Text" />
         <map from="thickness" to="thickness" ref="Thickness" />
-        <map from="textItem" to="textItem" ref="Text" />
         <map from="categories" to="categories" ref="ProductCategory" type="Array" />
         <map from="status" to="status" ref="Status" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
@@ -249,7 +250,7 @@
         <map from="status" to="status" ref="Status" />
         <map from="positionCount" to="positionCount" type="cf:Integer" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" />
         <map from="category" to="category" ref="ProductCategory" />
         <map from="lines" to="lines" ref="Line" type="Array" />
     </mapper>
@@ -261,7 +262,7 @@
         <map from="status" to="status" ref="Status" />
         <map from="positionCount" to="positionCount" type="cf:Integer" />
         <map from="createdAt" to="createdAt" type="cf:Date" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" />
         <map from="category" to="category" ref="ProductCategory" />
     </mapper>
 
@@ -287,7 +288,7 @@
         <map from="name" to="name" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
         <map from="status" to="status" ref="Status" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" value="1" />
         <map from="type" to="type" ref="ProductCategoryType" />
         <map from="mode" to="mode" ref="ProductCategoryMode" />
     </mapper>
@@ -311,7 +312,7 @@
         <map from="name" to="name" type="cf:String" />
         <map from="code" to="code" type="cf:String" />
         <map from="fruitsCount" to="fruitsCount" type="cf:Integer" />
-        <map from="textItem" to="textItem" ref="Text" />
+        <map from="nameItem" to="nameItem" ref="Text" />
         <map from="status" to="status" ref="Status" />
         <map from="categories" to="categories" ref="ProductCategory" type="Array" />
         <map from="type" to="type" ref="ModelType" />

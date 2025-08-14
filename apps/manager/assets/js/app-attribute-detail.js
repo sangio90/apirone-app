@@ -42,7 +42,7 @@ AP.attribute.detail = ( function() {
                 orderBy: 0,
                 categories: [],
                 selectedCategories: [],
-                textItem: {
+                nameItem: {
                     id: "",
                     name: "",
                     lang: {
@@ -73,7 +73,7 @@ AP.attribute.detail = ( function() {
                 },
                 id: "",
                 orderBy: 0,
-                textItem: {
+                nameItem: {
                     id: "",
                     name: "",
                     lang: {

@@ -28,4 +28,26 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return getTextItem( arguments.langId, "DESC" )?.getName() ?: "** Not found";
 	}
 
+	public com.apirone.core.model.bean.Text function OnMissingMethod( String method, Array args ){
+		if ( arguments.method == "getNameItem" ) {
+			return getTextItem( NullValue(), "NAME" );
+		}
+
+		if ( arguments.method == "getDescriptionItem" ) {
+			return getTextItem( NullValue(), "DESC" );
+		}
+
+		Throw( "I'm custom OnMissingTemplate: component [#GetFileFromPath( GetCurrentTemplatePath() )#] has no function with name [#arguments.method#]." );
+	}
+
+	/*
+	public Struct function getNameItem( String langId = NullValue() ){
+		return getTextItem( arguments.langId, "NAME" )?.getName() ?: "** Not found";
+	}
+
+	public Struct function getDescriptionItem( String langId = NullValue() ){
+		return getTextItem( arguments.langId, "DESC" ) : ? ;
+	}
+		*/
+
 }

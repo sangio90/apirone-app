@@ -109,18 +109,19 @@ component extends="com.apirone.core.controller.AbsController" {
 			</cfif>
 
 			<!---
-			<cfquery datasource="apirone">
+				<cfquery datasource="apirone">
 				DELETE FROM product_items
 				WHERE
-					product_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
-					AND attribute_raw_value_id IN
-						(
-							SELECT attribute_raw_value_id
-							FROM attributes_raw_values
-							WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#rc.attributeId#">::uuid
-						)
-			</cfquery>
-			---->
+				product_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
+				AND attribute_raw_value_id IN
+				(
+				SELECT attribute_raw_value_id
+				FROM attributes_raw_values
+				WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#rc.attributeId#">::uuid
+				)
+				</cfquery>
+				-
+			--->
 
 			<cfloop array="#attribute.getValues()#" item="item">
 				<cfquery datasource="apirone">
@@ -283,8 +284,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		text.setLang( lang.setId( "IT" ) );
 		text.setStatus( statusText.setId( "ACT" ) );
 
-		text.setId( json?.textItem?.id );
-		text.setName( json.textItem.name );
+		text.setId( json?.nameItem?.id );
+		text.setName( json.nameItem.name );
 
 		product.setTexts( [ text ] );
 		product.setCategory( category.setId( json.category.id ) );

@@ -28,7 +28,7 @@
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4 uppercase" name="name"
                                     maxlength="125"
-                                    data-bind="value: detailForm.data.textItem.name">
+                                    data-bind="value: detailForm.data.nameItem.name">
                             </div>
                         </div>
 

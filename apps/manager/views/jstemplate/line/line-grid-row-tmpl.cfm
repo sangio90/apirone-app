@@ -18,14 +18,6 @@
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
             </td>
-            <!---
-            <td class="text-center">
-                #iconButton(bind="click:products", icon="cogs")#
-            </td>
-            <td class="text-center">
-                #iconButton(bind="click:attributes", icon="external-link-square-alt")#
-            </td>
-            ---->
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"
                     name="selected"

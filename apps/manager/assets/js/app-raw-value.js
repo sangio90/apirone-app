@@ -41,7 +41,7 @@ AP.rawValue.detail = ( function() {
                     id: "ACT"
                 },
                 id: "",
-                textItem: {
+                nameItem: {
                     id: "",
                     name: "",
                     lang: {

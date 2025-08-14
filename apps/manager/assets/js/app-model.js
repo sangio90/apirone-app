@@ -28,7 +28,7 @@ AP.model.list = ( function() {
             type: {
                 id: "",
             },
-            textItem: {
+            nameItem: {
                 id: "",
                 name: "",
                 lang: {

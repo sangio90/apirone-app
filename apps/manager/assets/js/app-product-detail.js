@@ -28,7 +28,7 @@ AP.product.detail = ( function() {
             id: "",
             code: "",
             name: "",
-            textItem: {
+            nameItem: {
                 name: ""
             },
             category: {

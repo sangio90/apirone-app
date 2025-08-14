@@ -62,7 +62,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		finish.setCategories( categories );
 		finish.setStatus( status.setId( json.status.id ) );
 
-		text.setId( json?.textItem?.id );
+		text.setId( json?.nameItem?.id );
 		text.setName( json.name );
 		text.setLang( lang.setId( "IT" ) ); // FIXME: this, get lang from json
 

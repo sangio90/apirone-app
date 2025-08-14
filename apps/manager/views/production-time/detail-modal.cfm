@@ -29,7 +29,7 @@
                             <div class="col-sm-10">
                                 <input type="text" class="form-control col-sm-4" name="name"
                                     maxlength="125"
-                                    data-bind="value: detailForm.data.textItem.name">
+                                    data-bind="value: detailForm.data.nameItem.name">
                             </div>
                         </div>
 

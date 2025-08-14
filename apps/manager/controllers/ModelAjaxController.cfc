@@ -60,11 +60,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		text.setLang( lang.setId( json.textItem.lang.id ) );
-		text.setStatus( status.setId( json.textItem.id ) );
+		text.setLang( lang.setId( json.nameItem.lang.id ) );
+		text.setStatus( status.setId( json.nameItem.id ) );
 
-		text.setId( json.textItem.id );
-		text.setName( json.textItem.name );
+		text.setId( json.nameItem.id );
+		text.setName( json.nameItem.name );
 
 		model.setTexts( [ text ] );
 

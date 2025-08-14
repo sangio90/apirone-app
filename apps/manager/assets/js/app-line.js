@@ -37,7 +37,7 @@ AP.line.detail = ( function() {
             category: {
                 id: "",
             },
-            textItem: {
+            nameItem: {
                 id: "",
                 name: "",
                 lang: {
