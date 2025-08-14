@@ -25,7 +25,7 @@ AP.font.detail = ( function() {
             code: "",
             directory: "",
             dimension: 0,
-            mainText: {
+            textItem: {
                 id: "",
                 name: "",
                 lang: {

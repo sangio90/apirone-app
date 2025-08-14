@@ -1,7 +1,7 @@
 ﻿<cfparam name="prc.title" default="">
 <cfparam name="prc.subtitle" default="">
 
-<cfprocessingdirective suppresswhitespace=true>
+<cfprocessingdirective suppressWhiteSpace=true>
 
 <cfoutput>
 

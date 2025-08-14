@@ -3,7 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="TextDAO";
 	property name="langService" inject="LangService";
 	property name="statusService" inject="StatusService";
-	// property name="textKindService" inject="TextKindService";
+	property name="lookupService" inject="LookupService";
+	//property name="textKindService" inject="TextKindService";
 
 	property name="cacheScope" type="String" default="Text.bean";
 
@@ -121,26 +122,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/**
 	 * @private
 	 */
-	private com.apirone.core.model.bean.Text function build( required String textId ){
-		var record = getDao().read( textId = arguments.textId );
-
-		if ( record.RecordCount ) {
-			var bean = super.bean( "Text" );
-
-			bean.setId( record.text_id );
-			bean.setName( record.text );
-			bean.setLang( getLangService().get( record.lang_id ) );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setEntity( getEntity( record ) );
-			// bean.setKind( getTextKindService().get( record.text_kind_id ) );
-
-			getStatusService().get( record.status_id )
-
-			return bean;
-		}
-
-		return NullValue();
-	}
 
 	private com.apirone.core.model.bean.Entity function getEntity( required record ){
 		var entity = super.bean( "Entity" );
@@ -213,6 +194,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			message = "No entity linked to this translation. Text Id: [#record.text_id#]"
 		);
 		*/
+	}
+
+	private com.apirone.core.model.bean.Text function build( required String textId ){
+		var record = getDao().read( textId = arguments.textId );
+
+		if ( record.RecordCount ) {
+			var bean = super.bean( "Text" );
+
+			bean.setId( record.text_id );
+			bean.setName( record.text );
+			bean.setLang( getLangService().get( record.lang_id ) );
+			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setEntity( getEntity( record ) );
+			bean.setKind( getLookupService().get( "textKind", record.text_kind_id ) );
+
+			return bean;
+		}
+
+		return NullValue();
 	}
 
 }

@@ -29,7 +29,7 @@ AP.fruit.list = ( function() {
             code: "",
             positionCount: "",
             selectedLines: [],
-            mainText: {
+            textItem: {
                 id: "",
                 name: "",
                 lang: {

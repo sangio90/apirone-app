@@ -107,7 +107,7 @@ AP.product.items = ( function() {
         },
 
         getImageTypeText: function( event ) {
-            var text = AP.util.getMainText( event.type.texts.toJSON() );
+            var text = AP.util.getTextItem( event.type.texts.toJSON() );
 
             return text.name + " " + event.shortId;
         },
@@ -168,7 +168,7 @@ AP.product.items = ( function() {
         },
 
         getAttributeName: function( event ) {
-            var text = AP.util.getMainText( event.texts );
+            var text = AP.util.getTextItem( event.texts );
 
             return text.name;
         },

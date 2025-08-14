@@ -21,7 +21,7 @@ AP.productCategory.list = ( function() {
         data: {
             id: "",
             code: "",
-            mainText: {
+            textItem: {
                 name: "",
                 id: "",
                 lang: {

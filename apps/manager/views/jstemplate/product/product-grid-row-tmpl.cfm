@@ -10,7 +10,7 @@
                 <span data-bind="text: code"></span>
             </td>
             <td>
-                <span data-bind="text: mainText.name"></span>
+                <span data-bind="text: textItem.name"></span>
             </td>
             <td class="text-end">
                 <span data-bind="text: positionCount"></span>

@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="texts" type="com.apirone.core.model.bean.Text[]";
 
-	public Struct function getMainText( langId ){
+	public Struct function getTextItem( langId, kindId = "NAME" ){
 		if ( IsNull( arguments.langId ) ) {
 			var langId = getCurrentLang().getId();
 		} else {
@@ -11,7 +11,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 		if ( !IsNull( getTexts() ) ) {
 			for ( var text in getTexts() ) {
-				if ( text.getLang().getId() == langId ) {
+				if ( text.getLang().getId() == langId AND text.getKind().getId() == kindId ) {
 					return text;
 				}
 			}
@@ -21,7 +21,11 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	}
 
 	public String function getName( String langId = NullValue() ){
-		return getMainText( arguments.langId )?.getName() ?: "** Not found";
+		return getTextItem( arguments.langId, "NAME" )?.getName() ?: "** Not found";
+	}
+
+	public String function getDescription( String langId = NullValue() ){
+		return getTextItem( arguments.langId, "DESC" )?.getName() ?: "** Not found";
 	}
 
 }

@@ -54,7 +54,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			categoryId = data.categoryId
 		}
 
-	 	var result = super.fire( "line.clone", params );
+		var result = super.fire( "line.clone", params );
 		// var result = super.service( "line" ).clone( argumentCollection = params );
 
 		event.setValue( "result", result );
@@ -188,10 +188,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		line.setCategories( categories );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
 
-		text.setLang( lang.setId( json.mainText.lang.id ) );
+		text.setLang( lang.setId( json.textItem.lang.id ) );
 
-		text.setId( json.mainText.id );
-		text.setName( json.mainText.name );
+		text.setId( json.textItem.id );
+		text.setName( json.textItem.name );
 
 		line.setTexts( [ text ] );
 

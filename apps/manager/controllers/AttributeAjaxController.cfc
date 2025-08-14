@@ -105,7 +105,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			categories.add( category );
 		}
 
-		text.setMemento( json.mainText )
+		text.setMemento( json.textItem )
 
 		texts.add( text );
 

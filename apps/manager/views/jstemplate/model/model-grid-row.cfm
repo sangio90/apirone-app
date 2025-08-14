@@ -13,7 +13,7 @@
                 <span data-bind="text: type.id"></span>
             </td>
             <td>
-                <span data-bind="text: mainText.name"></span>
+                <span data-bind="text: textItem.name"></span>
             </td>
             <td>
                 <div data-bind="source: categories" data-template="product-category-row-tmpl"></div>

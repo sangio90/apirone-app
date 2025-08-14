@@ -74,10 +74,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		var mainText = json.data.mainText;
+		var textItem = json.data.textItem;
 
-		text.setId( mainText.id )
-		text.setName( mainText.name )
+		text.setId( textItem.id )
+		text.setName( textItem.name )
 		text.setLang( lang.setId( mainText.lang.id ) );
 
 		texts.add( text );

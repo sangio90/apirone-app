@@ -79,10 +79,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		category.setMode( mode.setId( json.mode.id ) );
 		category.setStatus( status.setId( json.status.id ) );
 
-		text.setLang( lang.setId( json.mainText.lang.id ) );
+		text.setLang( lang.setId( json.textItem.lang.id ) );
 
-		text.setId( json.mainText.id );
-		text.setName( json.mainText.name );
+		text.setId( json.textItem.id );
+		text.setName( json.textItem.name );
 
 		category.setTexts( [ text ] );
 

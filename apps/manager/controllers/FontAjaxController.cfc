@@ -49,9 +49,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		font.setDirectory( "#LCase( json.code )#" );
 		font.setFamily( json.family );
 
-		text.setId( json.mainText.id );
-		text.setName( json.mainText.name );
-		text.setLang( lang.setId( json.mainText.lang.id, "IT" ) );
+		text.setId( json.textItem.id );
+		text.setName( json.textItem.name );
+		text.setLang( lang.setId( json.textItem.lang.id, "IT" ) );
 		texts.add( text );
 
 		font.setTexts( texts );

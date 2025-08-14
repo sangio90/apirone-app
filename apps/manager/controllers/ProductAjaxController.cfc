@@ -283,8 +283,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		text.setLang( lang.setId( "IT" ) );
 		text.setStatus( statusText.setId( "ACT" ) );
 
-		text.setId( json?.mainText?.id );
-		text.setName( json.mainText.name );
+		text.setId( json?.textItem?.id );
+		text.setName( json.textItem.name );
 
 		product.setTexts( [ text ] );
 		product.setCategory( category.setId( json.category.id ) );

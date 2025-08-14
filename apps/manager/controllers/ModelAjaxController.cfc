@@ -41,7 +41,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 
-		var model   = super.bean( "Model" );
+		var model  = super.bean( "Model" );
 		var type   = super.bean( "ModelType" );
 		var status = super.bean( "Status" );
 		var text   = super.bean( "Text" );
@@ -60,11 +60,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		text.setLang( lang.setId( json.mainText.lang.id ) );
-		text.setStatus( status.setId( json.mainText.id ) );
+		text.setLang( lang.setId( json.textItem.lang.id ) );
+		text.setStatus( status.setId( json.textItem.id ) );
 
-		text.setId( json.mainText.id );
-		text.setName( json.mainText.name );
+		text.setId( json.textItem.id );
+		text.setName( json.textItem.name );
 
 		model.setTexts( [ text ] );
 

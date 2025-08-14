@@ -26,7 +26,7 @@
         text.setLang( lang.setId( "IT" ) );
         text.setStatus( status.setId( "ACT" ) );
 
-        //text.setId( json.mainText.id );
+        //text.setId( json.textItem.id );
         text.setName( record.line );
 
         obj.setTexts( [ text ] );

@@ -30,7 +30,7 @@
                                 <input type="text" required class="form-control col-sm-4 uppercase" 
                                     name="name"
                                     maxlength="50"
-                                    data-bind="value: detailForm.data.mainText.name"
+                                    data-bind="value: detailForm.data.textItem.name"
                                     >
                             </div>
                         </div>

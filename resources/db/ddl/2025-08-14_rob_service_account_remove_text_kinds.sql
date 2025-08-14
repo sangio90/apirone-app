@@ -29,3 +29,21 @@ VALUES
         NULL,
         E'["ADM"]'
     );
+
+-- text_kind moved to lookup
+ALTER TABLE public.texts
+DROP CONSTRAINT IF EXISTS texts_kind_id_fk RESTRICT;
+
+DROP TABLE IF EXISTS public.text_kinds;
+
+UPDATE texts
+SET
+    text_kind_id = 'NAME';
+
+ALTER TABLE public.texts
+ALTER COLUMN text_kind_id
+SET NOT NULL;
+
+ALTER TABLE public.texts
+ALTER COLUMN text_kind_id
+SET DEFAULT 'NAME';

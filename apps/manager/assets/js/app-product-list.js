@@ -35,7 +35,7 @@ AP.product.list = ( function() {
             category: {
                 id: 167 // TODO: add dynamic value according to current category
             },
-            mainText: {
+            textItem: {
                 id: "",
                 name: "",
                 lang: {
