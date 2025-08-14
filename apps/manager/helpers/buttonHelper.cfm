@@ -47,7 +47,7 @@
     
     }
 
-    function iconButton( String bind, required String icon, String variant="default" ){ 
+    function iconButton( String bind, required String icon, String variant="default", size="sm" ){ 
 
         arguments["label"] = "";
         

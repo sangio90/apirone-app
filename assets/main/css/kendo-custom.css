@@ -1,8 +1,12 @@
-.k-block, .k-draghandle, .k-inline-block, .k-widget {
+.k-block,
+.k-draghandle,
+.k-inline-block,
+.k-widget {
 	border: 1px solid #ced4da;
 }
 
-.k-filter-row th, .k-grid-header th.k-header {
+.k-filter-row th,
+.k-grid-header th.k-header {
 	-weight: 500;
 }
 
@@ -16,9 +20,9 @@
 
 .k-focus {
 	border: 0 !important;
-    -webkit-box-shadow: none !important;
-    -moz-box-shadow: none !important;
-    box-shadow: none !important;
+	-webkit-box-shadow: none !important;
+	-moz-box-shadow: none !important;
+	box-shadow: none !important;
 }
 
 .no-scrollbar .k-grid-header {
@@ -30,12 +34,12 @@
 }
 
 .k-grid table tbody tr th {
-	height: 40px !important;
+	height: 35px !important;
 }
 
 .k-grid table tbody tr td {
-    border-bottom: 1px solid #e6e6e6 !important;
-	height: 40px !important;
+	border-bottom: 1px solid #e6e6e6 !important;
+	height: 35px !important;
 	padding: 4px 6px !important;
 
 }
@@ -46,11 +50,11 @@
 }
 
 .k-grid-content td input[type=text] {
-	width:  calc(100% - 25px);
+	width: calc(100% - 25px);
 }
 
 .k-grid-content td select {
-	width:  calc(100% - 38px);
+	width: calc(100% - 38px);
 }
 
 .k-grid table thead tr th {
@@ -70,7 +74,7 @@
 }
 
 .k-pager-numbers .k-link.k-state-selected {
-    background-color: #2771e8 !important;
+	background-color: #2771e8 !important;
 }
 
 .no-pager .k-pager {
@@ -87,8 +91,8 @@
 	color: #000000;
 }
 
-.k-grid .k-master-row:hover td {  
-	color: #000000;   
+.k-grid .k-master-row:hover td {
+	color: #000000;
 	background-color: #F4F0E5;
 }
 
@@ -103,7 +107,7 @@
 */
 
 .k-multiselect {
-	height: 40px !important;
+	height: 35px !important;
 }
 
 .k-chip {

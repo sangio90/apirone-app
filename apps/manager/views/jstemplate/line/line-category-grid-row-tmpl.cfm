@@ -16,7 +16,7 @@
                 #iconButton(bind="click:showCloneModal", icon="copy")#
             </td>
             <td class="text-center">
-                #iconButton(bind="click:products", icon="cogs")#
+                #iconButton(bind="click:products", icon="border-all")#
             </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
