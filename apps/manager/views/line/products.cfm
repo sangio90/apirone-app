@@ -28,7 +28,7 @@
 
                         <form name="line-products-form" id="line-products-form" method="post">
 
-                            <table class="table table-hover">
+                            <table class="table table-hover table-header-fixed">
                                 <thead>
                                 <tr>
                                     <th></th>
@@ -69,8 +69,8 @@
                                 </thead>
                                 <tbody>
                                 <cfloop array="#prc.finishes#" item="finish">
-                                    <tr>
-                                        <td>
+                                    <tr class="no-highlight">
+                                        <td class="no-highlight">
                                             #finish.getName()# <span class="small-code">(#finish.getShortId()#)</span>
                                         </td>
                                         <cfloop array="#prc.models#" item="model">

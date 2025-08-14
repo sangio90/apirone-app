@@ -34,20 +34,20 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
 		var result = super.getResult();
+
+		var categories = [];
+
+		var thisId    = "";
+		var messageId = "";
 
 		var finish = super.bean( "Finish" );
 		var status = super.bean( "Status" );
 		var text   = super.bean( "Text" );
 		var lang   = super.bean( "Lang" );
 
-		var categories = [];
-
-		var thisId    = "";
-		var messageId = "";
-		var texts     = [];
-
-		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		finish.setId( json.id );
 		finish.setCode( json.code );
@@ -62,13 +62,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		finish.setCategories( categories );
 		finish.setStatus( status.setId( json.status.id ) );
 
-		text.setId( json.mainText.id );
+		text.setId( json?.mainText?.id );
 		text.setName( json.name );
 		text.setLang( lang.setId( "IT" ) ); // FIXME: this, get lang from json
 
-		texts.add( text );
-
-		finish.setTexts( texts );
+		finish.setTexts( [ text ] );
 
 		if ( !Len( json.id ) ) {
 			messageId = "finish.created";

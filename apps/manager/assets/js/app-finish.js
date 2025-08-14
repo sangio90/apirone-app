@@ -1,206 +1,206 @@
 AP.finish = AP.finish || {};
 
 AP.finish.fields = {
-	listRoot: $("#finish-list-root"),
-	detailForm: $("#finish-detail-form"),
-	searchListForm: $("#finish-grid-search-form")
+    listRoot: $( "#finish-list-root" ),
+    detailForm: $( "#finish-detail-form" ),
+    searchListForm: $( "#finish-grid-search-form" )
 };
 
-$(document).ready(function (){
+$( document ).ready( function(){
 
-	if (AP.finish.fields.listRoot.length) {
+    if ( AP.finish.fields.listRoot.length ) {
 
-		AP.finish.list.init();
+        AP.finish.list.init();
 
-	}
+    }
 
-});
+} );
 
-AP.finish.list = (function () {
+AP.finish.list = ( function() {
 
-	var pub = {};
+    var pub = {};
 
-	var dataSources = {
-		items: NM.kendo.dataSource({ url: "/manager/ajax/finishes" })
-	};
+    var dataSources = {
+        items: NM.kendo.dataSource( { url: "/manager/ajax/finishes" } )
+    };
 
-	var defaultDetailForm = {
-		data: {
-			id: "",
-			code: "",
-			name: "",
-			selectedCategories: [],
-			status: {
-				id: "ACT"
-			}
-		},
-		statuses: AP.page.statuses,
-		categories: AP.page.categories,
+    var defaultDetailForm = {
+        data: {
+            id: "",
+            code: "",
+            name: "",
+            selectedCategories: [],
+            status: {
+                id: "ACT"
+            }
+        },
+        statuses: AP.page.statuses,
+        categories: AP.page.categories,
 
-		title: "Carica finitura"
-	};
+        title: "Carica finitura"
+    };
 
 
-	var viewModel = kendo.observable({
-		rows: dataSources.items,
-		detailForm: defaultDetailForm,
+    var viewModel = kendo.observable( {
+        rows: dataSources.items,
+        detailForm: defaultDetailForm,
 
-		resetForm: function () {
-			viewModel.set("detailForm", defaultDetailForm);
-		},
+        resetForm: function() {
+            viewModel.set( "detailForm", defaultDetailForm );
+        },
 
-		search: function (event) {
+        search: function( event ) {
 
-			var thisForm = AP.finish.fields.searchListForm;
+            var thisForm = AP.finish.fields.searchListForm;
 
-			var params = thisForm.serializeJSON();
+            var params = thisForm.serializeJSON();
 
-			viewModel.rows.read(params);
+            viewModel.rows.read( params );
 
-			return false;
+            return false;
 
-		},
+        },
 
-		save: function (event) {
+        save: function( event ) {
 
-			var thisForm = AP.finish.fields.detailForm;
-			var status = thisForm.find(".status");
+            var thisForm = AP.finish.fields.detailForm;
+            var status = thisForm.find( ".status" );
 
-			status.html("<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">");
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
-			if(thisForm.valid()) {
+            if( thisForm.valid() ) {
 
-				NM.util.ajax({
-					method: "POST",
-					url: "/manager/ajax/finishes",
-					data: JSON.stringify(viewModel.get("detailForm.data")),
-					callback: {
-						done: function (xhr) {
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/finishes",
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
 
-							NM.util.autoHideMessage(status, "<span class='green'>Finitura salvata</span>");
+                            NM.util.autoHideMessage( status, "<span class='green'>Finitura salvata</span>" );
 
-							setTimeout(() => $("#finish-detail-modal").modal("hide"), 1000);
+                            setTimeout( () => $( "#finish-detail-modal" ).modal( "hide" ), 1000 );
 
-							viewModel.rows.read();
+                            viewModel.rows.read();
 
-						}
-					}
-				});
+                        }
+                    }
+                } );
 
-			}
+            }
 
-			return false;
+            return false;
 
-		},
+        },
 
-		new: function (event) {
+        new: function( event ) {
 
-			this.resetForm();
+            this.resetForm();
 
-			NM.util.openModal($("#finish-detail-modal"));
+            NM.util.openModal( $( "#finish-detail-modal" ) );
 
-		},
+        },
 
-		edit: function (event) {
+        edit: function( event ) {
 
-			viewModel.set("detailForm.data", event.data);
-			viewModel.set("detailForm.title", "Modifica finitura < " + event.data.code + " >");
+            viewModel.set( "detailForm.data", event.data );
+            viewModel.set( "detailForm.title", "Modifica finitura < " + event.data.code + " >" );
 
-			var selectedCategories = [];
+            var selectedCategories = [];
 
-			if( event.data.categories ) {
-				
-				for (var category of event?.data?.categories)  {
-					selectedCategories.push( category );
-				}
-	
-			}
+            if( event.data.categories ) {
 
-			viewModel.set("detailForm.data.selectedCategories", selectedCategories);
+                for ( var category of event?.data?.categories )  {
+                    selectedCategories.push( category );
+                }
 
-			NM.util.openModal($("#finish-detail-modal"));
+            }
 
-		},
+            viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
 
-        delete: function (event) {
+            NM.util.openModal( $( "#finish-detail-modal" ) );
 
-			var checks = $("#finish-grid").find("[name=selected]:checked");
+        },
 
-			if (checks.length) {
+        delete: function( event ) {
 
-				var values = [];
+            var checks = $( "#finish-grid" ).find( "[name=selected]:checked" );
 
-				checks.each(function (){
-					values.push($(this).val());
-				});
+            if ( checks.length ) {
 
-				var ids = values.toString();
+                var values = [];
 
-				NM.util.ajax({
-					method: "DELETE",
-					url: "/manager/ajax/finishes",
-					data: ids,
-					callback: {
-						done: function (xhr) {
+                checks.each( function(){
+                    values.push( $( this ).val() );
+                } );
 
-							if(xhr.data.payload.hasOwnProperty("errors")) {
-								AP.widget.notify("error", "Non riesco a cancellare tutti i valori");
-							} else {
-								AP.widget.notify("success", "Cancellazione avvenuta con successo");
-							}
+                var ids = values.toString();
 
-							viewModel.rows.read();
+                NM.util.ajax( {
+                    method: "DELETE",
+                    url: "/manager/ajax/finishes",
+                    data: ids,
+                    callback: {
+                        done: function( xhr ) {
 
-						}
-					}
-				});
+                            if( xhr.data.payload.hasOwnProperty( "errors" ) ) {
+                                AP.widget.notify( "error", "Non riesco a cancellare tutti i valori" );
+                            } else {
+                                AP.widget.notify( "success", "Cancellazione avvenuta con successo" );
+                            }
 
-			} else {
+                            viewModel.rows.read();
 
-				AP.widget.notify("warning", "Seleziona almeno un valore");
+                        }
+                    }
+                } );
 
-			}
+            } else {
 
-        },		
+                AP.widget.notify( "warning", "Seleziona almeno un valore" );
 
-	});
+            }
 
-	pub.init = function () {
+        },
 
-		kendo.bind(AP.finish.fields.listRoot, viewModel);
+    } );
 
-		var detailForm = AP.finish.fields.detailForm;
+    pub.init = function() {
 
-		detailForm.validate({
-			onfocusout: function (element) {
-				$(element).valid();
-			},
-			rules: {
-				code: {
-					required: true,
-					checkCode: true,
-					remote: {
-						url: "/manager/ajax/finishes/code-exists",
-						data: { id: function () { return  viewModel.get("detailForm.data.id"); } },
-						dataFilter: function (xhr) {
-							var json = JSON.parse(xhr);
-							return json.data == false;
-						}
-					}
-				}
-			},
-			messages: {
-				code: {
-					required: "Codice richiesto",
-					checkCode: "Solo numeri, lettere, trattino o trattino basso",
-					remote: "Il codice esiste"
-				}
-			},
+        kendo.bind( AP.finish.fields.listRoot, viewModel );
 
-		});
+        var detailForm = AP.finish.fields.detailForm;
 
-	};
+        detailForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
+            },
+            rules: {
+                code: {
+                    required: true,
+                    checkCode: true,
+                    remote: {
+                        url: "/manager/ajax/finishes/code-exists",
+                        data: { id: function() { return  viewModel.get( "detailForm.data.id" ); } },
+                        dataFilter: function( xhr ) {
+                            var json = JSON.parse( xhr );
+                            return json.data == false;
+                        }
+                    }
+                }
+            },
+            messages: {
+                code: {
+                    required: "Codice richiesto",
+                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
+                    remote: "Il codice esiste"
+                }
+            },
 
-	return pub;
-}());
+        } );
+
+    };
+
+    return pub;
+}() );
 
