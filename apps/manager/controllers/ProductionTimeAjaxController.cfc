@@ -1,26 +1,71 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var mm     = super.getMementify();
 
-        var data = [];
-        var result = super.getResult();
-        var dm = getDataMapper();
+		var params = super.paramsFromUrl();
 
-        var params = super.paramsFromUrl();
+		var rows = super.fire( "productionTime.search", params );
 
-        var rows = super.fire( "productionTime.search", params );
+		for ( var row in rows.getData() ) {
+			var obj = mm.convert( target = row, profile = "detail" );
+			data.add( obj );
+		}
 
-        for ( var row in rows.getData() ) {
-            var obj = dm.convert( row, "productionTime", true );
-            data.add( obj );
-        }
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
 
-        result.setTotal( rows.getTotal() );
-        result.setCount( rows.getCount() );
-        result.setData( data );
+		event.setValue( "result", result );
+	}
 
-        event.setValue("result", result);
-        
-    }
+	function get( event, rc, prc ){
+		param rc.id = "___";
+
+		var data   = [];
+		var result = super.getResult();
+		var mm     = super.getMementify();
+
+		var row = super.fire( "productionTime.get", [ rc.id ] );
+
+		var obj = mm.convert( target = row, profile = "detail" );
+
+		result.setTotal( 1 );
+		result.setCount( 1 );
+		result.setData( obj );
+
+		event.setValue( "result", result );
+	}
+
+	function save( event, rc, prc ){
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		var thisId    = "";
+		var messageId = "";
+
+		var result = super.getResult();
+		var bean   = super.bean( "ProductionTime" );
+		var status = super.bean( "Status" );
+
+		bean.setId( json?.id );
+		bean.setName( json.name );
+		bean.setStatus( status.setId( json.status.id ) );
+
+		if ( !Len( json.id ) ) {
+			messageId = "ProductionTime.created";
+			thisId    = super.fire( "ProductionTime.create", [ bean ] )
+		} else {
+			messageId = "ProductionTime.updated";
+			thisId    = super.fire( "ProductionTime.update", [ bean ] )
+		}
+
+		var message = completeMessage( messageId );
+
+		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+
+		event.setValue( "result", result );
+	}
 
 }

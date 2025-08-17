@@ -9,21 +9,15 @@ AP.productionTime.fields = {
 };
 
 $( document ).ready( function(){
-
     if ( AP.productionTime.fields.listRoot.length ) {
-
 	    AP.productionTime.list.init();
-
     }
 
     if ( AP.productionTime.fields.detailRoot.length ) {
-
 	    AP.productionTime.detail.init();
-
     }
 
 } );
-
 
 AP.productionTime.detail = ( function() {
 
@@ -54,6 +48,7 @@ AP.productionTime.detail = ( function() {
 
 
     var viewModel = kendo.observable( {
+        statuses: AP.page.statuses,
 
         detailForm: defaultDetailForm,
 
@@ -88,18 +83,16 @@ AP.productionTime.detail = ( function() {
 
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/lines",
+                    url: "/manager/ajax/production-times",
                     data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
                         done: function( xhr ) {
 
                             if( xhr.status == "SUCCESS" ) {
 
-                                NM.util.autoHideMessage( status, "<span class='green'>Linea salvata</span>" );
+                                NM.util.autoHideMessage( status, "<span class='green'>Record salvato</span>" );
 
-                                setTimeout( () => $( "#line-detail-modal" ).modal( "hide" ), 1000 );
-
-                                // fireCallback("onSave");
+                                setTimeout( () => $( "#production-times-detail-modal" ).modal( "hide" ), 1000 );
 
                                 AP.util.fireCallback( "onSave", viewModel.get( "callback" ) );
 
@@ -270,9 +263,6 @@ AP.productionTime.list = ( function() {
 
                 var ids = values.toString();
 
-                console.log( "values", values );
-                console.log( "ids", ids );
-
                 NM.util.ajax( {
                     method: "DELETE",
                     url: "/manager/ajax/production-times",
@@ -307,58 +297,6 @@ AP.productionTime.list = ( function() {
     pub.init = function() {
 
         kendo.bind( fields.listRoot, viewModel );
-
-        var detailForm = AP.productionTime.fields.detailForm;
-
-        AP.page.types.unshift( { id: "", name: "-- Seleziona lo stato" } );
-
-        detailForm.validate( {
-            onfocusout: function( element ) {
-                $( element ).valid();
-            },
-            rules: {
-                name: {
-                    required: true,
-                },
-                statusId: {
-                    required: true,
-                },
-                code: {
-                    required: true,
-                    maxlength: 3,
-                    checkCode: true,
-                    remote: {
-                        url: "/manager/ajax/production-times/code-exists",
-                        data: {
-                            id: function() {
-                                return viewModel.get( "detailForm.data.id" );
-                            },
-                        },
-                        dataFilter: function( xhr ) {
-                            var json = JSON.parse( xhr );
-                            return json.data == false;
-                        },
-                    },
-                },
-            },
-            messages: {
-                name: {
-                    required: "Descrizione richiesta",
-                },
-                typeId: {
-                    required: "Tipo richiesto",
-                },
-                fruitsCount: {
-                    required: "Numero di moduli ricghiesto (0 per modello)",
-                },
-                code: {
-                    required: "Codice richiesto",
-                    maxlength: "Al massimo 3 caratteri",
-                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
-                    remote: "Il codice esiste",
-                },
-            },
-        } );
 
     };
 

@@ -1,18 +1,15 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		prc.title = "Tempi di produzione";
 
-        prc.title = "Tempi di produzione";
+		var mm = super.getMementify();
 
-        //prc.list = super.fire("ProductionTime.list");
+		prc.jsScripts.add( "app-production-time" );
 
-        prc.jsScripts.add( "app-production-time" );
+		prc.page[ "statuses" ] = mm.convertList( super.fire( "status.list", [ "PRODUCTION_TIME" ] ) );
 
-        event.setView( "production-time/list" );
+		event.setView( "production-time/list" );
+	}
 
-    }
-    
-    function get( event, rc, prc ){
-    }
-    
 }

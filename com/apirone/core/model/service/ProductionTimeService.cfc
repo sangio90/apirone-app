@@ -55,6 +55,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	public String function create( required com.apirone.core.model.bean.ProductionTime productionTime ){
+		var newId = getDao().insert( arguments.productionTime );
+
+		return newId;
+	}
+
+	public String function update( required com.apirone.core.model.bean.ProductionTime productionTime ){
+		getDao().update( arguments.productionTime );
+
+		var id = arguments.productionTime.getId();
+
+		super.getCacheManager().remove( getCacheScope(), id );
+
+		return id;
+	}
+
+
 	/*
     	private method
 	*/

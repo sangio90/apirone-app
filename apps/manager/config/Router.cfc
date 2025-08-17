@@ -27,8 +27,6 @@
 		/*
 			signages
 		*/
-		//get( "/ajax/audit-entries/:id" ).to( "AuditEntryAjaxController.get" ).end();
-		//get( "/ajax/audit-entries" ).to( "AuditEntryAjaxController.list" ).end();
 		post( "/ajax/signages/rows-config" ).to( "SignageConfigAjaxController.save" ).end();
 		get( "/signages/rows-config/:id" ).to( "SignageConfigController.rowConfig" ).end();
 		get( "/signages/rows-config" ).to( "SignageConfigController.rowConfig" ).end();
@@ -94,6 +92,8 @@
 		/*
 			production times
 		*/
+		get( "/ajax/production-times/:id").to("ProductionTimeAjaxController.get").end();
+		post( "/ajax/production-times").to("ProductionTimeAjaxController.save").end();
 		get( "/ajax/production-times").to("ProductionTimeAjaxController.list").end();
 		get( "/production-times").to("ProductionTimeController.list").end();
 
