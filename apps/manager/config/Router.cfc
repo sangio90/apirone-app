@@ -94,6 +94,7 @@
 		*/
 		get( "/ajax/production-times/:id").to("ProductionTimeAjaxController.get").end();
 		post( "/ajax/production-times").to("ProductionTimeAjaxController.save").end();
+		delete( "/ajax/production-times").to("ProductionTimeAjaxController.delete").end();
 		get( "/ajax/production-times").to("ProductionTimeAjaxController.list").end();
 		get( "/production-times").to("ProductionTimeController.list").end();
 

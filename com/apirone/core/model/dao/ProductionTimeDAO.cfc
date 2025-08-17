@@ -93,7 +93,8 @@
 			DELETE FROM
 				production_times
 			WHERE
-				production_time_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productionTimeId#">::uuid
+				production_time_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productionTimeId#">
+			RETURNING production_time_id
 		</cfquery>
 
 		<cfreturn local.q.recordCount>

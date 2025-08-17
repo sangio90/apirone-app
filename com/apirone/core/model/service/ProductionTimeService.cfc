@@ -71,6 +71,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return id;
 	}
 
+	public com.apirone.core.model.bean.Outcome function delete( required String productionTimeId ){
+		var outcome = super.bean( "Outcome" );
+
+		var obj = get( arguments.productionTimeId );
+
+		outcome.setData( { productionTimeId = arguments.productionTimeId } );
+
+		transaction {
+			try {
+				var result = getDao().delete( arguments.productionTimeId );
+				outcome.setData( { "deletedCount" = result } )
+
+				getCacheManager().remove( getCacheScope(), arguments.productionTimeId );
+			} catch ( any error ) {
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteProductionTime" );
+				outcome.setMessage( "Cannot delete productionTime [#arguments.productionTimeId#]" );
+			}
+		}
+
+		return outcome;
+	}
+
 
 	/*
     	private method

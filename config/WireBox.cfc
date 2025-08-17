@@ -123,6 +123,9 @@ component extends="coldbox.system.ioc.config.Binder" {
                 value=ExpandPath( "/config/DataMapper.xml.cfm" )
             );
 
+        map("Mementify").to( "com.apirone.core.util.Mementify" )
+            .asSingleton();
+
     }
 
 }

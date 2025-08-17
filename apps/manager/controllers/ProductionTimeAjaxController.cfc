@@ -68,4 +68,34 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function delete( event, rc, prc ){
+		var result    = super.getResult();
+		var list      = GetHTTPRequestData().content;
+		var messageId = "ProductionTime.deletedAllRecords";
+
+		var errors  = [];
+		var payload = "";
+
+		var ids = ListToArray( list );
+
+		for ( var id in ids ) {
+			var outcome = super.fire( "ProductionTime.delete", [ id ] );
+
+			if ( outcome.getStatus() == "ERROR" ) {
+				errors.add( { "message" = "Non sono riuscito a cancellare l'id #id#" } )
+			}
+		}
+
+		if ( errors.len() ) {
+			messageId = "ProductionTime.deletedNotAllRecords"
+			payload   = { "errors" = errors };
+		}
+
+		var message = super.completeMessage( messageId );
+
+		result.setData( { "message" = message, "payload" = payload } );
+
+		event.setValue( "result", result );
+	}
+
 }

@@ -249,7 +249,7 @@ AP.productionTime.list = ( function() {
         delete: function( event ) {
 
             var status = $( "#status-delete" );
-            var checks = $( "#production-time-grid" ).find( "[name=selected]:checked" );
+            var checks = $( "#production-times-grid-form" ).find( "[name=selected]:checked" );
 
             console.log( "checks", checks );
 
