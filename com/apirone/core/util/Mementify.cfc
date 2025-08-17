@@ -27,6 +27,7 @@ component {
 	 * Construct a memento representation from an entity according to it's defined this.memento properties.
 	 * You can also override those properties defined in a class by using the arguments in this method.
 	 *
+	 * @target         	 The object to convert
 	 * @includes         The properties array or list to build the memento with alongside the default includes
 	 * @excludes         The properties array or list to exclude from the memento alongside the default excludes
 	 * @mappers          A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
@@ -40,7 +41,8 @@ component {
 	 * @autoCastBooleans Auto cast boolean values if they are not numeric and isBoolean().
 	 */
 	struct function convert(
-		required Any obj,
+		required Any target,
+		string profile         = "",
 		includes               = "",
 		excludes               = "",
 		struct mappers         = {},
@@ -50,15 +52,14 @@ component {
 		boolean iso8601Format,
 		string dateMask,
 		string timeMask,
-		string profile = "",
 		boolean autoCastBooleans
 	){
-		var obj = Duplicate( arguments.obj );
+		var target = Duplicate( arguments.target );
 
 		local.includes = Duplicate( arguments.includes );
 		local.excludes = Duplicate( arguments.excludes );
 
-		var memento = arguments.obj.memento;
+		var memento = arguments.target.memento;
 
 		if ( IsSimpleValue( local.includes ) ) {
 			local.includes = ListToArray( local.includes );
@@ -171,9 +172,9 @@ component {
 				var thisAlias = item;
 			}
 
-			if ( arguments.trustedGetters || StructKeyExists( obj, "get#item#" ) ) {
+			if ( arguments.trustedGetters || StructKeyExists( target, "get#item#" ) ) {
 				try {
-					thisValue = Invoke( obj, "get#item#" );
+					thisValue = Invoke( target, "get#item#" );
 				} catch ( any e ) {
 					// Unless trusted getters is on and there is a mapper for this item rethrow the exception.
 					if ( !arguments.trustedGetters || !StructKeyExists( arguments.mappers, item ) ) {
@@ -252,7 +253,7 @@ component {
 
 						// Process the item memento
 						result[ thisAlias ][ thisIndex ] = convert(
-							obj             : thisValue[ thisIndex ],
+							target          : thisValue[ thisIndex ],
 							includes        : nestedIncludes,
 							excludes        : $buildNestedMementoList( excludes, item ),
 							mappers         : $buildNestedMementoStruct( mappers, item ),
@@ -280,7 +281,7 @@ component {
 
 				// Process the item memento
 				var thisItemMemento = convert(
-					obj             : thisValue,
+					target          : thisValue,
 					includes        : nestedIncludes,
 					excludes        : $buildNestedMementoList( excludes, item ),
 					mappers         : $buildNestedMementoStruct( mappers, item ),
@@ -330,6 +331,18 @@ component {
 	}
 
 	/**
+	 * Convert a list of object
+	 */
+	function convertList( required list, required profile = "default" ){
+		var result = [];
+
+		for ( var item in arguments.list ) {
+			result.append( convert( target = item, profile = arguments.profile ) );
+		}
+		return result;
+	}
+
+	/**
 	 * Build a new memento include/exclude list using the target list and a property root
 	 *
 	 * @list The list to use for construction
@@ -337,7 +350,7 @@ component {
 	 *
 	 * @return A string list of the new hiearchy to use
 	 */
-	function $buildNestedMementoList( required list, required root ){
+	private function $buildNestedMementoList( required list, required root ){
 		return arguments.list
 			.filter( function( target ){
 				return ListFirst( arguments.target, "." ) == root && ListLen( arguments.target, "." ) > 1;
@@ -355,7 +368,7 @@ component {
 	 *
 	 * @return A struct of the new hiearchy to use
 	 */
-	function $buildNestedMementoStruct( required struct s, required string root ){
+	private function $buildNestedMementoStruct( required struct s, required string root ){
 		return arguments.s.reduce( function( acc, key, value ){
 			if ( ListFirst( arguments.key, "." ) == root && ListLen( arguments.key, "." ) > 1 ) {
 				arguments.acc[ ListDeleteAt( arguments.key, 1, "." ) ] = arguments.value;
