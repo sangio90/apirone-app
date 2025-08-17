@@ -9,6 +9,8 @@ component {
 	this.sessionManagement = true;
 	this.sessionTimeout    = CreateTimespan( 0, 1, 0, 0 );
 	this.scriptProtect     = "url,cookie,cgi";
+	this.searchResults     = false;
+	// this.whiteSpaceManagement = "smart";
 
 	this.charset.web      = "UTF-8";
 	this.charset.resource = "UTF-8";
@@ -63,9 +65,14 @@ component {
 	this.mappings[ "/auditLogger" ] = ExpandPath( "/com/apirone/core/util/auditLogger/" );
 
 	public Boolean function onApplicationStart(){
-		startFramework();
-
 		return true;
+	}
+
+	public Void function clearContainer(){
+		if ( server.keyExists("wireBox-apirone") ) {
+			server['wireBox-apirone'].clearSingletons();
+			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# - clearContainer" );
+		}
 	}
 
 	public Boolean function OnMissingTemplate(){
@@ -79,17 +86,6 @@ component {
 	/*
         Private methods
     */
-
-	private function startFramework(){
-		new com.apirone.core.loading.Bootstrapper();
-		// var wirebox = new coldbox.system.ioc.Injector("config.WireboxServices");
-
-		cffile(
-			action = "APPEND",
-			file   = "#ExpandPath( "/debug.log" )#",
-			output = "#Now()# reload framework"
-		);
-	}
 
 	private String function getVersion(){
 		return this.version;

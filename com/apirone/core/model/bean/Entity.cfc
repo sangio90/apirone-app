@@ -1,4 +1,4 @@
-component accessors="true" {
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
     /* 
         ATTENTION:
         i dont want to extend this bean 

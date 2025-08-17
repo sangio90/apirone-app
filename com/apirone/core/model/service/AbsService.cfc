@@ -9,10 +9,9 @@ component output="false" accessors="true" {
 	// property name="logger" inject="Logger";
 	// property name="DBUtil" type="com.apirone.core.model.util.DBUtil";
 
-	public Struct function bean( required String type, Struct values = {} ){
-		var factory = new com.apirone.core.model.factory.Factory();
-
-		return factory.createInstance( argumentCollection = arguments );
+	public com.apirone.core.model.bean.AbsBean function bean( required String type, Struct values = {} ){
+		var bean = getContainer().getInstance("com.apirone.core.model.bean.#type#");
+		return bean;
 	}
 
 	public Any function getDataMapper(){

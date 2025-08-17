@@ -1,4 +1,3 @@
-
 AP.line = AP.line || {};
 
 AP.line.fields = {
@@ -37,13 +36,13 @@ AP.line.detail = ( function() {
             category: {
                 id: "",
             },
-            nameItem: {
-                id: "",
-                name: "",
-                lang: {
-                    id: "IT",
-                },
-            },
+            // TESTARE
+            texts: [
+                // Esempio:
+                // { kind: "NAME", name: "Linea italiana", lang: { id: "IT" } },
+                // { kind: "DESC", name: "Descrizione italiana", lang: { id: "IT" } },
+                // { kind: "NAME", name: "Line english", lang: { id: "EN" } }
+            ],
             thickness: {
                 id: "",
             },
@@ -51,13 +50,18 @@ AP.line.detail = ( function() {
                 id: "ACT",
             },
         },
-
         statuses: AP.page.statuses,
         categories: AP.page.categories,
         thicknesses: AP.page.thicknesses,
-
         title: "Carica linea",
     };
+
+    // Helper per estrarre la traduzione
+    function getText( texts, kind, lang ) {
+        return texts.find(
+            t => t.kind === kind && t.lang && t.lang.id === lang
+        ) || { name: "" };
+    }
 
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
@@ -66,6 +70,19 @@ AP.line.detail = ( function() {
             onCreate: undefined,
             onUpdate: undefined,
             onLoad: undefined,
+        },
+
+        // TESTARE
+        getText: getText,
+
+        // TESTARE
+        setTextName: function( kind, lang, value ) {
+            var texts = this.get( "detailForm.data.texts" );
+            var item = texts.find( t => t.kind === kind && t.lang && t.lang.id === lang );
+            if ( item ) {
+                item.name = value;
+                this.trigger( "change", { field: "detailForm.data.texts" } );
+            }
         },
 
         resetForm: function() {

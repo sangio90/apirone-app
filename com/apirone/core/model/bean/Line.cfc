@@ -1,5 +1,18 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
+	this.memento = {
+		defaultIncludes = [],
+		defaultExcludes = [],
+		neverInclude    = [],
+		defaults        = {},
+		mappers         = {},
+		profiles        = {
+			list   = { defaultIncludes = [ "id", "shortId", "name", "nameItem", "descriptionItem", "thickness.id", "status", "nameItem", "createdAt", "code" ] },
+		},
+		// Auto cast boolean strings to Java boolean
+		autoCastBooleans = true
+	}
+
 	property name="code" type="String";
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="thickness" type="com.apirone.core.model.bean.Thickness";

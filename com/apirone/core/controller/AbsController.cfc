@@ -72,12 +72,6 @@
 		return bean;
 	}
 
-	public Any function service( required String service ){
-		var bean = getContainer().getInstance( "#arguments.service#Service" );
-
-		return bean;
-	}
-
 	public Any function setMessage(
 		message = "",
 		type    = "success",
@@ -206,10 +200,6 @@
 		return params;
 	}
 
-	public Any function bean( required String type ){
-		return CreateObject( "com.apirone.core.model.bean.#arguments.type#" ).init();
-	}
-
 	public Any function getCategoriesAsJSON(){
 		var data = [];
 
@@ -222,10 +212,6 @@
 		}
 
 		return data;
-	}
-
-	public Struct function getCacheManager(){
-		return getContainer().getInstance( "CacheManager" );
 	}
 
 	// only message
@@ -282,6 +268,28 @@
 	public Struct function getAccessManager(){
 		return getContainer().getInstance( "AccessManager" );
 	}
+
+	public Struct function getCacheManager(){
+		return getContainer().getInstance( "CacheManager" );
+	}	
+
+	public Any function service( required String service ){
+		var bean = getContainer().getInstance( "#arguments.service#Service" );
+		return bean;
+	}	
+
+	/*
+	public Any function bean( required String type ){
+		//return CreateObject( "com.apirone.core.model.bean.#arguments.type#" ).init();
+	}
+	*/
+
+	public Any function bean( required String type, Struct values = {} ){
+		var bean = getContainer().getInstance("com.apirone.core.model.bean.#type#");
+		return bean;
+	}
+
+
 
 
 	/*

@@ -6,11 +6,64 @@ component extends="com.apirone.core.controller.AbsController" {
 		var dm     = getDataMapper();
 
 		var params = super.paramsFromUrl();
+		var params["limit"] = 50;
 
 		var rows = super.fire( "line.search", params );
 
+		dump( rows.getCount() );
+
+		var start = GetTickCount();
+
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Line", true );
+			var obj = row.getMemento( profile = "list" )
+			data.append( obj );
+		}		
+
+		var end = GetTickCount();
+		dump( "mementifier: " & (end - start) & "ms" );
+		abort;		
+
+		abort;
+
+		var profiles = {
+			list   = { defaultIncludes = "id,code,name,status" },
+			detail = {
+				defaultIncludes = "id,code,name,description,status,categories,thickness"
+			},
+			trans = { defaultIncludes = "id,code,status,texts" }
+		};
+
+		// dump( rows.getData()[ 1 ].getMemento() )
+
+		var obj = mementoSvc.process(
+			collection = {},
+			target     = rows.getData()[ 1 ].getMemento(),
+			includes   = "id,name,email"
+		);
+
+		dump( SerializeJSON( obj ) );
+		abort;
+
+		var data = [];
+		for ( var row in rows.getData() ) {
+			dump( mementoSvc.toMemento( row ) );
+			abort;
+
+			data.append( item );
+		}
+
+
+
+		dump( mementoSvc );
+
+		// dump(mementoSvc);
+		abort;
+
+		for ( var row in rows.getData() ) {
+			// var obj = dm.convert( row, "Line", true );
+
+			var obj = mementoSvc.toMemento( target = row, profiles = "detail" );
+
 			data.add( obj );
 		}
 
@@ -165,13 +218,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId  = "";
 		var categories = [];
 
-		var result    = super.getResult();
-		var line      = super.bean( "Line" );
-		var status    = super.bean( "Status" );
-		var thickness = super.bean( "Thickness" );
-		var category  = super.bean( "ProductCategory" );
-		var text      = super.bean( "Text" );
-		var lang      = super.bean( "Lang" );
+		var result          = super.getResult();
+		var line            = super.bean( "Line" );
+		var status          = super.bean( "Status" );
+		var thickness       = super.bean( "Thickness" );
+		var category        = super.bean( "ProductCategory" );
+		var nameItem        = super.bean( "Text" );
+		var descriptionItem = super.bean( "Text" );
+		var lang            = super.bean( "Lang" );
 
 		for ( var thisCategory in json.selectedCategories ) {
 			var category = super.bean( "ProductCategory" );
@@ -188,12 +242,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		line.setCategories( categories );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
 
-		text.setLang( lang.setId( json.nameItem.lang.id ) );
+		dump( json );
+		abort;
 
-		text.setId( json.nameItem.id );
-		text.setName( json.nameItem.name );
+		nameItem.setLang( lang.setId( json.nameItem.lang.id ) );
+		nameItem.setId( json.nameItem.id );
+		nameItem.setName( json.nameItem.name );
 
-		line.setTexts( [ text ] );
+		descriptionItem.setLang( lang.setId( json.descriptionItem?.lang?.id ?: "IT" ) );
+		descriptionItem.setId( json?.descriptionItem?.id );
+		descriptionItem.setName( json?.descriptionItem?.name );
+
+		line.setTexts( [ nameItem, descriptionItem ] );
 
 		if ( !Len( json.id ) ) {
 			messageId = "line.created";

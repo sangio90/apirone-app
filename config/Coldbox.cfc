@@ -52,6 +52,13 @@ component{
 			jsonPayloadToRC          : true
 		};
 
+		/*
+		wirebox = {
+			binder = "config.WireBox",
+			singletonReload = ( Right( cgi.SERVER_NAME, 5 ) IS "local" ) OR url.keyExists("reinit") ? true : false,
+		};
+		*/
+
 		/**
 		 * --------------------------------------------------------------------------
 		 * Custom Settings
@@ -153,80 +160,6 @@ component{
 		};
 
 		moduleSettings = {
-			cbswagger = {
-				// The route prefix to search.  Routes beginning with this prefix will be determined to be api routes
-				"routes" : [ "api" ],
-				// The default output format: json or yml
-				// Routes to exclude by prefix.  Routes beginning with this prefix will be excluded
-				"excludeRoutesPrefix" : [ "cbSwagger", "relax" ],
-				// Any routes to exclude - may use exact matches or globbing patterns e.g `[ "api/v1/mysecret" ]` or `[ "**/secret", "**/undocumented" ]` (no initial `/`, trailing `/` optional for routes)
-				"excludeRoutes"	: [],
-				// Routes to exclude based on event
-				"excludeEvents" : [],
-				"defaultFormat" : "json",
-				// A convention route, relative to your app root, where request/response samples are stored ( e.g. resources/apidocs/responses/[module].[handler].[action].[HTTP Status Code].json )
-				"samplesPath" : "resources/apidocs",
-				// Information about your API
-				"info"		:{
-					// A title for your API
-					"title": "Rest API for apirone" ,
-					// A description of your API
-					"contact":{
-						"name": "Apir IT dep.",
-						"email": "info@apirone.it"
-					},
-					//The version of your API
-					"version":"1.0.0",
-				},
-			
-				// Tags
-				"tags" : [],
-			
-				// https://swagger.io/specification/#serverObject
-				"servers" : [
-					{
-						"url" 			: "https://www.apirone.it/api",
-						"description" 	: "Production server"
-					},
-					{
-						"url" 			: "https://test.apirone.it/api",
-						"description" 	: "Test server"
-					}
-				],
-			
-				// An element to hold various schemas for the specification.
-				// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#componentsObject
-				"components" : {
-			
-					// Define your security schemes here
-					// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#securitySchemeObject
-					"securitySchemes" : {
-						"UserSecurity" : {
-							// REQUIRED. The type of the security scheme. Valid values are "apiKey", "http", "oauth2", "openIdConnect".
-							"type" 			: "http",
-							// A short description for security scheme. CommonMark syntax MAY be used for rich text representation.
-							"description" 	: "HTTP Basic auth",
-							// REQUIRED. The name of the HTTP Authorization scheme to be used in the Authorization header as defined in RFC7235.
-							"scheme" 		: "basic"
-						},
-						"APIKey" : {
-							"type" 			: "apiKey",
-							"description" 	: "An API key for security",
-							"name" 			: "x-api-key",
-							"in" 			: "header"
-						}
-					}
-				},
-			
-				// A default declaration of Security Requirement Objects to be used across the API.
-				// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#securityRequirementObject
-				// Only one of these requirements needs to be satisfied to authorize a request.
-				// Individual operations may set their own requirements with `@security`
-				"security" : [
-					{ "APIKey" : [] },
-					{ "UserSecurity" : [] }
-				]
-			}	
 		}
 	
 	}

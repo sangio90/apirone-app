@@ -9,12 +9,13 @@ component extends="coldbox.system.ioc.config.Binder" {
                 enabled = true,
                 scope   = "server",
                 key     = settings.get("app.wirebox.key")
-            },
+            }
         };
+
+        mapDirectory(packagePath="com.apirone.core.model.bean");
 
         mapDirectory(packagePath="com.apirone.core.model.dao")
             .asSingleton();
-
 
         mapDirectory(packagePath="com.apirone.core.model.service")
             .asSingleton();  

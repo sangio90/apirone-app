@@ -1,14 +1,11 @@
 component output="false" accessors="true" {
 
-	public Any function createInstance( required String type, Struct values={} ){
+	public Any function createInstance( required String type, Struct values = {} ){
+		var obj = CreateObject( "component", "com.apirone.core.model.bean.#arguments.type#" ).init();
 
-        var obj = CreateObject( "component", "com.apirone.core.model.bean.#arguments.type#" ).init();
-
-        if ( !StructIsEmpty( arguments.values ) ){
-
-            obj.setMemento( arguments.values );
-        
-        }
+		if ( !StructIsEmpty( arguments.values ) ) {
+			obj.setRawMemento( arguments.values );
+		}
 
 		return obj;
 	}

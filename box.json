@@ -1,49 +1,49 @@
 {
-    "name": "ApirOne for Apir Srl",
-    "slug": "apirone",
-    "author": "",
-    "contributors": [],
-    "dependencies": {
-        "porto-admin-template": "http+cached://www.coridalia.cc/repository/porto-admin-template/porto-admin-template-light-4.1.0.zip",
-        "kendoui": "http+cached://www.coridalia.cc/repository/kendoui/kendoui-2024.2.514.zip",
-        "dataMapper": "http+cached://www.coridalia.cc/repository/dataMapper/dataMapper-1.7.zip",
-        "accessManager": "http+cached://www.coridalia.cc/repository/accessManager/accessManager-1.0.0.zip",
-        "coldbox": "7.4.2+24",
-        "cbvalidation": "4.4.0"
+    "name":"ApirOne for Apir Srl",
+    "slug":"apirone",
+    "author":"",
+    "contributors":[],
+    "dependencies":{
+        "porto-admin-template":"http+cached://www.coridalia.cc/repository/porto-admin-template/porto-admin-template-light-4.1.0.zip",
+        "kendoui":"http+cached://www.coridalia.cc/repository/kendoui/kendoui-2024.2.514.zip",
+        "dataMapper":"http+cached://www.coridalia.cc/repository/dataMapper/dataMapper-1.7.zip",
+        "accessManager":"http+cached://www.coridalia.cc/repository/accessManager/accessManager-1.0.0.zip",
+        "coldbox":"7.4.2+24",
+        "cbvalidation":"4.4.0",
     },
-    "devDependencies": {
-        "testbox": "5.1.0+2",
-        "commandbox-cfformat": "*",
-        "cbMockData": "^4.1.0+3"
+    "devDependencies":{
+        "testbox":"5.1.0+2",
+        "commandbox-cfformat":"*",
+        "cbMockData":"^4.1.0+3"
     },
-    "ignore": [
+    "ignore":[
         "**/.*",
         "/test/",
         "/tests/"
     ],
-    "installPaths": {
-        "porto-admin-template": "modules/assets/template-admin/",
-        "kendoui": "modules/assets/kendoui/",
-        "dataMapper": "modules/external/dataMapper/",
-        "accessManager": "modules/external/accessManager/",
-        "coldbox": "modules/coldbox/",
-        "cbvalidation": "modules/cbvalidation/",
-        "testbox": "modules/testbox/",
-        "cbMockData": "modules/cbMockData/"
+    "installPaths":{
+        "porto-admin-template":"modules/assets/template-admin/",
+        "kendoui":"modules/assets/kendoui/",
+        "dataMapper":"modules/external/dataMapper/",
+        "accessManager":"modules/external/accessManager/",
+        "coldbox":"modules/coldbox/",
+        "cbvalidation":"modules/cbvalidation/",
+        "testbox":"modules/testbox/",
+        "cbMockData":"modules/cbMockData/",
     },
-    "location": "ForgeboxStorage",
-    "private": false,
-    "scripts": {
-        "setup:devel": "task run taskFile=tasks/Build.cfc target=setup :env=devel",
-        "setup:prod": "task run taskFile=tasks/Build.cfc target=setup :env=prod",
-        "setup:test": "task run taskFile=tasks/Build.cfc target=setup :env=test",
-        "format": "cfformat run /apps/**/controllers/**,/com/** --overwrite",
-        "format:watch": "cfformat watch /apps/**/controllers/**,/com/apirone/**",
-        "format:check": "cfformat check /apps/**/controllers/**,/com/apirone/**",
-        "createZip": "task run taskFile=tasks/Build.cfc target=createZip",
-        "createEnv:devel": "task run taskFile=tasks/Build.cfc target=createEnv :env=devel"
+    "location":"ForgeboxStorage",
+    "private":false,
+    "scripts":{
+        "setup:devel":"task run taskFile=tasks/Build.cfc target=setup :env=devel",
+        "setup:prod":"task run taskFile=tasks/Build.cfc target=setup :env=prod",
+        "setup:test":"task run taskFile=tasks/Build.cfc target=setup :env=test",
+        "format":"cfformat run /apps/**/controllers/**,/com/** --overwrite",
+        "format:watch":"cfformat watch /apps/**/controllers/**,/com/apirone/**",
+        "format:check":"cfformat check /apps/**/controllers/**,/com/apirone/**",
+        "createZip":"task run taskFile=tasks/Build.cfc target=createZip",
+        "createEnv:devel":"task run taskFile=tasks/Build.cfc target=createEnv :env=devel"
     },
-    "testbox": {},
-    "type": "modules",
-    "version": "109"
+    "testbox":{},
+    "type":"modules",
+    "version":"109"
 }

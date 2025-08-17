@@ -70,24 +70,12 @@ component accessors="true" {
 
 
 	private String function createCacheKey( required String scope, required Any key ){
-
-        if ( !scopeExists( arguments.scope ) ) {
-            throw( message = "The scope [#arguments.scope#] not exists. Add it to configuration. Key: #SerializeJSON( arguments.key )#", type = "CacheManager.Errors.ScopeNotExists" );
-        }
-
-		/*
-		var thisKey = "";
-
-		if ( IsNull( arguments.key ) ) {
-			thisKey = "nullvalue";
-		} else {
-			if ( IsSimpleValue( arguments.key ) ) {
-				thisKey = arguments.key
-			} else {
-				thisKey = arguments.key.toString()
-			}
+		if ( !scopeExists( arguments.scope ) ) {
+			Throw(
+				message = "The scope [#arguments.scope#] not exists. Add it to configuration. Key: #SerializeJSON( arguments.key )#",
+				type    = "CacheManager.Errors.ScopeNotExists"
+			);
 		}
-		*/
 
 		var thisKey = IsSimpleValue( arguments.key ) ? arguments.key : arguments.key.toString();
 

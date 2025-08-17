@@ -48,6 +48,8 @@ component extends="com.apirone.core.util.helper.AbsHelper" {
 			return "e702bf0b-d047-4ed7-bd64-5975efab123a"; // utente di servizio
 		}
 
+		//return "e702bf0b-d047-4ed7-bd64-5975efab123a";
+
 		Throw( message = "Account not authenticated and anonymous not allowed" );
 	}
 

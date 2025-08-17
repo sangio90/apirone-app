@@ -17,11 +17,11 @@
 
         }
 
-        if( url.KeyExists("fwreinit") AND fwreinit == 1 ) {
-
+        if( url.KeyExists("fwreinit") AND fwreinit == 1 OR !application.keyExists("cbBootstrap") ) {
             super.loadColdbox()
-
         }
+
+        application.cbBootstrap.onRequestStart( arguments.targetPage );
 
         return true;
 

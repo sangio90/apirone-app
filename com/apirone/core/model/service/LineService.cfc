@@ -9,6 +9,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="textService" inject="TextService";
+	//property name="wirebox" inject="Wirebox";
+	//property name="mementifier" inject="ResultsMapper@mementifier";
 
 	property name="cacheScope" type="String" default="Line.bean";
 
@@ -320,18 +322,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.lineId );
 
 		if ( record.recordCount ) {
+
 			var bean = super.bean( "Line" );
+
+			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 
 			bean.setTexts( getTextService().list( lineId = record.line_id ) );
 
-			// after setTexts()
 			bean.setName( bean.getName() );
 
 			bean.setId( record.line_id );
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
 
-			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setCategories( super.getCategoriesBeanByIds( record.categories ) );
 

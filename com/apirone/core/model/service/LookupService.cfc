@@ -51,15 +51,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.AbsBean function get( required String entity, required String value ){
-		var result = NullValue();
 
+		var result = NullValue();
 		var thisValue = arguments.value;
 
-		list( arguments.entity ).each( function( item ){
+		var rows = list( arguments.entity )
+
+		for( var item in rows ) {
+
 			if ( item.getId() == thisValue ) {
-				result = item;
+				result = item
 			}
-		} );
+		}
 
 		if ( IsNull( result ) ) {
 			getLogger().debug( "LookupService.get: value [#thisValue#] for entity [#entity#] not found. Adding it to config?" );
@@ -75,8 +78,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var list   = getData()[ arguments.entity ];
 		var config = variables.config[ arguments.entity ];
 
+		var wirebox = server["wirebox-apirone"];
+
 		list.each( function( item ){
-			result.add( factory.createInstance( config.bean, item ) )
+
+			var instance = Duplicate( wirebox.getInstance( config.bean ) );
+
+			instance.setRawMemento( item )
+			result.add( instance );
 		} );
 
 		return result;

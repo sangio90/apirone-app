@@ -4,17 +4,15 @@ component extends="com.apirone.core.root.Application" {
 	this.pdf.fontDirectory = "/assets/main/fonts";
 	this.customtagPaths = [ "/apps/utils/ctags/" ];
 
+	this.bufferOutput = false;
+	this.compression = true;
+
 	public Boolean function onApplicationStart() {
 
-		//cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:onApplicationStart" );
-
 		super.onApplicationStart();
-		//abort;
 
-		if ( !StructKeyExists( application, "cbBootstrap" ) OR StructKeyExists( url, "reinit" )) {
-
+		if ( !StructKeyExists( application, "cbBootstrap" ) ) {
 			loadColdbox()
-
 		}
 
 		return true;
@@ -45,10 +43,10 @@ component extends="com.apirone.core.root.Application" {
 
 		if ( super.isDev() OR url.keyExists("reinit") ) {
 
-			onApplicationStart();
-			
-			application.counter++;
+			super.clearContainer()
 
+			onApplicationStart();
+			application.counter++;
 		}
 		
 		application.cbBootstrap.onRequestStart( arguments.targetPage );
@@ -66,8 +64,6 @@ component extends="com.apirone.core.root.Application" {
 
 	public Void function loadColdbox(){
 		
-		//cffile( action="append" file="#ExpandPath('/debug.log')#" output="#now()# - Root:loadColdbox" );
-
 		var COLDBOX_APP_ROOT_PATH = GetDirectoryFromPath( GetCurrentTemplatePath() );
 		var COLDBOX_APP_MAPPING   = "";
 		var COLDBOX_CONFIG_FILE   = "config.Coldbox";

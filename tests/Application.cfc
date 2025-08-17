@@ -1,6 +1,5 @@
-component extends="com.apirone.core.root.Application" {
+component extends=".Application" {
 
-  	this.name = "tests";
   	this.sessionmanagement = "true";
     this.nullSupport = "true";
 
@@ -9,11 +8,19 @@ component extends="com.apirone.core.root.Application" {
     this.cache.object = "DefaultCache";
 
   	this.mappings[ "/testbox" ] = ExpandPath( "/modules/testbox/" );
+  	this.mappings[ "/mementifier" ] = ExpandPath( "/modules/mementifier/" );
 
-    this.customTagPaths = ["/external/ctags/MagickTag"];
+  	public boolean function onRequestStart( targetPage ){
 
-  	public boolean function onRequestStart(){
+		if( !application.keyExists("cbBootstrap") OR url.keyExists("reinit")) {
+			super.loadColdbox()
+		}
+
+		//super.onRequestStart( targetPage )
+
      	return true;
   	}
 
 }
+
+
