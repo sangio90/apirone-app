@@ -58,7 +58,7 @@ component accessors="true" {
 		return arguments.result;
 	}
 
-	public Any function setMemento( required Any data, metaData = GetMetadata( this ) ){
+	public Any function setRawMemento( required Any data, metaData = GetMetadata( this ) ){
 		var i       = 0;
 		var method  = "";
 		var obj     = "";
@@ -82,7 +82,7 @@ component accessors="true" {
 						for ( i = 1; i <= ArrayLen( arguments.data[ method ] ); i++ ) {
 							obj = CreateObject( "component", class ).init();
 
-							obj.setMemento( arguments.data[ method ][ i ] );
+							obj.setRawMemento( arguments.data[ method ][ i ] );
 
 							myArr.add( obj );
 						}
@@ -97,7 +97,7 @@ component accessors="true" {
 					if ( !ListContainsNoCase( "Struct,Array", class ) ) {
 						obj = CreateObject( "component", class ).init();
 
-						obj.setMemento( arguments.data[ method ] );
+						obj.setRawMemento( arguments.data[ method ] );
 
 						Evaluate( "set#method#( obj )" );
 					} else {
@@ -110,13 +110,14 @@ component accessors="true" {
 		}
 	}
 
-	public Struct function getMemento( Struct metadata = GetMetadata( this ) ){
+
+	public Struct function getRawMemento( Struct metadata = GetMetadata( this ) ){
 		var memento = {};
 		var i       = 1;
 		var c       = 1;
 
 		if ( StructKeyExists( arguments.metadata, "extends" ) ) {
-			memento = getMemento( arguments.metadata.extends );
+			memento = getRawMemento( arguments.metadata.extends );
 		}
 
 		if ( StructKeyExists( arguments.metadata, "properties" ) ) {
@@ -130,11 +131,11 @@ component accessors="true" {
 								if (
 									StructKeyExists(
 										variables[ arguments.metadata.properties[ i ].name ][ c ],
-										"getMemento"
+										"getRawMemento"
 									)
 								) {
 									memento[ arguments.metadata.properties[ i ].name ].add(
-										variables[ arguments.metadata.properties[ i ].name ][ c ].getMemento()
+										variables[ arguments.metadata.properties[ i ].name ][ c ].getRawMemento()
 									);
 								}
 							}
@@ -146,12 +147,12 @@ component accessors="true" {
 							if (
 								StructKeyExists(
 									variables[ arguments.metadata.properties[ i ].name ],
-									"getMemento"
+									"getRawMemento"
 								)
 							) {
 								memento[ arguments.metadata.properties[ i ].name ] = variables[
 									arguments.metadata.properties[ i ].name
-								].getMemento();
+								].getRawMemento();
 							} else {
 								memento[ arguments.metadata.properties[ i ].name ] = variables[
 									arguments.metadata.properties[ i ].name
