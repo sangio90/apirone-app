@@ -28,14 +28,7 @@ AP.productionTime.detail = ( function() {
     var defaultDetailForm = {
         data: {
             id: "",
-            code: "",
             name: "",
-            category: {
-                id: ""
-            },
-            thickness: {
-                id: ""
-            },
             status: {
                 id: "ACT"
             }
@@ -61,11 +54,6 @@ AP.productionTime.detail = ( function() {
         resetForm: function() {
 
             var detailForm = fields.detailForm;
-
-            console.log( "resetForm", detailForm );
-
-            // var validator = detailForm.validate();
-            // validator.resetForm();
 
             detailForm.find( ".status" ).html( "" );
 
