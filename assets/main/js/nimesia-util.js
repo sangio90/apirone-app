@@ -91,14 +91,13 @@ NM.util.checkAll = function( button ) {
 
     var checks = thisForm.find( "input[name=selected]:checkbox" );
 
-    var value = true;
+    console.log( "button.checked", button.checked );
+    console.log( "checks", checks );
 
-    if ( button.checked ) {
-        value = button.checked ? true : false;
-    }
+    var value = button?.checked ? true : false;
 
     checks.each( function() {
-        this.checked = value;
+        $( this ).prop( "checked", value );
     } );
 
 };
