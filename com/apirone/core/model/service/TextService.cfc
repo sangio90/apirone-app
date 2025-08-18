@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="langService" inject="LangService";
 	property name="statusService" inject="StatusService";
 	property name="lookupService" inject="LookupService";
-	//property name="textKindService" inject="TextKindService";
+	// property name="textKindService" inject="TextKindService";
 
 	property name="cacheScope" type="String" default="Text.bean";
 
@@ -67,51 +67,61 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public Array function bulkCreate( required com.apirone.core.model.bean.Text[] texts ){
-		/*
-			all translations of a same entity
-		*/
+	public array function bulkCreate( required com.apirone.core.model.bean.Text[] texts ){
+		// all translations of a same entity
 
 		var langs = getLangService().list( statusId = "ACT" );
+		var kinds = [];
+		var ids   = [];
 
-		var ids      = [];
-		var langDone = [];
-
-		// one at least
-		var entity = arguments.texts[ 1 ].getEntity();
-
-		for ( var thisText in arguments.texts ) {
-			var newId = getDao().insert( thisText );
-			langDone.add( thisText.getLang().getId() );
-
-			ids.add( newId );
+		// Raccogli tutti i kind presenti nei texts
+		for ( var t in arguments.texts ) {
+			kinds.append( t.getKind().getId() );
 		}
 
-		for ( var thisLang in langs ) {
-			if ( !ArrayFind( langDone, thisLang.getId() ) ) {
-				var text   = super.bean( "Text" );
-				var lang   = super.bean( "Lang" );
-				var status = super.bean( "Status" );
+		kinds = ListToArray( ListRemoveDuplicates( ArrayToList( kinds ) ) );
 
-				text.setName( "** To translate" );
+		// Raccogli l'entità (assumo che sia uguale per tutti)
+		var entity = arguments.texts[ 1 ].getEntity();
 
-				lang.setId( thisLang.getId() );
-				status.setId( "TOT" );
+		// Inserisci i texts già presenti
+		var done = [];
+		for ( var thisText in arguments.texts ) {
+			var newId = getDao().insert( thisText );
+			done.append( thisText.getKind().getId() & "|" & thisText.getLang().getId() );
+			ids.append( newId );
+		}
 
-				text.setStatus( status );
-				text.setLang( lang );
-				text.setEntity( entity );
+		// Per ogni kind e lingua, se manca, crea placeholder
+		for ( var kindId in kinds ) {
+			for ( var langBean in langs ) {
+				var key = kindId & "|" & langBean.getId();
+				if ( !ArrayFind( done, key ) ) {
+					var text   = super.bean( "Text" );
+					var lang   = super.bean( "Lang" );
+					var status = super.bean( "Status" );
+					var kind   = super.bean( "TextKind" );
 
-				var newId = getDao().insert( text );
+					text.setName( "** To translate" );
+					lang.setId( langBean.getId() );
+					status.setId( "TOT" );
+					kind.setId( kindId );
 
-				ids.add( newId );
+					text.setStatus( status );
+					text.setLang( lang );
+					text.setEntity( entity );
+					text.setKind( kind );
+
+					var newId = getDao().insert( text );
+					ids.append( newId );
+				}
 			}
 		}
 
 		return ids;
 	}
 
-	public String function update( required com.apirone.core.model.bean.Text text ){
+	public Numeric function update( required com.apirone.core.model.bean.Text text ){
 		var id = getDao().update( arguments.text );
 
 		getCacheManager().remove( getCacheScope(), id );

@@ -36,15 +36,19 @@ AP.line.detail = ( function() {
             category: {
                 id: "",
             },
-            // TESTARE
-            texts: [
-                // Esempio:
-                // { kind: "NAME", name: "Linea italiana", lang: { id: "IT" } },
-                // { kind: "DESC", name: "Descrizione italiana", lang: { id: "IT" } },
-                // { kind: "NAME", name: "Line english", lang: { id: "EN" } }
-            ],
-            thickness: {
+            nameItem: {
                 id: "",
+                name: "",
+                lang: {
+                    id: "IT"
+                }
+            },
+            descriptionItem: {
+                id: "",
+                name: "",
+                lang: {
+                    id: "IT"
+                }
             },
             status: {
                 id: "ACT",

@@ -1,9 +1,11 @@
-component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-    public Lang function init(){
+	this.memento = {
+		defaultIncludes = [ "id", "name", "kind", "lang", "status" ]
+	}
 
-        return this;
-        
-    }
+	public Lang function init(){
+		return this;
+	}
 
 }

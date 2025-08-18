@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [],
+		defaultIncludes = [ "id", "shortId", "name" ],
 		defaultExcludes = [],
 		neverInclude    = [],
 		defaults        = {},
@@ -13,10 +13,9 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 					"shortId",
 					"name",
 					"nameItem",
-					"descriptionItem",
-					"thickness.id",
 					"status",
 					"nameItem",
+					"descriptionItem",
 					"createdAt",
 					"code",
 					"categories"

@@ -1,8 +1,8 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	property name="texts" type="com.apirone.core.model.bean.Text[]" ; 
+	property name="texts" type="com.apirone.core.model.bean.Text[]";
 
-	public Struct function getTextItem( langId, kindId = "NAME" ){
+	public Struct function getTextItem( langId = "IT", kindId = "NAME" ){
 		if ( IsNull( arguments.langId ) ) {
 			var langId = getCurrentLang().getId();
 		} else {

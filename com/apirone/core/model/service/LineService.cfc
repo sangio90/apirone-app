@@ -68,9 +68,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * @auditPayload { "id": "@return@" }
 	 */
 	public String function create( required com.apirone.core.model.bean.Line line ){
-		var newId = getDao().insert( arguments.line );
-
 		transaction {
+			var newId = getDao().insert( arguments.line );
+
 			for ( var text in arguments.line.getTexts() ) {
 				var entity = super.bean( "Entity" );
 
@@ -82,8 +82,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getTextService().bulkCreate( arguments.line.getTexts() );
 		}
-
-		// super.logAction( type = "LINE.CREATED", message = "Line [#newId#] created" )
 
 		return newId;
 	}

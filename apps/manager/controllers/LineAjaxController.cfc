@@ -173,6 +173,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var nameItem        = super.bean( "Text" );
 		var descriptionItem = super.bean( "Text" );
 		var lang            = super.bean( "Lang" );
+		var nameKind        = super.bean( "TextKind" );
+		var descriptionKind = super.bean( "TextKind" );
 
 		for ( var thisCategory in json.selectedCategories ) {
 			var category = super.bean( "ProductCategory" );
@@ -192,10 +194,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		nameItem.setLang( lang.setId( json.nameItem.lang.id ) );
 		nameItem.setId( json.nameItem.id );
 		nameItem.setName( json.nameItem.name );
+		nameItem.setKind( nameKind.setId( "NAME" ) );
 
-		descriptionItem.setLang( lang.setId( json.descriptionItem?.lang?.id ?: "IT" ) );
+		descriptionItem.setLang( lang.setId( json.descriptionItem.lang.id ) );
 		descriptionItem.setId( json?.descriptionItem?.id );
 		descriptionItem.setName( json?.descriptionItem?.name );
+		descriptionItem.setKind( descriptionKind.setId( "DESC" ) );
 
 		line.setTexts( [ nameItem, descriptionItem ] );
 
@@ -213,7 +217,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
-
 
 	function delete( event, rc, prc ){
 		var result    = super.getResult();
