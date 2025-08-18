@@ -12,7 +12,7 @@ component {
 			iso8601Format     = settings?.iso8601Format ?: false,
 			dateMask          = settings?.dateMask ?: "yyyy-MM-dd",
 			timeMask          = settings?.timeMask ?: "HH:mm:ss",
-			nullDefaultValue  = settings?.nullDefaultValue ?: "",
+			nullDefaultValue  = settings?.nullDefaultValue ?: null,
 			trustedGetters    = settings?.trustedGetters ?: false,
 			convertToTimezone = settings?.convertToTimezone ?: "",
 			autoCastBooleans  = settings?.autoCastBooleans ?: true
@@ -27,13 +27,13 @@ component {
 	 * Construct a memento representation from an entity according to it's defined this.memento properties.
 	 * You can also override those properties defined in a class by using the arguments in this method.
 	 *
-	 * @target         	 The object to convert
+	 * @target         	 The target object to convert
 	 * @includes         The properties array or list to build the memento with alongside the default includes
 	 * @excludes         The properties array or list to exclude from the memento alongside the default excludes
 	 * @mappers          A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
 	 * @defaults         A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
-	 * @ignoreDefaults   If set to true, default includes and excludes will be ignored and only the incoming `includes` and `excludes` list will be used.
-	 * @trustedGetters   If set to true, getters will not be checked for in the `this` scope before trying to invoke them.
+	 * @ignoreDefaults   If set to true, default includes and excludes will be ignored and only the incoming 'includes' and 'excludes' list will be used.
+	 * @trustedGetters   If set to true, getters will not be checked for in the 'this' scope before trying to invoke them.
 	 * @iso8601Format    If set to true, will use the ISO 8601 standard for formatting dates
 	 * @dateMask         The date mask to use when formatting datetimes. Only used if iso8601Format is false.
 	 * @timeMask         The time mask to use when formatting datetimes. Only used if iso8601Format is false.
@@ -42,17 +42,17 @@ component {
 	 */
 	struct function convert(
 		required Any target,
-		string profile         = "",
+		String profile         = "",
 		includes               = "",
 		excludes               = "",
-		struct mappers         = {},
-		struct defaults        = {},
-		boolean ignoreDefaults = false,
-		boolean trustedGetters,
-		boolean iso8601Format,
-		string dateMask,
-		string timeMask,
-		boolean autoCastBooleans
+		Struct mappers         = {},
+		Struct defaults        = {},
+		Boolean ignoreDefaults = false,
+		Boolean trustedGetters,
+		Boolean iso8601Format,
+		String dateMask,
+		String timeMask,
+		Boolean autoCastBooleans
 	){
 		var target = Duplicate( arguments.target );
 
@@ -119,8 +119,8 @@ component {
 
 		// Incorporate Defaults if not ignored
 		if ( !arguments.ignoreDefaults ) {
-			includes.append( thisMemento.defaultIncludes, true );
-			excludes.append(
+			local.includes.append( thisMemento.defaultIncludes, true );
+			local.excludes.append(
 				thisMemento.defaultExcludes.filter( function( item ){
 					// Filter out if incoming includes was specified
 					return !includes.findNoCase( arguments.item );
@@ -128,6 +128,7 @@ component {
 				true
 			);
 		}
+
 
 		// Incorporate Memento Mappers, and Defaults
 		thisMemento.mappers.append( arguments.mappers, true );
@@ -146,6 +147,7 @@ component {
 			&& targetItem != "";
 		} );
 
+		// Remove duplicates
 		local.includes = ListToArray( ArrayToList( local.includes ).ListRemoveDuplicates() );
 		local.excludes = ListToArray( ArrayToList( local.excludes ).ListRemoveDuplicates() );
 
