@@ -24,11 +24,20 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Descrizione</label>
+                            <label class="col-sm-2 col-form-label text-end">Nome</label>
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4 uppercase" name="name"
                                     maxlength="125"
                                     data-bind="value: detailForm.data.nameItem.name">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Descrizione</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control col-sm-4 uppercase" name="description"
+                                    maxlength="125"
+                                    data-bind="value: detailForm.data.descriptionItem.name">
                             </div>
                         </div>
 

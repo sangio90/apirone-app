@@ -35,6 +35,13 @@ AP.model.list = ( function() {
                     id: "IT",
                 },
             },
+            descriptionItem: {
+                id: "",
+                name: "",
+                lang: {
+                    id: "IT",
+                },
+            },
             status: {
                 id: "ACT",
             },
