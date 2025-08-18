@@ -333,7 +333,7 @@ component {
 	/**
 	 * Convert a list of object
 	 */
-	function convertList( required list, required profile = "default" ){
+	public function convertList( required list, required profile = "default" ){
 		var result = [];
 
 		for ( var item in arguments.list ) {

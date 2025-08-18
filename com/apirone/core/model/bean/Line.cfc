@@ -7,10 +7,22 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 		defaults        = {},
 		mappers         = {},
 		profiles        = {
-			list   = { defaultIncludes = [ "id", "shortId", "name", "nameItem", "descriptionItem", "thickness.id", "status", "nameItem", "createdAt", "code" ] },
-		},
-		// Auto cast boolean strings to Java boolean
-		autoCastBooleans = true
+			list = {
+				defaultIncludes = [
+					"id",
+					"shortId",
+					"name",
+					"nameItem",
+					"descriptionItem",
+					"thickness.id",
+					"status",
+					"nameItem",
+					"createdAt",
+					"code",
+					"categories"
+				]
+			}
+		}
 	}
 
 	property name="code" type="String";

@@ -3,68 +3,15 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var dm     = getDataMapper();
+		var mm     = super.getMementify();
 
 		var params = super.paramsFromUrl();
-		var params["limit"] = 50;
 
 		var rows = super.fire( "line.search", params );
 
-		dump( rows.getCount() );
-
-		var start = GetTickCount();
-
 		for ( var row in rows.getData() ) {
-			var obj = row.getMemento( profile = "list" )
+			var obj = mm.convert( row, "list" );
 			data.append( obj );
-		}		
-
-		var end = GetTickCount();
-		dump( "mementifier: " & (end - start) & "ms" );
-		abort;		
-
-		abort;
-
-		var profiles = {
-			list   = { defaultIncludes = "id,code,name,status" },
-			detail = {
-				defaultIncludes = "id,code,name,description,status,categories,thickness"
-			},
-			trans = { defaultIncludes = "id,code,status,texts" }
-		};
-
-		// dump( rows.getData()[ 1 ].getMemento() )
-
-		var obj = mementoSvc.process(
-			collection = {},
-			target     = rows.getData()[ 1 ].getMemento(),
-			includes   = "id,name,email"
-		);
-
-		dump( SerializeJSON( obj ) );
-		abort;
-
-		var data = [];
-		for ( var row in rows.getData() ) {
-			dump( mementoSvc.toMemento( row ) );
-			abort;
-
-			data.append( item );
-		}
-
-
-
-		dump( mementoSvc );
-
-		// dump(mementoSvc);
-		abort;
-
-		for ( var row in rows.getData() ) {
-			// var obj = dm.convert( row, "Line", true );
-
-			var obj = mementoSvc.toMemento( target = row, profiles = "detail" );
-
-			data.add( obj );
 		}
 
 		result.setTotal( rows.getTotal() );
@@ -241,9 +188,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		line.setStatus( status.setId( json.status.id ) );
 		line.setCategories( categories );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
-
-		dump( json );
-		abort;
 
 		nameItem.setLang( lang.setId( json.nameItem.lang.id ) );
 		nameItem.setId( json.nameItem.id );

@@ -9,8 +9,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="textService" inject="TextService";
-	//property name="wirebox" inject="Wirebox";
-	//property name="mementifier" inject="ResultsMapper@mementifier";
+	// property name="wirebox" inject="Wirebox";
+	// property name="mementifier" inject="ResultsMapper@mementifier";
 
 	property name="cacheScope" type="String" default="Line.bean";
 
@@ -241,7 +241,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.line.getId();
 	}
 
-
 	public Boolean function codeExists( required String code, String excludedId = "" ){
 		var record = getDao().readByCode( arguments.code );
 
@@ -322,7 +321,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.lineId );
 
 		if ( record.recordCount ) {
-
 			var bean = super.bean( "Line" );
 
 			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );

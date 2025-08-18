@@ -12,7 +12,7 @@ component extends="coldbox.system.ioc.config.Binder" {
             }
         };
 
-        mapDirectory(packagePath="com.apirone.core.model.bean");
+        //mapDirectory(packagePath="com.apirone.core.model.bean");
 
         mapDirectory(packagePath="com.apirone.core.model.dao")
             .asSingleton();

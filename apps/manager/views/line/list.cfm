@@ -6,10 +6,10 @@
 				#pageTitle()#
             </div>
 			<div class="col-6 text-end pb-3">
-                <button type="button" class="btn btn-default btn-md" onclick="location.href='/report_linee_20241212120500.pdf'">
+                <button type="button" class="btn btn-default btn-sm" onclick="location.href='/report_linee_20241212120500.pdf'">
                     <i class="fas fa-print"></i> Stampa
                 </button>
-				#addButton( bind = "click:new", size = "md" )#
+				#addButton( bind = "click:new", size = "sm" )#
 			</div>
         </div>
 
@@ -26,30 +26,44 @@
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
 										
-                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+										<div class="col">
+											<span>Cerca</span>
+											<input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+										</div>
 
-										<select class="form-control me-2" name="categoryId">
-											<option value="">-- tutte le categorie</option>
-											<cfloop array="#prc.lineCategories#" item="thisLine">
-												<option value="#thisLine.getId()#">#thisLine.getName()#</option>
-											</cfloop>
-										</select>
+										<div class="col">
+											<span>Categoria</span>
+											<select class="form-control me-2" name="categoryId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.lineCategories#" item="thisLine">
+													<option value="#thisLine.getId()#">#thisLine.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
 
-										<select class="form-control me-2" name="statusId">
-											<option value="">-- tutti gli stati</option>
-											<cfloop array="#prc.statuses#" item="item">
-												<option value="#item.getId()#">#item.getName()#</option>
-											</cfloop>
-										</select>
+										<div class="col">
+											<span>Status</span>
+											<select class="form-control me-2" name="statusId">
+												<option value="">-- tutti</option>
+												<cfloop array="#prc.statuses#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
 
-										<select class="form-control me-2" name="orderBy">
-											<option value="line.code-asc" SELECTED>Codice [A-Z]</option>
-											<option value="line.code-desc">Codice [Z-A]</option>
-											<option value="line.name-asc">Descrizione [A-Z]</option>
-											<option value="line.name-desc">Descrizione [Z-A]</option>
-										</select>
+										<div class="col">
+											<span>Ordina per</span>
+											<select class="form-control me-2" name="orderBy">
+												<option value="line.code-asc" SELECTED>Codice [A-Z]</option>
+												<option value="line.code-desc">Codice [Z-A]</option>
+												<option value="line.name-asc">Descrizione [A-Z]</option>
+												<option value="line.name-desc">Descrizione [Z-A]</option>
+											</select>
+										</div>
 
-										#searchButton( bind = "click:search" )#
+										<div class="align-self-end">
+											#searchButton( bind = "click:search" )#
+										</div>
 									</form>
 								</div>
 							</div>
