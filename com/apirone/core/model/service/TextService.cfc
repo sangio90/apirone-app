@@ -87,6 +87,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// Inserisci i texts già presenti
 		var done = [];
 		for ( var thisText in arguments.texts ) {
+			var status = super.bean( "Status" );
+			thisText.setStatus( status.setId( "TRA" ) );
 			var newId = getDao().insert( thisText );
 			done.append( thisText.getKind().getId() & "|" & thisText.getLang().getId() );
 			ids.append( newId );

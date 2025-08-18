@@ -136,17 +136,12 @@
 
 		<cfset field = super.getDBField( arguments.text.getEntity().getKey() )>
 
-		<cffile
-			action="APPEND"
-			file  ="#ExpandPath( "/debug.log" )#"
-			output="#Now()# v: #text.getEntity().getValue()#, k: #text.getKind().getId()#, l: #text.getLang().getId()#, n: #text.getName()#"
-		>
-
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO texts (
 				text,
 				lang_id,
 				text_kind_id,
+				status_id,
 				#field.name#
 			)
 			VALUES
@@ -154,6 +149,7 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getLang().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.text.getKind().getId()#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.text.getStatus().getId()#">,
 
 				<cfif field.type == "uuid">
 					<cfqueryparam cfsqltype="varchar" value="#arguments.text.getEntity().getValue()#">::uuid
@@ -178,6 +174,7 @@
 				text	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getName()#">,
 				lang_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
 				text_kind_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getKind().getId()#">,
+				<!--- status_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getStatus().getId()#">, --->
 				#field.name# =
 
 					<cfif field.type == "uuid">
