@@ -1,5 +1,7 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
+	this.memento = { defaultIncludes = [ "id", "shortId", "name", "code" ] }
+
 	public ModelType function init(){
 		return this;
 	}

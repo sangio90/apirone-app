@@ -14,47 +14,64 @@
 			<div class="col-lg-12">
 				<section class="card">
 					<div class="card-body">
-						<div class="d-flex align-items-center mb-3">
-							<div class="box-search-small col-9">
-								<form
-									name  ="model-grid-search-form" id="model-grid-search-form"
-									method="get"
-									class ="row"
-									data-bind="events: { submit: search }"
-								>
-									<div class="col-md-3">
-										<input
-											class      ="form-control"
-											placeholder="Cerca..." id="attributes-search-input"
-											name       ="str"
-										>
-									</div>
 
-									<div class="col-md-4">
-										<select class="form-control" name="categoryId">
-											<option value="">-- tutte le categorie</option>
-											<cfloop array="#prc.categories#" item="item">
-												<option value="#item.getId()#">#item.getName()#</option>
-											</cfloop>
-										</select>
-									</div>
+						<div class="row d-flex align-items-center mb-3">
+							<div class="col-sm-10">
+								<div class="box-search-small">
+									<form
+										name  ="model-grid-search-form" id="model-grid-search-form"
+										method="get"
+										class="d-flex align-items-center justify-content-end"
+										data-bind="events: { submit: search }"
+									>
 
-									<div class="col-md-3">
-										<select class="form-control" name="typeId">
-											<option value="">-- tutti i tipi</option>
-											<cfloop array="#prc.types#" item="item">
-												<option value="#item.getId()#">#item.getName()#</option>
-											</cfloop>
-										</select>
-									</div>
+										<div class="col">
+											<span>Cerca</span>
+											<input
+												class      ="form-control"
+												placeholder="Cerca..." id="attributes-search-input"
+												name       ="str"
+											>
+										</div>
 
-									<div class="col-md-2">
-										#searchButton( bind = "click:search" )#
-									</div>
-								</form>
+										<div class="col">
+											<span>Categoria</span>
+											<select class="form-control" name="categoryId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.categories#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
+
+										<div class="col">
+											<span>Tipo</span>
+											<select class="form-control" name="typeId">
+												<option value="">-- tutti i tipi</option>
+												<cfloop array="#prc.types#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
+
+										<div class="col">
+											<span>Stato</span>
+											<select class="form-control" name="statusId">
+												<option value="">-- tutti</option>
+												<cfloop array="#prc.statuses#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
+
+										<div class="align-self-end">
+											#searchButton( bind = "click:search" )#
+										</div>
+									</form>
+								</div>
 							</div>
 
-							<div class="col-3 text-end">
+							<div class="col-sm-2 text-end">
 								<div class="float-end">
 									#deleteButton(
 										bind  = "click:delete",

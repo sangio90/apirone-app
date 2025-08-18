@@ -75,7 +75,7 @@ AP.model.list = ( function() {
             var thisForm = AP.model.fields.detailForm;
             var status = thisForm.find( ".status" );
 
-            status.html( "<img src=\"/assets/main/img/ajax-loading.svg\" width=\"20\" height=\"20\">" );
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
             if ( thisForm.valid() ) {
                 NM.util.ajax( {
@@ -105,7 +105,13 @@ AP.model.list = ( function() {
         },
 
         edit: function( event ) {
-            viewModel.set( "detailForm.data", event.data );
+
+            console.log( viewModel.get( "detailForm.data" ).toJSON() );
+            const merged = { ...viewModel.get( "detailForm.data" ), ...event.data };
+
+            console.log( "merged", merged );
+
+            viewModel.set( "detailForm.data", merged );
             viewModel.set( "detailForm.title", "Modifica modello < " + event.data.code + " >" );
 
             var selectedCategories = [];
@@ -119,6 +125,8 @@ AP.model.list = ( function() {
             viewModel.set( "detailForm.data.selectedCategories", selectedCategories );
 
             NM.util.openModal( $( "#model-detail-modal" ) );
+
+            return false;
         },
 
         delete: function( event ) {

@@ -35,6 +35,7 @@
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
 		<cfargument name="typeId" type="String">
+		<cfargument name="statusId" type="String">
 
 		<cfargument name="orderby" required="true" type="String" default="models.code">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -60,6 +61,10 @@
 
 				<cfif !IsNull( arguments.typeId )>
 					AND models.model_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.statusId )>
+					AND models.status_id = <cfqueryparam value="#arguments.statusId#" cfsqltype="varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>

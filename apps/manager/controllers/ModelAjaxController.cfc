@@ -3,14 +3,14 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var dm     = getDataMapper();
+		var mm     = getMementify();
 
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "model.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Model", true );
+			var obj = mm.convert( row, "list" );
 			data.add( obj );
 		}
 
