@@ -5,16 +5,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 		defaultExcludes = [],
 		neverInclude    = [],
 		defaults        = {},
-		mappers         = {
-			"descriptionItem" = function( value ){
-				return value ?: {
-					"id"   = "",
-					"name" = "",
-					"lang" = { "id" = "IT", "name" = "" }
-				};
-			}
-		},
-		profiles = {
+		profiles        = {
 			list = {
 				defaultIncludes = [
 					"id",

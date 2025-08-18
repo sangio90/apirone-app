@@ -132,7 +132,8 @@ AP.product.items = ( function() {
                     done: function( xhr ) {
                         // refreshDatasources();
 
-                        setTimeout( () => $( "#product-images-list-modal" ).modal( "hide" ), 600 );
+                        setTimeout(() => $("#product-images-list-modal").modal("hide"), 600);
+                        
                     },
                 },
             } );

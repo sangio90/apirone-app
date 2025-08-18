@@ -4,7 +4,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 
-		var dm = super.getDataMapper();
+		var mm = super.getMementify();
 
 		var params = super.paramsFromUrl();
 
@@ -13,7 +13,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "finish.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Finish", true );
+			var obj = mm.convert( row, "list" );
 			data.add( obj );
 		}
 
@@ -45,9 +45,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var finish = super.bean( "Finish" );
 		var status = super.bean( "Status" );
-		var text   = super.bean( "Text" );
-		var lang   = super.bean( "Lang" );
-
 
 		finish.setId( json.id );
 		finish.setCode( json.code );
@@ -62,11 +59,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		finish.setCategories( categories );
 		finish.setStatus( status.setId( json.status.id ) );
 
-		text.setId( json?.nameItem?.id );
-		text.setName( json.name );
-		text.setLang( lang.setId( "IT" ) ); // FIXME: this, get lang from json
+		var nameItem        = super.buildTextBean( json.nameItem, "NAME" );
+		var descriptionItem = super.buildTextBean( json.descriptionItem, "DESC" );
 
-		finish.setTexts( [ text ] );
+		finish.setTexts( [ nameItem, descriptionItem ] );
 
 		if ( !Len( json.id ) ) {
 			messageId = "finish.created";

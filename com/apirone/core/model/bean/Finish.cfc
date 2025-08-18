@@ -1,13 +1,42 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true"{
+component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-    property name="code" type="String";
-    property name="status" type="com.apirone.core.model.bean.Status";
-    property name="categories" type="com.apirone.core.model.bean.ProductCategory[]";
+	this.memento = {
+		defaultIncludes = [ "id", "shortId", "name" ],
+		defaultExcludes = [],
+		neverInclude    = [],
+		defaults        = {},
+		mappers         = {
+			"descriptionItem" = function( value ){
+				return value ?: {
+					"id"   = "",
+					"name" = "",
+					"lang" = { "id" = "IT", "name" = "" }
+				};
+			}
+		},
+		profiles = {
+			list = {
+				defaultIncludes = [
+					"id",
+					"shortId",
+					"name",
+					"nameItem",
+					"status",
+					"descriptionItem",
+					"createdAt",
+					"code",
+					"categories"
+				]
+			}
+		}
+	}
 
-    public Finish function init(){
+	property name="code" type="String";
+	property name="status" type="com.apirone.core.model.bean.Status";
+	property name="categories" type="com.apirone.core.model.bean.ProductCategory[]";
 
-        return this;
-    
-    }
+	public Finish function init(){
+		return this;
+	}
 
 }
