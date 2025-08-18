@@ -30,12 +30,12 @@
                                         data-bind:'events: { submit: search }'>
 
                                         <div class="col">
-                                            <span>cerca</cerca>
+                                            <span>Cerca</span>
                                             <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
                                         </div>
 
                                         <div class="col">
-                                            <span>Categoria</cerca>
+                                            <span>Categoria</span>
                                             <select class="form-control me-2" name="categoryId">
                                                 <option value="">-- tutte</option>
                                                 <cfloop array="#prc.lineCategories#" item="thisLine">
@@ -45,7 +45,7 @@
                                         </div>
                                     
                                         <div class="col">
-                                            <span>Status</cerca>
+                                            <span>Status</span>
                                             <select class="form-control me-2" name="statusId">
                                                 <option value="">-- tutti</option>
                                                 <cfloop array="#prc.statuses#" item="thisStatus">
@@ -55,7 +55,7 @@
                                         </div>
 
                                         <div class="col">
-                                            <span>Ordina</cerca>
+                                            <span>Ordina</span>
                                             <select class="form-control me-2" name="orderBy">
                                                 <option value="finish.code-asc">Codice [A-Z]</option>
                                                 <option value="finish.code-desc">Codice [Z-A]</option>
@@ -64,9 +64,9 @@
                                             </select>
                                         </div>
 
-                                    <div style="align-self: flex-end;">
-                                        #searchButton( bind="click:search" )#
-                                    </div>
+                                        <div class="align-self-end">
+                                            #searchButton( bind="click:search" )#
+                                        </div>
                                     
                                     </form>
 

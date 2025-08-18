@@ -10,7 +10,7 @@ component output="false" accessors="true" {
 	// property name="DBUtil" type="com.apirone.core.model.util.DBUtil";
 
 	public com.apirone.core.model.bean.AbsBean function bean( required String type, Struct values = {} ){
-		var bean = getContainer().getInstance("com.apirone.core.model.bean.#type#");
+		var bean = CreateObject( "com.apirone.core.model.bean.#arguments.type#" ).init();
 		return bean;
 	}
 
@@ -25,7 +25,6 @@ component output="false" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function getResult(){
 		var bean = new com.apirone.core.model.bean.Result();
-
 		return bean;
 	}
 

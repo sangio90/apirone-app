@@ -69,6 +69,8 @@
 		bean.setUuid( LCase( CreateUUID() ) );
 		bean.setStatus( "SUCCESS" );
 
+		//StructDelete( bean, "$wbMixer" );
+
 		return bean;
 	}
 
@@ -271,12 +273,16 @@
 
 	public Struct function getCacheManager(){
 		return getContainer().getInstance( "CacheManager" );
-	}	
+	}
+
+	public Struct function getMementify(){
+		return getContainer().getInstance( "Mementify" );
+	}
 
 	public Any function service( required String service ){
 		var bean = getContainer().getInstance( "#arguments.service#Service" );
 		return bean;
-	}	
+	}
 
 	/*
 	public Any function bean( required String type ){
@@ -285,11 +291,9 @@
 	*/
 
 	public Any function bean( required String type, Struct values = {} ){
-		var bean = getContainer().getInstance("com.apirone.core.model.bean.#type#");
+		var bean = CreateObject( "com.apirone.core.model.bean.#arguments.type#" ).init();
 		return bean;
 	}
-
-
 
 
 	/*
@@ -298,7 +302,6 @@
 
 	public Struct function getContainer(){
 		// TODO: use GetSystemPropOrEnvVar from Lucee 6.2.1
-
 		return server[ "wireBox-apirone" ];
 	}
 
