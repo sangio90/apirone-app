@@ -23,7 +23,7 @@
     </cfif>
 </cfif>
 
-<cfdirectory action="list" directory="#path#" recurse="true" name="q" sort="name desc">
+<cfdirectory action="list" directory="#path#" recurse="true" name="fileList" sort="name desc">
 
 <cfoutput>
 
@@ -71,21 +71,21 @@
                             <th>Directory</th>
                             <th>File</th>
                             <th>Size</th>
-                            <th>Date</th>
+                            <th>Date #fileList.currentRow# </th>
                             <th width="30"><a href="javascript:selectAll()">All</a></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <cfloop query="q" startRow="1" maxRows="100">
+                        <cfoutput query="#fileList#" startRow="1" maxRows="100">
                             <tr>
-                                <td align="right"><b>#currentrow#</b>/#recordcount#</td>
-                                <td>#directory#</td>
-                                <td><a href="detail.cfm?id=#Replace(name, '.html', '')#" target="_blank">#name#</a></td>
-                                <td>#size#</td>
-                                <td>#DateTimeFormat( dateLastModified, 'dd-mm-yyyy HH:nn:ss')#</td>
-                                <td align="center"><input type="checkbox" name="ids" value="#name#"></td>
+                                <td align="right"><b>#fileList.currentrow#</b>/#fileList.recordcount#</td>
+                                <td>#fileList.directory#</td>
+                                <td><a href="detail.cfm?id=#Replace(fileList.name, '.html', '')#" target="_blank">#fileList.name#</a></td>
+                                <td>#fileList.size#</td>
+                                <td>#DateTimeFormat( fileList.dateLastModified, 'dd-mm-yyyy HH:nn:ss')#</td>
+                                <td align="center"><input type="checkbox" name="ids" value="#fileList.name#"></td>
                             </tr>
-                        </cfloop>
+                        </cfoutput>
                     <tbody>
                 </table>
             </form>

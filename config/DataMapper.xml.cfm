@@ -5,7 +5,7 @@
         <map from="name" to="name" type="cf:String" />
     </mapper>
 
-    <mapper id="ProductionTime" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.RawProductionTime">
+    <mapper id="ProductionTime" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.ProductionTime">
         <map from="id" to="id" type="cf:String" />
         <map from="name" to="name" type="cf:String" />
         <map from="status" to="status" ref="Status" />
