@@ -41,14 +41,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 
-		var model           = super.bean( "Model" );
-		var type            = super.bean( "ModelType" );
-		var status          = super.bean( "Status" );
-		var nameText        = super.bean( "Text" );
-		var descriptionText = super.bean( "Text" );
-		var nameKind        = super.bean( "TextKind" );
-		var descriptionKind = super.bean( "TextKind" );
-		var lang            = super.bean( "Lang" );
+		var model  = super.bean( "Model" );
+		var type   = super.bean( "ModelType" );
+		var status = super.bean( "Status" );
 
 		model.setId( json.id );
 		model.setCode( json.code );
@@ -63,17 +58,10 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		nameText.setLang( lang.setId( json.nameItem.lang.id ) );
-		nameText.setStatus( status.setId( "TRA" ) );
-		nameText.setId( json.nameItem.id );
-		nameText.setName( json.nameItem.name );
+		var nameItem        = super.buildTextBean( json.nameItem, "NAME" );
+		var descriptionItem = super.buildTextBean( json.descriptionItem, "DESC" );
 
-		descriptionText.setLang( lang.setId( json.descriptionItem.lang.id ) );
-		descriptionText.setStatus( status.setId( "TRA" ) );
-		descriptionText.setId( json.descriptionItem.id );
-		descriptionText.setName( json.descriptionItem.name );
-
-		model.setTexts( [ nameText, descriptionText ] );
+		model.setTexts( [ nameItem, descriptionItem ] );
 
 		model.setCategories( categories );
 		model.setStatus( status.setId( json.status.id ) );

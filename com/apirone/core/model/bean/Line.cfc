@@ -5,8 +5,16 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 		defaultExcludes = [],
 		neverInclude    = [],
 		defaults        = {},
-		mappers         = {},
-		profiles        = {
+		mappers         = {
+			"descriptionItem" = function( value ){
+				return value ?: {
+					"id"   = "",
+					"name" = "",
+					"lang" = { "id" = "IT", "name" = "" }
+				};
+			}
+		},
+		profiles = {
 			list = {
 				defaultIncludes = [
 					"id",
@@ -14,12 +22,20 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 					"name",
 					"nameItem",
 					"status",
-					"nameItem",
 					"descriptionItem",
 					"createdAt",
 					"code",
 					"categories"
 				]
+			},
+			mappers = {
+				"descriptionItem" = function( value ){
+					return value ?: {
+						"id"   = "",
+						"name" = "",
+						"lang" = { "id" = "IT", "name" = "" }
+					};
+				}
 			}
 		}
 	}

@@ -56,8 +56,8 @@
 											<select class="form-control me-2" name="orderBy">
 												<option value="line.code-asc" SELECTED>Codice [A-Z]</option>
 												<option value="line.code-desc">Codice [Z-A]</option>
-												<option value="line.name-asc">Descrizione [A-Z]</option>
-												<option value="line.name-desc">Descrizione [Z-A]</option>
+												<option value="line.name-asc">Nome [A-Z]</option>
+												<option value="line.name-desc">Nome [Z-A]</option>
 											</select>
 										</div>
 
@@ -87,7 +87,7 @@
 									columns = "[
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '100px' },
-                                        { 'field':'name', 'title':'Descrizione' },
+                                        { 'field':'name', 'title':'Nome' },
                                         { 'field':'category.name', 'title':'Categorie' },
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 

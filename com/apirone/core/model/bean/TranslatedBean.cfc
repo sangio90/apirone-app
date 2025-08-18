@@ -36,7 +36,6 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return getTextItem( arguments.langId, "DESC" );
 	}
 
-
 	/*
 	public com.apirone.core.model.bean.Text function OnMissingMethod( String method, Array args ){
 		if ( arguments.method == "getNameItem" ) {

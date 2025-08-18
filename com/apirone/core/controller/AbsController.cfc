@@ -69,9 +69,24 @@
 		bean.setUuid( LCase( CreateUUID() ) );
 		bean.setStatus( "SUCCESS" );
 
-		//StructDelete( bean, "$wbMixer" );
+		// StructDelete( bean, "$wbMixer" );
 
 		return bean;
+	}
+
+	function buildTextBean( required Struct item, required string kindId ){
+		var text   = bean( "Text" );
+		var lang   = bean( "Lang" ).setId( "IT" );
+		var status = bean( "Status" ).setId( "TRA" );
+		var kind   = bean( "TextKind" ).setId( kindId );
+
+		text.setLang( lang );
+		text.setStatus( status );
+		text.setId( item.id );
+		text.setName( item.name );
+		text.setKind( kind );
+
+		return text;
 	}
 
 	public Any function setMessage(

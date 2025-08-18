@@ -70,7 +70,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var bean = super.fire( "line.get", [ rc.id ] );
 
-		var obj = super.getDataMapper().convert( bean, "Line", true );
+		// var obj = super.getDataMapper().convert( bean, "Line", true );
+		var obj = super.getMementify().convert( bean, "list" );
 
 		if ( !obj.keyExists( "thickness" ) ) {
 			obj[ "thickness" ] = { "id" = "", "name" = "" }
@@ -165,16 +166,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId  = "";
 		var categories = [];
 
-		var result          = super.getResult();
-		var line            = super.bean( "Line" );
-		var status          = super.bean( "Status" );
-		var thickness       = super.bean( "Thickness" );
-		var category        = super.bean( "ProductCategory" );
-		var nameItem        = super.bean( "Text" );
-		var descriptionItem = super.bean( "Text" );
-		var lang            = super.bean( "Lang" );
-		var nameKind        = super.bean( "TextKind" );
-		var descriptionKind = super.bean( "TextKind" );
+		var result    = super.getResult();
+		var line      = super.bean( "Line" );
+		var status    = super.bean( "Status" );
+		var thickness = super.bean( "Thickness" );
+		var category  = super.bean( "ProductCategory" );
 
 		for ( var thisCategory in json.selectedCategories ) {
 			var category = super.bean( "ProductCategory" );
@@ -191,15 +187,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		line.setCategories( categories );
 		line.setThickness( thickness.setId( json?.thickness?.id ) );
 
-		nameItem.setLang( lang.setId( json.nameItem.lang.id ) );
-		nameItem.setId( json.nameItem.id );
-		nameItem.setName( json.nameItem.name );
-		nameItem.setKind( nameKind.setId( "NAME" ) );
-
-		descriptionItem.setLang( lang.setId( json.descriptionItem.lang.id ) );
-		descriptionItem.setId( json?.descriptionItem?.id );
-		descriptionItem.setName( json?.descriptionItem?.name );
-		descriptionItem.setKind( descriptionKind.setId( "DESC" ) );
+		var nameItem        = super.buildTextBean( json.nameItem, "NAME" );
+		var descriptionItem = super.buildTextBean( json.descriptionItem, "DESC" );
 
 		line.setTexts( [ nameItem, descriptionItem ] );
 

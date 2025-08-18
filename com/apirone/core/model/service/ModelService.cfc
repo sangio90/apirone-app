@@ -79,11 +79,11 @@
 	 * @auditPayload { "id": "@model.id@" }
 	 */
 	public String function update( required com.apirone.core.model.bean.Model model ){
-		getDao().update( arguments.model );
-
 		var id = arguments.model.getId();
 
 		transaction {
+			getDao().update( arguments.model );
+
 			for ( var text in arguments.model.getTexts() ) {
 				var entity = super.bean( "Entity" )
 
@@ -159,7 +159,6 @@
 			bean.setName( record.model );
 			bean.setCode( record.code );
 			bean.setFruitsCount( record.fruits_count );
-
 			bean.setType( getLookupService().get( "modelType", record.model_type_id ) );
 			bean.setCategories( getCategoriesBeanByIds( record.categories ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );

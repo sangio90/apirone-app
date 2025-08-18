@@ -40,6 +40,7 @@ AP.model.list = ( function() {
                 name: "",
                 lang: {
                     id: "IT",
+                    name: ""
                 },
             },
             status: {
@@ -106,12 +107,7 @@ AP.model.list = ( function() {
 
         edit: function( event ) {
 
-            console.log( viewModel.get( "detailForm.data" ).toJSON() );
-            const merged = { ...viewModel.get( "detailForm.data" ), ...event.data };
-
-            console.log( "merged", merged );
-
-            viewModel.set( "detailForm.data", merged );
+            viewModel.set( "detailForm.data", event.data );
             viewModel.set( "detailForm.title", "Modifica modello < " + event.data.code + " >" );
 
             var selectedCategories = [];
