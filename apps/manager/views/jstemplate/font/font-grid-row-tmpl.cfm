@@ -4,7 +4,7 @@
     <nmscript type="text/x-kendo-template" id="font-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td>
-                <span data-bind="text: shortId"></span>
+                <span data-bind="text: id"></span>
             </td>
             <td>
                 <span data-bind="text: code"></span>

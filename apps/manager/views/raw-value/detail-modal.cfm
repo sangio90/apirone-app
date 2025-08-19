@@ -2,7 +2,7 @@
 
     <div id="raw-value-detail-modal" class="modal fade">
         
-        <section class="modal-dialog modal-xl">
+        <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
                 <header class="card-header d-flex align-elements-center justify-content-between">

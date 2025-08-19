@@ -219,6 +219,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setLang( getLangService().get( record.lang_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setEntity( getEntity( record ) );
+
 			bean.setKind( getLookupService().get( "textKind", record.text_kind_id ) );
 
 			return bean;

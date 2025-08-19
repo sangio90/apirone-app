@@ -61,16 +61,16 @@
                         </div>
 
                         <div class="row" data-bind="visible: detailForm.data.id">
-                            <label class="col-sm-2 col-form-label text-end">ID</label>
-                            <div class="col-sm-10 mt-1">
-                                <span data-bind="text: detailForm.data.id"></span>
-                            </div>
-                        </div>
-
-                        <div class="row" data-bind="visible: detailForm.data.id">
                             <label class="col-sm-2 col-form-label text-end">Directory</label>
                             <div class="col-sm-10 mt-1">
                                 <span data-bind="text: detailForm.data.directory"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
+                            <div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
+                                ID: <span data-bind="text: detailForm.data.id"></span><br>
+                                Creato: <span data-bind="text: detailForm.data.createdAt"></span>
                             </div>
                         </div>
 

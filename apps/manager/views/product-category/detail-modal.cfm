@@ -26,10 +26,10 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Descrizione</label>
+                            <label class="col-sm-2 col-form-label text-end">Nome</label>
                             <div class="col-sm-10">
                                 <input type="text" required class="form-control col-sm-4 uppercase" name="name"
-                                    data-msg-required="Descrizione richiesto"
+                                    data-msg-required="Nome richiesto"
                                     maxlength="125"
                                     data-bind="value: detailForm.data.nameItem.name">
                             </div>
@@ -74,6 +74,13 @@
                             </div>
                             <div class="col-sm-10 offset-sm-2">
                                 <span class="field-note">La modalità non è modificabile</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
+                            <div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
+                                ID: <span data-bind="text: detailForm.data.id"></span><br>
+                                Creato: <span data-bind="text: detailForm.data.createdAt"></span>
                             </div>
                         </div>
 

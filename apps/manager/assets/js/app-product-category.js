@@ -98,10 +98,8 @@ AP.productCategory.list = ( function() {
                                     "<span class='green'>Categoria salvata</span>",
                                 );
 
-                                setTimeout(
-                                    () => $( "#line-detail-modal" ).modal( "hide" ),
-                                    1000,
-                                );
+                                setTimeout( () => $( "#product-category-detail-modal" ).modal( "hide" ), 600 );
+
                             }
                         },
                     },

@@ -4,13 +4,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data = [];
 
 		var result = super.getResult();
-		var dm     = super.getDataMapper();
+		var mm     = super.getMementify();
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "font.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Font", true );
+			var obj = mm.convert( row, "list" );
 			data.add( obj );
 		}
 
@@ -49,9 +49,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		font.setDirectory( "#LCase( json.code )#" );
 		font.setFamily( json.family );
 
-		text.setId( json.nameItem.id );
-		text.setName( json.nameItem.name );
-		text.setLang( lang.setId( json.nameItem.lang.id, "IT" ) );
+		var text = super.buildTextBean( json.nameItem, "NAME" );
+
 		texts.add( text );
 
 		font.setTexts( texts );
@@ -77,8 +76,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 
 		var bean = super.fire( "font.get", [ rc.id ] );
-
-		var obj = super.getDataMapper().convert( bean, "Font", true );
+		var obj  = super.getMementify().convert( bean, "list" );
 
 		result.setData( obj );
 

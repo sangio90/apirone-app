@@ -2,14 +2,15 @@
 
     <div id="raw-value-list-root">
 
-        #pageTitle()#
-
         <div class="row">
-            <div class="col-lg-12 text-end mb-3">
-                #addButton( bind="click:new", size="sm" )#
+            <div class="col-6">
+				#pageTitle()#
             </div>
+			<div class="col-6 text-end pb-3">
+				#addButton( bind = "click:new", size = "sm" )#
+			</div>
         </div>
-    
+
         <div class="row">
             <div class="col-lg-12">
 
@@ -57,8 +58,8 @@
                                 id="raw-value-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px' },
-                                    { 'field':'name', 'title':'Codice', width: '150px' },
-                                    { 'field':'name', 'title':'Descrizione'},
+                                    { 'field':'nameItem.name', 'title':'Codice', width: '150px' },
+                                    { 'field':'name', 'title':'Nome'},
                                     { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 

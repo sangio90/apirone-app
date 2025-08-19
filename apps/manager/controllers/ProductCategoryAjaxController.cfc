@@ -3,7 +3,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var dm     = super.getDataMapper();
+		var mm     = super.getMementify();
 
 		var params = super.paramsFromUrl();
 
@@ -14,7 +14,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "ProductCategory.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "ProductCategory", true );
+			var obj = mm.convert( row, "list" );
 			data.add( obj );
 		}
 
@@ -59,9 +59,9 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var result = super.getResult();
 
-		var text     = super.bean( "Text" );
-		var lang     = super.bean( "Lang" );
-		var status   = super.bean( "Status" );
+		// var text     = super.bean( "Text" );
+		// var lang     = super.bean( "Lang" );
+		// var status   = super.bean( "Status" );
 		var status   = super.bean( "Status" );
 		var mode     = super.bean( "ProductCategoryMode" );
 		var type     = super.bean( "ProductCategoryType" );
@@ -79,10 +79,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		category.setMode( mode.setId( json.mode.id ) );
 		category.setStatus( status.setId( json.status.id ) );
 
-		text.setLang( lang.setId( json.nameItem.lang.id ) );
+		// text.setLang( lang.setId( json.nameItem.lang.id ) );
 
-		text.setId( json.nameItem.id );
-		text.setName( json.nameItem.name );
+		var text = super.buildTextBean( json.nameItem, "NAME" );
+
+		// text.setId( json.nameItem.id );
+		// text.setName( json.nameItem.name );
 
 		category.setTexts( [ text ] );
 
