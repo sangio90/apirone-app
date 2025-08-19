@@ -49,7 +49,7 @@
 													>
 														<i class="fa fa-ruler"></i>
 													</button>
-													<div style="font-model: .6em; font-style: italic; color: gray;">
+													<div class="model-size">
 														#model.modelConfig.getWidth()# x #model.modelConfig.getHeight()#
 													</div>
 												<cfelse>

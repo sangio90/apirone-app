@@ -869,3 +869,9 @@ h2 {
 /*
     // Table fix fixed header and highlighted cols
 */
+
+.model-size {
+    font-size: .7em;
+    font-style: italic;
+    color: gray;
+}

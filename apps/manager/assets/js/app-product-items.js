@@ -69,11 +69,21 @@ AP.product.items = ( function() {
 
         var filterState = AP.getUserPref( "product.items.showUnlinked", false );
 
+        var data = viewModel.get( "items" ).data();
+
+        var unlinked = 0;
+
+        for( var item of data  ) {
+            if ( item.id < 0 ) {
+                unlinked++;
+            }
+        }
+
         if ( !filterState ) {
-            viewModel.set( "textToggleLink", "Mostra attributi non collegati" );
+            viewModel.set( "textToggleLink", `Mostra ${unlinked}  attributi non collegati` );
             viewModel.get( "items" ).filter( { field: "id", operator: "gt", value: 0 } );
         } else {
-            viewModel.set( "textToggleLink", "Nascondi attributi non collegati" );
+            viewModel.set( "textToggleLink", `Nascondi ${unlinked} attributi non collegati` );
             viewModel.get( "items" ).filter( {} );
         }
 
