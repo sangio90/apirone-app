@@ -7,6 +7,8 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 				defaultIncludes = [
 					"id",
 					"name",
+					"shortId",
+					"nameItem",
 					"code",
 					"status",
 					"values",

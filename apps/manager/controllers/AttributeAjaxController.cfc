@@ -3,11 +3,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	function get( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var dm     = getDataMapper();
+		// var dm     = getDataMapper();
+		var mm     = super.getMementify();
 
 		var obj = super.fire( "attribute.get", [ rc.id ] );
 
-		var attr = dm.convert( obj, "attribute", true );
+		var attr = mm.convert( obj, "list" );
 
 		result.setData( attr );
 
@@ -29,7 +30,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
 		var data   = [];
-		var dm     = getDataMapper();
+		// var dm     = getDataMapper();
+		var mm     = super.getMementify();
 		var result = super.getResult();
 
 		var params = super.paramsFromUrl();
@@ -37,7 +39,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "attribute.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Attribute", true );
+			var obj = mm.convert( row, "list" );
 			data.add( obj );
 		}
 
@@ -50,7 +52,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function listRawValues( event, rc, prc ){
 		var data   = [];
-		var dm     = getDataMapper();
+		// var dm     = getDataMapper();
+		var mm     = super.getMementify();
 		var result = super.getResult();
 
 		var params = super.paramsFromUrl();
@@ -58,7 +61,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "rawValue.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "RawValue", true );
+			var obj = mm.convert( row, "list" );
 			data.add( obj );
 		}
 
@@ -74,7 +77,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var row = super.fire( "attribute.get", [ rc.id ] );
 
-		var obj = getDataMapper().convert( row, "Attribute", true );
+		var obj = super.getMementify().convert( row, "list" );
 
 		result.setTotal( 1 );
 		result.setData( 1 );

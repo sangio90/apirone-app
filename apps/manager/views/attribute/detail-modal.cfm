@@ -48,7 +48,7 @@
                                 </div>
 
                                 <div class="mb-3 row">
-                                    <label for="attr" class="col-sm-2 col-form-label text-end">Descrizione (it)</label>
+                                    <label for="attr" class="col-sm-2 col-form-label text-end">Nome (it)</label>
                                     <div class="col-sm-10">
                                         <input type="text" required class="form-control col-sm-4 uppercase" id="attr" name="attr"
                                             data-bind="value: detailForm.data.nameItem.name"

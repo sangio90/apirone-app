@@ -66,7 +66,7 @@
                                         columns="[
                                             { 'field':'shortId', 'title':'ID', width: '80px' },
                                             { 'field':'code', 'title':'Codice', width: '100px' },
-                                            { 'field':'name', 'title':'Descrizione'},
+                                            { 'field':'name', 'title':'Nome'},
                                             { 'field':'category.name', 'title':'Categorie'},
                                             { 'field':'', 'title':'Numero di valori', width: '55px'},
                                             { 'field':'', 'title':'', width: '55px'},
