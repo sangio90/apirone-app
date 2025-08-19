@@ -4,7 +4,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data = [];
 
 		var result = super.getResult();
-		var dm     = super.getDataMapper();
+		var mm     = super.getMementify();
 		var params = super.paramsFromUrl();
 
 		params[ "excludedCategoryIds" ] = [ 22 ];
@@ -12,7 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "product.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Product", true );
+			var obj = mm.convert( row, "list" );
 			data.add( obj );
 		}
 

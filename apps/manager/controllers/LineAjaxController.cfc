@@ -25,7 +25,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function listByCategoryId( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var dm     = getDataMapper();
+		var mm     = super.getMementify();
 
 		var params = super.paramsFromUrl();
 
@@ -34,7 +34,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "line.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Line", true );
+			var obj = mm.convert( row, "list" );
 			data.add( obj );
 		}
 

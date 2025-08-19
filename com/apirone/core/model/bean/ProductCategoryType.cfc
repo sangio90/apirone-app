@@ -1,11 +1,21 @@
-component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-    property name="orderby" type="Numeric";
-    property name="status" type="com.apirone.core.model.bean.Status";
+	this.memento = {
+		defaultIncludes = [
+			"id",
+			"shortId",
+			"name",
+			"code",
+			"orderby",
+			"status"
+		]
+	}
 
-    public ProductCategoryType function init(){
+	property name="orderby" type="Numeric";
+	property name="status" type="com.apirone.core.model.bean.Status";
 
-        return this;
-    }
+	public ProductCategoryType function init(){
+		return this;
+	}
 
 }
