@@ -87,14 +87,16 @@ NM.util.ajax = function( setup ) {
 
 NM.util.checkAll = function( button ) {
 
+    var value = true;
     var thisForm = $( button.closest( "form" ) );
 
     var checks = thisForm.find( "input[name=selected]:checkbox" );
 
-    console.log( "button.checked", button.checked );
-    console.log( "checks", checks );
-
-    var value = button?.checked ? true : false;
+    if( button.checked == undefined ) {
+        value = true;
+    } else {
+        value = button.checked;
+    }
 
     checks.each( function() {
         $( this ).prop( "checked", value );

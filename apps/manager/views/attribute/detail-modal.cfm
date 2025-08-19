@@ -84,8 +84,10 @@
                                 </div>
 
                                 <div class="mb-3 row" data-bind="visible: isUpdate">
-                                    <label for="statusId" class="col-sm-2 col-form-label text-end">ID</label>
-                                    <div class="col-sm-10 mt-1" data-bind="text: detailForm.data.id"></div>
+                                    <div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
+                                        ID: <span data-bind="text: detailForm.data.id"></span><br>
+                                        Creato: <span data-bind="text: detailForm.data.createdAt"></span>
+                                    </div>
                                 </div>
 
                                 <div class="row mb-3" data-bind="invisible: isUpdate">
