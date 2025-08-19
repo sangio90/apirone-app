@@ -64,6 +64,7 @@ component {
 		if ( IsSimpleValue( local.includes ) ) {
 			local.includes = ListToArray( local.includes );
 		}
+
 		if ( IsSimpleValue( local.excludes ) ) {
 			local.excludes = ListToArray( local.excludes );
 		}

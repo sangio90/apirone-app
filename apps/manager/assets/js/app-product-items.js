@@ -132,8 +132,8 @@ AP.product.items = ( function() {
                     done: function( xhr ) {
                         // refreshDatasources();
 
-                        setTimeout(() => $("#product-images-list-modal").modal("hide"), 600);
-                        
+                        setTimeout( () => $( "#product-images-list-modal" ).modal( "hide" ), 600 );
+
                     },
                 },
             } );
@@ -563,7 +563,7 @@ AP.product.items = ( function() {
 
                             success: function( event, data ) {
                                 // TODO
-                                console.log( "success" data);
+                                console.log( "success", data );
                             },
 
                             progressall: function( event, data ) {

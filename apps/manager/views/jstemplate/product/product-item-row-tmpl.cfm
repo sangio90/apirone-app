@@ -44,7 +44,7 @@
 
                 <td class="text-center">
                     <button type="button" class="btn btn-default btn-sm" data-bind="click:addValue">
-                        <i class="fas fa-plus"></i> 
+                        <i class="fas fa-chevron-right"></i>
                     </button>
                 </td>
             

@@ -32,15 +32,11 @@ AP.core = ( function() {
 
 AP.setUserPref = function( key, value ) {
 
-    console.log( "setUserPref", key, value );
-
     var user = AP.config.account.shortId;
     NM.storage.set( "apirOne:" + user + ":" + key, value );
 };
 
 AP.getUserPref = function( key, defaultValue ) {
-
-	 console.log( "getUserPref", key, defaultValue );
 
     var user = AP.config.account.shortId;
     return NM.storage.get( "apirOne:" + user + ":" + key, defaultValue );
