@@ -1,23 +1,37 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true"{
+component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-    property name="orderBy" type="Numeric" default=10;
-    property name="status" type="com.apirone.core.model.bean.Status";
-    property name="rawValue" type="com.apirone.core.model.bean.RawValue";
-    
-    property name="attributeId" type="String";
-    property name="componentCount" type="Numeric";
+	this.memento = {
+		defaultIncludes = [ "id", "name", "code" ],
+		profiles        = {
+			list = {
+				defaultIncludes = [
+					"id",
+					"name",
+					"code",
+					"status",
+					"orderBy",
+					"rawValue",
+					"attributeId",
+					"componentCount",
+					"allowNote",
+					"affectToImage"
+				]
+			}
+		}
+	}
 
-    property name="allowNote" type="Boolean";
-    property name="affectToImage" type="Boolean";
+	property name="orderBy" type="Numeric" default=10;
+	property name="status" type="com.apirone.core.model.bean.Status";
+	property name="rawValue" type="com.apirone.core.model.bean.RawValue";
 
-    //NOTE: Attribute ha già AttributeValue all'interno,
-    //questo crea una ricorsione: StackOverflow
-    //property name="attribute" type="com.apirone.core.model.bean.Attribute";
+	property name="attributeId" type="String";
+	property name="componentCount" type="Numeric";
 
-    public AttributeValue function init(){
+	property name="allowNote" type="Boolean";
+	property name="affectToImage" type="Boolean";
 
-        return this;
-        
-    }
+	public AttributeValue function init(){
+		return this;
+	}
 
 }

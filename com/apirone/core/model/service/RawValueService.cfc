@@ -119,7 +119,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.rawValueId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getScopeCache(), arguments.rawValueId );
+				getCacheManager().remove( getCacheScope(), arguments.rawValueId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );

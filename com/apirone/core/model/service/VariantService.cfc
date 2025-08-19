@@ -4,19 +4,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="colorService" inject="ColorService";
 
-	property name="scopeCache" type="String" default="Variant.bean";
+	property name="cacheScope" type="String" default="Variant.bean";
 
 	public com.apirone.core.model.bean.Variant function get( required String variantId ){
 		var cm = getCacheManager();
 
-		var cache = cm.get( getScopeCache(), arguments.variantId );
+		var cache = cm.get( getCacheScope(), arguments.variantId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
 		var bean = build( arguments.variantId );
-		cm.put( getScopeCache(), arguments.variantId, bean );
+		cm.put( getCacheScope(), arguments.variantId, bean );
 
 		return bean;
 	}

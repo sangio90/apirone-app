@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="scopeCache" type="String" default="SystemColor.bean";
+	property name="cacheScope" type="String" default="SystemColor.bean";
 
     public com.apirone.core.model.bean.SystemColor function get(
     		required String systemColorId
@@ -8,7 +8,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
     	var cm = getCacheManager();
 
-	   	var cache = cm.get( getScopeCache(), arguments.systemColorId ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.systemColorId ) ;
 
 	    if ( cache.status ) {
 	    
@@ -17,7 +17,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	    } 
 	    
 		var bean = build( arguments.systemColorId );
-		cm.put( getScopeCache(), arguments.systemColorId, bean );
+		cm.put( getCacheScope(), arguments.systemColorId, bean );
         
 		return bean;
 

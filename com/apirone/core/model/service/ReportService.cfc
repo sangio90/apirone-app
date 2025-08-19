@@ -4,21 +4,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="lookupService" inject="LookupService";
 
-	property name="scopeCache" type="String" default="Report.bean";
+	property name="cacheScope" type="String" default="Report.bean";
 
 	public com.apirone.core.model.bean.Report function get( required String reportId ){
 		var cm = getCacheManager();
 
-		var cache = cm.get( getScopeCache(), arguments.reportId );
+		var cache = cm.get( getCacheScope(), arguments.reportId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
-		var bean = build( getScopeCache(), arguments.reportId );
+		var bean = build( getCacheScope(), arguments.reportId );
 		cm.put( key, bean );
 
 		return bean;
+		2025 - 08 - 19 14:15:00
 	}
 
 	public String function create( required com.apirone.core.model.bean.Report report ){
@@ -30,7 +31,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Boolean function delete( required String reportId ){
 		var result = getDao().delete( arguments.reportId );
 
-		getCacheManager().remove( getScopeCache(), arguments.reportId );
+		getCacheManager().remove( getCacheScope(), arguments.reportId );
 
 		return result;
 	}

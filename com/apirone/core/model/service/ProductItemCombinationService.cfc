@@ -4,12 +4,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="productItemService" inject="ProductItemService";
 
-	property name="scopeCache" type="String" default="ProductItemProduct.bean";
+	property name="cacheScope" type="String" default="ProductItemProduct.bean";
 
 	public com.apirone.core.model.bean.ProductItemProduct function get( required String productItemProductId ){
 		var cm = getCacheManager();
 
-		var cache = cm.get( getScopeCache(), arguments.productItemProductId );
+		var cache = cm.get( getCacheScope(), arguments.productItemProductId );
 
 		if ( cache.status ) {
 			return cache.data;
@@ -17,7 +17,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var bean = build( arguments.productItemProductId );
 		cm.put(
-			getScopeCache(),
+			getCacheScope(),
 			arguments.productItemProductId,
 			bean
 		);

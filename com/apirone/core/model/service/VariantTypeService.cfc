@@ -2,19 +2,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="VariantTypeDAO";
 
-	property name="scopeCache" type="String" default="VariantType.bean";
+	property name="cacheScope" type="String" default="VariantType.bean";
 
 	public com.apirone.core.model.bean.VariantType function get( required String variantTypeId ){
 		var cm = super.getCacheManager();
 
-		var cache = cm.get( getScopeCache(), arguments.variantTypeId );
+		var cache = cm.get( getCacheScope(), arguments.variantTypeId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
 		var obj = build( arguments.variantTypeId );
-		cm.put( getScopeCache(), arguments.variantTypeId, obj );
+		cm.put( getCacheScope(), arguments.variantTypeId, obj );
 
 		return obj;
 	}

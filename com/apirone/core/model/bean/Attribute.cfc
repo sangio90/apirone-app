@@ -1,15 +1,29 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true"{
+component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-    property name="status" type="com.apirone.core.model.bean.Status";
-    property name="values" type="com.apirone.core.model.bean.AttributeValue[]";
-    property name="categories" type="com.apirone.core.model.bean.ProductCategory[]";
-    
-    property name="code" type="String";
+	this.memento = {
+		defaultIncludes = [ "id", "name", "code" ],
+		profiles        = {
+			list = {
+				defaultIncludes = [
+					"id",
+					"name",
+					"code",
+					"status",
+					"values",
+					"categories"
+				]
+			}
+		}
+	}
 
-    public Attribute function init(){
+	property name="status" type="com.apirone.core.model.bean.Status";
+	property name="values" type="com.apirone.core.model.bean.AttributeValue[]";
+	property name="categories" type="com.apirone.core.model.bean.ProductCategory[]";
 
-        return this;
-        
-    }
+	property name="code" type="String";
+
+	public Attribute function init(){
+		return this;
+	}
 
 }
