@@ -1,5 +1,35 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
+	this.memento = {
+		defaultIncludes = [
+			"id",
+			"shortId",
+			"name",
+			"code",
+			"category",
+			"categories"
+		],
+		mappers  = {},
+		profiles = {
+			list = {
+				defaultIncludes = [
+					"id",
+					"shortId",
+					"name",
+					"code",
+					"nameItem",
+					"status",
+					"positionCount",
+					"createdAt",
+					"code",
+					"categories",
+					"category",
+					"lines"
+				]
+			}
+		}
+	}
+
 	/*
 		complex (plates)
 	*/

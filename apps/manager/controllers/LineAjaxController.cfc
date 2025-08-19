@@ -55,7 +55,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		var result = super.fire( "line.clone", params );
-		// var result = super.service( "line" ).clone( argumentCollection = params );
 
 		event.setValue( "result", result );
 	}
@@ -70,7 +69,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var bean = super.fire( "line.get", [ rc.id ] );
 
-		// var obj = super.getDataMapper().convert( bean, "Line", true );
 		var obj = super.getMementify().convert( bean, "list" );
 
 		if ( !obj.keyExists( "thickness" ) ) {

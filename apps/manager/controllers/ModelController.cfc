@@ -2,6 +2,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
 		var categories = [];
+		var mm         = super.getMementify();
 
 		prc.title = "Modelli";
 
@@ -9,14 +10,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.categories = super.fire( "ProductCategory.list" );
 		prc.types      = super.fire( "lookup.list", [ "modelType" ] );
 
-		for ( var thisCategory in prc.categories ) {
-			var row = super.getDataMapper().convert( thisCategory, "ProductCategory", true );
-			categories.add( row );
-		}
-
-		prc.page[ "categories" ] = categories;
-		prc.page[ "statuses" ]   = prc.statuses;
-		prc.page[ "types" ]   = prc.types;
+		prc.page[ "types" ]      = mm.convertList( prc.types );
+		prc.page[ "statuses" ]   = mm.convertList( prc.statuses );
+		prc.page[ "categories" ] = mm.convertList( prc.categories );
 
 		prc.jsScripts.add( "app-model" );
 

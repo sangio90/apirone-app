@@ -3,7 +3,7 @@
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var dm     = getDataMapper();
+		var mm     = super.getMementify();
 
 		var params = super.paramsFromUrl();
 
@@ -11,9 +11,9 @@
 
 		var rows = super.fire( "product.search", params );
 
-		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Fruit", true );
-			data.add( obj );
+		for ( var obj in rows.getData() ) {
+			var row = mm.convert( obj, "list" );
+			data.add( row );
 		}
 
 		result.setTotal( rows.getTotal() );
@@ -33,7 +33,7 @@
 
 		var bean = super.fire( "product.get", [ rc.id ] );
 
-		var obj = super.getDataMapper().convert( bean, "Fruit", true );
+		var obj = super.getMementify().convert( bean, "list" );
 
 		result.setData( obj );
 
@@ -53,12 +53,9 @@
 		var result = super.getResult();
 		var lines  = [];
 
-		var fruit      = super.bean( "Product" );
-		var category   = super.bean( "ProductCategory" );
-		var status     = super.bean( "Status" );
-		var statusText = super.bean( "Status" );
-		var text       = super.bean( "Text" );
-		var lang       = super.bean( "Lang" );
+		var fruit    = super.bean( "Product" );
+		var category = super.bean( "ProductCategory" );
+		var status   = super.bean( "Status" );
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
@@ -79,11 +76,7 @@
 
 		fruit.setLines( lines );
 
-		text.setLang( lang.setId( json.nameItem.lang.id ) );
-		text.setStatus( statusText.setId( "ACT" ) );
-
-		text.setId( json.nameItem.id );
-		text.setName( json.nameItem.name );
+		var text = super.buildTextBean( json.nameItem, "NAME" );
 
 		fruit.setTexts( [ text ] );
 		fruit.setCategory( category.setId( json.category.id ) );

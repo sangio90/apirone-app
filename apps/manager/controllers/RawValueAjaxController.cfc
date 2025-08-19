@@ -2,7 +2,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
 		var data   = [];
-		// var dm     = getDataMapper();
 		var mm     = super.getMementify();
 		var result = super.getResult();
 
@@ -25,16 +24,13 @@ component extends="com.apirone.core.controller.AbsController" {
 	function get( event, rc, prc ){
 		param rc.id = "";
 
-		var dm     = getDataMapper();
+		var mm     = super.getMementify();
 		var result = super.getResult();
 
 		var row = super.fire( "rawValue.get", { rawValueId = rc.id } );
 
-		var obj = dm.convert( row, "RawValue", true );
-		// data.add( obj );
+		var obj = mm.convert( row, "list" );
 
-		// result.setCount( rows.getCount() );
-		// result.setTotal( rows.getTotal() );
 		result.setData( obj );
 
 		event.setValue( "result", result );

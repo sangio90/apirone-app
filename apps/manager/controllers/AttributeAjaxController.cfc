@@ -3,7 +3,6 @@ component extends="com.apirone.core.controller.AbsController" {
 	function get( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		// var dm     = getDataMapper();
 		var mm     = super.getMementify();
 
 		var obj = super.fire( "attribute.get", [ rc.id ] );
@@ -30,7 +29,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
 		var data   = [];
-		// var dm     = getDataMapper();
 		var mm     = super.getMementify();
 		var result = super.getResult();
 
@@ -52,7 +50,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function listRawValues( event, rc, prc ){
 		var data   = [];
-		// var dm     = getDataMapper();
 		var mm     = super.getMementify();
 		var result = super.getResult();
 
