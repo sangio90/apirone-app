@@ -92,7 +92,7 @@
 			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
 			bean.setProduct( getProductService().get( record.product_id ) );
 
-			bean.setParent(
+			bean.setOrigin(
 				IsNull( record.parent_id ) ? NullValue() : getQuotationItemProductService().get( record.parent_id )
 			);
 

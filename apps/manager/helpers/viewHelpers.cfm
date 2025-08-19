@@ -202,13 +202,13 @@
             //se la chiave roles non c'è l'item è accessibile a tutti
             if ( !row.keyExists("roles") OR (ListFind( row.roles, "ADM" ) ) ) {
 
-                var parentClass = "";
+                var originClass = "";
                 var activeClass = "";
                 var expandedClass = "";
      
                 if ( StructKeyExists ( row, "items" ) ) {
     
-                    var parentClass = "nav-parent";
+                    var originClass = "nav-origin";
     
                     for ( var item in row.items ) {
                         if ( item.href == active ) {
@@ -223,7 +223,7 @@
                 }
                 
                 var element = '
-                    <li class="#trim( parentClass & ' ' & activeClass & ' ' & expandedClass )#">
+                    <li class="#trim( originClass & ' ' & activeClass & ' ' & expandedClass )#">
                         <a class="nav-link" href="#row.href#">
                             
                             # Len( row?.badge ) ? '<span class="float-end badge badge-primary">#row.badge#</span>' : '' #
@@ -233,7 +233,7 @@
                             <span>#row.title#</span>
                         </a>
     
-                        # parentClass.len() 
+                        # originClass.len() 
                             ? 
                                 '<ul class="nav nav-children">' & 
                                     createMenu( row.items, arguments.active ) &

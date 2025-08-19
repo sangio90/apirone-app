@@ -131,7 +131,7 @@
 		var attribute = super.fire( "attribute.get", [ rc.attributeId ] );
 
 		param rc.id          = "_"; // Current fruit
-		param rc.parentId    = 0; // Parent item, if exists
+		param rc.originId    = 0; // Parent item, if exists
 		param rc.attributeId = 0; // To add items ​​to this attribute
 
 		```
@@ -154,13 +154,13 @@
 						fruit_id,
 						attribute_value_id,
 						orderby,
-						parent_id
+						origin_id
 					)
 					VALUES (
 						<cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid,
 						<cfqueryparam cfsqltype="Integer" value="#item.getId()#">,
 						<cfqueryparam cfsqltype="Integer" value="#item.getOrderBy()#">,
-						#( Val( rc.parentId ) ? rc.parentId : "NULL" )#
+						#( Val( rc.originId ) ? rc.originId : "NULL" )#
 					)
 				</cfquery>
 			</cfloop>

@@ -73,7 +73,7 @@
 		
 		<cfloop array="#arguments.productItem.getChildren()#" item="child">
 
-			<cfset child.getParent().setId( newProductItemId )>
+			<cfset child.getOrigin().setId( newProductItemId )>
 
 			<cfset createProductItem( productItem = child, level = arguments.level + 1, productId = arguments.productId )>
 		

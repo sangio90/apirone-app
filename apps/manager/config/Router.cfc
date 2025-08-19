@@ -200,7 +200,7 @@
 		get( "/ajax/products/:id" ).to( "ProductAjaxController.get" ).end();
 		delete( "/ajax/products" ).to( "ProductAjaxController.delete" ).end();
 		post( "/ajax/products" ).to( "ProductAjaxController.save" ).end();
-		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
+		//get( "/ajax/products" ).to( "ProductAjaxController.list" ).end(); not used
 		get( "/products/:id/combinations" ).to( "ProductController.combinations" ).end();
 
 		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();

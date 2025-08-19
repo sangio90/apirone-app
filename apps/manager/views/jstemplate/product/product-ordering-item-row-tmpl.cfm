@@ -8,7 +8,6 @@
             </td>
             <td class="hand sortable">
                 <span data-bind="html: spaces"></span>
-                <span data-bind="html: orderby"></span>
                 <span data-bind="html: level"></span>
                 <span data-bind="text: attribute.name"></span>: 
                 <span data-bind="text: attributeValue.rawValue.name"></span>

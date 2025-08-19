@@ -148,7 +148,7 @@
         <map from="id" to="id" type="cf:String" />
         <map from="quotationItem" to="quotationItem" ref="QuotationItem" />
         <map from="product" to="product" ref="Product" />
-        <map from="parent" to="parent" ref="QuotationItemProduct" />
+        <map from="origin" to="origin" ref="QuotationItemProduct" />
     </mapper>    
 
     <mapper id="Pricelist" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Pricelist">
@@ -175,7 +175,7 @@
         <map from="id" to="id" type="cf:String" />
         <map from="attributeValue" to="attributeValue" ref="AttributeValue" />
         <map from="attribute" to="Attribute" ref="AttributeForProductItem" />
-        <map from="parent" to="parent" ref="ProductItem" />
+        <map from="origin" to="origin" ref="ProductItem" />
         <!-- <map from="children" to="children" type="Array" ref="ProductItem" /> -->
         <map from="status" to="status" ref="Status" />
         <map from="orderby" to="orderby" type="cf:Numeric" />

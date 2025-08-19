@@ -76,10 +76,7 @@ AP.product.combination = ( function() {
 
             NM.util.ajax( {
                 method: "GET",
-                url:
-                    "/manager/ajax/products/" +
-                    AP.page.productId +
-                    "/combinations/calculate",
+                url: "/manager/ajax/products/" + AP.page.productId + "/combinations/calculate",
                 callback: {
                     done: function( xhr ) {
                         AP.widget.notify(
@@ -108,10 +105,7 @@ AP.product.combination = ( function() {
 
                 NM.util.ajax( {
                     method: "DELETE",
-                    url:
-                        "/manager/ajax/products/" +
-                        AP.page.productId +
-                        "/combinations",
+                    url: "/manager/ajax/products/" + AP.page.productId + "/combinations",
                     data: ids,
                     callback: {
                         done: function( xhr ) {

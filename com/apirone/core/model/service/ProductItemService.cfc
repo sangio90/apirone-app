@@ -60,7 +60,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var n = 1;
 
 		for ( var row in rows ) {
-
 			var thisOrderBy = "#arguments.orderBy#.#n#";
 			var parentId    = row.getId();
 
@@ -79,7 +78,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			result = result.merge( rows );
 
 			n++;
-
 		}
 
 		return result;
@@ -145,17 +143,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteEvent" );
+				outcome.setType( "ApirOne.CannotDeleteProduct" );
 				outcome.setMessage( "Cannot delete product [#arguments.productId#]" );
 			}
 		}
 
 		return outcome;
 	}
-
-	/*
-	
-	*/
 
 	public String function create( required com.apirone.core.model.bean.ProductItem ProductItem ){
 		var newId = getDao().insert( arguments.ProductItem );
@@ -172,6 +166,54 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
+	public Array function getFlatTree(
+		required String productId,
+		required Numeric parentId             = NullValue(),
+		required String level                 = 1,
+		required String orderBy               = "",
+		required Boolean includeMissingValues = true
+	){
+		var result = [];
+		var rows   = [];
+
+		var productId = arguments.productId;
+
+		var items = list( productId = arguments.productId, parentId = arguments.parentId );
+
+		if ( arguments.includeMissingValues ) {
+			rows = listWithMissingValues( items );
+		} else {
+			rows = items;
+		}
+
+		var thisLevel            = arguments.level;
+		var includeMissingValues = arguments.includeMissingValues;
+
+		var n = 1;
+
+		for ( var row in rows ) {
+			var thisOrderBy = "#arguments.orderBy#.#n#";
+			var parentId    = row.getId();
+
+			row.setLevel( arguments.level );
+
+			result.add( row );
+
+			var rows = getFlatTree(
+				productId,
+				parentId,
+				thisLevel + 1,
+				thisOrderBy,
+				includeMissingValues
+			);
+
+			result = result.merge( rows );
+
+			n++;
+		}
+
+		return result;
+	}
 
 
 	/*
@@ -245,11 +287,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			for ( var thisValue in thisAttr.getValues() ) {
 				// 2. cerco i valori mancanti per ogni attributo
 
-				var found = false;
-
-				var index = 1;
+				var found   = false;
+				var index   = 1;
+				var payload = { found = false, parent = NullValue() };
 
 				for ( var thisProduct in arguments.productItems ) {
+					payload.parent = thisProduct.getOrigin();
+
 					if ( thisAttr.getId() == thisProduct.getAttribute().getId() ) {
 						if (
 							thisValue.getRawValue().getId() == thisProduct
@@ -257,8 +301,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								.getRawValue()
 								.getId()
 						) {
-							var found = true;
-							// dump( "trovato: #thisAttr.getName()#: #thisValue.getRawValue().getName()# == #thisProduct.getAttributeValue().getRawValue().getName()#" );
+							payload.found = true;
 						}
 
 						var lastOrderby   = thisProduct.getOrderBy();
@@ -268,13 +311,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					}
 				}
 
-				if ( !found ) {
+				if ( !payload.found ) {
 					var bean = super.bean( "ProductItem" );
 
 					bean.setId( -1 );
 					bean.setAttributeValue( thisValue );
 					bean.setAttribute( lastAttribute );
 					bean.setStatus( getStatusService().get( "DEA" ) );
+					bean.setOrigin( payload.parent );
 
 					// attributeValue
 					bean.setOrderBy( lastOrderby + 10 );
@@ -297,7 +341,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setProductId( record.product_id );
 			bean.setCreatedAt( record.created_at );
 
-			bean.setParent( IsNull( record.parent_id ) ? NullValue() : get( record.parent_id ) );
+			bean.setOrigin( IsNull( record.parent_id ) ? NullValue() : get( record.parent_id ) );
 
 			bean.setOrderBy( record.orderby );
 
@@ -316,55 +360,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return NullValue();
-	}
-
-	public com.apirone.core.model.bean.ProductItem[] function getFlatTree(
-		required String productId,
-		required Numeric parentId=NullValue(),
-		required String level=1,
-		required String orderBy="",
-		required Boolean includeMissingValues=true,
-	) {
-		var result = [];
-		var rows   = [];
-
-		var productId = arguments.productId;
-
-		var items = list( productId = arguments.productId, parentId = arguments.parentId );
-
-		if ( arguments.includeMissingValues ) {
-			rows = listWithMissingValues( items );
-		} else {
-			rows = items;
-		}
-
-		var thisLevel            = arguments.level;
-		var includeMissingValues = arguments.includeMissingValues;
-
-		var n = 1;
-
-		for ( var row in rows ) {
-			var thisOrderBy = "#arguments.orderBy#.#n#";
-			var parentId    = row.getId();
-
-			row.setLevel( arguments.level );
-
-			result.add( row );
-
-			var rows = getFlatTree(
-				productId,
-				parentId,
-				thisLevel + 1,
-				thisOrderBy,
-				includeMissingValues
-			);
-
-			result = result.merge( rows );
-
-			n++;
-		}
-
-		return result;
 	}
 
 }

@@ -1,13 +1,16 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
+		getLogger().debug( "ProductController.list: someone use this method?" );
+		abort;
+
 		var data = [];
 
 		var result = super.getResult();
 		var mm     = super.getMementify();
 		var params = super.paramsFromUrl();
 
-		params[ "excludedCategoryIds" ] = [ 22 ];
+		params[ "categoryModeId" ] = "COM";
 
 		var rows = super.fire( "product.search", params );
 
@@ -84,65 +87,17 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 	function addItem( event, rc, prc ){
-		var result    = super.getResult();
-		var attribute = super.fire( "attribute.get", [ rc.attributeId ] );
+		var result = super.getResult();
 
 		param rc.id          = "_"; // Current product
-		param rc.parentId    = 0; // Parent item, if exists
+		param rc.originId    = 0; // Parent item, if exists
 		param rc.attributeId = 0; // To add values ​​to this attribute
 
-		```
-		<cftransaction>
-			<!--- aggiungo tutto in coda --->
-
-			<cfquery datasource="apirone" name="orderBy">
-				SELECT MAX( orderby ) AS max_orderby
-				FROM
-					product_items
-				WHERE product_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
-			</cfquery>
-
-			<cfif orderBy.recordCount>
-				<cfset startOrderBy = orderBy.max_orderby>
-			<cfelse>
-				<cfset startOrderBy = 10>
-			</cfif>
-
-			<!---
-				<cfquery datasource="apirone">
-				DELETE FROM product_items
-				WHERE
-				product_id = <cfqueryparam cfsqltype="Varchar" value="#rc.id#">::uuid
-				AND attribute_raw_value_id IN
-				(
-				SELECT attribute_raw_value_id
-				FROM attributes_raw_values
-				WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#rc.attributeId#">::uuid
-				)
-				</cfquery>
-				-
-			--->
-
-			<cfloop array="#attribute.getValues()#" item="item">
-				<cfquery datasource="apirone">
-					INSERT INTO product_items (
-						product_id,
-						attribute_raw_value_id,
-						orderby,
-						parent_id,
-						status_id
-					)
-					VALUES (
-						'#rc.id#',
-						'#item.getId()#',
-						#startOrderBy + item.getOrderBy()#,
-						#( Val( rc.parentId ) ? rc.parentId : "NULL" )#,
-						'ACT'
-					)
-				</cfquery>
-			</cfloop>
-		</cftransaction>
-		```
+		linkAttribute(
+			productId   = rc.id,
+			originId    = rc.originId,
+			attributeId = rc.attributeId
+		);
 
 		var message = completeMessage( "product.itemsAdded" );
 
@@ -155,7 +110,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 
 		param rc.items = "_";
-
 
 		```
 		<!--- TODO: better than this --->
@@ -179,6 +133,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 
 		var item   = super.bean( "ProductItem" );
+		var origin = super.bean( "ProductItem" );
 		var value  = super.bean( "AttributeValue" );
 		var status = super.bean( "Status" );
 
@@ -190,6 +145,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		item.setProductId( rc.id );
 		item.setAttributeValue( value );
 		item.setStatus( status );
+		item.setOrigin( origin.setId( json?.origin?.id ) ?: NullValue() );
+
+		dump( json );
+		dump( "================================================" );
+		dump( "================================================" );
+		dump( DeserializeJSON( SerializeJSON( item ) ) );
+		abort;
 
 		var newId = super.fire( "ProductItem.create", { productItem = item } );
 
@@ -398,9 +360,56 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+
 	/*
         private methods
     */
+
+	private Boolean function linkAttribute(
+		required String productId,
+		required String attributeId,
+		Numeric originId = 0
+	){
+		var attribute = super.fire( "attribute.get", [ arguments.attributeId ] );
+
+		```
+		<cftransaction>
+			<cfquery datasource="apirone" name="orderBy">
+				SELECT MAX( orderby ) AS max_orderby
+				FROM
+					product_items
+				WHERE product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+			</cfquery>
+
+			<cfif orderBy.recordCount>
+				<cfset startOrderBy = orderBy.max_orderby>
+			<cfelse>
+				<cfset startOrderBy = 10>
+			</cfif>
+
+			<!--- TODO: use ProductItem.create --->
+			<cfloop array="#attribute.getValues()#" item="item">
+				<cfquery datasource="apirone">
+					INSERT INTO product_items (
+						product_id,
+						attribute_raw_value_id,
+						orderby,
+						origin_id,
+						status_id
+					)
+					VALUES (
+						'#productId#',
+						'#item.getId()#',
+						#startOrderBy + item.getOrderBy()#,
+						#( Val( arguments.originId ) ? arguments.originId : "NULL" )#,
+						'ACT'
+					)
+				</cfquery>
+			</cfloop>
+		</cftransaction>
+		```
+		return true;
+	}
 
 	private function getFlatTree( productId, includeMissingValues = true ){
 		var data   = [];
@@ -414,7 +423,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var items = super.fire( "ProductItem.getFlatTree", params );
 
 		for ( var item in items ) {
-			var row = super.getDataMapper().convert( item, "ProductItem", true );
+			var row = super.getMementify().convert( item, "list", true );
 
 			row[ "spaces" ] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
 

@@ -65,8 +65,8 @@
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getQuotationItem().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getProduct().getId()#">::uuid,
-				<cfif !IsNull( arguments.product.getParent() )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getParent().getId()#">::uuid
+				<cfif !IsNull( arguments.product.getOrigin() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getOrigin().getId()#">::uuid
 				<cfelse>
 					NULL
 				</cfif>
@@ -83,8 +83,8 @@
 			SET
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getQuotationItem().getId()#">::uuid,
 				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getProduct().getId()#">::uuid
-				<cfif !IsNull( arguments.product.getParent() )>
-					,parent_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getParent().getId()#">::uuid
+				<cfif !IsNull( arguments.product.getOrigin() )>
+					,parent_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getOrigin().getId()#">::uuid
 				</cfif>
 			WHERE
 				quotation_item_product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid

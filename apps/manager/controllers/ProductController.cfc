@@ -11,7 +11,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.product = product;
 
-		prc.model   = product.getModel();
+		prc.model  = product.getModel();
 		prc.finish = product.getFinish();
 		prc.line   = product.getLine();
 
@@ -36,7 +36,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			prc.page[ "lineId" ]   = prc.line.getId();
 			prc.page[ "products" ] = super.fire( "product.list", { lineId = prc.line.getId() } );
-
 		}
 
 		prc.jsScripts.add( "app-component" );
@@ -72,11 +71,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title    = category.getName();
 		prc.statuses = super.fire( "status.list", [ "PRODUCT" ] );
 
-		// prc.jsScripts.add( "app-component" );
-		// prc.jsScripts.add( "app-attribute-detail" );
 		prc.jsScripts.add( "app-product-detail" );
-		prc.jsScripts.add( "app-product-list" );
-		// prc.jsScripts.add( "app-product-detail" );
+		prc.jsScripts.add( "app-product-list" ); // remove this file
 
 		prc.page[ "statuses" ] = prc.statuses;
 

@@ -108,7 +108,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var result = 0;
 
 		for ( var item in items ) {
-			if ( item?.getParent()?.getId() == arguments.parentId ) {
+			if ( item?.getOrigin()?.getId() == arguments.parentId ) {
 				result++;
 			}
 		}
@@ -243,7 +243,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             bean.setId( record.product_item_id );
             bean.setProductId( record.product_id );
 			bean.setCreatedAt( record.created_at );
-			bean.setParent( get( record.parent_id ) );
+			bean.setOrigin( get( record.parent_id ) );
 			bean.setOrderBy( record.orderby );
 
             bean.setStatus( getStatusService().get( record.status_id ) );

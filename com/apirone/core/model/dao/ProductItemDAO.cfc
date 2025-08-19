@@ -70,10 +70,10 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductItem.getProductId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getOrderBy()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductItem.getStatus().getId()#">,
-				<cfif IsNull( arguments.ProductItem?.getParent()?.getId() )>
+				<cfif IsNull( arguments.ProductItem?.getOrigin()?.getId() )>
 					NULL
 				<cfelse>
-					<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getParent().getId()#">
+					<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getOrigin().getId()#">
 				</cfif>
 			) RETURNING product_item_id
 		</cfquery>

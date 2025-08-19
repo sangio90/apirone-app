@@ -90,7 +90,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setName( record.quotation_item_zone );
 			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
 
-			bean.setParent(
+			bean.setOrigin(
 				IsNull( record.parent_id ) ? NullValue() : getQuotationItemZoneService().get( record.parent_id )
 			);
 

@@ -22,7 +22,7 @@
                 </td>
 
                 <td class="text-center">
-                    <button type="button" class="btn btn-default btn-sm" data-bind="click:openAttributesList, attr: { data-parent-id: id }">
+                    <button type="button" class="btn btn-default btn-sm" data-bind="click:openAttributesList, attr: { data-origin-id: id }">
                         <i class="fas fa-plus"></i> 
                     </button>
                 </td>

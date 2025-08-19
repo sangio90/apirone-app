@@ -69,21 +69,15 @@ AP.product.items = ( function() {
 
         var filterState = AP.getUserPref( "product.items.showUnlinked", false );
 
-        var data = viewModel.get( "items" ).data();
+        viewModel.updateUnlinkedCount();
 
-        var unlinked = 0;
-
-        for( var item of data  ) {
-            if ( item.id < 0 ) {
-                unlinked++;
-            }
-        }
+        var count = viewModel.get( "unlinkedCount" );
 
         if ( !filterState ) {
-            viewModel.set( "textToggleLink", `Mostra ${unlinked}  attributi non collegati` );
+            viewModel.set( "textToggleLink", "Mostra " + count + " attributi non collegati" );
             viewModel.get( "items" ).filter( { field: "id", operator: "gt", value: 0 } );
         } else {
-            viewModel.set( "textToggleLink", `Nascondi ${unlinked} attributi non collegati` );
+            viewModel.set( "textToggleLink", "Nascondi " + count + " attributi non collegati" );
             viewModel.get( "items" ).filter( {} );
         }
 
@@ -97,12 +91,30 @@ AP.product.items = ( function() {
         orderingItems: dataSources.orderingItems,
         attributesList: dataSources.attributesList,
         orderingAttributes: dataSources.orderingAttributes,
-
         itemForAttributes: undefined,
 
         images: undefined,
         currentImageEntity: undefined,
         currentUploadUrl: undefined,
+
+        unlinkedCount: 0,
+
+        updateUnlinkedCount: function(){
+
+            var data = viewModel.get( "items" ).data();
+
+            var unlinked = 0;
+
+            for( var item of data  ) {
+                if ( item.id < 0 ) {
+                    unlinked++;
+                }
+            }
+
+            viewModel.set( "unlinkedCount", unlinked );
+
+        },
+
 
         /*
 			attributes methods
@@ -167,7 +179,7 @@ AP.product.items = ( function() {
                 url: "/manager/ajax/products/" + AP.page.productId + "/items",
                 data: {
                     attributeId: event.data.id,
-                    parentId: viewModel.get( "itemForAttributes.id" ),
+                    originId: viewModel.get( "itemForAttributes.id" ),
                 },
                 callback: {
                     done: function( xhr ) {
@@ -239,6 +251,8 @@ AP.product.items = ( function() {
         },
 
         addValue: function( event ) {
+
+            console.log( "event:addValue", event );
 
             NM.util.ajax( {
                 method: "POST",

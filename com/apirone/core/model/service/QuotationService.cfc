@@ -126,7 +126,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var quotationProductItems              = quotationItemProductSvc.list( quotationItemId = quotationItem.getId() );
 			// solo i prodotti senza parent
 			var quotationItemProductsWithoutParent = ArrayFilter( quotationProductItems, function( quotationItemProduct ){
-				return IsNull( quotationItemProduct.getParent() );
+				return IsNull( quotationItemProduct.getOrigin() );
 			} )
 			var quotationItemProductWithoutParentIdsMap = {};
 
@@ -146,7 +146,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				);
 				// solo gli item senza parent del prodotto
 				var quotationItemProductItemsWithoutParent = ArrayFilter( quotationItemProductItems, function( quotationItemProductItem ){
-					return IsNull( quotationItemProductItem.getParent() );
+					return IsNull( quotationItemProductItem.getOrigin() );
 				} )
 				var quotationItemProductItemsWithoutParentIdsMap = {};
 
@@ -167,7 +167,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				// solo gli item con parent del prodotto
 				var quotationItemProductItemsWithParent = ArrayFilter( quotationItemProductItems, function( quotationItemProductItem ){
-					return !IsNull( quotationItemProductItem.getParent() );
+					return !IsNull( quotationItemProductItem.getOrigin() );
 				} )
 
 				// ciclo sugli item con parent del prodotto
@@ -177,9 +177,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					clonedQuotationItemProductItem.setQuotationItemProduct( clonedQuotationItemProduct );
 					// recupero il nuovo id del parent dalla mappa
 					var newParentId = quotationItemProductItemsWithoutParentIdsMap[
-						quotationItemProductItem.getParent().getId()
+						quotationItemProductItem.getOrigin().getId()
 					];
-					clonedQuotationItemProductItem.setParent( quotationItemProductItemSvc.get( newParentId ) );
+					clonedQuotationItemProductItem.setOrigin( quotationItemProductItemSvc.get( newParentId ) );
 					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(
 						clonedQuotationItemProductItem
 					);
@@ -191,7 +191,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			// solo i prodotti con parent
 			var quotationItemProductsWithParent = ArrayFilter( quotationProductItems, function( quotationItemProduct ){
-				return !IsNull( quotationItemProduct.getParent() );
+				return !IsNull( quotationItemProduct.getOrigin() );
 			} )
 
 			// ciclo sui prodotti con parent
@@ -200,8 +200,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				clonedQuotationItemProduct.setId( Javacast( "null", "" ) );
 				clonedQuotationItemProduct.setQuotationItem( quotationItemSvc.get( newQuotationItemId ) );
 				// recupera il nuovo id del parent dalla mappa
-				var newParentId = quotationItemProductWithoutParentIdsMap[ quotationItemProduct.getParent().getId() ];
-				clonedQuotationItemProduct.setParent( quotationItemProductSvc.get( newParentId ) );
+				var newParentId = quotationItemProductWithoutParentIdsMap[ quotationItemProduct.getOrigin().getId() ];
+				clonedQuotationItemProduct.setOrigin( quotationItemProductSvc.get( newParentId ) );
 				var newQuotationItemProductId = quotationItemProductSvc.create( clonedQuotationItemProduct );
 				clonedQuotationItemProduct    = quotationItemProductSvc.get( newQuotationItemProductId );
 
@@ -211,7 +211,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				);
 				// solo gli item senza parent del prodotto
 				var quotationItemProductItemsWithoutParent = ArrayFilter( quotationItemProductItems, function( quotationItemProductItem ){
-					return IsNull( quotationItemProductItem.getParent() );
+					return IsNull( quotationItemProductItem.getOrigin() );
 				} )
 				var quotationItemProductItemsWithoutParentIdsMap = {};
 
@@ -232,7 +232,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				// solo gli item con parent del prodotto
 				var quotationItemProductItemsWithParent = ArrayFilter( quotationItemProductItems, function( quotationItemProductItem ){
-					return !IsNull( quotationItemProductItem.getParent() );
+					return !IsNull( quotationItemProductItem.getOrigin() );
 				} )
 
 				// ciclo sugli item con parent del prodotto
@@ -242,9 +242,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					clonedQuotationItemProductItem.setQuotationItemProduct( clonedQuotationItemProduct );
 					// recupero il nuovo id del parent dalla mappa
 					var newParentId = quotationItemProductItemsWithoutParentIdsMap[
-						quotationItemProductItem.getParent().getId()
+						quotationItemProductItem.getOrigin().getId()
 					];
-					clonedQuotationItemProductItem.setParent( quotationItemProductItemSvc.get( newParentId ) );
+					clonedQuotationItemProductItem.setOrigin( quotationItemProductItemSvc.get( newParentId ) );
 					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(
 						clonedQuotationItemProductItem
 					);
@@ -258,7 +258,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var quotationItemZones              = quotationItemZoneSvc.list( quotationItemId = quotationItem.getId() );
 			// solo le zone senza parent
 			var quotationItemZonesWithoutParent = ArrayFilter( quotationItemZones, function( quotationItemZone ){
-				return IsNull( quotationItemZone.getParent() );
+				return IsNull( quotationItemZone.getOrigin() );
 			} )
 			var quotationZoneIdsMap = {};
 			for ( var quotationItemZone in quotationItemZonesWithoutParent ) {
@@ -281,15 +281,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			// solo le zone con parent
 			var quotationItemZonesWithParent = ArrayFilter( quotationItemZones, function( quotationItemZone ){
-				return !IsNull( quotationItemZone.getParent() );
+				return !IsNull( quotationItemZone.getOrigin() );
 			} )
 			for ( var quotationItemZone in quotationItemZonesWithParent ) {
 				var clonedQuotationItemZone = Duplicate( quotationItemZone );
 				clonedQuotationItemZone.setId( Javacast( "null", "" ) );
 				clonedQuotationItemZone.setQuotationItem( quotationItemSvc.get( newQuotationItemId ) );
 				// recupera il nuovo id del parent dalla mappa
-				var newParentId = quotationZoneIdsMap[ quotationItemZone.getParent().getId() ];
-				clonedQuotationItemZone.setParent( quotationItemZoneSvc.get( newParentId ) );
+				var newParentId = quotationZoneIdsMap[ quotationItemZone.getOrigin().getId() ];
+				clonedQuotationItemZone.setOrigin( quotationItemZoneSvc.get( newParentId ) );
 				var newQuotationItemZoneId = quotationItemZoneSvc.create( clonedQuotationItemZone );
 				clonedQuotationItemZone    = quotationItemZoneSvc.get( newQuotationItemZoneId );
 

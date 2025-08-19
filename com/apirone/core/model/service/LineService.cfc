@@ -150,7 +150,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			if ( arguments.productItem.getChildren().len() ) {
 				for ( var child in arguments.productItem.getChildren() ) {
-					child.getParent().setId( newProductItemId );
+					child.getOrigin().setId( newProductItemId );
 
 					createProductItem(
 						productItem = child,

@@ -69,20 +69,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var combinationId = create( combination );
 
 			for ( var productItemId in node ) {
-				
-				var item = super.bean( "CombinationProductItem" );
+				var item    = super.bean( "CombinationProductItem" );
 				var product = super.bean( "productItem" );
-				
+
 				item.setCombinationId( combinationId );
 				item.setProductItem( product.setId( productItemId ) );
-				
+
 				getCombinationProductItemService().create( item );
 			}
 		}
 		// Converto l'albero in un array di combinazioni uniche
 
-		//TODO: message with number of combinations created
-		var combinations = []; 
+		// TODO: message with number of combinations created
+		var combinations = [];
 		return combinations;
 	}
 
@@ -156,7 +155,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				ArrayAppend( tree, node );
 			} else {
 				var parent = stack[ node.level - 1 ];
-				ArrayAppend( parent.children, node );
+				ArrayAppend( origin.children, node );
 			}
 
 			stack[ node.level ] = node;
