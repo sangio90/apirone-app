@@ -472,7 +472,7 @@ AP.component.list = ( function() {
             viewModel.set( "currentProduct", event.data );
 
             viewModel.set( "showSearchPanel", false );
-            viewModel.set( "variantsTitle", "Varianti per " + event.data.name + " <small>(" + event.data.id + ")</small>" );
+            viewModel.set( "variantsTitle", event.data.name + " <small class='fs-10'>(" + event.data.id + ")</small>" );
             viewModel.set( "variants", event.data.variants );
 
             viewModel.set( "colors", [] );

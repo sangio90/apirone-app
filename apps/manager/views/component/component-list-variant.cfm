@@ -1,9 +1,10 @@
 ﻿<cfoutput>
     <div data-bind="visible: showVariants">
         
-        <p><a role="button" data-bind="click:showComponentsList">&laquo; Torna ai componenti</a></p>
+        <p class="mb-1"><a role="button" data-bind="click:showComponentsList">&laquo; Torna ai componenti</a></p>
 
-        <h3 data-bind="html:variantsTitle"></h3>
+        <span class="title-intro">Varianti per</span>
+        <h3 class="mt-1" data-bind="html:variantsTitle"></h3>
     
         <div class="row">
 

@@ -27,32 +27,46 @@
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search } '>
 										
-                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+										<div class="col">
+											<span>Cerca</span>
+											<input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+										</div>
 
-                                        <select class="form-control me-2" name="statusId">
-                                            <option value="">-- seleziona</option>
-                                            <cfloop array="#prc.statuses#" item="item">
-                                                <option value="#item.getId()#">#item.getName()#</option>
-                                            </cfloop>
-                                        </select>
+										<div class="col">
+											<span>Stato</span>
+											<select class="form-control me-2" name="statusId">
+                                                <option value="">-- tutti</option>
+                                                <cfloop array="#prc.statuses#" item="item">
+                                                    <option value="#item.getId()#">#item.getName()#</option>
+                                                </cfloop>
+                                            </select>
+										</div>
 
-										<select class="form-control me-2" name="typeId">
-											<option value="">-- tutti i tipi</option>
-                                            <cfloop array="#prc.types#" item="item">
-    											<option value="#item.getId()#">#item.getName()#</option>
-                                            </cfloop>
-										</select>
+										<div class="col">
+											<span>Tipi</span>
+											<select class="form-control me-2" name="typeId">
+												<option value="">-- tutti</option>
+                                                <cfloop array="#prc.types#" item="item">
+    												<option value="#item.getId()#">#item.getName()#</option>
+                                                </cfloop>
+										    </select>
+                                        </div>
 
-										<select class="form-control me-2" name="orderBy">
-											<option value="productCategory.id-asc">ID [A-Z]</option>
-											<option value="productCategory.id-desc">ID [Z-A]</option>
-											<option value="productCategory.code-asc">Codice [A-Z]</option>
-											<option value="productCategory.code-desc">Codice [Z-A]</option>
-											<option value="text.text-asc">Descrizione [A-Z]</option>
-											<option value="text.text-desc">Descrizione [Z-A]</option>
-										</select>
+										<div class="col">
+											<span>Ordina per</span>
+											<select class="form-control me-2" name="orderBy">
+												<option value="productCategory.id-asc">ID [A-Z]</option>
+												<option value="productCategory.id-desc">ID [Z-A]</option>
+												<option value="productCategory.code-asc">Codice [A-Z]</option>
+												<option value="productCategory.code-desc">Codice [Z-A]</option>
+												<option value="text.text-asc">Descrizione [A-Z]</option>
+	    										<option value="text.text-desc">Descrizione [Z-A]</option>
+    										</select>
+                                        </div>
                                         
-										#searchButton( bind = "click:search" )#
+                                        <div class="align-self-end">
+										    #searchButton( bind = "click:search" )#
+                                        </div>
 									</form>
 								</div>
 							</div>

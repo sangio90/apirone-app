@@ -877,3 +877,12 @@ h2 {
     font-style: italic;
     color: gray;
 }
+
+.title-intro {
+    font-size: 10px;
+    text-transform: uppercase;
+    background-color: #9f9f9f;
+    color: White;
+    padding: 1px 6px;
+    border-radius: 4px;
+}
