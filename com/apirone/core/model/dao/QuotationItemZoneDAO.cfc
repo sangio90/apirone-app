@@ -6,7 +6,7 @@
 			SELECT
 				quotation_item_zone_id::varchar,
 				quotation_item_id::varchar,
-				parent_id::varchar,
+				origin_id::varchar,
 				*
 			FROM quotation_item_zones
 			WHERE quotation_item_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zoneId#">::uuid
@@ -16,7 +16,7 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationItemId" type="String" required="false">
-		<cfargument name="parentId" type="String" required="false">
+		<cfargument name="originId" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_item_zone_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
@@ -25,7 +25,7 @@
 			SELECT
 				quotation_item_zone_id::varchar,
 				quotation_item_id::varchar,
-				parent_id::varchar,
+				origin_id::varchar,
 				COUNT(quotation_item_zone_id) OVER() AS total
 			FROM
 				quotation_item_zones
@@ -33,8 +33,8 @@
 				<cfif !IsNull( arguments.quotationItemId )>
 					AND quotation_item_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemId#">::uuid
 				</cfif>
-				<cfif !IsNull( arguments.parentId )>
-					AND parent_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.parentId#">::uuid
+				<cfif !IsNull( arguments.originId )>
+					AND origin_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.originId#">::uuid
 				</cfif>
 			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
 
@@ -53,7 +53,7 @@
 			INSERT INTO quotation_item_zones (
 				quotation_item_id,
 				quotation_item_zone,
-				parent_id
+				origin_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationItem().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">,
@@ -76,7 +76,7 @@
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationItem().getId()#">::uuid,
 				quotation_item_zone = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">
 				<cfif !IsNull( arguments.zone.getOrigin() )>
-					,parent_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
+					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
 				</cfif>
 			WHERE
 				quotation_item_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getId()#">::uuid

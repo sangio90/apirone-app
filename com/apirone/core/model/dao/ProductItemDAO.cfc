@@ -17,12 +17,12 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="productId" type="String">
-		<cfargument name="parentId" type="Numeric">
+		<cfargument name="originId" type="Numeric">
 		<cfargument name="attributeId" type="String">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				product_item_id, parent_id
+				product_item_id, origin_id
 			FROM
 				product_items
 				<cfif !IsNull( arguments.attributeId )>
@@ -32,11 +32,11 @@
 					--INNER JOIN attributes_raw_values USING ( attribute_raw_value_id )
 			WHERE 1=1
 
-				AND parent_id
-					<cfif IsNull( arguments.parentId )>
+				AND origin_id
+					<cfif IsNull( arguments.originId )>
 						IS NULL
 					<cfelse>
-						= <cfqueryparam cfsqltype="Integer" value="#arguments.parentId#">
+						= <cfqueryparam cfsqltype="Integer" value="#arguments.originId#">
 					</cfif>
 
 				<cfif !IsNull( arguments.productId )>
@@ -63,7 +63,7 @@
 				product_id,
 				orderby,
 				status_id,
-				parent_id
+				origin_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Integer" value="#arguments.ProductItem.getAttributeValue().getId()#">,

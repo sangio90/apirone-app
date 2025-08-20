@@ -7,7 +7,7 @@
 				quotation_item_product_id::varchar,
 				product_id::varchar,
 				quotation_item_id::varchar,
-				parent_id::varchar,
+				origin_id::varchar,
 				*
 			FROM
 				quotation_item_products
@@ -19,7 +19,7 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationItemId" type="String" required="false">
-		<cfargument name="parentId" type="String" required="false">
+		<cfargument name="originId" type="String" required="false">
 		<cfargument name="productId" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_item_product_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
@@ -30,7 +30,7 @@
 				quotation_item_product_id::varchar,
 				product_id::varchar,
 				quotation_item_id::varchar,
-				parent_id::varchar,
+				origin_id::varchar,
 				COUNT(quotation_item_product_id) OVER() AS total
 			FROM
 				quotation_item_products
@@ -41,8 +41,8 @@
 				<cfif !IsNull( arguments.productId )>
 					AND product_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.productId#">::uuid
 				</cfif>
-				<cfif !IsNull( arguments.parentId )>
-					AND parent_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.parentId#">::uuid
+				<cfif !IsNull( arguments.originId )>
+					AND origin_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.originId#">::uuid
 				</cfif>
 			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
 
@@ -61,7 +61,7 @@
 			INSERT INTO quotation_item_products (
 				quotation_item_id,
 				product_id,
-				parent_id
+				origin_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getQuotationItem().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getProduct().getId()#">::uuid,
@@ -84,7 +84,7 @@
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getQuotationItem().getId()#">::uuid,
 				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getProduct().getId()#">::uuid
 				<cfif !IsNull( arguments.product.getOrigin() )>
-					,parent_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getOrigin().getId()#">::uuid
+					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getOrigin().getId()#">::uuid
 				</cfif>
 			WHERE
 				quotation_item_product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid

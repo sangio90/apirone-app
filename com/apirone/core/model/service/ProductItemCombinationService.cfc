@@ -104,11 +104,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return { "result" = result, "data" = data };
 	}
 
-	private Numeric function getChildCount( required Array items, required Numeric parentId ){
+	private Numeric function getChildCount( required Array items, required Numeric originId ){
 		var result = 0;
 
 		for ( var item in items ) {
-			if ( item?.getOrigin()?.getId() == arguments.parentId ) {
+			if ( item?.getOrigin()?.getId() == arguments.originId ) {
 				result++;
 			}
 		}
@@ -138,7 +138,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				};
 			}
 
-			var childCount = getChildCount( data = items, parentId = item.getId() );
+			var childCount = getChildCount( data = items, originId = item.getId() );
 
 			baseAttributes[ attrId ].values.add( {
 				"id"         = item.getId(),
@@ -243,7 +243,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
             bean.setId( record.product_item_id );
             bean.setProductId( record.product_id );
 			bean.setCreatedAt( record.created_at );
-			bean.setOrigin( get( record.parent_id ) );
+			bean.setOrigin( get( record.origin_id ) );
 			bean.setOrderBy( record.orderby );
 
             bean.setStatus( getStatusService().get( record.status_id ) );

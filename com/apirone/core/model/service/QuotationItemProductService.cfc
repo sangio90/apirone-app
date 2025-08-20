@@ -93,7 +93,7 @@
 			bean.setProduct( getProductService().get( record.product_id ) );
 
 			bean.setOrigin(
-				IsNull( record.parent_id ) ? NullValue() : getQuotationItemProductService().get( record.parent_id )
+				IsNull( record.origin_id ) ? NullValue() : getQuotationItemProductService().get( record.origin_id )
 			);
 
 			return bean;

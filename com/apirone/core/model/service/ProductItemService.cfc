@@ -31,7 +31,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var baseItems = list( productId = arguments.productId );
 
 		for ( var item in baseItems ) {
-			var rows = getRecursiveTree( parentId = item.getId(), rows = [] )
+			var rows = getRecursiveTree( originId = item.getId(), rows = [] )
 			item.setChildren( rows );
 
 			result.add( item );
@@ -46,7 +46,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var productId = arguments.productId;
 
-		var items = list( productId = arguments.productId, parentId = arguments.parentId );
+		var items = list( productId = arguments.productId, originId = arguments.originId );
 
 		if ( arguments.includeMissingValues ) {
 			rows = listWithMissingValues( items );
@@ -61,7 +61,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		for ( var row in rows ) {
 			var thisOrderBy = "#arguments.orderBy#.#n#";
-			var parentId    = row.getId();
+			var originId    = row.getId();
 
 			row.setLevel( arguments.level );
 
@@ -69,7 +69,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var rows = getFlatTree(
 				productId,
-				parentId,
+				originId,
 				thisLevel + 1,
 				thisOrderBy,
 				includeMissingValues
@@ -84,7 +84,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	public Array function list( String productId, Numeric parentId ){
+	public Array function list( String productId, Numeric originId ){
 		arguments[ "limit" ] = -1;
 
 		return search( argumentCollection = arguments ).getData();
@@ -109,7 +109,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return true;
 	}
 
-	public com.apirone.core.model.bean.Result function search( String productId, Numeric parentId ){
+	public com.apirone.core.model.bean.Result function search( String productId, Numeric originId ){
 		var rows   = [];
 		var result = super.getResult();
 
@@ -168,7 +168,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public Array function getFlatTree(
 		required String productId,
-		required Numeric parentId             = NullValue(),
+		required Numeric originId             = NullValue(),
 		required String level                 = 1,
 		required String orderBy               = "",
 		required Boolean includeMissingValues = true
@@ -178,7 +178,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var productId = arguments.productId;
 
-		var items = list( productId = arguments.productId, parentId = arguments.parentId );
+		var items = list( productId = arguments.productId, originId = arguments.originId );
 
 		if ( arguments.includeMissingValues ) {
 			rows = listWithMissingValues( items );
@@ -193,7 +193,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		for ( var row in rows ) {
 			var thisOrderBy = "#arguments.orderBy#.#n#";
-			var parentId    = row.getId();
+			var originId    = row.getId();
 
 			row.setLevel( arguments.level );
 
@@ -201,7 +201,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var rows = getFlatTree(
 				productId,
-				parentId,
+				originId,
 				thisLevel + 1,
 				thisOrderBy,
 				includeMissingValues
@@ -234,13 +234,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 	}
 
-	private Array function getRecursiveTree( required Numeric parentId ){
+	private Array function getRecursiveTree( required Numeric originId ){
 		var result = [];
 
-		var items = list( parentId = arguments.parentId );
+		var items = list( originId = arguments.originId );
 
 		for ( var item in items ) {
-			var itemRows = getRecursiveTree( parentId = item.getId() );
+			var itemRows = getRecursiveTree( originId = item.getId() );
 
 			if ( ArrayLen( itemRows ) ) {
 				item.setChildren( itemRows );
@@ -341,7 +341,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setProductId( record.product_id );
 			bean.setCreatedAt( record.created_at );
 
-			bean.setOrigin( IsNull( record.parent_id ) ? NullValue() : get( record.parent_id ) );
+			bean.setOrigin( IsNull( record.origin_id ) ? NullValue() : get( record.origin_id ) );
 
 			bean.setOrderBy( record.orderby );
 
