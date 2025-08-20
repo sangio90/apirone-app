@@ -36,10 +36,8 @@ AP.component.list = ( function() {
             }
         ),
         colors: new kendo.data.DataSource(),
-        variants: new kendo.data.DataSource()
+        variants: new kendo.data.DataSource(),
     };
-
-    console.log( "ds", dataSources.variants instanceof kendo.data.DataSource );
 
     var selectedExists = function( row ) {
 
@@ -54,6 +52,19 @@ AP.component.list = ( function() {
         }
 
         return false;
+
+    };
+
+    var resetFilters = function() {
+
+        var variants = viewModel.get( "variants" );
+        var colors = viewModel.get( "colors" );
+
+        variants.filter( [] );
+        colors.filter( [] );
+
+        $( "#component-variant-search-str" ).val( "" );
+        $( "#component-color-search-str" ).val( "" );
 
     };
 
@@ -125,9 +136,9 @@ AP.component.list = ( function() {
 
         components: undefined,
         variants: dataSources.variants,
+        colors: dataSources.colors,
         selected: dataSources.selected,
 
-        colors: [],
         showColors: false,
         showSearchPanel: true,
         variantsTitle: "Varianti",
@@ -159,8 +170,6 @@ AP.component.list = ( function() {
         copy: function() {
 
             var checks = $( "#component-list-selected-form input[name=selected]:checked" );
-
-            console.log( "checks", checks.length );
 
             if ( !checks.length ) {
                 AP.widget.autoClearMessage(
@@ -215,8 +224,6 @@ AP.component.list = ( function() {
                 // try {
                 // Prova a parsare come JSON
                 var data = JSON.parse( clipboardText );
-
-                console.log( "Dati dal clipboard:", data );
 
                 // Aggiungi i dati al dataSource
                 var dataSource = viewModel.get( "selected" );
@@ -323,8 +330,6 @@ AP.component.list = ( function() {
 
         selectAll: function( event ) {
 
-            console.log( "event", event );
-
             NM.util.checkAll( event.currentTarget );
 
             return false;
@@ -407,6 +412,8 @@ AP.component.list = ( function() {
         },
 
         showVariants: function() {
+
+            // viewModel.get( "variants" ).data( [] );
 
             return !viewModel.get( "showSearchPanel" );
         },
@@ -513,16 +520,17 @@ AP.component.list = ( function() {
         openColors: function( event ) {
 
             viewModel.set( "currentVariant", event.data );
-            viewModel.set( "colors", event.data.colors );
+            viewModel.get( "colors" ).data( event.data.colors );
 
             return false;
         },
 
         openVariants: function( event ) {
 
-            var variants = viewModel.get( "variants" );
+            resetFilters();
 
-            console.log( "v", variants );
+            var variants = viewModel.get( "variants" );
+            var colors = viewModel.get( "colors" );
 
             viewModel.set( "currentProduct", event.data );
 
@@ -530,8 +538,7 @@ AP.component.list = ( function() {
             viewModel.set( "variantsTitle", event.data.name + " <small class='fs-10'>(" + event.data.id + ")</small>" );
 
             variants.data( event.data.variants );
-
-            viewModel.set( "colors", [] );
+            // colors.data( [] );
 
             return false;
         },
@@ -550,8 +557,6 @@ AP.component.list = ( function() {
             var item = dataSource.getByUid( event.data.uid );
 
             var quantityOverride = item.get( "override.quantity" ) ? item.get( "override.quantity" ) : 0;
-
-            console.log( "quantityOverride", quantityOverride );
 
             var totalQuantity = math.add( quantityOverride, item.get( "quantity" ) );
 
@@ -619,8 +624,6 @@ AP.component.list = ( function() {
 
     var refreshSelectedComponents = function( onDone ) {
 
-        // console.log("refreshSelectedComponents:onDone", onDone);
-
         NM.util.ajax( {
             method: "GET",
             url: getCurrentConfig().readUrl,
@@ -643,14 +646,13 @@ AP.component.list = ( function() {
 
         viewModel.set( "currentItem", item );
 
-        viewModel.get( "colors" ).data( [] );
-        viewModel.get( "variants" ).data( [] );
+        // viewModel.get( "colors" ).data( [] );
+        // viewModel.get( "variants" ).data( [] );
 
         viewModel.showComponentsList();
 
         var onDone = function() {
             NM.util.openModal( $( "#component-list-modal" ) );
-            // console.log("done")
         };
 
         refreshSelectedComponents( onDone=onDone );
