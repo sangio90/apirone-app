@@ -65,19 +65,29 @@ AP.product.items = ( function() {
         return item;
     };
 
+    var refreshUnlinkedCount = function() {
+
+        var data = viewModel.get( "items" ).data();
+
+        var unlinked = 0;
+
+        for ( var item of data ) {
+            if ( item.id < 0 ) {
+                unlinked++;
+            }
+        }
+
+        viewModel.set( "unlinkedCount", unlinked );
+
+    };
+
     var fireFilter = function() {
 
         var filterState = AP.getUserPref( "product.items.showUnlinked", false );
 
-        viewModel.updateUnlinkedCount();
-
-        var count = viewModel.get( "unlinkedCount" );
-
         if ( !filterState ) {
-            viewModel.set( "textToggleLink", "Mostra " + count + " attributi non collegati" );
             viewModel.get( "items" ).filter( { field: "id", operator: "gt", value: 0 } );
         } else {
-            viewModel.set( "textToggleLink", "Nascondi " + count + " attributi non collegati" );
             viewModel.get( "items" ).filter( {} );
         }
 
@@ -86,35 +96,38 @@ AP.product.items = ( function() {
     };
 
     var viewModel = kendo.observable( {
-        textToggleLink: "",
+        textToggleLink: function() {
+
+            var text = "";
+
+            // var filterState = AP.getUserPref( "product.items.showUnlinked" );
+
+            var count = viewModel.get( "unlinkedCount" );
+
+            /*
+            TODO: non riesco ad aggiornare "text", mentre "count" viene aggiornato
+            if ( !filterState ) {
+                console.log( "nascondi" );
+                var text = "Nascondi " + count + " attributi non collegati";
+            } else {
+                console.log( "mostra" );
+
+            }
+            */
+
+            var text = "Mostra/nascondi " + count + " attributi non collegati";
+
+            return text;
+        },
         items: dataSources.items, // i need to run after user pref
         orderingItems: dataSources.orderingItems,
         attributesList: dataSources.attributesList,
         orderingAttributes: dataSources.orderingAttributes,
         itemForAttributes: undefined,
-
         images: undefined,
         currentImageEntity: undefined,
         currentUploadUrl: undefined,
-
         unlinkedCount: 0,
-
-        updateUnlinkedCount: function(){
-
-            var data = viewModel.get( "items" ).data();
-
-            var unlinked = 0;
-
-            for( var item of data  ) {
-                if ( item.id < 0 ) {
-                    unlinked++;
-                }
-            }
-
-            viewModel.set( "unlinkedCount", unlinked );
-
-        },
-
 
         /*
 			attributes methods
@@ -122,7 +135,9 @@ AP.product.items = ( function() {
 
         toggleUnlinked: function( event ) {
 
+
             fireFilter();
+            viewModel.textToggleLink();
 
             return false;
 
@@ -532,6 +547,12 @@ AP.product.items = ( function() {
         },
     } );
 
+
+    pub.onDataBound = function( event ) {
+        NM.kendo.toggleScrollbar( event ),
+        refreshUnlinkedCount();
+    };
+
     pub.init = function() {
 
         dataSources.items.one( "change", function() {
@@ -542,6 +563,7 @@ AP.product.items = ( function() {
 
         initSorts();
     };
+
 
     var initUpload = function() {
         var images = viewModel.get( "images" );

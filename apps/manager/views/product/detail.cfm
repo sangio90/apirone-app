@@ -160,7 +160,7 @@
 
                                 <form id="product-grid-form">
 
-                                    #productAttributesList( id="product-items-grid", type="product" )#
+                                    #productAttributesList( id="product-items-grid", type="product", onDataBound="AP.product.items.onDataBound" )#
 
                                 </form>
 

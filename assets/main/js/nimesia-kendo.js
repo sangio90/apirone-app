@@ -101,7 +101,7 @@ NM.kendo.toggleScrollbar = function( event ) {
             var start = checkboxes.index( this );
             var end = checkboxes.index( lastChecked );
 
-            checkboxes.slice( Math.min( start, end ), Math.max( start, end )+ 1 ).prop( "checked", lastChecked.checked );
+            checkboxes.slice( Math.min( start, end ), Math.max( start, end ) + 1 ).prop( "checked", lastChecked.checked );
         }
 
         lastChecked = this;

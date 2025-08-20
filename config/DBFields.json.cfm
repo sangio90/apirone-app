@@ -179,8 +179,8 @@
         "type": "uuid"
     },
 
-    "quotationItemProduct.parentId": {
-        "name": "parent_id",
+    "quotationItemProduct.originId": {
+        "name": "origin_id",
         "type": "uuid"
     },
 

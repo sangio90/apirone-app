@@ -52,6 +52,7 @@
     <cfargument name="class" type="String" default="no-pager">
     <cfargument name="source" type="String" default="items">
     <cfargument name="rowTemplate" type="String" default="product/product-item-row-tmpl">
+    <cfargument name="onDataBound" type="String" required="false" default="NM.kendo.toggleScrollbar">
 
     <cfset local.columns = "[
         { 'field':'Id', 'title':'ID', width: '60px' },
@@ -72,7 +73,8 @@
         class       = arguments.class,
         columns     = local.columns,
         source      = arguments.source,
-        rowTemplate = arguments.rowTemplate
+        rowTemplate = arguments.rowTemplate,
+        onDataBound  = arguments.onDataBound
     )>
 
     <cfreturn local.html>
@@ -115,13 +117,14 @@
     <cfargument name="columns" type="String" required="true" default="[]">
     <cfargument name="pageModels" type="String" required="true" default="[ '15', '50', '100' ]"> <!--- "false" for mute paging --->
     <cfargument name="class" type="String" required="false" default="">
+    <cfargument name="onDataBound" type="String" required="false" default="NM.kendo.toggleScrollbar">
 
     <cfsavecontent variable="local.html">
         <cfoutput>
             <div 
                 id="#arguments.id#"
                 class="#arguments.class#"
-                data-bound="NM.kendo.toggleScrollbar"
+                data-bound="#arguments.onDataBound#"
                 data-columns="#arguments.columns#" 
                 data-role="grid" 
                 data-sortable="#arguments.sortable#" 

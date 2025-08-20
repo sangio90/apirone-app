@@ -147,12 +147,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		item.setStatus( status );
 		item.setOrigin( origin.setId( json?.origin?.id ) ?: NullValue() );
 
-		dump( json );
-		dump( "================================================" );
-		dump( "================================================" );
-		dump( DeserializeJSON( SerializeJSON( item ) ) );
-		abort;
-
 		var newId = super.fire( "ProductItem.create", { productItem = item } );
 
 		var message = completeMessage( "product.valueAdded" );

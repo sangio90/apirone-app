@@ -15,7 +15,7 @@ component {
 			nullDefaultValue  = settings?.nullDefaultValue ?: null,
 			trustedGetters    = settings?.trustedGetters ?: false,
 			convertToTimezone = settings?.convertToTimezone ?: "",
-			autoCastBooleans  = settings?.autoCastBooleans ?: true
+			autoCastBooleans  = settings?.autoCastBooleans ?: false
 		}
 
 		variables.settings = thisSettings;
