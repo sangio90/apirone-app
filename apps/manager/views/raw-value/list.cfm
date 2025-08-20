@@ -20,29 +20,36 @@
 
                         <div class="row d-flex align-items-center mb-3">
 
-                            <div class=" box-search-small col-8">
+                            <div class="col-sm-9">
+								<div class="box-search-small">
+									<form
+										id   ="line-grid-search-form"
+										class="d-flex align-items-center justify-content-end"
+										data-bind: 'events: { submit: search }'>
 
-                                <form id="raw-value-grid-search-form" 
-                                    class="d-flex align-items-center justify-content-end" 
-                                    data-bind:'events: { submit: search }'
-                                >
+                                        <div class="col">
+                                            <span>Cerca</span>
+										    <input name="str" placeholder="Cerca" class="form-control me-3" type="text">
+                                        </div>
 
-                                    <input name="str" placeholder="Cerca" class="form-control me-3" type="text">
+                                        <div class="col">
+                                            <span>Stato</span>
+                                            <select class="form-control me-3" name="statusId">
+                                                <option value="">-- tutti</option>
+                                                <cfloop array="#prc.page.statusList#" item="thisStatus">
+                                                    <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
+                                                </cfloop>
+                                            </select>
+                                        </div>
 
-                                    <select class="form-control me-3" name="statusId">
-                                        <option value="">-- status</option>
-                                        <cfloop array="#prc.page.statusList#" item="thisStatus">
-                                            <option value="#thisStatus.getId()#">#thisStatus.getName()#</option>
-                                        </cfloop>
-                                    </select>
+										<div class="align-self-end">
+											#searchButton( bind = "click:search" )#
+										</div>
+									</form>
+								</div>
+							</div>                            
 
-                                    #searchButton(bind="click:search")#
-                                    
-                                </form>
-                            
-                            </div>
-
-                            <div class="col-sm-4 text-end">
+                            <div class="col-sm-3 text-end">
 
                                 <div class="float-end">
                                     #deleteButton( label="Cancella", bind="click:delete", size="sm" )#

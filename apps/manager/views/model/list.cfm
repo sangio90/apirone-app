@@ -47,7 +47,7 @@
 										<div class="col">
 											<span>Tipo</span>
 											<select class="form-control" name="typeId">
-												<option value="">-- tutti i tipi</option>
+												<option value="">-- tutti</option>
 												<cfloop array="#prc.types#" item="item">
 													<option value="#item.getId()#">#item.getName()#</option>
 												</cfloop>
