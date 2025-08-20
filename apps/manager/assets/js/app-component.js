@@ -34,8 +34,12 @@ AP.component.list = ( function() {
 
                 }
             }
-        )
+        ),
+        colors: new kendo.data.DataSource(),
+        variants: new kendo.data.DataSource()
     };
+
+    console.log( "ds", dataSources.variants instanceof kendo.data.DataSource );
 
     var selectedExists = function( row ) {
 
@@ -120,7 +124,7 @@ AP.component.list = ( function() {
     var viewModel = kendo.observable( {
 
         components: undefined,
-        variants: [],
+        variants: dataSources.variants,
         selected: dataSources.selected,
 
         colors: [],
@@ -326,6 +330,53 @@ AP.component.list = ( function() {
             return false;
         },
 
+        filterVariants: function() {
+
+            var dataSource = viewModel.get( "variants" );
+
+            var str = $( "#component-variant-search-str" ).val();
+
+            var filter = {
+                logic: "or",
+                filters: []
+            };
+
+            if ( str.length ) {
+                filter.filters.push( { field: "id", operator: "contains", value: str } );
+                filter.filters.push( { field: "name", operator: "contains", value: str } );
+            };
+
+            dataSource.filter( filter );
+
+            dataSource.view();
+
+            return false;
+        },
+
+        filterColors: function() {
+
+            var dataSource = viewModel.get( "colors" );
+
+            var str = $( "#component-color-search-str" ).val();
+
+            var filter = {
+                logic: "or",
+                filters: []
+            };
+
+            if ( str.length ) {
+                filter.filters.push( { field: "id", operator: "contains", value: str } );
+                filter.filters.push( { field: "rname", operator: "contains", value: str } );
+            };
+
+            dataSource.filter( filter );
+
+            dataSource.view();
+
+            return false;
+        },
+
+
         filterSelected: function() {
 
             var thisForm = $( "#component-list-selected-form" );
@@ -469,11 +520,16 @@ AP.component.list = ( function() {
 
         openVariants: function( event ) {
 
+            var variants = viewModel.get( "variants" );
+
+            console.log( "v", variants );
+
             viewModel.set( "currentProduct", event.data );
 
             viewModel.set( "showSearchPanel", false );
             viewModel.set( "variantsTitle", event.data.name + " <small class='fs-10'>(" + event.data.id + ")</small>" );
-            viewModel.set( "variants", event.data.variants );
+
+            variants.data( event.data.variants );
 
             viewModel.set( "colors", [] );
 
@@ -587,8 +643,8 @@ AP.component.list = ( function() {
 
         viewModel.set( "currentItem", item );
 
-        viewModel.set( "colors", [] );
-        viewModel.set( "variants", [] );
+        viewModel.get( "colors" ).data( [] );
+        viewModel.get( "variants" ).data( [] );
 
         viewModel.showComponentsList();
 
