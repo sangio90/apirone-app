@@ -211,7 +211,7 @@
      
                 if ( StructKeyExists ( row, "items" ) ) {
     
-                    var originClass = "nav-origin";
+                    var originClass = "nav-parent";
     
                     for ( var item in row.items ) {
                         if ( item.href == active ) {

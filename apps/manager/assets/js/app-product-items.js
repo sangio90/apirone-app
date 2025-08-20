@@ -111,7 +111,7 @@ AP.product.items = ( function() {
                 var text = "Nascondi " + count + " attributi non collegati";
             } else {
                 console.log( "mostra" );
-
+                var text = "Mostra " + count + " attributi non collegati";
             }
             */
 
@@ -134,7 +134,6 @@ AP.product.items = ( function() {
 		*/
 
         toggleUnlinked: function( event ) {
-
 
             fireFilter();
             viewModel.textToggleLink();
