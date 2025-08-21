@@ -1,7 +1,7 @@
 [ 
     {
         id: "PZ",
-        name: ""
+        name: "Pezzi"
     },
     {
         id: "CM",
@@ -26,5 +26,9 @@
     {
         id: "KG",
         name: "Kg"
+    },
+    {
+        id: "GR",
+        name: "Grammi"
     }
 ]

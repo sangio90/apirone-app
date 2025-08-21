@@ -205,4 +205,13 @@
         "name": "signage_config_item_id",
         "type": "Integer"
     },
+    "metaDataType.id": {
+        "name": "meta_data_type_id",
+        "type": "Integer"
+    },
+    "metaDataType.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+
 }

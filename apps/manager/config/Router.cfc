@@ -32,6 +32,14 @@
 		get( "/signages/rows-config" ).to( "SignageConfigController.rowConfig" ).end();
 
 		/*
+			metadata type
+		*/
+		post( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.save" ).end();
+		get( "/ajax/metadata-types/:id" ).to( "MetadataTypeController.get" ).end();
+		get( "/ajax/metadata-types" ).to( "MetadataTypeController.list" ).end();
+		get( "/metadata-types" ).to( "MetadataTypeController.list" ).end();
+
+		/*
 			audit entry
 		*/
 		get( "/ajax/audit-entries/:id" ).to( "AuditEntryAjaxController.get" ).end();
@@ -74,8 +82,6 @@
 		/*
 			raw value
 		*/
-		//get( "/ajax/raw-value" ).to( "RawValueAjaxController.new" ).end();
-		//get( "/ajax/raw-value/:id" ).to( "RawValueAjaxController.get" ).end();
 		get( "/ajax/raw-values/code-exists" ).to( "RawValueAjaxController.codeExists" ).end();
 		get( "/ajax/raw-values/:id" ).to( "RawValueAjaxController.get" ).end();
 		post( "/ajax/raw-values" ).to( "RawValueAjaxController.save" ).end();
