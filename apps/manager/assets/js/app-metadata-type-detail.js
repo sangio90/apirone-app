@@ -1,23 +1,17 @@
-AP.line = AP.line || {};
+AP.metadataType = AP.metadataType || {};
 
-AP.line.fields = {
-    listRoot: $( "#metadata-type-list-root" ),
+AP.metadataType.fields = {
     detailRoot: $( "#metadata-type-detail-modal" ),
     detailForm: $( "#metadata-type-detail-form" ),
-    searchListForm: $( "#metadata-type-grid-search-form" ),
 };
 
 $( document ).ready( function() {
-    if ( AP.line.fields.listRoot.length ) {
-        AP.line.list.init();
-    }
-
-    if ( AP.line.fields.detailRoot.length ) {
-        AP.line.detail.init();
+    if ( AP.metadataType.fields.detailRoot.length ) {
+        AP.metadataType.detail.init();
     }
 } );
 
-AP.line.detail = ( function() {
+AP.metadataType.detail = ( function() {
     var pub = {};
 
     var defaultDetailForm = {
@@ -195,115 +189,3 @@ AP.line.detail = ( function() {
 
     return pub;
 } () );
-
-AP.line.list = ( function() {
-    var pub = {};
-
-    var detailApp = AP.line.detail;
-
-    var dataSources = {
-        items: NM.kendo.dataSource( { url: "/manager/ajax/metadata-types" } ),
-    };
-
-    var viewModel = kendo.observable( {
-        rows: dataSources.items,
-
-        search: function( event ) {
-            var thisForm = AP.line.fields.searchListForm;
-
-            var params = thisForm.serializeJSON();
-
-            viewModel.rows.read( params );
-
-            return false;
-        },
-
-        new: function( event ) {
-            console.log( "detailApp", detailApp );
-
-            var onSave = function() {
-                console.log( "onSave" );
-                viewModel.get( "rows" ).read();
-            };
-
-            detailApp.new( { onSave: onSave } );
-
-            return false;
-        },
-
-        edit: function( event ) {
-            var onSave = function() {
-                viewModel.get( "rows" ).read();
-            };
-
-            detailApp.edit( { id: event.data.id, onSave: onSave } );
-
-            return false;
-        },
-
-        delete: function( event ) {
-            var checks = $( "#metadata-type-grid" ).find( "[name=selected]:checked" );
-
-            if ( checks.length ) {
-                var values = [];
-
-                checks.each( function() {
-                    values.push( $( this ).val() );
-                } );
-
-                var ids = values.toString();
-
-                NM.util.ajax( {
-                    method: "DELETE",
-                    url: "/manager/ajax/metadata-types",
-                    data: ids,
-                    callback: {
-                        done: function( xhr ) {
-                            if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
-                                AP.widget.notify(
-                                    "error",
-                                    "Non riesco a cancellare tutti i valori",
-                                );
-                            } else {
-                                AP.widget.notify(
-                                    "success",
-                                    "Cancellazione avvenuta con successo",
-                                );
-                            }
-
-                            var id = viewModel.get( "detailForm.data.id" );
-                            console.log( "id", id );
-
-                            viewModel.rows.read();
-                        },
-                    },
-                } );
-            } else {
-                AP.widget.notify( "warning", "Seleziona almeno un valore" );
-            }
-        },
-
-        products: function( event ) {
-            var id = event.data.id;
-            window.open( "/manager/metadata-types/" + id + "/products", "_blank" ).focus();
-
-            return false;
-        },
-
-        attributes: function( event ) {
-
-            var id = event.data.id;
-            window.open( "/manager/metadata-types/" + id + "/attributes", "_blank" ).focus();
-
-            return false;
-        },
-    } );
-
-    pub.init = function() {
-        kendo.bind( AP.line.fields.listRoot, viewModel );
-    };
-
-    return pub;
-} () );
-
-

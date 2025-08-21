@@ -27,6 +27,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		"profileType"         = { "bean" = "profileType", "file" = "profileTypes.json.cfm" },
 		"textKind"            = { "bean" = "textKind", "file" = "textKinds.json.cfm" },
 		"dataType"            = { "bean" = "dataType", "file" = "dataTypes.json.cfm" },
+		"entity"              = { "bean" = "entity", "file" = "entities.json.cfm" },
 		"productCategoryMode" = {
 			"bean" = "productCategoryMode",
 			"file" = "productCategoryModes.json.cfm"

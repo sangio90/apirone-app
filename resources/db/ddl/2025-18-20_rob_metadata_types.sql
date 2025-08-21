@@ -36,3 +36,10 @@ ALTER TABLE public.metadata_values OWNER TO apiruser;
 
 ALTER TABLE public.metadata_types
   ADD COLUMN orderby INTEGER DEFAULT 10 NOT NULL;
+
+
+UPDATE statuses
+SET
+    entities = '["LINE", "ATTRIBUTE", "FINISH", "MODEL", "ACCOUNT", "PRODUCTION_TIME", "PRODUCT_CATEGORY", "PRODUCT", "RAW_VALUE", "METADATA_TYPE"]'
+WHERE
+    status_id IN ('ACT', 'DEA');

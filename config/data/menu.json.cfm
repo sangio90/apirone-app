@@ -105,6 +105,12 @@
 				roles: "ADM"
 			},
 			{
+				href: "/manager/metadata-types",
+				icon: "fas fa-fan",
+				title: "Metadata",
+				roles: "ADM"
+			},
+			{
 				href: "/manager/texts",
 				icon: "fas fa-language",
 				title: "Traduzioni",
