@@ -38,6 +38,7 @@
 		get( "/ajax/metadata-types/:id" ).to( "MetadataTypeAjaxController.get" ).end();
 		post( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.save" ).end();
 		get( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.list" ).end();
+		delete( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.delete" ).end();
 		get( "/metadata-types" ).to( "MetadataTypeController.list" ).end();
 
 		/*

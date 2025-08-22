@@ -36,7 +36,7 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Unità di misura</label>
                             <div class="col-sm-10">
-                                <select id="unitId" class="form-control"
+                                <select id="unitId" name="unitId" class="form-control"
                                     required
                                     data-bind="source: units, value: detailForm.data.measurementUnit.id" 
                                     data-value-field="id"
@@ -49,7 +49,7 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Tipo di dato</label>
                             <div class="col-sm-10">
-                                <select id="dataTypeId" class="form-control"
+                                <select id="dataTypeId" name="dataTypeId" class="form-control"
                                     required
                                     data-bind="source: dataTypes, value: detailForm.data.dataType.id" 
                                     data-value-field="id"
@@ -62,7 +62,7 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Utilizzabile in</label>
                             <div class="col-sm-10">
-                                <select id="entities" 
+                                <select id="entities" name="entities"
                                     required
                                     data-placeholder="-- seleziona"
                                     data-role="multiselect" 
@@ -71,6 +71,7 @@
                                     data-text-field="name"
                                     >
                                 </select>
+                                <div id="entities-error"></div>                                    
                             </div>
                         </div>
 

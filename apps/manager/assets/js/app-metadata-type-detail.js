@@ -20,10 +20,10 @@ AP.metadataType.detail = ( function() {
             code: "",
             name: "",
             selectedEntities: [],
-            category: {
+            dataType: {
                 id: "",
             },
-            unit: {
+            measurementUnit: {
                 id: "",
             },
             status: {
@@ -129,26 +129,15 @@ AP.metadataType.detail = ( function() {
 
     pub.init = function() {
 
-        var detailForm = AP.metadataType.fields.detailForm;
-
-        /*
-        AP.page.entities.unshift( {
-            id: "",
-            name: "-- Seleziona",
-        } );
-        */
-
-        AP.page.units.unshift( {
-            id: "",
-            name: "-- Seleziona un'unità di misura",
-        } );
-
-        AP.page.dataTypes.unshift( {
-            id: "",
-            name: "-- Seleziona un tipo di dato",
-        } );
-
         kendo.bind( AP.metadataType.fields.detailRoot, viewModel );
+
+        AP.page.units = [];
+
+        viewModel.get( "units" ).unshift( { id: "", name: "-- Seleziona un'unità di misura" } );
+
+        viewModel.get( "dataTypes" ).unshift( { id: "", name: "-- Seleziona un tipo di dato" } );
+
+        var detailForm = AP.metadataType.fields.detailForm;
 
         detailForm.validate( {
             onfocusout: function( element ) {
@@ -165,6 +154,9 @@ AP.metadataType.detail = ( function() {
                     required: true,
                 },
                 name: {
+                    required: true,
+                },
+                entities: {
                     required: true,
                 },
                 code: {
@@ -187,7 +179,7 @@ AP.metadataType.detail = ( function() {
             },
             messages: {
                 unitId: {
-                    required: "Stato richiesto",
+                    required: "Unità di misura richiesta",
                 },
                 statusId: {
                     required: "Stato richiesto",
@@ -197,6 +189,9 @@ AP.metadataType.detail = ( function() {
                 },
                 name: {
                     required: "Nome richiesto",
+                },
+                entities: {
+                    required: "Selezionare almeno una entità",
                 },
                 code: {
                     required: "Codice richiesto",

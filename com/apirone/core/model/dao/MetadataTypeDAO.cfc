@@ -18,7 +18,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				metadata_type_id
+				metadata_type_id, code
 			FROM
 				metadata_types
 			WHERE

@@ -58,7 +58,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public String function update( required com.apirone.core.model.bean.MetadataType metadataType ){
+	public Numeric function update( required com.apirone.core.model.bean.MetadataType metadataType ){
 		getDao().update( arguments.metadataType );
 
 		var id = arguments.metadataType.getId();
@@ -68,12 +68,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.metadataType.getId();
 	}
 
+	public Numeric function create( required com.apirone.core.model.bean.MetadataType metadataType ){
+		var newId = getDao().insert( arguments.metadataType );
+
+		return newId;
+	}
+
 	public Boolean function codeExists( required String code, String excludedId = "" ){
 		var record = getDao().readByCode( arguments.code );
 
 		if (
 			record.recordCount
-			&& record.metadataType_id != arguments.excludedId
+			&& record.metadata_type_id != arguments.excludedId
 		) {
 			return record.code == arguments.code;
 		}
