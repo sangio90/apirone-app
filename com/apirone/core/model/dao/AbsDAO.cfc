@@ -25,6 +25,18 @@
 		<cfreturn items.len() ? items : NullValue()>
 	</cffunction>
 
+	<cffunction access="private" name="getEntitiesAsArray" returntype="Array">
+		<cfargument name="entities" required="true">
+
+		<cfset var items = []>
+
+		<cfloop array="#arguments.entities#" item="local.thisItem">
+			<cfset items.add( local.thisItem.getId() )>
+		</cfloop>
+
+		<cfreturn items.len() ? items : NullValue()>
+	</cffunction>
+
 	<cffunction name="sanitizeSQL" returntype="String">
 		<cfargument name="sql" type="String">
 

@@ -25,7 +25,6 @@ component extends="com.apirone.core.root.Application" {
 
 	}
 
-
 	public Boolean function onRequestStart( string targetPage ) {
 
 		SetLocale("italian (italy)");
@@ -36,14 +35,13 @@ component extends="com.apirone.core.root.Application" {
 			application.counter = 100;
 		}
 
-
         if ( !StructKeyExists( session, "user" ) ) {
             startUser()
         }
 
 		if ( super.isDev() OR url.keyExists("reinit") ) {
 
-			//super.clearContainer()
+			super.clearContainer()
 
 			onApplicationStart();
 			application.counter++;

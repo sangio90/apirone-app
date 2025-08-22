@@ -1,11 +1,19 @@
 [ 
     {
-        id: "INTEGER",
-        name: "Intero"
+        id: "BOOLEAN",
+        name: "Booleano"
+    },
+    {
+        id: "DATE",
+        name: "Data"
     },
     {
         id: "DECIMAL",
         name: "Decimale"
+    },
+    {
+        id: "INTEGER",
+        name: "Intero"
     },
     {
         id: "STRING",
@@ -14,13 +22,5 @@
     {
         id: "TEXT",
         name: "Testo"
-    },
-    {
-        id: "BOOLEAN",
-        name: "Booleano"
-    },
-    {
-        id: "DATE",
-        name: "Data"
     },
 ]

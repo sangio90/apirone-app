@@ -34,8 +34,9 @@
 		/*
 			metadata type
 		*/
-		post( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.save" ).end();
+		get( "/ajax/metadata-types/code-exists" ).to( "MetadataTypeAjaxController.codeExists" ).end();
 		get( "/ajax/metadata-types/:id" ).to( "MetadataTypeAjaxController.get" ).end();
+		post( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.save" ).end();
 		get( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.list" ).end();
 		get( "/metadata-types" ).to( "MetadataTypeController.list" ).end();
 

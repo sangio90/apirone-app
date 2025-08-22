@@ -4,6 +4,17 @@
     <cfreturn Replace( renderView( view="#arguments.view#" ), "nmscript", "script", "ALL" )>
 </cffunction>
 
+<cffunction name="relevantPath">
+    <cfargument required="true" type="String" name="fullPath">
+
+    <cfset var parts = ListToArray(fullPath, server.system.properties["file.separator"])>
+    <cfset var fileName = Replace( parts[arrayLen(parts)], ".cfm", "", "ALL")>
+    <cfset var lastDir = parts[arrayLen(parts)-1]>
+
+    <cfreturn "#lastDir#/#fileName#">
+
+</cffunction>
+
 <cffunction name="breadcrumbs">
     <cfreturn "">
 </cffunction>

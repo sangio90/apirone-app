@@ -25,7 +25,7 @@
 		<div class="columns">
 			<div class="column">
 				<b>Sistema</b>: Lucee #server.lucee.version#<br>
-				<b>Locale</b>: #GetLocaleInfo().name#<br>
+				<b>Locale</b>: #GetLocaleInfo().name# - <b>Separatore</b>: #server.system.properties["file.separator"]#<br>
 			</div>
 		</div>
 

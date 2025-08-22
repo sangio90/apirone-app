@@ -1,19 +1,19 @@
 [ 
     {
-        id: "PZ",
-        name: "Pezzi"
-    },
-    {
         id: "CM",
         name: "Centimetri"
     },
     {
-        id: "MM",
-        name: "Millimetri"
+        id: "GR",
+        name: "Grammi"
     },
     {
         id: "M",
         name: "Metri"
+    },
+    {
+        id: "MM",
+        name: "Millimetri"
     },
     {
         id: "MQ",
@@ -24,11 +24,11 @@
         name: "Paia"
     },
     {
+        id: "PZ",
+        name: "Pezzi"
+    },
+    {
         id: "KG",
         name: "Kg"
     },
-    {
-        id: "GR",
-        name: "Grammi"
-    }
 ]

@@ -19,7 +19,7 @@ AP.metadataType.detail = ( function() {
             id: "",
             code: "",
             name: "",
-            selectedCategories: [],
+            selectedEntities: [],
             category: {
                 id: "",
             },
@@ -39,6 +39,7 @@ AP.metadataType.detail = ( function() {
         units: AP.page.units,
         statuses: AP.page.statuses,
         dataTypes: AP.page.dataTypes,
+        entities: AP.page.entities,
 
         callbacks: {
             onCreate: undefined,
@@ -73,6 +74,9 @@ AP.metadataType.detail = ( function() {
                             if ( xhr.status == "SUCCESS" ) {
                                 NM.util.autoHideMessage( status, "<span class='green'>Metadato salvata</span>", );
                                 setTimeout( () => $( "#metadata-type-detail-modal" ).modal( "hide" ), 600 );
+
+                                AP.util.fireCallback( "onSave", viewModel.get( "callbacks" ) );
+
                             }
                         },
                     },
@@ -90,7 +94,8 @@ AP.metadataType.detail = ( function() {
         NM.util.openModal( AP.metadataType.fields.detailRoot );
     };
 
-    pub.edit = function(  id, onSave ) {
+    pub.edit = function( id, onSave ) {
+
         if ( onSave ) {
             viewModel.set( "callbacks.onSave", onSave );
         }
@@ -165,7 +170,7 @@ AP.metadataType.detail = ( function() {
                 code: {
                     required: true,
                     checkCode: true,
-                    rangelength: [ 5, 5 ],
+                    maxlength: 15,
                     remote: {
                         url: "/manager/ajax/metadata-types/code-exists",
                         data: {
@@ -181,12 +186,6 @@ AP.metadataType.detail = ( function() {
                 },
             },
             messages: {
-                code: {
-                    required: "Codice richiesto",
-                    rangelength: "Sono richiesti 5 caratteri",
-                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
-                    remote: "Il codice esiste",
-                },
                 unitId: {
                     required: "Stato richiesto",
                 },
@@ -198,6 +197,12 @@ AP.metadataType.detail = ( function() {
                 },
                 name: {
                     required: "Nome richiesto",
+                },
+                code: {
+                    required: "Codice richiesto",
+                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
+                    maxlength: "Al massimo 15 caratteri",
+                    remote: "Il codice esiste",
                 },
 
             },

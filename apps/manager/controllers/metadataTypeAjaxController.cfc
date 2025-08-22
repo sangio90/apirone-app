@@ -22,7 +22,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function get( event, rc, prc ){
-		param rc.id = "___";
+		param rc.id = "_";
 		var result  = super.getResult();
 
 		if ( !IsNumeric( rc.id ) ) {
@@ -41,19 +41,31 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
+		var result = getResult();
+
 		var messageId = "";
 		var thisId    = 0;
+		var entities  = [];
 
 		var dataType = super.bean( "DataType" );
 		var unit     = super.bean( "MeasurementUnit" );
 		var status   = super.bean( "Status" );
-		var entity   = super.bean( "Entity" );
 		var metaType = super.bean( "MetadataType" );
 
+		for ( var thisEntity in json.selectedEntities ) {
+			var entity = super.bean( "Entity" );
+
+			entity.setId( thisEntity.id )
+			entities.add( entity );
+		}
+
+		metaType.setId( json.id );
+		metaType.setCode( json.code );
+		metaType.setName( json.name );
 		metaType.setStatus( status.setId( json.status.id ) );
 		metaType.setMeasurementUnit( unit.setId( json.measurementUnit.id ) );
-		metaType.setEntity( entity.setId( json.entity.id ) );
 		metaType.setDataType( dataType.setId( json.dataType.id ) );
+		metaType.setEntities( entities );
 
 		if ( !Len( json.id ) ) {
 			messageId = "metadataType.created";

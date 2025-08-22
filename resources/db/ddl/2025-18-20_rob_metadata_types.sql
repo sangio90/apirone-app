@@ -1,6 +1,6 @@
 ﻿CREATE TABLE public.metadata_types (
   metadata_type_id SERIAL,
-  code VARCHAR(50) NOT NULL,
+  code VARCHAR(15) NOT NULL,
   metadata_type VARCHAR(255) NOT NULL,
   unit_id VARCHAR(20) NOT NULL,
   datatype_id VARCHAR(20) NOT NULL,

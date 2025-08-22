@@ -14,9 +14,11 @@
             </td>
             <td>
                 <span data-bind="text: dataType.name"></span>
+                <span class="small-code">(<span  data-bind="text: dataType.id"></span>)</span>
             </td>
             <td>
                 <span data-bind="text: measurementUnit.name"></span>
+                <span class="small-code">(<span  data-bind="text: measurementUnit.id"></span>)</span>
             </td>
             <td>
                 <div data-bind="source: entities" data-template="entity-row-tmpl"></div>

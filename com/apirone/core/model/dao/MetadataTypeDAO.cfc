@@ -122,13 +122,13 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE metadata_types
 			SET
-				code = <cfqueryparam cfsqltype="varchar" value="#arguments.metadataType.getCode()#">
+				code = <cfqueryparam cfsqltype="varchar" value="#arguments.metadataType.getCode()#">,
 				metadata_type = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getName()#">,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getStatus().getId()#">,
 				datatype_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getDataType().getId()#">,
-				unit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getMeasurementUnit().getId()#">
-				orderby = 10
-				entities = #SerializeJSON( entities )#
+				unit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getMeasurementUnit().getId()#">,
+				orderby = 10,
+				entities = '#SerializeJSON( entities )#'
 			WHERE
 				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataType.getId()#">
 		</cfquery>

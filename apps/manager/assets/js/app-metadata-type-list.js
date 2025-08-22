@@ -21,7 +21,6 @@ $( document ).ready( function() {
 AP.metadataType.list = ( function() {
     var pub = {};
 
-    var fields = AP.metadataType.fields;
     var detailApp = AP.metadataType.detail;
 
     var dataSources = {
@@ -43,19 +42,19 @@ AP.metadataType.list = ( function() {
 
         new: function() {
 
-            console.log( "new" );
-
-            console.log( "detailApp", detailApp );
-
             detailApp.new();
         },
 
         edit: function( event ) {
             // viewModel.resetForm();
 
-            console.log("event.data.id", event.data.id)
+            console.log( "event.data.id", event.data.id );
 
-            detailApp.new( event.data.id );
+            var onSave = function() {
+                viewModel.get( "rows" ).read();
+            };
+
+            detailApp.edit( event.data.id, onSave );
 
             return false;
         },
