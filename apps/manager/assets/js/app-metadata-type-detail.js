@@ -1,9 +1,9 @@
-AP.metadataType = AP.metadataType || {};
+AP.namespace( "metadataType" );
 
-AP.metadataType.fields = {
+Object.assign( AP.metadataType.fields, {
     detailRoot: $( "#metadata-type-detail-modal" ),
     detailForm: $( "#metadata-type-detail-form" ),
-};
+} );
 
 $( document ).ready( function() {
     if ( AP.metadataType.fields.detailRoot.length ) {
@@ -30,13 +30,15 @@ AP.metadataType.detail = ( function() {
                 id: "ACT",
             },
         },
-        units: AP.page.units,
-        statuses: AP.page.statuses,
         title: "Carica tipo di metadato",
     };
 
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
+
+        units: AP.page.units,
+        statuses: AP.page.statuses,
+        dataTypes: AP.page.dataTypes,
 
         callbacks: {
             onCreate: undefined,
@@ -45,7 +47,7 @@ AP.metadataType.detail = ( function() {
         },
 
         resetForm: function() {
-            var detailForm = AP.line.fields.detailForm;
+            var detailForm = AP.metadataType.fields.detailForm;
 
             var validator = detailForm.validate();
             validator.resetForm();
@@ -56,7 +58,7 @@ AP.metadataType.detail = ( function() {
         },
 
         save: function( event ) {
-            var detailForm = AP.line.fields.detailForm;
+            var detailForm = AP.metadataType.fields.detailForm;
             var status = detailForm.find( ".status" );
 
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
@@ -69,20 +71,8 @@ AP.metadataType.detail = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
-                                NM.util.autoHideMessage(
-                                    status,
-                                    "<span class='green'>Linea salvata</span>",
-                                );
-
-                                setTimeout(
-                                    () => $( "#metadata-type-detail-modal" ).modal( "hide" ),
-                                    1000,
-                                );
-
-                                AP.util.fireCallback(
-                                    "onSave",
-                                    viewModel.get( "callback" ),
-                                );
+                                NM.util.autoHideMessage( status, "<span class='green'>Metadato salvata</span>", );
+                                setTimeout( () => $( "#metadata-type-detail-modal" ).modal( "hide" ), 600 );
                             }
                         },
                     },
@@ -93,19 +83,16 @@ AP.metadataType.detail = ( function() {
         },
     } );
 
-    pub.new = function( { onSave } ) {
-        if ( onSave ) {
-            viewModel.set( "callback.onSave", onSave );
-        }
+    pub.new = function() {
 
         viewModel.resetForm();
 
-        NM.util.openModal( AP.line.fields.detailRoot );
+        NM.util.openModal( AP.metadataType.fields.detailRoot );
     };
 
-    pub.edit = function( { id, onSave } ) {
+    pub.edit = function(  id, onSave ) {
         if ( onSave ) {
-            viewModel.set( "callback.onSave", onSave );
+            viewModel.set( "callbacks.onSave", onSave );
         }
 
         viewModel.resetForm();
@@ -116,22 +103,19 @@ AP.metadataType.detail = ( function() {
             callback: {
                 done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
-                        var selectedCategories = [];
+                        var selectedEntities = [];
 
-                        if ( xhr.data?.categories ) {
-                            for ( var category of xhr.data.categories ) {
-                                selectedCategories.push( category );
+                        if ( xhr.data?.entities ) {
+                            for ( var entity of xhr.data.entities ) {
+                                selectedEntities.push( entity );
                             }
                         }
 
                         viewModel.set( "detailForm.data", xhr.data );
-                        viewModel.set(
-                            "detailForm.data.selectedCategories",
-                            selectedCategories,
-                        );
-                        viewModel.set( "detailForm.title", "Modifica linea" );
+                        viewModel.set( "detailForm.data.selectedEntities", selectedEntities );
+                        viewModel.set( "detailForm.title", "Modifica metadato" );
 
-                        NM.util.openModal( AP.line.fields.detailRoot );
+                        NM.util.openModal( AP.metadataType.fields.detailRoot );
                     }
                 },
             },
@@ -139,25 +123,45 @@ AP.metadataType.detail = ( function() {
     };
 
     pub.init = function() {
-        kendo.bind( AP.line.fields.detailRoot, viewModel );
 
-        AP.page.categories.unshift( {
+        var detailForm = AP.metadataType.fields.detailForm;
+
+        /*
+        AP.page.entities.unshift( {
             id: "",
-            name: "-- Seleziona una categoria",
+            name: "-- Seleziona",
+        } );
+        */
+
+        AP.page.units.unshift( {
+            id: "",
+            name: "-- Seleziona un'unità di misura",
         } );
 
-        AP.page.thicknesses.unshift( {
+        AP.page.dataTypes.unshift( {
             id: "",
-            name: "-- Seleziona uno spessore",
+            name: "-- Seleziona un tipo di dato",
         } );
 
-        var detailForm = AP.line.fields.detailForm;
+        kendo.bind( AP.metadataType.fields.detailRoot, viewModel );
 
         detailForm.validate( {
             onfocusout: function( element ) {
                 $( element ).valid();
             },
             rules: {
+                statusId: {
+                    required: true,
+                },
+                dataTypeId: {
+                    required: true,
+                },
+                unitId: {
+                    required: true,
+                },
+                name: {
+                    required: true,
+                },
                 code: {
                     required: true,
                     checkCode: true,
@@ -183,6 +187,19 @@ AP.metadataType.detail = ( function() {
                     checkCode: "Solo numeri, lettere, trattino o trattino basso",
                     remote: "Il codice esiste",
                 },
+                unitId: {
+                    required: "Stato richiesto",
+                },
+                statusId: {
+                    required: "Stato richiesto",
+                },
+                dataTypeId: {
+                    required: "Tipo di dato richiesto",
+                },
+                name: {
+                    required: "Nome richiesto",
+                },
+
             },
         } );
     };

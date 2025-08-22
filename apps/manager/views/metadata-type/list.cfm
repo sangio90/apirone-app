@@ -95,8 +95,9 @@
                                         { 'field':'id', 'title':'ID', width: '50px' },
                                         { 'field':'code', 'title':'Codice', width: '100px' },
                                         { 'field':'name', 'title':'Nome' },
-                                        { 'field':'entities', 'title':'Entità' },
+                                        { 'field':'dataType.name', 'title':'Tipo di dato' },
                                         { 'field':'unit', 'title':'Unità' },
+                                        { 'field':'entities', 'title':'Entità' },
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 
                                             'field'           :'', 

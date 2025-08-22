@@ -9,8 +9,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.units     = super.fire( "lookup.list", [ "measurementUnit" ] );
 		prc.entities  = super.fire( "lookup.list", [ "entity" ] );
 
-		prc.jsScripts.add( "app-metadata-type-list" );
 		prc.jsScripts.add( "app-metadata-type-detail" );
+		prc.jsScripts.add( "app-metadata-type-list" );
 
 		prc.page[ "statuses" ]  = mm.convertList( prc.statuses, "list" );
 		prc.page[ "units" ]     = mm.convertList( prc.units, "list" );

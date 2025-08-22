@@ -72,7 +72,7 @@ AP.rawValue.detail = ( function() {
             var data = viewModel.get( "detailForm.data" );
 
             if( this.isUpdate() ) {
-    			return "Modifica valore < " + data.id + " >";
+    			return "Modifica valore < " + data.name + " >";
             }
 
     		return "Carica nuovo valore";

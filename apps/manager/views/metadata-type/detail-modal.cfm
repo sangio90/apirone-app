@@ -1,10 +1,10 @@
 ﻿<cfoutput>
-    <div id="line-detail-modal" class="modal fade">
+    <div id="metadata-type-detail-modal" class="modal fade">
         
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                <form id="line-detail-form" method="POST" name="line-detail-form">
+                <form id="metadata-type-detail-form" method="POST" name="metadata-type-detail-form">
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:detailForm.title"></h2>
@@ -36,8 +36,8 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Unità di misura</label>
                             <div class="col-sm-10">
-                                <select id="units" class="form-control"
-                                    data-placeholder="-- seleziona"
+                                <select id="unitId" class="form-control"
+                                    required
                                     data-bind="source: units, value: detailForm.data.measurementUnit.id" 
                                     data-value-field="id"
                                     data-text-field="name"
@@ -47,10 +47,10 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Data type</label>
+                            <label class="col-sm-2 col-form-label text-end">Tipo di dato</label>
                             <div class="col-sm-10">
-                                <select id="dataType" class="form-control"
-                                    data-placeholder="-- seleziona"
+                                <select id="dataTypeId" class="form-control"
+                                    required
                                     data-bind="source: dataTypes, value: detailForm.data.dataType.id" 
                                     data-value-field="id"
                                     data-text-field="name"
@@ -63,6 +63,7 @@
                             <label class="col-sm-2 col-form-label text-end">Utilizzabile in</label>
                             <div class="col-sm-10">
                                 <select id="entities" 
+                                    required
                                     data-placeholder="-- seleziona"
                                     data-role="multiselect" 
                                     data-bind="source: entities, value: detailForm.data.selectedEntities" 

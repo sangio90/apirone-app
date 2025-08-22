@@ -1,8 +1,16 @@
-﻿AP.metadataType = AP.metadataType || {};
+﻿AP.namespace( "metadataType" );
 
-AP.metadataType.fields = {
+Object.assign( AP.metadataType.fields, {
     listRoot: $( "#metadata-type-list-root" ),
-};
+} );
+
+/*
+AP.metadataType = AP.metadataType || {};
+
+Object.assign( AP.namespace( "metadataType" ), {
+    listRoot: $( "#metadata-type-list-root" ),
+} );
+*/
 
 $( document ).ready( function() {
     if ( AP.metadataType.fields.listRoot.length ) {
@@ -13,8 +21,8 @@ $( document ).ready( function() {
 AP.metadataType.list = ( function() {
     var pub = {};
 
-    var detailApp = AP.metadataType.detail;
     var fields = AP.metadataType.fields;
+    var detailApp = AP.metadataType.detail;
 
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/metadata-types" } ),
@@ -24,7 +32,7 @@ AP.metadataType.list = ( function() {
         rows: dataSources.items,
 
         search: function( event ) {
-            var thisForm = AP.line.fields.searchListForm;
+            var thisForm = AP.metadataType.fields.searchListForm;
 
             var params = thisForm.serializeJSON();
 
@@ -34,21 +42,20 @@ AP.metadataType.list = ( function() {
         },
 
         new: function() {
-            viewModel.resetForm();
 
-            NM.util.openModal( fields.detailRoot );
+            console.log( "new" );
+
+            console.log( "detailApp", detailApp );
+
+            detailApp.new();
         },
 
         edit: function( event ) {
-            viewModel.resetForm();
+            // viewModel.resetForm();
 
-            viewModel.set( "detailForm.data", event.data );
-            viewModel.set(
-                "detailForm.title",
-                "Modifica categoria <" + event.data.code + " >",
-            );
+            console.log("event.data.id", event.data.id)
 
-            NM.util.openModal( fields.detailRoot );
+            detailApp.new( event.data.id );
 
             return false;
         },
@@ -98,7 +105,7 @@ AP.metadataType.list = ( function() {
     } );
 
     pub.init = function() {
-        kendo.bind( AP.line.fields.listRoot, viewModel );
+        kendo.bind( AP.metadataType.fields.listRoot, viewModel );
     };
 
     return pub;

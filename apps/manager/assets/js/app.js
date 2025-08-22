@@ -30,6 +30,24 @@ AP.core = ( function() {
 
 }() );
 
+/*
+AP.namespace = function( name ) {
+    AP[name] = AP[name] || {};
+    AP[name].fields = AP[name].fields || {};
+    return AP[name].fields;
+};
+*/
+
+AP.namespace = function( name ) {
+    AP[name] = AP[name] || {};
+    AP[name].fields = AP[name].fields || {};
+    return AP[name];
+};
+
+/*
+    for user pref
+*/
+
 AP.setUserPref = function( key, value ) {
 
     var user = AP.config.account.shortId;

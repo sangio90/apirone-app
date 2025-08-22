@@ -43,5 +43,6 @@
     "Variant.bean": {},
     "CatalogBundle.bean": {},
     "SignageConfig.bean": {},
-    "SignageConfigItem.bean": {}
+    "SignageConfigItem.bean": {},
+    "MetadataType.bean": {}
 }

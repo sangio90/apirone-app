@@ -7,16 +7,22 @@
                 <span data-bind="text: id"></span>
             </td>
             <td>
+                <span data-bind="text: code"></span>
+            </td>
+            <td>
                 <span data-bind="text: name"></span>
             </td>
             <td>
-                <span data-bind="text: unitMeasurement.name"></span>
+                <span data-bind="text: dataType.name"></span>
+            </td>
+            <td>
+                <span data-bind="text: measurementUnit.name"></span>
             </td>
             <td>
                 <div data-bind="source: entities" data-template="entity-row-tmpl"></div>
             </td>
-            <td>
-                <span data-bind="text: dataType.name"></span>
+            <td class="text-center">
+                #iconButton(bind="click:edit", icon="edit")#
             </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input" name="selected"
@@ -25,4 +31,7 @@
             </td>
         </tr>
     </nmscript>
+
+    #template( view="jstemplate/metadata-type/entity-row-tmpl" )#
+
 </cfoutput>

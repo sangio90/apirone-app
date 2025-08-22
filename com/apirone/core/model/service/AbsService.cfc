@@ -118,6 +118,26 @@ component output="false" accessors="true" {
 		return result.len() ? result : NullValue();
 	}
 
+	private Array function getEntitiesBeanByIds( required String entities ){
+		// [2,3,4,5]
+
+		var result   = [];
+		var entities = DeserializeJSON( arguments.entities );
+
+		if ( !IsNull( entities ) AND Len( entities ) ) {
+			for ( var thisEnt in entities ) {
+				// var beanEntity = this.service( "ProductCategory" ).get( thisEnt );
+				var beanEntity = this.service( "Lookup" ).get( "entity", thisEnt );
+
+				if ( !IsNull( beanEntity ) ) {
+					result.add( beanEntity );
+				}
+			}
+		}
+
+		return result.len() ? result : NullValue();
+	}
+
 	private Array function getLinesBeanByIds( required String lines ){
 		var result = [];
 		var lines  = DeserializeJSON( arguments.lines );

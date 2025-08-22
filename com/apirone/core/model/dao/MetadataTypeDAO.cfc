@@ -7,7 +7,7 @@
 			FROM
 				metadata_types
 			WHERE
-				metadata_type_id = <cfqueryparam cfsqltype="varchar" value="#arguments.metadataTypeId#">
+				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataTypeId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -22,7 +22,7 @@
 			FROM
 				metadata_types
 			WHERE
-				code = <cfqueryparam cfsqltype="varchar" value="#arguments.code#">
+				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.code#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -120,7 +120,7 @@
 		<cfset var entities = super.getEntitiesAsArray( metadataType.getEntities() )>
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE metadata_types 
+			UPDATE metadata_types
 			SET
 				code = <cfqueryparam cfsqltype="varchar" value="#arguments.metadataType.getCode()#">
 				metadata_type = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getName()#">,
@@ -129,8 +129,8 @@
 				unit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getMeasurementUnit().getId()#">
 				orderby = 10
 				entities = #SerializeJSON( entities )#
-			WHERE 
-				metadata_type_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.metadataType.getId()#">
+			WHERE
+				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataType.getId()#">
 		</cfquery>
 
 		<cfreturn arguments.metadataType.getId()>
@@ -143,7 +143,7 @@
 			DELETE FROM
 				metadata_types
 			WHERE
-				metadata_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataTypeId#">
+				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataTypeId#">
 			RETURNING metadata_type_id
 		</cfquery>
 

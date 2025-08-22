@@ -116,16 +116,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "MetadataType" );
 
-			bean.setName( bean.metadata_type );
-
 			bean.setId( record.metadata_type_id );
+			bean.setName( record.metadata_type );
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
 
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setMeasurementUnit( getLookupService().get( "MeasurementUnit", record.unit_id ) );
 			bean.setDataType( getLookupService().get( "DataType", record.datatype_id ) );
-			bean.setEntities( record.entities );
+			bean.setEntities( super.getEntitiesBeanByIds( record.entities ) );
 
 			return bean;
 		}
