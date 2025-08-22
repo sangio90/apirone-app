@@ -19,7 +19,7 @@
 							<div class="col-sm-10">
 								<div class="box-search-small">
 									<form
-										id   ="metadata-type-grid-search-form"
+										id="metadata-type-list-search-form"
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
 										

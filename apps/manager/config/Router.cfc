@@ -5,10 +5,6 @@
 
 		setFullRewrites( true );
 
-		route( "/healthcheck", function(event, rc, prc){
-			return "v. #settings( "app.version" )# Ok!";
-		} );
-
 		get( "/tmp" ).to( "MainController.tmp" ).end();
 
 		route( "/live", function(event, rc, prc){
@@ -40,6 +36,18 @@
 		get( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.list" ).end();
 		delete( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.delete" ).end();
 		get( "/metadata-types" ).to( "MetadataTypeController.list" ).end();
+
+		/*
+			metadata
+		*/
+		post( "/ajax/regex:(raw-items-combinations)/:id/metadata" ).to( "MetadataAjaxController.save" ).end();
+
+		post( "/ajax/metadata/regex:(raw-items-combinations)/:id" ).to( "MetadataAjaxController.save" ).end();
+
+
+		get( "/ajax/metadata" ).to( "MetadataTypeAjaxController.list" ).end();
+		delete( "/ajax/metadata" ).to( "MetadataTypeAjaxController.delete" ).end();
+		get( "/metadata" ).to( "MetadataTypeController.list" ).end();
 
 		/*
 			audit entry

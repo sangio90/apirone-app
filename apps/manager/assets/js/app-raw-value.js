@@ -88,11 +88,7 @@ AP.rawValue.detail = ( function() {
         resetForm: function() {
 
             var thisForm = $( "#raw-value-detail-form" );
-            // var thisForm = fields.detailForm;
 
-            console.log( "resetForm:defaults.detailForm", defaults.detailForm );
-
-            // viewModel.set("resetForm:detailForm", thisForm);
             viewModel.set( "detailForm", defaults.detailForm );
 
             thisForm.find( ".status" ).html( "" );
@@ -164,8 +160,6 @@ AP.rawValue.detail = ( function() {
         if( onUpdate ) {
             viewModel.set( "callback.onUpdate", onUpdate );
         }
-
-        console.log( "AP.rawValue.detail:edit", id );
 
         loadValue( id );
 
@@ -272,8 +266,6 @@ AP.rawValue.list = ( function() {
 
         search: function( event ) {
 
-            console.log( "search" );
-
             var thisForm = fields.listRoot.find( "#raw-value-grid-search-form" );
 
             var params = thisForm.serializeJSON();
@@ -354,10 +346,6 @@ AP.rawValue.list = ( function() {
     },
 
     pub.init = function() {
-
-        console.log( "AP.rawValue.list.init" );
-
-        console.log( "fields.listRoot", fields.listRoot );
 
         kendo.bind( fields.listRoot, viewModel );
 

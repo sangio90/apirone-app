@@ -2,15 +2,8 @@
 
 Object.assign( AP.metadataType.fields, {
     listRoot: $( "#metadata-type-list-root" ),
+    searchListForm: $( "#metadata-type-list-search-form" ),
 } );
-
-/*
-AP.metadataType = AP.metadataType || {};
-
-Object.assign( AP.namespace( "metadataType" ), {
-    listRoot: $( "#metadata-type-list-root" ),
-} );
-*/
 
 $( document ).ready( function() {
     if ( AP.metadataType.fields.listRoot.length ) {
