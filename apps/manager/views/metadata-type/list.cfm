@@ -30,7 +30,7 @@
 
 										<div class="col">
 											<span>Unità</span>
-											<select class="form-control me-2" name="categoryId">
+											<select class="form-control me-2" name="measurementUnitId">
 												<option value="">-- tutte</option>
 												<cfloop array="#prc.units#" item="thisUnit">
 													<option value="#thisUnit.getId()#">#thisUnit.getName()#</option>
@@ -63,6 +63,8 @@
 											<select class="form-control me-2" name="orderBy">
 												<option value="metadataType.code-asc" SELECTED>Codice [A-Z]</option>
 												<option value="metadataType.code-desc">Codice [Z-A]</option>
+												<option value="metadataType.id-asc">ID [A-Z]</option>
+												<option value="metadataType.id-desc">ID [Z-A]</option>
 												<option value="metadataType.name-asc">Nome [A-Z]</option>
 												<option value="metadataType.name-desc">Nome [Z-A]</option>
 											</select>

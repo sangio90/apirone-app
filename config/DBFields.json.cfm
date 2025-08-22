@@ -206,11 +206,15 @@
         "type": "Integer"
     },
     "metaDataType.id": {
-        "name": "meta_data_type_id",
+        "name": "metadata_type_id",
         "type": "Integer"
     },
     "metaDataType.code": {
         "name": "code",
+        "type": "Varchar"
+    },
+   "metaDataType.name": {
+        "name": "metadata_type",
         "type": "Varchar"
     },
 
