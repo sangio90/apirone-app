@@ -1,6 +1,6 @@
 component accessors="true"{
 
-    property name="id" default="100";
+    property name="id" default="100" setter=false getter=false;
     property name="value" default="myvalue";
     property name="test2" type="Test2";
 
@@ -9,33 +9,15 @@ component accessors="true"{
 
     public Test function init(){
 
-        //setTest2( new Test2() );
-
         return this;
         
     }
 
-    public Void function setId( value ) {
+    public Numeric function writeId( value ) {
 
-        variables.id = value;
+        variables.id = "200"
 
-    }
-
-    public Void function writeId() {
-
-        dump( "funziona: " & getId());
-
-    }
-
-    public Void function writeName() {
-
-        dump( "funziona: " & variables.name );
-
-    }
-
-    public Void function writeValue() {
-
-        dump( "funziona: " & this.getValue() );
+        return variables.id;
 
     }
 

@@ -7,6 +7,9 @@ component extends="com.apirone.core.root.Application" {
 	this.bufferOutput = false;
 	this.compression = true;
 
+	this.charset.web      = "UTF-8";
+	this.charset.resource = "UTF-8";
+
 	public Boolean function onApplicationStart() {
 
 		super.onApplicationStart();
@@ -27,7 +30,7 @@ component extends="com.apirone.core.root.Application" {
 
 	public Boolean function onRequestStart( string targetPage ) {
 
-		SetLocale("italian (italy)");
+		SetLocale( "italian (italy)" );
 
 		request.isDev = super.isDev;
 
@@ -35,7 +38,7 @@ component extends="com.apirone.core.root.Application" {
 			application.counter = 100;
 		}
 
-        if ( !StructKeyExists( session, "user" ) ) {
+        if ( !session.keyExists( "user" ) ) {
             startUser()
         }
 
