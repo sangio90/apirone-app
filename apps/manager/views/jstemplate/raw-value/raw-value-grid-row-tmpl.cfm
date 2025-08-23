@@ -13,9 +13,10 @@
                 <span data-bind="text: nameItem.name"></span>
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-default btn-sm" data-bind="click:edit">
-                    <i class="fas fa-edit"></i>
-                </button>
+                #iconButton(bind="click:metadata", icon="fan")#
+            </td>
+            <td class="text-center">
+                #iconButton(bind="click:edit", icon="edit")#
             </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"

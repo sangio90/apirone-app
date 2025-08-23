@@ -68,6 +68,7 @@
                                     { 'field':'nameItem.name', 'title':'Codice', width: '150px' },
                                     { 'field':'name', 'title':'Nome'},
                                     { 'field':'', 'title':'', width: '55px'},
+                                    { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

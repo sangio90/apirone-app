@@ -63,9 +63,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				var text   = super.bean( "Text" );
 				var lang   = super.bean( "Lang" );
-				var status = super.bean( "Status" );
-
-				status.setId( "ACT" );
+				var status = super.bean( "Status" ).setId( "ACT" );
+				var kind   = super.bean( "TextKind" ).setId( "NAME" );
 
 				lang.setId( thisLang.getId() );
 
@@ -75,6 +74,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				text.setId( id );
 				text.setStatus( status );
 				text.setLang( lang );
+				text.setKind( kind );
 			}
 
 			texts.add( text );

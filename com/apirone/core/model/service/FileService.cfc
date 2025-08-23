@@ -180,7 +180,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// TODO add arguments "throwOnNull" to lookup.get()
 			if ( IsNull( kind ) ) {
 				Throw(
-					type    = "apirone.errors.fileKindNotFound",
+					type    = "apirone.errors.file.kindNotFound",
 					message = "File kind [#record.kind_id#] not found for fileId [#record.file_id#]"
 				);
 			}

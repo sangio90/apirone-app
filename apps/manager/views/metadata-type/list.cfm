@@ -1,3 +1,5 @@
+<cfprocessingdirective pageEncoding="UTF-8">
+
 <cfoutput>
 	<div id="metadata-type-list-root">
 
