@@ -1,11 +1,11 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true"{
+component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-    property name="status" type="com.apirone.core.model.bean.Status";
+	this.memento = { defaultIncludes = [ "id", "name", "texts", "code" ] }
 
-    public FileType function init(){
+	property name="status" type="com.apirone.core.model.bean.Status";
 
-        return this;
-    
-    }
+	public FileType function init(){
+		return this;
+	}
 
 }

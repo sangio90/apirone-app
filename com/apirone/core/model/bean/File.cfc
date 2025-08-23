@@ -1,5 +1,24 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
+	this.memento = {
+		defaultIncludes = [ "id", "shortId", "name", "type" ],
+		profiles        = {
+			list = {
+				defaultIncludes = [
+					"id",
+					"size",
+					"width",
+					"height",
+					"directory",
+					"type",
+					"default",
+					"uri",
+					"shortId"
+				]
+			}
+		}
+	}
+
 	property name="size" type="Numeric";
 	property name="width" type="Numeric";
 	property name="height" type="Numeric";
@@ -35,6 +54,13 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	private String function getRelativePath( size = "_ori" ){
 		var config = super.getConfiguration();
+
+		/*
+		dump( config );
+		dump( this.getName() );
+		dump( this.getKind().getId() );
+		abort;
+		*/
 
 		var imageConfig = config.get( "imagesConfig" )[ getKind().getId() ];
 
