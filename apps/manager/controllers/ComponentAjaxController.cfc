@@ -63,7 +63,10 @@ component extends="com.apirone.core.controller.AbsController" {
 				// params = { fruitProductItemId = rc.itemId };
 				// break;
 			default:
-				Throw( type = "apirone.error.TypeSaveNotValid", message = "Type save [#rc.typeId#] not valid" );
+				Throw(
+					type    = "apirone.error.component.InvalidSaveType",
+					message = "Type save [#rc.typeId#] not valid"
+				);
 				break;
 		}
 

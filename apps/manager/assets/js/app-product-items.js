@@ -143,6 +143,7 @@ AP.product.items = ( function() {
         },
 
         getImageTypeText: function( event ) {
+
             var text = AP.util.getTextItem( event.type.texts.toJSON() );
 
             return text.name + " " + event.shortId;
@@ -161,14 +162,29 @@ AP.product.items = ( function() {
         },
 
         deleteImage: function( event ) {
+
+            var uid = event.data.uid;
+
+            var linked = $( "#img-linked-" + uid );
+            var loading = $( "#img-linked-loading-" + uid );
+
+            linked.addClass( "d-none" );
+            loading.removeClass( "d-none" );
+
+            loading.html( "<img src='/assets/main/img/ajax-loading.svg' width='40' height='40'>" );
+
             NM.util.ajax( {
                 method: "DELETE",
                 url: "/manager/ajax/products/" + event.data.id + "/images",
                 callback: {
                     done: function( xhr ) {
-                        // refreshDatasources();
 
-                        setTimeout( () => $( "#product-images-list-modal" ).modal( "hide" ), 600 );
+                        setTimeout( () => {
+                            loading.html( "" );
+                            linked.removeClass( "d-none" );
+
+                            initUpload();
+                        }, 800 );
 
                     },
                 },
@@ -597,9 +613,7 @@ AP.product.items = ( function() {
 
                                 // TODO: get list form configuration
                                 if ( !/\.(jpg|jpeg|png|pdf)$/i.test( data.files[0].name ) ) {
-                                    status.html(
-                                        "<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>",
-                                    );
+                                    status.html( "<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>" );
                                     return false;
                                 }
 

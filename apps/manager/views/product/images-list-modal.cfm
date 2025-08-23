@@ -13,9 +13,7 @@
 
                     <div class="card-body">
 
-                        <div class="row"
-                            data-bind="source: images"
-                            data-template="product-images-item-tmpl">
+                        <div class="row" data-bind="source: images" data-template="product-images-item-tmpl">
                         </div>
 
                     </div>

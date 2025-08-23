@@ -33,7 +33,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			if ( images.len() ) {
 				var image = images[ 1 ];
 
-				var json = image.toStruct();
+				// var json = image.toStruct();
+				var json = super.getMementify().convert( image, "list" );
 
 				json[ "complete" ] = true;
 				json[ "uri" ]      = image.getUri();
@@ -49,7 +50,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				file.setName( "" );
 				file.setDirectory( "" );
 
-				var json = file.toStruct();
+				var json = super.getMementify().convert( file );
 
 				json[ "complete" ] = false;
 				json[ "uri" ]      = "";

@@ -40,10 +40,14 @@
 
                 </div>
 
-                <div class="col-4 mb-2">
-                    <a href="" data-bind="attr: { href: getImageHref }" target="_blank">
-                        <img class="img-fluid" data-bind="attr: { src: getImageSrc }" height="500">
-                    </a>
+                <div class="col-4 mb-2" id="img-##: uid ##">
+                    <div id="img-linked-loading-##: uid ##" class="d-none text-center">
+                    </div>
+                    <div id="img-linked-##: uid ##">
+                        <a href="" data-bind="attr: { href: getImageHref }" target="_blank">
+                            <img class="img-fluid" data-bind="attr: { src: getImageSrc }" height="500">
+                        </a>
+                    </div>
                 </div>
 
             </div>
