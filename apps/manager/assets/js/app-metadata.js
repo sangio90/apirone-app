@@ -13,12 +13,78 @@ $( document ).ready( function() {
 AP.metadata.detail = ( function() {
     var pub = {};
 
+    function applyMetadataValidation( metadata ) {
+        // Rimuove tutte le regole e messaggi prima di applicarne di nuovi
+        validator.settings.rules = {};
+        validator.settings.messages = {};
+
+        // Aggiunge la regola per il campo standard del prodotto
+        // formValidator.settings.rules["product-name"] = { required: true };
+        validator.settings.messages["product-name"] = { required: "Il nome del prodotto è obbligatorio." };
+
+        metadata.forEach( item => {
+            const fieldName = `metadata_${item.code}`;
+            const rules = {};
+            const messages = {};
+
+            if ( item.required ) {
+                rules.required = true;
+                messages.required = `Il campo "${item.name}" è obbligatorio.`;
+            }
+
+            switch ( item.dataType ) {
+            case "INTEGER":
+                rules.digits = true;
+                messages.digits = `Inserisci un numero intero valido per "${item.name}".`;
+                if ( item.min !== undefined ) { rules.min = item.min; }
+                if ( item.max !== undefined ) { rules.max = item.max; }
+                break;
+
+            case "DECIMAL":
+                rules.number = true;
+                messages.number = `Inserisci un numero decimale valido per "${item.name}".`;
+                if ( item.min !== undefined ) { rules.min = item.min; }
+                if ( item.max !== undefined ) { rules.max = item.max; }
+                break;
+
+            case "DATE":
+                rules.date = true; // Utilizza la regola built-in di jQuery Validation
+                messages.date = `Inserisci una data valida per "${item.name}".`;
+                break;
+
+            case "STRING":
+                if ( item.minLength !== undefined ) { rules.minlength = item.minLength; }
+                if ( item.maxLength !== undefined ) { rules.maxlength = item.maxLength; }
+                break;
+
+            case "TEXT":
+                if ( item.minLength !== undefined ) { rules.minlength = item.minLength; }
+                if ( item.maxLength !== undefined ) { rules.maxlength = item.maxLength; }
+                break;
+
+            case "BOOLEAN":
+                // La regola 'required' per una checkbox garantisce che sia spuntata
+                break;
+            }
+
+            validator.settings.rules[fieldName] = rules;
+            validator.settings.messages[fieldName] = messages;
+        } );
+    }
+
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/metadata" } ),
     };
 
     var viewModel = kendo.observable( {
         rows: dataSources.items,
+        currentEntity: undefined,
+
+        callbacks: {
+            onCreate: undefined,
+            onUpdate: undefined,
+            onLoad: undefined,
+        },
 
         search: function( event ) {
             var thisForm = AP.metadata.fields.searchListForm;
@@ -26,19 +92,6 @@ AP.metadata.detail = ( function() {
             var params = thisForm.serializeJSON();
 
             viewModel.rows.read( params );
-
-            return false;
-        },
-
-        edit: function( event ) {
-
-            console.log( "event.data.id", event.data.id );
-
-            var onSave = function() {
-                viewModel.get( "rows" ).read();
-            };
-
-            detailApp.edit( event.data.id, onSave );
 
             return false;
         },
@@ -85,25 +138,26 @@ AP.metadata.detail = ( function() {
             }
         },
 
-        showList: function( event ) {
-
-            // viewModel.set( "showSearchPanel", true );
-
-            return false;
-        },
-
-
     } );
 
-    pub.open = function( item ) {
+    pub.open = function( entity, onSave ) {
 
-        viewModel.set( "currentItem", item );
+        viewModel.set( "currentEntity", entity );
+        viewModel.set( "callback.onSave", onSave );
 
         // viewModel.showList();
 
-        var onDone = function() {
-            NM.util.openModal( $( "#component-list-modal" ) );
-        };
+        NM.util.ajax( {
+            method: "DELETE",
+            url: "/manager/ajax/raw-values/:id/metadata",
+            data: JSON.stringify( entity ),
+            callback: {
+                done: function( xhr ) {
+                    NM.util.openModal( $( "#metadata-detail-modal" ) );
+                },
+            },
+        } );
+
 
         // refreshSelectedComponents( onDone=onDone );
 
@@ -111,6 +165,9 @@ AP.metadata.detail = ( function() {
 
     pub.init = function() {
         kendo.bind( AP.metadata.fields.listRoot, viewModel );
+
+        const validator = $( "#metadata-detail-form" ).validate( {} );
+
     };
 
     return pub;

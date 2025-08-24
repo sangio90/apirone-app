@@ -40,9 +40,8 @@
 		/*
 			metadata
 		*/
-		post( "/ajax/regex:(raw-items-combinations)/:id/metadata" ).to( "MetadataAjaxController.save" ).end();
-
-		post( "/ajax/metadata/regex:(raw-items-combinations)/:id" ).to( "MetadataAjaxController.save" ).end();
+		get( "/ajax/:by-regex:(raw-items)/:id/metadata" ).to( "MetadataAjaxController.get" ).end();
+		post( "/ajax/:by-regex:(raw-items)/:id/metadata" ).to( "MetadataAjaxController.save" ).end();
 
 
 		get( "/ajax/metadata" ).to( "MetadataTypeAjaxController.list" ).end();

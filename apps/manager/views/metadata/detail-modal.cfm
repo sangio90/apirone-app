@@ -13,39 +13,7 @@
 				<div class="card-body">
 					<form id="metadata-detail-form" method="POST" name="metadata-detail-form">
 					
-						<div class="">
-
-							<div class="mb-3 row">
-								<label class="col-sm-2 col-form-label text-end">Codice</label>
-								<div class="col-sm-10">
-									<input type="text" required class="form-control col-sm-4 uppercase" name="code" id="code"
-										maxlength="5"
-										data-rule-required="true"
-										data-msg-required="Codice richiesto"
-										data-bind="value: detailForm.data.code">
-								</div>
-							</div>
-
-							<div class="mb-3 row">
-								<label for="rawValueName" class="col-sm-2 col-form-label text-end">Descrizione (it)</label>
-								<div class="col-sm-10">
-									<input type="text" required class="form-control col-sm-4 uppercase" id="rawValueName" name="rawValueName"
-										data-bind="value: detailForm.data.nameItem.name"
-									>
-								</div>
-							</div>
-
-							<div class="mb-3 row">
-								<label for="rawValueStatusId" class="col-sm-2 col-form-label text-end">Stato</label>
-								<div class="col-sm-10">
-									<select type="text" class="form-control" name="rawValueStatusId" id="rawValueStatusId"
-										required
-										data-bind="source: statusList, value: detailForm.data.status.id"
-										data-value-field="id"
-										data-text-field="name">
-									</select>
-								</div>
-							</div>
+						<div data-bind="source: metadata" data-template="metadata-detail-row-tmpl">
 
 							<div class="mb-3 row" data-bind="visible: detailForm.data.id">
 								<div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
@@ -77,6 +45,6 @@
 
     </div>
 
-    #template( view="jstemplate/metadata/metadata-suggest-row-tmpl" )#
+    #template( view="jstemplate/metadata/metadata-detail-row-tmpl" )#
 
 </cfoutput>

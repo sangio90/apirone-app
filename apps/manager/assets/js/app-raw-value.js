@@ -96,43 +96,6 @@ AP.rawValue.detail = ( function() {
 
         },
 
-        metadata: function( event ) {
-
-
-            var element = $( event.currentTarget );
-
-            if ( !element.attr( "data-type" ) ) {
-                console.error( "ERROR. Set data-type attribute in currentTarget" );
-                return;
-            }
-
-            var type = element.data( "type" );
-
-            switch ( type ) {
-            case "catalogBundle":
-                var value = {
-                    type: "catalogBundle",
-                    model: {
-                        id: element.data( "model-id" ),
-                        name: element.data( "model-name" ),
-                    },
-                    line: {
-                        id: element.data( "line-id" ),
-                        name: element.data( "line-name" ),
-                    },
-                };
-
-                break;
-
-            default:
-                console.error( "ERROR. Set data-type attribute in currentTarget" );
-            }
-
-            metadataApp.open( value );
-
-            return false;
-        },
-
         save: function() {
 
             var thisForm = fields.detailForm;
@@ -287,6 +250,7 @@ AP.rawValue.list = ( function() {
 
     var fields = AP.fields.rawValue;
     var detailApp = AP.rawValue.detail;
+    var metadataApp = AP.metadata.detail;
 
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/raw-values" } )
@@ -372,6 +336,18 @@ AP.rawValue.list = ( function() {
 
             }
 
+        },
+
+        metadata: function( event ) {
+
+            var value = {
+                entity: "rawValue",
+                value: event.data.id
+            };
+
+            metadataApp.open( value );
+
+            return false;
         },
 
     } );
