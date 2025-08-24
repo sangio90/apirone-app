@@ -6,21 +6,36 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 
+		var types    = [];
+		var metadata = [];
+
 		var params = getParams( typeId = rc.by, rc = rc );
-		dump( params );
 
+		var metadataList = super.getMementify().convertList( super.fire( "metadata.list", params ) );
+		var typeObjList  = super.getMementify().convertList( super.fire( "metadataType.list" ) );
 
-		var items = super.fire( "metadata.list", params );
-		abort;
+		for ( var typeObj in typeObjList ) {
+			var row = {}
 
-		for ( var item in items ) {
-			var row = convertComponent( item );
-			data.add( row );
-		};
+			var found = false;
+			for ( var thisMetadata in metadataList ) {
+				if ( typeObj.code == thisMetadata.type.code ) {
+					row             = thisMetadata;
+					row[ "active" ] = true;
+				}
+			}
 
-		result.setTotal( items.len() );
-		result.setCount( items.len() );
-		result.setData( data );
+			if ( !found ) {
+				row             = typeObj;
+				row[ "active" ] = false;
+			}
+
+			metadata.add( row );
+		}
+
+		result.setTotal( metadata.len() );
+		result.setCount( metadata.len() );
+		result.setData( metadata );
 
 		event.setValue( "result", result );
 	}

@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="MetadataDAO";
-
+	property name="metadataTypeService" inject="MetadataTypeService";
 	property name="cacheScope" type="String" default="Metadata.bean";
 
 	public com.apirone.core.model.bean.MetadataType function get( required String metadataId ){
@@ -104,7 +104,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.metadata_type_id );
 			bean.setEntity( record.metadata_type_id );
-			bean.setValue( record.metadata_type_id );
+			bean.setValue( getValue( record ).value );
+			bean.setEntity( getEntity( record ) );
+
+			bean.setType( getMetadataTypeService().get( record.metadata_type_id ) )
 
 			bean.setCreatedAt( record.created_at );
 
@@ -116,37 +119,38 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	private com.apirone.core.model.bean.MetadataType function getValue( required record ){
 		if ( Len( record.value_text ) ) {
-			return {
-				"value"    = record.value_text
-				"dataType" = "TEXT"
-			}
+			return { "value" = record.value_text, "dataType" = "TEXT" }
 		}
 
 		if ( Len( record.value_char ) ) {
-			return {
-				"value"    = record.value_char
-				"dataType" = "STRING"
-			}
+			return { "value" = record.value_char, "dataType" = "STRING" }
 		}
 
 		if ( Len( record.value_integer ) ) {
-			return {
-				"value"    = record.value_integer
-				"dataType" = "INTEGER"
-			}
+			return { "value" = record.value_integer, "dataType" = "INTEGER" }
 		}
 
 		if ( Len( record.value_decimal ) ) {
-			return {
-				"value"    = record.value_decimal
-				"dataType" = "DECIMAL"
-			}
+			return { "value" = record.value_decimal, "dataType" = "DECIMAL" }
 		}
 
 		Throw(
 			type    = "apirone.error.metadata.valueNotFound",
 			message = "Value non found #SerializeJSON( record, "struct" )#"
 		)
+	}
+
+	private com.apirone.core.model.bean.Entity function getEntity( required record ){
+		var entity = super.bean( "Entity" );
+
+		if ( Len( record.raw_value_id ) ) {
+			entity.setKey( "rawValue.id" );
+			entity.setValue( record.raw_value_id );
+
+			return entity;
+		}
+
+		getLogger().error( "No entity linked to this metadata. Metadata id: [#record.metadata_id#]" );
 	}
 
 }
