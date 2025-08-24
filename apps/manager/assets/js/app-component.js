@@ -646,9 +646,6 @@ AP.component.list = ( function() {
 
         viewModel.set( "currentItem", item );
 
-        // viewModel.get( "colors" ).data( [] );
-        // viewModel.get( "variants" ).data( [] );
-
         viewModel.showComponentsList();
 
         var onDone = function() {

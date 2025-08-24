@@ -96,6 +96,43 @@ AP.rawValue.detail = ( function() {
 
         },
 
+        metadata: function( event ) {
+
+
+            var element = $( event.currentTarget );
+
+            if ( !element.attr( "data-type" ) ) {
+                console.error( "ERROR. Set data-type attribute in currentTarget" );
+                return;
+            }
+
+            var type = element.data( "type" );
+
+            switch ( type ) {
+            case "catalogBundle":
+                var value = {
+                    type: "catalogBundle",
+                    model: {
+                        id: element.data( "model-id" ),
+                        name: element.data( "model-name" ),
+                    },
+                    line: {
+                        id: element.data( "line-id" ),
+                        name: element.data( "line-name" ),
+                    },
+                };
+
+                break;
+
+            default:
+                console.error( "ERROR. Set data-type attribute in currentTarget" );
+            }
+
+            metadataApp.open( value );
+
+            return false;
+        },
+
         save: function() {
 
             var thisForm = fields.detailForm;

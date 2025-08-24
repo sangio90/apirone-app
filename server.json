@@ -1,22 +1,22 @@
 {
-    "profile": "${server.profile}",
-    "app": {
-        "cfengine": "lucee@5.4.8.2"
+    "profile":"${server.profile}",
+    "app":{
+        "cfengine":"lucee@5.4.8.2"
     },
-    "name": "${server.name}",
-    "openBrowser": false,
-    "web": {
-        "gzipEnable": true,
-        "blockSensitivePaths": false,
-        "directoryBrowsing": true,
-        "accessLogEnable": true,
-        "host": "${server.host}",
-        "http": {
-            "port": "${server.port}"
+    "name":"${server.name}",
+    "openBrowser":false,
+    "web":{
+        "gzipEnable":true,
+        "blockSensitivePaths":false,
+        "directoryBrowsing":true,
+        "accessLogEnable":true,
+        "host":"${server.host}",
+        "http":{
+            "port":"${server.port}"
         },
-        "rewrites": {
-            "enable": true,
-            "config": "config/urlrewrite.xml"
+        "rewrites":{
+            "enable":true,
+            "config":"config/urlrewrite.xml"
         }
     }
 }

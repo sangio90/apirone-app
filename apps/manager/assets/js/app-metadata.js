@@ -85,7 +85,29 @@ AP.metadata.detail = ( function() {
             }
         },
 
+        showList: function( event ) {
+
+            // viewModel.set( "showSearchPanel", true );
+
+            return false;
+        },
+
+
     } );
+
+    pub.open = function( item ) {
+
+        viewModel.set( "currentItem", item );
+
+        // viewModel.showList();
+
+        var onDone = function() {
+            NM.util.openModal( $( "#component-list-modal" ) );
+        };
+
+        // refreshSelectedComponents( onDone=onDone );
+
+    };
 
     pub.init = function() {
         kendo.bind( AP.metadata.fields.listRoot, viewModel );

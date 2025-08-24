@@ -63,13 +63,24 @@
                  String variant="primary", 
                  String title="",
                  String icon="",
-                 String class="" 
+                 String class="",
+                 Array data=[] // { "key" = "value" }
     ){ 
 
         ```
+
+        <cfset var dataAttr = "">
+        <cfif data.len()>
+            <cfloop collection="#data#" item="key">
+                <cfset dataAttr = ListAppend(dataAttr, 'data-#key#="#data[key]#"', " ")>
+            </cfloop>
+        </cfif>
+
         <cfsavecontent variable="local.html">
             <cfoutput>
-                <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size# #arguments.class#" title="#arguments.title#"
+                <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size# #arguments.class#" 
+                    title="#arguments.title#" 
+                    #dataAttr#
                     #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#>
                     <i class="fas fa-#arguments.icon#"></i> #arguments.label#
                 </button>
