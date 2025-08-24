@@ -6,9 +6,9 @@
 			<label class="col-sm-2 col-form-label text-end" data-bind="text: detailForm.data.name" ></label>
 			<div class="col-sm-10">
 				<input type="text" required class="form-control col-sm-4" 
-					name="form-metadata-##:uid##" id="form-metadata-#:uid#"
-					data-rule-##::validationRule##="true"
-					data-msg-##::validationRule##="Non valido"
+					name="form-metadata-##:uid##" id="form-metadata-##:uid##"
+					data-rule-##:validation.rule##="true"
+					data-msg-##:validation.rule##="##:validation.msg##"
 					data-bind="value: detailForm.data.value">
 					
 				<div id="form-metadata-##:uid##-error">

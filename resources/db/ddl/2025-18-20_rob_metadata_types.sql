@@ -52,3 +52,12 @@ SET
 WHERE
     status_id IN ('ACT', 'DEA');
 
+
+
+ALTER TABLE public.metadata_values
+  RENAME TO metadata;
+
+ALTER TABLE public.metadata
+  RENAME COLUMN metadata_value_id TO metadata_id;
+
+  

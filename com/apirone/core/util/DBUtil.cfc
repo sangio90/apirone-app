@@ -3,38 +3,33 @@
  * @since 18/10/2024
  */
 
- component output="false" accessors="true" {
+component output="false" accessors="true" {
 
-    public Struct function getDBField( required String field ) {
+	public Struct function getDBField( required String field ){
+		var fields = DeserializeJSON( FileRead( ExpandPath( "/config/DBFields.json.cfm" ) ) );
 
-        var fields = DESerializeJSON( FileRead( ExpandPath("/config/DBFields.json.cfm") ) );
- 
-        if ( !structKeyExists( fields, arguments.field ) ) {
+		if ( !StructKeyExists( fields, arguments.field ) ) {
+			Throw(
+				message = "Field [#arguments.field#] not found in available values.",
+				type    = "apirone.error.AbsService.DBFieldNotFound"
+			);
+		}
 
-            throw( 
-                message="Field [#arguments.field#] not found in available values.",
-                type="apirone.errors.AbsService.DBFieldNotFound" 
-            );
+		return fields[ arguments.field ];
+	}
 
-        }
 
-        return fields[ arguments.field ];
-    }
-    
+	public String function getCompleteSQL( required String sql, required Array params = [] ){
+		var result = arguments.sql;
 
-    public String function getCompleteSQL( required String sql, required Array params=[] ) {
+		var i = 1;
+		for ( var item in arguments.params ) {
+			result = Replace( result, "?", "'#item#'", i );
+			i++;
+		}
 
-        var result = arguments.sql;
-
-        var i = 1;
-        for( var item in arguments.params ) {
-            result = Replace( result, "?", "'#item#'", i );
-            i++;
-        }
-
-        return result;
-            
-    }
+		return result;
+	}
 
 }
 

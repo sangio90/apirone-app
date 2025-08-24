@@ -1,7 +1,7 @@
 [ 
     {
         id: "BOOLEAN",
-        name: "Booleano"
+        name: "Vero o falso"
     },
     {
         id: "DATE",

@@ -217,5 +217,9 @@
         "name": "metadata_type",
         "type": "Varchar"
     },
+   "metaData.id": {
+        "name": "metadata_id",
+        "type": "Integer"
+    },
 
 }

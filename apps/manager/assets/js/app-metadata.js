@@ -13,6 +13,49 @@ $( document ).ready( function() {
 AP.metadata.detail = ( function() {
     var pub = {};
 
+    function attachRules() {
+
+        var rows = viewModel.get("rows").data();
+
+        for (var row in rows ) {
+            
+            switch ( row.type.dataType ) {
+                case "INTEGER":
+                row.set("validation.rule") = digits;
+                row.set("validation.msg") = `Inserisci un numero intero valido per "${item.name}".`;
+                break;
+
+            case "DECIMAL":
+                rules.number = true;
+                messages.number = `Inserisci un numero decimale valido per "${item.name}".`;
+                if ( item.min !== undefined ) { rules.min = item.min; }
+                if ( item.max !== undefined ) { rules.max = item.max; }
+                break;
+
+            case "DATE":
+                rules.date = true; // Utilizza la regola built-in di jQuery Validation
+                messages.date = `Inserisci una data valida per "${item.name}".`;
+                break;
+
+            case "STRING":
+                if ( item.minLength !== undefined ) { rules.minlength = item.minLength; }
+                if ( item.maxLength !== undefined ) { rules.maxlength = item.maxLength; }
+                break;
+
+            case "TEXT":
+                if ( item.minLength !== undefined ) { rules.minlength = item.minLength; }
+                if ( item.maxLength !== undefined ) { rules.maxlength = item.maxLength; }
+                break;
+
+            case "BOOLEAN":
+                // La regola 'required' per una checkbox garantisce che sia spuntata
+                break;
+            }
+
+        } ;
+
+    }
+
     function applyMetadataValidation( metadata ) {
         // Rimuove tutte le regole e messaggi prima di applicarne di nuovi
         validator.settings.rules = {};
@@ -143,23 +186,22 @@ AP.metadata.detail = ( function() {
     pub.open = function( entity, onSave ) {
 
         viewModel.set( "currentEntity", entity );
-        viewModel.set( "callback.onSave", onSave );
+        viewModel.set("callback.onSave", onSave);
+        
+        console.log("entity", entity)
 
         // viewModel.showList();
 
         NM.util.ajax( {
-            method: "DELETE",
-            url: "/manager/ajax/raw-values/:id/metadata",
-            data: JSON.stringify( entity ),
+            method: "GET",
+            url: "/manager/ajax/raw-values/" + entity.value + "/metadata",
+            //data: { entity: entity.entity, value: entity.value },
             callback: {
                 done: function( xhr ) {
                     NM.util.openModal( $( "#metadata-detail-modal" ) );
                 },
             },
         } );
-
-
-        // refreshSelectedComponents( onDone=onDone );
 
     };
 

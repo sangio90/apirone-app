@@ -5,7 +5,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
-				metadata_types
+				metadata
 			WHERE
 				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataTypeId#">
 		</cfquery>
@@ -20,7 +20,7 @@
 			SELECT
 				metadata_type_id, code
 			FROM
-				metadata_types
+				metadata
 			WHERE
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.code#">
 		</cfquery>
@@ -31,9 +31,7 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
-		<cfargument name="entityId" type="String">
-		<cfargument name="measurementUnitId" type="String">
-		<cfargument name="dataTypeId" type="String">
+		<cfargument name="rawValueId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="20">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -44,31 +42,11 @@
 				metadata_type_id,
 				COUNT(metadata_type_id) OVER() AS total
 			FROM
-				metadata_types
+				metadata
 			WHERE 1=1
 
-				<cfif !IsNull( arguments.entityId )>
-					AND entities @> ANY ('{[#sanitizeSQL( arguments.entityId )#]}')
-				</cfif>
-
-				<cfif !IsNull( arguments.statusId )>
-					AND metadata_types.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
-				</cfif>
-
-				<cfif !IsNull( arguments.dataTypeId )>
-					AND metadata_types.datatype_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.dataTypeId#">
-				</cfif>
-
-				<cfif !IsNull( arguments.measurementUnitId )>
-					AND metadata_types.unit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.measurementUnitId#">
-				</cfif>
-
-				<cfif !IsNull( arguments.str )>
-					AND
-					(
-						metadata_types.code ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
-						OR metadata_types.metadata_type ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
-					)
+				<cfif !IsNull( arguments.rawValueId )>
+					AND metadata.raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.rawValueId#">
 				</cfif>
 
 			ORDER BY
@@ -91,7 +69,7 @@
 		<cfset var entities = super.getEntitiesAsArray( metadataType.getEntities() )>
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO metadata_types (
+			INSERT INTO metadata (
 				code,
 				metadata_type,
 				status_id,
@@ -120,7 +98,7 @@
 		<cfset var entities = super.getEntitiesAsArray( metadataType.getEntities() )>
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE metadata_types
+			UPDATE metadata
 			SET
 				code = <cfqueryparam cfsqltype="varchar" value="#arguments.metadataType.getCode()#">,
 				metadata_type = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getName()#">,
@@ -141,7 +119,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM
-				metadata_types
+				metadata
 			WHERE
 				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataTypeId#">
 			RETURNING metadata_type_id

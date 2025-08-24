@@ -89,5 +89,7 @@
     </div>
 
     #view("raw-value/detail-modal")#
+    
+    #view("metadata/detail-modal")#
 
 </cfoutput>

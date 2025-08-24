@@ -40,7 +40,7 @@ component output="false" accessors="true" {
 			if ( !ListFindNoCase( "ASC,DESC", i.dir ) ) {
 				Throw(
 					message = "Direction [#i.dir#] not valid for field [#i.field#]. Only accepted values are ASC or DESC",
-					type    = "apirone.errors.AbsService.SortValueNotValid"
+					type    = "apirone.error.AbsService.SortValueNotValid"
 				);
 			}
 

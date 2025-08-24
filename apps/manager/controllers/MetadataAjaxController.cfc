@@ -7,13 +7,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 
 		var params = getParams( typeId = rc.by, rc = rc );
+		dump( params );
 
-		var items = super.fire( "component.list", params );
+
+		var items = super.fire( "metadata.list", params );
+		abort;
 
 		for ( var item in items ) {
 			var row = convertComponent( item );
 			data.add( row );
-		}
+		};
 
 		result.setTotal( items.len() );
 		result.setCount( items.len() );
@@ -29,8 +32,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		switch ( rc.by ) {
 			case "rawValue":
-				var component = super.bean( "ComponentProduct" );
-				var product   = super.bean( "Product" );
+				// var component = super.bean( "ComponentProduct" );
+				var product = super.bean( "Product" );
 
 				component.setProduct( product.setId( rc.productId ) );
 
@@ -127,8 +130,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = {}
 
 		switch ( arguments.typeId ) {
-			case "rawValue":
-				params = { rawValueId = rc.rawValueId };
+			case "raw-values":
+				params = { rawValueId = rc.id };
 				break;
 			default:
 				Throw(

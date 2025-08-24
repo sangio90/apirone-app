@@ -67,11 +67,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create( required com.apirone.core.model.bean.ProductCategory ProductCategory ){
 		if ( !Len( arguments.ProductCategory.getCode() ) ) {
-			Throw( type = "apirone.errors.codeNotProvided", message = "Code required" );
+			Throw( type = "apirone.error.codeNotProvided", message = "Code required" );
 		};
 
 		if ( !Len( arguments.ProductCategory.getTexts() ) ) {
-			Throw( type = "apirone.errors.noTexsProvided", message = "At least one description required" );
+			Throw( type = "apirone.error.noTexsProvided", message = "At least one description required" );
 		};
 
 		transaction {
@@ -94,11 +94,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.ProductCategory ProductCategory ){
 		if ( !Len( arguments.ProductCategory.getCode() ) ) {
-			Throw( type = "apirone.errors.codeNotProvided", message = "Code required" );
+			Throw( type = "apirone.error.codeNotProvided", message = "Code required" );
 		};
 
 		if ( !Len( arguments.ProductCategory.getTexts() ) ) {
-			Throw( type = "apirone.errors.noTexsProvided", message = "At least one description required" );
+			Throw( type = "apirone.error.noTexsProvided", message = "At least one description required" );
 		};
 
 		var cm = getCacheManager();
