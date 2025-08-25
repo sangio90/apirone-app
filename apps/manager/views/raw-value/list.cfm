@@ -23,7 +23,7 @@
                             <div class="col-sm-9">
 								<div class="box-search-small">
 									<form
-										id   ="line-grid-search-form"
+										id   ="raw-valu-grid-search-form"
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
 

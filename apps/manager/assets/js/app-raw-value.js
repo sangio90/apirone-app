@@ -4,7 +4,8 @@ AP.fields.rawValue = AP.fields.rawValue || {};
 AP.fields.rawValue = {
     listRoot: $( "#raw-value-list-root" ),
     detailRoot: $( "#raw-value-detail-modal" ),
-    detailForm: $( "#raw-value-detail-form" )
+    detailForm: $( "#raw-value-detail-form" ),
+    searchForm: $( "#raw-valu-grid-search-form" )
 };
 
 $( document ).ready( function(){
@@ -163,6 +164,8 @@ AP.rawValue.detail = ( function() {
 
         loadValue( id );
 
+        return false;
+
     };
 
     pub.init = function() {
@@ -217,8 +220,6 @@ AP.rawValue.detail = ( function() {
 
     var loadValue = function( id ) {
 
-        // var thisForm = fields.detailForm;
-
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/raw-values/" + id,
@@ -267,7 +268,7 @@ AP.rawValue.list = ( function() {
 
         search: function( event ) {
 
-            var thisForm = fields.listRoot.find( "#raw-value-grid-search-form" );
+            var thisForm = fields.searchForm;
 
             var params = thisForm.serializeJSON();
 
@@ -294,6 +295,8 @@ AP.rawValue.list = ( function() {
             };
 
             detailApp.edit( event.data.id, onUpdate );
+
+            return false;
 
         },
 

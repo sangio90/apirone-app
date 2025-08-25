@@ -13,6 +13,8 @@ $( document ).ready( function() {
 AP.metadata.detail = ( function() {
     var pub = {};
 
+    var fields = AP.metadata.fields;
+
     var getCurrentConfig = function() {
 
         var current = viewModel.get( "currentEntity" );
@@ -134,8 +136,9 @@ AP.metadata.detail = ( function() {
             var config = getCurrentConfig();
             var data = viewModel.get( "rows" ).data();
             var thisForm = $( "#metadata-detail-form" );
+            var status = thisForm.find( ".status" );
 
-            console.log( "isValid", thisForm.valid() );
+            console.log( "status", status );
 
             if ( thisForm.valid() ) {
 
@@ -146,15 +149,20 @@ AP.metadata.detail = ( function() {
                     callback: {
                         done: function( xhr ) {
 
-                            var id = viewModel.get( "detailForm.data.id" );
-                            console.log( "id", id );
+                            NM.util.autoHideMessage( status, "<span class='green'>Metadati aggiornati</span>" );
 
-                            viewModel.rows.read();
+                            setTimeout( function() {
+                                fields.detailRoot.modal( "hide" ),
+                                AP.util.fireCallback( "onSave", viewModel.get( "callback" ) );
+                            }, 600 );
+
                         },
                     },
                 } );
 
             }
+
+            return false;
         },
 
     } );
