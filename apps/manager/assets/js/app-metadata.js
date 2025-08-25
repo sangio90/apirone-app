@@ -13,6 +13,41 @@ $( document ).ready( function() {
 AP.metadata.detail = ( function() {
     var pub = {};
 
+    var getCurrentConfig = function() {
+
+        var current = viewModel.get("currentEntity");
+        
+        console.log("current", current)
+
+        var baseUrl = "/manager/ajax/";
+
+        var result = {
+            modalTitle: "",
+            modifyUrl: "",
+            readUrl: ""
+        };
+
+        if( current ) {
+
+            switch( current.entity ) {
+
+            case "rawValue":
+
+                result.modalTitle = "Metadata per valore base <" + current.value + " >";
+                result.readUrl = baseUrl + "raw-values/" + current.value + "/metadata";
+                result.modifyUrl = result.readUrl;
+
+                break;
+
+            default:
+            }
+
+        }
+
+        return result;
+
+    };    
+
     function attachRules() {
 
         var rows = viewModel.get("rows").data();
@@ -137,50 +172,32 @@ AP.metadata.detail = ( function() {
             return false;
         },
 
-        getTitle: function( event ) {
-            return "Titolo";
+        getTitle: function (event) {
+            
+            var config = getCurrentConfig();
+
+            return config.modalTitle;
         },
 
-        save: function( event ) {
-            var checks = $( "#metadata-type-grid" ).find( "[name=selected]:checked" );
+        save: function (event) {
 
-            if ( checks.length ) {
-                var values = [];
+            var config = getCurrentConfig();
+            var data = viewModel.get("rows").data();
+            
+            NM.util.ajax( {
+                method: "POST",
+                url: config.modifyUrl,
+                data: JSON.stringify( data ),
+                callback: {
+                    done: function( xhr ) {
 
-                checks.each( function() {
-                    values.push( $( this ).val() );
-                } );
+                        var id = viewModel.get( "detailForm.data.id" );
+                        console.log( "id", id );
 
-                var ids = values.toString();
-
-                NM.util.ajax( {
-                    method: "DELETE",
-                    url: "/manager/ajax/metadata-types",
-                    data: ids,
-                    callback: {
-                        done: function( xhr ) {
-                            if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
-                                AP.widget.notify(
-                                    "error",
-                                    "Non riesco a cancellare tutti i valori",
-                                );
-                            } else {
-                                AP.widget.notify(
-                                    "success",
-                                    "Cancellazione avvenuta con successo",
-                                );
-                            }
-
-                            var id = viewModel.get( "detailForm.data.id" );
-                            console.log( "id", id );
-
-                            viewModel.rows.read();
-                        },
+                        viewModel.rows.read();
                     },
-                } );
-            } else {
-                AP.widget.notify( "warning", "Seleziona almeno un valore" );
-            }
+                },
+            } );            
         },
 
     } );
@@ -192,42 +209,51 @@ AP.metadata.detail = ( function() {
         
         console.log("entity", entity)
 
-        // viewModel.showList();
+        var config = getCurrentConfig();
 
         NM.util.ajax( {
             method: "GET",
-            url: "/manager/ajax/raw-values/" + entity.value + "/metadata",
+            url: config.readUrl,
             //data: { entity: entity.entity, value: entity.value },
             callback: {
                 done: function (xhr) {
 
-                    var newData = [];
-
-                    var data = new kendo.data.DataSource( xhr.data );
+                    var newData = new kendo.data.DataSource();
+                    var data = new kendo.data.DataSource({ data: xhr.data });
+                    data.read();
                     
                     console.log("data", data)
+                    console.log("data", data.data())
 
-                    for (var item in data.data()) {
+                    // TODO: consider move to an applyValidation() after loaded data 
+                    // with more than one rule.
+                    for (var item of data.data()) {
                         
-                        console.log("item", item)
+                        console.log("item", item);
 
-                        switch (item.type.dataType) {
+                        switch (item.type.dataType.id) {
                             case "INTEGER":
-                                item.set("validation.rule") = digits;
-                                item.set("validation.msg") = `Inserisci un numero intero valido per "${item.name}".`;
+                                item.set("validationRule", "digits");
+                                item.set("validationMsg", `Inserisci un numero intero valido per ${item.type.name}.`);
+                                break;
+                            
+                            case "BOOLEAN":
+                                item.set("validationRule", "boolean");
+                                item.set("validationMsg", `Seleziona una opzione per ${item.type.name}.`);
+                                break;
+                            
+                            case "DECIMAL":
+                                item.set("validationRule", "number");
+                                item.set("validationMsg", `Seleziona un valore numerico per ${item.type.name}.`);
                                 break;
                             
                         }
-                        newData.push( item )
+
+                        newData.add( item )
 
                     }
 
-                    console.log("newData", newData);
-                    
-
-                    viewModel.set("rows", xhr.data);
-                    
-                    console.log("-xx", viewModel.get("rows"))
+                    viewModel.set("rows", newData );
 
                     NM.util.openModal( $( "#metadata-modal-root" ) );
                 },

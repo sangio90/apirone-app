@@ -53,21 +53,33 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var result = super.getResult();
 
-		var components = DeserializeJSON( GetHTTPRequestData().content );
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		var metadata = super.bean( "Metadata" );
+		var svc      = super.service( "Metadata" )
 
 		switch ( rc.by ) {
-			case "rawValue":
-				// var component = super.bean( "ComponentProduct" );
-				var product = super.bean( "Product" );
+			case "raw-values":
+				for ( var item in json ) {
+					var entity = super.bean( "Entity" );
+					entity.setKey( "rawValue.id" );
+					entity.setValue( rc.id );
 
-				component.setProduct( product.setId( rc.productId ) );
+					metadata.setEntity( entity );
+
+					metadata.setType( type );
+					metadata.setValue( json.value );
+
+					if ( Len( item.id ) ) {
+						svc.update( metadata );
+					} else {
+						svc.create( metadata );
+					}
+				}
 
 				break;
 			default:
-				Throw(
-					type    = "apirone.error.metadata.InvalidSaveType",
-					message = "Type save [#rc.typeId#] not valid"
-				);
+				Throw( type = "apirone.error.metadata.InvalidSaveType", message = "Type save [#rc.by#] not valid" );
 				break;
 		}
 

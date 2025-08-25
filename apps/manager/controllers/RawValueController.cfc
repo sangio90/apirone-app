@@ -7,7 +7,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.jsScripts.add( "app-metadata" );
 		prc.jsScripts.add( "app-raw-value" );
-		// prc.jsScripts.add( "app-attribute-list" );
 
 		event.setView( "raw-value/list" );
 	}
