@@ -7,22 +7,7 @@
 			FROM
 				metadata
 			WHERE
-				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataTypeId#">
-		</cfquery>
-
-		<cfreturn local.q>
-	</cffunction>
-
-	<cffunction name="readByCode" output="false">
-		<cfargument name="code" type="String" required="true">
-
-		<cfquery name="local.q" datasource="apirone">
-			SELECT
-				metadata_type_id, code
-			FROM
-				metadata
-			WHERE
-				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.code#">
+				metadata_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataTypeId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -39,8 +24,8 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				metadata_type_id,
-				COUNT(metadata_type_id) OVER() AS total
+				metadata_id,
+				COUNT(metadata_id) OVER() AS total
 			FROM
 				metadata
 			WHERE 1=1
@@ -67,29 +52,39 @@
 		<cfargument name="metadataType" type="com.apirone.core.model.bean.MetadataType" required="true">
 
 		<cfset var entities = super.getEntitiesAsArray( metadataType.getEntities() )>
+		<cfset var meta = getFieldsAndValues( arguments.component )>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO metadata (
-				code,
-				metadata_type,
-				status_id,
-				datatype_id,
-				unit_id,
-				orderby,
-				entities
+				metadata_id
+				metadata_type_id
+				value_text
+				value_char
+				value_integer
+				value_decimal
+				#ArrayToList( meta.fields )#
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.metadataType.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getDataType().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getMeasurementUnit().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.pComponent().getId()#">,
 				10,
 				'#SerializeJSON( entities )#'
-			) RETURNING metadata_type_id
+
+				<cfloop array="#meta.values#" item="item" index="index">
+					<cfqueryparam cfsqltype="#item.type#" value="#item.value#">
+					<cfif Len( meta.values ) NEQ index>
+						,
+					</cfif>
+				</cfloop>
+
+
+			) RETURNING metadata_id
 		</cfquery>
 
-		<cfreturn local.q.metadata_type_id>
+		<cfreturn local.q.metadata_id>
 	</cffunction>
 
 	<cffunction name="update" returntype="Numeric">
@@ -108,7 +103,7 @@
 				orderby = 10,
 				entities = '#SerializeJSON( entities )#'
 			WHERE
-				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataType.getId()#">
+				metadata_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataType.getId()#">
 		</cfquery>
 
 		<cfreturn arguments.metadataType.getId()>
@@ -121,11 +116,33 @@
 			DELETE FROM
 				metadata
 			WHERE
-				metadata_type_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataTypeId#">
-			RETURNING metadata_type_id
+				metadata_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataTypeId#">
+			RETURNING metadata_id
 		</cfquery>
 
 		<cfreturn local.q.recordCount>
+	</cffunction>
+
+	<!--- private methods --->
+
+	<cffunction name="getFieldsAndValues" returntype="Struct" access="private">
+		<cfargument name="component" type="com.apirone.core.model.bean.Entity" required="true">
+
+		<cfset var fields = []>
+		<cfset var values = []>
+
+		<cfswitch expression="#entity.getKey()#">
+			<cfcase value="rawValue.id">
+				<cfset fields = [ "raw_value_id" ]>
+				<cfset values = [ { value = entity.getValue(), type = "Integer" } ]>
+			</cfcase>
+
+			<cfdefaultcase>
+				<cfthrow type="apirone.error.metadata.EntityNotValid" message="Entity [#entity.getKey()#] not valid">
+			</cfdefaultcase>
+		</cfswitch>
+
+		<cfreturn { "fields" = fields, "values" = values }>
 	</cffunction>
 </cfcomponent>
 

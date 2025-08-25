@@ -52,12 +52,11 @@ SET
 WHERE
     status_id IN ('ACT', 'DEA');
 
-
-
 ALTER TABLE public.metadata_values
   RENAME TO metadata;
 
 ALTER TABLE public.metadata
   RENAME COLUMN metadata_value_id TO metadata_id;
 
-  
+ALTER TABLE public.metadata
+  ADD COLUMN created_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT now() NOT NULL;

@@ -115,12 +115,10 @@ AP.metadata.detail = ( function() {
         } );
     }
 
-    var dataSources = {
-        items: NM.kendo.dataSource( { url: "/manager/ajax/metadata" } ),
-    };
+    var dataSource = new kendo.data.DataSource()
 
     var viewModel = kendo.observable( {
-        rows: dataSources.items,
+        rows: dataSource,
         currentEntity: undefined,
 
         callbacks: {
@@ -137,6 +135,10 @@ AP.metadata.detail = ( function() {
             viewModel.rows.read( params );
 
             return false;
+        },
+
+        getTitle: function( event ) {
+            return "Titolo";
         },
 
         save: function( event ) {
@@ -197,18 +199,51 @@ AP.metadata.detail = ( function() {
             url: "/manager/ajax/raw-values/" + entity.value + "/metadata",
             //data: { entity: entity.entity, value: entity.value },
             callback: {
-                done: function( xhr ) {
-                    NM.util.openModal( $( "#metadata-detail-modal" ) );
+                done: function (xhr) {
+
+                    var newData = [];
+
+                    var data = new kendo.data.DataSource( xhr.data );
+                    
+                    console.log("data", data)
+
+                    for (var item in data.data()) {
+                        
+                        console.log("item", item)
+
+                        switch (item.type.dataType) {
+                            case "INTEGER":
+                                item.set("validation.rule") = digits;
+                                item.set("validation.msg") = `Inserisci un numero intero valido per "${item.name}".`;
+                                break;
+                            
+                        }
+                        newData.push( item )
+
+                    }
+
+                    console.log("newData", newData);
+                    
+
+                    viewModel.set("rows", xhr.data);
+                    
+                    console.log("-xx", viewModel.get("rows"))
+
+                    NM.util.openModal( $( "#metadata-modal-root" ) );
                 },
             },
         } );
 
     };
 
-    pub.init = function() {
-        kendo.bind( AP.metadata.fields.listRoot, viewModel );
+    pub.init = function () {
+        
+        console.log("AP.metadata.fields.detailRoot", AP.metadata.fields.detailRoot)
+        console.log("viewModel", viewModel)
 
-        const validator = $( "#metadata-detail-form" ).validate( {} );
+        kendo.bind( AP.metadata.fields.detailRoot, viewModel );
+
+        //var validator = $( "#metadata-detail-form" ).validate( {} );
 
     };
 

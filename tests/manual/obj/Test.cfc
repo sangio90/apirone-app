@@ -1,24 +1,57 @@
-component accessors="true"{
+component accessors="true" {
 
-    property name="id" default="100" setter=false getter=false;
-    property name="value" default="myvalue";
-    property name="test2" type="Test2";
+	property name="textValue" type="String" getter="false" setter="false";
+	property name="booleanValue" type="Boolean" getter="false" setter="false";
+	property name="integerValue" type="Numeric" getter="false" setter="false";
+	property name="decimalValue" type="Numeric" getter="false" setter="false";
 
-    this.name = "My name - this";
-    variables.name = "My name - variables";
+    variables.type="BOOLEAN";
 
-    public Test function init(){
+	public Test function init(){
+		return this;
+	}
 
-        return this;
-        
-    }
+	public Any function getValue(){
+		switch ( variables.type ) {
+			case "BOOLEAN":
+				dump( variables.textValue );
+				dump( getbooleanValue() );
+				abort;
+				return variables.booleanValue;
+			case "INTEGER":
+				return variables.integerValue;
+			case "DECIMAL":
+				return variables.decimalValue;
+			case "TEXT":
+				return variables.textValue;
+			default:
+				Throw(
+					type    = "Apirone.error.metadata.DataTypeNotSupported",
+					message = "The [#getType().getDataType().getId()#] data type is not supported."
+				)
+		}
+	}
 
-    public Numeric function writeId( value ) {
-
-        variables.id = "200"
-
-        return variables.id;
-
-    }
+	public Any function setValue( required Any value ){
+		switch ( UCase( getType().getDataType().getId() ) ) {
+			case "BOOLEAN":
+				variables.booleanValue = arguments.value;
+				break;
+			case "INTEGER":
+				variables.integerValue = arguments.value;
+				break;
+			case "DECIMAL":
+				variables.decimalValue = arguments.value;
+				break;
+			case "TEXT":
+				variables.textValue = arguments.value;
+				break;
+			default:
+				Throw(
+					type    = "Apirone.error.metadata.dataTypeNotSupported",
+					message = "The [#getType().getDataType().getId()#] data type is not supported."
+				)
+		}
+	}
 
 }

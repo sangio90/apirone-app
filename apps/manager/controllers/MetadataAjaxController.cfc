@@ -11,27 +11,37 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var params = getParams( typeId = rc.by, rc = rc );
 
-		var metadataList = super.getMementify().convertList( super.fire( "metadata.list", params ) );
-		var typeObjList  = super.getMementify().convertList( super.fire( "metadataType.list" ) );
+		// var metadataList = super.getMementify().convertList( super.fire( "metadata.list", params ) );
+		// var typeObjList  = super.getMementify().convertList( super.fire( "metadataType.list" ) );
+
+		var metadataList = super.fire( "metadata.list", params );
+		var typeObjList  = super.fire( "metadataType.list" );
 
 		for ( var typeObj in typeObjList ) {
-			var row = {}
+			// DEVO RESTITUIRE METADATA NON metadataType
+			var row  = super.bean( "Metadata" );
+			var line = {};
 
 			var found = false;
 			for ( var thisMetadata in metadataList ) {
-				if ( typeObj.code == thisMetadata.type.code ) {
-					row             = thisMetadata;
-					row[ "active" ] = true;
+				if ( typeObj.getCode() == thisMetadata.getType().getCode() ) {
+					line             = super.getMementify().convert( thisMetadata, "list" );
+					line[ "active" ] = true;
+
+					found = true;
 				}
 			}
 
 			if ( !found ) {
-				row             = typeObj;
-				row[ "active" ] = false;
+				row.setType( typeObj );
+
+				line             = super.getMementify().convert( row, "list" );
+				line[ "active" ] = false;
 			}
 
-			metadata.add( row );
+			metadata.add( line );
 		}
+
 
 		result.setTotal( metadata.len() );
 		result.setCount( metadata.len() );
@@ -100,46 +110,6 @@ component extends="com.apirone.core.controller.AbsController" {
 	/*
         private methods
     */
-
-	private function convertMetadata( required Struct component ){
-		// TODO: move to DataMapper
-
-		var product = component.getRawProduct();
-
-		var row = {
-			"id"       = component.getId(),
-			"typeId"   = component.getTypeId(),
-			"quantity" = component.getQuantity(),
-			"override" = {
-				"id"       = component?.getOverride()?.getId(),
-				"deleted"  = component?.getOverride()?.getDeleted(),
-				"quantity" = component?.getOverride()?.getQuantity()
-			},
-			"totalQuantity" = component.getTotalQuantity(),
-			"rawProduct"    = {
-				"id"             = product.getId(),
-				"name"           = product.getName(),
-				"processingType" = {
-					"id"   = product.getProcessingType().getId(),
-					"name" = product.getProcessingType().getName()
-				},
-				"measurementUnit" = {
-					"id"   = product.getMeasurementUnit().getId(),
-					"name" = product.getMeasurementUnit().getName()
-				}
-			},
-			"variant" = {
-				"id"   = component.getVariant().getId(),
-				"name" = component.getVariant().getName()
-			},
-			"color" = {
-				"id"   = component.getColor().getId(),
-				"name" = component.getColor().getName()
-			}
-		}
-
-		return row;
-	}
 
 	private function getParams( required String typeId, required Struct rc ){
 		var params = {}

@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="metadataTypeService" inject="MetadataTypeService";
 	property name="cacheScope" type="String" default="Metadata.bean";
 
-	public com.apirone.core.model.bean.MetadataType function get( required String metadataId ){
+	public com.apirone.core.model.bean.Metadata function get( required String metadataId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.metadataId );
@@ -51,18 +51,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public Numeric function update( required com.apirone.core.model.bean.MetadataType metadataType ){
-		getDao().update( arguments.metadataType );
+	public Numeric function update( required com.apirone.core.model.bean.Metadata metadata ){
+		getDao().update( arguments.metadata );
 
-		var id = arguments.metadataType.getId();
+		var id = arguments.metadata.getId();
 
-		super.getCacheManager().remove( getCacheScope(), arguments.metadataType.getId() );
+		super.getCacheManager().remove( getCacheScope(), arguments.metadata.getId() );
 
-		return arguments.metadataType.getId();
+		return arguments.metadata.getId();
 	}
 
-	public Numeric function create( required com.apirone.core.model.bean.MetadataType metadataType ){
-		var newId = getDao().insert( arguments.metadataType );
+	public Numeric function create( required com.apirone.core.model.bean.Metadata metadata ){
+		var newId = getDao().insert( arguments.metadata );
 
 		return newId;
 	}
@@ -96,19 +96,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.MetadataType function build( required String metadataId ){
+	private com.apirone.core.model.bean.Metadata function build( required String metadataId ){
 		var record = getDao().read( arguments.metadataId );
 
 		if ( record.recordCount ) {
 			var bean = super.bean( "Metadata" );
 
-			bean.setId( record.metadata_type_id );
-			bean.setEntity( record.metadata_type_id );
-			bean.setValue( getValue( record ).value );
-			bean.setEntity( getEntity( record ) );
-
+			// MetadataType first
 			bean.setType( getMetadataTypeService().get( record.metadata_type_id ) )
 
+			bean.setId( record.metadata_type_id );
+			bean.setEntity( getEntity( record ) );
+			bean.setValue( getValue( record ).value );
 			bean.setCreatedAt( record.created_at );
 
 			return bean;
@@ -117,7 +116,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	private com.apirone.core.model.bean.MetadataType function getValue( required record ){
+	private Struct function getValue( required record ){
 		if ( Len( record.value_text ) ) {
 			return { "value" = record.value_text, "dataType" = "TEXT" }
 		}

@@ -44,5 +44,6 @@
     "CatalogBundle.bean": {},
     "SignageConfig.bean": {},
     "SignageConfigItem.bean": {},
-    "MetadataType.bean": {}
+    "MetadataType.bean": {},
+    "Metadata.bean": {}
 }

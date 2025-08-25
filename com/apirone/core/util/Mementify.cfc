@@ -56,6 +56,7 @@ component {
 	){
 		var target = Duplicate( arguments.target );
 
+
 		local.includes = Duplicate( arguments.includes );
 		local.excludes = Duplicate( arguments.excludes );
 
@@ -336,11 +337,24 @@ component {
 	/**
 	 * Convert a list of object
 	 */
-	public function convertList( required list, required profile = "default" ){
+	public function convertList(
+		required list,
+		profile  = "",
+		includes = ""
+	){
 		var result = [];
 
+		dump( var = includes, label = "inc" );
+		abort;
+
 		for ( var item in arguments.list ) {
-			result.append( convert( target = item, profile = arguments.profile ) );
+			result.append(
+				convert(
+					target   = item,
+					// profile  = arguments.profile,
+					includes = arguments.includes
+				)
+			);
 		}
 		return result;
 	}
