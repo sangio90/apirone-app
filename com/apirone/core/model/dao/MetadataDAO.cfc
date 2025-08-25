@@ -48,30 +48,23 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction name="insert" returntype="Numeric" output="false">
-		<cfargument name="metadataType" type="com.apirone.core.model.bean.MetadataType" required="true">
+	<cffunction name="insert" returntype="Numeric">
+		<cfargument name="metadata" type="com.apirone.core.model.bean.Metadata" required="true">
 
-		<cfset var entities = super.getEntitiesAsArray( metadataType.getEntities() )>
-		<cfset var meta = getFieldsAndValues( arguments.component )>
+		<cfset var meta = getFieldsAndValues( arguments.metadata.getEntity() )>
+		<cfset var dataType = arguments.metadata.getDataTypeId()>
+
+		<cfset var field = getFieldByDataType( dataType )>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO metadata (
-				metadata_id
-				metadata_type_id
-				value_text
-				value_char
-				value_integer
-				value_decimal
+				metadata_type_id,
+				#field#,
 				#ArrayToList( meta.fields )#
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.metadataType.getCode()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getName()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getDataType().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.pComponent().getId()#">,
-				10,
-				'#SerializeJSON( entities )#'
+				<cfqueryparam cfsqltype="varchar" value="#arguments.metadata.getType().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadata.getValue()#">,
 
 				<cfloop array="#meta.values#" item="item" index="index">
 					<cfqueryparam cfsqltype="#item.type#" value="#item.value#">
@@ -79,8 +72,6 @@
 						,
 					</cfif>
 				</cfloop>
-
-
 			) RETURNING metadata_id
 		</cfquery>
 
@@ -126,7 +117,7 @@
 	<!--- private methods --->
 
 	<cffunction name="getFieldsAndValues" returntype="Struct" access="private">
-		<cfargument name="component" type="com.apirone.core.model.bean.Entity" required="true">
+		<cfargument name="entity" type="com.apirone.core.model.bean.Entity" required="true">
 
 		<cfset var fields = []>
 		<cfset var values = []>
@@ -144,5 +135,21 @@
 
 		<cfreturn { "fields" = fields, "values" = values }>
 	</cffunction>
-</cfcomponent>
 
+	<cffunction name="getFieldByDataType" returntype="String" access="private">
+		<cfargument name="dataType" type="String" required="true">
+
+		<cfset var list = DeserializeJSON( FileRead( ExpandPath( "/config/data/dataTypes.json.cfm" ) ) )>
+
+		<cfloop array="#list#" index="item">
+			<cfif item.id eq arguments.dataType>
+				<cfreturn item.field>
+			</cfif>
+		</cfloop>
+
+		<cfthrow
+			type   ="apirone.error.FieldNotFoundByDatatype"
+			message="The field for [#dataType#] dataType not found"
+		>
+	</cffunction>
+</cfcomponent>

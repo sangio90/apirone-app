@@ -55,7 +55,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		dump( json );
+		// dump( json );
 
 		var metadata = super.bean( "Metadata" );
 		var service  = super.service( "Metadata" )
@@ -70,11 +70,13 @@ component extends="com.apirone.core.controller.AbsController" {
 
 					metadata.setEntity( entity );
 
-					metadata.setId( IsNumeric( json.id ) ? json.id : NullValue() );
-					metadata.setValue( json.value );
-					metadata.setType( type.setRawMemento( json.type ) );
+					metadata.setId( IsNumeric( item.id ) ? item.id : NullValue() );
 
-					metadata.setValue( json.value );
+					type.setRawMemento( item.type );
+
+					metadata.setType( type );
+
+					metadata.setValue( item.value );
 
 					if ( Len( item.id ) ) {
 						service.update( metadata );
