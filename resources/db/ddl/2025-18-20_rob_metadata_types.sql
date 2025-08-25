@@ -60,3 +60,7 @@ ALTER TABLE public.metadata
 
 ALTER TABLE public.metadata
   ADD COLUMN created_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT now() NOT NULL;
+
+ALTER TABLE public.metadata
+  ADD CONSTRAINT metadata_idx 
+    UNIQUE (metadata_type_id, raw_value_id) NOT DEFERRABLE;

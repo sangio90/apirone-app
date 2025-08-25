@@ -54,17 +54,17 @@
 		<cfset var meta = getFieldsAndValues( arguments.metadata.getEntity() )>
 		<cfset var dataType = arguments.metadata.getDataTypeId()>
 
-		<cfset var field = getFieldByDataType( dataType )>
+		<cfset var param = getFieldByDataType( dataType )>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO metadata (
 				metadata_type_id,
-				#field#,
+				#param.dbField#,
 				#ArrayToList( meta.fields )#
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.metadata.getType().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.metadata.getValue()#">,
+				<cfqueryparam cfsqltype="integer" value="#arguments.metadata.getType().getId()#">,
+				<cfqueryparam cfsqltype="#param.dbType#" value="#arguments.metadata.getValue()#">,
 
 				<cfloop array="#meta.values#" item="item" index="index">
 					<cfqueryparam cfsqltype="#item.type#" value="#item.value#">
@@ -79,25 +79,20 @@
 	</cffunction>
 
 	<cffunction name="update" returntype="Numeric">
-		<cfargument name="metadataType" type="com.apirone.core.model.bean.MetadataType" required="true">
+		<cfargument name="metadata" type="com.apirone.core.model.bean.Metadata" required="true">
 
-		<cfset var entities = super.getEntitiesAsArray( metadataType.getEntities() )>
+		<cfset var dataType = arguments.metadata.getDataTypeId()>
+		<cfset var param = getFieldByDataType( dataType )>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE metadata
 			SET
-				code = <cfqueryparam cfsqltype="varchar" value="#arguments.metadataType.getCode()#">,
-				metadata_type = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getName()#">,
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getStatus().getId()#">,
-				datatype_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getDataType().getId()#">,
-				unit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.metadataType.getMeasurementUnit().getId()#">,
-				orderby = 10,
-				entities = '#SerializeJSON( entities )#'
+				#param.dbField# = <cfqueryparam cfsqltype="#param.dbType#" value="#arguments.metadata.getValue()#">
 			WHERE
-				metadata_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadataType.getId()#">
+				metadata_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadata.getId()#">
 		</cfquery>
 
-		<cfreturn arguments.metadataType.getId()>
+		<cfreturn arguments.metadata.getId()>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">
@@ -136,14 +131,14 @@
 		<cfreturn { "fields" = fields, "values" = values }>
 	</cffunction>
 
-	<cffunction name="getFieldByDataType" returntype="String" access="private">
+	<cffunction name="getFieldByDataType" returntype="Struct" access="private">
 		<cfargument name="dataType" type="String" required="true">
 
 		<cfset var list = DeserializeJSON( FileRead( ExpandPath( "/config/data/dataTypes.json.cfm" ) ) )>
 
 		<cfloop array="#list#" index="item">
 			<cfif item.id eq arguments.dataType>
-				<cfreturn item.field>
+				<cfreturn item>
 			</cfif>
 		</cfloop>
 

@@ -344,9 +344,6 @@ component {
 	){
 		var result = [];
 
-		dump( var = includes, label = "inc" );
-		abort;
-
 		for ( var item in arguments.list ) {
 			result.append(
 				convert(

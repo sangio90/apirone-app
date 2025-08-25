@@ -91,35 +91,9 @@ component extends="com.apirone.core.controller.AbsController" {
 				break;
 		}
 
-		var params   = getParams( typeId = rc.by, rc = rc );
-		var oldItems = super.fire( "component.list", params );
+		var params = getParams( typeId = rc.by, rc = rc );
 
-		var itemExists = [];
-
-		for ( var thisComponent in components ) {
-			if ( thisComponent.id != "" ) {
-				ArrayAppend( itemExists, thisComponent.id );
-			}
-
-			if ( thisComponent.typeId == "base" ) {
-				var override = super.bean( "ComponentOverride" );
-
-
-				override.setId( thisComponent.override.id );
-				override.setDeleted( thisComponent.override.deleted );
-				override.setQuantity( thisComponent.override.quantity );
-				override.setComponentId( thisComponent.id );
-				override.setProductItemId( component.getProductItem().getId() );
-
-				if ( Len( thisComponent.override.id ) ) {
-					super.fire( "ComponentOverride.update", [ override ] );
-				} else {
-					super.fire( "ComponentOverride.create", [ override ] );
-				}
-			}
-		}
-
-		var message = completeMessage( "product.componentAdded" );
+		var message = completeMessage( "metadata.saved" );
 
 		result.setData( { "message" = message } );
 

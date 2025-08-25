@@ -1,32 +1,40 @@
+
+
 [ 
     {
         id: "BOOLEAN",
         name: "Vero o falso",
-        field: "value_boolean"
+        dbField: "value_boolean",
+        dbType: "boolean"
     },
     {
         id: "DATE",
         name: "Data",
-        field: "value_date"
+        dbField: "value_date",
+        dbType: "date"
     },
     {
         id: "DECIMAL",
         name: "Decimale",
-        field: "value_decimal"
+        dbField: "value_decimal",
+        dbType: "decimal"
     },
     {
         id: "INTEGER",
         name: "Intero",
-        field: "value_integer"
+        dbField: "value_integer",
+        dbType: "integer"
     },
     {
         id: "STRING",
         name: "Stringa",
-        field: "value_char"
+        dbField: "value_char",
+        dbType: "varchar"
     },
     {
         id: "TEXT",
         name: "Testo",
-        field: "value_text"
+        dbField: "value_text",
+        dbType: "varchar"
     },
 ]

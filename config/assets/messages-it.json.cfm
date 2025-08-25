@@ -11,6 +11,12 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
+    "metadata": {
+        "saved": "Metadati salvati",
+        "deletedAllRecords": "Valori cancellati",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
+    },
+
     "combination": {
         "created": "Combinazione caricata",
         "updated": "Combinazione aggiornata",
