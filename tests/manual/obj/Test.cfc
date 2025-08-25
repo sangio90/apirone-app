@@ -26,7 +26,7 @@ component accessors="true" {
 				return variables.textValue;
 			default:
 				Throw(
-					type    = "Apirone.error.metadata.DataTypeNotSupported",
+					type    = "apirone.error.metadata.DataTypeNotSupported",
 					message = "The [#getType().getDataType().getId()#] data type is not supported."
 				)
 		}
@@ -48,7 +48,7 @@ component accessors="true" {
 				break;
 			default:
 				Throw(
-					type    = "Apirone.error.metadata.dataTypeNotSupported",
+					type    = "apirone.error.metadata.dataTypeNotSupported",
 					message = "The [#getType().getDataType().getId()#] data type is not supported."
 				)
 		}

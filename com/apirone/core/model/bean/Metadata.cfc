@@ -32,12 +32,13 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 				return variables.integerValue;
 			case "DECIMAL":
 				return variables.decimalValue;
+			case "STRING":
 			case "TEXT":
 				return variables.textValue;
 			default:
 				Throw(
-					type    = "Apirone.error.metadata.DataTypeNotSupported",
-					message = "The [#getType().getDataType().getId()#] data type is not supported."
+					type    = "apirone.error.metadata.DataTypeNotSupported",
+					message = "The [#getType().getDataType().getId()#] dataType is not supported."
 				)
 		}
 	}
@@ -53,13 +54,14 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			case "DECIMAL":
 				variables.decimalValue = arguments.value;
 				break;
+			case "STRING":
 			case "TEXT":
 				variables.textValue = arguments.value;
 				break;
 			default:
 				Throw(
-					type    = "Apirone.error.metadata.dataTypeNotSupported",
-					message = "The [#getType().getDataType().getId()#] data type is not supported."
+					type    = "apirone.error.metadata.dataTypeNotSupported",
+					message = "The [#getType().getDataType().getId()#] dataType is not supported."
 				)
 		}
 	}

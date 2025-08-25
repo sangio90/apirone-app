@@ -171,7 +171,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// solo uno dei due
 		if ( !( IsNull( arguments.productId ) XOR IsNull( arguments.fruitId ) ) ) {
 			Throw(
-				type    = "ApirOne.errors.AtLeastOneParameterIsRequired",
+				type    = "apirone.error.AtLeastOneParameterIsRequired",
 				message = "At least one parameter is required: productId or fruitId"
 			);
 		}

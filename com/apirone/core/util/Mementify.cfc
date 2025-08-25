@@ -348,7 +348,7 @@ component {
 			result.append(
 				convert(
 					target   = item,
-					// profile  = arguments.profile,
+					profile  = arguments.profile,
 					includes = arguments.includes
 				)
 			);

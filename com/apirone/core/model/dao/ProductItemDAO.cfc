@@ -105,7 +105,7 @@
 		<cfif IsNull( arguments.productItemId )
 		AND IsNull( arguments.productId )
 		AND IsNull( arguments.attributeId )>
-			<cfthrow type="ApirOne.errors.NoArgumentsPassed" message="At least one parameter is required to delete">
+			<cfthrow type="apirone.error.NoArgumentsPassed" message="At least one parameter is required to delete">
 		</cfif>
 
 		<cfquery datasource="apirone">
