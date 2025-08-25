@@ -55,25 +55,31 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
+		dump( json );
+
 		var metadata = super.bean( "Metadata" );
-		var svc      = super.service( "Metadata" )
+		var service  = super.service( "Metadata" )
 
 		switch ( rc.by ) {
 			case "raw-values":
 				for ( var item in json ) {
 					var entity = super.bean( "Entity" );
+					var type   = super.bean( "MetadataType" );
 					entity.setKey( "rawValue.id" );
 					entity.setValue( rc.id );
 
 					metadata.setEntity( entity );
 
-					metadata.setType( type );
+					metadata.setId( IsNumeric( json.id ) ? json.id : NullValue() );
+					metadata.setValue( json.value );
+					metadata.setType( type.setRawMemento( json.type ) );
+
 					metadata.setValue( json.value );
 
 					if ( Len( item.id ) ) {
-						svc.update( metadata );
+						service.update( metadata );
 					} else {
-						svc.create( metadata );
+						service.create( metadata );
 					}
 				}
 
