@@ -5,7 +5,7 @@
 		<section class="modal-dialog modal-xl">
 			<div class="modal-content">
 				
-				<header class="card-header d-flex align-elements-center justify-content-between">
+				<header class="card-header d-flex align-elements-center justify-content-between modal-header--sticky">
 					<h2 class="card-title"><span data-bind="text: getModalTitle"></span></h2>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
 				</header>
@@ -133,7 +133,7 @@
 					</div>
 				</div>
 
-				<footer class="card-footer">
+				<footer class="card-footer modal-footer--sticky">
 					<div class="row">
 						<div class="col-md-12 text-end">
 							<button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>

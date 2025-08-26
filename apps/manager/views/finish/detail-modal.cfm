@@ -7,7 +7,7 @@
 
                 <form id="finish-detail-form" method="POST" name="finish-detail-form">
                 
-                    <header class="card-header d-flex align-elements-center justify-content-between">
+                    <header class="card-header d-flex align-elements-center justify-content-between modal-header--sticky">
                         <h2 class="card-title" data-bind="text:detailForm.title"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>                
@@ -84,7 +84,7 @@
 
                     </div>
 
-                    <footer class="card-footer">
+                    <footer class="card-footer modal-footer--sticky">
                         <div class="row">
                             <div class="col-md-12 float-end">
                                 <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">

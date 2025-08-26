@@ -293,8 +293,6 @@ AP.product.items = ( function() {
 
         addValue: function( event ) {
 
-            console.log( "event:addValue", event );
-
             NM.util.ajax( {
                 method: "POST",
                 url: "/manager/ajax/products/" + AP.page.productId + "/values",
