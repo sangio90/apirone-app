@@ -25,7 +25,7 @@
                                 
                                     <form class="row  align-items-center mb-4" data-bind="events: { submit: search }" id="attributes-search-form">
                                         <div class="col me-2">
-                                            <input class="form-control" placeholder="Cerca..." name="str">
+                                            <input class="form-control" id="attributes-search-form-str" placeholder="Cerca..." name="str" type="text" autofocus>
                                         </div>
                                         <div class="col-auto">
                                             #searchButton( bind="click:searchAttributes" )#

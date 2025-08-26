@@ -1,6 +1,6 @@
 NM.util = NM.util || {};
 
-NM.util.openModal = function( ele ) {
+NM.util.openModal = function( ele, onShow ) {
 
     var dialogs = $( ".modal.show" ); // opened dialog
     var currentId = ele.attr( "id" );
@@ -26,6 +26,10 @@ NM.util.openModal = function( ele ) {
     }
 
     ele.modal( "show" );
+
+    if ( onShow ) {
+        onShow();
+    }
 
     ele.css( { left: 0, top: 0 } );
     ele.offset( { left: currentLeft, top: currentTop } );

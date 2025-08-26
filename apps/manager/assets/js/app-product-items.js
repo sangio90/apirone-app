@@ -271,9 +271,20 @@ AP.product.items = ( function() {
         openAttributesList: function( event ) {
             var item = normalizeComponentItem( event.data );
 
+            var inputField = fields.attributeSearchForm.find( "input[name=str]" );
+
+            inputField.focus();
+
             viewModel.set( "itemForAttributes", item );
 
-            NM.util.openModal( fields.attributeModal );
+            var onShow = function() {
+                fields.attributeModal.on( "shown.bs.modal", function() {
+                    var field = fields.attributeModal.find( "[name=str]" );
+                    field.focus(); // TODO: not works
+                } );
+            };
+
+            NM.util.openModal( fields.attributeModal, onShow );
 
             this.searchAttributes();
 
