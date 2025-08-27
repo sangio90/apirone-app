@@ -105,9 +105,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// MetadataType first
 			bean.setType( getMetadataTypeService().get( record.metadata_type_id ) )
 
-			bean.setId( record.metadata_type_id );
+			bean.setId( record.metadata_id );
 			bean.setEntity( getEntity( record ) );
-			bean.setValue( getValue( record ).value );
+			bean.setValue( getValue( record ) );
 			bean.setCreatedAt( record.created_at );
 
 			return bean;
@@ -116,27 +116,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	private Struct function getValue( required record ){
+	private Any function getValue( required record ){
 		if ( Len( record.value_text ) ) {
-			return { "value" = record.value_text, "dataType" = "TEXT" }
+			return record.value_text;
 		}
 
 		if ( Len( record.value_char ) ) {
-			return { "value" = record.value_char, "dataType" = "STRING" }
+			return record.value_char;
 		}
 
 		if ( Len( record.value_integer ) ) {
-			return { "value" = record.value_integer, "dataType" = "INTEGER" }
+			return record.value_integer;
 		}
 
 		if ( Len( record.value_decimal ) ) {
-			return { "value" = record.value_decimal, "dataType" = "DECIMAL" }
+			return record.value_decimal;
 		}
 
+		if ( Len( record.value_boolean ) ) {
+			return record.value_boolean;
+		}
+
+		// il valore potrebbe essere stato aggiornato come vuoto
+		return nullValue();
+
+		/*
 		Throw(
 			type    = "apirone.error.metadata.valueNotFound",
 			message = "Value non found #SerializeJSON( record, "struct" )#"
 		)
+		*/
 	}
 
 	private com.apirone.core.model.bean.Entity function getEntity( required record ){

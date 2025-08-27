@@ -87,7 +87,11 @@ AP.metadataType.detail = ( function() {
         },
     } );
 
-    pub.new = function() {
+    pub.new = function( onSave ) {
+
+        if ( onSave ) {op
+            viewModel.set( "callbacks.onSave", onSave );
+        }
 
         viewModel.resetForm();
 

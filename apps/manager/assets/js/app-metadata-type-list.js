@@ -35,7 +35,11 @@ AP.metadataType.list = ( function() {
 
         new: function() {
 
-            detailApp.new();
+            var onSave = function() {
+                viewModel.get( "rows" ).read();
+            };
+
+            detailApp.new( onSave );
         },
 
         edit: function( event ) {

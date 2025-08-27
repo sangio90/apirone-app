@@ -4,6 +4,10 @@
         name: "Centimetri"
     },
     {
+        id: "KG-MMC",
+        name: "Kg / mmc"
+    },
+    {
         id: "GR",
         name: "Grammi"
     },
@@ -17,7 +21,7 @@
     },
     {
         id: "MQ",
-        name: "Mq"
+        name: "Metri quadri"
     },
     {
         id: "PA",

@@ -11,9 +11,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var params = getParams( typeId = rc.by, rc = rc );
 
-		// var metadataList = super.getMementify().convertList( super.fire( "metadata.list", params ) );
-		// var typeObjList  = super.getMementify().convertList( super.fire( "metadataType.list" ) );
-
 		var metadataList = super.fire( "metadata.list", params );
 		var typeObjList  = super.fire( "metadataType.list" );
 
@@ -41,7 +38,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			metadata.add( line );
 		}
-
 
 		result.setTotal( metadata.len() );
 		result.setCount( metadata.len() );

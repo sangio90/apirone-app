@@ -5,7 +5,7 @@
         <section class="modal-dialog modal-xl">
             <div class="modal-content">
                 
-                <header class="card-header">
+                <header class="card-header modal-header--sticky">
                     <h2 class="card-title">Attributi</h2>
                 </header>
                 
@@ -55,7 +55,7 @@
                 
                 </div>
 
-                <footer class="card-footer">
+                <footer class="card-footer modal-footer--sticky">
                     <div class="row">
                         <div class="col-md-12 text-end">
                             <button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>

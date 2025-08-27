@@ -63,3 +63,7 @@ ALTER TABLE public.metadata
 ALTER TABLE public.metadata
   ADD CONSTRAINT metadata_idx 
     UNIQUE (metadata_type_id, raw_value_id) NOT DEFERRABLE;
+
+ALTER TABLE public.metadata
+  ADD COLUMN value_boolean BOOLEAN DEFAULT FALSE;
+

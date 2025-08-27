@@ -55,6 +55,7 @@
 		<cfset var dataType = arguments.metadata.getDataTypeId()>
 
 		<cfset var param = getFieldByDataType( dataType )>
+		<cfset var value = arguments.metadata.getValue()>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO metadata (
@@ -64,7 +65,7 @@
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="integer" value="#arguments.metadata.getType().getId()#">,
-				<cfqueryparam cfsqltype="#param.dbType#" value="#arguments.metadata.getValue()#">,
+				<cfqueryparam cfsqltype="#param.dbType#" value="#value#">,
 
 				<cfloop array="#meta.values#" item="item" index="index">
 					<cfqueryparam cfsqltype="#item.type#" value="#item.value#">
@@ -83,11 +84,17 @@
 
 		<cfset var dataType = arguments.metadata.getDataTypeId()>
 		<cfset var param = getFieldByDataType( dataType )>
+		<cfset var value = arguments.metadata.getValue()>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE metadata
 			SET
-				#param.dbField# = <cfqueryparam cfsqltype="#param.dbType#" value="#arguments.metadata.getValue()#">
+				#param.dbField# = 
+					<cfif Len( value )>
+						<cfqueryparam cfsqltype="#param.dbType#" value="#value#">
+					<cfelse>
+						NULL
+					</cfif>
 			WHERE
 				metadata_id = <cfqueryparam cfsqltype="Integer" value="#arguments.metadata.getId()#">
 		</cfquery>
@@ -109,7 +116,9 @@
 		<cfreturn local.q.recordCount>
 	</cffunction>
 
-	<!--- private methods --->
+	<!--- 
+		private methods 
+	--->
 
 	<cffunction name="getFieldsAndValues" returntype="Struct" access="private">
 		<cfargument name="entity" type="com.apirone.core.model.bean.Entity" required="true">
