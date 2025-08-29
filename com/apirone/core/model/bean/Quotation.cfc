@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	property name="description" type="String";
+	property name="quotation" type="String";
 	property name="quotationNumber" type="String";
 	property name="versionNumber" type="Numeric";
 	property name="quotationDate" type="Date";

@@ -141,7 +141,7 @@
 				sales_agent_account_id,
 				graphic_technician_account_id
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getDescription()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotation()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVersionNumber()#">,
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getQuotationDate()#">,
@@ -172,7 +172,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotations
 			SET
-				quotation = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getDescription()#">
+				quotation = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getQuotation()#">
 				,
 				quotation_number = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getQuotationNumber()#">
 				,

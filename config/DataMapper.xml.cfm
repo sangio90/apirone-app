@@ -114,7 +114,7 @@
 
     <mapper id="Quotation" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Quotation">
         <map from="id" to="id" type="cf:String" />
-        <map from="description" to="description" type="cf:String" />
+        <map from="quotation" to="quotation" type="cf:String" />
         <map from="quotationNumber" to="quotationNumber" type="cf:String" />
         <map from="versionNumber" to="versionNumber" type="cf:Numeric" />
         <map from="quotationDate" to="quotationDate" type="cf:Date" />
@@ -141,7 +141,8 @@
         <map from="quotation" to="quotation" ref="Quotation" />
         <map from="zone" to="zone" ref="QuotationItemZone" />
         <map from="position" to="position" ref="QuotationItemPosition" />
-        <map from="product" to="product" ref="QuotationItemProduct" />
+        <map from="product" to="product" ref="Product" />
+        <map from="productOrigin" to="productOrigin" ref="Product" />
     </mapper>
 
     <mapper id="QuotationItemProduct" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.QuotationItemProduct">

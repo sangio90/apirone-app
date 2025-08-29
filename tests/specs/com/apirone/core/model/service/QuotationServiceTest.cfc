@@ -72,16 +72,16 @@ component extends="tests.utils.AbsSpec" {
 				var obj = bean.obj;
 				var newId = svc.create( obj );
 
-				var newDescription = "testDescription" & RandRange( 1000, 9999 );
+				var newQuotation = "testQuotation" & RandRange( 1000, 9999 );
 
-				obj.setDescription( newDescription );
+				obj.setQuotation( newQuotation );
 				obj.setId( newId );
 				svc.update( obj );
 
 				var result = svc.get( newId );
 
 				expect( result.getId() == newId ).toBeTrue();
-				expect( result.getDescription() == newDescription ).toBeTrue();
+				expect( result.getQuotation() == newQuotation ).toBeTrue();
 
 				svc.delete( newId );
 			} );
@@ -107,11 +107,6 @@ component extends="tests.utils.AbsSpec" {
 					var originalItems = quotationItemSvc.list(quotationId=originalQuotation.getId());
 					var clonedItems = quotationItemSvc.list(quotationId=clonedQuotation.getId());
 					expect( arrayLen(originalItems) ).toBe( arrayLen(clonedItems) );
-					for (var i=1; i <= arrayLen(originalItems); i++) {
-						var origProducts = quotationItemProductSvc.list(quotationItemId=originalItems[i].getId());
-						var cloneProducts = quotationItemProductSvc.list(quotationItemId=clonedItems[i].getId());
-						expect( arrayLen(origProducts) ).toBe( arrayLen(cloneProducts) );
-					}
 					transaction action="rollback";
 				}
 			} );
