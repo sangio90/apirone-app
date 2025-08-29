@@ -2,11 +2,11 @@ component extends="tests.utils.AbsSpec"{
 
     function setup(){
 
-        variables.wirebox = new wirebox.system.ioc.Injector( "config.WireboxServices" );
+        variables.wirebox = new wirebox.system.ioc.Injector( "config.Wirebox" );
         variables.svc = variables.wirebox.getInstance( "AccountService" );
-        
+
         var cm = variables.wirebox.getInstance( "CacheManager" );
-        
+
         cm.removeAll();
 
     }
@@ -33,11 +33,11 @@ component extends="tests.utils.AbsSpec"{
 
         var account = variables.svc.get( id );
 
-        $assert.isTrue( account.getLogin() EQ data.login ); 
-        $assert.isTrue( account.getId() EQ id ); 
+        $assert.isTrue( account.getLogin() EQ data.login );
+        $assert.isTrue( account.getId() EQ id );
 
         variables.svc.delete( id );
-                
+
     }
 
     function update_test() {

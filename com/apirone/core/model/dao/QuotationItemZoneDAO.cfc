@@ -52,7 +52,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_zones (
 				quotation_item_id,
-				quotation_item_zone,
+				"name",
 				origin_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationItem().getId()#">::uuid,
@@ -74,7 +74,7 @@
 			UPDATE quotation_item_zones
 			SET
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationItem().getId()#">::uuid,
-				quotation_item_zone = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">
+				"name" = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">
 				<cfif !IsNull( arguments.zone.getOrigin() )>
 					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
 				</cfif>

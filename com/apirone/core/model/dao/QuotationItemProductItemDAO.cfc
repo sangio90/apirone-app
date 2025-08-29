@@ -15,7 +15,7 @@
 	</cffunction>
 
 	<cffunction name="find" returntype="Query">
-		<cfargument name="quotationItemProductId" type="String" required="false">
+		<cfargument name="quotationItemId" type="String" required="false">
 		<cfargument name="productItemId" type="String" required="false">
 		<cfargument name="originId" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_item_product_item_id">
@@ -24,15 +24,15 @@
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				quotation_item_product_item_id::varchar,
-				quotation_item_product_id::varchar,
+				quotation_item_id::varchar,
 				product_item_id::integer,
 				origin_id::varchar,
 				COUNT(quotation_item_product_item_id) OVER() AS total
 			FROM
 				quotation_item_product_items
 			WHERE 1=1
-				<cfif !IsNull( arguments.quotationItemProductId )>
-					AND quotation_item_product_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemProductId#">::uuid
+				<cfif !IsNull( arguments.quotationItemId )>
+					AND quotation_item_product_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemId#">::uuid
 				</cfif>
 				<cfif !IsNull( arguments.productItemId )>
 					AND product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItemId#">
@@ -54,11 +54,11 @@
 		<cfargument name="productItem" type="com.apirone.core.model.bean.QuotationItemProductItem" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_product_items (
-				quotation_item_product_id,
+				quotation_item_id,
 				product_item_id,
 				origin_id
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItemProduct().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getOrigin().getId()#">::uuid
@@ -76,7 +76,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_item_product_items
 			SET
-				quotation_item_product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItemProduct().getId()#">::uuid,
+				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
 				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
 					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getOrigin().getId()#">::uuid

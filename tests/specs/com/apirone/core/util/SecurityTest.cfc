@@ -2,7 +2,7 @@ component extends="testbox.system.BaseSpec"{
 
     function setup(){
 
-        variables.wirebox = new wirebox.system.ioc.Injector( "config.WireboxServices" );
+        variables.wirebox = new wirebox.system.ioc.Injector( "config.Wirebox" );
         variables.security = variables.wirebox.getInstance( "Security" );
 
     }
@@ -26,11 +26,11 @@ component extends="testbox.system.BaseSpec"{
         var b = variables.security.decryptString( a );
 
         $assert.isTrue( b == start );
-        
+
 
     }
-    
+
     function decryptString_test(){
     }
-    
+
 }

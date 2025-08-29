@@ -13,7 +13,7 @@
 	}
 
 	public function getContainer(){
-		return new coldbox.system.ioc.Injector( "config.WireboxServices" );
+		return new coldbox.system.ioc.Injector( "config.Wirebox" );
 	}
 
 	public function getHelperData(){

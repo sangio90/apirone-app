@@ -1,11 +1,11 @@
 ﻿component{
 
 	public Bootstrapper function init() {
-		
-		var wirebox = new coldbox.system.ioc.Injector("config.WireboxServices")
-		
+
+		var wirebox = new coldbox.system.ioc.Injector("config.Wirebox")
+
 		return this;
-	
+
 	}
 
 }

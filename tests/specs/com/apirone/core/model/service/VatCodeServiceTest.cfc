@@ -2,7 +2,7 @@ component extends="tests.utils.AbsSpec"{
 
     function setup(){
 
-        variables.wirebox = new wirebox.system.ioc.Injector( "config.WireboxServices" );
+        variables.wirebox = new wirebox.system.ioc.Injector( "config.Wirebox" );
         variables.svc = variables.wirebox.getInstance( "VatCodeService" );
 
         var cm = variables.wirebox.getInstance( "CacheManager" );

@@ -2,7 +2,7 @@ component extends="tests.utils.AbsSpec"{
 
     function setup(){
 
-        variables.wirebox = new coldbox.system.ioc.Injector( "config.WireboxServices" );
+        variables.wirebox = new coldbox.system.ioc.Injector( "config.Wirebox" );
         variables.svc = variables.wirebox.getInstance( "CombinationService" );
         var cm = variables.wirebox.getInstance( "CacheManager" );
         variables.helpers = new tests.utils.Helpers();
@@ -22,8 +22,8 @@ component extends="tests.utils.AbsSpec"{
 
         var rows = variables.svc.calculateCombinations( productId = "67860a46-44e8-4c8e-9582-c62e24c5bfcb" );
         $assert.isTrue( isArray( rows ), "rows is an array" );
-        console(rows.len()); 
-                
+        console(rows.len());
+
     }
-  
+
 }

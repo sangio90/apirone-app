@@ -62,7 +62,7 @@
 
 			<cfif !IsNull( arguments.str )>
 				AND (
-					description ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
+					quotation ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
 					OR quotation_number ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
 				)
 			</cfif>

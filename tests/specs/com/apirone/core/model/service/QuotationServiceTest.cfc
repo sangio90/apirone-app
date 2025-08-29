@@ -34,16 +34,10 @@ component extends="tests.utils.AbsSpec" {
 					var quotationItemBean = helper.createQuotationItem( quotationId=quotationId );
 					var quotationItemId = quotationItemSvc.create( quotationItemBean.obj );
 
-					var quotationItemProductParentBean = helper.createQuotationItemProductParent( quotationItemId=quotationItemId );
-					var quotationItemProductParentId = quotationItemProductSvc.create( quotationItemProductParentBean.obj );
-
-					var quotationItemProductBean = helper.createQuotationItemProduct( quotationItemId=quotationItemId, quotationItemProductParentId=quotationItemProductParentId, prodottoEscluso=quotationItemProductParentBean.obj.getProduct().getId() );
-					var quotationItemProductId = quotationItemProductSvc.create( quotationItemProductBean.obj );
-
-					var quotationItemProductItemParentBean = helper.createQuotationItemProductItemParent( quotationItemProductId=quotationItemProductId );
+					var quotationItemProductItemParentBean = helper.createQuotationItemProductItemParent( quotationItemId=quotationItemId );
 					var quotationItemProductItemParentId = quotationItemProductItemSvc.create( quotationItemProductItemParentBean.obj );
 
-					var quotationItemProductItemBean = helper.createQuotationItemProductItem( quotationItemProductId=quotationItemProductId, quotationItemProductItemParentId=quotationItemProductItemParentId, productItemEscluso=quotationItemProductItemParentBean.obj.getProductItem().getId() );
+					var quotationItemProductItemBean = helper.createQuotationItemProductItem( quotationItemId=quotationItemId, quotationItemProductItemParentId=quotationItemProductItemParentId, productItemEscluso=quotationItemProductItemParentBean.obj.getProductItem().getId() );
 					var quotationItemProductItemId = quotationItemProductItemSvc.create( quotationItemProductItemBean.obj );
 
 					var quotationItemZoneParentBean = helper.createQuotationItemZoneParent( quotationItemId=quotationItemId );

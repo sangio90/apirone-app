@@ -2,11 +2,11 @@ component extends="tests.utils.AbsSpec"{
 
     function setup(){
 
-        variables.wirebox = new coldbox.system.ioc.Injector( "config.WireboxServices" );
+        variables.wirebox = new coldbox.system.ioc.Injector( "config.Wirebox" );
         variables.svc = variables.wirebox.getInstance( "FinishService" );
-        
+
         var cm = variables.wirebox.getInstance( "CacheManager" );
-        
+
         cm.removeAll();
 
     }
@@ -26,7 +26,7 @@ component extends="tests.utils.AbsSpec"{
 
         var data = {
             code = code,
-            
+
             status = {
                 id = "ACT"
             },
@@ -60,9 +60,9 @@ component extends="tests.utils.AbsSpec"{
 
         var outcome = variables.svc.delete( newId );
 
-        $assert.isTrue( outcome.getData().deletedCount == 1 ); 
-                
-    }    
+        $assert.isTrue( outcome.getData().deletedCount == 1 );
+
+    }
 
     function create_test(){
 
@@ -73,7 +73,7 @@ component extends="tests.utils.AbsSpec"{
 
         var data = {
             code = code,
-            
+
             status = {
                 id = "ACT"
             },
@@ -104,11 +104,11 @@ component extends="tests.utils.AbsSpec"{
 
         var thisBean = variables.svc.get( newId );
 
-        $assert.isTrue( thisBean.getCode() EQ data.code ); 
-        $assert.isTrue( thisBean.getName() EQ name ); 
+        $assert.isTrue( thisBean.getCode() EQ data.code );
+        $assert.isTrue( thisBean.getName() EQ name );
 
         variables.svc.delete( newId );
-                
+
     }
 
    function listByLineId_test(){
@@ -117,8 +117,8 @@ component extends="tests.utils.AbsSpec"{
 
         var list = variables.svc.list( lineId = lineId );
 
-        $assert.isTrue( list.len() == 8 ); 
-                
+        $assert.isTrue( list.len() == 8 );
+
     }
 
 
@@ -138,11 +138,11 @@ component extends="tests.utils.AbsSpec"{
 
         var account = variables.svc.get( id );
 
-        $assert.isTrue( account.getLogin() EQ data.login ); 
-        $assert.isTrue( account.getId() EQ id ); 
+        $assert.isTrue( account.getLogin() EQ data.login );
+        $assert.isTrue( account.getId() EQ id );
 
         variables.svc.delete( id );
-                
+
     }
 
 }

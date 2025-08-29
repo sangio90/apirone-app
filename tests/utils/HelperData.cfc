@@ -118,7 +118,7 @@ component extends="testbox.system.BaseSpec"{
         
         var raw = mock.mock(
             $returnType = "struct",
-            description = "words:4",
+            quotation = "words:4",
             quotationNumber = "string-numeric:5",
             quotationDate = "date",
             notes = "words:10",
@@ -174,6 +174,7 @@ component extends="testbox.system.BaseSpec"{
         }   else {
             raw.quotation = { id = quotationId };
         }
+        raw.product = { id = random.getRandomByTableName(limit=1, tableName='products').product_id.toString() };
 
         var bean = factory.createInstance( "QuotationItem", raw );
 
@@ -326,17 +327,17 @@ component extends="testbox.system.BaseSpec"{
         var util = new com.apirone.core.util.String();
         var factory = new com.apirone.core.model.factory.Factory();
         var random = new tests.utils.DBRandomData();
-        var quotationItemProductId = structKeyExists(arguments, "quotationItemProductId") ? arguments.quotationItemProductId : null;
+        var quotationItemId = structKeyExists(arguments, "quotationItemId") ? arguments.quotationItemId : null;
 
         var raw = mock.mock(
             $returnType = "struct",
             createdAt = "datetime"
         );
 
-        if (IsNull(quotationItemProductId)) {
-            raw.quotationItemProduct = { id = random.getRandomByTableName(limit=1, tableName='quotation_item_products').quotation_item_product_id.toString() };
+        if (IsNull(quotationItemId)) {
+            raw.quotationItem = { id = random.getRandomByTableName(limit=1, tableName='quotation_items').quotation_item_id.toString() };
         }   else {
-            raw.quotationItemProduct = { id = quotationItemProductId };
+            raw.quotationItem = { id = quotationItemId };
         }
         raw.productItem = { id = random.getRandomByTableName(limit=1, tableName='product_items').product_item_id.toString() };
 
@@ -353,7 +354,7 @@ component extends="testbox.system.BaseSpec"{
         var util = new com.apirone.core.util.String();
         var factory = new com.apirone.core.model.factory.Factory();
         var random = new tests.utils.DBRandomData();
-        var quotationItemProductId = structKeyExists(arguments, "quotationItemProductId") ? arguments.quotationItemProductId : null;
+        var quotationItemId = structKeyExists(arguments, "quotationItemId") ? arguments.quotationItemId : null;
         var quotationItemProductItemParentId = structKeyExists(arguments, "quotationItemProductItemParentId") ? arguments.quotationItemProductItemParentId : null;
         var productItemEscluso = structKeyExists(arguments, "productItemEscluso") ? arguments.productItemEscluso : null;
 
@@ -362,10 +363,14 @@ component extends="testbox.system.BaseSpec"{
             createdAt = "datetime"
         );
 
-        raw.quotationItemProduct = { id = quotationItemProductId };
+        if (IsNull(quotationItemId)) {
+            raw.quotationItem = { id = random.getRandomByTableName(limit=1, tableName='quotation_items').quotation_item_id.toString() };
+        }   else {
+            raw.quotationItem = { id = quotationItemId };
+        }
         var productItemId = random.getRandomByTableName(limit=1, tableName='product_items', primaryKey='product_item_id', escluso=productItemEscluso, tipo='id').product_item_id.toString();
         raw.productItem = { id = productItemId };
-        raw.parent = { id = quotationItemProductItemParentId };
+        raw.origin = { id = quotationItemProductItemParentId };
 
         var bean = factory.createInstance( "QuotationItemProductItem", raw );
 
