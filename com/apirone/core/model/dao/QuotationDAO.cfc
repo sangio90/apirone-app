@@ -121,7 +121,7 @@
 		<cfargument name="quotation" type="com.apirone.core.model.bean.Quotation" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotations (
-				"description",
+				quotation,
 				quotation_number,
 				version_number,
 				quotation_date,
@@ -172,7 +172,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotations
 			SET
-				description = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getDescription()#">
+				quotation = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getDescription()#">
 				,
 				quotation_number = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getQuotationNumber()#">
 				,

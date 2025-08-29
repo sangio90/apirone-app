@@ -282,8 +282,10 @@
 			quotations
 		*/
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
+		get( "/quotations/:id" ).to( "QuotationController.items" ).end();
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
-		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
+		//post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
+		post( "/quotations" ).to( "QuotationController.create" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		get( "/quotations" ).to( "QuotationController.list" ).end();
 

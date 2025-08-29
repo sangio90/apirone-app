@@ -18,7 +18,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return vatCode;
 	}
 
-	public com.apirone.core.model.bean.VatCode(){
+	public Array function list() {
 		arguments[ "limit" ] = -1;
 		return search( argumentCollection = arguments ).getData();
 	}

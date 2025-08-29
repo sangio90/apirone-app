@@ -6,7 +6,7 @@
 				#pageTitle()#
             </div>
 			<div class="col-6 text-end">
-				#addButton( bind = "click:newQuotation", size = "md", label = "Aggiungi preventivo" )#
+				#addButton( bind = "click:new", size = "sm", label = "Aggiungi preventivo" )#
 			</div>
         </div>
 

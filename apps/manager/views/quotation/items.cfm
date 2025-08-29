@@ -53,6 +53,7 @@
                                                     <button type="button" class="btn btn-primary btn-sm" onclick="javascript:addZone()">Aggiungi zona</button>
                                                 </div>
 
+                                                <!---
                                                 <cfloop array="#prc.zones#" item="item">
 
                                                     <div class="quotation-zone">
@@ -66,6 +67,7 @@
                                                         </div>
                                                     </div>
                                                 </cfloop>
+                                                ---->
 
                                             </div>
 
@@ -74,8 +76,10 @@
                                                 <div class="row">
 
                                                     <div class="12">
-                                                        <div class="row">
-                                                            <button type="button" class="col-2 btn btn-primary btn-sm" onclick="javascript:addPlate()">Aggiungi placca</button>
+                                                        <div class="row text-end">
+                                                            <button type="button" class="col-2 btn btn-primary btn-sm mr-2" onclick="javascript:addPlate()">Aggiungi placca</button>
+                                                            &nbsp;
+                                                            <button type="button" class="col-2 btn btn-primary btn-sm" onclick="javascript:addSignage()">Aggiungi segnaletica</button>
                                                         </div>
                                                     </div>
 

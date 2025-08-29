@@ -85,9 +85,9 @@ AP.quotation.list = ( function() {
             return false;
         },
 
-        newQuotation: function( ) {
+        new: function( ) {
             window.location.href = "/manager/quotations/new";
-		},
+        },
     } );
 
     pub.init = function() {

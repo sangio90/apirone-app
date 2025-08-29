@@ -1,7 +1,6 @@
 ﻿<cfoutput>
 
-    <div id="quotation-detail-root">
-
+    <div id="quotation-header-root">
 
         <div class="row mb-3">
             <div class="col-lg-6">
@@ -15,7 +14,7 @@
         <div class="row">
             <div class="col-lg-12">
                 
-                <form action="/manager/quotations" class="form-horizontal" method="post" id="quotation-detail-form">
+                <form action="/manager/quotations" class="form-horizontal" method="post" id="quotation-header-form">
                     
                     <section class="card">
                         
@@ -363,7 +362,7 @@
                                         <div class="col-sm-9 offset-sm-3">
 
                                             <button class="btn btn-default">&laquo; Precedente &raquo;</button>
-                                            <button class="btn btn-primary"><i class="fa fa-save"></i> Salva</button>
+                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
 
                                         </div>
                                     </div>                                    
@@ -385,6 +384,8 @@
 
 </cfoutput>
 <script>
+
+//TODO: direi di spostarlo nella app-
 document.addEventListener("DOMContentLoaded", function () {
     // Cerca tutti i bottoni con classe `changeTab`
     document.querySelectorAll("button.changeTab").forEach(function (button) {

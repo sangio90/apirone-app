@@ -242,15 +242,9 @@ AP.account.list = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
-                                AP.widget.notify(
-                                    "error",
-                                    "Non riesco a cancellare tutti gli account",
-                                );
+                                AP.widget.notify( "error", "Non riesco a cancellare tutti gli account" );
                             } else {
-                                AP.widget.notify(
-                                    "success",
-                                    "Cancellazione avvenuta con successo",
-                                );
+                                AP.widget.notify( "success", "Cancellazione avvenuta con successo" );
                             }
 
                             viewModel.rows.read();
