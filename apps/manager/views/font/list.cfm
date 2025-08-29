@@ -68,7 +68,7 @@
                                     { 'field':'code', 'title':'Codice', width: '100px' },
                                     { 'field':'name', 'title':'Nome'},
                                     { 'field':'family', 'title':'Famiglia'},
-                                    { 'field':'dimension', 'title':'Ingombro', width: '120px', 'headerAttributes': { 'class': 'text-center' } },
+                                    { 'field':'heightWidthRatio', 'title':'Rapporto Altezza-Larghezza', width: '300px' },
                                     { 'field':'', 'title':'Modifica', width: '55px'},
                                     { 
                                         'field'           :'', 

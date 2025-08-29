@@ -52,11 +52,11 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Ingrombro (mm)</label>
+                            <label class="col-sm-2 col-form-label text-end">Rapporto Altezza-Larghezza</label>
                             <div class="col-sm-10">
-                                <input type="number" required class="form-control col-sm-4" name="dimension"
-                                    data-msg-required="Dimensione richiesta"
-                                    data-bind="value: detailForm.data.dimension">
+                                <input type="number" required class="form-control col-sm-4" name="heightWidthRatio"
+                                    data-msg-required="Rapporto Altezza-Larghezza richiesto"
+                                    data-bind="value: detailForm.data.heightWidthRatio">
                             </div>
                         </div>
 

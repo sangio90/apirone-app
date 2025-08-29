@@ -167,7 +167,7 @@
 			bean.setId( record.font_id );
 			bean.setCode( record.code );
 			bean.setDirectory( record.directory );
-			bean.setDimension( record.dimension );
+			bean.setHeightWidthRatio( record.height_width_ratio );
 			bean.setFamily( record.family );
 
 			bean.setTexts( getTextService().list( fontId = record.font_id ) );

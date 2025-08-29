@@ -16,7 +16,7 @@
                 <span data-bind="text: family"></span>
             </td>
             <td class="text-end">
-                <span data-bind="text: dimension"></span> mm
+                <span data-bind="text: heightWidthRatio"></span>
             </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#

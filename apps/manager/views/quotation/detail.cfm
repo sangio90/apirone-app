@@ -161,7 +161,11 @@
                                     billing
                                 --->
                                 <div class="tab-pane fade" id="nav-billing" role="tabpanel">
-
+                                    
+                                    <div class="form-group row mb-2">
+                                        <h1><span class="required">CONTINUA DA QUA!</span></h1>
+                                    </div>
+                                    
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
                                         <div class="col-sm-9">

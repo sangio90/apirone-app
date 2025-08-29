@@ -12,7 +12,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 					"directory",
 					"family",
 					"nameItem",
-					"dimension",
+					"heightWidthRatio",
 					"status",
 					"categories"
 				]
@@ -23,7 +23,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	property name="code" type="String";
 	property name="family" type="String";
 	property name="directory" type="String";
-	property name="dimension" type="Numeric";
+	property name="heightWidthRatio" type="Numeric";
 
 	public Font function init(){
 		return this;

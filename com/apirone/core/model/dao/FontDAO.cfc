@@ -68,13 +68,13 @@
 			INSERT INTO fonts (
 				code,
 				directory,
-				dimension,
+				height_width_ratio,
 				family
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getDirectory()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.font.getDimension()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.font.getHeightWidthRatio()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getFamily()#">
 			) RETURNING font_id
 		</cfquery>
@@ -91,7 +91,7 @@
 			SET
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getCode()#">,
 				directory = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getDirectory()#">,
-				dimension = <cfqueryparam cfsqltype="Numeric" value="#arguments.font.getDimension()#">,
+				height_width_ratio = <cfqueryparam cfsqltype="Numeric" value="#arguments.font.getHeightWidthRatio()#">,
 				family = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getFamily()#">
 			WHERE
 				font_id = <cfqueryparam cfsqltype="Integer" value="#arguments.font.getId()#">

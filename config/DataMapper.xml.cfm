@@ -29,7 +29,7 @@
         <map from="name" to="name" type="cf:String" />
         <map from="family" to="family" type="cf:String" />
         <map from="directory" to="directory" type="cf:String" />
-        <map from="dimension" to="dimension" type="cf:Numeric" />
+        <map from="heightWidthRatio" to="heightWidthRatio" type="cf:Numeric" />
         <map from="nameItem" to="nameItem" ref="Text" />
     </mapper>
 

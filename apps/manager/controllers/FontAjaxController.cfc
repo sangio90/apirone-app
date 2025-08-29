@@ -8,7 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "font.search", params );
-
+		
 		for ( var row in rows.getData() ) {
 			var obj = mm.convert( row, "list" );
 			data.add( obj );
@@ -45,7 +45,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		font.setId( json.id );
 		font.setCode( json.code );
-		font.setDimension( json.dimension );
+		font.setHeightWidthRatio( json.heightWidthRatio );
 		font.setDirectory( "#LCase( json.code )#" );
 		font.setFamily( json.family );
 
