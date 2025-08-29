@@ -44,7 +44,7 @@ component extends="com.apirone.core.root.Application" {
 
 		if ( super.isDev() OR url.keyExists("reinit") ) {
 
-			//super.clearContainer()
+			super.clearContainer()
 
 			onApplicationStart();
 			application.counter++;
