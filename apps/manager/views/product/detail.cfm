@@ -161,6 +161,7 @@
                                 <form id="product-grid-form">
 
                                     <!---
+                                    TODO: remove productAttributesList
                                     #productAttributesList( 
                                         id="product-items-grid", 
                                         type="product", 

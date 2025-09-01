@@ -5,14 +5,6 @@ Object.assign( AP.plate.fields, {
 
 } );
 
-
-/*
-AP.plate.fields = {
-    designerRoot: $( "#plate-designer-root" ),
-    mapRoot: $( "#plates-map-root" ),
-};
-*/
-
 $( document ).ready( function() {
     if ( AP.plate.fields.mapRoot.length ) {
         AP.plate.map.init( {
@@ -270,3 +262,4 @@ AP.plate.map = ( function() {
 
     return pub;
 } () );
+

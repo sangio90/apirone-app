@@ -74,7 +74,7 @@
 			UPDATE quotation_item_zones
 			SET
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationItem().getId()#">::uuid,
-				"name" = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">
+				quotation_item_zone = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">
 				<cfif !IsNull( arguments.zone.getOrigin() )>
 					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
 				</cfif>

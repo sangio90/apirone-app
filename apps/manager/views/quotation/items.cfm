@@ -176,4 +176,5 @@
         </div>
     </div>
     #view( "quotation/signage-modal" )#
+    #view( "quotation/plate-modal" )#
 </cfoutput>

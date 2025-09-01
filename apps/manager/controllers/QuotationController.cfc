@@ -76,6 +76,7 @@
 		prc.plates = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
 
 		prc.jsScripts.add( "app-signage" );
+		prc.jsScripts.add( "app-plate" );
 		prc.jsScripts.add( "app-quotation-items" );
 
 		event.setView( "quotation/items" );

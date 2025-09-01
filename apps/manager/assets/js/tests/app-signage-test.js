@@ -1,13 +1,9 @@
-$(document).ready(function(){
+$( document ).ready( function() {
 
-    console.log("test:app-signage-attributes")
-
-    
     setTimeout( function() {
-        $("body").find("button[data-bind='click:addSignage']").click();
-        console.log("test:load");
-        
-    }, 1000 )
+        // $( "body" ).find( "button[data-bind='click:addSignage']" ).click();
+        console.log( "test-signage:load" );
 
-})
+    }, 1000 );
 
+} );

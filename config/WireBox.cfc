@@ -12,8 +12,6 @@ component extends="coldbox.system.ioc.config.Binder" {
             }
         };
 
-        //mapDirectory(packagePath="com.apirone.core.model.bean");
-
         mapDirectory(packagePath="com.apirone.core.model.dao")
             .asSingleton();
 
@@ -58,11 +56,6 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton()
             .initArg( name="wrappedService", ref="ModelServiceBase" );
 
-        /*
-        mapDirectory(packagePath="com.apirone.core.decorator")
-            .asSingleton();
-        */
-        
         /*
             configuration
         */

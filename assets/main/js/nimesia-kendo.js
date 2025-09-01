@@ -129,6 +129,8 @@ NM.kendo.formatDate = function( date, type="normal" ) {
 
 NM.kendo.formatISODate = function( date, type="normal" ) {
 
+    //TODO: use NM.kendo.formatDate() 
+
     if ( type == "normal" ) {
         var ret = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss", "en-US" ), "dd/MM/yyyy HH:mm" );
     }

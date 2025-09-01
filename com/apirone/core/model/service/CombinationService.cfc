@@ -61,8 +61,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			// Cerco se esiste già una combinazione per il prodotto
-			var combination = super.bean( "Combination" );
 
+			var combination = super.bean( "Combination" );
 			combination.setProductId( arguments.productId );
 			combination.setStatus( getStatusService().get( "ACT" ) );
 
@@ -75,8 +75,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				item.setCombinationId( combinationId );
 				item.setProductItem( product.setId( productItemId ) );
 
-				item.getId();
-
+				getCombinationProductItemService().create( item );
 			}
 		}
 		// Converto l'albero in un array di combinazioni uniche

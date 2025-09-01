@@ -89,7 +89,7 @@ AP.metadataType.detail = ( function() {
 
     pub.new = function( onSave ) {
 
-        if ( onSave ) {op
+        if ( onSave ) {
             viewModel.set( "callbacks.onSave", onSave );
         }
 
