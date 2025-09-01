@@ -145,3 +145,4 @@
 		<cfreturn local.q.recordCount>
 	</cffunction>
 </cfcomponent>
+	

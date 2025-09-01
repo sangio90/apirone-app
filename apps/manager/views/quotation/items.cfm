@@ -47,7 +47,7 @@
 
                                                 <div class="col-3">
 
-                                                    <div class="mb-3">
+                                                    <div class="mb-3 ">
                                                         <h2>Zone</h2>
                                                         <button type="button" class="btn btn-primary btn-sm" onclick="javascript:addZone()">Aggiungi zona</button>
                                                     </div>
@@ -74,12 +74,10 @@
 
                                                     <div class="row">
 
-                                                        <div class="12">
-                                                            <div class="row text-end">
-                                                                <button type="button" class="col-2 btn btn-primary btn-sm mr-2" onclick="javascript:addPlate()">Aggiungi placca</button>
-                                                                &nbsp;
-                                                                <button type="button" class="col-2 btn btn-primary btn-sm" data-bind="click:addSignage">Aggiungi segnaletica</button>
-                                                            </div>
+                                                        <div class="col-12">
+                                                            <button type="button" class="col-2 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
+
+                                                            <button type="button" class="col-2 btn btn-primary btn-sm" data-bind="click:addSignage">Aggiungi segnaletica</button>
                                                         </div>
 
                                                         <cfloop array="#prc.plates#" item="item">
@@ -91,7 +89,7 @@
                                                                             #item.name#
                                                                         </div>
                                                                         <div class="col-12">
-                                                                            <img src="/assets/fake/img/plate.jpg" style="width: 100%;">
+                                                                            <img src="/assets/fakes/img/plate.jpg" style="width: 100%;">
                                                                         </div>
                                                                         <div class="col-6">
                                                                             Quantità: #item.qty#<br>

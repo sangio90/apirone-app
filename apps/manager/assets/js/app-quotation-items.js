@@ -94,9 +94,9 @@ AP.quotation.items = ( function() {
         },
 
         addSignage: function( ) {
-            signageApp.open()
-        } 
-    });
+            signageApp.new();
+        }
+    } );
 
     pub.init = function() {
         console.log( "quotation.items:init" );

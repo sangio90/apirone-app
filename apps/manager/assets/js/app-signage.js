@@ -44,34 +44,14 @@ AP.signage.modal = ( function() {
         title: "Carica segnaletica",
     };
 
-    // Helper per estrarre la traduzione
-    function getText( texts, kind, lang ) {
-        return texts.find(
-            t => t.kind === kind && t.lang && t.lang.id === lang
-        ) || { name: "" };
-    }
-
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
-        categories: new Kendo.data.DataSource(),
+        categories: new kendo.data.DataSource(),
 
         callback: {
             onCreate: undefined,
             onUpdate: undefined,
             onLoad: undefined,
-        },
-
-        // TESTARE
-        getText: getText,
-
-        // TESTARE
-        setTextName: function( kind, lang, value ) {
-            var texts = this.get( "detailForm.data.texts" );
-            var item = texts.find( t => t.kind === kind && t.lang && t.lang.id === lang );
-            if ( item ) {
-                item.name = value;
-                this.trigger( "change", { field: "detailForm.data.texts" } );
-            }
         },
 
         resetForm: function() {},
@@ -116,22 +96,22 @@ AP.signage.modal = ( function() {
         },
     } );
 
-    pub.open = function( id, onSave ) {
+    pub.new = function( onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
 
         NM.util.ajax( {
             method: "GET",
-            url: "/ajax/quotations/categories",
+            url: "/manager/ajax/quotations/categories",
             callback: {
                 done: function( xhr ) {
-                    if ( xhr.status == "SUCCESS" ) {
-                        
-                        viewModel.get( "categories" ).data( xhr.data );
 
-                        NM.util.openModal( AP.signage.fields.modalRoot );
-                    }
+                    console.log( "xhr.data", xhr.data );
+
+                    viewModel.get( "categories" ).data( xhr.data );
+
+                    NM.util.openModal( AP.signage.fields.modalRoot );
                 },
             },
         } );
@@ -165,7 +145,7 @@ AP.signage.modal = ( function() {
                         );
                         viewModel.set( "detailForm.title", "Modifica segnaletica" );
 
-                        NM.util.openModal( AP.signage.fields.detailRoot );
+                        NM.util.openModal( AP.signage.fields.modalRoot );
                     }
                 },
             },
@@ -173,7 +153,7 @@ AP.signage.modal = ( function() {
     };
 
     pub.init = function() {
-        kendo.bind( AP.signage.fields.detailRoot, viewModel );
+        kendo.bind( AP.signage.fields.modalRoot, viewModel );
     };
 
     return pub;

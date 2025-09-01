@@ -281,7 +281,8 @@
 		/*
 			quotations
 		*/
-		get( "/ajax/quotations/categories" ).to( "QuotationSignageAjaxController.listCategories" ).end();
+		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
+		
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.items" ).end();
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();

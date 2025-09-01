@@ -18,9 +18,9 @@
                                 <label class="col-sm-2 col-form-label text-end">Categoria</label>
                                 <div class="col-sm-10">
                                     <select id="productCategory" 
-                                        data-placeholder="-- Seleziona la categoria --"
-                                        data-role="dropdownlist" 
-                                        data-bind="source: detailForm.categories" 
+                                        class="form-control"
+                                        data-placeholder="-- Seleziona la categoria"
+                                        data-bind="source: categories" 
                                         data-value-field="id"
                                         data-text-field="name"
                                         disabled="disabled"

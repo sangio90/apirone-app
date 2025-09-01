@@ -1,24 +1,5 @@
 ﻿component extends="com.apirone.core.controller.AbsController" {
 
-	function listCategories( event, rc, prc ){
-		var data = [];
-
-		var result = super.getResult();
-		var params = super.paramsFromUrl();
-		var mem = super.getMementify();
-		params[ 'typeId' ] = 'SEG';
-		
-		var rows = super.fire( "productCategory.list", params );
-
-		var data = mem.convertList( rows.getData(), "list" );
-
-		result.setTotal( rows.getTotal() );
-		result.setCount( rows.getCount() );
-		result.setData( data );
-
-		event.setValue( "result", result );
-	}
-
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 

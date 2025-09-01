@@ -1,23 +1,35 @@
 component extends="com.apirone.core.controller.AbsController" {
 
+	function listCategories( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+		var mem = super.getMementify();
+
+		params[ "typeId" ] = "SEG";
+		
+		var rows = super.fire( "productCategory.list", params );
+
+		var data = mem.convertList( rows, "list" );
+
+		result.setTotal( rows.len() );
+		result.setCount( rows.len() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
 	function list( event, rc, prc ){
 		var data = [];
 
 		var result = super.getResult();
-		//var dm     = super.getDatamapper();
 		var params = super.paramsFromUrl();
 		var mem = super.getMementify();
 
 		var rows = super.fire( "quotation.search", params );
 
 		var data = mem.convertList( rows.getData(), "list" );
-
-		/*
-		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Quotation", true );
-			data.add( obj );
-		}
-		*/
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );

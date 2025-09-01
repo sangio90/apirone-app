@@ -25,7 +25,7 @@
 		]
 	},
 	{
-		href: "",
+		href: "#",
 		icon: "fas fa-comment-dollar",
 		title: "Preventivi",
 		roles: "ADM",
