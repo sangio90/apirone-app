@@ -23,13 +23,7 @@ AP.product.items = ( function() {
     var attributeApp = AP.attribute.detail;
 
     var dataSources = {
-        items: NM.kendo.dataSource(
-            {
-                url: "/manager/ajax/products/" + AP.page.productId + "/items",
-                serverFiltering: false,
-                serverPaging: false,
-            }
-        ),
+        items: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items" } ),
         orderingItems: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items/order" } ),
         orderingAttributes: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order" } ),
         attributesList: undefined,

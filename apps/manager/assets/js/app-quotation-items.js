@@ -13,13 +13,14 @@ $( document ).ready( function() {
 
 AP.quotation.items = ( function() {
     var pub = {};
+
+    var plateApp = AP.plate.modal;
     var signageApp = AP.signage.modal;
+    var fields = AP.quotation.fields;
 
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/quotations" } ),
     };
-
-    var fields = AP.quotation.fields;
 
     var viewModel = kendo.observable( {
         rows: dataSources.items,
@@ -95,11 +96,15 @@ AP.quotation.items = ( function() {
 
         addSignage: function( ) {
             signageApp.new();
+        },
+
+        addPlat: function( ) {
+            plateApp.new();
         }
+
     } );
 
     pub.init = function() {
-        console.log( "quotation.items:init" );
         kendo.bind( AP.quotation.fields.itemsRoot, viewModel );
     };
 
