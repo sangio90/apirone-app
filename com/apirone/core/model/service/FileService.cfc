@@ -164,7 +164,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/**
 	 * @private
 	 */
-	private com.apirone.core.model.bean.file function build( required String fileId ){
+	private com.apirone.core.model.bean.File function build( required String fileId ){
 		var record = getDao().read( fileId = arguments.fileId );
 
 		if ( record.RecordCount ) {

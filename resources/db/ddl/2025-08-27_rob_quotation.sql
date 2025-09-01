@@ -1,2 +1,2 @@
-﻿ALTER TABLE public.quotations
-  RENAME COLUMN description TO quotation;
+﻿alter table quotations rename quotation_description to quotation;
+

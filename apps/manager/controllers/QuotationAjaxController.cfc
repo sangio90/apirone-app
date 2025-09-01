@@ -40,7 +40,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotation = super.bean( "Quotation" );
 
 		quotation.setId( json.id );
-		quotation.setDescription( json.description );
+		quotation.setName( json.description );
 		quotation.setQuotationNumber( json.quotation_number );
 		quotation.setVersionNumber( json.version_number );
 		quotation.setQuotationDate( json.quotation_date );
