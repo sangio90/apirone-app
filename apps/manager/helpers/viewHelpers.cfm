@@ -128,7 +128,7 @@
     <cfargument name="sortable" type="String" required="true" default="false">
     <cfargument name="source" type="String" required="true" default="rows">
     <cfargument name="columns" type="String" required="true" default="[]">
-    <cfargument name="pageSizes" type="String" required="true" default="[ '15', '50', '100' ]"> <!--- "false" for mute paging --->
+    <cfargument name="pageSizes" type="String" required="true" default="false"> <!--- "false" for mute paging --->
     <cfargument name="class" type="String" required="false" default="">
     <cfargument name="onDataBound" type="String" required="false" default="NM.kendo.toggleScrollbar">
 

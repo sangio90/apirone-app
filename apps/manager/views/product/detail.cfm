@@ -160,12 +160,35 @@
 
                                 <form id="product-grid-form">
 
+                                    <!---
                                     #productAttributesList( 
                                         id="product-items-grid", 
                                         type="product", 
                                         onDataBound="AP.product.items.onDataBound",
                                         pageSizes=false
                                     )#
+                                    ---->
+
+                                    #grid(
+                                        id      = "product-items-grid",
+                                        class   = "no-pager",
+                                        columns = "[
+                                            { 'field':'Id', 'title':'ID', width: '60px' },
+                                            { 'field':'name', 'title':'Attributo' },
+                                            { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
+                                            { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
+                                            { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
+                                            { 
+                                                'field'           :'', 
+                                                'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                                'width'           :'40px',
+                                                'headerAttributes': { 'class': 'text-center' }
+                                            }
+                                        ]",
+                                        source: "items",
+                                        rowTemplate = "product/product-item-row-tmpl"
+                                    )#
+
 
                                 </form>
 
