@@ -1,6 +1,5 @@
 /cache.properties
 /node_modules
-/*.sublime-project
 /*.code-workspace
 /.vscode/settings.json
 /tmp.cfm
@@ -8,7 +7,7 @@
 /.env
 /modules/*
 /tasks/envs/local.properties
-/*.log
+*.log
 /modules
 /userdata
 _data

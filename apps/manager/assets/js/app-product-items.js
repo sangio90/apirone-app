@@ -274,7 +274,12 @@ AP.product.items = ( function() {
             var onShow = function() {
                 fields.attributeModal.on( "shown.bs.modal", function() {
                     var field = fields.attributeModal.find( "[name=str]" );
-                    field.focus(); // TODO: not works
+
+                    setTimeout( function() {
+                        field.focus();
+                    }, 1000 );
+
+                    // TODO: not works
                 } );
             };
 
