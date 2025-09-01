@@ -16,4 +16,14 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	public Profile function init(){
 		return this;
 	}
+
+	public String function getName(){
+
+		if( Len( getCompany() ) ) {
+			return getCompany()
+		}
+
+		return getFirstName() & " " & getLastname();
+	}
+
 }

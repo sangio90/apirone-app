@@ -4,15 +4,20 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data = [];
 
 		var result = super.getResult();
-		var dm     = super.getDatamapper();
+		//var dm     = super.getDatamapper();
 		var params = super.paramsFromUrl();
+		var mem = super.getMementify();
 
 		var rows = super.fire( "quotation.search", params );
 
+		var data = mem.convertList( rows.getData(), "list" );
+
+		/*
 		for ( var row in rows.getData() ) {
 			var obj = dm.convert( row, "Quotation", true );
 			data.add( obj );
 		}
+		*/
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );

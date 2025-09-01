@@ -112,8 +112,6 @@ NM.kendo.toggleScrollbar = function( event ) {
 NM.kendo.formatDate = function( date, type="normal" ) {
     // example date, from server: July, 13 2022 10:50:39 +0200, culture: en-US
 
-    console.log( "date", date );
-
     if ( type == "normal" ) {
         var ret = kendo.toString( kendo.parseDate( date, "MMMM, dd yyyy HH:mm:ss", "en-US" ), "dd/MM/yyyy HH:mm" );
     }
@@ -124,6 +122,23 @@ NM.kendo.formatDate = function( date, type="normal" ) {
 
     if ( type == "short" ) {
         var ret = kendo.toString( kendo.parseDate( date, "MMMM, dd yyyy HH:mm:ss", "en-US" ), "dd/MM" );
+    }
+
+    return ret;
+};
+
+NM.kendo.formatISODate = function( date, type="normal" ) {
+
+    if ( type == "normal" ) {
+        var ret = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss", "en-US" ), "dd/MM/yyyy HH:mm" );
+    }
+
+    if ( type == "date-only" ) {
+        var ret = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss", "en-US" ), "dd/MM/yyyy" );
+    }
+
+    if ( type == "short" ) {
+        var ret = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss", "en-US" ), "dd/MM" );
     }
 
     return ret;

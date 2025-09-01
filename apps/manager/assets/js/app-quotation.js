@@ -25,7 +25,7 @@ AP.quotation.list = ( function() {
         rows: dataSources.items,
 
         getDate: function( event ) {
-            return NM.kendo.formatDate( event.quotationDate, "date-only" );
+            return NM.kendo.formatISODate( event.quotationDate, "date-only" );
         },
 
         search: function( event ) {
@@ -97,7 +97,7 @@ AP.quotation.list = ( function() {
     pub.init = function() {
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 
-        /* TODO: remoce this extra code.
+        /* TODO: remove this extra code.
         // Formatting by mvvm
         dataSources.items.fetch( function() {
             var rawData = dataSources.items.data();

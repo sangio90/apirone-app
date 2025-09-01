@@ -106,7 +106,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				case "S":
 					var bean = super.bean( "ShippingProfile" );
 					break;
-				case "G":
+				case "G": //TODO: ha senso?
 					var bean = super.bean( "Profile" );
 					break;
 				default:

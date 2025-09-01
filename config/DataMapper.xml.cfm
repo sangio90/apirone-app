@@ -114,7 +114,7 @@
 
     <mapper id="Quotation" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.Quotation">
         <map from="id" to="id" type="cf:String" />
-        <map from="quotation" to="quotation" type="cf:String" />
+        <map from="name" to="name" type="cf:String" />
         <map from="quotationNumber" to="quotationNumber" type="cf:String" />
         <map from="versionNumber" to="versionNumber" type="cf:Numeric" />
         <map from="quotationDate" to="quotationDate" type="cf:Date" />
