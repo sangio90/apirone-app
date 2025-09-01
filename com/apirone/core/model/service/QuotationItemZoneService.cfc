@@ -87,7 +87,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemZone" );
 			bean.setId( record.quotation_item_zone_id );
-			bean.setName( record.name );
+			bean.setName( record.quotation_item_zone );
 			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
 
 			bean.setOrigin(

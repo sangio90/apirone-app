@@ -100,6 +100,7 @@ component extends="testbox.system.BaseSpec"{
         );
         
         raw.country = { id = random.getCountries(limit=1).country_id.toString() };
+
         raw.type = { id = randomProfileType.getId() };
         
         var bean = factory.createInstance( "Profile", raw );

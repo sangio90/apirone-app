@@ -119,6 +119,7 @@
 
 	<cffunction name="insert" returntype="String">
 		<cfargument name="quotation" type="com.apirone.core.model.bean.Quotation" required="true">
+
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotations (
 				quotation,
@@ -141,7 +142,7 @@
 				sales_agent_account_id,
 				graphic_technician_account_id
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotation()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVersionNumber()#">,
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getQuotationDate()#">,
@@ -172,7 +173,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotations
 			SET
-				quotation = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getQuotation()#">
+				quotation = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getName()#">
 				,
 				quotation_number = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getQuotationNumber()#">
 				,

@@ -12,6 +12,7 @@ component extends="tests.utils.AbsSpec" {
 
             it( "Create quotation item zone", function(){
 				var quotationBean = helper.createQuotation();
+
 				var newQuotationId = quotationSvc.create( quotationBean.obj );
 
 				var quotationItemBean = helper.createQuotationItem( quotationId=newQuotationId );

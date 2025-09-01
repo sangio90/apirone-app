@@ -321,7 +321,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean = super.bean( "Quotation" );
 
 			bean.setId( record.quotation_id );
-			bean.setQuotation( record.quotation );
+			bean.setName( record.quotation );
 			bean.setQuotationNumber( record.quotation_number );
 			bean.setVersionNumber( record.version_number );
 			bean.setQuotationDate( record.quotation_date );

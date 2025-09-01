@@ -52,7 +52,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_zones (
 				quotation_item_id,
-				"name",
+				quotation_item_zone,
 				origin_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationItem().getId()#">::uuid,

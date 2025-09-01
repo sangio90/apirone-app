@@ -74,14 +74,14 @@ component extends="tests.utils.AbsSpec" {
 
 				var newQuotation = "testQuotation" & RandRange( 1000, 9999 );
 
-				obj.setQuotation( newQuotation );
+				obj.setName( newQuotation );
 				obj.setId( newId );
 				svc.update( obj );
 
 				var result = svc.get( newId );
 
 				expect( result.getId() == newId ).toBeTrue();
-				expect( result.getQuotation() == newQuotation ).toBeTrue();
+				expect( result.getName() == newQuotation ).toBeTrue();
 
 				svc.delete( newId );
 			} );
