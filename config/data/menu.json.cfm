@@ -25,10 +25,25 @@
 		]
 	},
 	{
-		href: "/manager/quotations",
+		href: "",
 		icon: "fas fa-comment-dollar",
 		title: "Preventivi",
-		roles: "ADM"
+		roles: "ADM",
+		items: [
+			{
+				href: "/manager/quotations",
+				icon: "fas fa-list",
+				title: "Elenco",
+				roles: "ADM"
+			},
+			{
+				href: "/manager/quotations/new",
+				icon: "fas fa-plus",
+				title: "Nuovo preventivo",
+				roles: "ADM"
+			},
+		]
+
 	},
 	{
 		href: "#",

@@ -53,12 +53,17 @@
 								#grid(
 									id      = "quotation-grid",
 									columns = "[
-                                        { 'field':'', 'title':'', width: '5%' },
                                         { 'field':'description', 'title':'Nome' },
-                                        { 'field':'quotation_number', 'title':'Numero', width: '15%' },
-                                        { 'field':'quotation_date', 'title':'Data', width: '15%'},
+                                        { 'field':'quotationNumber', 'title':'Numero', width: '15%' },
+                                        { 'field':'quotationDate', 'title':'Data', width: '15%'},
                                         { 'field':'status', 'title':'Stato', width: '15%'},
-                                        { 'field':'', 'title':'Modifica', width: '10%' }
+                                        { 'field':'', 'title':'Modifica', width: '55px'},
+                                        { 
+                                            'field'           :'', 
+                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                            'width'           :'40px',
+                                            'headerAttributes': { 'class': 'text-center' }
+                                        }
                                     ]",
 									rowTemplate = "quotation/quotation-grid-row-tmpl"
 								)#

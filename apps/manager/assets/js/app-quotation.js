@@ -24,6 +24,10 @@ AP.quotation.list = ( function() {
     var viewModel = kendo.observable( {
         rows: dataSources.items,
 
+        getDate: function( event ) {
+            return NM.kendo.formatDate( event.quotationDate, "date-only" );
+        },
+
         search: function( event ) {
             var thisForm = fields.searchForm;
             var params = thisForm.serializeJSON();
@@ -93,6 +97,8 @@ AP.quotation.list = ( function() {
     pub.init = function() {
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 
+        /* TODO: remoce this extra code.
+        // Formatting by mvvm
         dataSources.items.fetch( function() {
             var rawData = dataSources.items.data();
 
@@ -106,6 +112,7 @@ AP.quotation.list = ( function() {
                 data: rawData
             } ) );
         } );
+        */
     };
 
     return pub;
