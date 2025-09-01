@@ -57,7 +57,8 @@
 
 		prc.title = "Dettagli preventivo";
 
-		prc.vatCodeList = super.service( "VatCode" ).list();
+		//prc.vatCodeList = super.service( "VatCode" ).list();
+		prc.vatCodeList = [];
 
 		prc.jsScripts.add( "app-quotation" );
 
@@ -74,7 +75,8 @@
 		prc.zones  = DeserializeJSON( FileRead( "/config/data/fake/zones.json.cfm" ) );
 		prc.plates = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
 
-		prc.jsScripts.add( "app-quotation" );
+		prc.jsScripts.add( "app-signage" );
+		prc.jsScripts.add( "app-quotation-items" );
 
 		event.setView( "quotation/items" );
 	}

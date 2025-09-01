@@ -1,42 +1,16 @@
-AP.namespace( "quotation" );
+$(document).ready(function(){
 
-Object.assign( AP.quotation.fields, {
-    headerRoot: $( "#quotation-header-root" ),
-} );
+    console.log("test:app-line-attributes")
 
-$( document ).ready( function() {
-    if ( AP.quotation.fields.headerRoot.length ) {
-        AP.quotation.header.init();
-    }
-} );
+    $("body").find("button[data-bind='click:showAttributesList']").click();
 
-AP.quotation.header = ( function() {
-    var pub = {};
+    setTimeout( function() {
 
-    var fields = AP.quotation.fields;
+        console.log("test:load");
+        
+        //$("body").find("button[data-bind='click:openAttributeValues']").eq(1).click();
 
-    var viewModel = kendo.observable( {
-        rows: [],
+    }, 1000 )
 
-        search: function( event ) {
+})
 
-            return false;
-        },
-
-        save: function() {
-
-            document.getElementById( "quotation-header-form" ).submit();
-
-            // window.location.href = "/manager/quotations/new";
-        },
-    } );
-
-    pub.init = function() {
-        kendo.bind( AP.quotation.fields.headerRoot, viewModel );
-
-        console.log( "quotation.header:init" );
-
-    };
-
-    return pub;
-}() );
