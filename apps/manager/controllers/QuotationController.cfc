@@ -13,7 +13,7 @@
 	function create( event, rc, prc ){
 
 		var obj = super.bean("Quotation")
-		obj.setDescription("Descrizione");
+		obj.setName("Descrizione");
 		obj.setQuotationNumber( Left( CreateUUID(), 5 ) );
 		obj.setQuotationDate( now() );
 		obj.setValidityDate( now() );

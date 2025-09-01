@@ -55,43 +55,6 @@
 </cffunction>
 
 
-<cffunction name="productAttributesList" returntype="String">
-
-    <cfargument name="type" type="String" required="true">
-    
-    <cfargument name="id" type="String" required="true" default="product-items-grid">
-    <cfargument name="class" type="String" default="no-pager">
-    <cfargument name="source" type="String" default="items">
-    <cfargument name="rowTemplate" type="String" default="product/product-item-row-tmpl">
-    <cfargument name="onDataBound" type="String" required="false" default="NM.kendo.toggleScrollbar">
-
-    <cfset local.columns = "[
-        { 'field':'Id', 'title':'ID', width: '60px' },
-        { 'field':'name', 'title':'Attributo' },
-        { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
-        { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
-        { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
-        { 
-            'field'           :'', 
-            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-            'width'           :'40px',
-            'headerAttributes': { 'class': 'text-center' }
-        }
-    ]">
-
-    <cfset local.html = grid( 
-        id          = arguments.id,
-        class       = arguments.class,
-        columns     = local.columns,
-        source      = arguments.source,
-        rowTemplate = arguments.rowTemplate,
-        onDataBound  = arguments.onDataBound
-    )>
-
-    <cfreturn local.html>
-        
-</cffunction>
-
 <cffunction name="getPrintHeader">
     <cfreturn "<div><img src='/assets/main/img/logo.png' alt='Apir' style='width: 110px; height: 60px;'><div>">
 </cffunction>
@@ -119,6 +82,45 @@
 
 </cffunction>
 
+<cffunction name="productAttributesList" returntype="String">
+
+    <cfargument name="type" type="String" required="true">
+    
+    <cfargument name="id" type="String" required="true" default="product-items-grid">
+    <cfargument name="class" type="String" default="no-pager">
+    <cfargument name="source" type="String" default="items">
+    <cfargument name="rowTemplate" type="String" default="product/product-item-row-tmpl">
+    <cfargument name="onDataBound" type="String" required="false" default="NM.kendo.toggleScrollbar">
+    <cfargument name="pageSizes" type="String" required="false" default="false">
+
+    <cfset local.columns = "[
+        { 'field':'Id', 'title':'ID', width: '60px' },
+        { 'field':'name', 'title':'Attributo' },
+        { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
+        { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
+        { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
+        { 
+            'field'           :'', 
+            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+            'width'           :'40px',
+            'headerAttributes': { 'class': 'text-center' }
+        }
+    ]">
+
+    <cfset local.html = grid( 
+        id          = arguments.id,
+        class       = arguments.class,
+        columns     = local.columns,
+        source      = arguments.source,
+        pageSizes   = arguments.pageSizes,
+        rowTemplate = arguments.rowTemplate,
+        onDataBound = arguments.onDataBound
+    )>
+
+    <cfreturn local.html>
+        
+</cffunction>
+
 <cffunction name="grid">
 
     <cfargument name="id" type="String" required="true">
@@ -126,7 +128,7 @@
     <cfargument name="sortable" type="String" required="true" default="false">
     <cfargument name="source" type="String" required="true" default="rows">
     <cfargument name="columns" type="String" required="true" default="[]">
-    <cfargument name="pageModels" type="String" required="true" default="[ '15', '50', '100' ]"> <!--- "false" for mute paging --->
+    <cfargument name="pageSizes" type="String" required="true" default="[ '15', '50', '100' ]"> <!--- "false" for mute paging --->
     <cfargument name="class" type="String" required="false" default="">
     <cfargument name="onDataBound" type="String" required="false" default="NM.kendo.toggleScrollbar">
 
@@ -141,8 +143,8 @@
                 data-sortable="#arguments.sortable#" 
                 data-reorderable=""
                 data-bind="source: #arguments.source#"
-                <cfif arguments.pageModels NEQ "false">
-                    data-pageable="{ 'pageModels': #arguments.pageModels# }"
+                <cfif arguments.pageSizes NEQ "false">
+                    data-pageable="{ 'pageSizes': #arguments.pageSizes# }"
                 </cfif>
                 data-row-template="#ListLast( arguments.rowTemplate, "/" )#"
                 data-no-records="{ template : '<div class=grid-no-data><br>Nessun record trovato.<br><br></div>'}">

@@ -8,9 +8,13 @@
             </td>
             <td class="hand sortable">
                 <span data-bind="html: spaces"></span>
-                <span data-bind="html: level"></span>
+                <span data-bind="html: level" class="fs-10"></span>
+                <!----
                 <span data-bind="text: attribute.name"></span>: 
                 <span data-bind="text: attributeValue.rawValue.name"></span>
+                ---->
+                <b data-bind="text: attribute.name" class="fs-10"></b>: 
+                <span data-bind="text: attributeValue.rawValue.name"></span>                
             </td>
             <td>
                 <span class="handler">
