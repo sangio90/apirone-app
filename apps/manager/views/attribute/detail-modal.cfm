@@ -116,8 +116,12 @@
 
                                     <div class="col-sm-7 col-sx-12 mb-3  box-search-small">
 
-                                        <input type="text" name="attribute-suggest-raw-values" class="form-control" id="attribute-suggest-raw-values" 
-                                            maxlength="150" placeholder="Cerca e aggiungi un valore..."
+                                        <input type="text" 
+                                            class="form-control" 
+                                            id="attribute-suggest-raw-values"
+                                            name="attribute-suggest-raw-values" 
+                                            placeholder="Cerca e aggiungi un valore..."
+                                            maxlength="150" 
                                             data-bind="value: suggestForm.data.name"
                                             data-rule-required="true"
                                             data-msg-required="Valore richiesto">

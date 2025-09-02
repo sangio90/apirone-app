@@ -491,6 +491,12 @@ AP.attribute.detail = ( function() {
             return;
         }
 
+        suggest.keypress( function( event ){
+            if( event.keyCode == 13 ){
+                return false;
+            }
+        } );
+
         suggest.kendoAutoComplete( {
             dataTextField: "name",
             highlightFirst: true,
@@ -520,6 +526,8 @@ AP.attribute.detail = ( function() {
             } ),
             select: function( event ) {
                 var dataItem = this.dataItem( event.item.index() );
+
+                console.log( "select:dataItem", dataItem );
 
                 // TODO: add check if value already exists
                 var exists = false;
