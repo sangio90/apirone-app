@@ -59,6 +59,25 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
+	
+	function listFinishes( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+		var mem = super.getMementify();
+		params[ "productCategoryId" ] = rc.categoryId;
+		params[ "lineId" ]     = rc.lineId;
+
+		var rows = super.fire( "finish.list", params );
+		var data = mem.convertList( rows, "list" );
+
+		result.setTotal( rows.len() );
+		result.setCount( rows.len() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
 
 	function list( event, rc, prc ){
 		var data = [];

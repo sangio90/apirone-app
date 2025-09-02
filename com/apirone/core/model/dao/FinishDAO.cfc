@@ -36,6 +36,8 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
+		<cfargument name="productCategoryId" type="Numeric">
+		<cfargument name="lineId" type="String">
 		<cfargument name="langId" type="String" default="IT">
 		<cfargument name="orderBy" type="String" default="finishes.code asc, finishes.finish_id">
 
@@ -69,6 +71,10 @@
 
 				<cfif !IsNull( arguments.lineId )>
 					AND products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+				</cfif>
+
+				<cfif !IsNull( arguments.productCategoryId )>
+					AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productCategoryId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>
