@@ -33,6 +33,7 @@
 	<cffunction returntype="Query" name="find">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
+		<cfargument name="catalogBundleLineId" type="String">
 		<cfargument name="lineId" type="String">
 		<cfargument name="typeId" type="String">
 		<cfargument name="statusId" type="String">
@@ -50,7 +51,11 @@
 			FROM
 				models
 					<cfif !IsNull( arguments.lineId )>
+						-- TODO passare da catalog_bundles
 						INNER JOIN products USING ( model_id )
+					</cfif>
+					<cfif !IsNull( arguments.catalogBundleLineId )>
+						INNER JOIN catalog_bundles USING (model_id)
 					</cfif>
 
 			WHERE 1=1
@@ -65,6 +70,10 @@
 
 				<cfif !IsNull( arguments.statusId )>
 					AND models.status_id = <cfqueryparam value="#arguments.statusId#" cfsqltype="varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.catalogBundleLineId )>
+					AND catalog_bundles.line_id = <cfqueryparam cfsqltype="varchar" value="#arguments.catalogBundleLineId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>

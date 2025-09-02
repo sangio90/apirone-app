@@ -22,6 +22,12 @@ AP.signage.modal = ( function() {
             category: {
                 id: "",
             },
+            line: {
+                id: "",
+            },
+            model: {
+                id: "",
+            },
             nameItem: {
                 id: "",
                 name: "",
@@ -47,6 +53,8 @@ AP.signage.modal = ( function() {
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
         categories: new kendo.data.DataSource(),
+        lines: new kendo.data.DataSource(),
+        models: new kendo.data.DataSource(),
 
         callback: {
             onCreate: undefined,
@@ -55,6 +63,40 @@ AP.signage.modal = ( function() {
         },
 
         resetForm: function() {},
+
+        loadLines: function( event ) {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/lines/" + viewModel.get('detailForm.data.category.id'),
+                callback: {
+                    done: function( xhr ) {
+
+                        console.log( "xhr.data", xhr.data );
+
+                        viewModel.get( "lines" ).data( xhr.data );
+
+                        NM.util.openModal( AP.signage.fields.modalRoot );
+                    },
+                },
+            } );
+        },
+
+        loadModels: function( event ) {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/models/" + viewModel.get('detailForm.data.line.id'),
+                callback: {
+                    done: function( xhr ) {
+
+                        console.log( "xhr.data", xhr.data );
+
+                        viewModel.get( "models" ).data( xhr.data );
+
+                        NM.util.openModal( AP.signage.fields.modalRoot );
+                    },
+                },
+            } );
+        },
 
         save: function( event ) {
             var detailForm = AP.signage.fields.detailForm;
@@ -115,6 +157,8 @@ AP.signage.modal = ( function() {
                 },
             },
         } );
+
+        
     };
 
     pub.edit = function( { id, onSave } ) {

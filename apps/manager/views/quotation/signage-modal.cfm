@@ -14,21 +14,44 @@
                     <div class="card-body">
 
                         <div class="mb-3 row">
-                            <div class="col-6">
-                                <label class="col-sm-2 col-form-label text-end">Categoria</label>
+                            <div class="col-4">
+                                <label class="col-sm-2 col-form-label text-start">Categoria</label>
                                 <div class="col-sm-10">
-                                    <select id="productCategory" 
+                                    <select id="signangeProductCategory" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la categoria"
-                                        data-bind="source: categories" 
+                                        data-bind="source: categories, value: detailForm.data.category.id, events: { change: loadLines }"
                                         data-value-field="id"
                                         data-text-field="name"
-                                        disabled="disabled"
                                         >
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-6">    
+                            <div class="col-4">    
+                                <label class="col-sm-2 col-form-label text-start">Linea</label>
+                                <div class="col-sm-10">
+                                    <select id="signageLine" 
+                                        class="form-control"
+                                        data-placeholder="-- Seleziona la linea"
+                                        data-bind="source: lines, value: detailForm.data.line.id, events: { change: loadModels }" 
+                                        data-value-field="id"
+                                        data-text-field="name"
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-4">    
+                                <label class="col-sm-2 col-form-label text-start">Modello</label>
+                                <div class="col-sm-10">
+                                    <select id="signageModel" 
+                                        class="form-control"
+                                        data-placeholder="-- Seleziona il modello"
+                                        data-bind="source: models, value: detailForm.data.model.id" 
+                                        data-value-field="id"
+                                        data-text-field="name"
+                                        >
+                                    </select>
+                                </div>
                             </div>
                         </div>
 

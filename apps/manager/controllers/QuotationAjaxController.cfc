@@ -20,6 +20,46 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function listLines( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+		var mem = super.getMementify();
+
+		params[ "catalogBundleCategoryId" ] = rc.categoryId;
+	
+		var rows = super.fire( "line.list", params );
+
+		var data = mem.convertList( rows, "list" );
+
+		result.setTotal( rows.len() );
+		result.setCount( rows.len() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
+	function listModels( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+		var mem = super.getMementify();
+
+		params[ "catalogBundleLineId" ] = rc.lineId;
+	
+		var rows = super.fire( "model.list", params );
+
+		var data = mem.convertList( rows, "list" );
+
+		result.setTotal( rows.len() );
+		result.setCount( rows.len() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
 	function list( event, rc, prc ){
 		var data = [];
 

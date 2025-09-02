@@ -282,6 +282,8 @@
 			quotations
 		*/
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
+		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();
+		get( "/ajax/quotations/models/:lineId" ).to( "QuotationAjaxController.listModels" ).end();
 		
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.items" ).end();

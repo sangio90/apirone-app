@@ -32,6 +32,7 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
+		<cfargument name="catalogBundleCategoryId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -39,10 +40,13 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				line_id::varchar,
+				DISTINCT line_id::varchar,
 				COUNT(line_id) OVER() AS total
 			FROM
 				lines
+					<cfif !IsNull( arguments.catalogBundleCategoryId )>
+						INNER JOIN catalog_bundles USING (line_id)
+					</cfif>
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.categoryId )>
@@ -51,6 +55,10 @@
 
 				<cfif !IsNull( arguments.statusId )>
 					AND lines.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.catalogBundleCategoryId )>
+					AND catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.catalogBundleCategoryId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
@@ -62,7 +70,7 @@
 				</cfif>
 
 			ORDER BY
-				#super.sanitizeSQL( arguments.orderby )#
+				line_id
 
 			<cfif arguments.limit GT 0>
 				LIMIT
