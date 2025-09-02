@@ -15,3 +15,4 @@ _data
 docker-compose.yml
 .idea
 /apirone-site.txt
+/apps/manager/assets/js/tests/app-plate-test.js

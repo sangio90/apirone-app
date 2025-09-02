@@ -1451,6 +1451,7 @@ AP.plate.modal = ( function() {
                 },
             },
         } );
+
     };
 
     pub.edit = function( { id, onSave } ) {
