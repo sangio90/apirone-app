@@ -10,43 +10,6 @@ $( document ).ready( function() {
     }
 } );
 
-$(document).on("change", "#signangeProductCategory", function() {
-    var categorySelected = $(this).val();
-    var lineSelect = $("#signageLine");
-    if (categorySelected) {
-        lineSelect.prop("disabled", false);
-    } else {
-        lineSelect.prop("disabled", true);
-    }
-});
-$(document).on("change", "#signageLine", function() {
-    var categorySelected = $(this).val();
-    var modelSelect = $("#signageModel");
-    if (categorySelected) {
-        modelSelect.prop("disabled", false);
-    } else {
-        modelSelect.prop("disabled", true);
-    }
-});
-$(document).on("change", "#signageModel", function() {
-    var categorySelected = $(this).val();
-    var finishSelect = $("#signageFinish");
-    if (categorySelected) {
-        finishSelect.prop("disabled", false);
-    } else {
-        finishSelect.prop("disabled", true);
-    }
-});
-$(document).on("change", "#signageFinish", function() {
-    var categorySelected = $(this).val();
-    var fontSelect = $("#signageFont");
-    if (categorySelected) {
-        fontSelect.prop("disabled", false);
-    } else {
-        fontSelect.prop("disabled", true);
-    }
-});
-
 AP.signage.modal = ( function() {
     var pub = {};
 
@@ -72,6 +35,9 @@ AP.signage.modal = ( function() {
                 id: "",
             },
             font: {
+                id: "",
+            },
+            fontSize: {
                 id: "",
             },
             nameItem: {
@@ -104,6 +70,7 @@ AP.signage.modal = ( function() {
         finishes: new kendo.data.DataSource(),
         signageConfigs: new kendo.data.DataSource(),
         fonts: new kendo.data.DataSource(),
+        fontSizes: new kendo.data.DataSource(),
 
         callback: {
             onCreate: undefined,
@@ -210,15 +177,22 @@ AP.signage.modal = ( function() {
                             fonts.push( font.font );
                         }
                         viewModel.get( "fonts" ).data( fonts );
+                        viewModel.get( "signageConfigs" ).data( xhr.data );
 
                         if (fonts.length === 1) {
                             viewModel.set("detailForm.data.font.id", fonts[0].id);
+                            viewModel.get( "fontSizes" ).data( xhr.data.items );
                         }
 
                         NM.util.openModal( AP.signage.fields.modalRoot );
                     },
                 },
             } );
+        },
+
+        loadFontSizes: function() {
+            console.log(viewModel.getSignageConfig());
+            viewModel.get( "fontSizes" ).data( viewModel.getSignageConfig().items );
         },
 
         save: function( event ) {

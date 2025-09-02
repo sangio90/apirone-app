@@ -27,7 +27,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-3">    
+                            <div class="col-3" data-bind="visible: detailForm.data.category.id">    
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
                                     <select id="signageLine" 
@@ -41,7 +41,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-3">    
+                            <div class="col-3" data-bind="visible: detailForm.data.line.id">    
                                 <label class="col-sm-2 col-form-label text-start">Modello</label>
                                 <div class="col-sm-10">
                                     <select id="signageModel" 
@@ -55,7 +55,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-3">    
+                            <div class="col-3" data-bind="visible: detailForm.data.model.id">    
                                 <label class="col-sm-2 col-form-label text-start">Finitura</label>
                                 <div class="col-sm-10">
                                     <select id="signageFinish" 
@@ -71,16 +71,28 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <div class="col-6">    
+                            <div class="col-6" data-bind="visible: detailForm.data.finish.id">    
                                 <label class="col-sm-2 col-form-label text-start">Font</label>
                                 <div class="col-sm-10">
                                     <select id="signageFont" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la font"
-                                        data-bind="source: fonts, value: detailForm.data.font.id" 
+                                        data-bind="source: fonts, value: detailForm.data.font.id, events: { change: loadFontSizes }" 
                                         data-value-field="id"
                                         data-text-field="name"
-                                        disabled="disabled"
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6" data-bind="visible: detailForm.data.font.id">    
+                                <label class="col-sm-2 col-form-label text-start">Dimensione Font</label>
+                                <div class="col-sm-10">
+                                    <select id="signageFontSize" 
+                                        class="form-control"
+                                        data-placeholder="-- Seleziona la dimensione del font"
+                                        data-bind="source: fontSizes, value: detailForm.data.fontSize.id" 
+                                        data-value-field="id"
+                                        data-text-field="height"
                                         >
                                     </select>
                                 </div>
@@ -91,7 +103,7 @@
                                 <!--- qui dentro vanno gli items --->
                             </div>
                         </div>
-                        <button data-bind="click:addLine">Aggiungi Riga</button>
+                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:addLine">Aggiungi Riga</button>
                     </div>
 
                     <footer class="card-footer">
