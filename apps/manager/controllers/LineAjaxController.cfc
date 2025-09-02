@@ -101,10 +101,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		var line     = super.bean( "Line" );
 		var model    = super.bean( "Model" );
 		var finish   = super.bean( "Finish" );
-		var product  = super.bean( "Product" );
+		var product  = super.bean( "ProductComplex" );
 		var status   = super.bean( "Status" );
 		var category = super.bean( "ProductCategory" );
+		var bundle = super.bean( "CatalogBundle" );
+		bundle.setModel( model.setId( json.modelId ) );
+		bundle.setLine( line.setId( rc.id ) );
+		bundle.setCategory( category.setId( json.categoryId ) );
 
+		product.setCatalogBundle( bundle );
 		product.setLine( line.setId( rc.id ) );
 		product.setFinish( finish.setId( json.finishId ) );
 		product.setModel( model.setId( json.modelId ) );

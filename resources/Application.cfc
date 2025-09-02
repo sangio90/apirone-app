@@ -9,7 +9,7 @@
 
         var ip = getRealIP();
         
-        if ( !IsIPInRange( allowedIPs, getRealIP() ) ) {
+        if ( !IsIPInRange( allowedIPs, ip ) ) {
 
             cfheader(statuscode="404", statustext="Not Found");
             echo("Not allowed");

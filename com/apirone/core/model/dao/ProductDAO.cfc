@@ -8,6 +8,7 @@
 				model_id::varchar,
 				line_id::varchar,
 				finish_id::varchar,
+				catalog_bundle_id::varchar,
 				*
 			FROM
 				products
@@ -40,6 +41,7 @@
 		<cfargument name="finishId" type="String">
 		<cfargument name="excludedIds" type="Array">
 		<cfargument name="categoryId" type="Numeric">
+		<cfargument name="catalogBundleId" type="String">
 		<cfargument name="categoryModeId" type="String">
 		<cfargument name="str" type="String">
 
@@ -68,6 +70,10 @@
 
 				<cfif !IsNull( arguments.finishId )>
 					AND products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
+				</cfif>
+
+				<cfif !IsNull( arguments.catalogBundleId )>
+					AND products.catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundleId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.modelId )>
@@ -109,28 +115,15 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO products (
-				model_id,
-				line_id,
 				finish_id,
 				code,
 				position_count,
+				catalog_bundle_id,
 				product_category_id,
 				status_id,
 				lines
 			)
 			VALUES (
-				<cfif !IsNull( arguments.product.getModel() )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getModel()?.getId()#">::uuid
-				<cfelse>
-					NULL
-				</cfif>
-				,
-				<cfif !IsNull( arguments.product.getLine() )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getLine()?.getId()#">::uuid
-				<cfelse>
-					NULL
-				</cfif>
-				,
 				<cfif !IsNull( arguments.product.getFinish() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getFinish()?.getId()#">::uuid
 				<cfelse>
@@ -149,7 +142,18 @@
 					NULL
 				</cfif>
 				,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
+				<cfif !IsNull( arguments.product.getCatalogBundle() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getCatalogBundle()?.getId()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>
+				,
+				<cfif IsInstanceOf( arguments.product, "com.apirone.core.model.bean.ProductBase" )>
+					<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">
+				<cfelse>
+					<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">
+				</cfif>	
+				,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Other" value="#SerializeJSON( lines )#">
 			) RETURNING product_id
@@ -183,6 +187,14 @@
 					</cfif>
 				,
 
+				catalog_bundle_id =
+					<cfif !IsNull( arguments.product.getCatalogBundle() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getCatalogBundle()?.getId()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>
+				,
+
 				finish_id =
 					<cfif !IsNull( arguments.product.getFinish() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.product?.getFinish()?.getId()#">::uuid
@@ -207,7 +219,9 @@
 					</cfif>
 				,
 				lines = <cfqueryparam cfsqltype="Other" value="#SerializeJSON( lines )#">,
-				product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
+				<cfif IsInstanceOf( arguments.product, "com.apirone.core.model.bean.ProductBase" )>
+					product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
+				</cfif>
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
 			WHERE
 					product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid
@@ -237,8 +251,13 @@
 			DELETE
 			FROM products
 			WHERE
-				line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
-				AND product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
+				 catalog_bundle_id in (
+					SELECT catalog_bundle_id
+					FROM catalog_bundles
+					WHERE 
+						product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">::uuid AND
+						line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+				)
 		</cfquery>
 
 		<cfreturn true>

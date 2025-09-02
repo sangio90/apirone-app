@@ -6,6 +6,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="FinishService" inject="FinishService";
 	property name="StatusService" inject="StatusService";
 	property name="ProductCategoryService" inject="ProductCategoryService";
+	property name="CatalogBundleService" inject="CatalogBundleService";
 	property name="TextService" inject="TextService";
 
 	property name="cacheScope" type="String" default="Product.bean";
@@ -169,6 +170,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public String function create( required com.apirone.core.model.bean.Product product ){
+		if (IsInstanceOf(arguments.product, "com.apirone.core.model.bean.ProductComplex")) {
+			var catalogBundleId = getCatalogBundleService().getOrCreate( arguments.product.getCatalogBundle() );
+			arguments.product.setCatalogBundle( catalogBundleId );
+		}
 		var newId = getDao().insert( arguments.product );
 
 		if (
@@ -229,32 +234,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Product" );
+			if (IsNull(record.catalog_bundle_id)) {
+				var bean = super.bean( "ProductBase" );
+				bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
+				bean.setCode( record.code );
+				bean.setPositionCount( record.position_count );
+				var lines = super.getLinesBeanByIds( record.lines );
+				bean.setLines( lines );
+			} else {
+				var bean = super.bean( "ProductComplex" );
+				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
+				bean.setFinish( !IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue() );
+			}
 
 			bean.setId( record.product_id );
 			bean.setCreatedAt( record.created_at );
-			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
-
-			/*
-				complex (plates)
-			*/
-			bean.setModel( !IsNull( record.model_id ) ? getModelService().get( record.model_id ) : NullValue() );
-			bean.setLine( !IsNull( record.line_id ) ? getLineService().get( record.line_id ) : NullValue() );
-			bean.setFinish(
-				!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()
-			);
 			bean.setStatus( getStatusService().get( record.status_id ) );
-
-
-			/*
-				base (fruit)
-			*/
-			bean.setCode( record.code );
-			bean.setPositionCount( record.position_count );
-
-			var lines = super.getLinesBeanByIds( record.lines );
-			bean.setLines( lines );
-
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
 			return bean;

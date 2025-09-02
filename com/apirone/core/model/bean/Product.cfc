@@ -32,11 +32,13 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 
 	/*
 		complex (plates)
+		TODO da cancellare line/model sostituite da bundle
 	*/
-	property name="model" type="com.apirone.core.model.bean.Model"; //bundle
-	property name="line" type="com.apirone.core.model.bean.Line"; //bundle
+	property name="model" type="com.apirone.core.model.bean.Model";
+	property name="line" type="com.apirone.core.model.bean.Line";
 	property name="finish" type="com.apirone.core.model.bean.Finish";
 	property name="status" type="com.apirone.core.model.bean.Status";
+	
 
 	/*
 		simple (fruit)
@@ -49,7 +51,9 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 		common fields
 	*/
 	property name="status" type="com.apirone.core.model.bean.Status";
-	property name="category" type="com.apirone.core.model.bean.ProductCategory"; //bundle
+	property name="category" type="com.apirone.core.model.bean.ProductCategory";
+
+	property name="catalogBundle" type="com.apirone.core.model.bean.CatalogBundle";
 
 	public Product function init(){
 		return this;
