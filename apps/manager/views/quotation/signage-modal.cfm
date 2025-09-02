@@ -61,7 +61,7 @@
                                     <select id="signageFinish" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la finitura"
-                                        data-bind="source: finishes, value: detailForm.data.finish.id" 
+                                        data-bind="source: finishes, value: detailForm.data.finish.id, events: { change: loadSignageConfigs }" 
                                         data-value-field="id"
                                         data-text-field="name"
                                         disabled="disabled"
@@ -70,7 +70,28 @@
                                 </div>
                             </div>
                         </div>
-
+                        <div class="mb-3 row">
+                            <div class="col-6">    
+                                <label class="col-sm-2 col-form-label text-start">Font</label>
+                                <div class="col-sm-10">
+                                    <select id="signageFont" 
+                                        class="form-control"
+                                        data-placeholder="-- Seleziona la font"
+                                        data-bind="source: fonts, value: detailForm.data.font.id" 
+                                        data-value-field="id"
+                                        data-text-field="name"
+                                        disabled="disabled"
+                                        >
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-12" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.lines">
+                                <!--- qui dentro vanno gli items --->
+                            </div>
+                        </div>
+                        <button data-bind="click:addLine">Aggiungi Riga</button>
                     </div>
 
                     <footer class="card-footer">
@@ -91,5 +112,5 @@
         </selection>
     
     </div>
-
+    #template( view="jstemplate/quotation/signage-line-row-tmpl" )#
 </cfoutput>

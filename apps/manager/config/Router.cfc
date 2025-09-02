@@ -285,6 +285,7 @@
 		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();
 		get( "/ajax/quotations/models/:lineId" ).to( "QuotationAjaxController.listModels" ).end();
 		get( "/ajax/quotations/finishes/:categoryId/:lineId" ).to( "QuotationAjaxController.listFinishes" ).end();
+		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.items" ).end();

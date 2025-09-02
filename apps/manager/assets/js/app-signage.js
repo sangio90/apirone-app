@@ -37,6 +37,15 @@ $(document).on("change", "#signageModel", function() {
         finishSelect.prop("disabled", true);
     }
 });
+$(document).on("change", "#signageFinish", function() {
+    var categorySelected = $(this).val();
+    var fontSelect = $("#signageFont");
+    if (categorySelected) {
+        fontSelect.prop("disabled", false);
+    } else {
+        fontSelect.prop("disabled", true);
+    }
+});
 
 AP.signage.modal = ( function() {
     var pub = {};
@@ -46,7 +55,7 @@ AP.signage.modal = ( function() {
             id: "",
             code: "",
             name: "",
-            selectedCategories: [],
+            lines: new kendo.data.DataSource(),
             category: {
                 id: "",
             },
@@ -57,6 +66,12 @@ AP.signage.modal = ( function() {
                 id: "",
             },
             finish: {
+                id: "",
+            },
+            signageConfig: {
+                id: "",
+            },
+            font: {
                 id: "",
             },
             nameItem: {
@@ -87,6 +102,8 @@ AP.signage.modal = ( function() {
         lines: new kendo.data.DataSource(),
         models: new kendo.data.DataSource(),
         finishes: new kendo.data.DataSource(),
+        signageConfigs: new kendo.data.DataSource(),
+        fonts: new kendo.data.DataSource(),
 
         callback: {
             onCreate: undefined,
@@ -95,6 +112,32 @@ AP.signage.modal = ( function() {
         },
 
         resetForm: function() {},
+
+        getSignageConfig: function() {
+            const fontId = viewModel.get('detailForm.data.font.id');
+            for (var signageConfig of viewModel.get('signageConfigs').data()) {
+                if (signageConfig.font.id == fontId) {
+                    return signageConfig;
+                }
+            }
+        },
+
+        addLine: function() {
+            var lines = viewModel.get('detailForm.data.lines');
+            lines.add( {
+                id: new Date()
+            });
+
+            return false;
+        },
+
+        updateLine: function(e) {
+            const uid = e.data.uid
+            const line = viewModel.get('detailForm.data.lines').getByUid(uid);
+            line.set('id', new Date() );
+
+            return false;
+        },
 
         loadLines: function( event ) {
             NM.util.ajax( {
@@ -140,6 +183,37 @@ AP.signage.modal = ( function() {
                         console.log( "xhr.data", xhr.data );
 
                         viewModel.get( "finishes" ).data( xhr.data );
+
+                        NM.util.openModal( AP.signage.fields.modalRoot );
+                    },
+                },
+            } );
+        },
+        
+        loadSignageConfigs: function( event ) {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/signage-configs?categoryId=" 
+                    + viewModel.get('detailForm.data.category.id') 
+                    + "&lineId=" 
+                    + viewModel.get('detailForm.data.line.id') 
+                    + "&modelId=" 
+                    + viewModel.get('detailForm.data.model.id'),
+                callback: {
+                    done: function( xhr ) {
+
+                        console.log( "xhr.data", xhr.data );
+
+                        const fonts = [];
+
+                        for ( var font of xhr.data ) {
+                            fonts.push( font.font );
+                        }
+                        viewModel.get( "fonts" ).data( fonts );
+
+                        if (fonts.length === 1) {
+                            viewModel.set("detailForm.data.font.id", fonts[0].id);
+                        }
 
                         NM.util.openModal( AP.signage.fields.modalRoot );
                     },
