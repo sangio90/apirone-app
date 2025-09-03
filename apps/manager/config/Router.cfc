@@ -16,6 +16,7 @@
 			dashboard
 		*/
 		get( "/dashboard" ).to( "MainController.dashboard" ).end();
+		get( "/manager/selects" ).to( "MainController.selects" ).end();
 		get( "/plate/designer" ).to( "PlateController.designer" ).end();
 		get( "/plate/map" ).to( "PlateController.map" ).end();
 

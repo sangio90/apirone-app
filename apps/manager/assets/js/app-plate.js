@@ -1,22 +1,21 @@
 AP.namespace( "plate" );
 
 Object.assign( AP.plate.fields, {
-    designerRoot: $( "#plate-designer-root" ),
+    // designerRoot: $( "#plate-designer-root" ),
     modalRoot: $( "#plate-modal-root" ),
 } );
 
 $( document ).ready( function() {
-    if ( AP.plate.fields.designerRoot.length ) {
-        AP.plate.designer.init( {
-            container: AP.plate.fields.designerRoot,
-        } );
+    if ( AP.plate.fields.modalRoot.length ) {
+        AP.page = { GRID_CELL_DIMENSIONS: { "_": { "HEIGHT": 180, "WIDTH": 45 }, "0": { "HEIGHT": 105, "WIDTH": 52 } } };
+        AP.plate.designer.init( { container: AP.plate.fields.modalRoot } );
     }
 
+    /*
     if ( AP.plate.fields.modalRoot.length ) {
-        AP.plate.modal.init( {
-            container: AP.plate.fields.modalRoot,
-        } );
+        AP.plate.modal.init( { container: AP.plate.fields.modalRoot } );
     }
+    */
 
 } );
 
@@ -1057,11 +1056,114 @@ AP.plate.designer = ( function() {
         fruitsController: null,
     };
 
-    const priv = {
+    const settings = {
         container: null,
     };
 
-    priv.vm = new kendo.data.ObservableObject( {
+    var defaultdetailForm = {
+        data: {
+            id: "",
+            code: "",
+            name: "",
+            model: {
+                id: ""
+            },
+            finish: {
+                id: ""
+            },
+            line: {
+                id: ""
+            },
+            status: {
+                id: "ACT",
+            },
+        },
+        statuses: AP.page.statuses,
+        title: "Carica placca",
+    };
+
+    var viewModel = new kendo.data.ObservableObject( {
+
+        detailForm: defaultdetailForm,
+        lines: new kendo.data.DataSource(),
+        models: new kendo.data.DataSource(),
+        finishes: new kendo.data.DataSource(),
+
+        callback: {
+            onCreate: undefined,
+            onUpdate: undefined,
+            onLoad: undefined,
+        },
+
+        loadModels: function( event ) {
+
+            console.log( "line.id", viewModel.get( "detailForm.data.line.id" ) );
+
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.line.id" ),
+                callback: {
+                    done: function( xhr ) {
+                        console.log( "loadModels" );
+                        viewModel.get( "models" ).data( xhr.data );
+                        viewModel.set( "detailForm.data.model.id", xhr.data );
+
+                    },
+                },
+            } );
+        },
+
+        loadFinishes: function( event ) {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/finishes/22/" + viewModel.get( "detailForm.data.line.id" ),
+                callback: {
+                    done: function( xhr ) {
+                        console.log( "loadFinishes" );
+                        viewModel.get( "finishes" ).data( xhr.data );
+
+                        viewModel.set( "detailForm.data.finish", xhr.data[0] );
+
+                    },
+                },
+            } );
+        },
+
+        resetForm: function() {},
+
+        save: function( event ) {
+            var detailForm = AP.signage.fields.detailForm;
+            var status = detailForm.find( ".status" );
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
+
+            if ( detailForm.valid() ) {
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/signages",
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.status == "SUCCESS" ) {
+                                NM.util.autoHideMessage( status, "<span class='green'>Segnaletica salvata</span>" );
+
+                                setTimeout( () => $( "#signage-detail-modal" ).modal( "hide" ),
+                                    1000,
+                                );
+
+                                AP.util.fireCallback(
+                                    "onSave",
+                                    viewModel.get( "callback" ),
+                                );
+                            }
+                        },
+                    },
+                } );
+            }
+
+            return false;
+        },
+
         // DATA
         plates: new kendo.data.DataSource( {
             data: [
@@ -1225,9 +1327,9 @@ AP.plate.designer = ( function() {
             const selectedPlate = this.plates.get( this.get( "selectedPlate" ) );
 
             FREE_CELL_WIDTH =
-                pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
+                AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
             FREE_CELL_HEIGHT =
-                pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
+                AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
 
             if ( selectedPlate.CELL_ORIENTATION == ORIENTATION.VERTICAL ) {
                 const tmp = FREE_CELL_WIDTH;
@@ -1248,8 +1350,8 @@ AP.plate.designer = ( function() {
                     const cellType = selectedPlate.GRID[iRow][iCol];
 
                     const cell = new Cell(
-                        pageData.GRID_CELL_DIMENSIONS[cellType].WIDTH,
-                        pageData.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
+                        AP.page.GRID_CELL_DIMENSIONS[cellType].WIDTH,
+                        AP.page.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
                         selectedPlate.CELL_ORIENTATION,
                         cellType,
                     );
@@ -1284,14 +1386,38 @@ AP.plate.designer = ( function() {
         // INITS
     } );
 
-    pub.init = function( setup ) {
-        priv.container = setup.container;
+    pub.new = function( onSave ) {
+        if ( onSave ) {
+            viewModel.set( "callback.onSave", onSave );
+        }
 
-        priv.vm.set( "fruits", [
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/quotations/lines/22",
+            callback: {
+                done: function( xhr ) {
+                    viewModel.get( "lines" ).data( xhr.data );
+
+                    viewModel.set( "detailForm.data.line", xhr.data[0] );
+
+                    NM.util.openModal( AP.plate.fields.modalRoot );
+                },
+            },
+        } );
+
+    };
+
+    pub.init = function( setup ) {
+
+        console.log( "setup designer" );
+
+        settings.container = setup.container;
+
+        viewModel.set( "fruits", [
             {
-                width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
+                width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
                 height:
-                    pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                    AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 4,
                 rowSpan: 1,
                 uuid: "A",
@@ -1300,9 +1426,9 @@ AP.plate.designer = ( function() {
                 img: "/assets/main/img/foto_frutto_schuko.png",
             },
             {
-                width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
                 height:
-                    pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                    AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "B",
@@ -1311,9 +1437,9 @@ AP.plate.designer = ( function() {
                 img: "/assets/main/img/foto_frutto_bipasso.png",
             },
             {
-                width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
                 height:
-                    pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                    AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "C",
@@ -1322,9 +1448,9 @@ AP.plate.designer = ( function() {
                 img: "/assets/main/img/foto_frutto_cat6.png",
             },
             {
-                width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
                 height:
-                    pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                    AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "I",
@@ -1334,164 +1460,12 @@ AP.plate.designer = ( function() {
             },
         ] );
 
-        kendo.bind( priv.container, priv.vm );
+        kendo.bind( settings.container, viewModel );
     };
+
 
     pub.getVM = function() {
-        return priv.vm;
-    };
-
-    return pub;
-} () );
-
-
-AP.plate.modal = ( function() {
-    var pub = {};
-    var settings = {};
-
-    var defaultDetailForm = {
-        data: {
-            id: "",
-            code: "",
-            name: "",
-            selectedCategories: [],
-            category: {
-                id: "",
-            },
-            nameItem: {
-                id: "",
-                name: "",
-                lang: {
-                    id: "IT"
-                }
-            },
-            descriptionItem: {
-                id: "",
-                name: "",
-                lang: {
-                    id: "IT"
-                }
-            },
-            status: {
-                id: "ACT",
-            },
-        },
-        statuses: AP.page.statuses,
-        title: "Carica segnaletica",
-    };
-
-    var viewModel = kendo.observable( {
-        detailForm: defaultDetailForm,
-        categories: new kendo.data.DataSource(),
-
-        callback: {
-            onCreate: undefined,
-            onUpdate: undefined,
-            onLoad: undefined,
-        },
-
-        resetForm: function() {},
-
-        save: function( event ) {
-            var detailForm = AP.signage.fields.detailForm;
-            var status = detailForm.find( ".status" );
-
-            status.html(
-                "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
-            );
-
-            if ( detailForm.valid() ) {
-                NM.util.ajax( {
-                    method: "POST",
-                    url: "/manager/ajax/signages",
-                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
-                    callback: {
-                        done: function( xhr ) {
-                            if ( xhr.status == "SUCCESS" ) {
-                                NM.util.autoHideMessage(
-                                    status,
-                                    "<span class='green'>Segnaletica salvata</span>",
-                                );
-
-                                setTimeout(
-                                    () => $( "#signage-detail-modal" ).modal( "hide" ),
-                                    1000,
-                                );
-
-                                AP.util.fireCallback(
-                                    "onSave",
-                                    viewModel.get( "callback" ),
-                                );
-                            }
-                        },
-                    },
-                } );
-            }
-
-            return false;
-        },
-    } );
-
-    pub.new = function( onSave ) {
-        if ( onSave ) {
-            viewModel.set( "callback.onSave", onSave );
-        }
-
-        NM.util.ajax( {
-            method: "GET",
-            url: "/manager/ajax/quotations/categories",
-            callback: {
-                done: function( xhr ) {
-
-                    console.log( "xhr.data", xhr.data );
-
-                    viewModel.get( "categories" ).data( xhr.data );
-
-                    NM.util.openModal( AP.signage.fields.modalRoot );
-                },
-            },
-        } );
-
-    };
-
-    pub.edit = function( { id, onSave } ) {
-        if ( onSave ) {
-            viewModel.set( "callback.onSave", onSave );
-        }
-
-        viewModel.resetForm();
-
-        NM.util.ajax( {
-            method: "GET",
-            url: "/manager/ajax/signages/" + id,
-            callback: {
-                done: function( xhr ) {
-                    if ( xhr.status == "SUCCESS" ) {
-                        var selectedCategories = [];
-
-                        if ( xhr.data?.categories ) {
-                            for ( var category of xhr.data.categories ) {
-                                selectedCategories.push( category );
-                            }
-                        }
-
-                        viewModel.set( "detailForm.data", xhr.data );
-                        viewModel.set(
-                            "detailForm.data.selectedCategories",
-                            selectedCategories,
-                        );
-                        viewModel.set( "detailForm.title", "Modifica segnaletica" );
-
-                        NM.util.openModal( AP.signage.fields.modalRoot );
-                    }
-                },
-            },
-        } );
-    };
-
-    pub.init = function( container ) {
-        settings.container = container;
-        kendo.bind( container, viewModel );
+        return viewModel;
     };
 
     return pub;

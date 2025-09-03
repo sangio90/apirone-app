@@ -14,9 +14,9 @@ $( document ).ready( function() {
 AP.quotation.items = ( function() {
     var pub = {};
 
-    var plateApp = AP.plate.modal;
+    var plateApp   = AP.plate.designer;
     var signageApp = AP.signage.modal;
-    var fields = AP.quotation.fields;
+    var fields     = AP.quotation.fields;
 
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/quotations" } ),
@@ -90,15 +90,15 @@ AP.quotation.items = ( function() {
             return false;
         },
 
-        new: function( ) {
+        new: function() {
             window.location.href = "/manager/quotations/new";
         },
 
-        addSignage: function( ) {
+        addSignage: function() {
             signageApp.new();
         },
 
-        addPlat: function( ) {
+        addPlate: function() {
             plateApp.new();
         }
 

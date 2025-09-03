@@ -21,6 +21,12 @@
 				icon: "fas fa-cogs",
 				title: "Mappa",
 				roles: "ADM"
+			},
+			{
+				href: "/manager/selects",
+				icon: "fas fa-cogs",
+				title: "Select collegati",
+				roles: "ADM"
 			}
 		]
 	},

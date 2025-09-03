@@ -81,27 +81,27 @@ AP.signage.modal = ( function() {
         resetForm: function() {},
 
         getSignageConfig: function() {
-            const fontId = viewModel.get('detailForm.data.font.id');
-            for (var signageConfig of viewModel.get('signageConfigs').data()) {
-                if (signageConfig.font.id == fontId) {
+            const fontId = viewModel.get( "detailForm.data.font.id" );
+            for ( var signageConfig of viewModel.get( "signageConfigs" ).data() ) {
+                if ( signageConfig.font.id == fontId ) {
                     return signageConfig;
                 }
             }
         },
 
         addLine: function() {
-            var lines = viewModel.get('detailForm.data.lines');
+            var lines = viewModel.get( "detailForm.data.lines" );
             lines.add( {
                 id: new Date()
-            });
+            } );
 
             return false;
         },
 
-        updateLine: function(e) {
-            const uid = e.data.uid
-            const line = viewModel.get('detailForm.data.lines').getByUid(uid);
-            line.set('id', new Date() );
+        updateLine: function( e ) {
+            const uid = e.data.uid;
+            const line = viewModel.get( "detailForm.data.lines" ).getByUid( uid );
+            line.set( "id", new Date() );
 
             return false;
         },
@@ -109,7 +109,7 @@ AP.signage.modal = ( function() {
         loadLines: function( event ) {
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotations/lines/" + viewModel.get('detailForm.data.category.id'),
+                url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.category.id" ),
                 callback: {
                     done: function( xhr ) {
 
@@ -126,7 +126,7 @@ AP.signage.modal = ( function() {
         loadModels: function( event ) {
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotations/models/" + viewModel.get('detailForm.data.line.id'),
+                url: "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.line.id" ),
                 callback: {
                     done: function( xhr ) {
 
@@ -139,11 +139,11 @@ AP.signage.modal = ( function() {
                 },
             } );
         },
-        
+
         loadFinishes: function( event ) {
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotations/finishes/" + viewModel.get('detailForm.data.category.id') + "/" + viewModel.get('detailForm.data.line.id'),
+                url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.category.id" ) + "/" + viewModel.get( "detailForm.data.line.id" ),
                 callback: {
                     done: function( xhr ) {
 
@@ -156,16 +156,16 @@ AP.signage.modal = ( function() {
                 },
             } );
         },
-        
+
         loadSignageConfigs: function( event ) {
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotations/signage-configs?categoryId=" 
-                    + viewModel.get('detailForm.data.category.id') 
-                    + "&lineId=" 
-                    + viewModel.get('detailForm.data.line.id') 
-                    + "&modelId=" 
-                    + viewModel.get('detailForm.data.model.id'),
+                url: "/manager/ajax/quotations/signage-configs?categoryId="
+                    + viewModel.get( "detailForm.data.category.id" )
+                    + "&lineId="
+                    + viewModel.get( "detailForm.data.line.id" )
+                    + "&modelId="
+                    + viewModel.get( "detailForm.data.model.id" ),
                 callback: {
                     done: function( xhr ) {
 
@@ -179,8 +179,8 @@ AP.signage.modal = ( function() {
                         viewModel.get( "fonts" ).data( fonts );
                         viewModel.get( "signageConfigs" ).data( xhr.data );
 
-                        if (fonts.length === 1) {
-                            viewModel.set("detailForm.data.font.id", fonts[0].id);
+                        if ( fonts.length === 1 ) {
+                            viewModel.set( "detailForm.data.font.id", fonts[0].id );
                             viewModel.get( "fontSizes" ).data( xhr.data.items );
                         }
 
@@ -191,7 +191,7 @@ AP.signage.modal = ( function() {
         },
 
         loadFontSizes: function() {
-            console.log(viewModel.getSignageConfig());
+            console.log( viewModel.getSignageConfig() );
             viewModel.get( "fontSizes" ).data( viewModel.getSignageConfig().items );
         },
 
@@ -255,7 +255,7 @@ AP.signage.modal = ( function() {
             },
         } );
 
-        
+
     };
 
     pub.edit = function( { id, onSave } ) {

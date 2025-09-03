@@ -66,8 +66,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
 		var mem = super.getMementify();
+
+		params[ "lineId" ] = rc.lineId;
 		params[ "productCategoryId" ] = rc.categoryId;
-		params[ "lineId" ]     = rc.lineId;
 
 		var rows = super.fire( "finish.list", params );
 		var data = mem.convertList( rows, "list" );
