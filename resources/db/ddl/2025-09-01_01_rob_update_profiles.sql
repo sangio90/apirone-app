@@ -1,4 +1,6 @@
-﻿UPDATE profiles 
+﻿-- deployed at: 2025-09-01 20:00:00
+
+UPDATE profiles 
 SET
     country_id = '693a3dda-bf35-4556-9a12-2c693afce836'
 WHERE profile_id IN ('3a9253a7-f299-4b46-8e6f-49d608eafc96', '9f36b292-7467-41de-91b2-51223f9694fa');

@@ -19,4 +19,3 @@ ALTER TABLE products
 ADD CONSTRAINT products_catalog_bundle_fk
 FOREIGN KEY (catalog_bundle_id)
 REFERENCES catalog_bundles(catalog_bundle_id);
-

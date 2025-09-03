@@ -527,8 +527,6 @@ AP.attribute.detail = ( function() {
             select: function( event ) {
                 var dataItem = this.dataItem( event.item.index() );
 
-                console.log( "select:dataItem", dataItem );
-
                 // TODO: add check if value already exists
                 var exists = false;
 
