@@ -36,7 +36,6 @@
                                         data-bind="source: lines, value: detailForm.data.line.id, events: { change: loadModels }" 
                                         data-value-field="id"
                                         data-text-field="name"
-                                        disabled="disabled"
                                         >
                                     </select>
                                 </div>
@@ -50,7 +49,6 @@
                                         data-bind="source: models, value: detailForm.data.model.id, events: { change: loadFinishes }" 
                                         data-value-field="id"
                                         data-text-field="name"
-                                        disabled="disabled"
                                         >
                                     </select>
                                 </div>
@@ -64,7 +62,6 @@
                                         data-bind="source: finishes, value: detailForm.data.finish.id, events: { change: loadSignageConfigs }" 
                                         data-value-field="id"
                                         data-text-field="name"
-                                        disabled="disabled"
                                         >
                                     </select>
                                 </div>
