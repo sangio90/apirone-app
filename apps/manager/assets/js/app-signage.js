@@ -110,18 +110,99 @@ AP.signage.modal = ( function() {
             }
         },
 
-        addSignageLine: function() {     
-            var defaultSignageLine = {
-                id: "",
-                textAlign: "center",
-                content: "",
-                orderby: viewModel.get('detailForm.data.signageLines').data().length + 1
-            };       
-            viewModel.get('detailForm.data.signageLines').add(defaultSignageLine);
+        addSignageLine: function() {
+            if (viewModel.get('detailForm.data.signageLines').data().length < 10) {
+                var defaultSignageLine = {
+                    id: "",
+                    textAlign: "center",
+                    content: "",
+                    orderby: viewModel.get('detailForm.data.signageLines').data().length + 1
+                };
+                viewModel.get('detailForm.data.signageLines').add(defaultSignageLine);               
+            }
 
             return false;
         },
-    
+
+        parsedLineContent: function(valore, orderby) {
+            const contentSpanPreview = $('#content_span_preview_' + orderby);
+
+            if (contentSpanPreview.length == 1) {
+                const pictogramNames = viewModel.get('detailForm.data.pictogramNames');
+                const pictograms = this.extractAllOccurrences(valore, pictogramNames)
+                pictograms.forEach(function(pictogram) {
+                    valore = valore.replace(pictogram, '<img src="/assets/main/pictograms/' + pictogram.replace(/[<>]/g, '') + '.png" alt="' + pictogram.replace(/[<>]/g, '') + '" class="pictogram px-2">');
+                })
+                contentSpanPreview.html(valore);
+            }
+
+            return false;
+        },
+
+        extractAllOccurrences: function(haystack, needles) {
+            // Escapo i caratteri speciali per ciascun needle
+            let escaped = needles.map(n => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+            let regex = new RegExp(escaped.join("|"), "g");
+
+            // matchAll ritorna tutti i match nell'ordine
+            let matches = [...haystack.matchAll(regex)].map(m => m[0]);
+
+            return matches;
+        },
+
+        countPictogramsTotals: function(haystack, needles) {
+            let totalOccurrences = 0;
+            let totalChars = 0;
+
+            needles.forEach(needle => {
+                // Escapo i caratteri speciali per sicurezza
+                let regex = new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+                let matches = haystack.match(regex);
+                let count = matches ? matches.length : 0;
+
+                totalOccurrences += count;
+                totalChars += count * needle.length;
+            });
+
+            return { totalOccurrences, totalChars };
+        },
+
+        updateCharCounter: function(e) {
+            const signageConfig = viewModel.getSignageConfig()
+
+            let charCount = e.currentTarget.value.length
+            const realContent = e.currentTarget.value
+            const pictogramNames = viewModel.get('detailForm.data.pictogramNames');
+            let content = e.currentTarget.value
+            const usedPictos = [];
+            pictogramNames.forEach(pictogram => {
+                let position = realContent.indexOf(pictogram)
+                while (position !== -1) {
+                    usedPictos[position] = pictogram;
+                    position = realContent.indexOf(pictogram, position + 1)
+                    content = content.replace(pictogram,'#')
+                }
+            })
+
+            charCount = content.length;
+
+            const signageConfigItem = signageConfig.items.filter(function(config) { return config.id == viewModel.get('detailForm.data.fontSize.id')})[0];
+            if (charCount >= signageConfigItem.charCount) {
+                content = content.substring(0, signageConfigItem.charCount);
+                charCount = signageConfigItem.charCount
+            }
+            usedPictos.forEach((value, index) => {
+                if (content[index] && content[index] == '#') {
+                    content = content.replace('#', value)
+                }
+            })
+            viewModel.get('detailForm.data.signageLines').data()[e.currentTarget.id.replace('_contentInput', '') - 1].set('content', content)
+            $('#' + e.currentTarget.id.replace('_contentInput', '_charCounter')).html(charCount + '/' + signageConfigItem.charCount);
+            this.parsedLineContent(content, e.data.orderby);
+
+            return false;
+        },
+
         togglePictogramHelper: function(e) {
             if (viewModel.get('detailForm.data.pictogramHelper') == false) {
                 $('#pictogram-helper-modal').modal('show');
@@ -132,24 +213,6 @@ AP.signage.modal = ( function() {
             }
         },
 
-        parsedLineContent: function(e) {
-            const contentSpanPreview = $('#content_span_preview_' + e.data.orderby);
-            
-            if (contentSpanPreview.length == 1) {
-                var valore = e.currentTarget.value;
-                const pictogramNames = viewModel.get('detailForm.data.pictogramNames');
-                var pictograms = pictogramNames.filter(function(pictogramName) {
-                    return valore.includes(pictogramName);
-                });
-                pictograms.forEach(function(pictogram) {
-                    valore = valore.replace(pictogram, '<img src="/assets/main/pictograms/' + pictogram.replace(/[<>]/g, '') + '.png" alt="' + pictogram.replace(/[<>]/g, '') + '" class="pictogram px-2">');
-                })
-                contentSpanPreview.html(valore);
-            }
-            
-            return false;
-        },
-
         removeSignageLine: function(e) {
             const uid = e.data.uid
             const row = viewModel.get('detailForm.data.signageLines').getByUid(uid);
@@ -157,11 +220,11 @@ AP.signage.modal = ( function() {
             return false;
         },
 
-        setTextAlign: function (e) { 
+        setTextAlign: function (e) {
             var uid = e.data.uid
             var signageLine = viewModel.get('detailForm.data.signageLines').getByUid(uid);
             signageLine.set('textAlign', $(e.currentTarget).data('value') );
-            $(e.currentTarget).addClass('selected-text-align').siblings().removeClass('selected-text-align');
+            $(e.currentTarget).addClass('selected-text-align').siblings().removeClass('selected-text-align').addClass('selected-text-align-not');
         },
 
         updateLine: function( e ) {

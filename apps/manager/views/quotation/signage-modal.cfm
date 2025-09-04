@@ -96,23 +96,23 @@
                             </div>
                         </div>
                         <div class="mb-3 mt-3 row">
-                            <div class="col-3 mb-3">
+                            <div class="col-3 mb-3" data-bind="visible:detailForm.data.font.id">
                                 Righe
                             </div>
                             <div class="col-3 mb-3 flex justify-content-end align-items-end">
                                 <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
                             </div>
-                            <div class=col-6 mb-3>
+                            <div class="col-6 mb-3" data-bind="visible:detailForm.data.font.id">
                                 Anteprima
                             </div>
-                            <div class="col-6" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.signageLines">
+                            <div class="col-6" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.signageLines, visible:detailForm.data.font.id">
                                 <!--- qui dentro vanno gli items --->
                             </div>
-                            <div class="col-6" style="width: 600px;" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.signageLines">
+                            <div class="col-6" style="width: 600px;" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.signageLines, visible:detailForm.data.font.id">
                                 <!--- qui dentro vanno gli items di preview --->
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageLine">Aggiungi Riga</button>
+                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageLine, visible:detailForm.data.font.id">Aggiungi Riga</button>
                     </div>
 
                     <footer class="card-footer">
@@ -141,7 +141,6 @@
                     <div class="text-center px-2 mt-1" style="font-size: 11px">Inserendo queste parole contornate da "<" e ">", verranno inseriti i pittogrammi nella riga.</div>
                     <div class="modal-body" data-bind="source: detailForm.data.parsedPictograms" data-template="pictogram-template">
                         <script id="pictogram-template" type="text/x-kendo-template">
-                            <!--- <div data-bind="text: this"></div> --->
                             <div class="row text-center p-3">
                                     <div class="col-3">##= data.label ##</div>
                                     <div class="col-3">##= data.image ##</div>                            
