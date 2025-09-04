@@ -295,7 +295,7 @@ AP.signage.modal = ( function() {
 
                         if ( fonts.length === 1 ) {
                             viewModel.set( "detailForm.data.font.id", fonts[0].id );
-                            viewModel.get( "fontSizes" ).data( xhr.data.items );
+                            viewModel.get( "fontSizes" ).data( xhr.data[0].items );
                         }
 
                         NM.util.openModal( AP.signage.fields.modalRoot );
