@@ -78,7 +78,7 @@
 		prc.jsScripts.add( "app-signage" );
 		prc.jsScripts.add( "app-plate" );
 		prc.jsScripts.add( "app-quotation-items" );
-
+	
 		event.setView( "quotation/items" );
 	}
 

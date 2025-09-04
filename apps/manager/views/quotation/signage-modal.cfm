@@ -95,12 +95,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
-                            <div class="col-12" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.lines">
+                        <div class="mb-3 mt-3 row">
+                            <div class="col-12 mb-3">
+                                Righe
+                            </div>
+                            <div class="col-6" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.signageLines">
                                 <!--- qui dentro vanno gli items --->
                             </div>
+                            <div class="col-6" style="width: 600px;" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.signageLines">
+                                <!--- qui dentro vanno gli items di preview --->
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:addLine">Aggiungi Riga</button>
+                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageLine">Aggiungi Riga</button>
                     </div>
 
                     <footer class="card-footer">
@@ -122,4 +128,5 @@
     
     </div>
     #template( view="jstemplate/quotation/signage-line-row-tmpl" )#
+    #template( view="jstemplate/quotation/signage-line-preview-row-tmpl" )#
 </cfoutput>

@@ -16,3 +16,7 @@ docker-compose.yml
 .idea
 /apirone-site.txt
 /apps/manager/assets/js/tests/app-plate-test.js
+/apps/manager/assets/js/tests/app-signage-test.js
+/scripts
+dump_db.sh
+restore_db.sh

@@ -263,6 +263,11 @@ ul.nav-main>li.nav-expanded>a {
     color: White !important;
 }
 
+.btn-danger {
+    background-color: #dd391c !important;
+    color: White !important;
+}
+
 h2,
 a {
     color: #2771e8 !important;
@@ -905,4 +910,22 @@ h2 {
     bottom: 0;
     background-color: inherit;
     z-index: 1055;
+}
+
+.selected-text-align {
+    border: 1px solid #000 !important;
+    padding: 3px;
+}
+.selected-text-align-not {
+    border: 1px solid #00000000;
+    padding: 3px;
+}
+.text-left {
+    text-align: left !important;
+}
+.text-center {
+    text-align: center !important;
+}
+.text-right {
+    text-align: right !important;
 }
