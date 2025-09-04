@@ -96,8 +96,14 @@
                             </div>
                         </div>
                         <div class="mb-3 mt-3 row">
-                            <div class="col-12 mb-3">
+                            <div class="col-3 mb-3">
                                 Righe
+                            </div>
+                            <div class="col-3 mb-3 flex justify-content-end align-items-end">
+                                <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
+                            </div>
+                            <div class=col-6 mb-3>
+                                Anteprima
                             </div>
                             <div class="col-6" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.signageLines">
                                 <!--- qui dentro vanno gli items --->
@@ -125,7 +131,26 @@
 
             </div>
         </selection>
-    
+        <div class="modal hide fade" tabindex="-1" id="pictogram-helper-modal">
+            <div style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0;">
+                <div class="modal-dialog" style="position: fixed; left: calc(50% + 150px); top: 20px; z-index: 1001;">
+                    <div class="modal-content" style="width: 300px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Elenco pittogrammi</h3>
+                    </div>
+                    <div class="text-center px-2 mt-1" style="font-size: 11px">Inserendo queste parole contornate da "<" e ">", verranno inseriti i pittogrammi nella riga.</div>
+                    <div class="modal-body" data-bind="source: detailForm.data.parsedPictograms" data-template="pictogram-template">
+                        <script id="pictogram-template" type="text/x-kendo-template">
+                            <!--- <div data-bind="text: this"></div> --->
+                            <div class="row text-center p-3">
+                                    <div class="col-3">##= data.label ##</div>
+                                    <div class="col-3">##= data.image ##</div>                            
+                            </div>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     #template( view="jstemplate/quotation/signage-line-row-tmpl" )#
     #template( view="jstemplate/quotation/signage-line-preview-row-tmpl" )#

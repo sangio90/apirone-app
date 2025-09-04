@@ -929,3 +929,18 @@ h2 {
 .text-right {
     text-align: right !important;
 }
+.flex {
+    display: flex !important;
+}
+.justify-content-center {
+    justify-content: center !important;
+}
+.align-items-center {
+    align-items: center !important;
+}
+.justify-content-end {
+    justify-content: end !important;
+}
+.align-items-end {
+    align-items: end !important;
+}

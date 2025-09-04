@@ -29,6 +29,16 @@ AP.signage.modal = ( function() {
                 '<sx>',
                 '<wom>'
             ],
+            parsedPictograms: function() {
+                    return this.pictogramNames.map(p => {
+                        let name = p.replace(/[<>]/g, '');
+                        return {
+                            label: name,
+                            image: `<img src="/assets/main/pictograms/${name}.png" alt="${name}" class="pictogram px-2">`
+                        }
+                    });
+                },
+            pictogramHelper: false,
             category: {
                 id: "",
             },
@@ -110,6 +120,16 @@ AP.signage.modal = ( function() {
             viewModel.get('detailForm.data.signageLines').add(defaultSignageLine);
 
             return false;
+        },
+    
+        togglePictogramHelper: function(e) {
+            if (viewModel.get('detailForm.data.pictogramHelper') == false) {
+                $('#pictogram-helper-modal').modal('show');
+                viewModel.set('detailForm.data.pictogramHelper', true);
+            } else {
+                $('#pictogram-helper-modal').modal('hide');
+                viewModel.set('detailForm.data.pictogramHelper', false);
+            }
         },
 
         parsedLineContent: function(e) {
