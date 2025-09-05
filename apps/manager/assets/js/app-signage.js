@@ -34,7 +34,7 @@ AP.signage.modal = ( function() {
                         let name = p.replace(/[<>]/g, '');
                         return {
                             label: name,
-                            image: `<img src="/assets/main/pictograms/${name}.png" alt="${name}" class="pictogram px-2">`
+                            image: `<img src="/assets/main/pictograms/Arial/${name}.png" alt="${name}" class="pictogram px-2">`
                         }
                     });
                 },
