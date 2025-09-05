@@ -73,16 +73,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params   = getParams( typeId = rc.by, rc = rc );
 		var oldItems = super.fire( "component.list", params );
 
-		var itemExists = [];
+		var esistingRows = [];
 
 		for ( var thisComponent in components ) {
 			if ( thisComponent.id != "" ) {
-				ArrayAppend( itemExists, thisComponent.id );
+				ArrayAppend( esistingRows, thisComponent.id );
 			}
 
 			if ( thisComponent.typeId == "base" ) {
 				var override = super.bean( "ComponentOverride" );
-
 
 				override.setId( thisComponent.override.id );
 				override.setDeleted( thisComponent.override.deleted );
@@ -97,17 +96,17 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 			} else {
 				var color      = super.bean( "Color" );
-				var rawProduct = super.bean( "RawProduct" );
 				var variant    = super.bean( "Variant" );
+				var rawProduct = super.bean( "RawProduct" );
 
-				variant.setId( thisComponent.variant.id )
 				color.setId( thisComponent.color.id )
+				variant.setId( thisComponent.variant.id )
 				rawProduct.setId( thisComponent.rawProduct.id )
 
 				component.setId( thisComponent.id );
-				component.setRawProduct( rawProduct );
 				component.setColor( color );
 				component.setVariant( variant );
+				component.setRawProduct( rawProduct );
 				component.setQuantity( thisComponent.quantity );
 
 				if ( Len( component.getId() ) ) {
@@ -119,13 +118,20 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		for ( var oldItem in oldItems ) {
-			if ( !itemExists.find( oldItem.getId() ) ) {
-				super.fire( "component.delete", { componentId = oldItem.getId() } );
-				cffile(
-					action = "APPEND",
-					file   = "#ExpandPath( "/debug.log" )#",
-					output = "#Now()# delete oldItems: this: #oldItem.getId()#"
+			if ( !esistingRows.find( oldItem.getId() ) ) {
+				var beanParam = Duplicate( component );
+				
+				beanParam.setId( oldItem.getId() );
+				
+				super.fire( "component.deleteByParams", [ beanParam ] );
+
+				super.logEvent(
+					event   = "component.deleted",
+					message = "Component [#oldItem.getId()#] deleted by params",
+					payload = { "component" = beanParam.extractIds() }
 				);
+
+				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# by: #rc.by#; beanParams: #SerializeJSON( beanParam.extractIds() )#");
 			}
 		}
 

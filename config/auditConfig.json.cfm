@@ -9,7 +9,8 @@
 		"PRODUCT": {},
 		"PRODUCT_ITEM": {},
 		"QUOTATION": {},
-		"RAW_VALUE": {}
+		"RAW_VALUE": {},
+		"COMPONENT": {}
 	},
 	actions: {
 		"CREATED": {},

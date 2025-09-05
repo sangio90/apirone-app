@@ -1,16 +1,16 @@
-$(document).ready(function(){
+$( document ).ready( function(){
 
-    console.log("test:app-line-attributes")
+    console.log( "test:app-line-attributes" );
 
-    $("body").find("button[data-bind='click:showAttributesList']").click();
+    $( "body" ).find( "button[data-bind='click:showAttributesList']" ).click();
 
     setTimeout( function() {
 
-        console.log("test:load");
-        
-        //$("body").find("button[data-bind='click:openAttributeValues']").eq(1).click();
+        console.log( "test:load" );
 
-    }, 1000 )
+        // $("body").find("button[data-bind='click:openAttributeValues']").eq(1).click();
 
-})
+    }, 1000 );
+
+} );
 

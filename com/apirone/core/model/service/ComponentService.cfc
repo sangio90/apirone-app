@@ -104,6 +104,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+	public com.apirone.core.model.bean.Outcome function deleteByParams( 
+		required  com.apirone.core.model.bean.Component component
+	){
+		var outcome = super.bean( "Outcome" );
+
+		var obj = get( arguments.component.getId() );
+
+		outcome.setData( { component = arguments.component } );
+
+		transaction {
+			try {
+				getDao().deleteByParams( arguments.component );
+
+				super.getCacheManager().remove( getCacheScope(), obj.getId() );
+			} catch ( any error ) {
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteComponent" );
+				outcome.setMessage( "Cannot delete component [#obj.getId()#]" );
+			}
+		}
+
+		return outcome;
+	}
+
 	public String function create( required com.apirone.core.model.bean.Component component ){
 		if ( Len( arguments.component.getId() ) ) {
 			var id = getDao().update( arguments.component.getId() );

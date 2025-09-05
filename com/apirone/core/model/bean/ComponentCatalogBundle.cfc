@@ -7,4 +7,8 @@ component extends="com.apirone.core.model.bean.Component" accessors="true" {
 		return this;
 	}
 
+	public Struct function extractIds(){
+		return { "id": getId(), "lineId": getLine().getId(), "modelId": getModel().getId() };
+	}
+
 }

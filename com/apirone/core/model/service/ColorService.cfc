@@ -37,19 +37,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var records = getDao().find( argumentCollection = arguments );
 
-		cffile(
-			action = "APPEND",
-			file   = "#ExpandPath( "/debug.log" )#",
-			output = "#Now()# colorService:search();recordCount:#records.recordCount#;rawProductId:'#arguments.rawProductId#'"
-		);
-
 		records.each( function( record, index ){
-			cffile(
-				action = "APPEND",
-				file   = "#ExpandPath( "/debug.log" )#",
-				output = "#Now()# colorService:search();index:#index#;clcodice:'#record.clcodice#'"
-			);
-
 			rows.add( get( colorId = record.clcodice ) );
 		} );
 

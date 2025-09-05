@@ -29,6 +29,14 @@ AP.finish.list = ( function() {
             id: "",
             code: "",
             name: "",
+            nameItem: {
+                id: "",
+                name: ""
+            },
+            descriptionItem: {
+                id: "",
+                name: ""
+            },
             selectedCategories: [],
             status: {
                 id: "ACT"

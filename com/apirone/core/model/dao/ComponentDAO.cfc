@@ -67,7 +67,6 @@
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">
-		<!--- <cfargument name="component" type="com.apirone.core.model.bean.Component" required="true"> --->
 		<cfargument name="componentId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone" result="result">
@@ -77,9 +76,34 @@
 				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.componentId#">
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath( "/debug.log" )#" output="#Now()# delete method: #result.sql#">
+		<cffile action="APPEND" file="#ExpandPath( "/debug.log" )#" output="#Now()# component delete: #getCompleteSQL( result )#" >
 
 		<cfreturn true>
+	</cffunction>
+
+	<cffunction name="deleteByParams" returntype="Boolean">
+	    <cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
+
+		<cfset var meta = getFieldsAndValues( arguments.component )>
+		
+		<cfquery name="local.q" datasource="apirone" result="result">
+			DELETE FROM components
+			WHERE 
+				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.component.getId()#">
+
+				<cfloop array="#meta.fields#" index="index" item="field">
+					AND #field# = <cfif meta.values[index].type IS "uuid">
+						<cfqueryparam cfsqltype="Varchar" value="#meta.values[index].value#" >::uuid
+					<cfelse>
+						<cfqueryparam cfsqltype="#meta.values[index].type#" value="#meta.values[index].value#">
+					</cfif>
+				</cfloop>
+		</cfquery>
+
+		<cffile action="APPEND" file="#ExpandPath( "/debug.log" )#" output="#Now()# component deleteByParams: #getCompleteSQL( result )#">
+
+		<cfreturn true>
+
 	</cffunction>
 
 	<cffunction name="insert" returntype="Numeric">
@@ -138,7 +162,10 @@
 		<cfreturn arguments.component.getId()>
 	</cffunction>
 
-	<!--- private methods --->
+
+	<!--- 
+		private methods 
+	--->
 
 	<cffunction name="getFieldsAndValues" returntype="Struct" access="private">
 		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">

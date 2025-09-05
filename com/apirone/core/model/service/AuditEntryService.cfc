@@ -64,7 +64,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.auditEntryId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "AuditEntry" );
+			//var bean = super.bean( "AuditEntry" ); // non è di tipo AbsBean
+			var bean = new com.apirone.core.model.bean.AuditEntry();
 
 			bean.setId( record.audit_log_id );
 			bean.setMessage( record.message );

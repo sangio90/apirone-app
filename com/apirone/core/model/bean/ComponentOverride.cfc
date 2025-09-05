@@ -14,5 +14,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
         return this;
         
     }
+
+	public Struct function extractIds(){
+		return { "id": getId(), "componentId": getComponentId(), "productItemId": getProductItemId() };
+	}
    
 }

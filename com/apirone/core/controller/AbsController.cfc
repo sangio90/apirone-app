@@ -294,6 +294,11 @@
 		return getContainer().getInstance( "Mementify" );
 	}
 
+	private Struct function logEvent(){
+		var helper = getContainer().getInstance( "AuditHelper" );
+		helper.logEvent( argumentCollection = arguments );
+	}
+
 	public Any function service( required String service ){
 		var bean = getContainer().getInstance( "#arguments.service#Service" );
 		return bean;

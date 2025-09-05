@@ -7,9 +7,15 @@ component extends="coldbox.system.Interceptor" {
 		rc,
 		prc
 	){
+
+		if( prc.keyExists("currentRoutedURL") AND prc.currentRoutedURL == "manager/" ) {
+			location( url="/manager/login" );
+		}
+
 		cfheader( name = "Access-Control-Allow-Origin", value = "*" );
 		cfheader( name = "Access-Control-Allow-Methods", value = "GET, POST, OPTIONS" );
 		cfheader( name = "Access-Control-Allow-Headers", value = "Content-Type, X-Requested-With" );
+
 
 		/*
         if( !rc.keyExists("currentRoutedModule") ) {
