@@ -74,6 +74,7 @@
 
 		prc.zones  = DeserializeJSON( FileRead( "/config/data/fake/zones.json.cfm" ) );
 		prc.plates = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
+        prc.page["quotation"]["id"] = rc.id;
 
 		prc.jsScripts.add( "app-signage" );
 		prc.jsScripts.add( "app-plate" );

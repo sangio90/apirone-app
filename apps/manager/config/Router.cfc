@@ -296,6 +296,7 @@
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		get( "/quotations" ).to( "QuotationController.list" ).end();
 
+		post("/ajax/quotation-items").to( "QuotationItemAjaxController.save" ).end();
 
 		/*
 			roles

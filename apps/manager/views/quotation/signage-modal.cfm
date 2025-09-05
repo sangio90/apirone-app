@@ -137,13 +137,13 @@
         </selection>
         <div class="modal hide fade" tabindex="-1" id="pictogram-helper-modal">
             <div style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0;">
-                <div class="modal-dialog" style="position: fixed; left: calc(50% + 150px); top: 20px; z-index: 1001;">
+                <div class="modal-dialog" style="position: fixed; left: calc(50% + 300px); top: 20px; z-index: 1001;">
                     <div class="modal-content" style="width: 300px;">
                     <div class="modal-header">
                         <h3 class="modal-title">Elenco pittogrammi</h3>
                     </div>
                     <div class="text-center px-2 mt-1" style="font-size: 11px">Inserendo queste parole contornate da "<" e ">", verranno inseriti i pittogrammi nella riga.</div>
-                    <div class="modal-body" data-bind="source: detailForm.data.parsedPictograms" data-template="pictogram-template">
+                    <div class="modal-body" data-bind="source: parsedPictograms" data-template="pictogram-template">
                         <script id="pictogram-template" type="text/x-kendo-template">
                             <div class="row text-center p-3">
                                     <div class="col-3">##= data.label ##</div>

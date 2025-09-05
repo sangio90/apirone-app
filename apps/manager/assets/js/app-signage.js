@@ -19,26 +19,6 @@ AP.signage.modal = ( function() {
             code: "",
             name: "",
             signageLines: new kendo.data.DataSource(),
-            pictogramNames: [
-                '<dx>',
-                '<giu>',
-                '<lift>',
-                '<man>',
-                '<pmr>',
-                '<su>',
-                '<sx>',
-                '<wom>'
-            ],
-            parsedPictograms: function() {
-                    return this.pictogramNames.map(p => {
-                        let name = p.replace(/[<>]/g, '');
-                        return {
-                            label: name,
-                            image: `<img src="/assets/main/pictograms/Arial/${name}.png" alt="${name}" class="pictogram px-2">`
-                        }
-                    });
-                },
-            pictogramHelper: false,
             category: {
                 id: "",
             },
@@ -92,6 +72,26 @@ AP.signage.modal = ( function() {
         fonts: new kendo.data.DataSource(),
         fontSizes: new kendo.data.DataSource(),
         signageImages: new kendo.data.DataSource(),
+        pictogramNames: [
+            '<dx>',
+            '<giu>',
+            '<lift>',
+            '<man>',
+            '<pmr>',
+            '<su>',
+            '<sx>',
+            '<wom>'
+        ],
+        parsedPictograms: function() {
+            return this.pictogramNames.map(p => {
+                let name = p.replace(/[<>]/g, '');
+                return {
+                    label: name,
+                    image: `<img src="/assets/main/pictograms/Arial/${name}.png" alt="${name}" class="pictogram px-2">`
+                }
+            });
+        },
+        pictogramHelper: false,
 
         callback: {
             onCreate: undefined,
@@ -134,7 +134,7 @@ AP.signage.modal = ( function() {
             const contentSpanPreview = $('#content_span_preview_' + orderby);
 
             if (contentSpanPreview.length == 1) {
-                const pictogramNames = viewModel.get('detailForm.data.pictogramNames');
+                const pictogramNames = viewModel.get('pictogramNames');
                 const pictograms = this.extractAllOccurrences(valore, pictogramNames);
                 const signageConfig = viewModel.getSignageConfig();
                 const signageConfigItem = signageConfig.items.filter(function(config) { return config.id == viewModel.get('detailForm.data.fontSize.id')})[0];
@@ -187,7 +187,7 @@ AP.signage.modal = ( function() {
 
             let charCount = e.currentTarget.value.length
             const realContent = e.currentTarget.value
-            const pictogramNames = viewModel.get('detailForm.data.pictogramNames');
+            const pictogramNames = viewModel.get('pictogramNames');
             let content = e.currentTarget.value
             const usedPictos = [];
             pictogramNames.forEach(pictogram => {
@@ -219,12 +219,12 @@ AP.signage.modal = ( function() {
         },
 
         togglePictogramHelper: function(e) {
-            if (viewModel.get('detailForm.data.pictogramHelper') == false) {
+            if (viewModel.get('pictogramHelper') == false) {
                 $('#pictogram-helper-modal').modal('show');
-                viewModel.set('detailForm.data.pictogramHelper', true);
+                viewModel.set('pictogramHelper', true);
             } else {
                 $('#pictogram-helper-modal').modal('hide');
-                viewModel.set('detailForm.data.pictogramHelper', false);
+                viewModel.set('pictogramHelper', false);
             }
         },
 
@@ -324,38 +324,16 @@ AP.signage.modal = ( function() {
         },
 
         save: function( event ) {
-            var detailForm = AP.signage.fields.detailForm;
-            var status = detailForm.find( ".status" );
+            var quotationId = AP.page.quotation.id;
+            let parsedData = viewModel.get('detailForm.data');
+            parsedData.quotationId = quotationId;
 
-            status.html(
-                "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
-            );
-
-            if ( detailForm.valid() ) {
+            // if ( detailForm.valid() ) {
+            if (true) {
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/signages",
-                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
-                    callback: {
-                        done: function( xhr ) {
-                            if ( xhr.status == "SUCCESS" ) {
-                                NM.util.autoHideMessage(
-                                    status,
-                                    "<span class='green'>Segnaletica salvata</span>",
-                                );
-
-                                setTimeout(
-                                    () => $( "#signage-detail-modal" ).modal( "hide" ),
-                                    1000,
-                                );
-
-                                AP.util.fireCallback(
-                                    "onSave",
-                                    viewModel.get( "callback" ),
-                                );
-                            }
-                        },
-                    },
+                    url: "/manager/ajax/quotation-items",
+                    data: JSON.stringify(parsedData)
                 } );
             }
 
