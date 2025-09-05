@@ -14,7 +14,7 @@
                     <div class="card-body">
 
                         <div class="mb-3 row">
-                            <div class="col-3">
+                            <div class="col-2">
                                 <label class="col-sm-2 col-form-label text-start">Categoria</label>
                                 <div class="col-sm-10">
                                     <select id="signangeProductCategory" 
@@ -27,7 +27,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-3" data-bind="visible: detailForm.data.category.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.category.id">    
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
                                     <select id="signageLine" 
@@ -40,7 +40,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-3" data-bind="visible: detailForm.data.line.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.line.id">    
                                 <label class="col-sm-2 col-form-label text-start">Modello</label>
                                 <div class="col-sm-10">
                                     <select id="signageModel" 
@@ -53,7 +53,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-3" data-bind="visible: detailForm.data.model.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.model.id">    
                                 <label class="col-sm-2 col-form-label text-start">Finitura</label>
                                 <div class="col-sm-10">
                                     <select id="signageFinish" 
@@ -66,9 +66,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <div class="col-6" data-bind="visible: detailForm.data.finish.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.finish.id">    
                                 <label class="col-sm-2 col-form-label text-start">Font</label>
                                 <div class="col-sm-10">
                                     <select id="signageFont" 
@@ -81,9 +79,9 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-6" data-bind="visible: detailForm.data.font.id">    
-                                <label class="col-sm-2 col-form-label text-start">Dimensione Font</label>
-                                <div class="col-sm-10">
+                            <div class="col-2" data-bind="visible: detailForm.data.font.id">    
+                                <label class="col-sm-12 col-form-label text-start">Dimensione Font</label>
+                                <div class="col-sm-12">
                                     <select id="signageFontSize" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la dimensione del font"
@@ -96,19 +94,25 @@
                             </div>
                         </div>
                         <div class="mb-3 mt-3 row">
+                            <div class="col-2 mb-3">
+                                Albero
+                            </div>
                             <div class="col-3 mb-3" data-bind="visible:detailForm.data.font.id">
                                 Righe
                             </div>
                             <div class="col-3 mb-3 flex justify-content-end align-items-end">
                                 <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
                             </div>
-                            <div class="col-6 mb-3" data-bind="visible:detailForm.data.font.id">
+                            <div class="col-4 mb-3" data-bind="visible:detailForm.data.font.id">
                                 Anteprima
+                            </div>
+                            <div class="col-2 mb-3">
+                                Albero
                             </div>
                             <div class="col-6" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.signageLines, visible:detailForm.data.font.id">
                                 <!--- qui dentro vanno gli items --->
                             </div>
-                            <div class="col-6" style="width: 600px;" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.signageLines, visible:detailForm.data.font.id">
+                            <div class="col-4" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.signageLines, visible:detailForm.data.font.id">
                                 <!--- qui dentro vanno gli items di preview --->
                             </div>
                         </div>
