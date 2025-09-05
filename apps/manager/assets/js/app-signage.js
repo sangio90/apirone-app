@@ -137,11 +137,13 @@ AP.signage.modal = ( function() {
                 const pictogramNames = viewModel.get('detailForm.data.pictogramNames');
                 const pictograms = this.extractAllOccurrences(valore, pictogramNames);
                 const signageConfig = viewModel.getSignageConfig();
+                const signageConfigItem = signageConfig.items.filter(function(config) { return config.id == viewModel.get('detailForm.data.fontSize.id')})[0];
                 const fontFamily = signageConfig.font.family;
                 pictograms.forEach(function(pictogram) {
-                    valore = valore.replace(pictogram, '<img src="/assets/main/pictograms/' + fontFamily + '/' + pictogram.replace(/[<>]/g, '') + '.png" alt="' + pictogram.replace(/[<>]/g, '') + '" class="pictogram px-2">');
+                    valore = valore.replace(pictogram, 
+                        '<img src="/assets/main/pictograms/' + fontFamily + '/' + pictogram.replace(/[<>]/g, '') + '.png" alt="' + pictogram.replace(/[<>]/g, '') + '" style="transform: scale(' + signageConfigItem.height / 100 + ');" class="pictogram px-2">'
+                    );
                 })
-                const signageConfigItem = signageConfig.items.filter(function(config) { return config.id == viewModel.get('detailForm.data.fontSize.id')})[0];
                 contentSpanPreview.css({
                     "font-family": fontFamily,
                     "font-size": signageConfigItem.heightInPixels + 'px'
