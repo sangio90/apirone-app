@@ -89,6 +89,16 @@ AP.quotation.list = ( function() {
             return false;
         },
 
+        edit: function(e) {
+            e.preventDefault()
+            const id = e.data.id;
+            if (!id || id == '') {
+                return false;
+            }
+            const url = "/manager/quotations/" + id;
+            window.location.href = "/manager/quotations/" + id;
+        },
+
         new: function( ) {
             window.location.href = "/manager/quotations/new";
         },
