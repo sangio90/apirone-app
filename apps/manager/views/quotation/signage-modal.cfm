@@ -87,7 +87,7 @@
                                     <select id="signageFontSize" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la dimensione del font"
-                                        data-bind="source: fontSizes, value: detailForm.data.fontSize.id" 
+                                        data-bind="source: fontSizes, value: detailForm.data.fontSize.id, events: { change: parseLines }" 
                                         data-value-field="id"
                                         data-text-field="height"
                                         >
