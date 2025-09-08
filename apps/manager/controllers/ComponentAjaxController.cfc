@@ -128,7 +128,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				super.logEvent(
 					event   = "component.deleted",
 					message = "Component [#oldItem.getId()#] deleted by params",
-					payload = { "component" = beanParam.extractIds() }
+					payload = { "component" = beanParam.extractIds(), "from": rc.by }
 				);
 
 				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# by: #rc.by#; beanParams: #SerializeJSON( beanParam.extractIds() )#");
