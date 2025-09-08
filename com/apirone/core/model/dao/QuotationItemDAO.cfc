@@ -39,16 +39,36 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="String">
-		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="true">
+		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="false">
+		<cfargument name="quotationItemSignage" type="com.apirone.core.model.bean.QuotationItemSignage" required="false">
+		<cfif NOT structKeyExists(arguments, "quotationItem") AND NOT structKeyExists(arguments, "quotationItemSignage")>
+			<cfthrow type="Application" message="Devi passare almeno quotationItem o quotationItemSignage">
+		</cfif>
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_items (
 				quotation_id,
 				price,
 				quantity
+				<cfif !IsNull( arguments.quotationItemSignage )>
+					,
+					font_size,
+					chart_count,
+					height,
+					height_in_pixel,
+					row_count
+				</cfif>
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">
+				<cfif !IsNull( arguments.quotationItemSignage )>
+					,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getFontSize()#">,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getChatCount()#">,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeight()#">,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeightInPixel()#">,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getRowCount()#">
+				</cfif>
 			)
 			RETURNING quotation_item_id
 		</cfquery>
@@ -56,13 +76,25 @@
 	</cffunction>
 
 	<cffunction name="update" returntype="String">
-		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="true">
+		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="false">
+		<cfargument name="quotationItemSignage" type="com.apirone.core.model.bean.QuotationItemSignage" required="false">
+		<cfif NOT structKeyExists(arguments, "quotationItem") AND NOT structKeyExists(arguments, "quotationItemSignage")>
+			<cfthrow type="Application" message="Devi passare almeno quotationItem o quotationItemSignage">
+		</cfif>
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_items
 			SET
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
 				price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
 				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
+				<cfif !IsNull( arguments.quotationItemSignage )>
+					,
+					font_size = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getFontSize()#">,
+					chart_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getChatCount()#">,
+					height = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeight()#">,
+					height_in_pixel = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeightInPixel()#">,
+					row_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getRowCount()#">
+				</cfif>
 			WHERE
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getId()#">::uuid
 		</cfquery>

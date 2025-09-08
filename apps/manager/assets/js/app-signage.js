@@ -34,6 +34,9 @@ AP.signage.modal = ( function() {
             signageConfig: {
                 id: "",
             },
+            signageConfigItem: {
+                id: "",
+            },
             font: {
                 id: "",
             },
@@ -128,6 +131,10 @@ AP.signage.modal = ( function() {
             viewModel.get('detailForm.data.signageLines').data().forEach(signageLine => {
                 this.parsedLineContent(signageLine.content, signageLine.orderby)
             })
+
+            const signageConfig = viewModel.getSignageConfig();
+            const signageConfigItem = signageConfig.items.filter(function(config) { return config.id == viewModel.get('detailForm.data.fontSize.id')})[0];
+            viewModel.set('detailForm.data.signageConfigItem', signageConfigItem)
         },
 
         parsedLineContent: function(valore, orderby) {

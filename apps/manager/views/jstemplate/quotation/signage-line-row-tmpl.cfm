@@ -7,12 +7,12 @@
                 <div class="col-2 text-start">
                     Riga N°<span data-bind="text: orderby"></span>
                 </div>
-                <div class="col-7 pl-0-ml-3">
+                <div class="col-6 pl-0-ml-3">
                     <button type="button" class="btn btn-danger btn-sm" data-bind="click:removeSignageLine">
                         <i class="fas fa-trash"></i> Elimina
                     </button>
                 </div>
-                <div class="col-3 text-end">
+                <div class="col-4 text-end">
                     <i class="fas fa-align-left text-md mx-2 selected-text-align-not" style="cursor: pointer" data-value="left" data-bind="click:setTextAlign"></i>
                     <i class="fas fa-align-center text-md mx-2 selected-text-align" style="cursor: pointer" data-value="center" data-bind="click:setTextAlign"></i>
                     <i class="fas fa-align-right text-md mx-2 selected-text-align-not" style="cursor: pointer" data-value="right" data-bind="click:setTextAlign"></i>

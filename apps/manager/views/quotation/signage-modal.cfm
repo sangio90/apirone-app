@@ -72,7 +72,7 @@
                                     <select id="signageFont" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la font"
-                                        data-bind="source: fonts, value: detailForm.data.font.id, events: { change: loadFontSizes }" 
+                                        data-bind="source: fonts, value: detailForm.data.font, events: { change: loadFontSizes }" 
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
@@ -85,7 +85,7 @@
                                     <select id="signageFontSize" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la dimensione del font"
-                                        data-bind="source: fontSizes, value: detailForm.data.fontSize.id, events: { change: parseLines }" 
+                                        data-bind="source: fontSizes, value: detailForm.data.fontSize, events: { change: parseLines }" 
                                         data-value-field="id"
                                         data-text-field="height"
                                         >
