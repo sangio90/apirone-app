@@ -7,25 +7,19 @@
                 <span data-bind="text: shortId"></span>
             </td>
             <td>
-                <span data-bind="text: code"></span>
+                <span data-bind="text: category.name"></span>
             </td>
             <td>
-                <span data-bind="text: nameItem.name"></span>
+                <span data-bind="text: line.name"></span>
             </td>
-            <td class="text-end">
-                <span data-bind="text: positionCount"></span>
+            <td>
+                <span data-bind="text: model.name"></span>
+            </td>
+            <td>
+                <span data-bind="text: finish.name"></span>
             </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
-            </td>
-            <td class="text-center">
-                #iconButton(bind="click:edit", icon="edit")#
-            </td>
-            <td class="text-center">
-                <input type="checkbox" class="form-check-input"
-                    name="selected"
-                    value="##: id ##"
-                >
             </td>
         </tr>
     </nmscript>

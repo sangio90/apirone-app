@@ -1,5 +1,21 @@
 component extends="com.apirone.core.controller.AbsController" {
 
+	function list( event, rc, prc ){
+		// var params[ "categoryModeId" ] = "COM";
+
+		prc.categories = super.fire( "productCategory.list", { modeId = "COM" } );
+		prc.lines      = super.fire( "model.list" );
+		prc.models     = super.fire( "model.list" );
+		prc.statuses   = super.fire( "status.list", [ "line" ] );
+		prc.finishes   = super.fire( "finish.list" );
+
+		prc.title = "Prodotti complessi";
+
+		prc.jsScripts.add( "app-product-list" );
+
+		event.setView( "product/list" );
+	}
+
 	function detail( event, rc, prc ){
 		var product = super.fire( "product.get", [ rc.id ] );
 

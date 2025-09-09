@@ -216,13 +216,11 @@
 		get( "/ajax/products/:id" ).to( "ProductAjaxController.get" ).end();
 		delete( "/ajax/products" ).to( "ProductAjaxController.delete" ).end();
 		post( "/ajax/products" ).to( "ProductAjaxController.save" ).end();
-		//get( "/ajax/products" ).to( "ProductAjaxController.list" ).end(); not used
+		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
 		get( "/products/:id/combinations" ).to( "ProductController.combinations" ).end();
-
 		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();
 		get( "/products/:id" ).to( "ProductController.detail" ).end();
-		//get( "/comb/:id/items" ).to( "ProductController.items" ).end();
-
+		get( "/products" ).to( "ProductController.list" ).end();
 
 		/*
 			product category

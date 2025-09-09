@@ -19,44 +19,80 @@
 					<div class="card-body">
 						
 						<div class="row d-flex align-items-center mb-3">
-							<div class="col-sm-10">
+							<div class="col-sm-12">
 								<div class="box-search-small">
 									<form
 										id   ="product-grid-search-form"
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
-										
-                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
-										<select class="form-control me-2" name="statusId">
-											<option value="">-- tutti gli stati</option>
-											<cfloop array="#prc.statuses#" item="item">
-												<option value="#item.getId()#">#item.getName()#</option>
-											</cfloop>
-										</select>
+										<div class="col">
+											<span>Categoria</span>
+											<select class="form-control me-2" name="categoryId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.categories#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
 
-										<select class="form-control me-2" name="orderBy">
-											<option value="product.code-asc" SELECTED>Codice [A-Z]</option>
-											<option value="product.code-desc">Codice [Z-A]</option>
-											<option value="product.name-asc">Descrizione [A-Z]</option>
-											<option value="product.name-desc">Descrizione [Z-A]</option>
-										</select>
+										<div class="col">
+											<span>Linea</span>
+											<select class="form-control me-2" name="lineId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.lines#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
 
-										#searchButton( bind = "click:search" )#
+										<div class="col">
+											<span>Modello</span>
+											<select class="form-control me-2" name="modelId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.models#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
+
+										<div class="col">
+											<span>Status</span>
+											<select class="form-control me-2" name="statusId">
+												<option value="">-- tutti</option>
+												<cfloop array="#prc.statuses#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
+
+										<div class="col">
+											<span>Ordina per</span>
+											<select class="form-control me-2" name="orderBy">
+												<option value="product.code-asc" SELECTED>Codice [A-Z]</option>
+												<option value="product.code-desc">Codice [Z-A]</option>
+												<option value="product.name-asc">Descrizione [A-Z]</option>
+												<option value="product.name-desc">Descrizione [Z-A]</option>
+											</select>
+										</div>
+
+										<div class="align-self-end flex">
+											#searchButton( bind = "click:search", class="me-1" )#
+
+											<div class="dropdown">
+												<button class="btn btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+													Report
+												</button>
+												<ul class="dropdown-menu">
+													<li><a class="dropdown-item" href="##">Distinta base</a></li>
+												</ul>
+											</div>
+
+										</div>
 									</form>
 								</div>
 							</div>
 
-							<div class="col-sm-2">
-								<div class="float-end">
-									#deleteButton(
-										bind  = "click:delete",
-										size  = "sm"
-									)#
-								</div>
-
-								<div class="status float-end me-3" id="status-delete"></div>
-							</div>
 						</div>
 
 						<form name="product-grid-form" id="product-grid-form" method="post">
@@ -65,17 +101,11 @@
 									id      = "product-grid",
 									columns = "[
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
-                                        { 'field':'code', 'title':'Codice', width: '120px' },
-                                        { 'field':'name', 'title':'Descrizione' },
-                                        { 'field':'name', 'title':'Mezzi moduli', width: '55px' },
-                                        { 'field':'', 'title':'Attributi', width: '55px'},
-                                        { 'field':'', 'title':'Modifica', width: '55px'},
-                                        { 
-                                            'field':'', 
-                                            'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                            'width':'40px',
-                                            'headerAttributes': { 'class': 'text-center' }
-                                        }
+                                        { 'field':'category.id', 'title':'Categoria' },
+                                        { 'field':'line.name', 'title':'Linea' },
+                                        { 'field':'model.name', 'title':'Modello'},
+                                        { 'field':'finish.name', 'title':'Finitura'},
+                                        { 'field':'', 'title':'Attributi', width: '55px'}
                                     ]",
 									rowTemplate = "product/product-grid-row-tmpl"
 								)#

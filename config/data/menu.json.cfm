@@ -64,8 +64,14 @@
 				roles: "ADM"
 			},
 			{
-				href: "/manager/lines/categories",
+				href: "/manager/products",
 				icon: "fas fa-vector-square",
+				title: "Prodotti complessi",
+				roles: "ADM"
+			},
+			{
+				href: "/manager/lines/categories",
+				icon: "fas fa-bezier-curve",
 				title: "Prodotti per linea",
 				roles: "ADM",
 			},

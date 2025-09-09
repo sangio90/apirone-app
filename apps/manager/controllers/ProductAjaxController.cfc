@@ -1,9 +1,6 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
-		getLogger().debug( "ProductController.list: someone use this method?" );
-		abort;
-
 		var data = [];
 
 		var result = super.getResult();

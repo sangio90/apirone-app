@@ -50,7 +50,9 @@
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 
 		<cfquery name="local.q" datasource="apirone" result="result">
-			SELECT product_id::varchar
+			SELECT
+				product_id::varchar,
+				COUNT(line_id) OVER() AS total
 			FROM
 				products
 					INNER JOIN product_categories USING ( product_category_id )
