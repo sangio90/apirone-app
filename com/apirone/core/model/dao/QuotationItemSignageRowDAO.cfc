@@ -45,12 +45,16 @@
 		<cfargument name="quotationItemSignageRow" type="com.apirone.core.model.bean.QuotationItemSignageRow" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_signage_rows (
-				quotation_item_id
+				quotation_item_id,
+				text_align,
+				content,
+				char_count,
+				orderby
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getQuotationItem().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getTextAlign()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getContent()#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemSignageRow.getChatCount()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemSignageRow.getCharCount()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemSignageRow.getOrderby()#">
 			)
 			RETURNING quotation_item_signage_row_id
@@ -66,7 +70,7 @@
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getQuotationItem().getId()#">::uuid,
 				text_align = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemSignageRow.getTextAlign()#">,
 				content = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemSignageRow.getContent()#">,
-				char_count = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotationItemSignageRow.getChatCount()#">
+				char_count = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotationItemSignageRow.getCharCount()#">
 				orderby = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotationItemSignageRow.getOrderby()#">
 			WHERE
 				quotation_item_signage_row_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getId()#">::uuid

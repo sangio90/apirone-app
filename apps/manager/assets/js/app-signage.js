@@ -18,6 +18,7 @@ AP.signage.modal = ( function() {
             id: "",
             code: "",
             name: "",
+            quantita: 1,
             signageLines: new kendo.data.DataSource(),
             category: {
                 id: "",
@@ -119,6 +120,7 @@ AP.signage.modal = ( function() {
                     id: "",
                     textAlign: "center",
                     content: "",
+                    charCount: 0,
                     orderby: viewModel.get('detailForm.data.signageLines').data().length + 1
                 };
                 viewModel.get('detailForm.data.signageLines').add(defaultSignageLine);               
@@ -219,6 +221,7 @@ AP.signage.modal = ( function() {
                 }
             })
             viewModel.get('detailForm.data.signageLines').data()[e.currentTarget.id.replace('_contentInput', '') - 1].set('content', content)
+            viewModel.get('detailForm.data.signageLines').data()[e.currentTarget.id.replace('_contentInput', '') - 1].set('charCount', charCount)
             $('#' + e.currentTarget.id.replace('_contentInput', '_charCounter')).html(charCount + '/' + signageConfigItem.charCount);
             this.parsedLineContent(content, e.data.orderby);
 
@@ -340,7 +343,18 @@ AP.signage.modal = ( function() {
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotation-items",
-                    data: JSON.stringify(parsedData)
+                    data: JSON.stringify(parsedData),
+                    callback: {
+                    done: function( xhr ) {
+                        console.log(xhr)
+                        if( xhr.status == "ERRORE" ) {
+                            AP.widget.notify( "error", "Errore nel salvataggio della segnaletica." );
+                        } 
+                        if ( xhr.status == "SUCCESS" ) {
+                            AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
+                        }
+                    }
+                }
                 } );
             }
 

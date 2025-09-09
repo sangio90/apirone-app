@@ -1,47 +1,55 @@
 component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
         var json = DeserializeJSON(GetHTTPRequestData().content);
-
 		var thisId    = "";
 		var messageId = "";
 		var texts     = [];
 
 		var result = super.getResult();
 
-		var quotationItemSignageBean = super.bean('QuotationItemSignage');
+		transaction {
+			try {
+				var quotationItemSignageBean = super.bean('QuotationItemSignage');
+				quotationItemSignageBean.setSignageConfigItem(super.service( "SignageConfigItem" ).get( json.signageConfigItem.id ));
+				quotationItemSignageBean.setQuotation(super.service( "Quotation" ).get( json.quotationId ));
+				quotationItemSignageBean.setPrice(20.1);
+				quotationItemSignageBean.setQuantity(json.quantita);
+				if ( !Len( json.id ) ) {
+					messageId = "quotationItem.created";
+					thisId    = super.fire( "quotationItem.create", [ quotationItemSignageBean ] )
+				} else {
+					messageId = "quotationItem.updated";
+					thisId    = super.fire( "quotationItem.update", [ quotationItemSignageBean ] )
+				}
+			
+				for (signageLine in json.signageLines._data) {
+					if (!Len( signageLine.id )) {
+						var signageLineBean = super.bean('QuotationItemSignageRow');
+						var messaggiId = "QuotationItemSignageRow.create";
+					} else {
+						var signageLineBean = super.bean('QuotationItemSignageRow').get(singnageLine.id);
+						var messaggiId = "QuotationItemSignageRow.update";
+					}
+					signageLineBean.setQuotationItem(quotationItemSignageBean.setId(thisId));
+					signageLineBean.setTextAlign(signageLine.textAlign);
+					signageLineBean.setContent(signageLine.content);
+					signageLineBean.setCharCount(signageLine.charCount);
+					signageLineBean.setOrderby(signageLine.orderby);
 
-		quotationItemSignageBean.setSignage(super.service( "SignageConfigItem" ).get( json.signageConfigItem.id ));
-		quotationItemSignageBean.getSignage().setCharCount(json.fontSize.charCount);
-		quotationItemSignageBean.setHeight(json.fontSize.height);
-		quotationItemSignageBean.setHeightInPixel(json.fontSize.heightInPixels);
-		quotationItemSignageBean.setRowCount(json.fontSize.rowCount);
-		quotationItemSignageBean.setPrice(20.1);
-		quotationItemSignageBean.setQuantity(2);
-		if ( !Len( json.id ) ) {
-			messageId = "quotationItem.created";
-			thisId    = super.fire( "quotationItem.create", [ quotationItemSignageBean ] )
-		} else {
-			messageId = "quotationItem.updated";
-			thisId    = super.fire( "quotationItem.update", [ quotationItemSignageBean ] )
-		}
-	
-		for (signageLine in json.signageLines._data) {
-			var signageLine = super.bean('QuotationItemSignageRow')
-			signageLine.setQuotationItem(quotationItemSignageBean);
-			signageLine.setTextAlign(signageLine.textAlign);
-			signageLine.setContent(signageLine.content);
-			signageLine.setOrderby(signageLine.orderby);
-			signageLine.setCharCount(signageLine.charCount);
-
-			if (!signageLine.id) {
-				super.fire( "QuotationItemSignageRow.create", [signageLine] );
-			} else {
-				super.fire( "QuotationItemSignageRow.update", [signageLine] );
+					super.fire( messaggiId, [ signageLineBean ] );
+				}
+				
+				var message = completeMessage( messageId );
+			} catch ( any e ) {
+				var message = "Errore nella creazione/aggiornamento della riga di preventivo: #e.message#";
+				result.setData( { "error" = e.message } );
+				result.setStatus( 'ERRORE' );
+				event.setValue( "result", result );
+				dump(result);
+				return;
 			}
 		}
 		
-		var message = completeMessage( messageId );
-
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
 
 		event.setValue( "result", result );

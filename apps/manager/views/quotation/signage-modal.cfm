@@ -1,7 +1,7 @@
 ﻿<cfoutput>
     <div id="signage-modal" class="modal fade">
         
-        <section class="modal-dialog modal-xl">
+        <section class="modal-dialog modalxl">
             <div class="modal-content">
 
                 <form id="line-detail-form" method="POST" name="line-detail-form">
@@ -14,6 +14,10 @@
                     <div class="card-body">
 
                         <div class="mb-3 row">
+                            <div class="col-1">    
+                                <label class="col-sm-12 col-form-label text-start">Quantità</label>
+                                <input class="form-control" type="number" data-bind="value: detailForm.data.quantita" min="1">
+                            </div>
                             <div class="col-2">
                                 <label class="col-sm-2 col-form-label text-start">Categoria</label>
                                 <div class="col-sm-10">
@@ -79,7 +83,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.font.id">    
+                            <div class="col-1" data-bind="visible: detailForm.data.font.id">    
                                 <label class="col-sm-12 col-form-label text-start">Dimensione Font</label>
                                 <div class="col-sm-12">
                                     <select id="signageFontSize" 

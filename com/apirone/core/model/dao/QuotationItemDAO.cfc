@@ -46,28 +46,26 @@
 		</cfif>
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_items (
-				quotation_id,
-				price,
-				quantity
-				<cfif !IsNull( arguments.quotationItemSignage )>
-					,
-					font_size,
-					chart_count,
-					height,
-					height_in_pixel,
-					row_count
+				<cfif IsNull( arguments.quotationItemSignage )>
+					quotation_id,
+					price,
+					quantity
+				<cfelse>
+					quotation_id,
+					signage_config_item_id,
+					price,
+					quantity
 				</cfif>
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">
-				<cfif !IsNull( arguments.quotationItemSignage )>
-					,
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">,
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getFontSize()#">,
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getChatCount()#">,
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeight()#">,
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeightInPixel()#">,
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getRowCount()#">
+				<cfif IsNull( arguments.quotationItemSignage )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
+				<cfelse>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignage.getQuotation().getId()#">::uuid,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getSignageConfigItem().getId()#">,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getPrice()#">,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getQuantity()#">
 				</cfif>
 			)
 			RETURNING quotation_item_id
@@ -90,7 +88,7 @@
 				<cfif !IsNull( arguments.quotationItemSignage )>
 					,
 					font_size = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getFontSize()#">,
-					chart_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getChatCount()#">,
+					chart_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getCharCount()#">,
 					height = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeight()#">,
 					height_in_pixel = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeightInPixel()#">,
 					row_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getRowCount()#">

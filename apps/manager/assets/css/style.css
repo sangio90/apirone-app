@@ -305,6 +305,11 @@ h2 {
     }
 }
 
+.modalxl {
+    width: 95vw !important;
+    max-width: 2200px !important;  
+}
+
 .content-body {
     padding: 20px !important;
 }
