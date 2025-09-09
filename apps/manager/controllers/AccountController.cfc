@@ -1,54 +1,44 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		prc.title = "Lista degli account";
 
-        prc.title = "Lista degli account";
+		prc.roles    = super.fire( "lookup.list", [ "role" ] );
+		prc.statuses = super.fire( "status.list", [ "ACCOUNT" ] );
+		prc.langs    = super.fire( "lang.list" );
 
-        prc.roles = super.fire("lookup.list", [ "role" ]);
-        prc.statuses = super.fire("status.list", [ "ACCOUNT" ]);
-        prc.langs = super.fire("lang.list");
+		prc.page[ "roles" ]    = prc.roles;
+		prc.page[ "statuses" ] = prc.statuses;
+		prc.page[ "langs" ]    = prc.langs;
 
-        prc.page["roles"] = prc.roles;
-        prc.page["statuses"] = prc.statuses;
-        prc.page["langs"] = prc.langs;
+		prc.jsScripts.add( "app-account" );
 
-        prc.jsScripts.add( "app-account" );
+		event.setView( "account/list" );
+	}
 
-        event.setView("account/list");
+	function get( event, rc, prc ){
+		var user = prc.user;
 
-    }
-    
-    function get( event, rc, prc ){
+		prc.title = "Account";
 
-        var user = prc.user;
+		prc.jsScripts.add( "app-account" );
 
-        prc.title = "Account";
+		prc.perms = DeserializeJSON( FileRead( "/config/data/fake/perms.json.cfm" ) );
 
-        prc.jsScripts.add( 'app-account' );
+		event.setView( "account/detail" );
+	}
 
-        prc.perms = DESerializeJSON( FileRead( '/config/data/fake/perms.json.cfm' ) );
+	function print( event, rc, prc ){
+		var user = prc.user;
 
-        event.setView('account/detail');
+		var result = getAccessManager().exec( user, "Account.search" );
 
-    }
-    
-    function print( event, rc, prc ) {
+		prc.printArgs = {
+			data   = DeserializeJSON( SerializeJSON( result.getData() ) ),
+			fields = "email,role"
+		}
 
-        var user = prc.user;
+		event.setView( "util/print" ).setLayout( "print" );
+	}
 
-        var result = getAccessManager()
-                .exec( 
-                    user, 
-                    "Account.search"
-                );
-
-        prc.printArgs = {
-            data = DESerializeJSON( SerializeJSON( result.getData() ) ),
-            fields = "email,role"
-        }
-
-        event.setView( "util/print" ).setLayout( "print" );
-        
-    }
-    
 }

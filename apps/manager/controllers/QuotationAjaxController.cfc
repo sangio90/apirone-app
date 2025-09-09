@@ -5,10 +5,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var mem = super.getMementify();
+		var mem    = super.getMementify();
 
 		params[ "typeId" ] = "SEG";
-		
+
 		var rows = super.fire( "productCategory.list", params );
 
 		var data = mem.convertList( rows, "list" );
@@ -25,10 +25,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var mem = super.getMementify();
+		var mem    = super.getMementify();
 
 		params[ "catalogBundleCategoryId" ] = rc.categoryId;
-	
+
 		var rows = super.fire( "line.list", params );
 
 		var data = mem.convertList( rows, "list" );
@@ -45,10 +45,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var mem = super.getMementify();
+		var mem    = super.getMementify();
 
 		params[ "catalogBundleLineId" ] = rc.lineId;
-	
+
 		var rows = super.fire( "model.list", params );
 
 		var data = mem.convertList( rows, "list" );
@@ -59,15 +59,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
-	
+
 	function listFinishes( event, rc, prc ){
 		var data = [];
 
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var mem = super.getMementify();
+		var mem    = super.getMementify();
 
-		params[ "lineId" ] = rc.lineId;
+		params[ "lineId" ]            = rc.lineId;
 		params[ "productCategoryId" ] = rc.categoryId;
 
 		var rows = super.fire( "finish.list", params );
@@ -85,7 +85,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var mem = super.getMementify();
+		var mem    = super.getMementify();
 
 		var rows = super.fire( "quotation.search", params );
 		var data = mem.convertList( rows.getData(), "list" );
@@ -97,8 +97,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function save( event, rc, prc ) {
-        var json = DeserializeJSON(GetHTTPRequestData().content);
+	function save( event, rc, prc ){
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		var categories = [];
 

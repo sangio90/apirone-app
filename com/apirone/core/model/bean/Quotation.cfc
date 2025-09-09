@@ -1,9 +1,17 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "shortId", "quotationNumber", "versionNumber", "quotationDate", "billingProfile.name", "name", "status"],
-		profiles = {
-		}
+		defaultIncludes = [
+			"id",
+			"shortId",
+			"quotationNumber",
+			"versionNumber",
+			"quotationDate",
+			"billingProfile.name",
+			"name",
+			"status"
+		],
+		profiles = {}
 	}
 
 	property name="quotationNumber" type="String";
