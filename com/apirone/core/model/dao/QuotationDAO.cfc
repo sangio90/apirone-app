@@ -119,7 +119,6 @@
 
 	<cffunction name="insert" returntype="String">
 		<cfargument name="quotation" type="com.apirone.core.model.bean.Quotation" required="true">
-
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotations (
 				quotation,
@@ -131,16 +130,18 @@
 				opportunity_name,
 				lead_name,
 				active,
-				pricelist_id,
-				payment_method_id,
-				custom_payment_method,
-				currency_id,
 				status_id,
-				lang_id,
-				billing_profile_id,
-				shipping_profile_id,
-				sales_agent_account_id,
-				graphic_technician_account_id
+				lang_id
+				<cfif true == false>
+					,pricelist_id,
+					payment_method_id,
+					custom_payment_method,
+					currency_id,
+					billing_profile_id,
+					shipping_profile_id,
+					sales_agent_account_id,
+					graphic_technician_account_id
+				</cfif>
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -151,16 +152,18 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOpportunityName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLeadName()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getActive()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPricelist().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPaymentMethod().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomPaymentMethod()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCurrency().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLang().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getBillingProfile().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getShippingProfile().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getSalesAgentAccount().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getGraphicTechnicianAccount().getId()#">::uuid
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLang().getId()#">
+				<cfif true == false>
+					,<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPricelist().getId()#">::uuid,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPaymentMethod().getId()#">::uuid,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomPaymentMethod()#">,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCurrency().getId()#">::uuid,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getBillingProfile().getId()#">::uuid,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getShippingProfile().getId()#">::uuid,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getSalesAgentAccount().getId()#">::uuid,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getGraphicTechnicianAccount().getId()#">::uuid
+				</cfif>
 			)
 			RETURNING quotation_id
 		</cfquery>

@@ -1,6 +1,5 @@
 ﻿<cfoutput>
-
-    <div id="quotation-header-root">
+    <div id="quotation-detail-root">
 
         <div class="row mb-3">
             <div class="col-lg-6">
@@ -23,12 +22,12 @@
                             <nav>
                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                     <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="##nav-general" type="button" role="tab">Dati generali</button>
-                                    <button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button>
-                                    <button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Indirizzo di Fatturazione</button>
-                                    <button class="nav-link" id="nav-shipment-tab" data-bs-toggle="tab" data-bs-target="##nav-shipment" type="button" role="tab">Indirizzo di Spedizione</button>
-                                    <button class="nav-link" id="nav-print-tab" data-bs-toggle="tab" data-bs-target="##nav-print" type="button" role="tab">Stampa</button>
-                                    <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button>
-                                    <button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatario</button>
+                                    <!--- <button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button> --->
+                                    <!--- <button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Indirizzo di Fatturazione</button> --->
+                                    <!--- <button class="nav-link" id="nav-shipment-tab" data-bs-toggle="tab" data-bs-target="##nav-shipment" type="button" role="tab">Indirizzo di Spedizione</button> --->
+                                    <!--- <button class="nav-link" id="nav-print-tab" data-bs-toggle="tab" data-bs-target="##nav-print" type="button" role="tab">Stampa</button> --->
+                                    <!--- <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button> --->
+                                    <!--- <button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatario</button> --->
                                 </div>
                             </nav>
                             <div class="tab-content" id="nav-tabContent">
@@ -41,42 +40,53 @@
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
                                             <label class="control-label text-sm-end">Nome <span class="required">*</span></label>
-                                            <input type="text" name="description" class="form-control" id="description"
+                                            <input type="text" name="name" class="form-control" id="name"
+                                                data-bind="value: detailForm.data.name"
                                                 data-rule-required="true"
                                                 data-msg-required="Nome"
                                             >
                                         </div>
+                                        <div class="col-sm-2">
+                                            <label class="control-label text-sm-end">Numero <span class="required">*</span></label>
+                                            <input type="text" name="number" class="form-control" id="number"
+                                                data-bind="value: detailForm.data.number"
+                                                data-rule-required="true"
+                                                data-msg-required="Number"
+                                            >
+                                        </div>
                                         <div class="col-sm-3">
                                             <label class="control-label text-sm-end">Lingua <span class="required">*</span></label>
-                                            <select name="langId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <cfloop array="#prc.langs#" item="item">
-                                                    <option value="#item.getId()#">#item.getName()#</option>
-                                                </cfloop>
+                                            <select name="langId" class="form-control"
+                                                data-placeholder="-- Seleziona lingua"
+                                                data-bind="source: languages, value: detailForm.data.language.id"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
                                             </select>
                                         </div>
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-2">
                                             <label class="control-label text-sm-end">Data documento</label>
-                                            <input type="text" class="form-control" value="#DateFormat( now(), 'dd/mm/yyyy' )#" disabled>
+                                            <input type="date" class="form-control" data-bind="value: detailForm.data.quotationDate" disabled>
                                         </div>
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-2">
                                             <label class="control-label text-sm-end">Data validità <span class="required">*</span></label>
-                                            <input type="text" name="validity_date" class="form-control" value="#DateFormat( DateAdd( 'm', 1, now() ), 'dd/mm/yyyy' )#">
+                                            <input type="date" class="form-control" data-bind="value: detailForm.data.validityDate">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-9">
                                             <label class="control-label text-sm-end">Note</label>
-                                            <textarea name="note" class="form-control" rows="1"></textarea>
+                                            <textarea name="note" class="form-control" rows="1" data-bind="value: detailForm.data.notes"></textarea>
                                         </div>
                                         <div class="col-sm-3">
                                             <label class="control-label text-sm-end">Stato <span class="required">*</span></label>
-                                            <select name="statusId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <cfloop array="#prc.statusList#" item="item">
-                                                    <option value="#item.getId()#">#item.getName()#</option>
-                                                </cfloop>
+                                            <select name="statusId" class="form-control"
+                                                data-placeholder="-- Seleziona stato"
+                                                data-bind="source: statuses, value: detailForm.data.status.id"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
                                             </select>
                                         </div>
                                     </div>
@@ -84,14 +94,15 @@
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-5">
                                             <label class="control-label text-sm-end">Nome opportunità <span class="required">*</span></label>
-                                            <input type="text" name="opportunity_name" class="form-control">
+                                            <input type="text" data-bind="value: detailForm.data.opportunityName" class="form-control">
                                         </div>
                                         <div class="col-sm-5">
                                             <label class="control-label text-sm-end">Nome lead <span class="required">*</span></label>
-                                            <input type="text" name="lead_name" class="form-control">
+                                            <input type="text" data-bind="value: detailForm.data.leadName" class="form-control">
                                         </div>
                                         <div class="col-sm-2 pt-4">
-                                           <button class="btn btn-primary changeTab" id="fiscal">Dati fiscali &raquo;</button>
+                                           <!--- <button class="btn btn-primary changeTab" id="fiscal">Dati fiscali &raquo;</button> --->
+                                           <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div>
 
@@ -104,51 +115,47 @@
                                 <div class="tab-pane fade" id="nav-fiscal" role="tabpanel">
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end pt-2">Listino <span class="required">*</span></label>
-                                            <select name="pricelistId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <cfloop array="#prc.pricelist#" item="item">
-                                                    <option value="#item.getId()#">#item.getName()#</option>
-                                                </cfloop>
+                                            <label class="control-label text-sm-end">Listino <span class="required">*</span></label>
+                                            <select name="pricelist" class="form-control"
+                                                data-placeholder="-- Seleziona listino"
+                                                data-bind="source: pricelists, value: detailForm.data.pricelist.id"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
                                             </select>
                                         </div>
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end pt-2">Pagamento</label>
-                                            <select name="paymentMethodId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <cfloop array="#prc.paymentMethod#" item="item">
-                                                    <option value="#item.getId()#">#item.getName()#</option>
-                                                </cfloop>
+                                            <label class="control-label text-sm-end">Pagamento <span class="required">*</span></label>
+                                            <select name="paymentMethod" class="form-control"
+                                                data-placeholder="-- Seleziona metodo pagamento"
+                                                data-bind="source: paymentMethods, value: detailForm.data.paymentMethod.id"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
                                             </select>
                                         </div>
                                         <div class="col-sm-3 pt-2">
                                             <label class="control-label text-sm-end pb-2">Pagamento personalizzato</label>
-                                            <input type="text" name="custom_payment_method" class="form-control" id="custom_payment_method">
+                                            <input type="text" name="custom_payment_method" class="form-control" id="custom_payment_method" data-bind="value: detailForm.data.customPaymentMethod">
                                         </div>
                                         <div class="col-sm-3">
                                             <label class="control-label text-sm-end pt-2">Aliquota IVA</label>
-                                            <select name="vatCodeId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <option value="A">Iva A</option>
-                                                <option value="B">Iva B</option>
-                                                <option value="C">Iva C</option>
-                                                <option value="D">Iva D</option>
-                                            </select>
+                                            <input type="text" name="vatNumber" class="form-control" id="vatNumber" data-bind="value: detailForm.data.vatNumber">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Valuta</label>
-                                            <select name="currencyId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <cfloop array="#prc.currency#" item="item">
-                                                    <option value="#item.getId()#">#item.getName()#</option>
-                                                </cfloop>
+                                            <label class="control-label text-sm-end">Valuta <span class="required">*</span></label>
+                                            <select name="currency" class="form-control"
+                                                data-placeholder="-- Seleziona valuta"
+                                                data-bind="source: currencies, value: detailForm.data.currency.id"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
                                             </select>
                                         </div>
                                         <div class="col-sm-3 pt-4">
-
                                            <button class="btn btn-default changeTab" id="general">&laquo; Precedente &raquo;</button>
                                             <button class="btn btn-primary changeTab" id="billing">Fatturazione &raquo;</button>
                                         </div>
@@ -162,73 +169,70 @@
                                 <div class="tab-pane fade" id="nav-billing" role="tabpanel">
                                     
                                     <div class="form-group row mb-2">
-                                        <h1><span class="required">CONTINUA DA QUA!</span></h1>
-                                    </div>
-                                    
-                                    <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="invoiceData.name" class="form-control" data-bind="value: detailForm.data.invoiceData.name">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Ragione sociale</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="invoiceData.company" class="form-control" data-bind="value: detailForm.data.invoiceData.company">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Partita Iva</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="invoiceData.vatNumber" class="form-control" data-bind="value: detailForm.data.invoiceData.vatNumber">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Email</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="invoiceData.email" class="form-control" data-bind="value: detailForm.data.invoiceData.email">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Telefono</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="invoiceData.phone" class="form-control" data-bind="value: detailForm.data.invoiceData.phone">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Indirizzo</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="invoiceData.street" class="form-control" data-bind="value: detailForm.data.invoiceData.street">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Città</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="invoiceData.city" class="form-control" data-bind="value: detailForm.data.invoiceData.city">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">CAP</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
+                                            <input type="text" name="invoiceData.postalCode" class="form-control" data-bind="value: detailForm.data.invoiceData.postalCode">
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Nazione</label>
                                         <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <cfloop array="#prc.statusList#" item="item">
-                                                    <option value="#item.getId()#">#item.getName()#</option>
-                                                </cfloop>
+                                            <select name="invoiceData.country" class="form-control"
+                                                data-placeholder="-- Seleziona Nazione"
+                                                data-bind="source: countries, value: detailForm.data.invoiceData.country.id, events: { change: loadInvoiceStates }"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
                                             </select>
                                         </div>
                                     </div>
@@ -236,29 +240,131 @@
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-3 control-label text-sm-end pt-2">Provincia</label>
                                         <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <option value="REF">22%</option>
+                                            <select name="invoiceData.state" class="form-control"
+                                                data-placeholder="-- Seleziona Provincia"
+                                                data-bind="source: filteredInvoiceStates, value: detailForm.data.invoiceData.state.id"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
                                             </select>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-9 offset-sm-3">
-
-                                            <button class="btn btn-default">&laquo; Precedente &raquo;</button>
-                                            <button class="btn btn-primary">Successivo &raquo;</button>
-
+                                           <button class="btn btn-default changeTab" id="fiscal">&laquo; Precedente &raquo;</button>
+                                           <button class="btn btn-primary changeTab" id="shipment">Spedizione &raquo;</button>
                                         </div>
                                     </div>                                    
 
-                                </div>                                
-                
+                                </div>     
+                            
+                                <!---
+                                    shipment
+                                --->
+                                <div class="tab-pane fade" id="nav-shipment" role="tabpanel">
+                                                                        
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="shipmentData.name" class="form-control" data-bind="value: detailForm.data.shipmentData.name">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Ragione sociale</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="shipmentData.company" class="form-control" data-bind="value: detailForm.data.shipmentData.company">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Partita Iva</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="shipmentData.vatNumber" class="form-control" data-bind="value: detailForm.data.shipmentData.vatNumber">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Email</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="shipmentData.email" class="form-control" data-bind="value: detailForm.data.shipmentData.email">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Telefono</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="shipmentData.phone" class="form-control" data-bind="value: detailForm.data.shipmentData.phone">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Indirizzo</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="shipmentData.street" class="form-control" data-bind="value: detailForm.data.shipmentData.street">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Città</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="shipmentData.city" class="form-control" data-bind="value: detailForm.data.shipmentData.city">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">CAP</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" name="shipmentData.postalCode" class="form-control" data-bind="value: detailForm.data.shipmentData.postalCode">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nazione</label>
+                                        <div class="col-sm-9">
+                                            <select name="shipmentData.country" class="form-control"
+                                                data-placeholder="-- Seleziona Nazione"
+                                                data-bind="source: countries, value: detailForm.data.shipmentData.country.id, events: { change: loadShipmentStates }"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-3 control-label text-sm-end pt-2">Provincia</label>
+                                        <div class="col-sm-9">
+                                            <select name="shipmentData.state" class="form-control"
+                                                data-placeholder="-- Seleziona Provincia"
+                                                data-bind="source: filteredShipmentStates, value: detailForm.data.shipmentData.state.id"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                            >
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <div class="col-sm-9 offset-sm-3">
+                                           <button class="btn btn-default changeTab" id="billing">&laquo; Precedente &raquo;</button>
+                                           <button class="btn btn-primary changeTab" id="print">Stampa &raquo;</button>
+                                        </div>
+                                    </div> 
+                                </div>
+
                                 <!---
                                     print
                                 --->
                                 <div class="tab-pane fade" id="nav-print" role="tabpanel">
                                     <p>print</p>
+                                    <div class="form-group row mb-2">
+                                        <div class="col-sm-9 offset-sm-3">
+                                           <button class="btn btn-default changeTab" id="shipment">&laquo; Precedente &raquo;</button>
+                                           <button class="btn btn-primary changeTab" id="discount">Sconti/Costi &raquo;</button>
+                                        </div>
+                                    </div> 
                                 </div>
                             
                                 <!---
@@ -266,82 +372,13 @@
                                 --->
                                 <div class="tab-pane fade" id="nav-discount" role="tabpanel">
                                     <p>price / discount</p>
-                                </div>
-                            
-                                <!---
-                                    shipment
-                                --->
-                                <div class="tab-pane fade" id="nav-shipment" role="tabpanel">
-
-                                </div>
-
-
-                                    <!-----------
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Ragione sociale</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Indirizzo</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Città</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">CAP</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="str" class="form-control">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nazione</label>
-                                        <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <option value="REF">22%</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Provincia</label>
-                                        <div class="col-sm-9">
-                                            <select name="statusId" class="form-control">
-                                                <option value="">-- selezionare</option>
-                                                <option value="REF">22%</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-9 offset-sm-3">
-
-                                            <button class="btn btn-default">&laquo; Precedente &raquo;</button>
-                                            <button class="btn btn-primary">Successivo &raquo;</button>
-
+                                           <button class="btn btn-default changeTab" id="print">&laquo; Precedente &raquo;</button>
+                                           <button class="btn btn-primary changeTab" id="assignment">Assegnatario &raquo;</button>
                                         </div>
-                                    </div>
-                                    ----->
-
+                                    </div> 
+                                </div>
 
                                 <!---
                                     assignment
@@ -360,8 +397,7 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-9 offset-sm-3">
-
-                                            <button class="btn btn-default">&laquo; Precedente &raquo;</button>
+                                           <button class="btn btn-primary changeTab" id="discount">Precendete &raquo;</button>
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
 
                                         </div>

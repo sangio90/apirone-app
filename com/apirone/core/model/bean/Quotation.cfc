@@ -1,12 +1,11 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "shortId", "quotationNumber", "versionNumber", "quotationDate", "billingProfile.name", "status"],
+		defaultIncludes = [ "id", "shortId", "quotationNumber", "versionNumber", "quotationDate", "billingProfile.name", "name", "status"],
 		profiles = {
 		}
 	}
 
-	property name="quotation" type="String"; //TODO: to remove
 	property name="quotationNumber" type="String";
 	property name="versionNumber" type="Numeric";
 	property name="quotationDate" type="Date";

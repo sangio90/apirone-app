@@ -88,7 +88,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mem = super.getMementify();
 
 		var rows = super.fire( "quotation.search", params );
-
 		var data = mem.convertList( rows.getData(), "list" );
 
 		result.setTotal( rows.getTotal() );
@@ -98,8 +97,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function save( event, rc, prc ){
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+	function save( event, rc, prc ) {
+        var json = DeserializeJSON(GetHTTPRequestData().content);
 
 		var categories = [];
 
@@ -112,25 +111,25 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotation = super.bean( "Quotation" );
 
 		quotation.setId( json.id );
-		quotation.setName( json.description );
-		quotation.setQuotationNumber( json.quotation_number );
-		quotation.setVersionNumber( json.version_number );
-		quotation.setQuotationDate( json.quotation_date );
+		quotation.setName( json.name );
+		quotation.setQuotationNumber( json.number );
+		quotation.setVersionNumber( json.version );
+		quotation.setQuotationDate( json.quotationDate );
 		quotation.setNotes( json.notes );
-		quotation.setValidityDate( json.validity_date );
-		quotation.setOpportunityName( json.opportunity_name );
-		quotation.setLeadName( json.lead_name );
-		quotation.setActive( json.active );
-		quotation.setCustomPaymentMethod( json.custom_payment_method );
-		quotation.setPricelist( type.setId( json.pricelist.id ) );
-		quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
-		quotation.setCurrency( type.setId( json.currency.id ) );
-		quotation.setStatus( type.setId( json.status.id ) );
-		quotation.setLang( type.setId( json.lang.id ) );
-		quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
-		quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
-		quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
-		quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
+		quotation.setValidityDate( json.validityDate );
+		quotation.setOpportunityName( json.opportunityName );
+		quotation.setLeadName( json.leadName );
+		quotation.setActive( true );
+		quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
+		quotation.setLang( super.fire( "lang.get", [ json.language.id ] ) );
+		// quotation.setCustomPaymentMethod( json.custom_payment_method );
+		// quotation.setPricelist( type.setId( json.pricelist.id ) );
+		// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
+		// quotation.setCurrency( type.setId( json.currency.id ) );
+		// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
+		// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
+		// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
+		// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
 
 		if ( !Len( json.id ) ) {
 			messageId = "quotation.created";

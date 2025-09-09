@@ -352,6 +352,8 @@ AP.signage.modal = ( function() {
                         } 
                         if ( xhr.status == "SUCCESS" ) {
                             AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
+                            viewModel.set( "detailForm", defaultDetailForm );
+                            setTimeout( () => $( "#signage-modal" ).modal( "hide" ), 1000 );
                         }
                     }
                 }
@@ -417,6 +419,7 @@ AP.signage.modal = ( function() {
     };
 
     pub.init = function() {
+
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
 
         var signageLines = new kendo.data.DataSource();

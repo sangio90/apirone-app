@@ -297,6 +297,7 @@
 		get( "/quotations" ).to( "QuotationController.list" ).end();
 
 		post("/ajax/quotation-items").to( "QuotationItemAjaxController.save" ).end();
+		post("/ajax/quotations").to( "QuotationAjaxController.save" ).end();
 
 		/*
 			roles

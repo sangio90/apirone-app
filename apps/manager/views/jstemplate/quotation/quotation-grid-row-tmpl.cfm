@@ -4,7 +4,7 @@
     <nmscript type="text/x-kendo-template" id="quotation-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td>
-                <span data-bind="text: billingProfile.name"></span>
+                <span data-bind="text: name"></span>
             </td>
             <td>
                 <span data-bind="text: quotationNumber"></span>/<span data-bind="text: versionNumber"></span>

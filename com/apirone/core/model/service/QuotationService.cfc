@@ -331,16 +331,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setLeadName( record.lead_name );
 			bean.setActive( record.active );
 			bean.setCustomPaymentMethod( record.custom_payment_method );
-
-			bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
-			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
-			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setLang( getLangService().get( record.lang_id ) );
-			bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
-			bean.setShippingProfile( getProfileService().get( record.shipping_profile_id ) );
-			bean.setSalesAgentAccount( getAccountService().get( record.sales_agent_account_id ) );
-			bean.setGraphicTechnicianAccount( getAccountService().get( record.graphic_technician_account_id ) );
+
+			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
+			// bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
+			// bean.setCurrency( getCurrencyService().get( record.currency_id ) );
+			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
+			// bean.setShippingProfile( getProfileService().get( record.shipping_profile_id ) );
+			// bean.setSalesAgentAccount( getAccountService().get( record.sales_agent_account_id ) );
+			// bean.setGraphicTechnicianAccount( getAccountService().get( record.graphic_technician_account_id ) );
 
 			return bean;
 		}

@@ -53,7 +53,7 @@
 								#grid(
 									id      = "quotation-grid",
 									columns = "[
-                                        { 'field':'billingProfile.name', 'title':'Cliente' },
+                                        { 'field':'name', 'title':'Nome' },
                                         { 'field':'quotationNumber', 'title':'Numero', width: '15%' },
                                         { 'field':'quotationDate', 'title':'Data', width: '15%'},
                                         { 'field':'status', 'title':'Stato', width: '15%'},
