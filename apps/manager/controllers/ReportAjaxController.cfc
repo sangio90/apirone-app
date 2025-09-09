@@ -1,26 +1,22 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function list( event, rc, prc ){
+	function list( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var dm     = super.getDatamapper();
 
-        var data = [];
-        var result = super.getResult();
-        var dm = super.getDatamapper();
-        
-        var rows = super.fire( "report.search" ).getData();
+		var rows = super.fire( "report.search" ).getData();
 
-        for ( var row in rows ) {
+		for ( var row in rows ) {
+			var obj = dm.convert( row, "Report", true );
+			data.add( obj );
+		}
 
-            var obj = dm.convert( row, "Report", true );
-            data.add( obj );
+		result.setTotal( rows.len() );
+		result.setCount( rows.len() );
+		result.setData( data );
 
-        }
-
-        result.setTotal( rows.len() );
-        result.setCount( rows.len() );
-        result.setData( data );
-
-        event.setValue( "result", result );
-        
-    }
+		event.setValue( "result", result );
+	}
 
 }
