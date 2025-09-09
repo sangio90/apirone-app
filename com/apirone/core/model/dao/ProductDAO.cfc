@@ -152,7 +152,7 @@
 					<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">
 				<cfelse>
 					<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">
-				</cfif>	
+				</cfif>
 				,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Other" value="#SerializeJSON( lines )#">
@@ -254,7 +254,7 @@
 				 catalog_bundle_id in (
 					SELECT catalog_bundle_id
 					FROM catalog_bundles
-					WHERE 
+					WHERE
 						product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">::uuid AND
 						line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				)

@@ -170,7 +170,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public String function create( required com.apirone.core.model.bean.Product product ){
-		if (IsInstanceOf(arguments.product, "com.apirone.core.model.bean.ProductComplex")) {
+		if ( IsInstanceOf( arguments.product, "com.apirone.core.model.bean.ProductComplex" ) ) {
 			var catalogBundleId = getCatalogBundleService().getOrCreate( arguments.product.getCatalogBundle() );
 			arguments.product.setCatalogBundle( catalogBundleId );
 		}
@@ -234,7 +234,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productId );
 
 		if ( record.recordCount ) {
-			if (IsNull(record.catalog_bundle_id)) {
+			if ( IsNull( record.catalog_bundle_id ) ) {
 				var bean = super.bean( "ProductBase" );
 				bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
 				bean.setCode( record.code );
@@ -244,7 +244,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} else {
 				var bean = super.bean( "ProductComplex" );
 				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
-				bean.setFinish( !IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue() );
+				bean.setFinish(
+					!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()
+				);
 			}
 
 			bean.setId( record.product_id );
