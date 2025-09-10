@@ -538,7 +538,7 @@ AP.component.list = ( function() {
             viewModel.set( "variantsTitle", event.data.name + " <small class='fs-10'>(" + event.data.id + ")</small>" );
 
             variants.data( event.data.variants );
-            // colors.data( [] );
+            colors.data( [] );
 
             return false;
         },
