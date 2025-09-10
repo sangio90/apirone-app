@@ -1,8 +1,9 @@
-component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-    public ProcessingType function init(){
+	this.memento = { defaultIncludes = [ "id", "name" ] }
 
-        return this;
-    }
+	public ProcessingType function init(){
+		return this;
+	}
 
 }

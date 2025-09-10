@@ -1,10 +1,11 @@
 component extends="com.apirone.core.controller.AbsController" {
+
 	function list( event, rc, prc ){
-		var data = [];
-		var result = super.getResult();
-		var params = super.paramsFromUrl();
-		params['quotationId'] = rc.quotationId;
-		
+		var data                = [];
+		var result              = super.getResult();
+		var params              = super.paramsFromUrl();
+		params[ "quotationId" ] = rc.quotationId;
+
 		var rows = super.fire( "QuotationZone.search", params );
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );

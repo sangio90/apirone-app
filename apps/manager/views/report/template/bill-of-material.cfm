@@ -1,42 +1,40 @@
 <cfoutput>
 
-    <!--- TODO: better than this --->
-    <cfset productItemService = server["wirebox-apirone"].getInstance("ProductItemService")>
-    <cfset componentService = server["wirebox-apirone"].getInstance("ComponentService")>
-
     <cfdocument attributeCollection="#args.pdfArgs#">
 
         #importPrintStyle()#
 
         <h2>#args.title#</h2>
 
-        <h3>Dell'articolo</h3>
+        <div>
+            <cfloop collection="#args.filters#" item="value" index="key">
+                Filtri: <b>#key#:</b> #value# &nbsp;&nbsp;
+            </cfloop>
+        </div>
 
-        <cfloop array="#args.rows#" index="row">
-        </cfloop>
+        <cfloop array="#args.data.products#" index="row">
+            <div><h3>#row.title#</h3></div>
 
-        <h3>Degli attributi</h3>
+            <h3>Dell'articolo</h3>
 
-        <cfloop array="#args.rows#" index="row">
-            <cfset productItems = productItemService.getFlatTree( productId = row.id, includeMissingValues = false )>
-            <div><h3>#row.category.name# - #row.line.name# #row.model.name# - #row.finish.name#</h3></div>
+
+            <h3>Degli attributi</h3>
             <div>
-                <cfloop array="#productItems#" item="productItem">
+                <cfloop array="#row.productItems#" item="productItem">
                     <div style="margin-bottom: 7px;">
-                    <cfset components = componentService.list( productItemId=productItem.getId(), includeBaseAttributeComponents=true )>
 
-                    <i style="display:block;">#productItem.getAttribute().getName()# #productItem.getAttributeValue().getRawValue().getName()# (#components.len()#) </i>
+                    <i style="display:block;">#productItem.attribute.name#: #productItem.attributeValue.rawValue.name# (#productItem.components.len()#) </i>
                     
-                    <cfloop array="#components#" item="component">
-                        - <b>#component.getQuantity()# 
+                    <cfloop array="#productItem.components#" item="component">
+                        - <b>#component.quantity# 
 
-                            <cfif component.getTypeId() == "base">
-                                + #component.getOverride().getQuantity()# = #component.getTotalQuantity()#
+                            <cfif component.typeId == "base">
+                                + #component.override.quantity# = #component.totalQuantity#
                             </cfif>
-                            
-                            #component.getRawProduct().getMeasurementUnit().getId()#</b> x #component.getRawProduct().getName()# 
-                            - #component.getColor().getName()# 
-                            - #component.getVariant().getName()#<br/>
+
+                            #component.rawProduct.measurementUnit.id#</b> x #component.rawProduct.name# 
+                            - #component.color.name# 
+                            - #component.variant.name#<br/>
                     </cfloop>
                     </div>
                 </cfloop>

@@ -1,28 +1,50 @@
-component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-    property name="rawProduct" type="com.apirone.core.model.bean.RawProduct";
-    property name="variant" type="com.apirone.core.model.bean.Variant";
-    property name="color" type="com.apirone.core.model.bean.Color";
-    property name="quantity" type="Numeric";
+	this.memento = {
+		defaultIncludes = [
+			"id",
+			"shortId",
+			"rawProduct",
+			"variant",
+			"color",
+			"quantity"
+		],
+		profiles = {
+			list = {
+				defaultIncludes = [
+					"id",
+					"rawProduct",
+					"variant",
+					"color",
+					"quantity",
+					"override",
+					"status",
+					"typeId",
+					"totalQuantity"
+				]
+			}
+		}
+	}
 
-    property name="override" type="com.apirone.core.model.bean.ComponentOverride";
-    property name="status" type="com.apirone.core.model.bean.Status";
-    property name="typeId" type="String" default="own"; //own or base
+	property name="rawProduct" type="com.apirone.core.model.bean.RawProduct";
+	property name="variant" type="com.apirone.core.model.bean.Variant";
+	property name="color" type="com.apirone.core.model.bean.Color";
+	property name="quantity" type="Numeric";
 
-    public Component function init(){
+	property name="override" type="com.apirone.core.model.bean.ComponentOverride";
+	property name="status" type="com.apirone.core.model.bean.Status";
+	property name="typeId" type="String" default="own"; // own or base
 
-        return this;
-        
-    }
-    
-    public Numeric function getTotalQuantity(){
+	public Component function init(){
+		return this;
+	}
 
-        if( IsNull( this.getOverride() ) ) {
-            return this.getQuantity();
-        }
+	public Numeric function getTotalQuantity(){
+		if ( IsNull( this.getOverride() ) ) {
+			return this.getQuantity();
+		}
 
-        return Val( this.getQuantity() ) + Val( this.getOverride().getQuantity() );
-
-    }
+		return Val( this.getQuantity() ) + Val( this.getOverride().getQuantity() );
+	}
 
 }

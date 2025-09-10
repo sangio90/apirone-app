@@ -115,35 +115,88 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title       = "Distinte basi";
 		param rc.report = "bill-of-material";
 
+		var memy = super.getMementify();
+
+		var searchArgs = {};
+		var filters    = {};
+
+		if ( Len( rc.lineId ) ) {
+			var line = super.service( "line" ).get( rc.lineId );
+
+			searchArgs.lineId  = rc.lineId;
+			filters[ "Linea" ] = line.getName();
+		}
+
+		if ( Len( rc.categoryId ) ) {
+			var category = super.service( "productCategory" ).get( rc.categoryId )
+
+			searchArgs.lineId      = rc.lineId;
+			filters[ "Categoria" ] = category.getName();
+		}
+
+		if ( Len( rc.modelId ) ) {
+			var model = super.service( "model" ).get( rc.modelId )
+
+			searchArgs.modelId   = rc.modelId;
+			filters[ "Modello" ] = model.getName();
+		}
+
+		if ( Len( rc.statusId ) ) {
+			var status = super.service( "status" ).get( rc.statusId )
+
+			searchArgs.statusId = rc.statusId;
+			filters[ "Status" ] = status.getName();
+		}
+
+		var products = super.fire( "product.search", searchArgs );
+
+		var data.products = [];
+
+		for ( var product in products.getData() ) {
+			var row = {}
+
+			row[ "title" ] = "#product.getCategory().getName()# - #product.getLine().getName()# #product.getModel().getName()# - #product.getFinish().getName()#"
+
+			var productItems = service( "ProductItem" ).getFlatTree(
+				productId            = product.getId(),
+				includeMissingValues = false
+			);
+
+			var items = [];
+
+			for ( var productItem in productItems ) {
+				var item = {};
+
+				item = memy.convert( productItem, "list" );
+
+				var components = service( "component" ).list(
+					productItemId                  = productItem.getId(),
+					includeBaseAttributeComponents = true
+				);
+
+				item[ "components" ] = memy.convertList( components, "list" );
+
+				items.add( item )
+			}
+
+			row[ "productItems" ] = items;
+
+			data.products.add( row );
+		}
+
 		var params = {
-			lineId     = Len( rc.lineId ) ? rc.lineId : NullValue(),
-			modelId    = Len( rc.modelId ) ? rc.modelId : NullValue(),
-			categoryId = Len( rc.categoryId ) ? rc.categoryId : NullValue(),
-			statusId   = Len( rc.statusId ) ? rc.statusId : NullValue()
-		};
-
-		var result = super.fire( "product.search", params );
-
-		// var filename = ExpandPath( "/../repository/private/_tmp/#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf" );
-
-		var data = {
 			title   = "Distinte basi",
-			rows    = super.getMementify().convertList( result.getData(), "list" ),
+			filters = filters,
+			data    = data,
 			pdfArgs = {
-				bookmark          = "yes",
-				backgroundVisible = "yes",
+				bookmark          = true,
+				backgroundVisible = true,
 				orientation       = "portrait",
 				pagetype          = "A4",
 				overwrite         = true,
 				fontembed         = "true",
 				saveasname        = "#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
-			},
-			columns = [
-				{ title = "ID" },
-				{ title = "Linea" },
-				{ title = "Modello" },
-				{ title = "Finitura" }
-			]
+			}
 		}
 
 		// var bean = super.bean( "PrintList" );
@@ -151,7 +204,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		// prc.printData = data;
 
-		event.renderData( data = renderView( view = "report/template/#rc.report#", args = data ), type = "PDF" );
+		event.renderData( data = renderView( view = "report/template/#rc.report#", args = params ), type = "PDF" );
 
 		// var binary = FileReadBinary( filename );
 		// event.renderData(data=binary,type="PDF");

@@ -1,11 +1,11 @@
-component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-    property name="colors" type="com.apirone.core.model.bean.Color[]";
+	this.memento = { defaultIncludes = [ "id", "name" ] }
 
-    public Variant function init(){
+	property name="colors" type="com.apirone.core.model.bean.Color[]";
 
-        return this;
-        
-    }
+	public Variant function init(){
+		return this;
+	}
 
 }

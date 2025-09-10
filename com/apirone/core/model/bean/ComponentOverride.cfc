@@ -1,22 +1,34 @@
-component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-    property name="componentId" type="Numeric";
-    property name="productItemId" type="Numeric";
+	this.memento = {
+		defaultIncludes = [
+			"id",
+			"quantity",
+			"deleted",
+			"productItemId",
+			"componentId"
+		]
+	}
 
-    property name="quantity" type="Numeric";
-    property name="deleted" type="Boolean";
+	property name="componentId" type="Numeric";
+	property name="productItemId" type="Numeric";
 
-    public ComponentOverride function init(){
+	property name="quantity" type="Numeric";
+	property name="deleted" type="Boolean";
 
-        this.setQuantity( 0 );
-        this.setDeleted( false );
-        
-        return this;
-        
-    }
+	public ComponentOverride function init(){
+		this.setQuantity( 0 );
+		this.setDeleted( false );
+
+		return this;
+	}
 
 	public Struct function extractIds(){
-		return { "id": getId(), "componentId": getComponentId(), "productItemId": getProductItemId() };
+		return {
+			"id"            = getId(),
+			"componentId"   = getComponentId(),
+			"productItemId" = getProductItemId()
+		};
 	}
-   
+
 }

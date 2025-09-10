@@ -3,7 +3,7 @@
 </cffunction>
 
 <cffunction name="importPrintStyle">
-    <cfreturn "<style>body, td, th, span, div { font-family: 'Poppins'; font-size: 13px };</style>">
+    <cfreturn "<style>body, td, th, span, div, p { font-family: 'Poppins'; font-size: 13px };</style>">
 </cffunction>
 
 <cffunction name="getPrintFooter">

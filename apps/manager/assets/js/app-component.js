@@ -101,7 +101,7 @@ AP.component.list = ( function() {
 
             case "product":
 
-                result.modalTitle = "Componenti base per il prodotto: " + current.product.name;
+                result.modalTitle = "Componenti per il prodotto: " + current.product.name;
                 result.readUrl = baseUrl + "?by=product&productId=" + current.product.id;
                 result.modifyUrl = result.readUrl;
 
@@ -109,7 +109,7 @@ AP.component.list = ( function() {
 
             case "attributeValue":
 
-                result.modalTitle = "Componenti base per il valore: " + current.attribute.name + " / " + current.rawValue.name;
+                result.modalTitle = "Componenti per il valore: " + current.attribute.name + " / " + current.rawValue.name;
                 result.readUrl = baseUrl + "?by=attributeValue&attributeValueId=" + current.attributeValue.id;
                 result.modifyUrl = result.readUrl;
 

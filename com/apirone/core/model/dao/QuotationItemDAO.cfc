@@ -29,10 +29,10 @@
 				*
 			FROM quotation_items
 				LEFT JOIN signage_config_items USING (signage_config_item_id)
-			WHERE 1=1 
+			WHERE 1=1
 				<cfif !IsNull( arguments.quotationId )>
 					AND quotation_items.quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationId#">::uuid
-				</cfif>	
+				</cfif>
 				<cfif !IsNull( arguments.quotationZoneId )>
 					AND quotation_zone_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationZoneId#">::uuid
 				</cfif>
