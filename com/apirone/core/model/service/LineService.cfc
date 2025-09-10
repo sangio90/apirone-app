@@ -140,7 +140,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					getComponentOverrideService().create( overrideBean );
 				} else {
 					var newComponent = Duplicate( thisComponent );
-					q
 
 					newComponent.setId( "" );
 					newComponent.getProductItem().setId( newProductItemId );
