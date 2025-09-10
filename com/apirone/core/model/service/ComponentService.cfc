@@ -47,6 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Result function search(
+		// TODO: add category
 		String lineId,
 		String modelId,
 		String productId,
@@ -104,7 +105,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	public com.apirone.core.model.bean.Outcome function deleteByParams( 
+	public com.apirone.core.model.bean.Outcome function deleteByParams(
 		required  com.apirone.core.model.bean.Component component
 	){
 		var outcome = super.bean( "Outcome" );

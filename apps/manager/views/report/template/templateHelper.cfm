@@ -1,5 +1,5 @@
 ﻿<cffunction name="getPrintHeader">
-    <cfreturn "<div><img src='/assets/main/img/logo.png' alt='Apir' style='width: 100%; height: 60px;'><div>">
+    <cfreturn "<img src='/assets/main/img/logo.png' alt='Apir' style='width: 100%; height: 40px;'>">
 </cffunction>
 
 <cffunction name="importPrintStyle">
@@ -24,3 +24,21 @@
     <cfreturn local.html>
 
 </cffunction>
+
+<cffunction name="printComponents">
+    <!--- print components by a struct --->
+    <cfargument name="components" required=true>
+    <cfloop array="#components#" item="component">
+        <cfoutput>
+        - #component.shortId# - <b>#component.quantity# 
+
+            <cfif component?.typeId == "base">
+                + #component.override.quantity# = #component.totalQuantity#
+            </cfif>
+
+            #component.rawProduct.measurementUnit.id#</b> x #component.rawProduct.name# 
+            - #component.variant.name# (#component.variant.id#)
+            - #component.color.name# (#component.color.id#)<br/>
+        </cfoutput> 
+    </cfloop>
+</cffunction>   

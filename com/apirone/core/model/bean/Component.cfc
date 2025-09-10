@@ -7,12 +7,14 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			"rawProduct",
 			"variant",
 			"color",
-			"quantity"
+			"quantity",
+			"typeId",
 		],
 		profiles = {
 			list = {
 				defaultIncludes = [
 					"id",
+					"shortId",
 					"rawProduct",
 					"variant",
 					"color",

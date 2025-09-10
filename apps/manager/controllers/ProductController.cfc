@@ -150,12 +150,34 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var products = super.fire( "product.search", searchArgs );
 
-		var data.products = [];
+		var data = {};
+
+		data.products = [];
+
+		var blundlesCreated = {};
 
 		for ( var product in products.getData() ) {
 			var row = {}
 
-			row[ "title" ] = "#product.getCategory().getName()# - #product.getLine().getName()# #product.getModel().getName()# - #product.getFinish().getName()#"
+			row.line   = memy.convert( product.getLine() );
+			row.model  = memy.convert( product.getModel() );
+			row.finish = memy.convert( product.getFinish() );
+
+			row.bundle = {};
+
+			if ( !blundlesCreated.keyExists( "#lineId#__#modelId#" ) ) {
+				row[ "bundle" ][ "#lineId#__#modelId#" ] = memy.convertList(
+					service( "component" ).list( lineId = lineId, modelId = modelId )
+				);
+
+				blundlesCreated[ "#lineId#__#modelId#" ] = true;
+			}
+
+			var components = service( "component" ).list( productId = product.getId() );
+
+			row[ "components" ] = memy.convertList( components, "list" );
+
+			row[ "title" ] = "#product.getCategory().getName()# - #product.getLine().getName()# - #product.getModel().getName()# (#product.getModel().getCode()#) - #product.getFinish().getName()#"
 
 			var productItems = service( "ProductItem" ).getFlatTree(
 				productId            = product.getId(),
@@ -169,12 +191,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				item = memy.convert( productItem, "list" );
 
-				var components = service( "component" ).list(
+				var itemComponents = service( "component" ).list(
 					productItemId                  = productItem.getId(),
 					includeBaseAttributeComponents = true
 				);
 
-				item[ "components" ] = memy.convertList( components, "list" );
+				item[ "components" ] = memy.convertList( itemComponents, "list" );
 
 				items.add( item )
 			}
@@ -191,7 +213,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			pdfArgs = {
 				bookmark          = true,
 				backgroundVisible = true,
-				orientation       = "portrait",
+				orientation       = "landscape",
 				pagetype          = "A4",
 				overwrite         = true,
 				fontembed         = "true",

@@ -2,6 +2,14 @@
 
     <cfdocument attributeCollection="#args.pdfArgs#">
 
+        <cfdocumentitem type="header">
+            #getPrintHeader()#
+        </cfdocumentitem>
+
+        <cfdocumentitem type="footer">
+            #getPrintFooter()#
+        </cfdocumentitem>
+
         #importPrintStyle()#
 
         <h2>#args.title#</h2>
@@ -12,38 +20,44 @@
             </cfloop>
         </div>
 
-        <cfloop array="#args.data.products#" index="row">
-            <div><h3>#row.title#</h3></div>
+        <cfset blundlesPrinted = {}>
+
+        <cfloop array="#args.data.products#" index="product">
+
+            <div style="border-bottom:1px solid ##EAEAEA; padding: 15px 0"></div>
+
+            <div><h3>Articolo: #product.title#</h3></div>
+
+            <cfset key = product.line.id & '__' & product.model.id>
+
+            <!--- l stampiamo una volta soltanto --->
+            <cfif product.bundle.keyExists( key ) AND !blundlesPrinted.keyExists( key )>
+                <div style="background-color: ##EAEAEA; padding: 10px;">
+                    <h3>Linea/modello</h3>
+                    <div>
+                        #printComponents( product.bundle[ key ] )#
+                    </div>  
+
+                    <cfset blundlesPrinted[ "#lineId#__#modelId#" ] = true>
+                </div>
+
+            </cfif>
 
             <h3>Dell'articolo</h3>
-
+            <div>
+                #printComponents( product.components )#
+            </div>  
 
             <h3>Degli attributi</h3>
             <div>
-                <cfloop array="#row.productItems#" item="productItem">
+                <cfloop array="#product.productItems#" item="productItem">
                     <div style="margin-bottom: 7px;">
-
-                    <i style="display:block;">#productItem.attribute.name#: #productItem.attributeValue.rawValue.name# (#productItem.components.len()#) </i>
-                    
-                    <cfloop array="#productItem.components#" item="component">
-                        - <b>#component.quantity# 
-
-                            <cfif component.typeId == "base">
-                                + #component.override.quantity# = #component.totalQuantity#
-                            </cfif>
-
-                            #component.rawProduct.measurementUnit.id#</b> x #component.rawProduct.name# 
-                            - #component.color.name# 
-                            - #component.variant.name#<br/>
-                    </cfloop>
+                        <i style="display:block;">#productItem.attribute.name#: #productItem.attributeValue.rawValue.name# (#productItem.components.len()#) </i>
+                        #printComponents( productItem.components )#
                     </div>
                 </cfloop>
             </div>            
         </cfloop>
-        
-        <cfdocumentitem type="footer">
-            #getPrintFooter()#
-        </cfdocumentitem>
     
     </cfdocument>
 
