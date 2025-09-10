@@ -5,7 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="quotationItemSvc" inject="QuotationItemService";
 	property name="quotationItemProductSvc" inject="QuotationItemProductService";
 	property name="quotationItemProductItemSvc" inject="QuotationItemProductItemService";
-	property name="quotationItemZoneSvc" inject="QuotationItemZoneService";
+	property name="quotationZoneSvc" inject="QuotationZoneService";
 	property name="quotationItemPositionSvc" inject="QuotationItemPositionService";
 	property name="AccountService" inject="AccountService";
 	property name="ProfileService" inject="ProfileService";
@@ -255,7 +255,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			// tutte le zone
-			var quotationItemZones              = quotationItemZoneSvc.list( quotationItemId = quotationItem.getId() );
+			var quotationItemZones              = quotationZoneSvc.list( quotationItemId = quotationItem.getId() );
 			// solo le zone senza parent
 			var quotationItemZonesWithoutParent = ArrayFilter( quotationItemZones, function( quotationItemZone ){
 				return IsNull( quotationItemZone.getOrigin() );
@@ -265,8 +265,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var clonedQuotationItemZone = Duplicate( quotationItemZone );
 				clonedQuotationItemZone.setId( Javacast( "null", "" ) );
 				clonedQuotationItemZone.setQuotationItem( quotationItemSvc.get( newQuotationItemId ) );
-				var newQuotationItemZoneId                       = quotationItemZoneSvc.create( clonedQuotationItemZone );
-				clonedQuotationItemZone                          = quotationItemZoneSvc.get( newQuotationItemZoneId );
+				var newQuotationItemZoneId                       = quotationZoneSvc.create( clonedQuotationItemZone );
+				clonedQuotationItemZone                          = quotationZoneSvc.get( newQuotationItemZoneId );
 				// mappo l'id vecchio con l'id nuovo delle zone senza parent
 				quotationZoneIdsMap[ quotationItemZone.getId() ] = newQuotationItemZoneId;
 
@@ -289,9 +289,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				clonedQuotationItemZone.setQuotationItem( quotationItemSvc.get( newQuotationItemId ) );
 				// recupera il nuovo id del parent dalla mappa
 				var newParentId = quotationZoneIdsMap[ quotationItemZone.getOrigin().getId() ];
-				clonedQuotationItemZone.setOrigin( quotationItemZoneSvc.get( newParentId ) );
-				var newQuotationItemZoneId = quotationItemZoneSvc.create( clonedQuotationItemZone );
-				clonedQuotationItemZone    = quotationItemZoneSvc.get( newQuotationItemZoneId );
+				clonedQuotationItemZone.setOrigin( quotationZoneSvc.get( newParentId ) );
+				var newQuotationItemZoneId = quotationZoneSvc.create( clonedQuotationItemZone );
+				clonedQuotationItemZone    = quotationZoneSvc.get( newQuotationItemZoneId );
 
 				// clona le positions
 				var quotationItemPositions = quotationItemPositionSvc.list( zoneId = quotationItemZone.getId() );

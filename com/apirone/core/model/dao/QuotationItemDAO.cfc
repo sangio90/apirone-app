@@ -23,24 +23,25 @@
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				quotation_item_id::varchar,
-				quotation_id::varchar,
+				quotation_items.quotation_id::varchar,
 				quotation_zone_id::varchar,
-				COUNT(quotation_item_id) OVER() AS total
+				COUNT(quotation_item_id) OVER() AS total,
+				*
 			FROM quotation_items
-			WHERE 1=1
+				LEFT JOIN signage_config_items USING (signage_config_item_id)
+			WHERE 1=1 
 				<cfif !IsNull( arguments.quotationId )>
-					AND quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationId#">::uuid
-				</cfif>
+					AND quotation_items.quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationId#">::uuid
+				</cfif>	
 				<cfif !IsNull( arguments.quotationZoneId )>
 					AND quotation_zone_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationZoneId#">::uuid
 				</cfif>
-			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
+			ORDER BY quotation_items.#super.sanitizeSQL( arguments.orderBy )#
 			<cfif arguments.limit GT 0>
 				LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
 				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 		</cfquery>
-
 		<cfreturn local.q>
 	</cffunction>
 

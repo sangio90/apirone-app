@@ -118,11 +118,12 @@
                                             <label>Zone: </label>
                                         </div>
                                         <div class="col-2 mb-2">
-                                            <select class="form-control me-3" name="zona">
-                                                <option value="">-- Seleziona la zona</option>
-                                                <cfloop array="#prc.zones#" item="item">
-                                                    <option value="#item.id#">#item.name#</option>
-                                                </cfloop>
+                                            <select class="form-control me-3"
+                                                    data-bind="source: zones, value: detailForm.data.zone.id, events: { change: getItems }"
+                                                    data-placeholder="-- Seleziona la zona"
+                                                    data-value-field="id"
+                                                    data-text-field="name"    
+                                                >
                                             </select>
                                         </div>
                                         <div class="col-2 mb-2">
@@ -151,8 +152,8 @@
 
                                                         <cfloop array="#prc.plates#" item="item">
 
-                                                            <div class="quotation-plate col-3">
-                                                                <div class="quotation-plate-inner">
+                                                            <div class="quotation-item col-3">
+                                                                <div class="quotation-item-inner">
                                                                     <div class="row">
                                                                         <div class="col-12" style="font-size: 14px; font-weight: bold;">
                                                                             #item.name#
@@ -173,6 +174,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="nav-signage" role="tabpanel">
+                                                    <div data-role="listview" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems">
+                                                    </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="nav-accessories" role="tabpanel">
                                                 </div>
@@ -494,6 +497,7 @@
     </div>
     #view( "quotation/signage-modal" )#
     #view( "quotation/plate-modal" )#
+    #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
 </cfoutput>
 <script>
 

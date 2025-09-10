@@ -293,10 +293,15 @@
 		//post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
 		post( "/quotations" ).to( "QuotationController.create" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
+		
 		get( "/quotations" ).to( "QuotationController.list" ).end();
+
+		get( "/ajax/quotationzones/:quotationId" ).to( "QuotationZoneAjaxController.list" ).end();
+		post( "/ajax/quotationitems" ).to( "QuotationItemAjaxController.list" ).end();
 
 		post("/ajax/quotation-items").to( "QuotationItemAjaxController.save" ).end();
 		post("/ajax/quotations").to( "QuotationAjaxController.save" ).end();
+		
 
 		/*
 			roles

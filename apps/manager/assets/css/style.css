@@ -206,13 +206,13 @@ ul.nav-main>li>a:focus {
     padding: 10px;
 }
 
-.quotation-plate {
+.quotation-item {
     border-radius: 10px;
     background-color: #e2ebfb;
     padding: 10px;
 }
 
-.quotation-plate-inner {
+.quotation-item-inner {
     border-radius: 10px;
     background-color: #e2ebfb;
     margin: 10px;

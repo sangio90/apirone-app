@@ -28,18 +28,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String str,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotationZone.id" } ]
+		required Array orderBy  = [ { field = "quotation.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
 		var rows    = [];
 		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
-
+		
 		records.each( function( record ){
 			rows.add( get( zoneId = record.quotation_zone_id ) );
 		} );
-
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );

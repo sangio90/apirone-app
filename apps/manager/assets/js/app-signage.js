@@ -18,7 +18,8 @@ AP.signage.modal = ( function() {
             id: "",
             code: "",
             name: "",
-            quantita: 1,
+            quantity: 1,
+            price: 0,
             signageLines: new kendo.data.DataSource(),
             category: {
                 id: "",

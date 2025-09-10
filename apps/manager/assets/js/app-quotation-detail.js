@@ -15,6 +15,7 @@ AP.quotationDetail.detail = ( function() {
 
     var plateApp   = AP.plate.designer;
     var signageApp = AP.signage.modal;
+    // var zoneModal = AP.zone.modal;
     
     var defaultDetailForm = {
         data: {
@@ -24,6 +25,10 @@ AP.quotationDetail.detail = ( function() {
             version: 1,
             language: {
                 "id":""
+            },
+            zone: {
+                "id":"",
+                "name":""
             },
             quotationDate: new Date(),
             validityDate: new Date(),
@@ -83,6 +88,8 @@ AP.quotationDetail.detail = ( function() {
         states: new kendo.data.DataSource(),
         filteredInvoiceStates: new kendo.data.DataSource(),
         filteredShipmentStates: new kendo.data.DataSource(),
+        zones: new kendo.data.DataSource(),
+        quotationItems: new kendo.data.DataSource(),
 
         callback: {
             onCreate: undefined,
@@ -145,7 +152,6 @@ AP.quotationDetail.detail = ( function() {
                 data: JSON.stringify(parsedData),
                 callback: {
                 done: function( xhr ) {
-                    console.log(xhr)
                     if( xhr.status == "ERRORE" ) {
                         AP.widget.notify( "error", "Errore nel salvataggio del preventivo." );
                     } 
@@ -161,13 +167,63 @@ AP.quotationDetail.detail = ( function() {
             return false;
         },
 
+        getZones: function( e ) {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotationzones/" + AP.page.quotation.id,
+                callback: {
+                done: function( xhr ) {
+                        if( xhr.status == "ERRORE" ) {
+                            AP.widget.notify( "error", "Errore nel recupero delle zone." );
+                        } 
+                        if ( xhr.status == "SUCCESS" ) {
+                            var zones = xhr.data.length ? xhr.data : [ { "id": "", "name": "Tutte le zone" } ];
+                            zones.unshift( { "id": "", "name": "Tutte le zone" } );
+                            viewModel.get('zones').data(zones);
+                            viewModel.set('detailForm.data.zone', zones[0]);
+                            viewModel.getItems();
+                        }
+                    }
+                }
+            } );
+
+
+            return false;
+        },
+        
+        getItems: function( e ) {
+            if (viewModel.detailForm.data.zone.name != "") {
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/quotationitems",
+                    data: JSON.stringify({ zoneId: viewModel.detailForm.data.zone ? viewModel.detailForm.data.zone.id : "", quotationId: AP.page.quotation.id }),
+                    callback: {
+                        done: function( xhr ) {
+                            if( xhr.status == "ERRORE" ) {
+                                AP.widget.notify( "error", "Errore nel recupero delle righe." );
+                            } 
+                            if ( xhr.status == "SUCCESS" ) {
+                                viewModel.get('quotationItems').data(xhr.data);
+                            }
+                        }
+                    }
+                } );
+            }
+            
+            return false;
+        },
+
         addSignage: function() {
             signageApp.new();
         },
 
         addPlate: function() {
             plateApp.new();
-        }
+        },
+
+        // addZone: function() {
+        //     zoneModal.new();
+        // }
     } )
 
     pub.init = function() {
@@ -178,6 +234,8 @@ AP.quotationDetail.detail = ( function() {
         viewModel.get( "currencies" ).data( AP.page.currencies )
         viewModel.get( "countries" ).data( AP.page.countries )
         viewModel.get( "states" ).data( AP.page.states )
+        viewModel.getZones();
+
         if ( AP.page.quotation ) {
             // $( "#nav-plan-tab" ).removeAttr("hidden");
             $( "#nav-products-tab" ).removeAttr("hidden");

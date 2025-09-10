@@ -16,7 +16,7 @@
                         <div class="mb-3 row">
                             <div class="col-1">    
                                 <label class="col-sm-12 col-form-label text-start">Quantità</label>
-                                <input class="form-control" type="number" data-bind="value: detailForm.data.quantita" min="1">
+                                <input class="form-control" type="number" data-bind="value: detailForm.data.quantity" min="1">
                             </div>
                             <div class="col-2">
                                 <label class="col-sm-2 col-form-label text-start">Categoria</label>

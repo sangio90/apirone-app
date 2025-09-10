@@ -32,7 +32,7 @@
     "QuotationItemPosition.bean": {},
     "QuotationItemProduct.bean": {},
     "QuotationItemProductItem.bean": {},
-    "QuotationItemZone.bean": {},
+    "QuotationZone.bean": {},
     "RawProduct.bean": {},
     "RawProductType.bean": {},
     "RawValue.bean": {},
