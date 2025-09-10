@@ -28,6 +28,9 @@
                                     <!--- <button class="nav-link" id="nav-print-tab" data-bs-toggle="tab" data-bs-target="##nav-print" type="button" role="tab">Stampa</button> --->
                                     <!--- <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button> --->
                                     <!--- <button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatario</button> --->
+                                    <!--- <button class="nav-link" id="nav-plan-tab" data-bs-toggle="tab" data-bs-target="##nav-plan" type="button" role="tab" hidden>Planimentria</button> --->
+                                    <button class="nav-link" id="nav-products-tab" data-bs-toggle="tab" data-bs-target="##nav-products" type="button" role="tab" hidden>Prodotti</button>
+                                    <!--- <button class="nav-link" id="nav-shipments-tab" data-bs-toggle="tab" data-bs-target="##nav-shipments" type="button" role="tab" hidden>Spedizioni</button> --->
                                 </div>
                             </nav>
                             <div class="tab-content" id="nav-tabContent">
@@ -101,13 +104,87 @@
                                             <input type="text" data-bind="value: detailForm.data.leadName" class="form-control">
                                         </div>
                                         <div class="col-sm-2 pt-4">
+                                           <button class="btn btn-primary changeTab" id="products">Prodotti &raquo;</button>
                                            <!--- <button class="btn btn-primary changeTab" id="fiscal">Dati fiscali &raquo;</button> --->
                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div>
 
                                 </div>
-                                
+                                <!--- products --->
+                                <div class="tab-pane fade" id="nav-products" role="tabpanel">
+                                    <div class="form-group row mb-2" style="margin-left: -75px;">
+                                        <div class="col-1 mb-2 text-end mt-2">
+                                            <label>Zone: </label>
+                                        </div>
+                                        <div class="col-2 mb-2">
+                                            <select class="form-control me-3" name="zona">
+                                                <option value="">-- Seleziona la zona</option>
+                                                <cfloop array="#prc.zones#" item="item">
+                                                    <option value="#item.id#">#item.name#</option>
+                                                </cfloop>
+                                            </select>
+                                        </div>
+                                        <div class="col-2 mb-2">
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="javascript:addZone()">Aggiungi zona</button>                                        
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mb-2">
+                                        <section class="card">
+                                            <div class="card-body">
+                                            <nav>
+                                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                                    <div class="col-3 flex">
+                                                        <button class="nav-link active" id="nav-plate-tab" data-bs-toggle="tab" data-bs-target="##nav-plate" type="button" role="tab">Placche</button>
+                                                        <button class="nav-link" id="nav-signage-tab" data-bs-toggle="tab" data-bs-target="##nav-signage" type="button" role="tab">Segnaletiche</button>
+                                                        <button class="nav-link" id="nav-accessories-tab" data-bs-toggle="tab" data-bs-target="##nav-accessories" type="button" role="tab">Accessori</button>
+                                                    </div>
+                                                    <div class="col-6 text-start">
+                                                        <button id="addPlateButton" type="button" class="col-2 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
+                                                        <button id="addSignageButton" type="button" class="col-2 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none">Aggiungi segnaletica</button>
+                                                    </div>
+                                                </div>
+                                            </nav>
+                                            <div class="tab-content" id="nav-tabContent">
+                                                <div class="tab-pane show active" id="nav-plate" role="tabpanel">
+                                                    <div class="row">
+
+                                                        <cfloop array="#prc.plates#" item="item">
+
+                                                            <div class="quotation-plate col-3">
+                                                                <div class="quotation-plate-inner">
+                                                                    <div class="row">
+                                                                        <div class="col-12" style="font-size: 14px; font-weight: bold;">
+                                                                            #item.name#
+                                                                        </div>
+                                                                        <div class="col-12">
+                                                                            <img src="/assets/fakes/img/plate.jpg" style="width: 100%;">
+                                                                        </div>
+                                                                        <div class="col-6">
+                                                                            Quantità: #item.qty#<br>
+                                                                            Prezzo: #item.price#<br>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        
+                                                        </cfloop>
+
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-signage" role="tabpanel">
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-accessories" role="tabpanel">
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="form-group row mb-2">
+                                        <div class="col-sm-1 ms-4">
+                                           <button class="btn btn-primary changeTab" id="general">&laquo; Precendete</button>
+                                        </div>
+                                    </div>  
+                                </div>
 
                                 <!---
                                     dati fiscali 
@@ -404,8 +481,6 @@
                                     </div>                                    
 
                                 </div>                                
-
-                            
                             </div>                         
                             
                     </section>
@@ -417,7 +492,8 @@
         </div>
 
     </div>
-
+    #view( "quotation/signage-modal" )#
+    #view( "quotation/plate-modal" )#
 </cfoutput>
 <script>
 
@@ -444,6 +520,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.warn(`Nessun tab trovato con id ${targetTabId}`);
             }
         });
+    });
+
+    document.querySelector('#nav-plate-tab').addEventListener("click", function (e) {
+        e.preventDefault();
+        $( "#addSignageButton" ).hide();
+        $( "#addPlateButton" ).show();
+    });
+    document.querySelector('#nav-signage-tab').addEventListener("click", function (e) {
+        e.preventDefault();
+        $( "#addPlateButton" ).hide();
+        $( "#addSignageButton" ).show();
+    });
+    document.querySelector('#nav-accessories-tab').addEventListener("click", function (e) {
+        e.preventDefault();
+        $( "#addPlateButton" ).hide();
+        $( "#addSignageButton" ).hide();
     });
 });
 </script>

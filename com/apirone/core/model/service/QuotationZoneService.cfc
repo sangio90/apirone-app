@@ -1,11 +1,11 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" inject="QuotationItemZoneDAO";
-	property name="QuotationItemService" inject="QuotationItemService";
-	property name="QuotationItemZoneService" inject="QuotationItemZoneService";
-	property name="cacheScope" type="String" default="QuotationItemZone.bean";
+	property name="dao" inject="QuotationZoneDAO";
+	property name="QuotationService" inject="QuotationService";
+	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="cacheScope" type="String" default="QuotationZone.bean";
 
-	public com.apirone.core.model.bean.QuotationItemZone function get( required String zoneId ){
+	public com.apirone.core.model.bean.QuotationZone function get( required String zoneId ){
 		var cm    = getCacheManager();
 		var cache = cm.get( getCacheScope(), arguments.zoneId );
 
@@ -28,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String str,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotationItemZone.id" } ]
+		required Array orderBy  = [ { field = "quotationZone.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
@@ -37,7 +37,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( zoneId = record.quotation_item_zone_id ) );
+			rows.add( get( zoneId = record.quotation_zone_id ) );
 		} );
 
 		result.setData( rows );
@@ -62,36 +62,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteQuotationItemZone" );
+				outcome.setType( "ApirOne.CannotDeleteQuotationZone" );
 				outcome.setMessage( "Cannot delete zone [#arguments.zoneId#]" );
 			}
 		}
 		return outcome;
 	}
 
-	public String function create( required com.apirone.core.model.bean.QuotationItemZone zone ){
+	public String function create( required com.apirone.core.model.bean.QuotationZone zone ){
 		var newId = getDao().insert( arguments.zone );
 
 		return newId;
 	}
 
-	public String function update( required com.apirone.core.model.bean.QuotationItemZone zone ){
+	public String function update( required com.apirone.core.model.bean.QuotationZone zone ){
 		getDao().update( arguments.zone );
 		super.getCacheManager().remove( getCacheScope(), arguments.zone.getId() );
 
 		return arguments.zone.getId();
 	}
 
-	private com.apirone.core.model.bean.QuotationItemZone function build( required String zoneId ){
+	private com.apirone.core.model.bean.QuotationZone function build( required String zoneId ){
 		var record = getDao().read( arguments.zoneId );
 		if ( record.recordCount ) {
-			var bean = super.bean( "QuotationItemZone" );
-			bean.setId( record.quotation_item_zone_id );
-			bean.setName( record.quotation_item_zone );
-			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
+			var bean = super.bean( "QuotationZone" );
+			bean.setId( record.quotation_zone_id );
+			bean.setName( record.quotation_zone );
+			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
 
 			bean.setOrigin(
-				IsNull( record.origin_id ) ? NullValue() : getQuotationItemZoneService().get( record.origin_id )
+				IsNull( record.origin_id ) ? NullValue() : getQuotationZoneService().get( record.origin_id )
 			);
 
 			return bean;

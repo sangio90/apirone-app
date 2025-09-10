@@ -4,34 +4,34 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				quotation_item_zone_id::varchar,
-				quotation_item_id::varchar,
+				quotation_zone_id::varchar,
+				quotation_id::varchar,
 				origin_id::varchar,
 				*
-			FROM quotation_item_zones
-			WHERE quotation_item_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zoneId#">::uuid
+			FROM quotation_zones
+			WHERE quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zoneId#">::uuid
 		</cfquery>
 		<cfreturn local.q>
 	</cffunction>
 
 	<cffunction name="find" returntype="Query">
-		<cfargument name="quotationItemId" type="String" required="false">
+		<cfargument name="quotationId" type="String" required="false">
 		<cfargument name="originId" type="String" required="false">
-		<cfargument name="orderBy" type="String" required="true" default="quotation_item_zone_id">
+		<cfargument name="orderBy" type="String" required="true" default="quotation_zone_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
 
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
-				quotation_item_zone_id::varchar,
-				quotation_item_id::varchar,
+				quotation_zone_id::varchar,
+				quotation_id::varchar,
 				origin_id::varchar,
-				COUNT(quotation_item_zone_id) OVER() AS total
+				COUNT(quotation_zone_id) OVER() AS total
 			FROM
-				quotation_item_zones
+				quotation_zones
 			WHERE 1=1
-				<cfif !IsNull( arguments.quotationItemId )>
-					AND quotation_item_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemId#">::uuid
+				<cfif !IsNull( arguments.quotationId )>
+					AND quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationId#">::uuid
 				</cfif>
 				<cfif !IsNull( arguments.originId )>
 					AND origin_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.originId#">::uuid
@@ -48,14 +48,14 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="String">
-		<cfargument name="zone" type="com.apirone.core.model.bean.QuotationItemZone" required="true">
+		<cfargument name="zone" type="com.apirone.core.model.bean.QuotationZone" required="true">
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO quotation_item_zones (
-				quotation_item_id,
-				quotation_item_zone,
+			INSERT INTO quotation_zones (
+				quotation_id,
+				quotation_zone,
 				origin_id
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationItem().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotation().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">,
 				<cfif !IsNull( arguments.zone.getOrigin() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
@@ -63,23 +63,23 @@
 					NULL
 				</cfif>
 			)
-			RETURNING quotation_item_zone_id
+			RETURNING quotation_zone_id
 		</cfquery>
-		<cfreturn local.q.quotation_item_zone_id.toString()>
+		<cfreturn local.q.quotation_zone_id.toString()>
 	</cffunction>
 
 	<cffunction name="update" returntype="String">
-		<cfargument name="zone" type="com.apirone.core.model.bean.QuotationItemZone" required="true">
+		<cfargument name="zone" type="com.apirone.core.model.bean.QuotationZone" required="true">
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE quotation_item_zones
+			UPDATE quotation_zones
 			SET
-				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationItem().getId()#">::uuid,
-				quotation_item_zone = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">
+				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotation().getId()#">::uuid,
+				quotation_zone = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">
 				<cfif !IsNull( arguments.zone.getOrigin() )>
 					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
 				</cfif>
 			WHERE
-				quotation_item_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getId()#">::uuid
+				quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getId()#">::uuid
 		</cfquery>
 		<cfreturn arguments.zone.getId()>
 	</cffunction>
@@ -89,9 +89,9 @@
 		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM
-				quotation_item_zones
+				quotation_zones
 			WHERE
-				quotation_item_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zoneId#">::uuid
+				quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zoneId#">::uuid
 		</cfquery>
 		<cfreturn true>
 	</cffunction>

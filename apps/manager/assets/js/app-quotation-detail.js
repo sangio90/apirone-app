@@ -13,6 +13,9 @@ $( document ).ready( function() {
 AP.quotationDetail.detail = ( function() {
     var pub = {};
 
+    var plateApp   = AP.plate.designer;
+    var signageApp = AP.signage.modal;
+    
     var defaultDetailForm = {
         data: {
             id: "",
@@ -157,6 +160,14 @@ AP.quotationDetail.detail = ( function() {
 
             return false;
         },
+
+        addSignage: function() {
+            signageApp.new();
+        },
+
+        addPlate: function() {
+            plateApp.new();
+        }
     } )
 
     pub.init = function() {
@@ -167,6 +178,11 @@ AP.quotationDetail.detail = ( function() {
         viewModel.get( "currencies" ).data( AP.page.currencies )
         viewModel.get( "countries" ).data( AP.page.countries )
         viewModel.get( "states" ).data( AP.page.states )
+        if ( AP.page.quotation ) {
+            // $( "#nav-plan-tab" ).removeAttr("hidden");
+            $( "#nav-products-tab" ).removeAttr("hidden");
+            // $( "#nav-shipments-tab" ).removeAttr("hidden");
+        }
         kendo.bind( AP.quotationDetail.fields.detailRoot, viewModel );
     };
     

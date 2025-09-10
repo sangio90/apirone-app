@@ -288,7 +288,7 @@
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
-		get( "/quotations/:id" ).to( "QuotationController.items" ).end();
+		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		//post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
 		post( "/quotations" ).to( "QuotationController.create" ).end();

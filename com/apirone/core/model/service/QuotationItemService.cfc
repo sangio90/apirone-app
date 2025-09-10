@@ -2,6 +2,7 @@
 
 	property name="dao" inject="QuotationItemDAO";
 	property name="QuotationService" inject="QuotationService";
+	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="cacheScope" type="String" default="QuotationItem.bean";
 
 	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId ){
@@ -100,6 +101,9 @@
 			bean.setPrice( record.price );
 			bean.setQuantity( record.quantity );
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
+			bean.setQuotationZone(
+				IsNull( record.quotation_zone_id ) ? NullValue() : getQuotationZoneService().get( record.quotation_zone_id )
+			);
 
 			return bean;
 		}

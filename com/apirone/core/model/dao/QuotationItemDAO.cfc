@@ -5,6 +5,7 @@
 			SELECT
 				quotation_item_id::varchar,
 				quotation_id::varchar,
+				quotation_zone_id::varchar,
 				*
 			FROM quotation_items
 			WHERE quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
@@ -14,6 +15,7 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationId" type="String" required="false">
+		<cfargument name="quotationZoneId" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_items.quotation_item_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
@@ -22,11 +24,15 @@
 			SELECT
 				quotation_item_id::varchar,
 				quotation_id::varchar,
+				quotation_zone_id::varchar,
 				COUNT(quotation_item_id) OVER() AS total
 			FROM quotation_items
 			WHERE 1=1
 				<cfif !IsNull( arguments.quotationId )>
 					AND quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationId#">::uuid
+				</cfif>
+				<cfif !IsNull( arguments.quotationZoneId )>
+					AND quotation_zone_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationZoneId#">::uuid
 				</cfif>
 			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
 			<cfif arguments.limit GT 0>
@@ -48,10 +54,12 @@
 			INSERT INTO quotation_items (
 				<cfif IsNull( arguments.quotationItemSignage )>
 					quotation_id,
+					quotation_zone_id,
 					price,
 					quantity
 				<cfelse>
 					quotation_id,
+					quotation_zone_id,
 					signage_config_item_id,
 					price,
 					quantity
@@ -59,10 +67,22 @@
 			) VALUES (
 				<cfif IsNull( arguments.quotationItemSignage )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
+					<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid,
+					<cfelse>
+						NULL,
+					</cfif>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
 				<cfelse>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignage.getQuotation().getId()#">::uuid,
+					<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid,
+					<cfelse>
+						NULL,
+					</cfif>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignage.getQuotationZone().getId()#">::uuid,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getSignageConfigItem().getId()#">,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getPrice()#">,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getQuantity()#">
@@ -82,16 +102,30 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_items
 			SET
-				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
-				price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
-				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
 				<cfif !IsNull( arguments.quotationItemSignage )>
-					,
-					font_size = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getFontSize()#">,
-					chart_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getCharCount()#">,
-					height = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeight()#">,
-					height_in_pixel = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeightInPixel()#">,
-					row_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getRowCount()#">
+					quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignage.getQuotation().getId()#">::uuid,
+					quotation_zone_id = <cfif NOT IsNull( arguments.quotationItemSignage.getQuotationZone() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignage.getQuotationZone().getId()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>,
+					signage_config_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getSignageConfigItem().getId()#">,
+					price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getPrice()#">,
+					quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getQuantity()#">
+					font_size = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getFontSize()#">,
+					chart_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getCharCount()#">,
+					height = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getHeight()#">,
+					height_in_pixel = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getHeightInPixel()#">,
+					row_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemSignage.getRowCount()#">
+				<cfelse>
+					quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
+					quotation_zone_id = <cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>,
+					price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
+					quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
 				</cfif>
 			WHERE
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getId()#">::uuid

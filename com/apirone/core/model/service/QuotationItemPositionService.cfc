@@ -1,7 +1,8 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemPositionDAO";
-	property name="QuotationItemZoneService" inject="QuotationItemZoneService";
+	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="QuotationItemService" inject="QuotationItemService";
 	property name="cacheScope" type="String" default="QuotationItemPosition.bean";
 
 	public com.apirone.core.model.bean.QuotationItemPosition function get( required String positionId ){
@@ -86,7 +87,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemPosition" );
 			bean.setId( record.quotation_item_position_id );
-			bean.setQuotationItemZone( getQuotationItemZoneService().get( record.quotation_item_zone_id ) );
+			bean.setQuotationZone( getQuotationZoneService().get( record.quotation_zone_id ) );
+			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
 			bean.setPositionCoordinateX( record.position_coordinate_x );
 			bean.setPositionCoordinateY( record.position_coordinate_y );
 			return bean;
