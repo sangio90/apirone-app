@@ -30,8 +30,8 @@
 
 		<cfquery name="local.q" datasource="verticale" result="local.result">
 			SELECT
-				clcodice,
-				COUNT(clcodice) OVER() AS total
+				clcodice
+				--COUNT(clcodice) OVER() AS total
 			FROM
 				#super.sanitizeSQL( "#variables.companyId#_colori" )# colori
 
@@ -43,6 +43,37 @@
 
 				<cfif !IsNull( arguments.rawProductId )>
 					AND comcol.clcodart = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="varchar">
+				</cfif>
+
+			UNION ALL
+
+			SELECT
+				clcodcol AS clcodice
+				--COUNT(clcodice) OVER() AS total
+			FROM
+				#super.sanitizeSQL( "#variables.companyId#_cvrcom" )# colori
+
+				<!----		
+<cfif !IsNull( arguments.rawProductId )>		
+INNER JOIN #super.sanitizeSQL( "#variables.companyId#_comcol" )# comcol ON comcol.clcodcol = colori.clcodcol		
+</cfif>		
+<cfif !IsNull( arguments.variantId )>		
+INNER JOIN #super.sanitizeSQL( "#variables.companyId#_comcol" )# comcol ON comcol.clcodcol = colori.clcodice		
+</cfif>		
+----->
+
+			WHERE 1=1
+
+				<!----		
+<cfif !IsNull( arguments.rawProductId )>		
+AND comcol.clcodart = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="varchar">		
+</cfif>		
+---->
+				<cfif !IsNull( arguments.variantId )>
+					AND colori.clcodvar = <cfqueryparam value="#arguments.variantId#" cfsqltype="varchar">
+				</cfif>
+				<cfif !IsNull( arguments.rawProductId )>
+					AND colori.clcodart = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="varchar">
 				</cfif>
 
 			ORDER BY

@@ -27,11 +27,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String rawProductId,
+		String variantId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0
 	){
-		// cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# colorService:search()");
-
 		var rows   = [];
 		var result = super.getResult();
 
@@ -43,7 +42,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		result.setData( rows );
 		result.setCount( Val( records.recordCount ) );
-		result.setTotal( Val( records.total ) );
+		result.setTotal( Val( 100 ) );
 
 		return result;
 	}

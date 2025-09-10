@@ -77,8 +77,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setMeasurementUnit( getLookupService().get( "measurementUnit", misurementValue ) );
 
 			var variants = getVariantService().list( rawProductId = record.arcodart );
-
-			var colors = getColorService().list( rawProductId = record.arcodart );
+			// var colors   = getColorService().list( rawProductId = record.arcodart );
 
 			if ( !variants.len() ) {
 				var variant = super.bean( "Variant" );
@@ -89,6 +88,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				variants.add( variant );
 			}
 
+			/*
 			if ( !colors.len() ) {
 				var color = super.bean( "Color" );
 
@@ -97,12 +97,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				colors.add( color );
 			}
+			*/
 
 			var colorVariants = []
 
 			for ( var thisVariant in variants ) {
 				// remove reference
 				var newVariant = Duplicate( thisVariant );
+
+				var colors = getColorService().list(
+					rawProductId = record.arcodart,
+					variantId    = thisVariant.getId()
+				);
+
+				if ( !colors.len() ) {
+					var color = super.bean( "Color" );
+
+					color.setId( "_NOCOL" );
+					color.setName( "Nessun colore" );
+
+					colors.add( color );
+				}
 
 				newVariant.setColors( colors );
 				colorVariants.add( newVariant );

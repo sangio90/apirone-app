@@ -3,15 +3,42 @@
 <cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
+<cfset dao = new com.apirone.core.model.dao.ColorDAO()>
+
+<cfset colors = dao.find( rawProductId = "MATTPZMOQCARREL", variantId="OCEANIA" )>
+
+<cfdump var="#colors#">
+
 <cfquery name="j" datasource="verticale">
     SELECT *
     FROM azapi_codvar AS codvar 
         INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod 
     WHERE 1=1 
-        AND comvar.cbcodart = 'MATARMINO' 
+        AND comvar.cbcodart = 'MATTPZMOQCARREL' 
     --ORDER BY arcodart 
 </cfquery>
+
 <cfdump var="#j#">
+
+<cfquery name="k" datasource="verticale">
+    SELECT *
+    FROM azapi_colori AS colori
+        INNER JOIN azapi_comcol AS comcol ON comcol.clcodcol = colori.clcodice
+    WHERE 1=1
+        AND comcol.clcodart = 'MATTPZMOQCARREL' 
+</cfquery>
+
+<cfdump var="#k#">
+
+<cfquery name="k" datasource="verticale">
+    SELECT *
+    FROM azapi_cvrcom AS cc
+        --INNER JOIN azapi_comcol AS comcol ON comcol.clcodcol = colori.clcodice
+    WHERE 1=1
+        AND cc.clcodart = 'MATTPZMOQCARREL' 
+</cfquery>
+
+<cfdump var="#k#">
 
 <cfabort>
 
