@@ -16,6 +16,21 @@
                             
                             <div class="card-body">
 
+                                <div class="row">
+                                <div class="col-3">
+                                    <select class="form-control">
+                                        <option>zona 1</option>
+                                        <option>-- sottozona 1.1</option>
+                                        <option>-- sottozona 1.2</option>
+                                        <option>zona 2</option>
+                                        <option>-- sottozona 2.1</option>
+                                        <option>-- sottozona 2.2</option>
+                                        <option>zona 3</option>
+                                    </select>
+                                </div>
+                                </div>
+
+
                                 <nav>
                                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                         <button class="nav-link" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="##nav-general" type="button" role="tab">Dati generali</button>

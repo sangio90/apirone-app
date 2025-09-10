@@ -1,13 +1,13 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction name="read">
-		<cfargument name="reportId" type="Numeric" required="true">
+		<cfargument name="reportId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT report_id::varchar, *
 			FROM
 				reports
 			WHERE
-				report_id = <cfqueryparam cfsqltype="Integer" value="#arguments.reportId#">
+				report_id = <cfqueryparam cfsqltype="String" value="#arguments.reportId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -20,7 +20,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				report_id,
+				report_id::varchar,
 				COUNT(report_id) OVER() AS total
 			FROM
 				reports
@@ -57,7 +57,7 @@
 			DELETE
 			FROM reports
 			WHERE
-				report_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.reportId#">
+				report_id = <cfqueryparam cfsqltype="String" value="#arguments.reportId#">::uuid
 		</cfquery>
 
 		<cfreturn true>

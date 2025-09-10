@@ -59,6 +59,13 @@ AP.product.list = ( function() {
             viewModel.set( "detailForm", defaultDetailForm );
         },
 
+        attributes: function( event ) {
+            var id = event.data.id;
+            window.open( "/manager/products/" + id + "/detail", "_blank" ).focus();
+
+            return false;
+        },
+
         search: function( event ) {
 
             var thisForm = AP.fields.product.searchListForm;
@@ -73,93 +80,18 @@ AP.product.list = ( function() {
 
         },
 
-        attributes: function( event ) {
+        print: function( event ) {
+
+            var target = $( event.currentTarget );
+            var report = target.data( "report" );
+
+            var qs = $( "#product-grid-search-form" ).serialize();
 
             var id = event.data.id;
-            window.open( "/manager/products/" + id + "/detail", "_blank" ).focus();
+            window.open( "/manager/products/print/" + report + "?" + qs, "_blank" ).focus();
 
             return false;
         },
-
-        new: function( event ) {
-
-            var onSave = function() {
-                viewModel.rows.read();
-            };
-
-            console.log( "event", event.data.id );
-
-            detailApp.new( onSave );
-
-            /*
-
-			var onSave = function () {
-				viewModel.rows.read()
-			};
-
-			this.resetForm();
-
-			NM.util.openModal( fields.detailRoot );
-			*/
-
-        },
-
-        edit: function( event ) {
-
-            var onSave = function() {
-                viewModel.rows.read();
-            };
-
-            console.log( "event", event.data.id );
-
-            detailApp.edit( event.data.id, onSave );
-
-            return false;
-
-        },
-
-        delete: function( event ) {
-
-            var checks = $( "#product-grid" ).find( "[name=selected]:checked" );
-
-            if ( checks.length ) {
-
-                var values = [];
-
-                checks.each( function(){
-                    values.push( $( this ).val() );
-                } );
-
-                var ids = values.toString();
-
-                NM.util.ajax( {
-                    method: "DELETE",
-                    url: "/manager/ajax/products",
-                    data: ids,
-                    callback: {
-                        done: function( xhr ) {
-
-                            if( xhr.data.payload.hasOwnProperty( "errors" ) ) {
-                                AP.widget.notify( "error", "Non riesco a cancellare tutti i frutti" );
-                            } else {
-                                AP.widget.notify( "success", "Cancellazione avvenuta con successo" );
-                            }
-
-                            var id = viewModel.get( "detailForm.data.id" );
-
-                            viewModel.rows.read();
-
-                        }
-                    }
-                } );
-
-            } else {
-
-                AP.widget.notify( "warning", "Selezionare almeno un frutto" );
-
-            }
-
-        }
 
     } );
 

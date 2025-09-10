@@ -24,7 +24,7 @@
                             #grid( 
                                 id="report-grid",
                                 columns="[
-                                    { 'field':'id', 'title':'ID', width: '50px' },
+                                    { 'field':'id', 'title':'ID', width: '80px' },
                                     { 'field':'name', 'title':'Descrizione'},
                                     { 'field':'', 'title':'File JRXML'},
                                     { 'field':'', 'title':'File di esempio', width: '450px'},

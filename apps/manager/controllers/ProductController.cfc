@@ -4,7 +4,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		// var params[ "categoryModeId" ] = "COM";
 
 		prc.categories = super.fire( "productCategory.list", { modeId = "COM" } );
-		prc.lines      = super.fire( "model.list" );
+		prc.lines      = super.fire( "line.list" );
 		prc.models     = super.fire( "model.list" );
 		prc.statuses   = super.fire( "status.list", [ "line" ] );
 		prc.finishes   = super.fire( "finish.list" );
@@ -78,6 +78,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function listByCategoryId( event, rc, prc ){
 		// TODO: not used, remove?
+		/*
 		getLogger().debug( "ProductController.listByCategoryId: someone use this method? CategoryId: #rc.id#" );
 
 		param rc.id = "";
@@ -93,6 +94,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "statuses" ] = prc.statuses;
 
 		event.setView( "product/list" );
+		*/
 	}
 
 	function combinations( event, rc, prc ){
@@ -109,6 +111,54 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setView( "product/combinations" );
 	}
 
+	function print( event, rc, prc ){
+		prc.title       = "Distinte basi";
+		param rc.report = "bill-of-material";
+
+		var params = {
+			lineId     = Len( rc.lineId ) ? rc.lineId : NullValue(),
+			modelId    = Len( rc.modelId ) ? rc.modelId : NullValue(),
+			categoryId = Len( rc.categoryId ) ? rc.categoryId : NullValue(),
+			statusId   = Len( rc.statusId ) ? rc.statusId : NullValue()
+		};
+
+		var result = super.fire( "product.search", params );
+
+		var filename = ExpandPath("/../repository/private/_tmp/#rc.report#_#DateTimeFormat(now(), 'yyyyMMddHHnnss')#.pdf");
+
+		var data = {
+			params  = { "orientation" = "portrait", "fontembed" = true },
+			title   = "Distinte basi",
+			rows    = super.getMementify().convertList( result.getData(), "list" ),
+			filename = filename,
+			columns = [
+				{ title = "ID" },
+				{ title = "Linea" },
+				{ title = "Modello" },
+				{ title = "Finitura" }
+			]
+		}
+
+		var pdfArgs = { bookmark = "yes", backgroundVisible = "yes", orientation="landscape" };
+
+		// var bean = super.bean( "PrintList" );
+		// var reportData = bean.getRawMemento();
+
+		//prc.printData = data;
+
+		event.renderData( 
+			data=renderView(
+				view="report/template/#rc.report#", 
+				args=data
+			), 
+			type="PDF" 
+		);
+
+		//var binary = FileReadBinary( filename );
+        //event.renderData(data=binary,type="PDF");
+
+		//event.setView( "report/template/#rc.report#" ).setLayout( "print" );
+	}
 
 	/*
 		private methods

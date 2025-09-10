@@ -15,11 +15,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return cache.data;
 		}
 
-		var bean = build( getCacheScope(), arguments.reportId );
-		cm.put( key, bean );
+		var bean = build( arguments.reportId );
+		cm.put( getCacheScope(), arguments.reportId, bean );
 
 		return bean;
-		2025 - 08 - 19 14:15:00
 	}
 
 	public String function create( required com.apirone.core.model.bean.Report report ){

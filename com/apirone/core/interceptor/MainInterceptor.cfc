@@ -16,7 +16,6 @@ component extends="coldbox.system.Interceptor" {
 		cfheader( name = "Access-Control-Allow-Methods", value = "GET, POST, OPTIONS" );
 		cfheader( name = "Access-Control-Allow-Headers", value = "Content-Type, X-Requested-With" );
 
-
 		/*
         if( !rc.keyExists("currentRoutedModule") ) {
             location( url="/manager/login" );

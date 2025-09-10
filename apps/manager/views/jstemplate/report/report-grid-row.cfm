@@ -4,7 +4,7 @@
     <nmscript type="text/x-kendo-template" id="report-grid-row">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td>
-                <span data-bind="text: id"></span>
+                <span data-bind="text: shortId"></span>
             </td>
             <td>
                 <span data-bind="text: name"></span>
@@ -17,7 +17,7 @@
             </td>
             <td>
                 <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
+                    <button type="button" class="btn btn-default btn-sm" data-bind="click:edit">
                         <i class="fas fa-edit"></i>
                     </button>
                 </div>

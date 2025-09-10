@@ -51,7 +51,7 @@
 											<select class="form-control me-2" name="modelId">
 												<option value="">-- tutte</option>
 												<cfloop array="#prc.models#" item="item">
-													<option value="#item.getId()#">#item.getName()#</option>
+													<option value="#item.getId()#">#item.getName()# (#item.getCode()#)</option>
 												</cfloop>
 											</select>
 										</div>
@@ -76,7 +76,7 @@
 											</select>
 										</div>
 
-										<div class="align-self-end flex">
+										<div class="align-self-end d-flex">
 											#searchButton( bind = "click:search", class="me-1" )#
 
 											<div class="dropdown">
@@ -84,7 +84,7 @@
 													Report
 												</button>
 												<ul class="dropdown-menu">
-													<li><a class="dropdown-item" href="##">Distinta base</a></li>
+													<li><a class="dropdown-item hand" data-bind="click:print" data-report="bill-of-material">Distinta base</a></li>
 												</ul>
 											</div>
 

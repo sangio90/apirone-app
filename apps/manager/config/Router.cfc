@@ -217,6 +217,7 @@
 		delete( "/ajax/products" ).to( "ProductAjaxController.delete" ).end();
 		post( "/ajax/products" ).to( "ProductAjaxController.save" ).end();
 		get( "/ajax/products" ).to( "ProductAjaxController.list" ).end();
+		get( "/products/print/:id" ).to( "ProductController.print" ).end();
 		get( "/products/:id/combinations" ).to( "ProductController.combinations" ).end();
 		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();
 		get( "/products/:id" ).to( "ProductController.detail" ).end();

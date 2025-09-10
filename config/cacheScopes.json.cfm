@@ -46,5 +46,6 @@
     "SignageConfigItem.bean": {},
     "MetadataType.bean": {},
     "Metadata.bean": {},
-    "VatCode.bean": {}
+    "VatCode.bean": {},
+    "Report.bean": {}
 }
