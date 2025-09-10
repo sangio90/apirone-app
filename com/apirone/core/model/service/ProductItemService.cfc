@@ -139,12 +139,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				getDao().delete( getCacheScope(), arguments.productId );
 
-				cm.remove( "product_#obj.getId()#" );
+				cm.remove( getCacheScope(), obj.getId() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteProduct" );
-				outcome.setMessage( "Cannot delete product [#arguments.productId#]" );
+				outcome.setType( "ApirOne.CannotDeleteProductItem" );
+				outcome.setMessage( "Cannot delete product item [#arguments.productId#]" );
 			}
 		}
 

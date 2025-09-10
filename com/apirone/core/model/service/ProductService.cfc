@@ -152,14 +152,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		outcome.setData( arguments );
 
 		transaction {
-			try {
-				getDao().deleteAllByParams( lineId = arguments.lineId, categoryId = arguments.categoryId );
+			// try {
+			getDao().deleteAllByParams( lineId = arguments.lineId, categoryId = arguments.categoryId );
+			/*
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteProduct" );
 				outcome.setMessage( "Cannot delete product by lineId [#arguments.lineId#] and categoryId [#arguments.categoryId#]" );
 			}
+				*/
 		}
 
 		getCacheManager().removeAll();

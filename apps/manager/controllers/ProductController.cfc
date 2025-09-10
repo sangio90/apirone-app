@@ -124,13 +124,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.fire( "product.search", params );
 
-		var filename = ExpandPath("/../repository/private/_tmp/#rc.report#_#DateTimeFormat(now(), 'yyyyMMddHHnnss')#.pdf");
+		// var filename = ExpandPath( "/../repository/private/_tmp/#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf" );
 
 		var data = {
-			params  = { "orientation" = "portrait", "fontembed" = true },
 			title   = "Distinte basi",
 			rows    = super.getMementify().convertList( result.getData(), "list" ),
-			filename = filename,
+			pdfArgs = {
+				bookmark          = "yes",
+				backgroundVisible = "yes",
+				orientation       = "portrait",
+				pagetype          = "A4",
+				overwrite         = true,
+				fontembed         = "true",
+				saveasname        = "#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
+			},
 			columns = [
 				{ title = "ID" },
 				{ title = "Linea" },
@@ -139,25 +146,17 @@ component extends="com.apirone.core.controller.AbsController" {
 			]
 		}
 
-		var pdfArgs = { bookmark = "yes", backgroundVisible = "yes", orientation="landscape" };
-
 		// var bean = super.bean( "PrintList" );
 		// var reportData = bean.getRawMemento();
 
-		//prc.printData = data;
+		// prc.printData = data;
 
-		event.renderData( 
-			data=renderView(
-				view="report/template/#rc.report#", 
-				args=data
-			), 
-			type="PDF" 
-		);
+		event.renderData( data = renderView( view = "report/template/#rc.report#", args = data ), type = "PDF" );
 
-		//var binary = FileReadBinary( filename );
-        //event.renderData(data=binary,type="PDF");
+		// var binary = FileReadBinary( filename );
+		// event.renderData(data=binary,type="PDF");
 
-		//event.setView( "report/template/#rc.report#" ).setLayout( "print" );
+		// event.setView( "report/template/#rc.report#" ).setLayout( "print" );
 	}
 
 	/*

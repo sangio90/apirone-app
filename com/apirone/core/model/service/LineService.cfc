@@ -140,6 +140,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					getComponentOverrideService().create( overrideBean );
 				} else {
 					var newComponent = Duplicate( thisComponent );
+					q
 
 					newComponent.setId( "" );
 					newComponent.getProductItem().setId( newProductItemId );
@@ -160,6 +161,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 		}
+
+		/*
+		dump( categoryId )
+		dump( toLineId )
+		abort;
+		*/
 
 		productService.deleteAllByParams( lineId = toLineId, categoryId = categoryId );
 

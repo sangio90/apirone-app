@@ -75,7 +75,7 @@
 	}
 
 	public String function create( required quotationItem ){
-		if (IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )) {
+		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
 			var newId = getDao().insert( quotationItemSignage = arguments.quotationItem );
 		} else {
 			var newId = getDao().insert( quotationItem = arguments.quotationItem );
@@ -102,7 +102,9 @@
 			bean.setQuantity( record.quantity );
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
 			bean.setQuotationZone(
-				IsNull( record.quotation_zone_id ) ? NullValue() : getQuotationZoneService().get( record.quotation_zone_id )
+				IsNull( record.quotation_zone_id ) ? NullValue() : getQuotationZoneService().get(
+					record.quotation_zone_id
+				)
 			);
 
 			return bean;

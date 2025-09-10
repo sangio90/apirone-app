@@ -46,8 +46,15 @@
 
 	<cffunction name="insert" returntype="String">
 		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="false">
-		<cfargument name="quotationItemSignage" type="com.apirone.core.model.bean.QuotationItemSignage" required="false">
-		<cfif NOT structKeyExists(arguments, "quotationItem") AND NOT structKeyExists(arguments, "quotationItemSignage")>
+		<cfargument
+			name    ="quotationItemSignage"
+			type    ="com.apirone.core.model.bean.QuotationItemSignage"
+			required="false"
+		>
+		<cfif NOT StructKeyExists( arguments, "quotationItem" ) AND NOT StructKeyExists(
+			arguments,
+			"quotationItemSignage"
+		)>
 			<cfthrow type="Application" message="Devi passare almeno quotationItem o quotationItemSignage">
 		</cfif>
 		<cfquery name="local.q" datasource="apirone">
@@ -95,8 +102,15 @@
 
 	<cffunction name="update" returntype="String">
 		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="false">
-		<cfargument name="quotationItemSignage" type="com.apirone.core.model.bean.QuotationItemSignage" required="false">
-		<cfif NOT structKeyExists(arguments, "quotationItem") AND NOT structKeyExists(arguments, "quotationItemSignage")>
+		<cfargument
+			name    ="quotationItemSignage"
+			type    ="com.apirone.core.model.bean.QuotationItemSignage"
+			required="false"
+		>
+		<cfif NOT StructKeyExists( arguments, "quotationItem" ) AND NOT StructKeyExists(
+			arguments,
+			"quotationItemSignage"
+		)>
 			<cfthrow type="Application" message="Devi passare almeno quotationItem o quotationItemSignage">
 		</cfif>
 		<cfquery name="local.q" datasource="apirone">

@@ -46,6 +46,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function clone( event, rc, prc ){
+		setting requesttimeout=240;
+
 		var data = DeserializeJSON( GetHTTPRequestData().content );
 
 		var params = {
@@ -104,7 +106,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var product  = super.bean( "ProductComplex" );
 		var status   = super.bean( "Status" );
 		var category = super.bean( "ProductCategory" );
-		var bundle = super.bean( "CatalogBundle" );
+		var bundle   = super.bean( "CatalogBundle" );
 		bundle.setModel( model.setId( json.modelId ) );
 		bundle.setLine( line.setId( rc.id ) );
 		bundle.setCategory( category.setId( json.categoryId ) );

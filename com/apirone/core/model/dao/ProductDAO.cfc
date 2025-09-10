@@ -260,8 +260,14 @@
 						product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">::uuid AND
 						line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				)
+			RETURNING product_id
 		</cfquery>
 
+		<cffile
+			file  ="#ExpandPath( "/debug.log" )#"
+			output="line:#lineId#, category: #categoryId#; cancellati: #local.q.recordcount#"
+			action="APPEND"
+		>
 		<cfreturn true>
 	</cffunction>
 </cfcomponent>
