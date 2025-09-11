@@ -7,7 +7,6 @@
 				#pageTitle()#
             </div>
 			<div class="col-6 text-end pb-3">
-                #printButton( bind="click:print", size="sm", variant="default" )#
                 #addButton( bind="click:new", size="sm" )#
 			</div>
         </div>
