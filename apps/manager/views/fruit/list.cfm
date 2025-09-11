@@ -25,23 +25,44 @@
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
 										
-                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+										<div class="col">
+											<span>Cerca</span>
+                                        	<input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+										</div>
 
-										<select class="form-control me-2" name="statusId">
-											<option value="">-- tutti gli stati</option>
-											<cfloop array="#prc.statuses#" item="item">
-												<option value="#item.getId()#">#item.getName()#</option>
-											</cfloop>
-										</select>
+										<div class="col">
+											<span>Categoria</span>
+											<select class="form-control me-2" name="categoryId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.categories#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
 
-										<select class="form-control me-2" name="orderBy">
-											<option value="fruit.code-asc" SELECTED>Codice [A-Z]</option>
-											<option value="fruit.code-desc">Codice [Z-A]</option>
-											<option value="fruit.name-asc">Descrizione [A-Z]</option>
-											<option value="fruit.name-desc">Descrizione [Z-A]</option>
-										</select>
+										<div class="col">
+											<span>Status</span>
+											<select class="form-control me-2" name="statusId">
+												<option value="">-- tutti</option>
+												<cfloop array="#prc.statuses#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
 
-										#searchButton( bind = "click:search" )#
+										<div class="col">
+											<span>Ordina per</span>
+											<select class="form-control me-2" name="orderBy">
+												<option value="fruit.code-asc" SELECTED>Codice [A-Z]</option>
+												<option value="fruit.code-desc">Codice [Z-A]</option>
+												<option value="fruit.name-asc">Descrizione [A-Z]</option>
+												<option value="fruit.name-desc">Descrizione [Z-A]</option>
+											</select>
+										</div>
+
+										<div class="align-self-end">
+											#searchButton( bind = "click:search" )#
+										</div>
 									</form>
 								</div>
 							</div>
