@@ -138,7 +138,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		// il valore potrebbe essere stato aggiornato come vuoto
-		return nullValue();
+		return NullValue();
 
 		/*
 		Throw(
