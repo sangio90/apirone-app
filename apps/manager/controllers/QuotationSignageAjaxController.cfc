@@ -5,16 +5,17 @@
 
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var mem = super.getMementify();
+		var mem    = super.getMementify();
 
 		var rows = super.fire(
 			"signageConfig.list",
 			{
 				categoryId = rc.categoryId,
-				lineId = rc.lineId,
-				modelId = rc.modelId
+				lineId     = rc.lineId,
+				modelId    = rc.modelId
 			}
 		);
+
 		var data = mem.convertList( rows, "list" );
 
 		result.setTotal( rows.len() );

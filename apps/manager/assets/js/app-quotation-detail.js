@@ -13,11 +13,11 @@ $( document ).ready( function() {
 
 AP.quotationDetail.detail = ( function() {
     var pub = {};
-    
+
     function zoneModal() {
         return AP.quotationDetail.zoneModal;
     }
-    
+
     function signageApp() {
         return AP.signage.modal;
     }
@@ -63,8 +63,8 @@ AP.quotationDetail.detail = ( function() {
                 "street":"",
                 "city":"",
                 "postalCode":"",
-                "country": {"id":""},
-                "state": {"id":""}
+                "country": { "id":"" },
+                "state": { "id":"" }
             },
             shipmentData: {
                 "name":"",
@@ -75,8 +75,8 @@ AP.quotationDetail.detail = ( function() {
                 "street":"",
                 "city":"",
                 "postalCode":"",
-                "country": {"id":"","name":""},
-                "state": {"id":"","name":""}
+                "country": { "id":"", "name":"" },
+                "state": { "id":"", "name":"" }
             },
             title: this.id ? "Modifica Preventivo" : "Nuovo Preventivo"
         }
@@ -149,25 +149,25 @@ AP.quotationDetail.detail = ( function() {
         resetForm: function() {},
 
         save: function( event ) {
-            let parsedData = viewModel.get('detailForm.data');
+            const parsedData = viewModel.get( "detailForm.data" );
 
             NM.util.ajax( {
                 method: "POST",
                 url: "/manager/ajax/quotations",
-                data: JSON.stringify(parsedData),
+                data: JSON.stringify( parsedData ),
                 callback: {
-                done: function( xhr ) {
-                    if( xhr.status == "ERRORE" ) {
-                        AP.widget.notify( "error", "Errore nel salvataggio del preventivo." );
-                    } 
-                    if ( xhr.status == "SUCCESS" ) {
-                        AP.widget.notify( "success", "Preventivo salvato correttamente." );
-                        viewModel.set( "detailForm", defaultDetailForm );
-                        setTimeout( () => $( "#signage-modal" ).modal( "hide" ), 1000 );
-                    }}
+                    done: function( xhr ) {
+                        if( xhr.status == "ERRORE" ) {
+                            AP.widget.notify( "error", "Errore nel salvataggio del preventivo." );
+                        }
+                        if ( xhr.status == "SUCCESS" ) {
+                            AP.widget.notify( "success", "Preventivo salvato correttamente." );
+                            viewModel.set( "detailForm", defaultDetailForm );
+                            setTimeout( () => $( "#signage-modal" ).modal( "hide" ), 1000 );
+                        }
+                    }
                 }
             } );
-
 
             return false;
         },
@@ -177,15 +177,15 @@ AP.quotationDetail.detail = ( function() {
                 method: "GET",
                 url: "/manager/ajax/quotationzones/" + AP.page.quotation.id,
                 callback: {
-                done: function( xhr ) {
+                    done: function( xhr ) {
                         if( xhr.status == "ERRORE" ) {
                             AP.widget.notify( "error", "Errore nel recupero delle zone." );
-                        } 
+                        }
                         if ( xhr.status == "SUCCESS" ) {
                             var zones = xhr.data.length ? xhr.data : [ { "id": "", "name": "Tutte le zone" } ];
                             zones.unshift( { "id": "", "name": "Tutte le zone" } );
-                            viewModel.get('zones').data(zones);
-                            viewModel.set('detailForm.data.zone', zones[0]);
+                            viewModel.get( "zones" ).data( zones );
+                            viewModel.set( "detailForm.data.zone", zones[0] );
                             viewModel.getItems();
                         }
                     }
@@ -195,41 +195,40 @@ AP.quotationDetail.detail = ( function() {
 
             return false;
         },
-        
+
         getItems: function( e ) {
-            if (viewModel.detailForm.data.zone.name != "") {
+            if ( viewModel.detailForm.data.zone.name != "" ) {
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotationitems",
-                    data: JSON.stringify({ zoneId: viewModel.detailForm.data.zone ? viewModel.detailForm.data.zone.id : "", quotationId: AP.page.quotation.id }),
+                    data: JSON.stringify( { zoneId: viewModel.detailForm.data.zone ? viewModel.detailForm.data.zone.id : "", quotationId: AP.page.quotation.id } ),
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERRORE" ) {
                                 AP.widget.notify( "error", "Errore nel recupero delle righe." );
-                            } 
+                            }
                             if ( xhr.status == "SUCCESS" ) {
-                                viewModel.get('quotationItems').data(xhr.data);
+                                viewModel.get( "quotationItems" ).data( xhr.data );
                             }
                         }
                     }
                 } );
             }
-            
+
             return false;
         },
 
         setQuotation: function( quotation ) {
-            viewModel.set('detailForm.data.name', quotation.name);
-            viewModel.set('detailForm.data.number', quotation.quotationNumber);
-            viewModel.set('detailForm.data.version', quotation.versionNumber);
-            viewModel.set('detailForm.data.quotationDate', quotation.quotationDate);
-            viewModel.set('detailForm.data.validityDate', quotation.validityDate);
-            viewModel.set('detailForm.data.opportunityName', quotation.opportunityName);
-            viewModel.set('detailForm.data.leadName', quotation.leadName);
-            viewModel.set('detailForm.data.active', quotation.active);
-            viewModel.set('detailForm.data.status.id', quotation.status.id);
-            viewModel.set('detailForm.data.language.id', quotation.lang.id);
-
+            viewModel.set( "detailForm.data.name", quotation.name );
+            viewModel.set( "detailForm.data.number", quotation.quotationNumber );
+            viewModel.set( "detailForm.data.version", quotation.versionNumber );
+            viewModel.set( "detailForm.data.quotationDate", quotation.quotationDate );
+            viewModel.set( "detailForm.data.validityDate", quotation.validityDate );
+            viewModel.set( "detailForm.data.opportunityName", quotation.opportunityName );
+            viewModel.set( "detailForm.data.leadName", quotation.leadName );
+            viewModel.set( "detailForm.data.active", quotation.active );
+            viewModel.set( "detailForm.data.status.id", quotation.status.id );
+            viewModel.set( "detailForm.data.language.id", quotation.lang.id );
         },
 
         addSignage: function() {
@@ -243,30 +242,30 @@ AP.quotationDetail.detail = ( function() {
         addZone: function() {
             NM.util.openModal( AP.quotationDetail.fields.zoneModalRoot );
         }
-    } )
+    } );
 
     pub.config = function( options ) {
-        return viewModel.get('detailForm.data');
+        return viewModel.get( "detailForm.data" );
     };
 
     pub.init = function() {
-        viewModel.get( "languages" ).data( AP.page.languages )
-        viewModel.get( "statuses" ).data( AP.page.statuses )
-        viewModel.get( "pricelists" ).data( AP.page.pricelists )
-        viewModel.get( "paymentMethods" ).data( AP.page.paymentMethods )
-        viewModel.get( "currencies" ).data( AP.page.currencies )
-        viewModel.get( "countries" ).data( AP.page.countries )
-        viewModel.get( "states" ).data( AP.page.states )
+        viewModel.get( "languages" ).data( AP.page.languages );
+        viewModel.get( "statuses" ).data( AP.page.statuses );
+        viewModel.get( "pricelists" ).data( AP.page.pricelists );
+        viewModel.get( "paymentMethods" ).data( AP.page.paymentMethods );
+        viewModel.get( "currencies" ).data( AP.page.currencies );
+        viewModel.get( "countries" ).data( AP.page.countries );
+        viewModel.get( "states" ).data( AP.page.states );
         viewModel.getZones();
         viewModel.setQuotation( AP.page.quotation );
         if ( AP.page.quotation ) {
             // $( "#nav-plan-tab" ).removeAttr("hidden");
-            $( "#nav-products-tab" ).removeAttr("hidden");
+            $( "#nav-products-tab" ).removeAttr( "hidden" );
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
         }
         kendo.bind( AP.quotationDetail.fields.detailRoot, viewModel );
     };
-    
+
     return pub;
 } () );
 
@@ -282,7 +281,7 @@ AP.quotationDetail.zoneModal = ( function() {
             quotation: {
                 id: AP.page.quotation.id
             },
-            title: this.id ? "Modifica Zona" : "Nuova Zona"
+            title: this.id ? "Modifica zona" : "Nuova zona"
         }
     };
 
@@ -294,31 +293,28 @@ AP.quotationDetail.zoneModal = ( function() {
         },
 
         saveZone: function( event ) {
-            let parsedData = viewModel.get('detailForm.data');
+            const parsedData = viewModel.get( "detailForm.data" );
 
             NM.util.ajax( {
                 method: "POST",
                 url: "/manager/ajax/quotationzones",
-                data: JSON.stringify(parsedData),
+                data: JSON.stringify( parsedData ),
                 callback: {
-                done: function( xhr ) {
-                    if( xhr.status == "ERRORE" ) {
-                        AP.widget.notify( "error", "Errore nel salvataggio della zona." );
-                    } 
-                    if ( xhr.status == "SUCCESS" ) {
+                    done: function( xhr ) {
                         AP.widget.notify( "success", "Zona salvata correttamente." );
                         viewModel.set( "detailForm", defaultDetailForm );
                         setTimeout( () => $( "#zone-modal" ).modal( "hide" ), 1000 );
+
                         AP.quotationDetail.detail.getZones();
-                    }}
+                    }
                 }
             } );
             return false;
-        },  
+        },
     } );
 
     pub.init = function() {
         kendo.bind( fields, viewModel );
     };
     return pub;
-} () );  
+} () );

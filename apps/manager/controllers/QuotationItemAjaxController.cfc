@@ -1,14 +1,18 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
-		var data                = [];
-		var result              = super.getResult();
-		var params              = super.paramsFromUrl();
+		var data   = [];
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+
 		params[ "quotationId" ] = rc.quotationId;
+
 		if ( Len( rc.zoneId ) ) {
 			params[ "quotationZoneId" ] = rc.zoneId;
 		}
+
 		var rows = super.fire( "QuotationItem.search", params );
+
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
 		result.setData( rows.getData() );
