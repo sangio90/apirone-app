@@ -213,6 +213,20 @@ AP.quotationDetail.detail = ( function() {
             return false;
         },
 
+        setQuotation: function( quotation ) {
+            viewModel.set('detailForm.data.name', quotation.name);
+            viewModel.set('detailForm.data.number', quotation.quotationNumber);
+            viewModel.set('detailForm.data.version', quotation.versionNumber);
+            viewModel.set('detailForm.data.quotationDate', quotation.quotationDate);
+            viewModel.set('detailForm.data.validityDate', quotation.validityDate);
+            viewModel.set('detailForm.data.opportunityName', quotation.opportunityName);
+            viewModel.set('detailForm.data.leadName', quotation.leadName);
+            viewModel.set('detailForm.data.active', quotation.active);
+            viewModel.set('detailForm.data.status.id', quotation.status.id);
+            viewModel.set('detailForm.data.language.id', quotation.lang.id);
+
+        },
+
         addSignage: function() {
             signageApp.new();
         },
@@ -235,7 +249,7 @@ AP.quotationDetail.detail = ( function() {
         viewModel.get( "countries" ).data( AP.page.countries )
         viewModel.get( "states" ).data( AP.page.states )
         viewModel.getZones();
-
+        viewModel.setQuotation( AP.page.quotation );
         if ( AP.page.quotation ) {
             // $( "#nav-plan-tab" ).removeAttr("hidden");
             $( "#nav-products-tab" ).removeAttr("hidden");

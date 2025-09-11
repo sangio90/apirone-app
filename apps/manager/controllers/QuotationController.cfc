@@ -119,7 +119,10 @@
 
 		prc.zones                       = DeserializeJSON( FileRead( "/config/data/fake/zones.json.cfm" ) );
 		prc.plates                      = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
-		prc.page[ "quotation" ][ "id" ] = rc.id;
+		var quotation = super.fire( "Quotation.get", [rc.id] );
+		quotation.setQuotationDate(DateFormat( quotation.getQuotationDate(), "yyyy-mm-dd" ));
+		quotation.setValidityDate(DateFormat( quotation.getValidityDate(), "yyyy-mm-dd" ));
+		prc.page['quotation'] = quotation;
 
 		event.setView( "quotation/detail" );
 	}
