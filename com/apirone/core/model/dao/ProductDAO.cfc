@@ -66,6 +66,7 @@
 					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 				</cfif>
 
+				<!--- TODO: move to bundle --->
 				<cfif !IsNull( arguments.lineId )>
 					AND products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				</cfif>
@@ -78,6 +79,7 @@
 					AND products.catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundleId#">::uuid
 				</cfif>
 
+				<!--- TODO: move to bundle --->
 				<cfif !IsNull( arguments.modelId )>
 					AND products.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
 				</cfif>
@@ -86,6 +88,10 @@
 					AND products.product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">)
 				</cfif>
 
+				/*
+					TODO: move to bundle (cercare anche in catalog_bundle.category_id,
+					verificare se categoryModeId è sempre valorizzato )
+				*/
 				<cfif !IsNull( arguments.categoryId )>
 					AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
 				</cfif>

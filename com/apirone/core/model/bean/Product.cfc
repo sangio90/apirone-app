@@ -36,12 +36,14 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	/*
 		complex (plates)
 		TODO da cancellare line/model sostituite da bundle
+		TODO: move to bundle:
+			  - remove properties
+			  - and shortcut getMolde(), setModel()
 	*/
 	property name="model" type="com.apirone.core.model.bean.Model";
 	property name="line" type="com.apirone.core.model.bean.Line";
 	property name="finish" type="com.apirone.core.model.bean.Finish";
 	property name="status" type="com.apirone.core.model.bean.Status";
-
 
 	/*
 		simple (fruit)
