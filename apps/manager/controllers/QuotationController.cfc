@@ -112,15 +112,15 @@
 			{ "id" = 15, "name" = "Birmingham", "countryId" = 5 }
 		];
 
-		//prc.jsScripts.add( "app-plate" );
+		// prc.jsScripts.add( "app-plate" );
 		prc.jsScripts.add( "app-quotation-detail" );
 		prc.jsScripts.add( "app-signage" );
 		prc.vatCodeList = super.service( "VatCode" ).list();
-		prc.plates                      = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
-		var quotation = super.fire( "Quotation.get", [rc.id] );
-		quotation.setQuotationDate(DateFormat( quotation.getQuotationDate(), "yyyy-mm-dd" ));
-		quotation.setValidityDate(DateFormat( quotation.getValidityDate(), "yyyy-mm-dd" ));
-		prc.page['quotation'] = quotation;
+		prc.plates      = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
+		var quotation   = super.fire( "Quotation.get", [ rc.id ] );
+		quotation.setQuotationDate( DateFormat( quotation.getQuotationDate(), "yyyy-mm-dd" ) );
+		quotation.setValidityDate( DateFormat( quotation.getValidityDate(), "yyyy-mm-dd" ) );
+		prc.page[ "quotation" ] = quotation;
 
 		event.setView( "quotation/detail" );
 	}

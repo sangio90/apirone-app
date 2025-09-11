@@ -32,7 +32,9 @@ component extends="com.apirone.core.controller.AbsController" {
 				);
 				quotationItemSignageBean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
 				if ( Len( json.zoneId ) ) {
-					quotationItemSignageBean.setQuotationZone( super.service( "QuotationZone" ).get( json.zoneId ) );
+					quotationItemSignageBean.setQuotationZone(
+						super.service( "QuotationZone" ).get( json.zoneId )
+					);
 				}
 				quotationItemSignageBean.setPrice( 20.1 );
 				quotationItemSignageBean.setQuantity( json.quantity );

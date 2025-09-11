@@ -75,7 +75,10 @@
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getId()#">,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getCharCount()#">,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeight()#">,
-					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeightInPixel()#">,
+					<cfqueryparam
+			cfsqltype="Numeric"
+			value="#arguments.quotationItem.getSignageConfigItem().getHeightInPixel()#"
+		>,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getRowCount()#">
 				</cfif>
 			)
@@ -90,7 +93,7 @@
 			UPDATE quotation_items
 			SET
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
-				quotation_zone_id = 
+				quotation_zone_id =
 				<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid
 				<cfelse>
