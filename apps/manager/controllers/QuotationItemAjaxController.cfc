@@ -31,8 +31,11 @@ component extends="com.apirone.core.controller.AbsController" {
 					super.service( "SignageConfigItem" ).get( json.signageConfigItem.id )
 				);
 				quotationItemSignageBean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
+				if ( Len( json.zoneId ) ) {
+					quotationItemSignageBean.setQuotationZone( super.service( "QuotationZone" ).get( json.zoneId ) );
+				}
 				quotationItemSignageBean.setPrice( 20.1 );
-				quotationItemSignageBean.setQuantity( json.quantita );
+				quotationItemSignageBean.setQuantity( json.quantity );
 				if ( !Len( json.id ) ) {
 					messageId = "quotationItem.created";
 					thisId    = super.fire( "quotationItem.create", [ quotationItemSignageBean ] )

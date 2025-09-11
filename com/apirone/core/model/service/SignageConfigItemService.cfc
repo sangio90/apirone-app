@@ -99,7 +99,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 
 			bean.setHeight( record.height );
-			bean.setHeightInPixels( record.height_in_pixel );
+			bean.setHeightInPixel( record.height_in_pixel );
 			bean.setRowCount( record.row_count );
 			bean.setCharCount( record.char_count );
 

@@ -16,7 +16,7 @@
             </td>
             <td width="20%" class="align-end align-top">
                 <input type="text" class="form-control w-70" name="heightInPx_##:uid##"
-                    data-bind="value: heightInPixels"
+                    data-bind="value: heightInPixel"
                     data-rule-required="true"
                     data-rule-number="true"
                     data-msg="Altezza in px richiesta e non valida"

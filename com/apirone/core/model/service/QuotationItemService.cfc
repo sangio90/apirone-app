@@ -75,11 +75,7 @@
 	}
 
 	public String function create( required quotationItem ){
-		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
-			var newId = getDao().insert( quotationItemSignage = arguments.quotationItem );
-		} else {
-			var newId = getDao().insert( quotationItem = arguments.quotationItem );
-		}
+		var newId = getDao().insert( arguments.quotationItem );
 
 		return newId;
 	}

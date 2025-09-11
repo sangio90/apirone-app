@@ -210,12 +210,16 @@ ul.nav-main>li>a:focus {
     border-radius: 10px;
     background-color: #e2ebfb;
     padding: 10px;
+    max-width: 300px !important;
+    max-height: 300px !important;
 }
 
 .quotation-item-inner {
     border-radius: 10px;
     background-color: #e2ebfb;
     margin: 10px;
+    max-width: 100% !important;
+    max-height: 100% !important;
 }
 
 .page-header {

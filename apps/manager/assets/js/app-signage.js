@@ -12,13 +12,15 @@ $( document ).ready( function() {
 
 AP.signage.modal = ( function() {
     var pub = {};
-
+    function quotationDetailApp() {
+        return AP.quotationDetail.detail;
+    };
     var defaultDetailForm = {
         data: {
             id: "",
             code: "",
             name: "",
-            quantity: 1,
+            quantity: 0,
             price: 0,
             signageLines: new kendo.data.DataSource(),
             category: {
@@ -28,6 +30,9 @@ AP.signage.modal = ( function() {
                 id: "",
             },
             model: {
+                id: "",
+            },
+            zone: {
                 id: "",
             },
             finish: {
@@ -156,7 +161,7 @@ AP.signage.modal = ( function() {
                 })
                 contentSpanPreview.css({
                     "font-family": fontFamily,
-                    "font-size": signageConfigItem.heightInPixels + 'px'
+                    "font-size": signageConfigItem.heightInPixel + 'px'
                 });
                 contentSpanPreview.html(valore);
             }
@@ -335,9 +340,12 @@ AP.signage.modal = ( function() {
         },
 
         save: function( event ) {
+            var quotationDetailData = quotationDetailApp().config();
             var quotationId = AP.page.quotation.id;
             let parsedData = viewModel.get('detailForm.data');
+            debugger
             parsedData.quotationId = quotationId;
+            parsedData.zoneId = quotationDetailData.zone.id
 
             // if ( detailForm.valid() ) {
             if (true) {

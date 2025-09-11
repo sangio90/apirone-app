@@ -42,7 +42,7 @@
     <mapper id="SignageConfigItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.SignageConfigItem">
         <map from="id" to="id" type="cf:Numeric" />
         <map from="height" to="height" type="cf:Numeric" />
-        <map from="heightInPixels" to="heightInPixels" type="Integer" />
+        <map from="heightInPixel" to="heightInPixel" type="Integer" />
         <map from="rowCount" to="rowCount" type="Integer" />
         <map from="charCount" to="charCount" type="Integer" />
     </mapper>
