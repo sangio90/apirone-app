@@ -55,7 +55,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				bean.setId( item.id );
 				bean.setHeight( item.height );
-				bean.setHeightInPixels( item.heightInPixels );
+				bean.setHeightInPixel( item.heightInPixel );
 				bean.setCharCount( item.charCount );
 				bean.setRowCount( item.rowCount );
 

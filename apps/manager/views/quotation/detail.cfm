@@ -119,15 +119,15 @@
                                         </div>
                                         <div class="col-2 mb-2">
                                             <select class="form-control me-3"
-                                                    data-bind="source: zones, value: detailForm.data.zone.id, events: { change: getItems }"
+                                                    data-bind="source: zones, value: detailForm.data.zone, events: { change: getItems }"
                                                     data-placeholder="-- Seleziona la zona"
                                                     data-value-field="id"
-                                                    data-text-field="name"    
+                                                    data-text-field="name"
                                                 >
                                             </select>
                                         </div>
                                         <div class="col-2 mb-2">
-                                            <button type="button" class="btn btn-primary btn-sm" onclick="javascript:addZone()">Aggiungi zona</button>                                        
+                                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:addZone">Aggiungi zona</button>                                        
                                         </div>
                                     </div>
                                     <div class="form-group row mb-2">
@@ -135,14 +135,14 @@
                                             <div class="card-body">
                                             <nav>
                                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                                    <div class="col-3 flex">
+                                                    <div class="col-4 flex">
                                                         <button class="nav-link active" id="nav-plate-tab" data-bs-toggle="tab" data-bs-target="##nav-plate" type="button" role="tab">Placche</button>
                                                         <button class="nav-link" id="nav-signage-tab" data-bs-toggle="tab" data-bs-target="##nav-signage" type="button" role="tab">Segnaletiche</button>
                                                         <button class="nav-link" id="nav-accessories-tab" data-bs-toggle="tab" data-bs-target="##nav-accessories" type="button" role="tab">Accessori</button>
                                                     </div>
                                                     <div class="col-6 text-start">
-                                                        <button id="addPlateButton" type="button" class="col-2 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
-                                                        <button id="addSignageButton" type="button" class="col-2 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none">Aggiungi segnaletica</button>
+                                                        <button id="addPlateButton" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
+                                                        <button id="addSignageButton" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none">Aggiungi segnaletica</button>
                                                     </div>
                                                 </div>
                                             </nav>
@@ -151,7 +151,6 @@
                                                     <div class="row">
 
                                                         <cfloop array="#prc.plates#" item="item">
-
                                                             <div class="quotation-item col-3">
                                                                 <div class="quotation-item-inner">
                                                                     <div class="row">
@@ -159,7 +158,7 @@
                                                                             #item.name#
                                                                         </div>
                                                                         <div class="col-12">
-                                                                            <img src="/assets/fakes/img/plate.jpg" style="width: 100%;">
+                                                                            <img src="/assets/fakes/img/plate.jpg" style="width: 80%;">
                                                                         </div>
                                                                         <div class="col-6">
                                                                             Quantità: #item.qty#<br>
@@ -167,8 +166,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        
+                                                            </div>                                                        
                                                         </cfloop>
 
                                                     </div>
@@ -198,7 +196,7 @@
                                             <label class="control-label text-sm-end">Listino <span class="required">*</span></label>
                                             <select name="pricelist" class="form-control"
                                                 data-placeholder="-- Seleziona listino"
-                                                data-bind="source: pricelists, value: detailForm.data.pricelist.id"
+                                                data-bind="source: pricelists, value: detailForm.data.pricelist"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -208,7 +206,7 @@
                                             <label class="control-label text-sm-end">Pagamento <span class="required">*</span></label>
                                             <select name="paymentMethod" class="form-control"
                                                 data-placeholder="-- Seleziona metodo pagamento"
-                                                data-bind="source: paymentMethods, value: detailForm.data.paymentMethod.id"
+                                                data-bind="source: paymentMethods, value: detailForm.data.paymentMethod"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -229,7 +227,7 @@
                                             <label class="control-label text-sm-end">Valuta <span class="required">*</span></label>
                                             <select name="currency" class="form-control"
                                                 data-placeholder="-- Seleziona valuta"
-                                                data-bind="source: currencies, value: detailForm.data.currency.id"
+                                                data-bind="source: currencies, value: detailForm.data.currency"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -309,7 +307,7 @@
                                         <div class="col-sm-9">
                                             <select name="invoiceData.country" class="form-control"
                                                 data-placeholder="-- Seleziona Nazione"
-                                                data-bind="source: countries, value: detailForm.data.invoiceData.country.id, events: { change: loadInvoiceStates }"
+                                                data-bind="source: countries, value: detailForm.data.invoiceData.country, events: { change: loadInvoiceStates }"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -322,7 +320,7 @@
                                         <div class="col-sm-9">
                                             <select name="invoiceData.state" class="form-control"
                                                 data-placeholder="-- Seleziona Provincia"
-                                                data-bind="source: filteredInvoiceStates, value: detailForm.data.invoiceData.state.id"
+                                                data-bind="source: filteredInvoiceStates, value: detailForm.data.invoiceData.state"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -405,7 +403,7 @@
                                         <div class="col-sm-9">
                                             <select name="shipmentData.country" class="form-control"
                                                 data-placeholder="-- Seleziona Nazione"
-                                                data-bind="source: countries, value: detailForm.data.shipmentData.country.id, events: { change: loadShipmentStates }"
+                                                data-bind="source: countries, value: detailForm.data.shipmentData.country, events: { change: loadShipmentStates }"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -418,7 +416,7 @@
                                         <div class="col-sm-9">
                                             <select name="shipmentData.state" class="form-control"
                                                 data-placeholder="-- Seleziona Provincia"
-                                                data-bind="source: filteredShipmentStates, value: detailForm.data.shipmentData.state.id"
+                                                data-bind="source: filteredShipmentStates, value: detailForm.data.shipmentData.state"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -497,6 +495,7 @@
     </div>
     #view( "quotation/signage-modal" )#
     #view( "quotation/plate-modal" )#
+    #view( "quotation/zone-modal" )#
     #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
 </cfoutput>
 <script>

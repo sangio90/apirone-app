@@ -1,7 +1,8 @@
 AP.namespace( "quotationDetail" );
 
 Object.assign( AP.quotationDetail.fields, {
-    detailRoot: $( "#quotation-detail-root" )
+    detailRoot: $( "#quotation-detail-root" ),
+    zoneModalRoot: $( "#zone-modal-root" ),
 } );
 
 $( document ).ready( function() {
@@ -12,11 +13,15 @@ $( document ).ready( function() {
 
 AP.quotationDetail.detail = ( function() {
     var pub = {};
-
-    var plateApp   = AP.plate.designer;
-    var signageApp = AP.signage.modal;
-    // var zoneModal = AP.zone.modal;
     
+    function zoneModal() {
+        return AP.quotationDetail.zoneModal;
+    }
+    
+    function signageApp() {
+        return AP.signage.modal;
+    }
+
     var defaultDetailForm = {
         data: {
             id: "",
@@ -228,17 +233,21 @@ AP.quotationDetail.detail = ( function() {
         },
 
         addSignage: function() {
-            signageApp.new();
+            signageApp().new();
         },
 
         addPlate: function() {
             plateApp.new();
         },
 
-        // addZone: function() {
-        //     zoneModal.new();
-        // }
+        addZone: function() {
+            NM.util.openModal( AP.quotationDetail.fields.zoneModalRoot );
+        }
     } )
+
+    pub.config = function( options ) {
+        return viewModel.get('detailForm.data');
+    };
 
     pub.init = function() {
         viewModel.get( "languages" ).data( AP.page.languages )
@@ -260,3 +269,56 @@ AP.quotationDetail.detail = ( function() {
     
     return pub;
 } () );
+
+AP.quotationDetail.zoneModal = ( function() {
+    var pub = {};
+    var fields = AP.quotationDetail.fields.zoneModalRoot;
+
+    var defaultDetailForm = {
+        data: {
+            id: "",
+            name: "",
+            description: "",
+            quotation: {
+                id: AP.page.quotation.id
+            },
+            title: this.id ? "Modifica Zona" : "Nuova Zona"
+        }
+    };
+
+    var viewModel = kendo.observable( {
+        detailForm: defaultDetailForm,
+
+        resetForm: function() {
+            viewModel.set( "detailForm", defaultDetailForm );
+        },
+
+        saveZone: function( event ) {
+            let parsedData = viewModel.get('detailForm.data');
+
+            NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/quotationzones",
+                data: JSON.stringify(parsedData),
+                callback: {
+                done: function( xhr ) {
+                    if( xhr.status == "ERRORE" ) {
+                        AP.widget.notify( "error", "Errore nel salvataggio della zona." );
+                    } 
+                    if ( xhr.status == "SUCCESS" ) {
+                        AP.widget.notify( "success", "Zona salvata correttamente." );
+                        viewModel.set( "detailForm", defaultDetailForm );
+                        setTimeout( () => $( "#zone-modal" ).modal( "hide" ), 1000 );
+                        AP.quotationDetail.detail.getZones();
+                    }}
+                }
+            } );
+            return false;
+        },  
+    } );
+
+    pub.init = function() {
+        kendo.bind( fields, viewModel );
+    };
+    return pub;
+} () );  
