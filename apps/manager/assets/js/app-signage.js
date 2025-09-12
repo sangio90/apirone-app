@@ -12,9 +12,6 @@ $( document ).ready( function() {
 
 AP.signage.modal = ( function() {
     var pub = {};
-    function quotationDetailApp() {
-        return AP.quotationDetail.detail;
-    };
     var defaultDetailForm = {
         data: {
             id: "",
@@ -343,7 +340,6 @@ AP.signage.modal = ( function() {
             var quotationDetailData = quotationDetailApp().config();
             var quotationId = AP.page.quotation.id;
             let parsedData = viewModel.get('detailForm.data');
-            debugger
             parsedData.quotationId = quotationId;
             parsedData.zoneId = quotationDetailData.zone.id
 

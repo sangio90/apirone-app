@@ -297,6 +297,7 @@
 		get( "/quotations" ).to( "QuotationController.list" ).end();
 
 		get( "/ajax/quotationzones/:quotationId" ).to( "QuotationZoneAjaxController.list" ).end();
+		post( "/ajax/quotationzones" ).to( "QuotationZoneAjaxController.save" ).end();
 		post( "/ajax/quotationitems" ).to( "QuotationItemAjaxController.list" ).end();
 
 		post("/ajax/quotation-items").to( "QuotationItemAjaxController.save" ).end();

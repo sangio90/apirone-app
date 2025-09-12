@@ -1,4 +1,5 @@
 component extends="com.apirone.core.controller.AbsController" {
+	property name="dao" inject="QuotationZoneDAO";
 
 	function list( event, rc, prc ){
 		var data   = [];
@@ -19,54 +20,41 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		var categories = [];
-
 		var thisId    = "";
 		var messageId = "";
 		var texts     = [];
+		var errors  = [];
 
 		var result = super.getResult();
 
-		var quotation = super.bean( "Quotation" );
+		var quotationZone = super.bean( "QuotationZone" );
+		var existingCombination = dao.find( argumentCollection = {
+				quotationId = json.quotation.id,
+				name        = json.name,
+				originId    = Len(json.parentZone) ? json.parentZone.id : null
+		} );
 
-		quotation.setId( json.id );
-		quotation.setName( json.name );
-		quotation.setQuotationNumber( json.number );
-		quotation.setVersionNumber( json.version );
-		quotation.setQuotationDate( json.quotationDate );
-		quotation.setNotes( json.notes );
-		quotation.setValidityDate( json.validityDate );
-		quotation.setOpportunityName( json.opportunityName );
-		quotation.setLeadName( json.leadName );
-		quotation.setActive( true );
-		quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
-		quotation.setLang( super.fire( "lang.get", [ json.language.id ] ) );
-		// quotation.setCustomPaymentMethod( json.custom_payment_method );
-		// quotation.setPricelist( type.setId( json.pricelist.id ) );
-		// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
-		// quotation.setCurrency( type.setId( json.currency.id ) );
-		// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
-		// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
-		// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
-		// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
-
-		if ( !Len( json.id ) ) {
-			messageId = "quotation.created";
-			thisId    = super.fire( "quotation.create", [ quotation ] )
-		} else {
-			var bean = super.fire( "Quotation.get", [ rc.id ] );
-			if ( json.status != bean.getStatus().getId() ) {
-				quotation.setActive( 0 );
-				super.fire( "quotation.update", [ quotation ] )
-				thisId    = super.fire( "quotation.clone", [ quotation ] );
-				messageId = "quotation.updated";
-			} else {
-				messageId = "quotation.updated";
-				thisId    = super.fire( "quotation.update", [ quotation ] )
+		if (!Len(existingCombination)) {
+			quotationZone.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
+			quotationZone.setName(json.name);
+			if (Len(json.parentZone)) {
+				quotationZone.setOrigin(super.service( "QuotationZone" ).get( json.parentZone.id ));
 			}
-		}
 
-		var message = completeMessage( messageId );
+			if ( !Len( json.id ) ) {
+				messageId = "quotationZone.created";
+				thisId    = super.fire( "quotationZone.create", [ quotationZone ] )
+			} else {
+				messageId = "quotationZone.updated";
+				thisId    = super.fire( "quotationZone.update", [ quotationZone ] )
+			}
+			var message = completeMessage( messageId );
+		} else {
+				result.setData( { "error" = "Combinazione Zona già esistente in questo preventivo." } );
+				result.setStatus( "ERRORE" );
+				event.setValue( "result", result );
+				return;
+		}
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
 

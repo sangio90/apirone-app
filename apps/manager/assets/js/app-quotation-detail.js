@@ -14,10 +14,6 @@ $( document ).ready( function() {
 AP.quotationDetail.detail = ( function() {
     var pub = {};
 
-    function zoneModal() {
-        return AP.quotationDetail.zoneModal;
-    }
-
     function signageApp() {
         return AP.signage.modal;
     }
@@ -35,6 +31,7 @@ AP.quotationDetail.detail = ( function() {
                 "id":"",
                 "name":""
             },
+            zones: new kendo.data.DataSource(), 
             quotationDate: new Date(),
             validityDate: new Date(),
             notes: "",
@@ -186,6 +183,7 @@ AP.quotationDetail.detail = ( function() {
                             zones.unshift( { "id": "", "name": "Tutte le zone" } );
                             viewModel.get( "zones" ).data( zones );
                             viewModel.set( "detailForm.data.zone", zones[0] );
+                            viewModel.set( "detailForm.data.zones", zones );
                             viewModel.getItems();
                         }
                     }
@@ -240,12 +238,19 @@ AP.quotationDetail.detail = ( function() {
         },
 
         addZone: function() {
+            if ( AP.quotationDetail.fields.zoneModalRoot.length ) {
+                AP.quotationDetail.zoneModal.init();
+            }
             NM.util.openModal( AP.quotationDetail.fields.zoneModalRoot );
         }
     } );
 
     pub.config = function( options ) {
         return viewModel.get( "detailForm.data" );
+    };
+
+    pub.methods = function( options ) {
+        return viewModel;
     };
 
     pub.init = function() {
@@ -272,21 +277,24 @@ AP.quotationDetail.detail = ( function() {
 AP.quotationDetail.zoneModal = ( function() {
     var pub = {};
     var fields = AP.quotationDetail.fields.zoneModalRoot;
-
     var defaultDetailForm = {
         data: {
             id: "",
-            name: "",
+            name: "Nuova Zona",
             description: "",
             quotation: {
                 id: AP.page.quotation.id
             },
-            title: this.id ? "Modifica zona" : "Nuova zona"
+            title: this.id ? "Modifica zona" : "Nuova zona",
+            parentZone: {
+                id: ""
+            }
         }
     };
 
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
+        zones: new kendo.data.DataSource(),
 
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
@@ -301,11 +309,14 @@ AP.quotationDetail.zoneModal = ( function() {
                 data: JSON.stringify( parsedData ),
                 callback: {
                     done: function( xhr ) {
-                        AP.widget.notify( "success", "Zona salvata correttamente." );
-                        viewModel.set( "detailForm", defaultDetailForm );
-                        setTimeout( () => $( "#zone-modal" ).modal( "hide" ), 1000 );
-
-                        AP.quotationDetail.detail.getZones();
+                        if( xhr.status == "ERRORE" ) {
+                            AP.widget.notify( "error", "Combinazione Zona già esistente in questo preventivo." );
+                        } 
+                        if ( xhr.status == "SUCCESS" ) {
+                            AP.widget.notify( "success", "Zona salvata correttamente." );
+                            setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
+                            AP.quotationDetail.detail.methods().getZones();
+                        }
                     }
                 }
             } );
@@ -315,6 +326,8 @@ AP.quotationDetail.zoneModal = ( function() {
 
     pub.init = function() {
         kendo.bind( fields, viewModel );
+        
+        viewModel.get('zones').data(AP.quotationDetail.detail.config().get('zones').filter((zone) => { return zone.id != '' }));
     };
     return pub;
 } () );
