@@ -7,12 +7,22 @@
                 <form id="zone-form" method="POST" name="zone-form">
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
-                        <h2 class="card-title" data-bind="text:zoneForm.title"></h2>
+                        <h2 class="card-title" data-bind="text:detailForm.data.title"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>                
                         
                     <div class="card-body">
                         <div class="mb-3 row">
+                            <div class="col-6">
+                                <label class="col-sm-12 col-form-label text-start">Zone</label>
+                                <select class="form-control me-3"
+                                    data-bind="source: zones, value: detailForm.data.parentZone"
+                                    data-placeholder="-- Seleziona la zona"
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                >
+                                </select>
+                            </div>
                             <div class="col-6">    
                                 <label class="col-sm-12 col-form-label text-start">Nome</label>
                                 <input class="form-control" type="name" data-bind="value: detailForm.data.name" min="1">
@@ -35,7 +45,7 @@
                 </form>
 
             </div>
-        </selection>
+        </section>
     
     </div>
 

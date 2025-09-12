@@ -12,9 +12,6 @@ $( document ).ready( function() {
 
 AP.signage.modal = ( function() {
     var pub = {};
-    function quotationDetailApp() {
-        return AP.quotationDetail.detail;
-    };
     var defaultDetailForm = {
         data: {
             id: "",

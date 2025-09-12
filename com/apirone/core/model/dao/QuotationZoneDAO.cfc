@@ -17,12 +17,14 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationId" type="String" required="false">
 		<cfargument name="originId" type="String" required="false">
+		<cfargument name="name" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_zone_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
 
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
+				quotation_zone,
 				quotation_zone_id::varchar,
 				quotation_id::varchar,
 				origin_id::varchar,
@@ -30,6 +32,9 @@
 			FROM
 				quotation_zones
 			WHERE 1=1
+				<cfif !IsNull( arguments.name )>
+					AND quotation_zone = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.name#">
+				</cfif>
 				<cfif !IsNull( arguments.quotationId )>
 					AND quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationId#">::uuid
 				</cfif>
