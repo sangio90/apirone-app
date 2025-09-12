@@ -5,6 +5,6 @@
     },
     {
         id: "COM",
-        name: "Per linea",
+        name: "Complesso",
     },
 ]

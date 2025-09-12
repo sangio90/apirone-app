@@ -76,8 +76,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setProcessingType( getLookupService().get( "processingType", record.processiong_type_id ) );
 			bean.setMeasurementUnit( getLookupService().get( "measurementUnit", misurementValue ) );
 
-			var variants = getVariantService().list( rawProductId = record.arcodart );
-			// var colors   = getColorService().list( rawProductId = record.arcodart );
+			var variants  = getVariantService().list( rawProductId = record.arcodart );
+			var allColors = getColorService().list( rawProductId = record.arcodart );
 
 			if ( !variants.len() ) {
 				var variant = super.bean( "Variant" );
@@ -88,27 +88,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				variants.add( variant );
 			}
 
-			/*
-			if ( !colors.len() ) {
-				var color = super.bean( "Color" );
-
-				color.setId( "_NOCOL" );
-				color.setName( "Nessun colore" );
-
-				colors.add( color );
-			}
-			*/
-
 			var colorVariants = []
 
 			for ( var thisVariant in variants ) {
 				// remove reference
 				var newVariant = Duplicate( thisVariant );
 
-				var colors = getColorService().list(
-					rawProductId = record.arcodart,
-					variantId    = thisVariant.getId()
-				);
+				if ( record.artipcol == "V" ) {
+					// colori per variante
+
+					var colors = getColorService().list(
+						rawProductId = record.arcodart,
+						variantId    = thisVariant.getId()
+					);
+				} else {
+					// tutti i colori dell'articolo
+					var colors = allColors;
+				}
 
 				if ( !colors.len() ) {
 					var color = super.bean( "Color" );
