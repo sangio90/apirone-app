@@ -1,6 +1,7 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
+		// TODO: viene usato?
 		var data   = [];
 		var result = super.getResult();
 		var dm     = getDataMapper();

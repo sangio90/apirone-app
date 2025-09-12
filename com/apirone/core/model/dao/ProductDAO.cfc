@@ -269,11 +269,6 @@
 			RETURNING product_id
 		</cfquery>
 
-		<cffile
-			file  ="#ExpandPath( "/debug.log" )#"
-			output="line:#lineId#, category: #categoryId#; cancellati: #local.q.recordcount#"
-			action="APPEND"
-		>
 		<cfreturn true>
 	</cffunction>
 </cfcomponent>

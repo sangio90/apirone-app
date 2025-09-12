@@ -68,37 +68,37 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <cfloop array="#prc.finishes#" item="finish">
-                                    <tr class="no-highlight">
-                                        <td class="no-highlight">
-                                            #finish.getName()# <span class="small-code">(#finish.getShortId()#)</span>
-                                        </td>
-                                        <cfloop array="#prc.models#" item="model">
-                                            <td>
-
-                                                <cfset exists = productExists( model.getId(), finish.getId() )>
-
-                                                <button class="btn btn-success btn-sm active" data-bind="click:deactivate"
-                                                    data-category="#prc.category.getId()#"
-                                                    data-values="#model.getId()#__#finish.getId()#"
-                                                    <cfif !exists>style="display: none"</cfif>
-                                                    >
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-
-                                                <button class="btn btn-primary btn-sm deactive" data-bind="click:activate"
-                                                data-category="#prc.category.getId()#"
-                                                    data-values="#model.getId()#__#finish.getId()#"
-                                                    <cfif exists>style="display: none"</cfif>
-                                                    >
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-
+                                    <cfloop array="#prc.finishes#" item="finish">
+                                        <tr class="no-highlight">
+                                            <td class="no-highlight">
+                                                #finish.getName()# <span class="small-code">(#finish.getShortId()#)</span>
                                             </td>
+                                            <cfloop array="#prc.models#" item="model">
+                                                <td>
 
-                                        </cfloop>
-                                    </tr>
-                                </cfloop>
+                                                    <cfset exists = productExists( model.getId(), finish.getId() )>
+
+                                                    <button class="btn btn-success btn-sm active" data-bind="click:deactivate"
+                                                        data-category="#prc.category.getId()#"
+                                                        data-values="#model.getId()#__#finish.getId()#"
+                                                        <cfif !exists>style="display: none"</cfif>
+                                                        >
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+
+                                                    <button class="btn btn-primary btn-sm deactive" data-bind="click:activate"
+                                                        data-category="#prc.category.getId()#"
+                                                        data-values="#model.getId()#__#finish.getId()#"
+                                                        <cfif exists>style="display: none"</cfif>
+                                                        >
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+
+                                                </td>
+
+                                            </cfloop>
+                                        </tr>
+                                    </cfloop>
                                 </tbody>
                             </table>
 

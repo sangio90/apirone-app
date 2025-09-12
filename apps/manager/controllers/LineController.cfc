@@ -71,9 +71,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title    = "Categoria #prc.category.getName()# linea #prc.line.getName()#";
 		prc.subtitle = "Prodotti disponibili";
 
-		var models   = super.fire( "model.list", { categoryId = prc.category.getId() } );
-		prc.models   = models;
-		prc.finishes = super.fire( "finish.list" );
+		var models = super.fire( "model.list", { categoryId = prc.category.getId() } );
+		prc.models = models;
+
+		prc.finishes = super.fire( "finish.list" ); // , { categoryId = prc.category.getId() }
 
 		for ( var model in models ) {
 			var existingModelConfig = super.fire(

@@ -150,8 +150,8 @@
                     <div class="modal-body" data-bind="source: parsedPictograms" data-template="pictogram-template">
                         <script id="pictogram-template" type="text/x-kendo-template">
                             <div class="row text-center p-3">
-                                    <div class="col-3">##= data.label ##</div>
-                                    <div class="col-3">##= data.image ##</div>                            
+                                <div class="col-3">##= data.label ##</div>
+                                <div class="col-3">##= data.image ##</div>
                             </div>
                         </script>
                     </div>
