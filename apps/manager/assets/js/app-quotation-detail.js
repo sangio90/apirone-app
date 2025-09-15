@@ -332,7 +332,7 @@ AP.quotationDetail.zoneModal = ( function() {
     pub.init = function() {
         kendo.bind( fields, viewModel );
         
-        viewModel.get('zones').data(AP.quotationDetail.detail.config().get('zones').filter((zone) => { return zone.id != '' }));
+        viewModel.get('zones').data(AP.quotationDetail.detail.config().get('zones').filter((zone) => { return zone.id != '' && !zone.origin }));
     };
     return pub;
 } () );
