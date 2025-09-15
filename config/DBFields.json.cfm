@@ -205,6 +205,10 @@
         "name": "signage_config_item_id",
         "type": "Integer"
     },
+    "quotationItemSignageRow.id": {
+        "name": "quotation_item_signage_row_id",
+        "type": "uuid"
+    },
     "metaDataType.id": {
         "name": "metadata_type_id",
         "type": "Integer"

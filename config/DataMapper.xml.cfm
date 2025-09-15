@@ -138,11 +138,16 @@
         <map from="id" to="id" type="cf:String" />
         <map from="price" to="price" type="cf:Numeric" />
         <map from="quantity" to="quantity" type="cf:Numeric" />
-        <map from="quotation" to="quotation" ref="Quotation" />
+        <map from="charCount" to="charCount" type="cf:Numeric" />
+        <map from="height" to="height" type="cf:Numeric" />
+        <map from="heightInPixel" to="heightInPixel" type="cf:Numeric" />
+        <map from="rowCount" to="rowCount" type="cf:Numeric" />
         <map from="zone" to="zone" ref="QuotationItemZone" />
+        <map from="signageConfigItem" to="signageConfigItem" ref="SignageConfigItem" />
         <map from="position" to="position" ref="QuotationItemPosition" />
         <map from="product" to="product" ref="Product" />
         <map from="productOrigin" to="productOrigin" ref="Product" />
+        <map from="signageRows" to="signageRows" type="Array" ref="QuotationItemSignageRow" />
     </mapper>
 
     <mapper id="QuotationItemProduct" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.QuotationItemProduct">

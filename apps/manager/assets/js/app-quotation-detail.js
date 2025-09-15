@@ -9,6 +9,7 @@ $( document ).ready( function() {
     if ( AP.quotationDetail.fields.detailRoot.length ) {
         AP.quotationDetail.detail.init();
     }
+    $(".k-listview-content").first().css("display", "flex");
 } );
 
 AP.quotationDetail.detail = ( function() {
@@ -22,9 +23,9 @@ AP.quotationDetail.detail = ( function() {
         data: {
             id: "",
             name: "",
-            number: "",
+            quotationNumber: "",
             version: 1,
-            language: {
+            lang: {
                 "id":""
             },
             zone: {
@@ -172,7 +173,7 @@ AP.quotationDetail.detail = ( function() {
         getZones: function( e ) {
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotationzones/" + AP.page.quotation.id,
+                url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/zones",
                 callback: {
                     done: function( xhr ) {
                         if( xhr.status == "ERRORE" ) {
@@ -201,10 +202,13 @@ AP.quotationDetail.detail = ( function() {
 
         getItems: function( e ) {
             if ( viewModel.detailForm.data.zone.name != "" ) {
+                var url = '/manager/ajax/quotationitems?quotationId=' + AP.page.quotation.id;
+                if (viewModel.detailForm.data.zone) {
+                    url = url + '&quotationZoneId=' + viewModel.detailForm.data.zone.id
+                }
                 NM.util.ajax( {
-                    method: "POST",
-                    url: "/manager/ajax/quotationitems",
-                    data: JSON.stringify( { zoneId: viewModel.detailForm.data.zone ? viewModel.detailForm.data.zone.id : "", quotationId: AP.page.quotation.id } ),
+                    method: "GET",
+                    url: url,
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERRORE" ) {
@@ -217,34 +221,42 @@ AP.quotationDetail.detail = ( function() {
                     }
                 } );
             }
+            if (viewModel.detailForm.data.zone.id != '') {
+                $('#addSignageButton').prop('disabled', false)
+            } else {
+                $('#addSignageButton').prop('disabled', true)
+            }
 
             return false;
         },
 
         setQuotation: function( quotation ) {
-            viewModel.set( "detailForm.data.name", quotation.name );
-            viewModel.set( "detailForm.data.number", quotation.quotationNumber );
-            viewModel.set( "detailForm.data.version", quotation.versionNumber );
-            viewModel.set( "detailForm.data.quotationDate", quotation.quotationDate );
-            viewModel.set( "detailForm.data.validityDate", quotation.validityDate );
-            viewModel.set( "detailForm.data.opportunityName", quotation.opportunityName );
-            viewModel.set( "detailForm.data.leadName", quotation.leadName );
-            viewModel.set( "detailForm.data.active", quotation.active );
-            viewModel.set( "detailForm.data.status.id", quotation.status.id );
-            viewModel.set( "detailForm.data.language.id", quotation.lang.id );
+            viewModel.set( "detailForm.data", quotation );
         },
 
         addSignage: function() {
             signageApp().new();
         },
 
+        editSignate: function (event) {
+            event.preventDefault();
+            signageApp().edit({ id: event.data.id });
+        },
+
         addPlate: function() {
             plateApp.new();
         },
 
-        addZone: function() {
+        openAddZoneModal: function() {
             if ( AP.quotationDetail.fields.zoneModalRoot.length ) {
-                AP.quotationDetail.zoneModal.init();
+                AP.quotationDetail.zoneModal.init('add');
+            }
+            NM.util.openModal( AP.quotationDetail.fields.zoneModalRoot );
+        },
+
+        openDeleteZoneModal: function() {
+            if ( AP.quotationDetail.fields.zoneModalRoot.length ) {
+                AP.quotationDetail.zoneModal.init('delete');
             }
             NM.util.openModal( AP.quotationDetail.fields.zoneModalRoot );
         }
@@ -293,7 +305,8 @@ AP.quotationDetail.zoneModal = ( function() {
             title: this.id ? "Modifica zona" : "Nuova zona",
             parentZone: {
                 id: ""
-            }
+            },
+            mode: ""
         }
     };
 
@@ -305,12 +318,12 @@ AP.quotationDetail.zoneModal = ( function() {
             viewModel.set( "detailForm", defaultDetailForm );
         },
 
-        saveZone: function( event ) {
+        createZone: function( event ) {
             const parsedData = viewModel.get( "detailForm.data" );
 
             NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax/quotationzones",
+                url: "/manager/ajax/quotations/zones",
                 data: JSON.stringify( parsedData ),
                 callback: {
                     done: function( xhr ) {
@@ -327,12 +340,49 @@ AP.quotationDetail.zoneModal = ( function() {
             } );
             return false;
         },
+
+        deleteZone: function( event ) {
+            const zone = viewModel.get( "detailForm.data.parentZone" );
+
+            NM.util.ajax( {
+                method: "DELETE",
+                url: "/manager/ajax/quotations/zones",
+                data: JSON.stringify({'zone': zone}),
+                callback: {
+                    done: function( xhr ) {
+                        if( xhr.status == "ERRORE" ) {
+                            if (xhr.data?.error) {
+                                AP.widget.notify( "error", xhr.data.error );
+                            } else {
+                                AP.widget.notify( "error", "Errore durante la cancellazione di una zona." );
+                            }
+                        } 
+                        if ( xhr.status == "SUCCESS" ) {
+                            AP.widget.notify( "success", "Zona eliminata correttamente." );
+                            setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
+                            AP.quotationDetail.detail.methods().getZones();
+                        }
+                    }
+                }
+            } );
+            return false;
+        },
     } );
 
-    pub.init = function() {
+    pub.init = function(mode) {
         kendo.bind( fields, viewModel );
-        
-        viewModel.get('zones').data(AP.quotationDetail.detail.config().get('zones').filter((zone) => { return zone.id != '' && !zone.origin }));
+        if (mode == 'delete') {
+            viewModel.get('zones').data(AP.quotationDetail.detail.config().get('zones').filter((zone) => { return zone.id != '' }));
+            $('#delete-zone-button').show();
+            $('#add-zone-button').hide();
+            $('#zone-name-input').hide();
+        }
+        if (mode == 'add') {
+            viewModel.get('zones').data(AP.quotationDetail.detail.config().get('zones').filter((zone) => { return zone.id != '' && !zone.origin }));
+            $('#delete-zone-button').hide();
+            $('#add-zone-button').show();
+            $('#zone-name-input').show();
+        }
     };
     return pub;
 } () );

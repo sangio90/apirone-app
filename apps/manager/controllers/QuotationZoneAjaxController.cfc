@@ -1,5 +1,6 @@
 component extends="com.apirone.core.controller.AbsController" {
 	property name="dao" inject="QuotationZoneDAO";
+	property name="quotationItemDao" inject="QuotationItemDAO";
 
 	function list( event, rc, prc ){
 		var data   = [];
@@ -62,21 +63,42 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function delete( event, rc, prc ){
-		var result    = super.getResult();
-		var list      = GetHTTPRequestData().content;
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+		
 		var messageId = "quotation.deletedAllRecords";
-
 		var errors  = [];
 		var payload = "";
+		var valid = true;
+		
+		var result    = super.getResult();
 
-		var ids = ListToArray( list );
-
-		for ( var id in ids ) {
-			var outcome = super.fire( "quotation.delete", [ id ] );
-
-			if ( outcome.getStatus() == "ERROR" ) {
-				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+		var zone = json.zone;
+		var outcome = null;
+		if (!isNull(zone)) {
+			var zonaInUso = super.fire( "quotationItem.search", [ quotationZoneId = zone.id ] );
+			if (Len(zonaInUso.getData())) {
+					result.setData( { "error" = "Impossibile eliminare questa zona perché associata ad una riga del preventivo." } );
+					result.setStatus( "ERRORE" );
+					event.setValue( "result", result );
+					return;
 			}
+
+			if (structKeyExists(zone, 'origin')) {
+				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
+			} else {
+				var zonaConSottozone = super.fire( "quotationZone.search", [ originId = zone.id ] );
+				if (Len(zonaConSottozone.getData())) {
+					result.setData( { "error" = "Impossibile eliminare questa zona perché contiene delle sottozone." } );
+					result.setStatus( "ERRORE" );
+					event.setValue( "result", result );
+					return;
+				}
+				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
+			}
+		}
+
+		if ( outcome.getStatus() == "ERROR" || isNull(outcome) ) {
+			errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
 		}
 
 		if ( errors.len() ) {

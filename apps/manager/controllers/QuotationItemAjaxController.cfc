@@ -4,18 +4,24 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-
-		params[ "quotationId" ] = rc.quotationId;
-
-		if ( Len( rc.zoneId ) ) {
-			params[ "quotationZoneId" ] = rc.zoneId;
-		}
-
 		var rows = super.fire( "QuotationItem.search", params );
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
 		result.setData( rows.getData() );
+
+		event.setValue( "result", result );
+	}
+
+	function editSignage( event, rc, prc ){
+		var data   = [];
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+
+		params[ "quotationItemId" ] = rc.id;
+		
+		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
+		result.setData( quotationItem );
 
 		event.setValue( "result", result );
 	}
@@ -73,7 +79,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				result.setData( { "error" = e.message } );
 				result.setStatus( "ERRORE" );
 				event.setValue( "result", result );
-				dump( result );
 				return;
 			}
 		}

@@ -17,7 +17,7 @@ AP.signage.modal = ( function() {
             id: "",
             code: "",
             name: "",
-            quantity: 0,
+            quantity: 1,
             price: 0,
             signageLines: new kendo.data.DataSource(),
             category: {
@@ -345,7 +345,7 @@ AP.signage.modal = ( function() {
         },
 
         save: function( event ) {
-            var quotationDetailData = quotationDetailApp().config();
+            var quotationDetailData = AP.quotationDetail.detail.config();
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             parsedData.quotationId = quotationId;
@@ -355,7 +355,7 @@ AP.signage.modal = ( function() {
             if ( true ) {
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/quotation-items",
+                    url: "/manager/ajax/quotationitems",
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
@@ -366,7 +366,7 @@ AP.signage.modal = ( function() {
                             if ( xhr.status == "SUCCESS" ) {
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                                 viewModel.set( "detailForm", defaultDetailForm );
-                                setTimeout( () => $( "#signage-modal" ).modal( "hide" ), 1000 );
+                                setTimeout( () => window.location.reload(), 1000 );
                             }
                         }
                     }
@@ -397,15 +397,10 @@ AP.signage.modal = ( function() {
     };
 
     pub.edit = function( { id, onSave } ) {
-        if ( onSave ) {
-            viewModel.set( "callback.onSave", onSave );
-        }
-
         viewModel.resetForm();
-
         NM.util.ajax( {
             method: "GET",
-            url: "/manager/ajax/signages/" + id,
+            url: "/manager/ajax/quotationitems/signage/" + id,
             callback: {
                 done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {

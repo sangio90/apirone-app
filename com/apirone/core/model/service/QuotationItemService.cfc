@@ -3,6 +3,8 @@
 	property name="dao" inject="QuotationItemDAO";
 	property name="QuotationService" inject="QuotationService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="SignageConfigItemService" inject="SignageConfigItemService";
+	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
 	property name="cacheScope" type="String" default="QuotationItem.bean";
 
 	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId ){
@@ -91,7 +93,11 @@
 		var record = getDao().read( arguments.quotationItemId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "QuotationItem" );
+			if (Len(record.signage_config_item_id)) {
+				var bean = super.bean( "QuotationItemSignage" );
+			} else {
+				var bean = super.bean( "QuotationItem" );
+			}
 
 			bean.setId( record.quotation_item_id );
 			bean.setPrice( record.price );
@@ -102,6 +108,24 @@
 					record.quotation_zone_id
 				)
 			);
+
+			if (record.signage_config_item_id) {
+				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_id ) );
+				if (record.char_count) {
+					bean.getSignageConfigItem().setCharCount(record.char_count);
+				}
+				if (record.height) {
+					bean.getSignageConfigItem().setHeight(record.height);
+				}
+				if (record.height_in_pixel) {
+					bean.getSignageConfigItem().setHeightInPixel(record.height_in_pixel);
+				}
+				if (record.row_count) {
+					bean.getSignageConfigItem().setRowCount(record.row_count);
+				}
+				var signageRows = getQuotationItemSignageRowService().list( quotationItemId = quotationItemId );
+				bean.setSignageRows( signageRows );
+			}
 
 			return bean;
 		}

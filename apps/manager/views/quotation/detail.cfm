@@ -51,8 +51,8 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <label class="control-label text-sm-end">Numero <span class="required">*</span></label>
-                                            <input type="text" name="number" class="form-control" id="number"
-                                                data-bind="value: detailForm.data.number"
+                                            <input type="text" name="number" class="form-control" id="quotationNumber"
+                                                data-bind="value: detailForm.data.quotationNumber"
                                                 data-rule-required="true"
                                                 data-msg-required="Number"
                                             >
@@ -61,7 +61,7 @@
                                             <label class="control-label text-sm-end">Lingua <span class="required">*</span></label>
                                             <select name="langId" class="form-control"
                                                 data-placeholder="-- Seleziona lingua"
-                                                data-bind="source: languages, value: detailForm.data.language.id"
+                                                data-bind="source: languages, value: detailForm.data.lang.id"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -126,8 +126,9 @@
                                                 >
                                             </select>
                                         </div>
-                                        <div class="col-2 mb-2">
-                                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:addZone">Aggiungi zona</button>                                        
+                                        <div class="col-2 mb-2 flex">
+                                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>                                        
+                                            <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>                                        
                                         </div>
                                     </div>
                                     <div class="form-group row mb-2">
@@ -142,7 +143,7 @@
                                                     </div>
                                                     <div class="col-6 text-start">
                                                         <button id="addPlateButton" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
-                                                        <button id="addSignageButton" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none">Aggiungi segnaletica</button>
+                                                        <button id="addSignageButton" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none" disabled>Aggiungi segnaletica</button>
                                                     </div>
                                                 </div>
                                             </nav>

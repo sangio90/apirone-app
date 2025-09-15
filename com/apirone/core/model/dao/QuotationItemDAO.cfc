@@ -25,8 +25,7 @@
 				quotation_item_id::varchar,
 				quotation_items.quotation_id::varchar,
 				quotation_zone_id::varchar,
-				COUNT(quotation_item_id) OVER() AS total,
-				*
+				COUNT(quotation_item_id) OVER() AS total
 			FROM quotation_items
 				LEFT JOIN signage_config_items USING (signage_config_item_id)
 			WHERE 1=1

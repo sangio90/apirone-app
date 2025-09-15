@@ -286,22 +286,24 @@
 		get( "/ajax/quotations/models/:lineId" ).to( "QuotationAjaxController.listModels" ).end();
 		get( "/ajax/quotations/finishes/:categoryId/:lineId" ).to( "QuotationAjaxController.listFinishes" ).end();
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
+		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();
 		
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
-		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
-		//post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
-		post( "/quotations" ).to( "QuotationController.create" ).end();
-		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
-		
+		post( "/quotations" ).to( "QuotationController.create" ).end(); //Da togliere
 		get( "/quotations" ).to( "QuotationController.list" ).end();
+		
+		get( "/ajax/quotations/:quotationId/zones" ).to( "QuotationZoneAjaxController.list" ).end();
+		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
+		delete( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.delete" ).end();
 
-		get( "/ajax/quotationzones/:quotationId" ).to( "QuotationZoneAjaxController.list" ).end();
-		post( "/ajax/quotationzones" ).to( "QuotationZoneAjaxController.save" ).end();
-		post( "/ajax/quotationitems" ).to( "QuotationItemAjaxController.list" ).end();
-
-		post("/ajax/quotation-items").to( "QuotationItemAjaxController.save" ).end();
+		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
+		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		post("/ajax/quotations").to( "QuotationAjaxController.save" ).end();
+		
+		get( "/ajax/quotationitems/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
+		get( "/ajax/quotationitems" ).to( "QuotationItemAjaxController.list" ).end();
+		post("/ajax/quotationitems").to( "QuotationItemAjaxController.save" ).end();
 		
 
 		/*

@@ -2,6 +2,7 @@
     <div id="zone-modal-root" class="modal fade">
         
         <section class="modal-dialog modal-lg">
+
             <div class="modal-content">
 
                 <form id="zone-form" method="POST" name="zone-form">
@@ -23,7 +24,7 @@
                                 >
                                 </select>
                             </div>
-                            <div class="col-6">    
+                            <div class="col-6" id="zone-name-input">    
                                 <label class="col-sm-12 col-form-label text-start">Nome</label>
                                 <input class="form-control" type="name" data-bind="value: detailForm.data.name" min="1">
                             </div>
@@ -33,8 +34,11 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-12 float-end">
-                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:saveZone">
+                                <button type="button" id="add-zone-button" class="btn btn-primary btn-sm float-end" data-bind="click:createZone">
                                     <i class="fas fa-save"></i> Salva
+                                </button>
+                                <button type="button" id="delete-zone-button" class="btn btn-danger btn-sm float-end" data-bind="click:deleteZone">
+                                    <i class="fas fa-trash"></i> Elimina
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
                                 <div class="status errors-counter mt-1 float-end me-3"></div>

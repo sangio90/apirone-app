@@ -86,7 +86,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemSignageRow" );
 			bean.setId( record.quotation_item_signage_row_id );
-			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
+			bean.setTextAlign( record.text_align );
+			bean.setContent( record.content );
+			bean.setCharCount( record.char_count );
+			bean.setOrderBy( record.orderby );
+			//bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
 
 			return bean;
 		}
