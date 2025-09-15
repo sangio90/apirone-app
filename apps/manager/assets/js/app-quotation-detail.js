@@ -181,6 +181,11 @@ AP.quotationDetail.detail = ( function() {
                         if ( xhr.status == "SUCCESS" ) {
                             var zones = xhr.data.length ? xhr.data : [ { "id": "", "name": "Tutte le zone" } ];
                             zones.unshift( { "id": "", "name": "Tutte le zone" } );
+                            zones.forEach(function(zone) {
+                                if (zone.origin) {
+                                    zone.name = "\u00A0\u00A0- " + zone.name;
+                                }
+                            });
                             viewModel.get( "zones" ).data( zones );
                             viewModel.set( "detailForm.data.zone", zones[0] );
                             viewModel.set( "detailForm.data.zones", zones );

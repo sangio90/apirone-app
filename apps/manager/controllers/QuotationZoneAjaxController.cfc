@@ -9,10 +9,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "quotationId" ] = rc.quotationId;
 
 		var rows = super.fire( "QuotationZone.search", params );
-
+		dataRows = orderZonesByOrigin(rows.getData());
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
-		result.setData( rows.getData() );
+		result.setData( dataRows );
 
 		event.setValue( "result", result );
 	}
@@ -89,6 +89,26 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( { "message" = message, "payload" = payload } );
 
 		event.setValue( "result", result );
+	}
+
+	function orderZonesByOrigin(zones) {
+		var parsedZones = [];
+		var zonesWithoutOrigin = arrayFilter(zones, function(zone){
+			return isNull(zone.getOrigin());
+		});
+		var zonesWithOrigin = arrayFilter(zones, function(zone){
+			return !isNull(zone.getOrigin());
+		});
+		zonesWithoutOrigin.each(function (zone) {
+			parsedZones.add(zone);
+			zonesWithOrigin.each(function (childZone) {
+				if (childZone.getOrigin().getId() == zone.getId()) {
+					parsedZones.add(childZone);
+				}
+			});
+		});
+		
+		return parsedZones;
 	}
 
 }
