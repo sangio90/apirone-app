@@ -94,7 +94,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( record.recordCount ) {
 			var bean = super.bean( "SignageConfigItem" );
-
+			bean.setSignageConfigId( record.signage_config_id );
+			
 			bean.setId( record.signage_config_item_id );
 			bean.setCreatedAt( record.created_at );
 

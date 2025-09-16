@@ -70,7 +70,7 @@
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getQuotationItem().getId()#">::uuid,
 				text_align = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemSignageRow.getTextAlign()#">,
 				content = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemSignageRow.getContent()#">,
-				char_count = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotationItemSignageRow.getCharCount()#">
+				char_count = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotationItemSignageRow.getCharCount()#">,
 				orderby = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotationItemSignageRow.getOrderby()#">
 			WHERE
 				quotation_item_signage_row_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getId()#">::uuid

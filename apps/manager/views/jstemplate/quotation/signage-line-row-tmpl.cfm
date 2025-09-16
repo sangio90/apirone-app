@@ -8,7 +8,7 @@
                     Riga N°<span data-bind="text: orderby"></span>
                 </div>
                 <div class="col-6 pl-0-ml-3">
-                    <button type="button" class="btn btn-danger btn-sm" data-bind="click:removeSignageLine">
+                    <button type="button" class="btn btn-danger btn-sm" data-bind="click:removeSignagRow">
                         <i class="fas fa-trash"></i> Elimina
                     </button>
                 </div>

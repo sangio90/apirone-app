@@ -34,7 +34,7 @@
                             <div class="col-2" data-bind="visible: detailForm.data.category.id">    
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
-                                    <select id="signageLine" 
+                                    <select id="signageRow" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la linea"
                                         data-bind="source: lines, value: detailForm.data.line.id, events: { change: loadModels }" 
@@ -113,14 +113,14 @@
                             <div class="col-2 mb-3">
                                 Albero
                             </div>
-                            <div class="col-6" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.signageLines, visible:detailForm.data.font.id">
+                            <div class="col-6" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.signageRows, visible:detailForm.data.font.id">
                                 <!--- qui dentro vanno gli items --->
                             </div>
-                            <div class="col-4" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.signageLines, visible:detailForm.data.font.id">
+                            <div class="col-4" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.signageRows, visible:detailForm.data.font.id">
                                 <!--- qui dentro vanno gli items di preview --->
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageLine, visible:detailForm.data.font.id">Aggiungi Riga</button>
+                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageRow, visible:detailForm.data.font.id">Aggiungi Riga</button>
                     </div>
 
                     <footer class="card-footer">
@@ -129,7 +129,7 @@
                                 <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
                                     <i class="fas fa-save"></i> Salva
                                 </button>
-                                <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
+                                <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal" data-bind="click:resetForm">Chiudi</button>
                                 <div class="status errors-counter mt-1 float-end me-3"></div>
                             </div>
                         </div>

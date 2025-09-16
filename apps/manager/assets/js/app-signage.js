@@ -19,7 +19,7 @@ AP.signage.modal = ( function() {
             name: "",
             quantity: 1,
             price: 0,
-            signageLines: new kendo.data.DataSource(),
+            signageRows: new kendo.data.DataSource(),
             category: {
                 id: "",
             },
@@ -35,6 +35,9 @@ AP.signage.modal = ( function() {
             finish: {
                 id: "",
             },
+            product: {
+                id: "",
+            },
             signageConfig: {
                 id: "",
             },
@@ -46,20 +49,6 @@ AP.signage.modal = ( function() {
             },
             fontSize: {
                 id: "",
-            },
-            nameItem: {
-                id: "",
-                name: "",
-                lang: {
-                    id: "IT"
-                }
-            },
-            descriptionItem: {
-                id: "",
-                name: "",
-                lang: {
-                    id: "IT"
-                }
             },
             status: {
                 id: "ACT",
@@ -89,6 +78,9 @@ AP.signage.modal = ( function() {
             "<sx>",
             "<wom>"
         ],
+        resetForm: function() {
+            viewModel.set( "detailForm", defaultDetailForm );
+        },
         parsedPictograms: function() {
             return this.pictogramNames.map( p => {
                 const name = p.replace( /[<>]/g, "" );
@@ -106,8 +98,6 @@ AP.signage.modal = ( function() {
             onLoad: undefined,
         },
 
-        resetForm: function() {},
-
         getSignageConfig: function() {
             const fontId = viewModel.get( "detailForm.data.font.id" );
             for ( var signageConfig of viewModel.get( "signageConfigs" ).data() ) {
@@ -117,24 +107,24 @@ AP.signage.modal = ( function() {
             }
         },
 
-        addSignageLine: function() {
-            if ( viewModel.get( "detailForm.data.signageLines" ).data().length < 10 ) {
-                var defaultSignageLine = {
+        addSignageRow: function() {
+            if ( viewModel.get( "detailForm.data.signageRows" ).data().length < 10 ) {
+                var defaultSignageRow = {
                     id: "",
                     textAlign: "center",
                     content: "",
                     charCount: 0,
-                    orderby: viewModel.get( "detailForm.data.signageLines" ).data().length + 1
+                    orderby: viewModel.get( "detailForm.data.signageRows" ).data().length + 1
                 };
-                viewModel.get( "detailForm.data.signageLines" ).add( defaultSignageLine );
+                viewModel.get( "detailForm.data.signageRows" ).add( defaultSignageRow );
             }
 
             return false;
         },
 
         parseLines: function( e ) {
-            viewModel.get( "detailForm.data.signageLines" ).data().forEach( signageLine => {
-                this.parsedLineContent( signageLine.content, signageLine.orderby );
+            viewModel.get( "detailForm.data.signageRows" ).data().forEach( signageRow => {
+                this.parsedLineContent( signageRow.content, signageRow.orderby );
             } );
 
             const signageConfig = viewModel.getSignageConfig();
@@ -229,8 +219,8 @@ AP.signage.modal = ( function() {
                     content = content.replace( "#", value );
                 }
             } );
-            viewModel.get( "detailForm.data.signageLines" ).data()[e.currentTarget.id.replace( "_contentInput", "" ) - 1].set( "content", content );
-            viewModel.get( "detailForm.data.signageLines" ).data()[e.currentTarget.id.replace( "_contentInput", "" ) - 1].set( "charCount", charCount );
+            viewModel.get( "detailForm.data.signageRows" ).data()[e.currentTarget.id.replace( "_contentInput", "" ) - 1].set( "content", content );
+            viewModel.get( "detailForm.data.signageRows" ).data()[e.currentTarget.id.replace( "_contentInput", "" ) - 1].set( "charCount", charCount );
             $( "#" + e.currentTarget.id.replace( "_contentInput", "_charCounter" ) ).html( charCount + "/" + signageConfigItem.charCount );
             this.parsedLineContent( content, e.data.orderby );
 
@@ -247,17 +237,17 @@ AP.signage.modal = ( function() {
             }
         },
 
-        removeSignageLine: function( e ) {
+        removeSignageRow: function( e ) {
             const uid = e.data.uid;
-            const row = viewModel.get( "detailForm.data.signageLines" ).getByUid( uid );
-            viewModel.get( "detailForm.data.signageLines" ).remove( row );
+            const row = viewModel.get( "detailForm.data.signageRows" ).getByUid( uid );
+            viewModel.get( "detailForm.data.signageRows" ).remove( row );
             return false;
         },
 
         setTextAlign: function( e ) {
             var uid = e.data.uid;
-            var signageLine = viewModel.get( "detailForm.data.signageLines" ).getByUid( uid );
-            signageLine.set( "textAlign", $( e.currentTarget ).data( "value" ) );
+            var signageRow = viewModel.get( "detailForm.data.signageRows" ).getByUid( uid );
+            signageRow.set( "textAlign", $( e.currentTarget ).data( "value" ) );
             $( e.currentTarget ).addClass( "selected-text-align" ).siblings()
                 .removeClass( "selected-text-align" )
                 .addClass( "selected-text-align-not" );
@@ -349,7 +339,6 @@ AP.signage.modal = ( function() {
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             parsedData.quotationId = quotationId;
-            parsedData.zoneId = quotationDetailData.zone.id;
 
             // if ( detailForm.valid() ) {
             if ( true ) {
@@ -398,28 +387,48 @@ AP.signage.modal = ( function() {
 
     pub.edit = function( { id, onSave } ) {
         viewModel.resetForm();
+
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/quotations/categories",
+            callback: {
+                done: function( xhr ) {
+                    viewModel.get( "categories" ).data( xhr.data );
+                    NM.util.openModal( AP.signage.fields.modalRoot );
+                },
+            },
+        } );
+
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotationitems/signage/" + id,
             callback: {
                 done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
-                        var selectedCategories = [];
-
-                        if ( xhr.data?.categories ) {
-                            for ( var category of xhr.data.categories ) {
-                                selectedCategories.push( category );
-                            }
-                        }
-
+                        debugger
                         viewModel.set( "detailForm.data", xhr.data );
-                        viewModel.set(
-                            "detailForm.data.selectedCategories",
-                            selectedCategories,
-                        );
+                        viewModel.set("detailForm.data.signageRows", new kendo.data.DataSource());
+                        viewModel.get("detailForm.data.signageRows").data(xhr.data.signageRows);
                         viewModel.set( "detailForm.title", "Modifica segnaletica" );
-
-                        NM.util.openModal( AP.signage.fields.modalRoot );
+                        viewModel.loadLines();
+                        setTimeout(function() {
+                            viewModel.loadModels();
+                            setTimeout(function() {
+                                viewModel.loadFinishes();
+                                setTimeout(function() {
+                                    viewModel.loadSignageConfigs();
+                                    setTimeout(function() {
+                                        viewModel.loadFontSizes();
+                                        setTimeout(function() {
+                                            setTimeout(function() {
+                                                viewModel.parseLines();
+                                                NM.util.openModal(AP.signage.fields.modalRoot);
+                                            }, 50);
+                                        }, 50);
+                                    }, 50);
+                                }, 50);
+                            }, 50);
+                        }, 50);
                     }
                 },
             },
@@ -430,22 +439,22 @@ AP.signage.modal = ( function() {
 
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
 
-        var signageLines = new kendo.data.DataSource();
-        var loadedSignageLines = [];
-        // TODO a tendere dovremo riceverle quando aprimo la modale della segnaletica (AP.page.signageLines)
+        var signageRows = new kendo.data.DataSource();
+        var loadedSignageRows = [];
+        // TODO a tendere dovremo riceverle quando aprimo la modale della segnaletica (AP.page.signageRows)
 
-        for ( var signageLine of loadedSignageLines ) {
-            var newSignageLine = {
+        for ( var signageRow of loadedSignageRows ) {
+            var newSignageRow = {
                 id: font.id,
-                textAlign: signageLine.textAlign,
-                content: signageLine.content,
-                orderby: signageLine.orderby
+                textAlign: signageRow.textAlign,
+                content: signageRow.content,
+                orderby: signageRow.orderby
             };
 
-            signageLines.add( newSignageLine );
+            signageRows.add( newSignageRow );
         }
 
-        viewModel.get( "detailForm.data.signageLines", signageLines );
+        viewModel.get( "detailForm.data.signageRows", signageRows );
     };
 
     return pub;

@@ -50,6 +50,7 @@
 			INSERT INTO quotation_items (
 					quotation_id,
 					quotation_zone_id,
+					product_id,
 					price,
 					quantity
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
@@ -67,6 +68,11 @@
 				<cfelse>
 					NULL,
 				</cfif>
+				<cfif NOT IsNull( arguments.quotationItem.getProduct() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getProduct().getId()#">::uuid,
+				<cfelse>
+					NULL,
+				</cfif>
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
@@ -74,10 +80,7 @@
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getId()#">,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getCharCount()#">,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeight()#">,
-					<cfqueryparam
-			cfsqltype="Numeric"
-			value="#arguments.quotationItem.getSignageConfigItem().getHeightInPixel()#"
-		>,
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeightInPixel()#">,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getRowCount()#">
 				</cfif>
 			)
@@ -98,15 +101,21 @@
 				<cfelse>
 					NULL
 				</cfif>,
+				product_id =
+				<cfif NOT IsNull( arguments.quotationItem.getProduct() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getProduct().getId()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
 				price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
 				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
 					,
 					signage_config_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getId()#">,
-					char_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getCharCount()#">,
-					height = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeight()#">,
-					height_in_pixel = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getHeightInPixel()#">,
-					row_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getRowCount()#">
+					char_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getCharCount()#">,
+					height = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeight()#">,
+					height_in_pixel = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeightInPixel()#">,
+					row_count = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getRowCount()#">
 				</cfif>
 			WHERE
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getId()#">::uuid

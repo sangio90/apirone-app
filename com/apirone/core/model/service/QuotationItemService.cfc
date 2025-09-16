@@ -3,6 +3,7 @@
 	property name="dao" inject="QuotationItemDAO";
 	property name="QuotationService" inject="QuotationService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="ProductService" inject="ProductService";
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
 	property name="cacheScope" type="String" default="QuotationItem.bean";
@@ -103,6 +104,9 @@
 			bean.setPrice( record.price );
 			bean.setQuantity( record.quantity );
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
+			if (Len(record.product_id)) {
+				bean.setProduct( getProductService().get( record.product_id ) );
+			}
 			bean.setQuotationZone(
 				IsNull( record.quotation_zone_id ) ? NullValue() : getQuotationZoneService().get(
 					record.quotation_zone_id
