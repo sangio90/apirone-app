@@ -27,7 +27,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String str,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotationItemSignageRow.id" } ]
+		required Array orderBy  = [ { field = "quotationItemSignageRow.orderby" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
@@ -55,9 +55,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().delete( arguments.quotationItemSignageRowId );
-				cm.remove( getCacheScope(), arguments.quotationItemSignageRowId );
+				removeCache(obj)
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -66,6 +65,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 		return outcome;
+	}
+
+	private Void function removeCache( required com.apirone.core.model.bean.QuotationItemSignageRow quotationItemSignageRow ){
+		var cm = super.getCacheManager();
+		cm.remove( getCacheScope(), arguments.quotationItemSignageRow.getId() );
+
+		if ( !Len( arguments.quotationItemSignageRow.getQuotationItemId() ) ) {
+			Throw( type = "apirone.error.QuotationItemSignageRow.InvalidSaveType", message = "Missing Quotation Item ID" );
+			return;
+		}
+		cm.remove( "QuotationItem.bean", arguments.quotationItemSignageRow.getQuotationItemId() );
 	}
 
 	public String function create( required com.apirone.core.model.bean.QuotationItemSignageRow quotationItemSignageRow ){
@@ -90,7 +100,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setContent( record.content );
 			bean.setCharCount( record.char_count );
 			bean.setOrderBy( record.orderby );
-			//bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
+			bean.setQuotationItemId( record.quotation_item_id );
 
 			return bean;
 		}

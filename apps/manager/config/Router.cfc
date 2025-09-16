@@ -301,6 +301,7 @@
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		post("/ajax/quotations").to( "QuotationAjaxController.save" ).end();
 		
+		delete( "/ajax/quotationitems/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
 		get( "/ajax/quotationitems/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
 		get( "/ajax/quotationitems" ).to( "QuotationItemAjaxController.list" ).end();
 		post("/ajax/quotationitems").to( "QuotationItemAjaxController.save" ).end();

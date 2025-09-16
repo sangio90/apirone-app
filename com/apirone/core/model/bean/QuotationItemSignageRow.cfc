@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="charCount" type="Numeric";
 	property name="orderby" type="Numeric";
 
-	property name="quotationItem" type="com.apirone.core.model.bean.QuotationItemSignage";
+	property name="quotationItemId" type="String";
 
 	public QuotationItemSignageRow function init(){
 		return this;

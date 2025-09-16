@@ -51,7 +51,7 @@
 				char_count,
 				orderby
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getQuotationItem().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getQuotationItemId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getTextAlign()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getContent()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemSignageRow.getCharCount()#">,
@@ -67,7 +67,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_item_signage_rows
 			SET
-				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getQuotationItem().getId()#">::uuid,
+				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemSignageRow.getQuotationItemId()#">::uuid,
 				text_align = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemSignageRow.getTextAlign()#">,
 				content = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemSignageRow.getContent()#">,
 				char_count = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotationItemSignageRow.getCharCount()#">,

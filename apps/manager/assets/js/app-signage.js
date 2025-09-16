@@ -12,6 +12,16 @@ $( document ).ready( function() {
 
 AP.signage.modal = ( function() {
     var pub = {};
+    var getEmptyDataSource = function() {
+        return new kendo.data.DataSource(
+            { change: function() {
+                $.each( this.data(), function( index, item ) {
+                    item.set( "index", index+1 );
+                    console.log(item);
+                } );
+            }}
+        );
+    };
     var defaultDetailForm = {
         data: {
             id: "",
@@ -19,7 +29,7 @@ AP.signage.modal = ( function() {
             name: "",
             quantity: 1,
             price: 0,
-            signageRows: new kendo.data.DataSource(),
+            signageRows: getEmptyDataSource(),
             category: {
                 id: "",
             },
@@ -52,6 +62,20 @@ AP.signage.modal = ( function() {
             },
             status: {
                 id: "ACT",
+            },
+            nameItem: {
+                id: "",
+                name: "",
+                lang: {
+                    id: "IT"
+                }
+            },
+            descriptionItem: {
+                id: "",
+                name: "",
+                lang: {
+                    id: "IT"
+                }
             },
         },
         statuses: AP.page.statuses,
@@ -117,6 +141,7 @@ AP.signage.modal = ( function() {
                     orderby: viewModel.get( "detailForm.data.signageRows" ).data().length + 1
                 };
                 viewModel.get( "detailForm.data.signageRows" ).add( defaultSignageRow );
+                console.log(viewModel.get( "detailForm.data.signageRows" ).data());
             }
 
             return false;
@@ -238,10 +263,34 @@ AP.signage.modal = ( function() {
         },
 
         removeSignageRow: function( e ) {
-            const uid = e.data.uid;
-            const row = viewModel.get( "detailForm.data.signageRows" ).getByUid( uid );
-            viewModel.get( "detailForm.data.signageRows" ).remove( row );
-            return false;
+            if (e.data.id != '') {
+                NM.util.ajax( {
+                    method: "DELETE",
+                    url: "/manager/ajax/quotationitems/signagerow",
+                    data: {id: e.data.id},
+                    callback: {
+                        done: function( xhr ) {
+                            if( xhr.status == "ERROR" ) {
+                                AP.widget.notify( "error", "Errore nella cancellazione della Riga Segnaletica." );
+                            }
+                            if ( xhr.status == "SUCCESS" ) {
+                                AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
+                                const row = viewModel.get( "detailForm.data.signageRows" ).data().filter(row => {
+                                    return row.id = e.data.id
+                                });
+                                if (row.length) {
+                                    viewModel.get( "detailForm.data.signageRows" ).data().remove( row[0] );
+                                }
+                                return false;
+                            }
+                    }}
+                } );
+            } else {
+                const uid = e.data.uid;
+                const row = viewModel.get( "detailForm.data.signageRows" ).getByUid( uid );
+                viewModel.get( "detailForm.data.signageRows" ).remove( row );
+                return false;
+            }
         },
 
         setTextAlign: function( e ) {
@@ -348,7 +397,6 @@ AP.signage.modal = ( function() {
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
-                            console.log( xhr );
                             if( xhr.status == "ERRORE" ) {
                                 AP.widget.notify( "error", "Errore nel salvataggio della segnaletica." );
                             }
@@ -405,9 +453,8 @@ AP.signage.modal = ( function() {
             callback: {
                 done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
-                        debugger
                         viewModel.set( "detailForm.data", xhr.data );
-                        viewModel.set("detailForm.data.signageRows", new kendo.data.DataSource());
+                        viewModel.set("detailForm.data.signageRows", getEmptyDataSource());
                         viewModel.get("detailForm.data.signageRows").data(xhr.data.signageRows);
                         viewModel.set( "detailForm.title", "Modifica segnaletica" );
                         viewModel.loadLines();
@@ -423,12 +470,12 @@ AP.signage.modal = ( function() {
                                             setTimeout(function() {
                                                 viewModel.parseLines();
                                                 NM.util.openModal(AP.signage.fields.modalRoot);
-                                            }, 50);
-                                        }, 50);
-                                    }, 50);
-                                }, 50);
-                            }, 50);
-                        }, 50);
+                                            }, 100);
+                                        }, 100);
+                                    }, 100);
+                                }, 100);
+                            }, 100);
+                        }, 100);
                     }
                 },
             },
@@ -439,7 +486,7 @@ AP.signage.modal = ( function() {
 
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
 
-        var signageRows = new kendo.data.DataSource();
+        var signageRows = getEmptyDataSource();
         var loadedSignageRows = [];
         // TODO a tendere dovremo riceverle quando aprimo la modale della segnaletica (AP.page.signageRows)
 

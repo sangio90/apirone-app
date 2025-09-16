@@ -16,6 +16,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
+		// var mm     = super.getMementify();
 
 		params[ "quotationItemId" ] = rc.id;
 		
@@ -38,6 +39,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotationItem.getSignageRows().each((row) => {
 			arrayAppend(parsedQuotationItemData['signageRows'], row);
 		});
+
+		// var obj = mm.convert( parsedQuotationItemData, "list" );
+		// data.add( obj );
+
 		result.setData( parsedQuotationItemData );
 		event.setValue( "result", result );
 	}
@@ -92,7 +97,7 @@ component extends="com.apirone.core.controller.AbsController" {
 						var signageRowBean = super.fire( "QuotationItemSignageRow.get", { quotationItemSignageRowId = signageRow.id } );
 						var messaggiId      = "QuotationItemSignageRow.update";
 					}
-					signageRowBean.setQuotationItem( quotationItemSignageBean.setId( thisId ) );
+					signageRowBean.setQuotationItemId( thisId );
 					signageRowBean.setTextAlign( signageRow.textAlign );
 					signageRowBean.setContent( signageRow.content );
 					signageRowBean.setCharCount( signageRow.charCount );

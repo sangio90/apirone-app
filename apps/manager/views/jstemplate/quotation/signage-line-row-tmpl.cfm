@@ -5,10 +5,10 @@
         <div class="border rounded p-3 mb-3">
             <div class="mb-3 row">
                 <div class="col-2 text-start">
-                    Riga N°<span data-bind="text: orderby"></span>
+                    Riga N°<span data-bind="text: index"></span>
                 </div>
                 <div class="col-6 pl-0-ml-3">
-                    <button type="button" class="btn btn-danger btn-sm" data-bind="click:removeSignagRow">
+                    <button type="button" class="btn btn-danger btn-sm" data-bind="click:removeSignageRow">
                         <i class="fas fa-trash"></i> Elimina
                     </button>
                 </div>

@@ -8,7 +8,7 @@
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:detailForm.title"></h2>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" data-bind="click:resetForm" aria-label="Chiudi">
                     </header>                
                         
                     <div class="card-body">

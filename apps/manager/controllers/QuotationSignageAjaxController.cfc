@@ -25,4 +25,31 @@
 		event.setValue( "result", result );
 	}
 
+	function deleteRow( event, rc, prc ){
+		var result = super.getResult();
+        var messageId = "quotationItemSignageRow.deleted";
+
+        var errors = [];
+        var payload = "";
+
+        var id = rc.id
+
+		var row = super.fire( 'quotationItemSignageRow.get', { quotationItemSignageRowId: id } );
+		var outcome = super.fire( "quotationItemSignageRow.delete", [ id ] );
+
+		if( outcome.getStatus() == "ERROR"  ) {
+			errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+		}
+
+        if( errors.len() ) {
+            payload = { "errors": errors } ;
+        }
+
+        var message = super.completeMessage( messageId );
+
+        result.setData( { "message" = message, "payload" =  payload } );
+        
+		event.setValue( "result", result );
+	}
+
 }

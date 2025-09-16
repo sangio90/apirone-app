@@ -209,6 +209,10 @@
         "name": "quotation_item_signage_row_id",
         "type": "uuid"
     },
+    "quotationItemSignageRow.orderby": {
+        "name": "orderby",
+        "type": "varchar"
+    },
     "metaDataType.id": {
         "name": "metadata_type_id",
         "type": "Integer"
