@@ -55,7 +55,17 @@ AP.file.modal = ( function() {
 
                 break;
 
+            case "combination":
+
+                result.modalTitle = "File per la combinazione: <" + current.name.substr( current.name.length - 5 ) + " >";
+                result.readUrl = baseUrl + "/combinations/" + current.id + "/images";
+                result.modifyUrl = result.readUrl;
+
+                break;
+
             default:
+                console.error( "ERROR. Type not managed: ", current.type );
+                break;
             }
 
         }

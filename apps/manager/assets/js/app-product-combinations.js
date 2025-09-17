@@ -18,11 +18,11 @@ AP.product.combination = ( function() {
     var pub = {};
 
     var fields = AP.fields.combination;
+    var fileApp = AP.file.modal;
 
     var dataSources = {
         items: NM.kendo.dataSource( {
-            url:
-                "/manager/ajax/products/" + AP.page.productId + "/combinations",
+            url: "/manager/ajax/products/" + AP.page.productId + "/combinations",
         } ),
     };
 
@@ -134,42 +134,17 @@ AP.product.combination = ( function() {
         },
 
         openImagesList: function( event ) {
+
             var element = $( event.currentTarget );
             var id = event.data.id;
 
-            if ( !element.attr( "data-type" ) ) {
-                console.error(
-                    "ERROR. Set data-type attribute in currentTarget",
-                );
-                return;
-            }
+            var value = {
+                type: "combination",
+                id: id,
+                name: id
+            };
 
-            var type = element.data( "type" );
-
-            switch ( type ) {
-            case "combination":
-                var value = {
-                    type: "combination",
-                    id: id,
-                };
-
-                var thisUrl = "/manager/ajax/combinations/" + id + "/images";
-
-                break;
-
-            default:
-                console.error( "ERROR. Type [" + type + "] for image not found" );
-            }
-
-            var dataSource = NM.kendo.dataSource( { url: thisUrl } );
-
-            viewModel.set( "currentImageEntity", value );
-            viewModel.set( "currentUploadUrl", thisUrl );
-            if ( dataSource ) {
-                viewModel.set( "images", dataSource );
-            }
-
-            initUpload();
+            fileApp.open( value );
 
             return false;
         },

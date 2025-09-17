@@ -80,12 +80,15 @@ component extends="com.apirone.core.controller.AbsController" {
 	function combinations( event, rc, prc ){
 		param rc.id = "";
 
-		var product             = super.service( "Product" ).get( rc.id );
-		prc.statuses            = super.fire( "status.list", [ "PRODUCT" ] );
+		var product  = super.service( "Product" ).get( rc.id );
+		prc.statuses = super.fire( "status.list", [ "PRODUCT" ] );
 
-		prc.title               = "Combinazioni #product.getModel().getCode()#, finitura #product.getFinish().getName()#";
-		prc.subtitle            = "Linea #product.getLine().getName()#";
+		//prc.title = "Combinazioni #product.getModel().getCode()#, finitura #product.getFinish().getName()#";
+		//TODO: migliorare titolo per base/complesso
+		prc.title = "Combinazioni";
+		prc.subtitle = "Linea -";
 
+		prc.jsScripts.add( "app-file" );
 		prc.jsScripts.add( "app-product-combinations" );
 
 		prc.page[ "statuses" ] = prc.statuses;
@@ -95,8 +98,9 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function print( event, rc, prc ){
-		prc.title       = "Distinte basi";
 		param rc.report = "bill-of-material";
+		
+		prc.title       = "Distinte basi";
 
 		var memy = super.getMementify();
 

@@ -67,8 +67,8 @@
 			</div>
 		</div>
 
-		#view("product/combinations-images-list-modal")#
-
 	</div>
+
+	#view( view="file/list-modal" )#
 
 </cfoutput>

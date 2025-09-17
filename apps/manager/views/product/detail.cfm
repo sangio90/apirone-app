@@ -119,15 +119,9 @@
 
                                             <br>
 
-                                            <cfif prc.product.getCategory().getMode().getId() <> "BAS">
-
-                                                - <a href="/manager/products/#rc.id#/combinations" class="underline"
-                                                    data-type="product"
-                                                    data-bind="click:open">
-                                                        Tutte le combinazioni &raquo;
-                                                    </a>
-
-                                            </cfif>
+                                            - <a href="/manager/products/#rc.id#/combinations" class="underline">
+                                                    Tutte le combinazioni &raquo;
+                                                </a>
                                         </p>
 
                                     </div>
