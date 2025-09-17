@@ -255,6 +255,8 @@ AP.product.items = ( function() {
 
         openImagesList: function( event ) {
 
+            console.log( "openImagesList", event.data );
+
             var element = $( event.currentTarget );
 
             if ( !element.attr( "data-type" ) ) {
@@ -265,14 +267,13 @@ AP.product.items = ( function() {
             var type = element.data( "type" );
 
             switch ( type ) {
+
             case "productItem":
                 var value = {
-                    type: "item",
+                    type: "productItem",
                     id: event.data.id,
-                    name: event.data.attribute.name + " / " + event.data.attributeValue.name,
+                    name: event.data.attribute.name + " / " + event.data.attributeValue.rawValue.name,
                 };
-
-                // var thisUrl = "/manager/ajax/product-items/" + event.data.id + "/images";
 
                 break;
 
@@ -283,23 +284,11 @@ AP.product.items = ( function() {
                     name: AP.page.productId,
                 };
 
-                // var thisUrl = "/manager/ajax/products/" + AP.page.productId + "/images";
-
                 break;
 
             default:
-                console.error( "ERROR. Type [" + type + "] for image not found" );
+                console.error( "ERROR. Type [" + type + "] for file not found" );
             }
-
-            // var dataSource = NM.kendo.dataSource( { url: thisUrl } );
-
-            // viewModel.set( "currentImageEntity", value );
-            // viewModel.set( "currentUploadUrl", thisUrl );
-            // viewModel.set( "images", dataSource );
-
-            // initUpload();
-
-            console.log( "fileApp", fileApp );
 
             fileApp.open( value );
 

@@ -37,7 +37,6 @@ AP.file.modal = ( function() {
                 result.readUrl = baseUrl + "/product-items/" + current.id + "/images";
                 result.modifyUrl = result.readUrl;
 
-
                 break;
 
             case "product":
@@ -98,8 +97,8 @@ AP.file.modal = ( function() {
 
             var uid = event.data.uid;
 
-            var linked = $( "#img-linked-" + uid );
-            var loading = $( "#img-linked-loading-" + uid );
+            var linked = $( "#file-linked-" + uid );
+            var loading = $( "#file-linked-loading-" + uid );
 
             linked.addClass( "d-none" );
             loading.removeClass( "d-none" );
@@ -108,7 +107,7 @@ AP.file.modal = ( function() {
 
             NM.util.ajax( {
                 method: "DELETE",
-                url: "/manager/ajax/products/" + event.data.id + "/images",
+                url: "/manager/ajax/files/" + event.data.id,
                 callback: {
                     done: function( xhr ) {
 
@@ -136,72 +135,17 @@ AP.file.modal = ( function() {
             return "/assets/main/img/img-not-found.png";
         },
 
-        /*
-        list: function( event ) {
-            var element = $( event.currentTarget );
-            var id = event.data.id;
-
-            if ( !element.attr( "data-type" ) ) {
-                console.error(
-                    "ERROR. Set data-type attribute in currentTarget",
-                );
-                return;
-            }
-
-            var type = element.data( "type" );
-
-            switch ( type ) {
-            case "combination":
-                var value = {
-                    type: "combination",
-                    id: id,
-                };
-
-                var thisUrl = "/manager/ajax/combinations/" + id + "/images";
-
-                break;
-
-            default:
-                console.error( "ERROR. Type [" + type + "] for image not found" );
-            }
-
-            var dataSource = NM.kendo.dataSource( { url: thisUrl } );
-
-            viewModel.set( "currentImageEntity", value );
-            viewModel.set( "currentUploadUrl", thisUrl );
-
-            if ( dataSource ) {
-                viewModel.set( "files", dataSource );
-            }
-
-
-        },
-		*/
     } );
 
     pub.open = function( item ) {
 
-        kendo.bind( fields.modal, viewModel );
+        console.log( "AP.file.modal.open ", item );
 
-        // console.log( "item", item );
-        // console.log( "fields.modal", fields.modal );
+        kendo.bind( fields.modal, viewModel );
 
         viewModel.set( "currentItem", item );
 
-        var config = getCurrentConfig();
-
-        NM.util.ajax( {
-            method: "GET",
-            url: config.readUrl,
-            callback: {
-                done: function( xhr ) {
-                    viewModel.get( "files" ).data( xhr.data );
-                    initUpload();
-                }
-            }
-        } );
-
-        // NM.util.openModal( fields.modal );
+        initUpload();
 
     };
 
@@ -215,84 +159,96 @@ AP.file.modal = ( function() {
 
         var config = getCurrentConfig();
 
-        var files = viewModel.get( "files" );
-        var thisUrl = config.modifyUrl;
+        NM.util.ajax( {
+            method: "GET",
+            url: config.readUrl,
+            callback: {
+                done: function( xhr ) {
+                    viewModel.get( "files" ).data( xhr.data );
 
-        NM.util.openModal( fields.modal );
+                    var files = viewModel.get( "files" );
+                    var modifyUrl = config.modifyUrl;
 
-        files
-            .fetch()
-            .then( function() {
-                if ( files.total() > 0 ) {
-                    // console.log("total:in", images.total() );
+                    console.log( " modifyUrl ", modifyUrl );
 
-                    for ( var file of files.data() ) {
-                        var uid = file.uid;
+                    NM.util.openModal( fields.modal );
 
-                        // console.log( "file", file );
+                    files
+                        .fetch()
+                        .then( function() {
+                            if ( files.total() > 0 ) {
 
-                        $( "#file-upload-" + uid ).fileupload( {
-                            dropZone: $( "#file-upload-dropzone-" + uid ),
-                            autoUpload: true,
-                            formData: {
-                                typeId: file.type.id,
-                                fileId: file.id,
-                            },
-                            url: thisUrl,
-                            add: function( event, data ) {
-                                var uid = $( event.target ).data( "uid" );
+                                for ( var file of files.data() ) {
+                                    var uid = file.uid;
 
-                                var status = $( "#file-upload-status-" + uid );
+                                    console.log( " file.type.id ", file.type.id );
 
-                                status.html( "" );
+                                    $( "#file-upload-" + uid ).fileupload( {
+                                        dropZone: $( "#file-upload-dropzone-" + uid ),
+                                        autoUpload: true,
+                                        formData: {
+                                            typeId: file.type.id,
+                                            fileId: file.id,
+                                        },
+                                        url: modifyUrl,
+                                        add: function( event, data ) {
+                                            var uid = $( event.target ).data( "uid" );
 
-                                // TODO: get list form configuration
-                                if (
-                                    !/\.(jpg|jpeg|png|pdf|svg)$/i.test(
-                                        data.files[0].name,
-                                    )
-                                ) {
-                                    status.html( "<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf, svg.</span>" );
-                                    return false;
+                                            var status = $( "#file-upload-status-" + uid );
+
+                                            status.html( "" );
+
+                                            // TODO: get list form configuration
+                                            if (
+                                                !/\.(jpg|jpeg|png|pdf|svg)$/i.test(
+                                                    data.files[0].name,
+                                                )
+                                            ) {
+                                                status.html( "<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf, svg.</span>" );
+                                                return false;
+                                            }
+
+                                            data.submit();
+                                        },
+
+                                        success: function( event, data ) {
+                                            // TODO
+                                            console.log( "success", data );
+                                        },
+
+                                        progressall: function( event, data ) {
+
+                                            console.log( "progressall", event, data );
+                                            var uid = $( event.target ).data( "uid" );
+
+                                            var status = $( "#file-upload-status-" + uid );
+
+                                            console.log( "status", status );
+                                            status.html( "" );
+
+                                            var progress = parseInt( ( data.loaded / data.total ) * 100, 10, );
+
+                                            $( "#file-upload-progress-" + uid + " .upload-bar", ).css( "width", progress + "%" );
+
+                                            status.html( "Fatto!" );
+
+                                            var row = viewModel.get( "files" ).getByUid( uid );
+
+                                            setTimeout( () => {
+                                                initUpload();
+                                            }, 800 );
+                                        },
+                                    } );
                                 }
-
-                                console.log( "upload:data", data );
-
-                                data.submit();
-                            },
-
-                            success: function( event, data ) {
-                                // TODO
-                                console.log( "success", data );
-                            },
-
-                            progressall: function( event, data ) {
-                                var status = $( "#file-upload-status-" + uid );
-                                status.html( "" );
-
-                                var uid = $( event.target ).data( "uid" );
-
-                                var progress = parseInt(
-                                    ( data.loaded / data.total ) * 100,
-                                    10,
-                                );
-                                $( "#file-upload-progress-" + uid + " .upload-bar", ).css( "width", progress + "%" );
-
-                                status.html( "Fatto!" );
-
-                                var row = viewModel.get( "files" ).getByUid( uid );
-
-                                setTimeout( () => {
-                                    initUpload();
-                                }, "1000" );
-                            },
+                            }
+                        } )
+                        .catch( ( error ) => {
+                            console.error( error );
                         } );
-                    }
                 }
-            } )
-            .catch( ( error ) => {
-                console.error( error );
-            } );
+            }
+        } );
+
     };
 
     return pub;

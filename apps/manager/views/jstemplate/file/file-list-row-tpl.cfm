@@ -19,6 +19,8 @@
                                 </span>
                                 <span data-bind="visible: complete" class="text-end">
                                     <span class="badge bg-success" style="font-size:13px">Caricato</span>
+                                    <br>
+                                    <a class="underline hand" data-bind="click:delete">cancella</a>
                                 </span>
                             </div>
                         </div>
@@ -38,10 +40,14 @@
 
                 </div>
 
-                <div class="col-4 mb-2">
-                    <a href="" data-bind="attr: { href: getImageHref }" target="_blank">
-                        <img class="img-fluid" data-bind="attr: { src: getImageSrc }" height="500">
-                    </a>
+                <div class="col-4 mb-2" id="img-##: uid ##">
+                    <div id="file-linked-loading-##: uid ##" class="d-none text-center">
+                    </div>
+                    <div id="file-linked-##: uid ##">
+                        <a href="" data-bind="attr: { href: getImageHref }" target="_blank">
+                            <img class="img-fluid" data-bind="attr: { src: getImageSrc }" height="500">
+                        </a>
+                    </div>
                 </div>
 
             </div>

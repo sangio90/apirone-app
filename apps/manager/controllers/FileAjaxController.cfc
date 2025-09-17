@@ -91,8 +91,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			action       = "UPLOAD"
 		);
 
-		if ( Len( rc.imageId ) ) {
-			super.fire( "file.delete", { fileId = rc.imageId } );
+		if ( Len( rc.fileId ) ) {
+			super.fire( "file.delete", { fileId = rc.fileId } );
 		}
 
 		var fileId = super.fire(
