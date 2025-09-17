@@ -19,6 +19,7 @@ AP.product.items = ( function() {
     var pub = {};
 
     var fields = AP.product.fields;
+    var fileApp = AP.file.modal;
     var componentApp = AP.component.list;
     var attributeApp = AP.attribute.detail;
 
@@ -134,67 +135,6 @@ AP.product.items = ( function() {
 
             return false;
 
-        },
-
-        getImageTypeText: function( event ) {
-
-            var text = AP.util.getTextItem( event.type.texts.toJSON() );
-
-            return text.name + " " + event.shortId;
-        },
-
-        getImageSrc: function( event ) {
-            var uri = event.uri;
-
-            if ( event.uri != "" ) {
-                var replaced = uri.replace( "_ori", "500" );
-
-                return replaced;
-            }
-
-            return "/assets/main/img/img-not-found.png";
-        },
-
-        deleteImage: function( event ) {
-
-            var uid = event.data.uid;
-
-            var linked = $( "#img-linked-" + uid );
-            var loading = $( "#img-linked-loading-" + uid );
-
-            linked.addClass( "d-none" );
-            loading.removeClass( "d-none" );
-
-            loading.html( "<img src='/assets/main/img/ajax-loading.svg' width='40' height='40'>" );
-
-            NM.util.ajax( {
-                method: "DELETE",
-                url: "/manager/ajax/products/" + event.data.id + "/images",
-                callback: {
-                    done: function( xhr ) {
-
-                        setTimeout( () => {
-                            loading.html( "" );
-                            linked.removeClass( "d-none" );
-
-                            initUpload();
-                        }, 800 );
-
-                    },
-                },
-            } );
-        },
-
-        getImageHref: function( event ) {
-            var uri = event.uri;
-
-            if ( event.uri != "" ) {
-                var replaced = uri.replace( "_ori", "500" );
-
-                return replaced;
-            }
-
-            return "/assets/main/img/img-not-found.png";
         },
 
         selectAttribute: function( event ) {
@@ -314,6 +254,7 @@ AP.product.items = ( function() {
         },
 
         openImagesList: function( event ) {
+
             var element = $( event.currentTarget );
 
             if ( !element.attr( "data-type" ) ) {
@@ -328,9 +269,10 @@ AP.product.items = ( function() {
                 var value = {
                     type: "item",
                     id: event.data.id,
+                    name: event.data.attribute.name + " / " + event.data.attributeValue.name,
                 };
 
-                var thisUrl = "/manager/ajax/product-items/" + event.data.id + "/images";
+                // var thisUrl = "/manager/ajax/product-items/" + event.data.id + "/images";
 
                 break;
 
@@ -338,9 +280,10 @@ AP.product.items = ( function() {
                 var value = {
                     type: "product",
                     id: AP.page.productId,
+                    name: AP.page.productId,
                 };
 
-                var thisUrl = "/manager/ajax/products/" + AP.page.productId + "/images";
+                // var thisUrl = "/manager/ajax/products/" + AP.page.productId + "/images";
 
                 break;
 
@@ -348,13 +291,17 @@ AP.product.items = ( function() {
                 console.error( "ERROR. Type [" + type + "] for image not found" );
             }
 
-            var dataSource = NM.kendo.dataSource( { url: thisUrl } );
+            // var dataSource = NM.kendo.dataSource( { url: thisUrl } );
 
-            viewModel.set( "currentImageEntity", value );
-            viewModel.set( "currentUploadUrl", thisUrl );
-            viewModel.set( "images", dataSource );
+            // viewModel.set( "currentImageEntity", value );
+            // viewModel.set( "currentUploadUrl", thisUrl );
+            // viewModel.set( "images", dataSource );
 
-            initUpload();
+            // initUpload();
+
+            console.log( "fileApp", fileApp );
+
+            fileApp.open( value );
 
             return false;
         },
@@ -587,7 +534,7 @@ AP.product.items = ( function() {
         initSorts();
     };
 
-
+    /*
     var initUpload = function() {
         var images = viewModel.get( "images" );
 
@@ -658,6 +605,7 @@ AP.product.items = ( function() {
                 console.error( error );
             } );
     };
+    */
 
     var initSorts = function() {
         initItemsSort();

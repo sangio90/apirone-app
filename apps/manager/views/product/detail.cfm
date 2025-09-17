@@ -205,12 +205,13 @@
         </div>
 
         #view("product/attributes-list-modal")#
-        #view("product/images-list-modal")#
+        <!--- #view("product/images-list-modal")# ---->
         #view("product/sorting-modal")#
 
     </div>
 
     #view("attribute/detail-modal")#
     #view("component/list-modal")#
+    #view("file/list-modal")#
 
 </cfoutput>

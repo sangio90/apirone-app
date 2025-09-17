@@ -153,15 +153,12 @@ AP.product.combination = ( function() {
                     id: id,
                 };
 
-                var thisUrl =
-                        "/manager/ajax/combinations/" + id + "/images";
+                var thisUrl = "/manager/ajax/combinations/" + id + "/images";
 
                 break;
 
             default:
-                console.error(
-                    "ERROR. Type [" + type + "] for image not found",
-                );
+                console.error( "ERROR. Type [" + type + "] for image not found" );
             }
 
             var dataSource = NM.kendo.dataSource( { url: thisUrl } );

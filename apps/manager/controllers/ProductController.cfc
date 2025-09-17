@@ -54,14 +54,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.page[ "products" ] = super.fire( "product.list", { lineId = prc.line.getId() } );
 		}
 
-		prc.jsScripts.add( "app-component" );
-		prc.jsScripts.add( "app-attribute-detail" );
-		prc.jsScripts.add( "app-product-items" );
-
 		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = super.fire( "status.list", [ "attribute" ] );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
+
+		prc.jsScripts.add( "app-file" );
+		prc.jsScripts.add( "app-component" );
+		prc.jsScripts.add( "app-attribute-detail" );
+		prc.jsScripts.add( "app-product-items" );
 
 		event.setView( "product/detail" );
 	}
@@ -76,38 +77,20 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 
-	function listByCategoryId( event, rc, prc ){
-		// TODO: not used, remove?
-		/*
-		getLogger().debug( "ProductController.listByCategoryId: someone use this method? CategoryId: #rc.id#" );
-
-		param rc.id = "";
-
-		var category = super.fire( "productCategory.get", [ rc.id ] );
-
-		prc.title    = category.getName();
-		prc.statuses = super.fire( "status.list", [ "PRODUCT" ] );
-
-		prc.jsScripts.add( "app-product-detail" );
-		prc.jsScripts.add( "app-product-list" ); // remove this file
-
-		prc.page[ "statuses" ] = prc.statuses;
-
-		event.setView( "product/list" );
-		*/
-	}
-
 	function combinations( event, rc, prc ){
 		param rc.id = "";
 
-		prc.statuses            = super.fire( "status.list", [ "PRODUCT" ] );
 		var product             = super.service( "Product" ).get( rc.id );
+		prc.statuses            = super.fire( "status.list", [ "PRODUCT" ] );
+
 		prc.title               = "Combinazioni #product.getModel().getCode()#, finitura #product.getFinish().getName()#";
 		prc.subtitle            = "Linea #product.getLine().getName()#";
-		prc.page[ "productId" ] = product.getId();
 
 		prc.jsScripts.add( "app-product-combinations" );
+
 		prc.page[ "statuses" ] = prc.statuses;
+		prc.page[ "productId" ] = product.getId();
+
 		event.setView( "product/combinations" );
 	}
 

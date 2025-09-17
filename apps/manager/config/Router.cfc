@@ -197,9 +197,9 @@
 		/*
 			products
 		*/
-		get( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.list" ).end();
-		post( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.upload" ).end();
-		delete( "/ajax/:by-regex:(products|product-items|combinations)/:id/images" ).to( "FileAjaxController.delete" ).end();
+		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.list" ).end();
+		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.upload" ).end();
+		delete( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.delete" ).end();
 
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
 		get( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();

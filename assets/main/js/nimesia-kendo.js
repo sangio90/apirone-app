@@ -18,9 +18,9 @@ NM.kendo.dataSource = function( config = {} ) {
         }
     };
 
-    defaults.schema = { "data": "data", total: "total" };
+    defaults.schema = { "data": "data", "total": "total" };
 
-    if ( config.url != undefined ) {
+    if ( "url" in config ) {
 
         // defaults.serverPaging = true;
         defaults.transport = {
@@ -129,7 +129,7 @@ NM.kendo.formatDate = function( date, type="normal" ) {
 
 NM.kendo.formatISODate = function( date, type="normal" ) {
 
-    //TODO: use NM.kendo.formatDate() 
+    // TODO: use NM.kendo.formatDate()
 
     if ( type == "normal" ) {
         var ret = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss", "en-US" ), "dd/MM/yyyy HH:mm" );

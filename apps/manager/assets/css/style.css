@@ -311,7 +311,7 @@ h2 {
 
 .modalxl {
     width: 95vw !important;
-    max-width: 2200px !important;  
+    max-width: 2200px !important;
 }
 
 .content-body {
@@ -471,7 +471,7 @@ h2 {
 	dropzone
 */
 
-.image-dropzone {
+.file-dropzone {
     margin-top: 20px;
     width: 100%;
     border: 2px solid #eaeaea;
@@ -931,31 +931,40 @@ h2 {
     border: 1px solid #000 !important;
     padding: 3px;
 }
+
 .selected-text-align-not {
     border: 1px solid #ffffff;
     padding: 3px;
 }
+
 .text-left {
     text-align: left !important;
 }
+
 .text-center {
     text-align: center !important;
 }
+
 .text-right {
     text-align: right !important;
 }
+
 .flex {
     display: flex !important;
 }
+
 .justify-content-center {
     justify-content: center !important;
 }
+
 .align-items-center {
     align-items: center !important;
 }
+
 .justify-content-end {
     justify-content: end !important;
 }
+
 .align-items-end {
     align-items: end !important;
 }
