@@ -22,6 +22,15 @@
 
 
 		/*
+			catalog bundle
+		*/
+		get( "/ajax/catalog-bundles" ).to( "CatalogBundleAjaxController.list" ).end();
+		post( "/ajax/catalog-bundles" ).to( "CatalogBundleAjaxController.save" ).end();
+		delete( "/signages/catalog-bundles" ).to( "CatalogBundleAjaxController.delete" ).end();
+		get( "/catalog-bundles" ).to( "CatalogBundleController.list" ).end();
+
+
+		/*
 			signages
 		*/
 		post( "/ajax/signages/rows-config" ).to( "SignageConfigAjaxController.save" ).end();

@@ -6,17 +6,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			list = {
 				defaultIncludes = [
 					"id",
-					"shortId",
-					"name",
-					"code",
-					"nameItem",
-					"status",
-					"positionCount",
-					"createdAt",
-					"code",
-					"categories",
+					"line",
+					"model",
 					"category",
-					"lines"
 				]
 			}
 		}

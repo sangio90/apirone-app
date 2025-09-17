@@ -96,15 +96,21 @@
 				roles: "ADM",
 			},
 			{
-				href: "/manager/finishes",
-				icon: "fas fa-palette",
-				title: "Finiture",
-				roles: "ADM"
-			},
-			{
 				href: "/manager/models",
 				icon: "fas fa-expand-alt",
 				title: "Modelli",
+				roles: "ADM"
+			},
+			{
+				href: "/manager/catalog-bundles",
+				icon: "fas fa-palette",
+				title: "Bundle catalogo",
+				roles: "ADM"
+			},
+			{
+				href: "/manager/finishes",
+				icon: "fas fa-palette",
+				title: "Finiture",
 				roles: "ADM"
 			},
 			{

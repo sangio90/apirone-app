@@ -171,7 +171,6 @@ AP.attribute.detail = ( function() {
             return false;
         },
 
-        // TODO: only one "resetForm"
         resetDetailForm: function() {
 
             var thisForm = fields.detailForm;
