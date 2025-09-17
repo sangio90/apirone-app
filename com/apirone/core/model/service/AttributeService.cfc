@@ -44,7 +44,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
-		result.setTotal( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
 		return result;
 	}
