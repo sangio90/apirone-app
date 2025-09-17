@@ -127,21 +127,11 @@ NM.kendo.formatDate = function( date, type="normal" ) {
     return ret;
 };
 
-NM.kendo.formatISODate = function( date, type="normal" ) {
+NM.kendo.formatISODate = function( date, type = "normal" ) {
 
-    // TODO: use NM.kendo.formatDate()
+    var parsed = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss" ), "MMMM, dd yyyy HH:mm:ss" );
 
-    if ( type == "normal" ) {
-        var ret = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss", "en-US" ), "dd/MM/yyyy HH:mm" );
-    }
-
-    if ( type == "date-only" ) {
-        var ret = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss", "en-US" ), "dd/MM/yyyy" );
-    }
-
-    if ( type == "short" ) {
-        var ret = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss", "en-US" ), "dd/MM" );
-    }
+    var ret = NM.kendo.formatDate( parsed, type );
 
     return ret;
 };

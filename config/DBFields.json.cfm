@@ -221,13 +221,17 @@
         "name": "code",
         "type": "Varchar"
     },
-   "metaDataType.name": {
+    "metaDataType.name": {
         "name": "metadata_type",
         "type": "Varchar"
     },
-   "metaData.id": {
+    "metaData.id": {
         "name": "metadata_id",
         "type": "Integer"
+    },
+    "catalogBundle.createdAt": {
+        "name": "created_at",
+        "type": "Date"
     },
 
 }

@@ -47,7 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String statusId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "line.code", desc = "asc" } ]
+		required Array orderBy  = [ { field = "catalogBundle.createdAt", desc = "asc" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -106,6 +106,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			obj.setId( record.catalog_bundle_id );
 			obj.setName( record.catalog_bundle );
+			obj.setCreatedAt( record.created_at );
+
 			obj.setLine( getLineService().get( record.line_id ) );
 			obj.setModel( getModelService().get( record.model_id ) );
 			obj.setCategory( getProductCategoryService().get( record.product_category_id ) );

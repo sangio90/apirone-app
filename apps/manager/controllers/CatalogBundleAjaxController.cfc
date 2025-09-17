@@ -3,7 +3,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var mem     = super.getMementify();
+		var mem    = super.getMementify();
 
 		var params = super.paramsFromUrl();
 

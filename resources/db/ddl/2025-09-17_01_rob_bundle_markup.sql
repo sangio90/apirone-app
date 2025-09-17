@@ -1,8 +1,8 @@
 ALTER TABLE public.catalog_bundles
-  ADD COLUMN markup_percent NUMERIC(10,2);
+  ADD COLUMN markup_value NUMERIC(10,2);
 
-COMMENT ON COLUMN public.catalog_bundles.markup_percent
+COMMENT ON COLUMN public.catalog_bundles.markup_value
 IS 'Markup di incremento';
 
 ALTER TABLE public.catalog_bundles
-  ALTER COLUMN markup_percent SET DEFAULT 0;  
+  ALTER COLUMN markup_value SET DEFAULT 0;  

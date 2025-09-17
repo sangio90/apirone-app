@@ -1,6 +1,6 @@
 <cfoutput>
 
-    <div id="account-list-root">
+    <div id="catalog-bundle-list-root">
 
         <div class="row">
             <div class="col-8">
@@ -22,27 +22,43 @@
 
                                 <div class="box-search-small"> 
 
-                                    <form id="account-grid-search-form" 
+                                    <form id="catalog-bundle-grid-search-form" 
                                         class="d-flex align-items-center justify-content-end" 
                                         data-bind:'events: { submit: search }'>
 
-                                        <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
+										<div class="col">
+											<span>Categoria</span>
+											<select class="form-control me-2" name="categoryId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.categories#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
 
-                                        <select class="form-control me-2" name="roleId">
-                                            <option value="">-- tutti i ruoli</option>
-                                            <cfloop array="#prc.roles#" item="thisLine">
-                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
-                                            </cfloop>
-                                        </select>
+										<div class="col">
+											<span>Linea</span>
+											<select class="form-control me-2" name="lineId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.lines#" item="item">
+													<option value="#item.getId()#">#item.getName()#</option>
+												</cfloop>
+											</select>
+										</div>
+
+										<div class="col">
+											<span>Modello</span>
+											<select class="form-control me-2" name="modelId">
+												<option value="">-- tutte</option>
+												<cfloop array="#prc.models#" item="item">
+													<option value="#item.getId()#">#item.getName()# (#item.getCode()#)</option>
+												</cfloop>
+											</select>
+										</div>
                                     
-                                        <select class="form-control me-2" name="statusId">
-                                            <option value="">-- tutti gli stati</option>
-                                            <cfloop array="#prc.statuses#" item="thisLine">
-                                                <option value="#thisLine.getId()#">#thisLine.getName()#</option>
-                                            </cfloop>
-                                        </select>
-                                    
-                                        #searchButton(bind="click:search")#
+                                        <div class="align-self-end">
+                                            #searchButton(bind="click:search")#
+                                        </div>
                                     
                                     </form>
 
@@ -50,28 +66,21 @@
                             
                             </div>
 
-                            <div class="col-sm-4 text-end">
-
-                                <div class="float-end">
-                                    #deleteButton( label="Cancella", bind="click:delete", size="sm" )#
-                                </div>
-
-                            </div>
-                            
                         </div>
                         
-                        <form name="account-grid-form" id="account-grid-form" method="post">
+                        <form name="catalog-bundle-grid-form" id="catalog-bundle-grid-form" method="post">
 
                             #grid( 
-                                id="account-grid",
+                                id="catalog-bundle-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px'},
                                     { 'field':'createdAt', 'title':'Creato il', width: '140px' },
-                                    { 'field':'category.name', 'title':'Nome'},
-                                    { 'field':'line.name', 'title':'Ruoli' },
-                                    { 'field':'model.name', 'title':'Lingua' },
+                                    { 'field':'category.name', 'title':'Categoria'},
+                                    { 'field':'line.name', 'title':'Linea' },
+                                    { 'field':'model.name', 'title':'Modello' },
+                                    { 'field':'Markup', 'title':'Markup %', width: '120px'  },
                                 ]",
-                                rowTemplate="account/catalog-bundle-grid-row-tmpl"
+                                rowTemplate="catalog-bundle/catalog-bundle-grid-row-tmpl"
                             )#
 
                         </form>
