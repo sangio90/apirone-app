@@ -24,6 +24,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			var config = imageConfigs[ "combination" ];
 		}
 
+		if ( rc.by == "attributes-values" ) {
+			var params = { attributeValueId = rc.id }
+			var config = imageConfigs[ "attributeValue" ];
+		}
+
 		for ( var typeId in config.types ) {
 			params.put( "typeId", typeId );
 
@@ -80,6 +85,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( rc.by == "combinations" ) {
 			entity.setKey( "combination.id" );
 			var kindId = "combination";
+		}
+
+		if ( rc.by == "attributes-values" ) {
+			entity.setKey( "attributeValue.id" );
+			var kindId = "attributeValue";
 		}
 
 		entity.setValue( rc.id );

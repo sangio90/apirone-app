@@ -255,8 +255,6 @@ AP.product.items = ( function() {
 
         openImagesList: function( event ) {
 
-            console.log( "openImagesList", event.data );
-
             var element = $( event.currentTarget );
 
             if ( !element.attr( "data-type" ) ) {
@@ -523,78 +521,6 @@ AP.product.items = ( function() {
         initSorts();
     };
 
-    /*
-    var initUpload = function() {
-        var images = viewModel.get( "images" );
-
-        var thisUrl = viewModel.get( "currentUploadUrl" );
-
-        NM.util.openModal( fields.imagesModal );
-
-        // it shouldn't be needed "fetch"
-        images
-            .fetch()
-            .then( function() {
-                if ( images.total() > 0 ) {
-
-                    for ( var image of images.data() ) {
-                        var uid = image.uid;
-
-                        $( "#image-upload-" + uid ).fileupload( {
-                            dropZone: $( "#image-upload-dropzone-" + uid ),
-                            autoUpload: true,
-                            formData: {
-                                typeId: image.type.id,
-                                imageId: image.id,
-                            },
-                            url: thisUrl,
-                            add: function( event, data ) {
-                                var uid = $( event.target ).data( "uid" );
-
-                                var status = $( "#image-upload-status-" + uid );
-
-                                status.html( "" );
-
-                                // TODO: get list form configuration
-                                if ( !/\.(jpg|jpeg|png|pdf)$/i.test( data.files[0].name ) ) {
-                                    status.html( "<span class='error'>File non ammesso. Consentiti: jpg, jpeg, png, pdf.</span>" );
-                                    return false;
-                                }
-
-                                data.submit();
-                            },
-
-                            success: function( event, data ) {
-                                // TODO
-                                console.log( "success", data );
-                            },
-
-                            progressall: function( event, data ) {
-                                var status = $( "#image-upload-status-" + uid );
-                                status.html( "" );
-
-                                var uid = $( event.target ).data( "uid" );
-
-                                var progress = parseInt( ( data.loaded / data.total ) * 100, 10 );
-                                $( "#image-upload-progress-" + uid + " .upload-bar" ).css( "width", progress + "%" );
-
-                                status.html( "Fatto!" );
-
-                                var row = viewModel.get( "images" ).getByUid( uid );
-
-                                setTimeout( () => {
-                                    initUpload();
-                                }, "1000" );
-                            },
-                        } );
-                    }
-                }
-            } )
-            .catch( ( error ) => {
-                console.error( error );
-            } );
-    };
-    */
 
     var initSorts = function() {
         initItemsSort();

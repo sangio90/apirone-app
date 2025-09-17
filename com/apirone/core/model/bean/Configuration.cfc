@@ -45,6 +45,13 @@ component output="true" accessors="true" {
 						"horizontal" = { "sizes" = [ { "width" = "500" } ] },
 						"vertical"   = { "sizes" = [ { "width" = "500" } ] }
 					}
+				},
+				"attributeValue" = {
+					"path"  = "attribute-values",
+					"types" = {
+						"horizontal" = { "sizes" = [ { "width" = "500" } ] },
+						"vertical"   = { "sizes" = [ { "width" = "500" } ] }
+					}
 				}
 			},
 			"encryptKey" = settings.get( "db.encryptKey" )

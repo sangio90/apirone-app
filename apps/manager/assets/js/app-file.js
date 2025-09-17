@@ -76,12 +76,17 @@ AP.file.modal = ( function() {
 
         getImageTypeText: function( event ) {
 
+            console.log( "getImageTypeText ", event );
+
             var text = AP.util.getTextItem( event.type.texts.toJSON() );
 
             return text.name + " " + event.shortId;
         },
 
         getImageSrc: function( event ) {
+
+            console.log( "getImageSrc ", event );
+
             var uri = event.uri;
 
             if ( event.uri != "" ) {

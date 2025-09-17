@@ -35,7 +35,8 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				attribute_id::varchar
+				attribute_id::varchar,
+				COUNT(attribute_id) OVER() AS total
 			FROM
 				attributes
 					<cfif !IsNull( arguments.str )>
@@ -56,6 +57,14 @@
 				</cfif>
 			ORDER BY
 				attribute_id
+
+			<cfif arguments.limit GT 0>
+				LIMIT
+					<cfqueryparam value="#arguments.limit#" cfsqltype="integer">
+				OFFSET
+					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
+			</cfif>
+
 		</cfquery>
 
 		<cfreturn local.q>

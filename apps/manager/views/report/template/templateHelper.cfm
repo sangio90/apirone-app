@@ -36,7 +36,7 @@
                 + #component.override.quantity# = #component.totalQuantity#
             </cfif>
 
-            #component.rawProduct.measurementUnit.id#</b> x #component.rawProduct.name# 
+            #component.rawProduct.measurementUnit.id#</b> x #component.rawProduct.name# (#component.rawProduct.id#)
             - #component.variant.name# (#component.variant.id#)
             - #component.color.name# (#component.color.id#)<br/>
         </cfoutput> 

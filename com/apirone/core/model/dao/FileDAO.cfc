@@ -40,6 +40,10 @@
 				AND combination_id = <cfqueryparam value="#arguments.combinationId#" cfsqltype="Varchar">::uuid
 			</cfif>
 
+			<cfif !IsNull( arguments.attributeValueId )>
+				AND attribute_raw_value_id = <cfqueryparam value="#arguments.attributeValueId#" cfsqltype="Integer">
+			</cfif>
+
 			<cfif !IsNull( arguments.typeId )>
 				AND type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
 			</cfif>

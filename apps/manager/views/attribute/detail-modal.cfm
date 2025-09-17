@@ -159,6 +159,7 @@
                                         { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
                                         { 'field':'', 'width':'40px', 'title':'Attiva note' },
                                         { 'field':'', 'width':'40px', 'title':'Questo valore modifica l\'immagine' },
+                                        { 'field':'', 'width':'50px', 'title':'Immagini'},
                                         { 'field':'', 'width':'50px', 'title':'Numeri di componenti'},
                                         { 
                                             'field':'', 

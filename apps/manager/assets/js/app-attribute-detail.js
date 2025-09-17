@@ -29,6 +29,7 @@ AP.attribute.detail = ( function() {
     var fields = AP.fields.attribute.detail;
 
     var componentApp = AP.component.list;
+    var fileApp = AP.file.modal;
 
     var defaults = {
 
@@ -127,6 +128,21 @@ AP.attribute.detail = ( function() {
 
         isUpdate: function() {
             return viewModel.get( "detailForm.data.id" ).length;
+        },
+
+        openImagesList: function( event ) {
+
+            console.log( "openImagesList", event );
+
+            var value = {
+                type: "attributeValue",
+                id: event.data.id,
+                name: event.data.rawValue.name,
+            };
+
+            fileApp.open( value );
+
+            return false;
         },
 
         openComponentsList: function( event ) {

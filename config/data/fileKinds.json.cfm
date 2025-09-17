@@ -6,6 +6,9 @@
         id: "combinationItem",
     },
     {
+        id: "attributeValue",
+    },
+    {
         id: "combination",
     },
     {

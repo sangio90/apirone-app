@@ -19,6 +19,11 @@
                 <input type="checkbox" data-bind="checked: affectToImage" name="affectToImage" class="form-check-input">
             </td>
             <td class="text-center">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList">
+                    <i class="fas fa-image"></i> 
+                </button>
+            </td>
+            <td class="text-center">
                 <button type="button" class="btn btn-default btn-sm" data-bind="click:openComponentsList" data-type="attributeValue"> 
                     <i class="fas fa-window-restore"></i> 
                     <i class="button-badge info" data-bind="text: componentCount"></i> 

@@ -111,15 +111,15 @@
 
                                             <br>
 
+                                            - <a href="" class="underline"
+                                                data-type="product"
+                                                data-bind="click:openImagesList">
+                                                    Aggiungi immagini per questo articolo &raquo;
+                                                </a>
+
+                                            <br>
+
                                             <cfif prc.product.getCategory().getMode().getId() <> "BAS">
-
-                                                - <a href="" class="underline"
-                                                    data-type="product"
-                                                    data-bind="click:openImagesList">
-                                                        Aggiungi immagini per questo articolo &raquo;
-                                                    </a>
-
-                                                <br>
 
                                                 - <a href="/manager/products/#rc.id#/combinations" class="underline"
                                                     data-type="product"
