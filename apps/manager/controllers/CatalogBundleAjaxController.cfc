@@ -42,4 +42,44 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function save( event, rc, prc ){
+		var result    = super.getResult();
+		var mem       = super.getMementify();
+		var messageId = "catalogBundle.updated";
+
+		var content = GetHTTPRequestData().content;
+		var data    = DeserializeJSON( content )
+
+		var errors  = [];
+		var payload = {};
+
+		for ( var item in data._data ) {
+			if ( item.keyExists( "markupValue" ) AND Len( item.markupValue ) ) {
+				if ( IsNumeric( item.markupValue ) ) {
+					var bean = super.bean( "CatalogBundle" );
+
+					bean.setId( item.id );
+					bean.setMarkupValue( item.markupValue )
+
+					super.fire( "catalogBundle.update", [ bean ] )
+				} else {
+					errors.add( {
+						"message" = "Non sono riuscito ad aggiornare l'Id #item.id#"
+					} )
+				}
+			}
+		}
+
+		if ( errors.len() ) {
+			messageId = "catalogBundle.updatedNotAllRecords"
+			payload   = { "errors" = errors };
+		}
+
+		var message = super.completeMessage( messageId );
+
+		result.setData( { "message" = message, "payload" = payload } );
+
+		event.setValue( "result", result );
+	}
+
 }

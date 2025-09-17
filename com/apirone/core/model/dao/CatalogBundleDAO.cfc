@@ -52,6 +52,8 @@
 					AND
 					(
 						catalog_bundles.catalog_bundle ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
+						OR
+						catalog_bundles.catalog_bundle_id::varchar ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 					)
 				</cfif>
 
@@ -86,6 +88,23 @@
 		</cfquery>
 
 		<cfreturn local.q.catalog_bundle_id.toString()>
+	</cffunction>
+
+	<cffunction name="update" returntype="String">
+		<cfargument name="catalogBundle" type="com.apirone.core.model.bean.CatalogBundle" required="true">
+
+		<cfset var id = arguments.catalogBundle.getId()>
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE
+				catalog_bundles
+			SET
+				markup_value = <cfqueryparam cfsqltype="Numeric" value="#arguments.catalogBundle.getMarkupValue()#">
+			WHERE
+				catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#id#">::uuid
+		</cfquery>
+
+		<cfreturn id>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">

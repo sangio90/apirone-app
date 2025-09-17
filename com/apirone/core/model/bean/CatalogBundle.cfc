@@ -7,7 +7,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			"line",
 			"model",
 			"category",
-			"createdAt"
+			"createdAt",
+			"markupValue"
 		],
 		profiles = {
 			list = {
@@ -17,7 +18,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 					"line",
 					"model",
 					"category",
-					"createdAt"
+					"createdAt",
+					"markupValue"
 				]
 			}
 		}

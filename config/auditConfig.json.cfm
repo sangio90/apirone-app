@@ -10,7 +10,8 @@
 		"PRODUCT_ITEM": {},
 		"QUOTATION": {},
 		"RAW_VALUE": {},
-		"COMPONENT": {}
+		"COMPONENT": {},
+		"CATALOG_BUNDLE": {}
 	},
 	actions: {
 		"CREATED": {},

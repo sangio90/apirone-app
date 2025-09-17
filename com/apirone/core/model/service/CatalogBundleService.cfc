@@ -39,6 +39,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return Len( record.catalog_bundle_id ) ? record.catalog_bundle_id : NullValue();
 	}
 
+	public String function update( required com.apirone.core.model.bean.CatalogBundle catalogBundle ){
+		getDao().update( arguments.catalogBundle );
+
+		super.logEvent(
+			event   = "CATALOG_BUNDLE.updated",
+			message = "CatalogBundle [#arguments.catalogBundle.getId()#] updated"
+		);
+
+		super.getCacheManager().remove( getCacheScope(), arguments.catalogBundle.getId() );
+
+		return arguments.catalogBundle.getId();
+	}
+
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		String categoryId,
@@ -47,7 +60,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String statusId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "catalogBundle.createdAt", desc = "asc" } ]
+		required Array orderBy  = [ { field = "catalogBundle.createdAt", dir = "desc" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -107,6 +120,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			obj.setId( record.catalog_bundle_id );
 			obj.setName( record.catalog_bundle );
 			obj.setCreatedAt( record.created_at );
+			obj.setMarkupValue( record.markup_value );
 
 			obj.setLine( getLineService().get( record.line_id ) );
 			obj.setModel( getModelService().get( record.model_id ) );
