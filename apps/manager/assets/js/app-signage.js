@@ -17,9 +17,9 @@ AP.signage.modal = ( function() {
             { change: function() {
                 $.each( this.data(), function( index, item ) {
                     item.set( "index", index+1 );
-                    console.log(item);
+                    console.log( item );
                 } );
-            }}
+            } }
         );
     };
     var defaultDetailForm = {
@@ -141,7 +141,7 @@ AP.signage.modal = ( function() {
                     orderby: viewModel.get( "detailForm.data.signageRows" ).data().length + 1
                 };
                 viewModel.get( "detailForm.data.signageRows" ).add( defaultSignageRow );
-                console.log(viewModel.get( "detailForm.data.signageRows" ).data());
+                console.log( viewModel.get( "detailForm.data.signageRows" ).data() );
             }
 
             return false;
@@ -263,11 +263,11 @@ AP.signage.modal = ( function() {
         },
 
         removeSignageRow: function( e ) {
-            if (e.data.id != '') {
+            if ( e.data.id != "" ) {
                 NM.util.ajax( {
                     method: "DELETE",
                     url: "/manager/ajax/quotationitems/signagerow",
-                    data: {id: e.data.id},
+                    data: { id: e.data.id },
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERROR" ) {
@@ -275,15 +275,15 @@ AP.signage.modal = ( function() {
                             }
                             if ( xhr.status == "SUCCESS" ) {
                                 AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
-                                const row = viewModel.get( "detailForm.data.signageRows" ).data().filter(row => {
-                                    return row.id = e.data.id
-                                });
-                                if (row.length) {
+                                const row = viewModel.get( "detailForm.data.signageRows" ).data().filter( row => {
+                                    return row.id = e.data.id;
+                                } );
+                                if ( row.length ) {
                                     viewModel.get( "detailForm.data.signageRows" ).data().remove( row[0] );
                                 }
                                 return false;
                             }
-                    }}
+                        } }
                 } );
             } else {
                 const uid = e.data.uid;
@@ -453,29 +453,32 @@ AP.signage.modal = ( function() {
             callback: {
                 done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
+
                         viewModel.set( "detailForm.data", xhr.data );
-                        viewModel.set("detailForm.data.signageRows", getEmptyDataSource());
-                        viewModel.get("detailForm.data.signageRows").data(xhr.data.signageRows);
+                        viewModel.set( "detailForm.data.signageRows", getEmptyDataSource() );
+                        viewModel.get( "detailForm.data.signageRows" ).data( xhr.data.signageRows );
                         viewModel.set( "detailForm.title", "Modifica segnaletica" );
+
                         viewModel.loadLines();
-                        setTimeout(function() {
+
+                        setTimeout( function() {
                             viewModel.loadModels();
-                            setTimeout(function() {
+                            setTimeout( function() {
                                 viewModel.loadFinishes();
-                                setTimeout(function() {
+                                setTimeout( function() {
                                     viewModel.loadSignageConfigs();
-                                    setTimeout(function() {
+                                    setTimeout( function() {
                                         viewModel.loadFontSizes();
-                                        setTimeout(function() {
-                                            setTimeout(function() {
+                                        setTimeout( function() {
+                                            setTimeout( function() {
                                                 viewModel.parseLines();
-                                                NM.util.openModal(AP.signage.fields.modalRoot);
-                                            }, 100);
-                                        }, 100);
-                                    }, 100);
-                                }, 100);
-                            }, 100);
-                        }, 100);
+                                                NM.util.openModal( AP.signage.fields.modalRoot );
+                                            }, 100 );
+                                        }, 100 );
+                                    }, 100 );
+                                }, 100 );
+                            }, 100 );
+                        }, 100 );
                     }
                 },
             },
