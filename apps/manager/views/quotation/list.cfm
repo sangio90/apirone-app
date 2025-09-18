@@ -23,7 +23,7 @@
                                         class="d-flex justify-content-end" 
                                         data-bind="events: { submit: search }">
 
-                                        <input name="strDescription" placeholder="Cerca per nome" class="form-control me-2" type="text">
+                                        <input name="strDescription" placeholder="Cerca nella descrizione" class="form-control me-2" type="text">
                                         <input name="strNumber" placeholder="Cerca per numero" class="form-control me-2" type="text">
 
 										<select class="form-control me-2" name="statusId">
@@ -53,6 +53,7 @@
 								#grid(
 									id      = "quotation-grid",
 									columns = "[
+                                        { 'field':'shortId', 'title':'ID',  width: '80px' },
                                         { 'field':'name', 'title':'Nome' },
                                         { 'field':'quotationNumber', 'title':'Numero', width: '15%' },
                                         { 'field':'quotationDate', 'title':'Data', width: '15%'},
