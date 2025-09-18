@@ -55,13 +55,6 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	private String function getRelativePath( size = "_ori" ){
 		var config = super.getConfiguration();
 
-		/*
-		dump( config );
-		dump( this.getName() );
-		dump( this.getKind().getId() );
-		abort;
-		*/
-
 		var imageConfig = config.get( "imagesConfig" )[ getKind().getId() ];
 
 		var path = "/media/#imageConfig.path#/#arguments.size#/#this.getDirectory()#/#this.getName()#";

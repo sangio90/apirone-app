@@ -95,9 +95,12 @@ AP.file.modal = ( function() {
 
             var uri = event.uri;
 
-            if ( event.uri != "" ) {
-                var replaced = uri.replace( "_ori", "500" );
+            if ( uri.toLowerCase().endsWith( ".svg" ) ) {
+                return uri;
+            }
 
+            if ( uri != "" )  {
+                var replaced = uri.replace( "_ori", "500" );
                 return replaced;
             }
 
