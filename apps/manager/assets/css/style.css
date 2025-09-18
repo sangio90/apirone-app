@@ -145,6 +145,10 @@ html.no-overflowscrolling .sidebar-left .nano {
         background: #4482e8 !important;
         box-shadow: -5px 0 0 #2771e8 inset;
     }
+
+    html.fixed .inner-wrapper {
+        padding-top: 90px;
+    }
 }
 
 ul.nav-main li a {
