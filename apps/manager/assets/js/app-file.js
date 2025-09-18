@@ -93,7 +93,7 @@ AP.file.modal = ( function() {
 
         getImageSrc: function( event ) {
 
-            var uri = event.uri;
+            const uri = event.uri || "";
 
             if ( uri.toLowerCase().endsWith( ".svg" ) ) {
                 return uri;

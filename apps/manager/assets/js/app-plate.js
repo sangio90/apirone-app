@@ -1133,7 +1133,7 @@ AP.plate.modal = ( function() {
             var detailForm = AP.signage.fields.detailForm;
             var status = detailForm.find( ".status" );
 
-            status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
+            status.html( "<img src='/assets/fakes/img/ajax-loading.svg' width=20 height=20>" );
 
             if ( detailForm.valid() ) {
                 NM.util.ajax( {
@@ -1168,7 +1168,7 @@ AP.plate.modal = ( function() {
                 {
                     UUID: "100",
                     CODE: "508",
-                    IMG: "/assets/main/img/508.jpg",
+                    IMG: "/assets/fakes/img/508.jpg",
                     WIDTH: 1200, // in px
                     HEIGHT: 500, // in px
                     ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
@@ -1200,7 +1200,7 @@ AP.plate.modal = ( function() {
                 {
                     UUID: "111",
                     CODE: "1X3",
-                    IMG: "/assets/main/img/1X3.jpg",
+                    IMG: "/assets/fakes/img/1X3.jpg",
                     WIDTH: 1200, // in px
                     HEIGHT: 500, // in px
                     ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
@@ -1219,7 +1219,7 @@ AP.plate.modal = ( function() {
                 {
                     UUID: "200",
                     CODE: "508V",
-                    IMG: "/assets/main/img/508VERTICALE.jpg",
+                    IMG: "/assets/fakes/img/508VERTICALE.jpg",
                     WIDTH: 1200, // in px
                     HEIGHT: 500, // in px
                     ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
@@ -1249,7 +1249,7 @@ AP.plate.modal = ( function() {
                 {
                     UUID: "300",
                     CODE: "SPECIAL1",
-                    IMG: "/assets/main/img/508.jpg",
+                    IMG: "/assets/fakes/img/508.jpg",
                     WIDTH: 1200, // in px
                     HEIGHT: 500, // in px
                     ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
@@ -1264,7 +1264,7 @@ AP.plate.modal = ( function() {
                 {
                     UUID: "400",
                     CODE: "SPECIAL2",
-                    IMG: "/assets/main/img/508VERTICALE.jpg",
+                    IMG: "/assets/fakes/img/508VERTICALE.jpg",
                     WIDTH: 1200, // in px
                     HEIGHT: 500, // in px
                     ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
@@ -1281,7 +1281,7 @@ AP.plate.modal = ( function() {
                 {
                     UUID: "500",
                     CODE: "SPECIAL3",
-                    IMG: "/assets/main/img/508.jpg",
+                    IMG: "/assets/fakes/img/508.jpg",
                     WIDTH: 1200, // in px
                     HEIGHT: 500, // in px
                     ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
@@ -1414,14 +1414,13 @@ AP.plate.modal = ( function() {
         viewModel.set( "fruits", [
             {
                 width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
-                height:
-                    AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                height: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 4,
                 rowSpan: 1,
                 uuid: "A",
                 code: "schuko",
                 name: "SCHK 2P + 1T",
-                img: "/assets/main/img/foto_frutto_schuko.png",
+                img: "/assets/fakes/img/foto_frutto_schuko.png",
             },
             {
                 width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
@@ -1432,7 +1431,7 @@ AP.plate.modal = ( function() {
                 uuid: "B",
                 code: "bipasso",
                 name: "BIPAS.",
-                img: "/assets/main/img/foto_frutto_bipasso.png",
+                img: "/assets/fakes/img/foto_frutto_bipasso.png",
             },
             {
                 width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
@@ -1443,18 +1442,17 @@ AP.plate.modal = ( function() {
                 uuid: "C",
                 code: "cat6",
                 name: "CAT 6",
-                img: "/assets/main/img/foto_frutto_cat6.png",
+                img: "/assets/fakes/img/foto_frutto_cat6.png",
             },
             {
                 width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-                height:
-                    AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                height: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "I",
                 code: "switch",
                 name: "INT. Sottile",
-                img: "/assets/main/img/foto_frutto_interruttore.png",
+                img: "/assets/fakes/img/foto_frutto_interruttore.png",
             },
         ] );
 

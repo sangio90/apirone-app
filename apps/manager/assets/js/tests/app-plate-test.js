@@ -1,5 +1,4 @@
-/*
-$(document).ready(function () {
+$( document ).ready( function() {
 
     console.log( "test-plate:load" );
 
@@ -19,4 +18,3 @@ $(document).ready(function () {
     }, 500 );
 
 } );
-*/
