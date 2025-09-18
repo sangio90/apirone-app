@@ -298,13 +298,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data = [];
 
 		var result = super.getResult();
-		var dm     = super.getDataMapper();
 		var params = super.paramsFromUrl();
+		var memy   = super.getMementify();
 
 		var rows = super.service( "Combination" ).getByProductId( rc.id );
 
 		for ( var row in rows.getData() ) {
-			var obj = dm.convert( row, "Combination", true );
+			var obj = memy.convert( row );
 			data.add( obj );
 		}
 

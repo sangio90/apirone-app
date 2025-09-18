@@ -61,12 +61,15 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function products( event, rc, prc ){
+		var memy = super.getMementify();
+
 		prc.existingProducts = [];
 
+		// prc.line     = memy.convert( super.fire( "line.get", [ rc.id ] ) );
 		prc.line     = super.fire( "line.get", [ rc.id ] );
 		prc.category = super.fire( "productCategory.get", [ rc.categoryId ] );
 
-		prc.page[ "line" ] = prc.line;
+		prc.page[ "line" ] = memy.convert( prc.line );
 
 		prc.title    = "Categoria #prc.category.getName()# linea #prc.line.getName()#";
 		prc.subtitle = "Prodotti disponibili";
@@ -74,7 +77,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var models = super.fire( "model.list", { categoryId = prc.category.getId() } );
 		prc.models = models;
 
-		prc.finishes = super.fire( "finish.list" ); // , { categoryId = prc.category.getId() }
+		prc.finishes = super.fire( "finish.list", { categoryId = prc.category.getId() } );
 
 		for ( var model in models ) {
 			var existingModelConfig = super.fire(

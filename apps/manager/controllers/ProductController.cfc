@@ -18,6 +18,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function detail( event, rc, prc ){
 		var product = super.fire( "product.get", [ rc.id ] );
+		var memy    = super.getMementify();
+		;
 
 		if ( IsNull( product ) ) {
 			// TODO: better than this
@@ -51,11 +53,14 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.finishes   = super.fire( "finish.list", { lineId = prc.line.getId() } );
 
 			prc.page[ "lineId" ]   = prc.line.getId();
-			prc.page[ "products" ] = super.fire( "product.list", { lineId = prc.line.getId() } );
+			prc.page[ "products" ] = memy.convertList(
+				super.fire( "product.list", { lineId = prc.line.getId() } )
+			);
 		}
 
+
 		prc.page[ "productId" ]           = product.getId();
-		prc.page[ "attributeStatusList" ] = super.fire( "status.list", [ "attribute" ] );
+		prc.page[ "attributeStatusList" ] = memy.convertList( super.fire( "status.list", [ "attribute" ] ) );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
 
@@ -83,15 +88,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		var product  = super.service( "Product" ).get( rc.id );
 		prc.statuses = super.fire( "status.list", [ "PRODUCT" ] );
 
-		//prc.title = "Combinazioni #product.getModel().getCode()#, finitura #product.getFinish().getName()#";
-		//TODO: migliorare titolo per base/complesso
-		prc.title = "Combinazioni";
+		// prc.title = "Combinazioni #product.getModel().getCode()#, finitura #product.getFinish().getName()#";
+		// TODO: migliorare titolo per base/complesso
+		prc.title    = "Combinazioni";
 		prc.subtitle = "Linea -";
 
 		prc.jsScripts.add( "app-file" );
 		prc.jsScripts.add( "app-product-combinations" );
 
-		prc.page[ "statuses" ] = prc.statuses;
+		prc.page[ "statuses" ]  = prc.statuses;
 		prc.page[ "productId" ] = product.getId();
 
 		event.setView( "product/combinations" );
@@ -99,8 +104,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function print( event, rc, prc ){
 		param rc.report = "bill-of-material";
-		
-		prc.title       = "Distinte basi";
+
+		prc.title = "Distinte basi";
 
 		var memy = super.getMementify();
 

@@ -7,7 +7,10 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 			"name",
 			"code",
 			"category",
-			"categories"
+			"categories",
+			"line",
+			"model",
+			"finish"
 		],
 		mappers  = {},
 		profiles = {
