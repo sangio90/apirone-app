@@ -28,8 +28,8 @@
 
 		var thisPayload = NullValue();
 
-		if ( !Len( arguments.ipAddress ) ) ipAddress = CGI.remote_addr;
-		if ( !Len( arguments.userAgent ) ) userAgent = CGI.http_user_agent;
+		if ( !Len( arguments.ipAddress ) ) ipAddress = cgi.remote_addr;
+		if ( !Len( arguments.userAgent ) ) userAgent = cgi.http_user_agent;
 
 		if ( !IsNull( arguments.payload ) AND IsStruct( arguments.payload ) ) {
 			if ( !hasUppercaseOnlyKey( arguments.payload ) ) {

@@ -27,7 +27,7 @@ component extends="com.apirone.core.util.helper.AbsHelper" {
 			accountId = accountId,
 			payload   = payload,
 			severity  = severity,
-			ipAddress = CGI.remote_addr,
+			ipAddress = getRealIP(),
 			userAgent = CGI.http_user_agent
 		)
 
@@ -52,6 +52,21 @@ component extends="com.apirone.core.util.helper.AbsHelper" {
 
 		Throw( message = "Account not authenticated and anonymous not allowed" );
 	}
+
+	private function getRealIP(){
+
+        var headers = GetHTTPRequestData().headers;
+
+        if ( StructKeyExists( headers, "x-cluster-client-ip" ) ) {
+			return headers[ "x-cluster-client-ip" ];
+		}
+		if ( StructKeyExists( headers, "X-Forwarded-For" ) ) {
+			return headers[ "X-Forwarded-For" ];
+		}
+
+		return Len( CGI.REMOTE_ADDR ) ? Trim( listFirst( CGI.REMOTE_ADDR ) ) : "999.999.999.999";
+
+    }
 
 }
 
