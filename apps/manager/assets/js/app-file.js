@@ -86,16 +86,12 @@ AP.file.modal = ( function() {
 
         getImageTypeText: function( event ) {
 
-            console.log( "getImageTypeText ", event );
-
             var text = AP.util.getTextItem( event.type.texts.toJSON() );
 
             return text.name + " " + event.shortId;
         },
 
         getImageSrc: function( event ) {
-
-            console.log( "getImageSrc ", event );
 
             var uri = event.uri;
 
@@ -154,8 +150,6 @@ AP.file.modal = ( function() {
 
     pub.open = function( item ) {
 
-        console.log( "AP.file.modal.open ", item );
-
         kendo.bind( fields.modal, viewModel );
 
         viewModel.set( "currentItem", item );
@@ -184,8 +178,6 @@ AP.file.modal = ( function() {
                     var files = viewModel.get( "files" );
                     var modifyUrl = config.modifyUrl;
 
-                    console.log( " modifyUrl ", modifyUrl );
-
                     NM.util.openModal( fields.modal );
 
                     files
@@ -195,8 +187,6 @@ AP.file.modal = ( function() {
 
                                 for ( var file of files.data() ) {
                                     var uid = file.uid;
-
-                                    console.log( " file.type.id ", file.type.id );
 
                                     $( "#file-upload-" + uid ).fileupload( {
                                         dropZone: $( "#file-upload-dropzone-" + uid ),
@@ -233,12 +223,10 @@ AP.file.modal = ( function() {
 
                                         progressall: function( event, data ) {
 
-                                            console.log( "progressall", event, data );
                                             var uid = $( event.target ).data( "uid" );
 
                                             var status = $( "#file-upload-status-" + uid );
 
-                                            console.log( "status", status );
                                             status.html( "" );
 
                                             var progress = parseInt( ( data.loaded / data.total ) * 100, 10, );
