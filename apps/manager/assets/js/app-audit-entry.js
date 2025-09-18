@@ -10,7 +10,6 @@ $( document ).ready( function() {
     if ( AP.auditEntry.fields.listRoot.length ) {
         AP.auditEntry.list.init();
     }
-
 } );
 
 AP.auditEntry.list = ( function() {
@@ -27,7 +26,7 @@ AP.auditEntry.list = ( function() {
         },
 
         getCreatedAt: function( event ) {
-            return NM.kendo.formatDate( event.createdAt );
+            return NM.kendo.formatISODate( event.createdAt );
         },
 
         search: function( event ) {

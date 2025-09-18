@@ -9,7 +9,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "auditEntry.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = getDataMapper().convert( row, "AuditEntry", true );
+			//var obj = getDataMapper().convert( row, "AuditEntry", true );
+			var obj = getMementify().convert( row, "list" );
 			data.add( obj );
 		}
 

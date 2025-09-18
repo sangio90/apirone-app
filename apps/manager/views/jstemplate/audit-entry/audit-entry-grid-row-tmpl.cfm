@@ -19,6 +19,9 @@
                 <span data-bind="text: message"></span>
             </td>
             <td>
+                <span data-bind="text: ipAddress"></span>
+            </td>
+            <td>
                 <span data-bind="text: account.name"></span>
                 <span class="small-code">(<span data-bind="text: account.shortId"></span>)</span>
             </td>
