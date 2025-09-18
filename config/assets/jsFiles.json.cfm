@@ -41,6 +41,7 @@
         { file: "/modules/assets/template-admin/js/examples/examples.dashboard.js" },
 
         { file: "/assets/main/js/vendor/math.js" },
+        { file: "/assets/main/js/vendor/html2canvas.js" },
         { file: "/assets/main/js/vendor/jquery-validate/jquery.validate.js" },
         { file: "/assets/main/js/vendor/jquery-validate/additional-methods.js" },
         { file: "/assets/main/js/vendor/jquery.serializejson.js" },
@@ -55,6 +56,5 @@
         { file: "/modules/assets/kendoui/js/kendo.all.min.js" },
         { file: "/modules/assets/kendoui/js/messages/kendo.messages.it-IT.min.js" },
         { file: "/modules/assets/kendoui/js/cultures/kendo.culture.it-IT.min.js" },
-
     ]
 }
