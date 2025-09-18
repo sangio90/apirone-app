@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "shortId", "name" ],
+		defaultIncludes = [ "id", "shortId", "name", "email" ],
 		neverIncludes   = [ "pwd", "apiKey" ],
 		profiles        = {
 			list = {
@@ -14,7 +14,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 					"status",
 					"role",
 					"roles",
-					"lang"
+					"lang",
+					"shortId",
 				]
 			}
 		}
