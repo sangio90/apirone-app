@@ -19,6 +19,10 @@ AP.quotationDetail.detail = ( function() {
         return AP.signage.modal;
     }
 
+    function plateApp() {
+        return AP.plate.modal;
+    }
+
     var defaultDetailForm = {
         data: {
             id: "",
@@ -244,7 +248,7 @@ AP.quotationDetail.detail = ( function() {
         },
 
         addPlate: function() {
-            plateApp.new();
+            plateApp().new();
         },
 
         openAddZoneModal: function() {
@@ -369,19 +373,19 @@ AP.quotationDetail.zoneModal = ( function() {
         },
     } );
 
-    pub.init = function(mode) {
+    pub.init = function( mode ) {
         kendo.bind( fields, viewModel );
-        if (mode == 'delete') {
-            viewModel.get('zones').data(AP.quotationDetail.detail.config().get('zones').filter((zone) => { return zone.id != '' }));
-            $('#delete-zone-button').show();
-            $('#add-zone-button').hide();
-            $('#zone-name-input').hide();
+        if ( mode == "delete" ) {
+            viewModel.get( "zones" ).data( AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != ""; } ) );
+            $( "#delete-zone-button" ).show();
+            $( "#add-zone-button" ).hide();
+            $( "#zone-name-input" ).hide();
         }
-        if (mode == 'add') {
-            viewModel.get('zones').data(AP.quotationDetail.detail.config().get('zones').filter((zone) => { return zone.id != '' && !zone.origin }));
-            $('#delete-zone-button').hide();
-            $('#add-zone-button').show();
-            $('#zone-name-input').show();
+        if ( mode == "add" ) {
+            viewModel.get( "zones" ).data( AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != "" && !zone.origin; } ) );
+            $( "#delete-zone-button" ).hide();
+            $( "#add-zone-button" ).show();
+            $( "#zone-name-input" ).show();
         }
     };
     return pub;

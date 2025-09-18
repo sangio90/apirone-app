@@ -11,15 +11,13 @@ $( document ).ready( function() {
         AP.plate.designer.init( { container: AP.plate.fields.modalRoot } );
     }
 
-    /*
     if ( AP.plate.fields.modalRoot.length ) {
         AP.plate.modal.init( { container: AP.plate.fields.modalRoot } );
     }
-    */
 
 } );
 
-AP.plate.designer = ( function() {
+AP.plate.modal = ( function() {
     let FREE_CELL_WIDTH;
     let FREE_CELL_HEIGHT;
 
@@ -1462,7 +1460,6 @@ AP.plate.designer = ( function() {
 
         kendo.bind( settings.container, viewModel );
     };
-
 
     pub.getVM = function() {
         return viewModel;

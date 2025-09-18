@@ -71,6 +71,8 @@
 			{ "id" = 15, "name" = "Birmingham", "countryId" = 5 }
 		];
 
+		prc.plates = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
+
 		prc.jsScripts.add( "app-quotation-detail" );
 
 		event.setView( "quotation/detail" );

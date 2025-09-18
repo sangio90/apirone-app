@@ -414,7 +414,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var items = super.fire( "ProductItem.getFlatTree", params );
 
 		for ( var item in items ) {
-			var row = super.getMementify().convert( item, "list", true );
+			var row = super.getMementify().convert( item, "tree" );
 
 			row[ "spaces" ] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
 

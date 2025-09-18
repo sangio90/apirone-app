@@ -15,10 +15,9 @@
                     <div class="card-body">
                         <div class="mb-3 row">
                             <div class="col-6">
-                                <label class="col-sm-12 col-form-label text-start">Zone</label>
+                                <label class="col-sm-12 col-form-label text-start">Zona</label>
                                 <select class="form-control me-3"
                                     data-bind="source: zones, value: detailForm.data.parentZone"
-                                    data-placeholder="-- Seleziona la zona"
                                     data-value-field="id"
                                     data-text-field="name"
                                 >

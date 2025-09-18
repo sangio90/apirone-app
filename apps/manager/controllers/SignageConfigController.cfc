@@ -3,6 +3,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	function rowConfig( event, rc, prc ){
 		param rc.id = "";
 
+		var memy = super.getMementify();
+
 		var catalogBundleId = "";
 		var selectedFonts   = [];
 
@@ -30,7 +32,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			var fonts = super.fire( "signageConfig.list", { "catalogBundleId" = catalogBundle.getId() } );
 
 			for ( var item in fonts ) {
-				var obj = getDataMapper().convert( item, "signageConfig", true );
+				// var obj = getDataMapper().convert( item, "signageConfig", true );
+				var obj = memy.convert( item, "list" );
 				selectedFonts.add( obj );
 			}
 		}
@@ -46,7 +49,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var fonts          = super.fire( "font.list" );
 
 		for ( var item in fonts ) {
-			var obj = getDataMapper().convert( item, "Font", true );
+			// var obj = getDataMapper().convert( item, "Font", true );
+			var obj = memy.convert( item, "list" );
 			availableFonts.add( obj );
 		}
 

@@ -41,7 +41,8 @@
 				<cfif !IsNull( arguments.originId )>
 					AND origin_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.originId#">::uuid
 				</cfif>
-			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
+			ORDER BY
+				#super.sanitizeSQL( arguments.orderBy )#
 
 			<cfif arguments.limit GT 0>
 				LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">

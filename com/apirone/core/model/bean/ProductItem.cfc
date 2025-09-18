@@ -17,6 +17,17 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 					"productId",
 					"spaces"
 				]
+			},
+			tree = {
+				defaultIncludes = [
+					"id",
+					"shortId",
+					"status",
+					"level",
+					"attribute",
+					"attributeValue.rawValue",
+					"componentCount"
+				]
 			}
 		}
 	}

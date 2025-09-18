@@ -499,8 +499,8 @@
     #view( "quotation/zone-modal" )#
     #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
 </cfoutput>
-<script>
 
+<script>
 //TODO: direi di spostarlo nella app-
 document.addEventListener("DOMContentLoaded", function () {
     // Cerca tutti i bottoni con classe `changeTab`

@@ -1,9 +1,10 @@
 component extends="com.apirone.core.controller.AbsController" {
+
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var rows = super.fire( "QuotationItem.search", params );
+		var rows   = super.fire( "QuotationItem.search", params );
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
@@ -19,15 +20,23 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mm     = super.getMementify();
 
 		params[ "quotationItemId" ] = rc.id;
-		
+
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 
-		var parsedQuotationItemData = mm.convert(quotationItem, 'edit');
+		var parsedQuotationItemData = mm.convert( quotationItem, "edit" );
 
-		var signageConfig = super.fire('SignageConfig.get', { signageConfigId = quotationItem.getSignageConfigItem().getSignageConfigId() });
-		var parsedSignageConfigData = (mm.convert(signageConfig));
+		var signageConfig = super.fire(
+			"SignageConfig.get",
+			{
+				signageConfigId = quotationItem.getSignageConfigItem().getSignageConfigId()
+			}
+		);
+		var parsedSignageConfigData = ( mm.convert( signageConfig ) );
 
-		data.append( { "quotationItem": parsedQuotationItemData, "signageConfig": parsedSignageConfigData } );
+		data.append( {
+			"quotationItem" = parsedQuotationItemData,
+			"signageConfig" = parsedSignageConfigData
+		} );
 
 		result.setData( data );
 		event.setValue( "result", result );
@@ -47,8 +56,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				if ( !Len( id ) ) {
 					var quotationItemSignageBean = super.bean( "QuotationItemSignage" );
 				} else {
-					var quotationItemSignageBean = super.fire('QuotationItem.get', { quotationItemId = id});
-					if (IsNull(quotationItemSignageBean)) {
+					var quotationItemSignageBean = super.fire( "QuotationItem.get", { quotationItemId = id } );
+					if ( IsNull( quotationItemSignageBean ) ) {
 						var quotationItemSignageBean = super.bean( "QuotationItemSignage" );
 					}
 				}
@@ -56,19 +65,33 @@ component extends="com.apirone.core.controller.AbsController" {
 					super.service( "SignageConfigItem" ).get( json.quotationItem.signageConfigItem.id )
 				);
 				quotationItemSignageBean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
-				quotationItemSignageBean.setQuotationZone(super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ));
+				quotationItemSignageBean.setQuotationZone(
+					super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id )
+				);
 				quotationItemSignageBean.setPrice( 20.1 );
 				quotationItemSignageBean.setQuantity( json.quotationItem.quantity );
-				var product = super.fire( 'Product.search', { lineId = json.signageConfig.catalogBundle.line.id, modelId = json.signageConfig.catalogBundle.model.id, categoryId: json.signageConfig.catalogBundle.category.id, finishId: json.quotationItem.product.finish.id} ).getData();
-				if (!Len(product) || Len(product) > 1) {
+				var product = super
+					.fire(
+						"Product.search",
+						{
+							lineId     = json.signageConfig.catalogBundle.line.id,
+							modelId    = json.signageConfig.catalogBundle.model.id,
+							categoryId = json.signageConfig.catalogBundle.category.id,
+							finishId   = json.quotationItem.product.finish.id
+						}
+					)
+					.getData();
+				if ( !Len( product ) || Len( product ) > 1 ) {
 					var message = "Prodotto non valido.";
 					result.setData( { "error" = e.message } );
 					result.setStatus( "ERRORE" );
 					event.setValue( "result", result );
 					return;
 				}
-				product = product[1];
-				quotationItemSignageBean.setProduct(super.fire( 'Product.get', { 'productId' = product.getId() }));
+				product = product[ 1 ];
+				quotationItemSignageBean.setProduct(
+					super.fire( "Product.get", { "productId" = product.getId() } )
+				);
 				if ( !Len( id ) ) {
 					messageId = "quotationItem.created";
 					thisId    = super.fire( "quotationItem.create", [ quotationItemSignageBean ] )
@@ -77,13 +100,16 @@ component extends="com.apirone.core.controller.AbsController" {
 					thisId    = super.fire( "quotationItem.update", [ quotationItemSignageBean ] )
 				}
 				for ( signageRow in json.quotationItem.signageRows._data ) {
-					var signageRowBean = super.fire( "QuotationItemSignageRow.get", { quotationItemSignageRowId = signageRow.id } );
-					
-					if ( !Len(signageRowBean) ) {
+					var signageRowBean = super.fire(
+						"QuotationItemSignageRow.get",
+						{ quotationItemSignageRowId = signageRow.id }
+					);
+
+					if ( !Len( signageRowBean ) ) {
 						var signageRowBean = super.bean( "QuotationItemSignageRow" );
-						var messaggiId      = "QuotationItemSignageRow.create";
+						var messaggiId     = "QuotationItemSignageRow.create";
 					} else {
-						var messaggiId      = "QuotationItemSignageRow.update";
+						var messaggiId = "QuotationItemSignageRow.update";
 					}
 					signageRowBean.setQuotationItemId( thisId );
 					signageRowBean.setTextAlign( signageRow.textAlign );

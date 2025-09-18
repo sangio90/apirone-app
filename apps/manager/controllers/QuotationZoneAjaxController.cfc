@@ -1,4 +1,5 @@
 component extends="com.apirone.core.controller.AbsController" {
+
 	property name="dao" inject="QuotationZoneDAO";
 	property name="quotationItemDao" inject="QuotationItemDAO";
 
@@ -10,7 +11,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "quotationId" ] = rc.quotationId;
 
 		var rows = super.fire( "QuotationZone.search", params );
-		dataRows = orderZonesByOrigin(rows.getData());
+		dataRows = orderZonesByOrigin( rows.getData() );
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
 		result.setData( dataRows );
@@ -24,22 +25,27 @@ component extends="com.apirone.core.controller.AbsController" {
 		var thisId    = "";
 		var messageId = "";
 		var texts     = [];
-		var errors  = [];
+		var errors    = [];
 
 		var result = super.getResult();
 
 		var quotationZone = super.bean( "QuotationZone" );
-		var existingCombination = dao.find( argumentCollection = {
-				quotationId = json.quotation.id,
-				name        = json.name,
-				originId    = Len(json.parentZone) ? json.parentZone.id : null
-		} );
 
-		if (!Len(existingCombination)) {
+		var params = {
+			quotationId = json.quotation.id,
+			name        = json.name,
+			originId    = Len( json.parentZone?.id ) ? json.parentZone.id : null
+		}
+
+		// TODO: move to service
+		var existingCombination = dao.find( argumentCollection = params );
+
+		if ( !Len( existingCombination ) ) {
 			quotationZone.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
-			quotationZone.setName(json.name);
-			if (Len(json.parentZone)) {
-				quotationZone.setOrigin(super.service( "QuotationZone" ).get( json.parentZone.id ));
+			quotationZone.setName( json.name );
+
+			if ( Len( json.parentZone?.id ) ) {
+				quotationZone.setOrigin( super.service( "QuotationZone" ).get( json.parentZone.id ) );
 			}
 
 			if ( !Len( json.id ) ) {
@@ -51,10 +57,12 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 			var message = completeMessage( messageId );
 		} else {
-				result.setData( { "error" = "Combinazione Zona già esistente in questo preventivo." } );
-				result.setStatus( "ERRORE" );
-				event.setValue( "result", result );
-				return;
+			result.setData( {
+				"error" = "Combinazione Zona già esistente in questo preventivo."
+			} );
+			result.setStatus( "ERRORE" );
+			event.setValue( "result", result );
+			return;
 		}
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
@@ -64,31 +72,35 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function delete( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
-		
-		var messageId = "quotation.deletedAllRecords";
-		var errors  = [];
-		var payload = "";
-		var valid = true;
-		
-		var result    = super.getResult();
 
-		var zone = json.zone;
+		var messageId = "quotation.deletedAllRecords";
+		var errors    = [];
+		var payload   = "";
+		var valid     = true;
+
+		var result = super.getResult();
+
+		var zone    = json.zone;
 		var outcome = null;
-		if (!isNull(zone)) {
+		if ( !IsNull( zone ) ) {
 			var zonaInUso = super.fire( "quotationItem.search", [ quotationZoneId = zone.id ] );
-			if (Len(zonaInUso.getData())) {
-					result.setData( { "error" = "Impossibile eliminare questa zona perché associata ad una riga del preventivo." } );
-					result.setStatus( "ERRORE" );
-					event.setValue( "result", result );
-					return;
+			if ( Len( zonaInUso.getData() ) ) {
+				result.setData( {
+					"error" = "Impossibile eliminare questa zona perché associata ad una riga del preventivo."
+				} );
+				result.setStatus( "ERRORE" );
+				event.setValue( "result", result );
+				return;
 			}
 
-			if (structKeyExists(zone, 'origin')) {
+			if ( StructKeyExists( zone, "origin" ) ) {
 				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
 			} else {
 				var zonaConSottozone = super.fire( "quotationZone.search", [ originId = zone.id ] );
-				if (Len(zonaConSottozone.getData())) {
-					result.setData( { "error" = "Impossibile eliminare questa zona perché contiene delle sottozone." } );
+				if ( Len( zonaConSottozone.getData() ) ) {
+					result.setData( {
+						"error" = "Impossibile eliminare questa zona perché contiene delle sottozone."
+					} );
 					result.setStatus( "ERRORE" );
 					event.setValue( "result", result );
 					return;
@@ -97,7 +109,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		if ( outcome.getStatus() == "ERROR" || isNull(outcome) ) {
+		if ( outcome.getStatus() == "ERROR" || IsNull( outcome ) ) {
 			errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
 		}
 
@@ -113,23 +125,23 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function orderZonesByOrigin(zones) {
-		var parsedZones = [];
-		var zonesWithoutOrigin = arrayFilter(zones, function(zone){
-			return isNull(zone.getOrigin());
-		});
-		var zonesWithOrigin = arrayFilter(zones, function(zone){
-			return !isNull(zone.getOrigin());
-		});
-		zonesWithoutOrigin.each(function (zone) {
-			parsedZones.add(zone);
-			zonesWithOrigin.each(function (childZone) {
-				if (childZone.getOrigin().getId() == zone.getId()) {
-					parsedZones.add(childZone);
+	function orderZonesByOrigin( zones ){
+		var parsedZones        = [];
+		var zonesWithoutOrigin = ArrayFilter( zones, function( zone ){
+			return IsNull( zone.getOrigin() );
+		} );
+		var zonesWithOrigin = ArrayFilter( zones, function( zone ){
+			return !IsNull( zone.getOrigin() );
+		} );
+		zonesWithoutOrigin.each( function( zone ){
+			parsedZones.add( zone );
+			zonesWithOrigin.each( function( childZone ){
+				if ( childZone.getOrigin().getId() == zone.getId() ) {
+					parsedZones.add( childZone );
 				}
-			});
-		});
-		
+			} );
+		} );
+
 		return parsedZones;
 	}
 
