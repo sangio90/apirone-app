@@ -9,7 +9,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "auditEntry.search", params );
 
 		for ( var row in rows.getData() ) {
-			//var obj = getDataMapper().convert( row, "AuditEntry", true );
 			var obj = getMementify().convert( row, "list" );
 			data.add( obj );
 		}
@@ -27,7 +26,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var bean = super.fire( "auditEntry.get", [ rc.id ] );
 
-		var obj = super.getDataMapper().convert( bean, "AuditEntry", true );
+		var obj = super.getMementify().convert( bean, "detail" );
 
 		result.setData( obj );
 

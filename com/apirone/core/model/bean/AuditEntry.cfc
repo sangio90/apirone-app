@@ -24,7 +24,9 @@ component extends="auditLogger.bean.AuditEntry" accessors="true" {
 					"entity",
 					"action",
 					"ipAddress",
-					"createdAt"
+					"createdAt",
+					"userAgent",
+					"payload"
 				]
 			}
 		}
