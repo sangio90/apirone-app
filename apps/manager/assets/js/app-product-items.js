@@ -422,7 +422,9 @@ AP.product.items = ( function() {
 
             products?.forEach( function( product ) {
 
-                if ( lineId == product.line.id && finishId == product.finish.id && modelId == product.model.id ) {
+                if ( lineId == product.line.id
+                    && finishId == product.finish.id
+                    && modelId == product.model.id ) {
                     found = true;
                     window.location.href = "/manager/products/" + product.id;
                 }

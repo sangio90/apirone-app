@@ -34,8 +34,6 @@ AP.product.combination = ( function() {
             var params = thisForm.serializeJSON();
             var filters = [];
 
-            console.log( "params", params );
-
             var dataSource = viewModel.get( "rows" );
 
             var filterDataSource = new kendo.data.DataSource( {
@@ -166,12 +164,9 @@ AP.product.combination = ( function() {
             .fetch()
             .then( function() {
                 if ( images.total() > 0 ) {
-                    // console.log("total:in", images.total() );
 
                     for ( var image of images.data() ) {
                         var uid = image.uid;
-
-                        // console.log( "image", image );
 
                         $( "#image-upload-" + uid ).fileupload( {
                             dropZone: $( "#image-upload-dropzone-" + uid ),

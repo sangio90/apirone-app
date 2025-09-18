@@ -111,7 +111,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				filePath = "#tmpDir#/#cffile.ServerFile#",
 				entity   = entity,
 				typeId   = rc.typeId,
-				kindId   = kindId
+				kindId   = kindId // product, productItem, combination, attributeValue [signage]
 			}
 		);
 
