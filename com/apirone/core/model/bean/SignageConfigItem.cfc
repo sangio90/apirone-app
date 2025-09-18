@@ -1,5 +1,9 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
+	this.memento = {
+		defaultIncludes = [ "id", "signageConfig", "height", "heightInPixel", "rowCount", "charCount" ]
+	}
+
 	property name="height" type="Numeric"; // font height
 	property name="heightInPixel" type="Numeric";
 	property name="rowCount" type="Numeric";

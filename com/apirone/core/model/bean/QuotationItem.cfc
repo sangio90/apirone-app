@@ -1,5 +1,26 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
+	this.memento = {
+		defaultIncludes = [ "id", "shortId", "price", "quantity" ],
+		profiles = {
+			edit = {
+				defaultIncludes = [
+					"id",
+					"price",
+					"quantity",
+					"category",
+					"finish",
+					"line",
+					"model",
+					"font",
+					"fontSize",
+					"quotationZone",
+					"signageRows"
+				]
+			}
+		}
+	}
+
 	property name="price" type="Numeric";
 	property name="quantity" type="Numeric";
 

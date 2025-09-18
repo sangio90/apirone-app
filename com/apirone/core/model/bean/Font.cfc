@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "shortId", "name" ],
+		defaultIncludes = [ "id", "name", "family" ],
 		profiles        = {
 			list = {
 				defaultIncludes = [
