@@ -71,8 +71,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create(
 		required String filePath, // full path of file, from /tmp for example
-		required String typeId,
-		required String kindId,
+		required String typeId, // configurated in Configuration.imagesConfig
+		required String kindId, // entities: product, productItem, combination
 		Struct entity
 	){
 		var thisFile = "";
