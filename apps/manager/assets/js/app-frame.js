@@ -84,24 +84,29 @@ AP.frame.modal = ( function() {
     var pub = {};
     var fields = AP.frame.fields;
 
-    var viewModel = kendo.observable( {
-        frame: {
+    var defaultForm = {
+        title: "Carica armatura",
+        data: {
             id: "",
-            frame: "",
+            name: "",
             code: "",
             orientation: {
-                id: ""
+                id: "HOR"
             },
             cellOrientation: {
-                id: ""
+                id: "HOR"
             },
             cells: []
-        },
+        }
+    };
+
+    var viewModel = kendo.observable( {
+        detailForm: defaultForm,
+        orientations: AP.page.orientations, // /QUIIIIIIIIIIIIIII
+        statuses: AP.page.statuses,
         gridRows: 3,
         gridCols: 3,
         cellsMatrix: [],
-        activeTab: "detail",
-        isDirty: false,
         loading: false,
 
         reset: function() {
@@ -119,43 +124,29 @@ AP.frame.modal = ( function() {
             } );
             this.set( "gridRows", 3 );
             this.set( "gridCols", 3 );
-            this.set( "activeTab", "detail" );
-            this.set( "isDirty", false );
             this.updateCellsMatrix();
-        },
-
-        switchTab: function( tab ) {
-            this.set( "activeTab", tab );
-
-            if ( tab === "cells" && this.get( "frame.frameId" ) ) {
-                this.updateCellsMatrix();
-            }
         },
 
         addRow: function() {
             this.set( "gridRows", this.get( "gridRows" ) + 1 );
-            this.set( "isDirty", true );
             this.updateCellsMatrix();
         },
 
         removeRow: function() {
             if ( this.get( "gridRows" ) > 1 ) {
                 this.set( "gridRows", this.get( "gridRows" ) - 1 );
-                this.set( "isDirty", true );
                 this.updateCellsMatrix();
             }
         },
 
         addCol: function() {
             this.set( "gridCols", this.get( "gridCols" ) + 1 );
-            this.set( "isDirty", true );
             this.updateCellsMatrix();
         },
 
         removeCol: function() {
             if ( this.get( "gridCols" ) > 1 ) {
                 this.set( "gridCols", this.get( "gridCols" ) - 1 );
-                this.set( "isDirty", true );
                 this.updateCellsMatrix();
             }
         },
@@ -225,31 +216,28 @@ AP.frame.modal = ( function() {
 
             this.set( "loading", true );
 
-            $.ajax( {
+            NM.util.ajax( {
+                method: "GET",
                 url: "/ajax/frames",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify( frame ),
-                success: function( response ) {
-                    if ( response.success ) {
-                        NM.util.showSuccess( response.message || "Armatura salvata con successo" );
-                        self.set( "frame", response.data );
-                        self.set( "isDirty", false );
+                callback: {
+                    done: function( xhr ) {
+                        if ( response.success ) {
+                            NM.util.showSuccess( response.message || "Armatura salvata con successo" );
+                            self.set( "frame", response.data );
 
-                        // Aggiorna la griglia nella lista
-                        if ( AP.frame.list.viewModel.dataSource ) {
-                            AP.frame.list.viewModel.dataSource.read();
+                            // Aggiorna la griglia nella lista
+                            if ( AP.frame.list.viewModel.dataSource ) {
+                                AP.frame.list.viewModel.dataSource.read();
+                            }
+                        } else {
+                            NM.util.showError( response.message || "Errore durante il salvataggio" );
                         }
-                    } else {
-                        NM.util.showError( response.message || "Errore durante il salvataggio" );
-                    }
-                    self.set( "loading", false );
+                        self.set( "loading", false );
+
+                    },
                 },
-                error: function() {
-                    NM.util.showError( "Errore di comunicazione con il server" );
-                    self.set( "loading", false );
-                }
             } );
+
         },
 
         load: function( frameId ) {
@@ -296,67 +284,8 @@ AP.frame.modal = ( function() {
                 },
             } );
 
-
-            /*
-            $.ajax( {
-                url: "/ajax/frames/" + frameId,
-                type: "GET",
-                dataType: "json",
-                success: function( response ) {
-                    if ( response.success ) {
-                        self.set( "frame", response.data );
-
-                        // Calcola il numero di righe e colonne necessario
-                        var maxRow = 0;
-                        var maxCol = 0;
-
-                        if ( response.data.cells && response.data.cells.length ) {
-                            response.data.cells.forEach( function( cell ) {
-                                maxRow = Math.max( maxRow, cell.row );
-                                maxCol = Math.max( maxCol, cell.col );
-                            } );
-
-                            self.set( "gridRows", maxRow + 1 );
-                            self.set( "gridCols", maxCol + 1 );
-                        } else {
-                            self.set( "gridRows", 3 );
-                            self.set( "gridCols", 3 );
-                        }
-
-                        self.updateCellsMatrix();
-                    } else {
-                        NM.util.showError( response.message || "Armatura non trovata" );
-                    }
-                    self.set( "loading", false );
-                },
-                error: function() {
-                    NM.util.showError( "Errore di comunicazione con il server" );
-                    self.set( "loading", false );
-                }
-            } );
-            */
         },
 
-        codeExists: function() {
-            var code = this.get( "frame.code" );
-            var frameId = this.get( "frame.frameId" );
-
-            if ( !code ) { return; }
-
-            $.ajax( {
-                url: "/ajax/frames/code-exists",
-                type: "GET",
-                data: {
-                    code: code,
-                    excludedId: frameId
-                },
-                success: function( response ) {
-                    if ( response.exists ) {
-                        NM.util.showWarning( "Il codice è già in uso" );
-                    }
-                }
-            } );
-        }
     } );
 
 
@@ -376,7 +305,6 @@ AP.frame.modal = ( function() {
         if ( matrix[row] && matrix[row][col] !== undefined ) {
             matrix[row][col] = value;
             viewModel.set( "cellsMatrix", matrix );
-            viewModel.set( "isDirty", true );
         }
 
     },
