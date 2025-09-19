@@ -30,3 +30,22 @@ ALTER TABLE public.frame_cells
 
 ALTER TABLE public.frames OWNER TO apirone;
 ALTER TABLE public.frame_cells OWNER TO apirone;
+
+
+ALTER TABLE public.frame_cells
+  ADD CONSTRAINT frame_cells_unique_idx 
+    UNIQUE (frame_id, "row", col) NOT DEFERRABLE;
+
+ALTER TABLE public.frames
+  ADD COLUMN status_id VARCHAR(3) NOT NULL;    
+
+ALTER TABLE public.frames
+  ADD CONSTRAINT frames_status_id_fk FOREIGN KEY (status_id)
+    REFERENCES public.statuses(status_id)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE
+    NOT DEFERRABLE;
+
+UPDATE statuses 
+SET entities = '["LINE", "ATTRIBUTE", "FINISH", "MODEL", "ACCOUNT", "PRODUCTION_TIME", "PRODUCT_CATEGORY", "PRODUCT", "RAW_VALUE", "METADATA_TYPE", "FRAME"]'
+WHERE status_id in ('ACT', 'DEA');    

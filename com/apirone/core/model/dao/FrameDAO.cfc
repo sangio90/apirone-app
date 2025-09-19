@@ -46,7 +46,6 @@
 				frames
 			WHERE 1=1
 
-
 				<cfif !IsNull( arguments.statusId )>
 					AND frames.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
 				</cfif>
@@ -118,10 +117,6 @@
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
 				line = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getCode()#">,
-				<!---
-			thickness_id =
-			<cfqueryparam cfsqltype="Varchar" value="#arguments.line?.getThickness()?.getId()#">,
-		--->
 				orderby = 20,
 				categories = '#SerializeJSON( categories )#'
 			WHERE
@@ -145,56 +140,58 @@
 		<cfreturn local.q.recordCount>
 	</cffunction>
 
- <cffunction name="getCells" returntype="Query">
-        <cfargument name="frameId" type="string" required="true">
-        
-        <cfquery name="local.q" datasource="apirone">
-            SELECT 
-                frame_cell_id,
-                frame_id,
-                row,
-                col,
-                value
-            FROM 
-                frame_cells
-            WHERE 
-                frame_id = <cfqueryparam cfsqltype="varchar" value="#frameId#">
-            ORDER BY 
-                row, col
-        </cfquery>
-        
-        <cfreturn local.q>
-    </cffunction>
-	
-    <cffunction name="saveCells" returntype="Boolean">
-        <cfargument name="frameId" type="string" required="true">
-        <cfargument name="cells" type="array" required="true">
-        
-        <!--- Prima elimina le celle esistenti --->
-        <cfquery name="local.qDeleteCells" datasource="apirone">
-            DELETE FROM frame_cells
-            WHERE frame_id = <cfqueryparam cfsqltype="varchar" value="#arguments.frameId#">
-        </cfquery>
-        
-        <!--- Poi inserisce le nuove celle --->
-        <cfloop array="#arguments.cells#" index="cell">
-            <cfquery name="local.qInsertCell" datasource="apirone">
-                INSERT INTO frame_cells (
-                    frame_id,
-                    row,
-                    col,
-                    value
-                ) VALUES (
-                    <cfqueryparam cfsqltype="varchar" value="#arguments.frameId#">,
-                    <cfqueryparam cfsqltype="integer" value="#cell.row#">,
-                    <cfqueryparam cfsqltype="integer" value="#cell.col#">,
-                    <cfqueryparam cfsqltype="char" value="#cell.value#">
-                )
-            </cfquery>
-        </cfloop>
-        
-        <cfreturn true>
-    </cffunction>
+	<cffunction name="findCells" returntype="Query">
+		<cfargument name="frameId" type="string" required="true">
 
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				frame_cell_id,
+				frame_id,
+				row,
+				col,
+				value
+			FROM
+				frame_cells
+			WHERE
+				frame_id = <cfqueryparam cfsqltype="varchar" value="#frameId#">::uuid
+			ORDER BY
+				row, col
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<cffunction name="deleteCells" returntype="Query">
+		<cfargument name="frameId" type="string" required="true">
+
+		<cfquery name="local.qDeleteCells" datasource="apirone">
+			DELETE FROM frame_cells
+			WHERE frame_id = <cfqueryparam cfsqltype="varchar" value="#arguments.frameId#">::uuid
+		</cfquery>
+
+		<cfreturn true>
+	</cffunction>
+
+	<cffunction name="saveCells" returntype="Boolean">
+		<cfargument name="cells" type="com.apirone.core.model.bean.FrameCell[]" required="true">
+
+		<cfloop array="#arguments.cells#" index="cell">
+			<cfquery name="local.qInsertCell" datasource="apirone">
+				INSERT INTO frame_cells (
+					frame_id,
+					row,
+					col,
+					value
+				) VALUES (
+					<cfqueryparam cfsqltype="varchar" value="#arguments.cell.getFrameId()#">::uuid,
+					<cfqueryparam cfsqltype="integer" value="#arguments.cell.getRow()#">,
+					<cfqueryparam cfsqltype="integer" value="#arguments.cell.getCol()#">,
+					<cfqueryparam cfsqltype="varchar" value="#arguments.cell.getValue()#">
+				)
+			</cfquery>
+		</cfloop>
+
+		<cfreturn true>
+	</cffunction>
 </cfcomponent>
 

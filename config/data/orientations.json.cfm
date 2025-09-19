@@ -6,5 +6,5 @@
     {
         id: "VER",
         name: "Verticale"
-    },
+    }
 ]

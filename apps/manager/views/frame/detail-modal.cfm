@@ -1,6 +1,5 @@
-﻿<!-- filepath: s:\workspace\users\roberto\projects\apir\apps\apirone-app\code\apps\manager\views\frame\detail.cfm -->
-<cfoutput>
-<div class="modal fade" id="frame-detail-modal" tabindex="-1" aria-labelledby="frameDetailLabel" aria-hidden="true">
+﻿<cfoutput>
+<div class="modal fade" id="frame-detail-modal">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -51,23 +50,17 @@
                 </div>
 
                 <!-- Tab Content: Posizioni -->
-                <div id="frame-cells-container" data-bind="visible: activeTab === 'cells'">
+                <div id="frame-cells-container" data-bind="visible: activeTab">
                     <div class="mb-3 d-flex gap-2">
-                        <button id="add-row-btn" class="btn btn-outline-primary" data-bind="click: addRow">Aggiungi riga</button>
-                        <button id="remove-row-btn" class="btn btn-outline-danger" data-bind="click: removeRow, enable: gridRows > 1">Rimuovi riga</button>
+                        <button id="add-row-btn" class="btn btn-outline-primary" data-bind="click: addRow">Aggiungi rigax</button>
+                        <button id="remove-row-btn" class="btn btn-outline-danger" data-bind="click: removeRow">Rimuovi riga</button> <!--- enable: gridRows > 1 ---->
                         <button id="add-col-btn" class="btn btn-outline-primary" data-bind="click: addCol">Aggiungi colonna</button>
-                        <button id="remove-col-btn" class="btn btn-outline-danger" data-bind="click: removeCol, enable: gridCols > 1">Rimuovi colonna</button>
+                        <button id="remove-col-btn" class="btn btn-outline-danger" data-bind="click: removeCol">Rimuovi colonna</button> <!---- enable: gridCols > 1 ---->
                     </div>
                     
                     <div class="table-responsive">
                         <table id="frame-cells-table" class="table table-bordered">
-                            <tbody data-bind="foreach: cellsMatrix">
-                                <tr data-bind="foreach: $data">
-                                    <td style="width: 60px; height: 60px; text-align: center; vertical-align: middle;">
-                                        <input type="text" maxlength="1" style="width: 40px; text-align: center;" 
-                                              data-bind="value: $data, event: { change: function(e) { $parent.$parent.editCell($parentContext.$index(), $index(), e.target.value) } }">
-                                    </td>
-                                </tr>
+                            <tbody data-bind="source: cellsMatrix" data-template="frame-cells-row-tmpl">
                             </tbody>
                         </table>
                     </div>
@@ -78,8 +71,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button id="save-grid-btn" type="button" class="btn btn-primary" data-bind="click: save, disable: loading">
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Chiudi</button>
+                <button id="save-grid-btn" type="button" class="btn btn-primary" data-bind="click: save"> <!--- , disable: loading ---->
                     <span data-bind="visible: loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                     Salva
                 </button>
@@ -87,4 +80,7 @@
         </div>
     </div>
 </div>
+
+#template( view="jstemplate/frame/frame-cells-row-tmpl" )#
+
 </cfoutput>

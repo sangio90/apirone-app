@@ -23,7 +23,7 @@
                                 <select id="plateLineId" 
                                     required
                                     class="form-control"
-                                    data-bind="source: lines, events: { change: loadModels }" 
+                                    data-bind="source: lines, value: detailForm.data.line, events: { change: loadModels }" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -35,7 +35,7 @@
                                 <select id="plateModelId" 
                                     required
                                     class="form-control"
-                                    data-bind="source: models, events: { change: loadFinishes }"
+                                    data-bind="source: models, value: detailForm.data.model, events: { change: loadFinishes }"
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -47,7 +47,7 @@
                                 <select id="plateFinishId" 
                                     required
                                     class="form-control"
-                                    data-bind="source: finishes"
+                                    data-bind="source: finishes, value: detailForm.data.finish"
                                     data-value-field="id"
                                     data-text-field="name"
                                     >

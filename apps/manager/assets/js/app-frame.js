@@ -22,7 +22,10 @@ $( document ).ready( function() {
 
 AP.frame.list = ( function() {
 
-    var dataSource = NM.kendo.dataSource( { url: "/manager/ajax/audit-entries" } );
+    var pub = {};
+    var fields = AP.frame.fields;
+
+    var dataSource = NM.kendo.dataSource( { url: "/manager/ajax/frames" } );
 
     var viewModel = kendo.observable( {
         rows: dataSource,
@@ -46,6 +49,10 @@ AP.frame.list = ( function() {
             this.search();
         },
 
+        new: function() {
+            AP.frame.modal.new();
+        },
+
         addNew: function() {
             AP.frame.modal.open();
         },
@@ -56,39 +63,38 @@ AP.frame.list = ( function() {
         }
     } );
 
-    return {
-        // viewModel: viewModel,
-        init: function() {
-            if ( !AP.frame.fields.listRoot.length ) { return; }
+    pub.init = function() {
+        if ( !AP.frame.fields.listRoot.length ) { return; }
 
-            kendo.bind( AP.frame.fields.listRoot, viewModel );
+        kendo.bind( AP.frame.fields.listRoot, viewModel );
 
-            AP.frame.fields.searchForm.on( "submit", function( e ) {
-                e.preventDefault();
-                viewModel.search();
-            } );
+        AP.frame.fields.searchForm.on( "submit", function( e ) {
+            e.preventDefault();
+            viewModel.search();
+        } );
 
-            // Gestione eventi
-            AP.frame.fields.listTable.on( "click", "[data-action='detail']", viewModel.showDetail );
-
-            // Carica i dati
-            viewModel.rows.read();
-        }
     };
-} () );
+
+    return pub;
+
+}() );
 
 AP.frame.modal = ( function() {
 
     var pub = {};
-    var fields = AP.frame.field;
+    var fields = AP.frame.fields;
 
     var viewModel = kendo.observable( {
         frame: {
-            frameId: "",
+            id: "",
             frame: "",
             code: "",
-            orientationId: "VER",
-            cellOrientationId: "VER",
+            orientation: {
+                id: ""
+            },
+            cellOrientation: {
+                id: ""
+            },
             cells: []
         },
         gridRows: 3,
@@ -103,8 +109,12 @@ AP.frame.modal = ( function() {
                 frameId: "",
                 frame: "",
                 code: "",
-                orientationId: "VER",
-                cellOrientationId: "VER",
+                orientation: {
+                    id: ""
+                },
+                cellOrientation: {
+                    id: ""
+                },
                 cells: []
             } );
             this.set( "gridRows", 3 );
@@ -150,33 +160,28 @@ AP.frame.modal = ( function() {
             }
         },
 
-        editCell: function( row, col, value ) {
-            var matrix = this.get( "cellsMatrix" );
-            if ( matrix[row] && matrix[row][col] !== undefined ) {
-                matrix[row][col] = value;
-                this.set( "cellsMatrix", matrix );
-                this.set( "isDirty", true );
-            }
-        },
-
         updateCellsMatrix: function() {
             var rows = this.get( "gridRows" );
             var cols = this.get( "gridCols" );
             var cells = this.get( "frame.cells" ) || [];
             var matrix = [];
 
-            // Inizializza matrice vuota
+            // Inizializza matrice vuota con rowIndex
             for ( var i = 0; i < rows; i++ ) {
                 matrix[i] = [];
                 for ( var j = 0; j < cols; j++ ) {
-                    matrix[i][j] = "_"; // Default vuoto
+                    matrix[i][j] = { value: "_", rowIndex: i, colIndex: j }; // aggiungi rowIndex e colIndex
                 }
             }
 
             // Popola la matrice con i valori esistenti
             cells.forEach( function( cell ) {
                 if ( cell.row < rows && cell.col < cols ) {
-                    matrix[cell.row][cell.col] = cell.value;
+                    matrix[cell.row][cell.col] = {
+                        value: cell.value,
+                        rowIndex: cell.row,
+                        colIndex: cell.col
+                    };
                 }
             } );
 
@@ -364,8 +369,22 @@ AP.frame.modal = ( function() {
         AP.frame.fields.detailRoot.modal( "show" );
     };
 
+    pub.editCell = function( row, col, value ) {
+        // TODO: forse non serve
+        var matrix = viewModel.get( "cellsMatrix" );
+
+        if ( matrix[row] && matrix[row][col] !== undefined ) {
+            matrix[row][col] = value;
+            viewModel.set( "cellsMatrix", matrix );
+            viewModel.set( "isDirty", true );
+        }
+
+    },
+
     pub.init = function() {
         if ( !AP.frame.fields.detailRoot.length ) { return; }
+
+        console.log( "AP.frame.fields.detailRoot", AP.frame.fields.detailRoot );
 
         kendo.bind( AP.frame.fields.detailRoot, viewModel );
 
@@ -374,7 +393,7 @@ AP.frame.modal = ( function() {
             viewModel.save();
         } );
 
-        var detailForm = fields.modelConfigForm;
+        var detailForm = fields.detailForm;
 
         detailForm.validate( {
             onfocusout: function( element ) {

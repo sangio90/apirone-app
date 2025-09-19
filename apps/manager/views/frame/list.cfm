@@ -80,6 +80,6 @@
 	</div>
 </div>
 
-#view("frame/detail")#
+#view("frame/detail-modal")#
 
 </cfoutput>

@@ -19,7 +19,6 @@ component extends="com.apirone.core.controller.AbsController" {
 	function detail( event, rc, prc ){
 		var product = super.fire( "product.get", [ rc.id ] );
 		var memy    = super.getMementify();
-		;
 
 		if ( IsNull( product ) ) {
 			// TODO: better than this
@@ -57,7 +56,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				super.fire( "product.list", { lineId = prc.line.getId() } )
 			);
 		}
-
 
 		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = memy.convertList( super.fire( "status.list", [ "attribute" ] ) );
@@ -206,25 +204,19 @@ component extends="com.apirone.core.controller.AbsController" {
 				bookmark          = true,
 				backgroundVisible = true,
 				orientation       = "landscape",
-				pagetype          = "A4",
+				pageType          = "A4",
 				overwrite         = true,
-				fontembed         = "true",
-				saveasname        = "#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
+				fontEmbed         = "true",
+				saveAsName        = "#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
 			}
 		}
 
-		// var bean = super.bean( "PrintList" );
-		// var reportData = bean.getRawMemento();
-
-		// prc.printData = data;
-
-		event.renderData( data = renderView( view = "report/template/#rc.report#", args = params ), type = "PDF" );
-
-		// var binary = FileReadBinary( filename );
-		// event.renderData(data=binary,type="PDF");
-
-		// event.setView( "report/template/#rc.report#" ).setLayout( "print" );
+		event.renderData( 
+			data = renderView( view = "report/template/#rc.report#", args = params ), 
+			type = "PDF" 
+		);
 	}
+
 
 	/*
 		private methods
