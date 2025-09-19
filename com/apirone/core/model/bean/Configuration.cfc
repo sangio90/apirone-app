@@ -52,6 +52,12 @@ component output="true" accessors="true" {
 						"horizontal" = { "sizes" = [ { "width" = "500" } ] },
 						"vertical"   = { "sizes" = [ { "width" = "500" } ] }
 					}
+				},
+				"quotationItem" = {
+					"path"  = "quotation-items",
+					"types" = {
+						"default" = { "sizes" = [ { "width" = "500" } ] }
+					}
 				}
 			},
 			"encryptKey" = settings.get( "db.encryptKey" )

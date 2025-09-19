@@ -431,9 +431,12 @@ AP.signage.modal = ( function() {
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             parsedData.quotationId = quotationId;
+            var preview = $('#signage-preview-container')[0];
 
-            // if ( detailForm.valid() ) {
-            if ( true ) {
+            html2canvas(preview).then(function (canvas) {
+                let imgData = canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, "");
+                parsedData.imageBase64 = imgData;
+
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotationitems",
@@ -451,7 +454,7 @@ AP.signage.modal = ( function() {
                         }
                     }
                 } );
-            }
+            });
 
             return false;
         },

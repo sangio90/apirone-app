@@ -4,7 +4,48 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var rows   = super.fire( "QuotationItem.search", params );
+		var rows = super.fire( "QuotationItem.search", params );
+		var imageConfigs = getConfiguration().get( "imagesConfig" );
+
+		for ( var row in rows.getData() ) {
+			var params = { quotationItemId = row.getId() }
+			var config = imageConfigs[ "quotationItem" ];
+			params.put( "typeId", 'default' );
+			var images = super.fire( "file.list", params );
+			
+			var file = super.bean( "File" );
+
+			// esiste l'immagine la servo
+			if ( images.len() ) {
+				var image = images[ 1 ];
+
+				// var json = image.toStruct();
+				var json = super.getMementify().convert( image, "list" );
+
+				json[ "complete" ] = true;
+				json[ "uri" ]      = image.getUri();
+				json[ "shortId" ]  = Right( image.getId(), 5 );
+
+				// se non esiste, servo un'immagine vuota
+			} else {
+				var type = super.fire( "fileType.get", [ typeId ] );
+
+				file.setType( type );
+
+				file.setId( "" );
+				file.setName( "" );
+				file.setDirectory( "" );
+
+				var json = super.getMementify().convert( file );
+
+				json[ "complete" ] = false;
+				json[ "uri" ]      = "";
+				json[ "shortId" ]  = "";
+			}
+
+			// dump(json);abort;
+			row.add( json );
+		}
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
@@ -51,6 +92,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 
 		transaction {
+			var tmpDir = getTempDir();
+			fileName = "preview_segnaletica_id_" & json.quotationItem.id & ".png";
+			filePath = tmpDir & fileName;
+			binaryData = ToBinary(json.imageBase64);
+
+			fileWrite(filePath, binaryData);
+
 			var id = json.quotationItem.id;
 			try {
 				if ( !Len( id ) ) {
@@ -119,6 +167,29 @@ component extends="com.apirone.core.controller.AbsController" {
 
 					super.fire( messaggiId, [ signageRowBean ] );
 				}
+
+				var files = super.fire('File.search', { quotationItemId: id });
+				if (Len(files)) {
+					for (file in files.getData()) {
+						super.fire('File.delete', { fileId: file.getId() });
+					}
+				}
+				
+				var entity = super.bean( "Entity" );
+		
+				var kindId = "quotationItem";
+				entity.setKey( "quotationItem.id" );
+				entity.setValue( id );
+
+				var fileId = super.fire(
+					"file.create",
+					{
+						filePath = filePath,
+						typeId = 'default',
+						kindId = 'quotationItem',
+						entity = entity
+					}
+				);
 
 				var message = completeMessage( messageId );
 			} catch ( any e ) {

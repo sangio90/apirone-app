@@ -16,6 +16,7 @@
 		<cfargument name="productItemId" type="Numeric">
 		<cfargument name="combinationId" type="String">
 		<cfargument name="typeId" type="String">
+		<cfargument name="quotationItemId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -47,6 +48,13 @@
 			<cfif !IsNull( arguments.typeId )>
 				AND type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
 			</cfif>
+			
+			<cfif !IsNull( arguments.quotationItemId )>
+				AND quotation_item_id = <cfqueryparam value="#arguments.quotationItemId#" cfsqltype="Varchar">::uuid
+			</cfif>
+
+			ORDER BY
+				created_at
 
 			<cfif arguments.limit GT 0>
 				LIMIT
@@ -54,9 +62,6 @@
 				OFFSET
 					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
-
-			ORDER BY
-				created_at
 		</cfquery>
 
 		<cfreturn local.q>

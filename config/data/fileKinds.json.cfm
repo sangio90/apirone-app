@@ -13,5 +13,8 @@
     },
     {
         id: "product",
+    },
+    {
+        id: "quotationItem",
     }
 ]
