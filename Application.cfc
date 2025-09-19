@@ -49,6 +49,21 @@ component extends="com.apirone.core.root.Application" {
 			onApplicationStart();
 			application.counter++;
 		}
+
+		if ( url.keyExists("reset") ) {
+
+			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# reset all");
+
+			CacheRemoveAll();
+
+			super.clearContainer();
+
+			onApplicationStart();
+			
+			application.counter++;
+			
+		}
+
 		
 		application.cbBootstrap.onRequestStart( arguments.targetPage );
 
