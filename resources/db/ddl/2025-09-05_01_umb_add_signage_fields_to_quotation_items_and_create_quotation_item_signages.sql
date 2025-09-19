@@ -20,5 +20,4 @@ CREATE TABLE quotation_item_signage_rows (
     orderby INTEGER NOT NULL
 );
 
-
 ALTER TABLE quotation_item_signage_rows OWNER TO apiruser;
