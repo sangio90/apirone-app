@@ -28,7 +28,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				// se non esiste, servo un'immagine vuota
 			} else {
-				var type = super.fire( "fileType.get", [ typeId ] );
+				var type = super.fire( "fileType.get", [ 'default' ] );
 
 				file.setType( type );
 
@@ -44,7 +44,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 
 			// dump(json);abort;
-			row.add( json );
+			//row.add( json );
 		}
 
 		result.setTotal( rows.getTotal() );
