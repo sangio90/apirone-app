@@ -8,7 +8,7 @@
                     Anteprima Segnaletica
                 </div>
                 <div class="col-12">
-                    <img src="/assets/fakes/img/plate.jpg" style="width: 80%;">
+                    <img data-bind="attr: { src: getImageSrc }" style="width: 80%;">
                 </div>
                 <div class="col-6">
                     Quantità: #: quantity #

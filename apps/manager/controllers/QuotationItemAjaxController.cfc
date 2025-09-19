@@ -4,52 +4,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
+		var mm     = super.getMementify();
 		var rows = super.fire( "QuotationItem.search", params );
-		var imageConfigs = getConfiguration().get( "imagesConfig" );
 
-		for ( var row in rows.getData() ) {
-			var params = { quotationItemId = row.getId() }
-			var config = imageConfigs[ "quotationItem" ];
-			params.put( "typeId", 'default' );
-			var images = super.fire( "file.list", params );
-			
-			var file = super.bean( "File" );
-
-			// esiste l'immagine la servo
-			if ( images.len() ) {
-				var image = images[ 1 ];
-
-				// var json = image.toStruct();
-				var json = super.getMementify().convert( image, "list" );
-
-				json[ "complete" ] = true;
-				json[ "uri" ]      = image.getUri();
-				json[ "shortId" ]  = Right( image.getId(), 5 );
-
-				// se non esiste, servo un'immagine vuota
-			} else {
-				var type = super.fire( "fileType.get", [ 'default' ] );
-
-				file.setType( type );
-
-				file.setId( "" );
-				file.setName( "" );
-				file.setDirectory( "" );
-
-				var json = super.getMementify().convert( file );
-
-				json[ "complete" ] = false;
-				json[ "uri" ]      = "";
-				json[ "shortId" ]  = "";
-			}
-
-			// dump(json);abort;
-			//row.add( json );
-		}
+		var rowsData = ( mm.convertList( rows.getData() ) );
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
-		result.setData( rows.getData() );
+		result.setData( rowsData );
 
 		event.setValue( "result", result );
 	}

@@ -47,6 +47,7 @@
                                                 data-bind="value: detailForm.data.name"
                                                 data-rule-required="true"
                                                 data-msg-required="Nome"
+                                                required
                                             >
                                         </div>
                                         <div class="col-sm-2">

@@ -98,6 +98,22 @@ AP.quotationDetail.detail = ( function() {
         zones: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
 
+        getImageSrc: function( event ) {
+
+            const uri = event.image?.uri || "";
+
+            if ( uri.toLowerCase().endsWith( ".svg" ) ) {
+                return uri;
+            }
+
+            if ( uri != "" )  {
+                var replaced = uri.replace( "_ori", "500" );
+                return replaced;
+            }
+
+            return "/assets/main/img/img-not-found.png";
+        },
+
         callback: {
             onCreate: undefined,
             onUpdate: undefined,
@@ -225,6 +241,7 @@ AP.quotationDetail.detail = ( function() {
                                 AP.widget.notify( "error", "Errore nel recupero delle righe." );
                             }
                             if ( xhr.status == "SUCCESS" ) {
+                                debugger
                                 viewModel.get( "quotationItems" ).data( xhr.data );
                             }
                         }
