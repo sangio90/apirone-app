@@ -7,11 +7,7 @@ Object.assign( AP.plate.fields, {
 
 $( document ).ready( function() {
     if ( AP.plate.fields.modalRoot.length ) {
-        AP.page = { GRID_CELL_DIMENSIONS: { "_": { "HEIGHT": 180, "WIDTH": 45 }, "0": { "HEIGHT": 105, "WIDTH": 52 } } };
-        AP.plate.designer.init( { container: AP.plate.fields.modalRoot } );
-    }
-
-    if ( AP.plate.fields.modalRoot.length ) {
+        AP.plate.constants = { GRID_CELL_DIMENSIONS: { "_": { "HEIGHT": 180, "WIDTH": 45 }, "0": { "HEIGHT": 105, "WIDTH": 52 } } };
         AP.plate.modal.init( { container: AP.plate.fields.modalRoot } );
     }
 
@@ -1076,7 +1072,7 @@ AP.plate.modal = ( function() {
                 id: "ACT",
             },
         },
-        statuses: AP.page.statuses,
+        // statuses: AP.plate.constants.statuses,
         title: "Carica placca",
     };
 
@@ -1325,9 +1321,9 @@ AP.plate.modal = ( function() {
             const selectedPlate = this.plates.get( this.get( "selectedPlate" ) );
 
             FREE_CELL_WIDTH =
-                AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
+                AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
             FREE_CELL_HEIGHT =
-                AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
+                AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
 
             if ( selectedPlate.CELL_ORIENTATION == ORIENTATION.VERTICAL ) {
                 const tmp = FREE_CELL_WIDTH;
@@ -1348,8 +1344,8 @@ AP.plate.modal = ( function() {
                     const cellType = selectedPlate.GRID[iRow][iCol];
 
                     const cell = new Cell(
-                        AP.page.GRID_CELL_DIMENSIONS[cellType].WIDTH,
-                        AP.page.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
+                        AP.plate.constants.GRID_CELL_DIMENSIONS[cellType].WIDTH,
+                        AP.plate.constants.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
                         selectedPlate.CELL_ORIENTATION,
                         cellType,
                     );
@@ -1413,8 +1409,9 @@ AP.plate.modal = ( function() {
 
         viewModel.set( "fruits", [
             {
-                width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
-                height: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
+                height:
+                    AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 4,
                 rowSpan: 1,
                 uuid: "A",
@@ -1423,9 +1420,9 @@ AP.plate.modal = ( function() {
                 img: "/assets/fakes/img/foto_frutto_schuko.png",
             },
             {
-                width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
                 height:
-                    AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                    AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "B",
@@ -1434,9 +1431,9 @@ AP.plate.modal = ( function() {
                 img: "/assets/fakes/img/foto_frutto_bipasso.png",
             },
             {
-                width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
                 height:
-                    AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                    AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "C",
@@ -1445,8 +1442,9 @@ AP.plate.modal = ( function() {
                 img: "/assets/fakes/img/foto_frutto_cat6.png",
             },
             {
-                width: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-                height: AP.page.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                height:
+                    AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "I",

@@ -79,9 +79,7 @@
                                                 data-role="dropdownlist"
                                                 data-value-field="UUID"
                                                 data-text-field="CODE"
-                                                data-bind="source: plates,
-                                                        value: selectedPlate"
-                                            />
+                                                data-bind="source: plates, value: selectedPlate" />
                                         </div>
 
                                         <button
