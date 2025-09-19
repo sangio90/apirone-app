@@ -42,29 +42,29 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Nome <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Nome </label>
                                             <input type="text" name="name" class="form-control" id="name"
                                                 data-bind="value: detailForm.data.name"
                                                 data-rule-required="true"
-                                                data-msg-required="Nome"
                                                 required
                                             >
                                         </div>
                                         <div class="col-sm-2">
-                                            <label class="control-label text-sm-end">Numero <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Numero </label>
                                             <input type="text" name="number" class="form-control" id="quotationNumber"
                                                 data-bind="value: detailForm.data.quotationNumber"
                                                 data-rule-required="true"
-                                                data-msg-required="Number"
+                                                required
                                             >
                                         </div>
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Lingua <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Lingua </label>
                                             <select name="langId" class="form-control"
                                                 data-placeholder="-- Seleziona lingua"
                                                 data-bind="source: languages, value: detailForm.data.lang.id"
                                                 data-value-field="id"
                                                 data-text-field="name"
+                                                required
                                             >
                                             </select>
                                         </div>
@@ -73,8 +73,8 @@
                                             <input type="date" class="form-control" data-bind="value: detailForm.data.quotationDate" disabled>
                                         </div>
                                         <div class="col-sm-2">
-                                            <label class="control-label text-sm-end">Data validità <span class="required">*</span></label>
-                                            <input type="date" class="form-control" data-bind="value: detailForm.data.validityDate">
+                                            <label class="control-label text-sm-end">Data validità </label>
+                                            <input type="date" name="validityDate" class="form-control" data-bind="value: detailForm.data.validityDate" required>
                                         </div>
                                     </div>
 
@@ -84,7 +84,7 @@
                                             <textarea name="note" class="form-control" rows="1" data-bind="value: detailForm.data.notes"></textarea>
                                         </div>
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Stato <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Stato </label>
                                             <select name="statusId" class="form-control"
                                                 data-placeholder="-- Seleziona stato"
                                                 data-bind="source: statuses, value: detailForm.data.status.id"
@@ -97,11 +97,11 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-5">
-                                            <label class="control-label text-sm-end">Nome opportunità <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Nome opportunità </label>
                                             <input type="text" data-bind="value: detailForm.data.opportunityName" class="form-control">
                                         </div>
                                         <div class="col-sm-5">
-                                            <label class="control-label text-sm-end">Nome lead <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Nome lead </label>
                                             <input type="text" data-bind="value: detailForm.data.leadName" class="form-control">
                                         </div>
                                         <div class="col-sm-2 pt-4">
@@ -195,7 +195,7 @@
                                 <div class="tab-pane fade" id="nav-fiscal" role="tabpanel">
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Listino <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Listino </label>
                                             <select name="pricelist" class="form-control"
                                                 data-placeholder="-- Seleziona listino"
                                                 data-bind="source: pricelists, value: detailForm.data.pricelist"
@@ -205,7 +205,7 @@
                                             </select>
                                         </div>
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Pagamento <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Pagamento </label>
                                             <select name="paymentMethod" class="form-control"
                                                 data-placeholder="-- Seleziona metodo pagamento"
                                                 data-bind="source: paymentMethods, value: detailForm.data.paymentMethod"
@@ -226,7 +226,7 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Valuta <span class="required">*</span></label>
+                                            <label class="control-label text-sm-end">Valuta </label>
                                             <select name="currency" class="form-control"
                                                 data-placeholder="-- Seleziona valuta"
                                                 data-bind="source: currencies, value: detailForm.data.currency"

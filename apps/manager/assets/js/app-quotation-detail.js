@@ -2,6 +2,7 @@ AP.namespace( "quotationDetail" );
 
 Object.assign( AP.quotationDetail.fields, {
     detailRoot: $( "#quotation-detail-root" ),
+    detailForm: $( "#quotation-header-form" ),
     zoneModalRoot: $( "#zone-modal-root" ),
 } );
 
@@ -167,27 +168,63 @@ AP.quotationDetail.detail = ( function() {
         resetForm: function() {},
 
         save: function( event ) {
-            const parsedData = viewModel.get( "detailForm.data" );
+            var detailFormDom = AP.quotationDetail.fields.detailForm;
 
-            console.log( "parsedData", parsedData );
+            detailFormDom.validate( {
+                onfocusout: function( element ) {
+                    $( element ).valid();
+                },
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    number: {
+                        required: true
+                    },
+                    langId: {
+                        required: true
+                    },
+                    validityDate: {
+                        required: true
+                    },
+                },
+                messages: {
+                    name: {
+                        required: "Nome preventivo richiesto.",
+                    },
+                    number: {
+                        required: "Numero preventivo richiesto."
+                    },
+                    langId: {
+                        required: "Lingua preventivo richiesta."
+                    },
+                    validityDate: {
+                        required: "Data validità preventivo richiesta."
+                    },
+                }
+            })
 
-            NM.util.ajax( {
-                method: "POST",
-                url: "/manager/ajax/quotations",
-                data: JSON.stringify( parsedData ),
-                callback: {
-                    done: function( xhr ) {
-                        if( xhr.status == "ERRORE" ) {
-                            AP.widget.notify( "error", "Errore nel salvataggio del preventivo." );
-                        }
-                        if ( xhr.status == "SUCCESS" ) {
-                            AP.widget.notify( "success", "Preventivo salvato correttamente." );
-                            viewModel.set( "detailForm", defaultDetailForm );
-                            setTimeout( () => $( "#signage-modal" ).modal( "hide" ), 1000 );
+            if ( detailFormDom.valid() ) {
+                const parsedData = viewModel.get( "detailForm.data" );
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/quotations",
+                    data: JSON.stringify( parsedData ),
+                    callback: {
+                        done: function( xhr ) {
+                            if( xhr.status == "ERRORE" ) {
+                                AP.widget.notify( "error", "Errore nel salvataggio del preventivo." );
+                            }
+                            if ( xhr.status == "SUCCESS" ) {
+                                AP.widget.notify( "success", "Preventivo salvato correttamente." );
+                                viewModel.set( "detailForm", defaultDetailForm );
+                                window.location.href = "/manager/quotations/" + xhr.data.payload.ID;
+                            }
                         }
                     }
-                }
-            } );
+                } );
+            }
 
             return false;
         },
@@ -299,6 +336,7 @@ AP.quotationDetail.detail = ( function() {
     };
 
     pub.init = function() {
+        kendo.bind( AP.quotationDetail.fields.detailRoot, viewModel );
 
         viewModel.get( "languages" ).data( AP.page.languages );
         viewModel.get( "statuses" ).data( AP.page.statuses );
@@ -309,16 +347,13 @@ AP.quotationDetail.detail = ( function() {
         viewModel.get( "states" ).data( AP.page.states );
 
         viewModel.getZones();
-
-        viewModel.setQuotation( AP.page.quotation );
-
+        
         if ( AP.page.quotation ) {
+            viewModel.setQuotation( AP.page.quotation );
             // $( "#nav-plan-tab" ).removeAttr("hidden");
             $( "#nav-products-tab" ).removeAttr( "hidden" );
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
         }
-
-        kendo.bind( AP.quotationDetail.fields.detailRoot, viewModel );
     };
 
     return pub;

@@ -132,17 +132,4 @@
 		event.setView( "quotation/detail" );
 	}
 
-	function get( event, rc, prc ){
-		var user = prc.user;
-
-		prc.title = "Dettagli preventivo";
-
-		// prc.vatCodeList = super.service( "VatCode" ).list();
-		prc.vatCodeList = [];
-
-		prc.jsScripts.add( "app-quotation" );
-
-		event.setView( "quotation/items" );
-	}
-
 }

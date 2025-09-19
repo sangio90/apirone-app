@@ -112,7 +112,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		quotation.setId( json.id );
 		quotation.setName( json.name );
-		quotation.setQuotationNumber( json.number );
+		quotation.setQuotationNumber( json.quotationNumber );
 		quotation.setVersionNumber( json.version );
 		quotation.setQuotationDate( json.quotationDate );
 		quotation.setNotes( json.notes );
@@ -120,8 +120,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setOpportunityName( json.opportunityName );
 		quotation.setLeadName( json.leadName );
 		quotation.setActive( true );
-		quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
-		quotation.setLang( super.fire( "lang.get", [ json.language.id ] ) );
+		var statusId = json.status.id != '' ? json.status.id : 'NEW';
+		quotation.setStatus( super.fire( "status.get", [ statusId ] ) );
+		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
 		// quotation.setCustomPaymentMethod( json.custom_payment_method );
 		// quotation.setPricelist( type.setId( json.pricelist.id ) );
 		// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
@@ -133,14 +134,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( !Len( json.id ) ) {
 			messageId = "quotation.created";
-			thisId    = super.fire( "quotation.create", [ quotation ] )
+			thisId    = super.fire( "quotation.create", [ quotation ] );
 		} else {
 			var bean = super.fire( "Quotation.get", [ rc.id ] );
 			if ( json.status != bean.getStatus().getId() ) {
-				quotation.setActive( 0 );
-				super.fire( "quotation.update", [ quotation ] )
-				thisId    = super.fire( "quotation.clone", [ quotation ] );
-				messageId = "quotation.updated";
+				//commentato per la clone è da sistemare
+				// quotation.setActive( 0 );
+				// super.fire( "quotation.update", [ quotation ] )
+				// thisId    = super.fire( "quotation.clone", [ quotation ] );
+				// messageId = "quotation.updated";
 			} else {
 				messageId = "quotation.updated";
 				thisId    = super.fire( "quotation.update", [ quotation ] )
@@ -149,7 +151,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message,  "payload" = { id = thisId } } );
 
 		event.setValue( "result", result );
 	}
