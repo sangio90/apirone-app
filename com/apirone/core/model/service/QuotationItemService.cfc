@@ -5,6 +5,7 @@
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="ProductService" inject="ProductService";
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
+	property name="FileService" inject="FileService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
 	property name="cacheScope" type="String" default="QuotationItem.bean";
 
@@ -129,6 +130,10 @@
 				}
 				var signageRows = getQuotationItemSignageRowService().list( quotationItemId = quotationItemId );
 				bean.setSignageRows( signageRows );
+				var images = getFileService().list( quotationItemId = record.quotation_item_id )
+				if (Len(images)) {
+					bean.setImage(images[1])
+				} 
 			}
 
 			return bean;

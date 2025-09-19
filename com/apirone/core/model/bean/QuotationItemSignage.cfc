@@ -9,7 +9,8 @@ component extends="com.apirone.core.model.bean.QuotationItem" accessors="true" {
 			"height",
 			"heightInPixel",
 			"charCount",
-			"rowCount"
+			"rowCount",
+			"image"
 		],
 		profiles = {
 			edit = {
@@ -35,6 +36,7 @@ component extends="com.apirone.core.model.bean.QuotationItem" accessors="true" {
 	// campi storico signage per questa riga di preventivo. riprendiamo signage config item perché ha la stessa struttura.
 	property name="signageConfigItem" type="com.apirone.core.model.bean.SignageConfigItem";
 	property name="signageRows" type="com.apirone.core.model.bean.QuotationItemSignageRow[]";
+	property name="image" type="com.apirone.core.model.bean.File";
 
 	public QuotationItemSignage function init(){
 		return this;
