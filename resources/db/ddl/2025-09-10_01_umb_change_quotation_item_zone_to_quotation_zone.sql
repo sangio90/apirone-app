@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS quotation_item_positions;
 DROP TABLE IF EXISTS quotation_item_zones;
 
 CREATE TABLE quotation_zones (
@@ -13,7 +14,6 @@ CREATE TABLE quotation_zones (
         FOREIGN KEY (quotation_id) REFERENCES quotations(quotation_id)
 );
 
-DROP TABLE IF EXISTS quotation_item_positions;
 
 CREATE TABLE quotation_item_positions (
     quotation_item_position_id uuid NOT NULL DEFAULT uuid_generate_v4(),
