@@ -1,10 +1,14 @@
 [ 
     {
-        id: "HOR",
-        name: "Orizzonale"
+        id: "B",
+        name: "Billing"
     },
     {
-        id: "VER",
-        name: "Verticale"
+        id: "S",
+        name: "Shipping"
     },
+    {
+        id: "G",
+        name: "Generic"
+    }
 ]
