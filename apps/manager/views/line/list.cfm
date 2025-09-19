@@ -70,10 +70,7 @@
 
 							<div class="col-sm-2">
 								<div class="float-end">
-									#deleteButton(
-										bind  = "click:delete",
-										size  = "sm"
-									)#
+									#deleteButton( bind  = "click:delete", size = "sm" )#
 								</div>
 
 								<div class="status float-end me-3" id="status-delete"></div>

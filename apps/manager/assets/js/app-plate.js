@@ -1,11 +1,11 @@
 AP.namespace( "plate" );
 
 Object.assign( AP.plate.fields, {
-    // designerRoot: $( "#plate-designer-root" ),
     modalRoot: $( "#plate-modal-root" ),
 } );
 
 $( document ).ready( function() {
+
     if ( AP.plate.fields.modalRoot.length ) {
         AP.plate.constants = { GRID_CELL_DIMENSIONS: { "_": { "HEIGHT": 180, "WIDTH": 45 }, "0": { "HEIGHT": 105, "WIDTH": 52 } } };
         AP.plate.modal.init( { container: AP.plate.fields.modalRoot } );
@@ -85,8 +85,7 @@ AP.plate.modal = ( function() {
                                 fruitPosition.left - fruitPosition.right,
                             );
 
-                            result.column =
-                                column - fruitWidth / FREE_CELL_WIDTH + 1;
+                            result.column = column - fruitWidth / FREE_CELL_WIDTH + 1;
                         }
                     } else if (
                         ( newPositionDirection & MOVE_DIRECTION.LEFT ) ==
@@ -1167,7 +1166,7 @@ AP.plate.modal = ( function() {
                     IMG: "/assets/fakes/img/508.jpg",
                     WIDTH: 1200, // in px
                     HEIGHT: 500, // in px
-                    ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
+                    ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL //frame
                     CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
                     GRID: [
                         // LEGEND:
@@ -1443,8 +1442,7 @@ AP.plate.modal = ( function() {
             },
             {
                 width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-                height:
-                    AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                height: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "I",

@@ -4,9 +4,9 @@ $( document ).ready( async function() {
 
         var helper = AP.test.helper;
 
-        const lineId = "56906918-8a2a-4652-80fe-adc1ededacd1";
-        const modelId = "9d3266f5-db0d-4044-a120-22bd400d899c";
-        const finishId = "7357f125-e556-467c-ba37-2a1e17abc6cf";
+        const lineId = "56906918-8a2a-4652-80fe-adc1ededacd1"; // linea: Square
+        const modelId = "9d3266f5-db0d-4044-a120-22bd400d899c"; // modello: 54x82 (1x2)
+        const finishId = "7357f125-e556-467c-ba37-2a1e17abc6cf"; // finitura: Acciaio lucido
 
         const plateEle = $( "#plateLineId" );
         const modelEle = $( "#plateModelId" );
