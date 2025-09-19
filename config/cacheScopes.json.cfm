@@ -48,5 +48,6 @@
     "MetadataType.bean": {},
     "Metadata.bean": {},
     "VatCode.bean": {},
-    "Report.bean": {}
+    "Frame.bean": {},
+    "FrameCell.bean": {}
 }

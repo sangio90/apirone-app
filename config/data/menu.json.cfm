@@ -75,6 +75,7 @@
 				title: "Prodotti per linea",
 				roles: "ADM",
 			},
+			
 		]
 	},	
 	{
@@ -111,6 +112,12 @@
 				href: "/manager/finishes",
 				icon: "fas fa-palette",
 				title: "Finiture",
+				roles: "ADM"
+			},
+			{
+				href: "/manager/frames",
+				icon: "fas fa-shield-alt",
+				title: "Armnature",
 				roles: "ADM"
 			},
 			{

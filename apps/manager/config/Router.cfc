@@ -197,6 +197,15 @@
 
 
 		/*
+			frames
+		*/
+		get( "/ajax/frames/code-exists" ).toHandler( "FrameAjaxController.codeExists" );
+		get( "/ajax/frames/:id" ).toHandler( "FrameAjaxController.get" );
+		get( "/ajax/frames" ).toHandler( "FrameAjaxController.list" );
+		get( "/frames" ).toHandler( "FrameController.list" );
+
+
+		/*
 			components
 		*/
 		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
