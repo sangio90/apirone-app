@@ -11,9 +11,11 @@
             </td>
             <td>
                 <span data-bind="text: line.name"></span>
+                <span class="small-code">(<span data-bind="text: line.code"></span>)</span>
             </td>
             <td>
                 <span data-bind="text: model.name"></span>
+                <span class="small-code">(<span data-bind="text: model.code"></span>)</span>
             </td>
             <td>
                 <span data-bind="text: finish.name"></span>

@@ -173,6 +173,7 @@
         #includeJsFiles()#
 
         <cfif prc.isDev>
+            <script src="/assets/#prc.staticVersion#/manager/js/tests/test-helper.js"></script>
             <style>.header{ border-top: 3px solid Red !important }</style>
         </cfif>
 
