@@ -32,6 +32,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String productId,
 		String productItemId,
 		String combinationId,
+		String quotationItemId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0
 	){
@@ -39,11 +40,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var result = super.getResult();
 
 		var records = getDao().find( argumentCollection = arguments );
-
 		records.each( function( record ){
 			rows.add( get( fileId = record.file_id ) );
 		} );
-
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );
