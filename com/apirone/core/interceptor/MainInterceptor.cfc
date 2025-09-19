@@ -180,6 +180,9 @@ component extends="coldbox.system.Interceptor" {
 		var config = getContainer().getInstance( "Configuration" ).get();
 
 		var result = {
+			"user" = {
+				"id": session.user.getId(),
+			},
 			"appName"    = config.get( "appName" ),
 			"appVersion" = config.get( "appVersion" ),
 			"account"    = {
