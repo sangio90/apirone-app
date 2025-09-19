@@ -36,3 +36,5 @@ ALTER TABLE quotation_items
 ALTER TABLE quotation_items
     ADD CONSTRAINT fk_quotation_items_quotation_zone
     FOREIGN KEY (quotation_zone_id) REFERENCES quotation_zones(quotation_zone_id);
+
+ALTER TABLE quotation_zones OWNER TO apiruser;
