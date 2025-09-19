@@ -1,38 +1,38 @@
 AP.widget = AP.widget || {};
 
-AP.widget.notify = function (type, message, title) {
+AP.widget.notify = function( type, message, title ) {
     var stack_bar_top = { dir1: "down", dir2: "right", push: "top", spacing1: 0, spacing2: 0 };
 
     var icon = "";
     var title = "";
 
-    switch (type) {
-        case "error":
-            icon = "fas fa-exclamation-circle";
-            title = title ? title : "Errore";
-            break;
+    switch ( type ) {
+    case "error":
+        icon = "fas fa-exclamation-circle";
+        title = title ? title : "Errore";
+        break;
 
-        case "info":
-            icon = "fas fa-info-circle";
-            title = title ? title : "Info";
-            break;
+    case "info":
+        icon = "fas fa-info-circle";
+        title = title ? title : "Info";
+        break;
 
-        case "warning":
-            icon = "fas fa-exclamation-triangle";
-            title = title ? title : "Attenzione";
-            break;
+    case "warning":
+        icon = "fas fa-exclamation-triangle";
+        title = title ? title : "Attenzione";
+        break;
 
-        case "success":
-            icon = "fas fa-check-circle";
-            title = title ? title : "Completato";
-            break;
+    case "success":
+        icon = "fas fa-check-circle";
+        title = title ? title : "Completato";
+        break;
 
-        default:
-            throw "Notify type [ " + type + " ] not found";
-            return;
+    default:
+        throw "Notify type [ " + type + " ] not found";
+        return;
     }
 
-    var notice = new PNotify({
+    var notice = new PNotify( {
         delay: 3000,
         type: type,
         title: title,
@@ -45,17 +45,17 @@ AP.widget.notify = function (type, message, title) {
             sticker: false,
         },
         stack: stack_bar_top,
-    });
+    } );
 
-    notice.get().click(function () {
+    notice.get().click( function() {
         notice.remove();
-    });
+    } );
 };
 
-AP.widget.autoClearMessage = function (id, message) {
-    var ele = $("#" + id);
+AP.widget.autoClearMessage = function( id, message ) {
+    var ele = $( "#" + id );
 
-    ele.html(message);
+    ele.html( message );
 
-    setTimeout(() => ele.html(""), 2000);
+    setTimeout( () => ele.html( "" ), 2000 );
 };

@@ -32,7 +32,7 @@
                 <div class="tab-content" id="nav-tabContent">
 
                     <!--- panel 1 ---->
-                    <div class="tab-pane fade show active" id="attribute-nav-detail-tab" role="tabpanel" aria-labelledby="attribute-nav-detail-but">                
+                    <div class="tab-pane fade show active" id="attribute-nav-detail-tab" role="tabpanel" aria-labelledby="attribute-nav-detail-but">
 
                         <form id="attribute-detail-form" method="POST" name="attribute-detail-form">
                         
