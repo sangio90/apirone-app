@@ -11,14 +11,13 @@ if ( localStorage.getItem( "sidebar-left-position" ) !== null ) {
 // the overlay shows above the first modal, not in the back.
 // https://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $( document ).on( "show.bs.modal", ".modal", function() {
-    const zIndex = 1040 + 10 * $( ".modal:visible" ).length;
+    const zIndex = 1040 + ( 10 * $( ".modal:visible" ).length );
     $( this ).css( "z-index", zIndex );
     setTimeout( () => $( ".modal-backdrop" )
         .not( ".modal-stack" )
         .css( "z-index", zIndex - 1 )
         .addClass( "modal-stack" ) );
 } );
-
 
 if ( localStorage.getItem( "sidebar-left-collapsed" ) == "true" ) {
 
@@ -31,16 +30,33 @@ if ( localStorage.getItem( "sidebar-left-collapsed" ) == "true" ) {
         .classList.remove( "sidebar-left-collapsed" );
 
 }
+
+function highlightTabWithError( fieldName ) {
+    var input = $( "[name=\"" + fieldName + "\"]" );
+    var tabPane = input.closest( ".tab-pane" );
+    var tabPaneId = tabPane.attr( "id" );
+    var tabButton = $( ".nav-link[href=\"#" + tabPaneId + "\"]" );
+
+    tabButton.css( { "font-weight": "bold", "border-top": "3px solid #dc3545" } );
+}
+
 $.validator.setDefaults( {
 
     invalidHandler: function( event, validator ) {
+
+        console.log( "invalidHandler" );
+
+        // NOTE: We use inline styles because I can't override them with a dedicated class.
+        $( ".nav-link" ).css( { "font-weight": "normal", "border-top": "" } );
+
+        $.each( validator.errorList, function( i, error ) {
+            highlightTabWithError( error.element.name );
+        } );
 
         // console.log("invalidHandler", validator);
 
         var count = validator.numberOfInvalids();
         var thisForm = $( event.currentTarget );
-
-        console.log( "thisForm", thisForm );
 
         if ( count == 1 ) {
             var message = "<span class='error'>C'è un errore.</span>";
@@ -68,6 +84,10 @@ $.validator.setDefaults( {
 
         var message = "";
 
+        if ( errors == 0 ) {
+            $( ".nav-link" ).css( { "font-weight": "normal", "border-top": "" } );
+        }
+
         if ( errors == 1 ) {
             message = "C'è un errore.";
         } else if ( errors > 1 ) {
@@ -75,7 +95,6 @@ $.validator.setDefaults( {
         }
 
         var status = thisForm.find( ".errors-counter" );
-
 
         thisForm.find( ".errors-counter" ).html( message );
 
@@ -159,5 +178,9 @@ $( document ).ready( function() {
         return this.optional( element ) || value != $( param ).val();
     }, "This two elements are the same, please change it." );
 
+    // set the sidebar height
+    var nano = $( "#sidebar-left .nano" );
+    nano.height( $( window ).height() );
 
 } );
+

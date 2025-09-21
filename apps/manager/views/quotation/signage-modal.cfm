@@ -1,7 +1,7 @@
 ﻿<cfoutput>
     <div id="signage-modal" class="modal fade" tabindex="-1">
         
-        <section class="modal-dialog modalxl">
+        <section class="modal-dialog modal-xl">
             <div class="modal-content">
 
                 <form id="line-detail-form">

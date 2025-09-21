@@ -243,12 +243,6 @@ ul.nav-main>li>a:focus {
     color: #e3c000 !important;
 }
 
-/*
-ul.nav-main li .nav-children {
-	background-color: #4482E8 !important;
-}
-*/
-
 ul.nav-main li .nav-children li a:hover,
 ul.nav-main li .nav-children li a:focus {
     background: #2771e8 !important;
@@ -309,13 +303,9 @@ h2 {
 
 @media (min-width: 1900px) {
     .modal-xl {
+        width: 95vw !important;
         max-width: 1800px;
     }
-}
-
-.modalxl {
-    width: 95vw !important;
-    max-width: 2200px !important;
 }
 
 .content-body {
@@ -367,10 +357,12 @@ h2 {
     padding: 10px 0 !important;
 }
 
+/*
 .modal .nav {
-    margin-top: 20px !important;
+    margin-top: 10px !important;
     margin-left: 15px !important;
 }
+*/
 
 .field-value {
     font-size: 16px;
@@ -759,6 +751,7 @@ h2 {
     margin-left: auto;
     margin-right: 30px;
 }
+
 
 /*
 	badget numerici nei bottoni

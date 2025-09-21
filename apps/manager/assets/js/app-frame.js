@@ -96,13 +96,16 @@ AP.frame.modal = ( function() {
             cellOrientation: {
                 id: "HOR"
             },
+            status: {
+                id: "ACT"
+            },
             cells: []
         }
     };
 
     var viewModel = kendo.observable( {
         detailForm: defaultForm,
-        orientations: AP.page.orientations, // /QUIIIIIIIIIIIIIII
+        orientations: AP.page.orientations,
         statuses: AP.page.statuses,
         gridRows: 3,
         gridCols: 3,
@@ -196,47 +199,43 @@ AP.frame.modal = ( function() {
             return cells;
         },
 
-        validateForm: function() {
-            var frame = this.get( "frame" );
+        save: function() {
 
-            if ( !frame.code || !frame.frame ) {
-                NM.util.showError( "Codice e nome sono obbligatori" );
-                return false;
+            var thisForm = fields.detailForm;
+
+            if ( thisForm.valid() ) {
+
+                var self = this;
+                var frame = this.get( "detailForm.data" );
+                frame.cells = this.cellsToArray();
+
+                this.set( "loading", true );
+
+                NM.util.ajax( {
+                    method: "GET",
+                    url: "/ajax/frames",
+                    data: JSON.stringify( frame ),
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.success ) {
+                                NM.util.showSuccess( xhr.message || "Armatura salvata con successo" );
+                                self.set( "frame", xhr.data );
+
+                                // Aggiorna la griglia nella lista
+                                if ( AP.frame.list.viewModel.dataSource ) {
+                                    AP.frame.list.viewModel.dataSource.read();
+                                }
+                            } else {
+                                NM.util.showError( xhr.message || "Errore durante il salvataggio" );
+                            }
+                            self.set( "loading", false );
+
+                        },
+                    },
+                } );
+
             }
 
-            return true;
-        },
-
-        save: function() {
-            if ( !this.validateForm() ) { return; }
-
-            var self = this;
-            var frame = this.get( "frame" );
-            frame.cells = this.cellsToArray();
-
-            this.set( "loading", true );
-
-            NM.util.ajax( {
-                method: "GET",
-                url: "/ajax/frames",
-                callback: {
-                    done: function( xhr ) {
-                        if ( response.success ) {
-                            NM.util.showSuccess( response.message || "Armatura salvata con successo" );
-                            self.set( "frame", response.data );
-
-                            // Aggiorna la griglia nella lista
-                            if ( AP.frame.list.viewModel.dataSource ) {
-                                AP.frame.list.viewModel.dataSource.read();
-                            }
-                        } else {
-                            NM.util.showError( response.message || "Errore durante il salvataggio" );
-                        }
-                        self.set( "loading", false );
-
-                    },
-                },
-            } );
 
         },
 
@@ -328,6 +327,22 @@ AP.frame.modal = ( function() {
                 $( element ).valid();
             },
             rules: {
+                name: {
+                    required: true
+                },
+                grid: {
+                    required: function() {
+
+                        console.log( "gridExists", viewModel.get( "cellsMatrix" ).length );
+
+                        if ( viewModel.get( "cellsMatrix" ).length ) {
+                            return false;
+                        }
+
+                        return true;
+
+                    }
+                },
                 code: {
                     required: true,
                     checkCode: true,
@@ -347,6 +362,12 @@ AP.frame.modal = ( function() {
                 },
             },
             messages: {
+                name: {
+                    required: "Nome richiesto"
+                },
+                grid: {
+                    required:"Inserisci almeno una riga nella griglia",
+                },
                 code: {
                     required: "Codice richiesto",
                     rangelength: "Sono richiesti 5 caratteri",

@@ -14,6 +14,14 @@
     
     }
 
+    function removeButton( String bind, required String label="Rimuovi" ){ 
+
+        arguments["icon"] = "minus";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
     function printButton( String bind, required String label="Stampa", class="" ){ 
 
         arguments["icon"] = "print";
@@ -64,6 +72,7 @@
                  String title="",
                  String icon="",
                  String class="",
+                 String id="",
                  Array data=[] // { "key" = "value" }
     ){ 
 
@@ -81,7 +90,8 @@
                 <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size# #arguments.class#" 
                     title="#arguments.title#" 
                     #dataAttr#
-                    #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#>
+                    #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#
+                    #Len( arguments.id ) ? 'id="#arguments.id#"' : ''#>
                     <i class="fas fa-#arguments.icon#"></i> #arguments.label#
                 </button>
             </cfoutput>

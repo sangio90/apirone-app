@@ -4,27 +4,27 @@ AP.widget.notify = function( type, message, title ) {
     var stack_bar_top = { dir1: "down", dir2: "right", push: "top", spacing1: 0, spacing2: 0 };
 
     var icon = "";
-    var title = "";
+    var finalTitle = title;
 
     switch ( type ) {
     case "error":
         icon = "fas fa-exclamation-circle";
-        title = title ? title : "Errore";
+        finalTitle = title ? title : "Errore";
         break;
 
     case "info":
         icon = "fas fa-info-circle";
-        title = title ? title : "Info";
+        finalTitle = title ? title : "Info";
         break;
 
     case "warning":
         icon = "fas fa-exclamation-triangle";
-        title = title ? title : "Attenzione";
+        finalTitle = title ? title : "Attenzione";
         break;
 
     case "success":
         icon = "fas fa-check-circle";
-        title = title ? title : "Completato";
+        finalTitle = title ? title : "Completato";
         break;
 
     default:
@@ -35,7 +35,7 @@ AP.widget.notify = function( type, message, title ) {
     var notice = new PNotify( {
         delay: 3000,
         type: type,
-        title: title,
+        title: finalTitle,
         text: message,
         addclass: "stack-bar-top",
         width: "100%",
