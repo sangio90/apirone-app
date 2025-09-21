@@ -2,8 +2,7 @@
 
 	this.memento = {
 		defaultIncludes = [
-			"frameCellId",
-			"frameId",
+			"id",
 			"row",
 			"col",
 			"value"

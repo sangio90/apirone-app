@@ -25,6 +25,10 @@ AP.frame.list = ( function() {
     var pub = {};
     var fields = AP.frame.fields;
 
+    var onSave = function() {
+        viewModel.get( "row" ).read;
+    };
+
     var dataSource = NM.kendo.dataSource( { url: "/manager/ajax/frames" } );
 
     var viewModel = kendo.observable( {
@@ -50,11 +54,10 @@ AP.frame.list = ( function() {
         },
 
         new: function() {
-            AP.frame.modal.new();
-        },
 
-        addNew: function() {
-            AP.frame.modal.open();
+            console.log( "onSave", onSave );
+
+            AP.frame.modal.new( onSave );
         },
 
         showDetail: function( e ) {
@@ -67,11 +70,6 @@ AP.frame.list = ( function() {
         if ( !AP.frame.fields.listRoot.length ) { return; }
 
         kendo.bind( AP.frame.fields.listRoot, viewModel );
-
-        AP.frame.fields.searchForm.on( "submit", function( e ) {
-            e.preventDefault();
-            viewModel.search();
-        } );
 
     };
 
@@ -111,6 +109,11 @@ AP.frame.modal = ( function() {
         gridCols: 3,
         cellsMatrix: [],
         loading: false,
+        callbacks: {
+            onCreate: undefined,
+            onUpdate: undefined,
+            onLoad: undefined
+        },
 
         reset: function() {
             this.set( "frame", {
@@ -212,8 +215,8 @@ AP.frame.modal = ( function() {
                 this.set( "loading", true );
 
                 NM.util.ajax( {
-                    method: "GET",
-                    url: "/ajax/frames",
+                    method: "POST",
+                    url: "/manager/ajax/frames",
                     data: JSON.stringify( frame ),
                     callback: {
                         done: function( xhr ) {
@@ -221,13 +224,12 @@ AP.frame.modal = ( function() {
                                 NM.util.showSuccess( xhr.message || "Armatura salvata con successo" );
                                 self.set( "frame", xhr.data );
 
-                                // Aggiorna la griglia nella lista
-                                if ( AP.frame.list.viewModel.dataSource ) {
-                                    AP.frame.list.viewModel.dataSource.read();
-                                }
+                                AP.util.fireCallback( "onSave", viewModel.get( "callbacks" ) );
+
                             } else {
                                 NM.util.showError( xhr.message || "Errore durante il salvataggio" );
                             }
+
                             self.set( "loading", false );
 
                         },
@@ -287,13 +289,19 @@ AP.frame.modal = ( function() {
 
     } );
 
-
     pub.edit = function( frameId ) {
         viewModel.load( frameId );
         AP.frame.fields.detailRoot.modal( "show" );
     };
 
-    pub.new = function( frameId ) {
+    pub.new = function( onCreate ) {
+
+        console.log( "onCreate", onCreate );
+
+        if( onCreate ) {
+            viewModel.set( "callbacks.onCreate", onCreate );
+        }
+
         AP.frame.fields.detailRoot.modal( "show" );
     };
 

@@ -6,7 +6,8 @@
 			"frame",
 			"code",
 			"orientationId",
-			"cellOrientationId"
+			"cellOrientationId",
+			"status"
 		],
 		profiles = {
 			list = {
@@ -18,22 +19,13 @@
 					"cellOrientationId"
 				]
 			},
-			detail = {
-				defaultIncludes = [
-					"id",
-					"frame",
-					"code",
-					"orientationId",
-					"cellOrientationId",
-					"cells"
-				]
-			}
 		}
 	};
 
 	property name="code" type="String";
 	property name="orientation" type="com.apirone.core.model.bean.Orientation";
 	property name="cellOrientation" type="com.apirone.core.model.bean.Orientation";
+	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="cells" type="com.apirone.core.model.bean.FrameCell[]";
 
 	public Frame function init(){

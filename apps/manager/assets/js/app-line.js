@@ -518,15 +518,10 @@ AP.line.products = ( function() {
                                     1000,
                                 );
 
-                                AP.util.fireCallback(
-                                    "onSave",
-                                    viewModel.get( "callback" ),
-                                );
 
-                                setTimeout(
-                                    () => window.location.reload(),
-                                    1000,
-                                );
+                                var callback = viewModel.isUpdate() ? "onUpdate" : "onCreate";
+                                AP.util.fireCallback( callback, viewModel.get( "callback" ) );
+
                             }
                         },
                     },

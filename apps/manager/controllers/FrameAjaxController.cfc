@@ -48,18 +48,33 @@
 
 		var thisId     = "";
 		var messageId  = "";
-		var categories = [];
+		var cells = [];
 
 		var result = super.getResult();
 		var frame  = super.bean( "Frame" );
 		var status = super.bean( "Status" );
+		var orientation = super.bean( "Orientation" );
+		var cellOrientation = super.bean( "Orientation" );
 
 		frame.setId( json?.id );
 		frame.setCode( json.code );
 		frame.setName( json.name );
-
 		frame.setStatus( status.setId( json.status.id ) );
+		frame.setOrientation( orientation.setId( json.Orientation.id ) );
+		frame.setCellOrientation( cellOrientation.setId( json.cellOrientation.id ) );
 
+		for( var cell in json.cells ) {
+
+			var cell = super.bean( "FrameCell" );
+
+			cell.setRow( cell.row )
+			cell.setCol( cell.col )
+			cell.setValue( cell.value )
+
+			cells.add( cell )
+
+		}
+		
 		if ( !Len( json.id ) ) {
 			messageId = "frame.created";
 			thisId    = super.fire( "frame.create", [ frame ] )
