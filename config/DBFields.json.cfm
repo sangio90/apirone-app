@@ -233,5 +233,22 @@
         "name": "created_at",
         "type": "Date"
     },
+    "frameCell.id": {
+        "name": "frame_cell_id",
+        "type": "Integer"
+    },
+    
+    "frame.id": {
+        "name": "frame_id",
+        "type": "uuid"
+    },
+    "frame.code": {
+        "name": "code",
+        "type": "String"
+    },
+    "frame.createdAt": {
+        "name": "created_at",
+        "type": "Date"
+    },
 
 }

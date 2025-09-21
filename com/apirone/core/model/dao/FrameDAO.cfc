@@ -1,13 +1,13 @@
 ﻿<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction name="read">
-		<cfargument name="lineId" type="String" required="true">
+		<cfargument name="frameId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT frame_id::varchar, *
 			FROM
 				frames
 			WHERE
-				frame_id = <cfqueryparam cfsqltype="varchar" value="#arguments.lineId#">::uuid
+				frame_id = <cfqueryparam cfsqltype="varchar" value="#arguments.frameId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -33,6 +33,8 @@
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="Numeric">
 		<cfargument name="orientationId" type="Varchar">
+		<cfargument name="cellOrientationId" type="Varchar">
+		<cfargument name="statusId" type="Varchar">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -51,14 +53,18 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.orientationId )>
-					AND frames.orientation_id = <cfqueryparam cfsqltype="Integer" value="#arguments.catalogBundleCategoryId#">
+					AND frames.orientation_id = <cfqueryparam cfsqltype="Integer" value="#arguments.orientationId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.cellOrientationId )>
+					AND frames.cell_orientation_id = <cfqueryparam cfsqltype="Integer" value="#arguments.cellOrientationId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
 					AND
 					(
 						frames.code ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
-						OR frames.line ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
+						OR frames.frame ILIKE <cfqueryparam cfsqltype="Varchar" value="%#arguments.str#%">
 					)
 				</cfif>
 
@@ -77,28 +83,24 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="String" output="false">
-		<cfargument name="line" type="com.apirone.core.model.bean.Line" required="true">
+		<cfargument name="frame" type="com.apirone.core.model.bean.Frame" required="true">
 
 		<cfset var categories = super.getCategoriesAsArray( line.getCategories() )>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO frames (
 				code,
-				line,
+				frame,
 				status_id,
-				<!--- product_category_id, --->
-				<!--- thickness_id, --->
-				orderby,
-				categories
+				orientation_id,
+				cell_orientation_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.line.getCode()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
-				<!--- <cfqueryparam cfsqltype="Integer" value="#arguments.line.getCategory().getId()#"> --->
-				<!--- <cfqueryparam cfsqltype="Integer" value="#arguments.line?.getTickness()?.getId()#"> --->
-				10,
-				'#SerializeJSON( categories )#'
+				<cfqueryparam cfsqltype="varchar" value="#arguments.frame.getCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getName()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getStatus().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getOrientation().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getCellOrientation().getId()#">
 			) RETURNING frame_id
 		</cfquery>
 
@@ -106,92 +108,37 @@
 	</cffunction>
 
 	<cffunction name="update" returntype="String">
-		<cfargument name="line" type="com.apirone.core.model.bean.Line" required="true">
-
-		<cfset var categories = super.getCategoriesAsArray( line.getCategories() )>
+		<cfargument name="frame" type="com.apirone.core.model.bean.Frame" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
 				frames
 			SET
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
-				line = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
-				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getCode()#">,
-				orderby = 20,
-				categories = '#SerializeJSON( categories )#'
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getStatus().getId()#">,
+				frame = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getName()#">,
+				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getCode()#">,
+				orientation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getOrientation().getId()#">,
+				cell_orientation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getCellOrientation().getId()#">
 			WHERE
-				frame_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getId()#">::uuid
+				frame_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getId()#">::uuid
 		</cfquery>
 
-		<cfreturn arguments.line.getId()>
+		<cfreturn arguments.frame.getId()>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">
-		<cfargument name="lineId" type="String" required="true">
+		<cfargument name="frameId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM
 				frames
 			WHERE
-				frame_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+				frame_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frameId#">::uuid
 			RETURNING frame_id
 		</cfquery>
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
 
-	<cffunction name="findCells" returntype="Query">
-		<cfargument name="frameId" type="string" required="true">
-
-		<cfquery name="local.q" datasource="apirone">
-			SELECT
-				frame_cell_id,
-				frame_id,
-				row,
-				col,
-				value
-			FROM
-				frame_cells
-			WHERE
-				frame_id = <cfqueryparam cfsqltype="varchar" value="#frameId#">::uuid
-			ORDER BY
-				row, col
-		</cfquery>
-
-		<cfreturn local.q>
-	</cffunction>
-
-	<cffunction name="deleteCells" returntype="Query">
-		<cfargument name="frameId" type="string" required="true">
-
-		<cfquery name="local.qDeleteCells" datasource="apirone">
-			DELETE FROM frame_cells
-			WHERE frame_id = <cfqueryparam cfsqltype="varchar" value="#arguments.frameId#">::uuid
-		</cfquery>
-
-		<cfreturn true>
-	</cffunction>
-
-	<cffunction name="saveCells" returntype="Boolean">
-		<cfargument name="cells" type="com.apirone.core.model.bean.FrameCell[]" required="true">
-
-		<cfloop array="#arguments.cells#" index="cell">
-			<cfquery name="local.qInsertCell" datasource="apirone">
-				INSERT INTO frame_cells (
-					frame_id,
-					row,
-					col,
-					value
-				) VALUES (
-					<cfqueryparam cfsqltype="varchar" value="#arguments.cell.getFrameId()#">::uuid,
-					<cfqueryparam cfsqltype="integer" value="#arguments.cell.getRow()#">,
-					<cfqueryparam cfsqltype="integer" value="#arguments.cell.getCol()#">,
-					<cfqueryparam cfsqltype="varchar" value="#arguments.cell.getValue()#">
-				)
-			</cfquery>
-		</cfloop>
-
-		<cfreturn true>
-	</cffunction>
 </cfcomponent>
 
