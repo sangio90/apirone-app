@@ -201,6 +201,7 @@
 		*/
 		get( "/ajax/frames/code-exists" ).toHandler( "FrameAjaxController.codeExists" );
 		get( "/ajax/frames/:id" ).toHandler( "FrameAjaxController.get" );
+		post( "/ajax/frames" ).toHandler( "FrameAjaxController.save" );
 		get( "/ajax/frames" ).toHandler( "FrameAjaxController.list" );
 		get( "/frames" ).toHandler( "FrameController.list" );
 
@@ -215,8 +216,8 @@
 		/*
 			files
 		*/
-
 		delete( "/ajax/files/:id" ).to( "FileAjaxController.delete" ).end();
+
 
 		/*
 			products
@@ -245,6 +246,7 @@
 		get( "/products/category/:id" ).to( "ProductController.listByCategoryId" ).end();
 		get( "/products/:id" ).to( "ProductController.detail" ).end();
 		get( "/products" ).to( "ProductController.list" ).end();
+
 
 		/*
 			product category
@@ -324,10 +326,10 @@
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		post("/ajax/quotations").to( "QuotationAjaxController.save" ).end();
 		
-		delete( "/ajax/quotationitems/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
-		get( "/ajax/quotationitems/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
-		get( "/ajax/quotationitems" ).to( "QuotationItemAjaxController.list" ).end();
-		post("/ajax/quotationitems").to( "QuotationItemAjaxController.save" ).end();
+		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
+		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
+		get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
+		post("/ajax/quotation-items").to( "QuotationItemAjaxController.save" ).end();
 		
 
 		/*

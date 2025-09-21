@@ -286,7 +286,7 @@ AP.signage.modal = ( function() {
             if ( e.data.id != "" ) {
                 NM.util.ajax( {
                     method: "DELETE",
-                    url: "/manager/ajax/quotationitems/signagerow",
+                    url: "/manager/ajax/quotation-items/signagerow",
                     data: { id: e.data.id },
                     callback: {
                         done: function( xhr ) {
@@ -443,7 +443,7 @@ AP.signage.modal = ( function() {
 
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/quotationitems",
+                    url: "/manager/ajax/quotation-items",
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
@@ -500,7 +500,7 @@ AP.signage.modal = ( function() {
 
         NM.util.ajax( {
             method: "GET",
-            url: "/manager/ajax/quotationitems/signage/" + id,
+            url: "/manager/ajax/quotation-items/signage/" + id,
             callback: {
                 done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
