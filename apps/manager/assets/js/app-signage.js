@@ -448,7 +448,11 @@ AP.signage.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERRORE" ) {
-                                AP.widget.notify( "error", "Errore nel salvataggio della segnaletica." );
+                                if (xhr.data && xhr.data.error) {
+                                    AP.widget.notify( "error", xhr.data.error );
+                                } else {
+                                    AP.widget.notify( "error", "Errore nel salvataggio della segnaletica." );
+                                }
                             }
                             if ( xhr.status == "SUCCESS" ) {
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );

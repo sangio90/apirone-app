@@ -92,8 +92,8 @@ component extends="com.apirone.core.controller.AbsController" {
 					)
 					.getData();
 				if ( !Len( product ) || Len( product ) > 1 ) {
-					var message = "Prodotto non valido.";
-					result.setData( { "error" = e.message } );
+					var message = "Combinazione Linea/Modello/Categoria/Finitura non disponibile.";
+					result.setData( { "error" = message } );
 					result.setStatus( "ERRORE" );
 					event.setValue( "result", result );
 					return;
@@ -130,8 +130,8 @@ component extends="com.apirone.core.controller.AbsController" {
 					super.fire( messaggiId, [ signageRowBean ] );
 				}
 
-				var files = super.fire('File.search', { quotationItemId: id });
-				if (Len(files)) {
+				var files = super.fire('File.search', { quotationItemId: thisId });
+				if (Len(files.getData())) {
 					for (file in files.getData()) {
 						super.fire('File.delete', { fileId: file.getId() });
 					}
@@ -141,7 +141,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 				var kindId = "quotationItem";
 				entity.setKey( "quotationItem.id" );
-				entity.setValue( id );
+				entity.setValue( thisId );
 
 				var fileId = super.fire(
 					"file.create",
@@ -166,6 +166,41 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
 
 		event.setValue( "result", result );
+	}
+
+	function delete( event, rc, prc ) {
+		var result = super.getResult();
+		var id     = GetHTTPRequestData().content;
+		var payload = "";
+
+		try {
+			transaction {
+				var files = super.fire( 'file.list', { quotationItemId: id } );
+				
+				for (file in files) {
+					var outcome = super.fire( "file.delete", [ file.getId() ] );
+				}
+				var signageRows = super.fire( 'quotationItemSignageRow.list', { quotationItemId: id } );
+
+				for (signageRow in signageRows) {
+					var outcome = super.fire( "quotationItemSignageRow.delete", [ signageRow.getId() ] );
+				}
+
+				var outcome = super.fire("quotationItem.delete", [ id ]);
+
+				if (outcome.getStatus() == "ERROR") {
+					transaction action="rollback";
+					result.setStatus("ERRORE");
+					result.setMessage(outcome.getMessage());
+				}
+			}
+		} catch(any e) {
+			try { transaction action="rollback"; } catch(any _) {}
+			result.setStatus("ERRORE");
+		}
+
+		result.setData({ "payload" = payload });
+		event.setValue("result", result);
 	}
 
 }

@@ -167,6 +167,30 @@ AP.quotationDetail.detail = ( function() {
 
         resetForm: function() {},
 
+        delete: function( event ) {
+            event.stopPropagation();
+            event.preventDefault();
+            var id = event.currentTarget.dataset.id
+
+            NM.util.ajax( {
+                    method: "DELETE",
+                    url: "/manager/ajax/quotation-items",
+                    data: id,
+                    callback: {
+                        done: function( xhr ) {
+                            if( xhr.status == "ERRORE" ) {
+                                AP.widget.notify( "error", "Errore nella cancellazione della riga di preventivo." );
+                            }
+                            if ( xhr.status == "SUCCESS" ) {
+                                AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
+                                viewModel.set( "detailForm", defaultDetailForm );
+                                window.location.href = "/manager/quotations/" + AP.page.quotation.id;
+                            }
+                        }
+                    }
+                } );
+        },
+
         save: function( event ) {
             var detailFormDom = AP.quotationDetail.fields.detailForm;
 
@@ -242,8 +266,12 @@ AP.quotationDetail.detail = ( function() {
                                 AP.widget.notify( "error", "Errore nel recupero delle zone." );
                             }
                             if ( xhr.status == "SUCCESS" ) {
-                                var zones = xhr.data.length ? xhr.data : [ { "id": "", "name": "Tutte le zone" } ];
-                                zones.unshift( { "id": "", "name": "Tutte le zone" } );
+                                if (xhr.data.length) {
+                                    var zones = xhr.data;
+                                    zones.unshift( { "id": "", "name": "Tutte le zone" } );
+                                } else {
+                                    var zones = [ { "id": "", "name": "Tutte le zone" } ];
+                                }
                                 zones.forEach( function( zone ) {
                                     if ( zone.origin ) {
                                         zone.name = "\u00A0\u00A0- " + zone.name;
@@ -265,7 +293,7 @@ AP.quotationDetail.detail = ( function() {
 
         getItems: function( e ) {
             if ( viewModel.detailForm.data.zone.name != "" ) {
-                var url = "/manager/ajax/quotationitems?quotationId=" + AP.page.quotation.id;
+                var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id;
                 if ( viewModel.detailForm.data.zone ) {
                     url = url + "&quotationZoneId=" + viewModel.detailForm.data.zone.id;
                 }
@@ -278,7 +306,6 @@ AP.quotationDetail.detail = ( function() {
                                 AP.widget.notify( "error", "Errore nel recupero delle righe." );
                             }
                             if ( xhr.status == "SUCCESS" ) {
-                                debugger
                                 viewModel.get( "quotationItems" ).data( xhr.data );
                             }
                         }
