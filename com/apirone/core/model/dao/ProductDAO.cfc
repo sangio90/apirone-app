@@ -55,7 +55,12 @@
 				COUNT(product_id) OVER() AS total
 			FROM
 				products
-					INNER JOIN product_categories USING ( product_category_id )
+					INNER JOIN catalog_bundles USING ( catalog_bundle_id )
+					INNER JOIN product_categories
+						ON (
+							(products.catalog_bundle_id IS NULL AND product_categories.product_category_id = products.product_category_id)
+							OR (products.catalog_bundle_id IS NOT NULL AND product_categories.product_category_id = catalog_bundles.product_category_id)
+					 )
 					<cfif !IsNull( arguments.str )>
 						INNER JOIN texts USING ( product_id )
 					</cfif>
@@ -66,34 +71,34 @@
 					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 				</cfif>
 
-				<!--- TODO: move to bundle --->
-				<cfif !IsNull( arguments.lineId )>
-					AND products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
-				</cfif>
-
 				<cfif !IsNull( arguments.finishId )>
 					AND products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 				</cfif>
 
-				<cfif !IsNull( arguments.catalogBundleId )>
-					AND products.catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundleId#">::uuid
-				</cfif>
+                <cfif !IsNull(arguments.catalogBundleId)>
+                    AND products.catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundleId#">::uuid
+                </cfif>
 
-				<!--- TODO: move to bundle --->
-				<cfif !IsNull( arguments.modelId )>
-					AND products.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
-				</cfif>
+                <cfif !IsNull(arguments.modelId)>
+                    AND catalog_bundles.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
+                </cfif>
 
-				<cfif !IsNull( arguments.excludedCategoryIds ) AND ArrayLen( arguments.excludedCategoryIds )>
-					AND products.product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">)
-				</cfif>
+                <cfif !IsNull(arguments.lineId)>
+                    AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+                </cfif>
 
-				/*
-					TODO: move to bundle (cercare anche in catalog_bundle.category_id,
-					verificare se categoryModeId è sempre valorizzato )
-				*/
-				<cfif !IsNull( arguments.categoryId )>
-					AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">
+                <cfif !IsNull(arguments.categoryId)>
+                    AND (
+                        (products.catalog_bundle_id IS NULL AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
+                        OR (catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
+                    )
+                </cfif>
+
+				<cfif !IsNull(arguments.excludedCategoryIds) AND ArrayLen(arguments.excludedCategoryIds)>
+					AND (
+						(products.catalog_bundle_id IS NULL AND products.product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">))
+						OR (products.catalog_bundle_id IS NOT NULL AND catalog_bundles.product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">))
+					)
 				</cfif>
 
 				<cfif !IsNull( arguments.categoryModeId )>
@@ -159,7 +164,7 @@
 				<cfif IsInstanceOf( arguments.product, "com.apirone.core.model.bean.ProductBase" )>
 					<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">
 				<cfelse>
-					<cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">
+					NULL
 				</cfif>
 				,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">,
@@ -232,7 +237,7 @@
 				</cfif>
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
 			WHERE
-					product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid
+				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid
 		</cfquery>
 
 		<cfreturn arguments.product.getId()>

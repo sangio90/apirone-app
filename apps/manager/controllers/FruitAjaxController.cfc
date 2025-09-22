@@ -53,7 +53,7 @@
 		var result = super.getResult();
 		var lines  = [];
 
-		var fruit    = super.bean( "Product" );
+		var fruit    = super.bean( "ProductBase" );
 		var category = super.bean( "ProductCategory" );
 		var status   = super.bean( "Status" );
 

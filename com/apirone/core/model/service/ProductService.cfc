@@ -172,35 +172,44 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	public String function create( required com.apirone.core.model.bean.Product product ){
-		if ( IsInstanceOf( arguments.product, "com.apirone.core.model.bean.ProductComplex" ) ) {
-			var catalogBundleId = getCatalogBundleService().getOrCreate( arguments.product.getCatalogBundle() );
-			arguments.product.setCatalogBundle( catalogBundleId );
+		if ( IsInstanceOf(product, "com.apirone.core.model.bean.ProductComplex") ) {
+			var cb = super.bean("CatalogBundle");
+			cb.setLine(product.getLine());
+			cb.setModel(product.getModel());
+			cb.setCategory(product.getCategory());
+
+			var catalogBundle = getCatalogBundleService().getOrCreate(cb);
+			product.setCatalogBundle(catalogBundle);
 		}
-		var newId = getDao().insert( arguments.product );
 
-		if (
-			!IsNull( arguments.product.getTexts() )
-			AND arguments.product.getTexts().len()
-		) {
+		var newId = getDao().insert(product);
+
+		if(!IsNull(product.getTexts()) AND product.getTexts().len()){
 			transaction {
-				for ( var text in arguments.product.getTexts() ) {
-					var entity = super.bean( "Entity" );
-
-					entity.setKey( "product.id" );
-					entity.setValue( newId );
-
-					text.setEntity( entity );
+				for(var text in product.getTexts()){
+					var entity = super.bean("Entity");
+					entity.setKey("product.id");
+					entity.setValue(newId);
+					text.setEntity(entity);
 				}
-
-				getTextService().bulkCreate( arguments.product.getTexts() );
+				getTextService().bulkCreate(product.getTexts());
 			}
 		}
 
 		return newId;
 	}
 
-
 	public String function update( required com.apirone.core.model.bean.Product product ){
+		if ( IsInstanceOf(product, "com.apirone.core.model.bean.ProductComplex") ) {
+			var cb = super.bean("CatalogBundle");
+			cb.setLine(product.getLine());
+			cb.setModel(product.getModel());
+			cb.setCategory(product.getCategory());
+
+			var catalogBundle = getCatalogBundleService().getOrCreate(cb);
+			product.setCatalogBundle(catalogBundle);
+		}
+
 		getDao().update( arguments.product );
 
 		var id = arguments.product.getId();
