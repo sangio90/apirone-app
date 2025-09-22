@@ -218,7 +218,7 @@ AP.frame.modal = ( function() {
         updateCellsMatrix: function() {
             var rows = this.get( "gridRows" );
             var cols = this.get( "gridCols" );
-            var cells = this.get( "frame.cells" ) || [];
+            // var cells = this.get( "frame.cells" ) || [];
             var matrix = [];
 
             // Inizializza matrice vuota con rowIndex
@@ -230,6 +230,7 @@ AP.frame.modal = ( function() {
             }
 
             // Popola la matrice con i valori esistenti
+            /*
             cells.forEach( function( cell ) {
                 if ( cell.row < rows && cell.col < cols ) {
                     matrix[cell.row][cell.col] = {
@@ -239,6 +240,7 @@ AP.frame.modal = ( function() {
                     };
                 }
             } );
+            */
 
             console.log( "matrix", matrix );
 
@@ -302,13 +304,17 @@ AP.frame.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        self.set( "frame", xhr.data );
+                        console.log( "xhr.data", xhr.data );
+
+                        self.set( "detailForm.data", xhr.data );
+                        self.set( "detailForm.title", "Modifica armatura < " + xhr.data.name + " >" );
 
                         // Calcola il numero di righe e colonne necessario
                         var maxRow = 0;
                         var maxCol = 0;
 
                         if ( xhr.data.cells && xhr.data.cells.length ) {
+
                             xhr.data.cells.forEach( function( cell ) {
                                 maxRow = Math.max( maxRow, cell.row );
                                 maxCol = Math.max( maxCol, cell.col );

@@ -18,7 +18,7 @@ CREATE TABLE frame_cells (
     frame_id UUID NOT NULL,
     row INTEGER NOT NULL,
     col INTEGER NOT NULL,
-    value CHAR(1) CHECK (value IN ('0', '_')),
+    value CHAR(1),
     CONSTRAINT frames_fk FOREIGN KEY (frame_id) REFERENCES frames(frame_id)
 );
 
@@ -48,7 +48,7 @@ ALTER TABLE public.frames
 
 UPDATE statuses 
 SET entities = '["LINE", "ATTRIBUTE", "FINISH", "MODEL", "ACCOUNT", "PRODUCTION_TIME", "PRODUCT_CATEGORY", "PRODUCT", "RAW_VALUE", "METADATA_TYPE", "FRAME"]'
-WHERE status_id in ('ACT', 'DEA');    
+WHERE status_id in ('ACT', 'DEA');
 
 
 -- object recreation

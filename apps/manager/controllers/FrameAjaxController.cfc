@@ -27,7 +27,7 @@
 
 		var bean = super.fire( "frame.get", [ rc.id ] );
 
-		var obj = super.getMementify().convert( bean, "list" );
+		var obj = super.getMementify().convert( bean, "detail" );
 
 		result.setData( obj );
 
