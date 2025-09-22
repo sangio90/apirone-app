@@ -157,6 +157,11 @@ AP.signage.modal = ( function() {
         },
 
         parseLines: function( e ) {
+            if (viewModel.get('detailForm.data.quotationItem.signageConfigItem.id') != '') {
+                $('#signageFont').prop("disabled", true);
+            } else {
+                $('#signageFont').prop("disabled", false);
+            }
             viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( signageRow => {
                 this.parsedLineContent( signageRow.content, signageRow.id );
             } );
@@ -347,6 +352,11 @@ AP.signage.modal = ( function() {
         },
 
         loadModels: function( event ) {
+            if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.id') != '') {
+                $('#signangeProductCategory').prop("disabled", true);
+            } else {
+                $('#signangeProductCategory').prop("disabled", false);
+            }
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
@@ -362,6 +372,11 @@ AP.signage.modal = ( function() {
         },
 
         loadFinishes: function( event ) {
+            if (viewModel.get('detailForm.data.signageConfig.catalogBundle.model.id') != '') {
+                $('#signageRow').prop("disabled", true);
+            } else {
+                $('#signageRow').prop("disabled", false);
+            }
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
@@ -377,6 +392,11 @@ AP.signage.modal = ( function() {
         },
 
         loadSignageConfigs: function( event ) {
+            if (viewModel.get('detailForm.data.quotationItem.product.finish.id') != '') {
+                $('#signageModel').prop("disabled", true);
+            } else {
+                $('#signageModel').prop("disabled", false);
+            }
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/signage-configs?categoryId="
@@ -410,6 +430,11 @@ AP.signage.modal = ( function() {
         },
 
         loadFontSizes: function() {
+            if (viewModel.get('detailForm.data.signageConfig.font.id') != '') {
+                $('#signageFinish').prop("disabled", true);
+            } else {
+                $('#signageFinish').prop("disabled", false);
+            }
             var signageConfig = viewModel.getSignageConfig();
             if ( signageConfig ) {
                 const exists = viewModel.getSignageConfig().items.some( item => item.id === "" );
