@@ -169,18 +169,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-
-
 	public String function create( required com.apirone.core.model.bean.Product product ){
-		if ( IsInstanceOf(product, "com.apirone.core.model.bean.ProductComplex") ) {
-			var cb = super.bean("CatalogBundle");
-			cb.setLine(product.getLine());
-			cb.setModel(product.getModel());
-			cb.setCategory(product.getCategory());
 
-			var catalogBundle = getCatalogBundleService().getOrCreate(cb);
-			product.setCatalogBundle(catalogBundle);
-		}
+		var product = this.handleCatalogBundle( arguments.product );
 
 		var newId = getDao().insert(product);
 
@@ -200,22 +191,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function update( required com.apirone.core.model.bean.Product product ){
-		if ( IsInstanceOf(product, "com.apirone.core.model.bean.ProductComplex") ) {
-			var cb = super.bean("CatalogBundle");
-			cb.setLine(product.getLine());
-			cb.setModel(product.getModel());
-			cb.setCategory(product.getCategory());
+		
+		var product = this.handleCatalogBundle( arguments.product );
 
-			var catalogBundle = getCatalogBundleService().getOrCreate(cb);
-			product.setCatalogBundle(catalogBundle);
-		}
+		getDao().update( product );
 
-		getDao().update( arguments.product );
+		var id = product.getId();
 
-		var id = arguments.product.getId();
-
-		if ( !IsNull( arguments.product.getTexts() ) ) {
-			for ( var text in arguments.product.getTexts() ) {
+		if ( !IsNull( product.getTexts() ) ) {
+			for ( var text in product.getTexts() ) {
 				var entity = super.bean( "Entity" )
 
 				entity.setKey( "product.id" );
@@ -231,15 +215,33 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.product.getId() );
+		super.getCacheManager().remove( getCacheScope(), product.getId() );
 
-		return arguments.product.getId();
+		return product.getId();
 	}
 
 
 	/*
     	private method
 	*/
+
+	// normalize data  for catalogBundle
+	private com.apirone.core.model.bean.Product function handleCatalogBundle( required com.apirone.core.model.bean.Product product ){
+
+		if ( IsInstanceOf(product, "com.apirone.core.model.bean.ProductComplex") ) {
+			var cb = super.bean("CatalogBundle");
+			cb.setLine(product.getLine());
+			cb.setModel(product.getModel());
+			cb.setCategory(product.getCategory());
+
+			var catalogBundle = getCatalogBundleService().getOrCreate(cb);
+			product.setCatalogBundle(catalogBundle);
+
+		}
+
+		return product;
+
+	}
 
 	private com.apirone.core.model.bean.Product function build( required String productId ){
 		var record = getDao().read( arguments.productId );
