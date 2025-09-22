@@ -8,7 +8,7 @@
 				<span data-bind="text: code"></span>
 			</td>
 			<td>
-				<span data-bind="text: frame"></span>
+				<span data-bind="text: name"></span>
 			</td>
 			<td>
 				<span data-bind="text: orientation.name"></span>

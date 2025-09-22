@@ -85,8 +85,6 @@
 	<cffunction name="insert" returntype="String" output="false">
 		<cfargument name="frame" type="com.apirone.core.model.bean.Frame" required="true">
 
-		<cfset var categories = super.getCategoriesAsArray( line.getCategories() )>
-
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO frames (
 				code,

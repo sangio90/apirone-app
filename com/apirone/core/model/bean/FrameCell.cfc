@@ -14,7 +14,7 @@
 	property name="value" type="String" default="";
 	property name="frameId" type="String";
 
-	public Frame function init(){
+	public FrameCell function init(){
 		return this;
 	}
 

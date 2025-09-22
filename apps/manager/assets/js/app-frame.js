@@ -101,6 +101,31 @@ AP.frame.modal = ( function() {
         }
     };
 
+    var cellsToArray = function() {
+        /*
+            from array of array:
+                [ //col
+                    [{},{}] //row
+                    [{},{}]
+                ]
+            to plain array
+        */
+        var matrix = viewModel.get( "cellsMatrix" );
+        var cells = [];
+
+        for ( var i = 0; i < matrix.length; i++ ) {
+            for ( var j = 0; j < matrix[i].length; j++ ) {
+                cells.push( {
+                    row: i,
+                    col: j,
+                    value: matrix[i][j].value
+                } );
+            }
+        }
+
+        return cells;
+    };
+
     var viewModel = kendo.observable( {
         detailForm: defaultForm,
         orientations: AP.page.orientations,
@@ -167,7 +192,7 @@ AP.frame.modal = ( function() {
             for ( var i = 0; i < rows; i++ ) {
                 matrix[i] = [];
                 for ( var j = 0; j < cols; j++ ) {
-                    matrix[i][j] = { value: "_", rowIndex: i, colIndex: j }; // aggiungi rowIndex e colIndex
+                    matrix[i][j] = { value: "_", row: i, col: j }; // aggiungi rowIndex e colIndex
                 }
             }
 
@@ -176,43 +201,32 @@ AP.frame.modal = ( function() {
                 if ( cell.row < rows && cell.col < cols ) {
                     matrix[cell.row][cell.col] = {
                         value: cell.value,
-                        rowIndex: cell.row,
-                        colIndex: cell.col
+                        row: cell.row,
+                        col: cell.col
                     };
                 }
             } );
 
+            console.log( "matrix", matrix );
+
             this.set( "cellsMatrix", matrix );
-        },
-
-        cellsToArray: function() {
-            var matrix = this.get( "cellsMatrix" );
-            var cells = [];
-
-            for ( var i = 0; i < matrix.length; i++ ) {
-                for ( var j = 0; j < matrix[i].length; j++ ) {
-                    cells.push( {
-                        row: i,
-                        col: j,
-                        value: matrix[i][j] || "_"
-                    } );
-                }
-            }
-
-            return cells;
         },
 
         save: function() {
 
             var thisForm = fields.detailForm;
+            var status = $( "footer .status" );
 
             if ( thisForm.valid() ) {
 
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
                 var self = this;
                 var frame = this.get( "detailForm.data" );
-                frame.cells = this.cellsToArray();
+                frame.cells = cellsToArray();
+                console.log( "cells", frame.cells );
 
-                this.set( "loading", true );
+                console.log( "frame.cells", frame.cells );
 
                 NM.util.ajax( {
                     method: "POST",
@@ -220,17 +234,15 @@ AP.frame.modal = ( function() {
                     data: JSON.stringify( frame ),
                     callback: {
                         done: function( xhr ) {
-                            if ( xhr.success ) {
-                                NM.util.showSuccess( xhr.message || "Armatura salvata con successo" );
-                                self.set( "frame", xhr.data );
 
+                            status.html( "" );
+
+                            AP.widget.notify( "success", "Armatura salvata con successo", "Ok" );
+
+                            setTimeout( () => {
+                                $( "#account-detail-modal" ).modal( "hide" );
                                 AP.util.fireCallback( "onSave", viewModel.get( "callbacks" ) );
-
-                            } else {
-                                NM.util.showError( xhr.message || "Errore durante il salvataggio" );
-                            }
-
-                            self.set( "loading", false );
+                            }, 1000 );
 
                         },
                     },
@@ -305,12 +317,12 @@ AP.frame.modal = ( function() {
         AP.frame.fields.detailRoot.modal( "show" );
     };
 
-    pub.editCell = function( row, col, value ) {
+    pub.updateCell = function( row, col, value ) {
         // TODO: forse non serve
         var matrix = viewModel.get( "cellsMatrix" );
 
         if ( matrix[row] && matrix[row][col] !== undefined ) {
-            matrix[row][col] = value;
+            matrix[row][col].value = value;
             viewModel.set( "cellsMatrix", matrix );
         }
 

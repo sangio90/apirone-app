@@ -56,11 +56,11 @@
 							#grid(
 								id      = "frame-grid",
 								columns = "[
-								{ 'field': 'shortId', 'title': 'ID', 'width': '100px' },
+								{ 'field': 'shortId', 'title': 'ID', 'width': '80px' },
 								{ 'field': 'code', 'title': 'Codice', 'width': '100px' },
 								{ 'field': 'name', 'title': 'Nome' },
-								{ 'field': 'orientation.name', 'title': 'Orientamento', 'width': '120px' },
-								{ 'field': 'cellOrientation.name', 'title': 'Orientamento celle', 'width': '120px' },
+								{ 'field': 'orientation.name', 'title': 'Orient. armatura', 'width': '140px' },
+								{ 'field': 'cellOrientation.name', 'title': 'Orient. celle', 'width': '140px' },
 									{ 'field':'', 'title':'Modifica', width: '55px'},
 									{ 
 										'field'           :'', 

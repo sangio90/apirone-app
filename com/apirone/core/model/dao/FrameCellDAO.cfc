@@ -14,7 +14,7 @@
 	</cffunction>
 
 	<cffunction name="find" returntype="Query">
-		<cfargument name="frameId" type="Numeric">
+		<cfargument name="frameId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">

@@ -3,20 +3,23 @@
 	this.memento = {
 		defaultIncludes = [
 			"id",
-			"frame",
+			"shortId",
+			"name",
 			"code",
-			"orientationId",
-			"cellOrientationId",
+			"orientation",
+			"cellOrientation",
 			"status"
 		],
 		profiles = {
-			list = {
+			detail = {
 				defaultIncludes = [
 					"id",
-					"frame",
+					"shortId",
+					"name",
 					"code",
-					"orientationId",
-					"cellOrientationId"
+					"orientation",
+					"cellOrientation",
+					"cells"
 				]
 			},
 		}

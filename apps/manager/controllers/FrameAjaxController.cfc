@@ -63,13 +63,13 @@
 		frame.setOrientation( orientation.setId( json.Orientation.id ) );
 		frame.setCellOrientation( cellOrientation.setId( json.cellOrientation.id ) );
 
-		for( var cell in json.cells ) {
+		for( var thisCell in json.cells ) {
 
 			var cell = super.bean( "FrameCell" );
 
-			cell.setRow( cell.row )
-			cell.setCol( cell.col )
-			cell.setValue( cell.value )
+			cell.setRow( thisCell.row )
+			cell.setCol( thisCell.col )
+			cell.setValue( thisCell.value )
 
 			cells.add( cell )
 

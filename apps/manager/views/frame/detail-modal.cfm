@@ -111,11 +111,11 @@
                             --->
                             <div class="tab-pane fade" id="frame-nav-grid-tab" role="tabpanel" aria-labelledby="frame-nav-grid-but">
                                 <div class="mb-3 d-flex gap-2">
-                                    #addButton( id="add-row-btn", bind="click:addRow", size="sm", label="Aggiungi riga" )#
-                                    #removeButton( id="remove-row-btn", bind="click:removeRow", size="sm", label="Rimuovi riga" )#
+                                    #addButton( id="add-row-btn", bind="click:addRow", size="sm", label="Aggiungi riga", type="button" )#
+                                    #removeButton( id="remove-row-btn", bind="click:removeRow", size="sm", label="Rimuovi riga", type="button" )#
                                     &nbsp;&nbsp;
-                                    #addButton( id="add-col-btn", bind="click:addCol", size="sm", label="Aggiungi colonna" )#
-                                    #removeButton( id="remove-col-btn", bind="click:removeCol", size="sm", label="Rimuovi colonna" )#
+                                    #addButton( id="add-col-btn", bind="click:addCol", size="sm", label="Aggiungi colonna", type="button" )#
+                                    #removeButton( id="remove-col-btn", bind="click:removeCol", size="sm", label="Rimuovi colonna", type="button" )#
                                 </div>
                                 
                                 <div class="table-responsive">

@@ -55,13 +55,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create( required com.apirone.core.model.bean.Frame frame ){
+
 		var newId = getDao().insert( arguments.Frame );
+
+		if( ( !IsNull( arguments.frame.getCells() ) ) ) {
+			
+			for( var cell in arguments.frame.getCells() ) {
+				cell.setFrameId( newId );
+				getFrameCellService().create( cell );
+			}
+		
+		}
 
 		return newId;
 	}
 
 	public String function update( required com.apirone.core.model.bean.Frame frame ){
-		getDao().update( arguments.frame );
+
+		transaction {
+
+			getDao().update( arguments.frame );
+
+			getFrameCellService().deleteFromFrameId( arguments.frame.getId() );
+
+		}
+		
 
 		super.getCacheManager().remove( getCacheScope(), arguments.Frame.getId() );
 
@@ -73,7 +91,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if (
 			record.recordCount
-			&& record.Frame_id != arguments.excludedId
+			&& record.frame_id != arguments.excludedId
 		) {
 			return record.code == arguments.code;
 		}
@@ -112,6 +130,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+
 	/*
     	private method
 	*/
@@ -127,11 +146,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
 
-			bean.setOrientation( getLookupservice().get( "orientation",  orientation_id ) );
-			bean.setCellOrientation( getLookupservice().get( "orientation",  cell_orientation_id )  );
+			bean.setOrientation( getLookupservice().get( "orientation",  record.orientation_id ) );
+			bean.setCellOrientation( getLookupservice().get( "orientation",  record.cell_orientation_id )  );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
-			bean.setCells( super.getFrameCellService().list( record.frame_id ) );
+			bean.setCells( getFrameCellService().list( record.frame_id ) );
 
 			return bean;
 		}

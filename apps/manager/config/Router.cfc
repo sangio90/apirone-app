@@ -199,11 +199,11 @@
 		/*
 			frames
 		*/
-		get( "/ajax/frames/code-exists" ).toHandler( "FrameAjaxController.codeExists" );
-		get( "/ajax/frames/:id" ).toHandler( "FrameAjaxController.get" );
-		post( "/ajax/frames" ).toHandler( "FrameAjaxController.save" );
-		get( "/ajax/frames" ).toHandler( "FrameAjaxController.list" );
-		get( "/frames" ).toHandler( "FrameController.list" );
+		get( "/ajax/frames/code-exists" ).to( "FrameAjaxController.codeExists" ).end();
+		get( "/ajax/frames/:id" ).to( "FrameAjaxController.get" ).end();
+		post( "/ajax/frames" ).to( "FrameAjaxController.save" ).end();
+		get( "/ajax/frames" ).to( "FrameAjaxController.list" ).end();
+		get( "/frames" ).to( "FrameController.list" ).end();
 
 
 		/*
