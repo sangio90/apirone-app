@@ -24,9 +24,11 @@ ALTER TABLE public.line_prices
 ALTER TABLE public.line_prices
   ALTER COLUMN markup_value SET STORAGE PLAIN;
 
-
 ALTER TABLE public.line_prices
   RENAME TO product_category_lines;
 
 ALTER TABLE public.product_category_lines
   RENAME COLUMN line_price_id TO product_category_line_id;
+
+ALTER TABLE public.product_category_lines
+  RENAME COLUMN markup_value TO markup;

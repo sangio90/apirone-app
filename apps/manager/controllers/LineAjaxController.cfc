@@ -25,21 +25,28 @@ component extends="com.apirone.core.controller.AbsController" {
 	function listByCategoryId( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var mm     = super.getMementify();
+		var memy   = super.getMementify();
 
 		var params = super.paramsFromUrl();
 
 		var params[ "categoryId" ] = rc.categoryId;
 
-		var rows = super.fire( "line.search", params );
+		var lines = super.fire( "line.search", params );
 
-		for ( var row in rows.getData() ) {
-			var obj = mm.convert( row, "list" );
+		for ( var line in lines.getData() ) {
+			var lineCategory = super
+				.service( "ProductCategoryLine" )
+				.list( categoryId = rc.categoryId, lineId = line.getId() )
+
+			var obj = memy.convert( line, "list" );
+
+			obj[ "markup" ] = !IsNull( lineCategory ) ? lineCategory[ 1 ].getMarkup() : 0;
+
 			data.add( obj );
 		}
 
-		result.setTotal( rows.getTotal() );
-		result.setCount( rows.getCount() );
+		result.setTotal( lines.getTotal() );
+		result.setCount( lines.getCount() );
 		result.setData( data );
 
 		event.setValue( "result", result );
@@ -164,6 +171,33 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function saveMarkup( event, rc, prc ){
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		var thisId    = "";
+		var messageId = "productCategoryLine.created";
+
+		var result = super.getResult();
+
+		for ( var item in json._data ) {
+			var line     = super.bean( "Line" );
+			var category = super.bean( "ProductCategory" );
+			var bean     = super.bean( "productCategoryLine" );
+
+			bean.setLine( line.setId( item.id ) );
+			bean.setProductCategory( category.setId( rc.categoryId ) );
+			bean.setMarkup( item.markup );
+
+			super.fire( "productCategoryLine.create", [ bean ] )
+		}
+
+		var message = completeMessage( messageId );
+
+		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+
+		event.setValue( "result", result );
+	}
+
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
@@ -243,3 +277,4 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 }
+

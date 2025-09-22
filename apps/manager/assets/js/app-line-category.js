@@ -97,6 +97,40 @@ AP.lineCategory.list = ( function() {
             return false;
         },
 
+        save: function( event ) {
+
+            var rows = viewModel.get( "rows" );
+
+            var status = $( "#line-category-status" );
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+            NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/lines/categories/" + fields.listRoot.find( "[name=categoryId]" ).val(),
+                data: JSON.stringify( rows ),
+                callback: {
+                    done: function( xhr ) {
+                        if ( xhr.status == "SUCCESS" ) {
+                            // NM.util.autoHideMessage( status, "<span class='green'>Dati salvati nella linea</span>" );
+
+                            AP.widget.notify( "success", "Importi salvati con successo" );
+                            status.html( "" );
+
+                            viewModel.get( "rows" ).read();
+
+                            setTimeout( () =>
+                                $( fields.cloneModal ).modal( "hide" ), 1000
+                            );
+
+                        }
+                    },
+                },
+            } );
+
+            return false;
+        },
+
         change: function( event ) {
             var select = $( event.currentTarget );
             var categoryId = select.val();

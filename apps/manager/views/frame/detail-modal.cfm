@@ -134,7 +134,7 @@
                                 </p>
                                 
                                 <div class="alert alert-info mt-3">
-                                    <small>Inserisci "0" per posizione occupata o "_" per posizione vuota</small>
+                                    <small>Inserisci "0" per posizione non utilizzabile o "_" per posizione utilizzabile.</small>
                                 </div>
                             </div>
 

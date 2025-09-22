@@ -265,6 +265,7 @@
 		post( "/ajax/lines/clone" ).to( "LineAjaxController.clone" ).end();
 		get( "/ajax/lines/code-exists" ).to( "LineAjaxController.codeExists" ).end();
 		get( "/ajax/lines/categories/:categoryId" ).to( "LineAjaxController.listByCategoryId" ).end();
+		post( "/ajax/lines/categories/:categoryId" ).to( "LineAjaxController.saveMarkup" ).end();
 		delete( "/ajax/lines/:id/products" ).to( "LineAjaxController.deleteProduct" ).end();
 		post( "/ajax/lines/:id/products" ).to( "LineAjaxController.createProduct" ).end();
 		get( "/ajax/lines/attributes" ).to( "LineAjaxController.attributes" ).end();

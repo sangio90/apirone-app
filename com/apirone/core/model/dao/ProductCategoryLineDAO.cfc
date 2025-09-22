@@ -22,12 +22,12 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				product_category_line_id,
-				COUNT(product_category_line_id)
+				COUNT(product_category_line_id) OVER() AS total
 			FROM
 				product_category_lines
 			WHERE 1=1
 				<cfif !IsNull( arguments.lineId )>
-					AND product_category_lines.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">
+					AND product_category_lines.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="Varchar">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.categoryId )>
@@ -59,12 +59,12 @@
 			INSERT INTO product_category_lines (
 				product_category_id,
 				line_id,
-				markup_value
+				markup
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Integer" value="#arguments.ProductCategoryLine.getProductCategory().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.ProductCategoryLine.getLine().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.ProductCategoryLine.getMarkupValue()#">
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.ProductCategoryLine.getMarkup()#">
 			) RETURNING product_category_line_id
 		</cfquery>
 
@@ -98,6 +98,22 @@
 				product_category_lines
 			WHERE
 				product_category_line_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productCategoryLineId#">
+			RETURNING product_category_line_id
+		</cfquery>
+
+		<cfreturn local.q.recordCount>
+	</cffunction>
+
+	<cffunction name="deleteByParams" returntype="Numeric">
+		<cfargument name="lineId" type="String" required="true">
+		<cfargument name="productCategoryId" type="Numeric" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			DELETE FROM
+				product_category_lines
+			WHERE
+				line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+				AND product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productCategoryId#">
 			RETURNING product_category_line_id
 		</cfquery>
 

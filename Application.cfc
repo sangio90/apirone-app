@@ -56,9 +56,9 @@ component extends="com.apirone.core.root.Application" {
 
 			CacheRemoveAll();
 
-			super.clearContainer();
-
 			onApplicationStart();
+
+			super.clearContainer();
 			
 			application.counter++;
 			

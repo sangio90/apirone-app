@@ -1,8 +1,8 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" inject="LineDAO";
+	property name="dao" inject="ProductCategoryLineDAO";
 	property name="lineService" inject="lineService";
-	property name="productService" inject="ProductService";
+	property name="productCategoryService" inject="productCategoryService";
 
 	property name="cacheScope" type="String" default="ProductCategoryLine.bean";
 
@@ -58,7 +58,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Numeric function create( required com.apirone.core.model.bean.ProductCategoryLine productCategoryLine ){
-		var newId = getDao().insert( arguments.productCategoryLine );
+		transaction {
+			getDao().deleteByParams(
+				lineId            = productCategoryLine.getLine().getId(),
+				productCategoryId = productCategoryLine.getProductCategory().getId()
+			);
+			var newId = getDao().insert( arguments.productCategoryLine );
+		}
+
+		super.getCacheManager().remove( getCacheScope(), arguments.productCategoryLine.getId() );
 
 		return newId;
 	}
@@ -93,33 +101,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	public com.apirone.core.model.bean.Outcome function deleteByParams(
-		required String lineId,
-		required String categoryId
-	){
-		var outcome = super.bean( "Outcome" );
-
-		var obj = get( arguments.lineId );
-
-		outcome.setData( { lineId = arguments.lineId } );
-
-		transaction {
-			try {
-				var result = getDao().delete( lineId = arguments.lineId, categoryId = arguments.categoryId );
-				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.lineId );
-			} catch ( any error ) {
-				outcome.setError( error );
-				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteLine" );
-				outcome.setMessage( "Cannot delete line [#arguments.lineId#]" );
-			}
-		}
-
-		return outcome;
-	}
-
 
 	/*
     	private method
@@ -133,6 +114,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.product_category_line_id );
 			bean.setCreatedAt( record.created_at );
+			bean.setMarkup( record.markup );
 
 			bean.setLine( getLineService().get( record.line_id ) );
 			bean.setProductCategory( getProductCategoryService().get( record.product_category_id ) );

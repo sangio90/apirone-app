@@ -46,6 +46,14 @@
                             </div>
                         </div>						
 
+                        <div class="row d-flex align-items-center mb-2">
+
+                            <div class="col-sm-10 text-end" id="line-category-status"></div>
+                            <div class="col-sm-2 text-end mb-2">
+                                #saveButton( bind="click:save", size="md" )#
+                            </div>
+                        </div>						
+
 						<form name="line-category-grid-form" id="line-category-grid-form" method="post">
 							<div class="col-12">
 								#grid(
@@ -54,15 +62,10 @@
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '90px' },
                                         { 'field':'name', 'title':'Descrizione' },
+                                        { 'field':'', 'title':'% Markup', width: '110px'},
                                         { 'field':'', 'title':'Duplica', width: '55px'},
                                         { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
-                                        { 'field':'', 'title':'Tutti gli attributi', width: '55px'},
-                                        { 
-                                            'field'           :'', 
-                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                            'width'           :'40px',
-                                            'headerAttributes': { 'class': 'text-center' }
-                                        }
+                                        { 'field':'', 'title':'Tutti gli attributi', width: '55px'}
                                     ]",
 									rowTemplate = "line/line-category-grid-row-tmpl"
 								)#
