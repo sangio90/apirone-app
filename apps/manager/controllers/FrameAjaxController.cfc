@@ -74,6 +74,8 @@
 			cells.add( cell )
 
 		}
+
+		frame.setCells( cells );
 		
 		if ( !Len( json.id ) ) {
 			messageId = "frame.created";

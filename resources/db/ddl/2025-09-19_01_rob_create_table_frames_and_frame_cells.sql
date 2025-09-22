@@ -49,3 +49,15 @@ ALTER TABLE public.frames
 UPDATE statuses 
 SET entities = '["LINE", "ATTRIBUTE", "FINISH", "MODEL", "ACCOUNT", "PRODUCTION_TIME", "PRODUCT_CATEGORY", "PRODUCT", "RAW_VALUE", "METADATA_TYPE", "FRAME"]'
 WHERE status_id in ('ACT', 'DEA');    
+
+
+-- object recreation
+ALTER TABLE public.frame_cells
+  DROP CONSTRAINT frames_fk RESTRICT;
+
+ALTER TABLE public.frame_cells
+  ADD CONSTRAINT frames_fk FOREIGN KEY (frame_id)
+    REFERENCES public.frames(frame_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    NOT DEFERRABLE;

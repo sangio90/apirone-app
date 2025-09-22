@@ -7,7 +7,7 @@
 			FROM
 				frame_cells
 			WHERE
-				frame_cell_id = <cfqueryparam cfsqltype="Integer" value="#arguments.frameCellId#">::uuid
+				frame_cell_id = <cfqueryparam cfsqltype="Integer" value="#arguments.frameCellId#">
 		</cfquery>
 
 		<cfreturn local.q>

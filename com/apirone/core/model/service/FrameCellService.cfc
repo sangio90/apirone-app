@@ -4,17 +4,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="FrameCell.bean";
 
-	public com.apirone.core.model.bean.Frame function get( required String frameCellId ){
+	public com.apirone.core.model.bean.FrameCell function get( required String frameCellId ){
 		var cm = getCacheManager();
 
-		var cache = cm.get( getCacheScope(), arguments.frameId );
+		var cache = cm.get( getCacheScope(), arguments.frameCellId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
-		var bean = build( arguments.frameId );
-		cm.put( getCacheScope(), arguments.frameId, bean );
+		var bean = build( arguments.frameCellId );
+		cm.put( getCacheScope(), arguments.frameCellId, bean );
 
 		return bean;
 	}
@@ -86,17 +86,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Frame function build( required String frameCellId ){
-		var record = getDao().read( arguments.frameId );
+	private com.apirone.core.model.bean.FrameCell function build( required String frameCellId ){
+		var record = getDao().read( arguments.frameCellId );
 
 		if ( record.recordCount ) {
 			var bean = super.bean( "FrameCell" );
 
-			//bean.setName( record.frame );
-
 			bean.setId( record.frame_cell_id );
-			bean.setRow( record.code );
+			bean.setRow( record.row );
 			bean.setCol( record.col );
+			bean.setValue( record.value );
 			bean.setFrameId( record.frame_id );
 			bean.setCreatedAt( record.created_at );
 

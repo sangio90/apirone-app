@@ -87,10 +87,13 @@ AP.frame.list = ( function() {
             AP.frame.modal.new( onSave );
         },
 
-        showDetail: function( e ) {
-            var frameId = $( e.currentTarget ).data( "frame-id" );
-            AP.frame.modal.open( frameId );
-        }
+        edit: function( event ) {
+
+            AP.frame.modal.edit( event.data.id, onSave );
+
+            return false;
+        },
+
     } );
 
     pub.init = function() {
@@ -293,38 +296,34 @@ AP.frame.modal = ( function() {
                 return;
             }
 
-            this.set( "loading", true );
-
             NM.util.ajax( {
                 method: "GET",
-                url: "/ajax/frames/" + frameId,
+                url: "/manager/ajax/frames/" + frameId,
                 callback: {
                     done: function( xhr ) {
-                        if ( xhr.success ) {
-                            self.set( "frame", xhr.data );
 
-                            // Calcola il numero di righe e colonne necessario
-                            var maxRow = 0;
-                            var maxCol = 0;
+                        self.set( "frame", xhr.data );
 
-                            if ( xhr.data.cells && xhr.data.cells.length ) {
-                                xhr.data.cells.forEach( function( cell ) {
-                                    maxRow = Math.max( maxRow, cell.row );
-                                    maxCol = Math.max( maxCol, cell.col );
-                                } );
+                        // Calcola il numero di righe e colonne necessario
+                        var maxRow = 0;
+                        var maxCol = 0;
 
-                                self.set( "gridRows", maxRow + 1 );
-                                self.set( "gridCols", maxCol + 1 );
-                            } else {
-                                self.set( "gridRows", 3 );
-                                self.set( "gridCols", 3 );
-                            }
+                        if ( xhr.data.cells && xhr.data.cells.length ) {
+                            xhr.data.cells.forEach( function( cell ) {
+                                maxRow = Math.max( maxRow, cell.row );
+                                maxCol = Math.max( maxCol, cell.col );
+                            } );
 
-                            self.updateCellsMatrix();
+                            self.set( "gridRows", maxRow + 1 );
+                            self.set( "gridCols", maxCol + 1 );
+
                         } else {
-                            NM.util.showError( xhr.message || "Armatura non trovata" );
+
+                            self.set( "gridRows", 3 );
+                            self.set( "gridCols", 3 );
+
                         }
-                        self.set( "loading", false );
+
                     },
                 },
             } );
@@ -333,8 +332,14 @@ AP.frame.modal = ( function() {
 
     } );
 
-    pub.edit = function( frameId ) {
+    pub.edit = function( frameId, onUpdate ) {
+
+        if( onUpdate ) {
+            viewModel.set( "callbacks.onUpdate", onUpdate );
+        }
+
         viewModel.load( frameId );
+
         AP.frame.fields.detailRoot.modal( "show" );
     };
 
