@@ -55,7 +55,7 @@
 				COUNT(product_id) OVER() AS total
 			FROM
 				products
-					INNER JOIN catalog_bundles USING ( catalog_bundle_id )
+					LEFT JOIN catalog_bundles USING ( catalog_bundle_id )
 					INNER JOIN product_categories
 						ON (
 							(products.catalog_bundle_id IS NULL AND product_categories.product_category_id = products.product_category_id)
