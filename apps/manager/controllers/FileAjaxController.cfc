@@ -49,17 +49,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			} else {
 				var type = super.fire( "fileType.get", [ typeId ] );
 
-				file.setType( type );
+				//var json = super.getMementify().convert( file );
 
-				file.setId( "" );
-				file.setName( "" );
-				file.setDirectory( "" );
-
-				var json = super.getMementify().convert( file );
-
-				json[ "complete" ] = false;
-				json[ "uri" ]      = "";
-				json[ "shortId" ]  = "";
+				json[ "id" ]        = "";
+				json[ "name" ]      = "";
+				json[ "shortId" ]   = "";
+				json[ "type" ]      = super.getMementify().convert( type );
+				json[ "complete" ]  = false;
+				json[ "uri" ]       = "";
+				json[ "directory" ] = "";
 			}
 
 			data.add( json );
