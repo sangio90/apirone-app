@@ -31,7 +31,6 @@ ALTER TABLE public.frame_cells
 ALTER TABLE public.frames OWNER TO apirone;
 ALTER TABLE public.frame_cells OWNER TO apirone;
 
-
 ALTER TABLE public.frame_cells
   ADD CONSTRAINT frame_cells_unique_idx 
     UNIQUE (frame_id, "row", col) NOT DEFERRABLE;

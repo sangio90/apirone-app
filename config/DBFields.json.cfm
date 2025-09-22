@@ -250,5 +250,9 @@
         "name": "created_at",
         "type": "Date"
     },
+    "productCategoryLine.id": {
+        "name": "product_category_line_id",
+        "type": "Integer"
+    },
 
 }

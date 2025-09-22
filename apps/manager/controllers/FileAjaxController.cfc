@@ -33,23 +33,18 @@ component extends="com.apirone.core.controller.AbsController" {
 			params.put( "typeId", typeId );
 
 			var images = super.fire( "file.list", params );
+			var json = {};
 
-			// esiste l'immagine la servo
 			if ( images.len() ) {
+				// esiste l'immagine la servo
 				var image = images[ 1 ];
 
-				// var json = image.toStruct();
-				var json = super.getMementify().convert( image, "list" );
-
+				json = super.getMementify().convert( image, "list" );
 				json[ "complete" ] = true;
-				json[ "uri" ]      = image.getUri();
-				json[ "shortId" ]  = Right( image.getId(), 5 );
 
-				// se non esiste, servo un'immagine vuota
 			} else {
+				// se non esiste, servo un'immagine vuota
 				var type = super.fire( "fileType.get", [ typeId ] );
-
-				//var json = super.getMementify().convert( file );
 
 				json[ "id" ]        = "";
 				json[ "uri" ]       = "";

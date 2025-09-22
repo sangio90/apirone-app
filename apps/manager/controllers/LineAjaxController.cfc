@@ -107,6 +107,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var status   = super.bean( "Status" );
 		var category = super.bean( "ProductCategory" );
 		var bundle   = super.bean( "CatalogBundle" );
+
 		bundle.setModel( model.setId( json.modelId ) );
 		bundle.setLine( line.setId( rc.id ) );
 		bundle.setCategory( category.setId( json.categoryId ) );
@@ -115,7 +116,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		product.setLine( line.setId( rc.id ) );
 		product.setFinish( finish.setId( json.finishId ) );
 		product.setModel( model.setId( json.modelId ) );
-		// product.setCategory( category.setId( 22 ) ); // TODO: check if this value is ok here
 		product.setCategory( category.setId( json.categoryId ) );
 		product.setStatus( status.setId( "ACT" ) );
 

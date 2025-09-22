@@ -49,5 +49,6 @@
     "Metadata.bean": {},
     "VatCode.bean": {},
     "Frame.bean": {},
-    "FrameCell.bean": {}
+    "FrameCell.bean": {},
+    "ProductCategoryLine.bean": {}
 }
