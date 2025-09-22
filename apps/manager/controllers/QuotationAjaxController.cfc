@@ -137,7 +137,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotation.create", [ quotation ] );
 		} else {
 			var bean = super.fire( "Quotation.get", [ rc.id ] );
-			if ( json.status != bean.getStatus().getId() ) 
+			if ( json.status != bean.getStatus().getId() ) {
 				quotation.setActive( 0 );
 				super.fire( "quotation.update", [ quotation ] )
 				thisId    = super.fire( "quotation.clone", [ quotation ] );
