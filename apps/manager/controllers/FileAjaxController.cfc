@@ -52,12 +52,12 @@ component extends="com.apirone.core.controller.AbsController" {
 				//var json = super.getMementify().convert( file );
 
 				json[ "id" ]        = "";
+				json[ "uri" ]       = "";
 				json[ "name" ]      = "";
 				json[ "shortId" ]   = "";
+				json[ "directory" ] = "";
 				json[ "type" ]      = super.getMementify().convert( type );
 				json[ "complete" ]  = false;
-				json[ "uri" ]       = "";
-				json[ "directory" ] = "";
 			}
 
 			data.add( json );

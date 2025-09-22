@@ -3,7 +3,7 @@ AP.namespace( "frame" );
 AP.frame.fields = {
     listRoot: $( "#frame-list-root" ),
     listTable: $( "#frame-list-table" ),
-    searchForm: $( "#frame-search-form" ),
+    searchForm: $( "#frame-grid-search-form" ),
     detailRoot: $( "#frame-detail-modal" ),
     detailForm: $( "#frame-detail-form" ),
     cellsContainer: $( "#frame-cells-container" ),
@@ -35,16 +35,14 @@ AP.frame.list = ( function() {
         rows: dataSource,
 
         search: function() {
-            var filter = {
-                code: $( "#search-code" ).val(),
-                orientationId: $( "#search-orientation-id" ).val()
-            };
 
-            this.rows.transport.options.read.data = {
-                filter: filter
-            };
+            var thisForm = fields.searchForm;
+            var params = thisForm.serializeJSON();
 
-            this.rows.read();
+            this.rows.read( params );
+
+            return false;
+
         },
 
         delete: function() {
@@ -81,8 +79,6 @@ AP.frame.list = ( function() {
         },
 
         new: function() {
-
-            console.log( "onSave", onSave );
 
             AP.frame.modal.new( onSave );
         },
@@ -142,8 +138,6 @@ AP.frame.modal = ( function() {
         */
         var matrix = viewModel.get( "cellsMatrix" );
 
-        console.log( "matrix", matrix );
-
         var cells = [];
 
         for ( var i = 0; i < matrix.length; i++ ) {
@@ -173,24 +167,6 @@ AP.frame.modal = ( function() {
             onLoad: undefined
         },
 
-        reset: function() {
-            this.set( "frame", {
-                frameId: "",
-                frame: "",
-                code: "",
-                orientation: {
-                    id: ""
-                },
-                cellOrientation: {
-                    id: ""
-                },
-                cells: []
-            } );
-            this.set( "gridRows", 3 );
-            this.set( "gridCols", 3 );
-            this.updateCellsMatrix();
-        },
-
         addRow: function() {
             this.set( "gridRows", this.get( "gridRows" ) + 1 );
             this.updateCellsMatrix();
@@ -218,19 +194,18 @@ AP.frame.modal = ( function() {
         updateCellsMatrix: function() {
             var rows = this.get( "gridRows" );
             var cols = this.get( "gridCols" );
-            // var cells = this.get( "frame.cells" ) || [];
+            var cells = this.get( "detailForm.data.cells" ) || [];
             var matrix = [];
 
-            // Inizializza matrice vuota con rowIndex
+            // Crea la matrice vuota
             for ( var i = 0; i < rows; i++ ) {
                 matrix[i] = [];
                 for ( var j = 0; j < cols; j++ ) {
-                    matrix[i][j] = { value: "_", row: i, col: j }; // aggiungi rowIndex e colIndex
+                    matrix[i][j] = { value: "_", row: i, col: j };
                 }
             }
 
             // Popola la matrice con i valori esistenti
-            /*
             cells.forEach( function( cell ) {
                 if ( cell.row < rows && cell.col < cols ) {
                     matrix[cell.row][cell.col] = {
@@ -240,63 +215,12 @@ AP.frame.modal = ( function() {
                     };
                 }
             } );
-            */
-
-            console.log( "matrix", matrix );
 
             this.set( "cellsMatrix", matrix );
         },
 
-        save: function() {
-
-            var thisForm = fields.detailForm;
-            var status = $( "footer .status" );
-
-            if ( thisForm.valid() ) {
-
-                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
-
-                var self = this;
-                var frame = this.get( "detailForm.data" );
-                frame.cells = cellsToArray();
-                console.log( "cells", frame.cells );
-
-                console.log( "frame.cells", frame.cells );
-
-                NM.util.ajax( {
-                    method: "POST",
-                    url: "/manager/ajax/frames",
-                    data: JSON.stringify( frame ),
-                    callback: {
-                        done: function( xhr ) {
-
-                            status.html( "" );
-
-                            AP.widget.notify( "success", "Armatura salvata con successo", "Ok" );
-
-                            console.log( "cb", viewModel.get( "callbacks" ) );
-
-                            setTimeout( () => {
-                                $( "#frame-detail-modal" ).modal( "hide" );
-                                AP.util.fireCallback( "onCreate", viewModel.get( "callbacks" ) );
-                            }, 1000 );
-
-                        },
-                    },
-                } );
-
-            }
-
-
-        },
-
         load: function( frameId ) {
             var self = this;
-
-            if ( !frameId ) {
-                this.reset();
-                return;
-            }
 
             NM.util.ajax( {
                 method: "GET",
@@ -304,9 +228,8 @@ AP.frame.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        console.log( "xhr.data", xhr.data );
-
                         self.set( "detailForm.data", xhr.data );
+                        self.set( "detailForm.data.cells", xhr.data.cells );
                         self.set( "detailForm.title", "Modifica armatura < " + xhr.data.name + " >" );
 
                         // Calcola il numero di righe e colonne necessario
@@ -323,16 +246,56 @@ AP.frame.modal = ( function() {
                             self.set( "gridRows", maxRow + 1 );
                             self.set( "gridCols", maxCol + 1 );
 
-                        } else {
-
-                            self.set( "gridRows", 3 );
-                            self.set( "gridCols", 3 );
-
                         }
+
+                        self.updateCellsMatrix();
 
                     },
                 },
             } );
+
+        },
+
+        save: function() {
+
+            var thisForm = fields.detailForm;
+            var status = $( "footer .status" );
+
+            if ( thisForm.valid() ) {
+
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+                var self = this;
+                var frame = this.get( "detailForm.data" );
+                frame.cells = cellsToArray();
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/frames",
+                    data: JSON.stringify( frame ),
+                    callback: {
+                        done: function( xhr ) {
+
+                            status.html( "" );
+
+                            AP.widget.notify( "success", "Armatura salvata con successo", "Ok" );
+
+                            var cb = self.get( "detailForm.data.id" ).length ? "onUpdate" : "onCreate";
+
+                            console.log( "save:cb", cb );
+                            console.log( "save:id", self.get( "detailForm.data.id" ) );
+
+                            setTimeout( () => {
+                                $( "#frame-detail-modal" ).modal( "hide" );
+                                AP.util.fireCallback( cb, viewModel.get( "callbacks" ) );
+                            }, 1000 );
+
+                        },
+                    },
+                } );
+
+            }
+
 
         },
 
@@ -351,11 +314,12 @@ AP.frame.modal = ( function() {
 
     pub.new = function( onCreate ) {
 
-        console.log( "onCreate", onCreate );
-
         if( onCreate ) {
             viewModel.set( "callbacks.onCreate", onCreate );
         }
+
+        viewModel.set( "detailForm", defaultForm );
+        viewModel.set( "cellsMatrix", [] );
 
         AP.frame.fields.detailRoot.modal( "show" );
     };
@@ -374,14 +338,7 @@ AP.frame.modal = ( function() {
     pub.init = function() {
         if ( !AP.frame.fields.detailRoot.length ) { return; }
 
-        console.log( "AP.frame.fields.detailRoot", AP.frame.fields.detailRoot );
-
         kendo.bind( AP.frame.fields.detailRoot, viewModel );
-
-        AP.frame.fields.detailForm.on( "submit", function( e ) {
-            e.preventDefault();
-            viewModel.save();
-        } );
 
         var detailForm = fields.detailForm;
 
@@ -395,8 +352,6 @@ AP.frame.modal = ( function() {
                 },
                 grid: {
                     required: function() {
-
-                        console.log( "gridExists", viewModel.get( "cellsMatrix" ).length );
 
                         if ( viewModel.get( "cellsMatrix" ).length ) {
                             return false;

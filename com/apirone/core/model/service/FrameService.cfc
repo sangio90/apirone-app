@@ -76,10 +76,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getDao().update( arguments.frame );
 
-			getFrameCellService().deleteFromFrameId( arguments.frame.getId() );
+			getFrameCellService().deleteByFrameId( arguments.frame.getId() );
+
+			if( ( !IsNull( arguments.frame.getCells() ) ) ) {
+				
+				for( var cell in arguments.frame.getCells() ) {
+					cell.setFrameId( frame.getId() );
+					getFrameCellService().create( cell );
+				}
+			
+			}
 
 		}
-		
 
 		super.getCacheManager().remove( getCacheScope(), arguments.Frame.getId() );
 

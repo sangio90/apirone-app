@@ -39,75 +39,80 @@
                             --->
 
                             <div class="tab-pane fade show active" id="frame-nav-detail-tab" role="tabpanel" aria-labelledby="frame-nav-detail-but">
+
+                                <div class="mb-3 row">
+                                    <label class="col-sm-2 col-form-label text-end">Codice</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" required class="form-control col-sm-4 uppercase" 
+                                            name="code"
+                                            maxlength="5"
+                                            data-bind="value: detailForm.data.code"
+                                            >
+                                    </div>
+                                </div>
                                 
+                                <div class="mb-3 row">
+                                    <label class="col-sm-2 col-form-label text-end">Nome</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" required class="form-control col-sm-4 uppercase" 
+                                            name="name"
+                                            maxlength="200"
+                                            data-bind="value: detailForm.data.name"
+                                            >
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 row">
+                                    <label class="col-sm-2 col-form-label text-end">Orientamento</label>
+                                    <div class="col-sm-10">
+                                        <select id="orientationId" class="form-control" name="orientationId"
+                                            required
+                                            data-bind="source: orientations, value: detailForm.data.orientation" 
+                                            data-value-field="id"
+                                            data-text-field="name"
+                                            >
+                                        </select>
+                                    </div>
+                                </div>
 
-                                    <div class="mb-3 row">
-                                        <label class="col-sm-2 col-form-label text-end">Codice</label>
-                                        <div class="col-sm-10">
-                                            <input type="text" required class="form-control col-sm-4 uppercase" 
-                                                name="code"
-                                                maxlength="5"
-                                                data-bind="value: detailForm.data.code"
-                                                >
-                                        </div>
+                                <div class="mb-3 row">
+                                    <label class="col-sm-2 col-form-label text-end">Orientamento celle</label>
+                                    <div class="col-sm-10">
+                                        <select id="orientationId" class="form-control" name="cellOrientationId"
+                                            required
+                                            data-bind="source: orientations, value: detailForm.data.cellOrientation" 
+                                            data-value-field="id"
+                                            data-text-field="name"
+                                            >
+                                        </select>
                                     </div>
-                                    
-                                    <div class="mb-3 row">
-                                        <label class="col-sm-2 col-form-label text-end">Nome</label>
-                                        <div class="col-sm-10">
-                                            <input type="text" required class="form-control col-sm-4 uppercase" 
-                                                name="name"
-                                                maxlength="200"
-                                                data-bind="value: detailForm.data.name"
-                                                >
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-3 row">
-                                        <label class="col-sm-2 col-form-label text-end">Orientamento</label>
-                                        <div class="col-sm-10">
-                                            <select id="orientationId" class="form-control" name="orientationId"
-                                                required
-                                                data-bind="source: orientations, value: detailForm.data.orientation" 
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                                >
-                                            </select>
-                                        </div>
-                                    </div>
+                                </div>
 
-                                    <div class="mb-3 row">
-                                        <label class="col-sm-2 col-form-label text-end">Orientamento celle</label>
-                                        <div class="col-sm-10">
-                                            <select id="orientationId" class="form-control" name="cellOrientationId"
-                                                required
-                                                data-bind="source: orientations, value: detailForm.data.cellOrientation" 
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                                >
-                                            </select>
-                                        </div>
+                                
+                                <div class="mb-3 row">
+                                    <label class="col-sm-2 col-form-label text-end">Stato</label>
+                                    <div class="col-sm-10">
+                                        <select id="orientationId" class="form-control" name="orientationId"
+                                            required
+                                            data-bind="source: statuses, value: detailForm.data.status" 
+                                            data-value-field="id"
+                                            data-text-field="name"
+                                            >
+                                        </select>
                                     </div>
+                                </div>
 
-                                    
-                                    <div class="mb-3 row">
-                                        <label class="col-sm-2 col-form-label text-end">Stato</label>
-                                        <div class="col-sm-10">
-                                            <select id="orientationId" class="form-control" name="orientationId"
-                                                required
-                                                data-bind="source: statuses, value: detailForm.data.status" 
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                                >
-                                            </select>
-                                        </div>
+                                <div class="mb-3 row" data-bind="visible: detailForm.data.id">
+                                    <div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
+                                        ID: <span data-bind="text: detailForm.data.id"></span><br>
+                                        Creato: <span data-bind="text: detailForm.data.createdAt"></span>
                                     </div>
-
+                                </div>
                             
                             </div>
 
                             <!--- 
-                                Tab: riglia
+                                Tab: griglia
                             --->
                             <div class="tab-pane fade" id="frame-nav-grid-tab" role="tabpanel" aria-labelledby="frame-nav-grid-but">
                                 <div class="mb-3 d-flex gap-2">

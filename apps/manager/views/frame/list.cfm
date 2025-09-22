@@ -16,7 +16,7 @@
 				<div class="card-body">	
 
 					<div class="row d-flex align-items-center mb-3">
-						<div class="col-sm-8">
+						<div class="col-sm-9">
 							<div class="box-search-small">
 								<form 
 									id   ="frame-grid-search-form"
@@ -25,15 +25,25 @@
 
 									<div class="col">
 										<span>Cerca</span>
-										<input type="text" class="form-control" id="search-code" placeholder="Cerca">
+										<input type="text" name="str" class="form-control" id="search-code" placeholder="Cerca">
 									</div>
 									
 									<div class="col">
 										<span>Orientamento</label>
-										<select class="form-select" id="search-orientation-id">
+										<select class="form-select" name="orientationId">
 											<option value="">-- tutti</option>
 											<option value="VER">Verticale</option>
 											<option value="HOR">Orizzontale</option>
+										</select>
+									</div>
+
+									<div class="col">
+										<span>Stato</label>
+										<select class="form-select" name="statusId">
+											<option value="">-- tutti</option>
+											<cfloop array="#prc.statuses#" index="status">
+												<option value="#status.getId()#">#status.getName()#</option>
+											</cfloop>
 										</select>
 									</div>
 
@@ -44,7 +54,7 @@
 							</div>
 						</div>
 
-						<div class="col-sm-4">
+						<div class="col-sm-3">
 							<div class="float-end">
 								#deleteButton( bind = "click:delete", size = "sm" )#
 							</div>

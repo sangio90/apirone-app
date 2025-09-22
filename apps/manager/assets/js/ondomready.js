@@ -44,8 +44,6 @@ $.validator.setDefaults( {
 
     invalidHandler: function( event, validator ) {
 
-        console.log( "invalidHandler" );
-
         // NOTE: We use inline styles because I can't override them with a dedicated class.
         $( ".nav-link" ).css( { "font-weight": "normal", "border-top": "" } );
 

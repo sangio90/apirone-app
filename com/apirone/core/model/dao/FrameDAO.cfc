@@ -31,10 +31,9 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
-		<cfargument name="statusId" type="Numeric">
-		<cfargument name="orientationId" type="Varchar">
-		<cfargument name="cellOrientationId" type="Varchar">
-		<cfargument name="statusId" type="Varchar">
+		<cfargument name="orientationId" type="String">
+		<cfargument name="cellOrientationId" type="String">
+		<cfargument name="statusId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -53,11 +52,11 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.orientationId )>
-					AND frames.orientation_id = <cfqueryparam cfsqltype="Integer" value="#arguments.orientationId#">
+					AND frames.orientation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.orientationId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.cellOrientationId )>
-					AND frames.cell_orientation_id = <cfqueryparam cfsqltype="Integer" value="#arguments.cellOrientationId#">
+					AND frames.cell_orientation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.cellOrientationId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>

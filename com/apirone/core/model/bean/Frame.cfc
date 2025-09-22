@@ -8,7 +8,8 @@
 			"code",
 			"orientation",
 			"cellOrientation",
-			"status"
+			"status",
+			"createdAt"
 		],
 		profiles = {
 			detail = {
@@ -19,6 +20,8 @@
 					"code",
 					"orientation",
 					"cellOrientation",
+					"status",
+					"createdAt",
 					"cells"
 				]
 			},

@@ -117,7 +117,7 @@
 			{
 				href: "/manager/frames",
 				icon: "fas fa-shield-alt",
-				title: "Armnature",
+				title: "Armature",
 				roles: "ADM"
 			},
 			{

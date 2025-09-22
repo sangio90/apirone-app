@@ -60,9 +60,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		var outcome = super.bean( "Outcome" );
 
-		var obj = get( arguments.frameId );
-
-		outcome.setData( { frameCellId = arguments.frameId } );
+		outcome.setData( { frameId = arguments.frameId } );
 
 		transaction {
 			try {
@@ -86,7 +84,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.FrameCell function build( required String frameCellId ){
+	private com.apirone.core.model.bean.FrameCell function build( required Numeric frameCellId ){
 		var record = getDao().read( arguments.frameCellId );
 
 		if ( record.recordCount ) {
