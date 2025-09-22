@@ -7,8 +7,6 @@ ON CONFLICT (line_id, model_id, product_category_id) DO NOTHING;
 
 ALTER TABLE products
 ADD COLUMN catalog_bundle_id UUID;
-ALTER TABLE products
-ALTER COLUMN product_category_id DROP NOT NULL;
 
 UPDATE products
 SET catalog_bundle_id = catalog_bundles.catalog_bundle_id
