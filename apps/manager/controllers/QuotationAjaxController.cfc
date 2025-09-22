@@ -137,12 +137,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotation.create", [ quotation ] );
 		} else {
 			var bean = super.fire( "Quotation.get", [ rc.id ] );
-			if ( json.status != bean.getStatus().getId() ) {
-				//commentato per la clone è da sistemare
-				// quotation.setActive( 0 );
-				// super.fire( "quotation.update", [ quotation ] )
-				// thisId    = super.fire( "quotation.clone", [ quotation ] );
-				// messageId = "quotation.updated";
+			if ( json.status != bean.getStatus().getId() ) 
+				quotation.setActive( 0 );
+				super.fire( "quotation.update", [ quotation ] )
+				thisId    = super.fire( "quotation.clone", [ quotation ] );
+				messageId = "quotation.updated";
 			} else {
 				messageId = "quotation.updated";
 				thisId    = super.fire( "quotation.update", [ quotation ] )

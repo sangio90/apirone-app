@@ -16,6 +16,7 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="zoneId" type="String" required="false">
+		<cfargument name="quotationItemId" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_item_position_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
@@ -31,6 +32,9 @@
 			WHERE 1=1
 				<cfif !IsNull( arguments.zoneId )>
 					AND quotation_zone_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.zoneId#">::uuid
+				</cfif>
+				<cfif !IsNull( arguments.quotationItemId )>
+					AND quotation_item_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemId#">::uuid
 				</cfif>
 			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
 

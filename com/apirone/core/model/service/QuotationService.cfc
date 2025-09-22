@@ -115,191 +115,47 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		clonedQuotation.setStatus( status );
 
 		var newQuotationId = getDao().insert( clonedQuotation );
+
+		var quotationZoneIdsMap = {};
+		var quotationZones = quotationZoneSvc.list( quotationId = originalQuotation.getId() );
+		var quotationZonesWithoutParent = ArrayFilter( quotationZones, function( quotationZone ){
+			return IsNull( quotationZone.getOrigin() );
+		} )
+		for ( var quotationZone in quotationZonesWithoutParent ) {
+			var clonedZone = Duplicate( quotationZone );
+			clonedZone.setQuotation( quotationSvc.get( newQuotationId ) );
+			clonedZone.setId( LCase( CreateUUID() ) );
+			var newQuotationZoneId = quotationZoneSvc.create( clonedZone );
+			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
+		}
+
+		var quotationZonesWithParent = ArrayFilter( quotationZones, function( quotationZone ){
+			return !IsNull( quotationZone.getOrigin() );
+		} )
+		for ( var quotationZone in quotationZonesWithParent ) {
+			var clonedZone = Duplicate( quotationZone );
+			clonedZone.setQuotation( quotationSvc.get( newQuotationId ) );
+			clonedZone.setId( LCase( CreateUUID() ) );
+			var newOriginId = quotationZoneIdsMap[ quotationZone.getOrigin().getId() ];
+			clonedQuotationItemZone.setOrigin( quotationZoneSvc.get( newOriginId ) );
+			var newQuotationZoneId = quotationZoneSvc.create( clonedZone );
+			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
+		}
+
 		var quotationItems = quotationItemSvc.list( quotationId = originalQuotation.getId() );
 		for ( var quotationItem in quotationItems ) {
 			var clonedItem = Duplicate( quotationItem );
 			clonedItem.setQuotation( quotationSvc.get( newQuotationId ) );
+			clonedItem.setQuotationZone( quotatioZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
 			clonedItem.setId( LCase( CreateUUID() ) );
 			var newQuotationItemId = quotationItemSvc.create( clonedItem );
 
-			// tutti i prodotti
-			var quotationProductItems              = quotationItemProductSvc.list( quotationItemId = quotationItem.getId() );
-			// solo i prodotti senza parent
-			var quotationItemProductsWithoutParent = ArrayFilter( quotationProductItems, function( quotationItemProduct ){
-				return IsNull( quotationItemProduct.getOrigin() );
-			} )
-			var quotationItemProductWithoutParentIdsMap = {};
-
-			// ciclo sui prodotti senza parent
-			for ( var quotationItemProduct in quotationItemProductsWithoutParent ) {
-				var clonedQuotationItemProduct = Duplicate( quotationItemProduct );
-				clonedQuotationItemProduct.setId( Javacast( "null", "" ) );
-				clonedQuotationItemProduct.setQuotationItem( quotationItemSvc.get( newQuotationItemId ) );
-				var newQuotationItemProductId                                           = quotationItemProductSvc.create( clonedQuotationItemProduct );
-				clonedQuotationItemProduct                                              = quotationItemProductSvc.get( newQuotationItemProductId );
-				// mappo l'id vecchio con l'id nuovo dei prodotti senza parent
-				quotationItemProductWithoutParentIdsMap[ quotationItemProduct.getId() ] = newQuotationItemProductId;
-
-				// tutti gli item del prodotto
-				var quotationItemProductItems = quotationItemProductItemSvc.list(
-					quotationItemProductId = quotationItemProduct.getId()
-				);
-				// solo gli item senza parent del prodotto
-				var quotationItemProductItemsWithoutParent = ArrayFilter( quotationItemProductItems, function( quotationItemProductItem ){
-					return IsNull( quotationItemProductItem.getOrigin() );
-				} )
-				var quotationItemProductItemsWithoutParentIdsMap = {};
-
-				// ciclo sugli item senza parent del prodotto
-				for ( var quotationItemProductItem in quotationItemProductItemsWithoutParent ) {
-					var clonedQuotationItemProductItem = Duplicate( quotationItemProductItem );
-					clonedQuotationItemProductItem.setId( Javacast( "null", "" ) );
-					clonedQuotationItemProductItem.setQuotationItemProduct( clonedQuotationItemProduct );
-					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(
-						clonedQuotationItemProductItem
-					);
-					clonedQuotationItemProductItem = quotationItemProductItemSvc.get(
-						newQuotationItemProductItemId
-					);
-					// mappo l'id vecchio con l'id nuovo degli item senza parent
-					quotationItemProductItemsWithoutParentIdsMap[ quotationItemProductItem.getId() ] = newQuotationItemProductItemId;
-				}
-
-				// solo gli item con parent del prodotto
-				var quotationItemProductItemsWithParent = ArrayFilter( quotationItemProductItems, function( quotationItemProductItem ){
-					return !IsNull( quotationItemProductItem.getOrigin() );
-				} )
-
-				// ciclo sugli item con parent del prodotto
-				for ( var quotationItemProductItem in quotationItemProductItemsWithParent ) {
-					var clonedQuotationItemProductItem = Duplicate( quotationItemProductItem );
-					clonedQuotationItemProductItem.setId( Javacast( "null", "" ) );
-					clonedQuotationItemProductItem.setQuotationItemProduct( clonedQuotationItemProduct );
-					// recupero il nuovo id del parent dalla mappa
-					var newParentId = quotationItemProductItemsWithoutParentIdsMap[
-						quotationItemProductItem.getOrigin().getId()
-					];
-					clonedQuotationItemProductItem.setOrigin( quotationItemProductItemSvc.get( newParentId ) );
-					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(
-						clonedQuotationItemProductItem
-					);
-					clonedQuotationItemProductItem = quotationItemProductItemSvc.get(
-						newQuotationItemProductItemId
-					);
-				}
-			}
-
-			// solo i prodotti con parent
-			var quotationItemProductsWithParent = ArrayFilter( quotationProductItems, function( quotationItemProduct ){
-				return !IsNull( quotationItemProduct.getOrigin() );
-			} )
-
-			// ciclo sui prodotti con parent
-			for ( var quotationItemProduct in quotationItemProductsWithParent ) {
-				var clonedQuotationItemProduct = Duplicate( quotationItemProduct );
-				clonedQuotationItemProduct.setId( Javacast( "null", "" ) );
-				clonedQuotationItemProduct.setQuotationItem( quotationItemSvc.get( newQuotationItemId ) );
-				// recupera il nuovo id del parent dalla mappa
-				var newParentId = quotationItemProductWithoutParentIdsMap[ quotationItemProduct.getOrigin().getId() ];
-				clonedQuotationItemProduct.setOrigin( quotationItemProductSvc.get( newParentId ) );
-				var newQuotationItemProductId = quotationItemProductSvc.create( clonedQuotationItemProduct );
-				clonedQuotationItemProduct    = quotationItemProductSvc.get( newQuotationItemProductId );
-
-				// tutti gli item del prodotto
-				var quotationItemProductItems = quotationItemProductItemSvc.list(
-					quotationItemProductId = quotationItemProduct.getId()
-				);
-				// solo gli item senza parent del prodotto
-				var quotationItemProductItemsWithoutParent = ArrayFilter( quotationItemProductItems, function( quotationItemProductItem ){
-					return IsNull( quotationItemProductItem.getOrigin() );
-				} )
-				var quotationItemProductItemsWithoutParentIdsMap = {};
-
-				// ciclo sugli item senza parent del prodotto
-				for ( var quotationItemProductItem in quotationItemProductItemsWithoutParent ) {
-					var clonedQuotationItemProductItem = Duplicate( quotationItemProductItem );
-					clonedQuotationItemProductItem.setId( Javacast( "null", "" ) );
-					clonedQuotationItemProductItem.setQuotationItemProduct( clonedQuotationItemProduct );
-					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(
-						clonedQuotationItemProductItem
-					);
-					clonedQuotationItemProductItem = quotationItemProductItemSvc.get(
-						newQuotationItemProductItemId
-					);
-					// mappo l'id vecchio con l'id nuovo degli item senza parent
-					quotationItemProductItemsWithoutParentIdsMap[ quotationItemProductItem.getId() ] = newQuotationItemProductItemId;
-				}
-
-				// solo gli item con parent del prodotto
-				var quotationItemProductItemsWithParent = ArrayFilter( quotationItemProductItems, function( quotationItemProductItem ){
-					return !IsNull( quotationItemProductItem.getOrigin() );
-				} )
-
-				// ciclo sugli item con parent del prodotto
-				for ( var quotationItemProductItem in quotationItemProductItemsWithParent ) {
-					var clonedQuotationItemProductItem = Duplicate( quotationItemProductItem );
-					clonedQuotationItemProductItem.setId( Javacast( "null", "" ) );
-					clonedQuotationItemProductItem.setQuotationItemProduct( clonedQuotationItemProduct );
-					// recupero il nuovo id del parent dalla mappa
-					var newParentId = quotationItemProductItemsWithoutParentIdsMap[
-						quotationItemProductItem.getOrigin().getId()
-					];
-					clonedQuotationItemProductItem.setOrigin( quotationItemProductItemSvc.get( newParentId ) );
-					var newQuotationItemProductItemId = quotationItemProductItemSvc.create(
-						clonedQuotationItemProductItem
-					);
-					clonedQuotationItemProductItem = quotationItemProductItemSvc.get(
-						newQuotationItemProductItemId
-					);
-				}
-			}
-
-			// tutte le zone
-			var quotationItemZones              = quotationZoneSvc.list( quotationItemId = quotationItem.getId() );
-			// solo le zone senza parent
-			var quotationItemZonesWithoutParent = ArrayFilter( quotationItemZones, function( quotationItemZone ){
-				return IsNull( quotationItemZone.getOrigin() );
-			} )
-			var quotationZoneIdsMap = {};
-			for ( var quotationItemZone in quotationItemZonesWithoutParent ) {
-				var clonedQuotationItemZone = Duplicate( quotationItemZone );
-				clonedQuotationItemZone.setId( Javacast( "null", "" ) );
-				clonedQuotationItemZone.setQuotationItem( quotationItemSvc.get( newQuotationItemId ) );
-				var newQuotationItemZoneId                       = quotationZoneSvc.create( clonedQuotationItemZone );
-				clonedQuotationItemZone                          = quotationZoneSvc.get( newQuotationItemZoneId );
-				// mappo l'id vecchio con l'id nuovo delle zone senza parent
-				quotationZoneIdsMap[ quotationItemZone.getId() ] = newQuotationItemZoneId;
-
-				// clona le positions
-				var quotationItemPositions = quotationItemPositionSvc.list( zoneId = quotationItemZone.getId() );
-				for ( quotationItemPosition in quotationItemPositions ) {
-					var clonedQuotationItemPosition = Duplicate( quotationItemPosition );
-					clonedQuotationItemPosition.setQuotationItemZone( clonedQuotationItemZone );
-					quotationItemPositionSvc.create( clonedQuotationItemPosition );
-				}
-			}
-
-			// solo le zone con parent
-			var quotationItemZonesWithParent = ArrayFilter( quotationItemZones, function( quotationItemZone ){
-				return !IsNull( quotationItemZone.getOrigin() );
-			} )
-			for ( var quotationItemZone in quotationItemZonesWithParent ) {
-				var clonedQuotationItemZone = Duplicate( quotationItemZone );
-				clonedQuotationItemZone.setId( Javacast( "null", "" ) );
-				clonedQuotationItemZone.setQuotationItem( quotationItemSvc.get( newQuotationItemId ) );
-				// recupera il nuovo id del parent dalla mappa
-				var newParentId = quotationZoneIdsMap[ quotationItemZone.getOrigin().getId() ];
-				clonedQuotationItemZone.setOrigin( quotationZoneSvc.get( newParentId ) );
-				var newQuotationItemZoneId = quotationZoneSvc.create( clonedQuotationItemZone );
-				clonedQuotationItemZone    = quotationZoneSvc.get( newQuotationItemZoneId );
-
-				// clona le positions
-				var quotationItemPositions = quotationItemPositionSvc.list( zoneId = quotationItemZone.getId() );
-				for ( quotationItemPosition in quotationItemPositions ) {
-					var clonedQuotationItemPosition = Duplicate( quotationItemPosition );
-					clonedQuotationItemPosition.setQuotationItemZone( clonedQuotationItemZone );
-					quotationItemPositionSvc.create( clonedQuotationItemPosition );
-				}
+			var quotationItemPositions = quotationItemPositionSvc.list( quotationItemId = quotationItem.getId() );
+			for ( quotationItemPosition in quotationItemPositions ) {
+				var clonedQuotationItemPosition = Duplicate( quotationItemPosition );
+				clonedQuotationItemPosition.setQuotationItem( clonedItem );
+				clonedQuotationItemPosition.setQuotationZone( quotatioZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
+				quotationItemPositionSvc.create( clonedQuotationItemPosition );
 			}
 		}
 
