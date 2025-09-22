@@ -201,6 +201,7 @@
 		*/
 		get( "/ajax/frames/code-exists" ).to( "FrameAjaxController.codeExists" ).end();
 		get( "/ajax/frames/:id" ).to( "FrameAjaxController.get" ).end();
+		delete( "/ajax/frames" ).to( "FrameAjaxController.delete" ).end();
 		post( "/ajax/frames" ).to( "FrameAjaxController.save" ).end();
 		get( "/ajax/frames" ).to( "FrameAjaxController.list" ).end();
 		get( "/frames" ).to( "FrameController.list" ).end();

@@ -26,7 +26,7 @@ AP.frame.list = ( function() {
     var fields = AP.frame.fields;
 
     var onSave = function() {
-        viewModel.get( "row" ).read;
+        viewModel.get( "rows" ).read();
     };
 
     var dataSource = NM.kendo.dataSource( { url: "/manager/ajax/frames" } );
@@ -47,10 +47,37 @@ AP.frame.list = ( function() {
             this.rows.read();
         },
 
-        resetSearch: function() {
-            $( "#search-code" ).val( "" );
-            $( "#search-orientation-id" ).val( "" );
-            this.search();
+        delete: function() {
+            var checks = $( "#frame-grid-form" ).find( "[name=selected]:checked" );
+
+            if ( checks.length ) {
+                var values = [];
+
+                checks.each( function() {
+                    values.push( $( this ).val() );
+                } );
+
+                var ids = values.toString();
+
+                NM.util.ajax( {
+                    method: "DELETE",
+                    url: "/manager/ajax/frames",
+                    data: ids,
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
+                                AP.widget.notify( "error", "Non riesco a cancellare tutti i frame" );
+                            } else {
+                                AP.widget.notify( "success", "Cancellazione avvenuta con successo" );
+                            }
+
+                            viewModel.rows.read();
+                        },
+                    },
+                } );
+            } else {
+                AP.widget.notify( "warning", "Seleziona almeno una armatura" );
+            }
         },
 
         new: function() {
@@ -111,6 +138,9 @@ AP.frame.modal = ( function() {
             to plain array
         */
         var matrix = viewModel.get( "cellsMatrix" );
+
+        console.log( "matrix", matrix );
+
         var cells = [];
 
         for ( var i = 0; i < matrix.length; i++ ) {
@@ -239,9 +269,11 @@ AP.frame.modal = ( function() {
 
                             AP.widget.notify( "success", "Armatura salvata con successo", "Ok" );
 
+                            console.log( "cb", viewModel.get( "callbacks" ) );
+
                             setTimeout( () => {
-                                $( "#account-detail-modal" ).modal( "hide" );
-                                AP.util.fireCallback( "onSave", viewModel.get( "callbacks" ) );
+                                $( "#frame-detail-modal" ).modal( "hide" );
+                                AP.util.fireCallback( "onCreate", viewModel.get( "callbacks" ) );
                             }, 1000 );
 
                         },

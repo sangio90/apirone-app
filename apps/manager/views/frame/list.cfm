@@ -51,7 +51,7 @@
 						</div>
 					</div>
 
-					<form name="frme-grid-form" id="frame-grid-form" method="post">
+					<form name="frame-grid-form" id="frame-grid-form" method="post">
 						<div class="col-12">
 							#grid(
 								id      = "frame-grid",
