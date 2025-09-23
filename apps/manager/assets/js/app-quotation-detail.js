@@ -165,30 +165,46 @@ AP.quotationDetail.detail = ( function() {
             }
         },
 
-        resetForm: function() {},
-
         delete: function( event ) {
             event.stopPropagation();
             event.preventDefault();
             var id = event.currentTarget.dataset.id
 
-            NM.util.ajax( {
-                    method: "DELETE",
-                    url: "/manager/ajax/quotation-items",
-                    data: id,
-                    callback: {
-                        done: function( xhr ) {
-                            if( xhr.status == "ERRORE" ) {
-                                AP.widget.notify( "error", "Errore nella cancellazione della riga di preventivo." );
+            bootbox.confirm( {
+                title: "Conferma eliminazione",
+                message: "Sei sicuro di voler cancellare questa riga del preventivo?",
+                buttons: {
+                    confirm: {
+                        label: "Si, confermo",
+                        className: "btn-primary",
+                    },
+                    cancel: {
+                        label: "No, chiudi",
+                        className: "btn-danger",
+                    },
+                },
+                callback: function( result ) {
+                    if ( result ) {
+                        NM.util.ajax( {
+                            method: "DELETE",
+                            url: "/manager/ajax/quotation-items",
+                            data: id,
+                            callback: {
+                                done: function( xhr ) {
+                                    if( xhr.status == "ERRORE" ) {
+                                        AP.widget.notify( "error", "Errore nella cancellazione della riga di preventivo." );
+                                    }
+                                    if ( xhr.status == "SUCCESS" ) {
+                                        AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
+                                        viewModel.set( "detailForm", defaultDetailForm );
+                                        window.location.href = "/manager/quotations/" + AP.page.quotation.id;
+                                    }
+                                }
                             }
-                            if ( xhr.status == "SUCCESS" ) {
-                                AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
-                                viewModel.set( "detailForm", defaultDetailForm );
-                                window.location.href = "/manager/quotations/" + AP.page.quotation.id;
-                            }
-                        }
+                        } );
                     }
-                } );
+                },
+            } );
         },
 
         save: function( event ) {
@@ -341,6 +357,7 @@ AP.quotationDetail.detail = ( function() {
 
         openAddZoneModal: function() {
             if ( AP.quotationDetail.fields.zoneModalRoot.length ) {
+                AP.quotationDetail.zoneModal.methods().resetForm()
                 AP.quotationDetail.zoneModal.init( "add" );
             }
             NM.util.openModal( AP.quotationDetail.fields.zoneModalRoot );
@@ -415,6 +432,10 @@ AP.quotationDetail.zoneModal = ( function() {
 
         createZone: function( event ) {
             const parsedData = viewModel.get( "detailForm.data" );
+            if (parsedData.name.trim() == '') {
+                AP.widget.notify( "error", "Specificare un nome per la zona." );
+                return false;
+            }
 
             NM.util.ajax( {
                 method: "POST",
@@ -473,11 +494,17 @@ AP.quotationDetail.zoneModal = ( function() {
             $( "#zone-name-input" ).hide();
         }
         if ( mode == "add" ) {
-            viewModel.get( "zones" ).data( AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != "" && !zone.origin; } ) );
+            var zones = AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != "" && !zone.origin; } );
+            zones.unshift( { "id": "", "name": "" } );
+            viewModel.get( "zones" ).data( zones );
             $( "#delete-zone-button" ).hide();
             $( "#add-zone-button" ).show();
             $( "#zone-name-input" ).show();
         }
+    };
+
+    pub.methods = function( options ) {
+        return viewModel;
     };
     return pub;
 } () );

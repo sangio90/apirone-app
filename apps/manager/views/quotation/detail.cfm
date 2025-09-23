@@ -121,10 +121,9 @@
                                         <div class="col-2 mb-2">
                                             <select class="form-control me-3"
                                                     data-bind="source: zones, value: detailForm.data.zone, events: { change: getItems }"
-                                                    data-placeholder="-- Seleziona la zona"
                                                     data-value-field="id"
                                                     data-text-field="name"
-                                                >
+                                            >
                                             </select>
                                         </div>
                                         <div class="col-2 mb-2 flex">
