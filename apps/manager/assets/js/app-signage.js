@@ -468,7 +468,7 @@ AP.signage.modal = ( function() {
                         if (viewModel.get('detailForm.data.quotationItem.product.finish.id') != '') {
                             NM.util.ajax( {
                             method: "POST",
-                            url: "/manager/ajax/products/get-by-params",
+                            url: "/manager/ajax/products/get-id-and-file-by-params",
                             data: { 
                                 categoryId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ), 
                                 lineId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ), 

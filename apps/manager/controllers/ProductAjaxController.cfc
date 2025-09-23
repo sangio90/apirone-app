@@ -216,7 +216,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function getByParams( event, rc, prc ){
+	function getIdAndFileByParams( event, rc, prc ){
 		var result = super.getResult();
 		var data = {}
 		var catalogBundles = super.fire( "catalogBundle.list", { categoryId = rc.categoryId, lineId = rc.lineId, modelId = rc.modelId } )
@@ -233,7 +233,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				data.set('productId', productId)
 				if (Len(files)) {
 					var file = files[1];
-					data.set('file', file)
+					json = super.getMementify().convert( file, "list" );
+					data.set('file', json)
 				}
 				result.setData(data)
 			}

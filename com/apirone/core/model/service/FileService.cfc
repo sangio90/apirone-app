@@ -192,7 +192,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			obj.setDescription( record.description );
 			obj.setExtension( record.extension );
 			obj.setDirectory( record.directory );
-			obj.setUri( obj.getUri() )
 
 			return obj;
 		}
