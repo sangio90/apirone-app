@@ -75,26 +75,26 @@
 					AND products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 				</cfif>
 
-                <cfif !IsNull(arguments.catalogBundleId)>
-                    AND products.catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundleId#">::uuid
-                </cfif>
+				<cfif !IsNull( arguments.catalogBundleId )>
+					AND products.catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundleId#">::uuid
+				</cfif>
 
-                <cfif !IsNull(arguments.modelId)>
-                    AND catalog_bundles.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
-                </cfif>
+				<cfif !IsNull( arguments.modelId )>
+					AND catalog_bundles.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
+				</cfif>
 
-                <cfif !IsNull(arguments.lineId)>
-                    AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
-                </cfif>
+				<cfif !IsNull( arguments.lineId )>
+					AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+				</cfif>
 
-                <cfif !IsNull(arguments.categoryId)>
-                    AND (
-                        (products.catalog_bundle_id IS NULL AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
-                        OR (catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
-                    )
-                </cfif>
+				<cfif !IsNull( arguments.categoryId )>
+					AND (
+						(products.catalog_bundle_id IS NULL AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
+						OR (catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
+					)
+				</cfif>
 
-				<cfif !IsNull(arguments.excludedCategoryIds) AND ArrayLen(arguments.excludedCategoryIds)>
+				<cfif !IsNull( arguments.excludedCategoryIds ) AND ArrayLen( arguments.excludedCategoryIds )>
 					AND (
 						(products.catalog_bundle_id IS NULL AND products.product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">))
 						OR (products.catalog_bundle_id IS NOT NULL AND catalog_bundles.product_category_id NOT IN (<cfqueryparam cfsqltype="Integer" value="#arguments.excludedCategoryIds#" list="yes">))

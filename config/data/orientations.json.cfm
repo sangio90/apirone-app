@@ -1,7 +1,7 @@
 [ 
     {
         id: "HOR",
-        name: "Orizzonale"
+        name: "Orizzontale"
     },
     {
         id: "VER",

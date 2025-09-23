@@ -5,20 +5,29 @@
 
 <cfset dao = new com.apirone.core.model.dao.ColorDAO()>
 
-<cfset colors = dao.find( rawProductId = "MATTPZMOQCARREL", variantId="OCEANIA" )>
+<cfquery name="i" datasource="verticale">
+    SELECT *
+    FROM azapi_codvar AS codvar 
+        INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod 
+    WHERE 1=1 
+        AND comvar.cbcodart = 'MATLASOTTGREZZO' 
+    --ORDER BY arcodart 
+</cfquery>
 
-<cfdump var="#colors#">
+<cfdump var="#i#">
 
 <cfquery name="j" datasource="verticale">
     SELECT *
     FROM azapi_codvar AS codvar 
         INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod 
     WHERE 1=1 
-        AND comvar.cbcodart = 'MATTPZMOQCARREL' 
+        AND comvar.cbcodart = 'MATLASOTTGREZZO' 
     --ORDER BY arcodart 
 </cfquery>
 
 <cfdump var="#j#">
+
+<cfabort>
 
 <cfquery name="k" datasource="verticale">
     SELECT *
