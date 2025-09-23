@@ -56,7 +56,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		transaction {
 			var tmpDir = getTempDir();
 			fileName = "preview_segnaletica_id_" & json.quotationItem.id & ".png";
-			filePath = tmpDir & fileName;
+			filePath = tmpDir & '/' & fileName;
 			binaryData = ToBinary(json.imageBase64);
 
 			fileWrite(filePath, binaryData);

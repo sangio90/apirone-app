@@ -216,6 +216,32 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function getByParams( event, rc, prc ){
+		var result = super.getResult();
+		var data = {}
+		var catalogBundles = super.fire( "catalogBundle.list", { categoryId = rc.categoryId, lineId = rc.lineId, modelId = rc.modelId } )
+		if (Len(catalogBundles)) {
+			var catalogBundle = catalogBundles[1];
+			var products = super.fire( "product.list", { 
+				catalogBundleId = catalogBundle.getId(),
+				finishId = rc.finishId 
+			});
+			if (Len(products)) {
+				var productId = products[1].getId()
+				var files = super.fire( "file.list", { productId: productId })
+				result.productId = productId;
+				data.set('productId', productId)
+				if (Len(files)) {
+					var file = files[1];
+					data.set('file', file)
+				}
+				result.setData(data)
+			}
+		}
+
+		event.setValue( "result", result );
+	}
+
 	function save( event, rc, prc ){
 		var result = super.getResult();
 

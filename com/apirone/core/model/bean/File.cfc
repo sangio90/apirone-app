@@ -26,6 +26,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="extension" type="String";
 	property name="description" type="String";
 	property name="directory" type="String";
+	property name="uri" type="String";
+	property name="directory" type="String";
 	property name="versions" type="Struct";
 	property name="default" type="Boolean" default="false";
 

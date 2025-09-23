@@ -63,7 +63,7 @@
                                     <select id="signageFinish" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la finitura"
-                                        data-bind="source: finishes, value: detailForm.data.quotationItem.product.finish.id, events: { change: loadSignageConfigs }" 
+                                        data-bind="source: finishes, value: detailForm.data.quotationItem.product.finish, events: { change: loadSignageConfigs }" 
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
@@ -117,7 +117,7 @@
                             <div id="signage-rows-container" class="col-6" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
                                 <!--- qui dentro vanno gli items --->
                             </div>
-                            <div id="signage-preview-container" class="col-4" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
+                            <div id="signage-preview-container" class="col-4" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
                                 <!--- qui dentro vanno gli items di preview --->
                             </div>
                         </div>

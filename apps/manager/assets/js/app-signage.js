@@ -73,6 +73,11 @@ AP.signage.modal = ( function() {
         fonts: new kendo.data.DataSource(),
         fontSizes: new kendo.data.DataSource(),
         signageImages: new kendo.data.DataSource(),
+        backgroundImage: {},
+        modelConfig: {
+            height: null,
+            width: null
+        },
 
         pictogramNames: [
             "<dx>",
@@ -104,6 +109,11 @@ AP.signage.modal = ( function() {
 
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
+            $('#signangeProductCategory').prop("disabled", false);
+            $('#signageRow').prop("disabled", false);
+            $('#signageModel').prop("disabled", false);
+            $('#signageFinish').prop("disabled", false);
+            $('#signageFont').prop("disabled", false);
         },
 
         parsedPictograms: function() {
@@ -164,6 +174,9 @@ AP.signage.modal = ( function() {
             }
             viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( signageRow => {
                 this.parsedLineContent( signageRow.content, signageRow.id );
+                 viewModel.updateCharCounter( {
+                    currentTarget: document.getElementById( signageRow.uid + "_contentInput" )
+                } );
             } );
             this.checkCanSave();
         },
@@ -179,7 +192,8 @@ AP.signage.modal = ( function() {
                 const fontFamily = signageConfig.font.family;
                 pictograms.forEach( function( pictogram ) {
                     valore = valore.replace( pictogram,
-                        "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogram.replace( /[<>]/g, "" ) + ".png\" alt=\"" + pictogram.replace( /[<>]/g, "" ) + "\" style=\"transform: scale(" + signageConfigItem.height / 100 + ");\" class=\"pictogram px-2\">"
+                        // "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogram.replace( /[<>]/g, "" ) + ".png\" alt=\"" + pictogram.replace( /[<>]/g, "" ) + "\" style=\"transform: scale(" + signageConfigItem.height / 100 + ");\" class=\"pictogram px-2\">"
+                        "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogram.replace( /[<>]/g, "" ) + ".png\" alt=\"" + pictogram.replace( /[<>]/g, "" ) + "\" style=\"height: " + signageConfigItem.heightInPixel + "px;\" class=\"pictogram px-2\">"
                     );
                 } );
 
@@ -344,7 +358,6 @@ AP.signage.modal = ( function() {
                     done: function( xhr ) {
                         xhr.data.unshift( { id: "", name: "" } );
                         viewModel.get( "lines" ).data( xhr.data );
-                        NM.util.openModal( AP.signage.fields.modalRoot );
                     },
                 },
             } );
@@ -354,6 +367,17 @@ AP.signage.modal = ( function() {
         loadModels: function( event ) {
             if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.id') != '') {
                 $('#signangeProductCategory').prop("disabled", true);
+                if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.name') != 'LETTERING') {
+                    $('#signage-preview-container').css({
+                        width: "500px",
+                        height: "500px"
+                    });
+                } else {
+                    $('#signage-preview-container').css({
+                        width: "",
+                        height: ""
+                    });
+                }
             } else {
                 $('#signangeProductCategory').prop("disabled", false);
             }
@@ -364,7 +388,6 @@ AP.signage.modal = ( function() {
                     done: function( xhr ) {
                         xhr.data.unshift( { id: "", name: "" } );
                         viewModel.get( "models" ).data( xhr.data );
-                        NM.util.openModal( AP.signage.fields.modalRoot );
                     },
                 },
             } );
@@ -384,7 +407,28 @@ AP.signage.modal = ( function() {
                     done: function( xhr ) {
                         xhr.data.unshift( { id: "", name: "" } );
                         viewModel.get( "finishes" ).data( xhr.data );
-                        NM.util.openModal( AP.signage.fields.modalRoot );
+                        NM.util.ajax( {
+                            method: "POST",
+                            url: "/manager/ajax/model-config/get-by-params",
+                            data: { 
+                                categoryId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ), 
+                                lineId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ), 
+                                modelId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" )
+                            },
+                            callback: {
+                                done: function( xhr ) {
+                                    if (xhr.data && xhr.data.modelConfig) {
+                                        var modelConfig = {
+                                            width: xhr.data.modelConfig.width,
+                                            height: xhr.data.modelConfig.height,
+                                        }
+                                        viewModel.set( "modelConfig", modelConfig )
+                                    } else {
+                                        viewModel.set( "modelConfig", { width: null, height: null } )
+                                    }
+                                }
+                            }
+                        })
                     },
                 },
             } );
@@ -421,8 +465,31 @@ AP.signage.modal = ( function() {
                             viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
                             viewModel.get( "fontSizes" ).data( xhr.data[0].items );
                         }
-
-                        NM.util.openModal( AP.signage.fields.modalRoot );
+                        if (viewModel.get('detailForm.data.quotationItem.product.finish.id') != '') {
+                            NM.util.ajax( {
+                            method: "POST",
+                            url: "/manager/ajax/products/get-by-params",
+                            data: { 
+                                categoryId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ), 
+                                lineId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ), 
+                                modelId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ), 
+                                finishId: viewModel.get('detailForm.data.quotationItem.product.finish.id') 
+                            },
+                            callback: {
+                                done: function( xhr ) {
+                                        if (xhr.data.productId) {
+                                            viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data.productId );
+                                        }
+                                        if (xhr.data.file) {
+                                            viewModel.set( "backgroundImage", xhr.data.file );
+                                            viewModel.set( "backgroundImage.url", "url('" + xhr.data.file.uri + "')" );
+                                        } else {
+                                            viewModel.set( "backgroundImage.url", "url()" );
+                                        }
+                                    },
+                                },
+                            })
+                        }
                     },
                 },
             } );
@@ -462,7 +529,7 @@ AP.signage.modal = ( function() {
             parsedData.quotationId = quotationId;
             var preview = $( "#signage-preview-container" )[0];
 
-            html2canvas( preview ).then( function( canvas ) {
+            html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
 

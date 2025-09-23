@@ -38,4 +38,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function getByParams( event, rc, prc ){
+		var result = super.getResult();
+		var data = {};
+
+		var modelConfigs = super.fire( "modelConfig.list", { productCategoryId = rc.categoryId, lineId = rc.lineId, modelId = rc.modelId } )
+		if (Len(modelConfigs)) {
+			var modelConfig = modelConfigs[1];
+			data.set('modelConfig', modelConfig)
+			result.setData(data);
+		}
+
+		event.setValue( "result", result );
+	}
+
 }

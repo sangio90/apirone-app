@@ -226,6 +226,7 @@
 		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.list" ).end();
 		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.upload" ).end();
 
+		post( "/ajax/products/get-by-params" ).to( "ProductAjaxController.getByParams" ).end();
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
 		get( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();
 		delete( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.deleteCombinations" ).end();
@@ -284,7 +285,8 @@
 		/*
 			model configs
 		*/
-		post( "/ajax/model-config" ).to( "ModelConfigAjaxController.save" ).end();
+		post( "/ajax/model-config/get-by-params" ).to( "ModelConfigAjaxController.getByParams" ).end();
+		post( "/ajax/model-config/" ).to( "ModelConfigAjaxController.save" ).end();
 
 
 		/*
