@@ -40,7 +40,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var obj = memy.convert( line, "list" );
 
-			obj[ "markup" ] = !IsNull( lineCategory ) ? lineCategory[ 1 ].getMarkup() : 0;
+			obj[ "markup" ] = Len( lineCategory ) ? lineCategory[ 1 ].getMarkup() : 0;
 
 			data.add( obj );
 		}
