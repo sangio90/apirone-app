@@ -7,6 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="quotationItemProductItemSvc" inject="QuotationItemProductItemService";
 	property name="quotationZoneSvc" inject="QuotationZoneService";
 	property name="quotationItemPositionSvc" inject="QuotationItemPositionService";
+	property name="quotationItemSignageRowSvc" inject="QuotationItemSignageRowService";
 	property name="AccountService" inject="AccountService";
 	property name="ProfileService" inject="ProfileService";
 	property name="LangService" inject="LangService";
@@ -149,6 +150,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			clonedItem.setQuotationZone( quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
 			clonedItem.setId( LCase( CreateUUID() ) );
 			var newQuotationItemId = quotationItemSvc.create( clonedItem );
+
+			var quotationItemSignageRows = quotationItemSignageRowSvc.list( quotationItemId = quotationItem.getId() );
+			for ( quotationItemSignageRow in quotationItemSignageRows ) {
+				var clonedQuotationItemSignageRow = Duplicate( quotationItemSignageRow );
+				clonedQuotationItemSignageRow.setQuotationItemId( newQuotationItemId );
+				quotationItemSignageRowSvc.create( clonedQuotationItemSignageRow );
+			}
 
 			var quotationItemPositions = quotationItemPositionSvc.list( quotationItemId = quotationItem.getId() );
 			for ( quotationItemPosition in quotationItemPositions ) {
