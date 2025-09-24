@@ -112,6 +112,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		quotationSvc.update( originalQuotation );
 		clonedQuotation.setId( LCase( CreateUUID() ) );
 		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
+		clonedQuotation.setActive( 1 );
 		var status = StatusService.get( status );
 		clonedQuotation.setStatus( status );
 
