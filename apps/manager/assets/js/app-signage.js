@@ -485,13 +485,13 @@ AP.signage.modal = ( function() {
                         xhr.data.unshift( { id: "", name: "" } );
                         viewModel.get( "finishes" ).data( xhr.data );
                         NM.util.ajax( {
-                            method: "POST",
-                            url: "/manager/ajax/model-config/get-by-params",
-                            data: { 
-                                categoryId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ), 
-                                lineId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ), 
-                                modelId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" )
-                            },
+                            method: "GET",
+                            url: "/manager/ajax/model-config/get-by-params?categoryId=" + 
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + 
+                                "&lineId=" + 
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) + 
+                                "&modelId=" + 
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
                             callback: {
                                 done: function( xhr ) {
                                     if (xhr.data && xhr.data.modelConfig) {
@@ -544,14 +544,15 @@ AP.signage.modal = ( function() {
                         }
                         if (viewModel.get('detailForm.data.quotationItem.product.finish.id') != '') {
                             NM.util.ajax( {
-                            method: "POST",
-                            url: "/manager/ajax/products/get-id-and-file-by-params",
-                            data: { 
-                                categoryId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ), 
-                                lineId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ), 
-                                modelId: viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ), 
-                                finishId: viewModel.get('detailForm.data.quotationItem.product.finish.id') 
-                            },
+                            method: "GET",
+                            url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" + 
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + 
+                                "&lineId=" + 
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) + 
+                                "&modelId=" + 
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
+                                "&finishId=" + 
+                                viewModel.get('detailForm.data.quotationItem.product.finish.id'),
                             callback: {
                                 done: function( xhr ) {
                                         if (xhr.data.productId) {
