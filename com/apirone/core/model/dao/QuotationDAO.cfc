@@ -194,25 +194,75 @@
 				,
 				active = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotation.getActive()#">
 				,
-				pricelist_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getPricelist().getId()#">::uuid
+				pricelist_id = 
+					<cfif !isNull(arguments.quotation.getPricelist())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getPricelist().getId()#">::uuid 
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				payment_method_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getPaymentMethod().getId()#">::uuid
+				payment_method_id = 
+					<cfif !isNull(arguments.quotation.getPaymentMethod())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getPaymentMethod().getId()#">::uuid
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				custom_payment_method = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getCustomPaymentMethod()#">
+				custom_payment_method = 
+					<cfif !isNull(arguments.quotation.getCustomPaymentMethod())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getCustomPaymentMethod()#">
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				currency_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getCurrency().getId()#">::uuid
+				currency_id = 
+					<cfif !isNull(arguments.quotation.getCurrency())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getCurrency().getId()#">::uuid
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				status_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getStatus().getId()#">
+				status_id = 
+					<cfif !isNull(arguments.quotation.getStatus())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getStatus().getId()#">
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				lang_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getLang().getId()#">
+				lang_id = 
+					<cfif !isNull(arguments.quotation.getLang())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getLang().getId()#">
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				billing_profile_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getBillingProfile().getId()#">::uuid
+				billing_profile_id = 
+					<cfif !isNull(arguments.quotation.getBillingProfile())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getBillingProfile().getId()#">::uuid
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				shipping_profile_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getShippingProfile().getId()#">::uuid
+				shipping_profile_id = 
+					<cfif !isNull(arguments.quotation.getShippingProfile())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getShippingProfile().getId()#">::uuid
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				sales_agent_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getSalesAgentAccount().getId()#">::uuid
+				sales_agent_account_id = 
+					<cfif !isNull(arguments.quotation.getSalesAgentAccount())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getSalesAgentAccount().getId()#">::uuid
+					<cfelse> 
+						NULL 
+					</cfif>
 				,
-				graphic_technician_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getGraphicTechnicianAccount().getId()#">::uuid
+				graphic_technician_account_id = 
+					<cfif !isNull(arguments.quotation.getGraphicTechnicianAccount())>
+						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getGraphicTechnicianAccount().getId()#">::uuid
+					<cfelse> 
+						NULL 
+					</cfif>
 
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getId()#">::uuid

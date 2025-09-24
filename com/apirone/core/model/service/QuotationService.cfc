@@ -137,7 +137,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			clonedZone.setQuotation( quotationSvc.get( newQuotationId ) );
 			clonedZone.setId( LCase( CreateUUID() ) );
 			var newOriginId = quotationZoneIdsMap[ quotationZone.getOrigin().getId() ];
-			clonedQuotationItemZone.setOrigin( quotationZoneSvc.get( newOriginId ) );
+			clonedZone.setOrigin( quotationZoneSvc.get( newOriginId ) );
 			var newQuotationZoneId = quotationZoneSvc.create( clonedZone );
 			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
 		}
@@ -146,7 +146,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		for ( var quotationItem in quotationItems ) {
 			var clonedItem = Duplicate( quotationItem );
 			clonedItem.setQuotation( quotationSvc.get( newQuotationId ) );
-			clonedItem.setQuotationZone( quotatioZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
+			clonedItem.setQuotationZone( quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
 			clonedItem.setId( LCase( CreateUUID() ) );
 			var newQuotationItemId = quotationItemSvc.create( clonedItem );
 
@@ -154,7 +154,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			for ( quotationItemPosition in quotationItemPositions ) {
 				var clonedQuotationItemPosition = Duplicate( quotationItemPosition );
 				clonedQuotationItemPosition.setQuotationItem( clonedItem );
-				clonedQuotationItemPosition.setQuotationZone( quotatioZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
+				clonedQuotationItemPosition.setQuotationZone( quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
 				quotationItemPositionSvc.create( clonedQuotationItemPosition );
 			}
 		}

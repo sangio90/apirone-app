@@ -122,7 +122,6 @@
 
 		quotation.setQuotationDate( DateFormat( quotation.getQuotationDate(), "yyyy-mm-dd" ) );
 		quotation.setValidityDate( DateFormat( quotation.getValidityDate(), "yyyy-mm-dd" ) );
-
 		prc.page[ "quotation" ] = quotation;
 
 		prc.jsScripts.add( "app-plate" );

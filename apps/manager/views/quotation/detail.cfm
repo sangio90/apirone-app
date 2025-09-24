@@ -49,6 +49,10 @@
                                                 required
                                             >
                                         </div>
+                                        <div class="col-sm-1">
+                                            <label class="control-label text-sm-end">Versione </label>
+                                            <span class="form-control" data-bind="text: detailForm.data.versionNumber"></span>
+                                        </div>
                                         <div class="col-sm-2">
                                             <label class="control-label text-sm-end">Numero </label>
                                             <input type="text" name="number" class="form-control" id="quotationNumber"
@@ -57,7 +61,7 @@
                                                 required
                                             >
                                         </div>
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-2">
                                             <label class="control-label text-sm-end">Lingua </label>
                                             <select name="langId" class="form-control"
                                                 data-placeholder="-- Seleziona lingua"
@@ -90,6 +94,7 @@
                                                 data-bind="source: statuses, value: detailForm.data.status.id"
                                                 data-value-field="id"
                                                 data-text-field="name"
+                                                required
                                             >
                                             </select>
                                         </div>
