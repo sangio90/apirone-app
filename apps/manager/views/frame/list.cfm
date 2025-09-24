@@ -25,7 +25,9 @@
 
 									<div class="col">
 										<span>Cerca</span>
-										<input type="text" name="str" class="form-control" id="search-code" placeholder="Cerca">
+										<input type="text" name="str" 
+											class="form-control" 
+											id="search-code" placeholder="Cerca">
 									</div>
 									
 									<div class="col">
@@ -38,7 +40,7 @@
 									</div>
 
 									<div class="col">
-										<span>Stato</label>
+										<span>Status</label>
 										<select class="form-select" name="statusId">
 											<option value="">-- tutti</option>
 											<cfloop array="#prc.statuses#" index="status">

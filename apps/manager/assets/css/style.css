@@ -965,3 +965,37 @@ h2 {
 .align-items-end {
     align-items: end !important;
 }
+
+/*
+    frames
+*/
+
+.frame-grid-row {
+    display: flex;
+}
+
+.frame-grid-cell {
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    background: #fff;
+    width: 100%
+}
+
+/* Bordo sinistro solo sulla prima cella della riga */
+.frame-grid-cell:first-child {
+    border-left: 1px solid #ccc;
+}
+
+/* Bordo superiore solo sulla prima riga (se vuoi) */
+.frame-grid-row:first-child .frame-grid-cell {
+    border-top: 1px solid #ccc;
+}
+
+/*
+    // frames
+*/

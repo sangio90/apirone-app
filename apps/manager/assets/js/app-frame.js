@@ -2,17 +2,9 @@ AP.namespace( "frame" );
 
 AP.frame.fields = {
     listRoot: $( "#frame-list-root" ),
-    listTable: $( "#frame-list-table" ),
     searchForm: $( "#frame-grid-search-form" ),
     detailRoot: $( "#frame-detail-modal" ),
     detailForm: $( "#frame-detail-form" ),
-    cellsContainer: $( "#frame-cells-container" ),
-    cellsTable: $( "#frame-cells-table" ),
-    addRowBtn: $( "#add-row-btn" ),
-    removeRowBtn: $( "#remove-row-btn" ),
-    addColBtn: $( "#add-col-btn" ),
-    removeColBtn: $( "#remove-col-btn" ),
-    saveGridBtn: $( "#save-grid-btn" )
 };
 
 $( document ).ready( function() {
@@ -128,7 +120,7 @@ AP.frame.modal = ( function() {
     };
 
     var cellsToArray = function() {
-        /*
+        /* INFO:
             from array of array:
                 [ //col
                     [{},{}] //row
@@ -159,6 +151,7 @@ AP.frame.modal = ( function() {
         statuses: AP.page.statuses,
         gridRows: 3,
         gridCols: 3,
+        // cellsMatrix: new kendo.data.ObservableArray( [] ),
         cellsMatrix: [],
         loading: false,
         callbacks: {
@@ -167,26 +160,65 @@ AP.frame.modal = ( function() {
             onLoad: undefined
         },
 
+        addBaseGrid: function() {
+            // this.set( "gridRows", this.get( "gridRows" ) + 1 );
+            this.updateCellsMatrix();
+        },
+
+        /*
         addRow: function() {
             this.set( "gridRows", this.get( "gridRows" ) + 1 );
             this.updateCellsMatrix();
+        },
+        */
+
+        addRowAfter: function( rowIdx ) {
+            var matrix = this.get( "cellsMatrix" );
+            var cols = matrix[0].cells.length;
+            var newRow = { cells: [] };
+            for ( var j = 0; j < cols; j++ ) {
+                newRow.cells.push( { value: "_", row: rowIdx + 1, col: j } );
+            }
+            matrix.splice( rowIdx + 1, 0, newRow );
+
+            // Aggiorna gli indici delle righe successive
+            for ( var i = rowIdx + 2; i < matrix.length; i++ ) {
+                for ( var j = 0; j < cols; j++ ) {
+                    matrix[i].cells[j].row = i;
+                }
+            }
+            this.set( "cellsMatrix", matrix );
+        },
+
+        deleteRow: function( rowIdx ) {
+            var matrix = this.get( "cellsMatrix" );
+            if ( matrix.length > 1 ) {
+                matrix.splice( rowIdx, 1 );
+                // Aggiorna gli indici delle righe successive
+                for ( var i = rowIdx; i < matrix.length; i++ ) {
+                    for ( var j = 0; j < matrix[i].cells.length; j++ ) {
+                        matrix[i].cells[j].row = i;
+                    }
+                }
+                this.set( "cellsMatrix", matrix );
+            }
+        },
+
+        addColAfter: function( colIdx ) {
+            var matrix = this.get( "cellsMatrix" );
+            for ( var i = 0; i < matrix.length; i++ ) {
+                matrix[i].cells.splice( colIdx + 1, 0, { value: "_", row: i, col: colIdx + 1 } );
+                // Aggiorna gli indici delle colonne successive
+                for ( var j = colIdx + 2; j < matrix[i].cells.length; j++ ) {
+                    matrix[i].cells[j].col = j;
+                }
+            }
+            this.set( "cellsMatrix", matrix );
         },
 
         removeRow: function() {
             if ( this.get( "gridRows" ) > 1 ) {
                 this.set( "gridRows", this.get( "gridRows" ) - 1 );
-                this.updateCellsMatrix();
-            }
-        },
-
-        addCol: function() {
-            this.set( "gridCols", this.get( "gridCols" ) + 1 );
-            this.updateCellsMatrix();
-        },
-
-        removeCol: function() {
-            if ( this.get( "gridCols" ) > 1 ) {
-                this.set( "gridCols", this.get( "gridCols" ) - 1 );
                 this.updateCellsMatrix();
             }
         },
@@ -197,24 +229,23 @@ AP.frame.modal = ( function() {
             var cells = this.get( "detailForm.data.cells" ) || [];
             var matrix = [];
 
-            // Crea la matrice vuota
+            // Crea la matrice vuota come array di oggetti { cells: [...] }
             for ( var i = 0; i < rows; i++ ) {
-                matrix[i] = [];
+                var row = { cells: [] };
                 for ( var j = 0; j < cols; j++ ) {
-                    matrix[i][j] = { value: "_", row: i, col: j };
+                    row.cells.push( { value: "_", row: i, col: j } );
                 }
+                matrix.push( row );
             }
 
             // Popola la matrice con i valori esistenti
             cells.forEach( function( cell ) {
                 if ( cell.row < rows && cell.col < cols ) {
-                    matrix[cell.row][cell.col] = {
-                        value: cell.value,
-                        row: cell.row,
-                        col: cell.col
-                    };
+                    matrix[cell.row].cells[cell.col].value = cell.value;
                 }
             } );
+
+            console.log( "matrix", matrix );
 
             this.set( "cellsMatrix", matrix );
         },
@@ -248,7 +279,7 @@ AP.frame.modal = ( function() {
 
                         }
 
-                        self.updateCellsMatrix();
+                        // self.updateCellsMatrix();
 
                     },
                 },
