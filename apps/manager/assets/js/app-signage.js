@@ -221,7 +221,6 @@ AP.signage.modal = ( function() {
                                 });
 
                                 Promise.all(promises).then(() => {
-                                    console.log("Tutte le righe sono state elaborate ✅");
                                     viewModel.save();
                                 });
                             }

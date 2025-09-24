@@ -7,6 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="quotationItemProductItemSvc" inject="QuotationItemProductItemService";
 	property name="quotationZoneSvc" inject="QuotationZoneService";
 	property name="quotationItemPositionSvc" inject="QuotationItemPositionService";
+	property name="quotationItemSignageRowSvc" inject="QuotationItemSignageRowService";
 	property name="AccountService" inject="AccountService";
 	property name="ProfileService" inject="ProfileService";
 	property name="LangService" inject="LangService";
@@ -111,6 +112,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		quotationSvc.update( originalQuotation );
 		clonedQuotation.setId( LCase( CreateUUID() ) );
 		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
+		clonedQuotation.setActive( 1 );
 		var status = StatusService.get( status );
 		clonedQuotation.setStatus( status );
 
@@ -137,7 +139,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			clonedZone.setQuotation( quotationSvc.get( newQuotationId ) );
 			clonedZone.setId( LCase( CreateUUID() ) );
 			var newOriginId = quotationZoneIdsMap[ quotationZone.getOrigin().getId() ];
-			clonedQuotationItemZone.setOrigin( quotationZoneSvc.get( newOriginId ) );
+			clonedZone.setOrigin( quotationZoneSvc.get( newOriginId ) );
 			var newQuotationZoneId = quotationZoneSvc.create( clonedZone );
 			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
 		}
@@ -146,15 +148,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		for ( var quotationItem in quotationItems ) {
 			var clonedItem = Duplicate( quotationItem );
 			clonedItem.setQuotation( quotationSvc.get( newQuotationId ) );
-			clonedItem.setQuotationZone( quotatioZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
+			clonedItem.setQuotationZone( quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
 			clonedItem.setId( LCase( CreateUUID() ) );
 			var newQuotationItemId = quotationItemSvc.create( clonedItem );
+
+			var quotationItemSignageRows = quotationItemSignageRowSvc.list( quotationItemId = quotationItem.getId() );
+			for ( quotationItemSignageRow in quotationItemSignageRows ) {
+				var clonedQuotationItemSignageRow = Duplicate( quotationItemSignageRow );
+				clonedQuotationItemSignageRow.setQuotationItemId( newQuotationItemId );
+				quotationItemSignageRowSvc.create( clonedQuotationItemSignageRow );
+			}
 
 			var quotationItemPositions = quotationItemPositionSvc.list( quotationItemId = quotationItem.getId() );
 			for ( quotationItemPosition in quotationItemPositions ) {
 				var clonedQuotationItemPosition = Duplicate( quotationItemPosition );
 				clonedQuotationItemPosition.setQuotationItem( clonedItem );
-				clonedQuotationItemPosition.setQuotationZone( quotatioZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
+				clonedQuotationItemPosition.setQuotationZone( quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] ) );
 				quotationItemPositionSvc.create( clonedQuotationItemPosition );
 			}
 		}

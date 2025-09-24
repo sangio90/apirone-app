@@ -117,7 +117,7 @@
                             <div id="signage-rows-container" class="col-6" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
                                 <!--- qui dentro vanno gli items --->
                             </div>
-                            <div id="signage-preview-container" class="col-4 d-flex flex-column justify-content-center align-items-center" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
+                            <div id="signage-preview-container" class="col-4 d-flex flex-column justify-content-center" data-template="signage-line-preview-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
                                 <!--- qui dentro vanno gli items di preview --->
                             </div>
                         </div>

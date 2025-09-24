@@ -98,6 +98,9 @@ AP.quotationDetail.detail = ( function() {
         filteredShipmentStates: new kendo.data.DataSource(),
         zones: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
+        list: function () {
+            window.location.href = "/manager/quotations";
+        },
 
         getImageSrc: function( event ) {
 
@@ -254,7 +257,11 @@ AP.quotationDetail.detail = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERRORE" ) {
-                                AP.widget.notify( "error", "Errore nel salvataggio del preventivo." );
+                                var error = "Errore nel salvataggio del preventivo."
+                                if (xhr.data.error) {
+                                    error = xhr.data.error
+                                }
+                                AP.widget.notify( "error", error );
                             }
                             if ( xhr.status == "SUCCESS" ) {
                                 AP.widget.notify( "success", "Preventivo salvato correttamente." );
@@ -393,7 +400,7 @@ AP.quotationDetail.detail = ( function() {
         viewModel.getZones();
         
         if ( AP.page.quotation ) {
-            viewModel.setQuotation( AP.page.quotation );
+            viewModel.set( 'detailForm.data', AP.page.quotation );
             // $( "#nav-plan-tab" ).removeAttr("hidden");
             $( "#nav-products-tab" ).removeAttr( "hidden" );
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
