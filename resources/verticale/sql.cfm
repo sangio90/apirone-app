@@ -7,6 +7,16 @@
 
 <cfquery name="i" datasource="verticale">
     SELECT *
+    FROM azapi_artico
+    WHERE 1=1 
+        AND arcodart = 'MATACOFELDIAM18' 
+    --ORDER BY arcodart 
+</cfquery>
+
+<cfdump var="#i#">
+<cfabort>
+<cfquery name="i" datasource="verticale">
+    SELECT *
     FROM azapi_codvar AS codvar 
         INNER JOIN azapi_comvar AS comvar ON comvar.cbcodvar = codvar.varcod 
     WHERE 1=1 

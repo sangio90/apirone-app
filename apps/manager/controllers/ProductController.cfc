@@ -138,7 +138,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			filters[ "Status" ] = status.getName();
 		}
 
-		var products = super.fire( "product.search", searchArgs );
+
+		var products = super.fire( "product.list", searchArgs );
 
 		var data = {};
 
@@ -146,7 +147,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var blundlesCreated = {};
 
-		for ( var product in products.getData() ) {
+		for ( var product in products ) {
 			var row = {}
 
 			row.line   = memy.convert( product.getLine() );
@@ -206,7 +207,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				orientation       = "landscape",
 				pageType          = "A4",
 				overwrite         = true,
-				fontEmbed         = "true",
+				fontEmbed         = true,
 				saveAsName        = "#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
 			}
 		}

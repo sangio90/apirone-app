@@ -8,7 +8,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			"variant",
 			"color",
 			"quantity",
-			"typeId",
+			"typeId"
 		],
 		profiles = {
 			list = {
@@ -28,9 +28,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		}
 	}
 
-	property name="rawProduct" type="com.apirone.core.model.bean.RawProduct";
-	property name="variant" type="com.apirone.core.model.bean.Variant";
-	property name="color" type="com.apirone.core.model.bean.Color";
+	property name="rawProduct" type="com.apirone.core.model.bean.RawProduct"; // arriva da Verticale
+	property name="variant" type="com.apirone.core.model.bean.Variant"; // arriva da Verticale
+	property name="color" type="com.apirone.core.model.bean.Color"; // arriva da Verticale
 	property name="quantity" type="Numeric";
 
 	property name="override" type="com.apirone.core.model.bean.ComponentOverride";

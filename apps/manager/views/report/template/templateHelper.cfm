@@ -1,5 +1,6 @@
 ﻿<cffunction name="getPrintHeader">
-    <cfreturn "<img src='/assets/main/img/logo.png' alt='Apir' style='width: 100%; height: 40px;'>">
+    <!--- TODO: move website to variable --->
+    <cfreturn "<img src='https://test.apirone.cc/assets/main/img/logo.png' alt='Apir' style='width: 100%; height: 40px;'>">
 </cffunction>
 
 <cffunction name="importPrintStyle">
@@ -36,9 +37,9 @@
                 + #component.override.quantity# = #component.totalQuantity#
             </cfif>
 
-            #component.rawProduct.measurementUnit.id#</b> x #component.rawProduct.name# (#component.rawProduct.id#)
-            - #component.variant.name# (#component.variant.id#)
-            - #component.color.name# (#component.color.id#)<br/>
+            #component.rawProduct.measurementUnit.id#</b> x #component.rawProduct.name# (<i>#component.rawProduct.id#</i>)
+            - #component.variant.name# (<i>#component.variant.id#</i>)
+            - #component.color.name# (<i>#component.color.id#</i>)<br/>
         </cfoutput> 
     </cfloop>
 </cffunction>   

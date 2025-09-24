@@ -1,6 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="FrameCellDAO";
+	property name="lookupService" inject="LookupService";
 
 	property name="cacheScope" type="String" default="FrameCell.bean";
 
@@ -93,7 +94,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.frame_cell_id );
 			bean.setRow( record.row );
 			bean.setCol( record.col );
-			bean.setValue( record.value );
+			//bean.setValue( record.value );
+			bean.setType( getLookupService().get( "frameCellType", record.type_id ) );
 			bean.setFrameId( record.frame_id );
 			bean.setCreatedAt( record.created_at );
 

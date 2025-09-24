@@ -30,7 +30,7 @@
 
             <cfset key = product.line.id & '__' & product.model.id>
 
-            <!--- l stampiamo una volta soltanto --->
+            <!--- lo stampiamo una volta soltanto --->
             <cfif product.bundle.keyExists( key ) AND !blundlesPrinted.keyExists( key )>
                 <div style="background-color: ##EAEAEA; padding: 10px;">
                     <h3>Linea/modello</h3>

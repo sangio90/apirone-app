@@ -123,8 +123,8 @@ AP.frame.modal = ( function() {
         /* INFO:
             from array of array:
                 [ //col
-                    [{},{}] //row
-                    [{},{}]
+                    cells: [{},{}] //row
+                    cells: [{},{}]
                 ]
             to plain array
         */
@@ -149,8 +149,11 @@ AP.frame.modal = ( function() {
         detailForm: defaultForm,
         orientations: AP.page.orientations,
         statuses: AP.page.statuses,
+        types: AP.page.types,
+
         gridRows: 3,
         gridCols: 3,
+
         // cellsMatrix: new kendo.data.ObservableArray( [] ),
         cellsMatrix: [],
         loading: false,
@@ -204,8 +207,10 @@ AP.frame.modal = ( function() {
             }
         },
 
-        addColAfter: function( colIdx ) {
+        addCol: function( event ) {
+            var colIdx = event.data.col;
             var matrix = this.get( "cellsMatrix" );
+
             for ( var i = 0; i < matrix.length; i++ ) {
                 matrix[i].cells.splice( colIdx + 1, 0, { value: "_", row: i, col: colIdx + 1 } );
                 // Aggiorna gli indici delle colonne successive
@@ -214,13 +219,6 @@ AP.frame.modal = ( function() {
                 }
             }
             this.set( "cellsMatrix", matrix );
-        },
-
-        removeRow: function() {
-            if ( this.get( "gridRows" ) > 1 ) {
-                this.set( "gridRows", this.get( "gridRows" ) - 1 );
-                this.updateCellsMatrix();
-            }
         },
 
         updateCellsMatrix: function() {

@@ -58,6 +58,7 @@
     function iconButton( String bind, required String icon, String variant="default", size="sm" ){ 
 
         arguments["label"] = "";
+        arguments["type"] = "button";
         
         return getButton( argumentCollection = arguments );
     

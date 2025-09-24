@@ -2,7 +2,7 @@
 
     <div id="frame-detail-modal" class="modal fade">
 
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
 
                 <header class="card-header d-flex align-elements-center justify-content-between">
@@ -13,7 +13,6 @@
                 <div class="card-body">
 
                     <nav>
-                        <!-- Tabs -->
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item active">
                                 <a class="nav-link active" id="frame-nav-detail-but" data-bs-toggle="tab" 

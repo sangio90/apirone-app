@@ -151,6 +151,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		// TODO: move to DataMapper
 
 		var product = component.getRawProduct();
+		
+		/*
+		var headers = GetHTTPRequestData().headers;
+		if ( StructKeyExists( headers, "X-Forwarded-For" ) ) {
+			if ( headers[ "X-Forwarded-For" ] == "185.52.113.41" ) {
+				dump(component.toStruct());
+				dump(component.getId());
+				dump(product);
+				abort;
+			}
+		}
+		*/
 
 		var row = {
 			"id"       = component.getId(),

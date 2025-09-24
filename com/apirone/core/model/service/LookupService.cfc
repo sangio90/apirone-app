@@ -23,12 +23,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"bean" = "measurementUnit",
 			"file" = "measurementUnits.json.cfm"
 		},
-		"modelType"           = { "bean" = "modelType", "file" = "modelTypes.json.cfm" },
-		"profileType"         = { "bean" = "profileType", "file" = "profileTypes.json.cfm" },
-		"textKind"            = { "bean" = "textKind", "file" = "textKinds.json.cfm" },
-		"dataType"            = { "bean" = "dataType", "file" = "dataTypes.json.cfm" },
-		"entity"              = { "bean" = "entity", "file" = "entities.json.cfm" },
-		"orientation"         = { "bean" = "orientation", "file" = "orientations.json.cfm" },
+		"modelType"     = { "bean" = "modelType", "file" = "modelTypes.json.cfm" },
+		"profileType"   = { "bean" = "profileType", "file" = "profileTypes.json.cfm" },
+		"textKind"      = { "bean" = "textKind", "file" = "textKinds.json.cfm" },
+		"dataType"      = { "bean" = "dataType", "file" = "dataTypes.json.cfm" },
+		"entity"        = { "bean" = "entity", "file" = "entities.json.cfm" },
+		"orientation"   = { "bean" = "orientation", "file" = "orientations.json.cfm" },
+		"frameCellType" = {
+			"bean" = "frameCellType",
+			"file" = "frameCellTypes.json.cfm"
+		},
 		"productCategoryMode" = {
 			"bean" = "productCategoryMode",
 			"file" = "productCategoryModes.json.cfm"

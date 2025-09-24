@@ -972,28 +972,85 @@ h2 {
 
 .frame-grid-row {
     display: flex;
+    width: 100%;
 }
 
 .frame-grid-cell {
+    flex: 1 1 0;
+    flex-direction: column;
+    display: flex;
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    padding: 10px;
+    min-width: 60px;
+    min-height: 60px;
+    display: flex;
+    box-sizing: border-box;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+.frame-grid-cell-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 4px;
+    border-bottom: 1px solid #eee;
+    min-height: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Limita lo sbordo */
+}
+
+.frame-grid-cell-header-label {
+    flex: 1 1 auto;
+    text-align: left;
+    font-size: 0.9em;
+    color: #646464;
+}
+
+.frame-grid-cell-header-buttons {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 1;
+    max-width: 80%;
+    /* Limita la larghezza dei bottoni */
+    overflow: hidden;
+}
+
+.frame-grid-cell-content {
+    flex: 1 1 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box;
-    background: #fff;
-    width: 100%
+    padding: 4px;
 }
 
-/* Bordo sinistro solo sulla prima cella della riga */
 .frame-grid-cell:first-child {
     border-left: 1px solid #ccc;
 }
 
-/* Bordo superiore solo sulla prima riga (se vuoi) */
 .frame-grid-row:first-child .frame-grid-cell {
     border-top: 1px solid #ccc;
+}
+
+.frame-grid-cell-header {
+    display: flex;
+    width: 100%;
+}
+
+.frame-grid-cell-header-buttons {
+    width: 100%;
+    text-align: text-right;
+}
+
+.frame-grid-cell-header-label {
+    color: #CCCCCC;
+    font-size: 13px;
 }
 
 /*
