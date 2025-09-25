@@ -254,5 +254,17 @@
         "name": "product_category_line_id",
         "type": "Integer"
     },
+    "component.rawProductId": {
+        "name": "raw_product_id",
+        "type": "Varchar"
+    },
+    "component.variantId": {
+        "name": "variant_id",
+        "type": "Varchar"
+    },
+    "component.colorId": {
+        "name": "color_id",
+        "type": "Varchar"
+    },
 
 }

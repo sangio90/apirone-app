@@ -16,7 +16,9 @@
 	actions: {
 		"CREATED": {},
 		"UPDATED": {},
+		"MULTI_UPDATED": {},
 		"DELETED": {},
+		"MULTI_DELETED": {},
 		"LOGIN": {},
 		"FAILED": {},
 		"LOGOUT": {},

@@ -103,9 +103,9 @@
 				roles: "ADM"
 			},
 			{
-				href: "/manager/reassign-components",
+				href: "/manager/components/reassign",
 				icon: "fas fa-stream",
-				title: "Riassegna componenti",
+				title: "Gestione componenti",
 				roles: "ADM"
 			},
 			{

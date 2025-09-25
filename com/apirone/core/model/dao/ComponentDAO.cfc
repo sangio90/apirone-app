@@ -56,15 +56,15 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.rawProductId )>
-					AND raw_product_id = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="Varchar">
+					AND TRIM(raw_product_id) = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="Varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.variantId )>
-					AND variant_id = <cfqueryparam value="#arguments.variantId#" cfsqltype="Varchar">
+					AND TRIM(variant_id) = <cfqueryparam value="#arguments.variantId#" cfsqltype="Varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.colorId )>
-					AND color_id = <cfqueryparam value="#arguments.colorId#" cfsqltype="Varchar">
+					AND TRIM(color_id) = <cfqueryparam value="#arguments.colorId#" cfsqltype="Varchar">
 				</cfif>
 
 			ORDER BY
@@ -189,18 +189,11 @@
 		<cfargument name="paramCategory" type="String">
 		<cfargument name="newParam" type="String" required="true">
 
-		<cfset var columnName = LCase(
-			ReReplace(
-				arguments.paramCategory,
-				"([A-Z])",
-				"_\1",
-				"all"
-			)
-		)>
+		<cfset var dbField = getDBField( "component.#arguments.paramCategory#" )>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE components
-			SET #columnName# = <cfqueryparam cfsqltype="Varchar" value="#arguments.newParam#">
+			SET #dbField.name# = <cfqueryparam cfsqltype="Varchar" value="#arguments.newParam#">
 			WHERE
 				component_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.componentId#">
 		</cfquery>
