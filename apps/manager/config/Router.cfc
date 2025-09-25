@@ -213,6 +213,12 @@
 		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
 		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end();
 
+		/*
+			reassign components
+		*/
+		post( "/ajax/reassign-components" ).to( "ComponentAjaxController.reassign" ).end();
+		get( "/reassign-components" ).to( "ComponentController.list" ).end();
+
 
 		/*
 			files

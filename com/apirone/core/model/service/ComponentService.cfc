@@ -13,7 +13,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="Component.bean";
 
-	public com.apirone.core.model.bean.Component function get( required String componentId ){
+	public com.apirone.core.model.bean.Component function get( required String componentId, verticale = true ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.componentId );
@@ -22,7 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return cache.data;
 		}
 
-		var bean = build( arguments.componentId );
+		var bean = build( arguments.componentId, verticale );
 		cm.put( getCacheScope(), arguments.componentId, bean );
 
 		return bean;
@@ -72,14 +72,57 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( record.component_id ) );
+			rows.add( get( record.component_id, false ) );
 		} );
+		dump(records);abort;
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.recordcount ) );
-
 		return result;
+	}
+
+	public Numeric function massiveReassign(
+		String rawProductId,
+		String variantId,
+		String colorId,
+		String paramCategory,
+		String newParam,
+	){
+		arguments[ "limit" ] = -1;
+
+		var rows   = [];
+		var result = super.getResult();
+
+		var records = getDao().find( argumentCollection = arguments );
+		var params = {};
+
+		if (paramCategory == 'rawProductId') {
+			params = {
+				'paramCategory' = paramCategory,
+				'newParam' = newParam
+			}
+		}
+		if (paramCategory == 'variantId') {
+			params = {
+				'paramCategory' = paramCategory,
+				'newParam' = newParam
+			}
+		}
+		if (paramCategory == 'colorId') {
+			params = {
+				'paramCategory' = paramCategory,
+				'newParam' = newParam
+			}
+		}
+
+		records.each( function( record ){
+			var rowParams = params;
+			rowParams['componentId'] = record.component_id;
+			getDao().reassign( argumentCollection = rowParams );
+		} );
+
+		return Val( records.recordcount );
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String componentId ){
@@ -197,7 +240,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	private com.apirone.core.model.bean.Component function build( required String componentId ){
+	private com.apirone.core.model.bean.Component function build( required String componentId, verticale = true ){
 		var record = getDao().read( arguments.componentId );
 
 		if ( record.recordCount ) {
@@ -223,10 +266,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.component_id );
 
-			bean.setRawProduct( getRawProductService().get( record.raw_product_id ) );
-
-			bean.setVariant( getVariantService().get( record.variant_id ) );
-			bean.setColor( getColorService().get( record.color_id ) );
+			if (verticale) {
+				bean.setRawProduct( getRawProductService().get( record.raw_product_id ) );
+	
+				bean.setVariant( getVariantService().get( record.variant_id ) );
+				bean.setColor( getColorService().get( record.color_id ) );
+			}
 
 			bean.setQuantity( record.quantity );
 			bean.setCreatedAt( record.created_at );

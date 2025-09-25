@@ -103,6 +103,12 @@
 				roles: "ADM"
 			},
 			{
+				href: "/manager/reassign-components",
+				icon: "fas fa-stream",
+				title: "Riassegna componenti",
+				roles: "ADM"
+			},
+			{
 				href: "/manager/catalog-bundles",
 				icon: "fas fa-palette",
 				title: "Bundle catalogo",

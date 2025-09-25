@@ -19,6 +19,9 @@
 		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
 		<cfargument name="attributeValueId" type="String">
+		<cfargument name="rawProductId" type="String">
+		<cfargument name="variantId" type="String">
+		<cfargument name="colorId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -50,6 +53,18 @@
 
 				<cfif !IsNull( arguments.attributeValueId )>
 					AND attribute_raw_value_id = <cfqueryparam value="#arguments.attributeValueId#" cfsqltype="Integer">
+				</cfif>
+
+				<cfif !IsNull( arguments.rawProductId )>
+					AND raw_product_id = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="Varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.variantId )>
+					AND variant_id = <cfqueryparam value="#arguments.variantId#" cfsqltype="Varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.colorId )>
+					AND color_id = <cfqueryparam value="#arguments.colorId#" cfsqltype="Varchar">
 				</cfif>
 
 			ORDER BY
@@ -160,6 +175,22 @@
 		<cffile action="APPEND" file="#ExpandPath( "/debug.log" )#" output="#Now()# ComponentDAO: update">
 
 		<cfreturn arguments.component.getId()>
+	</cffunction>
+
+	<cffunction name="reassign" returntype="Numeric">
+		<cfargument name="componentId" type="Numeric" required="true">
+		<cfargument name="paramCategory" type="String">
+		<cfargument name="newParam" type="String" required="true">
+
+		<cfset var columnName = lcase( reReplace( arguments.paramCategory, "([A-Z])", "_\1", "all" ) )>
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE components
+			SET #columnName# = <cfqueryparam cfsqltype="Varchar" value="#arguments.newParam#">
+			WHERE
+				component_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.componentId#">
+		</cfquery>
+		<cfreturn arguments.componentId>
 	</cffunction>
 
 
