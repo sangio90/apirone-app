@@ -182,11 +182,11 @@
 		<cfargument name="paramCategory" type="String">
 		<cfargument name="newParam" type="String" required="true">
 
-		<cfset var columnName = lcase( reReplace( arguments.paramCategory, "([A-Z])", "_\1", "all" ) )>
+		<cfset var dbField = getDBField( "component.#arguments.paramCategory#" )>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE components
-			SET #columnName# = <cfqueryparam cfsqltype="Varchar" value="#arguments.newParam#">
+			SET #dbField.name# = <cfqueryparam cfsqltype="Varchar" value="#arguments.newParam#">
 			WHERE
 				component_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.componentId#">
 		</cfquery>

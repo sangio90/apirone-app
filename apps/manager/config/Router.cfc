@@ -208,23 +208,21 @@
 
 
 		/*
+			reassign components
+		*/
+		get( "/components/reassign" ).to( "ComponentController.list" ).end();
+		post( "/ajax/components/reassign" ).to( "ComponentAjaxController.reassign" ).end();
+		delete( "/ajax/components/delete" ).to( "ComponentAjaxController.massiveDelete" ).end();
+		/*
 			components
 		*/
 		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
 		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end();
 
 		/*
-			reassign components
-		*/
-		post( "/ajax/reassign-components" ).to( "ComponentAjaxController.reassign" ).end();
-		get( "/reassign-components" ).to( "ComponentController.list" ).end();
-
-
-		/*
 			files
 		*/
 		delete( "/ajax/files/:id" ).to( "FileAjaxController.delete" ).end();
-
 
 		/*
 			products

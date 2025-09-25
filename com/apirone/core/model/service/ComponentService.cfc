@@ -120,6 +120,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var rowParams = params;
 			rowParams['componentId'] = record.component_id;
 			getDao().reassign( argumentCollection = rowParams );
+			super.getCacheManager().remove( getCacheScope(), record.component_id );
+		} );
+
+		return Val( records.recordcount );
+	}
+	
+	public Numeric function massiveDelete(
+		String rawProductId,
+		String variantId,
+		String colorId,
+		String paramCategory
+	){
+		arguments[ "limit" ] = -1;
+
+		var rows   = [];
+		var result = super.getResult();
+
+		var records = getDao().find( argumentCollection = arguments );
+		var params = {};
+
+		records.each( function( record ){
+			delete(record.component_id);
 		} );
 
 		return Val( records.recordcount );
@@ -128,7 +150,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Outcome function delete( required String componentId ){
 		var outcome = super.bean( "Outcome" );
 
-		var obj = get( arguments.componentId );
+		var obj = get( arguments.componentId, false );
 
 		outcome.setData( { componentId = arguments.componentId } );
 
