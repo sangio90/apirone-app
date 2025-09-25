@@ -105,17 +105,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( paramCategory == "variantId" ) {
 			params = { "paramCategory" = paramCategory, "newParam" = newParam }
 		}
-		if (paramCategory == 'colorId') {
-			params = {
-				'paramCategory' = paramCategory,
-				'newParam' = newParam
-			}
+		if ( paramCategory == "colorId" ) {
+			params = { "paramCategory" = paramCategory, "newParam" = newParam }
 		}
 
 		super.logEvent(
 			event   = "component.MULTI_UPDATED",
 			message = "Massive component reassign procedure started",
-			payload = { "Criteria" = paramCategory, "oldValue": oldParam, "newValue": newParam }
+			payload = {
+				"Criteria" = paramCategory,
+				"oldValue" = oldParam,
+				"newValue" = newParam
+			}
 		);
 		records.each( function( record ){
 			var rowParams              = params;
@@ -124,20 +125,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			super.getCacheManager().remove( getCacheScope(), record.component_id );
 			super.logEvent(
 				event   = "component.UPDATED",
-				message = "Component [#rowParams['componentId']#] updated.",
-				payload = { "Criteria" = rowParams['paramCategory'], "id": rowParams['componentId'], "oldValue": oldParam, "newValue": rowParams['newParam'] }
+				message = "Component [#rowParams[ "componentId" ]#] updated.",
+				payload = {
+					"Criteria" = rowParams[ "paramCategory" ],
+					"id"       = rowParams[ "componentId" ],
+					"oldValue" = oldParam,
+					"newValue" = rowParams[ "newParam" ]
+				}
 			);
 		} );
 
 		super.logEvent(
 			event   = "component.MULTI_UPDATED",
 			message = "Massive component reassign procedure ended",
-			payload = { "Criteria" = paramCategory, "oldValue": oldParam, "newValue": newParam, "recordUpdated": Val( records.recordcount ) }
+			payload = {
+				"Criteria"      = paramCategory,
+				"oldValue"      = oldParam,
+				"newValue"      = newParam,
+				"recordUpdated" = Val( records.recordcount )
+			}
 		);
 
 		return Val( records.recordcount );
 	}
-	
+
 	public Numeric function massiveDelete(
 		String rawProductId,
 		String variantId,
@@ -151,21 +162,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var result = super.getResult();
 
 		var records = getDao().find( argumentCollection = arguments );
-		var params = {};
+		var params  = {};
 		super.logEvent(
 			event   = "component.MULTI_DELETED",
 			message = "Massive component delete procedure started",
-			payload = { "Criteria" = paramCategory, "Value": oldParam }
+			payload = { "Criteria" = paramCategory, "Value" = oldParam }
 		);
 
 		records.each( function( record ){
-			delete(record.component_id);
+			delete( record.component_id );
 		} );
 
 		super.logEvent(
 			event   = "component.MULTI_DELETED",
 			message = "Massive component delete procedure ended",
-			payload = { "Criteria" = paramCategory, "Value": oldParam, "recordUpdated": Val( records.recordcount ) }
+			payload = {
+				"Criteria"      = paramCategory,
+				"Value"         = oldParam,
+				"recordUpdated" = Val( records.recordcount )
+			}
 		);
 
 		return Val( records.recordcount );
@@ -184,7 +199,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				super.logEvent(
 					event   = "component.DELETED",
 					message = "Component [#arguments.componentId#] deleted.",
-					payload = { "id": arguments.componentId }
+					payload = { "id" = arguments.componentId }
 				);
 				super.getCacheManager().remove( "Component_#obj.getId()#" );
 			} catch ( any error ) {
