@@ -7,18 +7,18 @@
                 <form id="frame-cell-form" method="POST" name="frame-cell-form">
 
                     <header class="card-header d-flex align-elements-center justify-content-between">
-                        <h2 class="card-title" data-bind="text:modelConfigModal.title"></h2>
+                        <h2 class="card-title" data-bind="text:title"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>
 
                     <div class="card-body">
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Tipo</label>
+                            <label class="col-sm-2 col-form-label text-end">Contenuto cella</label>
                             <div class="col-sm-10">
-								<select id="orientationId" class="form-control" name="typeId"
+								<select id="typeId" class="form-control" name="typeId"
 									required
-									data-bind="source: typesForCell, value: type" 
+									data-bind="source: typesForCell, events: { change: setCellType }"
 									data-value-field="id"
 									data-text-field="name"
 									>
@@ -26,14 +26,14 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row">
+                        <div class="mb-3 row" data-bind="visible: showDimensions" id="frame-cell-modal-dimensions">
                             <label class="col-sm-2 col-form-label text-end">Larghezza</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
                                     <input type="text" required class="form-control col-sm-4"
                                         name="width"
                                         maxlength="5"
-                                        data-bind="value: modelConfigModal.data.width"
+                                        data-bind="value: data.width"
                                     >
                                     <div class="input-group-append">
                                         <span class="input-group-text">mm</span>
@@ -43,19 +43,32 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row">
+                        <div class="mb-3 row" data-bind="visible: showDimensions">
                             <label class="col-sm-2 col-form-label text-end">Altezza</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
-                                    <input type="text" required class="form-control col-sm-4" name="height"
-                                        data-msg-required="height"
-                                        maxlength="125"
-                                        data-bind="value: modelConfigModal.data.height">
+                                    <input type="text" required class="form-control col-sm-4" 
+                                        name="height"
+                                        maxlength="5"
+                                        data-bind="value: data.height">
                                     <div class="input-group-append">
                                         <span class="input-group-text">mm</span>
                                     </div>
                                 </div>
                                 <span id="height-error"></span>
+                            </div>
+                        </div>                        
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Orientam. cella</label>
+                            <div class="col-sm-10">
+								<select id="orientationId" class="form-control" name="orientationId"
+									required
+									data-bind="source: orientations"
+									data-value-field="id"
+									data-text-field="name"
+									>
+								</select>
                             </div>
                         </div>
 

@@ -163,6 +163,7 @@
         </div>
     </div>
 
+    #view("frame/detail-modal-cell")#
     #template( view="jstemplate/frame/frame-cells-row-tmpl" )#
 
 </cfoutput>

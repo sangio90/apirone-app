@@ -128,12 +128,17 @@ AP.frame.modal = ( function() {
                 col   : 0,
                 row   : 0,
                 id    : NM.util.uuid(),
-                type  : { id: "AVAIL" }
+                type  : { id: "AVAIL", name: "" },
+                orientation: { id: "HOR", name: "" }
             };
         }
 
         var viewModel = new kendo.observable( {
             data: data,
+
+            title: function() {
+                return "Modifica cella " + this.get( "data.row" ) + "/" + this.get( "data.col" );
+            },
 
             shortId: function() {
                 return this.get( "data.id" ).substr( -5 );
@@ -142,6 +147,11 @@ AP.frame.modal = ( function() {
             showContent: function() {
                 var typeId = this.get( "data.type.id" );
                 return typeId != "COMMAND";
+            },
+
+            showDimensions: function() {
+                var typeId = this.get( "data.type.id" );
+                return typeId == "EMPTY";
             },
 
             showColCommands: function() {
@@ -179,12 +189,53 @@ AP.frame.modal = ( function() {
 
 
             editCell: function( event ) {
+
+                /*
+                    NOTE: mvvm does not work fully
+                    for this, added:
+                        setCellType()
+                        saveCell()
+                */
+
                 event.data;
 
-                // AP.frame.cellModal.edit(this.get("data"), (updated) => {
-                NM.util.openModal( "#cell-edit-modal" );
+                event.data.typesForCell = AP.page.types;
+                event.data.orientations = AP.page.orientations;
 
-                kendo.bind( $( "#cell-edit-modal" ), event.data );
+                console.log( "event.data.typesForCell", event.data.typesForCell );
+
+                console.log( "editCell.data", event );
+                console.log( "editCell.data:this", viewModel );
+                console.log( "editCell.isObservable:", typeof this.get === "function" );
+                console.log( "editCell.costructor", this.constructor.name );
+
+                NM.util.openModal( $( "#frame-cell-modal" ) );
+
+                kendo.bind( $( "#frame-cell-modal" ), viewModel );
+
+                return false;
+            },
+
+            setCellType: function( event ) {
+
+                var target = $( event.currentTarget );
+                var value = target.val();
+
+                this.set( "data.type.id", value );
+
+                return false;
+            },
+
+            saveCell: function( event ) {
+
+                var data = $( "#frame-cell-form" ).serializeJSON();
+
+                this.set( "data.type.id", data.typeId );
+                this.set( "data.orientation.id", data.orientationId );
+                this.set( "data.height", data.height );
+                this.set( "data.width", data.width );
+
+                $( "#frame-cell-modal" ).modal( "close" );
 
                 return false;
             },
@@ -210,7 +261,7 @@ AP.frame.modal = ( function() {
                 return this.get( "data.type.id" ) == "AVAIL";
             },
 
-            isUnAvailable: function() {
+            isUnvailable: function() {
                 return this.get( "data.type.id" ) == "NOTAV";
             }
         } );
@@ -398,7 +449,7 @@ AP.frame.modal = ( function() {
         updateIndexes: function() {
 
             var matrix = this.get( "matrix" );
-            console.log( "matrix_before", matrix );
+            // console.log( "matrix_before", matrix );
 
             // Cicla su tutte le righe
             for ( var i = 0; i < matrix.length; i++ ) {
@@ -415,8 +466,8 @@ AP.frame.modal = ( function() {
                 // i.set( "cells", matrix[i].cells );
             }
 
-            var matrix = this.get( "matrix" );
-            console.log( "matrix_after", matrix );
+            // var matrix = this.get( "matrix" );
+            // console.log( "matrix_after", matrix );
 
             // this.set( "matrix", matrix );
 

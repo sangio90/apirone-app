@@ -54,17 +54,13 @@
 			</div>
 
 			<div class="frame-grid-cell-content" data-bind="visible: showContent">
-				<div >
-					Larghezza: <span data-bind="text: shortId"></span>
-					Larghezza: <span data-bind="text: data.width"></span>
-					Altezza: <span data-bind="text: data.height"></span>
-				</div>
+				Type: <span data-bind="text: data.type.id"></span>
+				Larghezza: <span data-bind="text: data.width"></span>
+				Altezza: <span data-bind="text: data.height"></span>
 			</div>
 
 		</div>
 
     </nmscript>
-
-
 	
 </cfoutput>
