@@ -48,7 +48,7 @@ AP.reassignComponent.form = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if( xhr.status == "SUCCESS" ) {
-                            AP.widget.notify( "success", xhr.data.message );
+                            //AP.widget.notify( "success", xhr.data.message );
                             $("#resultMessage").attr("style", "color: green; font-weight: bold; font-size: 18px;");
                             $('#resultMessage').text(xhr.data.message);
                             setTimeout(function() {
@@ -56,7 +56,7 @@ AP.reassignComponent.form = ( function() {
                             }, 5000);
                         }
                         if ( xhr.status == "ERRORE" ) {
-                            AP.widget.notify( "error", xhr.data.error );
+                            //AP.widget.notify( "error", xhr.data.error );
                             $("#resultMessage").attr("style", "color: red; font-weight: bold; font-size: 18px;");
                             $('#resultMessage').text(xhr.data.error);
                             setTimeout(function() {
