@@ -2,10 +2,10 @@ component extends="com.apirone.core.controller.AbsController" {
 	function reassign( event, rc, prc ){
 		var result = super.getResult();
 		var args = {};
-		args[ rc.category ] = rc.oldParam;
+		args[ rc.category ] = uCase( trim( rc.oldParam ) );
 		args[ 'paramCategory' ] = rc.category;
-		args[ 'newParam' ] = rc.newParam;
-		args[ 'oldParam' ] = rc.oldParam;
+		args[ 'newParam' ] = uCase( trim( rc.newParam ) );
+		args[ 'oldParam' ] = uCase( trim( rc.oldParam ) );
 
 		transaction {
 			try {
@@ -37,9 +37,9 @@ component extends="com.apirone.core.controller.AbsController" {
 	function massiveDelete( event, rc, prc ){
 		var result = super.getResult();
 		var args = {};
-		args[ rc.category ] = rc.oldParam;
+		args[ rc.category ] = uCase( trim( rc.oldParam ) );
 		args[ 'paramCategory' ] = rc.category;
-		args[ 'oldParam' ] = rc.oldParam;
+		args[ 'oldParam' ] = uCase( trim( rc.oldParam ) );
 
 		transaction {
 			try {

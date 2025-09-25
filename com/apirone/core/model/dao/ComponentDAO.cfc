@@ -56,15 +56,15 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.rawProductId )>
-					AND raw_product_id = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="Varchar">
+					AND TRIM(raw_product_id) = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="Varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.variantId )>
-					AND variant_id = <cfqueryparam value="#arguments.variantId#" cfsqltype="Varchar">
+					AND TRIM(variant_id) = <cfqueryparam value="#arguments.variantId#" cfsqltype="Varchar">
 				</cfif>
 
 				<cfif !IsNull( arguments.colorId )>
-					AND color_id = <cfqueryparam value="#arguments.colorId#" cfsqltype="Varchar">
+					AND TRIM(color_id) = <cfqueryparam value="#arguments.colorId#" cfsqltype="Varchar">
 				</cfif>
 
 			ORDER BY
