@@ -88,6 +88,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String colorId,
 		String paramCategory,
 		String newParam,
+		String oldParam
 	){
 		arguments[ "limit" ] = -1;
 
@@ -116,12 +117,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
+		super.logEvent(
+			event   = "component.MULTI_UPDATED",
+			message = "Massive component reassign procedure started",
+			payload = { "paramCategory" = paramCategory, "oldValue": oldParam, "newValue": newParam }
+		);
 		records.each( function( record ){
 			var rowParams = params;
 			rowParams['componentId'] = record.component_id;
 			getDao().reassign( argumentCollection = rowParams );
 			super.getCacheManager().remove( getCacheScope(), record.component_id );
+			super.logEvent(
+				event   = "component.UPDATED",
+				message = "Component [#rowParams['componentId']#] updated.",
+				payload = { "paramCategory" = rowParams['paramCategory'], "id": rowParams['componentId'], "oldValue": oldParam, "newValue": rowParams['newParam'] }
+			);
 		} );
+
+		super.logEvent(
+			event   = "component.MULTI_UPDATED",
+			message = "Massive component reassign procedure ended",
+			payload = { "paramCategory" = paramCategory, "oldValue": oldParam, "newValue": newParam, "recordUpdated": Val( records.recordcount ) }
+		);
 
 		return Val( records.recordcount );
 	}
@@ -130,7 +147,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String rawProductId,
 		String variantId,
 		String colorId,
-		String paramCategory
+		String paramCategory,
+		String oldParam
 	){
 		arguments[ "limit" ] = -1;
 
@@ -139,10 +157,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var records = getDao().find( argumentCollection = arguments );
 		var params = {};
+		super.logEvent(
+			event   = "component.MULTI_DELETED",
+			message = "Massive component delete procedure started",
+			payload = { "paramCategory" = paramCategory, "criteria": oldParam }
+		);
 
 		records.each( function( record ){
 			delete(record.component_id);
+			super.logEvent(
+				event   = "component.DELETED",
+				message = "Component [#record.component_id#] deleted.",
+				payload = { "id": record.component_id }
+			);
 		} );
+
+		super.logEvent(
+			event   = "component.MULTI_DELETED",
+			message = "Massive component delete procedure ended",
+			payload = { "paramCategory" = paramCategory, "Criteria": oldParam, "recordUpdated": Val( records.recordcount ) }
+		);
 
 		return Val( records.recordcount );
 	}

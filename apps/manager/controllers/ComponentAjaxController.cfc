@@ -5,6 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		args[ rc.category ] = rc.oldParam;
 		args[ 'paramCategory' ] = rc.category;
 		args[ 'newParam' ] = rc.newParam;
+		args[ 'oldParam' ] = rc.oldParam;
 
 		transaction {
 			try {
@@ -38,6 +39,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var args = {};
 		args[ rc.category ] = rc.oldParam;
 		args[ 'paramCategory' ] = rc.category;
+		args[ 'oldParam' ] = rc.oldParam;
 
 		transaction {
 			try {
