@@ -165,11 +165,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		records.each( function( record ){
 			delete(record.component_id);
-			super.logEvent(
-				event   = "component.DELETED",
-				message = "Component [#record.component_id#] deleted.",
-				payload = { "id": record.component_id }
-			);
 		} );
 
 		super.logEvent(
@@ -191,7 +186,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			try {
 				getDao().delete( arguments.componentId );
-
+				super.logEvent(
+					event   = "component.DELETED",
+					message = "Component [#arguments.componentId#] deleted.",
+					payload = { "id": arguments.componentId }
+				);
 				super.getCacheManager().remove( "Component_#obj.getId()#" );
 			} catch ( any error ) {
 				outcome.setError( error );
