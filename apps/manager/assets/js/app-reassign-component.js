@@ -25,14 +25,31 @@ AP.reassignComponent.ressignForm = ( function() {
         save: function( event ) {
             event.preventDefault();
 
+            var category = viewModel.get('category')
+            var oldParam = viewModel.get('oldParam')
+            var newParam = viewModel.get('newParam')
+
+            if (category == null || category == '') {
+                AP.widget.notify( "warning", "Imposta la categoria." );
+                return false;
+            }
+            if (oldParam == null || oldParam == '') {
+                AP.widget.notify( "warning", "Imposta il vecchio parametro." );
+                return false;
+            }
+            if (newParam == null || newParam == '') {
+                AP.widget.notify( "warning", "Imposta il nuovo parametro." );
+                return false;
+            }
+
             var categoryString = '';
-            if (viewModel.get('category') == 'rawProductId') {
+            if (category == 'rawProductId') {
                 categoryString = 'Prodotto';
             }
-            if (viewModel.get('category') == 'colorId') {
+            if (category == 'colorId') {
                 categoryString = 'Colore';
             }
-            if (viewModel.get('category') == 'variantId') {
+            if (category == 'variantId') {
                 categoryString = 'Variante';
             }
             bootbox.confirm( {
@@ -50,23 +67,6 @@ AP.reassignComponent.ressignForm = ( function() {
                 },
                 callback: function( result ) {
                     if ( result ) {
-                        var category = viewModel.get('category')
-                        var oldParam = viewModel.get('oldParam')
-                        var newParam = viewModel.get('newParam')
-
-                        if (category == null || category == '') {
-                            AP.widget.notify( "warning", "Imposta la categoria." );
-                            return false;
-                        }
-                        if (oldParam == null || oldParam == '') {
-                            AP.widget.notify( "warning", "Imposta il vecchio parametro." );
-                            return false;
-                        }
-                        if (newParam == null || newParam == '') {
-                            AP.widget.notify( "warning", "Imposta il nuovo parametro." );
-                            return false;
-                        }
-
                         NM.util.ajax( {
                             method: "POST",
                             url: "/manager/ajax/components/reassign",
@@ -129,16 +129,29 @@ AP.reassignComponent.deleteForm = ( function() {
         oldParam: null,
         delete: function( event ) {
             event.preventDefault();
+            var category = viewModel.get('category')
+            var oldParam = viewModel.get('oldParam')
+
+            if (category == null || category == '') {
+                AP.widget.notify( "warning", "Imposta la categoria." );
+                return false;
+            }
+            if (oldParam == null || oldParam == '') {
+                AP.widget.notify( "warning", "Imposta il parametro." );
+                return false;
+            }
+            
             var categoryString = '';
-            if (viewModel.get('category') == 'rawProductId') {
+            if (category == 'rawProductId') {
                 categoryString = 'Prodotto';
             }
-            if (viewModel.get('category') == 'colorId') {
+            if (category == 'colorId') {
                 categoryString = 'Colore';
             }
-            if (viewModel.get('category') == 'variantId') {
+            if (category == 'variantId') {
                 categoryString = 'Variante';
             }
+
             bootbox.confirm( {
                 title: "Conferma eliminazione",
                 message: "Sei sicuro di voler cancellare i componenti con <b>" + categoryString + "</b> uguale a <b>" + viewModel.get('oldParam') + "</b>?",
@@ -154,18 +167,6 @@ AP.reassignComponent.deleteForm = ( function() {
                 },
                 callback: function( result ) {
                     if ( result ) {
-                        var category = viewModel.get('category')
-                        var oldParam = viewModel.get('oldParam')
-
-                        if (category == null || category == '') {
-                            AP.widget.notify( "warning", "Imposta la categoria." );
-                            return false;
-                        }
-                        if (oldParam == null || oldParam == '') {
-                            AP.widget.notify( "warning", "Imposta il parametro." );
-                            return false;
-                        }
-
                         NM.util.ajax( {
                             method: "DELETE",
                             url: "/manager/ajax/components/delete",
