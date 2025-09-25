@@ -119,6 +119,106 @@ AP.frame.modal = ( function() {
         }
     };
 
+    var createCell = function( data ) {
+
+        if ( !data ) {
+            var data = {
+                width : 0,
+                height: 0,
+                col   : 0,
+                row   : 0,
+                id    : NM.util.uuid(),
+                type  : { id: "AVAIL" }
+            };
+        }
+
+        var viewModel = new kendo.observable( {
+            data: data,
+
+            shortId: function() {
+                return this.get( "data.id" ).substr( -5 );
+            },
+
+            showContent: function() {
+                var typeId = this.get( "data.type.id" );
+                return typeId != "COMMAND";
+            },
+
+            showColCommands: function() {
+                var col = this.get( "data.col" );
+                var row = this.get( "data.row" );
+
+                if ( col == 0 && row == 0 ) {
+                    return false;
+                }
+
+                return this.get( "data.row" ) == 0;
+            },
+
+            showRowCommands: function() {
+                var col = this.get( "data.col" );
+                var row = this.get( "data.row" );
+
+                if ( col == 0 && row == 0 ) {
+                    return false;
+                }
+
+                return col == 0;
+            },
+
+            showCellEdit: function() {
+                var col = this.get( "data.col" );
+                var row = this.get( "data.row" );
+
+                if ( col > 0 && row > 0 ) {
+                    return true;
+                }
+
+                return false;
+            },
+
+
+            editCell: function( event ) {
+                event.data;
+
+                // AP.frame.cellModal.edit(this.get("data"), (updated) => {
+                NM.util.openModal( "#cell-edit-modal" );
+
+                kendo.bind( $( "#cell-edit-modal" ), event.data );
+
+                return false;
+            },
+
+
+            /*
+                css classes
+            */
+
+            isFirstLeftCell: function() {
+                return this.get( "data.col" ) == 0;
+            },
+
+            isCommand: function() {
+                return this.get( "data.type.id" ) == "COMMAND";
+            },
+
+            isEmpty: function() {
+                return this.get( "data.type.id" ) == "EMPTY";
+            },
+
+            isAvailable: function() {
+                return this.get( "data.type.id" ) == "AVAIL";
+            },
+
+            isUnAvailable: function() {
+                return this.get( "data.type.id" ) == "NOTAV";
+            }
+        } );
+
+        return viewModel;
+
+    };
+
     var cellsToArray = function() {
         /* INFO:
             from array of array:
@@ -128,7 +228,7 @@ AP.frame.modal = ( function() {
                 ]
             to plain array
         */
-        var matrix = viewModel.get( "cellsMatrix" );
+        var matrix = viewModel.get( "matrix" );
 
         var cells = [];
 
@@ -145,17 +245,15 @@ AP.frame.modal = ( function() {
         return cells;
     };
 
+    var matrix = new kendo.data.ObservableArray( [] );
+
     var viewModel = kendo.observable( {
         detailForm: defaultForm,
         orientations: AP.page.orientations,
         statuses: AP.page.statuses,
         types: AP.page.types,
 
-        gridRows: 3,
-        gridCols: 3,
-
-        // cellsMatrix: new kendo.data.ObservableArray( [] ),
-        cellsMatrix: [],
+        matrix: matrix,
         loading: false,
         callbacks: {
             onCreate: undefined,
@@ -163,89 +261,165 @@ AP.frame.modal = ( function() {
             onLoad: undefined
         },
 
+        /*
         addBaseGrid: function() {
             // this.set( "gridRows", this.get( "gridRows" ) + 1 );
-            this.updateCellsMatrix();
-        },
-
-        /*
-        addRow: function() {
-            this.set( "gridRows", this.get( "gridRows" ) + 1 );
-            this.updateCellsMatrix();
+            this.updateIndexes();
         },
         */
 
-        addRowAfter: function( rowIdx ) {
-            var matrix = this.get( "cellsMatrix" );
-            var cols = matrix[0].cells.length;
-            var newRow = { cells: [] };
-            for ( var j = 0; j < cols; j++ ) {
-                newRow.cells.push( { value: "_", row: rowIdx + 1, col: j } );
-            }
-            matrix.splice( rowIdx + 1, 0, newRow );
-
-            // Aggiorna gli indici delle righe successive
-            for ( var i = rowIdx + 2; i < matrix.length; i++ ) {
-                for ( var j = 0; j < cols; j++ ) {
-                    matrix[i].cells[j].row = i;
-                }
-            }
-            this.set( "cellsMatrix", matrix );
-        },
-
-        deleteRow: function( rowIdx ) {
-            var matrix = this.get( "cellsMatrix" );
-            if ( matrix.length > 1 ) {
-                matrix.splice( rowIdx, 1 );
-                // Aggiorna gli indici delle righe successive
-                for ( var i = rowIdx; i < matrix.length; i++ ) {
-                    for ( var j = 0; j < matrix[i].cells.length; j++ ) {
-                        matrix[i].cells[j].row = i;
+        addBaseGrid: function() {
+            var event = {
+                data: {
+                    data: {
+                        col: 0,
+                        row: 0
                     }
                 }
-                this.set( "cellsMatrix", matrix );
+            };
+
+            this.addCol( event );
+            this.addCol( event );
+
+            this.addRow( event );
+            this.addRow( event );
+
+            // this.addRow( event );
+
+        },
+
+        addRow: function( event ) {
+            // Recupera la matrice dal viewModel
+            var matrix = this.get( "matrix" );
+
+            // Calcola il numero di colonne (prende la lunghezza della prima riga)
+            var colCount = 0;
+            if ( matrix.length && matrix[0].cells ) {
+                colCount = matrix[0].cells.length;
+            } else {
+                // Se la matrice è vuota, imposta almeno una colonna
+                colCount = 1;
             }
+
+            // Calcola l'indice della nuova riga (alla fine della matrice)
+            var insertIdx = event.data.data.row + 1;
+
+            console.log( "insertIdx", insertIdx );
+            console.log( "addRow:event", event );
+
+            // Crea la nuova riga come oggetto con la chiave 'cells'
+            var newRow = { cells: new kendo.data.ObservableArray( [] ) };
+
+            // Cicla su tutte le colonne e crea una cella per ciascuna
+            for ( var j = 0; j < colCount; j++ ) {
+                newRow.cells.splice( insertIdx, 0, createCell() );
+            }
+
+
+            // Aggiungi la nuova riga alla matrice
+            // matrix.push( newRow );
+            matrix.splice( insertIdx, 0, newRow );
+
+            // Aggiorna la matrice nel viewModel per riflettere la modifica nella UI
+            this.set( "matrix", matrix );
+
+            // Aggiorna gli indici di tutte le celle per coerenza
+            this.updateIndexes();
+
         },
 
         addCol: function( event ) {
-            var colIdx = event.data.col;
-            var matrix = this.get( "cellsMatrix" );
 
-            for ( var i = 0; i < matrix.length; i++ ) {
-                matrix[i].cells.splice( colIdx + 1, 0, { value: "_", row: i, col: colIdx + 1 } );
-                // Aggiorna gli indici delle colonne successive
-                for ( var j = colIdx + 2; j < matrix[i].cells.length; j++ ) {
-                    matrix[i].cells[j].col = j;
-                }
+            console.log( "addCol" );
+
+            var colIdx = event.data.col;
+            var matrix = this.get( "matrix" );
+
+            if ( matrix.length ) {
+
+                matrix.forEach( ( item ) => {
+                    item.cells.push( createCell() );
+                } );
+
+            } else {
+                var matrix = [ {} ];
+                matrix[ 0 ].cells = new kendo.data.ObservableArray( [ createCell() ] );
             }
-            this.set( "cellsMatrix", matrix );
+
+            this.set( "matrix", matrix );
+
+            this.updateIndexes();
         },
 
-        updateCellsMatrix: function() {
-            var rows = this.get( "gridRows" );
-            var cols = this.get( "gridCols" );
-            var cells = this.get( "detailForm.data.cells" ) || [];
-            var matrix = [];
 
-            // Crea la matrice vuota come array di oggetti { cells: [...] }
-            for ( var i = 0; i < rows; i++ ) {
-                var row = { cells: [] };
-                for ( var j = 0; j < cols; j++ ) {
-                    row.cells.push( { value: "_", row: i, col: j } );
-                }
-                matrix.push( row );
+        deleteRow: function( event ) {
+            // Recupera l'indice della riga da cancellare
+            var rowIdx = event.data.data.row;
+
+            // Recupera la matrice dal viewModel
+            var matrix = this.get( "matrix" );
+
+
+            // Se c'è più di una riga, cancella la riga desiderata
+            if ( matrix.length > 1 ) {
+                matrix.splice( rowIdx, 1 ); // Rimuove la riga con indice rowIdx
             }
 
-            // Popola la matrice con i valori esistenti
-            cells.forEach( function( cell ) {
-                if ( cell.row < rows && cell.col < cols ) {
-                    matrix[cell.row].cells[cell.col].value = cell.value;
+            // Aggiorna la matrice nel viewModel
+            this.set( "matrix", matrix );
+
+            // Aggiorna gli indici row/col di tutte le celle per coerenza
+            this.updateIndexes();
+        },
+
+
+        deleteCol: function( event ) {
+            // Recupera l'indice della colonna da cancellare
+            var colIdx = event.data.data.col;
+            // Recupera la matrice dal viewModel
+            var matrix = this.get( "matrix" );
+
+            console.log( "colIdx", colIdx );
+            console.log( "colIdx:event", event );
+
+            // Cicla su tutte le righe della matrice
+            for ( var i = 0; i < matrix.length; i++ ) {
+                // Rimuovi la cella nella posizione colIdx dalla riga corrente
+                matrix[i].cells.splice( colIdx, 1 );
+            }
+
+            // Aggiorna la matrice nel viewModel
+            this.set( "matrix", matrix );
+
+            // Ricalcola gli indici row/col di tutte le celle per coerenza
+            this.updateIndexes();
+        },
+
+        updateIndexes: function() {
+
+            var matrix = this.get( "matrix" );
+            console.log( "matrix_before", matrix );
+
+            // Cicla su tutte le righe
+            for ( var i = 0; i < matrix.length; i++ ) {
+                // Cicla su tutte le celle della riga
+                for ( var j = 0; j < matrix[i].cells.length; j++ ) {
+                    var cell = matrix[i].cells[j];
+                    cell.set( "data.row", i );
+                    cell.set( "data.col", j );
+
+                    if( j == 0 || i == 0 ) {
+                        cell.set( "data.type.id", "COMMAND" );
+                    }
                 }
-            } );
+                // i.set( "cells", matrix[i].cells );
+            }
 
-            console.log( "matrix", matrix );
+            var matrix = this.get( "matrix" );
+            console.log( "matrix_after", matrix );
 
-            this.set( "cellsMatrix", matrix );
+            // this.set( "matrix", matrix );
+
         },
 
         load: function( frameId ) {
@@ -277,7 +451,7 @@ AP.frame.modal = ( function() {
 
                         }
 
-                        // self.updateCellsMatrix();
+                        // self.updateIndexes();
 
                     },
                 },
@@ -310,9 +484,6 @@ AP.frame.modal = ( function() {
                             AP.widget.notify( "success", "Armatura salvata con successo", "Ok" );
 
                             var cb = self.get( "detailForm.data.id" ).length ? "onUpdate" : "onCreate";
-
-                            console.log( "save:cb", cb );
-                            console.log( "save:id", self.get( "detailForm.data.id" ) );
 
                             setTimeout( () => {
                                 $( "#frame-detail-modal" ).modal( "hide" );
@@ -348,20 +519,17 @@ AP.frame.modal = ( function() {
         }
 
         viewModel.set( "detailForm", defaultForm );
-        viewModel.set( "cellsMatrix", [] );
+        viewModel.set( "matrix", [] );
 
         AP.frame.fields.detailRoot.modal( "show" );
     };
 
     pub.updateCell = function( row, col, value ) {
-        // TODO: forse non serve
-        var matrix = viewModel.get( "cellsMatrix" );
-
-        if ( matrix[row] && matrix[row][col] !== undefined ) {
-            matrix[row][col].value = value;
-            viewModel.set( "cellsMatrix", matrix );
+        var matrix = viewModel.get( "matrix" );
+        if ( matrix[row] && matrix[row].cells[col] !== undefined ) {
+            matrix[row].cells[col].value = value;
+            viewModel.set( "matrix", matrix );
         }
-
     },
 
     pub.init = function() {
@@ -382,7 +550,7 @@ AP.frame.modal = ( function() {
                 grid: {
                     required: function() {
 
-                        if ( viewModel.get( "cellsMatrix" ).length ) {
+                        if ( viewModel.get( "matrix" ).length ) {
                             return false;
                         }
 

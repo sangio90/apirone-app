@@ -74,7 +74,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		records.each( function( record ){
 			rows.add( get( record.component_id, false ) );
 		} );
-		dump(records);abort;
+		dump( records );
+		abort;
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -87,7 +88,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String variantId,
 		String colorId,
 		String paramCategory,
-		String newParam,
+		String newParam
 	){
 		arguments[ "limit" ] = -1;
 
@@ -95,30 +96,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var result = super.getResult();
 
 		var records = getDao().find( argumentCollection = arguments );
-		var params = {};
+		var params  = {};
 
-		if (paramCategory == 'rawProductId') {
-			params = {
-				'paramCategory' = paramCategory,
-				'newParam' = newParam
-			}
+		if ( paramCategory == "rawProductId" ) {
+			params = { "paramCategory" = paramCategory, "newParam" = newParam }
 		}
-		if (paramCategory == 'variantId') {
-			params = {
-				'paramCategory' = paramCategory,
-				'newParam' = newParam
-			}
+		if ( paramCategory == "variantId" ) {
+			params = { "paramCategory" = paramCategory, "newParam" = newParam }
 		}
-		if (paramCategory == 'colorId') {
-			params = {
-				'paramCategory' = paramCategory,
-				'newParam' = newParam
-			}
+		if ( paramCategory == "colorId" ) {
+			params = { "paramCategory" = paramCategory, "newParam" = newParam }
 		}
 
 		records.each( function( record ){
-			var rowParams = params;
-			rowParams['componentId'] = record.component_id;
+			var rowParams              = params;
+			rowParams[ "componentId" ] = record.component_id;
 			getDao().reassign( argumentCollection = rowParams );
 		} );
 
@@ -266,9 +258,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.component_id );
 
-			if (verticale) {
+			if ( verticale ) {
 				bean.setRawProduct( getRawProductService().get( record.raw_product_id ) );
-	
+
 				bean.setVariant( getVariantService().get( record.variant_id ) );
 				bean.setColor( getColorService().get( record.color_id ) );
 			}

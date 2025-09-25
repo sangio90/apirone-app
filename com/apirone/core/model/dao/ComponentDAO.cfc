@@ -91,34 +91,41 @@
 				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.componentId#">
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath( "/debug.log" )#" output="#Now()# component delete: #getCompleteSQL( result )#" >
+		<cffile
+			action="APPEND"
+			file  ="#ExpandPath( "/debug.log" )#"
+			output="#Now()# component delete: #getCompleteSQL( result )#"
+		>
 
 		<cfreturn true>
 	</cffunction>
 
 	<cffunction name="deleteByParams" returntype="Boolean">
-	    <cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
+		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">
 
 		<cfset var meta = getFieldsAndValues( arguments.component )>
-		
+
 		<cfquery name="local.q" datasource="apirone" result="result">
 			DELETE FROM components
-			WHERE 
+			WHERE
 				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.component.getId()#">
 
 				<cfloop array="#meta.fields#" index="index" item="field">
-					AND #field# = <cfif meta.values[index].type IS "uuid">
-						<cfqueryparam cfsqltype="Varchar" value="#meta.values[index].value#" >::uuid
+					AND #field# = <cfif meta.values[ index ].type IS "uuid">
+						<cfqueryparam cfsqltype="Varchar" value="#meta.values[ index ].value#">::uuid
 					<cfelse>
-						<cfqueryparam cfsqltype="#meta.values[index].type#" value="#meta.values[index].value#">
+						<cfqueryparam cfsqltype="#meta.values[ index ].type#" value="#meta.values[ index ].value#">
 					</cfif>
 				</cfloop>
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath( "/debug.log" )#" output="#Now()# component deleteByParams: #getCompleteSQL( result )#">
+		<cffile
+			action="APPEND"
+			file  ="#ExpandPath( "/debug.log" )#"
+			output="#Now()# component deleteByParams: #getCompleteSQL( result )#"
+		>
 
 		<cfreturn true>
-
 	</cffunction>
 
 	<cffunction name="insert" returntype="Numeric">
@@ -182,7 +189,14 @@
 		<cfargument name="paramCategory" type="String">
 		<cfargument name="newParam" type="String" required="true">
 
-		<cfset var columnName = lcase( reReplace( arguments.paramCategory, "([A-Z])", "_\1", "all" ) )>
+		<cfset var columnName = LCase(
+			ReReplace(
+				arguments.paramCategory,
+				"([A-Z])",
+				"_\1",
+				"all"
+			)
+		)>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE components
@@ -193,10 +207,7 @@
 		<cfreturn arguments.componentId>
 	</cffunction>
 
-
-	<!--- 
-		private methods 
-	--->
+	<!--- private methods --->
 
 	<cffunction name="getFieldsAndValues" returntype="Struct" access="private">
 		<cfargument name="component" type="com.apirone.core.model.bean.Component" required="true">

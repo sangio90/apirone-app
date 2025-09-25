@@ -2,65 +2,69 @@
 
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="frame-cells-col-tmpl">
-		<div class="frame-grid-cell">
+		<div class="frame-grid-cell" data-bind="css: { frame-cell-command: isCommand, frame-cell-empty: isEmpty, frame-cell-available: isAvailable, frame-cell-unvailable: isUnvailable, frame-cell-first: isFirstLeftCell }">
 			<div class="frame-grid-cell-header">
-				
 				<div class="frame-grid-cell-header-label">
-					<span data-bind="text: row"></span>/<span data-bind="text: col"></span>
+					<span data-bind="text: data.row"></span>/<span data-bind="text: data.col"></span>
 				</div>
 
 				<div class="frame-grid-cell-header-buttons">
-					## if( col === 0 ) { ##
+
+					<div data-bind="visible: showRowCommands">
+						<span>Riga:</span>
 
 						#iconButton(icon="plus", 
-							title="Aggiungi una riga sotto", class="btn-primary", size="sm",
-							bind="click:addRowAfter"
+							title="Aggiungi una riga sotto", class="btn-primary", size="xs",
+							bind="click:addRow"
 						)#
 
 						#iconButton(icon="minus", 
-							title="Cancella riga", class="btn-danger", size="sm",
+							title="Cancella riga", class="btn-danger", size="xs",
 							bind="click:deleteRow"
 						)#
 
-					## } ##
+					</div>
 
-					## if( row === 0 ) { ##
+					<div data-bind="visible: showColCommands">
+
+						<span>Colonna:</span>
 
 						#iconButton(icon="plus", 
-							title="Aggiungi una colonna dopo", class="btn-primary", size="sm",
+							title="Aggiungi una colonna dopo", class="btn-primary", size="xs",
 							bind="click:addCol"
 						)#
 
 						#iconButton(icon="minus", 
-							title="Canella riga", class="btn-danger", size="sm",
+							title="Cancella colonna", class="btn-danger", size="xs",
 							bind="click:deleteCol"
 						)#
 
-					## } ##
+					</div>
+
+					<div data-bind="visible: showCellEdit">
+
+						#iconButton(icon="cog", 
+							title="Edita cella", class="btn-primary", size="xs",
+							bind="click:editCell"
+						)#
+
+					</div>
 
 				</div>
 			</div>
 
-			<div class="frame-grid-cell-content">
-
-				<select id="typeId" class="form-control" name="typeId"
-					required
-					data-bind="source: types, value: detailForm.data.orientation" 
-					data-value-field="id"
-					data-text-field="name"
-					>
-				</select>
-
-				<!---
-				<input type="text" maxlength="1" class="form-control"
-					style="width: 40px; text-align: center;"
-					value="##= value ##"
-					data-row="##= row ##"
-					data-col="##= col ##"
-					data-bind="events: { change: updateCell }">
-				---->
+			<div class="frame-grid-cell-content" data-bind="visible: showContent">
+				<div >
+					Larghezza: <span data-bind="text: shortId"></span>
+					Larghezza: <span data-bind="text: data.width"></span>
+					Altezza: <span data-bind="text: data.height"></span>
+				</div>
 			</div>
 
 		</div>
+
     </nmscript>
+
+
+	
 </cfoutput>

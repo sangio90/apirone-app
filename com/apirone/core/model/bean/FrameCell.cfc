@@ -4,8 +4,11 @@
 
 	property name="row" type="Numeric" default=0;
 	property name="col" type="Numeric" default=0;
-	// property name="value" type="String" default="";
+	property name="width" type="Numeric" default=0;
+	property name="height" type="Numeric" default=0;
 	property name="type" type="com.apirone.core.model.bean.FrameCellType";
+
+
 	property name="frameId" type="String";
 
 	public FrameCell function init(){

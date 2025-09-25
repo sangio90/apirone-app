@@ -115,7 +115,7 @@
                             --->
                             <div class="tab-pane fade" id="frame-nav-grid-tab" role="tabpanel" aria-labelledby="frame-nav-grid-but">
                                 <div class="mb-3 d-flex gap-2">
-                                    #addButton( id="add-row-btn", bind="click:addBaseGrid", size="sm", label="Aggiungi griglia base", type="button" )#
+                                    #addButton( id="add-row-btn", bind="click:addBaseGrid", size="sm", label="Aggiungi colonna base", type="button" )#
                                     <!----
                                     #addButton( id="add-row-btn", bind="click:addRow", size="sm", label="Aggiungi riga", type="button" )#
                                     #removeButton( id="remove-row-btn", bind="click:removeRow", size="sm", label="Rimuovi riga", type="button" )#
@@ -126,7 +126,7 @@
                                 </div>
                                 
                                 <div class="table-responsive">
-                                    <div data-bind="source: cellsMatrix" data-template="frame-cells-row-tmpl">
+                                    <div data-bind="source: matrix" data-template="frame-cells-row-tmpl">
                                     </div>
                                     <!---
                                     <table id="frame-cells-table" class="table table-bordered">

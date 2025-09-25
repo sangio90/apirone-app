@@ -975,9 +975,9 @@ h2 {
     width: 100%;
 }
 
+/*
 .frame-grid-cell {
     flex: 1 1 0;
-    flex-direction: column;
     display: flex;
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
@@ -989,45 +989,53 @@ h2 {
     margin: 0;
     padding: 0;
 }
+*/
 
 .frame-grid-cell-header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    width: 100%;
     padding: 2px 4px;
     border-bottom: 1px solid #eee;
     min-height: 24px;
-    width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    /* Limita lo sbordo */
+    padding: 7px;
 }
 
 .frame-grid-cell-header-label {
-    flex: 1 1 auto;
+    min-width: 25px;
     text-align: left;
     font-size: 0.9em;
     color: #646464;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .frame-grid-cell-header-buttons {
-    display: flex;
-    gap: 2px;
+    gap: 4px;
     align-items: center;
-    justify-content: flex-end;
-    flex-shrink: 1;
-    max-width: 80%;
-    /* Limita la larghezza dei bottoni */
+    text-align: right;
     overflow: hidden;
 }
 
 .frame-grid-cell-content {
-    flex: 1 1 auto;
+    padding: 10px;
+}
+
+.frame-grid-cell {
+    flex: 1 1 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
+    flex-direction: column;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    box-sizing: border-box;
+    background: #fff;
+    margin: 0;
+    padding: 0;
 }
 
 .frame-grid-cell:first-child {
@@ -1048,9 +1056,31 @@ h2 {
     text-align: text-right;
 }
 
-.frame-grid-cell-header-label {
-    color: #CCCCCC;
-    font-size: 13px;
+.frame-cell-available {
+    background-color: #ffffff;
+}
+
+.frame-cell-first {
+    min-width: 150px;
+    max-width: 150px;
+    flex: 0 0 150px;
+}
+
+.frame-cell-unvailable {
+    background-image:
+        linear-gradient(45deg, #c10000 2px, transparent 2px),
+        linear-gradient(-45deg, #c10000 2px, transparent 2px);
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.frame-cell-empty {
+    background-color: #dcdcdc;
+}
+
+.frame-cell-command {
+    background-color: #daedff;
 }
 
 /*

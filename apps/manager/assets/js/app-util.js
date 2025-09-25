@@ -14,6 +14,7 @@ AP.util.getTextItem = function( texts, langId="it", kindId = "NAME" ) {
 
 };
 
+
 /**
  *
  * @param {Object} params { array, rowRange, colRange, isInclusiveEnd = false }

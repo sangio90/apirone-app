@@ -135,10 +135,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteProduct" );
+				outcome.setType( "ApirOne.errors.CannotDeleteProduct" );
 				outcome.setMessage( "Cannot delete product [#productId#]" );
 			}
 		}
+
 
 		return outcome;
 	}
@@ -170,20 +171,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create( required com.apirone.core.model.bean.Product product ){
-
 		var product = this.handleCatalogBundle( arguments.product );
 
-		var newId = getDao().insert(product);
+		var newId = getDao().insert( product );
 
-		if(!IsNull(product.getTexts()) AND product.getTexts().len()){
+		if ( !IsNull( product.getTexts() ) AND product.getTexts().len() ) {
 			transaction {
-				for(var text in product.getTexts()){
-					var entity = super.bean("Entity");
-					entity.setKey("product.id");
-					entity.setValue(newId);
-					text.setEntity(entity);
+				for ( var text in product.getTexts() ) {
+					var entity = super.bean( "Entity" );
+					entity.setKey( "product.id" );
+					entity.setValue( newId );
+					text.setEntity( entity );
 				}
-				getTextService().bulkCreate(product.getTexts());
+				getTextService().bulkCreate( product.getTexts() );
 			}
 		}
 
@@ -191,7 +191,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function update( required com.apirone.core.model.bean.Product product ){
-		
 		var product = this.handleCatalogBundle( arguments.product );
 
 		getDao().update( product );
@@ -226,21 +225,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	*/
 
 	// normalize data  for catalogBundle
-	private com.apirone.core.model.bean.Product function handleCatalogBundle( required com.apirone.core.model.bean.Product product ){
+	private com.apirone.core.model.bean.Product function handleCatalogBundle(
+		required com.apirone.core.model.bean.Product product
+	){
+		if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
+			var cb = super.bean( "CatalogBundle" );
+			cb.setLine( product.getLine() );
+			cb.setModel( product.getModel() );
+			cb.setCategory( product.getCategory() );
 
-		if ( IsInstanceOf(product, "com.apirone.core.model.bean.ProductComplex") ) {
-			var cb = super.bean("CatalogBundle");
-			cb.setLine(product.getLine());
-			cb.setModel(product.getModel());
-			cb.setCategory(product.getCategory());
-
-			var catalogBundle = getCatalogBundleService().getOrCreate(cb);
-			product.setCatalogBundle(catalogBundle);
-
+			var catalogBundle = getCatalogBundleService().getOrCreate( cb );
+			product.setCatalogBundle( catalogBundle );
 		}
 
 		return product;
-
 	}
 
 	private com.apirone.core.model.bean.Product function build( required String productId ){

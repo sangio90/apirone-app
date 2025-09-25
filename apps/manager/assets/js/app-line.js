@@ -411,12 +411,15 @@ AP.line.products = ( function() {
     };
 
     var generateTableStyles = function() {
-        const maxColumns = 30; // o il numero che ti serve
-        let style = "";
+        var maxColumns = 30; // il numero massimo previsto
+        var style = "";
+
         for ( let n = 1; n <= maxColumns; n++ ) {
             style += `.table-header-fixed:has(tbody tr > *:nth-child(${n}):hover) tr>*:nth-child(${n}):not(.no-highlight) { background: var(--col); }\n`;
         }
-        const sheet = document.createElement( "style" );
+
+        var sheet = document.createElement( "style" );
+
         sheet.innerHTML = style;
         document.head.appendChild( sheet );
     };
@@ -533,8 +536,6 @@ AP.line.products = ( function() {
     } );
 
     pub.init = function() {
-
-        console.log( "qui" );
 
         var $table = $( ".table-header-fixed" );
         $table.floatThead( { top: 94 } );

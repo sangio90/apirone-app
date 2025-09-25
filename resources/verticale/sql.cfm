@@ -3,6 +3,15 @@
 <cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
+<cfquery name="i" datasource="verticale">
+    SELECT *
+    FROM articoli_apir
+</cfquery>
+
+<cfdump var="#i#">
+<cfabort>
+
+
 <cfset dao = new com.apirone.core.model.dao.ColorDAO()>
 
 <cfquery name="i" datasource="verticale">
