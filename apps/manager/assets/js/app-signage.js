@@ -240,31 +240,70 @@ AP.signage.modal = ( function() {
             this.checkCanSave();
         },
 
-        parsedLineContent: function( valore, id ) {
-            const contentSpanPreview = $( "#content_span_preview_" + id );
+        parsedLineContent: function (valore, id) {
+            const contentSpanPreview = $("#content_span_preview_" + id);
+            if (!contentSpanPreview.length) return false;
 
-            if ( contentSpanPreview.length == 1 ) {
-                const pictogramNames = viewModel.get( "pictogramNames" );
-                const pictograms = this.extractAllOccurrences( valore, pictogramNames );
-                const signageConfig = viewModel.getSignageConfig();
-                const signageConfigItem = signageConfig.items.filter( function( config ) { return config.id == viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ); } )[0];
-                const fontFamily = signageConfig.font.family;
-                pictograms.forEach( function( pictogram ) {
-                    valore = valore.replace( pictogram,
-                        // "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogram.replace( /[<>]/g, "" ) + ".png\" alt=\"" + pictogram.replace( /[<>]/g, "" ) + "\" style=\"transform: scale(" + signageConfigItem.height / 100 + ");\" class=\"pictogram px-2\">"
-                        "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogram.replace( /[<>]/g, "" ) + ".png\" alt=\"" + pictogram.replace( /[<>]/g, "" ) + "\" style=\"height: " + signageConfigItem.heightInPixel + "px;\" class=\"pictogram px-2\">"
-                    );
-                } );
+            const pictogramNames = viewModel.get("pictogramNames") || []; // es. ["<man>", "<dx>", ...]
+            const signageConfig = viewModel.getSignageConfig();
+            if (!signageConfig) return false;
 
-                contentSpanPreview.css( {
-                    "font-family": fontFamily,
-                    "font-size": signageConfigItem.heightInPixel + "px"
-                } );
+            const signageConfigItem = signageConfig.items.filter(function(config) {
+                return config.id == viewModel.get("detailForm.data.quotationItem.signageConfigItem.id");
+            })[0];
 
-                contentSpanPreview.html( valore );
+            const fontFamily = signageConfig.font && signageConfig.font.family ? signageConfig.font.family : "";
+            const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel : 16;
+
+            // costruisco la regex solo con i nomi interni dei pictogram (senza <>), escapati
+            const innerNames = pictogramNames.map(n => n.replace(/[<>]/g, ""));
+            const escapedNames = innerNames.map(this.escapeRegExp);
+            const pictogramRegex = escapedNames.length ? new RegExp("<(" + escapedNames.join("|") + ")>", "g") : /$^/;
+
+            // scorro il testo e costruisco parti: testo escapato oppure <img>
+            const parts = [];
+            let lastIndex = 0;
+            let match;
+            while ((match = pictogramRegex.exec(valore)) !== null) {
+                if (match.index > lastIndex) {
+                    parts.push(this.escapeHtml(valore.substring(lastIndex, match.index)));
+                }
+
+                const pictogramName = match[1]; // es. "man"
+                const imgHtml =
+                    '<img src="/assets/main/pictograms/' + fontFamily + '/' + pictogramName + '.png" ' +
+                    'alt="' + pictogramName + '" ' +
+                    'style="height: ' + heightPx + 'px;" ' +
+                    'class="pictogram px-2">';
+                parts.push(imgHtml);
+
+                lastIndex = pictogramRegex.lastIndex;
             }
 
+            // resto finale (escapato)
+            if (lastIndex < valore.length) {
+                parts.push(this.escapeHtml(valore.substring(lastIndex)));
+            }
+
+            contentSpanPreview.css({
+                "font-family": fontFamily,
+                "font-size": heightPx + "px"
+            });
+
+            contentSpanPreview.html(parts.join(""));
+
             return false;
+        },
+
+        escapeHtml: function(text) {
+            if (text == null) return "";
+            return String(text).replace(/[&<>"']/g, function(m) {
+                return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+            });
+        },
+
+        escapeRegExp: function(string) {
+            return String(string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         },
 
         extractAllOccurrences: function( haystack, needles ) {
@@ -313,9 +352,11 @@ AP.signage.modal = ( function() {
             } );
 
             charCount = content.length;
-            const signageConfigItem = signageConfig.items.filter( function( config ) { return config.id == viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ); } )[0];
+            const signageConfigItem = signageConfig.items.filter(function(config) {
+                return config.id == viewModel.get("detailForm.data.quotationItem.signageConfigItem.id");
+            })[0];
 
-            if ( charCount >= signageConfigItem.charCount ) {
+            if ( charCount >= signageConfigItem.charCount && !this.hasUnclosedPictogram(realContent)) {
                 content = content.substring( 0, signageConfigItem.charCount );
                 charCount = signageConfigItem.charCount;
             }
@@ -330,6 +371,7 @@ AP.signage.modal = ( function() {
             const signageRow = viewModel.get( "detailForm.data.quotationItem.signageRows" ).getByUid( uid );
 
             signageRow.set( "content", content );
+            e.currentTarget.value = content;
             signageRow.set( "charCount", charCount );
 
             $( "#" + uid + "_charCounter" ).html( charCount + "/" + signageConfigItem.charCount );
@@ -338,6 +380,12 @@ AP.signage.modal = ( function() {
             this.setSelectedTextAlignIcon();
 
             return false;
+        },
+
+        hasUnclosedPictogram: function(str) {
+            const lastOpen = str.lastIndexOf("<");
+            const lastClose = str.lastIndexOf(">");
+            return lastOpen > lastClose;
         },
 
         togglePictogramHelper: function( e ) {
@@ -604,6 +652,16 @@ AP.signage.modal = ( function() {
         save: function( event ) {
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
+            const signageRows = parsedData.quotationItem.signageRows.data();
+            var exceedinRows = 0;
+            signageRows.forEach(function(row) {
+                if (row.charCount > parsedData.quotationItem.signageConfigItem.charCount) {
+                    exceedinRows = exceedinRows + 1;
+                }
+            })
+            if (exceedinRows > 0) {
+                return AP.widget.notify( "error", "C'è almeno una riga con più caratteri di quelli consentiti." );
+            }
             parsedData.quotationId = quotationId;
             var preview = $( "#signage-preview-container" )[0];
 

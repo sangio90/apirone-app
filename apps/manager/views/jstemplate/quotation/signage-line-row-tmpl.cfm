@@ -22,7 +22,7 @@
                 <div class="col-10">
                     <input id="##: uid ##_contentInput" type="text" class="form-control" 
                            placeholder="Inserisci qui il contenuto della riga"
-                           data-bind="value: content, events: { change: updateCharCounter }"
+                           data-bind="value: content, events: { keyup: updateCharCounter }"
                            data-uid="##: uid ##">
                 </div>
                 <div class="col-2">
