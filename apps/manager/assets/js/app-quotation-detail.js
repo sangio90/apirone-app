@@ -29,7 +29,7 @@ AP.quotationDetail.detail = ( function() {
             id: "",
             name: "",
             quotationNumber: "",
-            version: 1,
+            versionNumber: 1,
             lang: {
                 "id":""
             },
