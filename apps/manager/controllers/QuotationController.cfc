@@ -115,7 +115,7 @@
 		];
 
 
-		prc.vatCodeList = super.service( "VatCode" ).list();
+		// prc.vatCodeList = super.service( "VatCode" ).list();
 		prc.plates      = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
 
 		var quotation = super.fire( "Quotation.get", [ rc.id ] );
