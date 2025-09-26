@@ -43,6 +43,16 @@
 
 					<div data-bind="visible: showCellEdit">
 
+						#iconButton(icon="sync-alt", 
+							title="Cambia orientamento", class="btn-default", size="xs",
+							bind="click:changeOrientation"
+						)#
+
+						#iconButton(icon="layer-group", 
+							title="Cambia contenuto", class="btn-default", size="xs",
+							bind="click:changeType"
+						)#
+
 						#iconButton(icon="cog", 
 							title="Edita cella", class="btn-primary", size="xs",
 							bind="click:editCell"

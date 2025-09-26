@@ -26,7 +26,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row" data-bind="visible: showDimensions" id="frame-cell-modal-dimensions">
+                        <div class="mb-3 row" data-bind="visible: showDimensions">
                             <label class="col-sm-2 col-form-label text-end">Larghezza</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
@@ -44,6 +44,7 @@
                         </div>
 
                         <div class="mb-3 row" data-bind="visible: showDimensions">
+
                             <label class="col-sm-2 col-form-label text-end">Altezza</label>
                             <div class="col-sm-10">
                                 <div class="input-group">

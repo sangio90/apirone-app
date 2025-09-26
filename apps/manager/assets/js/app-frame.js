@@ -240,6 +240,35 @@ AP.frame.modal = ( function() {
                 return false;
             },
 
+            changeOrientation: function() {
+                var current = this.get( "data.orientation.id" );
+
+                // Alterna tra "HOR" e "VER"
+                var next = ( current === "HOR" ) ? "VER" : "HOR";
+
+                // Imposta il nuovo valore
+                this.set( "data.orientation.id", next );
+            },
+
+            changeType: function( event ) {
+                var currentId = this.get( "data.type.id" );
+                var types = AP.page.types;
+
+                var idx = -1;
+                for ( var i = 0; i < types.length; i++ ) {
+                    if ( types[i].id === currentId ) {
+                        idx = i;
+                        break;
+                    }
+                }
+
+                // Calcola l'indice del tipo successivo (ciclico)
+                var nextIdx = ( idx + 1 ) % types.length;
+
+                // Imposta il nuovo tipo sulla cella
+                this.set( "data.type.id", types[nextIdx].id );
+            },
+
 
             /*
                 css classes
