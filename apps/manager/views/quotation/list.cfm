@@ -37,6 +37,9 @@
 
                                         <input type="date" name="toDate" class="form-control me-2" id="toDate">
 
+                                        <label style="min-width: 120px; margin-top: 8px;">Mostra non attivi</label>
+                                        <input class="me-4 ms-2" type="checkbox" name="showActive" id="showActive">
+
                                         <div style="align-self: flex-end;">
                                             #searchButton( bind="click:search" )#
                                         </div>

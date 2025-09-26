@@ -88,7 +88,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mem    = super.getMementify();
 
 		var rows = super.fire( "quotation.search", params );
-		var data = mem.convertList( rows.getData(), "list" );
+		var data = mem.convertList( rows.getData() );
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );

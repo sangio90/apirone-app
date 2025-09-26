@@ -82,6 +82,14 @@ AP.quotation.list = ( function() {
                 } );
             }
 
+            if ( !params.showActive ) {
+                filters.push( {
+                    field: "active",
+                    operator: "equal",
+                    value: 1,
+                } );
+            }
+
             filterDataSource.filter( filters );
 
             viewModel.set( "rows", filterDataSource );
@@ -107,6 +115,9 @@ AP.quotation.list = ( function() {
     pub.init = function() {
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 
+        viewModel.get("rows").fetch(function() {
+            viewModel.search();
+        });
         /* TODO: remove this extra code.
         // Formatting by mvvm
         dataSources.items.fetch( function() {
