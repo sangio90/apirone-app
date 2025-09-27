@@ -119,17 +119,47 @@ AP.frame.modal = ( function() {
         }
     };
 
+    var getType = function( typeId ) {
+        var types = AP.page.types;
+        var type = {};
+
+        for ( var i = 0; i < types.length; i++ ) {
+            if ( types[i].id === typeId ) {
+                type = types[i];
+                break;
+            }
+        }
+
+        return type;
+
+    };
+
+    var getOrientation = function( orientationId ) {
+        var orientations = AP.page.orientations;
+        var orientation = {};
+
+        for ( var i = 0; i < orientations.length; i++ ) {
+            if ( orientations[i].id === orientationId ) {
+                orientation = orientations[i];
+                break;
+            }
+        }
+
+        return orientation;
+
+    };
+
     var createCell = function( data ) {
 
         if ( !data ) {
             var data = {
-                width : 0,
-                height: 0,
-                col   : 0,
-                row   : 0,
-                id    : NM.util.uuid(),
-                type  : { id: "AVAIL", name: "" },
-                orientation: { id: "HOR", name: "" }
+                width      : 0,
+                height     : 0,
+                col        : 0,
+                row        : 0,
+                id         : NM.util.uuid(),
+                type       : getType( "AVAIL" ),
+                orientation: getOrientation( "HOR" ),
             };
         }
 
@@ -230,24 +260,43 @@ AP.frame.modal = ( function() {
 
                 var data = $( "#frame-cell-form" ).serializeJSON();
 
-                this.set( "data.type.id", data.typeId );
-                this.set( "data.orientation.id", data.orientationId );
+                var type = getType( data.typeId );
+                var orientation = getOrientation( data.orientationId );
+
+                this.set( "data.type", type );
+                this.set( "data.orientation", orientation );
                 this.set( "data.height", data.height );
                 this.set( "data.width", data.width );
 
-                $( "#frame-cell-modal" ).modal( "close" );
+                setTimeout( () => {
+                    $( "#frame-cell-modal" ).modal( "hide" );
+                }, 500 );
 
                 return false;
             },
 
             changeOrientation: function() {
-                var current = this.get( "data.orientation.id" );
+                // Ottieni l'id corrente dell'orientamento
+                var currentId = this.get( "data.orientation.id" );
+                var orientations = AP.page.orientations; // Array di orientamenti disponibili
 
-                // Alterna tra "HOR" e "VER"
-                var next = ( current === "HOR" ) ? "VER" : "HOR";
+                // Trova l'indice dell'orientamento corrente
+                var idx = -1;
+                for ( var i = 0; i < orientations.length; i++ ) {
+                    if ( orientations[i].id === currentId ) {
+                        idx = i;
+                        break;
+                    }
+                }
 
-                // Imposta il nuovo valore
-                this.set( "data.orientation.id", next );
+                // Se non trovato, esci
+                if ( idx === -1 ) { return; }
+
+                // Calcola l'indice del prossimo orientamento (ciclico)
+                var nextIdx = ( idx + 1 ) % orientations.length;
+
+                // Imposta il nuovo orientamento sulla cella
+                this.set( "data.orientation", orientations[nextIdx] );
             },
 
             changeType: function( event ) {
@@ -266,7 +315,7 @@ AP.frame.modal = ( function() {
                 var nextIdx = ( idx + 1 ) % types.length;
 
                 // Imposta il nuovo tipo sulla cella
-                this.set( "data.type.id", types[nextIdx].id );
+                this.set( "data.type", types[nextIdx] );
             },
 
 
@@ -478,7 +527,6 @@ AP.frame.modal = ( function() {
         updateIndexes: function() {
 
             var matrix = this.get( "matrix" );
-            // console.log( "matrix_before", matrix );
 
             // Cicla su tutte le righe
             for ( var i = 0; i < matrix.length; i++ ) {
@@ -492,13 +540,7 @@ AP.frame.modal = ( function() {
                         cell.set( "data.type.id", "COMMAND" );
                     }
                 }
-                // i.set( "cells", matrix[i].cells );
             }
-
-            // var matrix = this.get( "matrix" );
-            // console.log( "matrix_after", matrix );
-
-            // this.set( "matrix", matrix );
 
         },
 
@@ -530,8 +572,6 @@ AP.frame.modal = ( function() {
                             self.set( "gridCols", maxCol + 1 );
 
                         }
-
-                        // self.updateIndexes();
 
                     },
                 },
@@ -575,7 +615,6 @@ AP.frame.modal = ( function() {
                 } );
 
             }
-
 
         },
 

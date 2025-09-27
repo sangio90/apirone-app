@@ -1005,20 +1005,13 @@ h2 {
 }
 
 .frame-grid-cell-header-label {
-    min-width: 25px;
+    min-width: 20px;
     text-align: left;
-    font-size: 0.9em;
+    font-size: 0.75em;
     color: #646464;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-}
-
-.frame-grid-cell-header-buttons {
-    gap: 4px;
-    align-items: center;
-    text-align: right;
-    overflow: hidden;
 }
 
 .frame-grid-cell-content {
@@ -1054,6 +1047,10 @@ h2 {
 .frame-grid-cell-header-buttons {
     width: 100%;
     text-align: text-right;
+    gap: 4px;
+    align-items: center;
+    text-align: right;
+    overflow: hidden;
 }
 
 .frame-cell-available {
@@ -1061,9 +1058,8 @@ h2 {
 }
 
 .frame-cell-first {
-    min-width: 150px;
-    max-width: 150px;
-    flex: 0 0 150px;
+    min-width: 60px;
+    flex: 0 0 60px;
 }
 
 .frame-cell-unvailable {

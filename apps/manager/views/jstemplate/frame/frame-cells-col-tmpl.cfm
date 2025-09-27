@@ -11,32 +11,31 @@
 				<div class="frame-grid-cell-header-buttons">
 
 					<div data-bind="visible: showRowCommands">
-						<span>Riga:</span>
+
+						#iconButton(icon="trash", 
+							title="Cancella riga", class="btn-danger mb-2", size="xs",
+							bind="click:deleteRow"
+						)#
+
+						<br>
 
 						#iconButton(icon="plus", 
 							title="Aggiungi una riga sotto", class="btn-primary", size="xs",
 							bind="click:addRow"
 						)#
 
-						#iconButton(icon="minus", 
-							title="Cancella riga", class="btn-danger", size="xs",
-							bind="click:deleteRow"
-						)#
-
 					</div>
 
 					<div data-bind="visible: showColCommands">
 
-						<span>Colonna:</span>
+						#iconButton(icon="trash", 
+							title="Cancella colonna", class="btn-danger", size="xs",
+							bind="click:deleteCol"
+						)#
 
 						#iconButton(icon="plus", 
 							title="Aggiungi una colonna dopo", class="btn-primary", size="xs",
 							bind="click:addCol"
-						)#
-
-						#iconButton(icon="minus", 
-							title="Cancella colonna", class="btn-danger", size="xs",
-							bind="click:deleteCol"
 						)#
 
 					</div>
@@ -64,9 +63,9 @@
 			</div>
 
 			<div class="frame-grid-cell-content" data-bind="visible: showContent">
-				Type: <span data-bind="text: data.type.id"></span>
-				Larghezza: <span data-bind="text: data.width"></span>
-				Altezza: <span data-bind="text: data.height"></span>
+				<span data-bind="text: data.type.name"></span>,
+				L: <span data-bind="text: data.width"></span> 
+				H: <span data-bind="text: data.height"></span>
 			</div>
 
 		</div>
