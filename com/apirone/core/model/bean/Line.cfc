@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "shortId", "name" ],
+		defaultIncludes = [ "id", "shortId", "name", "code" ],
 		mappers         = {
 			"descriptionItem" = function( value ){
 				return value ?: {

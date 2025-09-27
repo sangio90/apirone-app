@@ -493,14 +493,14 @@ AP.signage.modal = ( function() {
             if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.id') != '') {
                 $('#signangeProductCategory').prop("disabled", true);
                 if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.code') != 'LET00') {
-                    $('#signage-preview-container').css({
+                    $('#signage-preview-background').css({
                         width: "500px",
                         height: "500px"
                     });
                 } else {
-                    $('#signage-preview-container').css({
-                        width: "",
-                        height: ""
+                    $('#signage-preview-background').css({
+                        width: "500px",
+                        height: null
                     });
                 }
             } else {
@@ -550,6 +550,18 @@ AP.signage.modal = ( function() {
                                         viewModel.set( "modelConfig", modelConfig )
                                     } else {
                                         viewModel.set( "modelConfig", { width: null, height: null } )
+                                    }
+
+                                    if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.code') != 'LET00') {
+                                        $('#signage-preview-container').css({
+                                            width: viewModel.get('modelConfig.width') + "px",
+                                            height: viewModel.get('modelConfig.height') + "px"
+                                        });
+                                    } else {
+                                        $('#signage-preview-container').css({
+                                            width: "500px",
+                                            height: "500px"
+                                        });
                                     }
                                 }
                             }
@@ -663,7 +675,7 @@ AP.signage.modal = ( function() {
                 return AP.widget.notify( "error", "C'è almeno una riga con più caratteri di quelli consentiti." );
             }
             parsedData.quotationId = quotationId;
-            var preview = $( "#signage-preview-container" )[0];
+            var preview = $( "#signage-preview-background" )[0];
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
