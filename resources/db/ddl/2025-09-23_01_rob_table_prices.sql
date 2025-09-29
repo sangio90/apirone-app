@@ -1,5 +1,5 @@
 ﻿CREATE TABLE public.prices (
-  price_id INTEGER STORAGE PLAIN DEFAULT nextval('prices_price_id_seq'::regclass) NOT NULL,
+  price_id SERIAL NOT NULL,
   method_id CHAR(1) DEFAULT 'F'::bpchar NOT NULL,
   price_type_id VARCHAR(15) NOT NULL,
   amount NUMERIC(10,5) STORAGE MAIN,
@@ -64,6 +64,3 @@ VALUES
   (E'PROD_ITEM_GEN', E'Prezzo generale attributi', E'["PRODUCT_ITEM"]', E'2025-09-29 06:03:09'),
   (E'PROD_ITEM_PRICE', E'Prezzo attributo', E'["PRODUCT"]', E'2025-09-29 06:03:09');  
 
-
-ALTER TABLE public.price_types
-  ADD COLUMN status_id VARCHAR(5);

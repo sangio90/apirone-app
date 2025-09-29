@@ -20,6 +20,13 @@
 		get( "/plate/designer" ).to( "PlateController.designer" ).end();
 		get( "/plate/map" ).to( "PlateController.map" ).end();
 
+		
+		/*
+			prices
+		*/
+		get( "/prices" ).to( "PriceController.manage" ).end();
+
+
 
 		/*
 			catalog bundle

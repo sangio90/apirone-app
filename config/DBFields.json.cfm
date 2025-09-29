@@ -266,5 +266,17 @@
         "name": "color_id",
         "type": "Varchar"
     },
+    "priceType.id": {
+        "name": "price_type_id",
+        "type": "Integer"
+    },
+    "price.id": {
+        "name": "price_id",
+        "type": "Integer"
+    },
+   "price.amount": {
+        "name": "amount",
+        "type": "Numeric"
+    },
 
 }

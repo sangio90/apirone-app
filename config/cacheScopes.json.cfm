@@ -51,5 +51,6 @@
     "Frame.bean": {},
     "FrameCell.bean": {},
     "ProductCategoryLine.bean": {},
-    "Price.bean": {}
+    "Price.bean": {},
+    "PriceType.bean": {}
 }

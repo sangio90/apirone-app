@@ -7,8 +7,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 		]
 	}    
 
-    public PriceType function init(){
+    property name="status" type="com.apirone.core.model.bean.Status";
 
+	public PriceType function init(){
         return this;
     }
 

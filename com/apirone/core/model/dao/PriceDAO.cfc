@@ -7,7 +7,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM prices
-			WHERE price_id = <cfqueryparam cfsqltype="varchar" value="#arguments.priceId#">::uuid
+			WHERE price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.priceId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -16,9 +16,13 @@
 
 	<cffunction name="find" returntype="Query">
 
+		<cfargument name="str" type="String">
+		<cfargument name="productId" type="String">
+		<cfargument name="productItemId" type="Numeric">
+		<cfargument name="typeId" type="String">
+
 		<cfargument name="limit" required="true" type="Numeric" default="50">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
-		<cfargument name="variantId" type="String">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -26,10 +30,19 @@
 				COUNT(price_id) OVER() AS total
 			FROM
 				prices
+					INNER JOIN price_types USING ( price_type_id )
 			WHERE 1=1
 	
-			<cfif !isNull( arguments.variantId ) >
-				AND variant_id = <cfqueryparam value="#arguments.variantId#" cfsqltype="varchar">::uuid
+			<cfif !IsNull( arguments.str ) >
+				AND price_type ILIKE <cfqueryparam value="#arguments.str#" cfsqltype="varchar">
+			</cfif>
+
+			<cfif !IsNull( arguments.productId ) >
+				AND product_id = <cfqueryparam value="#arguments.product_id#" cfsqltype="varchar">::uuid
+			</cfif>
+
+			<cfif !IsNull( arguments.productItemId ) >
+				AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
 			</cfif>
 
 			<cfif arguments.limit GT 0>
@@ -49,18 +62,18 @@
 
 		<cfargument name="price" type="com.apirone.core.model.bean.Price" required="true">
 
+		<cfset var dbField = getDBField( arguments.entity.getKey() )>
+
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO prices(
-				price,
-                variant_id,
-                discount_value,
-                discount_type
+                amount,
+                price_type_id,
+				#dbField.name#
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="float" value="#arguments.price.getValue()#">,
-                <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getVariantId()#">::uuid,
-                <cfqueryparam cfsqltype="float" value="#arguments.price.getDiscount()#">,
-                <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getDiscountType()#">
+				<cfqueryparam cfsqltype="float" value="#arguments.price.getAmount()#">,
+                <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getType().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.entity.getValue()#">::#dbField.type#
 			) RETURNING price_id
 		</cfquery>
 
@@ -76,13 +89,9 @@
 			UPDATE 
 				prices
 			SET
-				value = <cfqueryparam cfsqltype="float" value="#arguments.price.getValue()#">,
-				variant_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getVariantId()#">::uuid,
-				discount_value =  <cfqueryparam cfsqltype="float" value="#arguments.price.getDiscount()#">,
-				discount_type =  <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getDiscountType()#">
+				amount = <cfqueryparam cfsqltype="float" value="#arguments.price.ggetAmount()#">
 			WHERE 
 				price_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getId()#">::uuid
-
 		</cfquery>
 
 		<cfreturn arguments.price.getId()>
@@ -97,7 +106,7 @@
 			DELETE
 			FROM prices
 			WHERE
-				price_id = <cfqueryparam cfsqltype="String" value="#arguments.priceId#">
+				price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.priceId#">
 		</cfquery>
 
 		<cfreturn true>

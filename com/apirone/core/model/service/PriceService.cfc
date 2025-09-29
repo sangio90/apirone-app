@@ -109,7 +109,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return id;
 	}
 
-
 	public String function update( required com.apirone.core.model.bean.Price price ){
 		getDao().update( arguments.price );
 

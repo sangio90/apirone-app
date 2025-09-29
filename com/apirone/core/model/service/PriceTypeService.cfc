@@ -28,6 +28,9 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
+		required Numeric limit  = 20,
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "priceType.id", desc = "asc" } ]
 	){
 		
 		var rows   = [];
@@ -93,14 +96,13 @@
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Component function build( required String priceTypeId ){
+	private com.apirone.core.model.bean.PriceType function build( required String priceTypeId ){
 		var record = getDao().read( arguments.priceTypeId );
 
 		if ( record.recordCount ) {
-			// TODO: factory for all Component*
-			var bean = super.bean( "Price" );
+			var bean = super.bean( "PriceType" );
 
-			bean.setId( record.price_id );
+			bean.setId( record.price_type_id );
 
 			bean.setName( record.price_type );
 			bean.setCreatedAt( record.created_at );
