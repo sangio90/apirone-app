@@ -7,7 +7,7 @@
                 <span data-bind="text: id"></span>
             </td>
             <td width="20%" class="align-end align-top">
-                <input type="text" class="form-control w-70" name="height_##:uid##"
+                <input type="text" class="form-control width-70" name="height_##:uid##"
                     data-bind="value: height" 
                     data-rule-required="true"
                     data-rule-number="true"
@@ -15,7 +15,7 @@
                 >
             </td>
             <td width="20%" class="align-end align-top">
-                <input type="text" class="form-control w-70" name="heightInPx_##:uid##"
+                <input type="text" class="form-control width-70" name="heightInPx_##:uid##"
                     data-bind="value: heightInPixel"
                     data-rule-required="true"
                     data-rule-number="true"
@@ -23,7 +23,7 @@
                 >
             </td>
             <td width="20%" class="align-end align-top">
-                <input type="text" class="form-control w-70" name="rowCount_##:uid##"
+                <input type="text" class="form-control width-70" name="rowCount_##:uid##"
                     data-bind="value: rowCount" 
                     data-rule-required="true"
                     data-rule-number="true"
@@ -31,7 +31,7 @@
                 >
             </td>
             <td width="20%" class="align-end align-top">
-                <input type="text" class="form-control w-70" name="charCount_##:uid##"
+                <input type="text" class="form-control width-70" name="charCount_##:uid##"
                     data-bind="value: charCount" 
                     data-rule-required="true"
                     data-rule-number="true"

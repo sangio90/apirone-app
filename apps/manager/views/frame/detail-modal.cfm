@@ -128,19 +128,13 @@
                                 <div class="table-responsive">
                                     <div data-bind="source: matrix" data-template="frame-cells-row-tmpl">
                                     </div>
-                                    <!---
-                                    <table id="frame-cells-table" class="table table-bordered">
-                                        <tbody data-bind="source: cellsMatrix" data-template="frame-cells-row-tmpl">
-                                        </tbody>
-                                    </table>
-                                    ---->
                                 </div>
                                 <p>
                                     <input type="hidden" name="grid">
                                 </p>
                                 
-                                <div class="alert alert-info mt-3">
-                                    <small>Inserisci "0" per posizione non utilizzabile o "_" per posizione utilizzabile.</small>
+                                <div class="mt-3">
+                                    <b>Contenuto cella</b>: 'disponibile' = con frutto, 'non disponibile' = con frutto ma non utilizzabile, 'vuoto' = senza frutto.
                                 </div>
                             </div>
 

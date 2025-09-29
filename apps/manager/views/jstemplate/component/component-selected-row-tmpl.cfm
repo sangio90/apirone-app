@@ -34,13 +34,13 @@
                             <span class="fs-10" data-bind="text: rawProduct.measurementUnit.id"></span>
                         </td>
                         <td class="ps-1">
-                            <div data-bind="text: quantity" class="d-inline-block w-40 text-end similar-to-form-control "></div>
+                            <div data-bind="text: quantity" class="d-inline-block width-40 text-end similar-to-form-control "></div>
                             <br>
                             <span class="fs-10">ATTR.</span>
                             
                         </td>
                         <td class="ps-1">
-                            <div data-bind="text: totalQuantity" class="d-inline-block w-40 text-end similar-to-form-control"></div>
+                            <div data-bind="text: totalQuantity" class="d-inline-block width-40 text-end similar-to-form-control"></div>
                             <br>
                             <span class="fs-10">TOTALE</span>
                         </td>
@@ -58,7 +58,7 @@
             ##} else {##
 
                 <td width="160">
-                    <input data-bind="value: quantity" class="form-control text-end w-70">
+                    <input data-bind="value: quantity" class="form-control text-end width-70">
                     <span data-bind="text: rawProduct.measurementUnit.id"></span>
                 </td>
                 <td class="text-center">

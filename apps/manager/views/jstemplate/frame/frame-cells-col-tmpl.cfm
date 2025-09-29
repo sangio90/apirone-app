@@ -42,9 +42,10 @@
 
 					<div data-bind="visible: showCellEdit">
 
-						#iconButton(icon="sync-alt", 
-							title="Cambia orientamento", class="btn-default", size="xs",
-							bind="click:changeOrientation"
+						#iconButton(icon="ellipsis-v", 
+							title="Cambia orientamento", class="btn-default width-30", size="xs",
+							bind="click:toggleOrientation",
+							iconBind="css: { fa-ellipsis-v: isVertical, fa-ellipsis-h: isHorizontal }"
 						)#
 
 						#iconButton(icon="layer-group", 

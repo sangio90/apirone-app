@@ -18,7 +18,7 @@
                             <div class="col-sm-10">
 								<select id="typeId" class="form-control" name="typeId"
 									required
-									data-bind="source: typesForCell, events: { change: setCellType }"
+									data-bind="source: typesForCell, events: { change: toggleDimensions }"
 									data-value-field="id"
 									data-text-field="name"
 									>
@@ -26,7 +26,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row" data-bind="visible: showDimensions">
+                        <div class="mb-3 row dimensions-content">
                             <label class="col-sm-2 col-form-label text-end">Larghezza</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
@@ -43,7 +43,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row" data-bind="visible: showDimensions">
+                        <div class="mb-3 row dimensions-content">
 
                             <label class="col-sm-2 col-form-label text-end">Altezza</label>
                             <div class="col-sm-10">

@@ -67,6 +67,7 @@
     private function getButton( 
         required String label,
                  String bind="", 
+                 String iconBind="", 
                  String size="md", 
                  String type="submit", 
                  String variant="primary", 
@@ -93,7 +94,9 @@
                     #dataAttr#
                     #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#
                     #Len( arguments.id ) ? 'id="#arguments.id#"' : ''#>
-                    <i class="fas fa-#arguments.icon#"></i> #arguments.label#
+                    <i class="fas fa-#arguments.icon#"
+                        #Len( arguments.iconBind ) ? 'data-bind="#arguments.iconBind#"' : ''#
+                    ></i> #arguments.label#
                 </button>
             </cfoutput>
         </cfsavecontent>

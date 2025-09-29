@@ -826,19 +826,28 @@ h2 {
     font-size: 18px !important;
 }
 
-.w-40 {
+/*
+    naming "w-*"
+    is just used by bootstrap
+*/
+
+.width-30 {
+    width: 30px !important;
+}
+
+.width-40 {
     width: 40px !important;
 }
 
-.w-70 {
+.width-70 {
     width: 70px !important;
 }
 
-.w-200 {
+.width-200 {
     width: 200px !important;
 }
 
-.w-250 {
+.width-250 {
     width: 250px !important;
 }
 
@@ -1073,6 +1082,10 @@ h2 {
 .frame-cell-command {
     background-color: #daedff;
 }
+
+.frame-cell-vertical {}
+
+.frame-cell-horizontal {}
 
 /*
     // frames

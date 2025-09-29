@@ -29,7 +29,7 @@
 
                                     <label class="me-2">Finitura:</label>
 
-                                    <select name="finishId" class="form-control w-250 me-4"
+                                    <select name="finishId" class="form-control width-250 me-4"
                                         data-bind="events: { change: changeUri }">
                                         <option value="">-- non trovato</option>
                                         <cfloop array="#prc.finishes#" item="item">

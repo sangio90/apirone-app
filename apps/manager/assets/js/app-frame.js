@@ -149,6 +149,24 @@ AP.frame.modal = ( function() {
 
     };
 
+    var setOrientation = function( orientationId ) {
+
+        var orientations = AP.page.orientations;
+        var orientation = orientations[orientationId];
+
+        var icon = $( event.currentTarget ).find( "i" );
+
+        var iconClass = "fa-ellipsis-v";
+        if ( orientation.id == "HOR" ) {
+            var iconClass = "fa-ellipsis-h";
+        }
+
+        icon.removeClass().addClass( "fas" ).addClass( iconClass );
+
+        // Imposta il nuovo orientamento sulla cella
+        this.set( "data.orientation", orientation );
+    };
+
     var createCell = function( data ) {
 
         if ( !data ) {
@@ -177,6 +195,20 @@ AP.frame.modal = ( function() {
             showContent: function() {
                 var typeId = this.get( "data.type.id" );
                 return typeId != "COMMAND";
+            },
+
+            toggleDimensions: function() {
+
+                var modal = $( "#frame-cell-modal" );
+                var typeId = modal.find( "[name=typeId]" ).val();
+
+                if( typeId == "EMPTY" ) {
+                    modal.find( ".dimensions-content" ).show();
+                } else {
+                    modal.find( ".dimensions-content" ).hide();
+                }
+
+                return;
             },
 
             showDimensions: function() {
@@ -225,23 +257,24 @@ AP.frame.modal = ( function() {
                     for this, added:
                         setCellType()
                         saveCell()
+                        toggleDimensions()
                 */
 
-                event.data;
+                var modal = $( "#frame-cell-modal" );
 
                 event.data.typesForCell = AP.page.types;
                 event.data.orientations = AP.page.orientations;
 
-                console.log( "event.data.typesForCell", event.data.typesForCell );
+                // bind before manual set fields
+                kendo.bind( modal, viewModel );
 
-                console.log( "editCell.data", event );
-                console.log( "editCell.data:this", viewModel );
-                console.log( "editCell.isObservable:", typeof this.get === "function" );
-                console.log( "editCell.costructor", this.constructor.name );
+                modal.find( "[name=typeId]" ).val( event.data.data.type.id );
+                modal.find( "[name=orientationId]" ).val( event.data.data.orientation.id );
+
+                this.toggleDimensions();
+                // this.toggleOrientations();
 
                 NM.util.openModal( $( "#frame-cell-modal" ) );
-
-                kendo.bind( $( "#frame-cell-modal" ), viewModel );
 
                 return false;
             },
@@ -275,8 +308,8 @@ AP.frame.modal = ( function() {
                 return false;
             },
 
-            changeOrientation: function() {
-                // Ottieni l'id corrente dell'orientamento
+            toggleOrientation: function( event ) {
+
                 var currentId = this.get( "data.orientation.id" );
                 var orientations = AP.page.orientations; // Array di orientamenti disponibili
 
@@ -289,14 +322,24 @@ AP.frame.modal = ( function() {
                     }
                 }
 
-                // Se non trovato, esci
-                if ( idx === -1 ) { return; }
-
                 // Calcola l'indice del prossimo orientamento (ciclico)
                 var nextIdx = ( idx + 1 ) % orientations.length;
 
+                var orientation = orientations[nextIdx];
+
+                /*
+                var icon = $(event.currentTarget).find("i");
+
+                var iconClass = "fa-ellipsis-v";
+                if ( orientation.id == "HOR" ) {
+                    var iconClass = "fa-ellipsis-h";
+                }
+
+                icon.removeClass().addClass( "fas" ).addClass( iconClass );
+                */
+
                 // Imposta il nuovo orientamento sulla cella
-                this.set( "data.orientation", orientations[nextIdx] );
+                this.set( "data.orientation", orientation );
             },
 
             changeType: function( event ) {
@@ -341,6 +384,14 @@ AP.frame.modal = ( function() {
 
             isUnvailable: function() {
                 return this.get( "data.type.id" ) == "NOTAV";
+            },
+
+            isHorizontal: function() {
+                return this.get( "data.orientation.id" ) == "HOR";
+            },
+
+            isVertical: function() {
+                return this.get( "data.orientation.id" ) == "VER";
             }
         } );
 
