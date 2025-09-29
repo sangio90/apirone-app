@@ -93,7 +93,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.errors.CannotDeleteProductCategoryLine" );
+				outcome.setType( "ApirOne.error.CannotDeleteProductCategoryLine" );
 				outcome.setMessage( "Cannot delete productCategoryLine id [#arguments.productCategoryLineId#]" );
 			}
 		}

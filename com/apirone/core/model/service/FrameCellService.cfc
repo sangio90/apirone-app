@@ -72,8 +72,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.error.CannotDeleteFRameCell" );
-				outcome.setMessage( "Cannot delete frame cells by frameId [#arguments.frameId#]" );
+				outcome.setType( "ApirOne.error.CannotDeleteFrameCells" );
+				outcome.setMessage( "Cannot delete cells by frameId [#arguments.frameId#]" );
 			}
 		}
 
@@ -92,12 +92,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean = super.bean( "FrameCell" );
 
 			bean.setId( record.frame_cell_id );
+
 			bean.setRow( record.row );
 			bean.setCol( record.col );
-			//bean.setValue( record.value );
-			bean.setType( getLookupService().get( "frameCellType", record.type_id ) );
+			bean.setWidth( record.width );
+			bean.setHeight( record.height );
+			
 			bean.setFrameId( record.frame_id );
 			bean.setCreatedAt( record.created_at );
+
+			bean.setType( getLookupService().get( "frameCellType", record.type_id ) );
+			bean.setOrientation( getLookupService().get( "orientation", record.orientation_id ) );
 
 			return bean;
 		}

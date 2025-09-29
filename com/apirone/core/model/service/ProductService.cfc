@@ -135,7 +135,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.errors.CannotDeleteProduct" );
+				outcome.setType( "ApirOne.error.CannotDeleteProduct" );
 				outcome.setMessage( "Cannot delete product [#productId#]" );
 			}
 		}

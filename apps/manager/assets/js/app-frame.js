@@ -149,11 +149,6 @@ AP.frame.modal = ( function() {
 
     };
 
-    var cellsToMatrix = function( cells ) {
-
-
-    };
-
     var createCell = function( data ) {
 
         if ( !data ) {
@@ -314,17 +309,6 @@ AP.frame.modal = ( function() {
 
                 var orientation = orientations[nextIdx];
 
-                /*
-                var icon = $(event.currentTarget).find("i");
-
-                var iconClass = "fa-ellipsis-v";
-                if ( orientation.id == "HOR" ) {
-                    var iconClass = "fa-ellipsis-h";
-                }
-
-                icon.removeClass().addClass( "fas" ).addClass( iconClass );
-                */
-
                 // Imposta il nuovo orientamento sulla cella
                 this.set( "data.orientation", orientation );
             },
@@ -386,50 +370,81 @@ AP.frame.modal = ( function() {
 
     };
 
-    var cellsToMatrix = function( cells ) {
+    var cellsToMatrix = function( data ) {
 
-        const output = [];
-
-        if ( cells.length === 0 ) {
-            return output;
+        if ( !data || data.length === 0 ) {
+            return [];
         }
 
-        const maxRow = Math.max( ...cells.map( c => c.row ) );
-        const maxCol = Math.max( ...cells.map( c => c.col ) );
-
-        for ( let row = 0; row <= maxRow; row++ ) {
-            const cells = [];
-            for ( let c = 0; c < maxCol; c++ ) {
-                let typeId;
-                if ( row === 0 ) {
-                    typeId = "COMMAND";
-                } else if ( row === maxRow ) {
-                    typeId = ( c === 0 ) ? "COMMAND" : "AVAIL";
-                } else {
-                    typeId = ( c === 0 ) ? "COMMAND" : "AVAIL";
-                }
-                cells.push( {
-                    data: {
-                        width: 0,
-                        height: 0,
-                        col: c,
-                        row: row,
-                        id: NM.util.uuid(),
-                        type: { name: "Disponibile", id: typeId },
-                        orientation: { name: "Orizzontale", id: "HOR" }
-                    }
-                } );
+        // Trova il numero massimo di righe e colonne
+        let maxRow = 0;
+        let maxCol = 0;
+        data.forEach( item => {
+            if ( item.row > maxRow ) {
+                maxRow = item.row;
             }
-            output.push( { cells } );
+            if ( item.col > maxCol ) {
+                maxCol = item.col;
+            }
+        } );
+
+        // Inizializza la griglia
+        const grid = Array.from( { length: maxRow + 1 }, () =>
+            Array.from( { length: maxCol + 1 }, () => null )
+        );
+
+        // Popola la griglia con i dati originali
+        data.forEach( item => {
+
+            var col = item.col;
+            var row = item.row;
+
+            console.log( "item", item );
+
+            var item = createCell( {
+                id: item.id,
+                row: item.row,
+                col: item.col,
+                width: parseInt( item.width ),
+                height: parseInt( item.height ),
+                type: getType( item.type.id ),
+                orientation: getOrientation( item.orientation.id ),
+            } );
+
+            grid[ row ][ col ] = item;
+        } );
+
+        // Aggiunge la riga e la colonna di comando
+        for ( let row = 0; row <= maxRow; row++ ) {
+            for ( let col = 0; col <= maxCol; col++ ) {
+                if ( !grid[ row ][ col ] ) {
+                    grid[ row ][ col ] = createCell(
+                        {
+                            id: NM.util.uuid(),
+                            row: row,
+                            col: col,
+                            width: 0,
+                            height: 0,
+                            type: { "id": "COMMAND" },
+                            orientation: getOrientation( "HOR" )
+                        }
+                    );
+                }
+            }
         }
 
-        return output;
+        // Raggruppa le celle per riga
+        const result = grid.map( row => ( {
+            cells: row
+        } ) );
+
+        console.log( "result", result );
+
+        return result;
 
     };
 
     var matrix = new kendo.data.ObservableArray( [] );
-
-    console.log( "matrix", matrix );
 
     var viewModel = kendo.observable( {
         detailForm: defaultForm,
