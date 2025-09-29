@@ -399,8 +399,6 @@ AP.frame.modal = ( function() {
             var col = item.col;
             var row = item.row;
 
-            console.log( "item", item );
-
             var item = createCell( {
                 id: item.id,
                 row: item.row,
@@ -425,7 +423,7 @@ AP.frame.modal = ( function() {
                             col: col,
                             width: 0,
                             height: 0,
-                            type: { "id": "COMMAND" },
+                            type: { "id": "COMMAND" }, // not in types
                             orientation: getOrientation( "HOR" )
                         }
                     );
@@ -437,8 +435,6 @@ AP.frame.modal = ( function() {
         const result = grid.map( row => ( {
             cells: row
         } ) );
-
-        console.log( "result", result );
 
         return result;
 
@@ -459,13 +455,6 @@ AP.frame.modal = ( function() {
             onLoad: undefined
         },
 
-        /*
-        addBaseGrid: function() {
-            // this.set( "gridRows", this.get( "gridRows" ) + 1 );
-            this.updateIndexes();
-        },
-        */
-
         addBaseGrid: function() {
             var event = {
                 data: {
@@ -482,15 +471,11 @@ AP.frame.modal = ( function() {
             this.addRow( event );
             this.addRow( event );
 
-            // this.addRow( event );
-
         },
 
         addRow: function( event ) {
             // Recupera la matrice dal viewModel
             var matrix = this.get( "matrix" );
-
-            console.log( "matrix", matrix );
 
             // Calcola il numero di colonne (prende la lunghezza della prima riga)
             var colCount = 0;
@@ -503,9 +488,6 @@ AP.frame.modal = ( function() {
 
             // Calcola l'indice della nuova riga (alla fine della matrice)
             var insertIdx = event.data.data.row + 1;
-
-            console.log( "insertIdx", insertIdx );
-            console.log( "addRow:event", event );
 
             // Crea la nuova riga come oggetto con la chiave 'cells'
             var newRow = { cells: new kendo.data.ObservableArray( [] ) };
@@ -531,8 +513,6 @@ AP.frame.modal = ( function() {
         addCol: function( event ) {
 
             var matrix = this.get( "matrix" );
-
-            console.log( "addCol:matrix", matrix );
 
             if ( matrix.length ) {
 
@@ -577,9 +557,6 @@ AP.frame.modal = ( function() {
             var colIdx = event.data.data.col;
             // Recupera la matrice dal viewModel
             var matrix = this.get( "matrix" );
-
-            console.log( "colIdx", colIdx );
-            console.log( "colIdx:event", event );
 
             // Cicla su tutte le righe della matrice
             for ( var i = 0; i < matrix.length; i++ ) {
@@ -630,8 +607,6 @@ AP.frame.modal = ( function() {
 
                         var matrix = cellsToMatrix( xhr.data.cells );
 
-                        console.log( "load:matrix", matrix );
-
                         self.set( "matrix", matrix );
 
                     },
@@ -652,8 +627,6 @@ AP.frame.modal = ( function() {
                 var self = this;
                 var frame = this.get( "detailForm.data" );
                 frame.cells = this.get( "matrix" );
-
-                console.log( "frame.cells", frame.cells );
 
                 NM.util.ajax( {
                     method: "POST",
