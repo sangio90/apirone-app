@@ -6,10 +6,13 @@
 
         var helper = AP.test.helper;
 
-        // Sequenza asincrona
-        await helper.wait( 400 );
+        await helper.wait( 300 );
         $( "#frame-grid" ).find( "button[data-bind='click:edit']:first" ).click();
         $( "#frame-nav-grid-but" ).tab( "show" );
+
+        // await helper.wait( 300 );
+        // $( "button[data-bind='click:addBaseGrid']:first" ).click();
+        // $( "button[data-bind='click:addBaseGrid']:first" ).click();
 
     }
 

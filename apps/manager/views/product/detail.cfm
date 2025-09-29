@@ -60,6 +60,20 @@
 
                             </cfif>
 
+                            <div class="mt-3 text-end mb-0" style="float: right;">
+                                <div class="d-flex align-items-center">
+                                    <span>Costo €:</span> <input class="form-control w-auto text-end mb-2" 
+                                        type="text" 
+                                        data-bind="value: costFormatted" readonly /> 
+                                </div>
+
+                                <div class="d-flex align-items-center">
+                                    <span>Markup %:</span> <input class="form-control w-auto text-end" 
+                                        type="text" 
+                                        data-bind="value: costFormatted" readonly /> 
+                                </div>
+                            </div>
+
                         </div>
 
                         <div class="col-md-12">
@@ -123,6 +137,12 @@
                                                     Tutte le combinazioni &raquo;
                                                 </a>
                                         </p>
+
+                                    <p class="d-flex align-items-center mb-3">
+                                        Markup attributi: <input class="form-control w-auto text-end" 
+                                        type="text" 
+                                        data-bind="value: costFormatted" readonly /> %                                        
+                                    </p>
 
                                     </div>
                                     <div class="col-sm-12 text-end">

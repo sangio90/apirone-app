@@ -984,22 +984,6 @@ h2 {
     width: 100%;
 }
 
-/*
-.frame-grid-cell {
-    flex: 1 1 0;
-    display: flex;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    min-width: 60px;
-    min-height: 60px;
-    display: flex;
-    box-sizing: border-box;
-    background: #fff;
-    margin: 0;
-    padding: 0;
-}
-*/
-
 .frame-grid-cell-header {
     display: flex;
     flex-direction: row;
@@ -1083,9 +1067,13 @@ h2 {
     background-color: #daedff;
 }
 
-.frame-cell-vertical {}
-
-.frame-cell-horizontal {}
+.frame-cell-help {
+    width: 14px;
+    height: 14px;
+    margin-right: 5px;
+    border: 1px solid #ccc;
+    display: inline-block;
+}
 
 /*
     // frames

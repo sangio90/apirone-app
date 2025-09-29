@@ -134,7 +134,11 @@
                                 </p>
                                 
                                 <div class="mt-3">
-                                    <small><b>Contenuto cella</b>: 'disponibile' = con frutto, 'non disponibile' = con frutto ma non utilizzabile, 'vuoto' = senza frutto.</small>
+                                    <small><b>Contenuto cella</b>: &nbsp;
+                                        <div class="frame-cell-available frame-cell-help"></div> 'disponibile' = con frutto, 
+                                        <div class="frame-cell-unvailable frame-cell-help"></div> 'non disponibile' = con frutto ma non utilizzabile, 
+                                        <div class="frame-cell-empty frame-cell-help"></div> 'vuoto' = senza frutto.
+                                    </small>
                                 </div>
                             </div>
 

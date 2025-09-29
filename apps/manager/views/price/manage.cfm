@@ -122,19 +122,6 @@
 												<option>Variazione in percentuale</option>
 											</select>
 										</div>
-
-										<div class="col-sm-3 d-flex align-items-center">
-											<div class="me-2">Variazione</div>
-											<input type="text" class="form-control" name="amount" required />
-										</div>
-
-										<div class="col-sm-3 d-flex align-items-center">
-											<div class="me-2">Metodo</div>
-											<select class="form-control" name="methodId">
-												<option>%</option>
-												<option>Fisso</option>
-											</select>
-										</div>
 									
 									</div>
 

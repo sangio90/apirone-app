@@ -54,12 +54,18 @@
 				frame_id,
 				row,
 				col,
-				value
+				width,
+				height,
+				orientation_id,
+				type_id
 			) VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.cell.getFrameId()#">::uuid,
-				<cfqueryparam cfsqltype="integer" value="#arguments.cell.getRow()#">,
-				<cfqueryparam cfsqltype="integer" value="#arguments.cell.getCol()#">,
-				<cfqueryparam cfsqltype="varchar" value="#arguments.cell.getValue()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.cell.getFrameId()#">::uuid,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.cell.getRow()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.cell.getCol()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.cell.getWidth()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.cell.getHeight()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.cell.getOrientation().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.cell.getType().getId()#">
 			)
 		</cfquery>
 
@@ -78,4 +84,3 @@
 	</cffunction>
 
 </cfcomponent>
-

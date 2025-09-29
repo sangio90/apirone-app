@@ -44,17 +44,49 @@
 	}
 
 	function save( event, rc, prc ){
+		
 		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		var cells = [];
 
 		var thisId     = "";
 		var messageId  = "";
-		var cells = [];
-
 		var result = super.getResult();
+
 		var frame  = super.bean( "Frame" );
 		var status = super.bean( "Status" );
 		var orientation = super.bean( "Orientation" );
 		var cellOrientation = super.bean( "Orientation" );
+
+		//dump(json.cells);
+
+		for ( var col in json.cells ) {
+
+            for ( var thisCell in col.cells ) {
+
+                if ( thisCell.data.type.id != "COMMAND" ) {
+
+					var cell = super.bean( "FrameCell" );
+					var type = super.bean( "FrameCellType" );
+					var orientation = super.bean( "Orientation" );
+
+					cell.setRow( thisCell.data.row )
+					cell.setCol( thisCell.data.col )
+					cell.setWidth( thisCell.data.width )
+					cell.setHeight( thisCell.data.height )
+					
+					cell.setType( type.setId( thisCell.data.type.id ) )
+					cell.setOrientation( orientation.setId( thisCell.data.orientation.id ) )
+
+					cells.add( cell )
+
+                }
+
+            }
+
+        }
+
+		frame.setCells( cells );
 
 		frame.setId( json?.id );
 		frame.setCode( json.code );
@@ -62,21 +94,6 @@
 		frame.setStatus( status.setId( json.status.id ) );
 		frame.setOrientation( orientation.setId( json.Orientation.id ) );
 		frame.setCellOrientation( cellOrientation.setId( json.cellOrientation.id ) );
-
-		for( var thisCell in json.cells ) {
-
-			var cell = super.bean( "FrameCell" );
-
-			cell.setRow( thisCell.row )
-			cell.setCol( thisCell.col )
-			cell.setValue( thisCell.value )
-
-			cells.add( cell )
-
-		}
-
-		frame.setCells( cells );
-
 		
 		if ( !Len( json.id ) ) {
 			messageId = "frame.created";
@@ -88,7 +105,7 @@
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
 
 		event.setValue( "result", result );
 	}
