@@ -74,8 +74,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		records.each( function( record ){
 			rows.add( get( record.component_id, false ) );
 		} );
-		dump( records );
-		abort;
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -239,6 +237,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create( required com.apirone.core.model.bean.Component component ){
+
+		//TODO: to fix, add validation
+		
 		if ( Len( arguments.component.getId() ) ) {
 			var id = getDao().update( arguments.component.getId() );
 		} else {

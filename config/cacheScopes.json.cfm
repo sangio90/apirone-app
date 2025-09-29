@@ -50,5 +50,6 @@
     "VatCode.bean": {},
     "Frame.bean": {},
     "FrameCell.bean": {},
-    "ProductCategoryLine.bean": {}
+    "ProductCategoryLine.bean": {},
+    "Price.bean": {}
 }

@@ -6,6 +6,7 @@
 		"FONT": {},
 		"LINE": {},
 		"MODEL": {},
+		"PRICE": {},
 		"PRODUCT": {},
 		"PRODUCT_ITEM": {},
 		"QUOTATION": {},

@@ -29,6 +29,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		"dataType"      = { "bean" = "dataType", "file" = "dataTypes.json.cfm" },
 		"entity"        = { "bean" = "entity", "file" = "entities.json.cfm" },
 		"orientation"   = { "bean" = "orientation", "file" = "orientations.json.cfm" },
+		"priceMethod"   = { "bean" = "priceMethod", "file" = "priceMethods.json.cfm" },
 		"frameCellType" = {
 			"bean" = "frameCellType",
 			"file" = "frameCellTypes.json.cfm"

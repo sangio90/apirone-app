@@ -1,9 +1,17 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
-    property name="value" type="Numeric";
-    property name="variantId" type="String";
-    property name="discount" type="Numeric";
-    property name="discountType" type="String" hint='P || F';
+	this.memento = {
+		defaultIncludes = [
+			"id",
+			"type",
+			"method",
+			"amount",
+		]
+	}    
+
+    property name="amount" type="Numeric";
+    property name="type" type="String" hint='com.apirone.core.model.bean.PriceType';
+    property name="method" type="String" hint='com.apirone.core.model.bean.PriceMethod';
 
     public Price function init(){
 
@@ -12,23 +20,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
     public Numeric function getFinalPrice() {
 
-        var value    = getValue();
-        var discount = getDiscount();
-        var type     = getDiscountType();
+        return getAmount()
 
-        if ( isNull( discount ) ) {
-
-            return value;
-
-        }
-
-        switch( type ) {
-            case 'P':
-                return value - value * ( discount / 100 );
-            default:
-                return value - discount;
-        }
-    
     }
 
 }

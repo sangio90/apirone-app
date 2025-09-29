@@ -1,10 +1,10 @@
 [ 
     {
         id: "P",
-        name: "Percentage"
+        name: "In percentuale"
     },
     {
         id: "F",
-        name: "Fixed"
+        name: "Fisso"
     }
 ]
