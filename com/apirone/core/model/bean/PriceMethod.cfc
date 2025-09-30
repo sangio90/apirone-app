@@ -1,15 +1,11 @@
-component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [
-			"id",
-			"name",
-		]
-	}    
+	this.memento = { defaultIncludes = [ "id", "name", "simbol" ] }
 
-    public PriceMethod function init(){
+	property name="simbol" type="String";
 
-        return this;
-    }
+	public PriceMethod function init(){
+		return this;
+	}
 
 }

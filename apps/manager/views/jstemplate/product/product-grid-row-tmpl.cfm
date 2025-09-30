@@ -20,9 +20,16 @@
             <td>
                 <span data-bind="text: finish.name"></span>
             </td>
+            <td>
+                <div data-bind="source: prices" data-template="price-row-tmpl"></div>
+            </td>
+            </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
         </tr>
     </nmscript>
+
+    #template( view="jstemplate/price/price-row-tmpl" )#
+
 </cfoutput>

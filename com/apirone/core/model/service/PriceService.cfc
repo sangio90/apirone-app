@@ -47,6 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setData( rows );
 		result.setTotal( Val( records.total ) );
 		result.setCount( Val( records.recordcount ) );
+
 		return result;
 	}
 
@@ -122,7 +123,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String lineId,
 		String finishId,
 		String typeId, // price type
-
 		String newMethodId,
 		Numeric newAmount
 	){
@@ -154,7 +154,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			);
 			*/
 
-			var prices = list( productId=product.getId(), typeId=arguments.typeId );
+			var prices = list( productId = product.getId(), typeId = arguments.typeId );
 
 			if ( prices.len() ) {
 				for ( var price in prices ) {
@@ -181,7 +181,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						event   = "price.UPDATED",
 						message = "Price [#price.getId()#] updated by mass update",
 						payload = {
-							"criteria" = SerializeJSON( findCriteria ),
+							"criteria" = findCriteria,
 							"price"    = {
 								"id"        = price.getId(),
 								"typeId"    = price.getType().getId(),
@@ -219,7 +219,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					event   = "price.CREATED",
 					message = "Price created by mass method.",
 					payload = {
-						"criteria"    = SerializeJSON( findCriteria ),
+						"criteria"    = findCriteria,
 						"price"       = { "newId" = currentId },
 						"newAmount"   = arguments.newAmount,
 						"newMethodId" = arguments.newMethodId
@@ -246,9 +246,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setAmount( record.amount );
 			bean.setCreatedAt( record.created_at );
-			bean.setMethod( getLookupService().get( "priceMethod", record.method_id ) );
-			bean.setType( getPriceTypeService().get( record.price_type_id ) );
 
+			bean.setMethod( getLookupService().get( "priceMethod", record.method_id ) );
+
+			bean.setType( getPriceTypeService().get( record.price_type_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
 			return bean;

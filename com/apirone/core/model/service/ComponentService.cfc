@@ -63,7 +63,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
 			return searchByProductItemId( arguments.productItemId );
-			// cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# search: searchByProductItemId: #arguments.productItemId#");
 		}
 
 		var rows   = [];
@@ -111,7 +110,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			event   = "component.MULTI_UPDATED",
 			message = "Massive component reassign procedure started",
 			payload = {
-				"Criteria" = paramCategory,
+				"criteria" = paramCategory,
 				"oldValue" = oldParam,
 				"newValue" = newParam
 			}
@@ -125,7 +124,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				event   = "component.UPDATED",
 				message = "Component [#rowParams[ "componentId" ]#] updated.",
 				payload = {
-					"Criteria" = rowParams[ "paramCategory" ],
+					"criteria" = rowParams[ "paramCategory" ],
 					"id"       = rowParams[ "componentId" ],
 					"oldValue" = oldParam,
 					"newValue" = rowParams[ "newParam" ]
@@ -137,7 +136,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			event   = "component.MULTI_UPDATED",
 			message = "Massive component reassign procedure ended",
 			payload = {
-				"Criteria"      = paramCategory,
+				"criteria"      = paramCategory,
 				"oldValue"      = oldParam,
 				"newValue"      = newParam,
 				"recordUpdated" = Val( records.recordcount )
@@ -161,10 +160,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var records = getDao().find( argumentCollection = arguments );
 		var params  = {};
+
 		super.logEvent(
 			event   = "component.MULTI_DELETED",
 			message = "Massive component delete procedure started",
-			payload = { "Criteria" = paramCategory, "Value" = oldParam }
+			payload = { "criteria" = paramCategory, "value" = oldParam }
 		);
 
 		records.each( function( record ){
@@ -175,9 +175,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			event   = "component.MULTI_DELETED",
 			message = "Massive component delete procedure ended",
 			payload = {
-				"Criteria"      = paramCategory,
-				"Value"         = oldParam,
-				"recordUpdated" = Val( records.recordcount )
+				"criteria"      = paramCategory,
+				"value"         = oldParam,
+				"recordDeleted" = Val( records.recordcount )
 			}
 		);
 
@@ -237,9 +237,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create( required com.apirone.core.model.bean.Component component ){
+		// TODO: to fix, add validation
 
-		//TODO: to fix, add validation
-		
 		if ( Len( arguments.component.getId() ) ) {
 			var id = getDao().update( arguments.component.getId() );
 		} else {

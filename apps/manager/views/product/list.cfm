@@ -104,6 +104,7 @@
                                         { 'field':'line.name', 'title':'Linea' },
                                         { 'field':'model.name', 'title':'Modello'},
                                         { 'field':'finish.name', 'title':'Finitura'},
+                                        { 'field':'prices', 'title':'Prezzi'},
                                         { 'field':'', 'title':'Attributi', width: '55px'}
                                     ]",
 									rowTemplate = "product/product-grid-row-tmpl"

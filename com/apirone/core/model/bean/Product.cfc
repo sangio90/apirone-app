@@ -30,7 +30,8 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 					"lines",
 					"line",
 					"model",
-					"finish"
+					"finish",
+					"prices"
 				]
 			}
 		}
@@ -63,8 +64,46 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 
 	property name="catalogBundle" type="com.apirone.core.model.bean.CatalogBundle";
 
+	// TODO: remove this for prices[]
+	property name="pricesAsArray" type="Array" default=[];
+
 	public Product function init(){
+		variables.prices = {};
 		return this;
+	}
+
+	public Struct function getPrice( required String typeId ){
+		for ( var price in getPricesAsArray() ) {
+			if ( price.getType().getId() EQ typeId ) {
+				return price;
+			}
+		}
+	}
+
+	public Array function getPrices(){
+		return this.getPricesAsArray();
+
+		/*
+		var result = {}
+
+		for ( var price in getPricesAsArray() ) {
+			// TODO: avoid "MEMENTO" key
+			// let's try...
+
+			StructDelete( price, "memento" );
+			StructDelete( price.getType(), "memento" );
+			StructDelete( price.getType().getStatus(), "memento" );
+			StructDelete( price.getMethod(), "memento" );
+
+			result[ price.getType().getId() ] = price;
+		}
+
+		return result;
+		*/
+	}
+
+	public Array function setPrices(){
+		Throw( type = "NotImplemented", message = "Use setPricesAsArray( price[] ) instead" );
 	}
 
 }

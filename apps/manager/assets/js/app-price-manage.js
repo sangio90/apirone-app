@@ -105,7 +105,7 @@ AP.price.manage = ( function() {
                 },
                 newAmount: {
                     number: "Importo non numerico",
-                    required: "inserisci un importo",
+                    required: "Inserisci un importo",
                 },
             },
 
