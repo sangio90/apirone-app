@@ -26,7 +26,7 @@
 									<div class="mb-3 row">
 										<label class="col-sm-2 col-form-label text-end">Categoria</label>
 										<div class="col-sm-10">
-											<select class="form-control me-2 col-sm-8" name="categoryId">
+											<select class="form-control me-2 col-sm-8" name="categoryId" required>
 												<option value="">-- tutte</option>
 												<cfloop array="#prc.categories#" item="item">
 													<option value="#item.getId()#">#item.getName()#</option>
@@ -38,7 +38,7 @@
 									<div class="mb-3 row">
 										<label class="col-sm-2 col-form-label text-end">Linea</label>
 										<div class="col-sm-10">
-											<select class="form-control me-2" name="lineId">
+											<select class="form-control me-2" name="lineId" required>
 												<option value="">-- tutte</option>
 												<cfloop array="#prc.lines#" item="item">
 													<option value="#item.getId()#">#item.getName()#</option>
@@ -85,7 +85,7 @@
 
 									<div class="mb-3 row">
 										
-										<label class="col-sm-2 col-form-label text-end">Aggiorna:</label>
+										<label class="col-sm-2 col-form-label text-end">Aggiorna</label>
 
 										<div class="col-sm-10">
 

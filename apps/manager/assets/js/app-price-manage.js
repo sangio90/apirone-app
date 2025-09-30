@@ -40,10 +40,12 @@ AP.price.manage = ( function() {
             var manageForm = AP.fields.price.manageForm;
             var status = manageForm.find( ".status" );
 
-            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
-            // if ( manageForm.valid() ) {
-            if ( true ) {
+            if ( manageForm.valid() ) {
+
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/prices/reassign",
@@ -69,6 +71,46 @@ AP.price.manage = ( function() {
     pub.init = function() {
 
         kendo.bind( AP.fields.price.manageRoot, viewModel );
+
+        var manageForm = AP.fields.price.manageForm;
+
+        manageForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
+            },
+            rules: {
+                categoryId: {
+                    required: true
+                },
+                lineId: {
+                    required: true
+                },
+                typeId: {
+                    required: true
+                },
+                newAmount: {
+                    number: true,
+                    required: true
+                },
+            },
+            messages: {
+                categoryId: {
+                    required: "Seleziona una categoria",
+                },
+                lineId: {
+                    required: "Seleziona una linea",
+                },
+                typeId: {
+                    required: "Seleziona un tipo di prezzo",
+                },
+                newAmount: {
+                    number: "Importo non numerico",
+                    required: "inserisci un importo",
+                },
+            },
+
+        } );
+
 
     };
 
