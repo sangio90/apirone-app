@@ -37,8 +37,6 @@ AP.price.manage = ( function() {
 
         save: function( event ) {
 
-            console.log( "save" );
-
             var manageForm = AP.fields.price.manageForm;
             var status = manageForm.find( ".status" );
 
@@ -61,14 +59,6 @@ AP.price.manage = ( function() {
                     },
                 } );
             }
-
-            return false;
-
-            var thisForm = AP.fields.price.manageForm;
-
-            var params = thisForm.serializeJSON();
-
-            viewModel.rows.read( params );
 
             return false;
 
