@@ -16,7 +16,7 @@
 			dashboard
 		*/
 		get( "/dashboard" ).to( "MainController.dashboard" ).end();
-		get( "/manager/selects" ).to( "MainController.selects" ).end();
+		//get( "/manager/selects" ).to( "MainController.selects" ).end();
 		get( "/plate/designer" ).to( "PlateController.designer" ).end();
 		get( "/plate/map" ).to( "PlateController.map" ).end();
 
@@ -24,6 +24,7 @@
 		/*
 			prices
 		*/
+		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
 		get( "/prices" ).to( "PriceController.manage" ).end();
 
 

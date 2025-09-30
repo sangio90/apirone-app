@@ -117,6 +117,109 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.price.getId();
 	}
 
+	public Numeric function massiveReassign(
+		String rawProductId,
+		String variantId,
+		String colorId,
+		String paramCategory,
+		String newParam,
+		String oldParam
+	){
+		arguments[ "limit" ] = -1;
+
+		var rows   = [];
+		var result = super.getResult();
+
+		var records = getDao().find( argumentCollection = arguments );
+		var params  = {};
+
+		if ( paramCategory == "rawProductId" ) {
+			params = { "paramCategory" = paramCategory, "newParam" = newParam }
+		}
+		if ( paramCategory == "variantId" ) {
+			params = { "paramCategory" = paramCategory, "newParam" = newParam }
+		}
+		if ( paramCategory == "colorId" ) {
+			params = { "paramCategory" = paramCategory, "newParam" = newParam }
+		}
+
+		super.logEvent(
+			event   = "component.MULTI_UPDATED",
+			message = "Massive component reassign procedure started",
+			payload = {
+				"Criteria" = paramCategory,
+				"oldValue" = oldParam,
+				"newValue" = newParam
+			}
+		);
+		records.each( function( record ){
+			var rowParams              = params;
+			rowParams[ "componentId" ] = record.component_id;
+			getDao().reassign( argumentCollection = rowParams );
+			super.getCacheManager().remove( getCacheScope(), record.component_id );
+			super.logEvent(
+				event   = "component.UPDATED",
+				message = "Component [#rowParams[ "componentId" ]#] updated.",
+				payload = {
+					"Criteria" = rowParams[ "paramCategory" ],
+					"id"       = rowParams[ "componentId" ],
+					"oldValue" = oldParam,
+					"newValue" = rowParams[ "newParam" ]
+				}
+			);
+		} );
+
+		super.logEvent(
+			event   = "component.MULTI_UPDATED",
+			message = "Massive component reassign procedure ended",
+			payload = {
+				"Criteria"      = paramCategory,
+				"oldValue"      = oldParam,
+				"newValue"      = newParam,
+				"recordUpdated" = Val( records.recordcount )
+			}
+		);
+
+		return Val( records.recordcount );
+	}
+
+	public Numeric function massiveDelete(
+		String productId,
+	){
+		
+		arguments[ "limit" ] = -1;
+
+		var rows   = [];
+		var result = super.getResult();
+
+		var records = getDao().find( argumentCollection = arguments );
+		var params  = {};
+		
+		super.logEvent(
+			event   = "price.MULTI_DELETED",
+			message = "Massive price delete procedure started",
+			payload = { "criteria" = SerilizeJSON( arguments ) }
+		);
+
+		records.each( function( record ){
+			delete( record.price_id );
+		} );
+
+		super.logEvent(
+			event   = "price.MULTI_DELETED",
+			message = "Massive price delete procedure ended",
+			
+			payload = {
+				"criteria"      = paramCategory,
+				"value"         = oldParam,
+				"recordUpdated" = Val( records.recordcount )
+			}
+		);
+
+		return Val( records.recordcount );
+	}
+
+
 
 	/*
     	private method

@@ -3,6 +3,7 @@ AP.fields.price = AP.fields.price || {};
 
 AP.fields.price = {
     manageRoot: $( "#price-manage-root" ),
+    manageForm: $( "#price-manage-search-form" ),
 };
 
 $( document ).ready( function(){
@@ -20,17 +21,6 @@ AP.price.manage = ( function() {
 
     var viewModel = kendo.observable( {
 
-        resetForm: function() {
-            viewModel.set( "detailForm", defaultDetailForm );
-        },
-
-        attributes: function( event ) {
-            var id = event.data.id;
-            window.open( "/manager/products/" + id + "/detail", "_blank" ).focus();
-
-            return false;
-        },
-
         search: function( event ) {
 
             var thisForm = AP.fields.price.searchListForm;
@@ -45,24 +35,45 @@ AP.price.manage = ( function() {
 
         },
 
-        print: function( event ) {
+        salve: function( event ) {
 
-            var target = $( event.currentTarget );
-            var report = target.data( "report" );
+            var manageForm = AP.price.fields.manageForm;
+            var status = manageForm.find( ".status" );
 
-            var qs = $( "#product-grid-search-form" ).serialize();
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
-            var id = event.data.id;
-            window.open( "/manager/products/print/" + report + "?" + qs, "_blank" ).focus();
+            // if ( manageForm.valid() ) {
+            if ( true ) {
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/prices/reassign",
+                    data: JSON.stringify( manageForm.serializeJSON() ),
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.status == "SUCCESS" ) {
+                                // NM.util.autoHideMessage(status, "<span class='green'>Prezi salvati</span>");
+                                AP.widget.notify( "success", "Prezzi salvati con successo" );
+                            }
+                        },
+                    },
+                } );
+            }
 
             return false;
+
+            var thisForm = AP.fields.price.manageForm;
+
+            var params = thisForm.serializeJSON();
+
+            viewModel.rows.read( params );
+
+            return false;
+
         },
 
     } );
 
     pub.init = function() {
-
-        console.log( "price:manage" );
 
         kendo.bind( AP.fields.price.listRoot, viewModel );
 

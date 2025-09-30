@@ -37,6 +37,10 @@
 				AND price_type ILIKE <cfqueryparam value="#arguments.str#" cfsqltype="varchar">
 			</cfif>
 
+			<cfif !IsNull( arguments.typeId ) >
+				AND price_types.price_type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
+			</cfif>
+
 			<cfif !IsNull( arguments.productId ) >
 				AND product_id = <cfqueryparam value="#arguments.product_id#" cfsqltype="varchar">::uuid
 			</cfif>

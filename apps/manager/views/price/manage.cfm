@@ -21,9 +21,7 @@
 						<div class="row mb-3">
 							
 							<div class="col-sm-12">
-								<form
-									id   ="price-manage-grid-search-form"
-									data-bind: 'events: { submit: search }'>
+								<form id="price-manage-search-form">
 
 									<div class="mb-3 row">
 										<label class="col-sm-2 col-form-label text-end">Categoria</label>
@@ -102,19 +100,24 @@
 										<label class="col-sm-2 col-form-label text-end">Imposta</label>
 
 										<div class="col-sm-3 d-flex align-items-center">
-											<div class="me-2">Tipo prezzo:</div>
+											<div class="me-2">Metodo:</div>
 											<select class="form-control" name="priceMethodId">
-												<option>Invariato</option>
 												<option>%</option>
 												<option>Fisso</option>
 											</select>
 										</div>
 										
-										<div class="col-sm-3 d-flex align-items-center">
-											<div class="me-2">Nuovo valore</div>
-											<input type="text" class="form-control" name="amount" required />
+										<div class="col-sm-4">
+											<div class="row align-items-center">
+												<div class="col-sm-4 text-end">Nuovo importo:</div>
+												<div class="col-sm-8">
+													<input type="text" class="form-control" name="amount" required />
+												</div>
+											</div>
 										</div>
 										
+										<!---
+										TODO: add more options, e.g. modify current value by percentage
 										<div class="col-sm-3 d-flex align-items-center">
 											<div class="me-2">calcola sul valore esistente... </div>
 											<select class="form-control" name="priceMethodId">
@@ -122,13 +125,15 @@
 												<option>Variazione in percentuale</option>
 											</select>
 										</div>
+										---->
 									
 									</div>
 
 									<div class="mb-3 row">
 										<label class="col-sm-2"></label>
-										<div class="col-sm-10">
+										<div class="col-sm-10 d-flex align-items-center">
 											#saveButton( bind = "click:save", class="me-1" )#
+											<div class="ms-2 status"></div>
 										</div>
 									</div>
 								</form>
