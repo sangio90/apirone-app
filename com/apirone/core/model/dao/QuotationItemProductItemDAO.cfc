@@ -4,9 +4,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				quotation_item_product_item_id::varchar,
-				quotation_item_product_id::varchar,
-				product_item_id::integer,
-				origin_id::varchar,
+				quotation_item_id::varchar,
 				*
 			FROM quotation_item_product_items
 			WHERE quotation_item_product_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItemId#">::uuid
@@ -25,20 +23,20 @@
 			SELECT
 				quotation_item_product_item_id::varchar,
 				quotation_item_id::varchar,
-				product_item_id::integer,
+				product_item_id,
 				origin_id::varchar,
 				COUNT(quotation_item_product_item_id) OVER() AS total
 			FROM
 				quotation_item_product_items
 			WHERE 1=1
 				<cfif !IsNull( arguments.quotationItemId )>
-					AND quotation_item_product_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemId#">::uuid
+					AND quotation_item_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemId#">::uuid
 				</cfif>
 				<cfif !IsNull( arguments.productItemId )>
 					AND product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItemId#">
 				</cfif>
 				<cfif !IsNull( arguments.originId )>
-					AND origin_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.originId#">::uuid
+					AND origin_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.originId#">
 				</cfif>
 			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
 
@@ -61,7 +59,7 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getOrigin().getId()#">::uuid
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getOrigin().getId()#">
 				<cfelse>
 					NULL
 				</cfif>
@@ -79,7 +77,7 @@
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
 				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
-					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getOrigin().getId()#">::uuid
+					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getOrigin().getId()#">
 				</cfif>
 			WHERE quotation_item_product_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getId()#">::uuid
 		</cfquery>

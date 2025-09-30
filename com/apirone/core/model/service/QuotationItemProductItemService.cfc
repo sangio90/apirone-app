@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemProductItemDAO";
-	property name="QuotationItemProductService" inject="QuotationItemProductService";
+	property name="QuotationItemService" inject="QuotationItemService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductItemService" inject="ProductItemService";
 	property name="cacheScope" type="String" default="QuotationItemProductItem.bean";
@@ -86,16 +86,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemProductItem" );
 			bean.setId( record.quotation_item_product_item_id );
-			bean.setQuotationItemProduct(
-				getQuotationItemProductService().get( record.quotation_item_product_id )
+			bean.setQuotationItem(
+				getQuotationItemService().get( record.quotation_item_id )
 			);
 			bean.setProductItem( getProductItemService().get( record.product_item_id ) );
 
-			bean.setOrigin(
-				IsNull( record.origin_id ) ? NullValue() : getQuotationItemProductItemService().get(
-					record.origin_id
-				)
-			);
+			if (!IsNull(record.origin_id)) {
+				bean.setOrigin( getProductItemService().get( record.origin_id ) );
+			}
 			return bean;
 		}
 		return NullValue();

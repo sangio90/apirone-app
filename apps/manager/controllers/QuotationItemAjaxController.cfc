@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 		var mm     = super.getMementify();
 		var rows = super.fire( "QuotationItem.search", params );
-
+		
 		var rowsData = ( mm.convertList( rows.getData() ) );
 
 		result.setTotal( rows.getTotal() );
@@ -201,6 +201,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		result.setData({ "payload" = payload });
 		event.setValue("result", result);
+	}
+
+	function productItems( event, rc, prc ) {
+		var result = super.getResult();
+		var quotationItemId = rc.id;
+		var mm = super.getMementify();
+		var productItems = super.fire( 'QuotationItemProductItem.list', { quotationItemId: quotationItemId } );
+
+		var productItems = ( mm.convertList( productItems ) );
+
+		result.setCount( Len(productItems) );
+		result.setData( productItems );
+
+		event.setValue( "result", result );
 	}
 
 }

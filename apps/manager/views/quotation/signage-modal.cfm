@@ -98,27 +98,27 @@
                             </div>
                         </div>
                         <div class="mb-3 mt-3 row" data-bind="visible:detailForm.data.quotationItem.signageConfigItem.id">
-                            <div class="col-2 mb-3">
+                            <div class="col-3 mb-3">
                                 Albero
                             </div>
-                            <div class="col-3 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
+                            <div class="col-2 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 Righe
                             </div>
-                            <div class="col-3 mb-3 flex justify-content-end align-items-end">
+                            <div class="col-2 mb-3 flex justify-content-end align-items-end">
                                 <!--- <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i> --->
                                 <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
                             </div>
                             <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 Anteprima
                             </div>
-                            <div class="col-2 mb-3">
-                                Albero
+                            <div class="col-3 mb-3">
+                                <div id="product-items" style="max-width: 90%"></div>
                             </div>
-                            <div id="signage-rows-container" class="col-6" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
+                            <div id="signage-rows-container" class="col-5" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
                                 <!--- qui dentro vanno gli items --->
                             </div>
                             <div id="signage-preview-background"
-                                class="col-4 d-flex justify-content-center align-items-center"
+                                class="col-3 d-flex justify-content-center align-items-center"
                                 data-bind="visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
                                 <div id="signage-preview-container"
                                     class="d-flex flex-column justify-content-center"

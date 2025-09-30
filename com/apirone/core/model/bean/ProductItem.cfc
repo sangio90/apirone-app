@@ -23,10 +23,22 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 					"id",
 					"shortId",
 					"status",
+					"origin.id",
 					"level",
 					"attribute",
 					"attributeValue.rawValue",
 					"componentCount"
+				]
+			},
+			treelight = {
+				defaultIncludes = [
+					"id",
+					"shortId",
+					"origin.id",
+					"attribute.id",
+					"attribute.name",
+					"attributeValue.id",
+					"attributeValue.rawValue.name"
 				]
 			}
 		}
