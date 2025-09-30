@@ -5,12 +5,6 @@ Object.assign( AP.file.fields, {
 } );
 
 
-$( document ).ready( function() {
-    if ( AP.file.fields.modal.length ) {
-        // AP.file.modal.init();
-    }
-} );
-
 AP.file.modal = ( function() {
     var pub = {};
 
@@ -64,8 +58,7 @@ AP.file.modal = ( function() {
                 break;
 
             default:
-                console.error( "ERROR. Type not managed: ", current.type );
-                break;
+                throw Error( "ERROR. Type not managed: " + current.type );
             }
 
         }
@@ -79,9 +72,7 @@ AP.file.modal = ( function() {
         currentItem: undefined,
 
         title: function( event ) {
-
             return getCurrentConfig().modalTitle;
-
         },
 
         getImageTypeText: function( event ) {

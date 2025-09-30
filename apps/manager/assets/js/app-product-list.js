@@ -57,7 +57,7 @@ AP.product.list = ( function() {
 
         editPrices: function( event ) {
 
-            AP.price.modal.multiEdit( { productId: event.data.productId } );
+            AP.price.modal.editList( { productId: event.data.productId } );
 
         },
 

@@ -1,24 +1,58 @@
-﻿AP.price = AP.price || {};
-AP.fields.price = AP.fields.price || {};
+﻿AP.namespace( "price" );
 
-AP.fields.price = {
-    detailList: $( "#price-form-list-detail" ),
-};
-
-$( document ).ready( function(){
-
-    if ( AP.fields.price.detailRoot.length ) {
-        AP.price.modal.init();
-    }
-
+Object.assign( AP.price.fields, {
+    modal: $( "#price-form-list-modal" ),
 } );
 
 AP.price.modal = ( function() {
 
     var pub = {};
-    var fields = AP.fields.price;
+	var fields = AP.price.fields;
+	
+    var getCurrentConfig = function() {
 
-    var viewModel = kendo.observable( {
+        var current = viewModel.get( "currentItem" );
+        var baseUrl = "/manager/ajax/prices";
+
+        var result = {
+            modalTitle: "",
+            modifyUrl: "",
+            readUrl: ""
+        };
+
+        if( current ) {
+
+            switch( current.type ) {
+
+            case "product":
+
+                result.modalTitle = "Prezzi per l'articolo: " + current.line.name + " / " + current.model.name;
+                result.readUrl = baseUrl + "/products/" + current.product.id + "/prices"
+                result.modifyUrl = result.readUrl;
+
+                break;
+
+            case "productItem": // productItem
+
+                result.modalTitle = "Prezzi per l'attributo: " + current.attribute.name + " / " + current.attributeValue.rawValue.name;
+                result.readUrl = baseUrl + "/product-items/" + current.item.id + "/prices";
+                result.modifyUrl = result.readUrl;
+
+                break;
+
+				default:
+					throw Error("Configuration [" + current.type + "] not valid" );
+            }
+
+        }
+
+        return result;
+
+    };	
+
+	var viewModel = kendo.observable({
+		
+		currentItem: null,
 
         save: function( event ) {
 
@@ -91,37 +125,27 @@ AP.price.modal = ( function() {
 
 	});
 	
-	var loadList = function () {
+	var loadList = function ( productId ) {
 
 		NM.util.ajax( {
-			method: "POST",
-			url: "/manager/ajax/prices",
-			data: JSON.stringify( manageForm.serializeJSON() ),
+			method: "GET",
+			url: getCurrentConfig().readUrl,
 			callback: {
-				done: function( xhr ) {
-					if ( xhr.status == "SUCCESS" ) {
-						// NM.util.autoHideMessage(status, "<span class='green'>Prezi salvati</span>");
-						AP.widget.notify( "success", "Prezzi salvati con successo" );
-						status.html( "" );
-					}
+				done: function (xhr) {
+					
 				},
 			},
 		} );
-
 		
 	}
 
-    pub.multiEdit = function() {
+    pub.open = function( item ) {
 
+        kendo.bind( fields.modal, viewModel );
 
-        viewModel.multiEdit(  );
+        viewModel.set( "currentItem", item );
 
-    };
-
-    pub.init = function() {
-
-        kendo.bind( AP.fields.price.manageRoot, viewModel );
-
+        initUpload();
 
     };
 
