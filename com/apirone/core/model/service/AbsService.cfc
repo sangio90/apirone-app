@@ -75,14 +75,14 @@ component output="false" accessors="true" {
 		return records;
 	}
 
-	public Boolean function backupTable( required String fromTable, required String toTable ){
+	public Boolean function backupTable( required String fromTable ){
 
 		var dbUtil  = new com.apirone.core.util.DBUtil();
 
 		dbUtil.backupTable(
-			datasource = getConfiguration().getDatasource(),
+			datasource = "apirone", //FIXME: make it configurable
 			fromTable  = arguments.fromTable,
-			toTable    = "backup.#arguments.toTable#_#DateFormat( Now(), "yyyymmddHHMMss" )#"
+			toTable    = "backup.#arguments.fromTable#_#DateFormat( Now(), "yyyymmdd" )#_#TimeFormat( Now(), "HHmmss" )#"
 		);
 
 		return true;

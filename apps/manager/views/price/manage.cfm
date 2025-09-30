@@ -84,37 +84,40 @@
 									</div>
 
 									<div class="mb-3 row">
-										<label class="col-sm-2 col-form-label text-end">Tipo prezzo</label>
+										
+										<label class="col-sm-2 col-form-label text-end">Aggiorna:</label>
+
 										<div class="col-sm-10">
-											<select class="form-control me-2" name="priceTypeId" required> 
-												<option value="">-- seleziona un tipo</option>
-												<cfloop array="#prc.types#" item="item">
-													<option value="#item.getId()#">#item.getName()#</option>
-												</cfloop>
-											</select>
-										</div>
-									</div>
 
-									<div class="mb-3 row">
-										
-										<label class="col-sm-2 col-form-label text-end">Imposta</label>
+											<div class="row">
 
-										<div class="col-sm-3 d-flex align-items-center">
-											<div class="me-2">Metodo:</div>
-											<select class="form-control" name="methodId">
-												<option value="P">%</option>
-												<option value="F">Fisso</option>
-											</select>
-										</div>
-										
-										<div class="col-sm-4">
-											<div class="row align-items-center">
-												<div class="col-sm-4 text-end">Nuovo importo:</div>
-												<div class="col-sm-8">
-													<input type="text" class="form-control" name="amount" required />
+												<div class="col-sm-4">
+													<div class="me-2">Tipo:</div>
+													<select class="form-control" name="typeId" required>
+														<option value="">-- seleziona</option>
+														<cfloop array="#prc.types#" item="item">
+															<option value="#item.getId()#">#item.getName()#</option>
+														</cfloop>
+													</select>
 												</div>
+												
+												<div class="col-sm-4">
+													<div class="me-2">Nuovo metodo:</div>
+													<select class="form-control" name="newMethodId">
+														<option value="P">%</option>
+														<option value="F">Fisso</option>
+													</select>
+												</div>
+												
+												<div class="col-sm-4">
+													<div>Nuovo importo:</div>
+													<input type="text" class="form-control" name="newAmount" required />
+												</div>
+
 											</div>
+
 										</div>
+
 										
 										<!---
 										TODO: add more options, e.g. modify current value by percentage

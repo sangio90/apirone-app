@@ -31,16 +31,16 @@ component output="false" accessors="true" {
 		return result;
 	}
 
-	public String function backupTable( required String datasource, required String fromTable, required String toTable ){
+	public Numeric function backupTable( required String datasource, required String fromTable, required String toTable ){
 
-		var sql = "CREATE TABLE #toTable# AS SELECT * FROM #fromTable#";
+		var sql = "CREATE TABLE #arguments.toTable# AS SELECT * FROM #arguments.fromTable#";
 
-		myQuery = queryExecute(
-			sql, 
-			{ datasource = datasource } 
+		var q = QueryExecute(
+			sql = sql, 
+			options = { datasource = arguments.datasource }
 		);
 		
-		return result;
+		return q.recordCount;
 	}
 
 }

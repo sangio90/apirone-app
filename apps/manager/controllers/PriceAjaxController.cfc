@@ -6,13 +6,17 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var messageId = "price.reassigned";
 
-		var result = super.fire( "price.massiveReassign", argumentCollection = rc );
+		for( var key in rc ){
+			if ( Len( rc[ key ] ) ) { // only non empty
+				args[ key ] = rc[ key ];
+			}
+		}
 
-		dump( result );
+		var outout = super.fire( "price.massiveReassign", { argumentCollection = args } );
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = result } );
+		result.setData( { "message" = message }, { "payload" = outout } );
 
 		event.setValue( "result", result );
 	

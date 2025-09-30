@@ -39,7 +39,7 @@ AP.price.manage = ( function() {
 
             console.log( "save" );
 
-            var manageForm = AP.price.fields.manageForm;
+            var manageForm = AP.fields.price.manageForm;
             var status = manageForm.find( ".status" );
 
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
@@ -55,6 +55,7 @@ AP.price.manage = ( function() {
                             if ( xhr.status == "SUCCESS" ) {
                                 // NM.util.autoHideMessage(status, "<span class='green'>Prezi salvati</span>");
                                 AP.widget.notify( "success", "Prezzi salvati con successo" );
+                                status.html( "" );
                             }
                         },
                     },

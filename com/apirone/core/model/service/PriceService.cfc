@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
 	property name="priceTypeService" inject="PriceTypeService";
+	property name="lookupService" inject="lookupService";
 
 	property name="cacheScope" type="String" default="Price.bean";
 
@@ -17,7 +18,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return cache.data;
 		}
 
-		var bean = build( arguments.priceId  );
+		var bean = build( arguments.priceId );
 		cm.put( getCacheScope(), arguments.priceId, bean );
 
 		return bean;
@@ -32,9 +33,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Result function search(
 		String productId,
 		Numeric productItemId,
-		String statusId,
+		String statusId
 	){
-		
 		var rows   = [];
 		var result = super.getResult();
 
@@ -103,7 +103,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create( required com.apirone.core.model.bean.Price price ){
-
 		var id = getDao().insert( arguments.price );
 
 		return id;
@@ -118,46 +117,89 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Struct function massiveReassign(
-		//String productId,
-		String typeId,
-		Strig methodId,
-		Numeric amount,
-	){
+		String categoryId,
+		String modelId,
+		String lineId,
+		String finishId,
+		String typeId, // price type
 
-		var findCriteria = { 
-			"lineId": arguments.lineId, 
-			"categoryId": arguments.categoryId, 
-			"modelId": arguments.modelId, 
-			"typeId": arguments.typeId ,
-			"finishId": arguments.finishId
+		String newMethodId,
+		Numeric newAmount
+	){
+		var arg = arguments.typeId;
+
+		var findCriteria = {
+			"lineId"     = arguments.lineId,
+			"categoryId" = arguments.categoryId,
+			"modelId"    = arguments.modelId,
+			"finishId"   = arguments.finishId
 		};
 
 		var rows   = [];
 		var result = super.getResult();
 
-		var updatedRecords=0;
-		var insertedRecords=0;
+		var updatedRecords  = 0;
+		var insertedRecords = 0;
 
 		backupTable( "prices" );
 
-		//var records = getDao().find( argumentCollection = findCriteria );
+		// var records = getDao().find( argumentCollection = findCriteria );
 
 		var products = getProductService().list( argumentCollection = findCriteria );
 
-		var params  = {};
+		for ( var product in products ) {
+			/*
+			var prices = getDao().find(
+				argumentCollection = { productId = product.getId(), typeId = arguments.typeId }
+			);
+			*/
 
-		products.each( function( product ){
+			var prices = list( productId=product.getId(), typeId=arguments.typeId );
 
-			var prices = getDao().find( argumentCollection = { productId = product.getId(), typeId = arguments.typeId } );
+			if ( prices.len() ) {
+				for ( var price in prices ) {
+					var bean   = super.bean( "Price" );
+					var entity = super.bean( "Entity" );
 
-			for( var price in prices ){
+					entity.setkey( "product.id" );
+					entity.setValue( product.getId() );
 
-				var bean = super.bean( "Price" );
+					var bean = get( price.getId() );
+
+					bean.setAmount( arguments.newAmount );
+					bean.setMethod( getLookupService().get( "priceMethod", arguments.newMethodId ) );
+
+					bean.setEntity( entity );
+
+					getDao().update( bean );
+
+					updatedRecords++;
+
+					super.getCacheManager().remove( getCacheScope(), price.getId() );
+
+					super.logEvent(
+						event   = "price.UPDATED",
+						message = "Price [#price.getId()#] updated by mass update",
+						payload = {
+							"criteria" = SerializeJSON( findCriteria ),
+							"price"    = {
+								"id"        = price.getId(),
+								"typeId"    = price.getType().getId(),
+								"productId" = product.getId(),
+								"amount"    = price.getAmount(),
+								"methodId"  = price.getMethod().getId()
+							},
+							"newAmount"   = arguments.newAmount,
+							"newMethodId" = arguments.newMethodId
+						}
+					);
+				}
+			} else {
+				var bean   = super.bean( "Price" );
 				var entity = super.bean( "Entity" );
-				
-				bean.setId( price.price_id );
-				bean.setAmount( arguments.amount );
-				bean.setMethod( getLookupService().get( "priceMethod", arguments.methodId ) );
+
+				bean.setAmount( arguments.newAmount );
+				bean.setMethod( getLookupService().get( "priceMethod", arguments.newMethodId ) );
 				bean.setType( getPriceTypeService().get( arguments.typeId ) );
 				bean.setStatus( getStatusService().get( "ACT" ) );
 
@@ -166,43 +208,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				bean.setEntity( entity );
 
-				if( IsNull( record.price_id ) ){
-					var currentId = getDao().create( bean );
+				var currentId = getDao().insert( bean );
 
-					var eventType = "price.CREATED" 
-					var eventMessage = "Price created by mass method." 
+				var eventType    = "price.CREATED"
+				var eventMessage = "Price [#currentId#] created by mass method."
 
-				} else {
-					
-					getDao().update( bean );
-
-					var currentId = record.price_id;
-					var eventType = "price.UPDATED" 
-					var eventMessage = "Price updated by mass update."
-
-					updatedRecords++;
-
-				}
+				insertedRecords++;
 
 				super.logEvent(
-					event   = eventType,
-					message = eventMessage,
+					event   = "price.CREATED",
+					message = "Price created by mass method.",
 					payload = {
-						"criteria" = SerializeJSON( findCriteria ),
-						"productId"= product.getId(),
-						"typeId"   = arguments.typeId,
-						"priceId"  = currentId,
-						"amount"   = arguments.amount,
-						"method"   = arguments.methodId,
+						"criteria"    = SerializeJSON( findCriteria ),
+						"price"       = { "newId" = currentId },
+						"newAmount"   = arguments.newAmount,
+						"newMethodId" = arguments.newMethodId
 					}
 				);
-
-				super.getCacheManager().remove( getCacheScope(), record.price_id );				
 			}
-		
-		} );
+		};
 
-		return { "insertedRecords" = insertedRecords, "updatedRecords" = updatedRecords };
+		return { "inserted" = insertedRecords, "updated" = updatedRecords };
 	}
 
 

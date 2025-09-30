@@ -42,7 +42,7 @@
 			</cfif>
 
 			<cfif !IsNull( arguments.productId ) >
-				AND product_id = <cfqueryparam value="#arguments.product_id#" cfsqltype="varchar">::uuid
+				AND prices.product_id = <cfqueryparam value="#arguments.productId#" cfsqltype="varchar">::uuid
 			</cfif>
 
 			<cfif !IsNull( arguments.productItemId ) >
@@ -66,7 +66,7 @@
 
 		<cfargument name="price" type="com.apirone.core.model.bean.Price" required="true">
 
-		<cfset var dbField = getDBField( arguments.entity.getKey() )>
+		<cfset var dbField = getDBField( arguments.price.getEntity().getKey() )>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO prices(
@@ -77,7 +77,7 @@
 			VALUES (
 				<cfqueryparam cfsqltype="float" value="#arguments.price.getAmount()#">,
                 <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getType().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.entity.getValue()#">::#dbField.type#
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.price.getEntity().getValue()#">::#dbField.type#
 			) RETURNING price_id
 		</cfquery>
 
@@ -93,9 +93,10 @@
 			UPDATE 
 				prices
 			SET
-				amount = <cfqueryparam cfsqltype="float" value="#arguments.price.ggetAmount()#">
+				amount = <cfqueryparam cfsqltype="float" value="#arguments.price.getAmount()#">,
+				method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getMethod().getId()#">
 			WHERE 
-				price_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getId()#">::uuid
+				price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.price.getId()#">
 		</cfquery>
 
 		<cfreturn arguments.price.getId()>

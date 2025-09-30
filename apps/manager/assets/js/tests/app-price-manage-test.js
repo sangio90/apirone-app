@@ -13,9 +13,9 @@
         $( "select[name=finishId]" ).val( "28db1469-a6b6-47ea-9482-5554d8c93376" );
         $( "select[name=statusId]" ).val( "ACT" );
 
-        $( "select[name=priceTypeId]" ).val( "PRICE" );
-        $( "select[name=methodId]" ).val( "F" );
-        $( "input[name=amount]" ).val( helper.randRange( 5, 20 ) );
+        $( "select[name=typeId]" ).val( "PRICE" );
+        $( "select[name=newMethodId]" ).val( "F" );
+        $( "input[name=newAmount]" ).val( helper.randRange( 5, 20 ) );
 
         await helper.wait( 300 );
         // $( "button[data-bind='click:save']:first" ).click();
