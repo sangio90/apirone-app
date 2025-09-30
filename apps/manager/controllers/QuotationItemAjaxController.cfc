@@ -153,6 +153,32 @@ component extends="com.apirone.core.controller.AbsController" {
 					}
 				);
 
+				var quotationItemProductItems = super.fire( 'quotationItemProductItem.list', { quotationItemId: thisId } );
+				quotationItemProductItems.each(function (quotationItemProductItem) {
+					super.fire( 'quotationItemProductItem.delete', { 'productItemId': quotationItemProductItem.getId() } )
+				});
+
+				var productItemsData = json.quotationItem.product.items._data;
+				productItemsData.each(function (productItemRow) {
+					var selectedValue = selectedValues = arrayFilter(productItemRow.values, function(v) {
+						return v.selected;
+					})
+					if (Len(selectedValue) > 0) {
+						selectedValue = selectedValue[1];
+						var productItem = super.fire( 'productItem.get', {'productItemId': selectedValue.product_item_id} );
+
+						var quotationItemProductItemBean = super.bean( 'quotationItemProductItem' );
+						var quotationItem = super.fire( 'quotationItem.get', { 'quotationItemId': thisId } );
+						quotationItemProductItemBean.setQuotationItem( quotationItem );
+						quotationItemProductItemBean.setProductItem(productItem);
+						quotationItemProductItemBean.setOrigin(productItem.getOrigin());
+						quotationItemProductItemBean.setLevel(productItemRow.level);
+						quotationItemProductItemBean.setId(thisId)
+
+						super.fire( "quotationItemProductItem.create", { 'productItem': quotationItemProductItemBean })
+					}
+				})
+
 				var message = completeMessage( messageId );
 			} catch ( any e ) {
 				var message = "Errore nella creazione/aggiornamento della riga di preventivo: #e.message#";

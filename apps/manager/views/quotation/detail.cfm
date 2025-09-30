@@ -128,6 +128,7 @@
                                                     data-bind="source: zones, value: detailForm.data.zone, events: { change: getItems }"
                                                     data-value-field="id"
                                                     data-text-field="name"
+                                                    id="zones-selector"
                                             >
                                             </select>
                                         </div>
