@@ -117,108 +117,93 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.price.getId();
 	}
 
-	public Numeric function massiveReassign(
-		String rawProductId,
-		String variantId,
-		String colorId,
-		String paramCategory,
-		String newParam,
-		String oldParam
+	public Struct function massiveReassign(
+		//String productId,
+		String typeId,
+		Strig methodId,
+		Numeric amount,
 	){
-		arguments[ "limit" ] = -1;
+
+		var findCriteria = { 
+			"lineId": arguments.lineId, 
+			"categoryId": arguments.categoryId, 
+			"modelId": arguments.modelId, 
+			"typeId": arguments.typeId ,
+			"finishId": arguments.finishId
+		};
 
 		var rows   = [];
 		var result = super.getResult();
 
-		var records = getDao().find( argumentCollection = arguments );
+		var updatedRecords=0;
+		var insertedRecords=0;
+
+		backupTable( "prices" );
+
+		//var records = getDao().find( argumentCollection = findCriteria );
+
+		var products = getProductService().list( argumentCollection = findCriteria );
+
 		var params  = {};
 
-		if ( paramCategory == "rawProductId" ) {
-			params = { "paramCategory" = paramCategory, "newParam" = newParam }
-		}
-		if ( paramCategory == "variantId" ) {
-			params = { "paramCategory" = paramCategory, "newParam" = newParam }
-		}
-		if ( paramCategory == "colorId" ) {
-			params = { "paramCategory" = paramCategory, "newParam" = newParam }
-		}
+		products.each( function( product ){
 
-		super.logEvent(
-			event   = "component.MULTI_UPDATED",
-			message = "Massive component reassign procedure started",
-			payload = {
-				"Criteria" = paramCategory,
-				"oldValue" = oldParam,
-				"newValue" = newParam
-			}
-		);
-		records.each( function( record ){
-			var rowParams              = params;
-			rowParams[ "componentId" ] = record.component_id;
-			getDao().reassign( argumentCollection = rowParams );
-			super.getCacheManager().remove( getCacheScope(), record.component_id );
-			super.logEvent(
-				event   = "component.UPDATED",
-				message = "Component [#rowParams[ "componentId" ]#] updated.",
-				payload = {
-					"Criteria" = rowParams[ "paramCategory" ],
-					"id"       = rowParams[ "componentId" ],
-					"oldValue" = oldParam,
-					"newValue" = rowParams[ "newParam" ]
+			var prices = getDao().find( argumentCollection = { productId = product.getId(), typeId = arguments.typeId } );
+
+			for( var price in prices ){
+
+				var bean = super.bean( "Price" );
+				var entity = super.bean( "Entity" );
+				
+				bean.setId( price.price_id );
+				bean.setAmount( arguments.amount );
+				bean.setMethod( getLookupService().get( "priceMethod", arguments.methodId ) );
+				bean.setType( getPriceTypeService().get( arguments.typeId ) );
+				bean.setStatus( getStatusService().get( "ACT" ) );
+
+				entity.setkey( "product.Id" );
+				entity.setValue( product.getId() );
+
+				bean.setEntity( entity );
+
+				if( IsNull( record.price_id ) ){
+					var currentId = getDao().create( bean );
+
+					var eventType = "price.CREATED" 
+					var eventMessage = "Price created by mass method." 
+
+				} else {
+					
+					getDao().update( bean );
+
+					var currentId = record.price_id;
+					var eventType = "price.UPDATED" 
+					var eventMessage = "Price updated by mass update."
+
+					updatedRecords++;
+
 				}
-			);
+
+				super.logEvent(
+					event   = eventType,
+					message = eventMessage,
+					payload = {
+						"criteria" = SerializeJSON( findCriteria ),
+						"productId"= product.getId(),
+						"typeId"   = arguments.typeId,
+						"priceId"  = currentId,
+						"amount"   = arguments.amount,
+						"method"   = arguments.methodId,
+					}
+				);
+
+				super.getCacheManager().remove( getCacheScope(), record.price_id );				
+			}
+		
 		} );
 
-		super.logEvent(
-			event   = "component.MULTI_UPDATED",
-			message = "Massive component reassign procedure ended",
-			payload = {
-				"Criteria"      = paramCategory,
-				"oldValue"      = oldParam,
-				"newValue"      = newParam,
-				"recordUpdated" = Val( records.recordcount )
-			}
-		);
-
-		return Val( records.recordcount );
+		return { "insertedRecords" = insertedRecords, "updatedRecords" = updatedRecords };
 	}
-
-	public Numeric function massiveDelete(
-		String productId,
-	){
-		
-		arguments[ "limit" ] = -1;
-
-		var rows   = [];
-		var result = super.getResult();
-
-		var records = getDao().find( argumentCollection = arguments );
-		var params  = {};
-		
-		super.logEvent(
-			event   = "price.MULTI_DELETED",
-			message = "Massive price delete procedure started",
-			payload = { "criteria" = SerilizeJSON( arguments ) }
-		);
-
-		records.each( function( record ){
-			delete( record.price_id );
-		} );
-
-		super.logEvent(
-			event   = "price.MULTI_DELETED",
-			message = "Massive price delete procedure ended",
-			
-			payload = {
-				"criteria"      = paramCategory,
-				"value"         = oldParam,
-				"recordUpdated" = Val( records.recordcount )
-			}
-		);
-
-		return Val( records.recordcount );
-	}
-
 
 
 	/*

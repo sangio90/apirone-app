@@ -62,7 +62,6 @@ component output="false" accessors="true" {
 
 		for ( var record in records ) {
 			for ( var column in columns ) {
-				// records.setCell( column_name="#column#", value="#Replace( Trim( record[ column ]), ",", "$" )#", row_number=index );
 				records.setCell(
 					column_name = "#column#",
 					value       = "#Trim( record[ column ] )#",
@@ -76,28 +75,24 @@ component output="false" accessors="true" {
 		return records;
 	}
 
+	public Boolean function backupTable( required String fromTable, required String toTable ){
+
+		var dbUtil  = new com.apirone.core.util.DBUtil();
+
+		dbUtil.backupTable(
+			datasource = getConfiguration().getDatasource(),
+			fromTable  = arguments.fromTable,
+			toTable    = "backup.#arguments.toTable#_#DateFormat( Now(), "yyyymmddHHMMss" )#"
+		);
+
+		return true;
+	}
+
 	private String function prettyString( required String str ){
 		var util = new com.apirone.core.util.Udf();
 
 		return util.prettyString( arguments.str );
 	}
-
-	/*
-	private String function getNameByTexts( required Array texts ){
-		var name   = "";
-		var langId = "IT";
-
-		if ( !IsNull( arguments.texts ) ) {
-			for ( var text in arguments.texts ) {
-				if ( text.getLang().getId() == "IT" ) {
-					return text.getName();
-				}
-			}
-		}
-
-		return name;
-	}
-	*/
 
 	private Array function getCategoriesBeanByIds( required String categories ){
 		// [2,3,4,5]

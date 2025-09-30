@@ -31,5 +31,17 @@ component output="false" accessors="true" {
 		return result;
 	}
 
+	public String function backupTable( required String datasource, required String fromTable, required String toTable ){
+
+		var sql = "CREATE TABLE #toTable# AS SELECT * FROM #fromTable#";
+
+		myQuery = queryExecute(
+			sql, 
+			{ datasource = datasource } 
+		);
+		
+		return result;
+	}
+
 }
 
