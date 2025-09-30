@@ -111,12 +111,12 @@ AP.signage.modal = ( function() {
 
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
-            $('#signangeProductCategory').prop("disabled", false);
-            $('#signageRow').prop("disabled", false);
-            $('#signageModel').prop("disabled", false);
-            $('#signageFinish').prop("disabled", false);
-            $('#signageFont').prop("disabled", false);
-            $('#product-items').empty();
+            $( "#signangeProductCategory" ).prop( "disabled", false );
+            $( "#signageRow" ).prop( "disabled", false );
+            $( "#signageModel" ).prop( "disabled", false );
+            $( "#signageFinish" ).prop( "disabled", false );
+            $( "#signageFont" ).prop( "disabled", false );
+            $( "#product-items" ).empty();
         },
 
         parsedPictograms: function() {
@@ -149,7 +149,7 @@ AP.signage.modal = ( function() {
 
         addSignageRow: function() {
             var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
-            if ( ds && ds.data().length < viewModel.get('maxRows') ) {
+            if ( ds && ds.data().length < viewModel.get( "maxRows" ) ) {
                 var defaultSignageRow = {
                     id: generateUUID(),
                     textAlign: "center",
@@ -170,9 +170,9 @@ AP.signage.modal = ( function() {
         },
 
         parseLines: function( e ) {
-            if (viewModel.get('detailForm.data.quotationItem.signageConfigItem.id') != '') {
-                viewModel.set('maxRows', viewModel.get('detailForm.data.quotationItem.signageConfigItem.rowCount'));
-                if (viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get('maxRows')) {
+            if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) != "" ) {
+                viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
+                if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
                     bootbox.confirm( {
                         title: "Cancellazione righe",
                         message: "Cambiando la dimensione del font cambierà la quantità di righe che puoi inserire nella segnaletica. Le righe in eccesso verranno eliminate, Vuoi procedere?",
@@ -188,124 +188,124 @@ AP.signage.modal = ( function() {
                         },
                         callback: function( result ) {
                             if ( result ) {
-                                let exceeded = viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().slice(viewModel.get('maxRows'));
-                                let promises = exceeded.map(signageRow => {
-                                    return new Promise(resolve => {
-                                        setTimeout(function () {
-                                            NM.util.ajax({
+                                const exceeded = viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().slice( viewModel.get( "maxRows" ) );
+                                const promises = exceeded.map( signageRow => {
+                                    return new Promise( resolve => {
+                                        setTimeout( function() {
+                                            NM.util.ajax( {
                                                 method: "DELETE",
                                                 url: "/manager/ajax/quotation-items/signagerow",
                                                 data: { id: signageRow.id },
                                                 callback: {
-                                                    done: function(xhr) {
-                                                        if (xhr.status == "ERROR") {
-                                                            AP.widget.notify("error", "Errore nella cancellazione della Riga Segnaletica.");
+                                                    done: function( xhr ) {
+                                                        if ( xhr.status == "ERROR" ) {
+                                                            AP.widget.notify( "error", "Errore nella cancellazione della Riga Segnaletica." );
                                                         }
-                                                        if (xhr.status == "SUCCESS") {
-                                                            AP.widget.notify("success", "Riga Segnaletica eliminata correttamente.");
-                                                            const ds = viewModel.get("detailForm.data.quotationItem.signageRows");
-                                                            const row = ds.view().find(r => r.id === signageRow.id);
-                                                            if (row) {
-                                                                ds.remove(row);
+                                                        if ( xhr.status == "SUCCESS" ) {
+                                                            AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
+                                                            const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+                                                            const row = ds.view().find( r => r.id === signageRow.id );
+                                                            if ( row ) {
+                                                                ds.remove( row );
                                                             }
-                                                            if (ds) {
-                                                                ds.data().forEach((row, i) => {
-                                                                    row.set("index", i + 1);
-                                                                });
+                                                            if ( ds ) {
+                                                                ds.data().forEach( ( row, i ) => {
+                                                                    row.set( "index", i + 1 );
+                                                                } );
                                                             }
                                                         }
                                                         resolve();
                                                     }
                                                 }
-                                            });
-                                        }, 200);
-                                    });
-                                });
+                                            } );
+                                        }, 200 );
+                                    } );
+                                } );
 
-                                Promise.all(promises).then(() => {
+                                Promise.all( promises ).then( () => {
                                     viewModel.save();
-                                });
+                                } );
                             }
                         },
                     } );
                 }
-                $('#signageFont').prop("disabled", true);
+                $( "#signageFont" ).prop( "disabled", true );
             } else {
-                $('#signageFont').prop("disabled", false);
+                $( "#signageFont" ).prop( "disabled", false );
             }
             viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( signageRow => {
                 this.parsedLineContent( signageRow.content, signageRow.id );
-                 viewModel.updateCharCounter( {
+                viewModel.updateCharCounter( {
                     currentTarget: document.getElementById( signageRow.uid + "_contentInput" )
                 } );
             } );
             this.checkCanSave();
         },
 
-        parsedLineContent: function (valore, id) {
-            const contentSpanPreview = $("#content_span_preview_" + id);
-            if (!contentSpanPreview.length) return false;
+        parsedLineContent: function( valore, id ) {
+            const contentSpanPreview = $( "#content_span_preview_" + id );
+            if ( !contentSpanPreview.length ) { return false; }
 
-            const pictogramNames = viewModel.get("pictogramNames") || []; // es. ["<man>", "<dx>", ...]
+            const pictogramNames = viewModel.get( "pictogramNames" ) || []; // es. ["<man>", "<dx>", ...]
             const signageConfig = viewModel.getSignageConfig();
-            if (!signageConfig) return false;
+            if ( !signageConfig ) { return false; }
 
-            const signageConfigItem = signageConfig.items.filter(function(config) {
-                return config.id == viewModel.get("detailForm.data.quotationItem.signageConfigItem.id");
-            })[0];
+            const signageConfigItem = signageConfig.items.filter( function( config ) {
+                return config.id == viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" );
+            } )[0];
 
             const fontFamily = signageConfig.font && signageConfig.font.family ? signageConfig.font.family : "";
             const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel : 16;
 
             // costruisco la regex solo con i nomi interni dei pictogram (senza <>), escapati
-            const innerNames = pictogramNames.map(n => n.replace(/[<>]/g, ""));
-            const escapedNames = innerNames.map(this.escapeRegExp);
-            const pictogramRegex = escapedNames.length ? new RegExp("<(" + escapedNames.join("|") + ")>", "g") : /$^/;
+            const innerNames = pictogramNames.map( n => n.replace( /[<>]/g, "" ) );
+            const escapedNames = innerNames.map( this.escapeRegExp );
+            const pictogramRegex = escapedNames.length ? new RegExp( "<(" + escapedNames.join( "|" ) + ")>", "g" ) : /$^/;
 
             // scorro il testo e costruisco parti: testo escapato oppure <img>
             const parts = [];
             let lastIndex = 0;
             let match;
-            while ((match = pictogramRegex.exec(valore)) !== null) {
-                if (match.index > lastIndex) {
-                    parts.push(this.escapeHtml(valore.substring(lastIndex, match.index)));
+            while ( ( match = pictogramRegex.exec( valore ) ) !== null ) {
+                if ( match.index > lastIndex ) {
+                    parts.push( this.escapeHtml( valore.substring( lastIndex, match.index ) ) );
                 }
 
                 const pictogramName = match[1]; // es. "man"
                 const imgHtml =
-                    '<img src="/assets/main/pictograms/' + fontFamily + '/' + pictogramName + '.png" ' +
-                    'alt="' + pictogramName + '" ' +
-                    'style="height: ' + heightPx + 'px;" ' +
-                    'class="pictogram px-2">';
-                parts.push(imgHtml);
+                    "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogramName + ".png\" " +
+                    "alt=\"" + pictogramName + "\" " +
+                    "style=\"height: " + heightPx + "px;\" " +
+                    "class=\"pictogram px-2\">";
+                parts.push( imgHtml );
 
                 lastIndex = pictogramRegex.lastIndex;
             }
 
             // resto finale (escapato)
-            if (lastIndex < valore.length) {
-                parts.push(this.escapeHtml(valore.substring(lastIndex)));
+            if ( lastIndex < valore.length ) {
+                parts.push( this.escapeHtml( valore.substring( lastIndex ) ) );
             }
 
-            contentSpanPreview.css({
+            contentSpanPreview.css( {
                 "font-family": fontFamily,
                 "font-size": heightPx + "px"
-            });
+            } );
 
-            contentSpanPreview.html(parts.join(""));
+            contentSpanPreview.html( parts.join( "" ) );
 
             return false;
         },
 
-        escapeHtml: function(text) {
-            if (text == null) return "";
-            return String(text).replace(/[&<>"']/g, function(m) {
-                return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
-            });
+        escapeHtml: function( text ) {
+            if ( text == null ) { return ""; }
+            return String( text ).replace( /[&<>"']/g, function( m ) {
+                return { "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;" }[m];
+            } );
         },
 
-        escapeRegExp: function(string) {
-            return String(string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        escapeRegExp: function( string ) {
+            return String( string ).replace( /[.*+?^${}()|[\]\\]/g, "\\$&" );
         },
 
         extractAllOccurrences: function( haystack, needles ) {
@@ -354,11 +354,11 @@ AP.signage.modal = ( function() {
             } );
 
             charCount = content.length;
-            const signageConfigItem = signageConfig.items.filter(function(config) {
-                return config.id == viewModel.get("detailForm.data.quotationItem.signageConfigItem.id");
-            })[0];
+            const signageConfigItem = signageConfig.items.filter( function( config ) {
+                return config.id == viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" );
+            } )[0];
 
-            if ( charCount >= signageConfigItem.charCount && !this.hasUnclosedPictogram(realContent)) {
+            if ( charCount >= signageConfigItem.charCount && !this.hasUnclosedPictogram( realContent ) ) {
                 content = content.substring( 0, signageConfigItem.charCount );
                 charCount = signageConfigItem.charCount;
             }
@@ -384,9 +384,9 @@ AP.signage.modal = ( function() {
             return false;
         },
 
-        hasUnclosedPictogram: function(str) {
-            const lastOpen = str.lastIndexOf("<");
-            const lastClose = str.lastIndexOf(">");
+        hasUnclosedPictogram: function( str ) {
+            const lastOpen = str.lastIndexOf( "<" );
+            const lastClose = str.lastIndexOf( ">" );
             return lastOpen > lastClose;
         },
 
@@ -412,7 +412,7 @@ AP.signage.modal = ( function() {
 
         removeSignageRow: function( e ) {
             if ( e.data.id != "" ) {
-                    bootbox.confirm( {
+                bootbox.confirm( {
                     title: "Conferma eliminazione",
                     message: "Sei sicuro di voler cancellare questa riga della segnaletica?",
                     buttons: {
@@ -492,21 +492,21 @@ AP.signage.modal = ( function() {
         },
 
         loadModels: function( event ) {
-            if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.id') != '') {
-                $('#signangeProductCategory').prop("disabled", true);
-                if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.code') != 'LET00') {
-                    $('#signage-preview-background').css({
+            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
+                $( "#signangeProductCategory" ).prop( "disabled", true );
+                if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
+                    $( "#signage-preview-background" ).css( {
                         width: "500px",
                         height: "500px"
-                    });
+                    } );
                 } else {
-                    $('#signage-preview-background').css({
+                    $( "#signage-preview-background" ).css( {
                         width: "500px",
                         height: null
-                    });
+                    } );
                 }
             } else {
-                $('#signangeProductCategory').prop("disabled", false);
+                $( "#signangeProductCategory" ).prop( "disabled", false );
             }
             NM.util.ajax( {
                 method: "GET",
@@ -522,10 +522,10 @@ AP.signage.modal = ( function() {
         },
 
         loadFinishes: function( event ) {
-            if (viewModel.get('detailForm.data.signageConfig.catalogBundle.model.id') != '') {
-                $('#signageRow').prop("disabled", true);
+            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) != "" ) {
+                $( "#signageRow" ).prop( "disabled", true );
             } else {
-                $('#signageRow').prop("disabled", false);
+                $( "#signageRow" ).prop( "disabled", false );
             }
             NM.util.ajax( {
                 method: "GET",
@@ -536,38 +536,38 @@ AP.signage.modal = ( function() {
                         viewModel.get( "finishes" ).data( xhr.data );
                         NM.util.ajax( {
                             method: "GET",
-                            url: "/manager/ajax/model-config/get-by-params?categoryId=" + 
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + 
-                                "&lineId=" + 
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) + 
-                                "&modelId=" + 
+                            url: "/manager/ajax/model-config/get-by-params?categoryId=" +
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
+                                "&lineId=" +
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
+                                "&modelId=" +
                                 viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
                             callback: {
                                 done: function( xhr ) {
-                                    if (xhr.data && xhr.data.modelConfig) {
+                                    if ( xhr.data && xhr.data.modelConfig ) {
                                         var modelConfig = {
                                             width: xhr.data.modelConfig.width,
                                             height: xhr.data.modelConfig.height,
-                                        }
-                                        viewModel.set( "modelConfig", modelConfig )
+                                        };
+                                        viewModel.set( "modelConfig", modelConfig );
                                     } else {
-                                        viewModel.set( "modelConfig", { width: null, height: null } )
+                                        viewModel.set( "modelConfig", { width: null, height: null } );
                                     }
 
-                                    if (viewModel.get('detailForm.data.signageConfig.catalogBundle.line.code') != 'LET00') {
-                                        $('#signage-preview-container').css({
-                                            width: viewModel.get('modelConfig.width') + "px",
-                                            height: viewModel.get('modelConfig.height') + "px"
-                                        });
+                                    if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
+                                        $( "#signage-preview-container" ).css( {
+                                            width: viewModel.get( "modelConfig.width" ) + "px",
+                                            height: viewModel.get( "modelConfig.height" ) + "px"
+                                        } );
                                     } else {
-                                        $('#signage-preview-container').css({
+                                        $( "#signage-preview-container" ).css( {
                                             width: "500px",
                                             height: "500px"
-                                        });
+                                        } );
                                     }
                                 }
                             }
-                        })
+                        } );
                     },
                 },
             } );
@@ -575,10 +575,10 @@ AP.signage.modal = ( function() {
         },
 
         loadSignageConfigs: function( event ) {
-            if (viewModel.get('detailForm.data.quotationItem.product.finish.id') != '') {
-                $('#signageModel').prop("disabled", true);
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
+                $( "#signageModel" ).prop( "disabled", true );
             } else {
-                $('#signageModel').prop("disabled", false);
+                $( "#signageModel" ).prop( "disabled", false );
             }
             NM.util.ajax( {
                 method: "GET",
@@ -604,23 +604,23 @@ AP.signage.modal = ( function() {
                             viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
                             viewModel.get( "fontSizes" ).data( xhr.data[0].items );
                         }
-                        if (viewModel.get('detailForm.data.quotationItem.product.finish.id') != '') {
+                        if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                             NM.util.ajax( {
-                            method: "GET",
-                            url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" + 
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + 
-                                "&lineId=" + 
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) + 
-                                "&modelId=" + 
+                                method: "GET",
+                                url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" +
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
+                                "&lineId=" +
+                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
+                                "&modelId=" +
                                 viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
-                                "&finishId=" + 
-                                viewModel.get('detailForm.data.quotationItem.product.finish.id'),
-                            callback: {
-                                done: function( xhr ) {
-                                        if (xhr.data.productId) {
+                                "&finishId=" +
+                                viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
+                                callback: {
+                                    done: function( xhr ) {
+                                        if ( xhr.data.productId ) {
                                             viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data.productId );
                                         }
-                                        if (xhr.data.file) {
+                                        if ( xhr.data.file ) {
                                             viewModel.set( "backgroundImage", xhr.data.file );
                                             viewModel.set( "backgroundImage.url", "url('" + xhr.data.file.uri + "')" );
                                         } else {
@@ -628,7 +628,7 @@ AP.signage.modal = ( function() {
                                         }
                                     },
                                 },
-                            })
+                            } );
                         }
                     },
                 },
@@ -637,10 +637,10 @@ AP.signage.modal = ( function() {
         },
 
         loadFontSizes: function() {
-            if (viewModel.get('detailForm.data.signageConfig.font.id') != '') {
-                $('#signageFinish').prop("disabled", true);
+            if ( viewModel.get( "detailForm.data.signageConfig.font.id" ) != "" ) {
+                $( "#signageFinish" ).prop( "disabled", true );
             } else {
-                $('#signageFinish').prop("disabled", false);
+                $( "#signageFinish" ).prop( "disabled", false );
             }
             var signageConfig = viewModel.getSignageConfig();
             if ( signageConfig ) {
@@ -659,30 +659,30 @@ AP.signage.modal = ( function() {
         },
 
         firstLoadProductItems: async function() {
-            const quotationItemId = viewModel.get('detailForm.data.quotationItem.id');
-            const productId = viewModel.get('detailForm.data.quotationItem.product.id');
+            const quotationItemId = viewModel.get( "detailForm.data.quotationItem.id" );
+            const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
 
             // Chiamata AJAX iniziale per ottenere tutti i product items
-            await NM.util.ajax({
+            await NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
-                    done: function(xhr) {
-                        if (xhr.data.length > 0) {
-                            viewModel.set("detailForm.data.quotationItem.product.items", new kendo.data.DataSource());
-                            let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
+                    done: function( xhr ) {
+                        if ( xhr.data.length > 0 ) {
+                            viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
+                            const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                             const attributeArray = productItems.data();
-                            xhr.data.forEach(item => {
-                                let existing = attributeArray.find(d => d.attribute_id === item.attribute.id);
-                                if (existing) {
-                                    existing.values.push({
+                            xhr.data.forEach( item => {
+                                const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
+                                if ( existing ) {
+                                    existing.values.push( {
                                         attributeValue: item.attributeValue,
                                         product_item_id: item.id,
                                         parent_attribute_id: null,
                                         level: 0,
                                         selected: false
-                                    });
-                                    productItems.trigger("change");
+                                    } );
+                                    productItems.trigger( "change" );
                                 } else {
                                     const parsedData = {
                                         attribute_id: item.attribute.id,
@@ -697,65 +697,65 @@ AP.signage.modal = ( function() {
                                             }
                                         ]
                                     };
-                                    productItems.add(parsedData);
+                                    productItems.add( parsedData );
                                 }
-                            });
+                            } );
 
                             viewModel.renderProductItems();
                         }
                     }
                 }
-            }).then(async function() {
+            } ).then( async function() {
                 // Se ci sono quotation items pre-selezionati, li carichiamo
-                if (quotationItemId != '') {
-                    await NM.util.ajax({
+                if ( quotationItemId != "" ) {
+                    await NM.util.ajax( {
                         method: "GET",
                         url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
                         callback: {
-                            done: async function(xhr) {
-                                if (xhr.data.length > 0) {
-                                    for (const qipi of xhr.data) {
-                                        const select = $(`select[data-attribute-id="${qipi.productItem.attribute.id}"]`);
-                                        if (select.length > 0) {
-                                            select.val(qipi.productItem.id);
+                            done: async function( xhr ) {
+                                if ( xhr.data.length > 0 ) {
+                                    for ( const qipi of xhr.data ) {
+                                        const select = $( `select[data-attribute-id="${qipi.productItem.attribute.id}"]` );
+                                        if ( select.length > 0 ) {
+                                            select.val( qipi.productItem.id );
                                             // Carichiamo eventuali figli ricorsivamente
-                                            await viewModel.loadProductItems(qipi.productItem.id, qipi.productItem.attribute.id);
+                                            await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id );
                                         }
                                     }
                                 }
                             }
                         }
-                    });
+                    } );
                 }
-            });
+            } );
         },
 
-        loadProductItems: function(originId, attributeId) {
-            return new Promise((resolve, reject) => {
-                const productId = viewModel.get('detailForm.data.quotationItem.product.id');
-                let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
+        loadProductItems: function( originId, attributeId ) {
+            return new Promise( ( resolve, reject ) => {
+                const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
+                const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                 const attributeArray = productItems.data();
-                originId = originId || '';
+                originId = originId || "";
 
                 let url = "/manager/ajax/product-items?productId=" + productId;
-                if (originId) {
+                if ( originId ) {
                     url += "&originId=" + originId;
                 }
 
                 // Deselezionamento: originId vuoto
-                if (originId === '') {
+                if ( originId === "" ) {
                     let actualIndex = null;
-                    for (let i = attributeArray.length - 1; i >= 0; i--) {
-                        if (attributeArray[i].attribute_id === attributeId) {
+                    for ( let i = attributeArray.length - 1; i >= 0; i-- ) {
+                        if ( attributeArray[i].attribute_id === attributeId ) {
                             actualIndex = i;
-                            attributeArray[i].values.forEach(attrValue => attrValue.selected = false);
+                            attributeArray[i].values.forEach( attrValue => attrValue.selected = false );
                         }
                     }
                     // Rimuovo attributi figli
-                    let i = actualIndex + 1;
-                    while (i < attributeArray.length) {
-                        if (attributeArray[i].level > attributeArray[actualIndex].level) {
-                            productItems.remove(attributeArray[i]);
+                    const i = actualIndex + 1;
+                    while ( i < attributeArray.length ) {
+                        if ( attributeArray[i].level > attributeArray[actualIndex].level ) {
+                            productItems.remove( attributeArray[i] );
                         } else {
                             break;
                         }
@@ -766,33 +766,33 @@ AP.signage.modal = ( function() {
                 }
 
                 // Selezionamento: originId valorizzato
-                NM.util.ajax({
+                NM.util.ajax( {
                     method: "GET",
                     url: url,
                     callback: {
-                        done: function(xhr) {
-                            if (xhr.data.length > 0) {
+                        done: function( xhr ) {
+                            if ( xhr.data.length > 0 ) {
                                 let attribute = null;
                                 let toInsert = false;
                                 let parentIndex = -1;
 
                                 // Trovo l'indice dell'attributo selezionato
-                                attributeArray.forEach((d, idx) => {
-                                    if (d.attribute_id == attributeId) parentIndex = idx;
-                                });
+                                attributeArray.forEach( ( d, idx ) => {
+                                    if ( d.attribute_id == attributeId ) { parentIndex = idx; }
+                                } );
 
                                 // Rimuovo eventuali attributi figli
-                                let i = parentIndex + 1;
-                                while (i < attributeArray.length) {
-                                    if (attributeArray[i].level > attributeArray[parentIndex].level) {
-                                        productItems.remove(attributeArray[i]);
+                                const i = parentIndex + 1;
+                                while ( i < attributeArray.length ) {
+                                    if ( attributeArray[i].level > attributeArray[parentIndex].level ) {
+                                        productItems.remove( attributeArray[i] );
                                     } else {
                                         break;
                                     }
                                 }
 
                                 // Creo nuovo attributo se necessario
-                                if (!attribute) {
+                                if ( !attribute ) {
                                     attribute = {
                                         attribute_id: xhr.data[0].attribute.id,
                                         attribute_name: xhr.data[0].attribute.name,
@@ -804,98 +804,98 @@ AP.signage.modal = ( function() {
                                 }
 
                                 // Imposto selected sul parent
-                                if (parentIndex !== -1) {
-                                    const parent = productItems.at(parentIndex);
-                                    parent.get("values").forEach(v => {
+                                if ( parentIndex !== -1 ) {
+                                    const parent = productItems.at( parentIndex );
+                                    parent.get( "values" ).forEach( v => {
                                         v.selected = v.product_item_id == originId;
-                                    });
+                                    } );
                                 }
 
                                 // Popolo i valori del nuovo attributo
-                                xhr.data.forEach(function(item) {
-                                    attribute.values.push({
+                                xhr.data.forEach( function( item ) {
+                                    attribute.values.push( {
                                         attributeValue: item.attributeValue,
                                         product_item_id: item.id,
                                         selected: false
-                                    });
-                                });
+                                    } );
+                                } );
 
                                 // Inserisco attributo se nuovo
-                                if (toInsert) {
-                                    productItems.insert(parentIndex + 1, attribute);
+                                if ( toInsert ) {
+                                    productItems.insert( parentIndex + 1, attribute );
                                 }
                             } else {
                                 // Se non ci sono figli, setto selected sul parent
                                 let parentIndex = -1;
-                                attributeArray.forEach((d, idx) => {
-                                    if (d.attribute_id == attributeId) parentIndex = idx;
-                                });
-                                if (parentIndex !== -1) {
-                                    const parent = productItems.at(parentIndex);
-                                    parent.get("values").forEach(v => {
+                                attributeArray.forEach( ( d, idx ) => {
+                                    if ( d.attribute_id == attributeId ) { parentIndex = idx; }
+                                } );
+                                if ( parentIndex !== -1 ) {
+                                    const parent = productItems.at( parentIndex );
+                                    parent.get( "values" ).forEach( v => {
                                         v.selected = v.product_item_id == originId;
-                                    });
+                                    } );
                                 }
                             }
 
                             viewModel.renderProductItems();
                             resolve();
                         },
-                        fail: function(err) {
-                            reject(err);
+                        fail: function( err ) {
+                            reject( err );
                         }
                     }
-                });
-            });
+                } );
+            } );
         },
 
         renderProductItems: function() {
-            const container = $("#product-items");
+            const container = $( "#product-items" );
             container.empty();
-            let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
+            const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
             const attributeArray = productItems.data();
-            attributeArray.forEach(function(item) {
+            attributeArray.forEach( function( item ) {
                 const attrName = item.attribute_name;
                 const values = item.values;
 
-                const subContainer = $('<div>');
-                subContainer.attr('id', 'attribute-container-' + item.attribute_id);
-                container.append(subContainer);
+                const subContainer = $( "<div>" );
+                subContainer.attr( "id", "attribute-container-" + item.attribute_id );
+                container.append( subContainer );
 
-                const label = $('<label>');
-                label.addClass('mb-1');
-                label.text(attrName);
-                subContainer.append(label);
+                const label = $( "<label>" );
+                label.addClass( "mb-1" );
+                label.text( attrName );
+                subContainer.append( label );
 
-                const select = $('<select>').addClass("form-control me-3 mb-2").on("change", function() {
-                    const selectedId = $(this).val();
-                    const attributeId = $(this).data('attribute-id');
-                    viewModel.loadProductItems(selectedId, attributeId);
-                });
-                select.attr('data-attribute-id', item.attribute_id);
+                const select = $( "<select>" ).addClass( "form-control me-3 mb-2" ).on( "change", function() {
+                    const selectedId = $( this ).val();
+                    const attributeId = $( this ).data( "attribute-id" );
+                    viewModel.loadProductItems( selectedId, attributeId );
+                } );
+                select.attr( "data-attribute-id", item.attribute_id );
 
-                if (item.level > 0) {
-                    select.css("margin-left", (2 * item.level) + "em");
+                if ( item.level > 0 ) {
+                    select.css( "margin-left", ( 2 * item.level ) + "em" );
                 }
 
-                const emptyOption = $("<option>").val("").html("Seleziona valore attributo");
-                select.append(emptyOption);
+                const emptyOption = $( "<option>" ).val( "" ).html( "Seleziona valore attributo" );
+                select.append( emptyOption );
 
-                values.forEach(function(attrValue) {
-                    const option = $("<option>")
-                        .val(attrValue.product_item_id)
-                        .html(`<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}`);
-                    select.append(option);
-                });
+                values.forEach( function( attrValue ) {
+                    const option = $( "<option>" )
+                        .val( attrValue.product_item_id )
+                        .html( `<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}` );
+                    select.append( option );
+                } );
 
                 // Imposto la option selezionata
-                const selectedOption = values.find(attrValue => attrValue.selected === true);
-                if (selectedOption) {
-                    select.val(selectedOption.product_item_id);
+                const selectedOption = values.find( attrValue => attrValue.selected === true );
+                if ( selectedOption ) {
+                    select.val( selectedOption.product_item_id );
                 }
 
-                subContainer.append(select);
-            });
+                subContainer.append( select );
+            } );
         },
 
         unsetSelects: function( data ) {
@@ -909,12 +909,12 @@ AP.signage.modal = ( function() {
             const parsedData = viewModel.get( "detailForm.data" );
             const signageRows = parsedData.quotationItem.signageRows.data();
             var exceedinRows = 0;
-            signageRows.forEach(function(row) {
-                if (row.charCount > parsedData.quotationItem.signageConfigItem.charCount) {
+            signageRows.forEach( function( row ) {
+                if ( row.charCount > parsedData.quotationItem.signageConfigItem.charCount ) {
                     exceedinRows = exceedinRows + 1;
                 }
-            })
-            if (exceedinRows > 0) {
+            } );
+            if ( exceedinRows > 0 ) {
                 return AP.widget.notify( "error", "C'è almeno una riga con più caratteri di quelli consentiti." );
             }
             parsedData.quotationId = quotationId;
@@ -931,7 +931,7 @@ AP.signage.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERRORE" ) {
-                                if (xhr.data && xhr.data.error) {
+                                if ( xhr.data && xhr.data.error ) {
                                     AP.widget.notify( "error", xhr.data.error );
                                 } else {
                                     AP.widget.notify( "error", "Errore nel salvataggio della segnaletica." );

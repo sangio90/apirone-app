@@ -1,7 +1,18 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "shortId", "productItem.id", "productItem.orderby", "productItem.level", "productItem.attribute", "productItem.attributeValue.rawValue", "origin", "origin.attribute", "level" ]
+		defaultIncludes = [
+			"id",
+			"shortId",
+			"productItem.id",
+			"productItem.orderby",
+			"productItem.level",
+			"productItem.attribute",
+			"productItem.attributeValue.rawValue",
+			"origin",
+			"origin.attribute",
+			"level"
+		]
 	}
 
 	property name="level" type="Numeric";

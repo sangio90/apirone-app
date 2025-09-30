@@ -51,7 +51,7 @@
 
 	<cffunction name="insert" returntype="String">
 		<cfargument name="productItem" type="com.apirone.core.model.bean.QuotationItemProductItem" required="true">
-		
+
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_product_items (
 				quotation_item_id,
@@ -60,7 +60,7 @@
 				origin_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,				
+				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">,
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
 					<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getOrigin().getId()#">
