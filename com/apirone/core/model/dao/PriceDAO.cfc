@@ -87,7 +87,8 @@
 				prices
 			SET
 				amount = <cfqueryparam cfsqltype="float" value="#arguments.price.getAmount()#">,
-				method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getMethod().getId()#">
+				method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getMethod().getId()#">,
+				price_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getType().getId()#">
 			WHERE
 				price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.price.getId()#">
 		</cfquery>

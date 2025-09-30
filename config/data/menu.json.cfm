@@ -200,6 +200,27 @@
 	},
 	{
 		href: "#",
+		icon: "fas fa-fill",
+		title: "Manutenzioni",
+		roles: "ADM",
+		items: [
+			{
+				href: "/manager/prices/manage",
+				icon: "fas fa-dollar-sign",
+				title: "Gestione prezzi",
+				roles: "ADM"
+			},
+			{
+				href: "/manager/components/reassign",
+				icon: "fas fa-stream",
+				title: "Gestione componenti",
+				roles: "ADM"
+			},
+		]
+	},	
+
+	{
+		href: "#",
 		icon: "fab fa-redhat",
 		title: "Sistema",
 		roles: "ADM",

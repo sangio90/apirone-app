@@ -220,6 +220,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return product.getId();
 	}
 
+	public Void function removeCache( required String productId ){
+		var cm = super.getCacheManager();
+
+		cm.remove( getCacheScope(), arguments.productId );
+	}
+
 
 	/*
     	private method
@@ -265,7 +271,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
-			
+
 			bean.setPricesAsArray( getPriceService().list( productId = record.product_id ) );
 
 			return bean;

@@ -4,13 +4,21 @@
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
 <cfquery name="i" datasource="verticale">
+    SELECT lisart, liscvr, liscol, lispre
+    FROM azapi_listin
+    ORDER BY lisart, liscvr, liscol
+</cfquery>
+
+<cfdump var="#i#">
+<cfabort>
+
+<cfquery name="i" datasource="verticale">
     SELECT *
     FROM articoli_apir
 </cfquery>
 
 <cfdump var="#i#">
 <cfabort>
-
 
 <cfset dao = new com.apirone.core.model.dao.ColorDAO()>
 

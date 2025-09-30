@@ -176,6 +176,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					updatedRecords++;
 
 					super.getCacheManager().remove( getCacheScope(), price.getId() );
+					getProductService().removeCache( product.getId() );
 
 					super.logEvent(
 						event   = "price.UPDATED",
@@ -210,14 +211,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				var currentId = getDao().insert( bean );
 
-				var eventType    = "price.CREATED"
-				var eventMessage = "Price [#currentId#] created by mass method."
-
 				insertedRecords++;
 
 				super.logEvent(
 					event   = "price.CREATED",
-					message = "Price created by mass method.",
+					message = "Price [#currentId#] created by mass method.",
 					payload = {
 						"criteria"    = findCriteria,
 						"price"       = { "newId" = currentId },
@@ -230,6 +228,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return { "inserted" = insertedRecords, "updated" = updatedRecords };
 	}
+
 
 
 	/*
