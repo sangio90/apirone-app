@@ -672,7 +672,6 @@ AP.signage.modal = ( function() {
                             viewModel.set("detailForm.data.quotationItem.product.items", new kendo.data.DataSource());
                             let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
                             const attributeArray = productItems.data();
-debugger
                             xhr.data.forEach(item => {
                                 let existing = attributeArray.find(d => d.attribute_id === item.attribute.id);
                                 if (existing) {
