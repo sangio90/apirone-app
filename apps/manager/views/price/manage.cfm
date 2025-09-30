@@ -86,7 +86,7 @@
 									<div class="mb-3 row">
 										<label class="col-sm-2 col-form-label text-end">Tipo prezzo</label>
 										<div class="col-sm-10">
-											<select class="form-control me-2" name="statusId" required> 
+											<select class="form-control me-2" name="priceTypeId" required> 
 												<option value="">-- seleziona un tipo</option>
 												<cfloop array="#prc.types#" item="item">
 													<option value="#item.getId()#">#item.getName()#</option>
@@ -101,9 +101,9 @@
 
 										<div class="col-sm-3 d-flex align-items-center">
 											<div class="me-2">Metodo:</div>
-											<select class="form-control" name="priceMethodId">
-												<option>%</option>
-												<option>Fisso</option>
+											<select class="form-control" name="methodId">
+												<option value="P">%</option>
+												<option value="F">Fisso</option>
 											</select>
 										</div>
 										

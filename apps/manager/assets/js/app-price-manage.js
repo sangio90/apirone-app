@@ -35,7 +35,9 @@ AP.price.manage = ( function() {
 
         },
 
-        salve: function( event ) {
+        save: function( event ) {
+
+            console.log( "save" );
 
             var manageForm = AP.price.fields.manageForm;
             var status = manageForm.find( ".status" );
@@ -75,7 +77,7 @@ AP.price.manage = ( function() {
 
     pub.init = function() {
 
-        kendo.bind( AP.fields.price.listRoot, viewModel );
+        kendo.bind( AP.fields.price.manageRoot, viewModel );
 
     };
 
