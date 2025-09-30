@@ -55,6 +55,12 @@ AP.product.list = ( function() {
         rows: dataSources.items,
         detailForm: defaultDetailForm,
 
+        editPrices: function( event ) {
+
+            AP.price.modal.multiEdit( { productId: event.data.productId } );
+
+        },
+
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
         },

@@ -27,6 +27,9 @@
 		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
 		get( "/prices" ).to( "PriceController.manage" ).end();
 
+		get( "/ajax/:by-regex:(products)/:id/prices" ).to( "PriceAjaxController.list" ).end();
+		
+
 
 
 		/*

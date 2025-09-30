@@ -21,7 +21,9 @@
                 <span data-bind="text: finish.name"></span>
             </td>
             <td>
-                <div data-bind="source: prices" data-template="price-row-tmpl"></div>
+                <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl">
+
+                </div>
             </td>
             </td>
             <td class="text-center">

@@ -1,136 +1,128 @@
-﻿component accessors="true"{
+﻿component accessors="true" {
 
-    property name="controllers" type="Struct";
-    property name="controllerPath" type="String";
+	property name="controllers" type="Struct";
+	property name="controllerPath" type="String";
 
-    public AccessManager function init( required String controllerPath ){
+	public AccessManager function init( required String controllerPath ){
+		var instance    = new controller.DefaultController();
+		var controllers = { "DefaultController" = instance };
 
-        var instance = new controller.DefaultController();
-        var controllers = { 'DefaultController' = instance };
-        
-        setControllers( controllers );
-        
-        setControllerPath( Replace( arguments.controllerPath, "/", ".", "ALL" ) );
+		setControllers( controllers );
 
-        return this;
+		setControllerPath( Replace( arguments.controllerPath, "/", ".", "ALL" ) );
 
-    }
+		return this;
+	}
 
-    public Any function exec( 
-        required Any user, 
-        required String action,
-                 Any payload = nullValue()
-    ){
-        
-        var ret = "";
+	public Any function exec(
+		required Any user,
+		required String action,
+		Any payload = NullValue()
+	){
+		var ret = "";
 
-        var method     = ListLast( arguments.action, '.' );
-        var controller = ListFirst( arguments.action, '.' ) & "Controller";
+		var method     = ListLast( arguments.action, "." );
+		var controller = ListFirst( arguments.action, "." ) & "Controller";
 
-        /*
+		/*
             se è un valore piano, viene convertito in array
         */
 
-        var dotPath = "#getControllerPath()#.#controller#";
-        var filePath = "/" & Replace( dotPath, ".", "/", "ALL" ) & ".cfc";
+		var dotPath  = "#getControllerPath()#.#controller#";
+		var filePath = "/" & Replace( dotPath, ".", "/", "ALL" ) & ".cfc";
 
-        /*
+		/*
             se il controller esiste
         */
-        if ( FileExists( ExpandPath( filePath ) ) ) {
+		if ( FileExists( ExpandPath( filePath ) ) ) {
+			addLog( "Controller [ #filePath# ] exists" );
 
-            addLog('Controller [ #filePath# ] exists');
-            
-            var instance = "";
+			var instance = "";
 
-            if( StructKeyExists( getControllers(), controller ) ) {
+			if ( StructKeyExists( getControllers(), controller ) ) {
+				addLog( "#controller# exists in memory" )
 
-                addLog('#controller# exists in memory')
+				instance = getControllers()[ controller ];
 
-                instance = getControllers()[ controller ];
+				// var path = ExpandPath('/../repository/private/log/');
+			} else {
+				addLog( "#controller# created in memory" )
 
-                //var path = ExpandPath('/../repository/private/log/');
+				instance = CreateObject( "component", dotPath );
 
+				addController( controller, instance );
+			}
 
-            } else {
+			var funcs = GetMetadata( instance ).functions;
 
-                addLog('#controller# created in memory')
-
-                instance = CreateObject( "component", dotPath );
-                
-                addController( controller, instance );
-
-            }
-
-            var funcs = getMetaData( instance ).functions;
-
-            /*
+			/*
                 [ROB] se il metodo nella classe esiste...
             */
 
-            for ( var func in funcs ) {
-                
-                if ( func.name == method ) {
+			for ( var func in funcs ) {
+				if ( func.name == method ) {
+					return Invoke(
+						instance,
+						method,
+						{ argumentCollection = arguments }
+					);
+				}
+			}
 
-                    return invoke( instance, method, { argumentCollection = arguments } );
+			addLog( "Controller [ #filePath# ] exists but not method [ #method# ]. Load DefaultController" );
 
-                }
-            }
+			ret = getDafaultController().fire(
+				arguments.user,
+				arguments.action,
+				arguments.payload
+			);
+		} else {
+			addLog( "Controller [ #filePath# ] not exists. Load DefaultController" );
 
-            addLog('Controller [ #filePath# ] exists but not method [ #method# ]. Load DefaultController');
+			ret = getDafaultController().fire(
+				arguments.user,
+				arguments.action,
+				arguments.payload
+			);
+		}
 
-            ret = getDafaultController().fire( arguments.user, arguments.action, arguments.payload );
-
-
-        } else {
-
-            addLog('Controller [ #filePath# ] not exists. Load DefaultController');
-
-            ret = getDafaultController().fire( arguments.user, arguments.action, arguments.payload );
-            
-        }
-
-        return ret;
-
-    }
+		return ret;
+	}
 
 
-    /*
+	/*
         private method
     */
 
-    private Struct function getDafaultController() {
+	private Struct function getDafaultController(){
+		return getControllers()[ "DefaultController" ];
+	}
 
-        return getControllers()[ 'DefaultController' ];
+	private Avoid function addController( required String key, required Struct instance ){
+		var controllers = getControllers();
 
-    }
+		StructAppend( controllers, { "#arguments.key#" = arguments.instance } );
 
-    private Avoid function addController( required String key, required Struct instance ) {
+		setControllers( controllers );
+	}
 
-        var controllers = getControllers();
-
-        StructAppend( controllers, { '#arguments.key#' = arguments.instance } );
-
-        setControllers( controllers );
-
-    }
-
-    private Avoid function addLog( required String message ) {
+	private Avoid function addLog( required String message ){
+		return;
 
 		var fileName = "access-manager.log";
-		var path = ExpandPath('/../repository/private/logs/');
+		var path     = ExpandPath( "/../repository/private/logs/" );
 
 		if ( !DirectoryExists( path ) ) {
 			DirectoryCreate( path )
 		}
 
-		cffile( 
-			action="append" 
-			file="#path#/#fileName#" 
-			output="#now()#;#arguments.message#",
-			nameconflict="overwrite"
+		cffile(
+			action       = "append",
+			file         = "#path#/#fileName#",
+			output       = "#Now()#;#arguments.message#",
+			nameconflict = "overwrite"
 		);
-
-    }
+	}
 
 }
+
