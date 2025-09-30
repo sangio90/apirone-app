@@ -25,6 +25,7 @@
 				quotation_item_id::varchar,
 				product_item_id,
 				origin_id::varchar,
+				"level",
 				COUNT(quotation_item_product_item_id) OVER() AS total
 			FROM
 				quotation_item_product_items
@@ -50,16 +51,19 @@
 
 	<cffunction name="insert" returntype="String">
 		<cfargument name="productItem" type="com.apirone.core.model.bean.QuotationItemProductItem" required="true">
+		
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_product_items (
 				quotation_item_id,
 				product_item_id,
+				level,
 				origin_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,				
+				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">,
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getOrigin().getId()#">
+					<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getOrigin().getId()#">
 				<cfelse>
 					NULL
 				</cfif>
@@ -75,9 +79,10 @@
 			UPDATE quotation_item_product_items
 			SET
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
-				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">
+				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
+				level = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
-					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getOrigin().getId()#">
+					,origin_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getOrigin().getId()#">
 				</cfif>
 			WHERE quotation_item_product_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getId()#">::uuid
 		</cfquery>

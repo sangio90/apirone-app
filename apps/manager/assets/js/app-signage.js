@@ -658,197 +658,195 @@ AP.signage.modal = ( function() {
             this.checkCanSave();
         },
 
-        firstLoadProductItems: function() {
-            var quotationItemId = viewModel.get('detailForm.data.quotationItem.id');
-            if (quotationItemId != '') {
-                NM.util.ajax( {
-                    method: "GET",
-                    url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
-                    callback: {
-                        done: function( xhr ) {
-                            if (xhr.data.length > 0) {
-                                viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
-                                var productItems = viewModel.get( "detailForm.data.quotationItem.product.items");
-                                var orderedData = xhr.data.sort((a, b) => {
-                                        const orderA = a.productItem?.orderby ?? 0;
-                                        const orderB = b.productItem?.orderby ?? 0;
-                                        return orderA - orderB;
-                                    });
-                                orderedData.forEach(function (productItem) {
-                                    productItems.add(productItem);
-                                })
-                                
-                                const container = $("#product-items");
+        firstLoadProductItems: async function() {
+            const quotationItemId = viewModel.get('detailForm.data.quotationItem.id');
+            const productId = viewModel.get('detailForm.data.quotationItem.product.id');
 
-                                productItems.data().forEach(item => {
-                                    const attrName = item.productItem?.attribute?.name ?? "";
-                                    const valueName = item.productItem?.attributeValue?.rawValue?.name ?? item.productItem?.attributeValue?.rawValue?.name ?? "";
-                                    
-                                    const select = $("<select>").addClass("form-control me-3 mb-2");
-                                    const option = $("<option>")
-                                        .val(item.id)
-                                        .html(`<b>${attrName}</b> ${valueName}`);
-                                    select.append(option);
-
-                                    if (item.origin) {
-                                        select.css("margin-left", "2em");
-                                    }
-
-                                    container.append(select);
-                                });
-                            }
-                        },
-                    },
-                } );
-            } else {
-                var productId = viewModel.get('detailForm.data.quotationItem.product.id');
-                NM.util.ajax( {
-                    method: "GET",
-                    url: "/manager/ajax/product-items?productId=" + productId,
-                    callback: {
-                        done: function( xhr ) {
-                            if (xhr.data.length > 0) {
-                                let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
-                                const attributeArray = productItems.data();
-                                xhr.data.forEach(item => {
-                                    let existing = attributeArray.find(d => d.attribute_id === item.attribute.id);
-                                    if (existing) {
-                                        existing.values.push({
-                                            attributeValue: item.attributeValue,
-                                            product_item_id: item.id,
-                                            parent_attribute_id: null,
-                                            level: 0,
-                                            selected: false
-                                        });
-                                        productItems.trigger("change");
-                                    } else {
-                                        let parsedData = {
-                                            attribute_id: item.attribute.id,
-                                            attribute_name: item.attribute.name,
-                                            parent_attribute_id: null,
-                                            level: 0,
-                                            values: [
-                                                {
-                                                    attributeValue: item.attributeValue,
-                                                    product_item_id: item.id,
-                                                    selected: false
-                                                }
-                                            ]
-                                        };
-                                        productItems.add(parsedData);
-                                    }
-                                })
-                                viewModel.renderProductItems()
-                            }
-                        }
-                    }
-                });
-            }
-        },
-
-        loadProductItems: function(originId, attributeId) {
-            var productId = viewModel.get('detailForm.data.quotationItem.product.id');
-            let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
-            const attributeArray = productItems.data();
-            originId = originId || '';
-
-            let url = "/manager/ajax/product-items?productId=" + productId;
-            if (originId) {
-                url += "&originId=" + originId;
-            }
-
-            //sto unsettando un attributo
-            if (originId == '') {
-                let actualIndex = null;
-                for (let i = attributeArray.length - 1; i >= 0; i--) {
-                    //tolgo il selected da tutti i valori dell'attributo
-                    if (attributeArray[i].attribute_id === attributeId) {
-                        actualIndex = i;
-                        attributeArray[i].values.forEach(attrValue => attrValue.selected = false)
-                    }
-                }
-                //rimuovo tutti gli attributi annidati nell'attributo che sto unsettando
-                let i = actualIndex + 1;
-                while (i < attributeArray.length) {
-                    if (attributeArray[i].level > attributeArray[actualIndex].level) {
-                        productItems.remove(attributeArray[i]);
-                    } else {
-                        break;
-                    }
-                }
-                this.renderProductItems();
-                return false;
-            }
-
-            NM.util.ajax({
+            // Chiamata AJAX iniziale per ottenere tutti i product items
+            await NM.util.ajax({
                 method: "GET",
-                url: url,
+                url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
-                    done: (xhr) => {
+                    done: function(xhr) {
                         if (xhr.data.length > 0) {
-                            let attribute = null;
-                            let toInsert = false;
-                            let parentIndex = -1;
-                            //cerco l'indice dell'attributo su cui ho cliccato
-                            attributeArray.forEach((d, idx) => {
-                                if (d.attribute_id == attributeId) {
-                                    parentIndex = idx;
+                            viewModel.set("detailForm.data.quotationItem.product.items", new kendo.data.DataSource());
+                            let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
+                            const attributeArray = productItems.data();
+debugger
+                            xhr.data.forEach(item => {
+                                let existing = attributeArray.find(d => d.attribute_id === item.attribute.id);
+                                if (existing) {
+                                    existing.values.push({
+                                        attributeValue: item.attributeValue,
+                                        product_item_id: item.id,
+                                        parent_attribute_id: null,
+                                        level: 0,
+                                        selected: false
+                                    });
+                                    productItems.trigger("change");
+                                } else {
+                                    const parsedData = {
+                                        attribute_id: item.attribute.id,
+                                        attribute_name: item.attribute.name,
+                                        parent_attribute_id: null,
+                                        level: 0,
+                                        values: [
+                                            {
+                                                attributeValue: item.attributeValue,
+                                                product_item_id: item.id,
+                                                selected: false
+                                            }
+                                        ]
+                                    };
+                                    productItems.add(parsedData);
                                 }
                             });
 
-                            //cerco tra gli attributi anidati dentro quello che sto configurando, se ne trovo li rimuovo.
-                            let i = parentIndex + 1;
-                            while (i < attributeArray.length) {
-                                if (attributeArray[i].level > attributeArray[parentIndex].level) {
-                                    productItems.remove(attributeArray[i]);
-                                } else {
-                                    break;
+                            viewModel.renderProductItems();
+                        }
+                    }
+                }
+            }).then(async function() {
+                // Se ci sono quotation items pre-selezionati, li carichiamo
+                if (quotationItemId != '') {
+                    await NM.util.ajax({
+                        method: "GET",
+                        url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
+                        callback: {
+                            done: async function(xhr) {
+                                if (xhr.data.length > 0) {
+                                    for (const qipi of xhr.data) {
+                                        const select = $(`select[data-attribute-id="${qipi.productItem.attribute.id}"]`);
+                                        if (select.length > 0) {
+                                            select.val(qipi.productItem.id);
+                                            // Carichiamo eventuali figli ricorsivamente
+                                            await viewModel.loadProductItems(qipi.productItem.id, qipi.productItem.attribute.id);
+                                        }
+                                    }
                                 }
                             }
+                        }
+                    });
+                }
+            });
+        },
 
-                            //se non ho trovato l'attribute, lo creo e assegno i valori recuperati con la ajax
-                            if (!attribute) {
-                                attribute = {
-                                    attribute_id: xhr.data[0].attribute.id,
-                                    attribute_name: xhr.data[0].attribute.name,
-                                    parent_attribute_id: attributeId,
-                                    level: attributeArray[parentIndex].level + 1,
-                                    values: []
-                                };
-                                toInsert = true;
-                            }
-                            
-                            //imposto come selezionato il valore scelto della select nel parent
-                            if (parentIndex !== -1) {
-                                const parent = productItems.at(parentIndex);
-                                const values = parent.get("values");
-                                values.forEach(v => {
-                                    if (v.product_item_id == originId) {
-                                        v.selected = true;
-                                    } else {
-                                        v.selected = false;
-                                    }
+        loadProductItems: function(originId, attributeId) {
+            return new Promise((resolve, reject) => {
+                const productId = viewModel.get('detailForm.data.quotationItem.product.id');
+                let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
+                const attributeArray = productItems.data();
+                originId = originId || '';
+
+                let url = "/manager/ajax/product-items?productId=" + productId;
+                if (originId) {
+                    url += "&originId=" + originId;
+                }
+
+                // Deselezionamento: originId vuoto
+                if (originId === '') {
+                    let actualIndex = null;
+                    for (let i = attributeArray.length - 1; i >= 0; i--) {
+                        if (attributeArray[i].attribute_id === attributeId) {
+                            actualIndex = i;
+                            attributeArray[i].values.forEach(attrValue => attrValue.selected = false);
+                        }
+                    }
+                    // Rimuovo attributi figli
+                    let i = actualIndex + 1;
+                    while (i < attributeArray.length) {
+                        if (attributeArray[i].level > attributeArray[actualIndex].level) {
+                            productItems.remove(attributeArray[i]);
+                        } else {
+                            break;
+                        }
+                    }
+                    viewModel.renderProductItems();
+                    resolve();
+                    return;
+                }
+
+                // Selezionamento: originId valorizzato
+                NM.util.ajax({
+                    method: "GET",
+                    url: url,
+                    callback: {
+                        done: function(xhr) {
+                            if (xhr.data.length > 0) {
+                                let attribute = null;
+                                let toInsert = false;
+                                let parentIndex = -1;
+
+                                // Trovo l'indice dell'attributo selezionato
+                                attributeArray.forEach((d, idx) => {
+                                    if (d.attribute_id == attributeId) parentIndex = idx;
                                 });
 
-                                //per ogni elemento del nuovo o aggiornato attributo recuperato con la ajax, imposto un'opzione alla select dell'attributo
-                                xhr.data.forEach(function (item) {
+                                // Rimuovo eventuali attributi figli
+                                let i = parentIndex + 1;
+                                while (i < attributeArray.length) {
+                                    if (attributeArray[i].level > attributeArray[parentIndex].level) {
+                                        productItems.remove(attributeArray[i]);
+                                    } else {
+                                        break;
+                                    }
+                                }
+
+                                // Creo nuovo attributo se necessario
+                                if (!attribute) {
+                                    attribute = {
+                                        attribute_id: xhr.data[0].attribute.id,
+                                        attribute_name: xhr.data[0].attribute.name,
+                                        parent_attribute_id: attributeId,
+                                        level: attributeArray[parentIndex].level + 1,
+                                        values: []
+                                    };
+                                    toInsert = true;
+                                }
+
+                                // Imposto selected sul parent
+                                if (parentIndex !== -1) {
+                                    const parent = productItems.at(parentIndex);
+                                    parent.get("values").forEach(v => {
+                                        v.selected = v.product_item_id == originId;
+                                    });
+                                }
+
+                                // Popolo i valori del nuovo attributo
+                                xhr.data.forEach(function(item) {
                                     attribute.values.push({
                                         attributeValue: item.attributeValue,
                                         product_item_id: item.id,
                                         selected: false
-                                    })
+                                    });
                                 });
+
+                                // Inserisco attributo se nuovo
+                                if (toInsert) {
+                                    productItems.insert(parentIndex + 1, attribute);
+                                }
+                            } else {
+                                // Se non ci sono figli, setto selected sul parent
+                                let parentIndex = -1;
+                                attributeArray.forEach((d, idx) => {
+                                    if (d.attribute_id == attributeId) parentIndex = idx;
+                                });
+                                if (parentIndex !== -1) {
+                                    const parent = productItems.at(parentIndex);
+                                    parent.get("values").forEach(v => {
+                                        v.selected = v.product_item_id == originId;
+                                    });
+                                }
                             }
 
-                            //se l'attributo è nuovo, aggiungo alla struttura l'elemento. Se esiste già a questo punto avrò già aggiornato la lista delle options
-                            if (toInsert == true) {
-                                productItems.insert(parentIndex + 1, attribute);
-                            }
-                            
-                            this.renderProductItems();
+                            viewModel.renderProductItems();
+                            resolve();
+                        },
+                        fail: function(err) {
+                            reject(err);
                         }
-                    },
-                },
+                    }
+                });
             });
         },
 
@@ -857,54 +855,49 @@ AP.signage.modal = ( function() {
             container.empty();
             let productItems = viewModel.get('detailForm.data.quotationItem.product.items');
             const attributeArray = productItems.data();
-            attributeArray.forEach(function (item) {
+            attributeArray.forEach(function(item) {
                 const attrName = item.attribute_name;
                 const values = item.values;
-                
-                subContainer = $('<div>');
+
+                const subContainer = $('<div>');
                 subContainer.attr('id', 'attribute-container-' + item.attribute_id);
-                container.append(subContainer)
-                
+                container.append(subContainer);
+
                 const label = $('<label>');
-                label.addClass('mb-1')
+                label.addClass('mb-1');
                 label.text(attrName);
                 subContainer.append(label);
 
-                select = $('<select>').addClass("form-control me-3 mb-2").on("change", function () {
+                const select = $('<select>').addClass("form-control me-3 mb-2").on("change", function() {
                     const selectedId = $(this).val();
                     const attributeId = $(this).data('attribute-id');
                     viewModel.loadProductItems(selectedId, attributeId);
                 });
                 select.attr('data-attribute-id', item.attribute_id);
-                let margin = 0;
+
                 if (item.level > 0) {
-                    margin = 2 * item.level;
-                    select.css("margin-left", margin + "em")
+                    select.css("margin-left", (2 * item.level) + "em");
                 }
-                const emptyOption = $("<option>")
-                .val("")
-                .html(`Seleziona valore attributo`);
+
+                const emptyOption = $("<option>").val("").html("Seleziona valore attributo");
                 select.append(emptyOption);
 
-                item.values.forEach(function (attrValue) {
+                values.forEach(function(attrValue) {
                     const option = $("<option>")
                         .val(attrValue.product_item_id)
                         .html(`<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}`);
                     select.append(option);
-                })
+                });
 
-                let selectedOption = values.find(attrValue => 
-                    attrValue.selected === true
-                );
-
+                // Imposto la option selezionata
+                const selectedOption = values.find(attrValue => attrValue.selected === true);
                 if (selectedOption) {
-                    select.val(selectedOption.product_item_id)
+                    select.val(selectedOption.product_item_id);
                 }
 
                 subContainer.append(select);
-            })
+            });
         },
-
 
         unsetSelects: function( data ) {
             data.forEach( function( element ) {
