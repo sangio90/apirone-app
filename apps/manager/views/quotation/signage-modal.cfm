@@ -112,7 +112,7 @@
                                 <span>Anteprima</span>
                             </div>
                             <div class="col-3 mb-3">
-                                <div id="product-items" style="max-width: 90%"></div>
+                                <div id="product-items" style="max-width: 100%"></div>
                             </div>
                             <div id="signage-rows-container" class="col-5" style="max-height: 600px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
                                 <!--- qui dentro vanno gli items --->
