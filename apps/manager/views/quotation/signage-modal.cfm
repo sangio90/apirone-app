@@ -101,20 +101,20 @@
                             <div class="col-3 mb-3">
                                 Albero
                             </div>
-                            <div class="col-2 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
-                                Righe
-                            </div>
-                            <div class="col-2 mb-3 flex justify-content-end align-items-end">
-                                <!--- <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i> --->
-                                <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
-                            </div>
                             <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
-                                Anteprima
+                                <div class="flex justify-content-between">
+                                    <span>Righe</span>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageRow, enabled:detailForm.data.quotationItem.signageConfigItem.id">Aggiungi Riga</button>
+                                </div>
+                            </div>
+                            <div class="col-3 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
+                                <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
+                                <span>Anteprima</span>
                             </div>
                             <div class="col-3 mb-3">
                                 <div id="product-items" style="max-width: 90%"></div>
                             </div>
-                            <div id="signage-rows-container" class="col-5" style="max-height: 400px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
+                            <div id="signage-rows-container" class="col-5" style="max-height: 600px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
                                 <!--- qui dentro vanno gli items --->
                             </div>
                             <div id="signage-preview-background"
@@ -128,7 +128,6 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageRow, enabled:detailForm.data.quotationItem.signageConfigItem.id">Aggiungi Riga</button>
                     </div>
 
                     <footer class="card-footer">

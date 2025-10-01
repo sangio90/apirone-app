@@ -866,6 +866,7 @@ AP.signage.modal = ( function() {
 
                 const label = $( "<label>" );
                 label.addClass( "mb-1" );
+                label.css( "margin-left", ( 1.5 * item.level ) + "rem" );
                 label.text( attrName );
                 subContainer.append( label );
 
@@ -877,7 +878,8 @@ AP.signage.modal = ( function() {
                 select.attr( "data-attribute-id", item.attribute_id );
 
                 if ( item.level > 0 ) {
-                    select.css( "margin-left", ( 2 * item.level ) + "em" );
+                    select.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                    select.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
                 }
 
                 const emptyOption = $( "<option>" ).val( "" ).html( "Seleziona valore attributo" );
