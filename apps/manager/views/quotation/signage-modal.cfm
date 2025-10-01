@@ -101,7 +101,7 @@
                             <div class="col-3 mb-3">
                                 Albero
                             </div>
-                            <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
+                            <div class="col-5 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 <div class="flex justify-content-between">
                                     <span>Righe</span>
                                     <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageRow, enabled:detailForm.data.quotationItem.signageConfigItem.id">Aggiungi Riga</button>
