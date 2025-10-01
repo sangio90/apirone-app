@@ -672,6 +672,7 @@ AP.signage.modal = ( function() {
                             viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                             const attributeArray = productItems.data();
+                            //settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
                                 if ( existing ) {
@@ -713,6 +714,7 @@ AP.signage.modal = ( function() {
                         url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
                         callback: {
                             done: async function( xhr ) {
+                                xhr.data.sort((a, b) => a.productItem.orderby - b.productItem.orderby);
                                 if ( xhr.data.length > 0 ) {
                                     for ( const qipi of xhr.data ) {
                                         const select = $( `select[data-attribute-id="${qipi.productItem.attribute.id}"]` );
