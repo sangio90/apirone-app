@@ -54,10 +54,21 @@ AP.product.list = ( function() {
     var viewModel = kendo.observable( {
         rows: dataSources.items,
         detailForm: defaultDetailForm,
+        // methods: AP.page.methods,
 
         editPrices: function( event ) {
 
-            AP.price.modal.editList( { productId: event.data.productId } );
+            var item = {
+                type: "product",
+                id: event.data.id,
+                line: event.data.line,
+                model: event.data.model,
+                finish: event.data.finish,
+            };
+
+            console.log( "editPrices", item );
+
+            AP.price.modal.open( item );
 
         },
 

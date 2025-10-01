@@ -8,13 +8,13 @@
                 <form id="product-detail-form" method="POST" name="product-detail-form">
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
-                        <h2 class="card-title" data-bind="text:detailForm.title"></h2>
+                        <h2 class="card-title" data-bind="text:title"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>                
                         
                     <div class="card-body">
 
-                        <div class="mb-3 row" data-template="price-list-row-tmpl" data-bind="source: prices">
+                        <div class="mb-3 row" data-template="price-form-list-row-tmpl" data-bind="source: prices">
                         </div>
                     
                     </div>

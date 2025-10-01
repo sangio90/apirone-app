@@ -3,6 +3,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		// var params[ "categoryModeId" ] = "COM";
 
+		var memy    = super.getMementify();
+
 		prc.categories = super.fire( "productCategory.list", { modeId = "COM" } );
 		prc.lines      = super.fire( "line.list" );
 		prc.models     = super.fire( "model.list" );
@@ -12,6 +14,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title = "Prodotti complessi";
 
 		prc.jsScripts.add( "app-product-list" );
+		prc.jsScripts.add( "app-price" );
+
+		prc.page[ "methods" ] =  memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );
 
 		event.setView( "product/list" );
 	}

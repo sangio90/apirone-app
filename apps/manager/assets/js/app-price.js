@@ -7,12 +7,12 @@ Object.assign( AP.price.fields, {
 AP.price.modal = ( function() {
 
     var pub = {};
-	var fields = AP.price.fields;
-	
+    var fields = AP.price.fields;
+
     var getCurrentConfig = function() {
 
         var current = viewModel.get( "currentItem" );
-        var baseUrl = "/manager/ajax/prices";
+        var baseUrl = "/manager/ajax";
 
         var result = {
             modalTitle: "",
@@ -26,8 +26,8 @@ AP.price.modal = ( function() {
 
             case "product":
 
-                result.modalTitle = "Prezzi per l'articolo: " + current.line.name + " / " + current.model.name;
-                result.readUrl = baseUrl + "/products/" + current.product.id + "/prices"
+                result.modalTitle = "Prezzi per l'articolo: " + current.line.name + " / " + current.model.name + " / " + current.finish.name;
+                result.readUrl = baseUrl + "/products/" + current.id + "/prices";
                 result.modifyUrl = result.readUrl;
 
                 break;
@@ -40,19 +40,29 @@ AP.price.modal = ( function() {
 
                 break;
 
-				default:
-					throw Error("Configuration [" + current.type + "] not valid" );
+            default:
+                throw Error( "ERROR. Type not managed: " + current.type );
             }
 
         }
 
         return result;
 
-    };	
+    };
 
-	var viewModel = kendo.observable({
-		
-		currentItem: null,
+
+    // var prices = new kendo.data.DataSource();
+    var prices = new kendo.data.DataSource( { data: [] } );
+
+    var viewModel = kendo.observable( {
+
+        currentItem: { type: "", id: "" }, // all object with type, id, line, model, attribute, attributeValue
+        prices: prices,
+        methods: AP.page.methods, // from ProductController
+
+        title: function( event ) {
+            return getCurrentConfig().modalTitle;
+        },
 
         save: function( event ) {
 
@@ -121,31 +131,42 @@ AP.price.modal = ( function() {
 
             return false;
 
-		};
+        }
 
-	});
-	
-	var loadList = function ( productId ) {
+    } );
 
-		NM.util.ajax( {
-			method: "GET",
-			url: getCurrentConfig().readUrl,
-			callback: {
-				done: function (xhr) {
-					
-				},
-			},
-		} );
-		
-	}
+    var loadList = function( productId ) {
+
+        NM.util.ajax( {
+            method: "GET",
+            url: getCurrentConfig().readUrl,
+            callback: {
+                done: function( xhr ) {
+
+                    // var prices = viewModel.get( "prices" );
+                    // console.log( "prices", prices );
+
+                    viewModel.get( "prices" ).data( xhr.data );
+
+                    NM.util.openModal( fields.modal );
+
+                },
+            },
+        } );
+
+    };
 
     pub.open = function( item ) {
 
-        kendo.bind( fields.modal, viewModel );
+
+        console.log( "AP.price.modal.open", item );
 
         viewModel.set( "currentItem", item );
 
-        initUpload();
+        loadList();
+
+        kendo.bind( fields.modal, viewModel );
+
 
     };
 
