@@ -1,25 +1,28 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="CrmApiService" inject="CrmApiService";
-	property name="crmMapper" inject="CrmMapper";
+	property name="CrmMapper" inject="CrmMapper";
+	property name="cacheScope" type="String" default="Customer.bean";
 
 	/**
 	 * Recupera cliente dalla cache, o dal CRM se necessario (senza DB)
 	 */
-	public com.apirone.core.model.bean.Customer function get( required string customerId ){
-		var cacheKey = "customer_#customerId#";
-		var cached   = getCacheManager().get( cacheKey );
+	public com.apirone.core.model.bean.Customer function get( required String customerId ){
+		var cm = getCacheManager();
 
-		if ( cached.status ) {
-			return cached.data;
+		var cache = cm.get( getCacheScope(), arguments.customerId );
+
+		if ( cache.status ) {
+			return cache.data;
 		}
 
 		// Recupera da CRM e mappa
-		var crmData  = getCrmService().getCustomer( customerId );
+		var crmData  = getCrmApiService().getCustomer( customerId );
+		if (!IsNull(crmData)) {
+			crmData = crmData.data;
+		}
 		var customer = getCrmMapper().mapCustomer( crmData );
-
-		// Salva in cache (es. 1 ora)
-		getCacheManager().put( cacheKey, customer, 3600 );
+		cm.put( getCacheScope(), customerId, customer );
 
 		return customer;
 	}
@@ -27,19 +30,17 @@
 	/**
 	 * Cerca clienti: recupera dal CRM e mappa
 	 */
-	public com.apirone.core.model.Result function search( string searchTerm = "" ){
+	public com.apirone.core.model.bean.Result function search( String str ){
 		var result = super.getResult();
 
-		// Recupera risultati dal CRM
-		var crmResults = getCrmService().searchCustomers( searchTerm );
+		var crmResults = getCrmApiService().searchCustomers( str );
 		var customers  = [];
 
-		for ( var crmData in crmResults ) {
+		for ( var crmData in crmResults.data ) {
 			var customer = getCrmMapper().mapCustomer( crmData );
-			// Salva in cache per accesso futuro
-			var cacheKey = "customer_#customer.getId()#"; // Assumi che crmData abbia id
+			var cacheKey = customer.getId();
 
-			getCacheManager().put( cacheKey, customer, 3600 );
+			getCacheManager().put( getCacheScope(), cacheKey, customer );
 
 			customers.append( customer );
 		}

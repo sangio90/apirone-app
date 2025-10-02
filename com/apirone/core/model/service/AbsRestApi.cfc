@@ -3,8 +3,7 @@
 	property name="baseUrl" type="string";
 	property name="apiKey" type="string";
 	property name="authToken" type="string";
-	property name="defaultHeaders" type="struct" default= {
-	};
+	property name="defaultHeaders" type="struct";
 	property name="timeout" type="numeric" default=30;
 
 	/**

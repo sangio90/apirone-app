@@ -196,4 +196,19 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function crmCustomers( event, rc, prc ){
+		var data = [];
+		var name = rc.name;
+
+		var result = super.getResult();
+		var mem    = super.getMementify();
+
+		var rows = super.fire( "customer.search", [ name ] );
+		var data = mem.convertList( rows.getData() );
+		result.setTotal( rows.getTotal() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
 }

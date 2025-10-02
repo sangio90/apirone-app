@@ -38,15 +38,21 @@ component extends="AbsRestApi" accessors="true" {
 	/**
 	 * Recupera dati cliente dal CRM via API
 	 */
-	public struct function getCustomer( required string customerId ){
+	public function getCustomer( required string customerId ){
 		return get( "/accounts/#customerId#" );
 	}
 
 	/**
 	 * Cerca clienti nel CRM
 	 */
-	public array function searchCustomers( required string str ){
-		return get( "/accounts", { search = str } );
+	public any function searchCustomers(required string str, numeric limit=10, numeric offset=0) {
+		var params = { 
+			"name" = str,
+			"limit" = limit,
+			"offset" = offset
+		};
+
+		return get("/accounts", params);
 	}
 
 	/**

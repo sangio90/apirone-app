@@ -18,6 +18,9 @@ component extends="coldbox.system.ioc.config.Binder" {
         mapDirectory(packagePath="com.apirone.core.model.service")
             .asSingleton();  
 
+        mapDirectory(packagePath="com.apirone.core.model.mapper")
+            .asSingleton();  
+
 
         /* 
             service with decorator 

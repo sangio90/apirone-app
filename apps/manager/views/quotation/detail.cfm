@@ -43,10 +43,11 @@
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
                                             <label class="control-label text-sm-end">Nome </label>
-                                            <input type="text" name="name" class="form-control" id="name"
-                                                data-bind="value: detailForm.data.name"
-                                                data-rule-required="true"
-                                                required
+                                            <input type="text" name="customer" class="form-control" id="customer"
+                                                data-bind="value: detailForm.data.customer"
+                                                data-role="combobox"
+                                                data-text-field="name"
+                                                data-value-field="name"
                                             >
                                         </div>
                                         <div class="col-sm-1">

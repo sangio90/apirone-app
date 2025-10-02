@@ -10,6 +10,7 @@
     "ComponentOverride.bean": {},
     "Country.bean": {},
     "Currency.bean": {},
+    "Customer.bean": {},
     "File.bean": {},
     "FileType.bean": {},
     "Finish.bean": {},
