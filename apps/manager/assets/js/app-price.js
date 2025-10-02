@@ -61,12 +61,20 @@ AP.price.modal = ( function() {
         prices: prices,
         methods: AP.page.methods, // from ProductController
 
+        callbacks: {
+            onCreate: undefined,
+            onUpdate: undefined,
+            onLoad: undefined
+        },
+
+
         title: function( event ) {
             return getCurrentConfig().modalTitle;
         },
 
         save: function( event ) {
 
+            var modal = fields.modal;
             var modalForm = fields.modalForm;
             var status = modalForm.find( ".status" );
 
@@ -85,12 +93,18 @@ AP.price.modal = ( function() {
                 NM.util.ajax( {
                     method: "POST",
                     url: getCurrentConfig().modifyUrl,
-                    data: JSON.stringify( viewModel.get( "prices" ).data() ),
+                    data: JSON.stringify( { prices: viewModel.get( "prices" ).data(), item: viewModel.get( "currentItem" ) } ),
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
                                 AP.widget.notify( "success", "Prezzi salvati con successo" );
                                 status.html( "" );
+
+                                setTimeout( () => {
+                                    modal.modal( "hide" );
+                                    AP.util.fireCallback( "onUpdate", viewModel.get( "callbacks" ) );
+                                }, 1000 );
+
                             }
                         },
                     },
@@ -121,17 +135,17 @@ AP.price.modal = ( function() {
 
     };
 
-    pub.open = function( item ) {
+    pub.open = function( item, onUpdate ) {
 
-
-        console.log( "AP.price.modal.open", item );
+        if( onUpdate ) {
+            viewModel.set( "callbacks.onUpdate", onUpdate );
+        }
 
         viewModel.set( "currentItem", item );
 
         loadList();
 
         kendo.bind( fields.modal, viewModel );
-
 
     };
 

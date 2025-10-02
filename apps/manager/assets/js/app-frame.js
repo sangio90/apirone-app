@@ -681,6 +681,7 @@ AP.frame.modal = ( function() {
 
     pub.updateCell = function( row, col, value ) {
         var matrix = viewModel.get( "matrix" );
+
         if ( matrix[row] && matrix[row].cells[col] !== undefined ) {
             matrix[row].cells[col].value = value;
             viewModel.set( "matrix", matrix );

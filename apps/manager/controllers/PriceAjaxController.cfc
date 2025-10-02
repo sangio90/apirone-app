@@ -54,49 +54,35 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+		var result = super.getResult();
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
 
-		var thisId     = "";
-		var messageId  = "";
-		var categories = [];
+		var messageId = "prices.updated";
 
-		var result    = super.getResult();
-		var line      = super.bean( "Line" );
-		var status    = super.bean( "Status" );
-		var thickness = super.bean( "Thickness" );
-		var category  = super.bean( "ProductCategory" );
+		for ( var item in json.prices ) {
+			var price  = super.bean( "Price" );
+			var method = super.bean( "PriceMethod" );
+			var entity = super.bean( "Entity" );
 
-		for ( var thisCategory in json.selectedCategories ) {
-			var category = super.bean( "ProductCategory" );
+			price.setId( item?.id );
+			price.setAmount( item.amount );
+			price.setMethod( method.setId( item.method.id ) );
+			price.setEntity( entity.setKey( "product.id" ).setValue( json.item.id ) );
 
-			category.setId( thisCategory.id )
-			categories.add( category );
-		}
+			if ( Len( item?.id ) ) {
+				super.fire( "price.update", [ price ] );
+			} else {
+				var type = super.bean( "PriceType" );
 
-		line.setId( json.id );
-		line.setCode( json.code );
-		line.setName( json.name );
+				price.setType( type.setId( item.type.id ) );
 
-		line.setStatus( status.setId( json.status.id ) );
-		line.setCategories( categories );
-		line.setThickness( thickness.setId( json?.thickness?.id ) );
 
-		var nameItem        = super.buildTextBean( json.nameItem, "NAME" );
-		var descriptionItem = super.buildTextBean( json.descriptionItem, "DESC" );
-
-		line.setTexts( [ nameItem, descriptionItem ] );
-
-		if ( !Len( json.id ) ) {
-			messageId = "line.created";
-			thisId    = super.fire( "line.create", [ line ] )
-		} else {
-			messageId = "line.updated";
-			thisId    = super.fire( "line.update", [ line ] )
+				super.fire( "price.create", [ price ] );
+			}
 		}
 
 		var message = completeMessage( messageId );
-
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message } );
 
 		event.setValue( "result", result );
 	}

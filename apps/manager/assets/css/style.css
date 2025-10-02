@@ -1078,3 +1078,7 @@ h2 {
 /*
     // frames
 */
+
+.col-form-label {
+    line-height: 1.3;
+}

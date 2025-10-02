@@ -4,8 +4,9 @@
 
 	<div class="mb-3 row">
 		<label class="col-sm-3 col-form-label text-end">
-			<spa data-bind="text: type.name"></span>
-			<spa data-bind="text: id"></span>
+			<span data-bind="text: type.name"></span>
+			<br>
+			<span class="small-code">(<span data-bind="text: type.id"></span> <span data-bind="text: id"></span>)</span>
 		</label>
 		<div class="col-sm-9">
 

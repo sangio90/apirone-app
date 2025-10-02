@@ -58,6 +58,11 @@ AP.product.list = ( function() {
 
         editPrices: function( event ) {
 
+            var onSave = function() {
+                viewModel.rows.read();
+            };
+
+
             var item = {
                 type: "product",
                 id: event.data.id,
@@ -68,7 +73,7 @@ AP.product.list = ( function() {
 
             console.log( "editPrices", item );
 
-            AP.price.modal.open( item );
+            AP.price.modal.open( item, onSave );
 
         },
 
