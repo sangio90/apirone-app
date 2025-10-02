@@ -2,6 +2,7 @@
 
 Object.assign( AP.price.fields, {
     modal: $( "#price-form-list-modal" ),
+    modalForm: $( "#price-form-list-modal-form" ),
 } );
 
 AP.price.modal = ( function() {
@@ -66,61 +67,28 @@ AP.price.modal = ( function() {
 
         save: function( event ) {
 
-            var manageForm = AP.fields.price.manageForm;
-            var status = manageForm.find( ".status" );
+            var modalForm = fields.modalForm;
+            var status = modalForm.find( ".status" );
 
-            var manageForm = AP.fields.price.manageForm;
-
-            manageForm.validate( {
+            modalForm.validate( {
                 onfocusout: function( element ) {
                     $( element ).valid();
                 },
-                rules: {
-                    categoryId: {
-                        required: true
-                    },
-                    lineId: {
-                        required: true
-                    },
-                    typeId: {
-                        required: true
-                    },
-                    newAmount: {
-                        number: true,
-                        required: true
-                    },
-                },
-                messages: {
-                    categoryId: {
-                        required: "Seleziona una categoria",
-                    },
-                    lineId: {
-                        required: "Seleziona una linea",
-                    },
-                    typeId: {
-                        required: "Seleziona un tipo di prezzo",
-                    },
-                    newAmount: {
-                        number: "Importo non numerico",
-                        required: "Inserisci un importo",
-                    },
-                },
-
             } );
 
 
-            if ( manageForm.valid() ) {
+            // thisForm.valid();
+            if ( true ) {
 
                 status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/prices/reassign",
-                    data: JSON.stringify( manageForm.serializeJSON() ),
+                    url: getCurrentConfig().modifyUrl,
+                    data: JSON.stringify( viewModel.get( "prices" ).data() ),
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
-                                // NM.util.autoHideMessage(status, "<span class='green'>Prezi salvati</span>");
                                 AP.widget.notify( "success", "Prezzi salvati con successo" );
                                 status.html( "" );
                             }
@@ -142,9 +110,6 @@ AP.price.modal = ( function() {
             url: getCurrentConfig().readUrl,
             callback: {
                 done: function( xhr ) {
-
-                    // var prices = viewModel.get( "prices" );
-                    // console.log( "prices", prices );
 
                     viewModel.get( "prices" ).data( xhr.data );
 

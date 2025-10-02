@@ -9,25 +9,29 @@
 		</label>
 		<div class="col-sm-9">
 
-			<div class="row">
+			<div class="row g-0">
 
-				<div class="col-7">
+				<div class="col-6 me-2">
 
 					<select required
 						name="methodId_#=id#"
 						class="form-control"
-						data-bind="source: methods, value: method.id" 
+						data-bind="source: methods, value: method }" 
 						data-value-field="id"
 						data-text-field="name">
 					</select>
 
 				</div>
 
-				<div class="col-5">
-					<input type="text" required class="form-control col-sm-4" 
+				<div class="col-4 me-1">
+					<input type="text" required class="form-control text-end" 
 						name="amount_#=id#"
 						maxlength="8"
 						data-bind="value: amount">
+				</div>
+
+				<div class="col-1 mt-2">
+					<span data-bind="text: method.simbol"></span>
 				</div>
 
 			</div>

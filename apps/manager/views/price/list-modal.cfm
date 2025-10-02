@@ -5,7 +5,7 @@
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                <form id="product-detail-form" method="POST" name="product-detail-form">
+                <form id="price-form-list-modal-form" method="POST" name="price-form-list-modal-form">
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:title"></h2>
