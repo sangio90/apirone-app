@@ -103,16 +103,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	public String function create( required com.apirone.core.model.bean.Price price ){
+	public Numeric function create( required com.apirone.core.model.bean.Price price ){
+		if ( IsNull( arguments.price.getEntity() ) ) {
+			Throw( type = "Apirone.errors.EntityRequired", message = "Entity of price is required." );
+		}
+
 		var id = getDao().insert( arguments.price );
+
+		getProductService().removeCache( arguments.price.getEntity().getValue() );
 
 		return id;
 	}
 
-	public String function update( required com.apirone.core.model.bean.Price price ){
+	public Numeric function update( required com.apirone.core.model.bean.Price price ){
+		if ( IsNull( arguments.price.getEntity() ) ) {
+			Throw( type = "Apirone.errors.EntityRequired", message = "Entity of price is required." );
+		}
+
 		getDao().update( arguments.price );
 
 		super.getCacheManager().remove( getCacheScope(), price.getId() );
+		getProductService().removeCache( arguments.price.getEntity().getValue() );
+
 
 		return arguments.price.getId();
 	}

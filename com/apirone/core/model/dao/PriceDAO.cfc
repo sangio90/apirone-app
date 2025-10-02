@@ -19,6 +19,7 @@
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="orderby" required="true" type="String" default="price_types.orderby ASC">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -44,6 +45,9 @@
 			<cfif !IsNull( arguments.productItemId )>
 				AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
 			</cfif>
+
+			ORDER BY
+				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
 				LIMIT
@@ -87,8 +91,10 @@
 				prices
 			SET
 				amount = <cfqueryparam cfsqltype="float" value="#arguments.price.getAmount()#">,
-				method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getMethod().getId()#">,
-				price_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getType().getId()#">
+				method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getMethod().getId()#">
+				<!---
+			price_method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.price.getType().getId()#"> -
+		--->
 			WHERE
 				price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.price.getId()#">
 		</cfquery>
