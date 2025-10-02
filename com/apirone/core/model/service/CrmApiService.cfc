@@ -26,11 +26,11 @@ component extends="AbsRestApi" accessors="true" {
 	/**
 	 * Inizializza con URL CRM e token
 	 */
-	public CrmService function init() {
+	public CrmApiService function init(){
 		super.init(
-			baseUrl = "http://api.test-crm.apirone.cc/api",
-			authToken = getAuthToken(),
-			defaultHeaders = { "Accept": "application/json" }
+			baseUrl        = "http://api.test-crm.apirone.cc/api",
+			authToken      = getAuthToken(),
+			defaultHeaders = { "Accept" = "application/json" }
 		);
 		return this;
 	}
@@ -38,22 +38,22 @@ component extends="AbsRestApi" accessors="true" {
 	/**
 	 * Recupera dati cliente dal CRM via API
 	 */
-	public struct function getCustomer(required string customerId) {
-		return get("/accounts/#customerId#");
+	public struct function getCustomer( required string customerId ){
+		return get( "/accounts/#customerId#" );
 	}
 
 	/**
 	 * Cerca clienti nel CRM
 	 */
-	public array function searchCustomers(required string str) {
-		return get("/accounts", { search: str });
+	public array function searchCustomers( required string str ){
+		return get( "/accounts", { search = str } );
 	}
 
 	/**
 	 * Metodo privato per ottenere il token auth
 	 */
-	private string function getAuthToken() {
-		return "c39bbed0-f211-46e7-8644-6d290dd00cd1"; 
+	private string function getAuthToken(){
+		return "c39bbed0-f211-46e7-8644-6d290dd00cd1";
 	}
 
 }

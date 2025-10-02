@@ -1,6 +1,6 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="crmService" inject="CrmService";
+	property name="CrmApiService" inject="CrmApiService";
 	property name="crmMapper" inject="CrmMapper";
 
 	/**
@@ -15,8 +15,8 @@
 		}
 
 		// Recupera da CRM e mappa
-		var crmData  = crmService.getCustomer( customerId );
-		var customer = crmMapper.mapCustomer( crmData );
+		var crmData  = getCrmService().getCustomer( customerId );
+		var customer = getCrmMapper().mapCustomer( crmData );
 
 		// Salva in cache (es. 1 ora)
 		getCacheManager().put( cacheKey, customer, 3600 );
@@ -31,14 +31,16 @@
 		var result = super.getResult();
 
 		// Recupera risultati dal CRM
-		var crmResults = crmService.searchCustomers( searchTerm );
+		var crmResults = getCrmService().searchCustomers( searchTerm );
 		var customers  = [];
 
 		for ( var crmData in crmResults ) {
-			var customer = crmMapper.mapCrmCustomerToBean( crmData );
+			var customer = getCrmMapper().mapCustomer( crmData );
 			// Salva in cache per accesso futuro
-			var cacheKey = "crm_customer_#customer.getId()#"; // Assumi che crmData abbia id
+			var cacheKey = "customer_#customer.getId()#"; // Assumi che crmData abbia id
+
 			getCacheManager().put( cacheKey, customer, 3600 );
+
 			customers.append( customer );
 		}
 
