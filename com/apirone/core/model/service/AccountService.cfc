@@ -56,7 +56,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return id;
 	}
 
-	/*
 	public Boolean function updatePassword(
 		required String accountId,
 		required String pwd
@@ -65,7 +64,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return true;
 	}
-	*/
 
 	public com.apirone.core.model.bean.Outcome function delete( required String accountId ){
 		var outcome = super.bean( "Outcome" );
@@ -100,7 +98,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( IsNull( obj ) ) {
 			Throw(
 				type    = "apirone.accountService.AccountNotExists",
-				message = "Account id [#arguments.accountId#] not exists"
+				message = "AccountId [#arguments.accountId#] not exists"
 			);
 		}
 

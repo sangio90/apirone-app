@@ -162,6 +162,7 @@
 			accounts
 		*/
 		get( "/ajax/accounts/email-exists" ).to( "AccountAjaxController.emailExists" ).end();
+		post( "/ajax/accounts/pwd" ).to( "AccountAjaxController.updatePwd" ).end();
 		get( "/ajax/accounts" ).to( "AccountAjaxController.list" ).end();
 		post( "/ajax/accounts" ).to( "AccountAjaxController.save" ).end();
 		delete( "/ajax/accounts" ).to( "AccountAjaxController.delete" ).end();

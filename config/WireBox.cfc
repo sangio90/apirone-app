@@ -75,6 +75,9 @@ component extends="coldbox.system.ioc.config.Binder" {
                 value="com.apirone.core.controller.accessManager"
             );
 
+        map("QueryLoader").to( "com.apirone.core.util.accessManager.QueryLoader" )
+            .property( name = "CacheManager", value = "CacheManager");
+
         map("CacheManager").to( "com.apirone.core.util.CacheManager" )
             .asSingleton()
             .initArg(

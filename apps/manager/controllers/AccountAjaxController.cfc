@@ -112,5 +112,23 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}    
 
+    function updatePwd( event, rc, prc ){
+
+        var user = prc.user;
+        var result = super.getResult();
+		var messageId = "line.deletedNotAllRecords"
+
+        var raw  = GetHTTPRequestData().content;
+        var json = DESerializeJSON( raw );
+
+        var id = super.fire( "account.setPassword", { newPwd: json.pwd , accountId: json.accountId } );
+
+		var message = super.completeMessage( "account.passwordUpdated" );
+
+        result.setData( { "message" = message } );
+
+        event.setValue( "result", result );
+
+    }    
 
 }

@@ -32,9 +32,15 @@ if ( localStorage.getItem( "sidebar-left-collapsed" ) == "true" ) {
 }
 
 function highlightTabWithError( fieldName ) {
+
+    console.log( "fieldName", fieldName );
+
     var input = $( "[name=\"" + fieldName + "\"]" );
     var tabPane = input.closest( ".tab-pane" );
     var tabPaneId = tabPane.attr( "id" );
+
+    console.log( "tabPaneId", tabPaneId );
+
     var tabButton = $( ".nav-link[href=\"#" + tabPaneId + "\"]" );
 
     tabButton.css( { "font-weight": "bold", "border-top": "3px solid #dc3545" } );
@@ -63,8 +69,6 @@ $.validator.setDefaults( {
         }
 
         var status = thisForm.find( ".errors-counter" );
-
-        console.log( "status.length", status.length );
 
         if( status.length == 0 ) {
             var status = $( ".errors-counter" );

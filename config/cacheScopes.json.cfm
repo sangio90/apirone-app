@@ -53,5 +53,6 @@
     "FrameCell.bean": {},
     "ProductCategoryLine.bean": {},
     "Price.bean": {},
-    "PriceType.bean": {}
+    "PriceType.bean": {},
+    "verticale.query": {}
 }
