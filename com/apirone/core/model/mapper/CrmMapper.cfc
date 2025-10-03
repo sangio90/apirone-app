@@ -8,6 +8,7 @@
 	public com.apirone.core.model.bean.Customer function mapCustomer( required struct data ){
 		var customer = new com.apirone.core.model.bean.Customer();
 		var accountCustom = data.custom;
+		customer.setId( data.id );
 		customer.setName( data.name ?: "" );
 		customer.setDescription( data.description ?: "" );
 		if (Len(accountCustom)) {

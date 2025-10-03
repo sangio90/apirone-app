@@ -198,8 +198,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function crmCustomers( event, rc, prc ){
 		var data = [];
-		var name = rc.name;
-
+		var name = rc.str;
 		var result = super.getResult();
 		var mem    = super.getMementify();
 

@@ -32,16 +32,21 @@
 	 */
 	public com.apirone.core.model.bean.Result function search( String str ){
 		var result = super.getResult();
+		var cm = getCacheManager();
 
 		var crmResults = getCrmApiService().searchCustomers( str );
 		var customers  = [];
 
 		for ( var crmData in crmResults.data ) {
+			var cache = cm.get( getCacheScope(), crmData.id );
+			if ( cache.status ) {
+				customers.append( cache.data );
+				continue;
+			}
 			var customer = getCrmMapper().mapCustomer( crmData );
 			var cacheKey = customer.getId();
 
 			getCacheManager().put( getCacheScope(), cacheKey, customer );
-
 			customers.append( customer );
 		}
 

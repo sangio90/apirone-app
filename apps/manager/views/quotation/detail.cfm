@@ -44,10 +44,12 @@
                                         <div class="col-sm-3">
                                             <label class="control-label text-sm-end">Nome </label>
                                             <input type="text" name="customer" class="form-control" id="customer"
-                                                data-bind="value: detailForm.data.customer"
-                                                data-role="combobox"
+                                                data-bind="source: crmCustomers, value: detailForm.data.customer, events: { select: onSelect }"
+                                                data-role="autocomplete"
                                                 data-text-field="name"
-                                                data-value-field="name"
+                                                data-value-primitive="false"
+                                                data-minlength="4"
+                                                data-filter="contains"
                                             >
                                         </div>
                                         <div class="col-sm-1">

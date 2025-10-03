@@ -28,7 +28,10 @@ AP.quotationDetail.detail = ( function() {
         data: {
             id: "",
             name: "",
-            customer: "",
+            customer: {
+                "id":"",
+                "name":""
+            },
             quotationNumber: "",
             versionNumber: 1,
             lang: {
@@ -99,8 +102,25 @@ AP.quotationDetail.detail = ( function() {
         filteredShipmentStates: new kendo.data.DataSource(),
         zones: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
-        crmCustomers: new kendo.data.DataSource(),
-
+        onSelect: function (event) { debugger },
+        crmCustomers: new kendo.data.DataSource({
+            serverFiltering: true,
+            transport: {
+                read: {
+                    url: "/manager/ajax/quotations/crmcustomers/",
+                    data: {
+                        str: function() {
+                            return $("#customer").val()
+                        },
+                    }
+                }
+            },
+            schema: {
+                data: function( xhr ) {
+                    return xhr.data;
+                }
+            }
+        }),
         list: function () {
             window.location.href = "/manager/quotations";
         },
@@ -211,33 +231,6 @@ AP.quotationDetail.detail = ( function() {
                     }
                 },
             } );
-        },
-
-        initComboBox: function() {
-            $("#name").kendoComboBox({
-                filter: "contains",
-                minLength: 4,
-                suggest: true,
-                autoBind: false,
-                dataSource: {
-                    serverFiltering: true,
-                    transport: {
-                        read: function(options) {
-                            var term = options.data.filter ? options.data.filter.filters[0].value : "";
-                            var url = "/manager/ajax/quotations/crmcustomers/" + encodeURIComponent(term);
-                            NM.util.ajax( {
-                                method: "GET",
-                                url: url,
-                                callback: {
-                                    done: function( xhr ) {
-                                        debugger
-                                    }
-                                }
-                            } );
-                        }
-                    }
-                }
-            });
         },
 
         save: function( event ) {
@@ -436,11 +429,6 @@ AP.quotationDetail.detail = ( function() {
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
         }
     };
-
-    $(document).ready(function() {
-        kendo.bind($("#name"), viewModel);
-        viewModel.initComboBox();
-    });
 
     return pub;
 } () );
