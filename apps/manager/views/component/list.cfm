@@ -31,21 +31,22 @@
 
                                         <div class="col">
                                             <span>Articolo</span>
-                                            <input name="str" placeholder="Codice articolo" class="form-control me-2" type="text">
+                                            <input name="rawProductId" placeholder="Codice articolo" class="form-control me-2" type="text">
                                         </div>
 
                                         <div class="col">
                                             <span>Variante</span>
-                                            <input name="str" placeholder="Codice variante" class="form-control me-2" type="text">
+                                            <input name="variantId" placeholder="Codice variante" class="form-control me-2" type="text">
                                         </div>
 
                                         <div class="col">
                                             <span>Colore</span>
-                                            <input name="str" placeholder="Codice colore" class="form-control me-2" type="text">
+                                            <input name="colorId" placeholder="Codice colore" class="form-control me-2" type="text">
                                         </div>
 
                                         <div class="align-self-end">
                                             #searchButton( bind="click:search" )#
+                                            #resetButton( bind="click:reset" )#
                                         </div>
                                     
                                     </form>

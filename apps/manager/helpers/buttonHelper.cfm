@@ -38,6 +38,15 @@
     
     }
 
+    function resetButton( String bind, required String label="Reset" ){ 
+
+        arguments["icon"] = "times";
+        arguments["variant"] = "default";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
     function saveButton( String bind, required String label="Salva" ){ 
 
         arguments["icon"] = "save";
