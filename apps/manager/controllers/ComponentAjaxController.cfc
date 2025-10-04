@@ -1,74 +1,27 @@
 component extends="com.apirone.core.controller.AbsController" {
-	function reassign( event, rc, prc ){
-		var result = super.getResult();
-		var args = {};
-		args[ rc.category ] = uCase( trim( rc.oldParam ) );
-		args[ 'paramCategory' ] = rc.category;
-		args[ 'newParam' ] = uCase( trim( rc.newParam ) );
-		args[ 'oldParam' ] = uCase( trim( rc.oldParam ) );
 
-		transaction {
-			try {
-				var rowsCount = super.fire( "component.massiveReassign", args );
-				var message = "";
-				if (rowsCount == 0) {
-					var message = "Non è stato modificato nessun componente.";
-				}
-				if (rowsCount == 1) {
-					var message = "è stato modificato 1 componente.";
-				}
-				if (rowsCount > 1) {
-					var message = "Sono stati modificati " & rowsCount & " componenti.";
-				}
-				result.setData( { "message" = message } );
-				event.setValue( "result", result );
-				return;
-			} catch ( any e ) {
-				transaction action="rollback";
-				var message = "Errore nella riassegnazione massive dei componenti.";
-				result.setData( { "error" = message } );
-				result.setStatus( "ERRORE" );
-				event.setValue( "result", result );
-				return;
-			}
-		}
-	}
-	
-	function massiveDelete( event, rc, prc ){
-		var result = super.getResult();
-		var args = {};
-		args[ rc.category ] = uCase( trim( rc.oldParam ) );
-		args[ 'paramCategory' ] = rc.category;
-		args[ 'oldParam' ] = uCase( trim( rc.oldParam ) );
-
-		transaction {
-			try {
-				var rowsCount = super.fire( "component.massiveDelete", args );
-				var message = "";
-				if (rowsCount == 0) {
-					var message = "Non è stato cancellato nessun componente.";
-				}
-				if (rowsCount == 1) {
-					var message = "è stato cancellato 1 componente.";
-				}
-				if (rowsCount > 1) {
-					var message = "Sono stati cancellati " & rowsCount & " componenti.";
-				}
-				result.setData( { "message" = message } );
-				event.setValue( "result", result );
-				return;
-			} catch ( any e ) {
-				transaction action="rollback";
-				var message = "Errore nella cancellazione massive dei componenti.";
-				result.setData( { "error" = message } );
-				result.setStatus( "ERRORE" );
-				event.setValue( "result", result );
-				return;
-			}
-		}
-	}
-	
 	function list( event, rc, prc ){
+		param rc.by = "";
+
+		var data   = [];
+		var params = super.paramsFromUrl();
+		var result = super.getResult();
+
+		var items = super.fire( "component.search", params );
+
+		for ( var item in items.getData() ) {
+			var row = convertComponent( item );
+			data.add( row );
+		}
+
+		result.setTotal( items.getTotal() );
+		result.setCount( items.getCount() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}	
+
+	function listByType( event, rc, prc ){
 		param rc.by = "";
 
 		var data   = [];
@@ -88,6 +41,78 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( data );
 
 		event.setValue( "result", result );
+	}	
+
+
+	function reassign( event, rc, prc ){
+		var result = super.getResult();
+		var args   = {};
+
+		args[ rc.category ]     = UCase( Trim( rc.oldParam ) );
+		args[ "paramCategory" ] = rc.category;
+		args[ "newParam" ]      = UCase( Trim( rc.newParam ) );
+		args[ "oldParam" ]      = UCase( Trim( rc.oldParam ) );
+
+		transaction {
+			try {
+				var rowsCount = super.fire( "component.massiveReassign", args );
+				var message   = "";
+				if ( rowsCount == 0 ) {
+					var message = "Non è stato modificato nessun componente.";
+				}
+				if ( rowsCount == 1 ) {
+					var message = "è stato modificato 1 componente.";
+				}
+				if ( rowsCount > 1 ) {
+					var message = "Sono stati modificati " & rowsCount & " componenti.";
+				}
+				result.setData( { "message" = message } );
+				event.setValue( "result", result );
+				return;
+			} catch ( any e ) {
+				transaction action="rollback";
+				var message       = "Errore nella riassegnazione massive dei componenti.";
+				result.setData( { "error" = message } );
+				result.setStatus( "ERRORE" );
+				event.setValue( "result", result );
+				return;
+			}
+		}
+	}
+
+	function massiveDelete( event, rc, prc ){
+		var result = super.getResult();
+		var args   = {};
+
+		args[ rc.category ]     = UCase( Trim( rc.oldParam ) );
+		args[ "paramCategory" ] = rc.category;
+		args[ "oldParam" ]      = UCase( Trim( rc.oldParam ) );
+
+		transaction {
+			try {
+				var rowsCount = super.fire( "component.massiveDelete", args );
+				var message   = "";
+				if ( rowsCount == 0 ) {
+					var message = "Non è stato cancellato nessun componente.";
+				}
+				if ( rowsCount == 1 ) {
+					var message = "è stato cancellato 1 componente.";
+				}
+				if ( rowsCount > 1 ) {
+					var message = "Sono stati cancellati " & rowsCount & " componenti.";
+				}
+				result.setData( { "message" = message } );
+				event.setValue( "result", result );
+				return;
+			} catch ( any e ) {
+				transaction action="rollback";
+				var message       = "Errore nella cancellazione massive dei componenti.";
+				result.setData( { "error" = message } );
+				result.setStatus( "ERRORE" );
+				event.setValue( "result", result );
+				return;
+			}
+		}
 	}
 
 	function save( event, rc, prc ){
@@ -188,18 +213,22 @@ component extends="com.apirone.core.controller.AbsController" {
 		for ( var oldItem in oldItems ) {
 			if ( !esistingRows.find( oldItem.getId() ) ) {
 				var beanParam = Duplicate( component );
-				
+
 				beanParam.setId( oldItem.getId() );
-				
+
 				super.fire( "component.deleteByParams", [ beanParam ] );
 
 				super.logEvent(
 					event   = "component.deleted",
 					message = "Component [#oldItem.getId()#] deleted by params",
-					payload = { "component" = beanParam.extractIds(), "from": rc.by }
+					payload = { "component" = beanParam.extractIds(), "from" = rc.by }
 				);
 
-				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# by: #rc.by#; beanParams: #SerializeJSON( beanParam.extractIds() )#");
+				cffile(
+					action = "APPEND",
+					file   = "#ExpandPath( "/debug.log" )#",
+					output = "#Now()# by: #rc.by#; beanParams: #SerializeJSON( beanParam.extractIds() )#"
+				);
 			}
 		}
 
@@ -219,23 +248,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		// TODO: move to DataMapper
 
 		var product = component.getRawProduct();
-		
-		/*
-		var headers = GetHTTPRequestData().headers;
-		if ( StructKeyExists( headers, "X-Forwarded-For" ) ) {
-			if ( headers[ "X-Forwarded-For" ] == "185.52.113.41" ) {
-				dump(component.toStruct());
-				dump(component.getId());
-				dump(product);
-				abort;
-			}
-		}
-		*/
 
 		var row = {
 			"id"       = component.getId(),
 			"typeId"   = component.getTypeId(),
+			"kindId"   = component.getKindId(),
 			"quantity" = component.getQuantity(),
+			"cost"     = {
+				amount = component.getCost().getAmount()
+			},
 			"override" = {
 				"id"       = component?.getOverride()?.getId(),
 				"deleted"  = component?.getOverride()?.getDeleted(),

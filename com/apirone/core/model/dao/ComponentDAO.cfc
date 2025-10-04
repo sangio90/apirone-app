@@ -67,6 +67,18 @@
 					AND TRIM(color_id) = <cfqueryparam value="#arguments.colorId#" cfsqltype="Varchar">
 				</cfif>
 
+				<cfif !IsNull( arguments.rawProductStr )>
+					AND TRIM(raw_product_id) = <cfqueryparam value="#arguments.rawProductId#" cfsqltype="Varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.variantStr )>
+					AND TRIM(variant_id) = <cfqueryparam value="#arguments.variantId#" cfsqltype="Varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.colorStr )>
+					AND TRIM(color_id) = <cfqueryparam value="#arguments.colorId#" cfsqltype="Varchar">
+				</cfif>
+
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
 
@@ -91,12 +103,6 @@
 				component_id = <cfqueryparam cfsqltype="Integer" value="#arguments.componentId#">
 		</cfquery>
 
-		<cffile
-			action="APPEND"
-			file  ="#ExpandPath( "/debug.log" )#"
-			output="#Now()# component delete: #getCompleteSQL( result )#"
-		>
-
 		<cfreturn true>
 	</cffunction>
 
@@ -118,12 +124,6 @@
 					</cfif>
 				</cfloop>
 		</cfquery>
-
-		<cffile
-			action="APPEND"
-			file  ="#ExpandPath( "/debug.log" )#"
-			output="#Now()# component deleteByParams: #getCompleteSQL( result )#"
-		>
 
 		<cfreturn true>
 	</cffunction>

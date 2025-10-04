@@ -221,21 +221,22 @@
 
 
 		/*
-			reassign components
-		*/
-		get( "/components/reassign" ).to( "ComponentController.list" ).end();
-		post( "/ajax/components/reassign" ).to( "ComponentAjaxController.reassign" ).end();
-		delete( "/ajax/components/delete" ).to( "ComponentAjaxController.massiveDelete" ).end();
-		/*
 			components
 		*/
+		post( "/ajax/components/reassign" ).to( "ComponentAjaxController.reassign" ).end();
+		delete( "/ajax/components/delete" ).to( "ComponentAjaxController.massiveDelete" ).end();
+		get( "/ajax/components/by-type" ).to( "ComponentAjaxController.listByType" ).end();
 		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
 		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end();
+		get( "/components/reassign" ).to( "ComponentController.reassign" ).end();
+		get( "/components" ).to( "ComponentController.list" ).end();
+
 
 		/*
 			files
 		*/
 		delete( "/ajax/files/:id" ).to( "FileAjaxController.delete" ).end();
+
 
 		/*
 			products

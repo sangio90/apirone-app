@@ -17,7 +17,7 @@
 
 							<div data-bind="visible: showSearchPanel">
 
-								<form data-bind="events: { submit: search }" id="component-list-search-form">
+								<form data-bind="events: { submit: search }" id="component-list-modal-search-form">
 
 									<div class="pb-2 d-flex align-items-center justify-content-start box-search-small">
 

@@ -1,15 +1,15 @@
-component extends="com.apirone.core.model.bean.Component" accessors="true"{
+component extends="com.apirone.core.model.bean.Component" accessors="true" {
 
-    property name="product" type="com.apirone.core.model.bean.Product";
-    
-    public ComponentProduct function init(){
+	property name="product" type="com.apirone.core.model.bean.Product";
 
-        return this;
-        
-    }
+	public ComponentProduct function init(){
+		super.init() // set cost
+		
+		return this;
+	}
 
 	public Struct function extractIds(){
-		return { "id": getId(), "productId": getProduct().getId() };
+		return { "id" = getId(), "productId" = getProduct().getId() };
 	}
 
 }

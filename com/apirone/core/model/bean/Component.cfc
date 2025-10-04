@@ -9,7 +9,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			"color",
 			"quantity",
 			"typeId",
-			"cost",
+			"cost"
 		],
 		profiles = {
 			list = {
@@ -24,7 +24,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 					"status",
 					"typeId",
 					"totalQuantity",
-					"cost"
+					"cost",
+					"kindId"
 				]
 			}
 		}
@@ -33,15 +34,20 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="rawProduct" type="com.apirone.core.model.bean.RawProduct"; // arriva da Verticale
 	property name="variant" type="com.apirone.core.model.bean.Variant"; // arriva da Verticale
 	property name="color" type="com.apirone.core.model.bean.Color"; // arriva da Verticale
-	
+	property name="cost" type="com.apirone.core.model.bean.Cost"; // arriva da Verticale
+
 	property name="quantity" type="Numeric";
-	property name="cost" type="Numeric"; //arriva da Verticale
 
 	property name="override" type="com.apirone.core.model.bean.ComponentOverride";
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="typeId" type="String" default="own"; // own or base
+	property name="kindId" type="String" default=""; // ** usare cum grano salis **
 
 	public Component function init(){
+		var cost = new com.apirone.core.model.bean.Cost();
+
+		setCost( cost );
+
 		return this;
 	}
 

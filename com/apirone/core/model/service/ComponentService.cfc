@@ -13,7 +13,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="Component.bean";
 
-	public com.apirone.core.model.bean.Component function get( required String componentId, verticale = true ){
+	public com.apirone.core.model.bean.Component function get( required String componentId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.componentId );
@@ -22,7 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return cache.data;
 		}
 
-		var bean = build( arguments.componentId, verticale );
+		var bean = build( arguments.componentId );
 		cm.put( getCacheScope(), arguments.componentId, bean );
 
 		return bean;
@@ -55,11 +55,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric attributeValueId,
 		Boolean includeBaseAttributeComponents = false hint="Only for product productItemId"
 	){
-		cffile(
-			action = "APPEND",
-			file   = "#ExpandPath( "/debug.log" )#",
-			output = "#Now()# search: start: #arguments.productItemId#"
-		);
 
 		if ( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
 			return searchByProductItemId( arguments.productItemId );
@@ -76,7 +71,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
-		result.setTotal( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 		return result;
 	}
 
@@ -305,21 +300,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	private com.apirone.core.model.bean.Component function build( required String componentId, verticale = true ){
+	private com.apirone.core.model.bean.Component function build( required String componentId ){
 		var record = getDao().read( arguments.componentId );
 
 		if ( record.recordCount ) {
 			// TODO: factory for all Component*
 			var bean = super.bean( "Component" );
+			var kindId = "CP";
 
 			if ( Len( record.product_item_id ) ) {
 				bean = super.bean( "ComponentProductItem" );
 				bean.setProductItem( getProductItemService().get( record.product_item_id ) );
+				kindId = "PI";
 			}
 
 			if ( Len( record.product_id ) ) {
 				bean = super.bean( "ComponentProduct" );
 				bean.setProduct( getProductService().get( record.product_id ) );
+				kindId = "PR";
 			}
 
 			if ( Len( record.line_id ) AND Len( record.model_id ) ) {
@@ -327,11 +325,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				bean.setLine( getLineService().get( record.line_id ) );
 				bean.setModel( getModelService().get( record.model_id ) );
+				kindId = "CB";
 			}
 
 			bean.setId( record.component_id );
+			bean.setKindId( kindId );
 
-			if ( verticale ) {
+			if ( request.loadFromVerticale == true ) {
 				bean.setRawProduct( getRawProductService().get( record.raw_product_id ) );
 
 				bean.setVariant( getVariantService().get( record.variant_id ) );
