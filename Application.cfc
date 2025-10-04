@@ -30,6 +30,8 @@ component extends="com.apirone.core.root.Application" {
 
 	public Boolean function onRequestStart( string targetPage ) {
 
+		request.loadFromVerticale = false;
+
 		SetLocale( "italian (italy)" );
 
 		request.isDev = super.isDev;
@@ -44,7 +46,7 @@ component extends="com.apirone.core.root.Application" {
 
 		if ( super.isDev() OR url.keyExists("reinit") ) {
 
-			super.clearContainer()
+			//super.clearContainer()
 
 			onApplicationStart();
 			application.counter++;
@@ -64,7 +66,6 @@ component extends="com.apirone.core.root.Application" {
 			
 		}
 
-		
 		application.cbBootstrap.onRequestStart( arguments.targetPage );
 
 		return true;
