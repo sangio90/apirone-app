@@ -73,11 +73,6 @@ component extends="com.apirone.core.controller.AbsController" {
             account.setLogin( rc.email ) //TODO: check email
             account.setPwd( rc.pwd );
 
-            /*
-            var id = accountSvc.create( account );
-            var accountNew = accountSvc.get( id );
-            */
-
             status.setId("ACT");
 
             company.setAccount( account );
