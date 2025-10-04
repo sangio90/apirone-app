@@ -1,11 +1,11 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="CostDAO";
-	property name="lookupService" inject="lookupService";
+	property name="lookupService" inject="LookupService";
 
-	property name="cacheScope" type="String" default="Price.bean";
+	property name="cacheScope" type="String" default="Cost.bean";
 
-	public com.apirone.core.model.bean.Price function get( required String priceId ){
+	public com.apirone.core.model.bean.Cost function get( required String priceId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.priceId );
@@ -13,6 +13,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( cache.status ) {
 			return cache.data;
 		}
+
+		var bean = build( arguments.priceId );
+		cm.put( getCacheScope(), arguments.priceId, bean );
+
+		return bean;
+	}
+
+	public com.apirone.core.model.bean.Cost function getByParams( 
+		required String rayProductId="", String required colorId="", String required variantId="" 
+	){
+		var cm = getCacheManager();
+
+		var q = getDao().read( argumentCollection = arguments )
+
+		dump(q);
+		abort;
 
 		var bean = build( arguments.priceId );
 		cm.put( getCacheScope(), arguments.priceId, bean );

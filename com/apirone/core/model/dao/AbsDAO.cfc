@@ -1,4 +1,5 @@
 <cfcomponent accessors="true">
+
 	<cffunction access="private" name="getLinesAsArray" returntype="Array">
 		<cfargument name="lines" required="true">
 
@@ -68,4 +69,13 @@
 
 		<cfreturn result>
 	</cffunction>
+
+	<cffunction access="private" name="getQueryLoader" returntype="Struct">
+
+		<cfset var loader = server["wirebox-apirone"].getInstance("QueryLoader")>
+
+		<cfreturn loader>
+
+	</cffunction>
+
 </cfcomponent>

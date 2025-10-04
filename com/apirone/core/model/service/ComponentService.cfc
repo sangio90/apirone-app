@@ -10,6 +10,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="lineService" inject="LineService";
 	property name="modelService" inject="ModelService";
+	property name="costService" inject="CostService";
 
 	property name="cacheScope" type="String" default="Component.bean";
 
@@ -331,9 +332,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.component_id );
 			bean.setKindId( kindId );
 
-			if ( request.loadFromVerticale == true ) {
+			if ( request.loadFromVerticale ) {
 				bean.setRawProduct( getRawProductService().get( record.raw_product_id ) );
-
 				bean.setVariant( getVariantService().get( record.variant_id ) );
 				bean.setColor( getColorService().get( record.color_id ) );
 			}
@@ -345,6 +345,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			// changes to Override are updated at runtime
 			bean.setOverride( super.bean( "ComponentOverride" ) );
+
+			// changes to Override are updated at runtime
+
+			var cost = getCostService().getByParams( 
+							rawProductId = bean.getRawProduct().getId(),
+							variantId    = bean.getVariant().getId(),
+							colorId      = bean.getColor().getId()
+						);
+
+
+
+			bean.setCost(  );
 
 			return bean;
 		}

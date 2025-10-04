@@ -1,13 +1,13 @@
-﻿<cfcomponent extends="com.opusplus.core.model.dao.AbsDAO" accessors="true">
+﻿<cfcomponent accessors="true">
     
-	<cfproperty name="CacheManager" inject="CacheManager">
+	<cfproperty name="CacheManager" type="com.apirone.core.util.CacheManager">
 
 	<cffunction name="getCosts" returntype="Query">
 		
 		<cfset var result = "">
 
 		<cfset var cm = getCacheManager()>
-	
+
 		<cfset var cache = cm.get( scope = "verticale.query", key = "costs"  )>
 
 		<cfif cache.status>
@@ -17,18 +17,15 @@
 		</cfif>
 
 		<cfquery name="local.q" datasource="verticale">
-			SELECT 
-				lisart + '*' AS lisart_, 
-				liscvr + '*' AS liscvr_, 
-				liscol + '*' AS liscol_, 
-				lispre + '*' AS lispre
+			SELECT *
 			FROM 
-				azapi_listin
-			ORDER BY 
-				lisart, liscvr, liscol
+				azapi_listin AS listin
+			ORDER BY 1
 		</cfquery>
 
-		<cfset cm.put( scope="cfquery.verticale",  key = "costs" , value = local.q )>
+		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# read azapi_listin">
+
+		<cfset cm.put( scope="verticale.query",  key = "costs" , value = local.q )>
 
 		<cfreturn  local.q>
 
