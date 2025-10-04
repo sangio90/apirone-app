@@ -346,17 +346,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// changes to Override are updated at runtime
 			bean.setOverride( super.bean( "ComponentOverride" ) );
 
-			// changes to Override are updated at runtime
-
 			var cost = getCostService().getByParams( 
 							rawProductId = bean.getRawProduct().getId(),
 							variantId    = bean.getVariant().getId(),
 							colorId      = bean.getColor().getId()
 						);
 
-
-
-			bean.setCost(  );
+			bean.setCost( cost );
 
 			return bean;
 		}

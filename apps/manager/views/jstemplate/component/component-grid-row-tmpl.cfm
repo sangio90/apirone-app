@@ -24,8 +24,9 @@
             <td>
                 <span data-bind="text: kindId"></span>
             </td>
-            <td>
+            <td class="text-end">
                 <span data-bind="text: cost.amount"></span>
+                <span>€</span>
             </td>
         </tr>
     </nmscript>

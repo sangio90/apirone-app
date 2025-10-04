@@ -10,7 +10,7 @@
 			FROM
 				#variables.companyId#_colori
 			WHERE
-				clcodice = <cfqueryparam cfsqltype="varchar" value="#arguments.colorId#">
+				TRIM( clcodice ) = <cfqueryparam cfsqltype="varchar" value="#arguments.colorId#">
 		</cfquery>
 
 		<cfreturn local.q>

@@ -255,7 +255,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			"kindId"   = component.getKindId(),
 			"quantity" = component.getQuantity(),
 			"cost"     = {
-				amount = component.getCost().getAmount()
+				"amount" = component.getCost().getAmount()
 			},
 			"override" = {
 				"id"       = component?.getOverride()?.getId(),

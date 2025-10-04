@@ -23,7 +23,7 @@
 			ORDER BY 1
 		</cfquery>
 
-		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# read azapi_listin">
+		<cffile action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# read 'azapi_listin' table from Verticale">
 
 		<cfset cm.put( scope="verticale.query",  key = "costs" , value = local.q )>
 

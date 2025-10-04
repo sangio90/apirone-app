@@ -1,10 +1,10 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="CostDAO";
-	property name="lookupService" inject="LookupService";
 
-	property name="cacheScope" type="String" default="Cost.bean";
-
+	/*
+		not used
+	*/
 	public com.apirone.core.model.bean.Cost function get( required String priceId ){
 		var cm = getCacheManager();
 
@@ -23,45 +23,46 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Cost function getByParams( 
 		required String rayProductId="", String required colorId="", String required variantId="" 
 	){
+		/*
+			TODO: performance note
+				We could cache the result with the key with the combination 
+				of product_id, color_id, variant_id. But the query is already in the cache.
+		*/
+
+		var q = "";
 		var cm = getCacheManager();
+		var bean = super.bean("Cost");
 
-		var q = getDao().read( argumentCollection = arguments )
+		q = getDao().read( argumentCollection = arguments );
 
-		dump(q);
-		abort;
+		if( q.recordcount ) {
+			getLogger().info( "CostService. Get cost for rawProductId: [#arguments.rawProductId#], variantId: [#arguments.variantId#], colorId: [#arguments.colorId#] found: #q.lispre#" )
+			return bean.setAmount( q.lispre );
+		}
 
-		var bean = build( arguments.priceId );
-		cm.put( getCacheScope(), arguments.priceId, bean );
+		q = getDao().read( rawproductId = arguments.rawProductId, variantId = arguments.variantId );
 
-		return bean;
+		if( q.recordcount ) {
+			getLogger().info( "CostService. Get cost for rawProductId: [#arguments.rawProductId#], variantId: [#arguments.variantId#] found: #q.lispre#" );
+			return bean.setAmount( q.lispre );
+		}
+
+		q = getDao().read( rawproductId = arguments.rawProductId, colorId = arguments.colorId );
+
+		if( q.recordcount ) {
+			getLogger().info( "CostService. Get cost for rawProductId: [#arguments.rawProductId#], colorId: [#arguments.colorId#] found: #q.lispre#" );
+			return bean.setAmount( q.lispre );
+		}
+
+		q = getDao().read( rawproductId = arguments.rawProductId);
+
+		if( q.recordcount ) {
+			getLogger().info( "CostService. Get cost for rawProductId: [#arguments.rawProductId#] found cost: #q.lispre#" );
+			return bean.setAmount( q.lispre );
+		}
+
+		getLogger().info( "CostService. Get cost for rawProductId: [#arguments.rawProductId#], variantId: [#arguments.variantId#], colorId: [#arguments.colorId#] NOT found. Return 0" );
+		return bean.setAmount( 0 );
 	}
-
-	public Array function list(){
-		arguments[ "limit" ] = -1;
-
-		return search( argumentCollection = arguments ).getData();
-	}
-
-	public com.apirone.core.model.bean.Result function search(
-		String productId,
-		Numeric productItemId,
-		String statusId
-	){
-		var rows   = [];
-		var result = super.getResult();
-
-		var records = getDao().find( argumentCollection = arguments );
-
-		records.each( function( record ){
-			rows.add( get( record.price_id, false ) );
-		} );
-
-		result.setData( rows );
-		result.setTotal( Val( records.total ) );
-		result.setCount( Val( records.recordcount ) );
-
-		return result;
-	}
-
 
 }

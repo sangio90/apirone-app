@@ -8,7 +8,7 @@
 
 		<cfset var thisQuery = super.getQueryLoader().getCosts()>
 
-		<cfquery name="local.q" dbtype="query">
+		<cfquery name="local.q" dbtype="query" datasource="verticale">
 			SELECT *
 			FROM 
 				thisQuery
@@ -17,11 +17,11 @@
 					AND lisart = <cfqueryparam cfsqltype="Varchar" value="#arguments.rawProductId#">
 				</cfif>
 				
-				<cfif !IsNUll( arguments.rawProductId )>
+				<cfif !IsNUll( arguments.variantId )>
 					AND liscvr = <cfqueryparam cfsqltype="Varchar" value="#arguments.variantId#">
 				</cfif>
 				
-				<cfif !IsNUll( arguments.rawProductId )>
+				<cfif !IsNUll( arguments.colorId )>
 					AND liscol = <cfqueryparam cfsqltype="Varchar" value="#arguments.colorId#">
 				</cfif>
 			ORDER BY 

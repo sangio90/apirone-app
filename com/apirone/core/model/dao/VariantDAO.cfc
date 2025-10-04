@@ -7,7 +7,7 @@
 			FROM
 				#super.sanitizeSQL( "#variables.companyId#_codvar" )#
 			WHERE
-				varcod = <cfqueryparam cfsqltype="varchar" value="#arguments.variantId#">
+				TRIM( varcod ) = <cfqueryparam cfsqltype="varchar" value="#arguments.variantId#">
 		</cfquery>
 
 		<cfreturn local.q>
