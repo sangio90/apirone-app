@@ -199,6 +199,12 @@
 				roles: "ADM"
 			},
 			{
+				href: "/manager/components",
+				icon: "fas fa-stream",
+				title: "Componenti",
+				roles: "ADM"
+			},
+			{
 				href: "/manager/components/reassign",
 				icon: "fas fa-stream",
 				title: "Gestione componenti",

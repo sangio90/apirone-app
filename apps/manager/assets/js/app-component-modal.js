@@ -1,21 +1,22 @@
-AP.component = AP.component || {};
+AP.namespace( "component" );
 
-AP.component.fields = {
-    rootList: $( "#component-list-modal" ),
-};
+Object.assign( AP.component.fields, {
+    modalRoot: $( "#component-list-modal" ),
+} );
+
 
 $( document ).ready( function(){
 
-    if ( AP.component.fields.rootList.length ) {
+    if ( AP.component.fields.modalRoot.length ) {
 
-        AP.component.list.init();
+        AP.component.modal.init();
 
     }
 
 } );
 
 
-AP.component.list = ( function() {
+AP.component.modal = ( function() {
 
     var pub = {};
     var fields = AP.component.fields;
@@ -71,7 +72,7 @@ AP.component.list = ( function() {
     var getCurrentConfig = function() {
 
         var current = viewModel.get( "currentItem" );
-        var baseUrl = "/manager/ajax/components";
+        var baseUrl = "/manager/ajax/components/by-type";
 
         var result = {
             modalTitle: "",
@@ -253,21 +254,6 @@ AP.component.list = ( function() {
 
                     alert( "Aggiunti " + data.length + " elementi dal clipboard" );
                 }
-                /*
-                    } else {
-                        // Se è un singolo oggetto, aggiungilo
-                        if ( data.typeId == "base" ) {
-                            data.override.id = ""; // Resetta l'ID solo per typeId "base"
-                        }
-                        dataSource.add( data );
-                        alert( "Aggiunto 1 elemento dal clipboard" );
-                    }
-                    */
-
-                // } catch ( error ) {
-                // console.error( "Il testo nel clipboard non è un JSON valido:", error );
-                // alert( "Il contenuto del clipboard non è in formato JSON valido" );
-                // }
             }
 
             function fallbackPaste() {
@@ -466,7 +452,7 @@ AP.component.list = ( function() {
 
         search: function( event ) {
 
-            var thisForm = $( "#component-list-search-form" );
+            var thisForm = $( "#component-list-modal-search-form" );
             var status = thisForm.find( ".status" );
 
             var requestStart = function() {
@@ -658,7 +644,7 @@ AP.component.list = ( function() {
 
     pub.init = function() {
 
-        kendo.bind( fields.rootList, viewModel );
+        kendo.bind( fields.modalRoot, viewModel );
 
     };
 
