@@ -31,6 +31,12 @@ if ( localStorage.getItem( "sidebar-left-collapsed" ) == "true" ) {
 
 }
 
+var setSidebarHeight = function() {
+    // set the sidebar height
+    var nano = $( "#sidebar-left .nano" );
+    nano.height( $( window ).height() );
+};
+
 function highlightTabWithError( fieldName ) {
 
     console.log( "fieldName", fieldName );
@@ -178,9 +184,10 @@ $( document ).ready( function() {
         return this.optional( element ) || value != $( param ).val();
     }, "This two elements are the same, please change it." );
 
-    // set the sidebar height
-    var nano = $( "#sidebar-left .nano" );
-    nano.height( $( window ).height() );
+    setSidebarHeight();
 
 } );
 
+window.addEventListener( "resize", function( event ){
+    setSidebarHeight();
+} );
