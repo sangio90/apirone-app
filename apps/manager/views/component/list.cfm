@@ -62,11 +62,11 @@
                             #grid( 
                                 id="component-grid",
                                 columns="[
-                                    { 'field':'id', 'title':'ID', width: '80px' },
+                                    { 'field':'id', 'title':'ID', width: '70px' },
                                     { 'field':'rawProduct.name', 'title':'Articolo'},
                                     { 'field':'variant.name', 'title':'Variante'},
                                     { 'field':'color.name', 'title':'Colore'},
-                                    { 'field':'color.name', 'title':'Tipo', width: '35px'},
+                                    { 'field':'color.name', 'title':'Tipo', width: '45px'},
                                     { 'field':'cost.amount', 'title':'Costo', width: '75px'},
                                 ]",
                                 rowTemplate="component/component-grid-row-tmpl"

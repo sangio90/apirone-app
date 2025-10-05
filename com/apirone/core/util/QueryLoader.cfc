@@ -16,8 +16,13 @@
 
 		</cfif>
 
+		<!---
+			TODO: add "codice listino"?
+				whats the field?
+		---->
+
 		<cfquery name="local.q" datasource="verticale">
-			SELECT *
+			SELECT lisart, liscvr, liscol, lispre
 			FROM 
 				azapi_listin AS listin
 			ORDER BY 1

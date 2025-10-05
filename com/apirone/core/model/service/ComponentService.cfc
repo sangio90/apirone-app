@@ -330,6 +330,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			bean.setId( record.component_id );
+
+			//TODO: move to bean
 			bean.setKindId( kindId );
 
 			if ( request.loadFromVerticale ) {
