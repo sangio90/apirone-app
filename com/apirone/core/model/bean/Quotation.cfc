@@ -20,12 +20,14 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="quotationDate" type="Date";
 	property name="notes" type="String";
 	property name="validityDate" type="Date";
-	property name="opportunityName" type="String";
-	property name="leadName" type="String";
 	property name="active" type="Numeric";
 	property name="pricelist" type="com.apirone.core.model.bean.Pricelist";
 	property name="customer" type="com.apirone.core.model.bean.Customer";
 	property name="customerId" type="String";
+	property name="opportunity" type="com.apirone.core.model.bean.Opportunity";
+	property name="opportunityId" type="String";
+	property name="lead" type="com.apirone.core.model.bean.Lead";
+	property name="leadId" type="String";
 	property name="paymentMethod" type="com.apirone.core.model.bean.PaymentMethod";
 	property name="customPaymentMethod" type="String";
 	property name="currency" type="com.apirone.core.model.bean.Currency";

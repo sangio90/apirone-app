@@ -335,6 +335,8 @@
 		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();
 		get( "/ajax/quotations/models/:lineId" ).to( "QuotationAjaxController.listModels" ).end();
 		get( "/ajax/quotations/crmcustomers" ).to( "QuotationAjaxController.crmCustomers" ).end();
+		get( "/ajax/quotations/crmopportunities" ).to( "QuotationAjaxController.crmOpportunities" ).end();
+		get( "/ajax/quotations/crmleads" ).to( "QuotationAjaxController.crmLeads" ).end();
 		get( "/ajax/quotations/finishes/:categoryId/:lineId" ).to( "QuotationAjaxController.listFinishes" ).end();
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();

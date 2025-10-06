@@ -27,4 +27,25 @@
 		return customer;
 	}
 
+	public com.apirone.core.model.bean.Opportunity function mapOpportunity( required struct data ){
+		var opportunity = new com.apirone.core.model.bean.Opportunity();
+		var accountCustom = data.custom;
+		opportunity.setId( data.id );
+		opportunity.setName( data.name ?: "" );
+		opportunity.setDescription( data.description ?: "" );
+
+		return opportunity;
+	}
+
+	public com.apirone.core.model.bean.Lead function mapLead( required struct data ){
+		var lead = new com.apirone.core.model.bean.Lead();
+		var accountCustom = data.custom;
+		lead.setId( data.id );
+		lead.setFirstName( data.first_name ?: "" );
+		lead.setLastName( data.last_name ?: "" );
+		lead.setDescription( data.description ?: "" );
+
+		return lead;
+	}
+
 }

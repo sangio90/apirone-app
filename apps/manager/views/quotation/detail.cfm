@@ -42,7 +42,7 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Nome </label>
+                                            <label class="control-label text-sm-end">Cliente </label>
                                             <input type="text" name="customer" class="form-control" id="customer"
                                                 data-bind="source: crmCustomers, value: detailForm.data.customer"
                                                 data-role="autocomplete"
@@ -105,12 +105,26 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-5">
-                                            <label class="control-label text-sm-end">Nome opportunità </label>
-                                            <input type="text" data-bind="value: detailForm.data.opportunityName" class="form-control">
+                                            <label class="control-label text-sm-end">Opportunità </label>
+                                            <input type="text" name="opportunity" class="form-control" id="opportunity"
+                                                data-bind="source: crmOpportunities, value: detailForm.data.opportunity"
+                                                data-role="autocomplete"
+                                                data-text-field="name"
+                                                data-value-primitive="false"
+                                                data-minlength="4"
+                                                data-filter="contains"
+                                            >
                                         </div>
                                         <div class="col-sm-5">
-                                            <label class="control-label text-sm-end">Nome lead </label>
-                                            <input type="text" data-bind="value: detailForm.data.leadName" class="form-control">
+                                            <label class="control-label text-sm-end">Lead </label>
+                                            <input type="text" name="lead" class="form-control" id="lead"
+                                                data-bind="source: crmLeads, value: detailForm.data.lead"
+                                                data-role="autocomplete"
+                                                data-text-field="fullName"
+                                                data-value-primitive="false"
+                                                data-minlength="4"
+                                                data-filter="contains"
+                                            >
                                         </div>
                                         <div class="col-sm-2 pt-4">
                                            <button class="btn btn-primary changeTab" id="products">Prodotti &raquo;</button>
