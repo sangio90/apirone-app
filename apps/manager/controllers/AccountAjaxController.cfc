@@ -62,6 +62,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			roles.add( role );
 		}
 
+
 		account.setRoles( roles );
 
 		if ( !len( json.id ) ) {

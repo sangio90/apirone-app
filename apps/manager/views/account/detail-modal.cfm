@@ -14,10 +14,14 @@
 
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item active">
-                            <a data-bind="click:showDetail" class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="##tab1" role="tab" aria-controls="tab1" aria-selected="true">Generale</a>
+                            <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="##tab1" role="tab" aria-controls="tab1" aria-selected="true"
+                                data-bind="click:showDetail"
+                            >Generale</a>
                         </li>
-                        <li class="nav-item">
-                            <a data-bind="click:showPassword" class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="##tab2" role="tab" aria-controls="tab2" aria-selected="true">Cambia password</a>
+                        <li class="nav-item" data-bind="visible:isTabPasswordVisible">
+                            <a class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="##tab2" role="tab" aria-controls="tab2" aria-selected="true"
+                                data-bind="click:showPassword"
+                            >Cambia password</a>
                         </li>
                     </ul>
 
@@ -111,7 +115,9 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label class="col-form-label">Conferma password</label>
-                                            <input class="form-control" name="pwd2" type="password" required>
+                                            <input class="form-control" name="pwd2" type="password" required
+                                                data-bind="value: detailForm.data.pwd"
+                                            >
                                         </div>
                                     </div>
                                 </div>

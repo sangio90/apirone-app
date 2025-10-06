@@ -56,6 +56,10 @@ AP.account.detail = ( function() {
 
         },
 
+        isTabPasswordVisible: function() {
+            return viewModel.get( "detailForm.data.id" ).length > 0;
+        },
+
         togglePassword: function() {
 
             var thisForm = fields.passwordForm;
