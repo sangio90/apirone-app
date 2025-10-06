@@ -400,6 +400,27 @@ AP.product.items = ( function() {
             NM.util.openModal( $( "#product-images-list-modal" ) );
         },
 
+        editPrices: function( event ) {
+
+            console.log( "editPrices", event );
+
+            var onSave = function() {
+                viewModel.items.read();
+            };
+
+            var item = {
+                type: "productItem",
+                id: event.data.id,
+                attribute: event.data.attribute,
+                attributeValue: event.data.attributeValue
+            };
+
+            console.log( "editPrices", item );
+
+            AP.price.modal.open( item, onSave );
+
+        },
+
         changeUri: function( event ) {
 
             var thisButton = $( event.currentTarget );

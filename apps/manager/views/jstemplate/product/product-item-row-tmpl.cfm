@@ -16,7 +16,10 @@
             ##if (status.id == 'ACT') {## 
 
                 <td>
-                    <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl">
+                    <div  style="display: flex; align-items: center; justify-content: flex-end;" data-bind="events: { click: editPrices }">
+                        <div data-bind="source: prices" data-template="price-row-tmpl" class="flex: 1">
+                        </div>
+                        <div style="width: 30px; flex-shrink: 0;">#iconButton(icon="euro-sign")#</div>
                     </div>
                 </td>
                 <td class="text-center">

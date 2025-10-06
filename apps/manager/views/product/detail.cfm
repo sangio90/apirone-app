@@ -227,5 +227,6 @@
     #view("attribute/detail-modal")#
     #view("component/list-modal")#
     #view("file/list-modal")#
+    #view("price/list-modal")#
 
 </cfoutput>

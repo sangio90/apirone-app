@@ -27,11 +27,9 @@
 		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
 		get( "/prices" ).to( "PriceController.manage" ).end();
 
-		get( "/ajax/:by-regex:(products)/:id/prices" ).to( "PriceAjaxController.list" ).end();
-		post( "/ajax/:by-regex:(products)/:id/prices" ).to( "PriceAjaxController.save" ).end();
+		get( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.list" ).end();
+		post( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.save" ).end();
 		
-
-
 
 		/*
 			catalog bundle
@@ -236,17 +234,21 @@
 			files
 		*/
 		delete( "/ajax/files/:id" ).to( "FileAjaxController.delete" ).end();
+		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.list" ).end();
+		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.upload" ).end();
+
+
+		/*
+			products items
+		*/
+		get( "/ajax/product-items" ).to( "ProductItemController.list" ).end();
 
 
 		/*
 			products
 		*/
-		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.list" ).end();
-		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.upload" ).end();
-
 		get( "/ajax/products/get-id-and-file-by-params" ).to( "ProductAjaxController.getIdAndFileByParams" ).end();
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
-		get( "/ajax/product-items" ).to( "ProductAjaxController.productItems" ).end();
 		get( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();
 		delete( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.deleteCombinations" ).end();
 		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();

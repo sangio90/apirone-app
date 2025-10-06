@@ -441,10 +441,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		var items = super.fire( "ProductItem.getFlatTree", params );
 
 		for ( var item in items ) {
-			var row = super.getMementify().convert( item, "tree" );
-
+			var row = super.getMementify().convert( item, "tree" ); //TODO: use "treelight" instead?
+			
 			row[ "spaces" ] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
-
+			
 			data.add( row );
 		}
 
@@ -455,13 +455,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		return result;
 	}
 
+	// TODO: move to productItemsAjaxController
 	public function productItems( event, rc, prc ) {
 		var result = super.getResult();
 		var productId = rc.productId;
-		var originId = StructKeyExists(rc, 'originId') ? rc.originId : null;
+		var originId = StructKeyExists(rc, "originId") ? rc.originId : null;
 		var mm = super.getMementify();
-		var productItems = super.fire( 'ProductItem.list', { productId: productId, originId: originId } );
-		var productItems = ( mm.convertList( productItems, 'treelight' ) );
+		var productItems = super.fire( "ProductItem.list", { productId: productId, originId: originId } );
+		var productItems = ( mm.convertList( productItems, "treelight" ) );
 
 		result.setCount( Len(productItems) );
 		result.setData( productItems );

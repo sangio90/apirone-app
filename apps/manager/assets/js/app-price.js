@@ -36,7 +36,7 @@ AP.price.modal = ( function() {
             case "productItem": // productItem
 
                 result.modalTitle = "Prezzi per l'attributo: " + current.attribute.name + " / " + current.attributeValue.rawValue.name;
-                result.readUrl = baseUrl + "/product-items/" + current.item.id + "/prices";
+                result.readUrl = baseUrl + "/product-items/" + current.id + "/prices";
                 result.modifyUrl = result.readUrl;
 
                 break;

@@ -1,20 +1,29 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
+
 		var params = {}
-
-		if ( rc.by == "products" ) {
-			params[ "productId" ] = rc.id;
-		}
-
 		var data   = [];
 		var result = super.getResult();
 		var mm     = super.getMementify();
 
-		var allTypes = super.fire( "priceType.list", { entityId = "PRODUCT" } );
+		var entity;
+
+		if ( rc.by == "products" ) {
+			params[ "productId" ] = rc.id;
+			entity = "PRODUCT";
+
+		}
+
+		if ( rc.by == "product-items" ) {
+			params[ "productItemId" ] = rc.id;
+			entity = "PRODUCT_ITEM";
+		}
+
+
+		var allTypes = super.fire( "priceType.list", { entityId = entity } );
 
 		var rows = super.fire( "price.list", { argumentCollection = params } );
-
 
 		// INFO: ensure all types are present
 		// 		even those with no price assigned yet
@@ -59,6 +68,23 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var messageId = "prices.updated";
 
+		var key = "";
+		var value = "";
+
+		if( rc.by == "products" ) {
+			key = "product.id";
+			value = json.item.id;
+		}
+
+		if( rc.by == "product-items" ) {
+			key = "productItem.id";
+			value = json.item.id;
+		}
+
+		if( key == "" ) {
+			throw( type="apirone.error.component.InvalidEntityType", message="You must specify the entity for which the price is saved." );
+		}
+
 		for ( var item in json.prices ) {
 			var price  = super.bean( "Price" );
 			var method = super.bean( "PriceMethod" );
@@ -67,7 +93,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			price.setId( item?.id );
 			price.setAmount( item.amount );
 			price.setMethod( method.setId( item.method.id ) );
-			price.setEntity( entity.setKey( "product.id" ).setValue( json.item.id ) );
+			price.setEntity( entity.setKey( key ).setValue( value ) );
 
 			if ( Len( item?.id ) ) {
 				super.fire( "price.update", [ price ] );
@@ -75,7 +101,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				var type = super.bean( "PriceType" );
 
 				price.setType( type.setId( item.type.id ) );
-
 
 				super.fire( "price.create", [ price ] );
 			}

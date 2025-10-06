@@ -64,10 +64,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = memy.convertList( super.fire( "status.list", [ "attribute" ] ) );
+		prc.page[ "methods" ] = memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
 
 		prc.jsScripts.add( "app-file" );
+		prc.jsScripts.add( "app-price" );
 		prc.jsScripts.add( "app-component-modal" );
 		prc.jsScripts.add( "app-attribute-detail" );
 		prc.jsScripts.add( "app-product-items" );

@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="attributeService" inject="AttributeService";
 	property name="attributeValueService" inject="AttributeValueService";
 	property name="componentService" inject="ComponentService";
+	property name="priceService" inject="PriceService";
 
 	property name="cacheScope" default="ProductItem.bean";
 
@@ -213,6 +214,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return result;
+	}
+
+	public Void function removeCache( required Numeric productItemId ){
+
+		super.getCacheManager().remove( getCacheScope(), arguments.productItemId );
+
 	}
 
 

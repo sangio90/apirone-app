@@ -111,6 +111,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var id = getDao().insert( arguments.price );
 
 		getProductService().removeCache( arguments.price.getEntity().getValue() );
+		getProductItemService().removeCache( arguments.price.getEntity().getValue() );
 
 		return id;
 	}
@@ -123,7 +124,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		getDao().update( arguments.price );
 
 		super.getCacheManager().remove( getCacheScope(), price.getId() );
+
 		getProductService().removeCache( arguments.price.getEntity().getValue() );
+		getProductItemService().removeCache( arguments.price.getEntity().getValue() );
 
 
 		return arguments.price.getId();
