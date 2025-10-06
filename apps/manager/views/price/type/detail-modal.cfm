@@ -80,7 +80,6 @@
 
                         <div class="mb-3 row" data-bind="visible: detailForm.isEdit">
                             <div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
-                                ID: <span data-bind="text: detailForm.data.id"></span><br>
                                 Creato: <span data-bind="text: detailForm.data.createdAt"></span>
                             </div>
                         </div>
