@@ -44,7 +44,7 @@
                                         <div class="col-sm-3">
                                             <label class="control-label text-sm-end">Nome </label>
                                             <input type="text" name="customer" class="form-control" id="customer"
-                                                data-bind="source: crmCustomers, value: detailForm.data.customer, events: { select: onSelect }"
+                                                data-bind="source: crmCustomers, value: detailForm.data.customer"
                                                 data-role="autocomplete"
                                                 data-text-field="name"
                                                 data-value-primitive="false"

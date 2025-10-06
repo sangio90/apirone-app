@@ -15,13 +15,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="PricelistService" inject="PricelistService";
 	property name="PaymentMethodService" inject="PaymentMethodService";
 	property name="CurrencyService" inject="CurrencyService";
+	property name="CustomerService" inject="CustomerService";
 	property name="cacheScope" type="String" default="Quotation.bean";
 
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.quotationId );
-
 		if ( cache.status ) {
 			return cache.data;
 		}
@@ -204,6 +204,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCustomPaymentMethod( record.custom_payment_method );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setLang( getLangService().get( record.lang_id ) );
+			bean.setCustomer( getCustomerService().get( record.customer_id ) );
 
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );

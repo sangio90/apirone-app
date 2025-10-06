@@ -124,6 +124,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				quotation.setActive( true );
 				var statusId = json.status.id != '' ? json.status.id : 'NEW';
 				quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
+				quotation.setCustomerId( json.customer.id );
 				// quotation.setCustomPaymentMethod( json.custom_payment_method );
 				// quotation.setPricelist( type.setId( json.pricelist.id ) );
 				// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
@@ -146,6 +147,7 @@ component extends="com.apirone.core.controller.AbsController" {
 						super.fire( "quotation.update", [ quotation ] )
 						messageId = "quotation.updated";
 					} else {
+						quotation.setStatus( bean.getStatus() );
 						messageId = "quotation.updated";
 						thisId    = super.fire( "quotation.update", [ quotation ] )
 					}

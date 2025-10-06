@@ -131,7 +131,8 @@
 				lead_name,
 				active,
 				status_id,
-				lang_id
+				lang_id,
+				customer_id
 				<cfif true == false>
 					,pricelist_id,
 					payment_method_id,
@@ -153,7 +154,8 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLeadName()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getActive()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLang().getId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLang().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerId()#">::uuid
 				<cfif true == false>
 					,<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPricelist().getId()#">::uuid,
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPaymentMethod().getId()#">::uuid,
@@ -232,6 +234,13 @@
 				lang_id = 
 					<cfif !isNull(arguments.quotation.getLang())>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getLang().getId()#">
+					<cfelse> 
+						NULL 
+					</cfif>
+				,
+				customer_id = 
+					<cfif !isNull(arguments.quotation.getCustomerId())>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerId()#">::uuid
 					<cfelse> 
 						NULL 
 					</cfif>

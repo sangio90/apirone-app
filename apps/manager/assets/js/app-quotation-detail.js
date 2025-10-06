@@ -102,7 +102,6 @@ AP.quotationDetail.detail = ( function() {
         filteredShipmentStates: new kendo.data.DataSource(),
         zones: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
-        onSelect: function (event) { debugger },
         crmCustomers: new kendo.data.DataSource({
             serverFiltering: true,
             transport: {
