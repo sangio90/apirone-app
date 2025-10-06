@@ -106,8 +106,9 @@
 
 			bean.setName( record.price_type );
 			bean.setCreatedAt( record.created_at );
+			bean.setMethods( record.methods );
 			
-			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setStatus( super.getMethodsBeanByIds( record.methods )  );
 
 			return bean;
 		}

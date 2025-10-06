@@ -16,11 +16,18 @@
 			dashboard
 		*/
 		get( "/dashboard" ).to( "MainController.dashboard" ).end();
-		//get( "/manager/selects" ).to( "MainController.selects" ).end();
 		get( "/plate/designer" ).to( "PlateController.designer" ).end();
 		get( "/plate/map" ).to( "PlateController.map" ).end();
 
 		
+		/*
+			prices types
+		*/
+		post( "/ajax/prices/types" ).to( "PriceTypeController.save" ).end();
+		delete( "/ajax/prices/types" ).to( "PriceTypeAjaxController.delete" ).end();
+		get( "/ajax/prices/types" ).to( "PriceTypeAjaxController.list" ).end();
+		get( "/prices/types" ).to( "PriceTypeController.list" ).end();
+
 		/*
 			prices
 		*/
@@ -224,8 +231,9 @@
 		post( "/ajax/components/reassign" ).to( "ComponentAjaxController.reassign" ).end();
 		delete( "/ajax/components/delete" ).to( "ComponentAjaxController.massiveDelete" ).end();
 		get( "/ajax/components/by-type" ).to( "ComponentAjaxController.listByType" ).end();
+		post( "/ajax/components/by-type" ).to( "ComponentAjaxController.save" ).end();
 		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
-		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end();
+		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end(); //TODO: to remove
 		get( "/components/reassign" ).to( "ComponentController.reassign" ).end();
 		get( "/components" ).to( "ComponentController.list" ).end();
 

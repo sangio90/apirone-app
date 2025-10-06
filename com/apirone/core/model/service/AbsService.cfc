@@ -113,6 +113,24 @@ component output="false" accessors="true" {
 		return result.len() ? result : NullValue();
 	}
 
+	private Array function getMethodsBeanByIds( required String methods ){
+
+		var result     = [];
+		var categories = DeserializeJSON( arguments.methods );
+
+		if ( !IsNull( methods ) AND Len( methods ) ) {
+			for ( var thisMethod in methods ) {
+				var bean = this.service( "PriceMethod" ).get( thisMethod );
+
+				if ( !IsNull( bean ) ) {
+					result.add( bean );
+				}
+			}
+		}
+
+		return result.len() ? result : NullValue();
+	}
+
 	private Array function getEntitiesBeanByIds( required String entities ){
 		// [2,3,4,5]
 

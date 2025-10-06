@@ -252,6 +252,47 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productId );
 
 		if ( record.recordCount ) {
+			var bean = super.bean( "Product" );
+
+			bean.setId( record.product_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
+
+			/*
+				complex (plates)
+			*/
+			bean.setModel( !IsNull( record.model_id ) ? getModelService().get( record.model_id ) : NullValue() );
+			bean.setLine( !IsNull( record.line_id ) ? getLineService().get( record.line_id ) : NullValue() );
+			bean.setFinish(
+				!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()
+			);
+			bean.setStatus( getStatusService().get( record.status_id ) );
+
+
+			/*
+				base (fruit)
+			*/
+			bean.setCode( record.code );
+			bean.setPositionCount( record.position_count );
+
+			var lines = super.getLinesBeanByIds( record.lines );
+			bean.setLines( lines );
+
+			bean.setTexts( getTextService().list( productId = record.product_id ) );
+
+			bean.setPrices( getPriceService().list( productId = record.product_id ) );
+
+			return bean;
+		}
+
+		return NullValue();
+	}	
+
+	/*
+	private com.apirone.core.model.bean.Product function build( required String productId ){
+		var record = getDao().read( arguments.productId );
+
+		if ( record.recordCount ) {
 			if ( IsNull( record.catalog_bundle_id ) ) {
 				var bean = super.bean( "ProductBase" );
 				bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
@@ -261,6 +302,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setLines( lines );
 			} else {
 				var bean = super.bean( "ProductComplex" );
+
+				ben.setModel( getModelService().get( record.model_id ) );
+				ben.setModel( getFinishService().get( record.finish_i ) );
+
 				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
 				bean.setFinish(
 					!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()
@@ -279,5 +324,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return NullValue();
 	}
+	*/
 
 }

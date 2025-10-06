@@ -35,7 +35,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments ).getData();
 	}
 
-
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		String categoryId,
@@ -160,12 +159,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 		}
-
-		/*
-		dump( categoryId )
-		dump( toLineId )
-		abort;
-		*/
 
 		productService.deleteAllByParams( lineId = toLineId, categoryId = categoryId );
 

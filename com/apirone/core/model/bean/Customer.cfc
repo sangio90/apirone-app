@@ -36,4 +36,5 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	public Customer function init(){
 		return this;
 	}
+
 }

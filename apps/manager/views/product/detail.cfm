@@ -204,7 +204,6 @@
                                         rowTemplate = "product/product-item-row-tmpl"
                                     )#
 
-
                                 </form>
 
                             </div>

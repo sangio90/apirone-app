@@ -193,6 +193,12 @@
 		roles: "ADM",
 		items: [
 			{
+				href: "/manager/prices/types",
+				icon: "fas fa-dollar-sign",
+				title: "Tipo prezzi",
+				roles: "ADM"
+			},
+			{
 				href: "/manager/prices/manage",
 				icon: "fas fa-dollar-sign",
 				title: "Gestione prezzi",
