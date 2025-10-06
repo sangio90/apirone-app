@@ -28,7 +28,7 @@ AP.attribute.detail = ( function() {
 
     var fields = AP.fields.attribute.detail;
 
-    var componentApp = AP.component.list;
+    var componentApp = AP.component.modal;
     var fileApp = AP.file.modal;
 
     var defaults = {

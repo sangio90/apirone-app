@@ -20,7 +20,7 @@ AP.product.items = ( function() {
 
     var fields = AP.product.fields;
     var fileApp = AP.file.modal;
-    var componentApp = AP.component.list;
+    var componentApp = AP.component.modal;
     var attributeApp = AP.attribute.detail;
 
     var dataSources = {

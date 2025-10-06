@@ -110,8 +110,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = getDao().insert( arguments.price );
 
-		getProductService().removeCache( arguments.price.getEntity().getValue() );
-		getProductItemService().removeCache( arguments.price.getEntity().getValue() );
+		removeEntityCache( price.getEntity() );
 
 		return id;
 	}
@@ -125,9 +124,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		super.getCacheManager().remove( getCacheScope(), price.getId() );
 
-		getProductService().removeCache( arguments.price.getEntity().getValue() );
-		getProductItemService().removeCache( arguments.price.getEntity().getValue() );
-
+		removeEntityCache( price.getEntity() );
 
 		return arguments.price.getId();
 	}
@@ -249,6 +246,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
     	private method
 	*/
+
+	private Struct function removeEntityCache( required com.apirone.core.model.bean.Entity entity ){
+
+		var result = {};
+
+		if( entity.getKey() == "product.id" ) {
+			getProductService().removeCache( entity.getValue() );
+			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# price: delete cache for #entity.getKey()#: #entity.getValue()#");
+			result = { key = "product.id", value = entity.getValue() }
+		}
+
+		if( entity.getKey() == "productItem.id" ) {
+			getProductItemService().removeCache( entity.getValue() );
+			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# price: delete cache for #entity.getKey()#: #entity.getValue()#");
+			result = { key = "productItem.id", value = entity.getValue() }
+		}
+
+		return result;
+
+	}
 
 	private com.apirone.core.model.bean.Price function build( required String priceId ){
 		var record = getDao().read( arguments.priceId );
