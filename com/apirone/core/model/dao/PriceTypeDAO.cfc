@@ -3,7 +3,7 @@
 		<cfargument name="priceTypeId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT entities::varchar, methods::varchar, *
 			FROM price_types
 			WHERE price_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.priceTypeId#">
 		</cfquery>

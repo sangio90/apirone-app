@@ -91,10 +91,11 @@
                             #grid( 
                                 id="price-type-grid",
                                 columns="[
-                                    { 'field':'shortId', 'title':'ID', width: '120px' },
+                                    { 'field':'shortId', 'title':'ID', width: '180px' },
                                     { 'field':'name', 'title':'Nome'},
                                     { 'field':'methods', 'title':'Metodi'},
-                                    { 'field':'entities', 'title':'Usa per'},
+                                    { 'field':'entities', 'title':'Usa in'},
+                                    { 'field':'', '':'', width: '50px' },
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

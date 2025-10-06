@@ -116,11 +116,11 @@ component output="false" accessors="true" {
 	private Array function getMethodsBeanByIds( required String methods ){
 
 		var result     = [];
-		var categories = DeserializeJSON( arguments.methods );
+		var methods = DeserializeJSON( arguments.methods );
 
 		if ( !IsNull( methods ) AND Len( methods ) ) {
 			for ( var thisMethod in methods ) {
-				var bean = this.service( "PriceMethod" ).get( thisMethod );
+				var bean = this.service( "lookup" ).get( "PriceMethod", thisMethod );
 
 				if ( !IsNull( bean ) ) {
 					result.add( bean );
@@ -132,7 +132,6 @@ component output="false" accessors="true" {
 	}
 
 	private Array function getEntitiesBeanByIds( required String entities ){
-		// [2,3,4,5]
 
 		var result   = [];
 		var entities = DeserializeJSON( arguments.entities );
