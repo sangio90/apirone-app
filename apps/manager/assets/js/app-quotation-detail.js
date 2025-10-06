@@ -475,7 +475,6 @@ AP.quotationDetail.detail = ( function() {
             $( "#nav-products-tab" ).removeAttr( "hidden" );
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
         }
-        debugger
     };
 
     return pub;
