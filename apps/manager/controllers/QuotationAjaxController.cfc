@@ -124,7 +124,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				quotation.setActive( true );
 				var statusId = json.status.id != '' ? json.status.id : 'NEW';
 				quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
-				quotation.setCustomerId( json.customer.id );
+				quotation.setCustomerId( !isNull(json.customer) ? json.customer.id : null );
 				// quotation.setCustomPaymentMethod( json.custom_payment_method );
 				// quotation.setPricelist( type.setId( json.pricelist.id ) );
 				// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
