@@ -356,6 +356,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setChildren( [] );
 
+			bean.setPrices( getPriceService().list( productItemId = record.product_item_id ) );
+
 			return bean;
 		}
 

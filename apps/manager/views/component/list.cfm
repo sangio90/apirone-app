@@ -6,9 +6,6 @@
             <div class="col-8">
                 #pageTitle()#
             </div>
-            <div class="col-4 text-end">
-                #addButton( bind="click:new", size="sm" )#
-            </div>
         </div>
 
         <div class="row">

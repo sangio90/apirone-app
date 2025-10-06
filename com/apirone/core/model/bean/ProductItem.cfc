@@ -56,11 +56,21 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="children" type="com.apirone.core.model.bean.ProductItem[]";
 
 	property name="componentCount" type="Numeric" default=0;
+	
+	property name="prices" type="com.apirone.core.model.bean.Price[]" default=[];
 
 	public ProductItem function init(){
 		setChildren( [] );
 
 		return this;
+	}
+
+	public Struct function getPrice( required String typeId ){
+		for ( var price in getPrices() ) {
+			if ( price.getType().getId() EQ typeId ) {
+				return price;
+			}
+		}
 	}
 
 }

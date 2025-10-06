@@ -15,6 +15,10 @@
             <!--- attivo --->
             ##if (status.id == 'ACT') {## 
 
+                <td>
+                    <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl">
+                    </div>
+                </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList" data-type="productItem">
                         <i class="fas fa-image"></i> 
@@ -51,4 +55,7 @@
             ##}##
         </tr>
     </nmscript>
+    
+    #template( view="jstemplate/price/price-row-tmpl" )#
+
 </cfoutput>

@@ -91,7 +91,7 @@
 	color: #000000;
 }
 
-.k-grid .k-master-row:hover td {
+.k-grid tbody tr:hover td {
 	color: #000000;
 	background-color: #F4F0E5;
 }

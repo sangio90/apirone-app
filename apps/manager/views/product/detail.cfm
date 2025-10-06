@@ -60,6 +60,7 @@
 
                             </cfif>
 
+                            <!----
                             <div class="mt-3 text-end mb-0" style="float: right;">
                                 <div class="d-flex align-items-center">
                                     <span>Costo €:</span> <input class="form-control w-auto text-end mb-2" 
@@ -73,6 +74,7 @@
                                         data-bind="value: costFormatted" readonly /> 
                                 </div>
                             </div>
+                            ---->
 
                         </div>
 
@@ -82,7 +84,7 @@
 
                                 <div class="row d-flex align-items-center mb-2">
 
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-6">
 
                                         <p>
 
@@ -138,12 +140,9 @@
                                                 </a>
                                         </p>
 
-                                    <p class="d-flex align-items-center mb-3">
-                                        Markup attributi: <input class="form-control w-auto text-end" 
-                                        type="text" 
-                                        data-bind="value: costFormatted" readonly /> %                                        
-                                    </p>
-
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <!--- price here --->
                                     </div>
                                     <div class="col-sm-12 text-end">
 
@@ -188,8 +187,9 @@
                                         id      = "product-items-grid",
                                         class   = "no-pager",
                                         columns = "[
-                                            { 'field':'Id', 'title':'ID', width: '60px' },
+                                            { 'field':'Id', 'title':'ID', width: '70px' },
                                             { 'field':'name', 'title':'Attributo' },
+                                            { 'field':'', 'title':'Prezzo', width: '180px'},
                                             { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
                                             { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
                                             { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},

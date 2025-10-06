@@ -272,7 +272,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
-			bean.setPricesAsArray( getPriceService().list( productId = record.product_id ) );
+			bean.setPrices( getPriceService().list( productId = record.product_id ) );
 
 			return bean;
 		}
