@@ -1,5 +1,9 @@
 <cfcomponent accessors="true">
 
+	<!--- 
+		CONVERTERS 
+	---->
+
 	<cffunction access="private" name="getLinesAsArray" returntype="Array">
 		<cfargument name="lines" required="true">
 
@@ -14,14 +18,16 @@
 		<cfreturn items.len() ? items : NullValue()>
 	</cffunction>
 
-	<cffunction access="private" name="getCategoriesAsArray" returntype="Array">
-		<cfargument name="categories" required="true">
+	<cffunction access="private" name="getMethodsAsArray" returntype="Array">
+		<cfargument name="methods" required="true">
 
 		<cfset var items = []>
 
-		<cfloop array="#arguments.categories#" item="local.thisItem">
-			<cfset items.add( local.thisItem.getId() )>
-		</cfloop>
+		<cfif IsArray( arguments.methods )>
+			<cfloop array="#arguments.methods#" item="local.thisItem">
+				<cfset items.add( local.thisItem.getId() )>
+			</cfloop>
+		</cfif>
 
 		<cfreturn items.len() ? items : NullValue()>
 	</cffunction>
@@ -37,6 +43,22 @@
 
 		<cfreturn items.len() ? items : NullValue()>
 	</cffunction>
+
+	<cffunction access="private" name="getCategoriesAsArray" returntype="Array">
+		<cfargument name="categories" required="true">
+
+		<cfset var items = []>
+
+		<cfloop array="#arguments.categories#" item="local.thisItem">
+			<cfset items.add( local.thisItem.getId() )>
+		</cfloop>
+
+		<cfreturn items.len() ? items : NullValue()>
+	</cffunction>
+	
+	<!--- 
+		// CONVERTERS 
+	---->
 
 	<cffunction name="sanitizeSQL" returntype="String">
 		<cfargument name="sql" type="String">

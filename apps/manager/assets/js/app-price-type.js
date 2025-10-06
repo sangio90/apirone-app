@@ -4,7 +4,7 @@ Object.assign( AP.priceType.fields, {
     list: $( "#price-type-list-root" ),
     detail: $( "#price-type-detail-modal" ),
     detailForm: $( "#price-type-detail-form" ),
-    searchListForm: $( "#price-type-list-form" )
+    searchListForm: $( "#price-type-grid-search-form" )
 } );
 
 $( document ).ready( function() {
@@ -31,6 +31,7 @@ AP.priceType.detail = ( function() {
                 id: "ACT",
             },
         },
+        isEdit: false,
         statuses: AP.page.statuses,
         entities: AP.page.entities,
         methods: AP.page.methods,
@@ -44,6 +45,12 @@ AP.priceType.detail = ( function() {
             onCreate: undefined,
             onUpdate: undefined,
             onLoad: undefined,
+        },
+
+        isDisabled: function() {
+
+            return viewModel.get( "detailForm.isEdit" );
+
         },
 
         resetForm: function() {
@@ -91,23 +98,27 @@ AP.priceType.detail = ( function() {
         },
     } );
 
-    pub.new = function( { onSave } ) {
+    pub.new = function( onSave ) {
 
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
+
+        viewModel.set( "detailForm.isEdit", false );
 
         viewModel.resetForm();
 
         NM.util.openModal( fields.detail );
     };
 
-    pub.edit = function( { id, onSave } ) {
+    pub.edit = function( id, onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
 
         viewModel.resetForm();
+
+        viewModel.set( "detailForm.isEdit", true );
 
         NM.util.ajax( {
             method: "GET",
@@ -134,7 +145,7 @@ AP.priceType.detail = ( function() {
                         viewModel.set( "detailForm.data", xhr.data );
                         viewModel.set( "detailForm.data.selectedMethods", selectedMethods  );
                         viewModel.set( "detailForm.data.selectedEntities", selectedEntities  );
-                        viewModel.set( "detailForm.title", "Modifica linea" );
+                        viewModel.set( "detailForm.title", "Modifica tipo prezzo < " + xhr.data.id + " >" );
 
                         NM.util.openModal( fields.detail );
                     }
@@ -158,7 +169,7 @@ AP.priceType.detail = ( function() {
                 id: {
                     required: true,
                     checkCode: true,
-                    rangelength: [ 2, 10 ],
+                    rangelength: [ 2, 14 ],
                     remote: {
                         url: "/manager/ajax/prices/types/exists",
                         data: {
@@ -206,6 +217,8 @@ AP.priceType.list = ( function() {
 
             var params = thisForm.serializeJSON();
 
+            console.log( "params", params );
+
             viewModel.rows.read( params );
 
             return false;
@@ -223,6 +236,7 @@ AP.priceType.list = ( function() {
         },
 
         edit: function( event ) {
+
             var onSave = function() {
                 viewModel.get( "rows" ).read();
             };

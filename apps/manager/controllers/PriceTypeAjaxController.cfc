@@ -30,11 +30,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function codeExists( event, rc, prc ){
+	function idExists( event, rc, prc ){
 		param rc.id   = "_";
-		param rc.code = "";
+		param rc.id = "";
 
-		var result = super.fire( "priceType.codeExists", { code = rc.code, excludedId = rc.id } );
+		var result = super.fire( "priceType.idExists", { id = rc.id, excludedId = rc.id } );
 
 		event.setValue( "result", result );
 	}
@@ -74,17 +74,28 @@ component extends="com.apirone.core.controller.AbsController" {
 		priceType.setEntities( entities );
 		priceType.setMethods( methods );
 
-		if ( !Len( json.id ) ) {
-			messageId = "priceType.created";
-			thisId    = super.fire( "priceType.create", [ priceType ] )
-		} else {
+		var isEdit = super.fire( "priceType.idExists", [ json.id ] );
+
+		if ( isEdit ) {
 			messageId = "priceType.updated";
-			thisId    = super.fire( "priceType.update", [ priceType ] )
+			thisId    = super.fire( "priceType.update", [ priceType ] );
+		} else {
+			messageId = "priceType.created";
+			thisId    = super.fire( "priceType.create", [ priceType ] );
 		}
 
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+
+		event.setValue( "result", result );
+	}
+
+	function codeExists( event, rc, prc ){
+		param rc.id   = "_";
+		param rc.code = "";
+
+		var result = super.fire( "priceType.idExists", { code = rc.code, excludedId = rc.id } );
 
 		event.setValue( "result", result );
 	}

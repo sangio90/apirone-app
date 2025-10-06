@@ -9,8 +9,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="textService" inject="TextService";
-	// property name="wirebox" inject="Wirebox";
-	// property name="mementifier" inject="ResultsMapper@mementifier";
 
 	property name="cacheScope" type="String" default="Line.bean";
 

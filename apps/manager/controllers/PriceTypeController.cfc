@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.title = "Tipi prezzi";
 
-		prc.statuses = super.fire( "status.list", [ "priceType" ] );
+		prc.statuses = super.fire( "status.list", [ "PRICE_TYPE" ] );
 		prc.methods  = super.fire( "lookup.list", [ "priceMethod" ] );
 		prc.entities = super.fire( "lookup.list", [ "entity" ] );
 

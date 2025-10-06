@@ -7,6 +7,7 @@
 		"LINE": {},
 		"MODEL": {},
 		"PRICE": {},
+		"PRICE_TYPE": {},
 		"PRODUCT": {},
 		"PRODUCT_ITEM": {},
 		"QUOTATION": {},

@@ -20,6 +20,18 @@
 		return bean;
 	}
 
+	public Boolean function idExists( required String id, String excludedId = "" ){
+		var record = getDao().read( arguments.id );
+
+		if (
+			record.recordCount
+		) {
+			return record.price_type_id == arguments.id;
+		}
+
+		return false;
+	}
+
 	public Array function list(){
 		arguments[ "limit" ] = -1;
 
@@ -58,37 +70,42 @@
 		transaction {
 			try {
 				getDao().delete( arguments.priceTypeId );
+
 				super.logEvent(
-					event   = "price.deleted",
+					event   = "price_type.deleted",
 					message = "Price type [#arguments.priceTypeId#] deleted.",
 					payload = { "id" = arguments.priceTypeId }
 				);
+
 				super.getCacheManager().remove( getCacheScope(), arguments.priceTypeId );
+			
 			} catch ( any error ) {
+
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeletePriceType" );
 				outcome.setMessage( "Cannot delete price type [#arguments.priceTypeId#]" );
+			
 			}
 		}
 
 		return outcome;
 	}
 
-	public String function create( required com.apirone.core.model.bean.PriceType price ){
+	public String function create( required com.apirone.core.model.bean.PriceType priceType ){
 
-		var id = getDao().insert( arguments.price );
+		var id = getDao().insert( arguments.priceType );
 
 		return id;
 	}
 
 
-	public String function update( required com.apirone.core.model.bean.price price ){
-		getDao().update( arguments.price );
+	public String function update( required com.apirone.core.model.bean.PriceType priceType ){
+		getDao().update( arguments.PriceType );
 
-		super.getCacheManager().remove( getCacheScope(), price.getId() );
+		super.getCacheManager().remove( getCacheScope(), priceType.getId() );
 
-		return arguments.price.getId();
+		return arguments.priceType.getId();
 	}
 
 

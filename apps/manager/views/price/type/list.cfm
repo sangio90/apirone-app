@@ -25,7 +25,7 @@
 
                                 <div class="mb-3 box-search-small"> 
 
-                                    <form id="price-grid-search-form" 
+                                    <form id="price-type-grid-search-form" 
                                         class="d-flex justify-content-end" 
                                         data-bind:'events: { submit: search }'>
 

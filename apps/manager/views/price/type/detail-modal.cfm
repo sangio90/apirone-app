@@ -15,44 +15,47 @@
                     <div class="card-body">
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Codice</label>
+                            <label class="col-sm-2 col-form-label text-end">ID</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" name="code"
-                                    maxlength="5"
+                                <input type="text" required class="form-control col-sm-4 uppercase"
+                                    name="id"
                                     data-rule-required="true"
                                     data-msg-required="Codice richiesto"
-                                    data-bind="value: detailForm.data.code"
-                                    onkeyup="this.value = this.value.toUpperCase();">
+                                    data-bind="value: detailForm.data.id, disabled: isDisabled">
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Nome</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4 uppercase" name="name"
+                                <input type="text" required class="form-control col-sm-4 uppercase" 
+                                    name="name"
                                     data-rule-required="true"
                                     data-msg-required="Descrizione richiesta"
                                     maxlength="125"
-                                    data-bind="value: detailForm.data.nameItem.name">
+                                    data-bind="value: detailForm.data.name">
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Descrizione</label>
+                            <label class="col-sm-2 col-form-label text-end">Metodi</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control col-sm-4 uppercase" name="description"
-                                   maxlength="125"
-                                    data-bind="value: detailForm.data.descriptionItem.name">
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Categorie</label>
-                            <div class="col-sm-10">
-                                <select id="categories" 
-                                    data-placeholder="Seleziona le categorie"
+                                <select id="methods" 
                                     data-role="multiselect" 
-                                    data-bind="source: detailForm.categories, value: detailForm.data.selectedCategories" 
+                                    data-bind="source: detailForm.methods, value: detailForm.data.selectedMethods" 
+                                    data-value-field="id"
+                                    data-text-field="name"
+                                    >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Usa in</label>
+                            <div class="col-sm-10">
+                                <select id="entities" 
+                                    data-role="multiselect" 
+                                    data-bind="source: detailForm.entities, value: detailForm.data.selectedEntities" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -67,7 +70,7 @@
                                     required
                                     id="statusId" 
                                     class="form-control"
-                                    data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
+                                    data-bind="source: detailForm.statuses, value: detailForm.data.status" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -75,7 +78,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row" data-bind="visible: detailForm.data.id">
+                        <div class="mb-3 row" data-bind="visible: detailForm.isEdit">
                             <div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
                                 ID: <span data-bind="text: detailForm.data.id"></span><br>
                                 Creato: <span data-bind="text: detailForm.data.createdAt"></span>

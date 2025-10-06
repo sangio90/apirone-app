@@ -108,14 +108,14 @@ AP.quotationDetail.detail = ( function() {
         filteredShipmentStates: new kendo.data.DataSource(),
         zones: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
-        crmCustomers: new kendo.data.DataSource({
+        crmCustomers: new kendo.data.DataSource( {
             serverFiltering: true,
             transport: {
                 read: {
                     url: "/manager/ajax/quotations/crmcustomers/",
                     data: {
                         str: function() {
-                            return $("#customer").val()
+                            return $( "#customer" ).val();
                         },
                     }
                 }
@@ -125,15 +125,15 @@ AP.quotationDetail.detail = ( function() {
                     return xhr.data;
                 }
             }
-        }),
-        crmOpportunities: new kendo.data.DataSource({
+        } ),
+        crmOpportunities: new kendo.data.DataSource( {
             serverFiltering: true,
             transport: {
                 read: {
                     url: "/manager/ajax/quotations/crmopportunities/",
                     data: {
                         str: function() {
-                            return $("#opportunity").val()
+                            return $( "#opportunity" ).val();
                         },
                     }
                 }
@@ -143,29 +143,29 @@ AP.quotationDetail.detail = ( function() {
                     return xhr.data;
                 }
             }
-        }),
-        crmLeads: new kendo.data.DataSource({
+        } ),
+        crmLeads: new kendo.data.DataSource( {
             serverFiltering: true,
             transport: {
                 read: {
                     url: "/manager/ajax/quotations/crmleads/",
                     data: {
                         str: function() {
-                            return $("#lead").val()
+                            return $( "#lead" ).val();
                         },
                     }
                 }
             },
             schema: {
                 data: function( xhr ) {
-                    return xhr.data.map(item => ({
+                    return xhr.data.map( item => ( {
                         ...item,
                         fullName: `${item.firstName} ${item.lastName}`
-                    }));
+                    } ) );
                 }
             }
-        }),
-        list: function () {
+        } ),
+        list: function() {
             window.location.href = "/manager/quotations";
         },
 
@@ -238,7 +238,7 @@ AP.quotationDetail.detail = ( function() {
         delete: function( event ) {
             event.stopPropagation();
             event.preventDefault();
-            var id = event.currentTarget.dataset.id
+            var id = event.currentTarget.dataset.id;
 
             bootbox.confirm( {
                 title: "Conferma eliminazione",
@@ -312,7 +312,7 @@ AP.quotationDetail.detail = ( function() {
                         required: "Data validità preventivo richiesta."
                     },
                 }
-            })
+            } );
 
             if ( detailFormDom.valid() ) {
                 const parsedData = viewModel.get( "detailForm.data" );
@@ -324,9 +324,9 @@ AP.quotationDetail.detail = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERRORE" ) {
-                                var error = "Errore nel salvataggio del preventivo."
-                                if (xhr.data.error) {
-                                    error = xhr.data.error
+                                var error = "Errore nel salvataggio del preventivo.";
+                                if ( xhr.data.error ) {
+                                    error = xhr.data.error;
                                 }
                                 AP.widget.notify( "error", error );
                             }
@@ -356,7 +356,7 @@ AP.quotationDetail.detail = ( function() {
                                 AP.widget.notify( "error", "Errore nel recupero delle zone." );
                             }
                             if ( xhr.status == "SUCCESS" ) {
-                                if (xhr.data.length) {
+                                if ( xhr.data.length ) {
                                     var zones = xhr.data;
                                     zones.unshift( { "id": "", "name": "Tutte le zone" } );
                                 } else {
@@ -431,7 +431,7 @@ AP.quotationDetail.detail = ( function() {
 
         openAddZoneModal: function() {
             if ( AP.quotationDetail.fields.zoneModalRoot.length ) {
-                AP.quotationDetail.zoneModal.methods().resetForm()
+                AP.quotationDetail.zoneModal.methods().resetForm();
                 AP.quotationDetail.zoneModal.init( "add" );
             }
             NM.util.openModal( AP.quotationDetail.fields.zoneModalRoot );
@@ -465,12 +465,12 @@ AP.quotationDetail.detail = ( function() {
         viewModel.get( "states" ).data( AP.page.states );
 
         viewModel.getZones();
-        
+
         if ( AP.page.quotation ) {
-            if (AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != '') {
-                AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + ' ' + AP.page.quotation.lead.lastName;
+            if ( AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != "" ) {
+                AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + " " + AP.page.quotation.lead.lastName;
             }
-            viewModel.set( 'detailForm.data', AP.page.quotation );
+            viewModel.set( "detailForm.data", AP.page.quotation );
             // $( "#nav-plan-tab" ).removeAttr("hidden");
             $( "#nav-products-tab" ).removeAttr( "hidden" );
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
@@ -509,7 +509,7 @@ AP.quotationDetail.zoneModal = ( function() {
 
         createZone: function( event ) {
             const parsedData = viewModel.get( "detailForm.data" );
-            if (parsedData.name.trim() == '') {
+            if ( parsedData.name.trim() == "" ) {
                 AP.widget.notify( "error", "Specificare un nome per la zona." );
                 return false;
             }

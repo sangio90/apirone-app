@@ -23,7 +23,9 @@
 		/*
 			prices types
 		*/
-		post( "/ajax/prices/types" ).to( "PriceTypeController.save" ).end();
+		get( "/ajax/prices/types/exists" ).to( "PriceTypeAjaxController.idExists" ).end();
+		get( "/ajax/prices/types/:id" ).to( "PriceTypeAjaxController.get" ).end();
+		post( "/ajax/prices/types" ).to( "PriceTypeAjaxController.save" ).end();
 		delete( "/ajax/prices/types" ).to( "PriceTypeAjaxController.delete" ).end();
 		get( "/ajax/prices/types" ).to( "PriceTypeAjaxController.list" ).end();
 		get( "/prices/types" ).to( "PriceTypeController.list" ).end();
