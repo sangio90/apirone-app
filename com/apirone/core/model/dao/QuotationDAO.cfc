@@ -127,8 +127,8 @@
 				quotation_date,
 				notes,
 				validity_date,
-				opportunity_name,
-				lead_name,
+				opportunity_id,
+				lead_id,
 				active,
 				status_id,
 				lang_id,
@@ -150,8 +150,8 @@
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getQuotationDate()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNotes()#">,
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getValidityDate()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOpportunityName()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLeadName()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOpportunityId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLeadId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getActive()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLang().getId()#">,
@@ -190,9 +190,9 @@
 				,
 				validity_date = <cfqueryparam cfsqltype="DATE" value="#arguments.quotation.getValidityDate()#">
 				,
-				opportunity_name = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getOpportunityName()#">
+				opportunity_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getOpportunityId()#">::uuid
 				,
-				lead_name = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getLeadName()#">
+				lead_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getLeadId()#">::uuid
 				,
 				active = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotation.getActive()#">
 				,

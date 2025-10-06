@@ -20,8 +20,8 @@
 		quotation.setQuotationDate( json.quotation_date );
 		quotation.setNotes( json.notes );
 		quotation.setValidityDate( json.validity_date );
-		quotation.setOpportunityName( json.opportunity_name );
-		quotation.setLeadName( json.lead_name );
+		quotation.setOpportunityId( json.opportunity.id );
+		quotation.setLeadId( json.lead.id );
 		quotation.setActive( json.active );
 		quotation.setCustomPaymentMethod( json.custom_payment_method );
 		quotation.setPricelist( type.setId( json.pricelist.id ) );

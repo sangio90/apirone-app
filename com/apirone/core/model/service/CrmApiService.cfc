@@ -56,6 +56,46 @@ component extends="AbsRestApi" accessors="true" {
 	}
 
 	/**
+	 * Recupera dati cliente dal CRM via API
+	 */
+	public function getLead( required string leadId ){
+		return get( "/leads/#leadId#" );
+	}
+
+	/**
+	 * Cerca clienti nel CRM
+	 */
+	public any function searchLeads(required string str, numeric limit=10, numeric offset=0) {
+		var params = { 
+			"name" = str,
+			"limit" = limit,
+			"offset" = offset
+		};
+
+		return get("/leads", params);
+	}
+
+	/**
+	 * Recupera dati cliente dal CRM via API
+	 */
+	public function getOpportunity( required string opportunityId ){
+		return get( "/opportunities/#opportunityId#" );
+	}
+
+	/**
+	 * Cerca clienti nel CRM
+	 */
+	public any function searchOpportunities(required string str, numeric limit=10, numeric offset=0) {
+		var params = { 
+			"name" = str,
+			"limit" = limit,
+			"offset" = offset
+		};
+
+		return get("/opportunities", params);
+	}
+
+	/**
 	 * Metodo privato per ottenere il token auth
 	 */
 	private string function getAuthToken(){

@@ -119,12 +119,12 @@ component extends="com.apirone.core.controller.AbsController" {
 				quotation.setQuotationDate( json.quotationDate );
 				quotation.setNotes( !isNull(json.notes) ? json.notes : null );
 				quotation.setValidityDate( json.validityDate );
-				quotation.setOpportunityName( !isNull(json.opportunityName) ? json.opportunityName : null );
-				quotation.setLeadName( !isNull(json.leadName) ? json.leadName : null );
+				quotation.setOpportunityId( !isNull(json.opportunity) ? json.opportunity.id : null );
+				quotation.setLeadId( !isNull(json.lead) ? json.lead.id : null );
 				quotation.setActive( true );
 				var statusId = json.status.id != '' ? json.status.id : 'NEW';
 				quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
-				quotation.setCustomerId( json.customer.id );
+				quotation.setCustomerId( !isNull(json.customer) ? json.customer.id : null );
 				// quotation.setCustomPaymentMethod( json.custom_payment_method );
 				// quotation.setPricelist( type.setId( json.pricelist.id ) );
 				// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
@@ -205,6 +205,34 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mem    = super.getMementify();
 
 		var rows = super.fire( "customer.search", [ name ] );
+		var data = mem.convertList( rows.getData() );
+		result.setTotal( rows.getTotal() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
+	function crmOpportunities( event, rc, prc ){
+		var data = [];
+		var name = rc.str;
+		var result = super.getResult();
+		var mem    = super.getMementify();
+
+		var rows = super.fire( "opportunity.search", [ name ] );
+		var data = mem.convertList( rows.getData() );
+		result.setTotal( rows.getTotal() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
+	function crmLeads( event, rc, prc ){
+		var data = [];
+		var name = rc.str;
+		var result = super.getResult();
+		var mem    = super.getMementify();
+
+		var rows = super.fire( "lead.search", [ name ] );
 		var data = mem.convertList( rows.getData() );
 		result.setTotal( rows.getTotal() );
 		result.setData( data );

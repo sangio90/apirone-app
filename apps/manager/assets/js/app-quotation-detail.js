@@ -48,8 +48,14 @@ AP.quotationDetail.detail = ( function() {
             status: {
                 "id":""
             },
-            opportunityName: "",
-            leadName: "",
+            opportunity: {
+                "id":"",
+                "name":""
+            },
+            lead: {
+                "id":"",
+                "name":""
+            },
             pricelist: {
                 "id":""
             },
@@ -117,6 +123,45 @@ AP.quotationDetail.detail = ( function() {
             schema: {
                 data: function( xhr ) {
                     return xhr.data;
+                }
+            }
+        }),
+        crmOpportunities: new kendo.data.DataSource({
+            serverFiltering: true,
+            transport: {
+                read: {
+                    url: "/manager/ajax/quotations/crmopportunities/",
+                    data: {
+                        str: function() {
+                            return $("#opportunity").val()
+                        },
+                    }
+                }
+            },
+            schema: {
+                data: function( xhr ) {
+                    return xhr.data;
+                }
+            }
+        }),
+        crmLeads: new kendo.data.DataSource({
+            serverFiltering: true,
+            transport: {
+                read: {
+                    url: "/manager/ajax/quotations/crmleads/",
+                    data: {
+                        str: function() {
+                            return $("#lead").val()
+                        },
+                    }
+                }
+            },
+            schema: {
+                data: function( xhr ) {
+                    return xhr.data.map(item => ({
+                        ...item,
+                        fullName: `${item.firstName} ${item.lastName}`
+                    }));
                 }
             }
         }),
@@ -422,6 +467,9 @@ AP.quotationDetail.detail = ( function() {
         viewModel.getZones();
         
         if ( AP.page.quotation ) {
+            if (AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != '') {
+                AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + ' ' + AP.page.quotation.lead.lastName;
+            }
             viewModel.set( 'detailForm.data', AP.page.quotation );
             // $( "#nav-plan-tab" ).removeAttr("hidden");
             $( "#nav-products-tab" ).removeAttr( "hidden" );

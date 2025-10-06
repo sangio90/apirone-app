@@ -23,7 +23,7 @@
                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                     <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="##nav-general" type="button" role="tab">Dati generali</button>
                                     <!--- <button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button> --->
-                                    <!--- <button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Indirizzo di Fatturazione</button> --->
+                                    <button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Indirizzo di Fatturazione</button>
                                     <!--- <button class="nav-link" id="nav-shipment-tab" data-bs-toggle="tab" data-bs-target="##nav-shipment" type="button" role="tab">Indirizzo di Spedizione</button> --->
                                     <!--- <button class="nav-link" id="nav-print-tab" data-bs-toggle="tab" data-bs-target="##nav-print" type="button" role="tab">Stampa</button> --->
                                     <!--- <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button> --->
@@ -42,7 +42,7 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Nome </label>
+                                            <label class="control-label text-sm-end">Cliente </label>
                                             <input type="text" name="customer" class="form-control" id="customer"
                                                 data-bind="source: crmCustomers, value: detailForm.data.customer"
                                                 data-role="autocomplete"
@@ -105,12 +105,26 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-5">
-                                            <label class="control-label text-sm-end">Nome opportunità </label>
-                                            <input type="text" data-bind="value: detailForm.data.opportunityName" class="form-control">
+                                            <label class="control-label text-sm-end">Opportunità </label>
+                                            <input type="text" name="opportunity" class="form-control" id="opportunity"
+                                                data-bind="source: crmOpportunities, value: detailForm.data.opportunity"
+                                                data-role="autocomplete"
+                                                data-text-field="name"
+                                                data-value-primitive="false"
+                                                data-minlength="4"
+                                                data-filter="contains"
+                                            >
                                         </div>
                                         <div class="col-sm-5">
-                                            <label class="control-label text-sm-end">Nome lead </label>
-                                            <input type="text" data-bind="value: detailForm.data.leadName" class="form-control">
+                                            <label class="control-label text-sm-end">Lead </label>
+                                            <input type="text" name="lead" class="form-control" id="lead"
+                                                data-bind="source: crmLeads, value: detailForm.data.lead"
+                                                data-role="autocomplete"
+                                                data-text-field="fullName"
+                                                data-value-primitive="false"
+                                                data-minlength="4"
+                                                data-filter="contains"
+                                            >
                                         </div>
                                         <div class="col-sm-2 pt-4">
                                            <button class="btn btn-primary changeTab" id="products">Prodotti &raquo;</button>
@@ -257,84 +271,65 @@
                                 <div class="tab-pane fade" id="nav-billing" role="tabpanel">
                                     
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="invoiceData.name" class="form-control" data-bind="value: detailForm.data.invoiceData.name">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Nome</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.name" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Ragione sociale</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="invoiceData.company" class="form-control" data-bind="value: detailForm.data.invoiceData.company">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Ragione sociale</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.company" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Partita Iva</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="invoiceData.vatNumber" class="form-control" data-bind="value: detailForm.data.invoiceData.vatNumber">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Partita Iva</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.vatNumber" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Email</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="invoiceData.email" class="form-control" data-bind="value: detailForm.data.invoiceData.email">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Telefono</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.phone" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Telefono</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="invoiceData.phone" class="form-control" data-bind="value: detailForm.data.invoiceData.phone">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Indirizzo</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.street" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Indirizzo</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="invoiceData.street" class="form-control" data-bind="value: detailForm.data.invoiceData.street">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Città</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.city" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Città</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="invoiceData.city" class="form-control" data-bind="value: detailForm.data.invoiceData.city">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">CAP</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.postalCode" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">CAP</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="invoiceData.postalCode" class="form-control" data-bind="value: detailForm.data.invoiceData.postalCode">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Nazione</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.country" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nazione</label>
-                                        <div class="col-sm-9">
-                                            <select name="invoiceData.country" class="form-control"
-                                                data-placeholder="-- Seleziona Nazione"
-                                                data-bind="source: countries, value: detailForm.data.invoiceData.country, events: { change: loadInvoiceStates }"
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                            >
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Provincia</label>
-                                        <div class="col-sm-9">
-                                            <select name="invoiceData.state" class="form-control"
-                                                data-placeholder="-- Seleziona Provincia"
-                                                data-bind="source: filteredInvoiceStates, value: detailForm.data.invoiceData.state"
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                            >
-                                            </select>
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Provincia</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.customer.state" disabled>
                                         </div>
                                     </div>
 

@@ -16,6 +16,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="PaymentMethodService" inject="PaymentMethodService";
 	property name="CurrencyService" inject="CurrencyService";
 	property name="CustomerService" inject="CustomerService";
+	property name="OpportunityService" inject="OpportunityService";
+	property name="LeadService" inject="LeadService";
 	property name="cacheScope" type="String" default="Quotation.bean";
 
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
@@ -198,13 +200,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setQuotationDate( record.quotation_date );
 			bean.setNotes( record.notes );
 			bean.setValidityDate( record.validity_date );
-			bean.setOpportunityName( record.opportunity_name );
-			bean.setLeadName( record.lead_name );
+			if (!isNull(record.opportunity_id)) {
+				bean.setOpportunity( getOpportunityService().get( record.opportunity_id ) );
+			}
+			if (!isNull(record.lead_id)) {
+				bean.setLead( getLeadService().get( record.lead_id ) );
+			}
+			if (!isNull(record.customer_id)) {
+				bean.setCustomer( getCustomerService().get( record.customer_id ) );
+			}
 			bean.setActive( record.active );
 			bean.setCustomPaymentMethod( record.custom_payment_method );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setLang( getLangService().get( record.lang_id ) );
-			bean.setCustomer( getCustomerService().get( record.customer_id ) );
 
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
