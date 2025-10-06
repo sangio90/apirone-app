@@ -38,15 +38,9 @@ var setSidebarHeight = function() {
 };
 
 function highlightTabWithError( fieldName ) {
-
-    console.log( "fieldName", fieldName );
-
     var input = $( "[name=\"" + fieldName + "\"]" );
     var tabPane = input.closest( ".tab-pane" );
     var tabPaneId = tabPane.attr( "id" );
-
-    console.log( "tabPaneId", tabPaneId );
-
     var tabButton = $( ".nav-link[href=\"#" + tabPaneId + "\"]" );
 
     tabButton.css( { "font-weight": "bold", "border-top": "3px solid #dc3545" } );

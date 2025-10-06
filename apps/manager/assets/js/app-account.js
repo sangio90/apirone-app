@@ -211,7 +211,6 @@ AP.account.detail = ( function() {
     };
 
     pub.init = function() {
-        console.log( "account:detail:init" );
 
         kendo.bind( fields.detailRoot, viewModel );
 

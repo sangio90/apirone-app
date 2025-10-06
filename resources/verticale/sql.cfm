@@ -3,6 +3,17 @@
 <cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
+LAV-VERNPOLVLIS
+
+<cfquery name="x" datasource="verticale">
+    SELECT varcod + '_' AS c, len( varcod + '_' ) AS l_con, len( varcod ) AS l_senza
+    FROM azapi_codvar
+    WHERE 1=1 
+        AND varcod = 'SIMBOLO' 
+</cfquery>
+
+<cfdump var="#x#">
+
 <cfquery name="i" datasource="verticale">
     SELECT lisart, liscvr, liscol, lispre
     FROM azapi_listin

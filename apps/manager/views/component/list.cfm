@@ -76,8 +76,6 @@
             </div>
         </div>
 
-        #view("component/detail-modal")#
-
     </div>
 
 </cfoutput>
