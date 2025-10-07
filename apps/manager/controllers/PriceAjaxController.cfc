@@ -1,5 +1,76 @@
 component extends="com.apirone.core.controller.AbsController" {
 
+	function calcultateQuotationItem( event, rc, prc ){
+
+		var params = {}
+		var data   = [];
+		var result = super.getResult();
+		var mm     = super.getMementify();
+
+		var output = {
+			"products" = [
+				{
+					"id": "ART",
+					"label": "Prezzo articolo",
+					"amount": 31.7
+				},
+				{
+					"id": "P1",
+					"label": "Posizione 1",
+					"amount": 3.5
+				},
+				{
+					"id": "P2",
+					"label": "Posizione 2",
+					"amount": 4.6
+				},
+				{
+					"id": "P2",
+					"label": "Posizione 3",
+					"amount": 5.7
+				},
+
+			],
+			"quantity" = {
+				"label": "Quantità prodotti",
+				"quantity": 3
+			},
+			"total" = {
+				"label": "TOTALE",
+				"amount": 45.50
+			}
+
+		}
+
+		result.setData( output );
+
+		event.setValue( "result", result );
+	}
+
+	function calculateQuotation( event, rc, prc ){
+
+		var params = {}
+		var data   = [];
+		var result = super.getResult();
+		var mm     = super.getMementify();
+
+		var output = {
+			"quantity" = {
+				"label" = "Numero prodotti",
+				"count" = 3
+			},
+			"total" = {
+				"label" = "TOTALE",
+				"amount" = 45.50
+			}
+		};
+
+		result.setData( output );
+
+		event.setValue( "result", output );
+	}	
+
+
 	function list( event, rc, prc ){
 
 		var params = {}

@@ -341,6 +341,7 @@
 		/*
 			quotations
 		*/
+		get( "/ajax/quotations/:id/total" ).to( "PriceAjaxController.calculateQuotation" ).end();
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
 		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();
 		get( "/ajax/quotations/models/:lineId" ).to( "QuotationAjaxController.listModels" ).end();
@@ -367,6 +368,7 @@
 		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
+		get( "/ajax/quotation-items/:id/total" ).to( "PriceAjaxController.calcultateQuotationItem" ).end();
 		delete("/ajax/quotation-items").to( "QuotationItemAjaxController.delete" ).end();
 		get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
 		post("/ajax/quotation-items").to( "QuotationItemAjaxController.save" ).end();
