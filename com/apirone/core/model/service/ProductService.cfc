@@ -262,10 +262,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setLines( lines );
 			} else {
 				var bean = super.bean( "ProductComplex" );
-
-				ben.setModel( getModelService().get( record.model_id ) );
-				ben.setModel( getFinishService().get( record.finish_i ) );
-
 				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
 				bean.setFinish(
 					!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()
