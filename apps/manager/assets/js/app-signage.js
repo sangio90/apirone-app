@@ -665,7 +665,7 @@ AP.signage.modal = ( function() {
             // Chiamata AJAX iniziale per ottenere tutti i product items
             await NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/product-items?productId=" + productId,
+                url: "/manager/ajax/products/" + productId + "/product-items",
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
@@ -739,7 +739,7 @@ AP.signage.modal = ( function() {
                 const attributeArray = productItems.data();
                 originId = originId || "";
 
-                let url = "/manager/ajax/product-items?productId=" + productId;
+                let url = "/manager/ajax/products/" + productId + "/product-items";
                 if ( originId ) {
                     url += "&originId=" + originId;
                 }
