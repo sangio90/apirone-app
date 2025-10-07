@@ -23,6 +23,11 @@
 		customer.setCity( data.billing_address_city ?: "" );
 		customer.setState( data.billing_address_state ?: "" );
 		customer.setCountry( data.billing_address_country ?: "" );
+		var accountAddresses = data.indirizzi_spedizione;
+		if (Len(accountAddresses)) {
+			ArrayPrepend(accountAddresses, { "id": null, "name": '' });
+			customer.setShippingAddresses( accountAddresses ?: [] );
+		}
 
 		return customer;
 	}

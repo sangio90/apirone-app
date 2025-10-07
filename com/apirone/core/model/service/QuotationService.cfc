@@ -209,6 +209,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if (!isNull(record.customer_id)) {
 				bean.setCustomer( getCustomerService().get( record.customer_id ) );
 			}
+			if (!isNull(record.customer_address_id)) {
+				bean.setCustomerAddressId( record.customer_address_id );
+			}
 			bean.setActive( record.active );
 			bean.setCustomPaymentMethod( record.custom_payment_method );
 			bean.setStatus( getStatusService().get( record.status_id ) );

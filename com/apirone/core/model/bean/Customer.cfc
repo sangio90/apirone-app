@@ -15,12 +15,13 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			"city",
 			"state",
 			"country",
-			"SDI"
+			"SDI",
+			"shippingAddress",
+			"shippingAddresses"
 		],
 		profiles = {}
 	}
 
-	property name="name" type="String";
 	property name="company" type="String";
 	property name="description" type="String";
 	property name="phone" type="String";
@@ -32,6 +33,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="state" type="String";
 	property name="country" type="String";
 	property name="SDI" type="String";
+	property name="shippingAddress" type="String";
+	property name="shippingAddresses" type="Array";
 
 	public Customer function init(){
 		return this;

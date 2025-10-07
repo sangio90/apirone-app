@@ -24,7 +24,7 @@
                                     <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="##nav-general" type="button" role="tab">Dati generali</button>
                                     <!--- <button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button> --->
                                     <button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Indirizzo di Fatturazione</button>
-                                    <!--- <button class="nav-link" id="nav-shipment-tab" data-bs-toggle="tab" data-bs-target="##nav-shipment" type="button" role="tab">Indirizzo di Spedizione</button> --->
+                                    <button class="nav-link" id="nav-shipment-tab" data-bs-toggle="tab" data-bs-target="##nav-shipment" type="button" role="tab">Indirizzo di Spedizione</button>
                                     <!--- <button class="nav-link" id="nav-print-tab" data-bs-toggle="tab" data-bs-target="##nav-print" type="button" role="tab">Stampa</button> --->
                                     <!--- <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button> --->
                                     <!--- <button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatario</button> --->
@@ -127,7 +127,7 @@
                                             >
                                         </div>
                                         <div class="col-sm-2 pt-4">
-                                           <button class="btn btn-primary changeTab" id="products">Prodotti &raquo;</button>
+                                           <button class="btn btn-primary changeTab" id="billing">Fatturazione &raquo;</button>
                                            <!--- <button class="btn btn-primary changeTab" id="fiscal">Dati fiscali &raquo;</button> --->
                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
@@ -206,7 +206,8 @@
                                     </div>
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-1 ms-4">
-                                           <button class="btn btn-primary changeTab" id="general">&laquo; Precendete</button>
+                                           <button class="btn btn-primary changeTab" id="shipment">&laquo; Precendete</button>
+                                           <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div>  
                                 </div>
@@ -258,7 +259,7 @@
                                             </select>
                                         </div>
                                         <div class="col-sm-3 pt-4">
-                                           <button class="btn btn-default changeTab" id="general">&laquo; Precedente &raquo;</button>
+                                            <button class="btn btn-default changeTab" id="general">&laquo; Precedente &raquo;</button>
                                             <button class="btn btn-primary changeTab" id="billing">Fatturazione &raquo;</button>
                                         </div>
                                     </div>
@@ -335,8 +336,9 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-9 offset-sm-3">
-                                           <button class="btn btn-default changeTab" id="fiscal">&laquo; Precedente &raquo;</button>
+                                           <button class="btn btn-default changeTab" id="general">&laquo; Precedente &raquo;</button>
                                            <button class="btn btn-primary changeTab" id="shipment">Spedizione &raquo;</button>
+                                           <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div>                                    
 
@@ -346,69 +348,12 @@
                                     shipment
                                 --->
                                 <div class="tab-pane fade" id="nav-shipment" role="tabpanel">
-                                                                        
+                                                 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nome</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="shipmentData.name" class="form-control" data-bind="value: detailForm.data.shipmentData.name">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Ragione sociale</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="shipmentData.company" class="form-control" data-bind="value: detailForm.data.shipmentData.company">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Partita Iva</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="shipmentData.vatNumber" class="form-control" data-bind="value: detailForm.data.shipmentData.vatNumber">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Email</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="shipmentData.email" class="form-control" data-bind="value: detailForm.data.shipmentData.email">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Telefono</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="shipmentData.phone" class="form-control" data-bind="value: detailForm.data.shipmentData.phone">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Indirizzo</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="shipmentData.street" class="form-control" data-bind="value: detailForm.data.shipmentData.street">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Città</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="shipmentData.city" class="form-control" data-bind="value: detailForm.data.shipmentData.city">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">CAP</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="shipmentData.postalCode" class="form-control" data-bind="value: detailForm.data.shipmentData.postalCode">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Nazione</label>
-                                        <div class="col-sm-9">
-                                            <select name="shipmentData.country" class="form-control"
-                                                data-placeholder="-- Seleziona Nazione"
-                                                data-bind="source: countries, value: detailForm.data.shipmentData.country, events: { change: loadShipmentStates }"
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Indirizzo</label>
+                                        <div class="col-sm-7">
+                                            <select class="form-control"
+                                                data-bind="source: detailForm.data.customer.shippingAddresses, value: detailForm.data.shippingAddress"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
@@ -417,22 +362,45 @@
                                     </div>
 
                                     <div class="form-group row mb-2">
-                                        <label class="col-sm-3 control-label text-sm-end pt-2">Provincia</label>
-                                        <div class="col-sm-9">
-                                            <select name="shipmentData.state" class="form-control"
-                                                data-placeholder="-- Seleziona Provincia"
-                                                data-bind="source: filteredShipmentStates, value: detailForm.data.shipmentData.state"
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                            >
-                                            </select>
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Indirizzo</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.via" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Città</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.citta" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">CAP</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.cap" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Nazione</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.paese" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label class="col-sm-1 control-label text-sm-end pt-2">Provincia</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.provincia" disabled>
                                         </div>
                                     </div>
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-9 offset-sm-3">
                                            <button class="btn btn-default changeTab" id="billing">&laquo; Precedente &raquo;</button>
-                                           <button class="btn btn-primary changeTab" id="print">Stampa &raquo;</button>
+                                           <button class="btn btn-primary changeTab" id="products">Prodotti &raquo;</button>
+                                           <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div> 
                                 </div>

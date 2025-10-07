@@ -32,6 +32,10 @@ AP.quotationDetail.detail = ( function() {
                 "id":"",
                 "name":""
             },
+            shippingAddress: {
+                "id": null,
+                "name": ""
+            },
             quotationNumber: "",
             versionNumber: 1,
             lang: {
@@ -470,7 +474,14 @@ AP.quotationDetail.detail = ( function() {
             if ( AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != "" ) {
                 AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + " " + AP.page.quotation.lead.lastName;
             }
+
             viewModel.set( "detailForm.data", AP.page.quotation );
+            if ( AP.page.quotation.customerAddressId && AP.page.quotation.customer.shippingAddresses ) {
+                const shippingAddress = AP.page.quotation.customer.shippingAddresses.find(item => item.id === AP.page.quotation.customerAddressId);
+                if (shippingAddress) {
+                    viewModel.set('detailForm.data.shippingAddress', shippingAddress);
+                }
+            }
             // $( "#nav-plan-tab" ).removeAttr("hidden");
             $( "#nav-products-tab" ).removeAttr( "hidden" );
             // $( "#nav-shipments-tab" ).removeAttr("hidden");

@@ -119,12 +119,13 @@ component extends="com.apirone.core.controller.AbsController" {
 				quotation.setQuotationDate( json.quotationDate );
 				quotation.setNotes( !isNull(json.notes) ? json.notes : null );
 				quotation.setValidityDate( json.validityDate );
-				quotation.setOpportunityId( !isNull(json.opportunity) ? json.opportunity.id : null );
-				quotation.setLeadId( !isNull(json.lead) ? json.lead.id : null );
+				quotation.setOpportunity( !isNull(json.opportunity) ? super.fire( "opportunity.get", [ json.opportunity.id ] ) : null );
+				quotation.setLead( !isNull(json.lead) ? super.fire( "lead.get", [ json.lead.id ] ) : null );
 				quotation.setActive( true );
 				var statusId = json.status.id != '' ? json.status.id : 'NEW';
 				quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
-				quotation.setCustomerId( !isNull(json.customer) ? json.customer.id : null );
+				quotation.setCustomer( !isNull(json.customer) ? super.fire( "customer.get", [ json.customer.id ] ) : null );
+				quotation.setCustomerAddressId( !isNull(json.shippingAddress) ? json.shippingAddress.id : null );
 				// quotation.setCustomPaymentMethod( json.custom_payment_method );
 				// quotation.setPricelist( type.setId( json.pricelist.id ) );
 				// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
