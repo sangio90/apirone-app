@@ -49,8 +49,9 @@ AP.signConfig.detail = ( function() {
 
     } );
 
-
     var pub = {};
+
+    var componentApp = AP.component.modal;
 
     var defaultSizeRow = {
         id: "",
@@ -106,6 +107,24 @@ AP.signConfig.detail = ( function() {
 
         showSelectedList: function( event ){
             return viewModel.get( "selectedFonts" ).data().length > 0;
+        },
+
+        showComponentButton: function( event ) {
+            return event.id > 0;
+        },
+
+        openComponentsList: function( event ) {
+
+            var value = {
+                type: "signageConfigItem",
+                signageConfigItem: {
+                    id: event.data.id,
+                },
+            };
+
+            componentApp.open( value );
+
+            return false;
         },
 
         delete: function( event ) {

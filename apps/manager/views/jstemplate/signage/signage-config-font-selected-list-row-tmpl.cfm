@@ -15,26 +15,28 @@
                         </td>
                     </tr>
                     <tr>
-                        <th width="30" class="align-end header-small">
+                        <th width="50" class="align-end header-small">
                             ID
                         </th>
-                        <th width="20%" class="align-end header-small">
+                        <th class="align-end header-small" width="25%">
                             Altezza mm
                         </th>
-                        <th width="20%" class="align-end header-small">
+                        <th class="align-end header-small" width="25%">
                             Altezza px
                         </th>
-                        <th width="20%" class="align-end header-small">
+                        <th class="align-end header-small" width="25%">
                             Righe
                         </th>
-                        <th width="20%" class="align-end header-small">
+                        <th class="align-end header-small" width="25%">
                             Caratteri
+                        </th>
+                        <th width="50">
                         </th>
                         <th width="50">
                         </th>
                     </tr>
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <table class="table">
                                 <tbody data-template="signage-config-font-selected-size-list-row-tmpl" data-bind="source: items">
                                 </tbody>
@@ -42,7 +44,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="6" class="pb-3 text-center">
+                        <td colspan="7" class="pb-3 text-center">
                             <button class="btn btn-sm btn-default" data-bind="click:addItem">Aggiungi riga &raquo;</button>
                         </td>
                     </tr>

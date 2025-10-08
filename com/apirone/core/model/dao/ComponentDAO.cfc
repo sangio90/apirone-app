@@ -22,6 +22,7 @@
 		<cfargument name="rawProductId" type="String">
 		<cfargument name="variantId" type="String">
 		<cfargument name="colorId" type="String">
+		<cfargument name="signageConfigItemId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -65,6 +66,10 @@
 
 				<cfif !IsNull( arguments.colorId )>
 					AND TRIM(color_id) = <cfqueryparam value="#arguments.colorId#" cfsqltype="Varchar">
+				</cfif>
+
+				<cfif !IsNull( arguments.signageConfigItemId )>
+					AND signage_config_item_id = <cfqueryparam value="#arguments.signageConfigItemId#" cfsqltype="Integer">
 				</cfif>
 
 			ORDER BY
@@ -218,6 +223,16 @@
 				<cfset values = [
 					{
 						value = arguments.component.getProductItem().getId(),
+						type  = "Integer"
+					}
+				]>
+			</cfcase>
+
+			<cfcase value="com.apirone.core.model.bean.ComponentSignageConfigItem">
+				<cfset fields = [ "signage_config_item_id" ]>
+				<cfset values = [
+					{
+						value = arguments.component.getSignageConfigItem().getId(),
 						type  = "Integer"
 					}
 				]>

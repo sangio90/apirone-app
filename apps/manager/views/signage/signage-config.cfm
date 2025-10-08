@@ -72,11 +72,10 @@
             </div>
         </div>
 
-        <!--- #template(view="jstemplate/signage/signage-config-font-list-row-tmpl")# ---->
         #template(view="jstemplate/signage/signage-config-font-selected-list-row-tmpl")#
         
     </div>
     
-    <!--- #view("attribute/detail-modal")# ---->
+    #view("component/list-modal")#
 
 </cfoutput>

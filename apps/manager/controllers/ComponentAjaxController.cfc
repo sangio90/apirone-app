@@ -19,7 +19,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( data );
 
 		event.setValue( "result", result );
-	}	
+	}
 
 	function listByType( event, rc, prc ){
 		param rc.by = "";
@@ -41,8 +41,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( data );
 
 		event.setValue( "result", result );
-	}	
-
+	}
 
 	function reassign( event, rc, prc ){
 		var result = super.getResult();
@@ -126,6 +125,13 @@ component extends="com.apirone.core.controller.AbsController" {
 				var product   = super.bean( "Product" );
 
 				component.setProduct( product.setId( rc.productId ) );
+
+				break;
+			case "signageConfigItem":
+				var component         = super.bean( "ComponentSignageConfigItem" );
+				var SignageConfigItem = super.bean( "SignageConfigItem" );
+
+				component.setSignageConfigItem( signageConfigItem.setId( rc.signageConfigItemId ) );
 
 				break;
 			case "item":
@@ -254,9 +260,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			"typeId"   = component.getTypeId(),
 			"kindId"   = component.getKindId(),
 			"quantity" = component.getQuantity(),
-			"cost"     = {
-				"amount" = component.getCost().getAmount()
-			},
+			"cost"     = { "amount" = component.getCost().getAmount() },
 			"override" = {
 				"id"       = component?.getOverride()?.getId(),
 				"deleted"  = component?.getOverride()?.getDeleted(),
@@ -315,6 +319,12 @@ component extends="com.apirone.core.controller.AbsController" {
 			case "attributeValue":
 				params = {
 					attributeValueId               = rc.attributeValueId,
+					includeBaseAttributeComponents = false
+				};
+				break;
+			case "signageConfigItem":
+				params = {
+					signageConfigItemId            = rc.signageConfigItemId,
 					includeBaseAttributeComponents = false
 				};
 				break;

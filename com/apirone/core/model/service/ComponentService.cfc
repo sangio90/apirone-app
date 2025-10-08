@@ -11,6 +11,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lineService" inject="LineService";
 	property name="modelService" inject="ModelService";
 	property name="costService" inject="CostService";
+	property name="signageConfigItemService" inject="SignageConfigItemService";
 
 	property name="cacheScope" type="String" default="Component.bean";
 
@@ -56,7 +57,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric attributeValueId,
 		Boolean includeBaseAttributeComponents = false hint="Only for product productItemId"
 	){
-
 		if ( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
 			return searchByProductItemId( arguments.productItemId );
 		}
@@ -306,7 +306,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( record.recordCount ) {
 			// TODO: factory for all Component*
-			var bean = super.bean( "Component" );
+			var bean   = super.bean( "Component" );
 			var kindId = "CP";
 
 			if ( Len( record.product_item_id ) ) {
@@ -321,6 +321,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				kindId = "PR";
 			}
 
+			if ( Len( record.signage_config_item_id ) ) {
+				bean = super.bean( "ComponentSignageConfigItem" );
+				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_id ) );
+				kindId = "PR";
+			}
+
 			if ( Len( record.line_id ) AND Len( record.model_id ) ) {
 				bean = super.bean( "ComponentCatalogBundle" );
 
@@ -331,7 +337,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.component_id );
 
-			//TODO: move to bean
+			// TODO: move to bean
 			bean.setKindId( kindId );
 
 			if ( request.loadFromVerticale ) {
@@ -348,11 +354,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// changes to Override are updated at runtime
 			bean.setOverride( super.bean( "ComponentOverride" ) );
 
-			var cost = getCostService().getByParams( 
-							rawProductId = bean.getRawProduct().getId(),
-							variantId    = bean.getVariant().getId(),
-							colorId      = bean.getColor().getId()
-						);
+			var cost = getCostService().getByParams(
+				rawProductId = bean.getRawProduct().getId(),
+				variantId    = bean.getVariant().getId(),
+				colorId      = bean.getColor().getId()
+			);
 
 			bean.setCost( cost );
 

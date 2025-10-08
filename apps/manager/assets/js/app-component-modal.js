@@ -92,6 +92,14 @@ AP.component.modal = ( function() {
 
                 break;
 
+            case "signageConfigItem":
+
+                result.modalTitle = "Componenti per riga font " + current.signageConfigItem.id;
+                result.readUrl = baseUrl + "?by=signageConfigItem&signageConfigItemId=" + current.signageConfigItem.id;
+                result.modifyUrl = result.readUrl;
+
+                break;
+
             case "item": // productItem
 
                 result.modalTitle = "Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.rawValue.name;

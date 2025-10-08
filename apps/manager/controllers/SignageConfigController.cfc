@@ -49,7 +49,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var fonts          = super.fire( "font.list" );
 
 		for ( var item in fonts ) {
-			// var obj = getDataMapper().convert( item, "Font", true );
 			var obj = memy.convert( item, "list" );
 			availableFonts.add( obj );
 		}
@@ -64,6 +63,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			"categoryId" = prc.category.getId()
 		};
 
+		prc.jsScripts.add( "app-component-modal" );
 		prc.jsScripts.add( "app-signage-config" );
 
 		event.setView( "signage/signage-config" );
