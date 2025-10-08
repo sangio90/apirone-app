@@ -45,7 +45,7 @@
 						#iconButton(icon="ellipsis-v", 
 							title="Cambia orientamento", class="btn-default width-30", size="xs",
 							bind="click:toggleOrientation",
-							iconBind="css: { fa-ellipsis-v: isVertical, fa-ellipsis-h: isHorizontal }"
+							iconBind="css: { fa-ellipsis-v: isVertical, fa-ellipsis-h: isHorizontal, fa-grip-vertical: isHorizontalAndVertical }"
 						)#
 
 						#iconButton(icon="layer-group", 

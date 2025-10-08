@@ -137,7 +137,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		status.setId( "ACT" ); // Active
 		value.setId( json.attributeValue.id );
 
-		item.setOrderBy( json.orderBy );
+		//item.setOrderBy( json.orderBy );
+		item.setOrderBy( 10 );
 
 		item.setProductId( rc.id );
 		item.setAttributeValue( value );

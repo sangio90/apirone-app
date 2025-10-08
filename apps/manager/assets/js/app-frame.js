@@ -363,6 +363,10 @@ AP.frame.modal = ( function() {
 
             isVertical: function() {
                 return this.get( "data.orientation.id" ) == "VER";
+            },
+
+            isHorizontalAndVertical: function() {
+                return this.get( "data.orientation.id" ) == "HAV";
             }
         } );
 
