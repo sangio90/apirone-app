@@ -215,6 +215,11 @@ AP.accessory.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
+                            if (!viewModel.get('detailForm.data.quotationItem.product.image') && xhr.data[0].image) {
+                                viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].image );
+                                viewModel.set( "backgroundImage", xhr.data[0].image );
+                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].image.uri + "')" );
+                            }
                             viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                             const attributeArray = productItems.data();
@@ -388,6 +393,7 @@ AP.accessory.modal = ( function() {
 
                             viewModel.renderProductItems();
                             if (productItems && productItems.data().length > 0) {
+                                debugger
                                 productItems.data().forEach(function(item) {
                                     let selectedValues = item.values.filter( ( value ) => { return value.selected == true } );
                                     if (selectedValues.length > 0) {
