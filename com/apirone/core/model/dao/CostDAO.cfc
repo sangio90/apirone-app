@@ -1,35 +1,35 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-
 	<cffunction name="read" returntype="Query">
-
 		<cfargument name="rawProductId" type="String">
 		<cfargument name="variantId" type="String">
 		<cfargument name="colorId" type="String">
 
 		<cfset var thisQuery = super.getQueryLoader().getCosts()>
 
+		<!--- NOTE: This is a QoQ, I need to trim the value to the left. --->
+
 		<cfquery name="local.q" dbtype="query" datasource="verticale">
 			SELECT *
-			FROM 
+			FROM
 				thisQuery
 			WHERE 1=1
-				<cfif !IsNUll( arguments.rawProductId )>
-					AND lisart = <cfqueryparam cfsqltype="Varchar" value="#arguments.rawProductId#">
+				<cfif !IsNull( arguments.rawProductId )>
+					AND TRIM( lisart ) = <cfqueryparam cfsqltype="Varchar" value="#arguments.rawProductId#">
 				</cfif>
-				
-				<cfif !IsNUll( arguments.variantId )>
-					AND liscvr = <cfqueryparam cfsqltype="Varchar" value="#arguments.variantId#">
+
+				<cfif !IsNull( arguments.variantId )>
+					AND TRIM( liscvr ) = <cfqueryparam cfsqltype="Varchar" value="#arguments.variantId#">
 				</cfif>
-				
-				<cfif !IsNUll( arguments.colorId )>
-					AND liscol = <cfqueryparam cfsqltype="Varchar" value="#arguments.colorId#">
+
+				<cfif !IsNull( arguments.colorId )>
+					AND TRIM( liscol ) = <cfqueryparam cfsqltype="Varchar" value="#arguments.colorId#">
 				</cfif>
-			ORDER BY 
+			ORDER BY
 				lisart
 		</cfquery>
-		
+
+		<cfdump var="#local.q#">
+
 		<cfreturn local.q>
-
 	</cffunction>
-
 </cfcomponent>

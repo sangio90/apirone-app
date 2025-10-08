@@ -324,7 +324,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( Len( record.signage_config_item_id ) ) {
 				bean = super.bean( "ComponentSignageConfigItem" );
 				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_id ) );
-				kindId = "PR";
+				kindId = "SI";
 			}
 
 			if ( Len( record.line_id ) AND Len( record.model_id ) ) {
