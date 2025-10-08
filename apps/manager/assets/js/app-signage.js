@@ -665,7 +665,7 @@ AP.signage.modal = ( function() {
             // Chiamata AJAX iniziale per ottenere tutti i product items
             await NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/products/" + productId + "/product-items",
+                url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
@@ -739,7 +739,7 @@ AP.signage.modal = ( function() {
                 const attributeArray = productItems.data();
                 originId = originId || "";
 
-                let url = "/manager/ajax/products/" + productId + "/product-items";
+                let url = "/manager/ajax/product-items?productId=" + productId;
                 if ( originId ) {
                     url += "&originId=" + originId;
                 }
@@ -962,7 +962,7 @@ AP.signage.modal = ( function() {
 
         NM.util.ajax( {
             method: "GET",
-            url: "/manager/ajax/quotations/categories",
+            url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
                     viewModel.get( "categories" ).data( xhr.data );
@@ -979,7 +979,7 @@ AP.signage.modal = ( function() {
 
         NM.util.ajax( {
             method: "GET",
-            url: "/manager/ajax/quotations/categories",
+            url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
                     xhr.data.unshift( { id: "", name: "" } );
