@@ -346,10 +346,15 @@
                                     </div>
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-9 offset-sm-3">
-                                           <button class="btn btn-default changeTab" id="shipment">&laquo; Precedente</button>
-                                           <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
+                                            <button class="btn btn-default changeTab" id="shipment">&laquo; Precedente</button>
+                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div> 
+                                    <div id="angolo" class="container py-3">
+                                        <div class="d-flex align-items-center">
+                                            <table style="width: 100%"></table>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!---
@@ -520,3 +525,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+<style>
+    #angolo {
+        position: fixed;
+        bottom: 50px;
+        right: 50px;
+        background-color: #2771e8;
+        width: 400px;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 9999;
+    }
+</style>

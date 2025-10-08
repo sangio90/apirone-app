@@ -1,13 +1,15 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function calcultateQuotationItem( event, rc, prc ){
+	function calculateQuotationItem( event, rc, prc ){
 
 		var params = {}
 		var data   = [];
 		var result = super.getResult();
 		var mm     = super.getMementify();
+		var quotationItemId = rc.id;
 
 		var output = {
+			"id" = quotationItemId,
 			"products" = [
 				{
 					"id": "ART",
@@ -33,7 +35,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			],
 			"quantity" = {
 				"label": "Quantità prodotti",
-				"quantity": 3
+				"count": 3
 			},
 			"total" = {
 				"label": "TOTALE",
@@ -53,8 +55,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 		var mm     = super.getMementify();
+		var quotationId = rc.id;
 
 		var output = {
+			"id" = quotationId,
 			"quantity" = {
 				"label" = "Numero prodotti",
 				"count" = 3

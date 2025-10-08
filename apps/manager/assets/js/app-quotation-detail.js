@@ -11,6 +11,21 @@ $( document ).ready( function() {
         AP.quotationDetail.detail.init();
     }
     $( ".k-listview-content" ).first().css( "display", "flex" );
+
+    const signageModal = document.getElementById('signage-modal');
+    signageModal.addEventListener('hide.bs.modal', (e) => {
+        renderQuotationTotals()
+    });
+
+    const plateModal = document.getElementById('plate-modal');
+    plateModal.addEventListener('hide.bs.modal', (e) => {
+        renderQuotationTotals()
+    });
+
+    const accessoryModal = document.getElementById('accessory-modal');
+    accessoryModal.addEventListener('hide.bs.modal', (e) => {
+        renderQuotationTotals()
+    });
 } );
 
 AP.quotationDetail.detail = ( function() {
@@ -99,7 +114,10 @@ AP.quotationDetail.detail = ( function() {
                 "country": { "id":"", "name":"" },
                 "state": { "id":"", "name":"" }
             },
-            title: this.id ? "Modifica Preventivo" : "Nuovo Preventivo"
+            title: this.id ? "Modifica Preventivo" : "Nuovo Preventivo",
+            totals: {
+                "id": null
+            }
         }
     };
 
@@ -437,6 +455,8 @@ AP.quotationDetail.detail = ( function() {
         editSignate: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
+            let tabellaTotali = $('#angolo').find('table')[0];
+            $(tabellaTotali).empty();
         },
 
         addPlate: function() {
@@ -484,7 +504,7 @@ AP.quotationDetail.detail = ( function() {
             if ( AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != "" ) {
                 AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + " " + AP.page.quotation.lead.lastName;
             }
-
+            renderQuotationTotals()
             viewModel.set( "detailForm.data", AP.page.quotation );
             if ( AP.page.quotation.customerAddressId && AP.page.quotation.customer.shippingAddresses ) {
                 const shippingAddress = AP.page.quotation.customer.shippingAddresses.find(item => item.id === AP.page.quotation.customerAddressId);
@@ -497,6 +517,39 @@ AP.quotationDetail.detail = ( function() {
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
         }
     };
+
+    renderQuotationTotals = function() {
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/total",
+            callback: {
+                done: function( xhr ) {
+                    if( xhr.data ) {
+                        if (!xhr.data.id || xhr.data.id != viewModel.get('detailForm.data.id')) {
+                            $('#angolo').hide();
+                        } else {
+                            viewModel.set('detailForm.data.totals', xhr.data)
+                            var totals = viewModel.get('detailForm.data.totals');
+                            let table = $('#angolo').find('table')[0]
+                            $(table).empty()
+                            $(table).append(
+                                `<tr>
+                                    <td>${totals.quantity.label}</td>
+                                    <td>${totals.quantity.count}</td>
+                                </tr>
+                                <tr style="font-weight: bold">
+                                    <td>${totals.total.label}</td>
+                                    <td>${totals.total.amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR'})}</td>
+                                </tr>
+                                `
+                            )
+                            $('#angolo').show();
+                        }
+                    }
+                }
+            }
+        } );
+    }
 
     return pub;
 } () );
