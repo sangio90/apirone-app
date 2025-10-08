@@ -17,7 +17,7 @@ $( document ).ready( function() {
         renderQuotationTotals()
     });
 
-    const plateModal = document.getElementById('plate-modal');
+    const plateModal = document.getElementById('plate-modal-root');
     plateModal.addEventListener('hide.bs.modal', (e) => {
         renderQuotationTotals()
     });
