@@ -31,7 +31,8 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 					"line",
 					"model",
 					"finish",
-					"prices"
+					"prices",
+					"image"
 				]
 			}
 		}
@@ -65,6 +66,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	property name="catalogBundle" type="com.apirone.core.model.bean.CatalogBundle";
 
 	property name="prices" type="com.apirone.core.model.bean.Price[]" default=[];
+	property name="image" type="com.apirone.core.model.bean.File";
 
 	public Product function init(){
 		variables.prices = {};

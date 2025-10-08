@@ -82,4 +82,19 @@ component extends="com.apirone.core.controller.AbsController" {
 
     }
 
+    public function productItemsByProduct( event, rc, prc ) {
+		var result = super.getResult();
+
+		var productId = rc.productId;
+		var originId = StructKeyExists(rc, "originId") ? rc.originId : null;
+		var mm = super.getMementify();
+		var productItems = super.fire( "ProductItem.list", { productId: productId, originId: originId } );
+		var productItems = ( mm.convertList( productItems, "treelight" ) );
+
+		result.setCount( Len(productItems) );
+		result.setData( productItems );
+
+		event.setValue( "result", result );
+	}
+
 }

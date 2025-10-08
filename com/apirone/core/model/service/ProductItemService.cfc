@@ -4,6 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="attributeService" inject="AttributeService";
 	property name="attributeValueService" inject="AttributeValueService";
+	property name="FileService" inject="FileService";
 	property name="componentService" inject="ComponentService";
 	property name="priceService" inject="PriceService";
 
@@ -364,6 +365,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setChildren( [] );
 
 			bean.setPrices( getPriceService().list( productItemId = record.product_item_id ) );
+
+			var images = getFileService().list( productItemId = record.product_item_id )
+			if (Len(images)) {
+				bean.setImage(images[1])
+			} else {
+				var images = getFileService().list( attributeValueId = record.attribute_raw_value_id )
+				if (Len(images)) {
+					bean.setImage(images[1])
+				} 
+			}
 
 			return bean;
 		}

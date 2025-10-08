@@ -127,6 +127,7 @@
 		prc.jsScripts.add( "app-plate" );
 		prc.jsScripts.add( "app-quotation-detail" );
 		prc.jsScripts.add( "app-signage" );
+		prc.jsScripts.add( "app-accessory" );
 
 		event.setView( "quotation/detail" );
 	}

@@ -36,10 +36,14 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 					"id",
 					"shortId",
 					"origin.id",
+					"level",
 					"attribute.id",
 					"attribute.name",
 					"attributeValue.id",
-					"attributeValue.rawValue.name"
+					"attributeValue.image",
+					"attributeValue.rawValue.name",
+					"attributeValue.rawValue.image",
+					"image"
 				]
 			}
 		}
@@ -53,6 +57,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="origin" type="com.apirone.core.model.bean.ProductItem";
 	property name="attributeValue" type="com.apirone.core.model.bean.AttributeValue";
 	property name="attribute" type="com.apirone.core.model.bean.Attribute";
+	property name="image" type="com.apirone.core.model.bean.File";
 
 	property name="children" type="com.apirone.core.model.bean.ProductItem[]";
 

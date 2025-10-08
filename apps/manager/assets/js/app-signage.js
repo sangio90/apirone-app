@@ -665,7 +665,7 @@ AP.signage.modal = ( function() {
             // Chiamata AJAX iniziale per ottenere tutti i product items
             await NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/products/" + productId + "/product-items",
+                url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
@@ -739,7 +739,7 @@ AP.signage.modal = ( function() {
                 const attributeArray = productItems.data();
                 originId = originId || "";
 
-                let url = "/manager/ajax/products/" + productId + "/product-items";
+                let url = "/manager/ajax/product-items?productId=" + productId;
                 if ( originId ) {
                     url += "&originId=" + originId;
                 }
@@ -962,7 +962,7 @@ AP.signage.modal = ( function() {
 
         NM.util.ajax( {
             method: "GET",
-            url: "/manager/ajax/quotations/categories",
+            url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
                     viewModel.get( "categories" ).data( xhr.data );
@@ -979,7 +979,7 @@ AP.signage.modal = ( function() {
 
         NM.util.ajax( {
             method: "GET",
-            url: "/manager/ajax/quotations/categories",
+            url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
                     xhr.data.unshift( { id: "", name: "" } );
@@ -1052,11 +1052,55 @@ AP.signage.modal = ( function() {
                 },
             },
         } );
+
+        renderQuotationItemTotals(id)
     };
 
     pub.init = function() {
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
     };
+
+    renderQuotationItemTotals = function(quotationItemId) {
+        NM.util.ajax( {
+            method: "GET",
+            url: `/manager/ajax/quotation-items/${quotationItemId}/total`,
+            callback: {
+                done: function( xhr ) {
+                    if( xhr.data ) {
+                        if (!xhr.data.id || xhr.data.id != quotationItemId) {
+                            $('#angolo').hide();
+                        } else {
+                            viewModel.set('detailForm.data.totals', xhr.data)
+                            var totals = viewModel.get('detailForm.data.totals');
+                            if (xhr.data) {
+                                let table = $('#angolo').find('table')[0]
+                                totals.products.forEach( function (row) {
+                                        $(table).append(`
+                                        <tr>
+                                            <td>${row.id} - ${row.label}</td>
+                                            <td>${row.amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR'})}</td>
+                                        </tr>
+                                    `)
+                                } )
+                                $(table).append(
+                                    `<tr>
+                                        <td>${totals.quantity.label}</td>
+                                        <td>${totals.quantity.count}</td>
+                                    </tr>
+                                    <tr style="font-weight: bold">
+                                        <td>${totals.total.label}</td>
+                                        <td>${totals.total.amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR'})}</td>
+                                    </tr>
+                                    `
+                                )
+                            }
+                            $('#angolo').show();
+                        }
+                    }
+                }
+            }
+        } );
+    }
 
     return pub;
 } () );
