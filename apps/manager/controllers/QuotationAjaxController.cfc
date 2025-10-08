@@ -7,7 +7,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 		var mem    = super.getMementify();
 
-		params[ "typeId" ] = "SEG";
+		params[ "typeId" ] = rc.typeId;
 
 		var rows = super.fire( "productCategory.list", params );
 

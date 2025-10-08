@@ -6,6 +6,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="statusService";
 	property name="langService" inject="LangService";
 	property name="componentService" inject="ComponentService";
+	property name="FileService" inject="FileService";
 
 	property name="cacheScope" type="String" default="AttributeValue.bean";
 
@@ -126,6 +127,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setRawValue( getRawValueService().get( record.raw_value_id ) );
 
 			bean.setAllowNote( record.allow_note ? true : false );
+
+			var images = getFileService().list( attributeValueId = record.attribute_raw_value_id )
+			if (Len(images)) {
+				bean.setImage(images[1])
+			} 
+
 			bean.setAffectToImage( record.affect_to_image ? true : false );
 
 			bean.setComponentCount( record.component_count );

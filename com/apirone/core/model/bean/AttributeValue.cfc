@@ -14,6 +14,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 					"attributeId",
 					"componentCount",
 					"allowNote",
+					"image",
 					"affectToImage"
 				]
 			}
@@ -29,6 +30,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 
 	property name="allowNote" type="Boolean";
 	property name="affectToImage" type="Boolean";
+	property name="image" type="com.apirone.core.model.bean.File";
 
 	public AttributeValue function init(){
 		return this;

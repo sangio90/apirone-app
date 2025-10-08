@@ -9,6 +9,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="CatalogBundleService" inject="CatalogBundleService";
 	property name="PriceService" inject="PriceService";
 	property name="TextService" inject="TextService";
+	property name="FileService" inject="FileService";
 
 	property name="cacheScope" type="String" default="Product.bean";
 
@@ -274,6 +275,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
 			bean.setPrices( getPriceService().list( productId = record.product_id ) );
+			var images = getFileService().list( productId = record.product_id )
+			if (Len(images)) {
+				bean.setImage(images[1])
+			} 
 
 			return bean;
 		}

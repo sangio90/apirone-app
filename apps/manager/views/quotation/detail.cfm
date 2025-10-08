@@ -306,6 +306,7 @@
                                                     <div class="col-6 text-start">
                                                         <button id="addPlateButton" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
                                                         <button id="addSignageButton" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none" disabled>Aggiungi segnaletica</button>
+                                                        <button id="addAccessoryButton" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addAccessory" style="display: none" disabled>Aggiungi accessorio</button>
                                                     </div>
                                                 </div>
                                             </nav>
@@ -467,6 +468,7 @@
 
     </div>
     #view( "quotation/signage-modal" )#
+    #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal" )#
     #view( "quotation/zone-modal" )#
     #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
@@ -501,17 +503,20 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector('#nav-plate-tab').addEventListener("click", function (e) {
         e.preventDefault();
         $( "#addSignageButton" ).hide();
+        $( "#addAccessoryButton" ).hide();
         $( "#addPlateButton" ).show();
     });
     document.querySelector('#nav-signage-tab').addEventListener("click", function (e) {
         e.preventDefault();
         $( "#addPlateButton" ).hide();
+        $( "#addAccessoryButton" ).hide();
         $( "#addSignageButton" ).show();
     });
     document.querySelector('#nav-accessories-tab').addEventListener("click", function (e) {
         e.preventDefault();
         $( "#addPlateButton" ).hide();
         $( "#addSignageButton" ).hide();
+        $( "#addAccessoryButton" ).show();
     });
 });
 </script>

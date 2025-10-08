@@ -251,7 +251,7 @@
 		/*
 			products items
 		*/
-		get( "/ajax/products/:productId/product-items" ).to( "ProductAjaxController.productItems" ).end();
+		get( "/ajax/product-items" ).to( "ProductItemAjaxController.productItemsByProduct" ).end();
 
 
 		/*

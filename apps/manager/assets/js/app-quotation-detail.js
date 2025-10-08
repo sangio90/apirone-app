@@ -24,6 +24,10 @@ AP.quotationDetail.detail = ( function() {
         return AP.plate.modal;
     }
 
+    function accessoryApp() {
+        return AP.accessory.modal;
+    }
+
     var defaultDetailForm = {
         data: {
             id: "",
@@ -409,8 +413,10 @@ AP.quotationDetail.detail = ( function() {
 
             if ( viewModel.detailForm.data.zone.id != "" ) {
                 $( "#addSignageButton" ).prop( "disabled", false );
+                $( "#addAccessoryButton" ).prop( "disabled", false );
             } else {
                 $( "#addSignageButton" ).prop( "disabled", true );
+                $( "#addAccessoryButton" ).prop( "disabled", true );
             }
 
             return false;
@@ -422,6 +428,10 @@ AP.quotationDetail.detail = ( function() {
 
         addSignage: function() {
             signageApp().new();
+        },
+
+        addAccessory: function() {
+            accessoryApp().new();
         },
 
         editSignate: function( event ) {

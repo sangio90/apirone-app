@@ -14,6 +14,7 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
+		<cfargument name="attributeValueId" type="Numeric">
 		<cfargument name="combinationId" type="String">
 		<cfargument name="typeId" type="String">
 		<cfargument name="quotationItemId" type="String">
