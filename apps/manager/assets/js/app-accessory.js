@@ -158,9 +158,9 @@ AP.accessory.modal = ( function() {
                                     }
 
                                     $( "#accessory-preview-container" ).css( {
-                                            width: "500px",
-                                            height: "500px"
-                                        } );
+                                        width: "500px",
+                                        height: "500px"
+                                    } );
                                 }
                             }
                         } );
@@ -171,25 +171,25 @@ AP.accessory.modal = ( function() {
         },
 
         loadProduct: function() {
-            $('#accessory-preview-background').empty()
+            $( "#accessory-preview-background" ).empty();
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                 $( "#accessoryModel" ).prop( "disabled", true );
             } else {
                 $( "#accessoryModel" ).prop( "disabled", false );
             }
-            let self = this;
+            const self = this;
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/products?categoryId=" + 
-                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) + 
-                    "&lineId=" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) + 
-                    "&modelId=" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) + 
+                url: "/manager/ajax/products?categoryId=" +
+                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) +
+                    "&lineId=" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) +
+                    "&modelId=" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) +
                     "&finishId=" + viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
                 callback: {
                     done: async function( xhr ) {
-                        if (xhr.data) {
-                            viewModel.set('detailForm.data.quotationItem.product.id', xhr.data[0].id);
-                            viewModel.set('detailForm.data.quotationItem.product.image', xhr.data[0].image);
+                        if ( xhr.data ) {
+                            viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data[0].id );
+                            viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].image );
                             if ( xhr.data[0].image ) {
                                 viewModel.set( "backgroundImage", xhr.data[0].image );
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].image.uri + "')" );
@@ -215,7 +215,7 @@ AP.accessory.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
-                            if (!viewModel.get('detailForm.data.quotationItem.product.image') && xhr.data[0].image) {
+                            if ( !viewModel.get( "detailForm.data.quotationItem.product.image" ) && xhr.data[0].image ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].image );
                                 viewModel.set( "backgroundImage", xhr.data[0].image );
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].image.uri + "')" );
@@ -223,7 +223,7 @@ AP.accessory.modal = ( function() {
                             viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                             const attributeArray = productItems.data();
-                            //settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
+                            // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
                                 if ( existing ) {
@@ -265,7 +265,7 @@ AP.accessory.modal = ( function() {
                         url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
                         callback: {
                             done: async function( xhr ) {
-                                xhr.data.sort((a, b) => a.productItem.orderby - b.productItem.orderby);
+                                xhr.data.sort( ( a, b ) => a.productItem.orderby - b.productItem.orderby );
                                 if ( xhr.data.length > 0 ) {
                                     for ( const qipi of xhr.data ) {
                                         const select = $( `select[data-attribute-id="${qipi.productItem.attribute.id}"]` );
@@ -392,16 +392,17 @@ AP.accessory.modal = ( function() {
                             }
 
                             viewModel.renderProductItems();
-                            if (productItems && productItems.data().length > 0) {
-                                debugger
-                                productItems.data().forEach(function(item) {
-                                    let selectedValues = item.values.filter( ( value ) => { return value.selected == true } );
-                                    if (selectedValues.length > 0) {
-                                        if (selectedValues[0].attributeValue?.image) {
-                                            $('#accessory-preview-background').append(`<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">`)
+                            if ( productItems && productItems.data().length > 0 ) {
+                                productItems.data().forEach( function( item ) {
+                                    const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
+                                    if ( selectedValues.length > 0 ) {
+                                        if ( selectedValues[0].attributeValue?.image ) {
+                                            // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
+                                            // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
+                                            $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
                                         }
                                     }
-                                })
+                                } );
                             }
                             resolve();
                         },
