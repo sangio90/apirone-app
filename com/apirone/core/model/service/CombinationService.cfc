@@ -42,7 +42,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Array function calculateCombinations( required String productId ){
-		var items = getProductItemService().getFlatTree( productId = arguments.productId );
+		var items = getProductItemService().getFlatTree( productId = arguments.productId, includeMissingValues = false );
 		// Trasformo il flat tree in un array di righe
 		var rows  = flattenTreeToRows( items );
 
