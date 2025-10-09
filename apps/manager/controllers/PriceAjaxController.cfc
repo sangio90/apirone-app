@@ -1,47 +1,26 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function calculateQuotationItem( event, rc, prc ){
-
-		var params = {}
-		var data   = [];
-		var result = super.getResult();
-		var mm     = super.getMementify();
+		var params          = {}
+		var data            = [];
+		var result          = super.getResult();
+		var mm              = super.getMementify();
 		var quotationItemId = rc.id;
 
 		var output = {
-			"id" = quotationItemId,
+			"id"       = quotationItemId,
 			"products" = [
 				{
-					"id": "ART",
-					"label": "Prezzo articolo",
-					"amount": 31.7
+					"id"     = "ART",
+					"label"  = "Prezzo articolo",
+					"amount" = 31.7
 				},
-				{
-					"id": "P1",
-					"label": "Posizione 1",
-					"amount": 3.5
-				},
-				{
-					"id": "P2",
-					"label": "Posizione 2",
-					"amount": 4.6
-				},
-				{
-					"id": "P2",
-					"label": "Posizione 3",
-					"amount": 5.7
-				},
-
+				{ "id" = "P1", "label" = "Riga 1", "amount" = 3.5 },
+				{ "id" = "P2", "label" = "Riga 2", "amount" = 4.6 },
+				{ "id" = "P2", "label" = "Riga 3", "amount" = 5.7 }
 			],
-			"quantity" = {
-				"label": "Quantità prodotti",
-				"count": 3
-			},
-			"total" = {
-				"label": "TOTALE",
-				"amount": 45.50
-			}
-
+			"quantity" = { "label" = "Quantità prodotti", "count" = 3 },
+			"total"    = { "label" = "TOTALE", "amount" = 45.50 }
 		}
 
 		result.setData( output );
@@ -50,33 +29,25 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function calculateQuotation( event, rc, prc ){
-
-		var params = {}
-		var data   = [];
-		var result = super.getResult();
-		var mm     = super.getMementify();
+		var params      = {}
+		var data        = [];
+		var result      = super.getResult();
+		var mm          = super.getMementify();
 		var quotationId = rc.id;
 
 		var output = {
-			"id" = quotationId,
-			"quantity" = {
-				"label" = "Numero prodotti",
-				"count" = 3
-			},
-			"total" = {
-				"label" = "TOTALE",
-				"amount" = 45.50
-			}
+			"id"       = quotationId,
+			"quantity" = { "label" = "Numero prodotti", "count" = 3 },
+			"total"    = { "label" = "TOTALE", "amount" = 45.50 }
 		};
 
 		result.setData( output );
 
 		event.setValue( "result", output );
-	}	
+	}
 
 
 	function list( event, rc, prc ){
-
 		var params = {}
 		var data   = [];
 		var result = super.getResult();
@@ -86,13 +57,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( rc.by == "products" ) {
 			params[ "productId" ] = rc.id;
-			entity = "PRODUCT";
-
+			entity                = "PRODUCT";
 		}
 
 		if ( rc.by == "product-items" ) {
 			params[ "productItemId" ] = rc.id;
-			entity = "PRODUCT_ITEM";
+			entity                    = "PRODUCT_ITEM";
 		}
 
 
@@ -143,21 +113,24 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var messageId = "prices.updated";
 
-		var key = "";
+		var key   = "";
 		var value = "";
 
-		if( rc.by == "products" ) {
-			key = "product.id";
+		if ( rc.by == "products" ) {
+			key   = "product.id";
 			value = json.item.id;
 		}
 
-		if( rc.by == "product-items" ) {
-			key = "productItem.id";
+		if ( rc.by == "product-items" ) {
+			key   = "productItem.id";
 			value = json.item.id;
 		}
 
-		if( key == "" ) {
-			throw( type="apirone.error.component.InvalidEntityType", message="You must specify the entity for which the price is saved." );
+		if ( key == "" ) {
+			Throw(
+				type    = "apirone.error.component.InvalidEntityType",
+				message = "You must specify the entity for which the price is saved."
+			);
 		}
 
 		for ( var item in json.prices ) {

@@ -275,10 +275,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
 			bean.setPrices( getPriceService().list( productId = record.product_id ) );
-			var images = getFileService().list( productId = record.product_id )
-			if (Len(images)) {
-				bean.setImage(images[1])
-			} 
+			var images = getFileService().list( productId = record.product_id );
+			dump( images );
+			abort;
+			if ( Len( images ) ) {
+				bean.setImage( images[ 1 ] )
+			}
 
 			return bean;
 		}
@@ -321,7 +323,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return NullValue();
-	}	
+	}
 	*/
 
 }

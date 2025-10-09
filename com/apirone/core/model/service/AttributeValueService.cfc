@@ -128,10 +128,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setAllowNote( record.allow_note ? true : false );
 
-			var images = getFileService().list( attributeValueId = record.attribute_raw_value_id )
-			if (Len(images)) {
-				bean.setImage(images[1])
-			} 
+			var images = getFileService().list( attributeValueId = record.attribute_raw_value_id );
+			if ( Len( images ) ) {
+				bean.setImage( images[ 1 ] )
+			}
 
 			bean.setAffectToImage( record.affect_to_image ? true : false );
 

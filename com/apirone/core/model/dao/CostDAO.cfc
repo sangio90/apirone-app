@@ -28,8 +28,6 @@
 				lisart
 		</cfquery>
 
-		<cfdump var="#local.q#">
-
 		<cfreturn local.q>
 	</cffunction>
 </cfcomponent>
