@@ -254,6 +254,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productId );
 
 		if ( record.recordCount ) {
+
 			if ( IsNull( record.catalog_bundle_id ) ) {
 				var bean = super.bean( "ProductBase" );
 				bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
@@ -276,8 +277,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setPrices( getPriceService().list( productId = record.product_id ) );
 			var images = getFileService().list( productId = record.product_id );
-			dump( images );
-			abort;
+			
 			if ( Len( images ) ) {
 				bean.setImage( images[ 1 ] )
 			}
