@@ -273,7 +273,10 @@ AP.signage.modal = ( function() {
 
                 const pictogramName = match[1]; // es. "man"
                 const imgHtml =
-                    "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogramName + ".png\" " +
+                    // TODO: usare il font selezionato quando avremo i pictogram in tutti i font,
+                    //      creare una mappa fontFamily -> esistenza pictogram
+                    // "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogramName + ".png\" " +
+                    "<img src=\"/assets/main/pictograms/Arial/" + pictogramName + ".png\" " +
                     "alt=\"" + pictogramName + "\" " +
                     "style=\"height: " + heightPx + "px;\" " +
                     "class=\"pictogram px-2\">";
@@ -672,7 +675,7 @@ AP.signage.modal = ( function() {
                             viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                             const attributeArray = productItems.data();
-                            //settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
+                            // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
                                 if ( existing ) {
@@ -714,7 +717,7 @@ AP.signage.modal = ( function() {
                         url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
                         callback: {
                             done: async function( xhr ) {
-                                xhr.data.sort((a, b) => a.productItem.orderby - b.productItem.orderby);
+                                xhr.data.sort( ( a, b ) => a.productItem.orderby - b.productItem.orderby );
                                 if ( xhr.data.length > 0 ) {
                                     for ( const qipi of xhr.data ) {
                                         const select = $( `select[data-attribute-id="${qipi.productItem.attribute.id}"]` );
@@ -1053,54 +1056,54 @@ AP.signage.modal = ( function() {
             },
         } );
 
-        renderQuotationItemTotals(id)
+        renderQuotationItemTotals( id );
     };
 
     pub.init = function() {
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
     };
 
-    renderQuotationItemTotals = function(quotationItemId) {
+    renderQuotationItemTotals = function( quotationItemId ) {
         NM.util.ajax( {
             method: "GET",
             url: `/manager/ajax/quotation-items/${quotationItemId}/total`,
             callback: {
                 done: function( xhr ) {
                     if( xhr.data ) {
-                        if (!xhr.data.id || xhr.data.id != quotationItemId) {
-                            $('#angolo').hide();
+                        if ( !xhr.data.id || xhr.data.id != quotationItemId ) {
+                            $( "#angolo" ).hide();
                         } else {
-                            viewModel.set('detailForm.data.totals', xhr.data)
-                            var totals = viewModel.get('detailForm.data.totals');
-                            if (xhr.data) {
-                                let table = $('#angolo').find('table')[0]
-                                totals.products.forEach( function (row) {
-                                        $(table).append(`
+                            viewModel.set( "detailForm.data.totals", xhr.data );
+                            var totals = viewModel.get( "detailForm.data.totals" );
+                            if ( xhr.data ) {
+                                const table = $( "#angolo" ).find( "table" )[0];
+                                totals.products.forEach( function( row ) {
+                                    $( table ).append( `
                                         <tr>
                                             <td>${row.id} - ${row.label}</td>
-                                            <td>${row.amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR'})}</td>
+                                            <td>${row.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
                                         </tr>
-                                    `)
-                                } )
-                                $(table).append(
+                                    ` );
+                                } );
+                                $( table ).append(
                                     `<tr>
                                         <td>${totals.quantity.label}</td>
                                         <td>${totals.quantity.count}</td>
                                     </tr>
                                     <tr style="font-weight: bold">
                                         <td>${totals.total.label}</td>
-                                        <td>${totals.total.amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR'})}</td>
+                                        <td>${totals.total.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
                                     </tr>
                                     `
-                                )
+                                );
                             }
-                            $('#angolo').show();
+                            $( "#angolo" ).show();
                         }
                     }
                 }
             }
         } );
-    }
+    };
 
     return pub;
 } () );
