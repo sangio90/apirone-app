@@ -240,6 +240,7 @@ AP.signage.modal = ( function() {
                 } );
             } );
             this.checkCanSave();
+            NM.storage.set('signage.signageConfigId', viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) );
         },
 
         parsedLineContent: function( valore, id ) {
@@ -492,6 +493,7 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            NM.storage.set('signage.categoryId', viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ));
         },
 
         loadModels: function( event ) {
@@ -522,6 +524,7 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            NM.storage.set('signage.lineId', viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ));
         },
 
         loadFinishes: function( event ) {
@@ -575,6 +578,7 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            NM.storage.set('signage.modelId', viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ));
         },
 
         loadSignageConfigs: function( event ) {
@@ -637,6 +641,7 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            NM.storage.set('signage.finishId', viewModel.get( "detailForm.data.quotationItem.product.finish.id" ));
         },
 
         loadFontSizes: function() {
@@ -659,6 +664,7 @@ AP.signage.modal = ( function() {
                 }
             }
             this.checkCanSave();
+            NM.storage.set('signage.fontId', viewModel.get( "detailForm.data.signageConfig.font.id" ));
         },
 
         firstLoadProductItems: async function() {
@@ -975,6 +981,39 @@ AP.signage.modal = ( function() {
         } );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
+        if (NM.storage.get('signage.categoryId')) {
+            viewModel.set("detailForm.data.signageConfig.catalogBundle.category.id", NM.storage.get('signage.categoryId'));
+        }
+        if (NM.storage.get('signage.lineId')) {
+            setTimeout( function() {
+                viewModel.loadLines();
+            }, 200);
+            viewModel.set("detailForm.data.signageConfig.catalogBundle.line.id", NM.storage.get('signage.lineId'));
+        }
+        if (NM.storage.get('signage.modelId')) {
+            setTimeout( function() {
+                viewModel.loadModels();
+            }, 200);
+            viewModel.set("detailForm.data.signageConfig.catalogBundle.model.id", NM.storage.get('signage.modelId'));
+        }
+        if (NM.storage.get('signage.finishId')) {
+            setTimeout( function() {
+                viewModel.loadFinishes();
+            }, 200);
+            viewModel.set("detailForm.data.quotationItem.product.finish.id", NM.storage.get('signage.finishId'));
+        }
+        if (NM.storage.get('signage.fontId')) {
+            setTimeout( function() {
+                viewModel.loadSignageConfigs();
+            }, 200);
+            viewModel.set("detailForm.data.signageConfig.font.id", NM.storage.get('signage.fontId'));
+        }
+        if (NM.storage.get('signage.signageConfigId')) {
+            setTimeout( function() {
+                viewModel.loadFontSizes();
+            }, 400);
+            viewModel.set("detailForm.data.quotationItem.signageConfigItem.id", NM.storage.get('signage.signageConfigId'));
+        }
     };
 
     pub.edit = function( { id, onSave } ) {

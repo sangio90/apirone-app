@@ -394,7 +394,17 @@ AP.quotationDetail.detail = ( function() {
                                     }
                                 } );
                                 viewModel.get( "zones" ).data( zones );
-                                viewModel.set( "detailForm.data.zone", zones[0] );
+                                if (NM.storage.get('quotation.zone.id')) {
+                                    var selectedZone = zones.find( zone => zone.id == NM.storage.get('quotation.zone.id') );
+                                    if (!selectedZone) { 
+                                        NM.storage.delete('quotation.zone.id'); 
+                                        NM.storage.delete('quotation.zone.name');
+                                        selectedZone = zones[0];
+                                    }
+                                    viewModel.set( "detailForm.data.zone", selectedZone );
+                                } else {
+                                    viewModel.set( "detailForm.data.zone", zones[0] );
+                                }
                                 viewModel.set( "detailForm.data.zones", zones );
                                 viewModel.getItems();
                             }
@@ -430,9 +440,13 @@ AP.quotationDetail.detail = ( function() {
             }
 
             if ( viewModel.detailForm.data.zone.id != "" ) {
+                NM.storage.set('quotation.zone.id', viewModel.detailForm.data.zone.id);
+                NM.storage.set('quotation.zone.name', viewModel.detailForm.data.zone.name);
                 $( "#addSignageButton" ).prop( "disabled", false );
                 $( "#addAccessoryButton" ).prop( "disabled", false );
             } else {
+                NM.storage.delete('quotation.zone.id');
+                NM.storage.delete('quotation.zone.name');
                 $( "#addSignageButton" ).prop( "disabled", true );
                 $( "#addAccessoryButton" ).prop( "disabled", true );
             }
