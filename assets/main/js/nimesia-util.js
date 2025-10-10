@@ -183,6 +183,12 @@ NM.util.uuid = function() {
 
 NM.storage = {
 
+    /*
+        Naming:
+            key: product.items.showUnlinked
+            value: true | 123 | miaStringa | { id: 123, name: "pippo" }
+    */
+
     set: function( key, value ) {
         localStorage.setItem( key, JSON.stringify( value ) );
     },
