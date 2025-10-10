@@ -129,46 +129,47 @@ AP.accessory.modal = ( function() {
         loadFinishes: function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) != "" ) {
                 $( "#accessoryRow" ).prop( "disabled", true );
+                NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ),
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "" } );
+                            viewModel.get( "finishes" ).data( xhr.data );
+                            NM.util.ajax( {
+                                method: "GET",
+                                url: "/manager/ajax/model-config/get-by-params?categoryId=" +
+                                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) +
+                                    "&lineId=" +
+                                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) +
+                                    "&modelId=" +
+                                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ),
+                                callback: {
+                                    done: function( xhr ) {
+                                        if ( xhr.data && xhr.data.modelConfig ) {
+                                            var modelConfig = {
+                                                width: xhr.data.modelConfig.width,
+                                                height: xhr.data.modelConfig.height,
+                                            };
+                                            viewModel.set( "modelConfig", modelConfig );
+                                        } else {
+                                            viewModel.set( "modelConfig", { width: null, height: null } );
+                                        }
+
+                                        $( "#accessory-preview-container" ).css( {
+                                            width: "500px",
+                                            height: "500px"
+                                        } );
+                                    }
+                                }
+                            } );
+                        },
+                    },
+                } );
             } else {
                 $( "#accessoryRow" ).prop( "disabled", false );
-            }
-            NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ),
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "" } );
-                        viewModel.get( "finishes" ).data( xhr.data );
-                        NM.util.ajax( {
-                            method: "GET",
-                            url: "/manager/ajax/model-config/get-by-params?categoryId=" +
-                                viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) +
-                                "&lineId=" +
-                                viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) +
-                                "&modelId=" +
-                                viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ),
-                            callback: {
-                                done: function( xhr ) {
-                                    if ( xhr.data && xhr.data.modelConfig ) {
-                                        var modelConfig = {
-                                            width: xhr.data.modelConfig.width,
-                                            height: xhr.data.modelConfig.height,
-                                        };
-                                        viewModel.set( "modelConfig", modelConfig );
-                                    } else {
-                                        viewModel.set( "modelConfig", { width: null, height: null } );
-                                    }
 
-                                    $( "#accessory-preview-container" ).css( {
-                                        width: "500px",
-                                        height: "500px"
-                                    } );
-                                }
-                            }
-                        } );
-                    },
-                },
-            } );
+            }
             this.checkCanSave();
             NM.storage.set('accessory.modelId', viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ));
         },

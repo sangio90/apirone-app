@@ -530,53 +530,53 @@ AP.signage.modal = ( function() {
         loadFinishes: function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) != "" ) {
                 $( "#signageRow" ).prop( "disabled", true );
+                NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "" } );
+                            viewModel.get( "finishes" ).data( xhr.data );
+                            NM.util.ajax( {
+                                method: "GET",
+                                url: "/manager/ajax/model-config/get-by-params?categoryId=" +
+                                    viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
+                                    "&lineId=" +
+                                    viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
+                                    "&modelId=" +
+                                    viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
+                                callback: {
+                                    done: function( xhr ) {
+                                        if ( xhr.data && xhr.data.modelConfig ) {
+                                            var modelConfig = {
+                                                width: xhr.data.modelConfig.width,
+                                                height: xhr.data.modelConfig.height,
+                                            };
+                                            viewModel.set( "modelConfig", modelConfig );
+                                        } else {
+                                            viewModel.set( "modelConfig", { width: null, height: null } );
+                                        }
+
+                                        if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
+                                            $( "#signage-preview-container" ).css( {
+                                                width: viewModel.get( "modelConfig.width" ) + "px",
+                                                height: viewModel.get( "modelConfig.height" ) + "px"
+                                            } );
+                                        } else {
+                                            $( "#signage-preview-container" ).css( {
+                                                width: "500px",
+                                                height: "500px"
+                                            } );
+                                        }
+                                    }
+                                }
+                            } );
+                        },
+                    },
+                } );
             } else {
                 $( "#signageRow" ).prop( "disabled", false );
             }
-            NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "" } );
-                        viewModel.get( "finishes" ).data( xhr.data );
-                        NM.util.ajax( {
-                            method: "GET",
-                            url: "/manager/ajax/model-config/get-by-params?categoryId=" +
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
-                                "&lineId=" +
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
-                                "&modelId=" +
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
-                            callback: {
-                                done: function( xhr ) {
-                                    if ( xhr.data && xhr.data.modelConfig ) {
-                                        var modelConfig = {
-                                            width: xhr.data.modelConfig.width,
-                                            height: xhr.data.modelConfig.height,
-                                        };
-                                        viewModel.set( "modelConfig", modelConfig );
-                                    } else {
-                                        viewModel.set( "modelConfig", { width: null, height: null } );
-                                    }
-
-                                    if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
-                                        $( "#signage-preview-container" ).css( {
-                                            width: viewModel.get( "modelConfig.width" ) + "px",
-                                            height: viewModel.get( "modelConfig.height" ) + "px"
-                                        } );
-                                    } else {
-                                        $( "#signage-preview-container" ).css( {
-                                            width: "500px",
-                                            height: "500px"
-                                        } );
-                                    }
-                                }
-                            }
-                        } );
-                    },
-                },
-            } );
             this.checkCanSave();
             NM.storage.set('signage.modelId', viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ));
         },
