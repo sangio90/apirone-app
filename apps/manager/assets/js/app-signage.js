@@ -962,6 +962,110 @@ AP.signage.modal = ( function() {
 
             return false;
         },
+
+        handleParamsUnset: function( param ) {
+            if ( param === "category" ) {
+                setTimeout( function() {
+                    if ($('#signageFontSize').val() !== '') {
+                        $('#signageFontSize').val('');
+                        $('#signageFontSize').trigger('change');
+                    }
+                    setTimeout( function() {
+                        if ($('#signageFont').val() !== '') {
+                            $('#signageFont').val('');
+                            $('#signageFont').trigger('change');
+                        }
+                        setTimeout( function() {
+                            if ($('#signageFinish').val() !== '') {                            
+                                $('#signageFinish').val('');
+                                $('#signageFinish').trigger('change');
+                            }
+                            setTimeout( function() {
+                                if ($('#signageModel').val() !== '') {                            
+                                    $('#signageModel').val('');
+                                    $('#signageModel').trigger('change');
+                                }
+                                setTimeout( function() {
+                                    if ($('#signageRow').val() !== '') {                            
+                                        $('#signageRow').val('');
+                                        $('#signageRow').trigger('change');
+                                    }
+                                }, 100);
+                            }, 100);
+                        }, 100);
+                    }, 100);
+                }, 100);
+            }
+            if ( param === "line" ) {
+                setTimeout( function() {
+                    if ($('#signageFontSize').val() !== '') {
+                        $('#signageFontSize').val('');
+                        $('#signageFontSize').trigger('change');
+                    }
+                    setTimeout( function() {
+                        if ($('#signageFont').val() !== '') {
+                            $('#signageFont').val('');
+                            $('#signageFont').trigger('change');
+                        }
+                        setTimeout( function() {
+                            if ($('#signageFinish').val() !== '') {                            
+                                $('#signageFinish').val('');
+                                $('#signageFinish').trigger('change');
+                            }
+                            setTimeout( function() {
+                                if ($('#signageModel').val() !== '') {                            
+                                    $('#signageModel').val('');
+                                    $('#signageModel').trigger('change');
+                                }
+                            }, 100);
+                        }, 100);
+                    }, 100);
+                }, 100);
+            }
+            if ( param === "model" ) {
+                setTimeout( function() {
+                    if ($('#signageFontSize').val() !== '') {
+                        $('#signageFontSize').val('');
+                        $('#signageFontSize').trigger('change');
+                    }
+                    setTimeout( function() {
+                        if ($('#signageFont').val() !== '') {
+                            $('#signageFont').val('');
+                            $('#signageFont').trigger('change');
+                        }
+                        setTimeout( function() {
+                            if ($('#signageFinish').val() !== '') {                            
+                                $('#signageFinish').val('');
+                                $('#signageFinish').trigger('change');
+                            }
+                        }, 100);
+                    }, 100);
+                }, 100);
+            }
+            if ( param === "finish" ) {
+                setTimeout( function() {
+                    if ($('#signageFontSize').val() !== '') {
+                        $('#signageFontSize').val('');
+                        $('#signageFontSize').trigger('change');
+                    }
+                    setTimeout( function() {
+                        if ($('#signageFont').val() !== '') {
+                            $('#signageFont').val('');
+                            $('#signageFont').trigger('change');
+                        }
+                    }, 100);
+                }, 100);
+            }
+            if ( param === "font" ) {
+                setTimeout( function() {
+                    if ($('#signageFontSize').val() !== '') {
+                        $('#signageFontSize').val('');
+                        $('#signageFontSize').trigger('change');
+                    }
+                }, 100);
+            }
+            this.checkCanSave();
+        }
     } );
 
     pub.new = function( onSave ) {
@@ -981,39 +1085,54 @@ AP.signage.modal = ( function() {
         } );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
+        
         if (NM.storage.get('signage.categoryId')) {
             viewModel.set("detailForm.data.signageConfig.catalogBundle.category.id", NM.storage.get('signage.categoryId'));
         }
         if (NM.storage.get('signage.lineId')) {
-            setTimeout( function() {
-                viewModel.loadLines();
-            }, 200);
             viewModel.set("detailForm.data.signageConfig.catalogBundle.line.id", NM.storage.get('signage.lineId'));
         }
         if (NM.storage.get('signage.modelId')) {
-            setTimeout( function() {
-                viewModel.loadModels();
-            }, 200);
             viewModel.set("detailForm.data.signageConfig.catalogBundle.model.id", NM.storage.get('signage.modelId'));
         }
         if (NM.storage.get('signage.finishId')) {
-            setTimeout( function() {
-                viewModel.loadFinishes();
-            }, 200);
             viewModel.set("detailForm.data.quotationItem.product.finish.id", NM.storage.get('signage.finishId'));
         }
         if (NM.storage.get('signage.fontId')) {
-            setTimeout( function() {
-                viewModel.loadSignageConfigs();
-            }, 200);
             viewModel.set("detailForm.data.signageConfig.font.id", NM.storage.get('signage.fontId'));
         }
         if (NM.storage.get('signage.signageConfigId')) {
-            setTimeout( function() {
-                viewModel.loadFontSizes();
-            }, 400);
             viewModel.set("detailForm.data.quotationItem.signageConfigItem.id", NM.storage.get('signage.signageConfigId'));
         }
+
+        viewModel.loadLines();
+        setTimeout( function() {
+            if (NM.storage.get('signage.lineId')) {
+                viewModel.loadModels();
+                setTimeout( function() {
+                    if (NM.storage.get('signage.modelId')) {
+                        viewModel.loadFinishes();
+                        setTimeout( function() {
+                            if (NM.storage.get('signage.finishId')) {
+                                viewModel.loadSignageConfigs();
+                                setTimeout( function() {
+                                    if (NM.storage.get('signage.fontId')) {
+                                        viewModel.loadFontSizes();
+                                        setTimeout( function() {
+                                            if (NM.storage.get('signage.signageConfigId')) {
+                                                setTimeout( function() {
+                                                    viewModel.parseLines();
+                                                }, 100 );
+                                            }
+                                        }, 100 );
+                                    }
+                                }, 100 );
+                            }
+                        }, 100 );
+                    }
+                }, 100 );
+            }
+        }, 100 );
     };
 
     pub.edit = function( { id, onSave } ) {

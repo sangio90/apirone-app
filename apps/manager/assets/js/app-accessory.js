@@ -99,6 +99,7 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            NM.storage.set('accessory.categoryId', viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ));
         },
 
         loadModels: function( event ) {
@@ -122,6 +123,7 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            NM.storage.set('accessory.lineId', viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ));
         },
 
         loadFinishes: function( event ) {
@@ -168,6 +170,7 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            NM.storage.set('accessory.modelId', viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ));
         },
 
         loadProduct: function() {
@@ -202,6 +205,7 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            NM.storage.set('accessory.finishId', viewModel.get( "detailForm.data.quotationItem.product.finish.id" ));
         },
 
         firstLoadProductItems: async function() {
@@ -525,6 +529,42 @@ AP.accessory.modal = ( function() {
         } );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
+
+
+        if (NM.storage.get('accessory.categoryId')) {
+            viewModel.set("detailForm.data.quotationItem.product.catalogBundle.category.id", NM.storage.get('accessory.categoryId'));
+        }
+        if (NM.storage.get('accessory.lineId')) {
+            viewModel.set("detailForm.data.quotationItem.product.catalogBundle.line.id", NM.storage.get('accessory.lineId'));
+        }
+        if (NM.storage.get('accessory.modelId')) {
+            viewModel.set("detailForm.data.quotationItem.product.catalogBundle.model.id", NM.storage.get('accessory.modelId'));
+        }
+        if (NM.storage.get('accessory.finishId')) {
+            viewModel.set("detailForm.data.quotationItem.product.finish.id", NM.storage.get('accessory.finishId'));
+        }
+
+        if (NM.storage.get('accessory.categoryId')) {
+            viewModel.loadLines();
+            setTimeout( function() {
+                if (NM.storage.get('accessory.lineId')) {
+                    viewModel.loadModels();
+                    setTimeout( function() {
+                        if (NM.storage.get('accessory.modelId')) {
+                            viewModel.loadFinishes();
+                            setTimeout( function() {
+                                if (NM.storage.get('accessory.finishId')) {
+                                    viewModel.loadProduct();
+                                    setTimeout( function() {
+                                        
+                                    }, 200);
+                                }
+                            }, 200);
+                        }
+                    }, 200);
+                }
+            }, 200);
+        }
     };
 
     pub.edit = function( { id, onSave } ) {
