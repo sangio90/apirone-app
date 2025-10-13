@@ -114,6 +114,7 @@ AP.product.items = ( function() {
 
             return text;
         },
+
         items: dataSources.items, // i need to run after user pref
         orderingItems: dataSources.orderingItems,
         attributesList: dataSources.attributesList,
@@ -127,6 +128,25 @@ AP.product.items = ( function() {
         /*
 			attributes methods
 		*/
+
+        simulatePrice: function( event ) {
+
+            $( "#product-simulate-loading" ).html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+            // TODO: move to POST
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/prices/calculate",
+                callback: {
+                    done: function( xhr ) {
+                        console.log( "" );
+                        $( "#product-simulate-loading" ).html( "" );
+                        $( "#product-simulate-result" ).val( xhr.data.total );
+                    },
+                },
+            } );
+
+        },
 
         toggleUnlinked: function( event ) {
 

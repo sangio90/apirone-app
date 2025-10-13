@@ -34,6 +34,7 @@
 			prices
 		*/
 		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
+		get( "/ajax/prices/calculate" ).to( "PriceAjaxController.calculate" ).end();
 		get( "/prices" ).to( "PriceController.manage" ).end();
 
 		get( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.list" ).end();

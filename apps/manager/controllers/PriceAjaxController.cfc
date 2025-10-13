@@ -1,5 +1,16 @@
 component extends="com.apirone.core.controller.AbsController" {
 
+	function calculate( event, rc, prc ){
+		var result = super.getResult();
+
+		var output = { "total" = RandRange( 3, 40 ) }
+
+		result.setData( output );
+
+		event.setValue( "result", result );
+	}
+
+
 	function calculateQuotationItem( event, rc, prc ){
 		var params          = {}
 		var data            = [];

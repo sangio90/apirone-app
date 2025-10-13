@@ -127,6 +127,7 @@ NM.kendo.formatDate = function( date, type="normal" ) {
     return ret;
 };
 
+// for Mementify dates (ISO 8601)
 NM.kendo.formatISODate = function( date, type = "normal" ) {
 
     var parsed = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss" ), "MMMM, dd yyyy HH:mm:ss" );

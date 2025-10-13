@@ -5,8 +5,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
 		var mm     = super.getMementify();
-		var rows = super.fire( "QuotationItem.search", params );
-		
+		var rows   = super.fire( "QuotationItem.search", params );
+
 		var rowsData = ( mm.convertList( rows.getData() ) );
 
 		result.setTotal( rows.getTotal() );
@@ -55,11 +55,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		transaction {
 			var tmpDir = getTempDir();
-			fileName = "preview_segnaletica_id_" & json.quotationItem.id & ".png";
-			filePath = tmpDir & '/' & fileName;
-			binaryData = ToBinary(json.imageBase64);
+			fileName   = "preview_segnaletica_id_" & json.quotationItem.id & ".png";
+			filePath   = tmpDir & "/" & fileName;
+			binaryData = ToBinary( json.imageBase64 );
 
-			fileWrite(filePath, binaryData);
+			FileWrite( filePath, binaryData );
 
 			var id = json.quotationItem.id;
 			try {
@@ -130,15 +130,15 @@ component extends="com.apirone.core.controller.AbsController" {
 					super.fire( messaggiId, [ signageRowBean ] );
 				}
 
-				var files = super.fire('File.search', { quotationItemId: thisId });
-				if (Len(files.getData())) {
-					for (file in files.getData()) {
-						super.fire('File.delete', { fileId: file.getId() });
+				var files = super.fire( "File.search", { quotationItemId = thisId } );
+				if ( Len( files.getData() ) ) {
+					for ( file in files.getData() ) {
+						super.fire( "File.delete", { fileId = file.getId() } );
 					}
 				}
-				
+
 				var entity = super.bean( "Entity" );
-		
+
 				var kindId = "quotationItem";
 				entity.setKey( "quotationItem.id" );
 				entity.setValue( thisId );
@@ -147,37 +147,49 @@ component extends="com.apirone.core.controller.AbsController" {
 					"file.create",
 					{
 						filePath = filePath,
-						typeId = 'default',
-						kindId = 'quotationItem',
-						entity = entity
+						typeId   = "default",
+						kindId   = "quotationItem",
+						entity   = entity
 					}
 				);
 
-				var quotationItemProductItems = super.fire( 'quotationItemProductItem.list', { quotationItemId: thisId } );
-				quotationItemProductItems.each(function (quotationItemProductItem) {
-					super.fire( 'quotationItemProductItem.delete', { 'productItemId': quotationItemProductItem.getId() } )
-				});
+				var quotationItemProductItems = super.fire(
+					"quotationItemProductItem.list",
+					{ quotationItemId = thisId }
+				);
+				quotationItemProductItems.each( function( quotationItemProductItem ){
+					super.fire(
+						"quotationItemProductItem.delete",
+						{ "productItemId" = quotationItemProductItem.getId() }
+					)
+				} );
 
 				var productItemsData = json.quotationItem.product.items._data;
-				productItemsData.each(function (productItemRow) {
-					var selectedValue = selectedValues = arrayFilter(productItemRow.values, function(v) {
+				productItemsData.each( function( productItemRow ){
+					var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
 						return v.selected;
-					})
-					if (Len(selectedValue) > 0) {
-						selectedValue = selectedValue[1];
-						var productItem = super.fire( 'productItem.get', {'productItemId': selectedValue.product_item_id} );
+					} )
+					if ( Len( selectedValue ) > 0 ) {
+						selectedValue   = selectedValue[ 1 ];
+						var productItem = super.fire(
+							"productItem.get",
+							{ "productItemId" = selectedValue.product_item_id }
+						);
 
-						var quotationItemProductItemBean = super.bean( 'quotationItemProductItem' );
-						var quotationItem = super.fire( 'quotationItem.get', { 'quotationItemId': thisId } );
+						var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
+						var quotationItem                = super.fire( "quotationItem.get", { "quotationItemId" = thisId } );
 						quotationItemProductItemBean.setQuotationItem( quotationItem );
-						quotationItemProductItemBean.setProductItem(productItem);
-						quotationItemProductItemBean.setOrigin(productItem.getOrigin());
-						quotationItemProductItemBean.setLevel(productItemRow.level);
-						quotationItemProductItemBean.setId(thisId)
+						quotationItemProductItemBean.setProductItem( productItem );
+						quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
+						quotationItemProductItemBean.setLevel( productItemRow.level );
+						quotationItemProductItemBean.setId( thisId )
 
-						super.fire( "quotationItemProductItem.create", { 'productItem': quotationItemProductItemBean })
+						super.fire(
+							"quotationItemProductItem.create",
+							{ "productItem" = quotationItemProductItemBean }
+						)
 					}
-				})
+				} )
 
 				var message = completeMessage( messageId );
 			} catch ( any e ) {
@@ -194,50 +206,55 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function delete( event, rc, prc ) {
-		var result = super.getResult();
-		var id     = GetHTTPRequestData().content;
+	function delete( event, rc, prc ){
+		var result  = super.getResult();
+		var id      = GetHTTPRequestData().content;
 		var payload = "";
 
 		try {
 			transaction {
-				var files = super.fire( 'file.list', { quotationItemId: id } );
-				
-				for (file in files) {
+				var files = super.fire( "file.list", { quotationItemId = id } );
+
+				// TODO: a cascata, lo fa il DB, c'è già on delete cascade
+				for ( file in files ) {
 					var outcome = super.fire( "file.delete", [ file.getId() ] );
 				}
-				var signageRows = super.fire( 'quotationItemSignageRow.list', { quotationItemId: id } );
+				var signageRows = super.fire( "quotationItemSignageRow.list", { quotationItemId = id } );
 
-				for (signageRow in signageRows) {
+				// TODO: a cascata, lo fa il DB, c'è già on delete cascade
+				for ( signageRow in signageRows ) {
 					var outcome = super.fire( "quotationItemSignageRow.delete", [ signageRow.getId() ] );
 				}
 
-				var outcome = super.fire("quotationItem.delete", [ id ]);
+				var outcome = super.fire( "quotationItem.delete", [ id ] );
 
-				if (outcome.getStatus() == "ERROR") {
+				if ( outcome.getStatus() == "ERROR" ) {
 					transaction action="rollback";
-					result.setStatus("ERRORE");
-					result.setMessage(outcome.getMessage());
+					result.setStatus( "ERRORE" );
+					result.setMessage( outcome.getMessage() );
 				}
 			}
-		} catch(any e) {
-			try { transaction action="rollback"; } catch(any _) {}
-			result.setStatus("ERRORE");
+		} catch ( any e ) {
+			try {
+				transaction action="rollback";
+			} catch ( any _ ) {
+			}
+			result.setStatus( "ERRORE" );
 		}
 
-		result.setData({ "payload" = payload });
-		event.setValue("result", result);
+		result.setData( { "payload" = payload } );
+		event.setValue( "result", result );
 	}
 
-	function productItems( event, rc, prc ) {
-		var result = super.getResult();
+	function productItems( event, rc, prc ){
+		var result          = super.getResult();
 		var quotationItemId = rc.id;
-		var mm = super.getMementify();
-		var productItems = super.fire( 'QuotationItemProductItem.list', { quotationItemId: quotationItemId } );
+		var mm              = super.getMementify();
+		var productItems    = super.fire( "QuotationItemProductItem.list", { quotationItemId = quotationItemId } );
 
 		var productItems = ( mm.convertList( productItems ) );
 
-		result.setCount( Len(productItems) );
+		result.setCount( Len( productItems ) );
 		result.setData( productItems );
 
 		event.setValue( "result", result );

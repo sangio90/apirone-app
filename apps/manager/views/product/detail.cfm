@@ -141,9 +141,28 @@
                                         </p>
 
                                     </div>
+
                                     <div class="col-sm-6">
-                                        <!--- price here --->
+                                    
+                                        <div class="row">
+                                        
+                                            <div class="col-12  d-flex gap-2 justify-content-end">
+
+                                                <div id="product-simulate-loading"></div>
+                                                
+                                                #button(
+                                                    label="Simula prezzo",
+                                                    bind  = "click:simulatePrice",
+                                                    size  = "sm",
+                                                    class = "ms-2"
+                                                )#
+                                                
+                                                <input class="form-control col-12" style="max-width: 150px; text-align: right; background-color: ##EAEAEA" id="product-simulate-result">
+                                            </div>
+                                        </div>
+                                    
                                     </div>
+
                                     <div class="col-sm-12 text-end">
 
                                         <a href=""
