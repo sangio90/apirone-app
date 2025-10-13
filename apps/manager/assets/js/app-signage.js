@@ -241,6 +241,7 @@ AP.signage.modal = ( function() {
             } );
             this.checkCanSave();
             NM.storage.set('signage.signageConfigId', viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) );
+            NM.storage.set('signage.signageConfigRowCount', viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
         },
 
         parsedLineContent: function( valore, id ) {
@@ -678,21 +679,33 @@ AP.signage.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
-                            viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
-                            const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
-                            const attributeArray = productItems.data();
+                            if ( quotationItemId != "" || !NM.storage.get('signage.product.items') || NM.storage.get('signage.product.items').length == 0 ) {
+                                viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
+                            } else {
+                                if ( quotationItemId == "" ) {
+                                    const itemsDataSource = new kendo.data.DataSource({
+                                        data: NM.storage.get('signage.product.items')
+                                    });
+                                    viewModel.set( "detailForm.data.quotationItem.product.items", itemsDataSource );
+                                    viewModel.get( "detailForm.data.quotationItem.product.items" ).read();
+                                }
+                            }
+                            productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
+                            attributeArray = productItems.data();
                             // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
                                 if ( existing ) {
-                                    existing.values.push( {
-                                        attributeValue: item.attributeValue,
-                                        product_item_id: item.id,
-                                        parent_attribute_id: null,
-                                        level: 0,
-                                        selected: false
-                                    } );
-                                    productItems.trigger( "change" );
+                                    if (!existing.values.find( v => v.product_item_id === item.id )) {
+                                        existing.values.push( {
+                                            attributeValue: item.attributeValue,
+                                            product_item_id: item.id,
+                                            parent_attribute_id: null,
+                                            level: 0,
+                                            selected: false
+                                        } );
+                                        productItems.trigger( "change" );
+                                    }
                                 } else {
                                     const parsedData = {
                                         attribute_id: item.attribute.id,
@@ -772,6 +785,7 @@ AP.signage.modal = ( function() {
                         }
                     }
                     viewModel.renderProductItems();
+                    NM.storage.set( 'signage.product.items', productItems.data() );
                     resolve();
                     return;
                 }
@@ -850,6 +864,7 @@ AP.signage.modal = ( function() {
                             }
 
                             viewModel.renderProductItems();
+                            NM.storage.set( 'signage.product.items', productItems.data() );
                             resolve();
                         },
                         fail: function( err ) {
@@ -864,7 +879,7 @@ AP.signage.modal = ( function() {
             const container = $( "#product-items" );
             container.empty();
             const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
-            const attributeArray = productItems.data();
+            attributeArray = productItems.data();
             attributeArray.forEach( function( item ) {
                 const attrName = item.attribute_name;
                 const values = item.values;
@@ -1103,6 +1118,7 @@ AP.signage.modal = ( function() {
         }
         if (NM.storage.get('signage.signageConfigId')) {
             viewModel.set("detailForm.data.quotationItem.signageConfigItem.id", NM.storage.get('signage.signageConfigId'));
+            viewModel.set("detailForm.data.quotationItem.signageConfigItem.rowCount", NM.storage.get('signage.signageConfigRowCount'));
         }
 
         viewModel.loadLines();
