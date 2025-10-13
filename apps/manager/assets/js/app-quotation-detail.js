@@ -12,20 +12,20 @@ $( document ).ready( function() {
     }
     $( ".k-listview-content" ).first().css( "display", "flex" );
 
-    const signageModal = document.getElementById('signage-modal');
-    signageModal.addEventListener('hide.bs.modal', (e) => {
-        renderQuotationTotals()
-    });
+    const signageModal = document.getElementById( "signage-modal" );
+    signageModal.addEventListener( "hide.bs.modal", ( e ) => {
+        renderQuotationTotals();
+    } );
 
-    const plateModal = document.getElementById('plate-modal-root');
-    plateModal.addEventListener('hide.bs.modal', (e) => {
-        renderQuotationTotals()
-    });
+    const plateModal = document.getElementById( "plate-modal-root" );
+    plateModal.addEventListener( "hide.bs.modal", ( e ) => {
+        renderQuotationTotals();
+    } );
 
-    const accessoryModal = document.getElementById('accessory-modal');
-    accessoryModal.addEventListener('hide.bs.modal', (e) => {
-        renderQuotationTotals()
-    });
+    const accessoryModal = document.getElementById( "accessory-modal" );
+    accessoryModal.addEventListener( "hide.bs.modal", ( e ) => {
+        renderQuotationTotals();
+    } );
 } );
 
 AP.quotationDetail.detail = ( function() {
@@ -262,8 +262,10 @@ AP.quotationDetail.detail = ( function() {
         },
 
         delete: function( event ) {
-            event.stopPropagation();
-            event.preventDefault();
+            // REF: non servono più ma lascio per sicurezza
+            // event.stopPropagation();
+            // event.preventDefault();
+
             var id = event.currentTarget.dataset.id;
 
             bootbox.confirm( {
@@ -287,20 +289,26 @@ AP.quotationDetail.detail = ( function() {
                             data: id,
                             callback: {
                                 done: function( xhr ) {
-                                    if( xhr.status == "ERRORE" ) {
+                                    if( xhr.status == "ERROR" ) {
                                         AP.widget.notify( "error", "Errore nella cancellazione della riga di preventivo." );
+                                        return;
                                     }
-                                    if ( xhr.status == "SUCCESS" ) {
-                                        AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
-                                        viewModel.set( "detailForm", defaultDetailForm );
-                                        window.location.href = "/manager/quotations/" + AP.page.quotation.id;
-                                    }
+                                    // REF: fare il check su "SUCCESS" non occorre: te lo fa la libreria.
+                                    // se è "ERROR" viene mostrato un errore generico di errore
+                                    // if ( xhr.status == "SUCCESS" ) {
+                                    AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
+                                    viewModel.set( "detailForm", defaultDetailForm );
+                                    window.location.href = "/manager/quotations/" + AP.page.quotation.id;
+                                    // }
                                 }
                             }
                         } );
                     }
                 },
             } );
+
+            // REF: per evitare che il click sul link faccia anche il redirect
+            return false;
         },
 
         save: function( event ) {
@@ -394,11 +402,11 @@ AP.quotationDetail.detail = ( function() {
                                     }
                                 } );
                                 viewModel.get( "zones" ).data( zones );
-                                if (NM.storage.get('quotation.zone.id')) {
-                                    var selectedZone = zones.find( zone => zone.id == NM.storage.get('quotation.zone.id') );
-                                    if (!selectedZone) { 
-                                        NM.storage.delete('quotation.zone.id'); 
-                                        NM.storage.delete('quotation.zone.name');
+                                if ( NM.storage.get( "quotation.zone.id" ) ) {
+                                    var selectedZone = zones.find( zone => zone.id == NM.storage.get( "quotation.zone.id" ) );
+                                    if ( !selectedZone ) {
+                                        NM.storage.delete( "quotation.zone.id" );
+                                        NM.storage.delete( "quotation.zone.name" );
                                         selectedZone = zones[0];
                                     }
                                     viewModel.set( "detailForm.data.zone", selectedZone );
@@ -440,13 +448,13 @@ AP.quotationDetail.detail = ( function() {
             }
 
             if ( viewModel.detailForm.data.zone.id != "" ) {
-                NM.storage.set('quotation.zone.id', viewModel.detailForm.data.zone.id);
-                NM.storage.set('quotation.zone.name', viewModel.detailForm.data.zone.name);
+                NM.storage.set( "quotation.zone.id", viewModel.detailForm.data.zone.id );
+                NM.storage.set( "quotation.zone.name", viewModel.detailForm.data.zone.name );
                 $( "#addSignageButton" ).prop( "disabled", false );
                 $( "#addAccessoryButton" ).prop( "disabled", false );
             } else {
-                NM.storage.delete('quotation.zone.id');
-                NM.storage.delete('quotation.zone.name');
+                NM.storage.delete( "quotation.zone.id" );
+                NM.storage.delete( "quotation.zone.name" );
                 $( "#addSignageButton" ).prop( "disabled", true );
                 $( "#addAccessoryButton" ).prop( "disabled", true );
             }
@@ -469,8 +477,8 @@ AP.quotationDetail.detail = ( function() {
         editSignate: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
-            let tabellaTotali = $('#angolo').find('table')[0];
-            $(tabellaTotali).empty();
+            const tabellaTotali = $( "#angolo" ).find( "table" )[0];
+            $( tabellaTotali ).empty();
         },
 
         addPlate: function() {
@@ -518,12 +526,12 @@ AP.quotationDetail.detail = ( function() {
             if ( AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != "" ) {
                 AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + " " + AP.page.quotation.lead.lastName;
             }
-            renderQuotationTotals()
+            renderQuotationTotals();
             viewModel.set( "detailForm.data", AP.page.quotation );
             if ( AP.page.quotation.customerAddressId && AP.page.quotation.customer.shippingAddresses ) {
-                const shippingAddress = AP.page.quotation.customer.shippingAddresses.find(item => item.id === AP.page.quotation.customerAddressId);
-                if (shippingAddress) {
-                    viewModel.set('detailForm.data.shippingAddress', shippingAddress);
+                const shippingAddress = AP.page.quotation.customer.shippingAddresses.find( item => item.id === AP.page.quotation.customerAddressId );
+                if ( shippingAddress ) {
+                    viewModel.set( "detailForm.data.shippingAddress", shippingAddress );
                 }
             }
             // $( "#nav-plan-tab" ).removeAttr("hidden");
@@ -539,31 +547,31 @@ AP.quotationDetail.detail = ( function() {
             callback: {
                 done: function( xhr ) {
                     if( xhr.data ) {
-                        if (!xhr.data.id || xhr.data.id != viewModel.get('detailForm.data.id')) {
-                            $('#angolo').hide();
+                        if ( !xhr.data.id || xhr.data.id != viewModel.get( "detailForm.data.id" ) ) {
+                            $( "#angolo" ).hide();
                         } else {
-                            viewModel.set('detailForm.data.totals', xhr.data)
-                            var totals = viewModel.get('detailForm.data.totals');
-                            let table = $('#angolo').find('table')[0]
-                            $(table).empty()
-                            $(table).append(
+                            viewModel.set( "detailForm.data.totals", xhr.data );
+                            var totals = viewModel.get( "detailForm.data.totals" );
+                            const table = $( "#angolo" ).find( "table" )[0];
+                            $( table ).empty();
+                            $( table ).append(
                                 `<tr>
                                     <td>${totals.quantity.label}</td>
                                     <td>${totals.quantity.count}</td>
                                 </tr>
                                 <tr style="font-weight: bold">
                                     <td>${totals.total.label}</td>
-                                    <td>${totals.total.amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR'})}</td>
+                                    <td>${totals.total.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
                                 </tr>
                                 `
-                            )
-                            $('#angolo').show();
+                            );
+                            $( "#angolo" ).show();
                         }
                     }
                 }
             }
         } );
-    }
+    };
 
     return pub;
 } () );

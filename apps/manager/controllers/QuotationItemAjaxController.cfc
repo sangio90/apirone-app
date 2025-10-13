@@ -109,7 +109,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					messageId = "quotationItem.updated";
 					thisId    = super.fire( "quotationItem.update", [ quotationItemSignageBean ] )
 				}
-				for ( signageRow in json.quotationItem.signageRows._data ) {
+				for ( var signageRow in json.quotationItem.signageRows._data ) {
 					var signageRowBean = super.fire(
 						"QuotationItemSignageRow.get",
 						{ quotationItemSignageRowId = signageRow.id }
@@ -132,7 +132,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				var files = super.fire( "File.search", { quotationItemId = thisId } );
 				if ( Len( files.getData() ) ) {
-					for ( file in files.getData() ) {
+					for ( var file in files.getData() ) {
 						super.fire( "File.delete", { fileId = file.getId() } );
 					}
 				}
@@ -209,31 +209,39 @@ component extends="com.apirone.core.controller.AbsController" {
 	function delete( event, rc, prc ){
 		var result  = super.getResult();
 		var id      = GetHTTPRequestData().content;
-		var payload = "";
+		//var payload = "";
 
-		try {
-			transaction {
+		//try {
+			// REF: in gnere sui delete le transazioni non servono
+			//transaction {
 				var files = super.fire( "file.list", { quotationItemId = id } );
 
-				// TODO: a cascata, lo fa il DB, c'è già on delete cascade
-				for ( file in files ) {
-					var outcome = super.fire( "file.delete", [ file.getId() ] );
-				}
-				var signageRows = super.fire( "quotationItemSignageRow.list", { quotationItemId = id } );
+				// REF: non occorre lo fa il db
+				// REF: nel "for" mancherebbe il "var" file
+				//for ( 'var' file in files ) {
+				//	var outcome = super.fire( "file.delete", [ file.getId() ] );
+				//}
+				//var signageRows = super.fire( "quotationItemSignageRow.list", { quotationItemId = id } );
 
-				// TODO: a cascata, lo fa il DB, c'è già on delete cascade
-				for ( signageRow in signageRows ) {
-					var outcome = super.fire( "quotationItemSignageRow.delete", [ signageRow.getId() ] );
-				}
+				
+				// REF: non occorre lo fa il db
+				// REF: nel "for" mancherebbe il "var" per signageRow
+				//for ( 'var' signageRow in signageRows ) {
+				//	var outcome = super.fire( "quotationItemSignageRow.delete", [ signageRow.getId() ] );
+				//}
 
 				var outcome = super.fire( "quotationItem.delete", [ id ] );
 
 				if ( outcome.getStatus() == "ERROR" ) {
-					transaction action="rollback";
-					result.setStatus( "ERRORE" );
+					// REF: Le transazioni vengono committate di default
+					// e ne viene fatto il rollback automanticamente se c'è un errore.
+					//transaction action="rollback";
+					// REF: facciamo validazione
+					result.setStatus( "INVALID" );
 					result.setMessage( outcome.getMessage() );
 				}
-			}
+			//}
+			/*
 		} catch ( any e ) {
 			try {
 				transaction action="rollback";
@@ -241,6 +249,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 			result.setStatus( "ERRORE" );
 		}
+			*/
 
 		result.setData( { "payload" = payload } );
 		event.setValue( "result", result );
