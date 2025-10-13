@@ -234,9 +234,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				if ( outcome.getStatus() == "ERROR" ) {
 					// REF: Le transazioni vengono committate di default
-					// e ne viene fatto il rollback automanticamente se c'è un errore.
+					// e ne viene fatto il rollback automaticamente se c'è un errore.
 					//transaction action="rollback";
-					// REF: facciamo validazione
+					// REF: convertiamo l'errore in una risposta di validazione per il frontend
 					result.setStatus( "INVALID" );
 					result.setMessage( outcome.getMessage() );
 				}

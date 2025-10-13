@@ -14,17 +14,17 @@ $( document ).ready( function() {
 
     const signageModal = document.getElementById( "signage-modal" );
     signageModal.addEventListener( "hide.bs.modal", ( e ) => {
-        renderQuotationTotals();
+        AP.quotationDetail.detail.renderTotals();
     } );
 
     const plateModal = document.getElementById( "plate-modal-root" );
     plateModal.addEventListener( "hide.bs.modal", ( e ) => {
-        renderQuotationTotals();
+        AP.quotationDetail.detail.renderTotals();
     } );
 
     const accessoryModal = document.getElementById( "accessory-modal" );
     accessoryModal.addEventListener( "hide.bs.modal", ( e ) => {
-        renderQuotationTotals();
+        AP.quotationDetail.detail.renderTotals();
     } );
 } );
 
@@ -289,7 +289,7 @@ AP.quotationDetail.detail = ( function() {
                             data: id,
                             callback: {
                                 done: function( xhr ) {
-                                    if( xhr.status == "ERROR" ) {
+                                    if( xhr.status == "INVALID" ) {
                                         AP.widget.notify( "error", "Errore nella cancellazione della riga di preventivo." );
                                         return;
                                     }
@@ -334,16 +334,18 @@ AP.quotationDetail.detail = ( function() {
                 },
                 messages: {
                     name: {
-                        required: "Nome preventivo richiesto.",
+                        // REF: ho tolto "preventivo" dappertutto
+                        // siamo già nel dominio, abbiamo poco spazio ed è inutile ripeterlo
+                        required: "Nome richiesto.",
                     },
                     number: {
-                        required: "Numero preventivo richiesto."
+                        required: "Numero richiesto."
                     },
                     langId: {
-                        required: "Lingua preventivo richiesta."
+                        required: "Lingua richiesta."
                     },
                     validityDate: {
-                        required: "Data validità preventivo richiesta."
+                        required: "Data validità richiesta."
                     },
                 }
             } );
@@ -526,7 +528,7 @@ AP.quotationDetail.detail = ( function() {
             if ( AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != "" ) {
                 AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + " " + AP.page.quotation.lead.lastName;
             }
-            renderQuotationTotals();
+            this.renderTotals();
             viewModel.set( "detailForm.data", AP.page.quotation );
             if ( AP.page.quotation.customerAddressId && AP.page.quotation.customer.shippingAddresses ) {
                 const shippingAddress = AP.page.quotation.customer.shippingAddresses.find( item => item.id === AP.page.quotation.customerAddressId );
@@ -540,7 +542,13 @@ AP.quotationDetail.detail = ( function() {
         }
     };
 
-    renderQuotationTotals = function() {
+    // era: renderQuotationTotals()
+    // REF: davantia lla funzione manca il "var" perchè avevi
+    // la necessità che fosse pubblica
+    // è sufficiente metterlo in "pub" per averlo in:
+    // AP.quotationDetail.renderQuotationTotals()
+
+    pub.renderTotals = function() {
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/total",
