@@ -265,7 +265,7 @@
 	}
 
 	// only message
-	public String function message( required String id, required String langId = "it" ){
+	public String function getMessage( required String id, required String langId = "it" ){
 		// id is a dotted path
 
 		var messages = DeserializeJSON(
