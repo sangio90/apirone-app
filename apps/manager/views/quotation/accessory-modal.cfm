@@ -75,8 +75,11 @@
                             <div class="col-4 mb-3">
                                 Albero
                             </div>
-                            <div class="col-8 mb-3" data-bind="visible: detailForm.data.quotationItem.product.finish.id">
+                            <div class="col-7 mb-3" data-bind="visible: detailForm.data.quotationItem.product.finish.id">
                                 <span>Anteprima</span>
+                            </div>
+                            <div class="col-1 mb-3 flex justify-content-end">
+                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters">Pulisci Configurazione</button>
                             </div>
                             <div class="col-4 mb-3">
                                 <div id="accessory-product-items" style="max-width: 100%"></div>
@@ -96,6 +99,7 @@
                                     <i class="fas fa-save"></i> Salva
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal" data-bind="click:resetForm">Chiudi</button>
+                                <button type="button" class="btn btn-primary btn-sm me-2 float-end" data-bind="click:clearFilters, visible:visibleClearButton">Pulisci Configurazione</button>
                                 <div class="status errors-counter mt-1 float-end me-3"></div>
                             </div>
                         </div>

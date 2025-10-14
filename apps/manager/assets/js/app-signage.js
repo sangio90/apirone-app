@@ -676,7 +676,6 @@ AP.signage.modal = ( function() {
         },
 
         firstLoadProductItems: async function() {
-            debugger
             const quotationItemId = viewModel.get( "detailForm.data.quotationItem.id" );
             const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
 
@@ -984,6 +983,23 @@ AP.signage.modal = ( function() {
             } );
 
             return false;
+        },
+
+        visibleClearButton: function() {
+            const id = this.get('detailForm.data.quotationItem.signageConfigItem.id');
+            return id == '';
+        },
+
+        clearFilters: function() {
+            viewModel.resetForm();
+            NM.storage.delete('signage.categoryId');
+            NM.storage.delete('signage.lineId');
+            NM.storage.delete('signage.modelId');
+            NM.storage.delete('signage.finishId');
+            NM.storage.delete('signage.fontId');
+            NM.storage.delete('signage.signageConfigId');
+            NM.storage.delete('signage.product.items');
+            this.checkCanSave();
         },
 
         handleParamsUnset: function( param ) {

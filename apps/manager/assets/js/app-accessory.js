@@ -502,6 +502,21 @@ AP.accessory.modal = ( function() {
             } );
         },
 
+        visibleClearButton: function() {
+            const id = this.get('detailForm.data.quotationItem.product.finish.id');
+            return id == '';
+        },
+
+        clearFilters: function() {
+            viewModel.resetForm();
+            NM.storage.delete('accessory.categoryId');
+            NM.storage.delete('accessory.lineId');
+            NM.storage.delete('accessory.modelId');
+            NM.storage.delete('accessory.finishId');
+            NM.storage.delete('accessory.product.items');
+            this.checkCanSave();
+        },
+
         save: function( event ) {
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
