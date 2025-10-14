@@ -61,6 +61,18 @@
 	}
 
 	public Any function getValidationError(){
+
+		/*
+			fields available:
+
+			req message        = "";
+			req field          = "";
+				rejectedValue  = "";
+				validationType = "";
+				validationData = "";
+				errorMetadata  = {};
+		*/
+
 		if ( !StructKeyExists( arguments, "field" ) ) {
 			arguments.field = "generic";
 		}

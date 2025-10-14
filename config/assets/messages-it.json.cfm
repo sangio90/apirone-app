@@ -55,6 +55,7 @@
     "zone": {
         "notDeletedWithQuotationItem": "Impossibile eliminare questa zona perché associata a una riga del preventivo",
         "notDeletedWithSubZone": "Impossibile eliminare questa zona perché contiene delle sottozone",
+        "existInQuotation": "Combinazione zona già esistente in questo preventivo",
         "notDeleted": "Impossibile eliminare questa zona",
         "deleted": "Zona cancellata",
         "created": "Zona aggiunta"
