@@ -6,6 +6,7 @@
 			SELECT file_id::varchar, *
 			FROM files
 			WHERE file_id = <cfqueryparam cfsqltype="varchar" value="#arguments.fileId#">::uuid
+			AND deleted_at IS NULL
 		</cfquery>
 
 		<cfreturn local.q>
@@ -28,7 +29,7 @@
 				COUNT(file_id) OVER() AS total
 			FROM
 				files
-			WHERE 1=1
+			WHERE deleted_at IS NULL 
 
 			<cfif !IsNull( arguments.productId )>
 				AND product_id = <cfqueryparam value="#arguments.productId#" cfsqltype="Varchar">::uuid
@@ -109,8 +110,8 @@
 	<cffunction returntype="Void" name="delete">
 		<cfargument name="fileId" type="String" required="true">
 		<cfquery name="local.q" datasource="apirone" result="result">
-			DELETE
-			FROM files
+			UPDATE files
+			SET deleted_at = CURRENT_TIMESTAMP(0)
 			WHERE file_id = <cfqueryparam cfsqltype="varchar" value="#arguments.fileId#">::uuid
 		</cfquery>
 	</cffunction>
