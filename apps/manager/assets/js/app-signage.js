@@ -646,6 +646,9 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != NM.storage.get('signage.finishId') ) {
+                NM.storage.delete('signage.product.items')
+            }
             NM.storage.set('signage.finishId', viewModel.get( "detailForm.data.quotationItem.product.finish.id" ));
         },
 
@@ -673,6 +676,7 @@ AP.signage.modal = ( function() {
         },
 
         firstLoadProductItems: async function() {
+            debugger
             const quotationItemId = viewModel.get( "detailForm.data.quotationItem.id" );
             const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
 

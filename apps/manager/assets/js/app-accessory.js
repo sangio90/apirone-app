@@ -200,12 +200,17 @@ AP.accessory.modal = ( function() {
                             } else {
                                 viewModel.set( "backgroundImage.url", "url()" );
                             }
-                            await self.firstLoadProductItems();
+                            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
+                                await self.firstLoadProductItems();
+                            }
                         }
                     },
                 },
             } );
             this.checkCanSave();
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != NM.storage.get('accessory.finishId') ) {
+                NM.storage.delete('accessory.product.items')
+            }
             NM.storage.set('accessory.finishId', viewModel.get( "detailForm.data.quotationItem.product.finish.id" ));
         },
 
@@ -234,6 +239,7 @@ AP.accessory.modal = ( function() {
                                     });
                                     viewModel.set( "detailForm.data.quotationItem.product.items", itemsDataSource );
                                     viewModel.get( "detailForm.data.quotationItem.product.items" ).read();
+                                    viewModel.renderProductPreview( viewModel.get( "detailForm.data.quotationItem.product.items" ) );
                                 }
                             }
                             productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
@@ -411,16 +417,7 @@ AP.accessory.modal = ( function() {
 
                             viewModel.renderProductItems();
                             if ( productItems && productItems.data().length > 0 ) {
-                                productItems.data().forEach( function( item ) {
-                                    const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
-                                    if ( selectedValues.length > 0 ) {
-                                        if ( selectedValues[0].attributeValue?.image ) {
-                                            // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
-                                            // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
-                                            $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
-                                        }
-                                    }
-                                } );
+                                viewModel.renderProductPreview( productItems );
                             }
                             NM.storage.set( 'accessory.product.items', productItems.data() );
                             resolve();
@@ -431,6 +428,21 @@ AP.accessory.modal = ( function() {
                     }
                 } );
             } );
+        },
+
+        renderProductPreview: function(productItems) {
+            debugger
+            productItems.data().forEach( function( item ) {
+                    const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
+                    if ( selectedValues.length > 0 ) {
+                        if ( selectedValues[0].attributeValue?.image ) {
+                            // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
+                            // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
+                            $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
+                        }
+                    }
+            } );
+            return true;       
         },
 
         renderProductItems: function() {

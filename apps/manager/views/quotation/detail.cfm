@@ -529,7 +529,6 @@ document.addEventListener("DOMContentLoaded", function () {
     #angolo {
         position: fixed;
         bottom: 50px;
-        right: 50px;
         background-color: #2771e8;
         width: 400px;
         color: white;
