@@ -38,7 +38,7 @@
                                 <!--- 
                                     general 
                                 --->
-                                <div class="tab-pane fade show active" id="nav-general" role="tabpanel">
+                                <div class="tab-pane quotation-panel fade show active" id="nav-general" role="tabpanel">
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-3">
@@ -126,18 +126,21 @@
                                                 data-filter="contains"
                                             >
                                         </div>
-                                        <div class="col-sm-2 pt-4">
+                                    </div>
+
+                                    <div class="form-group button-box">
+                                        <div class="mt-2">
                                            <button class="btn btn-primary changeTab" id="billing">Fatturazione &raquo;</button>
                                            <!--- <button class="btn btn-primary changeTab" id="fiscal">Dati fiscali &raquo;</button> --->
                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
-                                    </div>
+                                    </div>        
 
                                 </div>
                                 <!---
                                     billing
                                 --->
-                                <div class="tab-pane fade" id="nav-billing" role="tabpanel">
+                                <div class="tab-pane quotation-panel fade" id="nav-billing" role="tabpanel">
                                     
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-1 control-label text-sm-end pt-2">Nome</label>
@@ -202,20 +205,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row mb-2">
-                                        <div class="col-sm-9 offset-sm-3">
+                                    <div class="form-group button-box">
+                                        <div class="mt-2">
                                            <button class="btn btn-default changeTab" id="general">&laquo; Precedente</button>
                                            <button class="btn btn-primary changeTab" id="shipment">Spedizione &raquo;</button>
                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
-                                    </div>                                    
+                                    </div>                            
 
                                 </div>     
                             
                                 <!---
                                     shipment
                                 --->
-                                <div class="tab-pane fade" id="nav-shipment" role="tabpanel">
+                                <div class="tab-pane quotation-panel fade" id="nav-shipment" role="tabpanel">
                                                  
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-1 control-label text-sm-end pt-2">Indirizzo</label>
@@ -264,8 +267,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row mb-2">
-                                        <div class="col-sm-9 offset-sm-3">
+                                    <div class="form-group button-box">
+                                        <div class="mt-2">
                                            <button class="btn btn-default changeTab" id="billing">&laquo; Precedente</button>
                                            <button class="btn btn-primary changeTab" id="products">Prodotti &raquo;</button>
                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
@@ -274,7 +277,7 @@
                                 </div>
 
                                 <!--- products --->
-                                <div class="tab-pane fade" id="nav-products" role="tabpanel">
+                                <div class="tab-pane quotation-panel fade" id="nav-products" role="tabpanel">
                                     <div class="form-group row mb-2" style="margin-left: -75px;">
                                         <div class="col-1 mb-2 text-end mt-2">
                                             <label>Zone: </label>
@@ -344,8 +347,8 @@
                                             </div>
                                         </section>
                                     </div>
-                                    <div class="form-group row mb-2">
-                                        <div class="col-sm-9 offset-sm-3">
+                                    <div class="form-group button-box">
+                                        <div class="mt-2">
                                             <button class="btn btn-default changeTab" id="shipment">&laquo; Precedente</button>
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
@@ -536,5 +539,13 @@ document.addEventListener("DOMContentLoaded", function () {
         border-radius: 10px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         z-index: 9999;
+    }
+    .quotation-panel {
+        min-height: 55vh !important;
+    }
+    .button-box {
+        position: absolute;
+        bottom: 30px;
+        right: 30px;
     }
 </style>
