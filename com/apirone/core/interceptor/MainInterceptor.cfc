@@ -217,9 +217,6 @@ component extends="coldbox.system.Interceptor" {
 			var arr = [];
 			for ( var err in errors[ key ] ) {
 
-				dump(err);
-				//abort;
-
 				var newErr = {};
 				if ( err.keyExists( "message" ) && Len( Trim( err.message ) ) ) {
 					newErr[ "message" ] = err.message;
