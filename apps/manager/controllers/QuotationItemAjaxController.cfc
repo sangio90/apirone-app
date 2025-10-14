@@ -208,50 +208,24 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function delete( event, rc, prc ){
 		var result  = super.getResult();
+		var validation = getValidationResult();
+		
 		var id      = GetHTTPRequestData().content;
-		//var payload = "";
-
-		//try {
-			// REF: in gnere sui delete le transazioni non servono
-			//transaction {
-				var files = super.fire( "file.list", { quotationItemId = id } );
-
-				// REF: non occorre lo fa il db
-				// REF: nel "for" mancherebbe il "var" file
-				//for ( 'var' file in files ) {
-				//	var outcome = super.fire( "file.delete", [ file.getId() ] );
-				//}
-				//var signageRows = super.fire( "quotationItemSignageRow.list", { quotationItemId = id } );
-
 				
-				// REF: non occorre lo fa il db
-				// REF: nel "for" mancherebbe il "var" per signageRow
-				//for ( 'var' signageRow in signageRows ) {
-				//	var outcome = super.fire( "quotationItemSignageRow.delete", [ signageRow.getId() ] );
-				//}
+		var outcome = super.fire( "quotationItem.delete", [ id ] );
 
-				var outcome = super.fire( "quotationItem.delete", [ id ] );
+		if ( outcome.getStatus() == "ERROR" ) {
 
-				if ( outcome.getStatus() == "ERROR" ) {
-					// REF: Le transazioni vengono committate di default
-					// e ne viene fatto il rollback automaticamente se c'è un errore.
-					//transaction action="rollback";
-					// REF: convertiamo l'errore in una risposta di validazione per il frontend
-					result.setStatus( "INVALID" );
-					result.setMessage( outcome.getMessage() );
-				}
-			//}
-			/*
-		} catch ( any e ) {
-			try {
-				transaction action="rollback";
-			} catch ( any _ ) {
-			}
-			result.setStatus( "ERRORE" );
+			var error = super.getValidationError( message = getMessage( "quotationItem.notDeleted" ), field="general" );
+			validation.addError( error );
+
+			event.setValue( "result", validation );
+			return;
+		
 		}
-			*/
 
-		result.setData( { "payload" = payload } );
+		result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
+		
 		event.setValue( "result", result );
 	}
 
