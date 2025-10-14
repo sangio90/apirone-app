@@ -1,4 +1,5 @@
 NM.util = NM.util || {};
+NM.form = NM.form || {};
 
 NM.util.openModal = function( ele, onShow ) {
 
@@ -45,10 +46,28 @@ NM.util.ajax = function( setup ) {
         method: "GET",
         callback: {
             done: undefined,
-            always: undefined,
-            fail: function( xhr ) {
-                AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
-            }
+            always: function( xhr, statusText, response, d ) {
+
+                if ( statusText == "error" ) {
+
+                    if ( xhr.status == 500 ) {
+                        AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
+                        return;
+                    }
+
+                    if ( xhr.status == 400 ) {
+                        setup.callback.done.apply( null, [ xhr.responseJSON ] );
+                        return;
+                    }
+
+                }
+
+                if ( statusText == "success" ) {
+                    console.log( "apply success" );
+                    setup.callback.done.apply( null, [ xhr ] );
+                }
+
+            },
         }
     };
 
@@ -71,6 +90,7 @@ NM.util.ajax = function( setup ) {
 		    method: settings.method,
 		    data: settings.data
 		} )
+		/*
 		    .done( function( xhr ) {
 
 		        if ( xhr.error === undefined ) { // dal proxy
@@ -83,6 +103,7 @@ NM.util.ajax = function( setup ) {
 
 		    } )
 		    .fail( settings.callback.fail )
+            */
 		    .always( settings.callback.always );
 
     return data;
@@ -203,3 +224,81 @@ NM.storage = {
     }
 
 };
+
+
+/*
+    form utils
+*/
+
+NM.form.clearMessages = function( formElement ) {
+
+    // remove single message
+    formElement.find( "label.error" ).remove();
+
+    // remove class from input
+    formElement.find( "input.error, select.error, textarea.error" ).removeClass( "error" );
+
+    // remove global status in form
+    formElement.find( ".status" ).html( "" );
+    formElement.find( ".errors-counter" ).html( "" );
+
+};
+
+NM.form.removeRules = function( formElement ) {
+
+    var thisForm = formElement.get( 0 );
+    $.removeData( thisForm, "validator" );
+
+    NM.form.clearMessages( formElement );
+
+};
+
+NM.form.showMessages = function( errors ) {
+    // Prendi il primo campo della struttura errors
+    var firstField = Object.keys( errors )[0];
+
+    // Trova il campo nel DOM
+    var firstInput = $( "[name='" + firstField + "']" );
+
+    // Trova il form contenitore di quell'input
+    var formElement = firstInput.closest( "form" );
+
+    // Conta il totale degli errori
+    var errorCount = 0;
+
+    // Cicla su ogni campo della struttura degli errori
+    $.each( errors, function( field, errorList ) {
+        errorCount += errorList.length;
+
+        // Seleziona il campo nel form (input, select, textarea)
+        var thisField = formElement.find( "[name='" + field + "']" );
+
+        // Assegna la classe "error" al campo
+        thisField.addClass( "error" );
+
+        // Costruisci il messaggio HTML (ogni errore su una riga)
+        var messages = errorList.map( function( e ) { return e.message; } ).join( "<br>" );
+
+        // Cerca se esiste già il label per questo campo
+        var label = $( "#" + field + "-error" );
+        if ( label.length === 0 ) {
+            // Se non esiste, crealo dopo il campo
+            label = $( "<label class=\"error\" id=\"" + field + "-error\"></label>" );
+            thisField.after( label );
+        }
+        // Svuota il label prima di riempirlo
+        label.html( "" );
+        // Inserisci i messaggi nel label
+        label.html( messages ).show();
+    } );
+
+    // Se esiste un div.status nel form, mostra il numero di errori
+    var status = formElement.find( ".status" );
+    if ( status.length ) {
+        status.text( "Ci sono " + errorCount + " errori" );
+    }
+};
+
+/*
+    // form utils
+*/

@@ -7,13 +7,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = [];
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
+		var mm     = super.getMementify();
 
 		params[ "quotationId" ] = rc.quotationId;
 
 		var rows = super.fire( "QuotationZone.search", params );
-		dataRows = orderZonesByOrigin( rows.getData() );
+		var dataRows = orderByOrigin( rows.getData() );
+
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
+		//result.setData( mm.convertList( dataRows, "list" ) );
 		result.setData( dataRows );
 
 		event.setValue( "result", result );
@@ -73,6 +76,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	function delete( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
+		var validation = getValidationResult();
+
 		var messageId = "quotation.deletedAllRecords";
 		var errors    = [];
 		var payload   = "";
@@ -82,8 +87,51 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var zone    = json.zone;
 		var outcome = null;
+
+		/*
+			if ( !data.keyExists( "info" ) OR !Len( Trim( data.info ) ) ) {
+				var error = getValidationError( message = "[Info] key not found or empty", field = "info" );
+				validation.addError( error );
+			}
+
+			if ( validation.hasErrors() ) {
+				event.setValue( "result", validation );
+				return;
+			}
+		*/
+
 		if ( !IsNull( zone ) ) {
-			var zonaInUso = super.fire( "quotationItem.search", [ quotationZoneId = zone.id ] );
+
+			var zoneInUse = super.fire( "quotationItem.search", [ quotationZoneId = zone.id ] );
+
+			if( Len( zoneInUse.getData() ) ) {
+				var error = getValidationError( message = message( "zone.cannotDeleteWithQuotationItem" ), field="parentId" );
+				validation.addError( error );
+			}
+
+			/*
+			if ( StructKeyExists( zone, "origin" ) ) {
+				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
+			} else {
+			*/
+				var zoneWithSubzone = super.fire( "quotationZone.search", [ originId = zone.id ] );
+
+				if ( Len( zoneWithSubzone.getData() ) ) {
+					var error = getValidationError( message = message( "zone.cannotDeleteWithSubZone" ), field="parentId" );
+					validation.addError( error );
+				}
+				
+			//}
+
+
+			if ( validation.hasErrors() ) {
+				event.setValue( "result", validation );
+				return;
+			}
+
+			outcome = super.fire( "quotationZone.delete", [ zone.id ] );
+			
+			/*
 			if ( Len( zonaInUso.getData() ) ) {
 				result.setData( {
 					"error" = "Impossibile eliminare questa zona perché associata ad una riga del preventivo."
@@ -92,7 +140,9 @@ component extends="com.apirone.core.controller.AbsController" {
 				event.setValue( "result", result );
 				return;
 			}
+			*/
 
+			/*
 			if ( StructKeyExists( zone, "origin" ) ) {
 				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
 			} else {
@@ -107,6 +157,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
 			}
+			*/
 		}
 
 		if ( outcome.getStatus() == "ERROR" || IsNull( outcome ) ) {
@@ -125,7 +176,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function orderZonesByOrigin( zones ){
+	function orderByOrigin( zones ){
 		var parsedZones        = [];
 		var zonesWithoutOrigin = ArrayFilter( zones, function( zone ){
 			return IsNull( zone.getOrigin() );

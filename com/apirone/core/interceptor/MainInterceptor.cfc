@@ -119,13 +119,14 @@ component extends="coldbox.system.Interceptor" {
                 https://community.ortussolutions.com/t/trouble-with-noexecution-and-pdf/9288
             */
 
-			var path   = "com.apirone.core.model.bean.AjaxResult";
-			var result = event.getValue( "result", "result-not-found" );
+			//var path   = "com.apirone.core.model.bean.AjaxResult";
+			//var result = event.getValue( "result", "result-not-found" );
 
 			/*
                 ATTENZIONE:
                 non c'è result se il nome dell'hanlder nel router è sbagliato
             */
+			/*
 			if ( IsSimpleValue( result ) AND result == "result-not-found" ) {
 				event.renderData( data = "Result key not found", statusCode = "400" ).noExecution();
 			} else {
@@ -166,12 +167,91 @@ component extends="coldbox.system.Interceptor" {
 						.noExecution()
 				}
 			}
+			*/
+
+			var result = event.getValue( "result", "result-not-found" );
+
+			var statusCode = 200;
+			var bean       = new com.apirone.core.model.bean.AjaxResult();
+
+			bean.setUuid( event.prc.eventId );
+			bean.setData( "Result not found" );
+
+			if ( IsInstanceOf( result, "com.apirone.core.model.bean.AjaxResult" ) ) {
+				bean = result;
+			} else if ( IsInstanceOf( result, "cbvalidation.models.result.ValidationResult" ) ) {
+				statusCode = 400;
+				var errors = exportErrors( result.getAllErrorsASStruct() );
+
+				bean.setStatus( "INVALID" );
+				bean.setData( errors );
+				bean.setCount( errors.len() );
+				bean.setTotal( errors.len() );
+			} else {
+				bean.setStatus( "SUCCESS" );
+				bean.setData( result );
+				bean.setCount( IsArray( result ) ? result.len() : 1 );
+				bean.setTotal( IsArray( result ) ? result.len() : 1 );
+			}
+
+			event
+				.renderData(
+					statusCode  = statusCode,
+					data        = bean,
+					contentType = "application/json",
+					type        = "json"
+				)
+				.noExecution();
+
 		}
 	}
 
 	/*
         private methods
     */
+
+	function exportErrors( required struct errors ){
+		var newErrors = {};
+
+		for ( var key in errors ) {
+			var arr = [];
+			for ( var err in errors[ key ] ) {
+
+				dump(err);
+				//abort;
+
+				var newErr = {};
+				if ( err.keyExists( "message" ) && Len( Trim( err.message ) ) ) {
+					newErr[ "message" ] = err.message;
+				}
+
+				if ( err.keyExists( "rejectedValue" ) && Len( Trim( err.rejectedValue ) ) ) {
+					newErr[ "rejected" ] = err.rejectedValue;
+				}
+
+				if ( err.keyExists( "validationType" ) && Len( Trim( err.validationType ) ) ) {
+					newErr[ "type" ] = err.validationType;
+				}
+
+				if (
+					err.keyExists( "errorMetadata" ) && !IsSimpleValue( err.errorMetadata ) && !IsNull( err.errorMetadata )
+				) {
+					newErr[ "metadata" ] = err.errorMetadata;
+				}
+
+				if ( err.keyExists( "field" ) && Len( Trim( err.field ) ) ) {
+					newErr[ "field" ] = err.field;
+				}
+
+				// aggiungi solo se almeno una chiave è presente
+				if ( StructCount( newErr ) ) {
+					ArrayAppend( arr, newErr );
+				}
+			}
+			newErrors[ key ] = arr;
+		}
+		return newErrors;
+	}	
 
 	private Struct function getGlobalConfiguration(){
 		// Select keys from Configuration.cfc

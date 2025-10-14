@@ -294,7 +294,7 @@ AP.quotationDetail.detail = ( function() {
                                         return;
                                     }
                                     // REF: fare il check su "SUCCESS" non occorre: te lo fa la libreria.
-                                    // se è "ERROR" viene mostrato un errore generico di errore
+                                    // se è "ERROR" (500) viene mostrato un messaggio generico di errore.
                                     // if ( xhr.status == "SUCCESS" ) {
                                     AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
                                     viewModel.set( "detailForm", defaultDetailForm );
@@ -546,7 +546,8 @@ AP.quotationDetail.detail = ( function() {
     // REF: davantia lla funzione manca il "var" perchè avevi
     // la necessità che fosse pubblica
     // è sufficiente metterlo in "pub" per averlo in:
-    // AP.quotationDetail.renderQuotationTotals()
+    // AP.quotationDetail.detail.renderQuotationTotals()
+    // la prossima volta lo facciamo con mvvm
 
     pub.renderTotals = function() {
         NM.util.ajax( {
@@ -586,7 +587,9 @@ AP.quotationDetail.detail = ( function() {
 
 AP.quotationDetail.zoneModal = ( function() {
     var pub = {};
-    var fields = AP.quotationDetail.fields.zoneModalRoot;
+    // REF: il nome è errato
+    var fields = AP.quotationDetail.fields;
+
     var defaultDetailForm = {
         data: {
             id: "",
@@ -612,75 +615,133 @@ AP.quotationDetail.zoneModal = ( function() {
         },
 
         createZone: function( event ) {
-            const parsedData = viewModel.get( "detailForm.data" );
-            if ( parsedData.name.trim() == "" ) {
-                AP.widget.notify( "error", "Specificare un nome per la zona." );
-                return false;
-            }
+            // REF: è sufficiente configurarlo con jquery validator,
+            // senza check manuali
 
-            NM.util.ajax( {
-                method: "POST",
-                url: "/manager/ajax/quotations/zones",
-                data: JSON.stringify( parsedData ),
-                callback: {
-                    done: function( xhr ) {
-                        if( xhr.status == "ERRORE" ) {
-                            AP.widget.notify( "error", "Combinazione Zona già esistente in questo preventivo." );
-                        }
-                        if ( xhr.status == "SUCCESS" ) {
-                            AP.widget.notify( "success", "Zona salvata correttamente." );
-                            setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
-                            AP.quotationDetail.detail.methods().getZones();
+            // const parsedData = viewModel.get( "detailForm.data" );
+            // if ( parsedData.name.trim() == "" ) {
+            //    AP.widget.notify( "error", "Specificare un nome per la zona." );
+            //    return false;
+            // }
+
+            var zoneForm = $( "#zone-form" );
+
+            if ( zoneForm.valid() ) {
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/quotations/zones",
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.status == "ERRORE" ) {
+                                AP.widget.notify( "error", "Combinazione Zona già esistente in questo preventivo." );
+                            }
+                            if ( xhr.status == "SUCCESS" ) {
+                                AP.widget.notify( "success", "Zona salvata correttamente." );
+                                setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
+                                AP.quotationDetail.detail.methods().getZones();
+                            }
                         }
                     }
-                }
-            } );
+                } );
+
+            }
+
             return false;
         },
 
         deleteZone: function( event ) {
             const zone = viewModel.get( "detailForm.data.parentZone" );
 
-            NM.util.ajax( {
-                method: "DELETE",
-                url: "/manager/ajax/quotations/zones",
-                data: JSON.stringify( { "zone": zone } ),
-                callback: {
-                    done: function( xhr ) {
-                        if( xhr.status == "ERRORE" ) {
-                            if ( xhr.data?.error ) {
-                                AP.widget.notify( "error", xhr.data.error );
-                            } else {
-                                AP.widget.notify( "error", "Errore durante la cancellazione di una zona." );
+            var zoneForm = $( "#zone-form" );
+
+            if ( zoneForm.valid() ) {
+                NM.util.ajax( {
+                    method: "DELETE",
+                    url: "/manager/ajax/quotations/zones",
+                    data: JSON.stringify( { "zone": zone } ),
+                    callback: {
+                        done: function( xhr ) {
+
+                            if ( xhr.status == "INVALID" ) {
+                                NM.form.showMessages( xhr.data );
                             }
-                        }
-                        if ( xhr.status == "SUCCESS" ) {
-                            AP.widget.notify( "success", "Zona eliminata correttamente." );
-                            setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
-                            AP.quotationDetail.detail.methods().getZones();
+
                         }
                     }
-                }
-            } );
+                } );
+            }
             return false;
         },
     } );
 
     pub.init = function( mode ) {
-        kendo.bind( fields, viewModel );
+        kendo.bind( fields.zoneModalRoot, viewModel );
+
+        var zoneForm = $( "#zone-form" );
+
+        NM.form.removeRules( zoneForm );
+
         if ( mode == "delete" ) {
-            viewModel.get( "zones" ).data( AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != ""; } ) );
+
+            var zones = AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != ""; } );
+
+            zones.unshift( { "id": "", "name": "-- seleziona una zona" } );
+
+            viewModel.get( "zones" ).data( zones );
+
             $( "#delete-zone-button" ).show();
             $( "#add-zone-button" ).hide();
             $( "#zone-name-input" ).hide();
+
+            // REF: aggiungo validazione per cancellazione
+            zoneForm.validate( {
+                onfocusout: function( element ) {
+                    $( element ).valid();
+                },
+                rules: {
+                    parentId: {
+                        required: true
+                    },
+                },
+                messages: {
+                    parentId: {
+                        required: "Seleziona una zona"
+                    },
+                },
+            } );
+
         }
+
         if ( mode == "add" ) {
+
             var zones = AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != "" && !zone.origin; } );
+
             zones.unshift( { "id": "", "name": "" } );
             viewModel.get( "zones" ).data( zones );
+
             $( "#delete-zone-button" ).hide();
             $( "#add-zone-button" ).show();
             $( "#zone-name-input" ).show();
+
+            // REF: aggiungo validazione per inserimento
+            zoneForm.validate( {
+                onfocusout: function( element ) {
+                    $( element ).valid();
+                },
+                rules: {
+                    name: {
+                        required: true
+                    },
+                },
+                messages: {
+                    name: {
+                        required: "Inserisci un nome"
+                    },
+                },
+            } );
+
         }
     };
 

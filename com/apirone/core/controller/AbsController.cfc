@@ -6,6 +6,9 @@
 		setConfiguration( getContainer().getInstance( "Configuration" ) );
 	}
 
+	/*
+		to remove
+	*/
 	public Array function convertCbErrors( required Array errors ){
 		return errors.map( ( error ) => {
 			return {
@@ -19,6 +22,9 @@
 		} )
 	}
 
+	/*
+		to remove
+	*/
 	public Void function setErrorResult( required Any event, required Array errors = [] ){
 		var result = getResult();
 
@@ -32,7 +38,6 @@
 			.setData( result );
 	}
 
-
 	public Struct function getConstraints( required String entity, String profile = "default" ){
 		var constraints = DeserializeJSON(
 			FileRead( ExpandPath( "/apps/api/constraints/#arguments.entity#.json" ) )
@@ -40,6 +45,34 @@
 
 		return constraints[ profile ]
 	}
+
+	/*
+		shorthands validation result
+	*/
+	public Any function getValidationResult(){
+		var validationResult = new cbvalidation.models.result.ValidationResult();
+		
+		// ROB: overwrite buildin function because it is bugged
+		validationResult.hasErrors = function( bean ){
+			return validationResult.getAllErrorsAsStruct().len() > 0;
+		}
+		
+		return validationResult;
+	}
+
+	public Any function getValidationError(){
+		if ( !StructKeyExists( arguments, "field" ) ) {
+			arguments.field = "generic";
+		}
+		var error = new cbvalidation.models.result.ValidationError();
+		error.configure( argumentCollection = arguments );
+
+		return error;
+	}
+	/*
+		// shorthands validation result
+	*/
+
 
 	public Any function setAuthUser( required com.apirone.core.model.bean.Account account ){
 		var user = bean( "User" );
@@ -232,14 +265,20 @@
 	}
 
 	// only message
-	public String function message( required String id, required String lang = "it" ){
+	public String function message( required String id, required String langId = "it" ){
 		// id is a dotted path
 
 		var messages = DeserializeJSON(
-			FileRead( ExpandPath( "/config/assets/messages-#LCase( arguments.lang )#.json.cfm" ) )
+			FileRead( ExpandPath( "/config/assets/messages-#LCase( arguments.langId )#.json.cfm" ) )
 		);
 
-		return StructGet( "messages.#id#" );
+		if( !keyPathExists( messages, arguments.id ) ) {
+			FileAppend( file = ExpandPath( "/message-not-found.log" ), data = "#Now()#;messageIdNotFound:#arguments.id#;langId:#arguments.langId# #Chr( 13 )##Chr( 10 )#");
+			return "Not found"
+		}
+
+		return StructGet( "messages.#arguments.id#" );
+		
 	}
 
 	// message and id
@@ -304,12 +343,6 @@
 		return bean;
 	}
 
-	/*
-	public Any function bean( required String type ){
-		//return CreateObject( "com.apirone.core.model.bean.#arguments.type#" ).init();
-	}
-	*/
-
 	public Any function bean( required String type, Struct values = {} ){
 		var bean = CreateObject( "com.apirone.core.model.bean.#arguments.type#" ).init();
 		return bean;
@@ -324,5 +357,22 @@
 		// TODO: use GetSystemPropOrEnvVar from Lucee 6.2.1
 		return server[ "wireBox-apirone" ];
 	}
+
+	
+	private Boolean function keyPathExists(structure, path) {
+
+		var keys = listToArray(path, ".");
+		var current = structure;
+
+		for (var key in keys) {
+			if (!isStruct(current) || !StructKeyExists(current, key)) {
+				return false;
+			}
+			current = current[key];
+		}
+
+		return true;
+	}
+
 
 }

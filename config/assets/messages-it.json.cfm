@@ -52,6 +52,11 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
+    "zone": {
+        "cannotDeleteWithQuotationItem": "Impossibile eliminare questa zona perché associata a una riga del preventivo",
+        "cannotDeleteWithSubZone": "Impossibile eliminare questa zona perché contiene delle sottozone"
+    },
+
     "finish": {
         "created": "Finitura caricata",
         "updated": "Finitura aggiornata"
