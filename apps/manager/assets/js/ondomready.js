@@ -57,8 +57,6 @@ $.validator.setDefaults( {
             highlightTabWithError( error.element.name );
         } );
 
-        // console.log("invalidHandler", validator);
-
         var count = validator.numberOfInvalids();
         var thisForm = $( event.currentTarget );
 
