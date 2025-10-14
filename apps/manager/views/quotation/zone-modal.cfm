@@ -15,7 +15,7 @@
                     <div class="card-body">
                         <div class="mb-3 row">
                             <div class="col-6">
-                                <label class="col-sm-12 col-form-label text-start">Zona</label>
+                                <label class="col-sm-12 col-form-label text-start" id="zone-label-parent">Zona</label>
                                 <select class="form-control me-3" 
                                     id="parentId"
                                     name="parentId"

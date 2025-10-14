@@ -55,6 +55,8 @@ NM.util.ajax = function( setup ) {
                         return;
                     }
 
+                    // voglio che i "400" arrivino sul client,
+                    // usando done() non succederebbe
                     if ( xhr.status == 400 ) {
                         setup.callback.done.apply( null, [ xhr.responseJSON ] );
                         return;
