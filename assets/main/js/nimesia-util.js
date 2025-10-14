@@ -266,6 +266,15 @@ NM.form.showMessages = function( errors ) {
     // Conta il totale degli errori
     var errorCount = 0;
 
+    // Se c'è un errore generale, mostra la notifica
+    if ( errors.general ) {
+        // Usa il primo messaggio del campo general, se presente
+        var generalMessage = Array.isArray( errors.general ) && errors.general.length > 0
+            ? errors.general.map( function( e ){ return e.message; } ).join( "\n" )
+            : "Ops! Si è verificato un errore generale.";
+        AP.widget.notify( "error", generalMessage, "Ops!" );
+    }
+
     // Cicla su ogni campo della struttura degli errori
     $.each( errors, function( field, errorList ) {
         errorCount += errorList.length;

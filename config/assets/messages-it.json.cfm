@@ -53,8 +53,10 @@
     },
 
     "zone": {
-        "cannotDeleteWithQuotationItem": "Impossibile eliminare questa zona perché associata a una riga del preventivo",
-        "cannotDeleteWithSubZone": "Impossibile eliminare questa zona perché contiene delle sottozone"
+        "notDeletedWithQuotationItem": "Impossibile eliminare questa zona perché associata a una riga del preventivo",
+        "notDeletedWithSubZone": "Impossibile eliminare questa zona perché contiene delle sottozone",
+        "notDeleted": "Impossibile eliminare questa zona",
+        "deleted": "Zona cancellata"
     },
 
     "finish": {

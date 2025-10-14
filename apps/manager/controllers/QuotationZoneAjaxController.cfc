@@ -74,104 +74,49 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function delete( event, rc, prc ){
-		var json = DeserializeJSON( GetHTTPRequestData().content );
-
-		var validation = getValidationResult();
-
-		var messageId = "quotation.deletedAllRecords";
-		var errors    = [];
-		var payload   = "";
-		var valid     = true;
-
-		var result = super.getResult();
-
-		var zone    = json.zone;
-		var outcome = null;
-
-		/*
-			if ( !data.keyExists( "info" ) OR !Len( Trim( data.info ) ) ) {
-				var error = getValidationError( message = "[Info] key not found or empty", field = "info" );
-				validation.addError( error );
-			}
-
-			if ( validation.hasErrors() ) {
-				event.setValue( "result", validation );
-				return;
-			}
-		*/
+		var json       = DeserializeJSON( GetHTTPRequestData().content );
+		
+		var validation = super.getValidationResult();
+		var result     = super.getResult();
+		
+		var payload    = {};
+		var zone       = json.zone;
 
 		if ( !IsNull( zone ) ) {
 
+			/*
 			var zoneInUse = super.fire( "quotationItem.search", [ quotationZoneId = zone.id ] );
 
 			if( Len( zoneInUse.getData() ) ) {
-				var error = getValidationError( message = message( "zone.cannotDeleteWithQuotationItem" ), field="parentId" );
+				var error = getValidationError( message = getMessage( "zone.notDeletedWithQuotationItem" ), field="parentId" );
 				validation.addError( error );
 			}
 
-			/*
-			if ( StructKeyExists( zone, "origin" ) ) {
-				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
-			} else {
-			*/
-				var zoneWithSubzone = super.fire( "quotationZone.search", [ originId = zone.id ] );
+			var zoneWithSubzone = super.fire( "quotationZone.search", [ originId = zone.id ] );
 
-				if ( Len( zoneWithSubzone.getData() ) ) {
-					var error = getValidationError( message = message( "zone.cannotDeleteWithSubZone" ), field="parentId" );
-					validation.addError( error );
-				}
+			if ( Len( zoneWithSubzone.getData() ) ) {
+				var error = getValidationError( message = getMessage( "zone.notDeletedWithSubZone" ), field="parentId" );
+				validation.addError( error );
+			}
 				
-			//}
-
-
 			if ( validation.hasErrors() ) {
 				event.setValue( "result", validation );
 				return;
 			}
-
-			outcome = super.fire( "quotationZone.delete", [ zone.id ] );
-			
-			/*
-			if ( Len( zonaInUso.getData() ) ) {
-				result.setData( {
-					"error" = "Impossibile eliminare questa zona perché associata ad una riga del preventivo."
-				} );
-				result.setStatus( "ERRORE" );
-				event.setValue( "result", result );
-				return;
-			}
 			*/
 
-			/*
-			if ( StructKeyExists( zone, "origin" ) ) {
-				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
-			} else {
-				var zonaConSottozone = super.fire( "quotationZone.search", [ originId = zone.id ] );
-				if ( Len( zonaConSottozone.getData() ) ) {
-					result.setData( {
-						"error" = "Impossibile eliminare questa zona perché contiene delle sottozone."
-					} );
-					result.setStatus( "ERRORE" );
-					event.setValue( "result", result );
-					return;
-				}
-				outcome = super.fire( "quotationZone.delete", [ zone.id ] );
-			}
-			*/
 		}
 
-		if ( outcome.getStatus() == "ERROR" || IsNull( outcome ) ) {
-			errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+		var outcome = super.fire( "quotationZone.delete", [ zone.id ] );
+
+		if ( outcome.hasError() ) {
+			var error = getValidationError( message = getMessage( "zone.notDeleted" ), field="general" );
+			validation.addError( error );
+			event.setValue( "result", validation );
+			return;
 		}
 
-		if ( errors.len() ) {
-			messageId = "quotation.deletedNotAllRecords"
-			payload   = { "errors" = errors };
-		}
-
-		var message = super.completeMessage( messageId );
-
-		result.setData( { "message" = message, "payload" = payload } );
+		result.setData( { "message" = getMessage( "zone.deleted" )  } );
 
 		event.setValue( "result", result );
 	}
