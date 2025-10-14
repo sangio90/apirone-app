@@ -290,7 +290,7 @@ AP.quotationDetail.detail = ( function() {
                             callback: {
                                 done: function( xhr ) {
                                     if( xhr.status == "INVALID" ) {
-                                        AP.widget.notify( "error", "Errore nella cancellazione della riga di preventivo." );
+                                        NM.form.showMessages( xhr.data );
                                         return;
                                     }
                                     // REF: fare il check su "SUCCESS" non occorre: te lo fa la libreria.
@@ -634,14 +634,14 @@ AP.quotationDetail.zoneModal = ( function() {
                     data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
                         done: function( xhr ) {
-                            if ( xhr.status == "ERRORE" ) {
-                                AP.widget.notify( "error", "Combinazione Zona già esistente in questo preventivo." );
+                            if ( xhr.status == "INVALID" ) {
+                                NM.form.showMessages( xhr.data );
+                                return;
                             }
-                            if ( xhr.status == "SUCCESS" ) {
-                                AP.widget.notify( "success", "Zona salvata correttamente." );
-                                setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
-                                AP.quotationDetail.detail.methods().getZones();
-                            }
+
+                            AP.widget.notify( "success", "Zona salvata correttamente." );
+                            setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
+                            AP.quotationDetail.detail.methods().getZones();
                         }
                     }
                 } );
@@ -675,6 +675,8 @@ AP.quotationDetail.zoneModal = ( function() {
                             }
 
                             AP.widget.notify( "success", xhr.data.message );
+                            setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
+                            AP.quotationDetail.detail.methods().getZones();
 
                         }
                     }
@@ -702,6 +704,7 @@ AP.quotationDetail.zoneModal = ( function() {
             $( "#delete-zone-button" ).show();
             $( "#add-zone-button" ).hide();
             $( "#zone-name-input" ).hide();
+            $( "#zone-label-parent" ).html( "Zona" );
 
             // REF: aggiungo validazione per cancellazione
             zoneForm.validate( {
@@ -726,12 +729,13 @@ AP.quotationDetail.zoneModal = ( function() {
 
             var zones = AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != "" && !zone.origin; } );
 
-            zones.unshift( { "id": "", "name": "" } );
+            zones.unshift( { "id": "", "name": "-- nessuna" } );
             viewModel.get( "zones" ).data( zones );
 
             $( "#delete-zone-button" ).hide();
             $( "#add-zone-button" ).show();
             $( "#zone-name-input" ).show();
+            $( "#zone-label-parent" ).html( "Zona padre" );
 
             // REF: aggiungo validazione per inserimento
             zoneForm.validate( {

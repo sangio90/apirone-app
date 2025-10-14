@@ -1,8 +1,5 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	property name="dao" inject="QuotationZoneDAO";
-	property name="quotationItemDao" inject="QuotationItemDAO";
-
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
@@ -24,14 +21,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
-
-		var thisId    = "";
-		var messageId = "";
-		var texts     = [];
-		var errors    = [];
-
+		
 		var result = super.getResult();
-
+		var validation = super.getValidationResult();
+		
 		var quotationZone = super.bean( "QuotationZone" );
 
 		var params = {
@@ -40,33 +33,34 @@ component extends="com.apirone.core.controller.AbsController" {
 			originId    = Len( json.parentZone?.id ) ? json.parentZone.id : null
 		}
 
-		// TODO: move to service
-		var existingCombination = dao.find( argumentCollection = params );
+		var existingCombination = super.service( "QuotationZone" ).search( argumentCollection = params );
 
-		if ( !Len( existingCombination ) ) {
-			quotationZone.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
-			quotationZone.setName( json.name );
+		if( Len( existingCombination.getData() ) ) {
+			
+			var error = super.getValidationError( message = getMessage( "zone.existInQuotation" ), field="name" );
+			validation.addError( error );
 
-			if ( Len( json.parentZone?.id ) ) {
-				quotationZone.setOrigin( super.service( "QuotationZone" ).get( json.parentZone.id ) );
-			}
-
-			if ( !Len( json.id ) ) {
-				messageId = "quotationZone.created";
-				thisId    = super.fire( "quotationZone.create", [ quotationZone ] )
-			} else {
-				messageId = "quotationZone.updated";
-				thisId    = super.fire( "quotationZone.update", [ quotationZone ] )
-			}
-			var message = completeMessage( messageId );
-		} else {
-			result.setData( {
-				"error" = "Combinazione Zona già esistente in questo preventivo."
-			} );
-			result.setStatus( "ERRORE" );
-			event.setValue( "result", result );
+			event.setValue( "result", validation );
 			return;
+
 		}
+
+		quotationZone.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
+		quotationZone.setName( json.name );
+
+		if ( Len( json.parentZone?.id ) ) {
+			quotationZone.setOrigin( super.service( "QuotationZone" ).get( json.parentZone.id ) );
+		}
+
+		if ( !Len( json.id ) ) {
+			messageId = "quotationZone.created";
+			thisId    = super.fire( "quotationZone.create", [ quotationZone ] )
+		} else {
+			messageId = "quotationZone.updated";
+			thisId    = super.fire( "quotationZone.update", [ quotationZone ] )
+		}
+		
+		var message = getMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
 
@@ -84,7 +78,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( !IsNull( zone ) ) {
 
-			/*
 			var zoneInUse = super.fire( "quotationItem.search", [ quotationZoneId = zone.id ] );
 
 			if( Len( zoneInUse.getData() ) ) {
@@ -103,7 +96,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				event.setValue( "result", validation );
 				return;
 			}
-			*/
 
 		}
 
