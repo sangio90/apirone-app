@@ -226,6 +226,12 @@ component extends="com.apirone.core.controller.AbsController" {
 					var outcome = super.fire( "quotationItemSignageRow.delete", [ signageRow.getId() ] );
 				}
 
+				var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = id } );
+				
+				for ( quotationItemProductItem in quotationItemProductItems ) {
+					var outcome = super.fire( "quotationItemProductItem.delete", [ quotationItemProductItem.getId() ] );
+				}
+
 				var outcome = super.fire( "quotationItem.delete", [ id ] );
 
 				if ( outcome.getStatus() == "ERROR" ) {

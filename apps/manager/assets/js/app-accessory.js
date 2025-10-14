@@ -225,21 +225,33 @@ AP.accessory.modal = ( function() {
                                 viewModel.set( "backgroundImage", xhr.data[0].image );
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].image.uri + "')" );
                             }
-                            viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
-                            const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
-                            const attributeArray = productItems.data();
+                            if ( quotationItemId != "" || !NM.storage.get('accessory.product.items') || NM.storage.get('accessory.product.items').length == 0 ) {
+                                viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
+                            } else {
+                                if ( quotationItemId == "" ) {
+                                    const itemsDataSource = new kendo.data.DataSource({
+                                        data: NM.storage.get('accessory.product.items')
+                                    });
+                                    viewModel.set( "detailForm.data.quotationItem.product.items", itemsDataSource );
+                                    viewModel.get( "detailForm.data.quotationItem.product.items" ).read();
+                                }
+                            }
+                            productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
+                            attributeArray = productItems.data();
                             // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
                                 if ( existing ) {
-                                    existing.values.push( {
-                                        attributeValue: item.attributeValue,
-                                        product_item_id: item.id,
-                                        parent_attribute_id: null,
-                                        level: 0,
-                                        selected: false
-                                    } );
-                                    productItems.trigger( "change" );
+									if (!existing.values.find( v => v.product_item_id === item.id )) {
+										existing.values.push( {
+											attributeValue: item.attributeValue,
+											product_item_id: item.id,
+											parent_attribute_id: null,
+											level: 0,
+											selected: false
+										} );
+										productItems.trigger( "change" );
+									}
                                 } else {
                                     const parsedData = {
                                         attribute_id: item.attribute.id,
@@ -319,6 +331,7 @@ AP.accessory.modal = ( function() {
                         }
                     }
                     viewModel.renderProductItems();
+                    NM.storage.set( 'accessory.product.items', productItems.data() );
                     resolve();
                     return;
                 }
@@ -409,6 +422,7 @@ AP.accessory.modal = ( function() {
                                     }
                                 } );
                             }
+                            NM.storage.set( 'accessory.product.items', productItems.data() );
                             resolve();
                         },
                         fail: function( err ) {
@@ -557,7 +571,7 @@ AP.accessory.modal = ( function() {
                                 if (NM.storage.get('accessory.finishId')) {
                                     viewModel.loadProduct();
                                     setTimeout( function() {
-                                        
+
                                     }, 200);
                                 }
                             }, 200);

@@ -155,7 +155,8 @@ AP.signage.modal = ( function() {
                     textAlign: "center",
                     content: "",
                     charCount: 0,
-                    orderby: 0
+                    orderby: 0,
+                    newRow: true
                 };
                 ds.add( defaultSignageRow );
 
@@ -445,6 +446,7 @@ AP.signage.modal = ( function() {
                                             AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
                                             const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
                                             const row = ds.view().find( r => r.id === e.data.id );
+                                            isNewRow = row.hasOwnProperty('newRow') ? row.newRow : null;
                                             if ( row ) {
                                                 ds.remove( row );
                                             }
@@ -453,7 +455,9 @@ AP.signage.modal = ( function() {
                                                     row.set( "index", i + 1 );
                                                 } );
                                             }
-                                            viewModel.save();
+                                            if ( !isNewRow ) {
+                                                viewModel.save();
+                                            }
                                         }
                                     } }
                             } );
@@ -991,17 +995,17 @@ AP.signage.modal = ( function() {
                             $('#signageFont').trigger('change');
                         }
                         setTimeout( function() {
-                            if ($('#signageFinish').val() !== '') {                            
+                            if ($('#signageFinish').val() !== '') {
                                 $('#signageFinish').val('');
                                 $('#signageFinish').trigger('change');
                             }
                             setTimeout( function() {
-                                if ($('#signageModel').val() !== '') {                            
+                                if ($('#signageModel').val() !== '') {
                                     $('#signageModel').val('');
                                     $('#signageModel').trigger('change');
                                 }
                                 setTimeout( function() {
-                                    if ($('#signageRow').val() !== '') {                            
+                                    if ($('#signageRow').val() !== '') {
                                         $('#signageRow').val('');
                                         $('#signageRow').trigger('change');
                                     }
@@ -1023,12 +1027,12 @@ AP.signage.modal = ( function() {
                             $('#signageFont').trigger('change');
                         }
                         setTimeout( function() {
-                            if ($('#signageFinish').val() !== '') {                            
+                            if ($('#signageFinish').val() !== '') {
                                 $('#signageFinish').val('');
                                 $('#signageFinish').trigger('change');
                             }
                             setTimeout( function() {
-                                if ($('#signageModel').val() !== '') {                            
+                                if ($('#signageModel').val() !== '') {
                                     $('#signageModel').val('');
                                     $('#signageModel').trigger('change');
                                 }
@@ -1049,7 +1053,7 @@ AP.signage.modal = ( function() {
                             $('#signageFont').trigger('change');
                         }
                         setTimeout( function() {
-                            if ($('#signageFinish').val() !== '') {                            
+                            if ($('#signageFinish').val() !== '') {
                                 $('#signageFinish').val('');
                                 $('#signageFinish').trigger('change');
                             }
@@ -1100,7 +1104,7 @@ AP.signage.modal = ( function() {
         } );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
-        
+
         if (NM.storage.get('signage.categoryId')) {
             viewModel.set("detailForm.data.signageConfig.catalogBundle.category.id", NM.storage.get('signage.categoryId'));
         }
