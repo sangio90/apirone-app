@@ -63,7 +63,6 @@ NM.util.ajax = function( setup ) {
                 }
 
                 if ( statusText == "success" ) {
-                    console.log( "apply success" );
                     setup.callback.done.apply( null, [ xhr ] );
                 }
 
