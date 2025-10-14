@@ -666,7 +666,10 @@ AP.quotationDetail.zoneModal = ( function() {
 
                             if ( xhr.status == "INVALID" ) {
                                 NM.form.showMessages( xhr.data );
+                                return;
                             }
+
+                            AP.widget.notify( "success", xhr.data.message );
 
                         }
                     }
