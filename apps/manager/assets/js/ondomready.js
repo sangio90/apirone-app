@@ -96,20 +96,17 @@ $.validator.setDefaults( {
 
         var status = thisForm.find( ".errors-counter" );
 
-        thisForm.find( ".errors-counter" ).html( message );
-
-        if( status.length == 0 ) {
-            var status = $( ".errors-counter" );
+        // se dentro non c'è il loading
+        if ( !status.html().trim().startsWith( "<img" ) ) {
+            status.html( message );
         }
-
-        status.html( message );
 
         this.defaultShowErrors();
 
     },
     errorPlacement: function( error, element ) {
 
-        var thisForm = $( this.currentForm );
+        // var thisForm = $( this.currentForm );
 
         var name = element[ 0 ].name;
         var ele = $( element[ 0 ] );

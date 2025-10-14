@@ -655,6 +655,9 @@ AP.quotationDetail.zoneModal = ( function() {
             const zone = viewModel.get( "detailForm.data.parentZone" );
 
             var zoneForm = $( "#zone-form" );
+            var status = zoneForm.find( ".status" );
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
             if ( zoneForm.valid() ) {
                 NM.util.ajax( {
@@ -663,6 +666,8 @@ AP.quotationDetail.zoneModal = ( function() {
                     data: JSON.stringify( { "zone": zone } ),
                     callback: {
                         done: function( xhr ) {
+
+                            status.html( "" );
 
                             if ( xhr.status == "INVALID" ) {
                                 NM.form.showMessages( xhr.data );
