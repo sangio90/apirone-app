@@ -112,7 +112,7 @@
                                 <span>Anteprima</span>
                             </div>
                             <div class="col-1 mb-3 flex justify-content-end">
-                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters">Pulisci Configurazione</button>
+                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci Configurazione</button>
                             </div>
                             <div class="col-3 mb-3">
                                 <div id="product-items" style="max-width: 100%"></div>
@@ -140,7 +140,7 @@
                                     <i class="fas fa-save"></i> Salva
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal" data-bind="click:resetForm">Chiudi</button>
-                                <button type="button" class="btn btn-primary btn-sm me-2 float-end" data-bind="click:clearFilters, visible:visibleClearButton">Pulisci Configurazione</button>
+                                <button type="button" class="btn btn-primary btn-sm me-2 float-end" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci Configurazione</button>
                                 <div class="status errors-counter mt-1 float-end me-3"></div>
                             </div>
                         </div>
@@ -172,3 +172,12 @@
     #template( view="jstemplate/quotation/signage-line-row-tmpl" )#
     #template( view="jstemplate/quotation/signage-line-preview-row-tmpl" )#
 </cfoutput>
+<style>
+    #signage-preview-background {
+        min-width: 500px;
+        min-height: 500px;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: auto !important;
+    }
+</style>

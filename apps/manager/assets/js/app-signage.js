@@ -985,9 +985,15 @@ AP.signage.modal = ( function() {
             return false;
         },
 
-        visibleClearButton: function() {
-            const id = this.get('detailForm.data.quotationItem.signageConfigItem.id');
-            return id == '';
+        visibleUpperClearButton: function() {
+            const id = viewModel.get('detailForm.data.quotationItem.id');
+            return id == "";
+        },
+        
+        visibleLowerClearButton: function() {
+            const signageConfigId = this.get('detailForm.data.quotationItem.signageConfigItem.id');
+            const id = viewModel.get('detailForm.data.quotationItem.id');
+            return signageConfigId == "" && id == "";
         },
 
         clearFilters: function() {

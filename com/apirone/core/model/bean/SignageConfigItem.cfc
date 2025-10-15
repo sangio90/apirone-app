@@ -3,7 +3,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	this.memento = {
 		defaultIncludes = [
 			"id",
-			"signageConfig",
+			"signageConfigId",
 			"height",
 			"heightInPixel",
 			"rowCount",

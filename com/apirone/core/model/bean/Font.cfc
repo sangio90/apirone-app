@@ -12,9 +12,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 					"directory",
 					"family",
 					"nameItem",
-					"heightWidthRatio",
-					"status",
-					"categories"
+					"heightWidthRatio"
 				]
 			}
 		}

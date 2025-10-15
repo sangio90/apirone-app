@@ -195,7 +195,7 @@ AP.accessory.modal = ( function() {
                             viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data[0].id );
                             viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
                             if ( xhr.data[0].horizontalImage ) {
-                                viewModel.set( "backgroundImage", xhr.data[0].verticalImage );
+                                viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
                             } else {
                                 viewModel.set( "backgroundImage.url", "url()" );
@@ -225,7 +225,6 @@ AP.accessory.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
-                            debugger
                             if ( !viewModel.get( "detailForm.data.quotationItem.product.image" ) && xhr.data[0].horizontalImage ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
@@ -502,9 +501,15 @@ AP.accessory.modal = ( function() {
             } );
         },
 
-        visibleClearButton: function() {
-            const id = this.get('detailForm.data.quotationItem.product.finish.id');
-            return id == '';
+        visibleUpperClearButton: function() {
+            const id = this.get('detailForm.data.id');
+            return id == "";
+        },
+        
+        visibleLowerClearButton: function() {
+            const finishId = this.get('detailForm.data.quotationItem.product.finish.id');
+            const id = this.get('detailForm.data.id');
+            return finishId == "" && id == "";
         },
 
         clearFilters: function() {
