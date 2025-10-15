@@ -278,7 +278,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var images = getFileService().list( productId = record.product_id );
 
 			if ( Len( images ) ) {
-				bean.setImage( images[ 1 ] )
+				bean.setImages( images )
 			}
 
 			return bean;

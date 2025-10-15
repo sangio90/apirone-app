@@ -368,11 +368,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var images = getFileService().list( productItemId = record.product_item_id )
 			if (Len(images)) {
-				bean.setImage(images[1])
+				bean.setImages(images)
 			} else {
 				var images = getFileService().list( attributeValueId = record.attribute_raw_value_id )
 				if (Len(images)) {
-					bean.setImage(images[1])
+					bean.setImages(images)
 				} 
 			}
 

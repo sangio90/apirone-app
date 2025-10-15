@@ -5,7 +5,6 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			"id",
 			"shortId",
 			"name",
-			"code",
 			"orderby",
 			"status"
 		]

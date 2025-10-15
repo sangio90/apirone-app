@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "name", "kind", "lang", "status" ]
+		defaultIncludes = [ "id", "name" ]
 	}
 
 	public Lang function init(){

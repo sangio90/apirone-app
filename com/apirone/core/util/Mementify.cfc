@@ -13,7 +13,7 @@ component {
 			dateMask          = settings?.dateMask ?: "yyyy-MM-dd",
 			timeMask          = settings?.timeMask ?: "HH:mm:ss",
 			nullDefaultValue  = settings?.nullDefaultValue ?: null,
-			trustedGetters    = settings?.trustedGetters ?: false,
+			trustedGetters    = settings?.trustedGetters ?: true,
 			convertToTimezone = settings?.convertToTimezone ?: "",
 			autoCastBooleans  = settings?.autoCastBooleans ?: false
 		}

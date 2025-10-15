@@ -86,20 +86,17 @@
                                     </div>
 
                                     <div class="form-group row mb-2">
+                                        <div class="col-sm-3">
+                                            <label class="control-label text-sm-end">Descrizione </label>
+                                            <input type="text" name="name" class="form-control" id="name"
+                                                data-bind="value: detailForm.data.name"
+                                                data-rule-required="true"
+                                                required
+                                            >
+                                        </div>
                                         <div class="col-sm-9">
                                             <label class="control-label text-sm-end">Note</label>
                                             <textarea name="note" class="form-control" rows="1" data-bind="value: detailForm.data.notes"></textarea>
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <label class="control-label text-sm-end">Stato </label>
-                                            <select name="statusId" class="form-control"
-                                                data-placeholder="-- Seleziona stato"
-                                                data-bind="source: statuses, value: detailForm.data.status.id"
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                                required
-                                            >
-                                            </select>
                                         </div>
                                     </div>
 
@@ -125,6 +122,17 @@
                                                 data-minlength="4"
                                                 data-filter="contains"
                                             >
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <label class="control-label text-sm-end">Stato </label>
+                                            <select name="statusId" class="form-control"
+                                                data-placeholder="-- Seleziona stato"
+                                                data-bind="source: statuses, value: detailForm.data.status.id"
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                                required
+                                            >
+                                            </select>
                                         </div>
                                     </div>
 

@@ -193,10 +193,10 @@ AP.accessory.modal = ( function() {
                     done: async function( xhr ) {
                         if ( xhr.data ) {
                             viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data[0].id );
-                            viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].image );
-                            if ( xhr.data[0].image ) {
-                                viewModel.set( "backgroundImage", xhr.data[0].image );
-                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].image.uri + "')" );
+                            viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
+                            if ( xhr.data[0].horizontalImage ) {
+                                viewModel.set( "backgroundImage", xhr.data[0].verticalImage );
+                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
                             } else {
                                 viewModel.set( "backgroundImage.url", "url()" );
                             }
@@ -225,10 +225,11 @@ AP.accessory.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
-                            if ( !viewModel.get( "detailForm.data.quotationItem.product.image" ) && xhr.data[0].image ) {
-                                viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].image );
-                                viewModel.set( "backgroundImage", xhr.data[0].image );
-                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].image.uri + "')" );
+                            debugger
+                            if ( !viewModel.get( "detailForm.data.quotationItem.product.image" ) && xhr.data[0].horizontalImage ) {
+                                viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
+                                viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
+                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
                             }
                             if ( quotationItemId != "" || !NM.storage.get('accessory.product.items') || NM.storage.get('accessory.product.items').length == 0 ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
@@ -431,14 +432,13 @@ AP.accessory.modal = ( function() {
         },
 
         renderProductPreview: function(productItems) {
-            debugger
             productItems.data().forEach( function( item ) {
                     const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
                     if ( selectedValues.length > 0 ) {
-                        if ( selectedValues[0].attributeValue?.image ) {
+                        if ( selectedValues[0].attributeValue?.horizontalImage ) {
                             // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
                             // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
-                            $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
+                            $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.horizontalImage.uri}" style="postion: absolute; top: 0; left: 0;">` );
                         }
                     }
             } );

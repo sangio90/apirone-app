@@ -6,10 +6,6 @@ component extends="com.apirone.core.model.bean.QuotationItem" accessors="true" {
 			"price",
 			"quantity",
 			"shortId",
-			"height",
-			"heightInPixel",
-			"charCount",
-			"rowCount",
 			"image"
 		],
 		profiles = {
@@ -18,13 +14,7 @@ component extends="com.apirone.core.model.bean.QuotationItem" accessors="true" {
 					"id",
 					"price",
 					"quantity",
-					"height",
-					"heightInPixel",
-					"charCount",
-					"rowCount",
 					"product",
-					"font",
-					"fontSize",
 					"quotationZone",
 					"signageRows",
 					"signageConfigItem"
