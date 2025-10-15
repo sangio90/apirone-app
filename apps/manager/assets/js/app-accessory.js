@@ -93,7 +93,7 @@ AP.accessory.modal = ( function() {
                 url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ),
                 callback: {
                     done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "" } );
+                        xhr.data.unshift( { id: "", name: "-- Seleziona la Linea" } );
                         viewModel.get( "lines" ).data( xhr.data );
                     },
                 },
@@ -117,7 +117,7 @@ AP.accessory.modal = ( function() {
                 url: "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ),
                 callback: {
                     done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "" } );
+                        xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
                         viewModel.get( "models" ).data( xhr.data );
                     },
                 },
@@ -134,7 +134,7 @@ AP.accessory.modal = ( function() {
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ),
                     callback: {
                         done: function( xhr ) {
-                            xhr.data.unshift( { id: "", name: "" } );
+                            xhr.data.unshift( { id: "", name: "-- Seleziona la Finitura" } );
                             viewModel.get( "finishes" ).data( xhr.data );
                             NM.util.ajax( {
                                 method: "GET",
@@ -475,7 +475,7 @@ AP.accessory.modal = ( function() {
                     select.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
                 }
 
-                const emptyOption = $( "<option>" ).val( "" ).html( "Seleziona valore attributo" );
+                const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
                 select.append( emptyOption );
 
                 values.forEach( function( attrValue ) {
@@ -569,7 +569,10 @@ AP.accessory.modal = ( function() {
             url: "/manager/ajax/quotations/categories?typeId=ACC",
             callback: {
                 done: function( xhr ) {
-                    viewModel.get( "categories" ).data( xhr.data );
+                    if ( xhr.data.length > 0 ) {
+                        xhr.data.unshift( { id: "", name: "-- Seleziona la Categoria" } );
+                        viewModel.get( "categories" ).data( xhr.data );
+                    }
                     NM.util.openModal( AP.accessory.fields.modalRoot );
                 },
             },
