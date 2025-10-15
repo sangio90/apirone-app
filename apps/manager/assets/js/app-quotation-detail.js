@@ -12,20 +12,20 @@ $( document ).ready( function() {
     }
     $( ".k-listview-content" ).first().css( "display", "flex" );
 
-    const signageModal = document.getElementById('signage-modal');
-    signageModal.addEventListener('hide.bs.modal', (e) => {
-        renderQuotationTotals()
-    });
+    const signageModal = document.getElementById( "signage-modal" );
+    signageModal.addEventListener( "hide.bs.modal", ( e ) => {
+        AP.quotationDetail.detail.renderTotals();
+    } );
 
-    const plateModal = document.getElementById('plate-modal-root');
-    plateModal.addEventListener('hide.bs.modal', (e) => {
-        renderQuotationTotals()
-    });
+    const plateModal = document.getElementById( "plate-modal-root" );
+    plateModal.addEventListener( "hide.bs.modal", ( e ) => {
+        AP.quotationDetail.detail.renderTotals();
+    } );
 
-    const accessoryModal = document.getElementById('accessory-modal');
-    accessoryModal.addEventListener('hide.bs.modal', (e) => {
-        renderQuotationTotals()
-    });
+    const accessoryModal = document.getElementById( "accessory-modal" );
+    accessoryModal.addEventListener( "hide.bs.modal", ( e ) => {
+        AP.quotationDetail.detail.renderTotals();
+    } );
 } );
 
 AP.quotationDetail.detail = ( function() {
@@ -262,8 +262,10 @@ AP.quotationDetail.detail = ( function() {
         },
 
         delete: function( event ) {
-            event.stopPropagation();
-            event.preventDefault();
+            // REF: non servono più ma lascio per sicurezza
+            // event.stopPropagation();
+            // event.preventDefault();
+
             var id = event.currentTarget.dataset.id;
 
             bootbox.confirm( {
@@ -287,20 +289,26 @@ AP.quotationDetail.detail = ( function() {
                             data: id,
                             callback: {
                                 done: function( xhr ) {
-                                    if( xhr.status == "ERRORE" ) {
-                                        AP.widget.notify( "error", "Errore nella cancellazione della riga di preventivo." );
+                                    if( xhr.status == "INVALID" ) {
+                                        NM.form.showMessages( xhr.data );
+                                        return;
                                     }
-                                    if ( xhr.status == "SUCCESS" ) {
-                                        AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
-                                        viewModel.set( "detailForm", defaultDetailForm );
-                                        window.location.href = "/manager/quotations/" + AP.page.quotation.id;
-                                    }
+                                    // REF: fare il check su "SUCCESS" non occorre: te lo fa la libreria.
+                                    // se è "ERROR" (500) viene mostrato un messaggio generico di errore.
+                                    // if ( xhr.status == "SUCCESS" ) {
+                                    AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
+                                    viewModel.set( "detailForm", defaultDetailForm );
+                                    window.location.href = "/manager/quotations/" + AP.page.quotation.id;
+                                    // }
                                 }
                             }
                         } );
                     }
                 },
             } );
+
+            // REF: per evitare che il click sul link faccia anche il redirect
+            return false;
         },
 
         save: function( event ) {
@@ -326,16 +334,18 @@ AP.quotationDetail.detail = ( function() {
                 },
                 messages: {
                     name: {
-                        required: "Nome preventivo richiesto.",
+                        // REF: ho tolto "preventivo" dappertutto
+                        // siamo già nel dominio, abbiamo poco spazio ed è inutile ripeterlo
+                        required: "Nome richiesto.",
                     },
                     number: {
-                        required: "Numero preventivo richiesto."
+                        required: "Numero richiesto."
                     },
                     langId: {
-                        required: "Lingua preventivo richiesta."
+                        required: "Lingua richiesta."
                     },
                     validityDate: {
-                        required: "Data validità preventivo richiesta."
+                        required: "Data validità richiesta."
                     },
                 }
             } );
@@ -394,11 +404,11 @@ AP.quotationDetail.detail = ( function() {
                                     }
                                 } );
                                 viewModel.get( "zones" ).data( zones );
-                                if (NM.storage.get('quotation.zone.id')) {
-                                    var selectedZone = zones.find( zone => zone.id == NM.storage.get('quotation.zone.id') );
-                                    if (!selectedZone) { 
-                                        NM.storage.delete('quotation.zone.id'); 
-                                        NM.storage.delete('quotation.zone.name');
+                                if ( NM.storage.get( "quotation.zone.id" ) ) {
+                                    var selectedZone = zones.find( zone => zone.id == NM.storage.get( "quotation.zone.id" ) );
+                                    if ( !selectedZone ) {
+                                        NM.storage.delete( "quotation.zone.id" );
+                                        NM.storage.delete( "quotation.zone.name" );
                                         selectedZone = zones[0];
                                     }
                                     viewModel.set( "detailForm.data.zone", selectedZone );
@@ -440,13 +450,13 @@ AP.quotationDetail.detail = ( function() {
             }
 
             if ( viewModel.detailForm.data.zone.id != "" ) {
-                NM.storage.set('quotation.zone.id', viewModel.detailForm.data.zone.id);
-                NM.storage.set('quotation.zone.name', viewModel.detailForm.data.zone.name);
+                NM.storage.set( "quotation.zone.id", viewModel.detailForm.data.zone.id );
+                NM.storage.set( "quotation.zone.name", viewModel.detailForm.data.zone.name );
                 $( "#addSignageButton" ).prop( "disabled", false );
                 $( "#addAccessoryButton" ).prop( "disabled", false );
             } else {
-                NM.storage.delete('quotation.zone.id');
-                NM.storage.delete('quotation.zone.name');
+                NM.storage.delete( "quotation.zone.id" );
+                NM.storage.delete( "quotation.zone.name" );
                 $( "#addSignageButton" ).prop( "disabled", true );
                 $( "#addAccessoryButton" ).prop( "disabled", true );
             }
@@ -469,8 +479,8 @@ AP.quotationDetail.detail = ( function() {
         editSignate: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
-            let tabellaTotali = $('#angolo').find('table')[0];
-            $(tabellaTotali).empty();
+            const tabellaTotali = $( "#angolo" ).find( "table" )[0];
+            $( tabellaTotali ).empty();
         },
 
         addPlate: function() {
@@ -518,12 +528,12 @@ AP.quotationDetail.detail = ( function() {
             if ( AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != "" ) {
                 AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + " " + AP.page.quotation.lead.lastName;
             }
-            renderQuotationTotals()
+            this.renderTotals();
             viewModel.set( "detailForm.data", AP.page.quotation );
             if ( AP.page.quotation.customerAddressId && AP.page.quotation.customer.shippingAddresses ) {
-                const shippingAddress = AP.page.quotation.customer.shippingAddresses.find(item => item.id === AP.page.quotation.customerAddressId);
-                if (shippingAddress) {
-                    viewModel.set('detailForm.data.shippingAddress', shippingAddress);
+                const shippingAddress = AP.page.quotation.customer.shippingAddresses.find( item => item.id === AP.page.quotation.customerAddressId );
+                if ( shippingAddress ) {
+                    viewModel.set( "detailForm.data.shippingAddress", shippingAddress );
                 }
             }
             // $( "#nav-plan-tab" ).removeAttr("hidden");
@@ -532,45 +542,54 @@ AP.quotationDetail.detail = ( function() {
         }
     };
 
-    renderQuotationTotals = function() {
+    // era: renderQuotationTotals()
+    // REF: davantia lla funzione manca il "var" perchè avevi
+    // la necessità che fosse pubblica
+    // è sufficiente metterlo in "pub" per averlo in:
+    // AP.quotationDetail.detail.renderQuotationTotals()
+    // la prossima volta lo facciamo con mvvm
+
+    pub.renderTotals = function() {
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/total",
             callback: {
                 done: function( xhr ) {
                     if( xhr.data ) {
-                        if (!xhr.data.id || xhr.data.id != viewModel.get('detailForm.data.id')) {
-                            $('#angolo').hide();
+                        if ( !xhr.data.id || xhr.data.id != viewModel.get( "detailForm.data.id" ) ) {
+                            $( "#angolo" ).hide();
                         } else {
-                            viewModel.set('detailForm.data.totals', xhr.data)
-                            var totals = viewModel.get('detailForm.data.totals');
-                            let table = $('#angolo').find('table')[0]
-                            $(table).empty()
-                            $(table).append(
+                            viewModel.set( "detailForm.data.totals", xhr.data );
+                            var totals = viewModel.get( "detailForm.data.totals" );
+                            const table = $( "#angolo" ).find( "table" )[0];
+                            $( table ).empty();
+                            $( table ).append(
                                 `<tr>
                                     <td>${totals.quantity.label}</td>
                                     <td>${totals.quantity.count}</td>
                                 </tr>
                                 <tr style="font-weight: bold">
                                     <td>${totals.total.label}</td>
-                                    <td>${totals.total.amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR'})}</td>
+                                    <td>${totals.total.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
                                 </tr>
                                 `
-                            )
-                            $('#angolo').show();
+                            );
+                            $( "#angolo" ).show();
                         }
                     }
                 }
             }
         } );
-    }
+    };
 
     return pub;
 } () );
 
 AP.quotationDetail.zoneModal = ( function() {
     var pub = {};
-    var fields = AP.quotationDetail.fields.zoneModalRoot;
+    // REF: il nome è errato
+    var fields = AP.quotationDetail.fields;
+
     var defaultDetailForm = {
         data: {
             id: "",
@@ -596,75 +615,145 @@ AP.quotationDetail.zoneModal = ( function() {
         },
 
         createZone: function( event ) {
-            const parsedData = viewModel.get( "detailForm.data" );
-            if ( parsedData.name.trim() == "" ) {
-                AP.widget.notify( "error", "Specificare un nome per la zona." );
-                return false;
-            }
+            // REF: è sufficiente configurarlo con jquery validator,
+            // senza check manuali
 
-            NM.util.ajax( {
-                method: "POST",
-                url: "/manager/ajax/quotations/zones",
-                data: JSON.stringify( parsedData ),
-                callback: {
-                    done: function( xhr ) {
-                        if( xhr.status == "ERRORE" ) {
-                            AP.widget.notify( "error", "Combinazione Zona già esistente in questo preventivo." );
-                        }
-                        if ( xhr.status == "SUCCESS" ) {
+            // const parsedData = viewModel.get( "detailForm.data" );
+            // if ( parsedData.name.trim() == "" ) {
+            //    AP.widget.notify( "error", "Specificare un nome per la zona." );
+            //    return false;
+            // }
+
+            var zoneForm = $( "#zone-form" );
+
+            if ( zoneForm.valid() ) {
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/quotations/zones",
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.status == "INVALID" ) {
+                                NM.form.showMessages( xhr.data );
+                                return;
+                            }
+
                             AP.widget.notify( "success", "Zona salvata correttamente." );
                             setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
                             AP.quotationDetail.detail.methods().getZones();
                         }
                     }
-                }
-            } );
+                } );
+
+            }
+
             return false;
         },
 
         deleteZone: function( event ) {
             const zone = viewModel.get( "detailForm.data.parentZone" );
 
-            NM.util.ajax( {
-                method: "DELETE",
-                url: "/manager/ajax/quotations/zones",
-                data: JSON.stringify( { "zone": zone } ),
-                callback: {
-                    done: function( xhr ) {
-                        if( xhr.status == "ERRORE" ) {
-                            if ( xhr.data?.error ) {
-                                AP.widget.notify( "error", xhr.data.error );
-                            } else {
-                                AP.widget.notify( "error", "Errore durante la cancellazione di una zona." );
+            var zoneForm = $( "#zone-form" );
+            var status = zoneForm.find( ".status" );
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
+
+            if ( zoneForm.valid() ) {
+                NM.util.ajax( {
+                    method: "DELETE",
+                    url: "/manager/ajax/quotations/zones",
+                    data: JSON.stringify( { "zone": zone } ),
+                    callback: {
+                        done: function( xhr ) {
+
+                            status.html( "" );
+
+                            if ( xhr.status == "INVALID" ) {
+                                NM.form.showMessages( xhr.data );
+                                return;
                             }
-                        }
-                        if ( xhr.status == "SUCCESS" ) {
-                            AP.widget.notify( "success", "Zona eliminata correttamente." );
+
+                            AP.widget.notify( "success", xhr.data.message );
                             setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
                             AP.quotationDetail.detail.methods().getZones();
+
                         }
                     }
-                }
-            } );
+                } );
+            }
             return false;
         },
     } );
 
     pub.init = function( mode ) {
-        kendo.bind( fields, viewModel );
+        kendo.bind( fields.zoneModalRoot, viewModel );
+
+        var zoneForm = $( "#zone-form" );
+
+        NM.form.removeRules( zoneForm );
+
         if ( mode == "delete" ) {
-            viewModel.get( "zones" ).data( AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != ""; } ) );
+
+            var zones = AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != ""; } );
+
+            zones.unshift( { "id": "", "name": "-- seleziona una zona" } );
+
+            viewModel.get( "zones" ).data( zones );
+
             $( "#delete-zone-button" ).show();
             $( "#add-zone-button" ).hide();
             $( "#zone-name-input" ).hide();
+            $( "#zone-label-parent" ).html( "Zona" );
+
+            // REF: aggiungo validazione per cancellazione
+            zoneForm.validate( {
+                onfocusout: function( element ) {
+                    $( element ).valid();
+                },
+                rules: {
+                    parentId: {
+                        required: true
+                    },
+                },
+                messages: {
+                    parentId: {
+                        required: "Seleziona una zona"
+                    },
+                },
+            } );
+
         }
+
         if ( mode == "add" ) {
+
             var zones = AP.quotationDetail.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != "" && !zone.origin; } );
-            zones.unshift( { "id": "", "name": "" } );
+
+            zones.unshift( { "id": "", "name": "-- nessuna" } );
             viewModel.get( "zones" ).data( zones );
+
             $( "#delete-zone-button" ).hide();
             $( "#add-zone-button" ).show();
             $( "#zone-name-input" ).show();
+            $( "#zone-label-parent" ).html( "Zona padre" );
+
+            // REF: aggiungo validazione per inserimento
+            zoneForm.validate( {
+                onfocusout: function( element ) {
+                    $( element ).valid();
+                },
+                rules: {
+                    name: {
+                        required: true
+                    },
+                },
+                messages: {
+                    name: {
+                        required: "Inserisci un nome"
+                    },
+                },
+            } );
+
         }
     };
 

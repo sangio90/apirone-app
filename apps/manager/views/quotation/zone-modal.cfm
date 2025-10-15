@@ -15,8 +15,10 @@
                     <div class="card-body">
                         <div class="mb-3 row">
                             <div class="col-6">
-                                <label class="col-sm-12 col-form-label text-start">Zona</label>
-                                <select class="form-control me-3"
+                                <label class="col-sm-12 col-form-label text-start" id="zone-label-parent">Zona</label>
+                                <select class="form-control me-3" 
+                                    id="parentId"
+                                    name="parentId"
                                     data-bind="source: zones, value: detailForm.data.parentZone"
                                     data-value-field="id"
                                     data-text-field="name"
@@ -25,7 +27,11 @@
                             </div>
                             <div class="col-6" id="zone-name-input">    
                                 <label class="col-sm-12 col-form-label text-start">Nome</label>
-                                <input class="form-control" type="name" data-bind="value: detailForm.data.name" min="1">
+                                <input class="form-control" 
+                                    type="text" 
+                                    id="zoneName"
+                                    name="name"
+                                    data-bind="value: detailForm.data.name">
                             </div>
                         </div>
                     </div>

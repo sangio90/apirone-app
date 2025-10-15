@@ -12,7 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 	function calculateQuotationItem( event, rc, prc ){
-		var params          = {}
+		var params          = {};
 		var data            = [];
 		var result          = super.getResult();
 		var mm              = super.getMementify();

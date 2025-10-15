@@ -51,11 +51,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var obj     = get( arguments.zoneId );
 
 		outcome.setData( { zoneId = arguments.zoneId } );
-		getDao().delete( arguments.zoneId );
-
+		
+		var cm = getCacheManager();
+		
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().delete( arguments.zoneId );
 				cm.remove( getCacheScope(), arguments.zoneId );
 			} catch ( any error ) {
@@ -84,7 +84,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	private com.apirone.core.model.bean.QuotationZone function build( required String zoneId ){
 		var record = getDao().read( arguments.zoneId );
 		if ( record.recordCount ) {
+
 			var bean = super.bean( "QuotationZone" );
+
 			bean.setId( record.quotation_zone_id );
 			bean.setName( record.quotation_zone );
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );

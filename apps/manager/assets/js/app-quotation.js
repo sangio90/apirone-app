@@ -97,10 +97,10 @@ AP.quotation.list = ( function() {
             return false;
         },
 
-        edit: function(e) {
-            e.preventDefault()
+        edit: function( e ) {
+            e.preventDefault();
             const id = e.data.id;
-            if (!id || id == '') {
+            if ( !id || id == "" ) {
                 return false;
             }
             const url = "/manager/quotations/" + id;
@@ -115,9 +115,9 @@ AP.quotation.list = ( function() {
     pub.init = function() {
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 
-        viewModel.get("rows").fetch(function() {
+        viewModel.get( "rows" ).fetch( function() {
             viewModel.search();
-        });
+        } );
         /* TODO: remove this extra code.
         // Formatting by mvvm
         dataSources.items.fetch( function() {

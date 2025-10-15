@@ -109,7 +109,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					messageId = "quotationItem.updated";
 					thisId    = super.fire( "quotationItem.update", [ quotationItemSignageBean ] )
 				}
-				for ( signageRow in json.quotationItem.signageRows._data ) {
+				for ( var signageRow in json.quotationItem.signageRows._data ) {
 					var signageRowBean = super.fire(
 						"QuotationItemSignageRow.get",
 						{ quotationItemSignageRowId = signageRow.id }
@@ -132,7 +132,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				var files = super.fire( "File.search", { quotationItemId = thisId } );
 				if ( Len( files.getData() ) ) {
-					for ( file in files.getData() ) {
+					for ( var file in files.getData() ) {
 						super.fire( "File.delete", { fileId = file.getId() } );
 					}
 				}
@@ -208,47 +208,24 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function delete( event, rc, prc ){
 		var result  = super.getResult();
+		var validation = getValidationResult();
+		
 		var id      = GetHTTPRequestData().content;
-		var payload = "";
-
-		try {
-			transaction {
-				var files = super.fire( "file.list", { quotationItemId = id } );
-
-				// TODO: a cascata, lo fa il DB, c'è già on delete cascade
-				for ( file in files ) {
-					var outcome = super.fire( "file.delete", [ file.getId() ] );
-				}
-				var signageRows = super.fire( "quotationItemSignageRow.list", { quotationItemId = id } );
-
-				// TODO: a cascata, lo fa il DB, c'è già on delete cascade
-				for ( signageRow in signageRows ) {
-					var outcome = super.fire( "quotationItemSignageRow.delete", [ signageRow.getId() ] );
-				}
-
-				var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = id } );
 				
-				for ( quotationItemProductItem in quotationItemProductItems ) {
-					var outcome = super.fire( "quotationItemProductItem.delete", [ quotationItemProductItem.getId() ] );
-				}
+		var outcome = super.fire( "quotationItem.delete", [ id ] );
 
-				var outcome = super.fire( "quotationItem.delete", [ id ] );
+		if ( outcome.getStatus() == "ERROR" ) {
 
-				if ( outcome.getStatus() == "ERROR" ) {
-					transaction action="rollback";
-					result.setStatus( "ERRORE" );
-					result.setMessage( outcome.getMessage() );
-				}
-			}
-		} catch ( any e ) {
-			try {
-				transaction action="rollback";
-			} catch ( any _ ) {
-			}
-			result.setStatus( "ERRORE" );
+			var error = super.getValidationError( message = getMessage( "quotationItem.notDeleted" ), field="general" );
+			validation.addError( error );
+
+			event.setValue( "result", validation );
+			return;
+		
 		}
 
-		result.setData( { "payload" = payload } );
+		result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
+		
 		event.setValue( "result", result );
 	}
 

@@ -138,8 +138,6 @@ AP.metadata.detail = ( function() {
             var thisForm = $( "#metadata-detail-form" );
             var status = thisForm.find( ".status" );
 
-            console.log( "status", status );
-
             if ( thisForm.valid() ) {
 
                 NM.util.ajax( {
