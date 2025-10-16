@@ -149,9 +149,24 @@
         "type": "Integer"
     },
 
+    "fontFamily.id": {
+        "name": "font_family_id",
+        "type": "Integer"
+    },
+
+    "fontFamily.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+
     "font.code": {
         "name": "code",
         "type": "Varchar"
+    },
+
+    "pictogram.id": {
+        "name": "pictogram_id",
+        "type": "Integer"
     },
 
     "quotation.id": {

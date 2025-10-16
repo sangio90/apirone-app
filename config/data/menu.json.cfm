@@ -152,6 +152,12 @@
 				roles: "ADM"
 			},
 			{
+				href: "/manager/font-families",
+				icon: "fas fa-font",
+				title: "Font Family",
+				roles: "ADM"
+			},
+			{
 				href: "/manager/metadata-types",
 				icon: "fas fa-fan",
 				title: "Metadata",

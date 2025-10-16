@@ -153,6 +153,25 @@
 		post( "/ajax/fonts" ).to( "FontAjaxController.save" ).end();
 		get( "/fonts").to("FontController.list").end();
 
+		/*
+			font families
+		*/
+		get( "/ajax/font-families/code-exists" ).to( "FontFamilyAjaxController.codeExists" ).end();
+		get( "/ajax/font-families/:id" ).to( "FontFamilyAjaxController.get" ).end();
+		delete( "/ajax/font-families" ).to( "FontFamilyAjaxController.delete" ).end();
+		get( "/ajax/font-families").to("FontFamilyAjaxController.list").end();
+		post( "/ajax/font-families" ).to( "FontFamilyAjaxController.save" ).end();
+		get( "/font-families").to("FontFamilyController.list").end();
+
+		/*
+			font families
+		*/
+		get( "/ajax/pictograms/font-family-exists" ).to( "PictogramAjaxController.fontFamilyExists" ).end();
+		get( "/ajax/pictograms/:id" ).to( "PictogramAjaxController.get" ).end();
+		delete( "/ajax/pictograms" ).to( "PictogramAjaxController.delete" ).end();
+		get( "/ajax/pictograms").to("PictogramAjaxController.list").end();
+		post( "/ajax/pictograms" ).to( "PictogramAjaxController.save" ).end();
+
 
 		/*
 			auth // login

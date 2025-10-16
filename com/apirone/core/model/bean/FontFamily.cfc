@@ -2,12 +2,13 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	this.memento = {
 		defaultIncludes = [
-			"id",	//serial
-			"code",	//codice 5 (codeExists)
-			"name",	//nome
+			"id",
+			"code",
+			"name",
 		]
 	}
 
+	property name="code" type="String";
 	property name="pictograms" type="Pictogram[]";
 
 	public FontFamily function init(){
