@@ -10,3 +10,5 @@
     CONSTRAINT font_family_sizes_code_font_family_id_uk
         UNIQUE (font_family_size, font_family_id)
 );
+
+alter table font_family_sizes owner to apiruser;

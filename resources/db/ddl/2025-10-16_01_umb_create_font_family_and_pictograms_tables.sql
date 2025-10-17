@@ -26,3 +26,8 @@ ADD CONSTRAINT files_pictogram_id_fk
     REFERENCES pictograms (pictogram_id)
     ON UPDATE CASCADE
     ON DELETE CASCADE;
+
+
+alter table pictograms owner to apiruser ;
+alter table font_families owner to apiruser;
+
