@@ -30,14 +30,6 @@ AP.core = ( function() {
 
 }() );
 
-/*
-AP.namespace = function( name ) {
-    AP[name] = AP[name] || {};
-    AP[name].fields = AP[name].fields || {};
-    return AP[name].fields;
-};
-*/
-
 AP.namespace = function( name ) {
     AP[name] = AP[name] || {};
     AP[name].fields = AP[name].fields || {};
