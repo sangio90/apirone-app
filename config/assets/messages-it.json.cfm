@@ -31,6 +31,20 @@
         "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
     },
 
+    "fontFamily": {
+        "created": "Font Family caricata",
+        "updated": "Font Family aggiornata",
+        "deletedAllRecords": "Valori cancellati",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
+    },
+
+    "fontFamilySize": {
+        "created": "Dimensione Font Family caricata",
+        "updated": "Dimensione Font Family aggiornata",
+        "deletedAllRecords": "Valori cancellati",
+        "deletedNotAllRecords": "Non sono riuscito a cancellare tutti i valori",
+    },
+
     "product": {
         "itemsDeleted": "Ho cancellato tutti gli attributi",
         "itemsAdded": "Attributi aggiunti con successo",

@@ -164,7 +164,7 @@
 		get( "/font-families").to("FontFamilyController.list").end();
 
 		/*
-			font families
+			pictograms
 		*/
 		get( "/ajax/pictograms/font-family-exists" ).to( "PictogramAjaxController.fontFamilyExists" ).end();
 		get( "/ajax/pictograms/:id" ).to( "PictogramAjaxController.get" ).end();
@@ -172,6 +172,13 @@
 		get( "/ajax/pictograms").to("PictogramAjaxController.list").end();
 		post( "/ajax/pictograms" ).to( "PictogramAjaxController.save" ).end();
 
+		/*
+			font family sizes
+		*/
+		get( "/ajax/font-family-sizes/:id" ).to( "FontFamilySizeAjaxController.get" ).end();
+		delete( "/ajax/font-family-sizes" ).to( "FontFamilySizeAjaxController.delete" ).end();
+		get( "/ajax/font-family-sizes").to("FontFamilySizeAjaxController.list").end();
+		post( "/ajax/font-family-sizes" ).to( "FontFamilySizeAjaxController.save" ).end();
 
 		/*
 			auth // login

@@ -64,7 +64,7 @@
 	}
 
 	/**
-	 * @auditEvent fontFamily.created
+	 * @auditEvent FONT_FAMILY.created
 	 * @auditMessage Font Family [@return@] created
 	 * @auditPayload { "id": "@return@" }
 	 */
@@ -74,7 +74,7 @@
 	}
 
 	/**
-	 * @auditEvent fontFamily.updated
+	 * @auditEvent FONT_FAMILY.updated
 	 * @auditMessage Font Family [@fontFamily.id@] updated
 	 * @auditPayload { "id": "@fontFamily.id@" }
 	 */
@@ -92,25 +92,16 @@
 
 		outcome.setData( { fontFamilyId = arguments.fontFamilyId } );
 
-		transaction {
-			try {
-				var result = getDao().delete( arguments.fontFamilyId );
-				outcome.setData( { "deletedCount" = result } )
+		var result = getDao().delete( arguments.fontFamilyId );
+		outcome.setData( { "deletedCount" = result } )
 
-				super.logEvent(
-					event   = "fontFamily.deleted",
-					message = "Font [#arguments.fontFamilyId#] deleted",
-					payload = { "id" = arguments.fontFamilyId }
-				);
+		super.logEvent(
+			event   = "FONT_FAMILY.deleted",
+			message = "Font [#arguments.fontFamilyId#] deleted",
+			payload = { "id" = arguments.fontFamilyId }
+		);
 
-				super.getCacheManager().remove( getCacheScope(), arguments.fontFamilyId );
-			} catch ( any error ) {
-				outcome.setError( error );
-				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteFont" );
-				outcome.setMessage( "Cannot delete Font Family [#arguments.fontFamilyId#]" );
-			}
-		}
+		super.getCacheManager().remove( getCacheScope(), arguments.fontFamilyId );
 
 		return outcome;
 	}

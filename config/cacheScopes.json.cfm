@@ -16,6 +16,7 @@
     "Finish.bean": {},
     "Font.bean": {},
     "FontFamily.bean": {},
+    "FontFamilySize.bean": {},
     "i18n.bean": {},
     "Lang.bean": {},
     "Lead.bean": {},

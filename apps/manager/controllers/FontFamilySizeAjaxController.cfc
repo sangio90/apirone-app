@@ -7,7 +7,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mm     = super.getMementify();
 		var params = super.paramsFromUrl();
 
-		var rows = super.fire( "fontFamily.search", params );
+		var rows = super.fire( "fontFamilySize.search", params );
 		
 		for ( var row in rows.getData() ) {
 			var obj = mm.convert( row, "list" );
@@ -21,36 +21,27 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function codeExists( event, rc, prc ){
-		param rc.id   = -1;
-		param rc.code = "";
-
-		var result = super.fire( "fontFamily.codeExists", { code = rc.code, excludedId = rc.id } );
-
-		event.setValue( "result", result );
-	}
-
 	function save( event, rc, prc ){
 		var result = super.getResult();
-		var fontFamily   = super.bean( "FontFamily" );
+		var fontFamilySize   = super.bean( "FontFamilySize" );
+
 
 		var thisId    = "";
 		var messageId = "";
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		fontFamily.setId( json.id );
-		fontFamily.setCode( json.code );
-		fontFamily.setName( json.name );
-		dump( json.fontFamilySizes );abort;
+		fontFamilySize.setId( json.id );
+		fontFamilySize.setCode( json.code );
 
 		if ( !Len( json.id ) ) {
-			messageId = "fontFamily.created";
+			messageId = "fontFamilySize.created";
+			// thisId    = super.fire( "fontfamily.create", { fontfamily = fontfamily, userId = "00001" } )
 
-			super.service( "fontFamily" ).create( fontfamily );
+			super.service( "fontFamilySize" ).create( fontfamily );
 		} else {
-			messageId = "fontFamily.updated";
-			thisId    = super.fire( "fontFamily.update", [ fontfamily ] )
+			messageId = "fontFamilySize.updated";
+			thisId    = super.fire( "fontFamilySize.update", [ fontfamily ] )
 		}
 
 		var message = completeMessage( messageId );
@@ -63,7 +54,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function get( event, rc, prc ){
 		var result = super.getResult();
 
-		var bean = super.fire( "fontFamily.get", [ rc.id ] );
+		var bean = super.fire( "fontFamilySize.get", [ rc.id ] );
 		var obj  = super.getMementify().convert( bean, "list" );
 
 		result.setData( obj );
@@ -73,23 +64,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function delete( event, rc, prc ){
 		var result    = super.getResult();
-		var content   = GetHTTPRequestData().content;
-		var messageId = "fontFamily.deletedAllRecords";
+		var messageId = "fontFamilySize.deletedAllRecords";
 
 		var errors  = [];
 		var payload = "";
 
-		var ids = ListToArray( content );
+		var fontFamilySizeId = rc.fontFamilySizeId
 
-		for ( var id in ids ) {
-			var outcome = super.fire( "fontFamily.delete", [ id ] );
-			if ( outcome.getStatus() == "ERROR" ) {
-				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
-			}
+		var outcome = super.fire( "fontFamilySize.delete", [ fontFamilySizeId ] );
+		if ( outcome.getStatus() == "ERROR" ) {
+			errors.add( { "message" = "Non sono riuscito a cancellare l'Id #fontFamilySizeId#" } )
 		}
 
 		if ( errors.len() ) {
-			messageId = "fontFamily.deletedNotAllRecords"
+			messageId = "fontFamilySize.deletedNotAllRecords"
 			payload   = { "errors" = errors };
 		}
 

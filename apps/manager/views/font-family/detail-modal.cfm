@@ -14,19 +14,16 @@
                     <div class="card-body">
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Codice</label>
-                            <div class="col-sm-10">
+                            <label class="col-sm-2 col-form-label text-start">Codice</label>
+                            <div class="col-sm-4">
                                 <input type="text" required class="form-control col-sm-4 uppercase" 
                                     name="code"
                                     maxlength="5"
                                     data-bind="value: detailForm.data.code"
                                     >
                             </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Descrizione</label>
-                            <div class="col-sm-10">
+                            <label class="col-sm-2 col-form-label text-start">Descrizione</label>
+                            <div class="col-sm-4">
                                 <input type="text" required class="form-control col-sm-4" 
                                     name="name"
                                     maxlength="50"
@@ -34,9 +31,24 @@
                                     >
                             </div>
                             <label class="col-sm-2 col-form-label"></label>
-                            <div class="field-note col-sm-10">
-                                Es. "Source Sans Pro", Arial, sans-serif<br>
-                                "Times New Roman", Georgia, serif
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-start">Dimensioni Font</label>
+                            <div class="col-sm-12">
+                                <form name="font-family-size-grid-form" id="font-family-size-grid-form" method="get">
+                                    #grid( 
+                                        id="font-family-size-grid",
+                                        columns="[
+                                            { 'field':'name', 'title':'Dimensione', width: '70%'},
+                                            { 'field':'', 'title':'', width: '30%'}
+                                        ]",
+                                        source = "fontFamilySizes",
+                                        rowTemplate="font-family-size/font-family-size-grid-row-tmpl"
+                                    )#
+
+                                </form>
+                                #iconButton(bind="click:addSize", icon="plus", id="addSize")#
                             </div>
                         </div>
 
