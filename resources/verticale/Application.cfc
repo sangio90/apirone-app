@@ -23,6 +23,13 @@
 
     public boolean function onRequestStart(){
 
+
+        dump("sqlserver://#variables.settings.get('verticaledb.host')#");
+        dump("port: #variables.settings.get('verticaledb.port')#");
+        dump("DATABASENAME=#variables.settings.get('verticaledb.name')#");
+
+        abort;
+
         return true
 
     }

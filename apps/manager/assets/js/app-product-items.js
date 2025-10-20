@@ -142,6 +142,7 @@ AP.product.items = ( function() {
                         console.log( "" );
                         $( "#product-simulate-loading" ).html( "" );
                         $( "#product-simulate-result" ).val( xhr.data.total );
+                        $( "#product-simulate-description" ).html( xhr.data.description );
                     },
                 },
             } );

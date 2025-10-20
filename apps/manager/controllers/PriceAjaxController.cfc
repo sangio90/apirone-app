@@ -3,13 +3,45 @@ component extends="com.apirone.core.controller.AbsController" {
 	function calculate( event, rc, prc ){
 		var result = super.getResult();
 
-		var output = { "total" = RandRange( 3, 40 ) }
+        var items = [
+            {
+                label = "Calcolo componenti base",
+                cost = RandRange( 1, 5) 
+            },
+            {
+                label = "Calcolo componenti dell'albero",
+                cost = RandRange( 1, 5)
+            },
+            {
+                label = "SPESSORE 2,5MM",
+                cost = RandRange( 1, 5)
+            },
+            {
+                label = "BRAILLE: SI",
+                cost = RandRange( 1, 7)
+            },
+            {
+                label = "PERNO 10MM",
+                cost = RandRange( 1, 8 )
+            },
+        ];
+
+        var description = "";
+        var total = 0;
+
+        for( var item in items ) {
+
+            description = "#description# #item.label#: #NumberFormat( item.cost, '0.00')# EUR<br>"
+            total = total + Val( item.cost );
+
+        }
+
+		var output = { "total" = total, "description" = description }
 
 		result.setData( output );
 
 		event.setValue( "result", result );
 	}
-
 
 	function calculateQuotationItem( event, rc, prc ){
 		var params          = {};
@@ -48,7 +80,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var output = {
 			"id"       = quotationId,
-			"quantity" = { "label" = "Numero prodotti", "count" = 3 },
+			"quantity" = { "label" = "Numero prodotti", "count" = 4 },
 			"total"    = { "label" = "TOTALE", "amount" = 45.50 }
 		};
 
