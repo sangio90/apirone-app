@@ -12,4 +12,8 @@ component extends="com.apirone.core.model.bean.Component" accessors="true" {
 		return { "id" = getId(), "productId" = getProduct().getId() };
 	}
 
+	public String function getKindId(){
+		return "PR";
+	}
+
 }

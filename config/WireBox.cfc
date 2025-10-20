@@ -19,12 +19,21 @@ component extends="coldbox.system.ioc.config.Binder" {
             .asSingleton();  
 
         mapDirectory(packagePath="com.apirone.core.model.mapper")
-            .asSingleton();  
+            .asSingleton();
+
+
+        /* 
+            service in request
+        */
+
+        map( "PriceCalculatorService" ).to( "com.apirone.core.model.service.PriceCalculatorService" )
+            .into( this.SCOPES.REQUEST );
 
 
         /* 
             service with decorator 
         */
+
         map( "FontServiceBase" ).to( "com.apirone.core.model.service.FontService" )
             .asSingleton();
         

@@ -17,4 +17,8 @@ component extends="com.apirone.core.model.bean.Component" accessors="true" {
 		};
 	}
 
+	public String function getKindId(){
+		return "CB";
+	}
+
 }

@@ -39,8 +39,9 @@
 		<cfargument name="orderby" required="true" type="String" default="code">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT
-				DISTINCT line_id::varchar,
+			SELECT DISTINCT 
+				LINE_ID::varchar,
+				code,
 				COUNT(line_id) OVER() AS total
 			FROM
 				lines
@@ -70,7 +71,7 @@
 				</cfif>
 
 			ORDER BY
-				line_id
+				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
 				LIMIT

@@ -1090,3 +1090,15 @@ h2 {
 #signage-preview-background {
     background-repeat: no-repeat;
 }
+
+.price-log-table {
+    width: 100%;
+}
+
+.price-log-table tr td {
+    padding: 3px;
+}
+
+.price-log-table tr:nth-child(even) {
+    background-color: #EAEAEA
+}

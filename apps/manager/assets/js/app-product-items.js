@@ -133,15 +133,34 @@ AP.product.items = ( function() {
 
             $( "#product-simulate-loading" ).html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
+            var checks = $( "#product-items-grid" ).find( "[name=selected]:checked" );
+
+            var ids = "";
+
+            if ( checks.length ) {
+                var values = [];
+
+                checks.each( function() {
+                    values.push( $( this ).val() );
+                } );
+
+                var ids = values.toString();
+            }
+
+            console.log( "ids", ids );
+
             // TODO: move to POST
             NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/prices/calculate",
+                method: "POST",
+                url: "/manager/ajax/products/" + AP.page.productId + "/price/calculate",
+                data: { itemIds: ids }, // the selected items
                 callback: {
                     done: function( xhr ) {
-                        console.log( "" );
                         $( "#product-simulate-loading" ).html( "" );
                         $( "#product-simulate-result" ).val( xhr.data.total );
+
+                        NM.util.openModal( $( "#price-simulate-modal" ) );
+
                         $( "#product-simulate-description" ).html( xhr.data.description );
                     },
                 },

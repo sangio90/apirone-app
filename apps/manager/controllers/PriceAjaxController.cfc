@@ -1,46 +1,15 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function calculate( event, rc, prc ){
-		var result = super.getResult();
+	function calculate( event, rc, prc ){ 
 
-        var items = [
-            {
-                label = "Calcolo componenti base",
-                cost = RandRange( 1, 5) 
-            },
-            {
-                label = "Calcolo componenti dell'albero",
-                cost = RandRange( 1, 5)
-            },
-            {
-                label = "SPESSORE 2,5MM",
-                cost = RandRange( 1, 5)
-            },
-            {
-                label = "BRAILLE: SI",
-                cost = RandRange( 1, 7)
-            },
-            {
-                label = "PERNO 10MM",
-                cost = RandRange( 1, 8 )
-            },
-        ];
+		var result = super.service("PriceCalculator").calculate( rc.id, ListToArray( rc.itemIds ) );
+		
+		var description = prepareDescription( result.logFile );
 
-        var description = "";
-        var total = 0;
+		var output = { "price" = result.price, "description" = description }
 
-        for( var item in items ) {
+		event.setValue( "result", output );
 
-            description = "#description# #item.label#: #NumberFormat( item.cost, '0.00')# EUR<br>"
-            total = total + Val( item.cost );
-
-        }
-
-		var output = { "total" = total, "description" = description }
-
-		result.setData( output );
-
-		event.setValue( "result", result );
 	}
 
 	function calculateQuotationItem( event, rc, prc ){
@@ -171,7 +140,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( key == "" ) {
 			Throw(
-				type    = "apirone.error.component.InvalidEntityType",
+				type    = "apirone.error.price.InvalidEntityType",
 				message = "You must specify the entity for which the price is saved."
 			);
 		}
@@ -225,5 +194,29 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
+
+	/*
+		private methods
+	*/
+
+    private String function prepareDescription( logFile ) {
+
+		// Toglie le prime due parli della riga: data e nome del prodotto
+
+		var result = "<table class='price-log-table'>";
+
+		loop file=logFile item="line" {
+
+
+			var parts = ListToArray(line, ";");
+			var newLine = ArrayToList( ArraySlice( parts, 3 ), ";" );
+
+			result = result & "<tr><td>" & newLine & "</td></tr>";
+
+		}
+
+		return result & "</table>";
+
+    }		
 
 }

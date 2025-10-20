@@ -278,8 +278,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var attrComponents = list( attributeValueId = productItem.getAttributeValue().getId() );
 
 			for ( var thisComponent in attrComponents ) {
-				var bean = Duplicate( thisComponent )
+				
+				// thisComponent is ComponentAttributeValue
+				// move to ComponentProductItem
 
+				var bean = super.bean("ComponentProductItem");
+				
+				bean.setRawMemento( thisComponent.getRawMemento() );
+				bean.setProductItem( productItem );
 				bean.setTypeId( "base" );
 
 				var override = getComponentOverrideService().list( productItem.getId(), thisComponent.getId() );
@@ -309,7 +315,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean   = super.bean( "Component" );
 			var kindId = "CP";
 
-			if ( Len( record.product_item_id ) ) {
+			if ( Val( record.product_item_id ) ) {
+
 				bean = super.bean( "ComponentProductItem" );
 				bean.setProductItem( getProductItemService().get( record.product_item_id ) );
 				kindId = "PI";
@@ -338,7 +345,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.component_id );
 
 			// TODO: move to bean
-			bean.setKindId( kindId );
+			//bean.setKindId( kindId );
 
 			if ( request.loadFromVerticale ) {
 				bean.setRawProduct( getRawProductService().get( record.raw_product_id ) );

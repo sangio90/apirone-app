@@ -59,4 +59,19 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return Val( this.getQuantity() ) + Val( this.getOverride().getQuantity() );
 	}
 
+	public Numeric function isDeleted(){
+		
+		if ( !IsNull( this.getOverride() ) ) {
+			return this.getOverride().getDeleted()
+		}
+
+		return false;
+	}
+
+	public String function getKindId(){
+		
+		return "CP";
+	
+	}
+
 }

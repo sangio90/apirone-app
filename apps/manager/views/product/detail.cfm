@@ -82,7 +82,7 @@
 
                             <div>
 
-                                <div class="row d-flex align-items-center mb-2">
+                                <div class="row d-flex mb-2">
 
                                     <div class="col-sm-6">
 
@@ -160,7 +160,6 @@
                                                 <input class="form-control col-12" style="max-width: 150px; text-align: right;" id="product-simulate-result">
                                             </div>
 
-                                            <p class="col-12 mt-2 text-end" style="line-height: 14px" id="product-simulate-description"></p>
                                         </div>
                                     
                                     </div>
@@ -248,5 +247,6 @@
     #view("component/list-modal")#
     #view("file/list-modal")#
     #view("price/list-modal")#
+    #view("price/simulate-modal")#
 
 </cfoutput>
