@@ -20,6 +20,26 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
+	
+	function fontFamilyList( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var mm     = super.getMementify();
+		var params = super.paramsFromUrl();
+
+		var rows = super.fire( "fontFamilySize.search", { 'fontFamilyId' = rc.id } );
+		for ( var row in rows.getData() ) {
+			var obj = mm.convert( row, "list" );
+			data.add( obj );
+		}
+
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
 
 	function save( event, rc, prc ){
 		var result = super.getResult();

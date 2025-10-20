@@ -2,6 +2,8 @@
 
 	property name="dao" inject="PictogramDAO";
 	property name="textService" inject="TextService";
+	property name="lookupService" inject="LookupService";
+	property name="FileService" inject="FileService";
 
 	property name="cacheScope" type="String" default="Pictogram.bean";
 
@@ -127,10 +129,14 @@
 			var bean = super.bean( "Pictogram" );
 
 			bean.setId( record.pictogram_id );
-			bean.setCode( record.code );
-			bean.setName( record.pictogram );
+			bean.setCode( getLookupService().get( "PictogramCode", record.code ).getId() );
+			bean.setName( getLookupService().get( "PictogramCode", record.code ).getName() );
+			var images = getFileService().list( pictogramId = record.pictogram_id );
 
-			bean.setTexts( getTextService().list( pictogramId = record.pictogram_id ) );
+			if ( Len( images ) ) {
+				bean.setImage( images[1] )
+			}
+			bean.setFontFamilyId( record.font_family_id )
 
 			return bean;
 		}

@@ -16,5 +16,8 @@
     },
     {
         id: "quotationItem",
+    },
+    {
+        id: "pictogram",
     }
 ]

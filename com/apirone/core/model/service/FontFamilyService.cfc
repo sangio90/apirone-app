@@ -30,7 +30,7 @@
 		String str,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "fontFamily.id" } ]
+		required Array orderBy  = [ { field = "fontFamily.code" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();

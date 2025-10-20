@@ -58,6 +58,12 @@ component output="true" accessors="true" {
 					"types" = {
 						"default" = { "sizes" = [ { "width" = "500" } ] }
 					}
+				},
+				"pictogram" = {
+					"path"  = "pictograms",
+					"types" = {
+						"default" = { "sizes" = [] }
+					}
 				}
 			},
 			"encryptKey" = settings.get( "db.encryptKey" )

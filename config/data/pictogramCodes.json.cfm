@@ -9,7 +9,7 @@
     },
     {
         id: "<lift>",
-        name: "Ascensose"
+        name: "Ascensore"
     },
     {
         id: "<man>",
