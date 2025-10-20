@@ -97,7 +97,7 @@ $.validator.setDefaults( {
         var status = thisForm.find( ".errors-counter" );
 
         // se dentro non c'è il loading
-        if ( !status.html().trim().startsWith( "<img" ) ) {
+        if ( status.length && !status.html().trim().startsWith( "<img" ) ) {
             status.html( message );
         }
 

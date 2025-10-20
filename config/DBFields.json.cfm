@@ -154,6 +154,11 @@
         "type": "Integer"
     },
 
+    "fontFamily.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+
     "fontFamilySize.id": {
         "name": "font_family_size_id",
         "type": "Integer"

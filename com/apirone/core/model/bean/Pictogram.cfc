@@ -2,14 +2,18 @@
 
 	this.memento = {
 		defaultIncludes = [
-			"id",	// serial
-			"code" 	// codice 5 (codeExists) key: code / fontFamilyId
-			"name",	// nome
+			"id",
+			"code",
+			"name",
+			"image"
 		]
 	}
 
-	property name="image" type="File"; //files
-	property name="code" type="PictogramCode"; 
+	property name="image" type="File";
+	property name="code" type="String";
+	property name="name" type="String";
+	property name="FontFamily" type="FontFamily";
+	property name="FontFamilyId" type="Numeric"; //aggiunto per evitare lo stack overflow nel build di PictogramService
 
 	public Pictogram function init(){
 		return this;

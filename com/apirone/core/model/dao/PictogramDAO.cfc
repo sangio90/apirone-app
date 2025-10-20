@@ -88,27 +88,6 @@
 		<cfreturn local.q.pictogram_id>
 	</cffunction>
 
-	<cffunction name="update" returntype="Numeric">
-		<cfargument name="font" type="com.apirone.core.model.bean.Pictogram" required="true">
-
-		<cfquery name="local.q" datasource="apirone">
-			UPDATE
-				pictograms
-			SET
-				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.pictogram.getCode()#">,
-				font_family_id =
-					<cfif !IsNull( arguments.pictogram.getFontFamily() )>
-						<cfqueryparam cfsqltype="Integer" value="#arguments.pictogram?.getFontFamily()?.getId()#">
-					<cfelse>
-						NULL
-					</cfif>
-			WHERE
-				pictogram_id = <cfqueryparam cfsqltype="Integer" value="#arguments.pictogram.getId()#">
-		</cfquery>
-
-		<cfreturn arguments.pictogram.getId()>
-	</cffunction>
-
 	<cffunction name="delete" returntype="Numeric">
 		<cfargument name="pictogramId" type="Numeric" required="true">
 

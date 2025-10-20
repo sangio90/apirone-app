@@ -20,6 +20,30 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
+	
+	function fontFamilyList( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var mm     = super.getMementify();
+		var params = super.paramsFromUrl();
+
+		var rows = super.fire( "Pictogram.search", { 'fontFamilyId' = rc.id } );
+		for ( var row in rows.getData() ) {
+			var obj = mm.convert( row, "list" );
+			data.add( obj );
+		}
+
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
+	function getTypes( event, rc, prc ) {
+		
+	} 
 
 	function fontFamilyExists( event, rc, prc ){
 		param rc.id   = -1;
@@ -44,25 +68,32 @@ component extends="com.apirone.core.controller.AbsController" {
 		var texts     = [];
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
+		transaction {
+			pictogram.setCode( json.pictogram.id );
+			pictogram.setFontFamily( fontFamily.setId( json.id ) );
 
-		pictogram.setId( json.id );
-		pictogram.setCode( json.code );
-		pictogram.setFontFamily( fontFamily.setId( json.fontFamily.id ) );
-
-		var text = super.buildTextBean( json.nameItem, "NAME" );
-
-		texts.add( text );
-
-		pictogram.setTexts( texts );
-
-		if ( !Len( json.id ) ) {
 			messageId = "pictogram.created";
-			// thisId    = super.fire( "pictogram.create", { pictogram = pictogram, userId = "00001" } )
+			thisId    = super.fire( "pictogram.create", { pictogram = pictogram } )
+			var entity = super.bean( "Entity" );
+			entity.setKey( "pictogram.id" );
+			entity.setValue( thisId );
 
-			super.service( "pictogram" ).create( pictogram );
-		} else {
-			messageId = "pictogram.updated";
-			thisId    = super.fire( "pictogram.update", [ pictogram ] )
+			var tmpDir = getTempDir();
+			fileName   = "pictogram_" & json.pictogram.name & "_font_family_" & json.name & ".png";
+			filePath   = tmpDir & "/" & fileName;
+			binaryData = ToBinary( json.pictogram.image );
+
+			FileWrite( filePath, binaryData );
+
+			var fileId = super.fire(
+				"file.create",
+				{
+					filePath = filePath,
+					typeId   = "default",
+					kindId   = "pictogram",
+					entity   = entity
+				}
+			);
 		}
 
 		var message = completeMessage( messageId );
@@ -91,13 +122,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var errors  = [];
 		var payload = "";
 
-		var ids = ListToArray( content );
+		var id = rc.pictogramId
 
-		for ( var id in ids ) {
-			var outcome = super.fire( "pictogram.delete", [ id ] );
-			if ( outcome.getStatus() == "ERROR" ) {
-				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
-			}
+		var outcome = super.fire( "pictogram.delete", [ id ] );
+		if ( outcome.getStatus() == "ERROR" ) {
+			errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
 		}
 
 		if ( errors.len() ) {

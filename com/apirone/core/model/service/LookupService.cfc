@@ -24,6 +24,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"file" = "measurementUnits.json.cfm"
 		},
 		"modelType"     = { "bean" = "modelType", "file" = "modelTypes.json.cfm" },
+		"pictogramCode" = { "bean" = "pictogramCode", "file" = "pictogramCodes.json.cfm" },
 		"profileType"   = { "bean" = "profileType", "file" = "profileTypes.json.cfm" },
 		"textKind"      = { "bean" = "textKind", "file" = "textKinds.json.cfm" },
 		"dataType"      = { "bean" = "dataType", "file" = "dataTypes.json.cfm" },

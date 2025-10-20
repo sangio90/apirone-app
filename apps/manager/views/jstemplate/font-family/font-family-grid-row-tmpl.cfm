@@ -14,7 +14,7 @@
             </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
-                #iconButton(bind="click:editPictogram", icon="image")#
+                #iconButton(bind="click:editPictograms", icon="image")#
             </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"

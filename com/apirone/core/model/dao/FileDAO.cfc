@@ -19,6 +19,7 @@
 		<cfargument name="combinationId" type="String">
 		<cfargument name="typeId" type="String">
 		<cfargument name="quotationItemId" type="String">
+		<cfargument name="pictogramId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -53,6 +54,10 @@
 			
 			<cfif !IsNull( arguments.quotationItemId )>
 				AND quotation_item_id = <cfqueryparam value="#arguments.quotationItemId#" cfsqltype="Varchar">::uuid
+			</cfif>
+
+			<cfif !IsNull( arguments.pictogramId )>
+				AND pictogram_id = <cfqueryparam value="#arguments.pictogramId#" cfsqltype="Integer">
 			</cfif>
 
 			ORDER BY

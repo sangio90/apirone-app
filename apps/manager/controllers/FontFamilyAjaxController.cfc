@@ -42,7 +42,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		fontFamily.setId( json.id );
 		fontFamily.setCode( json.code );
 		fontFamily.setName( json.name );
-		dump( json.fontFamilySizes );abort;
+
+		if ( json.fontFamilySizes._data.len() > 0 ) {
+			var sizes = [];
+			for ( var size in json.fontFamilySizes._data ) {
+				if (size.id == '') {
+					var fontFamilySize = super.bean( "FontFamilySize" )
+					fontFamilySize.setName( size.name );
+					fontFamilySize.setFontFamily( fontFamily );
+					super.service( "fontFamilySize" ).create( fontFamilySize );
+				}
+			}
+		}
 
 		if ( !Len( json.id ) ) {
 			messageId = "fontFamily.created";

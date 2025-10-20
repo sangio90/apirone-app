@@ -88,5 +88,6 @@
     </div>
 
 	#view( "font-family/detail-modal" )#
+	#view( "font-family/pictogram-modal" )#
 
 </cfoutput>

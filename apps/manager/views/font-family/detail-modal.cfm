@@ -43,7 +43,7 @@
                                             { 'field':'name', 'title':'Dimensione', width: '70%'},
                                             { 'field':'', 'title':'', width: '30%'}
                                         ]",
-                                        source = "fontFamilySizes",
+                                        source = "detailForm.data.fontFamilySizes",
                                         rowTemplate="font-family-size/font-family-size-grid-row-tmpl"
                                     )#
 
@@ -74,3 +74,8 @@
     </div>
 
 </cfoutput>
+<style>
+    #font-family-size-grid .k-grid-pager {
+        display: none !important;
+    }
+</style>

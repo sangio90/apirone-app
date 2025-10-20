@@ -33,6 +33,7 @@
 
 	<cffunction returntype="Query" name="find">
 		<cfargument name="str" type="String">
+		<cfargument name="fontFamilyId" type="Numeric">
 
 		<cfargument name="orderby" required="true" type="String" default="font_family_id desc">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -48,6 +49,9 @@
 			WHERE 1=1
 				<cfif !IsNull( arguments.str )>
 					AND font_families.font_family ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+				</cfif>
+				<cfif !IsNull( arguments.fontFamilyId )>
+					AND font_family_id = <cfqueryparam value="#arguments.fontFamilyId#" cfsqltype="integer">
 				</cfif>
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
@@ -72,8 +76,8 @@
 				font_family_size
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.fontFamilySize.getFontFamily.getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.fontFamilySize.getName()#">
+				<cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getFontFamily().getId()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getName()#">
 			) RETURNING font_family_size_id
 		</cfquery>
 
@@ -87,10 +91,9 @@
 			UPDATE
 				font_family_sizes
 			SET
-				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.fontFamily.getCode()#">,
-				font_family = <cfqueryparam cfsqltype="Varchar" value="#arguments.fontFamily.getName()#">
+				font_family_size = <cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getName()#">
 			WHERE
-				font_family_id = <cfqueryparam cfsqltype="Integer" value="#arguments.fontFamily.getId()#">
+				font_family_id = <cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getId()#">
 		</cfquery>
 
 		<cfreturn arguments.fontFamilySize.getId()>

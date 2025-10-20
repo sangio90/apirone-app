@@ -26,6 +26,7 @@
     "Opportunity.bean": {},
     "PaymentMethod.bean": {},
     "Pictogram.bean": {},
+    "PictogramCode.bean": {},
     "Pricelist.bean": {},
     "Product.bean": {},
     "ProductCategory.bean": {},

@@ -38,7 +38,6 @@ AP.fontFamily.detail = ( function() {
 
 	var viewModel = kendo.observable( {
 		detailForm: defaultDetailForm,
-		fontFamilySizes: new kendo.data.DataSource(),
 
 		callback: {
 			onCreate: undefined,
@@ -48,10 +47,9 @@ AP.fontFamily.detail = ( function() {
 
 		resetForm: function() {
 			var detailForm = AP.fontFamily.fields.detailForm;
-			viewModel.get( 'fontFamilySizes' ).data( new kendo.data.DataSource() );
+			// viewModel.get( 'fontFamilySizes' ).data( new kendo.data.DataSource() );
 
-			var validator = detailForm.validate();
-			validator.resetForm();
+			NM.form.clearMessages( $("#font-family-size-grid-form") );
 
 			detailForm.find( ".status" ).html( "" );
 
@@ -59,13 +57,13 @@ AP.fontFamily.detail = ( function() {
 		},
 
 		addSize: function( event ) {
-			viewModel.get( "fontFamilySizes" ).add( { id: "", name: "" } );
+			viewModel.get( "detailForm.data.fontFamilySizes" ).add( { id: "", name: "" } );
 		},
 
 		removeSize: function( event ) {
 			const name = event.data.name;
 			const id = event.data.id;
-			viewModel.get( "fontFamilySizes" ).remove( event.data );
+			viewModel.get( "detailForm.data.fontFamilySizes" ).remove( event.data );
 			if (id && id != "") {
 				NM.util.ajax( {
 					method: "DELETE",
@@ -92,8 +90,6 @@ AP.fontFamily.detail = ( function() {
 			status.html(
 				"<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>",
 			);
-
-			viewModel.set( "detailForm.data.fontFamilySize", viewModel.get( "fontFamilySizes" ).data() );
 
 			if ( detailForm.valid() ) {
 				NM.util.ajax( {
@@ -138,6 +134,8 @@ AP.fontFamily.detail = ( function() {
 	};
 
 	pub.edit = function( id, onSave ) {
+		viewModel.resetForm();
+		
 		if ( onSave ) {
 			viewModel.set( "callback.onSave", onSave );
 		}
@@ -149,7 +147,9 @@ AP.fontFamily.detail = ( function() {
 				done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
 
-                        viewModel.set( "detailForm.data", xhr.data );
+                        viewModel.set( "detailForm.data.id", xhr.data.id );
+                        viewModel.set( "detailForm.data.code", xhr.data.code );
+                        viewModel.set( "detailForm.data.name", xhr.data.name );
                         viewModel.set( "detailForm.title",  "Modifica Font Family < " + xhr.data.name + " >" );
 
                     }
@@ -159,38 +159,17 @@ AP.fontFamily.detail = ( function() {
 
 		NM.util.ajax( {
 			method: "GET",
-			url: "/manager/ajax/font-family-sizes?fontFamilyId=" + id,
+			url: `/manager/ajax/font-family/${id}/sizes`,
 			callback: {
 				done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
-
-                        viewModel.get( "fontFamilySizes" ).data( xhr.data );
-
+                        viewModel.get( "detailForm.data.fontFamilySizes" ).data( xhr.data );
                     }
 				},
 			},
 		} );
         
 		NM.util.openModal( AP.fontFamily.fields.detailRoot );
-	};
-
-	pub.editPictogram = function( id, onSave ) {
-		if ( onSave ) {
-			viewModel.set( "callback.onSave", onSave );
-		}
-
-		NM.util.ajax( {
-			method: "GET",
-			url: "/manager/ajax/pictograms?fontFamilyId=" + id,
-			callback: {
-				done: function( xhr ) {
-                    if ( xhr.status == "SUCCESS" ) {
-                        viewModel.get( "pictograms" ).data( xhr.data )
-                        NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
-                    }
-				},
-			},
-		} );
 	};
 
 	pub.init = function() {
@@ -210,8 +189,8 @@ AP.fontFamily.detail = ( function() {
 					remote: {
 						url: "/manager/ajax/font-families/code-exists",
 						data: {
-							code: function() {
-								return viewModel.get( "detailForm.data.code" );
+							id: function() {
+								return viewModel.get( "detailForm.data.id" );
 							}
 						},
 						dataFilter: function( xhr ) {
@@ -240,9 +219,16 @@ AP.fontFamily.pictogram = ( function() {
 
 	var defaultDetailForm = {
 		data: {
-			id: ""
+			id: "",
+			name: "",
+			fontFamilyPictograms: new kendo.data.DataSource(),
+			pictogram: {
+				id: "",
+				name: "",
+				image: null
+			}
 		},
-		title: "Carica Font Family",
+		title: "Pittogrammi",
 	};
 
 	var viewModel = kendo.observable( {
@@ -255,18 +241,74 @@ AP.fontFamily.pictogram = ( function() {
 		},
 
 		resetForm: function() {
-			var detailForm = AP.fontFamily.fields.detailForm;
+			var detailForm = AP.fontFamily.fields.pictogramForm;
 
 			var validator = detailForm.validate();
 			validator.resetForm();
 
 			detailForm.find( ".status" ).html( "" );
+			$('#pictogramFileUpload').val('')
 
 			viewModel.set( "detailForm", defaultDetailForm );
 		},
 
+		setDescription: function( event) {
+			$( '#pictogramDescription' ).text(viewModel.get('detailForm.data.pictogram.name'))
+			viewModel.checkCanSave()
+		},
+
+		checkCanSave: function( event ) {
+			return viewModel.get('detailForm.data.pictogram.id') == '' || viewModel.get('detailForm.data.pictogram.image') == null
+		},
+
+		remove: function( event ) {
+			const name = event.data.name;
+			const id = event.data.id;
+			NM.util.ajax( {
+				method: "DELETE",
+				url: "/manager/ajax/pictograms",
+				data: { 'pictogramId': id },
+				callback: {
+					done: function( xhr ) {
+						if ( xhr.status == "SUCCESS" ) {
+							AP.widget.notify(
+								"success",
+								"Pittogramma " + name + " cancellato con successo",
+							);
+
+							AP.util.fireCallback(
+								NM.util.ajax( {
+									method: "GET",
+									url: `/manager/ajax/font-family/${viewModel.get('detailForm.data.id')}/pictograms`,
+									callback: {
+										done: function( xhr ) {
+											if ( xhr.status == "SUCCESS" ) {
+												viewModel.set( "detailForm.data.pictogram", {
+													id: "",
+													name: "",
+													image: null
+												} )
+												viewModel.set( "detailForm.data.fontFamilyPictograms", xhr.data );
+												var pictograms = AP.page.pictogramCodes
+												const filtered = pictograms.filter(function(p) {
+													return !xhr.data.some(s => s.code === p.id)
+												});
+												viewModel.set('pictograms', filtered)
+												NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
+
+											}
+										},
+									},
+								} )
+							);
+						}
+					},
+				},
+			} );
+		},
+
 		save: function( event ) {
-			var detailForm = AP.fontFamily.fields.detailForm;
+			var detailForm = AP.fontFamily.fields.pictogramForm;
 			var status = detailForm.find( ".status" );
 
 			status.html(
@@ -276,24 +318,42 @@ AP.fontFamily.pictogram = ( function() {
 			if ( detailForm.valid() ) {
 				NM.util.ajax( {
 					method: "POST",
-					url: "/manager/ajax/font-families",
+					url: "/manager/ajax/pictograms",
 					data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
 					callback: {
 						done: function( xhr ) {
 							if ( xhr.status == "SUCCESS" ) {
 								NM.util.autoHideMessage(
 									status,
-									"<span class='green'>Linea salvata</span>",
-								);
-
-								setTimeout(
-									() => $( "#line-detail-modal" ).modal( "hide" ),
-									1000,
+									"<span class='green'>Pittogramma salvato</span>",
 								);
 
 								AP.util.fireCallback(
-									"onSave",
-									viewModel.get( "callback" ),
+									NM.util.ajax( {
+										method: "GET",
+										url: `/manager/ajax/font-family/${viewModel.get('detailForm.data.id')}/pictograms`,
+										callback: {
+											done: function( xhr ) {
+												if ( xhr.status == "SUCCESS" ) {
+													viewModel.set( "detailForm.data.pictogram", {
+														id: "",
+														name: "",
+														image: null
+													} )
+													viewModel.set( "detailForm.data.fontFamilyPictograms", xhr.data );
+													var pictograms = viewModel.get('pictograms')
+													const filtered = pictograms.filter(function(p) {
+														return !xhr.data.some(s => s.code === p.id)
+													});
+													viewModel.set('pictograms', filtered)
+													$('#pictogramDescription').text('')
+													$('#pictogramFileUpload').val('')
+													NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
+
+												}
+											},
+										},
+									} )
 								);
 							}
 						},
@@ -305,44 +365,54 @@ AP.fontFamily.pictogram = ( function() {
 		},
 	} );
 
-	pub.new = function( { onSave } ) {
-		if ( onSave ) {
-			viewModel.set( "callback.onSave", onSave );
-		}
-
+	pub.edit = function( id, name ) {
 		viewModel.resetForm();
-
-		NM.util.openModal( AP.fontFamily.fields.detailRoot );
-	};
-
-	pub.edit = function( id, onSave ) {
-		if ( onSave ) {
-			viewModel.set( "callback.onSave", onSave );
-		}
-
-		viewModel.resetForm();
-
+		
 		NM.util.ajax( {
 			method: "GET",
-			url: "/manager/ajax/font-families/" + id,
+			url: `/manager/ajax/font-family/${id}/pictograms`,
 			callback: {
 				done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
 
-                        viewModel.set( "detailForm.data", xhr.data );
-                        viewModel.set( "detailForm.title", "Modifica Font Family < " + xhr.data.name + " >" );
+                        viewModel.get( "detailForm.data.fontFamilyPictograms" ).data( xhr.data );
+                        viewModel.set( "detailForm.title", "Pittogrammi Font Family < " + name + " >" );
+						var pictograms = viewModel.get('pictograms')
+						const filtered = pictograms.filter(function(p) {
+							return !xhr.data.some(s => s.code === p.id)
+						});
+						viewModel.set('pictograms', filtered)
+                        NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
 
-                        NM.util.openModal( AP.fontFamily.fields.detailRoot );
                     }
 				},
 			},
 		} );
+
+		$("#pictogramFileUpload").on("change", function(e) {
+			const file = e.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function(evt) {
+					const base64 = evt.target.result;
+					viewModel.set("detailForm.data.pictogram.image", base64);
+					viewModel.checkCanSave()
+				};
+
+				reader.readAsDataURL(file);
+			}
+		});
+
+		viewModel.set('detailForm.data.id', id)
+		viewModel.set('detailForm.data.name', name)
 	};
 
 	pub.init = function() {
-		kendo.bind( AP.fontFamily.fields.detailRoot, viewModel );
+		kendo.bind( AP.fontFamily.fields.pictogramRoot, viewModel );
+		AP.page.pictogramCodes.unshift({ "id": "", "name": "-- Seleziona un pittogramma"})
+		viewModel.set( 'pictograms', AP.page.pictogramCodes );
 
-		var detailForm = AP.fontFamily.fields.detailForm;
+		var detailForm = AP.fontFamily.fields.pictogramForm;
 
 		detailForm.validate( {
 			onfocusout: function( element ) {
@@ -354,14 +424,11 @@ AP.fontFamily.pictogram = ( function() {
 					checkCode: true,
 					rangelength: [ 5, 5 ],
 					remote: {
-						url: "/manager/ajax/pictograms/pictogram-exists",
+						url: "/manager/ajax/font-families/code-exists",
 						data: {
 							id: function() {
-								return viewModel.get( "detailForm.data.pic.id" );
-							},
-							fontFamily: function() {
-								return viewModel.get( "detailForm.data.font.id" );
-							},
+								return viewModel.get( "detailForm.data.id" );
+							}
 						},
 						dataFilter: function( xhr ) {
 							var json = JSON.parse( xhr );
@@ -388,6 +455,7 @@ AP.fontFamily.list = ( function() {
     var pub = {};
 
     var detailApp = AP.fontFamily.detail;
+    var pictogramApp = AP.fontFamily.pictogram;
 
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/font-families" } ),
@@ -423,6 +491,12 @@ AP.fontFamily.list = ( function() {
             };
 
             detailApp.edit( event.data.id, onSave );
+
+            return false;
+        },
+
+        editPictograms: function( event ) {
+            pictogramApp.edit( event.data.id, event.data.name );
 
             return false;
         },
