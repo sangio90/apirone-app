@@ -6,6 +6,15 @@
 LAV-VERNPOLVLIS
 
 <cfquery name="i" datasource="verticale">
+    SELECT TOP 10 *
+    FROM azapi_listin
+</cfquery>
+
+<cfdump var="#i#">
+<cfabort>
+
+
+<cfquery name="i" datasource="verticale">
     SELECT lisart, liscvr, liscol, lispre
     FROM azapi_listin
     WHERE lisart='LAV-VERNPOLVMET'
@@ -15,13 +24,6 @@ LAV-VERNPOLVLIS
 <cfdump var="#i#">
 <cfabort>
 
-<cfquery name="i" datasource="verticale">
-    SELECT *
-    FROM articoli_apir
-</cfquery>
-
-<cfdump var="#i#">
-<cfabort>
 
 <cfset dao = new com.apirone.core.model.dao.ColorDAO()>
 
