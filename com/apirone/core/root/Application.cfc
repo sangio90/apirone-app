@@ -42,7 +42,7 @@ component {
 		bundleName       = "org.lucee.mssql",
 		bundleVersion    = "12.2.0.jre8",
 		
-		connectionString = "jdbc:sqlserver://#variables.settings.get( "verticaldb.host" )#:#variables.settings.get( "verticaledb.port" )#;DATABASENAME=#variables.settings.get( "verticaledb.name" )#;SelectMethod=direct",
+		connectionString = "jdbc:sqlserver://#variables.settings.get( "verticaledb.host" )#:#variables.settings.get( "verticaledb.port" )#;DATABASENAME=#variables.settings.get( "verticaledb.name" )#;SelectMethod=direct",
 		username         = variables.settings.get( "verticaledb.username" ),
 		password         = variables.settings.get( "verticaledb.pwd" ),
 		// optional settings
