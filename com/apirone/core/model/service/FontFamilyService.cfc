@@ -3,6 +3,7 @@
 	property name="dao" inject="FontFamilyDAO";
 	property name="textService" inject="TextService";
 	property name="pictogramService" inject="PictogramService";
+	property name="fontFamilySizeService" inject="FontFamilySizeService";
 
 	property name="cacheScope" type="String" default="FontFamily.bean";
 
@@ -63,21 +64,11 @@
 		return false;
 	}
 
-	/**
-	 * @auditEvent FONT_FAMILY.created
-	 * @auditMessage Font Family [@return@] created
-	 * @auditPayload { "id": "@return@" }
-	 */
-	public String function create( required com.apirone.core.model.bean.FontFamily fontFamily){
+	public String function create( required com.apirone.core.model.bean.FontFamily fontFamily ){
 		var newId = getDao().insert( arguments.fontFamily );
 		return newId;
 	}
 
-	/**
-	 * @auditEvent FONT_FAMILY.updated
-	 * @auditMessage Font Family [@fontFamily.id@] updated
-	 * @auditPayload { "id": "@fontFamily.id@" }
-	 */
 	public String function update( required com.apirone.core.model.bean.FontFamily fontFamily ){
 		getDao().update( arguments.fontFamily );
 		super.getCacheManager().remove( getCacheScope(), arguments.fontFamily.getId() );
@@ -122,8 +113,15 @@
 			bean.setName( record.font_family );
 
 			var pictograms = getPictogramService().list( fontFamilyId = arguments.fontFamilyId );
+
 			if ( Len( pictograms ) ) {
-				bean.setPictograms( pictograms )
+				bean.setPictograms( pictograms );
+			}
+
+			var sizes = getFontFamilySizeService().list( fontFamilyId = arguments.fontFamilyId );
+
+			if ( Len( sizes ) ) {
+				bean.setSizes( sizes );
 			}
 
 			return bean;

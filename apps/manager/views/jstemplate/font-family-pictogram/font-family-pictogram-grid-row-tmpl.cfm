@@ -17,7 +17,7 @@
                     <img data-bind="attr: { src: image.uri }" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                 </div>
             </td>
-            <td class="text-center">
+            <td class="text-center width-30">
                 #iconButton(bind="click:remove", class="btn-danger", icon="trash")#
             </td>
         </tr>

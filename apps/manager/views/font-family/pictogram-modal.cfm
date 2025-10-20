@@ -16,24 +16,23 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-start">Pittogrammi</label>
                             <div class="col-sm-12">
-                                <form name="font-family-pictogram-grid-form" id="font-family-pictogram-grid-form" method="get">
-                                    #grid( 
-                                        id="font-family-pictogram-grid",
-                                        columns="[
-                                            { 'field':'id', 'title':'ID', width: '10%'},
-                                            { 'field':'code', 'title':'Codice', width: '10%'},
-                                            { 'field':'name', 'title':'Nome', width: '20%'},
-                                            { 'field':'image', 'title':'', width: '30%'},
-                                            { 'field':'', 'title':'', width: '30%'}
-                                        ]",
-                                        source = "detailForm.data.fontFamilyPictograms",
-                                        rowTemplate="font-family-pictogram/font-family-pictogram-grid-row-tmpl"
-                                    )#
+                                
+                                #grid( 
+                                    id="font-family-pictogram-grid",
+                                    class="no-pager",
+                                    columns="[
+                                        { 'field':'id', 'title':'ID', width: '50'},
+                                        { 'field':'code', 'title':'Codice'},
+                                        { 'field':'name', 'title':'Nome'},
+                                        { 'field':'image', 'title':'Immagine'},
+                                        { 'field':'', 'title':'', width: '50'}
+                                    ]",
+                                    source = "detailForm.data.fontFamilyPictograms",
+                                    rowTemplate="font-family-pictogram/font-family-pictogram-grid-row-tmpl"
+                                )#
 
-                                </form>
                             </div>
                         </div>
-
 
                         <div class="mb-3 row">
                             <label class="col-sm-1 col-form-label text-start">Carica</label>
@@ -77,8 +76,3 @@
     </div>
 
 </cfoutput>
-<style>
-    #font-family-pictogram-grid .k-grid-pager {
-        display: none !important;
-    }
-</style>

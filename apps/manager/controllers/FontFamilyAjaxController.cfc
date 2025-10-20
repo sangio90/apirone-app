@@ -8,7 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "fontFamily.search", params );
-		
+
 		for ( var row in rows.getData() ) {
 			var obj = mm.convert( row, "list" );
 			data.add( obj );
@@ -31,10 +31,9 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result = super.getResult();
-		var fontFamily   = super.bean( "FontFamily" );
+		var result     = super.getResult();
+		var fontFamily = super.bean( "FontFamily" );
 
-		var thisId    = "";
 		var messageId = "";
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
@@ -43,13 +42,24 @@ component extends="com.apirone.core.controller.AbsController" {
 		fontFamily.setCode( json.code );
 		fontFamily.setName( json.name );
 
-		if ( json.fontFamilySizes._data.len() > 0 ) {
+		var fontFamilyId = json.id;
+
+		if ( !Len( json.id ) ) {
+			var fontFamilyId = super.service( "fontFamily" ).create( fontfamily );
+			// var fontFamily = super.service("FontFamily").get( thisId );
+		}
+
+		if ( json.sizes._data.len() > 0 ) {
 			var sizes = [];
-			for ( var size in json.fontFamilySizes._data ) {
-				if (size.id == '') {
-					var fontFamilySize = super.bean( "FontFamilySize" )
+
+			for ( var size in json.sizes._data ) {
+				var fontFamilySize = super.bean( "FontFamilySize" );
+
+				if ( size.id == "" ) {
+					fontFamilySize.setId( size.id );
 					fontFamilySize.setName( size.name );
-					fontFamilySize.setFontFamily( fontFamily );
+					fontFamilySize.setFontFamilyId( fontFamilyId );
+
 					super.service( "fontFamilySize" ).create( fontFamilySize );
 				}
 			}
@@ -57,8 +67,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( !Len( json.id ) ) {
 			messageId = "fontFamily.created";
-
-			super.service( "fontFamily" ).create( fontfamily );
 		} else {
 			messageId = "fontFamily.updated";
 			thisId    = super.fire( "fontFamily.update", [ fontfamily ] )
@@ -75,7 +83,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 
 		var bean = super.fire( "fontFamily.get", [ rc.id ] );
-		var obj  = super.getMementify().convert( bean, "list" );
+
+		var obj = super.getMementify().convert( bean, "detail" );
 
 		result.setData( obj );
 

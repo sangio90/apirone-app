@@ -14,23 +14,6 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction name="readByFontFamily" output="false">
-		<cfargument name="name" type="String" required="true">
-
-		<cfquery name="local.q" datasource="apirone">
-			SELECT
-				font_family_size_id, 
-				font_families.font_family
-			FROM
-				font_family_sizes
-					INNER JOIN font_families USING (font_family_id)
-			WHERE
-				font_families.font_family = <cfqueryparam cfsqltype="varchar" value="#arguments.name#">
-		</cfquery>
-
-		<cfreturn local.q>
-	</cffunction>
-
 	<cffunction returntype="Query" name="find">
 		<cfargument name="str" type="String">
 		<cfargument name="fontFamilyId" type="Numeric">
@@ -76,7 +59,7 @@
 				font_family_size
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getFontFamily().getId()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getFontFamilyId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getName()#">
 			) RETURNING font_family_size_id
 		</cfquery>

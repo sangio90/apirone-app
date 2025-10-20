@@ -1091,6 +1091,10 @@ h2 {
     background-repeat: no-repeat;
 }
 
+/*
+    price simulate log list 
+*/
+
 .price-log-table {
     width: 100%;
 }
@@ -1102,3 +1106,7 @@ h2 {
 .price-log-table tr:nth-child(even) {
     background-color: #EAEAEA
 }
+
+/*
+    // price simulate log list 
+*/

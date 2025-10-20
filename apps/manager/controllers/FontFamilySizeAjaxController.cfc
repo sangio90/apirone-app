@@ -8,7 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "fontFamilySize.search", params );
-		
+
 		for ( var row in rows.getData() ) {
 			var obj = mm.convert( row, "list" );
 			data.add( obj );
@@ -20,7 +20,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
-	
+
 	function fontFamilyList( event, rc, prc ){
 		var data = [];
 
@@ -28,7 +28,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mm     = super.getMementify();
 		var params = super.paramsFromUrl();
 
-		var rows = super.fire( "fontFamilySize.search", { 'fontFamilyId' = rc.id } );
+		var rows = super.fire( "fontFamilySize.search", { "fontFamilyId" = rc.id } );
 		for ( var row in rows.getData() ) {
 			var obj = mm.convert( row, "list" );
 			data.add( obj );
@@ -42,8 +42,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result = super.getResult();
-		var fontFamilySize   = super.bean( "FontFamilySize" );
+		var result         = super.getResult();
+		var fontFamilySize = super.bean( "FontFamilySize" );
 
 
 		var thisId    = "";
@@ -92,8 +92,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var fontFamilySizeId = rc.fontFamilySizeId
 
 		var outcome = super.fire( "fontFamilySize.delete", [ fontFamilySizeId ] );
+
 		if ( outcome.getStatus() == "ERROR" ) {
-			errors.add( { "message" = "Non sono riuscito a cancellare l'Id #fontFamilySizeId#" } )
+			errors.add( {
+				"message" = "Non sono riuscito a cancellare l'Id #fontFamilySizeId#"
+			} )
 		}
 
 		if ( errors.len() ) {

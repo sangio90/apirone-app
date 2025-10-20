@@ -14,7 +14,11 @@
 		}
 
 		var bean = build( arguments.fontFamilySizeId );
-		cm.put( getCacheScope(), arguments.fontFamilySizeId, bean );
+		cm.put(
+			getCacheScope(),
+			arguments.fontFamilySizeId,
+			bean
+		);
 
 		return bean;
 	}
@@ -26,6 +30,7 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
+		String fontFamilyId,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "fontFamilySize.id" } ]
@@ -48,22 +53,12 @@
 		return result;
 	}
 
-	/**
-	 * @auditEvent FONT_FAMILY_SIZE.created
-	 * @auditMessage Font Family Size [@return@] created
-	 * @auditPayload { "id": "@return@" }
-	 */
-	public String function create( required com.apirone.core.model.bean.FontFamilySize fontFamilySize){
+	public String function create( required com.apirone.core.model.bean.FontFamilySize fontFamilySize ){
 		var newId = getDao().insert( arguments.fontFamilySize );
 		return newId;
 	}
 
-	/**
-	 * @auditEvent FONT_FAMILY_SIZE.updated
-	 * @auditMessage Font Family Size [@fontFamilySize.id@] updated
-	 * @auditPayload { "id": "@fontFamilySize.id@" }
-	 */
-	public String function update( required com.apirone.core.model.bean.FontFamilySize fontFamilySize){
+	public String function update( required com.apirone.core.model.bean.FontFamilySize fontFamilySize ){
 		getDao().update( arguments.fontFamilySize );
 		super.getCacheManager().remove( getCacheScope(), arguments.fontFamilySize.getId() );
 
@@ -104,6 +99,7 @@
 
 			bean.setId( record.font_family_size_id );
 			bean.setName( record.font_family_size );
+			bean.setFontFamilyId( record.font_family_id );
 
 			return bean;
 		}

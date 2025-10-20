@@ -36,18 +36,13 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-start">Dimensioni Font</label>
                             <div class="col-sm-12">
-                                <form name="font-family-size-grid-form" id="font-family-size-grid-form" method="get">
-                                    #grid( 
-                                        id="font-family-size-grid",
-                                        columns="[
-                                            { 'field':'name', 'title':'Dimensione', width: '70%'},
-                                            { 'field':'', 'title':'', width: '30%'}
-                                        ]",
-                                        source = "detailForm.data.fontFamilySizes",
-                                        rowTemplate="font-family-size/font-family-size-grid-row-tmpl"
-                                    )#
+                                
+                                #table( 
+                                    id="font-family-size-grid",
+                                    source = "detailForm.data.sizes",
+                                    rowTemplate="font-family-size/font-family-size-grid-row-tmpl"
+                                )#
 
-                                </form>
                                 #iconButton(bind="click:addSize", icon="plus", id="addSize")#
                             </div>
                         </div>
@@ -74,8 +69,3 @@
     </div>
 
 </cfoutput>
-<style>
-    #font-family-size-grid .k-grid-pager {
-        display: none !important;
-    }
-</style>

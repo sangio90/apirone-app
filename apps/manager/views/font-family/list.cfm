@@ -64,14 +64,15 @@
                             #grid( 
                                 id="font-family-grid",
                                 columns="[
-                                    { 'field':'id', 'title':'ID', width: '10%', 'headerAttributes': { 'class': 'justify-content-center' } } ,
-                                    { 'field':'code', 'title':'Codice', width: '30%' },
-                                    { 'field':'name', 'title':'Nome', width: '40%'},
-                                    { 'field':'', 'title':'', width: '15%'},
+                                    { 'field':'id', 'title':'ID', width: '40px', 'headerAttributes': { 'class': 'justify-content-center' } } ,
+                                    { 'field':'code', 'title':'Codice'},
+                                    { 'field':'name', 'title':'Nome'},
+                                    { 'field':'', 'title':'Immagini', width: '50px'},
+                                    { 'field':'', 'title':'Dettaglio font family', width: '50px'},
                                     { 
                                         'field'           :'', 
                                         'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                        'width'           :'5%',
+                                        'width'           :'40px',
                                         'headerAttributes': { 'class': 'justify-content-center' }
                                     }
                                 ]",
