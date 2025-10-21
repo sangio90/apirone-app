@@ -8,7 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "pictogram.search", params );
-		
+
 		for ( var row in rows.getData() ) {
 			var obj = mm.convert( row, "list" );
 			data.add( obj );
@@ -21,7 +21,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	//TODO: è un duplicato di list
+	// TODO: è un duplicato di list
 	function fontFamilyList( event, rc, prc ){
 		var data = [];
 
@@ -29,7 +29,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mm     = super.getMementify();
 		var params = super.paramsFromUrl();
 
-		var rows = super.fire( "Pictogram.search", { 'fontFamilyId' = rc.id } );
+		var rows = super.fire( "Pictogram.search", { "fontFamilyId" = rc.id } );
 		for ( var row in rows.getData() ) {
 			var obj = mm.convert( row, "list" );
 			data.add( obj );
@@ -43,37 +43,46 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function fontFamilyExists( event, rc, prc ){
-		param rc.id   = -1;
-		param rc.code = "";
+		param rc.id           = -1;
+		param rc.code         = "";
 		param rc.fontFamilyId = -1;
 
-		var result = super.fire( "pictogram.fontFamilyExists", { code = rc.code, fontFamilyId = rc.fontFamilyId, excludedId = rc.id } );
+		var result = super.fire(
+			"pictogram.fontFamilyExists",
+			{
+				code         = rc.code,
+				fontFamilyId = rc.fontFamilyId,
+				excludedId   = rc.id
+			}
+		);
 
 		event.setValue( "result", result );
 	}
 
 	function save( event, rc, prc ){
-		
 		var result    = super.getResult();
 		var pictogram = super.bean( "Pictogram" );
 		var entity    = super.bean( "Entity" );
 
 		var util = new com.apirone.core.util.Udf();
 
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
 		var tmpDir = getTempDir();
-		
+
 		pictogram.setCode( json.pictogram.id );
 		pictogram.setFontFamilyId( json.id );
 
 		transaction {
+			var newId = super.fire( "pictogram.create", { pictogram = pictogram } )
 
-			var newId  = super.fire( "pictogram.create", { pictogram = pictogram } )
+			var fileName = "pictogram_" & newId & "_font_family_" & util.prettyString( json.name ) & ".svg";
+			var filePath = tmpDir & "/" & fileName;
 
-			var fileName   = "pictogram_" & newId & "_font_family_" & util.prettyString( json.name ) & ".svg";
-			var filePath   = tmpDir & "/" & fileName;
-			
-			var base64String = Replace( json.pictogram.image, "data:image/svg+xml;base64,", "" );
+			var base64String = Replace(
+				json.pictogram.image,
+				"data:image/svg+xml;base64,",
+				""
+			);
 			var binaryData = ToBinary( base64String );
 
 			FileWrite( filePath, binaryData );
@@ -139,7 +148,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 	function listDimensions( event, rc, prc ){
-
 		param rc.id = -1;
 
 		var data = [];
@@ -147,54 +155,41 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var memy   = super.getMementify();
 
-		var pictogram = super.service("Pictogram").get(rc.id);
-		var fontFamily = super.service("FontFamily").get( pictogram.getFontFamilyId() );
+		var pictogram  = super.service( "Pictogram" ).get( rc.id );
+		var fontFamily = super.service( "FontFamily" ).get( pictogram.getFontFamilyId() );
 
-		
-		var dimensions = super.service( "pictogramDimension").list( pictogramId = rc.id );
+
+		var dimensions = super.service( "pictogramDimension" ).list( pictogramId = rc.id );
 
 		var data = [];
 
-		dump(fontFamily.getSizes().len());
-		dump("===========");
-
-		for( var size in fontFamily.getSizes() ){
-
-			//var found = false;
+		for ( var size in fontFamily.getSizes() ) {
+			// var found = false;
 			var row = {};
 
-			for( var dimension in dimensions ) {
-
-				if( size.getId() == dimension.getFontFamilySizeId() ) {
-					dump("trovato");
-					row = memy.convert( dimension );
-					row["pictogram"]["id"] = rc.id;
-					row["fontFamilySize"]["id"] = size.getId();
-					row["fontFamilySize"]["name"] = size.getName();
+			for ( var dimension in dimensions ) {
+				if ( size.getId() == dimension.getFontFamilySizeId() ) {
+					dump( "trovato" );
+					row                               = memy.convert( dimension );
+					row[ "pictogram" ][ "id" ]        = rc.id;
+					row[ "fontFamilySize" ][ "id" ]   = size.getId();
+					row[ "fontFamilySize" ][ "name" ] = size.getName();
 
 					break;
-				
-				} 
-
+				}
 			}
 
-			if( !row.isEmpty() ) { 
-				data.add( row )	
+			if ( !row.isEmpty() ) {
+				data.add( row )
 			} else {
 				data.add( {
-					"id" = "",
-					"pictogram" = {
-						"id" = rc.id,
-					},
-					"fontFamilySize" = {
-						"id" = size.getId(),
-						"name" = size.getName()
-					},
-					"width" = "",
-					"height" = "",
-				})	
+					"id"             = "",
+					"pictogram"      = { "id" = rc.id },
+					"fontFamilySize" = { "id" = size.getId(), "name" = size.getName() },
+					"width"          = "",
+					"height"         = ""
+				} )
 			}
-
 		}
 		result.setData( data )
 
@@ -202,43 +197,43 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function saveDimensions( event, rc, prc ){
-
 		var items = DeserializeJSON( GetHTTPRequestData().content );
 
 		var result = super.getResult();
 
 		var modifiedIds = [];
-		var createdIds = [];
+		var createdIds  = [];
 
-		for( var item in items ) {
-			
-			var dimension  = super.bean( "PictogramDimension" );
+		for ( var item in items ) {
+			var dimension = super.bean( "PictogramDimension" );
 
-			//dimension.setWidth( IsNumeric( item.width ) ? item.width : 0 );
-			//dimension.setHeight( IsNumeric( item.height ) ? item.height : 0 );
+			// dimension.setWidth( IsNumeric( item.width ) ? item.width : 0 );
+			// dimension.setHeight( IsNumeric( item.height ) ? item.height : 0 );
 			dimension.setWidth( IsNumeric( item.width ) ? item.width : 0 );
 			dimension.setHeight( IsNumeric( item.height ) ? item.height : 0 );
 
-			dump(item.fontFamilySize.id);
-			//dump(dimension.getFontFamilySizeId());
+			dump( item.fontFamilySize.id );
+			// dump(dimension.getFontFamilySizeId());
 
-			dimension.setFontFamilySizeId( item.fontFamilySize.id ) ;
-			dimension.setPictogramId( item.pictogram.id ) ;
+			dimension.setFontFamilySizeId( item.fontFamilySize.id );
+			dimension.setPictogramId( item.pictogram.id );
 
-			if( !Len(item.id) ) {
-				var newId = super.service( "pictogramDimension").create( dimension );
-				//createdIds.add( createdIds )
+			if ( !Len( item.id ) ) {
+				var newId = super.service( "pictogramDimension" ).create( dimension );
+				// createdIds.add( createdIds )
 			} else {
 				dimension.setId( item.id );
-				var thisId = super.service( "pictogramDimension").update( dimension );
-				//modifiedIds.add( thisId );
+				var thisId = super.service( "pictogramDimension" ).update( dimension );
+				// modifiedIds.add( thisId );
 			}
 		}
 
-		result.setData( { "message" = "Salvato", "payload" = { "modified" = modifiedIds, "created" = createdIds } } );
+		result.setData( {
+			"message" = "Salvato",
+			"payload" = { "modified" = modifiedIds, "created" = createdIds }
+		} );
 
 		event.setValue( "result", result );
 	}
-
 
 }

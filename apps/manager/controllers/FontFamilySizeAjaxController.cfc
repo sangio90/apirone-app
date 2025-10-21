@@ -21,6 +21,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	// TODO: replace with previous method adding fontFamilyId
 	function fontFamilyList( event, rc, prc ){
 		var data = [];
 

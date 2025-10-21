@@ -36,7 +36,7 @@ AP.country.list = ( function() {
     var viewModel = kendo.observable( {
         rows: dataSources.items,
         detailForm: defaultDetailForm,
-        
+
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
         },
@@ -90,7 +90,7 @@ AP.country.list = ( function() {
             NM.util.openModal( $( "#country-detail-modal" ) );
 
         },
-        
+
         delete: function( event ) {
 
             var checks = $( "#country-grid" ).find( "[name=selected]:checked" );
@@ -135,7 +135,7 @@ AP.country.list = ( function() {
 
     pub.init = function() {
         kendo.bind( AP.country.fields.listRoot, viewModel );
-        
+
         var detailForm = AP.country.fields.detailForm;
 
         detailForm.validate( {

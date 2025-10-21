@@ -46,6 +46,7 @@
     "RawProductType.bean": {},
     "RawValue.bean": {},
     "Status.bean": {},
+    "SearchTerm.bean": {},
     "SystemColor.bean": {},
     "Text.bean": {},
     "TextKind.bean": {},
