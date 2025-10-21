@@ -5,9 +5,9 @@ AP.fontFamily.fields = {
     searchListForm: $( "#font-family-grid-search-form" ),
     detailRoot: $( "#font-family-detail-modal" ),
     detailForm: $( "#font-family-detail-form" ),
-    // detailSizesForm: $( "#font-family-size-grid-form" ),
     pictogramRoot: $( "#pictogram-modal" ),
-    pictogramForm: $( "#pictogram-form" )
+    pictogramForm: $( "#pictogram-form" ),
+    pictogramDimensionsRoot: $( "#pictogram-dimensions-root" )
 };
 
 $( document ).ready( function() {
@@ -251,19 +251,59 @@ AP.fontFamily.pictogram = ( function() {
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
         pictograms: new kendo.data.DataSource(),
+        dimensions: new kendo.data.DataSource(),
+        currentPictogramId: null,
+        titleDimensionModal: "",
         callback: {
             onCreate: undefined,
             onUpdate: undefined,
             onLoad: undefined,
         },
 
+        editDimensions: function( event ) {
+
+            var thisId = event.data.id;
+
+            NM.util.ajax( {
+                method: "GET",
+                url: `/manager/ajax/pictograms/${thisId}/dimensions`,
+                callback: {
+                    done: function( xhr ) {
+                        viewModel.set( "titleDimensionModal", "Dimensioni" );
+                        viewModel.get( "dimensions" ).data( xhr.data );
+                        viewModel.set( "currentPictogramId", thisId );
+
+                    },
+                },
+            } );
+
+
+            NM.util.openModal( fields.pictogramDimensionsRoot );
+        },
+
+        saveDimensions: function( event ) {
+
+            NM.util.ajax( {
+                method: "POST",
+                url: `/manager/ajax/pictograms/${viewModel.get( "currentPictogramId" )}/dimensions`,
+                data: JSON.stringify( viewModel.get( "dimensions" ).data() ),
+                callback: {
+                    done: function( xhr ) {
+                        AP.widget.notify( "success", "Dimensioni salvate" );
+                    },
+                },
+            } );
+
+        },
+
         resetForm: function() {
             var detailForm = fields.pictogramForm;
-            var validator = detailForm.validate();
+            // var validator = detailForm.validate();
 
-            validator.resetForm();
+            NM.form.clearMessages( detailForm );
 
-            detailForm.find( ".status" ).html( "" );
+            // validator.resetForm();
+
             $( "#pictogramFileUpload" ).val( "" );
 
             viewModel.set( "detailForm", defaultDetailForm );
@@ -293,6 +333,7 @@ AP.fontFamily.pictogram = ( function() {
                                 "Pittogramma " + name + " cancellato con successo",
                             );
 
+                            // TODO: i callback non vanno usati così
                             AP.util.fireCallback(
                                 NM.util.ajax( {
                                     method: "GET",
@@ -343,6 +384,7 @@ AP.fontFamily.pictogram = ( function() {
                                     "<span class='green'>Pittogramma salvato</span>",
                                 );
 
+                                // TODO: i callback non vanno usati così
                                 AP.util.fireCallback(
                                     NM.util.ajax( {
                                         method: "GET",
@@ -512,6 +554,9 @@ AP.fontFamily.list = ( function() {
         },
 
         editPictograms: function( event ) {
+
+            console.log( "editPictograms" );
+
             pictogramApp.edit( event.data.id, event.data.name );
 
             return false;

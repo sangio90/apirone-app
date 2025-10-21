@@ -18,6 +18,9 @@
                 </div>
             </td>
             <td class="text-center width-30">
+                #iconButton(bind="click:editDimensions", icon="expand-alt")#
+            </td>
+            <td class="text-center width-30">
                 #iconButton(bind="click:remove", class="btn-danger", icon="trash")#
             </td>
         </tr>

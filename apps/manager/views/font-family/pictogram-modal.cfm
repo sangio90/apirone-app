@@ -25,6 +25,7 @@
                                         { 'field':'code', 'title':'Codice'},
                                         { 'field':'name', 'title':'Nome'},
                                         { 'field':'image', 'title':'Immagine'},
+                                        { 'field':'', 'title':'Dimensioni', width: '50'},
                                         { 'field':'', 'title':'', width: '50'}
                                     ]",
                                     source = "detailForm.data.fontFamilyPictograms",
@@ -73,6 +74,8 @@
             </div>
         </selection>
     
+	    #view( "font-family/pictogram-dimensions-modal" )#
+
     </div>
 
 </cfoutput>

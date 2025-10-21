@@ -120,9 +120,7 @@
 
 			var sizes = getFontFamilySizeService().list( fontFamilyId = arguments.fontFamilyId );
 
-			if ( Len( sizes ) ) {
-				bean.setSizes( sizes );
-			}
+			bean.setSizes( sizes );
 
 			return bean;
 		}

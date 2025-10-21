@@ -847,6 +847,10 @@ h2 {
     width: 70px !important;
 }
 
+.width-100 {
+    width: 100px !important;
+}
+
 .width-200 {
     width: 200px !important;
 }

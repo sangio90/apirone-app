@@ -2,9 +2,6 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 
 	this.memento = {
 		defaultIncludes = [ "id", "shortId", "name" ],
-		defaultExcludes = [],
-		neverInclude    = [],
-		defaults        = {},
 		mappers         = {
 			"descriptionItem" = function( value ){
 				return value ?: {

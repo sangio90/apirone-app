@@ -27,6 +27,7 @@
     "PaymentMethod.bean": {},
     "Pictogram.bean": {},
     "PictogramCode.bean": {},
+    "PictogramDimension.bean": {},
     "Pricelist.bean": {},
     "Product.bean": {},
     "ProductCategory.bean": {},

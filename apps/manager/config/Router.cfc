@@ -167,11 +167,16 @@
 		/*
 			pictograms
 		*/
+		//TODO: non usato
 		get( "/ajax/pictograms/font-family-exists" ).to( "PictogramAjaxController.fontFamilyExists" ).end();
+		get( "/ajax/pictograms/:id/dimensions").to("PictogramAjaxController.listDimensions").end();
+		post( "/ajax/pictograms/:id/dimensions").to("PictogramAjaxController.saveDimensions").end();
 		get( "/ajax/pictograms/:id" ).to( "PictogramAjaxController.get" ).end();
 		delete( "/ajax/pictograms" ).to( "PictogramAjaxController.delete" ).end();
 		get( "/ajax/pictograms").to("PictogramAjaxController.list").end();
 		post( "/ajax/pictograms" ).to( "PictogramAjaxController.save" ).end();
+		
+		
 		get( "/ajax/font-family/:id/pictograms" ).to( "PictogramAjaxController.fontFamilyList" ).end();
 
 		/*
@@ -181,6 +186,8 @@
 		delete( "/ajax/font-family-sizes" ).to( "FontFamilySizeAjaxController.delete" ).end();
 		get( "/ajax/font-family-sizes").to("FontFamilySizeAjaxController.list").end();
 		post( "/ajax/font-family-sizes" ).to( "FontFamilySizeAjaxController.save" ).end();
+
+		//TODO: non torna famiglie ma una serie di sizes (riv. nome metodo)
 		get( "/ajax/font-family/:id/sizes" ).to( "FontFamilySizeAjaxController.fontFamilyList" ).end();
 
 		/*

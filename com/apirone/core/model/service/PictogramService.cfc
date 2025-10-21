@@ -1,7 +1,7 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="PictogramDAO";
-	property name="textService" inject="TextService";
+	//property name="textService" inject="TextService";
 	property name="lookupService" inject="LookupService";
 	property name="FileService" inject="FileService";
 
@@ -64,22 +64,12 @@
 		return false;
 	}
 
-	/**
-	 * @auditEvent pictogram.created
-	 * @auditMessage Font Family [@return@] created
-	 * @auditPayload { "id": "@return@" }
-	 */
 	public String function create( required com.apirone.core.model.bean.Pictogram pictogram ){
 		var newId = getDao().insert( arguments.pictogram );
 
 		return newId;
 	}
 
-	/**
-	 * @auditEvent pictogram.updated
-	 * @auditMessage Pictogram [@pictogram.id@] updated
-	 * @auditPayload { "id": "@pictogram.id@" }
-	 */
 	public String function update( required com.apirone.core.model.bean.Pictogram pictogram ){
 		getDao().update( arguments.pictogram );
 		super.getCacheManager().remove( getCacheScope(), arguments.pictogram.getId() );
@@ -129,13 +119,16 @@
 			var bean = super.bean( "Pictogram" );
 
 			bean.setId( record.pictogram_id );
+			
 			bean.setCode( getLookupService().get( "PictogramCode", record.code ).getId() );
 			bean.setName( getLookupService().get( "PictogramCode", record.code ).getName() );
+			
 			var images = getFileService().list( pictogramId = record.pictogram_id );
 
 			if ( Len( images ) ) {
 				bean.setImage( images[1] )
 			}
+
 			bean.setFontFamilyId( record.font_family_id )
 
 			return bean;
