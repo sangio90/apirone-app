@@ -74,8 +74,9 @@
             </div>
         </section>
     
-    </div>
-
     #view( "font-family/pictogram-dimensions-modal" )#
+
+</div>
+
 
 </cfoutput>
