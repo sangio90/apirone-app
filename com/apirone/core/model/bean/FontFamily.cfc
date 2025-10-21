@@ -8,10 +8,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		}
 	}
 
-	property name="code" type="String";
+	property name="fontFamilycode" type="String";
 	property name="pictograms" type="Pictogram[]";
-	// fontFamilySizes -> size
-	property name="sizes" type="FontFamilySize[]";
+	property name="fontFamily" type="FontFamilySize[]";
 
 	public FontFamily function init(){
 		return this;

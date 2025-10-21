@@ -32,8 +32,8 @@
                                         <input name="str" placeholder="Cerca" class="form-control me-2" type="text">
 
                                         <select class="form-control me-2" name="orderBy">
-                                            <option value="country.name-asc">Codice [A-Z]</option>
-                                            <option value="country.name-desc">Codice [Z-A]</option>
+                                            <option value="country.code-asc">Codice [A-Z]</option>
+                                            <option value="country.code-desc">Codice [Z-A]</option>
                                         </select>
 
                                         <div style="align-self: flex-end;">

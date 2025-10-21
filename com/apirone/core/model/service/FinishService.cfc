@@ -142,7 +142,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean = super.bean( "Finish" );
 
 			bean.setId( record.finish_id );
-			dump( record.finish_id );abort;
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
 

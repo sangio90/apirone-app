@@ -303,10 +303,6 @@
         "name": "amount",
         "type": "Numeric"
     },
-    "country.name": {
-        "name": "country",
-        "type": "Varchar"
-    },
     "country.code": {
         "name": "code",
         "type": "Varchar"

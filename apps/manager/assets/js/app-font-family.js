@@ -336,37 +336,20 @@ AP.fontFamily.pictogram = ( function() {
                             var fontFamilyId = viewModel.get( "detailForm.data.id" );
                             var fontFamilyName = viewModel.get( "detailForm.data.name" );
 
-                            // TODO: i callback non vanno usati così
-                            AP.util.fireCallback(
-                                NM.util.ajax( {
-                                    method: "GET",
-                                    url: `/manager/ajax/font-family/${viewModel.get( "detailForm.data.id" )}/pictograms`,
-                                    callback: {
-                                        done: function( xhr ) {
-                                            if ( xhr.status == "SUCCESS" ) {
-                                                // TODO: non basta richiamare edit()
-                                                /*
-                                                viewModel.set( "detailForm.data.pictogram", {
-                                                    id: "",
-                                                    name: "",
-                                                    image: null
-                                                } );
-                                                viewModel.set( "detailForm.data.fontFamilyPictograms", xhr.data );
-                                                var pictograms = AP.page.pictogramCodes;
-                                                const filtered = pictograms.filter( function( p ) {
-                                                    return !xhr.data.some( s => s.code === p.id );
-                                                } );
-                                                viewModel.set( "pictograms", filtered );
-                                                NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
-                                                */
+                            NM.util.ajax( {
+                                method: "GET",
+                                url: `/manager/ajax/font-family/${viewModel.get( "detailForm.data.id" )}/pictograms`,
+                                callback: {
+                                    done: function( xhr ) {
+                                        if ( xhr.status == "SUCCESS" ) {
 
-                                                pub.edit( fontFamilyId, fontFamilyName );
+                                            pub.edit( fontFamilyId, fontFamilyName );
 
-                                            }
-                                        },
+                                        }
                                     },
-                                } )
-                            );
+                                },
+                            } );
+
                         }
                     },
                 },
@@ -404,22 +387,6 @@ AP.fontFamily.pictogram = ( function() {
                                         callback: {
                                             done: function( xhr ) {
                                                 if ( xhr.status == "SUCCESS" ) {
-                                                    /*
-                                                    viewModel.set( "detailForm.data.pictogram", {
-                                                        id: "",
-                                                        name: "",
-                                                        image: null
-                                                    } );
-                                                    viewModel.set( "detailForm.data.fontFamilyPictograms", xhr.data );
-                                                    var pictograms = viewModel.get( "pictograms" );
-                                                    const filtered = pictograms.filter( function( p ) {
-                                                        return !xhr.data.some( s => s.code === p.id );
-                                                    } );
-                                                    viewModel.set( "pictograms", filtered );
-                                                    $( "#pictogramDescription" ).text( "" );
-                                                    $( "#pictogramFileUpload" ).val( "" );
-                                                    NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
-                                                    */
 
                                                     pub.edit( fontFamilyId, fontFamilyName );
 
@@ -570,8 +537,6 @@ AP.fontFamily.list = ( function() {
         },
 
         editPictograms: function( event ) {
-
-            console.log( "editPictograms" );
 
             pictogramApp.edit( event.data.id, event.data.name );
 

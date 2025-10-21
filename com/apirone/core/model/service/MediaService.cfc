@@ -31,7 +31,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var directory = "#variables.baseDir#/#arguments.category#/_ori/#dateDir#/";
 
-		DirectoryCreate( "#directory#", true, true );
+		DirectoryCreate( directory, true, true );
 
 		var result = "#directory#/#fileName#";
 

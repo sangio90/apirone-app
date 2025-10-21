@@ -34,7 +34,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
-		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby, "country" );
+		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby );
 
 		var records = getDao().find( argumentCollection = arguments );
 
