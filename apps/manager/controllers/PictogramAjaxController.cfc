@@ -53,34 +53,33 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var result = super.getResult();
-		var pictogram   = super.bean( "Pictogram" );
-		var fontFamily   = super.bean( "FontFamily" );
-		var text   = super.bean( "Text" );
-		var lang   = super.bean( "Lang" );
+		
+		var result    = super.getResult();
+		var pictogram = super.bean( "Pictogram" );
+		var entity    = super.bean( "Entity" );
 
-
-		var thisId    = "";
-		var messageId = "";
-		var texts     = [];
+		var util = new com.apirone.core.util.Udf();
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
+		var tmpDir = getTempDir();
+		
+		pictogram.setCode( json.pictogram.id );
+		pictogram.setFontFamilyId( json.id );
+
 		transaction {
-			pictogram.setCode( json.pictogram.id );
-			pictogram.setFontFamily( fontFamily.setId( json.id ) );
 
-			messageId = "pictogram.created";
-			thisId    = super.fire( "pictogram.create", { pictogram = pictogram } )
-			var entity = super.bean( "Entity" );
-			entity.setKey( "pictogram.id" );
-			entity.setValue( thisId );
+			var newId  = super.fire( "pictogram.create", { pictogram = pictogram } )
 
-			var tmpDir = getTempDir();
-			fileName   = "pictogram_" & json.pictogram.name & "_font_family_" & json.name & ".png";
-			filePath   = tmpDir & "/" & fileName;
-			binaryData = ToBinary( json.pictogram.image );
+			var fileName   = "pictogram_" & newId & "_font_family_" & util.prettyString( json.name ) & ".svg";
+			var filePath   = tmpDir & "/" & fileName;
+			
+			var base64String = Replace( json.pictogram.image, "data:image/svg+xml;base64,", "" );
+			var binaryData = ToBinary( base64String );
 
 			FileWrite( filePath, binaryData );
+
+			entity.setKey( "pictogram.id" );
+			entity.setValue( newId );
 
 			var fileId = super.fire(
 				"file.create",
@@ -93,9 +92,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			);
 		}
 
-		var message = completeMessage( messageId );
+		var message = completeMessage( "pictogram.created" );
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message }, { "payload" = { "id" = newId } } );
 
 		event.setValue( "result", result );
 	}

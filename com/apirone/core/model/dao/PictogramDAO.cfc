@@ -77,11 +77,7 @@
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.pictogram.getCode()#">,
-				<cfif !IsNull( arguments.pictogram.getFontFamily() )>
-					<cfqueryparam cfsqltype="Integer" value="#arguments.pictogram?.getFontFamily()?.getId()#">
-				<cfelse>
-					NULL
-				</cfif>
+				<cfqueryparam cfsqltype="Integer" value="#arguments.pictogram.getFontFamilyId()#">
 			) RETURNING pictogram_id
 		</cfquery>
 

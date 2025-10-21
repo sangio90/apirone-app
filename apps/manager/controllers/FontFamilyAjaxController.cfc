@@ -35,6 +35,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var fontFamily = super.bean( "FontFamily" );
 
 		var messageId = "";
+		var thisId = 0;
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 

@@ -102,7 +102,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			action      = "RENAME"
 		);
 
-		var fileInfo = fileInfo( "#destination#/#name#" );
+		var fileInfo = FileInfo( "#destination#/#name#" );
+
 		bean.setName( name );
 		bean.setDescription( "" );
 		bean.setDirectory( dayPath );

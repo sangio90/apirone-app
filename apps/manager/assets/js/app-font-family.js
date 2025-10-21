@@ -333,6 +333,9 @@ AP.fontFamily.pictogram = ( function() {
                                 "Pittogramma " + name + " cancellato con successo",
                             );
 
+                            var fontFamilyId = viewModel.get( "detailForm.data.id" );
+                            var fontFamilyName = viewModel.get( "detailForm.data.name" );
+
                             // TODO: i callback non vanno usati così
                             AP.util.fireCallback(
                                 NM.util.ajax( {
@@ -341,6 +344,8 @@ AP.fontFamily.pictogram = ( function() {
                                     callback: {
                                         done: function( xhr ) {
                                             if ( xhr.status == "SUCCESS" ) {
+                                                // TODO: non basta richiamare edit()
+                                                /*
                                                 viewModel.set( "detailForm.data.pictogram", {
                                                     id: "",
                                                     name: "",
@@ -353,6 +358,9 @@ AP.fontFamily.pictogram = ( function() {
                                                 } );
                                                 viewModel.set( "pictograms", filtered );
                                                 NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
+                                                */
+
+                                                pub.edit( fontFamilyId, fontFamilyName );
 
                                             }
                                         },
@@ -384,14 +392,19 @@ AP.fontFamily.pictogram = ( function() {
                                     "<span class='green'>Pittogramma salvato</span>",
                                 );
 
+                                var fontFamilyId = viewModel.get( "detailForm.data.id" );
+                                var fontFamilyName = viewModel.get( "detailForm.data.name" );
+
                                 // TODO: i callback non vanno usati così
                                 AP.util.fireCallback(
+
                                     NM.util.ajax( {
                                         method: "GET",
-                                        url: `/manager/ajax/font-family/${viewModel.get( "detailForm.data.id" )}/pictograms`,
+                                        url: `/manager/ajax/font-family/${fontFamilyId}/pictograms`,
                                         callback: {
                                             done: function( xhr ) {
                                                 if ( xhr.status == "SUCCESS" ) {
+                                                    /*
                                                     viewModel.set( "detailForm.data.pictogram", {
                                                         id: "",
                                                         name: "",
@@ -406,6 +419,9 @@ AP.fontFamily.pictogram = ( function() {
                                                     $( "#pictogramDescription" ).text( "" );
                                                     $( "#pictogramFileUpload" ).val( "" );
                                                     NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
+                                                    */
+
+                                                    pub.edit( fontFamilyId, fontFamilyName );
 
                                                 }
                                             },
@@ -450,13 +466,13 @@ AP.fontFamily.pictogram = ( function() {
             const file = e.target.files[0];
             if ( file ) {
                 const reader = new FileReader();
+                reader.readAsDataURL( file );
                 reader.onload = function( evt ) {
                     const base64 = evt.target.result;
                     viewModel.set( "detailForm.data.pictogram.image", base64 );
                     viewModel.checkCanSave();
                 };
 
-                reader.readAsDataURL( file );
             }
         } );
 
