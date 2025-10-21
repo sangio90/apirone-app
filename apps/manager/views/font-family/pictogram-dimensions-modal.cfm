@@ -9,7 +9,7 @@
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:titleDimensionModal"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
-                    </header>                
+                    </header>
                         
                     <div class="card-body">
 
@@ -50,7 +50,7 @@
                 </form>
 
             </div>
-        </selection>
+        </section>
     
     </div>
 

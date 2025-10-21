@@ -72,10 +72,10 @@
                 </form>
 
             </div>
-        </selection>
+        </section>
     
-	    #view( "font-family/pictogram-dimensions-modal" )#
-
     </div>
+
+    #view( "font-family/pictogram-dimensions-modal" )#
 
 </cfoutput>
