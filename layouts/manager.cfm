@@ -53,7 +53,11 @@
 
             </div>
 
-            <div class="header-right" style="margin-right:30px;">
+            <div class="header-right d-flex align-items-center" style="margin-right:30px;;">
+
+                <div id="search-widget-root" class="me-3">
+                    <input type="text" id="search-widget-suggest-input" class="search-widget-input" placeholder="Cerca un prodotto...">
+                </div>
 
                 <div id="userbox" class="userbox">
                     <a href="##" data-bs-toggle="dropdown">
@@ -169,6 +173,7 @@
         <script src="/assets/#prc.staticVersion#/manager/js/ondomready.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-util.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-widget.js"></script>
+        <script src="/assets/#prc.staticVersion#/manager/js/app-search.js"></script>
 
         #includeJsFiles()#
 
@@ -177,7 +182,10 @@
             <style>.header{ border-top: 3px solid Red !important }</style>
         </cfif>
 
+        #template( view="/jstemplate/search/search-widget-suggest-row-tmpl", cache=true )#
+
         <iframe src="/manager/live" style="display:none;"></iframe> 
+        
 
     </body>
 </html>

@@ -1114,3 +1114,19 @@ h2 {
 /*
     // price simulate log list 
 */
+
+/*
+    search widget 
+*/
+.search-widget-input {
+    width: 400px;
+}
+
+.search-widget-suggest-row,
+.search-widget-suggest-row * {
+    font-size: 11px
+}
+
+/*
+    search widget 
+*/

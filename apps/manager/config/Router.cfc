@@ -12,6 +12,8 @@
 				Live #now()#";
 		} );
 
+		get( "/ajax/search" ).to( "SearchAjaxController.list" ).end();
+
 		/*
 			dashboard
 		*/
