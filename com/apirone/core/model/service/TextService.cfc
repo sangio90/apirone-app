@@ -195,6 +195,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return entity;
 		}
 
+		if ( Len( record.country_id ) ) {
+			entity.setKey( "country.id" );
+			entity.setValue( record.country_id );
+
+			return entity;
+		}
+
 		getLogger().error( "No entity linked to this translation. Text Id: [#record.text_id#]" );
 
 		/*
