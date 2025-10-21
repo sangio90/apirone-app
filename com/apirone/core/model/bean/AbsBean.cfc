@@ -27,6 +27,13 @@ component accessors="true" {
 		}
 	}
 
+	private any function getImageBeanHelper(){
+		if ( NOT StructKeyExists( variables, "imageBeanHelper" ) ) {
+			variables.imageBeanHelper = new com.apirone.core.util.imageImageBeanHelper();
+		}
+		return variables.imageBeanHelper;
+	}
+
 	public Struct function getMetadataObject(
 		required Struct metadata,
 		required String name,

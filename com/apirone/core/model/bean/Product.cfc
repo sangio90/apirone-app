@@ -82,9 +82,15 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 		}
 	}
 
-	public any function onMissingMethod( required string missingMethodName, required array missingMethodArguments ) {
-		if ( reFindNoCase( "^get([A-Za-z]+)Image$", missingMethodName ) ) {
-			var typeId = lcase( reReplace( missingMethodName, "^get([A-Za-z]+)Image$", "\1" ) );
+	public any function onMissingMethod( required string missingMethodName, required array missingMethodArguments ){
+		if ( ReFindNoCase( "^get([A-Za-z]+)Image$", missingMethodName ) ) {
+			var typeId = LCase(
+				ReReplace(
+					missingMethodName,
+					"^get([A-Za-z]+)Image$",
+					"\1"
+				)
+			);
 			return getImage( typeId );
 		}
 
@@ -100,4 +106,5 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 			}
 		}
 	}
+
 }
