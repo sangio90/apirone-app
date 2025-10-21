@@ -85,6 +85,12 @@
 		roles: "ADM",
 		items: [
 			{
+				href: "/manager/countries",
+				icon: "fas fa-globe-europe",
+				title: "Nazioni",
+				roles: "ADM"
+			},
+			{
 				href: "/manager/product-categories",
 				icon: "fas fa-stream",
 				title: "Categorie prodotti",

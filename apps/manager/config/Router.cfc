@@ -134,6 +134,15 @@
 		*/
 		get( "/ajax/raw-products" ).to( "RawProductAjaxController.list" ).end();
 
+		/*
+			countries
+		*/
+		get( "/countries" ).to( "CountryController.list" ).end();
+		get( "/ajax/countries/code-exists" ).to( "CountryAjaxController.codeExists" ).end();
+		post( "/ajax/countries" ).to( "CountryAjaxController.save" ).end();
+		delete( "/ajax/countries" ).to( "CountryAjaxController.delete" ).end();
+		get( "/ajax/countries" ).to( "CountryAjaxController.list" ).end();
+
 
 		/*
 			production times

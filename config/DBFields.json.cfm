@@ -303,5 +303,16 @@
         "name": "amount",
         "type": "Numeric"
     },
-
+    "country.name": {
+        "name": "country",
+        "type": "Varchar"
+    },
+    "country.code": {
+        "name": "code",
+        "type": "Varchar"
+    },
+    "country.id": {
+        "name": "country_id",
+        "type": "uuid"
+    },
 }
