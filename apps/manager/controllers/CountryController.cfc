@@ -4,15 +4,18 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var user = prc.user;
 
-        // geo
-        prc.countries = getAccessManager().exec( user, "geo.listCountries" ).getData();
+        // // geo
+        // prc.countries = getAccessManager().exec( user, "geo.listCountries" ).getData();
 
-        // lookup
-        prc.liquidTypes = getAccessManager().exec( user, "lookup.list", { entity = "liquidType" } );
-        prc.bottleCapacities = getAccessManager().exec( user, "lookup.list", { entity = "capacity" } );
+        // // lookup
+        // prc.liquidTypes = getAccessManager().exec( user, "lookup.list", { entity = "liquidType" } );
+        // prc.bottleCapacities = getAccessManager().exec( user, "lookup.list", { entity = "capacity" } );
         
-        //prc.foodOptions = getAccessManager().exec( user, "option.list", { areaId = 'F' } );
-        prc.wineOptions = getAccessManager().exec( user, "option.list", { areaId = 'W' } ).getData();
+        // //prc.foodOptions = getAccessManager().exec( user, "option.list", { areaId = 'F' } );
+        // prc.wineOptions = getAccessManager().exec( user, "option.list", { areaId = 'W' } ).getData();
+
+
+		prc.jsScripts.add( "app-country" );
 
         prc.title = "Nazioni";
 
