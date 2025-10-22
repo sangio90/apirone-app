@@ -53,10 +53,11 @@
 
             </div>
 
-            <div class="header-right d-flex align-items-center" style="margin-right:30px;;">
+            <div class="header-right d-flex align-items-center me-3">
 
-                <div id="search-widget-root" class="me-3">
-                    <input type="text" id="search-widget-suggest-input" class="search-widget-input" placeholder="Cerca un prodotto...">
+                <div id="search-widget-root" class="me-3 d-flex align-items-center d-none">
+                    <div id="search-widget-suggest-status" class="me-2"></div>
+                    <input type="text" id="search-widget-suggest-input" class="search-widget-input" placeholder="Cerca un prodotto... (Ctrl + K)">
                 </div>
 
                 <div id="userbox" class="userbox">

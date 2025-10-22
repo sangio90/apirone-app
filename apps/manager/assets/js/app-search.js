@@ -3,6 +3,7 @@ AP.namespace( "search" );
 Object.assign( AP.search.fields, {
     widgetRoot: $( "#search-widget-root" ),
     widgetInput: $( "#search-widget-suggest-input" ),
+    widgetStatus: $( "#search-widget-suggest-status" ),
 } );
 
 $( document ).ready( function(){
@@ -29,13 +30,15 @@ AP.search.widget = ( function() {
             return;
         }
 
-        suggest.keypress( function( event ){
+        suggest.keypress( function( event ) {
             if( event.keyCode == 13 ){
                 return false;
             }
         } );
 
         suggest.kendoAutoComplete( {
+            template: $.proxy( kendo.template( suggestTemplate ) ),
+            // template: $.proxy( kendo.template( "#= formatValue(data, this.val()) #" ), suggest ),
             dataTextField: "term",
             highlightFirst: true,
             minLength: 4,
@@ -65,10 +68,10 @@ AP.search.widget = ( function() {
             select: function( event ) {
                 var dataItem = this.dataItem( event.item.index() );
 
-                window.location.href = "/manager/products/" + dataItem.productId + "/detail";
+                fields.widgetStatus.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
+                window.location.href = "/manager/products/" + dataItem.productId + "/detail";
             },
-            template: kendo.template( suggestTemplate ),
             noDataTemplate: "<div>NESSUN RECORD</div>"
         } );
 
@@ -76,9 +79,17 @@ AP.search.widget = ( function() {
 
     pub.init = function() {
 
-        console.log( "search:init" );
+        fields.widgetRoot.removeClass( "d-none" );
 
         initSuggest();
+
+        document.onkeydown  = function() {
+            var e = e || window.event; // for IE to cover IEs window event-object
+            if( e.ctrlKey && e.which == 75 ) {
+                fields.widgetInput.focus();
+                return false;
+            }
+        };
 
     };
 

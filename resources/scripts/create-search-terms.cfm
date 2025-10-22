@@ -1,5 +1,5 @@
-﻿Remove cfabort.
-<cfabort>
+﻿
+<cfsetting requestTimeOut="99999999999999">
 
 <cfset containter = server["wirebox-apirone"]>
 <cfset svc = containter.getInstance("ProductService")>
