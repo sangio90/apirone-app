@@ -183,7 +183,7 @@
             <style>.header{ border-top: 3px solid Red !important }</style>
         </cfif>
 
-        #template( view="/jstemplate/search/search-widget-suggest-row-tmpl", cache=true )#
+        #template( view="jstemplate/search/search-widget-suggest-row-tmpl", cache=true )#
 
         <iframe src="/manager/live" style="display:none;"></iframe> 
         
