@@ -57,6 +57,7 @@ AP.signConfig.detail = ( function() {
         id: "",
         height: "",
         heightInPx: "",
+        size: { "id": null, "name": "-- Seleziona Font Size" },
         charCount: "",
         rowCount: ""
     };
@@ -141,6 +142,11 @@ AP.signConfig.detail = ( function() {
                 items.remove( sizeRow );
             }
             return false;
+        },
+
+        getFamilySizes: function(event) {
+            var selectedFont = viewModel.get("selectedFonts").getByUid( event.parent().parent().uid );
+            return selectedFont?.font?.fontFamily?.sizes || [];
         },
 
         save: function( event ) {

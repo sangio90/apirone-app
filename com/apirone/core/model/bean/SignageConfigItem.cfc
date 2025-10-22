@@ -6,6 +6,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			"signageConfigId",
 			"height",
 			"heightInPixel",
+			"size",
 			"rowCount",
 			"charCount"
 		]
@@ -16,6 +17,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="rowCount" type="Numeric";
 	property name="charCount" type="Numeric";
 	property name="signageConfigId" type="Numeric";
+	property name="size" type="FontFamilySize";
 
 	public SignageConfigItem function init(){
 		return this;

@@ -57,6 +57,9 @@ component extends="com.apirone.core.controller.AbsController" {
 				bean.setId( item.id );
 				bean.setHeight( item.height );
 				bean.setHeightInPixel( item.heightInPixel );
+				if (!IsNull(item.size?.id)) {
+					bean.setSize( super.fire( "FontFamilySize.get", [ item.size.id ] ) );
+				}
 				bean.setCharCount( item.charCount );
 				bean.setRowCount( item.rowCount );
 

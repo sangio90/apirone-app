@@ -1,9 +1,9 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "code", "name" ],
+		defaultIncludes = [ "id", "code", "name", "sizes" ],
 		profiles        = {
-			list   = { defaultIncludes = [ "id", "code", "name" ] },
+			list   = { defaultIncludes = [ "id", "code", "name", "sizes" ] },
 			detail = { defaultIncludes = [ "id", "code", "name", "sizes" ] }
 		}
 	}

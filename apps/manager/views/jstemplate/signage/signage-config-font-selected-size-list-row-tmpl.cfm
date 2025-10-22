@@ -7,12 +7,13 @@
                 <span data-bind="text: id"></span>
             </td>
             <td class="align-end align-top" width="25%">
-                <input type="text" class="form-control width-70" name="height_##:uid##"
-                    data-bind="value: height" 
-                    data-rule-required="true"
-                    data-rule-number="true"
-                    data-msg="Altezza in mm richiesta e non valida"
+                <select 
+                    class="form-control"
+                    data-text-field="name"
+                    data-value-field="id"
+                    data-bind="source: getFamilySizes, value: size"
                 >
+                </select>
             </td>
             <td class="align-end align-top" width="25%">
                 <input type="text" class="form-control width-70" name="heightInPx_##:uid##"

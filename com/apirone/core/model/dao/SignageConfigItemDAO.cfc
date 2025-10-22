@@ -56,14 +56,20 @@
 				height,
 				height_in_pixel,
 				row_count,
-				char_count
+				char_count,
+				font_family_size_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSignageConfigId()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.signageConfigItem.getHeight()#" scale="2">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getHeightInPixel()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getRowCount()#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getCharCount()#">
+				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getCharCount()#">,
+				<cfif !IsNull( arguments.signageConfigItem.getSize() )>
+					<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSize().getId()#">
+				<cfelse>
+					NULL
+				</cfif>
 			) RETURNING signage_config_item_id
 		</cfquery>
 
