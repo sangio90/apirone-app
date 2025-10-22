@@ -14,6 +14,9 @@
 
 		get( "/ajax/search" ).to( "SearchAjaxController.list" ).end();
 
+		get( "/batch/update-terms" ).to( "BatchController.updateSearchTerms" ).end();
+
+
 		/*
 			dashboard
 		*/

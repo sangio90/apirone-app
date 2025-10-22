@@ -5,8 +5,8 @@
 	}
 
 	// Restituisce la prima image il cui getType().getId() == typeId
-	public any function findImageByType( required array images, required string typeId ){
-		if ( ArrayLen( images ) ) {
+	public any function findImageByType( required Array images, required String typeId ){
+		if ( !IsNull( images ) AND ArrayLen( images ) ) {
 			for ( var image in images ) {
 				if ( IsDefined( "image.getType" ) AND image.getType().getId() EQ typeId ) {
 					return image;
@@ -17,7 +17,7 @@
 	}
 
 	// Restituisce tutte le immagini con quel typeId
-	public array function getImagesByType( required array images, required string typeId ){
+	public Array function getImagesByType( required Array images, required string typeId ){
 		var output = [];
 		if ( ArrayLen( images ) ) {
 			for ( var image in images ) {
@@ -30,7 +30,7 @@
 	}
 
 	// Risolve metodi dinamici tipo getHorizontalImage -> findImageByType(...)
-	public any function resolveGetImageMethod( required string missingMethodName, required array images ){
+	public any function resolveGetImageMethod( required string missingMethodName, required Array images ){
 		if ( ReFindNoCase( "^get([A-Za-z]+)Image$", missingMethodName ) ) {
 			var typeId = LCase(
 				ReReplace(
@@ -44,13 +44,13 @@
 		return NullValue();
 	}
 
-	// Aggiunge un'immagine all'array (modifica in place)
-	public void function addImage( required any image, required array images ){
+	// Aggiunge un'immagine all'Array (modifica in place)
+	public void function addImage( required any image, required Array images ){
 		ArrayAppend( images, image );
 	}
 
 	// Rimuove immagini per typeId e ritorna il numero rimosso
-	public numeric function removeImagesByType( required array images, required string typeId ){
+	public numeric function removeImagesByType( required Array images, required string typeId ){
 		var removed = 0;
 		for ( var image in images ) {
 			if ( IsDefined( "image.getType" ) AND image.getType().getId() EQ typeId ) {
