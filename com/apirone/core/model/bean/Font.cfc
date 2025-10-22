@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "name", "family" ],
+		defaultIncludes = [ "id", "name", "fontFamily" ],
 		profiles        = {
 			list = {
 				defaultIncludes = [
@@ -10,7 +10,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 					"code",
 					"createdAt",
 					"directory",
-					"family",
+					"fontFamily",
 					"nameItem",
 					"heightWidthRatio"
 				]
@@ -19,7 +19,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	}
 
 	property name="code" type="String";
-	property name="family" type="String";
+	property name="fontFamily" type="FontFamily";
 	property name="directory" type="String";
 	property name="heightWidthRatio" type="Numeric";
 

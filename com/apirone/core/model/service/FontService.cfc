@@ -2,6 +2,7 @@
 
 	property name="dao" inject="FontDAO";
 	property name="fontService" inject="FontService";
+	property name="fontFamilyService" inject="FontFamilyService";
 	property name="textService" inject="TextService";
 
 	property name="cacheScope" type="String" default="Font.bean";
@@ -168,7 +169,9 @@
 			bean.setCode( record.code );
 			bean.setDirectory( record.directory );
 			bean.setHeightWidthRatio( record.height_width_ratio );
-			bean.setFamily( record.family );
+			bean.setFontFamily( 
+				!IsNull( record.font_family_id ) ? getFontFamilyService().get( record.font_family_id ) : super.bean( "FontFamily" )
+			)
 
 			bean.setTexts( getTextService().list( fontId = record.font_id ) );
 			bean.setCreatedAt( record.created_at );

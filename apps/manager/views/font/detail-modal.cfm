@@ -38,16 +38,13 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Font-family</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" 
-                                    name="family"
-                                    maxlength="100"
-                                    data-bind="value: detailForm.data.family"
+                                <select id="fontFamily" 
+                                    class="form-control col-sm-4"
+                                    data-bind="source: fontFamilies, value: detailForm.data.fontFamily"
+                                    data-value-field="id"
+                                    data-text-field="name"
                                     >
-                            </div>
-                            <label class="col-sm-2 col-form-label"></label>
-                            <div class="field-note col-sm-10">
-                                Es. "Source Sans Pro", Arial, sans-serif<br>
-                                "Times New Roman", Georgia, serif
+                                </select>
                             </div>
                         </div>
 

@@ -47,7 +47,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		font.setCode( json.code );
 		font.setHeightWidthRatio( json.heightWidthRatio );
 		font.setDirectory( "#LCase( json.code )#" );
-		font.setFamily( json.family );
+		if (!isNull(json.fontFamily) && json.fontFamily.id != '' ) {
+			font.setFontFamily( super.fire( "fontFamily.get", [ json.fontFamily.id ] ) );
+		}
 
 		var text = super.buildTextBean( json.nameItem, "NAME" );
 

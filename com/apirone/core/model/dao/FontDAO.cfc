@@ -4,6 +4,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
+				font_family_id,
 				*
 			FROM
 				fonts
@@ -31,6 +32,7 @@
 
 	<cffunction returntype="Query" name="find">
 		<cfargument name="str" type="String">
+		<cfargument name="fontFamilyId" type="Numeric">
 
 		<cfargument name="orderby" required="true" type="String" default="font_id desc">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -45,7 +47,9 @@
 			WHERE 1=1
 				<cfif !IsNull( arguments.str )>
 					AND code ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
-					OR family ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+				</cfif>
+				<cfif !IsNull( arguments.fontFamilyId )>
+					AND font_family_id = <cfqueryparam value="%#arguments.fontFamilyId#%" cfsqltype="Numeric">
 				</cfif>
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
@@ -69,13 +73,18 @@
 				code,
 				directory,
 				height_width_ratio,
-				family
+				font_family_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getDirectory()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.font.getHeightWidthRatio()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getFamily()#">
+				<cfif !IsNull( arguments.font.getFontFamily() )>
+					<cfqueryparam cfsqltype="Numeric" value="#arguments.font.getFontFamily().getId()#">
+				<cfelse>
+					NULL
+				</cfif>
 			) RETURNING font_id
 		</cfquery>
 
@@ -91,8 +100,11 @@
 			SET
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getCode()#">,
 				directory = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getDirectory()#">,
-				height_width_ratio = <cfqueryparam cfsqltype="Numeric" value="#arguments.font.getHeightWidthRatio()#">,
-				family = <cfqueryparam cfsqltype="Varchar" value="#arguments.font.getFamily()#">
+				height_width_ratio = <cfqueryparam cfsqltype="Numeric" value="#arguments.font.getHeightWidthRatio()#">
+				<cfif !IsNull( arguments.font.getFontFamily() )>
+					,
+					font_family_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.font.getFontFamily().getId()#">
+				</cfif>
 			WHERE
 				font_id = <cfqueryparam cfsqltype="Integer" value="#arguments.font.getId()#">
 		</cfquery>

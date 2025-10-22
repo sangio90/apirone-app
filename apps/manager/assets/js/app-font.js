@@ -31,7 +31,8 @@ AP.font.detail = ( function() {
                 lang: {
                     id: "IT",
                 },
-            }
+            },
+            fontFamily: { id: "" }
         },
 
 
@@ -40,6 +41,7 @@ AP.font.detail = ( function() {
 
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
+        fontFamilies: new kendo.data.DataSource(),
 
         callback: {
             onCreate: undefined,
@@ -121,7 +123,6 @@ AP.font.detail = ( function() {
             callback: {
                 done: function( xhr ) {
                     if ( xhr.status == "SUCCESS" ) {
-
                         viewModel.set( "detailForm.data", xhr.data );
                         viewModel.set( "detailForm.title", "Modifica font < " + xhr.data.name + " >" );
 
@@ -136,7 +137,8 @@ AP.font.detail = ( function() {
         kendo.bind( AP.font.fields.detailRoot, viewModel );
 
         var detailForm = AP.font.fields.detailForm;
-
+        viewModel.get( 'fontFamilies' ).data( AP.page.fontFamilies )
+        
         detailForm.validate( {
             onfocusout: function( element ) {
                 $( element ).valid();
