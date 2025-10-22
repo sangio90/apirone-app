@@ -29,7 +29,7 @@ component accessors="true" {
 
 	private any function getImageBeanHelper(){
 		if ( NOT StructKeyExists( variables, "imageBeanHelper" ) ) {
-			variables.imageBeanHelper = new com.apirone.core.util.imageImageBeanHelper();
+			variables.imageBeanHelper = new com.apirone.core.util.ImageBeanHelper();
 		}
 		return variables.imageBeanHelper;
 	}
