@@ -14,7 +14,7 @@
             </td>
             <td>
                 <div data-bind="visible: image.uri">
-                    <img data-bind="attr: { src: image.uri }" style="max-width: 50%; max-height: 50%; object-fit: contain;">
+                    <img data-bind="attr: { src: image.uri }" style="max-width: 20%; max-height: 20%; object-fit: contain;">
                 </div>
             </td>
             <td class="text-center width-30">

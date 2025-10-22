@@ -83,9 +83,14 @@ AP.search.widget = ( function() {
 
         initSuggest();
 
-        document.onkeydown  = function() {
-            var e = e || window.event; // for IE to cover IEs window event-object
-            if( e.ctrlKey && e.which == 75 ) {
+        document.onkeydown = function( event ) {
+            // prefer ev.key (carattere) e ev.code (tasto fisico). fallback a keyCode se serve ancora supporto legacy
+            var key = event.key || event.code || event.keyCode;
+            var isK = ( key === "k" || key === "K" || key === "KeyK" || key === 75 );
+
+            if ( event.ctrlKey && isK ) {
+                event.preventDefault();
+                event.stopPropagation();
                 fields.widgetInput.focus();
                 return false;
             }

@@ -5,7 +5,8 @@ AP.fontFamily.fields = {
     searchListForm: $( "#font-family-grid-search-form" ),
     detailRoot: $( "#font-family-detail-modal" ),
     detailForm: $( "#font-family-detail-form" ),
-    pictogramRoot: $( "#pictogram-modal" ),
+    pictogramRoot: $( "#pictogram-root" ),
+    pictogramModal: $( "#pictogram-modal" ),
     pictogramForm: $( "#pictogram-form" ),
     pictogramDimensionsRoot: $( "#pictogram-dimensions-root" )
 };
@@ -277,11 +278,10 @@ AP.fontFamily.pictogram = ( function() {
                 },
             } );
 
-
             NM.util.openModal( fields.pictogramDimensionsRoot );
         },
 
-        saveDimensions: function( event ) {
+        saveDimensions: function() {
 
             NM.util.ajax( {
                 method: "POST",
@@ -298,21 +298,20 @@ AP.fontFamily.pictogram = ( function() {
 
         resetForm: function() {
             var detailForm = fields.pictogramForm;
-            // var validator = detailForm.validate();
 
             NM.form.clearMessages( detailForm );
-
-            // validator.resetForm();
 
             $( "#pictogramFileUpload" ).val( "" );
 
             viewModel.set( "detailForm", defaultDetailForm );
         },
 
+        /*
         setDescription: function( event ) {
             $( "#pictogramDescription" ).text( viewModel.get( "detailForm.data.pictogram.name" ) );
             viewModel.checkCanSave();
         },
+        */
 
         checkCanSave: function( event ) {
             return viewModel.get( "detailForm.data.pictogram.id" ) == "" || viewModel.get( "detailForm.data.pictogram.image" ) == null;
@@ -321,39 +320,49 @@ AP.fontFamily.pictogram = ( function() {
         remove: function( event ) {
             const name = event.data.name;
             const id = event.data.id;
-            NM.util.ajax( {
-                method: "DELETE",
-                url: "/manager/ajax/pictograms",
-                data: { "pictogramId": id },
-                callback: {
-                    done: function( xhr ) {
-                        if ( xhr.status == "SUCCESS" ) {
-                            AP.widget.notify(
-                                "success",
-                                "Pittogramma " + name + " cancellato con successo",
-                            );
 
-                            var fontFamilyId = viewModel.get( "detailForm.data.id" );
-                            var fontFamilyName = viewModel.get( "detailForm.data.name" );
+            if ( id && id != "" ) {
+                bootbox.confirm( {
+                    title: "Conferma cancellazione",
+                    message: "Sei sicuro di voler cancellare il pittogramma " + name + "?",
+                    buttons: {
+                        confirm: {
+                            label: "Si, confermo",
+                            className: "btn-primary",
+                        },
+                        cancel: {
+                            label: "No, chiudi",
+                            className: "btn-danger",
+                        },
+                    },
+                    callback: function( result ) {
+
+                        if ( result ) { // true
 
                             NM.util.ajax( {
-                                method: "GET",
-                                url: `/manager/ajax/font-family/${viewModel.get( "detailForm.data.id" )}/pictograms`,
+                                method: "DELETE",
+                                url: "/manager/ajax/pictograms",
+                                data: { "pictogramId": id },
                                 callback: {
                                     done: function( xhr ) {
-                                        if ( xhr.status == "SUCCESS" ) {
 
-                                            pub.edit( fontFamilyId, fontFamilyName );
+                                        AP.widget.notify( "success", "Pittogramma " + name + " cancellato con successo" );
 
-                                        }
-                                    },
-                                },
+                                        var fontFamilyId = viewModel.get( "detailForm.data.id" );
+                                        var fontFamilyName = viewModel.get( "detailForm.data.name" );
+
+                                        pub.edit( fontFamilyId, fontFamilyName );
+
+
+                                    }
+                                }
                             } );
 
                         }
                     },
-                },
-            } );
+                } );
+            }
+
         },
 
         save: function( event ) {
@@ -378,23 +387,17 @@ AP.fontFamily.pictogram = ( function() {
                                 var fontFamilyId = viewModel.get( "detailForm.data.id" );
                                 var fontFamilyName = viewModel.get( "detailForm.data.name" );
 
-                                // TODO: i callback non vanno usati così
-                                AP.util.fireCallback(
-
-                                    NM.util.ajax( {
-                                        method: "GET",
-                                        url: `/manager/ajax/font-family/${fontFamilyId}/pictograms`,
-                                        callback: {
-                                            done: function( xhr ) {
-                                                if ( xhr.status == "SUCCESS" ) {
-
-                                                    pub.edit( fontFamilyId, fontFamilyName );
-
-                                                }
-                                            },
+                                NM.util.ajax( {
+                                    method: "GET",
+                                    url: `/manager/ajax/font-family/${fontFamilyId}/pictograms`,
+                                    callback: {
+                                        done: function( xhr ) {
+                                            if ( xhr.status == "SUCCESS" ) {
+                                                pub.edit( fontFamilyId, fontFamilyName );
+                                            }
                                         },
-                                    } )
-                                );
+                                    },
+                                } );
                             }
                         },
                     },
@@ -416,13 +419,17 @@ AP.fontFamily.pictogram = ( function() {
                     if ( xhr.status == "SUCCESS" ) {
 
                         viewModel.get( "detailForm.data.fontFamilyPictograms" ).data( xhr.data );
-                        viewModel.set( "detailForm.title", "Pittogrammi Font Family < " + name + " >" );
+                        viewModel.set( "detailForm.title", "Pittogrammi per < " + name + " >" );
+
                         var pictograms = viewModel.get( "pictograms" );
+
                         const filtered = pictograms.filter( function( p ) {
                             return !xhr.data.some( s => s.code === p.id );
                         } );
+
                         viewModel.set( "pictograms", filtered );
-                        NM.util.openModal( AP.fontFamily.fields.pictogramRoot );
+
+                        NM.util.openModal( fields.pictogramModal );
 
                     }
                 },
@@ -430,14 +437,16 @@ AP.fontFamily.pictogram = ( function() {
         } );
 
         $( "#pictogramFileUpload" ).on( "change", function( e ) {
+
             const file = e.target.files[0];
+
             if ( file ) {
                 const reader = new FileReader();
                 reader.readAsDataURL( file );
                 reader.onload = function( evt ) {
                     const base64 = evt.target.result;
                     viewModel.set( "detailForm.data.pictogram.image", base64 );
-                    viewModel.checkCanSave();
+                    // viewModel.checkCanSave();
                 };
 
             }
@@ -448,41 +457,33 @@ AP.fontFamily.pictogram = ( function() {
     };
 
     pub.init = function() {
-        kendo.bind( AP.fontFamily.fields.pictogramRoot, viewModel );
-        AP.page.pictogramCodes.unshift( { "id": "", "name": "-- Seleziona un pittogramma" } );
+        kendo.bind( fields.pictogramRoot, viewModel );
+
+        AP.page.pictogramCodes.unshift( { "id": "", "name": "--" } );
         viewModel.set( "pictograms", AP.page.pictogramCodes );
 
-        var detailForm = AP.fontFamily.fields.pictogramForm;
+        var pictogramForm = fields.pictogramForm;
 
-        detailForm.validate( {
+        pictogramForm.validate( {
             onfocusout: function( element ) {
                 $( element ).valid();
             },
             rules: {
-                code: {
+                pictogramFileUpload: {
                     required: true,
-                    checkCode: true,
-                    rangelength: [ 5, 5 ],
-                    remote: {
-                        url: "/manager/ajax/font-families/code-exists",
-                        data: {
-                            id: function() {
-                                return viewModel.get( "detailForm.data.id" );
-                            }
-                        },
-                        dataFilter: function( xhr ) {
-                            var json = JSON.parse( xhr );
-                            return json.data == false;
-                        },
-                    },
+                    extension: "svg"
+                },
+                pictogramCode: {
+                    required: true,
                 },
             },
             messages: {
-                code: {
-                    required: "Codice richiesto",
-                    rangelength: "Sono richiesti 5 caratteri",
-                    checkCode: "Solo numeri, lettere, trattino o trattino basso",
-                    remote: "Il codice esiste",
+                pictogramFileUpload: {
+                    required: "File richiesto",
+                    extension: "Solo nel formato SVG",
+                },
+                pictogramCode: {
+                    required: "Seleziona un pittogramma",
                 },
             },
         } );
