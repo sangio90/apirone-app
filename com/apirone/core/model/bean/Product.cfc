@@ -82,12 +82,12 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 		}
 	}
 
-	public any function onMissingMethod( required string missingMethodName, required array missingMethodArguments ){
+	public any function onMissingMethod( required string missingMethodName ){
 		return super.getImageBeanHelper( ).resolveGetImageMethod( missingMethodName, getImages() );
 	}
 
 	public Struct function getImage( String typeId = "horizontal" ){
-		return super.getImageBeanHelper( ).getImagesByType( getImages() );
+		return super.getImageBeanHelper( ).findImageByType( getImages(), typeId );
 	}
 
 }
