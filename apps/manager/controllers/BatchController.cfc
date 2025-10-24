@@ -1,10 +1,16 @@
 ﻿component extends="com.apirone.core.controller.AbsController" {
 
 	function updateSearchTerms( event, rc, prc ){
-		requestTimeOut = 99999999999999;
+		setting requesttimeout=99999999999999;
 
-		var containter = server[ "wirebox-apirone" ];
-		var svc        = containter.getInstance( "ProductService" );
+		getLogger().info( file = "schedule", message = "Start maintenance for of updateSearchTerms()" );
+
+		var start = GetTickCount();
+
+		var svc = super.service( "Product" );
+
+		var updatedRecords  = 0;
+		var insertedRecords = 0;
 
 		var q = QueryExecute(
 			"
@@ -53,7 +59,8 @@
 
 			// CREATE
 			if ( IsNull( existingElement ) ) {
-				WriteDump( "Create " & existingElement.search_term );
+				insertedRecords++;
+
 				QueryExecute(
 					"
 					INSERT INTO utils.search_terms (
@@ -73,7 +80,8 @@
 				// UPDATE
 			}
 			elseif( Trim( existingElement.search_term ) != Trim( term ) ){
-				WriteDump( "Update " & existingElement.search_term );
+				updatedRecords++;
+
 				QueryExecute(
 					"
 					UPDATE utils.search_terms
@@ -85,6 +93,15 @@
 				);
 			}
 		}
+
+		var end = GetTickCount();
+
+		getLogger().info(
+			file    = "schedule",
+			message = "End maintenance for of updateSearchTerms(). Inserted records: #insertedRecords#, updated record: #updatedRecords#. Time spended: #end - start#ms."
+		);
+
+		return {};
 	}
 
 }
