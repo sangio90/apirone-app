@@ -4,7 +4,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 		defaultIncludes = [ "id", "name" ],
 	}
 
-	property name="permissions" type="Permission[]";
+	property name="entity" type="Entity";
 
     public Role function init(){
 
