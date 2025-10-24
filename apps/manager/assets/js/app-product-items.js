@@ -147,12 +147,9 @@ AP.product.items = ( function() {
                 var ids = values.toString();
             }
 
-            console.log( "ids", ids );
-
-            // TODO: move to POST
             NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax/products/" + AP.page.productId + "/price/calculate",
+                url: "/manager/ajax/products/" + AP.page.productId + "/price/simulate",
                 data: { itemIds: ids }, // the selected items
                 callback: {
                     done: function( xhr ) {

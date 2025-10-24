@@ -16,7 +16,6 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	}
 
 	public String function getProductId(){
-		//TODO: move to "product.id" in memento. But now not works 😪
 		return this.getProduct()?.getId() ?: "";
 	}
 

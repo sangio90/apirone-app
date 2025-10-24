@@ -1,8 +1,8 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function calculate( event, rc, prc ){ 
+	function simulate( event, rc, prc ){ 
 
-		var result = super.service("PriceCalculator").calculate( rc.id, ListToArray( rc.itemIds ) );
+		var result = super.service("PriceCalculator").simulate( rc.id, ListToArray( rc.itemIds ) );
 		
 		var description = prepareDescription( result.logFile );
 
@@ -204,14 +204,25 @@ component extends="com.apirone.core.controller.AbsController" {
 		// Toglie le prime due parli della riga: data e nome del prodotto
 
 		var result = "<table class='price-log-table'>";
+		var count = 1;
 
 		loop file=logFile item="line" {
 
-
 			var parts = ListToArray(line, ";");
-			var newLine = ArrayToList( ArraySlice( parts, 3 ), ";" );
 
-			result = result & "<tr><td>" & newLine & "</td></tr>";
+			var td1 = parts.indexExists(3) ? parts[3] : "";
+			var td2 = parts.indexExists(4) ? parts[4] : "";
+
+			//var newLine = ArrayToList( ArraySlice( parts, 3 ), ";" );
+
+			result = result 
+				& "<tr>
+					<td width='25' class='text-end'>#count#</td>
+					<td>#td1#</td>
+					<td width='200' class='text-end'><b>#td2#</b></td>
+				</tr>";
+
+			count++;
 
 		}
 

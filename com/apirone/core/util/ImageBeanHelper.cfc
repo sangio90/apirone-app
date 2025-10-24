@@ -36,7 +36,7 @@
 			var typeId = LCase(
 				ReReplace(
 					missingMethodName,
-					"^get([A-Za-z]+)Image$", 
+					"^get([A-Za-z]+)Image$",
 					"\1"
 				)
 			);
