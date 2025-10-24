@@ -3,50 +3,59 @@
 	function updateSearchTerms( event, rc, prc ){
 		requestTimeOut = 99999999999999;
 
-		containter = server["wirebox-apirone"];
-		svc = containter.getInstance("ProductService");
+		var containter = server[ "wirebox-apirone" ];
+		var svc        = containter.getInstance( "ProductService" );
 
-		q = queryExecute("
+		var q = QueryExecute(
+			"
 			SELECT 
 				products.product_id
 			FROM products
 			ORDER BY products.created_at DESC
-		", [], { datasource = "apirone" });
+		",
+			[],
+			{ datasource = "apirone" }
+		);
 
-		for (row in q) {
-			product = svc.get(row.product_id);
-			term = "";
+		for ( var row in q ) {
+			var product = svc.get( row.product_id );
+			var term    = "";
 
-			if (isNull(product.getModel())) {
+			if ( IsNull( product.getModel() ) ) {
 				term &= product.getName() & " ";
 			} else {
-				if (!isNull(product.getCategory())) {
+				if ( !IsNull( product.getCategory() ) ) {
 					term &= product.getCategory().getName() & " ";
 				}
 
-				if (!isNull(product.getLine())) {
+				if ( !IsNull( product.getLine() ) ) {
 					term &= product.getLine().getName() & " ";
 				}
 
-				if (!isNull(product.getModel())) {
+				if ( !IsNull( product.getModel() ) ) {
 					term &= product.getModel().getName() & " ";
 				}
 
-				if (!isNull(product.getFinish())) {
+				if ( !IsNull( product.getFinish() ) ) {
 					term &= product.getFinish().getName();
 				}
 			}
 
-			var existingElement = queryExecute("
+			var existingElement = QueryExecute(
+				"
 				SELECT product_id, search_term
 				FROM utils.search_terms
 				WHERE product_id = CAST(:product_id AS uuid) and lang_id = 'IT'
-			", { product_id = product.getId() }, { datasource = "apirone" });
+			",
+				{ product_id = product.getId() },
+				{ datasource = "apirone" }
+			);
 
-			//CREATE
-			if (isNull(existingElement)) {
-				WriteDump('Create ' & existingElement.search_term);
-				queryExecute("
+			// CREATE
+			if ( IsNull( existingElement ) ) {
+				WriteDump( "Create " & existingElement.search_term );
+				QueryExecute(
+					"
 					INSERT INTO utils.search_terms (
 						search_term,
 						product_id,
@@ -57,15 +66,23 @@
 						:product_id::uuid,
 						'IT'
 					)
-				", { term: term, product_id = product.getId() }, { datasource = "apirone" });
-			//UPDATE
-			} elseif (trim(existingElement.search_term) != trim(term)) {
-				WriteDump('Update ' & existingElement.search_term);
-				queryExecute("
+				",
+					{ term = term, product_id = product.getId() },
+					{ datasource = "apirone" }
+				);
+				// UPDATE
+			}
+			elseif( Trim( existingElement.search_term ) != Trim( term ) ){
+				WriteDump( "Update " & existingElement.search_term );
+				QueryExecute(
+					"
 					UPDATE utils.search_terms
 					SET search_term = :term
 					WHERE product_id = CAST(:product_id AS uuid) and lang_id = 'IT'
-				", { term: term, product_id = product.getId() }, { datasource = "apirone" });
+				",
+					{ term = term, product_id = product.getId() },
+					{ datasource = "apirone" }
+				);
 			}
 		}
 	}
