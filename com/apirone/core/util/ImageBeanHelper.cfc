@@ -1,11 +1,11 @@
 ﻿component accessors="false" {
 
-	public any function init(){
+	public Any function init(){
 		return this;
 	}
 
 	// Restituisce la prima image il cui getType().getId() == typeId
-	public any function findImageByType( required Array images, required String typeId = "horizontal" ){
+	public Any function findImageByType( required Array images, required String typeId = "horizontal" ){
 		if ( !IsNull( images ) AND ArrayLen( images ) ) {
 			for ( var image in images ) {
 				if ( IsDefined( "image.getType" ) AND image.getType().getId() EQ typeId ) {
@@ -31,7 +31,7 @@
 	}
 
 	// Risolve metodi dinamici tipo getHorizontalImage -> findImageByType(...)
-	public any function resolveGetImageMethod( required string missingMethodName, required Array images ){
+	public Any function resolveGetImageMethod( required string missingMethodName, required Array images ){
 		if ( ReFindNoCase( "^get([A-Za-z]+)Image$", missingMethodName ) ) {
 			var typeId = LCase(
 				ReReplace(
@@ -51,7 +51,7 @@
 	}
 
 	// Rimuove immagini per typeId e ritorna il numero rimosso
-	public numeric function removeImagesByType( required Array images, required String typeId = "horizontal" ){
+	public Numeric function removeImagesByType( required Array images, required String typeId = "horizontal" ){
 		var removed = 0;
 		for ( var image in images ) {
 			if ( IsDefined( "image.getType" ) AND image.getType().getId() EQ typeId ) {

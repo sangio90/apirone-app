@@ -147,14 +147,15 @@ AP.product.items = ( function() {
                 var ids = values.toString();
             }
 
+            var quantity = $( "#product-simulate-quantity" ).val();
+
             NM.util.ajax( {
                 method: "POST",
                 url: "/manager/ajax/products/" + AP.page.productId + "/price/simulate",
-                data: { itemIds: ids }, // the selected items
+                data: { itemIds: ids, quantity: quantity }, // the selected items
                 callback: {
                     done: function( xhr ) {
                         $( "#product-simulate-loading" ).html( "" );
-                        $( "#product-simulate-result" ).val( xhr.data.total );
 
                         NM.util.openModal( $( "#price-simulate-modal" ) );
 

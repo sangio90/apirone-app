@@ -11,6 +11,7 @@
 	}
 
 	function create( event, rc, prc ){
+
 		var obj = super.bean( "Quotation" )
 		obj.setName( "Descrizione" );
 		obj.setQuotationNumber( Left( CreateUUID(), 5 ) );

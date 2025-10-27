@@ -1,82 +1,112 @@
-﻿component accessors="true"{
+﻿component accessors="true" {
 
 	public function init( required String folder ){
-		
 		variables.folder = arguments.folder;
-		
+
 		return this
 	}
 
-	public function debug( required message="", required type="NONE", extraInfo="", file="" ){
+	public function debug(
+		required message = "",
+		required type    = "NONE",
+		extraInfo        = "",
+		file             = ""
+	){
 		arguments.severity = "DEBUG";
-		return logMessage( argumentCollection=arguments );
+		return logMessage( argumentCollection = arguments );
 	}
 
-	public function info( required message="", required type="NONE", extraInfo="", file="" ){
+	public function info(
+		required message = "",
+		required type    = "NONE",
+		extraInfo        = "",
+		file             = ""
+	){
 		arguments.severity = "INFO";
-		return logMessage( argumentCollection=arguments );
+		return logMessage( argumentCollection = arguments );
 	}
 
-	public function warn( required message="", required type="NONE", extraInfo="", file="" ){
+	public function warn(
+		required message = "",
+		required type    = "NONE",
+		extraInfo        = "",
+		file             = ""
+	){
 		arguments.severity = "WARN";
-		return logMessage( argumentCollection=arguments );
+		return logMessage( argumentCollection = arguments );
 	}
 
-	public function error( required message="", required type="NONE", extraInfo="", file="" ){
+	public function error(
+		required message = "",
+		required type    = "NONE",
+		extraInfo        = "",
+		file             = ""
+	){
 		arguments.severity = "ERROR";
-		return logMessage( argumentCollection=arguments );
+		return logMessage( argumentCollection = arguments );
 	}
 
-	public function fatal( required message="", required type="NONE", extraInfo="", file="" ){
+	public function fatal(
+		required message = "",
+		required type    = "NONE",
+		extraInfo        = "",
+		file             = ""
+	){
 		arguments.severity = "FATAL";
-		return logMessage( argumentCollection=arguments );
+		return logMessage( argumentCollection = arguments );
 	}
 
 
-    /*=========
+	/*
         Private methods
-    =========*/
+    */
 
-	private Void function logMessage( required message, required severity, type="", extraInfo="", file="" ){
+	private Void function logMessage(
+		required message,
+		required severity,
+		type      = "",
+		extraInfo = "",
+		file      = ""
+	){
+		arguments.message = Trim( arguments.message );
 
-		arguments.message = trim( arguments.message );
-
-		var msg = Replace( arguments.message, '"', "'", "all" );
-		msg = Replace( msg, "#chr(13)##chr(10)#", ' ', "all" );
-		msg = Replace( msg, chr(13), ' ', "all" );
+		var msg = Replace( arguments.message, """", "'", "all" );
+		msg     = Replace( msg, "#Chr( 13 )##Chr( 10 )#", " ", "all" );
+		msg     = Replace( msg, Chr( 13 ), " ", "all" );
 
 		var extra = formatExtraInfo( arguments.extraInfo );
 
-		var timestamp = now();
+		var timestamp = Now();
 
-		var fileName = "#LCase(arguments.severity)#.log";
+		var fileName = "#LCase( arguments.severity )#.log";
 
-		if ( len( arguments.file ) ) {
-			fileName = "custom-#arguments.file#.log";
+		if ( Len( arguments.file ) ) {
+			fileName = "#arguments.file#.log";
 		}
 
-		var entry = '"#arguments.severity#", "#cgi.remote_addr#", "#DateTimeFormat( timestamp, "yyyy-mm-dd HH:nn:ss.ll" )#", "#arguments.type#", "#msg#", #extra#';
+		var entry = """#arguments.severity#"", ""#cgi.remote_addr#"", ""#DateTimeFormat( timestamp, "yyyy-mm-dd HH:nn:ss.ll" )#"", ""#arguments.type#"", ""#msg#"", #extra#";
 
-		if( !DirectoryExists( variables.folder ) ) {
+		if ( !DirectoryExists( variables.folder ) ) {
 			DirectoryCreate( variables.folder )
 		}
 
-		cffile( action="append" file="#variables.folder#/#fileName#" output="#entry#" );
-
+		cffile(
+			action = "append",
+			file   = "#variables.folder#/#fileName#",
+			output = "#entry#"
+		);
 	}
 
 	private String function formatExtraInfo( required Any data ){
-
 		var ret = "";
 
 		if ( IsObject( arguments.data ) ) {
 			ret = SerializeJSON( arguments.data );
 		} else {
-			ret = '"#arguments.data#"';
+			ret = """#arguments.data#""";
 		}
 
 		return ret;
-
 	}
 
 }

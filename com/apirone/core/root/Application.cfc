@@ -4,12 +4,12 @@ component {
 
 	variables.settings = new config.Settings();
 
-	this.name              = "apirone-core";
-	this.nullSupport       = true;
-	this.sessionManagement = true;
-	this.sessionTimeout    = CreateTimespan( 0, 1, 0, 0 );
-	this.scriptProtect     = "url,cookie,cgi";
-	this.searchResults     = false;
+	this.name                 = "apirone-core";
+	this.nullSupport          = true;
+	this.sessionManagement    = true;
+	this.sessionTimeout       = CreateTimespan( 0, 1, 0, 0 );
+	this.scriptProtect        = "url,cookie,cgi";
+	this.searchResults        = false;
 	this.whiteSpaceManagement = "smart";
 
 	this.charset.web      = "UTF-8";
@@ -41,11 +41,22 @@ component {
 		class            = "com.microsoft.sqlserver.jdbc.SQLServerDriver",
 		bundleName       = "org.lucee.mssql",
 		bundleVersion    = "12.2.0.jre8",
-		
 		connectionString = "jdbc:sqlserver://#variables.settings.get( "verticaledb.host" )#:#variables.settings.get( "verticaledb.port" )#;DATABASENAME=#variables.settings.get( "verticaledb.name" )#;SelectMethod=direct",
 		username         = variables.settings.get( "verticaledb.username" ),
 		password         = variables.settings.get( "verticaledb.pwd" ),
 		// optional settings
+		connectionLimit  = -1, // default:-1
+		liveTimeout      = 15, // default: -1; unit: minutes
+		validate         = false // default: false
+	};
+
+	this.datasources[ "verticaleExport" ] = {
+		class            = "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+		bundleName       = "org.lucee.mssql",
+		bundleVersion    = "12.2.0.jre8",
+		connectionString = "jdbc:sqlserver://#variables.settings.get( "verticaledb.host" )#:#variables.settings.get( "verticaledb.port" )#;DATABASENAME=#variables.settings.get( "VERTICALE_WEB_DATA" )#;SelectMethod=direct",
+		username         = variables.settings.get( "verticaledb.username" ),
+		password         = variables.settings.get( "verticaledb.pwd" ),
 		connectionLimit  = -1, // default:-1
 		liveTimeout      = 15, // default: -1; unit: minutes
 		validate         = false // default: false
@@ -70,9 +81,13 @@ component {
 	}
 
 	public Void function clearContainer(){
-		if ( server.keyExists("wireBox-apirone") ) {
-			server['wireBox-apirone'].clearSingletons();
-			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# - clearContainer" );
+		if ( server.keyExists( "wireBox-apirone" ) ) {
+			server[ "wireBox-apirone" ].clearSingletons();
+			cffile(
+				action = "APPEND",
+				file   = "#ExpandPath( "/debug.log" )#",
+				output = "#Now()# - clearContainer"
+			);
 		}
 	}
 

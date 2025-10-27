@@ -17,7 +17,6 @@
                         <div class="card-body">
 
                             <div class="mb-3 row">
-                                <label class="col-sm-2 col-form-label text-start">Pittogrammi</label>
                                 <div class="col-sm-12">
                                     
                                     #grid( 
