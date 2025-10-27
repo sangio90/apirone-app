@@ -8,25 +8,27 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mm     = super.getMementify();
 		var params = super.paramsFromUrl();
 
-		var rows = super.fire( "permission.search", params );
+		var rows = super.fire( "permission.list", params );
 		var role = super.fire( "role.get", [ rc.roleId ] );
-		for ( var row in rows.getData() ) {
+		for ( var row in rows ) {
 			var rolePermission = super.bean( "RolePermission" );
 			rolePermission.setPermission( row );
 			rolePermission.setRoleId( rc.roleId );
 			rolePermission.setActive(false);
+
 			for ( var permission in role.getPermissions() ) {
 				if ( row.getId() == permission.getPermission().getId() ) {
 					rolePermission.setActive(true);
 					break;
 				}
 			}
+			
 			var obj = mm.convert( rolePermission, "list" );
 			data.add( obj );
 		}
 
-		result.setTotal( rows.getTotal() );
-		result.setCount( rows.getCount() );
+		result.setTotal( data.len() );
+		result.setCount( data.len() );
 		result.setData( data );
 
 		event.setValue( "result", result );
@@ -35,11 +37,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		var categories = [];
-
 		var thisId    = "";
 		var messageId = "";
-		var texts     = [];
 
 		var result = super.getResult();
 
@@ -47,12 +46,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		transaction {
 			for ( var permission in permissions ) {
-				var existingPermission = super.fire( "rolePermission.search", { "roleId" = json.id, "permissionId" = permission.permission.id } )	
-				if ( !isNull(existingPermission) && existingPermission.getCount() > 0 && permission.active == false ) {
+				var existingPermission = super.fire( "rolePermission.list", { "roleId" = json.id, "permissionId" = permission.permission.id } )	
+				if ( !isNull(existingPermission) && existingPermission.len() > 0 && permission.active == false ) {
 					var existingId = existingPermission.getData()[1].getId()
 					super.fire( "rolePermission.delete", [ existingId ] )
 				}
-				if (existingPermission.getCount() == 0 && permission.active == true) {
+				if (existingPermission.len() == 0 && permission.active == true) {
 					var newPermission = super.bean( "rolePermission" );
 					var role = super.fire( "role.get", [ json.id ] );
 					newPermission.setRoleId( json.id );
