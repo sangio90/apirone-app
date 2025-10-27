@@ -3,14 +3,14 @@
 	function updateSearchTerms( event, rc, prc ){
 		setting requesttimeout=99999999999999;
 
-		getLogger().info( file = "schedule", message = "Start maintenance for of updateSearchTerms()" );
+		getLogger().info( file = "schedule", message = "Start maintenance GlobalSearch" );
 
 		var start = GetTickCount();
 
 		var svc = super.service( "Product" );
 
-		var updatedRecords  = 0;
-		var insertedRecords = 0;
+		var updatedRows  = 0;
+		var insertedRows = 0;
 
 		var q = QueryExecute(
 			"
@@ -22,6 +22,7 @@
 			[],
 			{ datasource = "apirone" }
 		);
+
 
 		for ( var row in q ) {
 			var product = svc.get( row.product_id );
@@ -59,7 +60,7 @@
 
 			// CREATE
 			if ( IsNull( existingElement ) ) {
-				insertedRecords++;
+				insertedRows++;
 
 				QueryExecute(
 					"
@@ -80,7 +81,7 @@
 				// UPDATE
 			}
 			elseif( Trim( existingElement.search_term ) != Trim( term ) ){
-				updatedRecords++;
+				insertedRows++;
 
 				QueryExecute(
 					"
@@ -96,12 +97,22 @@
 
 		var end = GetTickCount();
 
+		var timeSpent = end - start;
+
 		getLogger().info(
 			file    = "schedule",
-			message = "End maintenance for of updateSearchTerms(). Inserted records: #insertedRecords#, updated record: #updatedRecords#. Time spended: #end - start#ms."
+			message = "End maintenance of GlobalSearch. Total records: #q.recordCount#, inserted records: #insertedRows#, updated records: #updatedRows#. Time spent: #timeSpent#ms."
 		);
 
-		return {};
+		event.renderData(
+			type = "json",
+			data = {
+				"timeSpent"    = timeSpent,
+				"totalRows"    = q.recordCount,
+				"insertedRows" = insertedRows,
+				"updatedRows"  = updatedRows
+			}
+		);
 	}
 
 }
