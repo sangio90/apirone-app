@@ -198,7 +198,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	*/
 
 	private String function prepareDescription( logFile ){
-		// Toglie le prime tre parli della riga: data e nome del prodotto
+		// Toglie le prime tre parti della riga: data e nome del prodotto
 
 		var result = "<table class='price-log-table'>";
 		var count  = 1;
