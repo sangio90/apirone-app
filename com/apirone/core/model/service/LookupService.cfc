@@ -9,7 +9,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		"fileType"     = { "bean" = "fileType", "file" = "fileTypes.json.cfm" },
 		"fileKind"     = { "bean" = "fileKind", "file" = "fileKinds.json.cfm" },
 		"priceType"    = { "bean" = "priceType", "file" = "priceTypes.json.cfm" },
-		"role"         = { "bean" = "role", "file" = "roles.json.cfm" },
 		"documentType" = {
 			"bean" = "documentType",
 			"file" = "documentTypes.json.cfm"
