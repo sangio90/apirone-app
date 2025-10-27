@@ -1,15 +1,13 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function simulate( event, rc, prc ){ 
+	function simulate( event, rc, prc ){
+		var result = super.service( "PriceCalculator" ).simulate( rc.id, rc.quantity, ListToArray( rc.itemIds ) );
 
-		var result = super.service("PriceCalculator").simulate( rc.id, ListToArray( rc.itemIds ) );
-		
 		var description = prepareDescription( result.logFile );
 
 		var output = { "price" = result.price, "description" = description }
 
 		event.setValue( "result", output );
-
 	}
 
 	function calculateQuotationItem( event, rc, prc ){
@@ -199,35 +197,31 @@ component extends="com.apirone.core.controller.AbsController" {
 		private methods
 	*/
 
-    private String function prepareDescription( logFile ) {
-
-		// Toglie le prime due parli della riga: data e nome del prodotto
+	private String function prepareDescription( logFile ){
+		// Toglie le prime tre parli della riga: data e nome del prodotto
 
 		var result = "<table class='price-log-table'>";
-		var count = 1;
+		var count  = 1;
 
 		loop file=logFile item="line" {
+			var parts = ListToArray( line, ";" );
 
-			var parts = ListToArray(line, ";");
+			var td1 = parts.indexExists( 4 ) ? parts[ 4 ] : ""; // penultimate
+			var td2 = parts.indexExists( 5 ) ? parts[ 5 ] : ""; // last
 
-			var td1 = parts.indexExists(3) ? parts[3] : "";
-			var td2 = parts.indexExists(4) ? parts[4] : "";
+			var trClass = parts.indexExists( 2 ) AND parts[ 2 ] == "H" ? "price-log-table-tr-highlight" : "";
 
-			//var newLine = ArrayToList( ArraySlice( parts, 3 ), ";" );
-
-			result = result 
-				& "<tr>
+			result = result
+			& "<tr class='#trClass#'>
 					<td width='25' class='text-end'>#count#</td>
 					<td>#td1#</td>
 					<td width='200' class='text-end'><b>#td2#</b></td>
 				</tr>";
 
 			count++;
-
 		}
 
 		return result & "</table>";
-
-    }		
+	}
 
 }

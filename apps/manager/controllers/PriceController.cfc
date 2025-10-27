@@ -1,4 +1,4 @@
-component extends="com.apirone.core.controller.AbsController" {
+﻿component extends="com.apirone.core.controller.AbsController" {
 
 	function manage( event, rc, prc ){
 

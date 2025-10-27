@@ -40,6 +40,7 @@
 		*/
 		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
 		//get( "/ajax/prices/calculate" ).to( "PriceAjaxController.calculate" ).end();
+		post( "/ajax/:by-regex:(products|product-items)/:id/price/simulate" ).to( "PriceAjaxController.simulate" ).end();
 		get( "/prices" ).to( "PriceController.manage" ).end();
 
 		get( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.list" ).end();

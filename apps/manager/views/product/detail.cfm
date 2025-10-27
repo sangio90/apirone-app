@@ -60,22 +60,6 @@
 
                             </cfif>
 
-                            <!----
-                            <div class="mt-3 text-end mb-0" style="float: right;">
-                                <div class="d-flex align-items-center">
-                                    <span>Costo €:</span> <input class="form-control w-auto text-end mb-2" 
-                                        type="text" 
-                                        data-bind="value: costFormatted" readonly /> 
-                                </div>
-
-                                <div class="d-flex align-items-center">
-                                    <span>Markup %:</span> <input class="form-control w-auto text-end" 
-                                        type="text" 
-                                        data-bind="value: costFormatted" readonly /> 
-                                </div>
-                            </div>
-                            ---->
-
                         </div>
 
                         <div class="col-md-12">
@@ -146,18 +130,19 @@
                                     
                                         <div class="row">
                                         
-                                            <div class="col-12  d-flex gap-2 justify-content-end">
+                                            <div class="col-12  d-flex gap-2 justify-content-end align-items-center">
 
                                                 <div id="product-simulate-loading"></div>
                                                 
+                                                <input class="form-control col-sm-2 text-end" style="width: 100px" id="product-simulate-quantity" value="1" type="number" min="1" />
+
                                                 #button(
                                                     label="Simula prezzo",
                                                     bind  = "click:simulatePrice",
                                                     size  = "sm",
                                                     class = "ms-2"
                                                 )#
-                                                
-                                                <input class="form-control col-12" style="max-width: 150px; text-align: right;" id="product-simulate-result">
+
                                             </div>
 
                                         </div>
