@@ -19,7 +19,7 @@
 	<div class="container is-fluid mt-3 mb-3">	
 
 		<h1 class="title">Routines 
-			<a href="?fwreinit=1">FwReinit</a>
+			<a href="?reset=1">reset</a>
 		</h1>
 		
 		<div class="columns">

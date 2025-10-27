@@ -5,6 +5,8 @@
 
 	public Boolean function OnRequestStart( string targetPage ) {
 
+        //super.onRequestStart();
+
         var allowedIPs = "127.0.0.*,185.6.241.249,79.19.179.30,194.183.87.112,185.52.113.41,192.168.*,10.0.*";
 
         var ip = getRealIP();
@@ -19,6 +21,10 @@
 
         if( url.KeyExists("fwreinit") AND fwreinit == 1 OR !application.keyExists("cbBootstrap") ) {
             super.loadColdbox()
+        }
+
+        if( url.KeyExists("reset") ) {
+            super.clearContainer();
         }
 
         application.cbBootstrap.onRequestStart( arguments.targetPage );
