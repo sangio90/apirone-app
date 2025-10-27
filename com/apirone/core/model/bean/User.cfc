@@ -17,16 +17,17 @@ component accessors="true" extends="AbsBean" {
 
 	}
 
-	public Boolean function can( required String permissionId ) {
-
-		if( var permission in getRole().getPermissions()  ) {
-			if (permission.getId() == permissionId ) {
+	public boolean function canDo( required string permissionId ) {
+		if (getRole().getId() == 'ADM') {
+			return true;
+		}
+		var rolePermissions = getRole().getPermissions();
+		for (var rolePermission in rolePermissions) {
+			if (rolePermission.getPermission().getId() == permissionId) {
 				return true;
 			}
 		}
-		
 		return false;
-
 	}
 
 }

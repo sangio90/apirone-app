@@ -1,55 +1,65 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="lookupservice" type="lookupservice";
+	property name="lookupService" inject="LookupService";
 	
 	property name="cacheScope" type="String" default="Permission.bean";
 
-	public com.apirone.core.model.bean.Permission function get( required String priceId ){
+	public com.apirone.core.model.bean.Permission function get( permission ){
 		var cm = getCacheManager();
 
-		var cache = cm.get( getCacheScope(), arguments.priceId );
+		var cache = cm.get( getCacheScope(), arguments.permission.id );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
-		var bean = build( arguments.priceId );
-		cm.put( getCacheScope(), arguments.priceId, bean );
+		var bean = build( arguments.permission );
+		cm.put( getCacheScope(), arguments.permission.id, bean );
 
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.Result function list(
-		String productId,
-		Numeric productItemId,
-		String statusId
+	public com.apirone.core.model.bean.Result function search(
+		String permissionId,
+		String entityId
 	){
+		var rows = [];
+		var result = super.getResult();
+		var permissions = DeserializeJSON( FileRead( "/config/data/permissions.json.cfm" ) );
 
-		var rows = FileRead( "/path/file" );
+		if (!isNull(entityId)) {
+			permissions = permissions.filter(function(item) {
+				return item.entityId == entityId;
+			});
+		}
+
+		if (!isNull(permissionId)) {
+			permissions = permissions.filter(function(item) {
+				return item.id == permissionId;
+			});
+		}
+
+		permissions.each( function ( record ){
+			rows.add( get( record ) );
+		}); 
 
 		result.setData( rows );
-		result.setTotal( Val( records.total ) );
-		result.setCount( Val( records.recordcount ) );
+		result.setTotal( Val( Len(permissions) ) );
+		result.setCount( Val( Len(permissions) ) );
 
 		return result;
 	}
 
 
-	private com.apirone.core.model.bean.Permission function build( required String priceId ){
+	private com.apirone.core.model.bean.Permission function build( required permission ){		
+		var bean = super.bean( "Permission" );
+
+		bean.setId( permission.id );
+
+		bean.setName( permission.name );
+		bean.setEntity( getLookupService().get( "entity", permission.entityId ) );
 		
-
-		if ( record.recordCount ) {
-			var bean = super.bean( "Price" );
-
-			bean.setId( record.price_id );
-
-			bean.setName( record.amount );
-			bean.setEntity( lookupservice.get( "ENTITY", value ) );
-			
-			return bean;
-		}
-
-		return NullValue();
+		return bean;
 	}
 
 }

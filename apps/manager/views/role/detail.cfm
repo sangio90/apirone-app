@@ -1,75 +1,73 @@
 ﻿<cfoutput>
-<div class="row" id="role-item">
-    <div class="col-12">
-        <form id="role-detail-form">
-            <section class="card card-featured card-featured-primary mb-4">
+    <div id="role-permissions-modal" class="modal fade">
+        
+        <section class="modal-dialog modal-lg">
+            <div class="modal-content">
 
-                <header class="card-header">
-                    <h2 class="card-title" data-bind="text: detailForm.title"></h2>
-                </header>
+                <form id="role-permissions-form" method="POST" name="role-permissions-form">
                 
-                <div class="card-actions">
-                    <a href="##" class="card-action card-action-dismiss" data-dismiss="role-item"></a>
-                </div>
+                    <header class="card-header d-flex align-elements-center justify-content-between">
+                        <h2 class="card-title" data-bind="text:detailForm.title"></h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
+                    </header>                
+                        
+                    <div class="card-body">
 
-                <div class="card-body">
-                    <div class="row pb-3">
-
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group pb-3">
-                                        <label class="col-form-label" for="role-desc">Nome</label>
-                                        <input class="form-control" name="email" id="email" data-bind="value: detailForm.data.name">
-                                    </div>
+                        <div class="mb-3 row">
+                            <div class="col-12">
+                                <div class="form-group pb-3">
+                                    <label class="col-sm-2 col-form-label text-start">Entità</label>
+                                    <select type="text" class="form-control" name="entity" 
+                                        required
+                                        data-bind="source: detailForm.entities, value: detailForm.data.entity, events: { change: getPermissions }"
+                                        data-value-field="id"
+                                        data-text-field="name"
+                                    >
+                                    </select>
                                 </div>
                             </div>
-
                         </div>
-
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group pb-3">
-
-                                        <cfloop array="#prc.perms#" item="item">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" value="#item.id#" <cfif ArrayContains(item.roles, "COM")>checked</cfif>  > #item.name#
-                                                </label>
-                                            </div>
-                                        </cfloop>
-
-                                    </div>
-
-                                </div>
-                                <div class="col-6">
-                                    <div class="form-group pb-3">
-                                        <label class="col-form-label" for="account-desc">Stato</label>
-                                        <select type="text" class="form-control" name="status"
-                                            data-bind="value: detailForm.data.status.id, source: statusList"
-                                            data-value-field="id"
-                                            data-text-field="name"
-                                        >
-                                        </select>
-                                    </div>
-                                </div>
-
-                            </div>
-
+                        
+                        <div class="mb-3 row">
+                             #grid( 
+                                id="permission-grid",
+                                class="no-pager hidden",
+                                columns="[
+                                    { 'field':'id', 'title':'ID', width: '30%' },
+                                    { 'field':'name', 'title':'Nome', width: '60%'},
+                                    { 
+                                        'field':'', 
+                                        'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
+                                        'width':'10%',
+                                        'headerAttributes': { 'class': 'justify-content-center' }
+                                    }
+                                ]",
+                                source="detailForm.data.entity.permissions",
+                                rowTemplate="role/permissions-tmpl"
+                             )#
                         </div>
 
                     </div>
-                </div>
-                <footer class="card-footer text-end">
-                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:save">
-                        <i class="fas fa-save"></i> Salva
-                    </button>
 
-                </footer>
-            </section>
-        </form>
+                    <footer class="card-footer">
+                        <div class="row">
+                            <div class="col-md-12 float-end">
+                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
+                                    <i class="fas fa-save"></i> Salva
+                                </button>
+                                <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
+                                <div class="status errors-counter mt-1 float-end me-3"></div>
+                            </div>
+                        </div>
+                    </footer>
+
+                </form>
+
+            </div>
+        </section>
+    
+        #template( view="jstemplate/role/permissions-tmpl" )#
     </div>
-</div>  
+    
 
 </cfoutput>

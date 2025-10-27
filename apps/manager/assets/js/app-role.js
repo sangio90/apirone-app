@@ -1,101 +1,137 @@
 AP.role = AP.role || {};
 
 AP.role.fields = {
-    rootList: $("#role-list-root"),
-    rootDetail: $("#role-detail-form")
+    rolesList: $("#role-list-root"),
+    rolePermissions: $("#role-permissions-modal"),
+    rolePermissionsForm: $( "#role-permissions-form" ),
 };
 
 $(document).ready(function (){
 
-	if (AP.role.fields.rootList.length) {
-
-		// AP.role.list.init();
-
+	if (AP.role.fields.rolesList.length) {
+		AP.role.list.init();
 	}
 
-	if (AP.role.fields.rootDetail.length) {
-
+	if (AP.role.fields.rolePermissions.length) {
 	    AP.role.detail.init();
-
 	}
 
 });
-
-AP.role.list = (function () {
-
-	var pub = {};
-
-	pub.init = function () {
-
-        kendo.bind(AP.role.fields.rootList, viewModel);
-
-	};
-
-    return pub;
-}());
-
 
 AP.role.detail = (function () {
 
     var pub = {};
 
-    var roles = [{ id: "ADM", "name":  "Admin" }, { "id": "COM", "name": "Commerciale" }];
-    var statusList = [{ "id": "ACT", "name": "Attivo" }, { "id": "DEA", "name": "Disattivato" }];
-    var data = { "id": "1", "name": "Admin", "email": "roberto@marzialetti.com", "surname": "Marzialetti", "role": { "id": "ADM", "name": "Admin" } };
+    var fields = AP.role.fields;
+
+    function getDefaultDetailForm() {
+        return {
+            data: {
+                entity: {
+                    id: "",
+                    name: "",
+                    permissions: new kendo.data.DataSource()
+                },
+                id: "",
+                name: "",
+            },
+            title: "",
+            entities: new kendo.data.DataSource()
+        };
+    }
 
 	var viewModel = kendo.observable({
-        roles: roles,
-        statusList: statusList,
-        detailForm: {
-            data: data,
-            label: "",
-            title: "Dettaglio ruolo",
-            action: "update"
+        detailForm: getDefaultDetailForm(),
+
+        getPermissions: function() {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/roles/" + viewModel.get('detailForm.data.id') + "/permissions?entityId=" + viewModel.get('detailForm.data.entity.id'),
+                callback: {
+                    done: function( xhr ) {
+                        if ( xhr.status == "SUCCESS" ) {
+                            viewModel.set( "detailForm.data.entity.permissions", xhr.data );
+                            $('#permission-grid').removeClass('hidden')
+                        }
+                    },
+                },
+            } );
         },
+        
+        save: function( event ) {
 
-        edit: function (event) {
+            NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/roles-permissions",
+                data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                callback: {
+                    done: function( xhr ) {
+                        if ( xhr.status == "SUCCESS" ) {
 
-            AP.role.fields.item.removeClass("d-none");
+                            status.html( "" );
 
-            this.set("detailForm.data", event.data);
-            this.set("detailForm.title", "Modifica ruolo < " + event.data.email + " >");
-            this.set("detailForm.action", "update");
+                            AP.widget.notify( "success", xhr.data.message.text );
 
-            return false;
-		},
+                            setTimeout( () => {
+                                fields.rolePermissions.modal( "hide" );
+                            }, 700 );
 
-        new: function (event) {
-
-            AP.role.fields.item.removeClass("d-none");
-
-            var data = { role: { id: "ADM" }, status: { id: "ACT" } };
-
-            this.set("detailForm.data", data);
-            this.set("detailForm.title", "Carica account");
-            this.set("detailForm.action", "create");
-
-            return false;
-		},
-
-
-		print: function (item) {
-
-            window.open("/manager/account/print", "_blank");
+                        }
+                    },
+                },
+            } );
 
             return false;
-		},
-
-
+        },
 	});
+
+    pub.edit = function( role ) {
+        viewModel.set( "detailForm", getDefaultDetailForm() );
+
+        // $('#permission-grid').addClass('hidden')
+        viewModel.set( "detailForm.title", "Modifica Ruoli < " + role.name + " >" );
+        viewModel.set( "detailForm.data.id", role.id );
+        viewModel.set( "detailForm.data.name", role.name );
+        var entities = AP.page.entities.slice();
+        entities.unshift({'id': '', 'name': '-- Seleziona un Entità'});
+        viewModel.set('detailForm.entities', entities);
+
+        NM.util.openModal( fields.rolePermissions );
+    };
 
 	pub.init = function () {
 
-        console.log("role:detail:init");
-
-		kendo.bind(AP.role.fields.rootDetail, viewModel);
+		kendo.bind(AP.role.fields.rolePermissions, viewModel);
 
 	};
 
     return pub;
 
+}());
+
+
+AP.role.list = (function () {
+
+	var pub = {};
+    var rolePermissions = AP.role.detail;
+
+
+    var dataSources = {
+        items: AP.page.roles,
+    };
+
+    var viewModel = kendo.observable({
+        rows: dataSources.items,
+        edit: function (event) {
+            rolePermissions.edit( event.data );
+
+            return false;
+		}
+    })
+
+	pub.init = function () {
+        kendo.bind(AP.role.fields.rolesList, viewModel);
+	};
+
+    return pub;
 }());
