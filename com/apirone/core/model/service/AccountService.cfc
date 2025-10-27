@@ -197,7 +197,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setCreatedAt( record.created_at );
 
 			account.setStatus( getStatusService().get( record.status_id ) );
-			account.setRole( getRoleService().get( record.role_id ) );
+			//account.setRole( getRoleService().get( record.role_id ) );
 
 			// INFO:
 			// roles::varchar converts null value to "null" word. I didn't find anything better.

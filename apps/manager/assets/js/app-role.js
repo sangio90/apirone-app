@@ -1,24 +1,24 @@
 AP.role = AP.role || {};
 
 AP.role.fields = {
-    rolesList: $("#role-list-root"),
-    rolePermissions: $("#role-permissions-modal"),
+    rolesList: $( "#role-list-root" ),
+    rolePermissions: $( "#role-permissions-modal" ),
     rolePermissionsForm: $( "#role-permissions-form" ),
 };
 
-$(document).ready(function (){
+$( document ).ready( function(){
 
-	if (AP.role.fields.rolesList.length) {
-		AP.role.list.init();
-	}
+    if ( AP.role.fields.rolesList.length ) {
+        AP.role.list.init();
+    }
 
-	if (AP.role.fields.rolePermissions.length) {
+    if ( AP.role.fields.rolePermissions.length ) {
 	    AP.role.detail.init();
-	}
+    }
 
-});
+} );
 
-AP.role.detail = (function () {
+AP.role.detail = ( function() {
 
     var pub = {};
 
@@ -40,24 +40,24 @@ AP.role.detail = (function () {
         };
     }
 
-	var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         detailForm: getDefaultDetailForm(),
 
         getPermissions: function() {
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/roles/" + viewModel.get('detailForm.data.id') + "/permissions?entityId=" + viewModel.get('detailForm.data.entity.id'),
+                url: "/manager/ajax/roles/" + viewModel.get( "detailForm.data.id" ) + "/permissions?entityId=" + viewModel.get( "detailForm.data.entity.id" ),
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.status == "SUCCESS" ) {
                             viewModel.set( "detailForm.data.entity.permissions", xhr.data );
-                            $('#permission-grid').removeClass('hidden')
+                            $( "#permission-grid" ).removeClass( "hidden" );
                         }
                     },
                 },
             } );
         },
-        
+
         save: function( event ) {
 
             NM.util.ajax( {
@@ -83,7 +83,7 @@ AP.role.detail = (function () {
 
             return false;
         },
-	});
+    } );
 
     pub.edit = function( role ) {
         viewModel.set( "detailForm", getDefaultDetailForm() );
@@ -93,45 +93,44 @@ AP.role.detail = (function () {
         viewModel.set( "detailForm.data.id", role.id );
         viewModel.set( "detailForm.data.name", role.name );
         var entities = AP.page.entities.slice();
-        entities.unshift({'id': '', 'name': '-- Seleziona un Entità'});
-        viewModel.set('detailForm.entities', entities);
+        entities.unshift( { "id": "", "name": "-- Seleziona un Entità" } );
+        viewModel.set( "detailForm.entities", entities );
 
         NM.util.openModal( fields.rolePermissions );
     };
 
-	pub.init = function () {
+    pub.init = function() {
 
-		kendo.bind(AP.role.fields.rolePermissions, viewModel);
+        kendo.bind( AP.role.fields.rolePermissions, viewModel );
 
-	};
+    };
 
     return pub;
 
-}());
+}() );
 
 
-AP.role.list = (function () {
+AP.role.list = ( function() {
 
-	var pub = {};
+    var pub = {};
     var rolePermissions = AP.role.detail;
-
 
     var dataSources = {
         items: AP.page.roles,
     };
 
-    var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
         rows: dataSources.items,
-        edit: function (event) {
+        edit: function( event ) {
             rolePermissions.edit( event.data );
 
             return false;
-		}
-    })
+        }
+    } );
 
-	pub.init = function () {
-        kendo.bind(AP.role.fields.rolesList, viewModel);
-	};
+    pub.init = function() {
+        kendo.bind( AP.role.fields.rolesList, viewModel );
+    };
 
     return pub;
-}());
+}() );

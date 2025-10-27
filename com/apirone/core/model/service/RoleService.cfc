@@ -1,49 +1,70 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="lookupService" inject="LookupService";
+	//property name="lookupService" inject="LookupService";
 	property name="rolePermissionService" inject="RolePermissionService";
+	property name="cacheScope" type="String" default="Role.bean";
 
-	public com.apirone.core.model.bean.Role function get( roleId ){
-		var role = getLookupService().get( "role", roleId );
-		var bean = build( role );
+	public com.apirone.core.model.bean.Role function get( required String roleId ){
+		var cm = getCacheManager();
+
+		var cache = cm.get( getCacheScope(), arguments.roleId );
+
+		if ( cache.status ) {
+			return cache.data;
+		}
+
+		var bean = build( arguments.roleId );
+		cm.put( getCacheScope(), arguments.roleId, bean );
 
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.Result function list(
-		String roleId
-	){
+	public Array function list(){
 		var rows = [];
 		var result = super.getResult();
-		var roles = DeserializeJSON( FileRead( "/config/data/roles.json.cfm" ) );
-
-		if (!isNull(roleId)) {
-			roles = roles.filter(function(item) {
-				return item.id == roleId;
-			});
-		}
+		
+		var roles = getRawList();
 
 		roles.each( function ( record ){
 			rows.add( get( record ) );
 		}); 
 
-		result.setData( rows );
-		result.setTotal( Val( Len(roles) ) );
-		result.setCount( Val( Len(roles) ) );
-
-		return result;
+		return rows;
 	}
 
+	/*
+		private methods
+	*/
 
-	private com.apirone.core.model.bean.Role function build( required role ){		
+	private com.apirone.core.model.bean.Role function build( required roleId ){
+
 		var bean = super.bean( "Role" );
+		var role = getRawItem( roleId );
 
-		bean.setId( role.getId() );
+		bean.setId( role.id );
+		bean.setName( role.name );
 
-		bean.setName( role.getName() );
-		bean.setPermissions( getRolePermissionService().list( roleId = role.getId() ) )
+		bean.setPermissions( getRolePermissionService().list( roleId = role.id ) )
 		
 		return bean;
+	}
+
+	private Array function getRawList(){
+		var list   = DeserializeJSON( FileRead( ExpandPath( "/config/data/roles.json.cfm" ) ) );
+
+		return list;
+	}
+
+	private Struct function getRawItem( roleId ){
+		var list = getRawList();
+
+		for( var item in list ) {
+			if( item.id == arguments.roleId ) {
+				return item;
+			}
+		}
+
+		return NullValue();
 	}
 
 }

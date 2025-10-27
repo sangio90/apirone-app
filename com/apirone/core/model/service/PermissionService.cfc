@@ -19,7 +19,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.Result function search(
+	public Array function list(
 		String permissionId,
 		String entityId
 	){
@@ -43,11 +43,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			rows.add( get( record ) );
 		}); 
 
-		result.setData( rows );
-		result.setTotal( Val( Len(permissions) ) );
-		result.setCount( Val( Len(permissions) ) );
-
-		return result;
+		return rows;
 	}
 
 
