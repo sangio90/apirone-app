@@ -20,13 +20,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Array function list(){
+		
 		var rows = [];
-		var result = super.getResult();
 		
 		var roles = getRawList();
 
-		roles.each( function ( record ){
-			rows.add( get( record ) );
+		roles.each( function ( item ){
+			rows.add( get( item.id ) );
 		}); 
 
 		return rows;
