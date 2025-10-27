@@ -3,7 +3,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		prc.title = "Lista degli account";
 
-		prc.roles    = super.fire( "lookup.list", [ "role" ] );
+		prc.roles    = super.fire( "role.list" );
 		prc.statuses = super.fire( "status.list", [ "ACCOUNT" ] );
 		prc.langs    = super.fire( "lang.list" );
 
@@ -14,18 +14,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.jsScripts.add( "app-account" );
 
 		event.setView( "account/list" );
-	}
-
-	function get( event, rc, prc ){
-		var user = prc.user;
-
-		prc.title = "Account";
-
-		prc.jsScripts.add( "app-account" );
-
-		prc.perms = DeserializeJSON( FileRead( "/config/data/fake/perms.json.cfm" ) );
-
-		event.setView( "account/detail" );
 	}
 
 	function print( event, rc, prc ){
