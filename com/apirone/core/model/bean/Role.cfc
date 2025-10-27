@@ -1,10 +1,10 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true"{
 
 	this.memento = {
-		defaultIncludes = [ "id", "name" ],
+		defaultIncludes = [ "id", "name", "permissions" ],
 	}
 
-	property name="permissions" type="Permission[]";
+	property name="permissions" type="com.apirone.core.model.bean.RolePermission[]";
 
     public Role function init(){
 

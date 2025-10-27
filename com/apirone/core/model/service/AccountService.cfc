@@ -3,21 +3,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="AccountDAO";
 	property name="langService" inject="LangService";
 	property name="statusService" inject="StatusService";
+	property name="roleService" inject="RoleService";
 	property name="lookupService" inject="LookupService";
 
 	property name="cacheScope" type="String" default="Account.bean";
 
 	public com.apirone.core.model.bean.Account function get( required String accountId ){
-		var cm = getCacheManager();
+		// var cm = getCacheManager();
 
-		var cache = cm.get( getCacheScope(), arguments.accountId );
+		// var cache = cm.get( getCacheScope(), arguments.accountId );
 
-		if ( cache.status ) {
-			return cache.data;
-		}
+		// if ( cache.status ) {
+		// 	return cache.data;
+		// }
 
 		var account = build( arguments.accountId );
-		cm.put( getCacheScope(), arguments.accountId, account );
+		// cm.put( getCacheScope(), arguments.accountId, account );
 
 		return account;
 	}
@@ -133,7 +134,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( !Len( arguments.email ) ) {
 			Throw( type = "apirone.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
 		};
-
+		
 		var accounts = search( email = arguments.email ).getData();
 
 		if ( !IsNull( accounts[ 1 ] ) ) {
@@ -196,7 +197,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setCreatedAt( record.created_at );
 
 			account.setStatus( getStatusService().get( record.status_id ) );
-			account.setRole( getLookupService().get( "role", record.role_id ) );
+			account.setRole( getRoleService().get( record.role_id ) );
 
 			// INFO:
 			// roles::varchar converts null value to "null" word. I didn't find anything better.
@@ -208,7 +209,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			if ( !IsNull( thisRoles ) ) {
 				thisRoles.each( function( item ){
-					var role = getLookupService().get( "role", item );
+					var role = getRoleService().get( item );
 					roles.add( role );
 				} );
 			}
