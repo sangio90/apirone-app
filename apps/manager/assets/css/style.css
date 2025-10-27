@@ -6,12 +6,12 @@
     color: #00841d;
 }
 
-*:required {
-    border-bottom: 2px solid #c10000 !important;
-}
-
 .form-control {
     border-color: #cccccc !important;
+}
+
+*:required {
+    border-bottom: 2px solid #c10000 !important;
 }
 
 .form-control-static {
