@@ -6,7 +6,8 @@
             <td width="50">
                 <span data-bind="text: id"></span>
             </td>
-            <td class="align-end align-top" width="25%">
+            <td class="align-end align-top" width="30%">
+                -<span data-bind="text: size.id"></span>-
                 <select 
                     class="form-control"
                     data-text-field="name"
@@ -15,7 +16,7 @@
                 >
                 </select>
             </td>
-            <td class="align-end align-top" width="25%">
+            <td class="align-end align-top" width="20%">
                 <input type="text" class="form-control width-70" name="heightInPx_##:uid##"
                     data-bind="value: heightInPixel"
                     data-rule-required="true"

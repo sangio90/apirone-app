@@ -104,10 +104,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setHeightInPixel( record.height_in_pixel );
 			bean.setRowCount( record.row_count );
 			bean.setCharCount( record.char_count );
-
-			if (!IsNull( record.font_family_size_id )) {
-				bean.setSize( getFontFamilySizeService().get( record.font_family_size_id ) );
-			}
+            
+            bean.setSize( getFontFamilySizeService().get( record.font_family_size_id ) );
 
 			return bean;
 		}

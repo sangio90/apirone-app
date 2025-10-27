@@ -52,25 +52,15 @@ AP.signConfig.detail = ( function() {
     var pub = {};
 
     var componentApp = AP.component.modal;
+    var fields = AP.signConfig.fields;
 
     var defaultSizeRow = {
         id: "",
         height: "",
         heightInPx: "",
-        size: { "id": null, "name": "-- Seleziona Font Size" },
+        size: { "id": "", "name": "-- Seleziona Font Size" },
         charCount: "",
         rowCount: ""
-    };
-
-    var defaultRow = {
-        font: {
-            id: "",
-            code: "",
-            directory: "",
-            name: "",
-        },
-        // sizes: new kendo.data.DataSource( { data: [] } )
-        items: []
     };
 
     var items = new kendo.data.DataSource( { data: AP.page.availableFonts } );
@@ -102,7 +92,7 @@ AP.signConfig.detail = ( function() {
 
         addItem: function( event ) {
             var row = viewModel.get( "selectedFonts" ).getByUid( event.data.uid );
-            row.items.add( defaultSizeRow ); // Usa il metodo del DataSource
+            row.get( "items" ).add( defaultSizeRow ); // Usa il metodo del DataSource
             return false;
         },
 
@@ -144,9 +134,20 @@ AP.signConfig.detail = ( function() {
             return false;
         },
 
-        getFamilySizes: function(event) {
-            var selectedFont = viewModel.get("selectedFonts").getByUid( event.parent().parent().uid );
-            return selectedFont?.font?.fontFamily?.sizes || [];
+        getFamilySizes: function( event ) {
+            var selectedFont = viewModel.get( "selectedFonts" ).getByUid( event.parent().parent().uid );
+
+            console.log( "type", selectedFont instanceof kendo );
+
+            const sizes = selectedFont?.font?.fontFamily?.sizes || [];
+
+            var data = [ { name: "-- Seleziona Altezza", id: null }, ...sizes ];
+
+            console.log( "data", data );
+
+            var ds = new kendo.data.DataSource( { data: data } );
+
+            return ds;
         },
 
         save: function( event ) {
