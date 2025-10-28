@@ -155,19 +155,42 @@
     <cfargument name="id" type="String" required="true" default="table-#CreateUUID()#">
     <cfargument name="rowTemplate" type="String" required="true">
     <cfargument name="source" type="String" default="rows">
+    <cfargument name="columns" type="String" default="">
     <cfargument name="class" type="String" default="">
+
+    <cfset var thisColumns = []>
+
+    <cfif IsJSON( columns ) >
+        <cfset thisColumns = DESerializeJSON( columns )>
+    </cfif>
 
     <cfsavecontent variable="local.html">
         <cfoutput>
 
             <table class="table table-hover #arguments.class# mb-0" id="#arguments.id#">
+
+                <cfif len(thisColumns)>
+                    <thead>
+                        <tr>
+                            <cfloop array="#thisColumns#" index="local.col">
+                                <cfif !local.col.keyExists("width")>
+                                    <cfset local.col.width = "">
+                                </cfif>
+                                <cfif !local.col.keyExists("title")>
+                                    <cfset local.col.title = "">
+                                </cfif>
+                                <th style="width:#local.col.width#">#local.col.title#</th>
+                            </cfloop>
+                        </tr>
+                    </thead>
+                </cfif>
+
                 <tbody data-bind="source:#arguments.source#" data-template="#ListLast( arguments.rowTemplate, "/" )#">
                 </tbody>
             </table>
             
             <div class="white-small mb-1">jstemplate/#arguments.rowTemplate#</div>
 
-            <!--- #template(view="jstemplate/#arguments.rowTemplate#")# ---->
             #template( view="jstemplate/#arguments.rowTemplate#" )#
 
         </cfoutput>

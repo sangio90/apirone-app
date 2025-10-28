@@ -20,9 +20,9 @@
                                     class = "no-pager",
 									id = "role-grid",
 									columns = "[
-                                        { 'field':'id', 'title':'ID',  width: '10%' },
-                                        { 'field':'name', 'title':'Nome' },
-                                        { 'field':'', 'title':'Modifica', width: '10%'}
+                                        { 'title':'ID',  width: '10%' },
+                                        { 'title':'Nome' },
+                                        { 'title':'Modifica', width: '10%'}
                                     ]",
 									rowTemplate = "role/role-grid-row-tmpl"
 								)#
