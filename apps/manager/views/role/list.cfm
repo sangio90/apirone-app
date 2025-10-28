@@ -1,12 +1,13 @@
 <cfoutput>
     <div id="role-list-root">
-
+       
         <div class="row">
-
-            <div class="col-12">
-                <h1>#prc.title#</h1>
+            <div class="col-8">
+                #pageTitle()#
             </div>
-
+        </div>
+        
+        <div class="row">
             <div class="col-12">
 
                 <section class="card">
