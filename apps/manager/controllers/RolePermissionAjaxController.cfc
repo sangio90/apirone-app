@@ -1,7 +1,5 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	property name="lookupService" inject="lookupService";
-
 	function list( event, rc, prc ){
 		var data = [];
 		var result = super.getResult();

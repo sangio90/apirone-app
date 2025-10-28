@@ -50,6 +50,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create( required com.apirone.core.model.bean.RolePermission rolePermission ){
 		var newId = getDao().insert( arguments.rolePermission );
+
+		getRoleService().removeCache( arguments.rolePermission.getRoleId() );
+
 		return newId;
 	}
 

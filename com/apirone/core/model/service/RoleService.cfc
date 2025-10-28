@@ -32,6 +32,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return rows;
 	}
 
+	public Void function removeCache( required com.apirone.core.model.bean.Role role ){
+		var cm = super.getCacheManager();
+
+		cm.remove( getCacheScope(), arguments.role.getId() );
+
+	}
+
+
 	/*
 		private methods
 	*/
