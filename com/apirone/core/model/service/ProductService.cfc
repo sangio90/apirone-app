@@ -237,12 +237,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required com.apirone.core.model.bean.Product product
 	){
 		if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
-			var cb = super.bean( "CatalogBundle" );
-			cb.setLine( product.getLine() );
-			cb.setModel( product.getModel() );
-			cb.setCategory( product.getCategory() );
+			var bundle = super.bean( "CatalogBundle" );
+			bundle.setLine( product.getLine() );
+			bundle.setModel( product.getModel() );
+			bundle.setCategory( product.getCategory() );
 
-			var catalogBundle = getCatalogBundleService().getOrCreate( cb );
+			var catalogBundle = getCatalogBundleService().getOrCreate( bundle );
 			product.setCatalogBundle( catalogBundle );
 		}
 
@@ -263,10 +263,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setLines( lines );
 			} else {
 				var bean = super.bean( "ProductComplex" );
+
+				bean.setModel( getModelService().get( record.model_id ) );
+				bean.setFinish( getFinishService().get( record.finish_id ) );
+
 				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
-				bean.setFinish(
-					!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()
-				);
 			}
 
 			bean.setId( record.product_id );
