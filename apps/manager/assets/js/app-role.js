@@ -43,6 +43,17 @@ AP.role.detail = ( function() {
     var viewModel = kendo.observable( {
         detailForm: getDefaultDetailForm(),
 
+        getCreatedAt: function( event ) {
+            return NM.kendo.formatISODate( event.createdAt );
+        },
+
+        selectAll: function( event ) {
+            NM.util.checkAll( event.currentTarget );
+            viewModel.get('detailForm.data.entity.permissions').forEach((permission) => permission.active = event.currentTarget.checked);
+
+            return false;
+        },
+
         getPermissions: function() {
             NM.util.ajax( {
                 method: "GET",
@@ -59,6 +70,10 @@ AP.role.detail = ( function() {
         },
 
         save: function( event ) {
+            var thisForm = AP.role.fields.rolePermissionsForm;
+            var status = thisForm.find( ".status" );
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
             NM.util.ajax( {
                 method: "POST",
@@ -67,15 +82,8 @@ AP.role.detail = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.status == "SUCCESS" ) {
-
-                            status.html( "" );
-
+                            NM.util.autoHideMessage( status );
                             AP.widget.notify( "success", xhr.data.message.text );
-
-                            setTimeout( () => {
-                                fields.rolePermissions.modal( "hide" );
-                            }, 700 );
-
                         }
                     },
                 },
@@ -102,6 +110,9 @@ AP.role.detail = ( function() {
     pub.init = function() {
 
         kendo.bind( AP.role.fields.rolePermissions, viewModel );
+        $(document).on('click', '[name="selectAll"]', function (e) {
+            viewModel.selectAll(e);
+        });
 
     };
 

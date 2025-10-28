@@ -84,6 +84,10 @@
         "created": "Finitura caricata",
         "updated": "Finitura aggiornata"
     },    
+
+    "rolePermission": {
+        "created": "Permesso Ruolo impostato"
+    },    
     
     "file": {
         "imageCreated": "Immagine salvata",

@@ -13,10 +13,12 @@ component extends="com.apirone.core.controller.AbsController" {
 			rolePermission.setPermission( row );
 			rolePermission.setRoleId( rc.roleId );
 			rolePermission.setActive(false);
+			rolePermission.setCreatedAt(null);
 
 			for ( var permission in role.getPermissions() ) {
 				if ( row.getId() == permission.getPermission().getId() ) {
 					rolePermission.setActive(true);
+					rolePermission.setCreatedAt(permission.getCreatedAt());
 					break;
 				}
 			}
@@ -46,7 +48,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			for ( var permission in permissions ) {
 				var existingPermission = super.fire( "rolePermission.list", { "roleId" = json.id, "permissionId" = permission.permission.id } )	
 				if ( !isNull(existingPermission) && existingPermission.len() > 0 && permission.active == false ) {
-					var existingId = existingPermission.getData()[1].getId()
+					var existingId = existingPermission[1].getId()
 					super.fire( "rolePermission.delete", [ existingId ] )
 				}
 				if (existingPermission.len() == 0 && permission.active == true) {
@@ -55,9 +57,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					newPermission.setRoleId( json.id );
 					newPermission.setPermission( super.fire( "lookup.get", [ "permission", permission.permission.id ] ) );
 					thisId = super.fire( "rolePermission.create", [ newPermission ] )	
-					messageId = "rolePermission.created";
 				}
 			}
+			messageId = "rolePermission.created";
 		}
 		
 		var message = completeMessage( messageId );

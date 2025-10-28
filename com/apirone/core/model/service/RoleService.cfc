@@ -52,7 +52,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setId( role.id );
 		bean.setName( role.name );
 
-		bean.setPermissions( getRolePermissionService().list( roleId = role.id ) )
+		bean.setPermissions( getRolePermissionService().list( roleId = role.id ) );
 		
 		return bean;
 	}

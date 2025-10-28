@@ -9,12 +9,16 @@
             <td>
                 <span data-bind="text: permission.name"></span>
             </td>
+            <td>
+                <span data-bind="text: getCreatedAt"></span>
+            </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"
                     data-bind="checked: active"
-                    value="##: id ##">
+                    name="selected"
+                    value="##: id ##"
+                >
             </td>
-
         </tr>
     </nmscript>
 </cfoutput>

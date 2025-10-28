@@ -34,10 +34,11 @@
                                 class="no-pager hidden",
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '30%' },
-                                    { 'field':'name', 'title':'Nome', width: '60%'},
+                                    { 'field':'name', 'title':'Nome', width: '30%'},
+                                    { 'field':'created_at', 'title':'Data', width: '30%'},
                                     { 
                                         'field':'', 
-                                        'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
+                                        'title':'<input type=checkbox name=selectAll>',
                                         'width':'10%',
                                         'headerAttributes': { 'class': 'justify-content-center' }
                                     }

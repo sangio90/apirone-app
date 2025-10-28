@@ -16,7 +16,8 @@
 
                         <form name="role-grid-form" id="role-grid-form" method="get">
                             <div class="col-12">
-								#grid(
+								#table(
+                                    class = "no-pager",
 									id = "role-grid",
 									columns = "[
                                         { 'field':'id', 'title':'ID',  width: '10%' },

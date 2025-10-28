@@ -50,8 +50,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create( required com.apirone.core.model.bean.RolePermission rolePermission ){
 		var newId = getDao().insert( arguments.rolePermission );
-
-		getRoleService().removeCache( arguments.rolePermission.getRoleId() );
+		getRoleService().removeCache( getRoleService().get( rolePermission.getRoleId() ) );
 
 		return newId;
 	}
@@ -88,6 +87,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setPermission( getLookupService().get( "permission", record.permission_id ) );
 			bean.setRoleId( record.role_id );
 			bean.setActive( true );
+			bean.setCreatedAt( record.created_at );
 
 			return bean;
 		}
