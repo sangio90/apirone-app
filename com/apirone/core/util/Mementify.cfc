@@ -13,7 +13,7 @@ component {
 			dateMask          = settings?.dateMask ?: "yyyy-MM-dd",
 			timeMask          = settings?.timeMask ?: "HH:mm:ss",
 			nullDefaultValue  = settings?.nullDefaultValue ?: null,
-			trustedGetters    = settings?.trustedGetters ?: true,
+			trustedGetters    = settings?.trustedGetters ?: false,
 			convertToTimezone = settings?.convertToTimezone ?: "",
 			autoCastBooleans  = settings?.autoCastBooleans ?: false
 		}
@@ -55,7 +55,6 @@ component {
 		Boolean autoCastBooleans
 	){
 		var target = Duplicate( arguments.target );
-
 
 		local.includes = Duplicate( arguments.includes );
 		local.excludes = Duplicate( arguments.excludes );
@@ -130,7 +129,6 @@ component {
 				true
 			);
 		}
-
 
 		// Incorporate Memento Mappers, and Defaults
 		thisMemento.mappers.append( arguments.mappers, true );
@@ -263,7 +261,7 @@ component {
 							mappers         : $buildNestedMementoStruct( mappers, item ),
 							defaults        : $buildNestedMementoStruct( defaults, item ),
 							// cascade the ignore defaults down if specific nested includes are requested
-							ignoreDefaults  : nestedIncludes.len() ? arguments.ignoreDefaults : false,
+							ignoreDefaults  : nestedIncludes.len() || arguments.ignoreDefaults,
 							// Cascade the arguments to the children
 							profile         : arguments.profile,
 							trustedGetters  : arguments.trustedGetters,
@@ -288,10 +286,11 @@ component {
 					target          : thisValue,
 					includes        : nestedIncludes,
 					excludes        : $buildNestedMementoList( excludes, item ),
+					//excludes        : ["name", "hex"],
 					mappers         : $buildNestedMementoStruct( mappers, item ),
 					defaults        : $buildNestedMementoStruct( defaults, item ),
 					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults  : nestedIncludes.len() ? arguments.ignoreDefaults : false,
+					ignoreDefaults  : nestedIncludes.len() || arguments.ignoreDefaults,
 					// Cascade the arguments to the children
 					profile         : arguments.profile,
 					trustedGetters  : arguments.trustedGetters,
@@ -365,6 +364,7 @@ component {
 	 * @return A string list of the new hiearchy to use
 	 */
 	private function $buildNestedMementoList( required list, required root ){
+		/*
 		return arguments.list
 			.filter( function( target ){
 				return ListFirst( arguments.target, "." ) == root && ListLen( arguments.target, "." ) > 1;
@@ -372,6 +372,17 @@ component {
 			.map( function( target ){
 				return ListDeleteAt( arguments.target, 1, "." );
 			} );
+		*/
+
+		var results = [];
+
+		for( var target in arguments.list ){
+			if( listFirst( target, "." ) == root && listLen( target, "." ) > 1 ){
+				results.append( target.listDeleteAt( 1, "." ) );
+			}
+		}
+
+		return results;		
 	}
 
 	/**
