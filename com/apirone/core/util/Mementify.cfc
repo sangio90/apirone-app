@@ -5,13 +5,17 @@
 
 component {
 
+	variables.settings = {};
+	variables.configDirectory = "";
+	variables.transformerRegistry = {};
 	variables.mementoRulesCache = {};
 
-	function init( 
+	function init(
 		required settings = {},
 		required String configDirectory = "/config/mementos/", 
-    	required Struct transformerRegistry
+    	required Struct transformerRegistry		
 	){
+		
 		var thisSettings = {
 			iso8601Format     = settings?.iso8601Format ?: false,
 			dateMask          = settings?.dateMask ?: "yyyy-MM-dd",
@@ -61,47 +65,48 @@ component {
 		Boolean autoCastBooleans
 	){
 
-		// 1. Determina l'entità target (utile per debug o log, ma non usato nel calcolo delle regole)
-		var entityName = ListLast( GetMetaData( arguments.target ).name, "." );
+		var target = Duplicate( arguments.target );
 
-		// 2. Carica le regole Memento esterne, rispettando la gerarchia di ereditarietà (Lazy Load + Cache)
-		var externalRules = $getRulesFromHierarchy( arguments.target );
+		var entityName = ListLast( GetMetaData( target ).fullname, "." );
 
-		// 3. Prepara le regole interne (del componente che stiamo serializzando)
-		var targetMemento = {};
-		if ( StructKeyExists( arguments.target, "memento" ) ) {
-			targetMemento = arguments.target.memento;
+		var externalRules = $getRulesFromHierarchy( target ); //from files
+
+		//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="#entityName# external rules: #SerializeJSON(externalRules)#" );
+
+		if( externalRules.len() ) {
+			var memento = externalRules
+		} else {
+			//TODO: inline rules to remove 
+			var memento = arguments.target.memento;
 		}
-		// NOTA: Si potrebbe aggiungere qui la logica di fallback per getMemento() se non si trova la key 'memento'.
 
-		// 4. CREA IL MEMENTO FINALE UNIFICATO:
-		// Le regole interne (targetMemento) sovrascrivono quelle esterne (externalRules).
-		var finalMemento = Duplicate( externalRules );
-		StructAppend( finalMemento, targetMemento, true );
+		local.includes = Duplicate( arguments.includes );
+		local.excludes = Duplicate( arguments.excludes );
 
-		// 5. Normalizza gli includes/excludes passati alla funzione
-		var includes = IsSimpleValue( arguments.includes )
-					? ListToArray( arguments.includes )
-					: arguments.includes;
+		//var memento = target.memento;
 
-		var excludes = IsSimpleValue( arguments.excludes )
-					? ListToArray( arguments.excludes )
-					: arguments.excludes;
+		if ( IsSimpleValue( local.includes ) ) {
+			local.includes = ListToArray( local.includes );
+		}
 
-		// Param Default Memento Settings (Inizializzazione con fallback)
-		// Usiamo 'finalMemento' per ottenere la configurazione unificata.
+		if ( IsSimpleValue( local.excludes ) ) {
+			local.excludes = ListToArray( local.excludes );
+		}
+
+		// Param Default Memento Settings
+		// We do it here, because ACF caches crap!
 		var thisMemento = {
-			"autoCastBooleans" = IsNull( finalMemento.autoCastBooleans ) ? variables.settings.autoCastBooleans : finalMemento.autoCastBooleans,
-			"dateMask"         = IsNull( finalMemento.dateMask ) ? variables.settings.dateMask : finalMemento.dateMask,
-			"defaults"         = IsNull( finalMemento.defaults ) ? {} : finalMemento.defaults,
-			"defaultIncludes"  = IsNull( finalMemento.defaultIncludes ) ? [] : finalMemento.defaultIncludes,
-			"defaultExcludes"  = IsNull( finalMemento.defaultExcludes ) ? [] : finalMemento.defaultExcludes,
-			"iso8601Format"    = IsNull( finalMemento.iso8601Format ) ? variables.settings.iso8601Format : finalMemento.iso8601Format,
-			"mappers"      = IsNull( finalMemento.mappers ) ? {} : finalMemento.mappers,
-			"neverInclude" = IsNull( finalMemento.neverInclude ) ? [] : finalMemento.neverInclude,
-			"profiles"     = IsNull( finalMemento.profiles ) ? {} : finalMemento.profiles,
-			"timeMask" = IsNull( finalMemento.timeMask ) ? variables.settings.timeMask : finalMemento.timeMask,
-			"trustedGetters" = IsNull( finalMemento.trustedGetters ) ? variables.settings.trustedGetters : finalMemento.trustedGetters
+			"autoCastBooleans" = IsNull( memento.autoCastBooleans ) ? variables.settings.autoCastBooleans : memento.autoCastBooleans,
+			"dateMask"         = IsNull( memento.dateMask ) ? variables.settings.dateMask : memento.dateMask,
+			"defaults"         = IsNull( memento.defaults ) ? {} : memento.defaults,
+			"defaultIncludes"  = IsNull( memento.defaultIncludes ) ? [] : memento.defaultIncludes,
+			"defaultExcludes"  = IsNull( memento.defaultExcludes ) ? [] : memento.defaultExcludes,
+			"iso8601Format"    = IsNull( memento.iso8601Format ) ? variables.settings.iso8601Format : memento.iso8601Format,
+			"mappers"          = IsNull( memento.mappers ) ? {} : memento.mappers,
+			"neverInclude"     = IsNull( memento.neverInclude ) ? [] : memento.neverInclude,
+			"profiles"         = IsNull( memento.profiles ) ? {} : memento.profiles,
+			"timeMask"         = IsNull( memento.timeMask ) ? variables.settings.timeMask : variables.settings.timeMask,
+			"trustedGetters"   = IsNull( memento.trustedGetters ) ? variables.settings.trustedGetters : variables.settings.trustedGetters
 		};
 
 		// Param arguments according to instance > settings chain precedence
@@ -111,7 +116,16 @@ component {
 		arguments.timeMask         = IsNull( arguments.timeMask ) ? thisMemento.timeMask : arguments.timeMask;
 		arguments.autoCastBooleans = IsNull( arguments.autoCastBooleans ) ? thisMemento.autoCastBooleans : arguments.autoCastBooleans;
 
-		// Risoluzione dei Transformer (Stringa -> Closure)
+		// Choose a profile
+		// ROB: forse qui dovrebbe essere profileCorrente.defaultinclude che mergia thisMememento.defaultinclude
+		if ( Len( arguments.profile ) && thisMemento.profiles.keyExists( arguments.profile ) ) {
+			StructAppend(
+				thisMemento,
+				thisMemento.profiles[ arguments.profile ],
+				true
+			);
+		}
+
 		var resolvedMappers = {};
 		for ( var prop in thisMemento.mappers ) {
 			var transformerNameOrClosure = thisMemento.mappers[ prop ];
@@ -126,16 +140,6 @@ component {
 		}
 		// Sostituiamo i transformer originali (con stringhe) con quelli risolti (con closure).
 		thisMemento.mappers = resolvedMappers;		
-
-		// Choose a profile
-		// ROB: forse qui dovrebbe essere profileCorrente.defaultinclude che mergia thisMememento.defaultinclude
-		if ( Len( arguments.profile ) && thisMemento.profiles.keyExists( arguments.profile ) ) {
-			StructAppend(
-				thisMemento,
-				thisMemento.profiles[ arguments.profile ],
-				true
-			);
-		}
 
 		// Do we have a * for auto includes of all properties in the object
 		if ( ArrayLen( thisMemento.defaultIncludes ) && thisMemento.defaultIncludes[ 1 ] == "*" ) {
@@ -273,6 +277,7 @@ component {
 
 			// Array Collections
 			else if ( IsArray( thisValue ) ) {
+
 				// Map Items into result object
 				result[ thisAlias ] = [];
 				// Again we use traditional loops to avoid closure references and slowness on some engines
@@ -312,9 +317,11 @@ component {
 			}
 
 			// Single Object Relationships
-			else if ( IsValid( "component", thisValue ) && IsDefined( "thisValue.memento" ) ) {
+			else if ( IsValid( "component", thisValue ) ) {
 				// If no nested includes requested, then default them
 				var nestedIncludes = $buildNestedMementoList( includes, item );
+
+				//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="#entityName# : nestedIncludes:#nestedIncludes#" );
 
 				// Process the item memento
 				var thisItemMemento = convert(
@@ -355,10 +362,10 @@ component {
 				// ACF compat
 				var thisMapper = thisMemento.mappers[ item ];
 				// Transform it
-				result[ item ] = thisMapper( result[ item ], result );
+				result[ item ] = thisMapper( result[ item ], result );;
 			} else {
 				// Check for null values
-				result[ item ] = ( !result.keyExists( item ) || IsNull( result[ item ] ) ) ? Javacast( "null", "" ) : result[
+				result[ item ] = ( !result.keyExists( item ) || IsNull( result[ item ] ) ) ? NullValue() : result[
 					item
 				];
 			}
@@ -466,13 +473,16 @@ component {
 
 	private struct function $loadEntityRules( required string entityName ){
 		// 1. Controlla la cache: Se già caricato, restituisci immediatamente.
+		//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="cerco regole per #entityName#" );
+
 		if ( StructKeyExists( variables.mementoRulesCache, arguments.entityName ) ) {
+			//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="Regole in cache per #entityName#: #SerializeJSON( variables.mementoRulesCache[ arguments.entityName ] )#" );
 			return variables.mementoRulesCache[ arguments.entityName ];
 		}
 
 		var rules = {};
 		var filePath = ExpandPath( variables.configDirectory & "/" & arguments.entityName & ".json.cfm" );
-
+		
 		// 2. Controlla se il file esiste
 		if ( FileExists( filePath ) ) {
 			try {
@@ -481,14 +491,16 @@ component {
 				rules = DeserializeJSON( fileContent );
 			} catch ( any e ) {
 				throw( 
-					message="Memento config file [#arguments.entityName#] is broken", 
-					type="Mementify.entityRule.ConfigFileIsBroken" 
+					message="Memento config file for #arguments.entityName# is broken", 
+					type="Mementify.entityRule.ConfigFileIsBroken"
 				);
 			}
 		}
 
 		// 3. Salva nella cache (anche se vuoto, per non ricaricarlo)
 		variables.mementoRulesCache[ arguments.entityName ] = rules;
+
+		//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="Trovate regole per #entityName#: #SerializeJSON(rules)#" );
 		
 		return rules;
 	}	
@@ -514,7 +526,10 @@ component {
 			var currentRules = $loadEntityRules( entityName ); 
 
 			if ( !StructIsEmpty( currentRules ) ) {
+				
 				// Regole trovate! La configurazione più specifica vince.
+				//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="regole trovate: #entityName# #SerializeJSON(currentRules)#" );
+
 				externalRules = currentRules;
 				break; 
 			}

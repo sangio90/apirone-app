@@ -1,47 +1,6 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
 	/*
-	this.memento = {
-		defaultIncludes = [
-			"id",
-			"shortId",
-			"name",
-			"code",
-			"category",
-			"categories",
-			"line",
-			"model",
-			"finish"
-		],
-		mappers  = {},
-		profiles = {
-			list = {
-				defaultIncludes = [
-					"id",
-					"shortId",
-					"name",
-					"code",
-					"nameItem",
-					"status",
-					"positionCount",
-					"createdAt",
-					"code",
-					"categories",
-					"category",
-					"lines",
-					"line",
-					"model",
-					"finish",
-					"prices",
-					"horizontalImage",
-					"verticalImage"
-				]
-			}
-		}
-	}
-	*/
-
-	/*
 		complex (plates)
 		TODO da cancellare line/model sostituite da bundle
 		TODO: move to bundle:

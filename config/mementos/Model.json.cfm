@@ -1,7 +1,8 @@
 ﻿{
 	defaultIncludes = [ "id", "shortId", "name", "code" ],
 	mappers         = {
-		"descriptionItem" = "descriptionItem",
+		descriptionItem = "descriptionItem",
+		categories = "categoriesTrasformer"
 	},
 	profiles = {
 		list = {
@@ -9,12 +10,14 @@
 				"id",
 				"shortId",
 				"name",
+				"fruitsCount",
 				"nameItem",
-				"status.id",
+				"status",
 				"descriptionItem",
 				"createdAt",
 				"code",
-				"categories"
+				"categories",
+				"type"
 			]
 		}
 	}

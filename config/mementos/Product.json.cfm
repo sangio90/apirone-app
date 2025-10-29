@@ -1,14 +1,6 @@
 ﻿{
 	defaultIncludes = [
 		"id",
-		"shortId",
-		"name",
-		"code",
-		"category",
-		"categories",
-		"line",
-		"model",
-		"finish"
 	],
 	mappers  = {},
 	profiles = {

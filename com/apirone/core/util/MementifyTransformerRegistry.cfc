@@ -42,14 +42,12 @@ component {
         if ( !StructKeyExists( variables.registry, arguments.name ) ) {
             throw( 
                 message="Transformer [#arguments.name#] not found in registry.", 
-                type="Mementify.TransformerRegistry.NotFoundError" 
+                type="Mementify.TransformerRegistry.TransformerNotFound" 
             );
         }
         return variables.registry[ arguments.name ];
     }
     
-    // --- Metodi Fake per Demo ---
-
     private function registerTransformers(){
         
         registerTransformer( 
@@ -74,6 +72,21 @@ component {
                     "name" = "",
                     "lang" = { "id" = "IT", "name" = "" }
                 };
+                
+            }
+        );
+    
+        registerTransformer( 
+            name="categoriesTrasformer",
+            transformer=function( value, memento ){
+
+                var result = [];
+
+                for( var category in arguments.memento.categories ) {
+                    result.add( { "id" = category.id, "name" = category.name } );
+                }
+                
+                return result;
                 
             }
         );
