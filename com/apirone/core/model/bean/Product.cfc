@@ -1,5 +1,6 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
+	/*
 	this.memento = {
 		defaultIncludes = [
 			"id",
@@ -38,6 +39,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 			}
 		}
 	}
+	*/
 
 	/*
 		complex (plates)

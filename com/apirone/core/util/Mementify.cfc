@@ -5,9 +5,13 @@
 
 component {
 
-	variables.settings = {};
+	variables.mementoRulesCache = {};
 
-	function init( required settings = {} ){
+	function init( 
+		required settings = {},
+		required String configDirectory = "/config/mementos/", 
+    	required Struct transformerRegistry
+	){
 		var thisSettings = {
 			iso8601Format     = settings?.iso8601Format ?: false,
 			dateMask          = settings?.dateMask ?: "yyyy-MM-dd",
@@ -19,6 +23,8 @@ component {
 		}
 
 		variables.settings = thisSettings;
+		variables.configDirectory = arguments.configDirectory;
+		variables.transformerRegistry = arguments.transformerRegistry;
 
 		return this
 	}
@@ -54,35 +60,48 @@ component {
 		String timeMask,
 		Boolean autoCastBooleans
 	){
-		var target = Duplicate( arguments.target );
 
-		local.includes = Duplicate( arguments.includes );
-		local.excludes = Duplicate( arguments.excludes );
+		// 1. Determina l'entità target (utile per debug o log, ma non usato nel calcolo delle regole)
+		var entityName = ListLast( GetMetaData( arguments.target ).name, "." );
 
-		var memento = arguments.target.memento;
+		// 2. Carica le regole Memento esterne, rispettando la gerarchia di ereditarietà (Lazy Load + Cache)
+		var externalRules = $getRulesFromHierarchy( arguments.target );
 
-		if ( IsSimpleValue( local.includes ) ) {
-			local.includes = ListToArray( local.includes );
+		// 3. Prepara le regole interne (del componente che stiamo serializzando)
+		var targetMemento = {};
+		if ( StructKeyExists( arguments.target, "memento" ) ) {
+			targetMemento = arguments.target.memento;
 		}
+		// NOTA: Si potrebbe aggiungere qui la logica di fallback per getMemento() se non si trova la key 'memento'.
 
-		if ( IsSimpleValue( local.excludes ) ) {
-			local.excludes = ListToArray( local.excludes );
-		}
+		// 4. CREA IL MEMENTO FINALE UNIFICATO:
+		// Le regole interne (targetMemento) sovrascrivono quelle esterne (externalRules).
+		var finalMemento = Duplicate( externalRules );
+		StructAppend( finalMemento, targetMemento, true );
 
-		// Param Default Memento Settings
-		// We do it here, because ACF caches crap!
+		// 5. Normalizza gli includes/excludes passati alla funzione
+		var includes = IsSimpleValue( arguments.includes )
+					? ListToArray( arguments.includes )
+					: arguments.includes;
+
+		var excludes = IsSimpleValue( arguments.excludes )
+					? ListToArray( arguments.excludes )
+					: arguments.excludes;
+
+		// Param Default Memento Settings (Inizializzazione con fallback)
+		// Usiamo 'finalMemento' per ottenere la configurazione unificata.
 		var thisMemento = {
-			"autoCastBooleans" = IsNull( memento.autoCastBooleans ) ? variables.settings.autoCastBooleans : memento.autoCastBooleans,
-			"dateMask"         = IsNull( memento.dateMask ) ? variables.settings.dateMask : memento.dateMask,
-			"defaults"         = IsNull( memento.defaults ) ? {} : memento.defaults,
-			"defaultIncludes"  = IsNull( memento.defaultIncludes ) ? [] : memento.defaultIncludes,
-			"defaultExcludes"  = IsNull( memento.defaultExcludes ) ? [] : memento.defaultExcludes,
-			"iso8601Format"    = IsNull( memento.iso8601Format ) ? variables.settings.iso8601Format : memento.iso8601Format,
-			"mappers"          = IsNull( memento.mappers ) ? {} : memento.mappers,
-			"neverInclude"     = IsNull( memento.neverInclude ) ? [] : memento.neverInclude,
-			"profiles"         = IsNull( memento.profiles ) ? {} : memento.profiles,
-			"timeMask"         = IsNull( memento.timeMask ) ? variables.settings.timeMask : variables.settings.timeMask,
-			"trustedGetters"   = IsNull( memento.trustedGetters ) ? variables.settings.trustedGetters : variables.settings.trustedGetters
+			"autoCastBooleans" = IsNull( finalMemento.autoCastBooleans ) ? variables.settings.autoCastBooleans : finalMemento.autoCastBooleans,
+			"dateMask"         = IsNull( finalMemento.dateMask ) ? variables.settings.dateMask : finalMemento.dateMask,
+			"defaults"         = IsNull( finalMemento.defaults ) ? {} : finalMemento.defaults,
+			"defaultIncludes"  = IsNull( finalMemento.defaultIncludes ) ? [] : finalMemento.defaultIncludes,
+			"defaultExcludes"  = IsNull( finalMemento.defaultExcludes ) ? [] : finalMemento.defaultExcludes,
+			"iso8601Format"    = IsNull( finalMemento.iso8601Format ) ? variables.settings.iso8601Format : finalMemento.iso8601Format,
+			"mappers"      = IsNull( finalMemento.mappers ) ? {} : finalMemento.mappers,
+			"neverInclude" = IsNull( finalMemento.neverInclude ) ? [] : finalMemento.neverInclude,
+			"profiles"     = IsNull( finalMemento.profiles ) ? {} : finalMemento.profiles,
+			"timeMask" = IsNull( finalMemento.timeMask ) ? variables.settings.timeMask : finalMemento.timeMask,
+			"trustedGetters" = IsNull( finalMemento.trustedGetters ) ? variables.settings.trustedGetters : finalMemento.trustedGetters
 		};
 
 		// Param arguments according to instance > settings chain precedence
@@ -91,6 +110,22 @@ component {
 		arguments.dateMask         = IsNull( arguments.dateMask ) ? thisMemento.dateMask : arguments.dateMask;
 		arguments.timeMask         = IsNull( arguments.timeMask ) ? thisMemento.timeMask : arguments.timeMask;
 		arguments.autoCastBooleans = IsNull( arguments.autoCastBooleans ) ? thisMemento.autoCastBooleans : arguments.autoCastBooleans;
+
+		// Risoluzione dei Transformer (Stringa -> Closure)
+		var resolvedMappers = {};
+		for ( var prop in thisMemento.mappers ) {
+			var transformerNameOrClosure = thisMemento.mappers[ prop ];
+			
+			if ( IsSimpleValue( transformerNameOrClosure ) ) {
+				// È una stringa! Risolvila tramite il registro iniettato.
+				resolvedMappers[ prop ] = variables.transformerRegistry.get( transformerNameOrClosure ); 
+			} else {
+				// È già una closure (definita direttamente nel codice), usala così com'è.
+				resolvedMappers[ prop ] = transformerNameOrClosure;
+			}
+		}
+		// Sostituiamo i transformer originali (con stringhe) con quelli risolti (con closure).
+		thisMemento.mappers = resolvedMappers;		
 
 		// Choose a profile
 		// ROB: forse qui dovrebbe essere profileCorrente.defaultinclude che mergia thisMememento.defaultinclude
@@ -428,5 +463,73 @@ component {
 
 		return properties;
 	}
+
+	private struct function $loadEntityRules( required string entityName ){
+		// 1. Controlla la cache: Se già caricato, restituisci immediatamente.
+		if ( StructKeyExists( variables.mementoRulesCache, arguments.entityName ) ) {
+			return variables.mementoRulesCache[ arguments.entityName ];
+		}
+
+		var rules = {};
+		var filePath = ExpandPath( variables.configDirectory & "/" & arguments.entityName & ".json.cfm" );
+
+		// 2. Controlla se il file esiste
+		if ( FileExists( filePath ) ) {
+			try {
+				var fileContent = FileRead( filePath );
+				// Assumiamo che il file JSON contenga direttamente le regole dell'entità
+				rules = DeserializeJSON( fileContent );
+			} catch ( any e ) {
+				throw( 
+					message="Memento config file [#arguments.entityName#] is broken", 
+					type="Mementify.entityRule.ConfigFileIsBroken" 
+				);
+			}
+		}
+
+		// 3. Salva nella cache (anche se vuoto, per non ricaricarlo)
+		variables.mementoRulesCache[ arguments.entityName ] = rules;
+		
+		return rules;
+	}	
+
+	/**
+	 * Trova le regole Memento risalendo la gerarchia di ereditarietà.
+	 * Questo assicura che un'entità derivata erediti le regole dal suo antenato 
+	 * se non ha un proprio file di configurazione specifico.
+	 * * @targetObject L'istanza dell'oggetto da serializzare.
+	 * @return struct La configurazione Memento più specifica trovata (es. Product.json).
+	 */
+	private struct function $getRulesFromHierarchy( required Any targetObject ){
+		var metadata = GetMetaData( arguments.targetObject );
+		var externalRules = {};
+
+		// Ciclo di risalita della gerarchia: inizia dall'oggetto più specifico
+		while ( StructKeyExists( metadata, "fullname" ) ) {
+
+			var entityName = ListLast( metadata.fullname, "." );
+
+			// Carica le regole (usa la cache e legge il file se necessario)
+			// Dobbiamo assicuraci che $loadEntityRules sia un metodo esistente nel Mementify
+			var currentRules = $loadEntityRules( entityName ); 
+
+			if ( !StructIsEmpty( currentRules ) ) {
+				// Regole trovate! La configurazione più specifica vince.
+				externalRules = currentRules;
+				break; 
+			}
+			
+			// Passa al genitore
+			if ( StructKeyExists( metadata, "extends" ) ) {
+				// Usa GetMetaData sul percorso completo della classe genitore
+				metadata = metadata.extends; 
+			} else {
+				// Raggiunto l'oggetto base (es. Component, Object)
+				break;
+			}
+		}
+
+		return externalRules;
+	}	
 
 }

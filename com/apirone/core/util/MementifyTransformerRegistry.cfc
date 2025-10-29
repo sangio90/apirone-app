@@ -1,0 +1,83 @@
+﻿/**
+ * Registro per le closure (funzioni) di trasformazione dati.
+ * Mappa i nomi delle stringhe (es. "creationDateTransformer") alle closure CFML reali.
+ */
+component {
+
+    // Struttura che contiene tutte le closure registrate: { name: closure }
+    variables.registry = {};
+
+    /**
+     * Inizializza il registro.
+     */
+    function init(){
+        // Pre-registra i metodi fake per i test
+        registerTransformers();
+        return this;
+    }
+
+    /**
+     * Registra una closure di trasformazione con un nome univoco.
+     * @name Il nome stringa da usare nella configurazione Memento (es. "isoDateTransformer").
+     * @transformer La closure CFML (funzione anonima) che esegue la trasformazione.
+     */
+    public function registerTransformer( required string name, required transformer ){
+        // Si assicura che l'argomento 'transformer' sia una funzione (closure)
+        if ( !IsCustomFunction( arguments.transformer ) ) {
+            throw( 
+                message="The registered transformer must be a closure or a CFML function.", 
+                type="Mementify.TransformerRegistry.FuncionIsNotCustom" 
+            );
+        }
+        variables.registry[ arguments.name ] = arguments.transformer;
+        return this;
+    }
+
+    /**
+     * Recupera una closure di trasformazione dal registro.
+     * @name Il nome stringa del transformer da recuperare.
+     * @return function La closure CFML.
+     */
+    public function get( required string name ){
+        if ( !StructKeyExists( variables.registry, arguments.name ) ) {
+            throw( 
+                message="Transformer [#arguments.name#] not found in registry.", 
+                type="Mementify.TransformerRegistry.NotFoundError" 
+            );
+        }
+        return variables.registry[ arguments.name ];
+    }
+    
+    // --- Metodi Fake per Demo ---
+
+    private function registerTransformers(){
+        
+        registerTransformer( 
+            name="nameItem",
+            transformer=function( value, memento ){
+                
+                return value ?: {
+                    "id"   = "",
+                    "name" = "",
+                    "lang" = { "id" = "IT", "name" = "" }
+                };
+                
+            }
+        );
+
+        registerTransformer( 
+            name="descriptionItem",
+            transformer=function( value, memento ){
+                
+                return value ?: {
+                    "id"   = "",
+                    "name" = "",
+                    "lang" = { "id" = "IT", "name" = "" }
+                };
+                
+            }
+        );
+    
+    }
+
+}
