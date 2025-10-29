@@ -1,55 +1,5 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [ "id", "shortId", "name", "code" ],
-		profiles        = {
-			list = {
-				defaultIncludes = [
-					"id",
-					"status",
-					"origin",
-					"attribute",
-					"attributeValue",
-					"nameItem",
-					"componentCount",
-					"level",
-					"orderBy",
-					"productId",
-					"spaces"
-				]
-			},
-			tree = {
-				defaultIncludes = [
-					"id",
-					"shortId",
-					"status",
-					"origin.id",
-					"level",
-					"attribute",
-					"attributeValue.rawValue",
-					"componentCount",
-					"prices"
-				]
-			},
-			treelight = {
-				defaultIncludes = [
-					"id",
-					"shortId",
-					"origin.id",
-					"level",
-					"attribute.id",
-					"attribute.name",
-					"attributeValue.id",
-					"attributeValue.horizontalImage",
-					"attributeValue.verticalImage",
-					"attributeValue.rawValue.name",
-					"horizontalImage",
-					"verticalImage"
-				]
-			}
-		}
-	}
-
 	property name="level" type="Numeric";
 	property name="orderBy" type="String";
 	property name="productId" type="String";

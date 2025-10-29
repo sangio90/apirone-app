@@ -43,6 +43,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function listItems( event, rc, prc ){
 		var result = getFlatTree( productId = rc.id, includeMissingValues = true );
 
+
 		event.setValue( "result", result );
 	}
 
