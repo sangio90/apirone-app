@@ -829,6 +829,10 @@ h2 {
     width: 100px !important;
 }
 
+.width-150 {
+    width: 150px !important;
+}
+
 .width-200 {
     width: 200px !important;
 }
@@ -1142,7 +1146,7 @@ h2 {
     width: 80px;
     float: left;
     padding: 5px;
-    border-color: 1px solid #989898;
+    border: 1px solid #c2c2c2;
     background: #EAEAEA;
     border-radius: 5px;
     margin: 5px;

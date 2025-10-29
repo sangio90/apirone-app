@@ -14,6 +14,7 @@
 		}
 
 		var bean = build( arguments.fontFamilySizeId );
+
 		cm.put(
 			getCacheScope(),
 			arguments.fontFamilySizeId,
@@ -31,6 +32,7 @@
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		String fontFamilyId,
+		
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "fontFamilySize.id" } ]

@@ -25,10 +25,10 @@ AP.signConfig.detail = ( function() {
             const seenHeights = new Set();
             const duplicateHeights = new Set();
 
-            const sizesData = fontConfig.items.data();
+            const items = fontConfig.items.data();
 
-            sizesData.forEach( size => {
-                const heightValue = size.get( "height" );
+            items.forEach( item => {
+                const heightValue = item.get( "size.id" );
 
                 if ( seenHeights.has( heightValue ) ) {
                     duplicateHeights.add( heightValue );
@@ -134,20 +134,19 @@ AP.signConfig.detail = ( function() {
             return false;
         },
 
-        getFamilySizes: function( event ) {
-            var selectedFont = viewModel.get( "selectedFonts" ).getByUid( event.parent().parent().uid );
+        getFontFamilySizes: function( event ) {
 
-            console.log( "type", selectedFont instanceof kendo );
+            var parent = event.parent().parent();
+            var sizes = parent.font.fontFamily.sizes.toJSON();
 
-            const sizes = selectedFont?.font?.fontFamily?.sizes || [];
+            var dataSource = new kendo.data.DataSource();
 
-            var data = [ { name: "-- Seleziona Altezza", id: null }, ...sizes ];
+            sizes.unshift( { "id": "", "name": "-- Seleziona" } );
 
-            console.log( "data", data );
+            dataSource.data( sizes );
 
-            var ds = new kendo.data.DataSource( { data: data } );
+            return dataSource;
 
-            return ds;
         },
 
         save: function( event ) {
@@ -194,6 +193,8 @@ AP.signConfig.detail = ( function() {
                 items: new kendo.data.DataSource( { data: font.items } )
             };
 
+            // console.log( "newRow", newRow );
+
             selected.add( newRow );
         }
 
@@ -209,4 +210,5 @@ AP.signConfig.detail = ( function() {
     };
 
     return pub;
-} () );
+}() );
+

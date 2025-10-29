@@ -24,13 +24,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
+		var result = super.getResult();
 
 		var thisId     = "";
 		var messageId  = "";
 		var newIds     = [];
 		var updatedIds = [];
-
-		var result = super.getResult();
 
 		for ( var thisConfig in json.configs ) {
 			var sizes         = [];
@@ -55,11 +54,10 @@ component extends="com.apirone.core.controller.AbsController" {
 				var bean = super.bean( "signageConfigItem" );
 
 				bean.setId( item.id );
-				bean.setHeight( item.height );
 				bean.setHeightInPixel( item.heightInPixel );
-				if (!IsNull(item.size?.id)) {
-					bean.setSize( super.fire( "FontFamilySize.get", [ item.size.id ] ) );
-				}
+				
+				bean.setSize( super.fire( "FontFamilySize.get", [ item.size.id ] ) );
+				
 				bean.setCharCount( item.charCount );
 				bean.setRowCount( item.rowCount );
 
@@ -67,19 +65,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 
 			signageConfig.setItems( sizes );
-
-			/*
-			if ( thisConfig.keyExists( "id" ) AND thisConfig.id.len() ) {
-				messageId = "signageConfig.updated";
-				thisId    = super.fire( "signageConfig.update", [ signageConfig ] )
-				updatedIds.add( thisId );
-			} else {
-				messageId = "signageConfig.created";
-				thisId    = super.fire( "signageConfig.create", [ signageConfig ] )
-				newIds.add( thisId );
-			}
-			*/
-
 
 			// TODO: consider:
 			// - implementing update logic

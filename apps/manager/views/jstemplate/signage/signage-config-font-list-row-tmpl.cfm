@@ -12,8 +12,8 @@
             <td>
                 <span data-bind="text: nameItem.name"></span>
             </td>
-            <td class="text-end">
-                <span data-bind="text: dimension"></span> mm
+            <td>
+                <span data-bind="text: fontFamily.name"></span>
             </td>
             <td class="text-end">
                 #iconButton(bind="click:add", icon="angle-right")#

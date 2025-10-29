@@ -6,25 +6,33 @@
             <td width="50">
                 <span data-bind="text: id"></span>
             </td>
-            <td class="align-end align-top" width="30%">
-                -<span data-bind="text: size.id"></span>-
-                <select 
-                    class="form-control"
-                    data-text-field="name"
-                    data-value-field="id"
-                    data-bind="source: getFamilySizes, value: size"
-                >
-                </select>
+            <td width="55%">
+                <div class="d-flex align-items-center">
+                    [<span data-bind="text: height"></span>]
+                    <select 
+                        class="form-control width-150 ms-1"
+                        data-text-field="name"
+                        data-value-field="id"
+                        data-rule-required="true"
+                        data-msg="Altezza font richiesta"
+                        data-bind="source: getFontFamilySizes, value: size"
+                    >
+                    </select>
+                    
+                </div>
             </td>
-            <td class="align-end align-top" width="20%">
-                <input type="text" class="form-control width-70" name="heightInPx_##:uid##"
-                    data-bind="value: heightInPixel"
-                    data-rule-required="true"
-                    data-rule-number="true"
-                    data-msg="Altezza in px richiesta e non valida"
-                >
+            <td width="15%">
+                <div class="d-flex align-items-center mr-1">
+                    <input type="text" class="form-control width-70 me-1" name="heightInPx_##:uid##"
+                        data-bind="value: heightInPixel"
+                        data-rule-required="true"
+                        data-rule-number="true"
+                        data-msg="Altezza in px richiesta e non valida"
+                    >
+                    <span>px</span>
+                </div>
             </td>
-            <td class="align-end align-top" width="25%">
+            <td width="15%">
                 <input type="text" class="form-control width-70" name="rowCount_##:uid##"
                     data-bind="value: rowCount" 
                     data-rule-required="true"
@@ -32,7 +40,7 @@
                     data-msg="Numero di righe richiesto e non valido"
                 >
             </td>
-            <td class="align-end align-top" width="25%">
+            <td width="15%">
                 <input type="text" class="form-control width-70" name="charCount_##:uid##"
                     data-bind="value: charCount" 
                     data-rule-required="true"

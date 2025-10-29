@@ -32,13 +32,12 @@ component extends="com.apirone.core.controller.AbsController" {
 			var fonts = super.fire( "signageConfig.list", { "catalogBundleId" = catalogBundle.getId() } );
 
 			for ( var item in fonts ) {
-				// var obj = getDataMapper().convert( item, "signageConfig", true );
 				var obj = memy.convert( item, "list" );
 				selectedFonts.add( obj );
 			}
 		}
 
-		prc.title    = "Configurazione per la linea < #prc.line.getName()#, #prc.model.getName()# >";
+		prc.title    = "Configurazione per < #prc.line.getName()#, #prc.model.getName()# >";
 		prc.subtitle = "#prc.category.getName()#";
 
 

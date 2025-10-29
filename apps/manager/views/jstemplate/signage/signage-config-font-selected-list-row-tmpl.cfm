@@ -15,19 +15,19 @@
                         </td>
                     </tr>
                     <tr>
-                        <th width="50" class="align-end header-small">
+                        <th width="50" class="header-small">
                             ID
                         </th>
-                        <th class="align-end header-small" width="25%">
+                        <th class="header-small" width="55%">
                             Altezza mm
                         </th>
-                        <th class="align-end header-small" width="25%">
+                        <th class="header-small" width="15%">
                             Altezza px
                         </th>
-                        <th class="align-end header-small" width="25%">
+                        <th class="header-small" width="15%">
                             Righe
                         </th>
-                        <th class="align-end header-small" width="25%">
+                        <th class="header-small" width="15%">
                             Caratteri
                         </th>
                         <th width="50">
