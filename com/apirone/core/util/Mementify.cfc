@@ -10,6 +10,7 @@ component {
 	variables.transformerRegistry = {};
 	variables.mementoRulesCache   = {};
 	variables.metadataCache       = {};
+	variables.stats               = {};
 
 	function init(
 		required settings               = {},
@@ -29,6 +30,15 @@ component {
 		variables.settings            = thisSettings;
 		variables.configDirectory     = arguments.configDirectory;
 		variables.transformerRegistry = arguments.transformerRegistry;
+
+		// Inizializza le statistiche
+		variables.stats = {
+			"conversionsCount" = 0,
+			"totalTimeMs"      = 0,
+			"cacheHits"        = { "metadata" = 0, "rules" = 0 },
+			"cacheMisses"      = { "metadata" = 0, "rules" = 0 },
+			"startedAt"        = Now()
+		};
 
 		return this
 	}
@@ -64,6 +74,9 @@ component {
 		String timeMask,
 		Boolean autoCastBooleans
 	){
+		// Track stats: inizio timing
+		var startTick = GetTickCount();
+
 		var target = Duplicate( arguments.target );
 
 		var entityName = ListLast( $getCachedMetadata( target ).fullname, "." );
@@ -384,6 +397,11 @@ component {
 			}
 		}
 
+		// Track stats: fine timing e aggiornamento contatori
+		var duration = GetTickCount() - startTick;
+		variables.stats.conversionsCount++;
+		variables.stats.totalTimeMs += duration;
+
 		// Return memento
 		return result;
 	}
@@ -485,10 +503,13 @@ component {
 	}
 
 	private struct function $loadEntityRules( required string entityName ){
-		// Controlla la cache: Se gi� caricato, restituisci immediatamente.
+		// Controlla la cache: Se già caricato, restituisci immediatamente.
 		if ( StructKeyExists( variables.mementoRulesCache, arguments.entityName ) ) {
+			variables.stats.cacheHits.rules++;
 			return variables.mementoRulesCache[ arguments.entityName ];
 		}
+
+		variables.stats.cacheMisses.rules++;
 
 		var rules    = {};
 		var filePath = ExpandPath( variables.configDirectory & "/" & arguments.entityName & ".json.cfm" );
@@ -628,7 +649,7 @@ component {
 				// Se un array, restituiscilo, altrimenti prova a convertirlo
 				return IsArray( arguments.value ) ? arguments.value : ListToArray( arguments.value );
 			default:
-				Throw( message = "Type [#type#] not found", type = "Mementify.errors.castType.TypeNotFound" );
+				Throw( message = "CastType [#type#] not found", type = "Mementify.errors.castType.TypeNotFound" );
 		}
 	}
 
@@ -648,9 +669,50 @@ component {
 		// Se non è in cache, lo aggiungiamo
 		if ( !variables.metadataCache.keyExists( fullname ) ) {
 			variables.metadataCache[ fullname ] = metadata;
+			variables.stats.cacheMisses.metadata++;
+		} else {
+			variables.stats.cacheHits.metadata++;
 		}
 
 		return variables.metadataCache[ fullname ];
+	}
+
+	/**
+	 * Recupera le statistiche correnti sulle conversioni e l'uso della cache.
+	 *
+	 * @return struct Le statistiche con contatori e metriche calcolate.
+	 */
+	public struct function getStats(){
+		var stats              = Duplicate( variables.stats );
+		stats[ "avgTimeMs" ]   = stats.conversionsCount > 0 ? Round( stats.totalTimeMs / stats.conversionsCount ) : 0;
+		stats[ "uptimeHours" ] = DateDiff( "h", stats.startedAt, Now() );
+
+		// Calcola percentuali cache hit rate
+		var totalMetadataRequests = stats.cacheHits.metadata + stats.cacheMisses.metadata;
+		var totalRulesRequests    = stats.cacheHits.rules + stats.cacheMisses.rules;
+
+		stats[ "cacheHitRate" ] = {
+			"metadata" = totalMetadataRequests > 0 ? Round(
+				( stats.cacheHits.metadata / totalMetadataRequests ) * 100
+			) : 0,
+			"rules" = totalRulesRequests > 0 ? Round( ( stats.cacheHits.rules / totalRulesRequests ) * 100 ) : 0
+		};
+
+		return stats;
+	}
+
+	/**
+	 * Resetta i contatori delle statistiche.
+	 * Mantiene le cache ma azzera i contatori di conversioni e timing.
+	 */
+	public void function resetStats(){
+		variables.stats = {
+			"conversionsCount" = 0,
+			"totalTimeMs"      = 0,
+			"cacheHits"        = { "metadata" = 0, "rules" = 0 },
+			"cacheMisses"      = { "metadata" = 0, "rules" = 0 },
+			"startedAt"        = Now()
+		};
 	}
 
 }
