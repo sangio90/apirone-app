@@ -43,7 +43,6 @@ component extends="com.apirone.core.controller.AbsController" {
 	function listItems( event, rc, prc ){
 		var result = getFlatTree( productId = rc.id, includeMissingValues = true );
 
-
 		event.setValue( "result", result );
 	}
 
@@ -138,7 +137,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		status.setId( "ACT" ); // Active
 		value.setId( json.attributeValue.id );
 
-		//item.setOrderBy( json.orderBy );
+		// item.setOrderBy( json.orderBy );
 		item.setOrderBy( 10 );
 
 		item.setProductId( rc.id );
@@ -219,26 +218,36 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function getIdAndFileByParams( event, rc, prc ){
-		var result = super.getResult();
-		var data = {}
-		var catalogBundles = super.fire( "catalogBundle.list", { categoryId = rc.categoryId, lineId = rc.lineId, modelId = rc.modelId } )
-		if (Len(catalogBundles)) {
-			var catalogBundle = catalogBundles[1];
-			var products = super.fire( "product.list", { 
-				catalogBundleId = catalogBundle.getId(),
-				finishId = rc.finishId 
-			});
-			if (Len(products)) {
-				var productId = products[1].getId()
-				var files = super.fire( "file.list", { productId: productId })
-				result.productId = productId;
-				data.set('productId', productId)
-				if (Len(files)) {
-					var file = files[1];
-					json = super.getMementify().convert( file, "list" );
-					data.set('file', json)
+		var result         = super.getResult();
+		var data           = {}
+		var catalogBundles = super.fire(
+			"catalogBundle.list",
+			{
+				categoryId = rc.categoryId,
+				lineId     = rc.lineId,
+				modelId    = rc.modelId
+			}
+		)
+		if ( Len( catalogBundles ) ) {
+			var catalogBundle = catalogBundles[ 1 ];
+			var products      = super.fire(
+				"product.list",
+				{
+					catalogBundleId = catalogBundle.getId(),
+					finishId        = rc.finishId
 				}
-				result.setData(data)
+			);
+			if ( Len( products ) ) {
+				var productId    = products[ 1 ].getId()
+				var files        = super.fire( "file.list", { productId = productId } )
+				result.productId = productId;
+				data.set( "productId", productId )
+				if ( Len( files ) ) {
+					var file = files[ 1 ];
+					json     = super.getMementify().convert( file, "list" );
+					data.set( "file", json )
+				}
+				result.setData( data )
 			}
 		}
 
@@ -443,10 +452,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		var items = super.fire( "ProductItem.getFlatTree", params );
 
 		for ( var item in items ) {
-			var row = super.getMementify().convert( item, "tree" ); //TODO: use "treelight" instead?
-			
+			var row = super.getMementify().convert( item, "tree" ); // TODO: use "treelight" instead?
+
 			row[ "spaces" ] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
-			
+
 			data.add( row );
 		}
 

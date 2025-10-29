@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Thanks to:
 	https://github.com/coldbox-modules/mementifier
 */
@@ -9,6 +9,7 @@ component {
 	variables.configDirectory     = "";
 	variables.transformerRegistry = {};
 	variables.mementoRulesCache   = {};
+	variables.metadataCache       = {};
 
 	function init(
 		required settings               = {},
@@ -65,7 +66,7 @@ component {
 	){
 		var target = Duplicate( arguments.target );
 
-		var entityName = ListLast( GetMetadata( target ).fullname, "." );
+		var entityName = ListLast( $getCachedMetadata( target ).fullname, "." );
 
 		var externalRules = $getRulesFromHierarchy( target ); // from files
 
@@ -127,10 +128,10 @@ component {
 			var transformerNameOrClosure = thisMemento.mappers[ prop ];
 
 			if ( IsSimpleValue( transformerNameOrClosure ) ) {
-				// � una stringa! Risolvila tramite il registro iniettato.
+				// E' una stringa! Risolvila tramite il registro iniettato.
 				resolvedMappers[ prop ] = variables.transformerRegistry.get( transformerNameOrClosure );
 			} else {
-				// � gi� una closure (definita direttamente nel codice), usala cos� com'�.
+				// E' già una closure (definita direttamente nel codice), usala com'è
 				resolvedMappers[ prop ] = transformerNameOrClosure;
 			}
 		}
@@ -205,8 +206,7 @@ component {
 			var castType  = parsedDef.castType;
 			item          = parsedDef.prop;
 
-			// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
-			var thisValue = Javacast( "null", "" );
+			var thisValue = NullValue()
 
 			if ( arguments.trustedGetters || StructKeyExists( target, "get#item#" ) ) {
 				try {
@@ -288,7 +288,7 @@ component {
 						// Use resolved local.includes so nested keys from defaults/profiles are considered
 						var nestedIncludes = $buildNestedMementoList( local.includes, item );
 
-						// FIX: Determine if we should ignore defaults for the child
+						// Determine if we should ignore defaults for the child
 						// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
 						// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
 						// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
@@ -323,7 +323,7 @@ component {
 				// Use resolved local.includes so nested keys from defaults/profiles are considered
 				var nestedIncludes = $buildNestedMementoList( local.includes, item );
 
-				// FIX: Determine if we should ignore defaults for the child
+				// Determine if we should ignore defaults for the child
 				// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
 				// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
 				// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
@@ -465,7 +465,7 @@ component {
 	 *
 	 * @return an array of object properties
 	 */
-	private array function $getDeepProperties( struct metaData = GetMetadata( this ) ){
+	private array function $getDeepProperties( struct metaData = getCachedMetadata( this ) ){
 		var properties = [];
 
 		// if this object extends another object, append any inherited properties.
@@ -515,16 +515,16 @@ component {
 
 	/**
 	 * Trova le regole Memento risalendo la gerarchia di ereditariet�.
-	 * Questo assicura che un'entit� derivata erediti le regole dal suo antenato
+	 * Questo assicura che un'entità derivata erediti le regole dal suo antenato
 	 * se non ha un proprio file di configurazione specifico.
 	 * * @targetObject L'istanza dell'oggetto da serializzare.
-	 * @return struct La configurazione Memento pi� specifica trovata (es. Product.json).
+	 * @return struct La configurazione Memento più specifica trovata (es. Product.json).
 	 */
 	private struct function $getRulesFromHierarchy( required Any targetObject ){
-		var metadata      = GetMetadata( arguments.targetObject );
+		var metadata      = $getCachedMetadata( arguments.targetObject );
 		var externalRules = {};
 
-		// Ciclo di risalita della gerarchia: inizia dall'oggetto pi� specifico
+		// Ciclo di risalita della gerarchia: inizia dall'oggetto più specifico
 		while ( StructKeyExists( metadata, "fullname" ) ) {
 			var entityName = ListLast( metadata.fullname, "." );
 
@@ -533,7 +533,7 @@ component {
 			var currentRules = $loadEntityRules( entityName );
 
 			if ( !StructIsEmpty( currentRules ) ) {
-				// Regole trovate! La configurazione pi� specifica vince.
+				// Regole trovate! La configurazione più specifica vince.
 
 				externalRules = currentRules;
 				break;
@@ -554,7 +554,7 @@ component {
 
 	/**
 	 * Analizza una stringa di configurazione (es. "name:fullName$String") e ne estrae
-	 * la propriet� originale, l'alias finale e il tipo di casting richiesto.
+	 * la proprietà originale, l'alias finale e il tipo di casting richiesto.
 	 *
 	 * @propertyDefinition La stringa da analizzare.
 	 * @return struct Contiene le chiavi 'originalProp', 'finalAlias', 'castType'.
@@ -632,4 +632,26 @@ component {
 		}
 	}
 
+	/**
+	 * Recupera i metadata di un oggetto con caching.
+	 * Questa funzione cachea i metadata per evitare chiamate ripetute a GetMetaData()
+	 * che sono molto costose in termini di performance.
+	 *
+	 * @target L'oggetto di cui recuperare i metadata.
+	 * @return struct I metadata dell'oggetto (cached se già recuperati in precedenza).
+	 */
+	private struct function $getCachedMetadata( required any target ){
+		// Prima otteniamo il metadata base per avere il fullname
+		var metadata = GetMetadata( arguments.target );
+		var fullname = metadata.fullname;
+
+		// Se non è in cache, lo aggiungiamo
+		if ( !variables.metadataCache.keyExists( fullname ) ) {
+			variables.metadataCache[ fullname ] = metadata;
+		}
+
+		return variables.metadataCache[ fullname ];
+	}
+
 }
+
