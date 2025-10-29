@@ -12,6 +12,9 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
+            <td>
+                <div data-bind="source: sizes" data-template="font-family-grid-size-row-tmpl"></div>
+            </td>
             <td class="text-center">
                 #iconButton(bind="click:editPictograms", icon="image")#
             </td>
@@ -26,6 +29,8 @@
             </td>
         </tr>
     </nmscript>
+
+    #template( view="jstemplate/font-family/font-family-grid-size-row-tmpl" )#
 
 </cfoutput>
 

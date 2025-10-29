@@ -65,8 +65,9 @@
                                 id="font-family-grid",
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '40px', 'headerAttributes': { 'class': 'justify-content-center' } } ,
-                                    { 'field':'code', 'title':'Codice'},
+                                    { 'field':'code', 'title':'Codice', width: '80px'},
                                     { 'field':'name', 'title':'Nome'},
+                                    { 'field':'sizes', 'title':'Dimensioni'},
                                     { 'field':'', 'title':'Immagini', width: '50px'},
                                     { 'field':'', 'title':'Dettaglio font family', width: '50px'},
                                     { 

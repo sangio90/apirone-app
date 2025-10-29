@@ -1137,3 +1137,13 @@ h2 {
     color: White;
     background-color: Red;
 }
+
+.font-family-grid-size-row {
+    width: 80px;
+    float: left;
+    padding: 5px;
+    border-color: 1px solid #989898;
+    background: #EAEAEA;
+    border-radius: 5px;
+    margin: 5px;
+}
