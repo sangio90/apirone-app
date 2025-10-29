@@ -813,6 +813,10 @@ h2 {
     is just used by bootstrap
 */
 
+.min-width-50 {
+    min-width: 50px !important;
+}
+
 .width-30 {
     width: 30px !important;
 }

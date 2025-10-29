@@ -15,7 +15,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th width="50" class="header-small">
+                        <th class="header-small min-width-50">
                             ID
                         </th>
                         <th class="header-small" width="55%">
@@ -30,13 +30,15 @@
                         <th class="header-small" width="15%">
                             Caratteri
                         </th>
-                        <th width="50">
+                        <th class="min-width-50">
                         </th>
-                        <th width="50">
+                        <th class="min-width-50">
+                        </th>
+                        <th class="min-width-50">
                         </th>
                     </tr>
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <table class="table">
                                 <tbody data-template="signage-config-font-selected-size-list-row-tmpl" data-bind="source: items">
                                 </tbody>
@@ -44,7 +46,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="7" class="pb-3 text-center">
+                        <td colspan="8" class="pb-3 text-center">
                             <button class="btn btn-sm btn-default" data-bind="click:addItem">Aggiungi riga &raquo;</button>
                         </td>
                     </tr>

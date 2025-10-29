@@ -1,19 +1,18 @@
-﻿AP.signConfig = AP.signConfig || {};
+﻿AP.signageConfig = AP.signageConfig || {};
 
-AP.signConfig.fields = {
+AP.signageConfig.fields = {
     detailRoot: $( "#signage-config-root" ),
     selectedForm: $( "#signage-config-selected-form" ),
     detailForm: $( "#signage-detail-form" ),
 };
 
 $( document ).ready( function() {
-    if ( AP.signConfig.fields.detailRoot.length ) {
-        AP.signConfig.detail.init();
+    if ( AP.signageConfig.fields.detailRoot.length ) {
+        AP.signageConfig.detail.init();
     }
 } );
 
-
-AP.signConfig.detail = ( function() {
+AP.signageConfig.detail = ( function() {
 
     $.validator.addMethod( "findDuplicateHeights", function( value, element ) {
 
@@ -52,7 +51,7 @@ AP.signConfig.detail = ( function() {
     var pub = {};
 
     var componentApp = AP.component.modal;
-    var fields = AP.signConfig.fields;
+    var fields = AP.signageConfig.fields;
 
     var defaultSizeRow = {
         id: "",
@@ -104,6 +103,13 @@ AP.signConfig.detail = ( function() {
             return event.id > 0;
         },
 
+        openComponentWithItems: function( event ) {
+
+            window.open( "/manager/signages/rows-config-item/" + event.data.id, "_blank" );
+
+            return false;
+        },
+
         openComponentsList: function( event ) {
 
             var value = {
@@ -150,7 +156,7 @@ AP.signConfig.detail = ( function() {
         },
 
         save: function( event ) {
-            var selectedForm = AP.signConfig.fields.selectedForm;
+            var selectedForm = AP.signageConfig.fields.selectedForm;
             var status = selectedForm.find( ".status" );
 
             if ( selectedForm.valid() ) {
@@ -182,7 +188,7 @@ AP.signConfig.detail = ( function() {
 
     pub.init = function() {
 
-        kendo.bind( AP.signConfig.fields.detailRoot, viewModel );
+        kendo.bind( AP.signageConfig.fields.detailRoot, viewModel );
 
         var selected = new kendo.data.DataSource();
 
@@ -193,14 +199,12 @@ AP.signConfig.detail = ( function() {
                 items: new kendo.data.DataSource( { data: font.items } )
             };
 
-            // console.log( "newRow", newRow );
-
             selected.add( newRow );
         }
 
         viewModel.set( "selectedFonts", selected );
 
-        var selectedForm = AP.signConfig.fields.selectedForm;
+        var selectedForm = AP.signageConfig.fields.selectedForm;
 
         selectedForm.validate( {
             onfocusout: function( element ) {

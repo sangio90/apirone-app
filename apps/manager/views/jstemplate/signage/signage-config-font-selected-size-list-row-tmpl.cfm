@@ -48,14 +48,21 @@
                     data-msg="Numero di caratteri richiesto e non valido"
                 >
             </td>
-            <td class="text-center" width="50">
+            <td class="text-center min-width-50">
+                <button type="button" class="btn btn-default btn-sm" 
+                    data-bind="click:openComponentWithItems, visible:showComponentButton" 
+                    data-type="signageConfigItem"> 
+                    <i class="far fa-window-restore"></i> 
+                </button>                
+            </td>
+            <td class="text-center min-width-50">
                 <button type="button" class="btn btn-default btn-sm" 
                     data-bind="click:openComponentsList, visible:showComponentButton" 
                     data-type="signageConfigItem"> 
                     <i class="fas fa-window-restore"></i> 
                 </button>                
             </td>
-            <td class="text-center" width="50">
+            <td class="text-center min-width-50">
                 #iconButton(bind="click:delete", icon="trash")#
             </td>
         </tr>

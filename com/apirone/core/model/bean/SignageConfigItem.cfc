@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	property name="height" type="Numeric"; // font height
+	property name="height" type="Numeric"; // font height //TODO: to remove
 	property name="heightInPixel" type="Numeric";
 	property name="rowCount" type="Numeric";
 	property name="charCount" type="Numeric";

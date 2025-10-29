@@ -22,7 +22,7 @@ component {
 			dateMask          = settings?.dateMask ?: "yyyy-MM-dd",
 			timeMask          = settings?.timeMask ?: "HH:mm:ss",
 			nullDefaultValue  = settings?.nullDefaultValue ?: null,
-			trustedGetters    = settings?.trustedGetters ?: false,
+			trustedGetters    = settings?.trustedGetters ?: true, // the fastest option
 			convertToTimezone = settings?.convertToTimezone ?: "",
 			autoCastBooleans  = settings?.autoCastBooleans ?: false
 		}
@@ -429,6 +429,59 @@ component {
 	}
 
 	/**
+	 * Recupera le statistiche correnti sulle conversioni e l'uso della cache.
+	 *
+	 * @return struct Le statistiche con contatori e metriche calcolate.
+	 */
+	public struct function getStats(){
+		var stats              = Duplicate( variables.stats );
+		// avgTimeMs è il tempo medio in millisecondi che ci vuole per fare una conversione (chiamata a convert()).
+		stats[ "avgTimeMs" ]   = stats.conversionsCount > 0 ? Round( stats.totalTimeMs / stats.conversionsCount ) : 0;
+		stats[ "uptimeHours" ] = DateDiff( "h", stats.startedAt, Now() );
+
+		// Calcola percentuali cache hit rate
+		var totalMetadataRequests = stats.cacheHits.metadata + stats.cacheMisses.metadata;
+		var totalRulesRequests    = stats.cacheHits.rules + stats.cacheMisses.rules;
+
+		/*
+			cacheHitRate contiene le percentuali di successo della cache (cache hit rate) per metadata e rules.
+			È un calcolo che ti dice su 100 richieste, quante volte ho trovato il dato in cache invece di doverlo ricaricare.
+			95-100% = Ottimo
+			70-94%  = Buono
+			< 70%   = Problema: troppi cache miss, forse cache troppo piccola o dati che cambiano spesso
+			Ti dice se la cache dei metadata e delle rules sta funzionando bene.
+			Se vedi percentuali basse, significa che stai facendo tante chiamate a GetMetaData() o tanti caricamenti di file JSON, rallentando l'app.
+		*/
+		stats[ "cacheHitRate" ] = {
+			"metadata" = totalMetadataRequests > 0 ? Round(
+				( stats.cacheHits.metadata / totalMetadataRequests ) * 100
+			) : 0,
+			"rules" = totalRulesRequests > 0 ? Round( ( stats.cacheHits.rules / totalRulesRequests ) * 100 ) : 0
+		};
+
+		return stats;
+	}
+
+	/**
+	 * Resetta i contatori delle statistiche.
+	 * Mantiene le cache ma azzera i contatori di conversioni e timing.
+	 */
+	public void function resetStats(){
+		variables.stats = {
+			"conversionsCount" = 0,
+			"totalTimeMs"      = 0,
+			"cacheHits"        = { "metadata" = 0, "rules" = 0 },
+			"cacheMisses"      = { "metadata" = 0, "rules" = 0 },
+			"startedAt"        = Now()
+		};
+	}
+
+
+	/*
+		private methods
+	*/
+
+	/**
 	 * Build a new memento include/exclude list using the target list and a property root
 	 *
 	 * @list The list to use for construction
@@ -677,43 +730,4 @@ component {
 		return variables.metadataCache[ fullname ];
 	}
 
-	/**
-	 * Recupera le statistiche correnti sulle conversioni e l'uso della cache.
-	 *
-	 * @return struct Le statistiche con contatori e metriche calcolate.
-	 */
-	public struct function getStats(){
-		var stats              = Duplicate( variables.stats );
-		stats[ "avgTimeMs" ]   = stats.conversionsCount > 0 ? Round( stats.totalTimeMs / stats.conversionsCount ) : 0;
-		stats[ "uptimeHours" ] = DateDiff( "h", stats.startedAt, Now() );
-
-		// Calcola percentuali cache hit rate
-		var totalMetadataRequests = stats.cacheHits.metadata + stats.cacheMisses.metadata;
-		var totalRulesRequests    = stats.cacheHits.rules + stats.cacheMisses.rules;
-
-		stats[ "cacheHitRate" ] = {
-			"metadata" = totalMetadataRequests > 0 ? Round(
-				( stats.cacheHits.metadata / totalMetadataRequests ) * 100
-			) : 0,
-			"rules" = totalRulesRequests > 0 ? Round( ( stats.cacheHits.rules / totalRulesRequests ) * 100 ) : 0
-		};
-
-		return stats;
-	}
-
-	/**
-	 * Resetta i contatori delle statistiche.
-	 * Mantiene le cache ma azzera i contatori di conversioni e timing.
-	 */
-	public void function resetStats(){
-		variables.stats = {
-			"conversionsCount" = 0,
-			"totalTimeMs"      = 0,
-			"cacheHits"        = { "metadata" = 0, "rules" = 0 },
-			"cacheMisses"      = { "metadata" = 0, "rules" = 0 },
-			"startedAt"        = Now()
-		};
-	}
-
 }
-

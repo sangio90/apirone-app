@@ -60,6 +60,7 @@
 		/*
 			signages
 		*/
+		get( "/signages/rows-config-item/:id" ).to( "SignageConfigItemController.get" ).end();
 		post( "/ajax/signages/rows-config" ).to( "SignageConfigAjaxController.save" ).end();
 		get( "/signages/rows-config/:id" ).to( "SignageConfigController.rowConfig" ).end();
 		get( "/signages/rows-config" ).to( "SignageConfigController.rowConfig" ).end();
