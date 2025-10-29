@@ -1,21 +1,20 @@
-﻿/*
+/*
 	Thanks to:
 	https://github.com/coldbox-modules/mementifier
 */
 
 component {
 
-	variables.settings = {};
-	variables.configDirectory = "";
+	variables.settings            = {};
+	variables.configDirectory     = "";
 	variables.transformerRegistry = {};
-	variables.mementoRulesCache = {};
+	variables.mementoRulesCache   = {};
 
 	function init(
-		required settings = {},
-		required String configDirectory = "/config/mementos/", 
-    	required Struct transformerRegistry		
+		required settings               = {},
+		required String configDirectory = "/config/mementos/",
+		required Struct transformerRegistry
 	){
-		
 		var thisSettings = {
 			iso8601Format     = settings?.iso8601Format ?: false,
 			dateMask          = settings?.dateMask ?: "yyyy-MM-dd",
@@ -26,8 +25,8 @@ component {
 			autoCastBooleans  = settings?.autoCastBooleans ?: false
 		}
 
-		variables.settings = thisSettings;
-		variables.configDirectory = arguments.configDirectory;
+		variables.settings            = thisSettings;
+		variables.configDirectory     = arguments.configDirectory;
 		variables.transformerRegistry = arguments.transformerRegistry;
 
 		return this
@@ -64,26 +63,23 @@ component {
 		String timeMask,
 		Boolean autoCastBooleans
 	){
-
 		var target = Duplicate( arguments.target );
 
-		var entityName = ListLast( GetMetaData( target ).fullname, "." );
+		var entityName = ListLast( GetMetadata( target ).fullname, "." );
 
-		var externalRules = $getRulesFromHierarchy( target ); //from files
+		var externalRules = $getRulesFromHierarchy( target ); // from files
 
-		//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="#entityName# external rules: #SerializeJSON(externalRules)#" );
-
-		if( externalRules.len() ) {
+		if ( externalRules.len() ) {
 			var memento = externalRules
 		} else {
-			//TODO: inline rules to remove 
+			// TODO: inline rules to remove
 			var memento = arguments.target.memento;
 		}
 
 		local.includes = Duplicate( arguments.includes );
 		local.excludes = Duplicate( arguments.excludes );
 
-		//var memento = target.memento;
+		// var memento = target.memento;
 
 		if ( IsSimpleValue( local.includes ) ) {
 			local.includes = ListToArray( local.includes );
@@ -129,17 +125,17 @@ component {
 		var resolvedMappers = {};
 		for ( var prop in thisMemento.mappers ) {
 			var transformerNameOrClosure = thisMemento.mappers[ prop ];
-			
+
 			if ( IsSimpleValue( transformerNameOrClosure ) ) {
-				// È una stringa! Risolvila tramite il registro iniettato.
-				resolvedMappers[ prop ] = variables.transformerRegistry.get( transformerNameOrClosure ); 
+				// � una stringa! Risolvila tramite il registro iniettato.
+				resolvedMappers[ prop ] = variables.transformerRegistry.get( transformerNameOrClosure );
 			} else {
-				// È già una closure (definita direttamente nel codice), usala così com'è.
+				// � gi� una closure (definita direttamente nel codice), usala cos� com'�.
 				resolvedMappers[ prop ] = transformerNameOrClosure;
 			}
 		}
 		// Sostituiamo i transformer originali (con stringhe) con quelli risolti (con closure).
-		thisMemento.mappers = resolvedMappers;		
+		thisMemento.mappers = resolvedMappers;
 
 		// Do we have a * for auto includes of all properties in the object
 		if ( ArrayLen( thisMemento.defaultIncludes ) && thisMemento.defaultIncludes[ 1 ] == "*" ) {
@@ -203,15 +199,14 @@ component {
 				item           = ListFirst( item, "." );
 			}
 
+			// Parse property definition: supports "prop", "prop:alias", "prop$Type", "prop:alias$Type"
+			var parsedDef = $parsePropertyDefinition( item );
+			var thisAlias = parsedDef.alias;
+			var castType  = parsedDef.castType;
+			item          = parsedDef.prop;
+
 			// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
 			var thisValue = Javacast( "null", "" );
-			// Do we have a property output alias?
-			if ( item.find( ":" ) ) {
-				var thisAlias = item.getToken( 2, ":" );
-				item          = item.getToken( 1, ":" );
-			} else {
-				var thisAlias = item;
-			}
 
 			if ( arguments.trustedGetters || StructKeyExists( target, "get#item#" ) ) {
 				try {
@@ -277,7 +272,6 @@ component {
 
 			// Array Collections
 			else if ( IsArray( thisValue ) ) {
-
 				// Map Items into result object
 				result[ thisAlias ] = [];
 				// Again we use traditional loops to avoid closure references and slowness on some engines
@@ -291,17 +285,24 @@ component {
 						)
 					) {
 						// If no nested includes requested, then default them
-						var nestedIncludes = $buildNestedMementoList( includes, item );
+						// Use resolved local.includes so nested keys from defaults/profiles are considered
+						var nestedIncludes = $buildNestedMementoList( local.includes, item );
+
+						// FIX: Determine if we should ignore defaults for the child
+						// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
+						// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
+						// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
+						var shouldIgnoreDefaults = nestedIncludes.len() > 0;
 
 						// Process the item memento
 						result[ thisAlias ][ thisIndex ] = convert(
 							target          : thisValue[ thisIndex ],
 							includes        : nestedIncludes,
-							excludes        : $buildNestedMementoList( excludes, item ),
+							excludes        : $buildNestedMementoList( local.excludes, item ),
 							mappers         : $buildNestedMementoStruct( mappers, item ),
 							defaults        : $buildNestedMementoStruct( defaults, item ),
-							// cascade the ignore defaults down if specific nested includes are requested
-							ignoreDefaults  : nestedIncludes.len() || arguments.ignoreDefaults,
+							// cascade the ignore defaults down ONLY if specific nested includes are requested
+							ignoreDefaults  : shouldIgnoreDefaults,
 							// Cascade the arguments to the children
 							profile         : arguments.profile,
 							trustedGetters  : arguments.trustedGetters,
@@ -319,20 +320,25 @@ component {
 			// Single Object Relationships
 			else if ( IsValid( "component", thisValue ) ) {
 				// If no nested includes requested, then default them
-				var nestedIncludes = $buildNestedMementoList( includes, item );
+				// Use resolved local.includes so nested keys from defaults/profiles are considered
+				var nestedIncludes = $buildNestedMementoList( local.includes, item );
 
-				//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="#entityName# : nestedIncludes:#nestedIncludes#" );
+				// FIX: Determine if we should ignore defaults for the child
+				// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
+				// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
+				// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
+				var shouldIgnoreDefaults = nestedIncludes.len() > 0;
 
 				// Process the item memento
 				var thisItemMemento = convert(
 					target          : thisValue,
 					includes        : nestedIncludes,
-					excludes        : $buildNestedMementoList( excludes, item ),
-					//excludes        : ["name", "hex"],
+					excludes        : $buildNestedMementoList( local.excludes, item ),
+					// excludes        : ["name", "hex"],
 					mappers         : $buildNestedMementoStruct( mappers, item ),
 					defaults        : $buildNestedMementoStruct( defaults, item ),
-					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults  : nestedIncludes.len() || arguments.ignoreDefaults,
+					// cascade the ignore defaults down ONLY if specific nested includes are requested
+					ignoreDefaults  : shouldIgnoreDefaults,
 					// Cascade the arguments to the children
 					profile         : arguments.profile,
 					trustedGetters  : arguments.trustedGetters,
@@ -341,6 +347,7 @@ component {
 					timeMask        : arguments.timeMask,
 					autoCastBooleans: arguments.autoCastBooleans
 				);
+
 
 				// Do we have a root already for this guy?
 				if ( result.keyExists( thisAlias ) ) {
@@ -354,6 +361,11 @@ component {
 			else {
 				result[ thisAlias ] = thisValue;
 			}
+
+			// Apply casting if specified in the property definition
+			if ( Len( castType ) && result.keyExists( thisAlias ) ) {
+				result[ thisAlias ] = $applyCast( result[ thisAlias ], castType );
+			}
 		}
 
 		for ( var item in result ) {
@@ -362,7 +374,8 @@ component {
 				// ACF compat
 				var thisMapper = thisMemento.mappers[ item ];
 				// Transform it
-				result[ item ] = thisMapper( result[ item ], result );;
+				result[ item ] = thisMapper( result[ item ], result );
+				;
 			} else {
 				// Check for null values
 				result[ item ] = ( !result.keyExists( item ) || IsNull( result[ item ] ) ) ? NullValue() : result[
@@ -418,13 +431,13 @@ component {
 
 		var results = [];
 
-		for( var target in arguments.list ){
-			if( listFirst( target, "." ) == root && listLen( target, "." ) > 1 ){
+		for ( var target in arguments.list ) {
+			if ( ListFirst( target, "." ) == root && ListLen( target, "." ) > 1 ) {
 				results.append( target.listDeleteAt( 1, "." ) );
 			}
 		}
 
-		return results;		
+		return results;
 	}
 
 	/**
@@ -472,26 +485,24 @@ component {
 	}
 
 	private struct function $loadEntityRules( required string entityName ){
-
-		// Controlla la cache: Se già caricato, restituisci immediatamente.
+		// Controlla la cache: Se gi� caricato, restituisci immediatamente.
 		if ( StructKeyExists( variables.mementoRulesCache, arguments.entityName ) ) {
-			//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="Regole in cache per #entityName#: #SerializeJSON( variables.mementoRulesCache[ arguments.entityName ] )#" );
 			return variables.mementoRulesCache[ arguments.entityName ];
 		}
 
-		var rules = {};
+		var rules    = {};
 		var filePath = ExpandPath( variables.configDirectory & "/" & arguments.entityName & ".json.cfm" );
-		
+
 		// Controlla se il file esiste
 		if ( FileExists( filePath ) ) {
 			try {
 				var fileContent = FileRead( filePath );
-				// Assumiamo che il file JSON contenga direttamente le regole dell'entità
-				rules = DeserializeJSON( fileContent );
+				// Assumiamo che il file JSON contenga direttamente le regole dell'entit�
+				rules           = DeserializeJSON( fileContent );
 			} catch ( any e ) {
-				throw( 
-					message="Config file for entity [#arguments.entityName#] is broken", 
-					type="Mementify.entityRule.ConfigFileIsBroken"
+				Throw(
+					message = "Config file for entity [#arguments.entityName#] is broken",
+					type    = "Mementify.entityRule.ConfigFileIsBroken"
 				);
 			}
 		}
@@ -500,41 +511,38 @@ component {
 		variables.mementoRulesCache[ arguments.entityName ] = rules;
 
 		return rules;
-	}	
+	}
 
 	/**
-	 * Trova le regole Memento risalendo la gerarchia di ereditarietà.
-	 * Questo assicura che un'entità derivata erediti le regole dal suo antenato 
+	 * Trova le regole Memento risalendo la gerarchia di ereditariet�.
+	 * Questo assicura che un'entit� derivata erediti le regole dal suo antenato
 	 * se non ha un proprio file di configurazione specifico.
 	 * * @targetObject L'istanza dell'oggetto da serializzare.
-	 * @return struct La configurazione Memento più specifica trovata (es. Product.json).
+	 * @return struct La configurazione Memento pi� specifica trovata (es. Product.json).
 	 */
 	private struct function $getRulesFromHierarchy( required Any targetObject ){
-		var metadata = GetMetaData( arguments.targetObject );
+		var metadata      = GetMetadata( arguments.targetObject );
 		var externalRules = {};
 
-		// Ciclo di risalita della gerarchia: inizia dall'oggetto più specifico
+		// Ciclo di risalita della gerarchia: inizia dall'oggetto pi� specifico
 		while ( StructKeyExists( metadata, "fullname" ) ) {
-
 			var entityName = ListLast( metadata.fullname, "." );
 
 			// Carica le regole (usa la cache e legge il file se necessario)
 			// Dobbiamo assicuraci che $loadEntityRules sia un metodo esistente nel Mementify
-			var currentRules = $loadEntityRules( entityName ); 
+			var currentRules = $loadEntityRules( entityName );
 
 			if ( !StructIsEmpty( currentRules ) ) {
-				
-				// Regole trovate! La configurazione più specifica vince.
-				//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="regole trovate: #entityName# #SerializeJSON(currentRules)#" );
+				// Regole trovate! La configurazione pi� specifica vince.
 
 				externalRules = currentRules;
-				break; 
+				break;
 			}
-			
+
 			// Passa al genitore
 			if ( StructKeyExists( metadata, "extends" ) ) {
 				// Usa GetMetaData sul percorso completo della classe genitore
-				metadata = metadata.extends; 
+				metadata = metadata.extends;
 			} else {
 				// Raggiunto l'oggetto base (es. Component, Object)
 				break;
@@ -542,6 +550,86 @@ component {
 		}
 
 		return externalRules;
-	}	
+	}
+
+	/**
+	 * Analizza una stringa di configurazione (es. "name:fullName$String") e ne estrae
+	 * la propriet� originale, l'alias finale e il tipo di casting richiesto.
+	 *
+	 * @propertyDefinition La stringa da analizzare.
+	 * @return struct Contiene le chiavi 'originalProp', 'finalAlias', 'castType'.
+	 */
+	private struct function $parsePropertyDefinition( required string propertyDefinition ){
+		var definition   = arguments.propertyDefinition;
+		var originalProp = "";
+		var finalAlias   = "";
+		var castType     = "";
+
+		// ESTRAZIONE DEL CASTING ($)
+		if ( definition contains "$" ) {
+			// Il casting � sempre l'ultima parte
+			castType   = ListLast( definition, "$" );
+			// Rimuove la parte del casting dalla stringa rimanente
+			definition = ListDeleteAt( definition, ListLen( definition, "$" ), "$" );
+		}
+
+		// ESTRAZIONE DELL'ALIAS (:)
+		if ( definition contains ":" ) {
+			// Alias presente: "OriginalProp:FinalAlias"
+			originalProp = ListFirst( definition, ":" );
+			finalAlias   = ListLast( definition, ":" );
+		} else {
+			// Nessun alias: OriginalProp � anche l'Alias
+			originalProp = definition;
+			finalAlias   = definition;
+		}
+
+		// 3. RESTITUISCE LA STRUTTURA PULITA
+		return {
+			"prop"     = originalProp,
+			"alias"    = finalAlias,
+			"castType" = castType
+		};
+	}
+
+
+	/**
+	 * Applica il casting al valore in base al tipo specificato.
+	 *
+	 * @value Il valore da convertire.
+	 * @castType Il tipo di casting richiesto (es. "String", "Number", "Boolean", "Integer").
+	 * @return any Il valore convertito secondo il tipo specificato.
+	 */
+	private any function $applyCast( required any value, required string castType ){
+		// Se non c'è casting richiesto o il valore è null, restituisci il valore
+		if ( arguments.castType == "" || IsNull( arguments.value ) ) {
+			return arguments.value;
+		}
+
+		// Normalizza il nome del tipo (case-insensitive)
+		var type = LCase( Trim( arguments.castType ) );
+
+		switch ( type ) {
+			case "string":
+				return Javacast( "string", arguments.value );
+			case "number":
+			case "numeric":
+			case "double":
+			case "float":
+				return Javacast( "double", arguments.value );
+			case "integer":
+			case "int":
+			case "long":
+				return Javacast( "long", arguments.value );
+			case "boolean":
+			case "bool":
+				return Javacast( "boolean", arguments.value );
+			case "array":
+				// Se un array, restituiscilo, altrimenti prova a convertirlo
+				return IsArray( arguments.value ) ? arguments.value : ListToArray( arguments.value );
+			default:
+				Throw( message = "Type [#type#] not found", type = "Mementify.errors.castType.TypeNotFound" );
+		}
+	}
 
 }
