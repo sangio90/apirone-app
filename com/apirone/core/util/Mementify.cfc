@@ -472,9 +472,8 @@ component {
 	}
 
 	private struct function $loadEntityRules( required string entityName ){
-		// 1. Controlla la cache: Se già caricato, restituisci immediatamente.
-		//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="cerco regole per #entityName#" );
 
+		// Controlla la cache: Se già caricato, restituisci immediatamente.
 		if ( StructKeyExists( variables.mementoRulesCache, arguments.entityName ) ) {
 			//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="Regole in cache per #entityName#: #SerializeJSON( variables.mementoRulesCache[ arguments.entityName ] )#" );
 			return variables.mementoRulesCache[ arguments.entityName ];
@@ -483,7 +482,7 @@ component {
 		var rules = {};
 		var filePath = ExpandPath( variables.configDirectory & "/" & arguments.entityName & ".json.cfm" );
 		
-		// 2. Controlla se il file esiste
+		// Controlla se il file esiste
 		if ( FileExists( filePath ) ) {
 			try {
 				var fileContent = FileRead( filePath );
@@ -491,17 +490,15 @@ component {
 				rules = DeserializeJSON( fileContent );
 			} catch ( any e ) {
 				throw( 
-					message="Memento config file for #arguments.entityName# is broken", 
+					message="Config file for entity [#arguments.entityName#] is broken", 
 					type="Mementify.entityRule.ConfigFileIsBroken"
 				);
 			}
 		}
 
-		// 3. Salva nella cache (anche se vuoto, per non ricaricarlo)
+		// Salva nella cache (anche se vuoto, per non ricaricarlo)
 		variables.mementoRulesCache[ arguments.entityName ] = rules;
 
-		//cffile( action="APPEND", file=ExpandPath('/memento.log'), output="Trovate regole per #entityName#: #SerializeJSON(rules)#" );
-		
 		return rules;
 	}	
 

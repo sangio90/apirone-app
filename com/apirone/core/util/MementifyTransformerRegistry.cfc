@@ -11,7 +11,6 @@ component {
      * Inizializza il registro.
      */
     function init(){
-        // Pre-registra i metodi fake per i test
         registerTransformers();
         return this;
     }
