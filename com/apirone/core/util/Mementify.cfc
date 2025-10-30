@@ -40,6 +40,10 @@ component {
 			"startedAt"        = Now()
 		};
 
+		// Per-target (entity) statistics to identify slow object types
+		// Structure: variables.stats.targets[entityName] = { count, totalTimeMs, maxTimeMs, durations = [] }
+		variables.stats.targets = {};
+
 		return this
 	}
 
@@ -402,6 +406,35 @@ component {
 		variables.stats.conversionsCount++;
 		variables.stats.totalTimeMs += duration;
 
+		// Update per-target statistics (track which entity types are slow)
+		try {
+			if ( Len( entityName ) ) {
+				if ( NOT StructKeyExists( variables.stats.targets, entityName ) ) {
+					variables.stats.targets[ entityName ] = {
+						"count"       = 0,
+						"totalTimeMs" = 0,
+						"maxTimeMs"   = 0,
+						"durations"   = []
+					};
+				}
+
+				var tstat         = variables.stats.targets[ entityName ];
+				tstat.count       = tstat.count + 1;
+				tstat.totalTimeMs = tstat.totalTimeMs + duration;
+				if ( duration gt tstat.maxTimeMs ) {
+					tstat.maxTimeMs = duration;
+				}
+				// Keep only the most recent N samples to limit memory (N=200)
+				ArrayAppend( tstat.durations, duration );
+				if ( ArrayLen( tstat.durations ) gt 200 ) {
+					ArrayDeleteAt( tstat.durations, 1 );
+				}
+				variables.stats.targets[ entityName ] = tstat;
+			}
+		} catch ( any e ) {
+			// non-fatal: ensure stats update doesn't break conversion
+		}
+
 		// Return memento
 		return result;
 	}
@@ -434,7 +467,8 @@ component {
 	 * @return struct Le statistiche con contatori e metriche calcolate.
 	 */
 	public struct function getStats(){
-		var stats              = Duplicate( variables.stats );
+		var stats = Duplicate( variables.stats );
+
 		// avgTimeMs è il tempo medio in millisecondi che ci vuole per fare una conversione (chiamata a convert()).
 		stats[ "avgTimeMs" ]   = stats.conversionsCount > 0 ? Round( stats.totalTimeMs / stats.conversionsCount ) : 0;
 		stats[ "uptimeHours" ] = DateDiff( "h", stats.startedAt, Now() );
@@ -459,6 +493,40 @@ component {
 			"rules" = totalRulesRequests > 0 ? Round( ( stats.cacheHits.rules / totalRulesRequests ) * 100 ) : 0
 		};
 
+		// Per-target summaries (avg, p95, p99, max)
+		stats[ "targets" ] = {};
+
+		for ( var target in variables.stats.targets ) {
+			var raw     = variables.stats.targets[ target ];
+			var summary = {};
+
+			summary[ "count" ]       = raw.count;
+			summary[ "totalTimeMs" ] = raw.totalTimeMs;
+			summary[ "avgTimeMs" ]   = raw.count gt 0 ? Round( raw.totalTimeMs / raw.count ) : 0;
+			summary[ "maxTimeMs" ]   = raw.maxTimeMs ?: 0;
+			// compute percentiles on the stored durations (recent samples)
+
+			var durations = Duplicate( raw.durations );
+
+			if ( ArrayLen( durations ) gt 0 ) {
+				// sort numeric durations ascending for percentile calculation
+				ArraySort( durations, "numeric" );
+
+				var durationCount     = ArrayLen( durations );
+				
+				var idx95 = Ceiling( 0.95 * durationCount );
+				var idx99 = Ceiling( 0.99 * durationCount );
+
+				summary[ "p95" ] = durations[ idx95 ];
+				summary[ "p99" ] = durations[ idx99 ];
+			} else {
+				summary[ "p95" ] = 0;
+				summary[ "p99" ] = 0;
+			}
+
+			stats[ "targets" ][ target ] = summary;
+		}
+
 		return stats;
 	}
 
@@ -474,6 +542,8 @@ component {
 			"cacheMisses"      = { "metadata" = 0, "rules" = 0 },
 			"startedAt"        = Now()
 		};
+		// reset per-target stats
+		variables.stats.targets = {};
 	}
 
 

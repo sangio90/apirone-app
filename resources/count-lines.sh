@@ -1,3 +1,3 @@
-﻿#count-lines.sh
+#!/bin/sh
 
-cloc apps/ com/ config/ layouts/ resources/ tests/ tasks/ assets/
+cloc ../apps/ ../com/ ../config/ ../layouts/ ../resources/ ../tests/ ../tasks/ ../assets/

@@ -79,6 +79,10 @@
 		</cfif>
 
 		<cfdump var="#GetApplicationMetadata().datasources#">
+
+		<p>
+			<cfdump var="#wirebox.getInstance("Mementify").getStats()#">
+		</p>
 		
 	</div>
 
