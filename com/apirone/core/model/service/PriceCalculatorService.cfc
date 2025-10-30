@@ -12,16 +12,21 @@
 		return simulate( argumentCollection = arguments ).price;
 	}
 
-	public Struct function simulate( required String productId, required Numeric quantity=1, Array producItemtIds ){
-
-		if( arguments.quantity LTE 0 ) {
-			throw(
+	public Struct function simulate(
+		required String productId,
+		required Numeric quantity = 1,
+		Array producItemtIds
+	){
+		if ( arguments.quantity LTE 0 ) {
+			Throw(
 				type    = "apirone.error.PriceCalculator.QuantityLessThenZero",
 				message = "The quantity [#arguments.quantity#] must be greater than zero."
 			);
 		}
 
 		/*
+			INFO:
+
 			c1 = totale costi comp. bundle
 			c2 = totale costi comp. articolo
 			s1 = ( c1+c2 ) * markup articolo (PRICE);
@@ -49,31 +54,15 @@
 		var productId      = arguments.productId;
 		var productItemIds = arguments.producItemtIds;
 
-		var product   = productSvc.get( productId );
-		var price     = product.getPrice( "PRICE" );
-		
+		var product = productSvc.get( productId );
+		var price   = product.getPrice( "PRICE" );
 
 		var name = "#product.getLine().getName()# / #product.getModel().getName()# / #product.getFinish().getName()#";
 
-		appendLog( message = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#.", productName = "#name#" );
-
-		/*
-		if ( IsNull( price ) ) {
-			appendLog( message = "Nessun prezzo caricato, imposto il markup a 1" );
-
-			markup = 1
-		} else {
-			if ( price.getMethod().getId() == "F" ) {
-				appendLog(
-					message = "Caricato un prezzo fisso: #price.getAmount()#. Fine.;Totale prezzo: #formatExtended( price.getAmount() )#"
-				);
-				return var output = {
-					"price"   = price.getAmount(),
-					"logFile" = variables.logConfig.filePath
-				};
-			}
-		}
-		*/
+		appendLog(
+			message   = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#.",
+			productId = product.getSerial()
+		);
 
 		var markup = price?.getAmount() ?: 0;
 
@@ -81,10 +70,12 @@
 			fixed cost
 		*/
 
-		var fixedCost = product.getPrice( "COST_FIXED" )?.getAmount() ?: 0;
+		var fixedCost     = product.getPrice( "COST_FIXED" )?.getAmount() ?: 0;
 		var unitFixedCost = fixedCost / arguments.quantity;
 
-		appendLog( message = "Costo fisso per #arguments.quantity# pezzi. Costo fisso #fixedCost# / #arguments.quantity#;Costo fisso unitario: #formatExtended( unitFixedCost )#" );
+		appendLog(
+			message = "Costo fisso per #arguments.quantity# pezzi. Costo fisso #fixedCost# / #arguments.quantity#;Costo fisso unitario: #formatExtended( unitFixedCost )#"
+		);
 
 		addCost( "Costo fisso", unitFixedCost, "P" ); // sommerò gli "P" per il costo finale
 
@@ -101,9 +92,13 @@
 
 		var bundleCost = calculateComponentsTotal( bundleComponents );
 
-		//appendLog( message = "Costo componenti bundle #bundleCost#;Totale unitario: #formatExtended( bundleComponents )#" );
+		// appendLog( message = "Costo componenti bundle #bundleCost#;Totale unitario: #formatExtended( bundleComponents )#" );
 
-		addCost( "Costo componenti componenti linea / modello", bundleCost, "P" );
+		addCost(
+			"Costo componenti componenti linea / modello",
+			bundleCost,
+			"P"
+		);
 
 
 		/*
@@ -112,9 +107,9 @@
 
 		var productComponents = componentSvc.list( productId = productId, includeBaseAttributeComponents = true );
 
-		var productCost = calculateComponentsTotal( productComponents);
+		var productCost = calculateComponentsTotal( productComponents );
 
-		//appendLog( message = "Costo componenti prodotto #productComponents#;Totale unitario: #formatExtended( productCost )#" );
+		// appendLog( message = "Costo componenti prodotto #productComponents#;Totale unitario: #formatExtended( productCost )#" );
 
 		addCost( "Costo componenti prodotto", productCost, "P" );
 
@@ -128,7 +123,6 @@
 		appendLog( "** Inizio del calcolo del prezzo degli attributi" );
 
 		for ( var itemId in productItemIds ) {
-
 			var itemComponents = componentSvc.list( productItemId = itemId, includeBaseAttributeComponents = true );
 
 			var itemCost = 0;
@@ -136,9 +130,12 @@
 
 			var productItem = getProductItemService().get( itemId );
 
-			//appendLog( "" );
+			// appendLog( "" );
 
-			var attributeName = "Item: #itemId#, Attributo: #productItem.getAttribute().getName()# / #productItem.getAttributeValue().getRawValue().getName()#";
+			var attributeName = "Item: #itemId#, Attributo: #productItem.getAttribute().getName()# / #productItem
+				.getAttributeValue()
+				.getRawValue()
+				.getName()#";
 
 			var productItemPrice = productItem.getPrice( "PROD_ITEM_PRICE" );
 
@@ -153,26 +150,24 @@
 					itemCost = amount;
 				} else if ( productItemPrice.getMethod().getId() == "M" ) {
 					var compCost = calculateComponentsTotal( itemComponents );
-					itemCost = compCost * productItemPrice.getAmount();
+					itemCost     = compCost * productItemPrice.getAmount();
 
 					appendLog(
 						message = "#attributeName#. Markup per questo attributo: #productItemPrice.getAmount()#. Totale componenti: #compCost# * markup: #productItemPrice.getAmount()#;Costo attributo: #formatExtended( itemCost )#"
 					);
 				}
 			} else {
-
 				if ( !IsNull( attributePrice ) ) {
 					compCost = calculateComponentsTotal( itemComponents );
 
 					var amount = attributePrice.getAmount() ?: 0;
 
-					itemCost   = compCost * amount;
+					itemCost = compCost * amount;
 
 					appendLog(
 						message = "Markup generale per questo attributo: #productItem.getId()#. Totale componenti: #compCost# * markup: #amount#;Costo attributo: #formatExtended( itemCost )#"
 					);
 				}
-
 			}
 
 			addCost( "Costo attributo #itemId#", itemCost, "I" );
@@ -187,18 +182,24 @@
 
 		var finalCost = bundleCost + productCost + unitFixedCost;
 
-		appendLog( message = "Costi finali. Bundle: #bundleCost# + prodotto base: #productCost# + costo fisso: #unitFixedCost#;Costo finale: #formatExtended( finalCost )#", lineTypeId="H" );
+		appendLog(
+			message    = "Costi finali. Bundle: #bundleCost# + prodotto base: #productCost# + costo fisso: #unitFixedCost#;Costo finale: #formatExtended( finalCost )#",
+			lineTypeId = "H"
+		);
 
 		/*
 			final price
 		*/
 
 
-		//appendLog( message = " ;Totale costi prodotto: #formatExtended( costProduct )#" );
+		// appendLog( message = " ;Totale costi prodotto: #formatExtended( costProduct )#" );
 
 		var finalCost = ( ( bundleCost + productCost ) * markup ) + calculateTotalCostItems() + unitFixedCost;
 
-		appendLog( message = "Prezzo finale. ( Bundle: #bundleCost# + prodotto base: #productCost# ) * markup: #markup# ) + prezzo items: #calculateTotalCostItems()# + costo fisso: #unitFixedCost#;Prezzo finale: #formatExtended( finalCost )#", lineTypeId="H" );
+		appendLog(
+			message    = "Prezzo finale. ( Bundle: #bundleCost# + prodotto base: #productCost# ) * markup: #markup# ) + prezzo items: #calculateTotalCostItems()# + costo fisso: #unitFixedCost#;Prezzo finale: #formatExtended( finalCost )#",
+			lineTypeId = "H"
+		);
 
 		var output = {
 			"price"   = price,
@@ -254,13 +255,21 @@
 		return total;
 	}
 
-	private Void function addCost( required String label, required Numeric amount, required String typeId="P" ){
-		variables.costs.add( { "label" = arguments.label, "amount" = arguments.amount, "typeId" = arguments.typeId } );
+	private Void function addCost(
+		required String label,
+		required Numeric amount,
+		required String typeId = "P"
+	){
+		variables.costs.add( {
+			"label"  = arguments.label,
+			"amount" = arguments.amount,
+			"typeId" = arguments.typeId
+		} );
 	}
 
 	private Void function appendLog(
 		required String message,
-		String productName,
+		String productId,
 		String lineTypeId
 	){
 		var allowedLineType = "N,H"; // N=normal, H=highlighted
@@ -284,26 +293,26 @@
 		}
 
 		if ( StructIsEmpty( variables.logConfig ) ) {
-			if ( IsNull( productName ) ) {
+			if ( IsNull( productId ) ) {
 				Throw(
-					type    = "apirone.error.PriceCalculator.productNameRequired",
-					message = "ProductName is required on the first invocation of appendLog()"
+					type    = "apirone.error.PriceCalculator.productIdRequired",
+					message = "ProductId is required on the first invocation of appendLog()"
 				)
 			}
 
-			startLog( productName );
+			startLog( productId );
 		}
 
 		var thisDate = DateTimeFormat( Now(), "yyyy-mm-dd HH:nn:ss" );
 
-		var line = "#thisDate#;#arguments.lineTypeId#;#variables.logConfig.productName#;#message##Chr( 10 )#";
+		var line = "#thisDate#;#arguments.lineTypeId#;#variables.logConfig.productId#;#message##Chr( 10 )#";
 
 		FileAppend( variables.logConfig.filePath, line );
 	}
 
-	private Struct function startLog( required String productName ){
+	private Struct function startLog( required String productId ){
 		var util = new com.apirone.core.util.Udf();
-		var name = util.prettyString( productName );
+		// var name = util.prettyString( productName );
 
 		var logsDir = ExpandPath( "/../repository/private/logs/prices" );
 
@@ -313,7 +322,7 @@
 
 		var fileName = "product_"
 		& DateTimeFormat( Now(), "yyyy-mm-dd_HH-nn-ss" )
-		& "_" & name & ".log";
+		& "_serial-" & productId & ".log";
 
 		if ( request.isDev() ) {
 			fileName = "product_price_DEV_" & DateFormat( Now(), "yyyy-mm-dd" ) & ".log"
@@ -323,7 +332,7 @@
 
 		FileWrite( filePath, "", "UTF-8" );
 
-		variables.logConfig = { filePath = filePath, productName = productName }
+		variables.logConfig = { filePath = filePath, productId = productId };
 
 		return logConfig;
 	}
