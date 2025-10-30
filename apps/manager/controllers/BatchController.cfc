@@ -48,6 +48,8 @@
 				}
 			}
 
+
+
 			var existingElement = QueryExecute(
 				"
 				SELECT product_id, search_term
@@ -59,7 +61,7 @@
 			);
 
 			// CREATE
-			if ( IsNull( existingElement ) ) {
+			if ( existingElement.recordCount == 0 ) {
 				insertedRows++;
 
 				QueryExecute(
@@ -71,7 +73,7 @@
 					)
 					VALUES (
 						:term,
-						:product_id::uuid,
+						CAST(:product_id AS uuid),
 						'IT'
 					)
 				",
@@ -81,7 +83,7 @@
 				// UPDATE
 			}
 			elseif( Trim( existingElement.search_term ) != Trim( term ) ){
-				insertedRows++;
+				updatedRows++;
 
 				QueryExecute(
 					"
