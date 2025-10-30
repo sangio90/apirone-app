@@ -23,13 +23,15 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
 		var result = super.getResult();
 
 		var thisId     = "";
 		var messageId  = "";
 		var newIds     = [];
 		var updatedIds = [];
+
+
 
 		for ( var thisConfig in json.configs ) {
 			var sizes         = [];
@@ -55,9 +57,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				bean.setId( item.id );
 				bean.setHeightInPixel( item.heightInPixel );
-				
+
 				bean.setSize( super.fire( "FontFamilySize.get", [ item.size.id ] ) );
-				
+
 				bean.setCharCount( item.charCount );
 				bean.setRowCount( item.rowCount );
 

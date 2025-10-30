@@ -12,7 +12,3 @@
         </tr>
     </nmscript>
 </cfoutput>
-
-
-
-

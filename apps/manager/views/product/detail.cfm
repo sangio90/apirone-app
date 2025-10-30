@@ -1,7 +1,5 @@
 ﻿<cfimport prefix="ap" taglib="/apps/utils/ctags">
 
-
-
 <cfoutput>
 
     <div id="product-detail-root">
