@@ -23,27 +23,37 @@
 
                                 <div class="row d-flex mb-2">
 
-                                    <div class="col-sm-6">
-
-
-                                    </div>
-
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-12">
                                     
                                         <div class="row">
                                         
                                             <div class="col-12  d-flex gap-2 justify-content-end align-items-center">
 
-                                                <form class="d-flex align-items-center justify-content-end" id="product-change-form">
+                                                <form class="d-flex align-items-center justify-content-end" id="signage-config-item-change-form">
+
+                                                    <label class="me-2">Dimensioni:</label>
+
+                                                    <select name="itemId" class="form-control width-250 me-3">
+                                                        <cfloop array="#prc.signageItems#" item="signage">
+                                                            <cfloop array="#signage.getItems()#" item="item">
+                                                                <option value="#item.getId()#"
+                                                                    <cfif item.getId() EQ prc.signageConfigItemId>SELECTED</cfif>
+                                                                >
+                                                                    #signage.getFont().getName()# - #item.getSize().getName()#mm
+                                                                </option>
+                                                            </cfloop>
+                                                        </cfloop>
+
+                                                    </select>
 
                                                     <label class="me-2">Finitura:</label>
 
-                                                    <select name="finishId" class="form-control width-250 me-4"
+                                                    <select name="finishId" class="form-control width-250 me-3"
                                                         data-bind="events: { change: changeUri }">
                                                         <option value="">-- non trovato</option>
                                                         <cfloop array="#prc.finishes#" item="item">
                                                             <option value="#item.getId()#"
-                                                                <cfif item.getId() EQ prc.finish.getId()>SELECTED</cfif>
+                                                                <cfif item.getId() EQ prc.product.getFinish().getId()>SELECTED</cfif>
                                                             >
                                                                 #item.getName()#
                                                             </option>
@@ -58,12 +68,13 @@
                                                         <option value="">-- non trovato</option>
                                                         <cfloop array="#prc.models#" item="item">
                                                             <option value="#item.getId()#"
-                                                                <cfif item.getId() EQ prc.model.getId()>SELECTED</cfif>
+                                                                <cfif item.getId() EQ prc.product.getModel().getId()>SELECTED</cfif>
                                                             >
                                                                 #item.getCode()#
                                                             </option>
                                                         </cfloop>
                                                     </select>
+
 
                                                 </form>                                                
 
@@ -74,44 +85,9 @@
                                     
                                     </div>
 
-                                    <div class="col-sm-12 text-end">
-
-                                        <a href=""
-                                            class="underline"
-                                            id="toggle-unlinked-attributes"
-                                            data-bind="click:toggleUnlinked, text: textToggleLink">
-                                        </a>
-
-                                        |
-
-                                        <a href="" class="underline" data-type="item" data-signage-config-item-id="0" 
-                                            data-signage-config-item-name="Attributo radice" 
-                                            data-bind="click:openAttributesList">
-                                            Aggiungi attributo di base
-                                        </a>
-
-
-                                        #deleteButton(
-                                            bind  = "click:removeAttributes",
-                                            size  = "sm",
-                                            class = "ms-2"
-                                        )#
-
-                                    </div>
-
                                 </div>
 
                                 <form id="signage-config-item-grid-form">
-
-                                    <!---
-                                    TODO: remove productAttributesList
-                                    #productAttributesList( 
-                                        id="signage-config-item-items-grid", 
-                                        type="product", 
-                                        onDataBound="AP.product.items.onDataBound",
-                                        pageSizes=false
-                                    )#
-                                    ---->
 
                                     #grid(
                                         id      = "signage-config-item-items-grid",
@@ -119,19 +95,10 @@
                                         columns = "[
                                             { 'field':'Id', 'title':'ID', width: '70px' },
                                             { 'field':'name', 'title':'Attributo' },
-                                            { 'field':'', 'title':'Prezzo', width: '180px'},
-                                            { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
-                                            { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
                                             { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
-                                            { 
-                                                'field'           :'', 
-                                                'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                                'width'           :'40px',
-                                                'headerAttributes': { 'class': 'text-center' }
-                                            }
                                         ]",
                                         source: "items",
-                                        rowTemplate = "product/signage-config-item-item-row-tmpl"
+                                        rowTemplate = "signage/signage-config-item-product-item-list-row-tmpl"
                                     )#
 
                                 </form>

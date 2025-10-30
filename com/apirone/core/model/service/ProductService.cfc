@@ -249,7 +249,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return product;
 	}
 
-
 	private com.apirone.core.model.bean.Product function build( required String productId ){
 		var record = getDao().read( arguments.productId );
 
@@ -264,6 +263,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} else {
 				var bean = super.bean( "ProductComplex" );
 
+				bean.setLine( getLineService().get( record.line_id ) );
 				bean.setModel( getModelService().get( record.model_id ) );
 				bean.setFinish( getFinishService().get( record.finish_id ) );
 

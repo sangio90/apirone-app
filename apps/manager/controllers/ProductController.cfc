@@ -52,19 +52,20 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.subtitle = "Categoria #product.getCategory().getName()#, linea #product.getLine().getName()#";
 			prc.textLink = "Componenti per #product.getLine().getName()# / #product.getModel().getCode()# / #product.getFinish().getName()#";
 
-			prc.models     = super.fire( "model.list", { lineId = prc.line.getId() } );
 			prc.statusList = super.fire( "status.list", [ "line" ] );
+			prc.models     = super.fire( "model.list", { lineId = prc.line.getId() } );
 			prc.finishes   = super.fire( "finish.list", { lineId = prc.line.getId() } );
 
 			prc.page[ "lineId" ]   = prc.line.getId();
 			prc.page[ "products" ] = memy.convertList(
-				super.fire( "product.list", { lineId = prc.line.getId() } )
+				super.fire( "product.list", { lineId = prc.line.getId() } ),
+				"list"
 			);
 		}
 
 		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = memy.convertList( super.fire( "status.list", [ "attribute" ] ) );
-		prc.page[ "methods" ] = memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );
+		prc.page[ "methods" ]             = memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
 

@@ -39,7 +39,6 @@
 			prices
 		*/
 		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
-		//get( "/ajax/prices/calculate" ).to( "PriceAjaxController.calculate" ).end();
 		post( "/ajax/:by-regex:(products|product-items)/:id/price/simulate" ).to( "PriceAjaxController.simulate" ).end();
 		get( "/prices" ).to( "PriceController.manage" ).end();
 
@@ -60,6 +59,7 @@
 		/*
 			signages
 		*/
+		get( "/signages/rows-config-item/:id/product/:productId" ).to( "SignageConfigItemController.get" ).end();
 		get( "/signages/rows-config-item/:id" ).to( "SignageConfigItemController.get" ).end();
 		post( "/ajax/signages/rows-config" ).to( "SignageConfigAjaxController.save" ).end();
 		get( "/signages/rows-config/:id" ).to( "SignageConfigController.rowConfig" ).end();

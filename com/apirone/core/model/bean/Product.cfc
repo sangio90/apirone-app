@@ -10,7 +10,6 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	property name="model" type="com.apirone.core.model.bean.Model";
 	property name="line" type="com.apirone.core.model.bean.Line";
 	property name="finish" type="com.apirone.core.model.bean.Finish";
-	property name="status" type="com.apirone.core.model.bean.Status";
 
 	/*
 		simple (fruit)
@@ -30,10 +29,23 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	property name="prices" type="com.apirone.core.model.bean.Price[]" default=[];
 	property name="images" type="com.apirone.core.model.bean.File[]";
 
+	property name="minQuantity" type="Numeric" default=0;
+	property name="maxQuantity" type="Numeric" default=0;
+
 	public Product function init(){
 		variables.prices = {};
 		return this;
 	}
+
+	/*
+	public com.apirone.core.model.bean.Status function getModel(){
+		return getCatalogBundle().getModel();
+	}
+
+	public com.apirone.core.model.bean.Status function getLine(){
+		return getCatalogBundle().getLine();
+	}
+	*/
 
 	public Struct function getPrice( required String typeId ){
 		for ( var price in getPrices() ) {

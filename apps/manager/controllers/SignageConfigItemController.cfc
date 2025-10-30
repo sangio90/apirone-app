@@ -1,17 +1,53 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function get( event, rc, prc ){
-		param rc.id = "";
+		param rc.id        = 0; // signageConfigItemId, at least this
+		param rc.productId = "";
 
 		var memy = super.getMementify();
 
 		var item    = super.service( "SignageConfigItem" ).get( rc.id );
 		var signage = super.service( "SignageConfig" ).get( item.getSignageConfigId() );
 
-		prc.title    = "Configurazione per < #signage.getLine().getName()#, #signage.getModel().getName()#, altezza: #item.getSize().getName()#cm >";
+		var bundleId = signage.getCatalogBundle().getId()
+
+		// se l'id prodotto non è definito, setto il primo prodotto del bundle
+		if ( !Len( rc.productId ) ) {
+			var bundle   = super.service( "CatalogBundle" ).get( bundleId );
+			var products = super.service( "Product" ).list( catalogBundleId = bundle.getId() );
+			prc.product  = products[ 1 ];
+
+			var redirectTo = "/manager/signages/rows-config-item/#rc.id#/product/#prc.product.getId()#";
+
+			cflocation( url = redirectTo, addToken = "false" );
+			abort;
+		} else {
+			prc.product = super.service( "Product" ).get( rc.productId );
+		}
+
+		var lineId = prc.product.getLine().getId();
+
+		prc.models       = super.fire( "model.list", { lineId = lineId } );
+		prc.finishes     = super.fire( "finish.list", { lineId = lineId } );
+		prc.signageItems = super.fire( "signageConfig.list", { "catalogBundleId" = bundleId } );
+
+		// prc.sizes = signage.getItems();
+		prc.signageConfigItemId = rc.id;
+
+		/*
+		prc.model  = product.getModel();
+		prc.finish = product.getFinish();
+		prc.line   = product.getLine();
+		*/
+
+		prc.title    = "Configurazione per < #signage.getLine().getName()#, #signage.getModel().getName()# / #signage.getFont().getName()#, #item.getSize().getName()#mm >";
 		prc.subtitle = "#signage.getCategory().getName()#";
 
-		prc.fonts = super.fire( "signageConfig.list", { "catalogBundleId" = signage.getCatalogBundle().getId() } );
+		prc.page[ "productId" ]           = prc.product.getId();
+		prc.page[ "lineId" ]              = lineId;
+		prc.page[ "signageConfigItemId" ] = prc.signageConfigItemId
+
+		prc.page[ "products" ] = memy.convertList( super.fire( "product.list", { lineId = lineId } ), "list" );
 
 		prc.jsScripts.add( "app-component-modal" );
 		prc.jsScripts.add( "app-signage-config-item" );

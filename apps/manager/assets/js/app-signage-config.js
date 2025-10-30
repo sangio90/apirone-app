@@ -161,7 +161,7 @@ AP.signageConfig.detail = ( function() {
 
             if ( selectedForm.valid() ) {
 
-                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+                // status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
                 NM.util.ajax( {
                     method: "POST",
@@ -173,6 +173,7 @@ AP.signageConfig.detail = ( function() {
                             if ( xhr.status == "SUCCESS" ) {
                                 // viewModel.get( "selectedFonts" ).read();
                                 AP.widget.notify( "success", "Configurazione salvata correttamente" );
+
                                 setTimeout( function() {
                                     window.location.reload();
                                 }, 1000 );
@@ -215,4 +216,3 @@ AP.signageConfig.detail = ( function() {
 
     return pub;
 }() );
-
