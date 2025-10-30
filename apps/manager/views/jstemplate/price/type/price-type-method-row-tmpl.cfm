@@ -1,4 +1,4 @@
-﻿<cfprocessingdirective pageEncoding='UTF-8'>
+﻿<cfprocessingdirective pageEncoding="UTF-8">
 
 <nmscript type="text/template" id="price-type-method-row-tmpl">
 	<div>

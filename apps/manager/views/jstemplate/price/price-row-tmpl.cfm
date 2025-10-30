@@ -1,4 +1,4 @@
-﻿<cfprocessingdirective pageEncoding='UTF-8'>
+﻿<cfprocessingdirective pageEncoding="UTF-8">
 
 <nmscript type="text/template" id="price-row-tmpl">
 	<div style="padding: 2px 5px; text-align: right; cursor: pointer">

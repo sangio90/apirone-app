@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding='UTF-8'>
+<cfprocessingdirective pageEncoding="UTF-8">
 
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="signage-config-font-selected-size-list-row-tmpl">
@@ -50,16 +50,16 @@
             </td>
             <td class="text-center min-width-50">
                 <button type="button" class="btn btn-default btn-sm" 
-                    data-bind="click:openComponentWithItems, visible:showComponentButton" 
+                    data-bind="click:openComponentsList, visible:showComponentButton" 
                     data-type="signageConfigItem"> 
-                    <i class="far fa-window-restore"></i> 
+                    <i class="fas fa-window-restore"></i> 
                 </button>                
             </td>
             <td class="text-center min-width-50">
                 <button type="button" class="btn btn-default btn-sm" 
-                    data-bind="click:openComponentsList, visible:showComponentButton" 
+                    data-bind="click:openComponentWithItems, visible:showComponentButton" 
                     data-type="signageConfigItem"> 
-                    <i class="fas fa-window-restore"></i> 
+                    <i class="far fa-window-restore"></i> 
                 </button>                
             </td>
             <td class="text-center min-width-50">

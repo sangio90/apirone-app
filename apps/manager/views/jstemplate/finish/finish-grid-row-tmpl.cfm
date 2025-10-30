@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding='UTF-8'>
+<cfprocessingdirective pageEncoding="UTF-8">
 
 <cfoutput>
     <script type="text/template" id="finish-grid-row-tmpl">

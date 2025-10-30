@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding='UTF-8'>
+<cfprocessingdirective pageEncoding="UTF-8">
 
 <script type="text/x-kendo-template" id="quotation-item-preview-tmpl">
     <div class="quotation-item m-1" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editSignate">

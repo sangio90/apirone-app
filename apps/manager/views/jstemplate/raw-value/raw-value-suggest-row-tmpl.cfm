@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding='UTF-8'>
+<cfprocessingdirective pageEncoding="UTF-8">
 
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="raw-value-suggest-row-tmpl">

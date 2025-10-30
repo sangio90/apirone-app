@@ -1,4 +1,4 @@
-﻿<cfprocessingdirective pageEncoding='UTF-8'>
+﻿<cfprocessingdirective pageEncoding="UTF-8">
 
 <nmscript type="text/template" id="font-family-grid-size-row-tmpl">
     <div class="font-family-grid-size-row">
