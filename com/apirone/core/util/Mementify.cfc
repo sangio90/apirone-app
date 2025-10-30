@@ -512,8 +512,8 @@ component {
 				// sort numeric durations ascending for percentile calculation
 				ArraySort( durations, "numeric" );
 
-				var durationCount     = ArrayLen( durations );
-				
+				var durationCount = ArrayLen( durations );
+
 				var idx95 = Ceiling( 0.95 * durationCount );
 				var idx99 = Ceiling( 0.99 * durationCount );
 
@@ -711,7 +711,7 @@ component {
 
 		// ESTRAZIONE DEL CASTING ($)
 		if ( definition contains "$" ) {
-			// Il casting � sempre l'ultima parte
+			// Il casting è sempre l'ultima parte
 			castType   = ListLast( definition, "$" );
 			// Rimuove la parte del casting dalla stringa rimanente
 			definition = ListDeleteAt( definition, ListLen( definition, "$" ), "$" );

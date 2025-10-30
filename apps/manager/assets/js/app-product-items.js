@@ -477,7 +477,6 @@ AP.product.items = ( function() {
             var finishId = finishEle.val();
 
             var products = AP.page.products;
-            var productId = AP.page.productId;
 
             products?.forEach( function( product ) {
 
