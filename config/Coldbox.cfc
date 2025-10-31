@@ -124,6 +124,11 @@ component{
 		 */
 		interceptors = [
 			{
+				name    = "Security",
+				class   = "com.apirone.core.interceptor.SecurityInterceptor",
+				properties = {}
+			},
+			{
 				name    = "Main",
 				class   = "com.apirone.core.interceptor.MainInterceptor",
 				properties = {}

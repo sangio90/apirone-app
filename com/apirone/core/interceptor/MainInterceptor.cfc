@@ -7,24 +7,25 @@ component extends="coldbox.system.Interceptor" {
 		rc,
 		prc
 	){
-
-		if( prc.keyExists("currentRoutedURL") AND prc.currentRoutedURL == "manager/" ) {
-			location( url="/manager/login" );
+		if ( prc.keyExists( "currentRoutedURL" ) AND prc.currentRoutedURL == "manager/" ) {
+			Location( url = "/manager/login" );
 		}
+
+		/*
+		if ( !rc.keyExists( "currentRoutedModule" ) ) {
+			Location( url = "/manager/login" );
+		}
+		*/
+
 
 		cfheader( name = "Access-Control-Allow-Origin", value = "*" );
 		cfheader( name = "Access-Control-Allow-Methods", value = "GET, POST, OPTIONS" );
 		cfheader( name = "Access-Control-Allow-Headers", value = "Content-Type, X-Requested-With" );
 
-		/*
-        if( !rc.keyExists("currentRoutedModule") ) {
-            location( url="/manager/login" );
-        }
-        */
 
 		event.prc.eventId = CreateUUID()
 
-		canAccess( event );
+		// canAccess( event );
 
 		var module = prc.currentRoutedModule;
 		var model  = getContainer();
@@ -77,13 +78,13 @@ component extends="coldbox.system.Interceptor" {
 			// se non sono loggato, e non un evento ammesso
 			if ( !session.user.isLogged() AND !ListFindNoCase( allowedEvents, event.getContext().event ) ) {
 				flash.put( "message", "Sessione scaduta. Fai il login." );
+
 				relocate(
 					uri               = "/manager/login",
 					postProcessExempt = false,
 					addToken          = false
 				);
 			}
-
 
 			prc.page      = {}; // current js config write in current html page
 			prc.jsScripts = []; // current js file for current html page
@@ -97,8 +98,6 @@ component extends="coldbox.system.Interceptor" {
 
 			prc.config        = getGlobalConfiguration(); // js global config
 			prc.staticVersion = ( prc.isDev ? RandRange( 1000, 9999 ) : DateFormat( Now(), "yyyymmdd" ) ) & application.counter;
-			// prc.staticVersion = prc.staticVersion & application.counter;
-			// prc.staticVersion = url.keyExists( "reinit" ) ? prc.staticVersion + 1 : prc.staticVersion;
 		}
 	}
 
@@ -119,8 +118,8 @@ component extends="coldbox.system.Interceptor" {
                 https://community.ortussolutions.com/t/trouble-with-noexecution-and-pdf/9288
             */
 
-			//var path   = "com.apirone.core.model.bean.AjaxResult";
-			//var result = event.getValue( "result", "result-not-found" );
+			// var path   = "com.apirone.core.model.bean.AjaxResult";
+			// var result = event.getValue( "result", "result-not-found" );
 
 			/*
                 ATTENZIONE:
@@ -202,7 +201,6 @@ component extends="coldbox.system.Interceptor" {
 					type        = "json"
 				)
 				.noExecution();
-
 		}
 	}
 
@@ -216,7 +214,6 @@ component extends="coldbox.system.Interceptor" {
 		for ( var key in errors ) {
 			var arr = [];
 			for ( var err in errors[ key ] ) {
-
 				var newErr = {};
 				if ( err.keyExists( "message" ) && Len( Trim( err.message ) ) ) {
 					newErr[ "message" ] = err.message;
@@ -231,7 +228,9 @@ component extends="coldbox.system.Interceptor" {
 				}
 
 				if (
-					err.keyExists( "errorMetadata" ) && !IsSimpleValue( err.errorMetadata ) && !IsNull( err.errorMetadata )
+					err.keyExists( "errorMetadata" ) && !IsSimpleValue( err.errorMetadata ) && !IsNull(
+						err.errorMetadata
+					)
 				) {
 					newErr[ "metadata" ] = err.errorMetadata;
 				}
@@ -248,7 +247,7 @@ component extends="coldbox.system.Interceptor" {
 			newErrors[ key ] = arr;
 		}
 		return newErrors;
-	}	
+	}
 
 	private Struct function getGlobalConfiguration(){
 		// Select keys from Configuration.cfc
@@ -257,9 +256,7 @@ component extends="coldbox.system.Interceptor" {
 		var config = getContainer().getInstance( "Configuration" ).get();
 
 		var result = {
-			"user" = {
-				"id": session.user.getId(),
-			},
+			"user"       = { "id" = session.user.getId() },
 			"appName"    = config.get( "appName" ),
 			"appVersion" = config.get( "appVersion" ),
 			"account"    = {
