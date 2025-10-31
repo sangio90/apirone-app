@@ -51,17 +51,16 @@
 	*/
 	public Any function getValidationResult(){
 		var validationResult = new cbvalidation.models.result.ValidationResult();
-		
+
 		// ROB: overwrite buildin function because it is bugged
 		validationResult.hasErrors = function( bean ){
 			return validationResult.getAllErrorsAsStruct().len() > 0;
 		}
-		
+
 		return validationResult;
 	}
 
 	public Any function getValidationError(){
-
 		/*
 			fields available:
 
@@ -85,6 +84,26 @@
 		// shorthands validation result
 	*/
 
+
+	public Any function changeRole( required String roleId ){
+		var found = false;
+
+		for ( var role in session.user.getAccount().getRoles() ) {
+			if ( role.getId() == roleId ) {
+				found = true;
+				break;
+			}
+		}
+
+		if ( found ) {
+			var role = service( "Role" ).get( roleId );
+			session.user.setRole( role );
+
+			return true;
+		}
+
+		return false;
+	}
 
 	public Any function setAuthUser( required com.apirone.core.model.bean.Account account ){
 		var user = bean( "User" );
@@ -284,13 +303,15 @@
 			FileRead( ExpandPath( "/config/assets/messages-#LCase( arguments.langId )#.json.cfm" ) )
 		);
 
-		if( !keyPathExists( messages, arguments.id ) ) {
-			FileAppend( file = ExpandPath( "/message-not-found.log" ), data = "#Now()#;messageIdNotFound:#arguments.id#;langId:#arguments.langId# #Chr( 13 )##Chr( 10 )#");
+		if ( !keyPathExists( messages, arguments.id ) ) {
+			FileAppend(
+				file = ExpandPath( "/message-not-found.log" ),
+				data = "#Now()#;messageIdNotFound:#arguments.id#;langId:#arguments.langId# #Chr( 13 )##Chr( 10 )#"
+			);
 			return "Not found"
 		}
 
 		return StructGet( "messages.#arguments.id#" );
-		
 	}
 
 	// message and id
@@ -370,21 +391,18 @@
 		return server[ "wireBox-apirone" ];
 	}
 
-	
-	private Boolean function keyPathExists(structure, path) {
-
-		var keys = listToArray(path, ".");
+	private Boolean function keyPathExists( structure, path ){
+		var keys    = ListToArray( path, "." );
 		var current = structure;
 
-		for (var key in keys) {
-			if (!isStruct(current) || !StructKeyExists(current, key)) {
+		for ( var key in keys ) {
+			if ( !IsStruct( current ) || !StructKeyExists( current, key ) ) {
 				return false;
 			}
-			current = current[key];
+			current = current[ key ];
 		}
 
 		return true;
 	}
-
 
 }

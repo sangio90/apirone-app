@@ -288,6 +288,7 @@
 		get( "/login/pincode" ).toHandler( "AuthController.pincode" );
 		get( "/login" ).toHandler( "AuthController.login" );
 		get( "/logout" ).toHandler( "AuthController.logout" );
+		get( "/change-role/:id" ).toHandler( "AuthController.changeRole" );
 
 
 		/*

@@ -72,7 +72,7 @@
                                 #prc.user.getName()#<br>
                             </span>
                             <span class="role">
-                                #prc.user.getRole().getId()# - #prc.user.getShortId()#
+                                #prc.user.getRole().getName()# - #prc.user.getShortId()#
                             </span>
                         </div>
 
@@ -91,6 +91,17 @@
                             <li>
                                 <a role="menuitem" tabindex="-1" href="/manager/logout"><i class="bx bx-power-off"></i> Esci</a>
                             </li>
+                            <cfif Len( session.user.getAccount().getRoles() )>
+                                <li class="divider"></li>
+                                <div id="user-other-roles">cambia ruolo</div>
+                                <cfloop array="#session.user.getAccount().getRoles()#" index="role">
+                                    <cfif ( role.getId() neq prc.user.getRole().getId() )>
+                                        <li>
+                                            <a role="menuitem" tabindex="-1" href="/manager/change-role/#role.getId()#"><i class="bx bx-user"></i> #role.getName()#</a>
+                                        </li>
+                                    </cfif>
+                                </cfloop>
+                            </cfif>
                         </ul>
                     </div>
                 </div>

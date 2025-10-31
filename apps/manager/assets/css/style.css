@@ -310,6 +310,20 @@ h2 {
     background-color: #ffffff !important;
 }
 
+#user-other-roles {
+    font-size: 11px;
+    text-transform: uppercase;
+    text-align: right;
+    margin-top: -15px;
+    margin-right: 10px;
+    background: white;
+    position: absolute;
+    right: 20px;
+    top: 165px;
+    padding: 5px 10px;
+    color: #ACACAC;
+}
+
 .card-body {
     padding: 1rem 1rem 1rem 1rem !important;
 }

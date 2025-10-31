@@ -1,87 +1,96 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-    function login( event, rc, prc ){
+	function login( event, rc, prc ){
+		if ( session.user.isLogged() ) {
+			Location( "/manager/dashboard", false );
+		}
 
-        if( session.user.isLogged() ) {
-            location("/manager/dashboard", false );
-        }
+		rc.email = StructKeyExists( cookie, "email" ) ? cookie.email : "";
 
-        rc.email = StructKeyExists( cookie, "email" ) ? cookie.email : '';
+		event.setView( "main/login" ).setLayout( "login" );
+	}
 
-        event.setView( "main/login" ).setLayout( "login" );
+	function pincode( event, rc, prc ){
+		event.setView( "main/pincode" ).setLayout( "login" );
+	}
 
-    }
+	function recover( event, rc, prc ){
+		event.setView( "main/recover" ).setLayout( "login" );
+	}
 
-    function pincode( event, rc, prc ){
+	function checkPincode( event, rc, prc ){
+		var user = prc.user;
 
-        event.setView( "main/pincode" ).setLayout( "login" );
+		Location( "/manager/dashboard", false );
+	}
 
-    }
+	function checkRecover( event, rc, prc ){
+		var user = prc.user;
 
-    function recover( event, rc, prc ){
+		Location( "/manager/login/recover/check", false );
+	}
 
-        event.setView( "main/recover" ).setLayout( "login" );
+	function checkLogin( event, rc, prc ){
+		var user = prc.user;
 
-    }
+		var access = super.fire( "auth.login", { "email" = rc.email, "pwd" = rc.pwd } );
 
-    function checkPincode( event, rc, prc ) {
+		// cookie.email = rc.email;
+		cfcookie(
+			name         = "email",
+			value        = "#rc.email#",
+			expires      = "15",
+			preservecase = true
+		);
 
-        var user = prc.user;
+		if ( access.getStatus() ) {
+			super.setAuthUser( access.getAccount() );
 
-        location("/manager/dashboard", false );
+			Location( "/manager/dashboard", false );
+		} else {
+			flash.put( "message", "Login e/o password errate." );
 
-    }
+			// TODO: Report Ortus:
+			// - only with "/manager/login" it location to "index.cfm?/manager/login"
+			// - with "uri" work fine, but raise an exception. Work adding "postProcessExempt=false"
+			relocate(
+				uri               = "/manager/login",
+				postProcessExempt = false,
+				addToken          = false
+			);
+		}
 
-    function checkRecover( event, rc, prc ) {
+		rc.email = StructKeyExists( cfcookie, "email" ) ? cfcookie.email : "";
 
-        var user = prc.user;
+		relocate(
+			uri               = "/manager/login",
+			postProcessExempt = false,
+			addToken          = false
+		);
+	}
 
-        location("/manager/login/recover/check", false );
+	function changeRole( event, rc, prc ){
+		var result = super.changeRole( rc.id );
 
-    }
+		if ( result ) {
+			setMessage( "Hai modificato il tuo ruolo.", "success" );
+		} else {
+			setMessage( "Non puoi accedere a questo ruolo.", "warning" );
+		}
 
-    function checkLogin( event, rc, prc ) {
+		relocate(
+			uri               = "/manager/dashboard",
+			postProcessExempt = false,
+			addToken          = false
+		);
+	}
 
-        var user = prc.user;
+	function logout( event, rc, prc ){
+		super.logout();
 
-        var access = super.fire( "auth.login", { "email" = rc.email , "pwd" = rc.pwd } );
+		flash.put( "message", "Ti sei disconnesso." );
 
-        //cookie.email = rc.email;
-        cfcookie( name="email", value="#rc.email#", expires="15", preservecase=true );
-
-        if ( access.getStatus() )  {
-
-
-            super.setAuthUser( access.getAccount() );
-            
-            location("/manager/dashboard", false );
-            //relocate( uri="/manager/login/pincode", postProcessExempt=false, addToken=false );
-
-        } else {
-
-            flash.put("message","Login e/o password errate.");
-
-            //TODO: Report Ortus: 
-            // - only with "/manager/login" it location to "index.cfm?/manager/login"
-            // - with "uri" work fine, but raise an exception. Work adding "postProcessExempt=false"
-            relocate( uri="/manager/login", postProcessExempt=false, addToken=false );
-
-        }
-
-        rc.email = StructKeyExists(cfcookie, "email") ? cfcookie.email : '';
-
-        relocate( uri="/manager/login", postProcessExempt=false, addToken=false );
-
-    }
-
-    function logout( event, rc, prc ) {
-
-        super.logout();
-    
-        flash.put("message","Ti sei disconnesso.");
-
-        location("/manager/login?msg=disconnected", false );
-
-    }
+		Location( "/manager/login?msg=disconnected", false );
+	}
 
 }
