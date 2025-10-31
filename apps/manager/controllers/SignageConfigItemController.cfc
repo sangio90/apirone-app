@@ -31,21 +31,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.finishes     = super.fire( "finish.list", { lineId = lineId } );
 		prc.signageItems = super.fire( "signageConfig.list", { "catalogBundleId" = bundleId } );
 
-		// prc.sizes = signage.getItems();
-		prc.signageConfigItemId = rc.id;
+		prc.signageConfigItemId = item.getId()
 
-		/*
-		prc.model  = product.getModel();
-		prc.finish = product.getFinish();
-		prc.line   = product.getLine();
-		*/
+		prc.title    = "Configurazione per < #prc.product.getLine().getName()#, #prc.product.getModel().getName()# / #signage.getFont().getName()#, #item.getSize().getName()#mm >";
+		prc.subtitle = "#signage.getCategory().getName()# / ALTEZZA FONT";
 
-		prc.title    = "Configurazione per < #signage.getLine().getName()#, #signage.getModel().getName()# / #signage.getFont().getName()#, #item.getSize().getName()#mm >";
-		prc.subtitle = "#signage.getCategory().getName()#";
-
-		prc.page[ "productId" ]           = prc.product.getId();
-		prc.page[ "lineId" ]              = lineId;
-		prc.page[ "signageConfigItemId" ] = prc.signageConfigItemId
+		prc.page[ "productId" ]         = prc.product.getId();
+		prc.page[ "lineId" ]            = lineId;
+		prc.page[ "signageConfigItem" ] = memy.convert( item );
 
 		prc.page[ "products" ] = memy.convertList( super.fire( "product.list", { lineId = lineId } ), "list" );
 

@@ -7,7 +7,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var mm     = super.getMementify();
 
-		var params = { limit = 20, str = rc.str }
+		var clean = REReplace( rc.str, "[^A-Za-z0-9 ]", "", "all" );
+
+		var params = { limit = 20, str = clean }
 
 		var rows = super.fire( "search.search", params );
 

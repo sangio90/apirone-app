@@ -100,6 +100,16 @@ AP.component.modal = ( function() {
 
                 break;
 
+            case "signageItemProduct":
+
+                console.log( "current", current.signageConfigItem );
+
+                result.modalTitle = "Componenti per dimensione font " + current.signageConfigItem.size.name + " e " + current.productItem.attribute.name + " / " + current.productItem.attributeValue.rawValue.name;
+                result.readUrl = baseUrl + "?by=signageItemProduct&signageConfigItemId=" + current.signageConfigItem.id + "&productItemId=" + current.productItem.id;
+                result.modifyUrl = result.readUrl;
+
+                break;
+
             case "item": // productItem
 
                 result.modalTitle = "Componenti per elemento: " + current.attribute.name + " / " + current.attributeValue.rawValue.name;

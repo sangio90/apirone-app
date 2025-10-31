@@ -1,13 +1,13 @@
 ﻿component {
 
 	function configure(){
-		var settings = new config.Settings();
+		//var settings = new config.Settings();
 
 		setFullRewrites( true );
 
-		get( "/tmp" ).to( "MainController.tmp" ).end();
+		get( "/tmp" ).prc(name="permissions", value="role_admin").to( "MainController.tmp" ).end();
 
-		route( "/live", function(event, rc, prc){
+		get( "/live", function(event, rc, prc){
 			return "<meta http-equiv='refresh' content='120'>
 				Live #now()#";
 		} );
@@ -448,7 +448,7 @@
 			lookup
 			[TODO] "JSDATA" non funziona
 		*/
-		get( "/(.*)/datajs" ).to( "LookupController.datajs" ).end();
+		//get( "/(.*)/datajs" ).to( "LookupController.datajs" ).end();
 
 	}
 

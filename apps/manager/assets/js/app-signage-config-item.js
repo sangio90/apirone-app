@@ -17,80 +17,34 @@ AP.signageConfigItem.items = ( function() {
     var fields = AP.signageConfigItem.fields;
     var componentApp = AP.component.modal;
 
-    var items = NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items" } );
+    var items = NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items?missingValues=false" } );
 
     var viewModel = kendo.observable( {
 
         items: items,
 
-        getAttributeName: function( event ) {
-            var text = AP.util.getTextItem( event.texts );
-
-            return text.name;
-        },
-
         openComponentsList: function( event ) {
 
             var element = $( event.currentTarget );
 
-            if ( !element.attr( "data-type" ) ) {
-                console.error( "ERROR. Set data-type attribute in currentTarget" );
-                return;
-            }
-
-            var type = element.data( "type" );
-
-            switch ( type ) {
-            case "catalogBundle":
-                var value = {
-                    type: "catalogBundle",
-                    model: {
-                        id: element.data( "model-id" ),
-                        name: element.data( "model-name" ),
-                    },
-                    line: {
-                        id: element.data( "line-id" ),
-                        name: element.data( "line-name" ),
-                    },
-                };
-
-                break;
-
-            case "item":
-                var value = {
-                    type: "item",
-                    item: {
-                        id: event.data.id,
-                    },
+            var value = {
+                type: "signageItemProduct",
+                productItem: {
+                    id: event.data.id,
                     attribute: {
                         id: event.data.attribute.id,
                         name: event.data.attribute.name,
                     },
                     attributeValue: {
                         id: event.data.attributeValue.id,
-                        // name: event.data.attributeValue.name,
                         rawValue: {
                             id: event.data.attributeValue.rawValue.id,
                             name: event.data.attributeValue.rawValue.name,
                         },
                     },
-                };
-
-                break;
-
-            case "product":
-                var value = {
-                    type: "product",
-                    product: {
-                        id: element.data( "product-id" ),
-                        name: element.data( "product-name" ),
-                    },
-                };
-
-                break;
-
-            default:
-            }
+                },
+                signageConfigItem: AP.page.signageConfigItem
+            };
 
             componentApp.open( value );
 
@@ -98,6 +52,20 @@ AP.signageConfigItem.items = ( function() {
         },
 
         changeUri: function( event ) {
+
+            var thisForm = fields.configRow;
+
+            var itemEle = thisForm.find( "[name=itemId]" );
+
+            if ( AP.page.selectedProductId ) {
+                window.location.href = "/manager/signages/rows-config-item/" + itemEle.val()  + "/product/" + AP.page.selectedProductId;
+            }
+
+            return false;
+
+        },
+
+        changeProduct: function( event ) {
 
             var thisButton = $( event.currentTarget );
 
@@ -121,8 +89,8 @@ AP.signageConfigItem.items = ( function() {
                 if ( lineId == product.line.id
                     && finishId == product.finish.id
                     && modelId == product.model.id ) {
+                    AP.page.selectedProductId = product.id;
                     found = true;
-                    window.location.href = "/manager/signages/rows-config-item/" + AP.page.signageConfigItemId + "/product/" + product.id;
                 }
             } );
 
@@ -136,6 +104,8 @@ AP.signageConfigItem.items = ( function() {
     } );
 
     pub.init = function() {
+
+        AP.page.selectedProductId = AP.page.productId;
 
         kendo.bind( fields.rootDetail, viewModel );
 

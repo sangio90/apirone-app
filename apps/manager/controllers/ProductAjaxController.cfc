@@ -40,8 +40,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	// used by app-signage-config-item too, with missingValues=false
 	function listItems( event, rc, prc ){
-		var result = getFlatTree( productId = rc.id, includeMissingValues = true );
+		param rc.missingValues = true;
+
+		var result = getFlatTree( productId = rc.id, includeMissingValues = rc.missingValues );
 
 		event.setValue( "result", result );
 	}
@@ -399,6 +402,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		required String attributeId,
 		Numeric originId = 0
 	){
+		// TODO: better than this
+
 		var attribute = super.fire( "attribute.get", [ arguments.attributeId ] );
 
 		```

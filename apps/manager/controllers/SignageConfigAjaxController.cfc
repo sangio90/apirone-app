@@ -31,9 +31,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var newIds     = [];
 		var updatedIds = [];
 
-
-
 		for ( var thisConfig in json.configs ) {
+			
 			var sizes         = [];
 			var font          = super.bean( "Font" );
 			var signageConfig = super.bean( "SignageConfig" );

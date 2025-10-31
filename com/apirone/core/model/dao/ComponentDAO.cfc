@@ -24,6 +24,9 @@
 		<cfargument name="colorId" type="String">
 		<cfargument name="signageConfigItemId" type="String">
 
+		<cfargument name="signageItemProduct" type="Struct">
+		<!--- productItemId AND SignageConfigItemId --->
+
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="created_at desc">
@@ -35,6 +38,11 @@
 			FROM
 				components
 			WHERE 1=1
+
+				<cfif !IsNull( arguments.signageItemProduct )>
+					AND product_item_join_id = <cfqueryparam value="#arguments.signageItemProduct.productItemId#" cfsqltype="Integer">
+					AND signage_config_item_join_id = <cfqueryparam value="#arguments.signageItemProduct.SignageConfigItemId#" cfsqltype="Integer">
+				</cfif>
 
 				<cfif !IsNull( arguments.productItemId )>
 					AND product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="Integer">
@@ -233,6 +241,20 @@
 				<cfset values = [
 					{
 						value = arguments.component.getSignageConfigItem().getId(),
+						type  = "Integer"
+					}
+				]>
+			</cfcase>
+
+			<cfcase value="com.apirone.core.model.bean.ComponentSignageItemProduct">
+				<cfset fields = [ "signage_config_item_join_id", "product_item_join_id" ]>
+				<cfset values = [
+					{
+						value = arguments.component.getSignageConfigItem().getId(),
+						type  = "Integer"
+					},
+					{
+						value = arguments.component.getProductItem().getId(),
 						type  = "Integer"
 					}
 				]>

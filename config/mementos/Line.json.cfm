@@ -10,7 +10,7 @@
 				"shortId",
 				"name",
 				"nameItem",
-				"status.id",
+				"status",
 				"descriptionItem",
 				"createdAt",
 				"code",

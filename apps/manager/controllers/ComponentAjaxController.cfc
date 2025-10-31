@@ -134,6 +134,17 @@ component extends="com.apirone.core.controller.AbsController" {
 				component.setSignageConfigItem( signageConfigItem.setId( rc.signageConfigItemId ) );
 
 				break;
+
+			case "signageItemProduct":
+				var component         = super.bean( "ComponentSignageItemProduct" );
+				
+				var productItem       = super.bean( "ProductItem" );
+				var signageConfigItem = super.bean( "SignageConfigItem" );
+
+				component.setProductItem( productItem.setId( rc.productItemId ) );
+				component.setSignageConfigItem( signageConfigItem.setId( rc.signageConfigItemId ) );
+
+				break;
 			case "item":
 				var component = super.bean( "ComponentProductItem" );
 				var item      = super.bean( "ProductItem" );
@@ -164,7 +175,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			default:
 				Throw(
 					type    = "apirone.error.component.InvalidSaveType",
-					message = "Type save [#rc.typeId#] not valid"
+					message = "Type save [#rc.by#] not valid"
 				);
 				break;
 		}
@@ -327,6 +338,12 @@ component extends="com.apirone.core.controller.AbsController" {
 					signageConfigItemId            = rc.signageConfigItemId,
 					includeBaseAttributeComponents = false
 				};
+				break;
+			case "signageItemProduct":
+				params = { "signageItemProduct" = {
+					signageConfigItemId = rc.signageConfigItemId,
+					productItemId       = rc.productItemId
+				} };
 				break;
 			default:
 				Throw( type = "apirone.error.TypeSearchNotValid", message = "Type search [#rc.by#] not valid" );

@@ -6,10 +6,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setView( "main/dashboard" );
 	}
 
-	function selects( event, rc, prc ){
-		prc.title = "Dashboard";
+	function tmp( event, rc, prc ){
+		prc.title = "Tmp";
 
-		event.setView( "util/selects" );
+		dump( prc );
+		abort;
+
+		event.setView( "util/tmp" );
 	}
 
 }

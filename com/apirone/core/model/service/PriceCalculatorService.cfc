@@ -325,7 +325,7 @@
 		& "_serial-" & productId & ".log";
 
 		if ( request.isDev() ) {
-			fileName = "product_price_DEV_" & DateFormat( Now(), "yyyy-mm-dd" ) & ".log"
+			fileName = "product_price_development_" & DateFormat( Now(), "yyyy-mm-dd" ) & ".log"
 		}
 
 		var filePath = logsDir & "/" & fileName;

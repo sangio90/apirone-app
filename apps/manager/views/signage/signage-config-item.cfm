@@ -27,6 +27,9 @@
                                     
                                         <div class="row">
                                         
+                                            <div class="col-12  mb-3 text-end">
+                                                <a class="underline" href="/manager/products/#prc.product.getId()#/detail" target="_blank">Vai all'articolo &raquo;</a>
+                                            </div>
                                             <div class="col-12  d-flex gap-2 justify-content-end align-items-center">
 
                                                 <form class="d-flex align-items-center justify-content-end" id="signage-config-item-change-form">
@@ -49,7 +52,7 @@
                                                     <label class="me-2">Finitura:</label>
 
                                                     <select name="finishId" class="form-control width-250 me-3"
-                                                        data-bind="events: { change: changeUri }">
+                                                        data-bind="events: { change: changeProduct }">
                                                         <option value="">-- non trovato</option>
                                                         <cfloop array="#prc.finishes#" item="item">
                                                             <option value="#item.getId()#"
@@ -63,8 +66,12 @@
 
                                                     <label class="me-2">Modello:</label>
 
-                                                    <select name="modelId" class="form-control w-auto" 
-                                                        data-bind="events: { change: changeUri }">
+                                                    <!----
+                                                        il lettering è configurato per modello, quindi
+                                                        non ha senso cambiare modello se non si cambia prodotto
+                                                    ---->
+
+                                                    <select name="modelId" class="form-control w-auto" disabled>
                                                         <option value="">-- non trovato</option>
                                                         <cfloop array="#prc.models#" item="item">
                                                             <option value="#item.getId()#"
@@ -75,9 +82,11 @@
                                                         </cfloop>
                                                     </select>
 
+                                                    <button type="submit" class="btn btn-primary ms-3" data-bind="events: { click: changeUri }">
+                                                        Cambia
+                                                    </button>
 
                                                 </form>                                                
-
 
                                             </div>
 
