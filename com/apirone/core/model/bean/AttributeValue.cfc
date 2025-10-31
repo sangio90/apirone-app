@@ -1,27 +1,5 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [ "id", "name", "code" ],
-		profiles        = {
-			list = {
-				defaultIncludes = [
-					"id",
-					"name",
-					"code",
-					"status",
-					"orderBy",
-					"rawValue",
-					"attributeId",
-					"componentCount",
-					"allowNote",
-					"horizontalImage",
-					"verticalImage",
-					"affectToImage"
-				]
-			}
-		}
-	}
-
 	property name="orderBy" type="Numeric" default=10;
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="rawValue" type="com.apirone.core.model.bean.RawValue";
@@ -38,10 +16,10 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	}
 
 	public any function onMissingMethod( required string missingMethodName ){
-		return super.getImageBeanHelper( ).resolveGetImageMethod( missingMethodName, getImages() );
+		return super.getImageBeanHelper().resolveGetImageMethod( missingMethodName, getImages() );
 	}
 
 	public Struct function getImage( String typeId = "horizontal" ){
-		return super.getImageBeanHelper( ).findImageByType( getImages(), typeId );
+		return super.getImageBeanHelper().findImageByType( getImages(), typeId );
 	}
 }
