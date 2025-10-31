@@ -1,6 +1,7 @@
 component extends="com.apirone.core.root.Application" {
 
-    this.name = "apirone-site";
+    this.name = "apirone-app";
+	this.nullSupported = true;
 	this.pdf.fontDirectory = "/assets/main/fonts";
 	this.customtagPaths = [ "/apps/utils/ctags/" ];
 
@@ -30,7 +31,7 @@ component extends="com.apirone.core.root.Application" {
 
 	public Boolean function onRequestStart( string targetPage ) {
 
-		request.loadFromVerticale = false;
+		param request.loadFromVerticale = true;
 
 		SetLocale( "italian (italy)" );
 
@@ -40,15 +41,15 @@ component extends="com.apirone.core.root.Application" {
 			application.counter = 100;
 		}
 
-        if ( !session.keyExists( "user" ) ) {
+        if ( !session.keyExists( "user" ) OR IsNull( session.user ) ) { //extra check
             startUser()
         }
 
 		if ( super.isDev() OR url.keyExists("reinit") ) {
 
-			//super.clearContainer()
+			//super.clearContainer();
 
-			onApplicationStart();
+			//onApplicationStart();
 			application.counter++;
 		}
 
