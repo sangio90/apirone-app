@@ -1,4 +1,5 @@
-﻿<!--- https://cfscript.me/ ---->
+﻿Remove cfabort.
+<cfabort>
 
 <cfsetting requestTimeOut="99999999999999">
 

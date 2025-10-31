@@ -1,15 +1,13 @@
 ﻿component {
 
 	function configure(){
-		//var settings = new config.Settings();
+		// var settings = new config.Settings();
 
 		setFullRewrites( true );
 
-		get( "/tmp" ).prc(name="permissions", value="role_admin").to( "MainController.tmp" ).end();
-
-		get( "/live", function(event, rc, prc){
+		get( "/live", function( event, rc, prc ){
 			return "<meta http-equiv='refresh' content='120'>
-				Live #now()#";
+				Live #Now()#";
 		} );
 
 		get( "/ajax/search" ).to( "SearchAjaxController.list" ).end();
@@ -20,11 +18,20 @@
 		/*
 			dashboard
 		*/
-		get( "/dashboard" ).to( "MainController.dashboard" ).end();
-		get( "/plate/designer" ).to( "PlateController.designer" ).end();
-		get( "/plate/map" ).to( "PlateController.map" ).end();
+		get( "/dashboard" )
+			.prc( name = "permissions", value = "all" )
+			.to( "MainController.dashboard" )
+			.end();
+		get( "/plate/designer" )
+			.prc( name = "permissions", value = "all" )
+			.to( "PlateController.designer" )
+			.end();
+		get( "/plate/map" )
+			.prc( name = "permissions", value = "all" )
+			.to( "PlateController.map" )
+			.end();
 
-		
+
 		/*
 			prices types
 		*/
@@ -33,19 +40,29 @@
 		post( "/ajax/prices/types" ).to( "PriceTypeAjaxController.save" ).end();
 		delete( "/ajax/prices/types" ).to( "PriceTypeAjaxController.delete" ).end();
 		get( "/ajax/prices/types" ).to( "PriceTypeAjaxController.list" ).end();
-		get( "/prices/types" ).to( "PriceTypeController.list" ).end();
+		get( "/prices/types" )
+			.prc( name = "permissions", value = "all" )
+			.to( "PriceTypeController.list" )
+			.end();
 
 		/*
 			prices
 		*/
 		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
-		post( "/ajax/:by-regex:(products|product-items)/:id/price/simulate" ).to( "PriceAjaxController.simulate" ).end();
-		get( "/prices" ).to( "PriceController.manage" ).end();
+		post( "/ajax/:by-regex:(products|product-items)/:id/price/simulate" )
+			.to( "PriceAjaxController.simulate" )
+			.end();
+		get( "/prices" )
+			.prc( name = "permissions", value = "all" )
+			.to( "PriceController.manage" )
+			.end();
 
 		get( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.list" ).end();
 		post( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.save" ).end();
-		POST( "/ajax/:by-regex:(products|product-items)/:id/price/calculate" ).to( "PriceAjaxController.calculate" ).end();
-		
+		post( "/ajax/:by-regex:(products|product-items)/:id/price/calculate" )
+			.to( "PriceAjaxController.calculate" )
+			.end();
+
 
 		/*
 			catalog bundle
@@ -53,17 +70,32 @@
 		get( "/ajax/catalog-bundles" ).to( "CatalogBundleAjaxController.list" ).end();
 		post( "/ajax/catalog-bundles" ).to( "CatalogBundleAjaxController.save" ).end();
 		delete( "/signages/catalog-bundles" ).to( "CatalogBundleAjaxController.delete" ).end();
-		get( "/catalog-bundles" ).to( "CatalogBundleController.list" ).end();
+		get( "/catalog-bundles" )
+			.prc( name = "permissions", value = "all" )
+			.to( "CatalogBundleController.list" )
+			.end();
 
 
 		/*
 			signages
 		*/
-		get( "/signages/rows-config-item/:id/product/:productId" ).to( "SignageConfigItemController.get" ).end();
-		get( "/signages/rows-config-item/:id" ).to( "SignageConfigItemController.get" ).end();
+		get( "/signages/rows-config-item/:id/product/:productId" )
+			.prc( name = "permissions", value = "all" )
+			.to( "SignageConfigItemController.get" )
+			.end();
+		get( "/signages/rows-config-item/:id" )
+			.prc( name = "permissions", value = "all" )
+			.to( "SignageConfigItemController.get" )
+			.end();
 		post( "/ajax/signages/rows-config" ).to( "SignageConfigAjaxController.save" ).end();
-		get( "/signages/rows-config/:id" ).to( "SignageConfigController.rowConfig" ).end();
-		get( "/signages/rows-config" ).to( "SignageConfigController.rowConfig" ).end();
+		get( "/signages/rows-config/:id" )
+			.prc( name = "permissions", value = "all" )
+			.to( "SignageConfigController.rowConfig" )
+			.end();
+		get( "/signages/rows-config" )
+			.prc( name = "permissions", value = "all" )
+			.to( "SignageConfigController.rowConfig" )
+			.end();
 
 		/*
 			metadata type
@@ -73,47 +105,63 @@
 		post( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.save" ).end();
 		get( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.list" ).end();
 		delete( "/ajax/metadata-types" ).to( "MetadataTypeAjaxController.delete" ).end();
-		get( "/metadata-types" ).to( "MetadataTypeController.list" ).end();
+		get( "/metadata-types" )
+			.prc( name = "permissions", value = "all" )
+			.to( "MetadataTypeController.list" )
+			.end();
 
 		/*
 			metadata
 		*/
 		get( "/ajax/:by-regex:(raw-values)/:id/metadata" ).to( "MetadataAjaxController.list" ).end();
 		post( "/ajax/:by-regex:(raw-values)/:id/metadata" ).to( "MetadataAjaxController.save" ).end();
-
-
 		get( "/ajax/metadata" ).to( "MetadataTypeAjaxController.list" ).end();
 		delete( "/ajax/metadata" ).to( "MetadataTypeAjaxController.delete" ).end();
-		get( "/metadata" ).to( "MetadataTypeController.list" ).end();
+		get( "/metadata" )
+			.prc( name = "permissions", value = "all" )
+			.to( "MetadataTypeController.list" )
+			.end();
 
 		/*
 			audit entry
 		*/
 		get( "/ajax/audit-entries/:id" ).to( "AuditEntryAjaxController.get" ).end();
 		get( "/ajax/audit-entries" ).to( "AuditEntryAjaxController.list" ).end();
-		get( "/audit-entries" ).to( "AuditEntryController.list" ).end();
+		get( "/audit-entries" )
+			.prc( name = "permissions", value = "all" )
+			.to( "AuditEntryController.list" )
+			.end();
 
 
 		/*
 			fruits
 		*/
 		get( "/ajax/fruits/code-exists" ).to( "FruitAjaxController.codeExists" ).end();
-		//TODO: consider to remove the 2 follow routes ("/items")
+		// TODO: consider to remove the 2 follow routes ("/items")
 		post( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.addItem" ).end();
 		get( "/ajax/fruits/:id/items" ).to( "FruitAjaxController.listItems" ).end();
 		get( "/ajax/fruits/:id" ).to( "FruitAjaxController.get" ).end();
 		get( "/ajax/fruits" ).to( "FruitAjaxController.list" ).end();
 		post( "/ajax/fruits" ).to( "FruitAjaxController.save" ).end();
 		delete( "/ajax/fruits" ).to( "FruitAjaxController.delete" ).end();
-		get( "/fruits" ).to( "FruitController.list" ).end();
+		get( "/fruits" )
+			.prc( name = "permissions", value = "all" )
+			.to( "FruitController.list" )
+			.end();
 
 
 		/*
 			current account
 		*/
 		post( "/ajax/change-pwd" ).to( "CurrentUserAjaxController.changePwd" ).end();
-		get( "/my/account" ).to( "CurrentUserController.get" ).end();
-		get( "/my/settings" ).to( "CurrentUserController.settings" ).end();
+		get( "/my/account" )
+			.prc( name = "permissions", value = "all" )
+			.to( "CurrentUserController.get" )
+			.end();
+		get( "/my/settings" )
+			.prc( name = "permissions", value = "all" )
+			.to( "CurrentUserController.settings" )
+			.end();
 
 
 		/*
@@ -123,18 +171,30 @@
 		get( "/ajax/finishes" ).to( "FinishAjaxController.list" ).end();
 		post( "/ajax/finishes" ).to( "FinishAjaxController.save" ).end();
 		delete( "/ajax/finishes" ).to( "FinishAjaxController.delete" ).end();
-		get( "/finishes" ).to( "FinishController.list" ).end();
+		get( "/finishes" )
+			.prc( name = "permissions", value = "all" )
+			.to( "FinishController.list" )
+			.end();
 
 
 		/*
 			raw value
 		*/
-		get( "/ajax/raw-values/code-exists" ).to( "RawValueAjaxController.codeExists" ).end();
-		get( "/ajax/raw-values/:id" ).to( "RawValueAjaxController.get" ).end();
+		get( "/ajax/raw-values/code-exists" )
+			.prc( name = "permissions", value = "all" )
+			.to( "RawValueAjaxController.codeExists" )
+			.end();
+		get( "/ajax/raw-values/:id" )
+			.prc( name = "permissions", value = "all" )
+			.to( "RawValueAjaxController.get" )
+			.end();
 		post( "/ajax/raw-values" ).to( "RawValueAjaxController.save" ).end();
 		delete( "/ajax/raw-values" ).to( "RawValueAjaxController.delete" ).end();
 		get( "/ajax/raw-values" ).to( "RawValueAjaxController.list" ).end();
-		get( "/raw-values" ).to( "RawValueController.list" ).end();
+		get( "/raw-values" )
+			.prc( name = "permissions", value = "all" )
+			.to( "RawValueController.list" )
+			.end();
 
 		/*
 			products
@@ -144,7 +204,10 @@
 		/*
 			countries
 		*/
-		get( "/countries" ).to( "CountryController.list" ).end();
+		get( "/countries" )
+			.prc( name = "permissions", value = "all" )
+			.to( "CountryController.list" )
+			.end();
 		get( "/ajax/countries/code-exists" ).to( "CountryAjaxController.codeExists" ).end();
 		post( "/ajax/countries" ).to( "CountryAjaxController.save" ).end();
 		delete( "/ajax/countries" ).to( "CountryAjaxController.delete" ).end();
@@ -154,11 +217,14 @@
 		/*
 			production times
 		*/
-		get( "/ajax/production-times/:id").to("ProductionTimeAjaxController.get").end();
-		post( "/ajax/production-times").to("ProductionTimeAjaxController.save").end();
-		delete( "/ajax/production-times").to("ProductionTimeAjaxController.delete").end();
-		get( "/ajax/production-times").to("ProductionTimeAjaxController.list").end();
-		get( "/production-times").to("ProductionTimeController.list").end();
+		get( "/ajax/production-times/:id" ).to( "ProductionTimeAjaxController.get" ).end();
+		post( "/ajax/production-times" ).to( "ProductionTimeAjaxController.save" ).end();
+		delete( "/ajax/production-times" ).to( "ProductionTimeAjaxController.delete" ).end();
+		get( "/ajax/production-times" ).to( "ProductionTimeAjaxController.list" ).end();
+		get( "/production-times" )
+			.prc( name = "permissions", value = "all" )
+			.to( "ProductionTimeController.list" )
+			.end();
 
 		/*
 			fonts
@@ -166,9 +232,9 @@
 		get( "/ajax/fonts/code-exists" ).to( "FontAjaxController.codeExists" ).end();
 		get( "/ajax/fonts/:id" ).to( "FontAjaxController.get" ).end();
 		delete( "/ajax/fonts" ).to( "FontAjaxController.delete" ).end();
-		get( "/ajax/fonts").to("FontAjaxController.list").end();
+		get( "/ajax/fonts" ).to( "FontAjaxController.list" ).end();
 		post( "/ajax/fonts" ).to( "FontAjaxController.save" ).end();
-		get( "/fonts").to("FontController.list").end();
+		get( "/fonts" ).to( "FontController.list" ).end();
 
 		/*
 			font families
@@ -176,23 +242,23 @@
 		get( "/ajax/font-families/code-exists" ).to( "FontFamilyAjaxController.codeExists" ).end();
 		get( "/ajax/font-families/:id" ).to( "FontFamilyAjaxController.get" ).end();
 		delete( "/ajax/font-families" ).to( "FontFamilyAjaxController.delete" ).end();
-		get( "/ajax/font-families").to("FontFamilyAjaxController.list").end();
+		get( "/ajax/font-families" ).to( "FontFamilyAjaxController.list" ).end();
 		post( "/ajax/font-families" ).to( "FontFamilyAjaxController.save" ).end();
-		get( "/font-families").to("FontFamilyController.list").end();
+		get( "/font-families" ).to( "FontFamilyController.list" ).end();
 
 		/*
 			pictograms
 		*/
-		//TODO: non usato
+		// TODO: non usato
 		get( "/ajax/pictograms/font-family-exists" ).to( "PictogramAjaxController.fontFamilyExists" ).end();
-		get( "/ajax/pictograms/:id/dimensions").to("PictogramAjaxController.listDimensions").end();
-		post( "/ajax/pictograms/:id/dimensions").to("PictogramAjaxController.saveDimensions").end();
+		get( "/ajax/pictograms/:id/dimensions" ).to( "PictogramAjaxController.listDimensions" ).end();
+		post( "/ajax/pictograms/:id/dimensions" ).to( "PictogramAjaxController.saveDimensions" ).end();
 		get( "/ajax/pictograms/:id" ).to( "PictogramAjaxController.get" ).end();
 		delete( "/ajax/pictograms" ).to( "PictogramAjaxController.delete" ).end();
-		get( "/ajax/pictograms").to("PictogramAjaxController.list").end();
+		get( "/ajax/pictograms" ).to( "PictogramAjaxController.list" ).end();
 		post( "/ajax/pictograms" ).to( "PictogramAjaxController.save" ).end();
-		
-		
+
+
 		get( "/ajax/font-family/:id/pictograms" ).to( "PictogramAjaxController.fontFamilyList" ).end();
 
 		/*
@@ -200,10 +266,10 @@
 		*/
 		get( "/ajax/font-family-sizes/:id" ).to( "FontFamilySizeAjaxController.get" ).end();
 		delete( "/ajax/font-family-sizes" ).to( "FontFamilySizeAjaxController.delete" ).end();
-		get( "/ajax/font-family-sizes").to("FontFamilySizeAjaxController.list").end();
+		get( "/ajax/font-family-sizes" ).to( "FontFamilySizeAjaxController.list" ).end();
 		post( "/ajax/font-family-sizes" ).to( "FontFamilySizeAjaxController.save" ).end();
 
-		//TODO: non torna famiglie ma una serie di sizes (riv. nome metodo)
+		// TODO: non torna famiglie ma una serie di sizes (riv. nome metodo)
 		get( "/ajax/font-family/:id/sizes" ).to( "FontFamilySizeAjaxController.fontFamilyList" ).end();
 
 		/*
@@ -258,7 +324,7 @@
 		get( "/ajax/reports" ).toHandler( "ReportAjaxController.list" );
 		get( "/reports/:id" ).toHandler( "ReportController.get" );
 		get( "/reports" ).toHandler( "ReportController.list" );
-		
+
 
 		/*
 			texts
@@ -288,7 +354,7 @@
 		get( "/ajax/components/by-type" ).to( "ComponentAjaxController.listByType" ).end();
 		post( "/ajax/components/by-type" ).to( "ComponentAjaxController.save" ).end();
 		get( "/ajax/components" ).to( "ComponentAjaxController.list" ).end();
-		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end(); //TODO: to remove
+		post( "/ajax/components" ).to( "ComponentAjaxController.save" ).end(); // TODO: to remove
 		get( "/components/reassign" ).to( "ComponentController.reassign" ).end();
 		get( "/components" ).to( "ComponentController.list" ).end();
 
@@ -297,8 +363,12 @@
 			files
 		*/
 		delete( "/ajax/files/:id" ).to( "FileAjaxController.delete" ).end();
-		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.list" ).end();
-		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" ).to( "FileAjaxController.upload" ).end();
+		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" )
+			.to( "FileAjaxController.list" )
+			.end();
+		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" )
+			.to( "FileAjaxController.upload" )
+			.end();
 
 
 		/*
@@ -312,7 +382,9 @@
 		*/
 		get( "/ajax/products/get-id-and-file-by-params" ).to( "ProductAjaxController.getIdAndFileByParams" ).end();
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
-		get( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();
+		get( "/ajax/products/:id/combinations/calculate" )
+			.to( "ProductAjaxController.calculateCombinations" )
+			.end();
 		delete( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.deleteCombinations" ).end();
 		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
@@ -358,12 +430,27 @@
 		get( "/ajax/lines" ).to( "LineAjaxController.list" ).end();
 		post( "/ajax/lines" ).to( "LineAjaxController.save" ).end();
 		delete( "/ajax/lines" ).to( "LineAjaxController.delete" ).end();
-		
-		get( "/lines/categories/:categoryId" ).to( "LineController.listByCategoryId" ).end();
-		get( "/lines/categories" ).to( "LineController.listByCategoryId" ).end();
-		get( "/lines/:id/categories/:categoryId/products" ).to( "LineController.products" ).end(); //TODO: better naming
-		get( "/lines/:id/categories/:categoryId/attributes" ).to( "LineController.attributes" ).end();
-		get( "/lines" ).to( "LineController.list" ).end();
+
+		get( "/lines/categories/:categoryId" )
+			.prc( name = "permissions", value = "all" )
+			.to( "LineController.listByCategoryId" )
+			.end();
+		get( "/lines/categories" )
+			.prc( name = "permissions", value = "all" )
+			.to( "LineController.listByCategoryId" )
+			.end();
+		get( "/lines/:id/categories/:categoryId/products" )
+			.prc( name = "permissions", value = "all" )
+			.to( "LineController.products" )
+			.end(); // TODO: better naming
+		get( "/lines/:id/categories/:categoryId/attributes" )
+			.prc( name = "permissions", value = "all" )
+			.to( "LineController.attributes" )
+			.end();
+		get( "/lines" )
+			.prc( name = "permissions", value = "all" )
+			.to( "LineController.list" )
+			.end();
 
 
 		/*
@@ -380,8 +467,14 @@
 		get( "/ajax/models" ).to( "ModelAjaxController.list" ).end();
 		post( "/ajax/models" ).to( "ModelAjaxController.save" ).end();
 		delete( "/ajax/models" ).to( "ModelAjaxController.delete" ).end();
-		get( "/models/print" ).to( "ModelController.print" ).end();
-		get( "/models" ).to( "ModelController.list" ).end();
+		get( "/models/print" )
+			.prc( name = "permissions", value = "all" )
+			.to( "ModelController.print" )
+			.end();
+		get( "/models" )
+			.prc( name = "permissions", value = "all" )
+			.to( "ModelController.list" )
+			.end();
 
 
 		/*
@@ -404,35 +497,46 @@
 		get( "/ajax/quotations/finishes/:categoryId/:lineId" ).to( "QuotationAjaxController.listFinishes" ).end();
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();
-		
-		get( "/quotations/new" ).to( "QuotationController.new" ).end();
+
+		get( "/quotations/new" )
+			.prc( name = "permissions", value = "all" )
+			.to( "QuotationController.new" )
+			.end();
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
-		post( "/quotations" ).to( "QuotationController.create" ).end(); //Da togliere
-		get( "/quotations" ).to( "QuotationController.list" ).end();
-		
+		post( "/quotations" ).to( "QuotationController.create" ).end(); // Da togliere
+		get( "/quotations" )
+			.prc( name = "permissions", value = "all" )
+			.to( "QuotationController.list" )
+			.end();
+
 		get( "/ajax/quotations/:quotationId/zones" ).to( "QuotationZoneAjaxController.list" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
 		delete( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.delete" ).end();
 
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
-		post("/ajax/quotations").to( "QuotationAjaxController.save" ).end();
-		
+		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
+
 		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
 		get( "/ajax/quotation-items/:id/total" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
-		delete("/ajax/quotation-items").to( "QuotationItemAjaxController.delete" ).end();
+		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
-		post("/ajax/quotation-items").to( "QuotationItemAjaxController.save" ).end();
-		
+		post( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.save" ).end();
+
 
 		/*
 			roles
 		*/
-		get( "/roles/:id" ).to( "RoleController.get" ).end();
-		get( "/roles" ).to( "RoleController.list" ).end();
-		get( "/roles/print" ).to( "RolController.print" ).end();
+		get( "/roles" )
+			.prc( name = "permissions", value = "all" )
+			.to( "RoleController.list" )
+			.end();
+		get( "/roles/print" )
+			.prc( name = "permissions", value = "all" )
+			.to( "RolController.print" )
+			.end();
 
 		get( "/ajax/roles/:roleId/permissions" ).to( "RolePermissionAjaxController.list" ).end();
 		post( "/ajax/roles-permissions" ).to( "RolePermissionAjaxController.save" ).end();
@@ -441,15 +545,17 @@
 		/*
 			system
 		*/
-		get( "/system" ).to( "SystemController.get" ).end();
+		get( "/system" )
+			.prc( name = "permissions", value = "all" )
+			.to( "SystemController.get" )
+			.end();
 
 
 		/*
 			lookup
 			[TODO] "JSDATA" non funziona
 		*/
-		//get( "/(.*)/datajs" ).to( "LookupController.datajs" ).end();
-
+		// get( "/(.*)/datajs" ).to( "LookupController.datajs" ).end();
 	}
 
 }
