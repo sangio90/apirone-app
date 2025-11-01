@@ -19,7 +19,7 @@ component{
 			reinitKey                : "fwreinit",
 			handlersIndexAutoReload  : true,
 			// Implicit Events
-			defaultEvent             : "manager:MainController.login",
+			defaultEvent             : "manager:AuthController.login",
 			requestStartHandler      : "",
 			requestEndHandler        : "",
 			applicationStartHandler  : "",
