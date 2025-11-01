@@ -46,12 +46,19 @@ NM.util.ajax = function( setup ) {
         method: "GET",
         callback: {
             done: undefined,
-            always: function( xhr, statusText, response, d ) {
+            always: function( xhr, statusText ) {
+
+                console.log( "xhr", xhr );
 
                 if ( statusText == "error" ) {
 
                     if ( xhr.status == 500 ) {
                         AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
+                        return;
+                    }
+
+                    if ( xhr.status == 401 ) {
+                        AP.widget.notify( "warning", "Accesso non consentito", "Ops!" );
                         return;
                     }
 

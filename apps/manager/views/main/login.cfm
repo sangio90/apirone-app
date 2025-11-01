@@ -26,8 +26,11 @@
                 <form action="/manager/login/check" method="POST" id="login-form" autocomplete="true">
 
                     <cfif flash.exists("message")>
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            #flash.get("message")#
+
+                        <cfset message = flash.get("message")>
+
+                        <div class="alert alert-#message.type# alert-dismissible fade show">
+                            #message.message#
                         </div>
                     </cfif>
                     
