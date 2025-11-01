@@ -1,6 +1,7 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	variables.permissionRoutes = {};
+	variables.permissionRoutes   = {};
+	variables.DEFAULT_POLICY_KEY = "DEFAULT_POLICY";
 
 	public SecurityService function init( permissionRoutesPath = "/config/permissionRoutes.json.cfm" ){
 		variables.permissionRoutes = DeserializeJSON( FileRead( ExpandPath( permissionRoutesPath ) ) );
@@ -11,59 +12,77 @@
 	public boolean function canAccess( required any user, required string eventName ){
 		var baseEventName = arguments.eventName;
 		if ( ListContains( arguments.eventName, ":" ) ) {
-			// può contenere il modulo, lo estrae ( da manager:product.save a product.save)
 			baseEventName = ListLast( arguments.eventName, ":" );
 		}
 
-		var requiredPermissions = getRequiredPermissions( baseEventName );
+		// 1. Ottieni l'intera configurazione (che ora include 'required' e 'roles')
+		var routeConfig         = getRouteConfig( baseEventName );
+		var requiredPermissions = routeConfig.required ?: []; // Usa il default se non specificato
+		var requiredRoles       = routeConfig.roles ?: []; // Nuovo: array dei ruoli richiesti
 
-		// 1. Livello 3: Accesso Libero (Array vuoto)
-		if ( ArrayIsEmpty( requiredPermissions ) ) {
+		// --- Livello 3: Accesso Libero (se entrambi gli array sono vuoti) ---
+		if ( ArrayIsEmpty( requiredPermissions ) && ArrayIsEmpty( requiredRoles ) ) {
 			return true;
 		}
 
-		// 2. Livello 2: Autenticazione Implicita
-		// Se l'array NON è vuoto, DEVE essere un utente loggato.
-		// Usiamo il tuo 'user' object per verificare lo stato di login.
+		// --- Livello 2: Autenticazione Implicita ---
+		// Se si richiedono Ruoli O Permessi, DEVE essere un utente loggato.
 		if ( !user.isLogged() ) {
-			// Assumi che il tuo oggetto utente abbia questo metodo
 			return false;
 		}
 
-		// 3. Livello 1: Verifica Permessi Specifici
-		// L'utente è loggato; ora verifica i permessi reali richiesti.
+		// --- Livello 1A: Verifica Ruoli ---
+		// Se sono richiesti ruoli, l'utente DEVE avere ALMENO UNO dei ruoli richiesti.
+		if ( !ArrayIsEmpty( requiredRoles ) ) {
+			var hasRequiredRole = false;
+			for ( var role in requiredRoles ) {
+				if ( user.getRole().getId() == role ) {
+					// Metodo ipotetico nell'oggetto utente
+					hasRequiredRole = true;
+					break;
+				}
+			}
+			if ( !hasRequiredRole ) {
+				return false; // Non ha nessun ruolo richiesto
+			}
+		}
+
+		// --- Livello 1B: Verifica Permessi Specifici ---
+		// Se sono richiesti permessi, l'utente DEVE averli tutti.
 		for ( var permission in requiredPermissions ) {
 			if ( !user.hasPermission( permission ) ) {
 				return false;
 			}
 		}
 
-		// Autenticato e ha tutti i permessi specifici.
+		// Autenticato e ha soddisfatto i requisiti di Ruolo E Permesso.
 		return true;
 	}
 
-	private array function getRequiredPermissions( required string eventName ){
-		// 1. Cerca Corrispondenza Esatta (l'evento preciso ha la massima priorità)
+	// 🔧 Modifica la funzione per restituire l'intera configurazione (struct)
+	private struct function getRouteConfig( required string eventName ){
+		// 1. Cerca Corrispondenza Esatta
 		if ( StructKeyExists( variables.permissionRoutes, arguments.eventName ) ) {
-			// Restituisce l'array dei permessi richiesti
-			return variables.permissionRoutes[ arguments.eventName ].required;
+			return variables.permissionRoutes[ arguments.eventName ];
 		}
 
-		// 2. Cerca Corrispondenza Wildcard (e.g., product.*)
+		// 2. Cerca Corrispondenza Wildcard
 		for ( var pattern in variables.permissionRoutes ) {
 			if ( pattern.endsWith( ".*" ) ) {
 				var prefix = pattern.replace( ".*", "", "one" );
-
-				// Controlla se l'eventName inizia con il prefisso + punto
 				if ( arguments.eventName.startsWith( prefix & "." ) ) {
-					// Trovata la regola di raggruppamento base, la usiamo e usciamo subito.
-					return variables.permissionRoutes[ pattern ].required;
+					return variables.permissionRoutes[ pattern ];
 				}
 			}
 		}
 
-		// se l'evento non c'è nel file di configurazione, l'accesso è negato
-		return [ "DENY_BY_DEFAULT_ACCESS" ]; //
+		// 3. APPLICA LA POLICY DI DEFAULT
+		if ( StructKeyExists( variables.permissionRoutes, variables.DEFAULT_POLICY_KEY ) ) {
+			return variables.permissionRoutes[ variables.DEFAULT_POLICY_KEY ];
+		}
+
+		// 4. DENY ALL: Configurazione di fallback per negare.
+		return { required = [ "DENY_ACCESS" ], roles = [] };
 	}
 
 }

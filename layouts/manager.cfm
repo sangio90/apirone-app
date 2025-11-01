@@ -129,7 +129,7 @@
                 <div class="nano">
                     <div class="nano-content" style="right: -17px;">
 
-                        #view( view="util/menu", cache=true )#
+                        #view( view="util/menu" )#
 
                         <hr class="separator" />
 

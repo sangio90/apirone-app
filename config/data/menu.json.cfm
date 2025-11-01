@@ -3,7 +3,7 @@
 		href: "/manager/dashboard",
 		icon: "bx bx-home-alt",
 		title: "Dashboard",
-		roles: "ADM",
+		roles: "ALL",
 	},
 	{
 		href: "#",
@@ -72,6 +72,7 @@
 		href: "#",
 		icon: "fas fa-cogs",
 		title: "Configurazioni",
+		roles: "ADM",
 		items: [
 			{
 				href: "/manager/countries",

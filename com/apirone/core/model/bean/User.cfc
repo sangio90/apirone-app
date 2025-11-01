@@ -9,28 +9,27 @@ component accessors="true" extends="AbsBean" {
 		return this;
 	}
 
-	public Boolean function isLogged(){
+	public Booleans function isLogged(){
 		return getId() != "ANONYMOUS";
 	}
 
-	public boolean function hasPermission( required string permissionId ){
+	public Booleans function hasPermission( required String permissionId ){
 		// 1. Blocco Esplicito (Permesso Fittizio):
 		// Se il permesso richiesto è il marcatore di blocco, L'ADM DEVE essere trattato come un utente normale (e fallire).
-		if ( arguments.permissionId == "DENY_BY_DEFAULT_ACCESS" ) {
-			// Non permettere all'ADM di superare questo controllo fittizio.
-			// Lo stato dell'ADM sarà gestito dal punto 2, ma questo DEVE fallire.
+		// Viene impostato "DENY_ALL" se la rotta non esiste.
+		if ( arguments.permissionId == "DENY_ALL" ) {
 			return false;
 		}
 
-		// 2. Superpotere per l'Amministratore (Permessi Reali):
-		if ( getRole().getId() == "ADM" ) {
-			// L'ADM ha accesso a TUTTI i permessi reali (CREATE_PRODUCT, etc.)
-			return true;
+		// 2. Logica per AUTHENTICATED e Permessi Standard (se non è ADM)
+		if ( arguments.permissionId == "AUTHENTICATED" ) {
+			return isLogged(); // Ritorna true o false per tutti gli utenti
 		}
 
-		// 3. Logica per AUTHENTICATED e Permessi Standard (se non è ADM)
-		if ( arguments.permissionId == "AUTHENTICATED" ) {
-			return isLogged();
+		// 1. Superpotere per l'Amministratore (Permessi Reali):
+		// Nota: L'ADM è già stato gestito per DENY_ALL e AUTHENTICATED
+		if ( getRole().getId() == "ADM" ) {
+			return true;
 		}
 
 		var rolePermissions = getRole().getPermissions();
@@ -40,6 +39,7 @@ component accessors="true" extends="AbsBean" {
 				return true;
 			}
 		}
+
 		return false;
 	}
 

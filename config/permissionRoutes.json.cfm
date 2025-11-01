@@ -1,43 +1,14 @@
 ﻿{
-    "MainController.dashboard": { 
-        required: ["AUTHENTICATED"]
+    "DEFAULT_POLICY": { 
+        "required": ["AUTHENTICATED"] 
     },
 
     "AuthController.*": { 
         required: []
     },
 
-    "AuthController.changeRole": { 
-        required: ["AUTHENTICATED"]
+    "LineController.*": { 
+        "roles": ["ADM"],
     },
-
-    "CurrentUserController.*": { 
-        required: ["AUTHENTICATED"]
-    },
-
-    "FruitController.*": { 
-        required: ["AUTHENTICATED"]
-    },
-
-    "FruitAjaxController.*": { 
-        required: ["AUTHENTICATED"]
-    },
-
-    "AccountController.*": { 
-        required: ["AUTHENTICATED"]
-    },
-
-    "AccountAjaxController.*": { 
-        required: ["AUTHENTICATED"]
-    },
-
-    "CountryController.*": { 
-        required: ["AUTHENTICATED"]
-    },
-
-    "CountryAjaxController.*": { 
-        required: ["AUTHENTICATED"]
-    },
-
 
 }
