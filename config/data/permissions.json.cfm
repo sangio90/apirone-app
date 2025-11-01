@@ -1,83 +1,82 @@
 ﻿[ 
 	{
-		"id": "RAW_VALUE_VIEW",
+		"id": "RAW_VALUE.VIEW",
 		"name": "Vedi Valore Base",
 		"entityId": "RAW_VALUE"
 	},
 	{
-		"id": "RAW_VALUE_CREATE",
+		"id": "RAW_VALUE.CREATE",
 		"name": "Crea Valore Base",
 		"entityId": "RAW_VALUE"
 	},
 	{
-		"id": "RAW_VALUE_UPDATE",
+		"id": "RAW_VALUE.UPDATE",
 		"name": "Aggiorna Valore Base",
 		"entityId": "RAW_VALUE"
 	},
 	{
-		"id": "RAW_VALUE_DELETE",
+		"id": "RAW_VALUE.DELETE",
 		"name": "Cancella Valore Base",
 		"entityId": "RAW_VALUE"
 	},
 	{
-		"id": "ATTRIBUTE_VALUE_VIEW",
+		"id": "ATTRIBUTE_VALUE.VIEW",
 		"name": "Vedi Valore Attributo",
 		"entityId": "ATTRIBUTE_VALUE"
 	},
 	{
-		"id": "ATTRIBUTE_VALUE_CREATE",
+		"id": "ATTRIBUTE_VALUE.CREATE",
 		"name": "Crea Valore Attributo",
 		"entityId": "ATTRIBUTE_VALUE"
 	},
 	{
-		"id": "ATTRIBUTE_VALUE_UPDATE",
+		"id": "ATTRIBUTE_VALUE.UPDATE",
 		"name": "Aggiorna Valore Attributo",
 		"entityId": "ATTRIBUTE_VALUE"
 	},
 	{
-		"id": "ATTRIBUTE_VALUE_DELETE",
+		"id": "ATTRIBUTE_VALUE.DELETE",
 		"name": "Cancella Valore Attributo",
 		"entityId": "ATTRIBUTE_VALUE"
 	},
 	{
-		"id": "PRODUCT_VIEW",
+		"id": "PRODUCT.VIEW",
 		"name": "Vedi Prodotto",
 		"entityId": "PRODUCT"
 	},
 	{
-		"id": "PRODUCT_CREATE",
+		"id": "PRODUCT.CREATE",
 		"name": "Crea Prodotto",
 		"entityId": "PRODUCT"
 	},
 	{
-		"id": "PRODUCT_UPDATE",
+		"id": "PRODUCT.UPDATE",
 		"name": "Aggiorna Prodotto",
 		"entityId": "PRODUCT"
 	},
 	{
-		"id": "PRODUCT_DELETE",
+		"id": "PRODUCT.DELETE",
 		"name": "Cancella Prodotto",
 		"entityId": "PRODUCT"
 	},
 	{
-		"id": "PRODUCT_ITEM_VIEW",
+		"id": "PRODUCT_ITEM.VIEW",
 		"name": "Vedi Componente Prodotto",
 		"entityId": "PRODUCT_ITEM"
 	},
 	{
-		"id": "PRODUCT_ITEM_CREATE",
+		"id": "PRODUCT_ITEM.CREATE",
 		"name": "Crea Componente Prodotto",
 		"entityId": "PRODUCT_ITEM"
 	},
 	{
-		"id": "PRODUCT_ITEM_UPDATE",
+		"id": "PRODUCT_ITEM.UPDATE",
 		"name": "Aggiorna Componente Prodotto",
 		"entityId": "PRODUCT_ITEM"
 	},
 	{
-		"id": "PRODUCT_ITEM_DELETE",
+		"id": "PRODUCT_ITEM.DELETE",
 		"name": "Cancella Componente Prodotto",
 		"entityId": "PRODUCT_ITEM"
 	}
 ]
-
