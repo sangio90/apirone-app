@@ -208,51 +208,60 @@
 
         var html = "";
 
+        if ( !arguments.data.len() ) {
+            arguments.data = DeserializeJSON( FileRead( ExpandPath("/config/data/menu.json.cfm") ) );
+        }        
+
         for ( var row in arguments.data ) {
 
-            var originClass = "";
-            var activeClass = "";
-            var expandedClass = "";
-    
-            if ( StructKeyExists ( row, "items" ) ) {
+            var roles = row.keyExists("roles") ? ListToArray( row.roles ) : ["ALL"];
 
-                var originClass = "nav-parent";
+            if( ArrayFind( roles, "ALL" ) || ArrayFind( roles, session.user.getRole().getId() ) ) {
 
-                for ( var item in row.items ) {
-                    if ( item.href == active ) {
-                        expandedClass = "nav-expanded nav-active";
+                var originClass = "";
+                var activeClass = "";
+                var expandedClass = "";
+        
+                if ( StructKeyExists ( row, "items" ) ) {
+
+                    var originClass = "nav-parent";
+
+                    for ( var item in row.items ) {
+                        if ( item.href == active ) {
+                            expandedClass = "nav-expanded nav-active";
+                        }
                     }
+                
                 }
-            
+                
+                if ( arguments.active == row.href ) {
+                    var activeClass = 'nav-active';
+                }
+                
+                var element = '
+                    <li class="#trim( originClass & ' ' & activeClass & ' ' & expandedClass )#">
+                        <a class="nav-link" href="#row.href#">
+                            
+                            # Len( row?.badge ) ? '<span class="float-end badge badge-primary">#row.badge#</span>' : '' #
+                            
+                            # Len( row?.icon ) ? '<i class="#row.icon#" aria-hidden="true"></i>' : '' #
+                            
+                            <span>#row.title#</span>
+                        </a>
+
+                        # originClass.len() 
+                            ? 
+                                '<ul class="nav nav-children">' & 
+                                    createMenu( row.items, arguments.active ) &
+                                '</ul>'
+                            : '' 
+                        #
+                    </li>
+                ';
+
+                html = html & element;                     
+
             }
-            
-            if ( arguments.active == row.href ) {
-                var activeClass = 'nav-active';
-            }
-            
-            var element = '
-                <li class="#trim( originClass & ' ' & activeClass & ' ' & expandedClass )#">
-                    <a class="nav-link" href="#row.href#">
-                        
-                        # Len( row?.badge ) ? '<span class="float-end badge badge-primary">#row.badge#</span>' : '' #
-                        
-                        # Len( row?.icon ) ? '<i class="#row.icon#" aria-hidden="true"></i>' : '' #
-                        
-                        <span>#row.title#</span>
-                    </a>
-
-                    # originClass.len() 
-                        ? 
-                            '<ul class="nav nav-children">' & 
-                                createMenu( row.items, arguments.active ) &
-                            '</ul>'
-                        : '' 
-                    #
-                </li>
-            ';
-
-            html = html & element;                
-
         
         }
 

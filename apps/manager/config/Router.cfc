@@ -15,50 +15,6 @@
 		get( "/batch/update-terms" ).to( "BatchController.updateSearchTerms" ).end();
 
 		/*
-		group( { pattern="/api", target="api", handler="api" }, function( options ){
-			route( "/", "main.index" );
-		 	route( "/echo", "echo" );
-			route( "/users/:id" ).withAction( { get : "index", post : "save" } ).toHandler( "users" );
-		} )
-		*/
-
-		// Metodo ColdBox per aggiungere properties e patterns al gruppo
-		// No va, non riesco ad aggoungere la chiave a "prc"
-		group(
-			{
-				pattern = "/", // Prefisso URL comune
-				// target     = "manager:MainController.", // Prefisso controller comune
-				prc     = { "permissions" = "all" }
-			},
-			function( event, a, b ){
-				// dump( arguments );
-				// abort;
-				// get( "/route-1" ).withNameSpace( "blog" ).to( "MainController.getMethod" );
-				// post( "/route-1" ).withNameSpace( "blog" ).to( "MainController.postMethod" );
-				route( "/route-1" )
-					.withAction( { get = "getMethod", post = "postMethod" } )
-					.toHandler( "MainController" );
-				// ecc.
-			}
-		);
-
-		/*
-		group(
-			{
-				pattern = "/",
-				target  = "manager:MainController.",
-				prc     = { "permissions" = "all" },
-				rc      = { "permissions" = "all" }
-			},
-			function(){
-				route( "/route-1", "postMethod" ).end();
-				// route( "/route-1", "getMethod" ).end();
-			}
-		);
-		*/
-
-
-		/*
 			dashboard
 		*/
 		get( "/dashboard" ).to( "MainController.dashboard" ).end();

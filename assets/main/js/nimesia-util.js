@@ -48,8 +48,6 @@ NM.util.ajax = function( setup ) {
             done: undefined,
             always: function( xhr, statusText ) {
 
-                console.log( "xhr", xhr );
-
                 if ( statusText == "error" ) {
 
                     if ( xhr.status == 500 ) {

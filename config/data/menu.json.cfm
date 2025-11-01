@@ -2,7 +2,8 @@
 	{
 		href: "/manager/dashboard",
 		icon: "bx bx-home-alt",
-		title: "Dashboard"
+		title: "Dashboard",
+		roles: "ADM",
 	},
 	{
 		href: "#",
@@ -160,6 +161,7 @@
 		href: "#",
 		icon: "fas fa-users",
 		title: "Utenze",
+		roles: "ADM",
 		items: [
 			{
 				href: "/manager/accounts",
