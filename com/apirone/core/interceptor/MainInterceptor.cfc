@@ -73,6 +73,7 @@ component extends="coldbox.system.Interceptor" {
             MANAGER module
         */
 		if ( module == "manager" ) {
+			/*
 			var allowedEvents = "manager:AuthController.login,manager:AuthController.checkLogin,manager:AuthController.logout";
 
 			// se non sono loggato, e non un evento ammesso
@@ -85,6 +86,7 @@ component extends="coldbox.system.Interceptor" {
 					addToken          = false
 				);
 			}
+			*/
 
 			prc.page      = {}; // current js config write in current html page
 			prc.jsScripts = []; // current js file for current html page
@@ -312,6 +314,7 @@ component extends="coldbox.system.Interceptor" {
 		abort;
 	}
 
+	/*
 	private function canAccess( event ){
 		hostCanAccess();
 		userAgentCanAccess();
@@ -337,6 +340,7 @@ component extends="coldbox.system.Interceptor" {
 			}
 		}
 	}
+		*/
 
 	private String function storeRequest(
 		required event,
