@@ -12,35 +12,61 @@ component extends="coldbox.system.Interceptor" {
 		var user = session.user;
 
 		var eventName = event.getCurrentEvent();
+		var module = event.getCurrentModule();
+		var controller = event.getCurrentHandler();
 
+		cffile(
+			action = "APPEND",
+			file   = "#ExpandPath( "/debug.log" )#",
+			output = "#Now()# #eventName#"
+		);
 
 		// Chiama il SecurityService per verificare i permessi.
 		if ( !securityService.canAccess( user, eventName ) ) {
-			if ( user.isLogged() ) {
-				// alla dashbord con messaggio
 
-				// TODO: move to an helper, like in AbsController
-				flash.put(
-					"message",
-					{
-						"type"    = "warning",
-						"message" = "Accesso negato. Non hai i permessi necessari per accedere a #eventName#",
-						"title"   = "Accesso negato"
-					}
-				);
+			var controller = event.getCurrentHandler();
 
-				relocate(
-					uri               = "/manager/dashboard",
-					postProcessExempt = false,
-					addToken          = false
-				);
+			if( controller CONTAINS "ajax" ) {
+
+				return arguments.event
+					.renderData(
+						data       = "Not Authorized.",
+						statusCode = "401",
+						statusText = "Unauthorized"
+					)
+					.noExecution();
+				
 			} else {
-				relocate(
-					uri               = "/manager/login",
-					postProcessExempt = false,
-					addToken          = false
-				);
+
+				if ( user.isLogged() ) {
+					// alla dashbord con messaggio
+
+					// TODO: move to an helper, like in AbsController
+					flash.put(
+						"message",
+						{
+							"type"    = "warning",
+							"message" = "Accesso negato. Non hai i permessi necessari per accedere a #eventName#",
+							"title"   = "Accesso negato"
+						}
+					);
+
+					relocate(
+						uri               = "/manager/dashboard",
+						postProcessExempt = false,
+						addToken          = false
+					);
+				} else {
+					relocate(
+						uri               = "/manager/login",
+						postProcessExempt = false,
+						addToken          = false
+					);
+				}
+
+
 			}
+			
 
 			event.noRender(); // Assicura che ColdBox non provi a renderizzare l'evento bloccato
 			return;

@@ -31,4 +31,13 @@
         required: ["AUTHENTICATED"]
     },
 
+    "CountryController.*": { 
+        required: ["AUTHENTICATED"]
+    },
+
+    "CountryAjaxController.*": { 
+        required: ["AUTHENTICATED"]
+    },
+
+
 }
