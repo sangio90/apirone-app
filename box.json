@@ -38,7 +38,7 @@
         "setup:prod": "task run taskFile=tasks/Build.cfc target=setup :env=prod",
         "setup:test": "task run taskFile=tasks/Build.cfc target=setup :env=test",
         "format": "cfformat run /apps/**/controllers/**,/com/** --overwrite",
-        "format:watch": "cfformat watch /apps/**/controllers/**,/com/apirone/**",
+        "format:watch": "cfformat watch /apps/**/controllers/**,/apps/**/config/**,/com/apirone/**",
         "format:check": "cfformat check /apps/**/controllers/**,/com/apirone/**",
         "createZip": "task run taskFile=tasks/Build.cfc target=createZip",
         "createEnv:devel": "task run taskFile=tasks/Build.cfc target=createEnv :env=devel"
