@@ -48,7 +48,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			Location( "/manager/dashboard", false );
 		} else {
-			flash.put( "message", "Login e/o password errate." );
+			setMessage( "Login e/o password errate.", "warning" );
 
 			// TODO: Report Ortus:
 			// - only with "/manager/login" it location to "index.cfm?/manager/login"
@@ -69,6 +69,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		);
 	}
 
+	function logout( event, rc, prc ){
+		super.logout();
+
+		setMessage( "Ti sei disconnesso.", "success" );
+		relocate(
+			uri               = "/manager/login",
+			postProcessExempt = false,
+			addToken          = false
+		);
+	}
+
+	// security: AUTHENTICATED
 	function changeRole( event, rc, prc ){
 		var result = super.changeRole( rc.id );
 
@@ -83,14 +95,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			postProcessExempt = false,
 			addToken          = false
 		);
-	}
-
-	function logout( event, rc, prc ){
-		super.logout();
-
-		flash.put( "message", "Ti sei disconnesso." );
-
-		Location( "/manager/login?msg=disconnected", false );
 	}
 
 }
