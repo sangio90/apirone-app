@@ -48,7 +48,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.subtitle = product.getCategory().getName();
 			prc.textLink = "Componenti per #product.getCategory().getName()# / #product.getName()#";
 		} else {
-			prc.title    = "Finitura #product.getFinish().getName()#, modello #product.getModel().getCode()#";
+			prc.title    = "Finitura #product.getFinish().getName()#, modello #product.getModel().getName()# (#product.getModel().getCode()#)";
 			prc.subtitle = "Categoria #product.getCategory().getName()#, linea #product.getLine().getName()#";
 			prc.textLink = "Componenti per #product.getLine().getName()# / #product.getModel().getCode()# / #product.getFinish().getName()#";
 
@@ -56,11 +56,21 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.models     = super.fire( "model.list", { lineId = prc.line.getId() } );
 			prc.finishes   = super.fire( "finish.list", { lineId = prc.line.getId() } );
 
-			prc.page[ "lineId" ]   = prc.line.getId();
-			prc.page[ "products" ] = memy.convertList(
-				super.fire( "product.list", { lineId = prc.line.getId() } ),
-				"list"
-			);
+			prc.page[ "lineId" ] = prc.line.getId();
+
+			var products = super.fire( "product.list", { lineId = prc.line.getId() } );
+
+			prc.page[ "products" ] = [];
+
+			stopwatch variable="time" {
+				products.each(
+					function( product ){
+						prc.page[ "products" ].add( memy.convert( product, "menu" ) )
+					},
+					true,
+					4
+				);
+			}
 		}
 
 		prc.page[ "productId" ]           = product.getId();

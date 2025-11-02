@@ -129,7 +129,7 @@
                 <div class="nano">
                     <div class="nano-content" style="right: -17px;">
 
-                        #view( view="util/menu" )#
+                        #view( view="util/menu", cache=true, cacheSuffix="cache-role-#session.user.getRole().getId()#" )#
 
                         <hr class="separator" />
 
