@@ -39,55 +39,13 @@ component extends="coldbox.system.Interceptor" {
 		/*
             API module
         */
-		if ( module == "api" ) {
-			storeRequest( event )
 
-			var svc = model.getInstance( "APIService" );
-
-			try {
-				var authToken = Trim( GetHTTPRequestData().Headers.authorization.replace( "Bearer", "" ) );
-
-				// used by Verticale
-				if ( authToken != "9e39d8edd05940ddab24411338e9def857679e76978041e29a1d7f956aa0be5d" ) {
-					return arguments.event
-						.renderData(
-							data       = "Not Authorized. Token not valid.",
-							statusCode = "401",
-							statusText = "Unauthorized"
-						)
-						.noExecution();
-				}
-			} catch ( e ) {
-				return arguments.event
-					.renderData(
-						data       = "Not Authorized.",
-						statusCode = "401",
-						statusText = "Unauthorized"
-					)
-					.noExecution();
-			}
-		}
 
 
 		/*
             MANAGER module
         */
 		if ( module == "manager" ) {
-			/*
-			var allowedEvents = "manager:AuthController.login,manager:AuthController.checkLogin,manager:AuthController.logout";
-
-			// se non sono loggato, e non un evento ammesso
-			if ( !session.user.isLogged() AND !ListFindNoCase( allowedEvents, event.getContext().event ) ) {
-				flash.put( "message", "Sessione scaduta. Fai il login." );
-
-				relocate(
-					uri               = "/manager/login",
-					postProcessExempt = false,
-					addToken          = false
-				);
-			}
-			*/
-
 			prc.page      = {}; // current js config write in current html page
 			prc.jsScripts = []; // current js file for current html page
 
@@ -115,61 +73,6 @@ component extends="coldbox.system.Interceptor" {
 				prc.currentRoutedURL.listContains( "ajax/" ) OR prc.currentRoutedURL.listContains( "api/" )
 			)
 		) {
-			/*
-                here [ event.noExecution() ] not works
-                https://community.ortussolutions.com/t/trouble-with-noexecution-and-pdf/9288
-            */
-
-			// var path   = "com.apirone.core.model.bean.AjaxResult";
-			// var result = event.getValue( "result", "result-not-found" );
-
-			/*
-                ATTENZIONE:
-                non c'è result se il nome dell'hanlder nel router è sbagliato
-            */
-			/*
-			if ( IsSimpleValue( result ) AND result == "result-not-found" ) {
-				event.renderData( data = "Result key not found", statusCode = "400" ).noExecution();
-			} else {
-				if ( IsInstanceOf( result, path ) ) {
-					var code = 200;
-
-					if ( result.getStatus() == "ERROR" ) {
-						code = 400
-					}
-
-					event
-						.renderData(
-							data        = result,
-							contentType = "text/json",
-							type        = "json",
-							statusCode  = code
-						)
-						.noExecution();
-				} else {
-					var bean = new "#path#"( );
-
-					bean.setUuid( event.prc.eventId );
-					bean.setStatus( "SUCCESS" );
-
-					bean.setData( result );
-
-					if ( !IsSimpleValue( result ) ) {
-						bean.setTotal( result.len() );
-						bean.setCount( result.len() );
-					}
-
-					event
-						.renderData(
-							data        = bean,
-							contentType = "text/json",
-							type        = "json"
-						)
-						.noExecution()
-				}
-			}
-			*/
-
 			var result = event.getValue( "result", "result-not-found" );
 
 			var statusCode = 200;
@@ -342,6 +245,7 @@ component extends="coldbox.system.Interceptor" {
 	}
 		*/
 
+	// TODO: use this in SecurityInterceptor
 	private String function storeRequest(
 		required event,
 		required prefix  = "api",

@@ -10,6 +10,7 @@
 	}
 
 	public boolean function canAccess( required any user, required string eventName ){
+		// return true;
 		var baseEventName = arguments.eventName;
 		if ( ListContains( arguments.eventName, ":" ) ) {
 			baseEventName = ListLast( arguments.eventName, ":" );
