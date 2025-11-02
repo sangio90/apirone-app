@@ -99,7 +99,7 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            NM.storage.set('accessory.categoryId', viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ));
+            NM.storage.set( "accessory.categoryId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) );
         },
 
         loadModels: function( event ) {
@@ -123,7 +123,7 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            NM.storage.set('accessory.lineId', viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ));
+            NM.storage.set( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) );
         },
 
         loadFinishes: function( event ) {
@@ -171,7 +171,7 @@ AP.accessory.modal = ( function() {
 
             }
             this.checkCanSave();
-            NM.storage.set('accessory.modelId', viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ));
+            NM.storage.set( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) );
         },
 
         loadProduct: function() {
@@ -208,10 +208,10 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != NM.storage.get('accessory.finishId') ) {
-                NM.storage.delete('accessory.product.items')
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != NM.storage.get( "accessory.finishId" ) ) {
+                NM.storage.delete( "accessory.product.items" );
             }
-            NM.storage.set('accessory.finishId', viewModel.get( "detailForm.data.quotationItem.product.finish.id" ));
+            NM.storage.set( "accessory.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
         },
 
         firstLoadProductItems: async function() {
@@ -230,13 +230,13 @@ AP.accessory.modal = ( function() {
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
                             }
-                            if ( quotationItemId != "" || !NM.storage.get('accessory.product.items') || NM.storage.get('accessory.product.items').length == 0 ) {
+                            if ( quotationItemId != "" || !NM.storage.get( "accessory.product.items" ) || NM.storage.get( "accessory.product.items" ).length == 0 ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             } else {
                                 if ( quotationItemId == "" ) {
-                                    const itemsDataSource = new kendo.data.DataSource({
-                                        data: NM.storage.get('accessory.product.items')
-                                    });
+                                    const itemsDataSource = new kendo.data.DataSource( {
+                                        data: NM.storage.get( "accessory.product.items" )
+                                    } );
                                     viewModel.set( "detailForm.data.quotationItem.product.items", itemsDataSource );
                                     viewModel.get( "detailForm.data.quotationItem.product.items" ).read();
                                     viewModel.renderProductPreview( viewModel.get( "detailForm.data.quotationItem.product.items" ) );
@@ -248,16 +248,16 @@ AP.accessory.modal = ( function() {
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
                                 if ( existing ) {
-									if (!existing.values.find( v => v.product_item_id === item.id )) {
-										existing.values.push( {
-											attributeValue: item.attributeValue,
-											product_item_id: item.id,
-											parent_attribute_id: null,
-											level: 0,
-											selected: false
-										} );
-										productItems.trigger( "change" );
-									}
+                                    if ( !existing.values.find( v => v.product_item_id === item.id ) ) {
+                                        existing.values.push( {
+                                            attributeValue: item.attributeValue,
+                                            product_item_id: item.id,
+                                            parent_attribute_id: null,
+                                            level: 0,
+                                            selected: false
+                                        } );
+                                        productItems.trigger( "change" );
+                                    }
                                 } else {
                                     const parsedData = {
                                         attribute_id: item.attribute.id,
@@ -337,7 +337,7 @@ AP.accessory.modal = ( function() {
                         }
                     }
                     viewModel.renderProductItems();
-                    NM.storage.set( 'accessory.product.items', productItems.data() );
+                    NM.storage.set( "accessory.product.items", productItems.data() );
                     resolve();
                     return;
                 }
@@ -419,7 +419,7 @@ AP.accessory.modal = ( function() {
                             if ( productItems && productItems.data().length > 0 ) {
                                 viewModel.renderProductPreview( productItems );
                             }
-                            NM.storage.set( 'accessory.product.items', productItems.data() );
+                            NM.storage.set( "accessory.product.items", productItems.data() );
                             resolve();
                         },
                         fail: function( err ) {
@@ -430,18 +430,18 @@ AP.accessory.modal = ( function() {
             } );
         },
 
-        renderProductPreview: function(productItems) {
+        renderProductPreview: function( productItems ) {
             productItems.data().forEach( function( item ) {
-                    const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
-                    if ( selectedValues.length > 0 ) {
-                        if ( selectedValues[0].attributeValue?.horizontalImage ) {
-                            // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
-                            // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
-                            $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.horizontalImage.uri}" style="postion: absolute; top: 0; left: 0;">` );
-                        }
+                const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
+                if ( selectedValues.length > 0 ) {
+                    if ( selectedValues[0].attributeValue?.horizontalImage ) {
+                        // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
+                        // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
+                        $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.horizontalImage.uri}" style="postion: absolute; top: 0; left: 0;">` );
                     }
+                }
             } );
-            return true;       
+            return true;
         },
 
         renderProductItems: function() {
@@ -502,23 +502,23 @@ AP.accessory.modal = ( function() {
         },
 
         visibleUpperClearButton: function() {
-            const id = this.get('detailForm.data.id');
+            const id = this.get( "detailForm.data.id" );
             return id == "";
         },
-        
+
         visibleLowerClearButton: function() {
-            const finishId = this.get('detailForm.data.quotationItem.product.finish.id');
-            const id = this.get('detailForm.data.id');
+            const finishId = this.get( "detailForm.data.quotationItem.product.finish.id" );
+            const id = this.get( "detailForm.data.id" );
             return finishId == "" && id == "";
         },
 
         clearFilters: function() {
             viewModel.resetForm();
-            NM.storage.delete('accessory.categoryId');
-            NM.storage.delete('accessory.lineId');
-            NM.storage.delete('accessory.modelId');
-            NM.storage.delete('accessory.finishId');
-            NM.storage.delete('accessory.product.items');
+            NM.storage.delete( "accessory.categoryId" );
+            NM.storage.delete( "accessory.lineId" );
+            NM.storage.delete( "accessory.modelId" );
+            NM.storage.delete( "accessory.finishId" );
+            NM.storage.delete( "accessory.product.items" );
             this.checkCanSave();
         },
 
@@ -581,39 +581,39 @@ AP.accessory.modal = ( function() {
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
 
 
-        if (NM.storage.get('accessory.categoryId')) {
-            viewModel.set("detailForm.data.quotationItem.product.catalogBundle.category.id", NM.storage.get('accessory.categoryId'));
+        if ( NM.storage.get( "accessory.categoryId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.category.id", NM.storage.get( "accessory.categoryId" ) );
         }
-        if (NM.storage.get('accessory.lineId')) {
-            viewModel.set("detailForm.data.quotationItem.product.catalogBundle.line.id", NM.storage.get('accessory.lineId'));
+        if ( NM.storage.get( "accessory.lineId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.line.id", NM.storage.get( "accessory.lineId" ) );
         }
-        if (NM.storage.get('accessory.modelId')) {
-            viewModel.set("detailForm.data.quotationItem.product.catalogBundle.model.id", NM.storage.get('accessory.modelId'));
+        if ( NM.storage.get( "accessory.modelId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.model.id", NM.storage.get( "accessory.modelId" ) );
         }
-        if (NM.storage.get('accessory.finishId')) {
-            viewModel.set("detailForm.data.quotationItem.product.finish.id", NM.storage.get('accessory.finishId'));
+        if ( NM.storage.get( "accessory.finishId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.finish.id", NM.storage.get( "accessory.finishId" ) );
         }
 
-        if (NM.storage.get('accessory.categoryId')) {
+        if ( NM.storage.get( "accessory.categoryId" ) ) {
             viewModel.loadLines();
             setTimeout( function() {
-                if (NM.storage.get('accessory.lineId')) {
+                if ( NM.storage.get( "accessory.lineId" ) ) {
                     viewModel.loadModels();
                     setTimeout( function() {
-                        if (NM.storage.get('accessory.modelId')) {
+                        if ( NM.storage.get( "accessory.modelId" ) ) {
                             viewModel.loadFinishes();
                             setTimeout( function() {
-                                if (NM.storage.get('accessory.finishId')) {
+                                if ( NM.storage.get( "accessory.finishId" ) ) {
                                     viewModel.loadProduct();
                                     setTimeout( function() {
 
-                                    }, 200);
+                                    }, 200 );
                                 }
-                            }, 200);
+                            }, 200 );
                         }
-                    }, 200);
+                    }, 200 );
                 }
-            }, 200);
+            }, 200 );
         }
     };
 
