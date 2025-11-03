@@ -1,1 +1,1 @@
-﻿{ defaultIncludes = [ "id", "name", "kind", "lang" ] };
+﻿{ defaultIncludes = [ "id", "name", "kind", "lang" ] }
