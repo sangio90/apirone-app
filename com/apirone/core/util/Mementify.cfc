@@ -295,42 +295,36 @@ component {
 
 				for ( var thisIndex = 1; thisIndex <= ArrayLen( thisValue ); thisIndex++ ) {
 					// only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
-					if (
-						!IsSimpleValue( thisValue[ thisIndex ] ) && StructKeyExists(
-							thisValue[ thisIndex ],
-							"memento"
-						)
-					) {
-						// If no nested includes requested, then default them
-						// Use resolved local.includes so nested keys from defaults/profiles are considered
-						var nestedIncludes = $buildNestedMementoList( local.includes, item );
 
-						// Determine if we should ignore defaults for the child
-						// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
-						// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
-						// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
-						var shouldIgnoreDefaults = nestedIncludes.len() > 0;
+					// var nestedIncludes = $buildNestedMementoList( local.includes, item );
 
-						// Process the item memento
-						result[ thisAlias ][ thisIndex ] = convert(
-							target          : thisValue[ thisIndex ],
-							includes        : nestedIncludes,
-							excludes        : $buildNestedMementoList( local.excludes, item ),
-							mappers         : $buildNestedMementoStruct( mappers, item ),
-							defaults        : $buildNestedMementoStruct( defaults, item ),
-							// cascade the ignore defaults down ONLY if specific nested includes are requested
-							ignoreDefaults  : shouldIgnoreDefaults,
-							// Cascade the arguments to the children
-							profile         : arguments.profile,
-							trustedGetters  : arguments.trustedGetters,
-							iso8601Format   : arguments.iso8601Format,
-							dateMask        : arguments.dateMask,
-							timeMask        : arguments.timeMask,
-							autoCastBooleans: arguments.autoCastBooleans
-						);
-					} else {
-						result[ thisAlias ][ thisIndex ] = thisValue[ thisIndex ];
-					}
+					// If no nested includes requested, then default them
+					// Use resolved local.includes so nested keys from defaults/profiles are considered
+					var nestedIncludes = $buildNestedMementoList( local.includes, item );
+
+					// Determine if we should ignore defaults for the child
+					// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
+					// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
+					// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
+					var shouldIgnoreDefaults = nestedIncludes.len() > 0;
+
+					// Process the item memento
+					result[ thisAlias ][ thisIndex ] = convert(
+						target          : thisValue[ thisIndex ],
+						includes        : nestedIncludes,
+						excludes        : $buildNestedMementoList( local.excludes, item ),
+						mappers         : $buildNestedMementoStruct( mappers, item ),
+						defaults        : $buildNestedMementoStruct( defaults, item ),
+						// cascade the ignore defaults down ONLY if specific nested includes are requested
+						ignoreDefaults  : shouldIgnoreDefaults,
+						// Cascade the arguments to the children
+						profile         : arguments.profile,
+						trustedGetters  : arguments.trustedGetters,
+						iso8601Format   : arguments.iso8601Format,
+						dateMask        : arguments.dateMask,
+						timeMask        : arguments.timeMask,
+						autoCastBooleans: arguments.autoCastBooleans
+					);
 				}
 			}
 
