@@ -70,6 +70,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getSignageConfigItemService().create( item );
 		}
 
+		// TODO: optimize cache invalidation
+		getCacheManager().removeAll();
+
 		return newId;
 	}
 
