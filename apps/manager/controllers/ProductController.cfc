@@ -48,7 +48,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.subtitle = product.getCategory().getName();
 			prc.textLink = "Componenti per #product.getCategory().getName()# / #product.getName()#";
 		} else {
-			prc.title    = "Finitura #product.getFinish().getName()#, modello #product.getModel().getName()# (#product.getModel().getCode()#)";
+			prc.title    = "Modello #product.getModel().getName()# (#product.getModel().getCode()#), finitura #product.getFinish().getName()#";
 			prc.subtitle = "Categoria #product.getCategory().getName()#, linea #product.getLine().getName()#";
 			prc.textLink = "Componenti per #product.getLine().getName()# / #product.getModel().getCode()# / #product.getFinish().getName()#";
 
@@ -62,15 +62,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			prc.page[ "products" ] = [];
 
-			stopwatch variable="time" {
-				products.each(
-					function( product ){
-						prc.page[ "products" ].add( memy.convert( product, "menu" ) )
-					},
-					true,
-					4
-				);
-			}
+			// We need speed...
+			products.each(
+				function( product ){
+					prc.page[ "products" ].add( memy.convert( product, "menu" ) )
+				},
+				true,
+				4
+			);
 		}
 
 		prc.page[ "productId" ]           = product.getId();
