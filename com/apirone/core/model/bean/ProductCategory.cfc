@@ -1,23 +1,5 @@
 component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [ "id", "name", "code" ],
-		profiles        = {
-			list = {
-				defaultIncludes = [
-					"id",
-					"code",
-					"name",
-					"nameItem",
-					"status",
-					"createdAt",
-					"type",
-					"mode"
-				]
-			}
-		}
-	};
-
 	property name="code" type="String";
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="type" type="com.apirone.core.model.bean.ProductCategoryType";

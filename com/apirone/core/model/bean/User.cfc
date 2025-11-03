@@ -9,7 +9,7 @@ component accessors="true" extends="AbsBean" {
 		return this;
 	}
 
-	public Booleans function isLogged(){
+	public Boolean function isLogged(){
 		return getId() != "ANONYMOUS";
 	}
 
