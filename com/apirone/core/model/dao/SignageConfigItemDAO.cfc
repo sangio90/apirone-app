@@ -76,6 +76,25 @@
 		<cfreturn local.q.signage_config_item_id>
 	</cffunction>
 
+	<cffunction name="update" returntype="Numeric" output="false">
+		<cfargument name="signageConfigItem" type="com.apirone.core.model.bean.SignageConfigItem" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE
+				signage_config_items
+			SET
+				height = <cfqueryparam cfsqltype="Numeric" value="#arguments.signageConfigItem.getHeight()#" scale="2">,
+				height_in_pixel = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getHeightInPixel()#">,
+				row_count = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getRowCount()#">,
+				char_count = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getCharCount()#">
+				<!--- SKIPPED: font_family_size_id --->
+			WHERE
+				signage_config_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getId()#">
+		</cfquery>
+
+		<cfreturn arguments.signageConfigItem.getId()>
+	</cffunction>
+
 	<cffunction name="delete" returntype="Numeric">
 		<cfargument name="signageConfigItemId" type="String" required="true">
 

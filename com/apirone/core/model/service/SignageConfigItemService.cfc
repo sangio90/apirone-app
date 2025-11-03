@@ -55,8 +55,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public Numeric function create( required com.apirone.core.model.bean.SignageConfigItem SignageConfigItem ){
-		var newId = getDao().insert( arguments.SignageConfigItem );
+	public Numeric function create( required com.apirone.core.model.bean.SignageConfigItem signageConfigItem ){
+		var newId = getDao().insert( arguments.signageConfigItem );
+
+		return newId;
+	}
+
+	public Numeric function update( required com.apirone.core.model.bean.SignageConfigItem signageConfigItem ){
+		var newId = getDao().update( arguments.signageConfigItem );
 
 		return newId;
 	}

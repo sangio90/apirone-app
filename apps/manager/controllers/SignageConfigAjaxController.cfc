@@ -32,10 +32,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var updatedIds = [];
 
 		for ( var thisConfig in json.configs ) {
-			
 			var sizes         = [];
 			var font          = super.bean( "Font" );
 			var signageConfig = super.bean( "SignageConfig" );
+
+			signageConfig.setId( thisConfig?.id );
 
 			signageConfig.setFont( font.setId( thisConfig.font.id ) );
 
@@ -67,15 +68,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			signageConfig.setItems( sizes );
 
-			// TODO: consider:
-			// - implementing update logic
-			// - set "id" to ''
-			transaction {
-				if ( thisConfig.keyExists( "id" ) AND Len( thisConfig.id ) ) {
-					super.fire( "signageConfig.delete", [ thisConfig.id ] );
-				}
+
+			if ( thisConfig.keyExists( "id" ) AND Len( thisConfig.id ) ) {
+				thisId = super.fire( "signageConfig.update", [ signageConfig ] );
+			} else {
+				// create new config
 				thisId = super.fire( "signageConfig.create", [ signageConfig ] );
 			}
+
 
 			messageId = "signageConfig.created";
 			newIds.add( thisId );

@@ -67,13 +67,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		for ( var item in arguments.signageConfig.getItems() ) {
 			item.setSignageConfigId( newId );
-			getSignageConfigItemService().create( item );
+
+			if ( Len( item.getId() ) ) {
+				getSignageConfigItemService().update( item );
+			} else {
+				getSignageConfigItemService().create( item );
+			}
 		}
 
 		// TODO: optimize cache invalidation
 		getCacheManager().removeAll();
 
 		return newId;
+	}
+
+	public Numeric function update( required com.apirone.core.model.bean.SignageConfig signageConfig ){
+		// var newId = getDao().update( arguments.signageConfig );
+
+		for ( var item in arguments.signageConfig.getItems() ) {
+			item.setSignageConfigId( signageConfig.getId() );
+			if ( Len( item.getId() ) ) {
+				getSignageConfigItemService().update( item );
+			} else {
+				getSignageConfigItemService().create( item );
+			}
+		}
+
+		// TODO: optimize cache invalidation
+		getCacheManager().removeAll();
+
+		return signageConfig.getId();
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String signageConfigId ){

@@ -63,7 +63,7 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="Numeric" output="false">
-		<cfargument name="line" type="com.apirone.core.model.bean.SignageConfig" required="true">
+		<cfargument name="SignageConfig" type="com.apirone.core.model.bean.SignageConfig" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO signage_configs (
@@ -71,12 +71,27 @@
 				font_id
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getCatalogBundle().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.line.getFont().getId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.SignageConfig.getCatalogBundle().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.SignageConfig.getFont().getId()#">
 			) RETURNING signage_config_id
 		</cfquery>
 
 		<cfreturn local.q.signage_config_id>
+	</cffunction>
+
+	<cffunction name="update" returntype="Numeric" output="false">
+		<cfargument name="signageConfig" type="com.apirone.core.model.bean.SignageConfig" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE
+				signage_configs
+			SET
+				font_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfig.getFont().getId()#">
+			WHERE
+				signage_config_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfig.getId()#">
+		</cfquery>
+
+		<cfreturn arguments.signageConfig.getId()>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">
