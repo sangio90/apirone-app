@@ -77,7 +77,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteSignageConfigItem" );
+				outcome.setType( "ApirOne.error.CannotDeleteSignageConfigItem" );
 				outcome.setMessage( "Cannot delete SignageConfigItem [#arguments.signageConfigItemId#]" );
 			}
 		}
@@ -96,7 +96,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "SignageConfigItem" );
 			bean.setSignageConfigId( record.signage_config_id );
-			
+
 			bean.setId( record.signage_config_item_id );
 			bean.setCreatedAt( record.created_at );
 
@@ -105,7 +105,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setRowCount( record.row_count );
 			bean.setCharCount( record.char_count );
 
-			if( !IsNull( record.font_family_size_id) ) {
+			if ( !IsNull( record.font_family_size_id ) ) {
 				bean.setSize( getFontFamilySizeService().get( record.font_family_size_id ) )
 			}
 

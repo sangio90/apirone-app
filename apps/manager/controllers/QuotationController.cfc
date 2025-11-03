@@ -11,7 +11,6 @@
 	}
 
 	function create( event, rc, prc ){
-
 		var obj = super.bean( "Quotation" )
 		obj.setName( "Descrizione" );
 		obj.setQuotationNumber( Left( CreateUUID(), 5 ) );
@@ -117,7 +116,7 @@
 
 
 		// prc.vatCodeList = super.service( "VatCode" ).list();
-		prc.plates      = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
+		prc.plates = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
 
 		var quotation = super.fire( "Quotation.get", [ rc.id ] );
 

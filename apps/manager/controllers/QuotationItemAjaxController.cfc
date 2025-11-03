@@ -207,35 +207,38 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function delete( event, rc, prc ){
-		var result  = super.getResult();
+		var result     = super.getResult();
 		var validation = getValidationResult();
-		
-		var id      = GetHTTPRequestData().content;
-				
+
+		var id = GetHTTPRequestData().content;
+
 		var outcome = super.fire( "quotationItem.delete", [ id ] );
 
 		if ( outcome.getStatus() == "ERROR" ) {
-
-			var error = super.getValidationError( message = getMessage( "quotationItem.notDeleted" ), field="general" );
+			var error = super.getValidationError(
+				message = getMessage( "quotationItem.notDeleted" ),
+				field   = "general"
+			);
 			validation.addError( error );
 
 			event.setValue( "result", validation );
 			return;
-		
 		}
 
 		result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
-		
+
 		event.setValue( "result", result );
 	}
 
 	function productItems( event, rc, prc ){
-		var result          = super.getResult();
-		var quotationItemId = rc.id;
-		var mm              = super.getMementify();
-		var productItems    = super.fire( "QuotationItemProductItem.list", { quotationItemId = quotationItemId } );
+		var result = super.getResult();
+		var memny  = super.getMementify();
 
-		var productItems = ( mm.convertList( productItems ) );
+		var quotationItemId = rc.id;
+
+		var productItems = super.fire( "QuotationItemProductItem.list", { quotationItemId = quotationItemId } );
+
+		var productItems = memny.convertList( productItems );
 
 		result.setCount( Len( productItems ) );
 		result.setData( productItems );
