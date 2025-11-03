@@ -13,7 +13,7 @@ component accessors="true" extends="AbsBean" {
 		return getId() != "ANONYMOUS";
 	}
 
-	public Booleans function hasPermission( required String permissionId ){
+	public Boolean function hasPermission( required String permissionId ){
 		// 1. Blocco Esplicito (Permesso Fittizio):
 		// Se il permesso richiesto è il marcatore di blocco, L'ADM DEVE essere trattato come un utente normale (e fallire).
 		// Viene impostato "DENY_ALL" se la rotta non esiste.
