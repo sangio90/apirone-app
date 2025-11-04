@@ -640,7 +640,7 @@ component {
 			} catch ( any e ) {
 				Throw(
 					message = "Config file for entity [#arguments.entityName#] is broken",
-					type    = "Mementify.entityRule.ConfigFileIsBroken"
+					type    = "Mementify.errors.entityRule.ConfigFileNotJson"
 				);
 			}
 		}

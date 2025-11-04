@@ -86,6 +86,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		for ( var item in arguments.signageConfig.getItems() ) {
 			item.setSignageConfigId( signageConfig.getId() );
+
 			if ( Len( item.getId() ) ) {
 				getSignageConfigItemService().update( item );
 			} else {

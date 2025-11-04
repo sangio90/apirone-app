@@ -40,6 +40,8 @@
                                 #table( 
                                     id="font-family-size-grid",
                                     source = "detailForm.data.sizes",
+                                    columns = "[ { field: 'size', title: 'Dimensione' },
+                                        { field: 'withPictograms', title: 'Con pittogrammi', width: '15%' } ]",
                                     rowTemplate="font-family-size/font-family-size-grid-row-tmpl"
                                 )#
 

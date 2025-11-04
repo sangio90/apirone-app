@@ -68,16 +68,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			signageConfig.setItems( sizes );
 
-
 			if ( thisConfig.keyExists( "id" ) AND Len( thisConfig.id ) ) {
 				thisId = super.fire( "signageConfig.update", [ signageConfig ] );
+				messageId = "signageConfig.updated";
 			} else {
 				// create new config
 				thisId = super.fire( "signageConfig.create", [ signageConfig ] );
+				messageId = "signageConfig.created";
 			}
 
-
-			messageId = "signageConfig.created";
 			newIds.add( thisId );
 		}
 

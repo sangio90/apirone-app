@@ -56,11 +56,13 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO font_family_sizes (
 				font_family_id,
-				font_family_size
+				font_family_size,
+				enabled_pictograms
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getFontFamilyId()#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getName()#">
+				<cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getName()#">,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.fontFamilySize.getEnabledPictograms()#">
 			) RETURNING font_family_size_id
 		</cfquery>
 
@@ -74,9 +76,10 @@
 			UPDATE
 				font_family_sizes
 			SET
-				font_family_size = <cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getName()#">
+				font_family_size = <cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getName()#">,
+				enabled_pictograms = <cfqueryparam cfsqltype="Boolean" value="#arguments.fontFamilySize.getEnabledPictograms()#">
 			WHERE
-				font_family_id = <cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getId()#">
+				font_family_size_id = <cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySize.getId()#">
 		</cfquery>
 
 		<cfreturn arguments.fontFamilySize.getId()>

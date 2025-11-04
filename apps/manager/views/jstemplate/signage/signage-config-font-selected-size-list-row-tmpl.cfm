@@ -24,7 +24,7 @@
             <td width="15%">
                 <div class="d-flex align-items-center mr-1">
                     <input type="text" class="form-control width-70 me-1" name="heightInPx_##:uid##"
-                        data-bind="value: heightInPixel"
+                        data-bind="value: heightInPixel, readonly: true"
                         data-rule-required="true"
                         data-rule-number="true"
                         data-msg="Altezza in px richiesta e non valida"

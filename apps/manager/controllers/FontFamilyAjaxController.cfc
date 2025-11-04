@@ -54,14 +54,18 @@ component extends="com.apirone.core.controller.AbsController" {
 			var sizes = [];
 
 			for ( var size in json.sizes._data ) {
+				
 				var fontFamilySize = super.bean( "FontFamilySize" );
 
-				if ( size.id == "" ) {
-					fontFamilySize.setId( size.id );
-					fontFamilySize.setName( size.name );
-					fontFamilySize.setFontFamilyId( fontFamilyId );
+				fontFamilySize.setId( size.id );
+				fontFamilySize.setName( size.name );
+				fontFamilySize.setFontFamilyId( fontFamilyId );
+				fontFamilySize.setEnabledPictograms( size.enabledPictograms ?: false );
 
+				if ( !Len( size.id ) ) {
 					super.service( "fontFamilySize" ).create( fontFamilySize );
+				} else {
+					super.service( "fontFamilySize" ).update( fontFamilySize );
 				}
 			}
 		}

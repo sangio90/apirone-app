@@ -102,6 +102,7 @@
 			bean.setId( record.font_family_size_id );
 			bean.setName( record.font_family_size );
 			bean.setFontFamilyId( record.font_family_id );
+			bean.setEnabledPictograms( record.enabled_pictograms );
 
 			return bean;
 		}

@@ -6,6 +6,12 @@
             <td>
                 <input type="number" class="form-control" data-bind="value: name, disabled: id" style="width: 15%"/>
             </td>
+            <td>
+                <input type="checkbox" class="form-check-input"
+                    name="selected"
+                    data-bind="value: id, checked: enabledPictograms"
+                >
+            </td>
             <td class="text-center width-30">
                 #iconButton(bind="click:removeSize", class="btn-danger", icon="trash")#
             </td>
