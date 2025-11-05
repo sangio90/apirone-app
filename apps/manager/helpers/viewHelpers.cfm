@@ -155,7 +155,7 @@
     <cfargument name="id" type="String" required="true" default="table-#CreateUUID()#">
     <cfargument name="rowTemplate" type="String" required="true">
     <cfargument name="source" type="String" default="rows">
-    <cfargument name="columns" type="String" default="">
+    <cfargument name="columns" type="String" default=""> <!--- format: [{ field:'', title:'' }] --->
     <cfargument name="class" type="String" default="">
 
     <cfset var thisColumns = []>

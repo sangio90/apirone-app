@@ -13,7 +13,7 @@ component {
 	variables.stats               = {};
 
 	function init(
-		required settings               = {},
+		required Struct settings        = {},
 		required String configDirectory = "/config/mementos/",
 		required Struct transformerRegistry
 	){
@@ -22,7 +22,7 @@ component {
 			dateMask          = settings?.dateMask ?: "yyyy-MM-dd",
 			timeMask          = settings?.timeMask ?: "HH:mm:ss",
 			nullDefaultValue  = settings?.nullDefaultValue ?: null,
-			trustedGetters    = settings?.trustedGetters ?: true, // the fastest option
+			trustedGetters    = settings?.trustedGetters ?: true, // true: the fastest option
 			convertToTimezone = settings?.convertToTimezone ?: "",
 			autoCastBooleans  = settings?.autoCastBooleans ?: false
 		}
@@ -351,7 +351,7 @@ component {
 				// Determine if we should ignore defaults for the child
 				// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
 				// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
-				// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
+ 				// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
 				var shouldIgnoreDefaults = nestedIncludes.len() > 0;
 
 				// Process the item memento
@@ -727,11 +727,11 @@ component {
 
 		// ESTRAZIONE DELL'ALIAS (:)
 		if ( definition contains ":" ) {
-			// Alias presente: "OriginalProp:FinalAlias"
+			// Alias exists: "OriginalProp:FinalAlias"
 			originalProp = ListFirst( definition, ":" );
 			finalAlias   = ListLast( definition, ":" );
 		} else {
-			// Nessun alias: OriginalProp � anche l'Alias
+			// Nessun alias: OriginalProp è anche l'alias
 			originalProp = definition;
 			finalAlias   = definition;
 		}
