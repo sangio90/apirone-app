@@ -83,7 +83,8 @@ component {
 
 		var target = Duplicate( arguments.target );
 
-		var entityName = ListLast( $getCachedMetadata( target ).fullname, "." );
+		var metadata   = $getCachedMetadata( target );
+		var entityName = metadata.keyExists( "fullname" ) ? ListLast( metadata.fullname, "." ) : "";
 
 		var externalRules = $getRulesFromHierarchy( target ); // from files
 
@@ -294,37 +295,50 @@ component {
 				// Again we use traditional loops to avoid closure references and slowness on some engines
 
 				for ( var thisIndex = 1; thisIndex <= ArrayLen( thisValue ); thisIndex++ ) {
-					// only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
+					var arrayItem = thisValue[ thisIndex ];
+					
+					// Se l'elemento è un simple value, usalo direttamente
+					if ( IsSimpleValue( arrayItem ) ) {
+						result[ thisAlias ][ thisIndex ] = arrayItem;
+					}
+					// Se è un component, processa il memento
+					else if ( IsValid( "component", arrayItem ) ) {
+						// only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
 
-					// var nestedIncludes = $buildNestedMementoList( local.includes, item );
+						// var nestedIncludes = $buildNestedMementoList( local.includes, item );
 
-					// If no nested includes requested, then default them
-					// Use resolved local.includes so nested keys from defaults/profiles are considered
-					var nestedIncludes = $buildNestedMementoList( local.includes, item );
+						// If no nested includes requested, then default them
+						// Use resolved local.includes so nested keys from defaults/profiles are considered
+						var nestedIncludes = $buildNestedMementoList( local.includes, item );
 
-					// Determine if we should ignore defaults for the child
-					// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
-					// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
-					// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
-					var shouldIgnoreDefaults = nestedIncludes.len() > 0;
+						// Determine if we should ignore defaults for the child
+						// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
+						// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
+						// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
+						var shouldIgnoreDefaults = nestedIncludes.len() > 0;
 
-					// Process the item memento
-					result[ thisAlias ][ thisIndex ] = convert(
-						target          : thisValue[ thisIndex ],
-						includes        : nestedIncludes,
-						excludes        : $buildNestedMementoList( local.excludes, item ),
-						mappers         : $buildNestedMementoStruct( mappers, item ),
-						defaults        : $buildNestedMementoStruct( defaults, item ),
-						// cascade the ignore defaults down ONLY if specific nested includes are requested
-						ignoreDefaults  : shouldIgnoreDefaults,
-						// Cascade the arguments to the children
-						profile         : arguments.profile,
-						trustedGetters  : arguments.trustedGetters,
-						iso8601Format   : arguments.iso8601Format,
-						dateMask        : arguments.dateMask,
-						timeMask        : arguments.timeMask,
-						autoCastBooleans: arguments.autoCastBooleans
-					);
+						// Process the item memento
+						result[ thisAlias ][ thisIndex ] = convert(
+							target          : arrayItem,
+							includes        : nestedIncludes,
+							excludes        : $buildNestedMementoList( local.excludes, item ),
+							mappers         : $buildNestedMementoStruct( mappers, item ),
+							defaults        : $buildNestedMementoStruct( defaults, item ),
+							// cascade the ignore defaults down ONLY if specific nested includes are requested
+							ignoreDefaults  : shouldIgnoreDefaults,
+							// Cascade the arguments to the children
+							profile         : arguments.profile,
+							trustedGetters  : arguments.trustedGetters,
+							iso8601Format   : arguments.iso8601Format,
+							dateMask        : arguments.dateMask,
+							timeMask        : arguments.timeMask,
+							autoCastBooleans: arguments.autoCastBooleans
+						);
+					}
+					// Altrimenti (struct, altro), usalo così com'è
+					else {
+						result[ thisAlias ][ thisIndex ] = arrayItem;
+					}
 				}
 			}
 
