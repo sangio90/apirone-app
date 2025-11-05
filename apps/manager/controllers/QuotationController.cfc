@@ -80,6 +80,7 @@
 
 	function edit( event, rc, prc ){
 		var user = prc.user;
+		var memy = super.getMementify()
 
 		prc.title = "Modifica preventivo";
 
@@ -88,6 +89,9 @@
 		prc.page[ "pricelists" ]     = super.fire( "pricelist.list" );
 		prc.page[ "paymentMethods" ] = super.fire( "paymentMethod.list" );
 		prc.page[ "currencies" ]     = super.fire( "currency.list" );
+
+		prc.page[ "frames" ] = memy.convertList( super.fire( "frame.list" ), "minimal" );
+
 		var countries                = [
 			{ "id" = 1, "name" = "Italia" },
 			{ "id" = 2, "name" = "Francia" },

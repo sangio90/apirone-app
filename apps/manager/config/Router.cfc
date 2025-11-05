@@ -36,9 +36,7 @@
 			prices
 		*/
 		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
-		post( "/ajax/:by-regex:(products|product-items)/:id/price/simulate" )
-			.to( "PriceAjaxController.simulate" )
-			.end();
+		post( "/ajax/:by-regex:(products|product-items)/:id/price/simulate" ).to( "PriceAjaxController.simulate" ).end();
 		get( "/prices/manage" ).to( "PriceController.manage" ).end();
 
 		get( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.list" ).end();
@@ -300,6 +298,7 @@
 		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" )
 			.to( "FileAjaxController.list" )
 			.end();
+
 		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" )
 			.to( "FileAjaxController.upload" )
 			.end();
@@ -307,18 +306,17 @@
 
 		/*
 			products items
-		*/
-		get( "/ajax/product-items" ).to( "ProductItemAjaxController.productItemsByProduct" ).end();
 
+		*/
+		// TODO: should be "ajax/products/:id/product-items"
+		get( "/ajax/product-items" ).to( "ProductItemAjaxController.productItemsByProduct" ).end();
 
 		/*
 			products
 		*/
 		get( "/ajax/products/get-id-and-file-by-params" ).to( "ProductAjaxController.getIdAndFileByParams" ).end();
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
-		get( "/ajax/products/:id/combinations/calculate" )
-			.to( "ProductAjaxController.calculateCombinations" )
-			.end();
+		get( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();
 		delete( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.deleteCombinations" ).end();
 		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
@@ -424,6 +422,8 @@
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
 
+		/* QuotationPlateAjaxController */
+		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
 		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
@@ -431,6 +431,7 @@
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
 		post( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.save" ).end();
+
 
 
 		/*

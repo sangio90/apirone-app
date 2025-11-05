@@ -1,60 +1,36 @@
 ﻿component extends="com.apirone.core.controller.AbsController" {
 
-	function save( event, rc, prc ){
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+	/*
+		cerco di scrivere questo controller
+		come una best practice per tutto quotation
+	*/
 
-		var categories = [];
-
-		var thisId    = "";
-		var messageId = "";
-		var texts     = [];
+	function getProductByParams( event, rc, prc ){
+		// by modelId, lineId, finishId, rc.categoryId
 
 		var result = super.getResult();
 
-		var quotation = super.bean( "Quotation" );
+		var products = super
+			.service( "Product" )
+			.list(
+				modelId    = rc.modelId,
+				lineId     = rc.lineId,
+				finishId   = rc.finishId,
+				categoryId = rc.categoryId
+			);
 
-		quotation.setId( json.id );
-		quotation.setName( json.description );
-		quotation.setQuotationNumber( json.quotation_number );
-		quotation.setVersionNumber( json.version_number );
-		quotation.setQuotationDate( json.quotation_date );
-		quotation.setNotes( json.notes );
-		quotation.setValidityDate( json.validity_date );
-		quotation.setOpportunityId( json.opportunity.id );
-		quotation.setLeadId( json.lead.id );
-		quotation.setActive( json.active );
-		quotation.setCustomPaymentMethod( json.custom_payment_method );
-		quotation.setPricelist( type.setId( json.pricelist.id ) );
-		quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
-		quotation.setCurrency( type.setId( json.currency.id ) );
-		quotation.setStatus( type.setId( json.status.id ) );
-		quotation.setLang( type.setId( json.lang.id ) );
-		quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
-		quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
-		quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
-		quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
-
-		if ( !Len( json.id ) ) {
-			messageId = "quotation.created";
-			thisId    = super.fire( "quotation.create", [ quotation ] )
-		} else {
-			var bean = super.fire( "Quotation.get", [ rc.id ] );
-			if ( json.status != bean.getStatus().getId() ) {
-				quotation.setActive( 0 );
-				super.fire( "quotation.update", [ quotation ] )
-				thisId    = super.fire( "quotation.clone", [ quotation ] );
-				messageId = "quotation.updated";
-			} else {
-				messageId = "quotation.updated";
-				thisId    = super.fire( "quotation.update", [ quotation ] )
-			}
+		if ( ArrayLen( products ) GT 1 ) {
+			getLogger().warning( "Products found: #ArrayLen( products )#. Get the first. Should be only one with this params: modelId: #rc.modelId#, lineId: #rc.lineId#, finishId: #rc.finishId#, categoryId: #rc.categoryId#" );
 		}
 
-		var message = completeMessage( messageId );
+		product = products[ 1 ];
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( product );
 
 		event.setValue( "result", result );
+	}
+
+	function save( event, rc, prc ){
 	}
 
 	function delete( event, rc, prc ){

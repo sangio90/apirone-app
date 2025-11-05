@@ -20,8 +20,8 @@ AP.plate.modal = ( function() {
     const MIN_DISTANCE_BEFORE_DRAGGING = 1;
 
     const ORIENTATION = {
-        VERTICAL: "V",
-        HORIZONTAL: "H",
+        VERTICAL: "VER",
+        HORIZONTAL: "HOR",
         V: "VERTICAL",
         H: "HORIZONTAL",
     };
@@ -61,7 +61,7 @@ AP.plate.modal = ( function() {
                 newPositionDirection |= MOVE_DIRECTION.TOP;
             }
 
-            const fruitsController = AP.plate.designer.fruitsController;
+            const fruitsController = AP.plate.modal.fruitsController;
             const grid = fruitsController.plate.grid;
 
             const result = {
@@ -146,6 +146,7 @@ AP.plate.modal = ( function() {
 
             return result;
         },
+
         doRectanglesCollide( rectA, rectB ) {
             let result = true;
 
@@ -160,6 +161,7 @@ AP.plate.modal = ( function() {
 
             return result;
         },
+
         extractTopLeftPositionFrom( gridPosition ) {
             const result = {
                 top: null,
@@ -176,6 +178,7 @@ AP.plate.modal = ( function() {
 
             return result;
         },
+
         findFirstFreePosition( fruit ) {
             const result = {
                 row: null,
@@ -210,6 +213,7 @@ AP.plate.modal = ( function() {
 
             return result;
         },
+
         cellHasFruit( row, column ) {
             let result = false;
 
@@ -1053,34 +1057,81 @@ AP.plate.modal = ( function() {
         container: null,
     };
 
-    var defaultdetailForm = {
+    var defaultDetailForm = {
         data: {
+            // quotationItem
             id: "",
-            code: "",
-            name: "",
-            model: {
+            quantity: 1,
+            price: 0,
+            product: {
+                finish: {
+                    id: ""
+                },
+                catalogBundle: {
+                    category: {
+                        id: ""
+                    },
+                    line: {
+                        id: ""
+                    },
+                    model: {
+                        id: ""
+                    },
+                },
+                items: new kendo.data.DataSource(),
+            },
+            zone: {
                 id: ""
-            },
-            finish: {
-                id: ""
-            },
-            line: {
-                id: ""
-            },
-            status: {
-                id: "ACT",
-            },
+            }
         },
-        // statuses: AP.plate.constants.statuses,
+        // statuses: AP.page.statuses,
         title: "Carica placca",
+        canSave: false,
+    };
+
+    var defaultPlate = {
+        UUID: "100",
+        CODE: "508",
+        IMG: "/assets/fakes/img/508.jpg",
+        WIDTH: 1200, // in px
+        HEIGHT: 500, // in px
+        ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL //frame
+        CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+        GRID: [
+            // LEGEND:
+            // "_" - empty free space
+            // "0" - prohibited space
+            [
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+                "_",
+            ],
+        ],
     };
 
     var viewModel = new kendo.data.ObservableObject( {
 
-        detailForm: defaultdetailForm,
+        detailForm: defaultDetailForm,
         lines: new kendo.data.DataSource(),
         models: new kendo.data.DataSource(),
         finishes: new kendo.data.DataSource(),
+
+        plate: defaultPlate,
+
+        productItems: new kendo.data.DataSource(),
 
         callback: {
             onCreate: undefined,
@@ -1088,18 +1139,397 @@ AP.plate.modal = ( function() {
             onLoad: undefined,
         },
 
-        loadModels: function( event ) {
+        loadPlate: function() {
 
-            console.log( "line.id", viewModel.get( "detailForm.data.line.id" ) );
+            // id from model
+            var modelId = "2X2";
+
+            // get plate/frame by code
+            // for plate, code of frame is the same code of model
+            const frameId = AP.page.frames
+                .find( frame => frame.code === modelId )
+                ?.id
+                || "";
 
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.line.id" ),
+                url: "/manager/ajax/frames/" + frameId,
+                callback: {
+                    done: function( xhr ) {
+                        viewModel.set( "plate.id", xhr.data );
+                        viewModel.set( "plate.code", xhr.data );
+                        viewModel.set( "plate.img", xhr.data );
+                        viewModel.set( "plate.width", xhr.data );
+                        viewModel.set( "plate.height", xhr.data );
+                        viewModel.set( "plate.orientation", xhr.data );
+                        viewModel.set( "plate.ORIENTATION", xhr.data.grid );
+                        viewModel.set( "plate.grid", [ xhr.data.grid ] );
+                    }
+                }
+            } );
+
+        },
+
+        firstLoadProductItems: function() {
+            const quotationItemId = viewModel.get( "detailForm.data.id" );
+            const productId = viewModel.get( "detailForm.data.product.id" );
+
+            // Chiamata AJAX iniziale per ottenere tutti i product items
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/product-items?productId=" + productId,
+                callback: {
+                    done: function( xhr ) {
+
+                        var userItems = AP.getUserPref( "accessory.product.items" );
+
+                        if ( xhr.count > 0 ) {
+                            if ( !viewModel.get( "detailForm.data.product.image" ) && xhr.data[0].horizontalImage ) {
+                                viewModel.set( "detailForm.data.product.image", xhr.data[0].horizontalImage );
+                                viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
+                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
+                            }
+                            if ( quotationItemId != "" || !userItems || userItems.length == 0 ) {
+                                viewModel.set( "detailForm.data.product.items", new kendo.data.DataSource() );
+                            } else {
+                                if ( quotationItemId == "" ) {
+                                    const itemsDataSource = new kendo.data.DataSource( {
+                                        data: userItems
+                                    } );
+                                    viewModel.set( "detailForm.data.product.items", itemsDataSource );
+                                    viewModel.get( "detailForm.data.product.items" ).read();
+                                    viewModel.renderProductPreview( viewModel.get( "detailForm.data.product.items" ) );
+                                }
+                            }
+
+                            var productItems = viewModel.get( "detailForm.data.product.items" );
+
+                            var attributeArray = productItems.data();
+
+                            // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
+                            xhr.data.forEach( item => {
+                                const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
+                                if ( existing ) {
+                                    if ( !existing.values.find( v => v.productItemId === item.id ) ) {
+
+                                        existing.values.push( {
+                                            attributeValue: item.attributeValue,
+                                            productItemId: item.id,
+                                            parentAttributeId: null,
+                                            level: 0,
+                                            selected: false
+                                        } );
+
+                                        productItems.trigger( "change" );
+                                    }
+                                } else {
+
+                                    const parsedData = {
+                                        attribute_id: item.attribute.id,
+                                        attribute_name: item.attribute.name,
+                                        parentAttributeId: null,
+                                        level: 0,
+                                        values: [
+                                            {
+                                                attributeValue: item.attributeValue,
+                                                productItemId: item.id,
+                                                selected: false
+                                            }
+                                        ]
+                                    };
+
+                                    productItems.add( parsedData );
+                                }
+                            } );
+
+                            console.log( "firstLoadProductItems:renderProductItems" );
+                            viewModel.renderProductItems();
+
+                            setTimeout( function() {
+
+                                viewModel.loadPlate();
+
+                            }, 500 );
+
+                        }
+                    }
+                }
+            } ).then( async function() {
+                // Se ci sono quotation items pre-selezionati, li carichiamo
+                if ( quotationItemId != "" ) {
+                    await NM.util.ajax( {
+                        method: "GET",
+                        url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
+                        callback: {
+                            done: async function( xhr ) {
+                                xhr.data.sort( ( a, b ) => a.productItem.orderby - b.productItem.orderby );
+                                if ( xhr.data.length > 0 ) {
+                                    for ( const qipi of xhr.data ) {
+                                        const select = $( `select[data-attribute-id="${qipi.productItem.attribute.id}"]` );
+                                        if ( select.length > 0 ) {
+                                            select.val( qipi.productItem.id );
+                                            // Carichiamo eventuali figli ricorsivamente
+                                            await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id );
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } );
+                }
+            } );
+        },
+
+        loadProductItems: function( originId, attributeId ) {
+
+            var productId = viewModel.get( "detailForm.data.product.id" );
+
+            console.log( "loadProductItems" );
+            console.log( "productId", productId );
+
+            return new Promise( ( resolve, reject ) => {
+                const productId = viewModel.get( "detailForm.data.product.id" );
+                const productItems = viewModel.get( "detailForm.data.product.items" );
+                const attributeArray = productItems.data();
+                originId = originId || "";
+
+                let url = "/manager/ajax/product-items?productId=" + productId;
+                if ( originId ) {
+                    url += "&originId=" + originId;
+                }
+
+                // Deselezionamento: originId vuoto
+                if ( originId === "" ) {
+                    let actualIndex = null;
+                    for ( let i = attributeArray.length - 1; i >= 0; i-- ) {
+                        if ( attributeArray[i].attribute_id === attributeId ) {
+                            actualIndex = i;
+                            attributeArray[i].values.forEach( attrValue => attrValue.selected = false );
+                        }
+                    }
+                    // Rimuovo attributi figli
+                    const i = actualIndex + 1;
+                    while ( i < attributeArray.length ) {
+                        if ( attributeArray[i].level > attributeArray[actualIndex].level ) {
+                            productItems.remove( attributeArray[i] );
+                        } else {
+                            break;
+                        }
+                    }
+                    viewModel.renderProductItems();
+                    NM.storage.set( "accessory.product.items", productItems.data() );
+                    resolve();
+                    return;
+                }
+
+                // Selezionamento: originId valorizzato
+                NM.util.ajax( {
+                    method: "GET",
+                    url: url,
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.data.length > 0 ) {
+                                let attribute = null;
+                                let toInsert = false;
+                                let parentIndex = -1;
+
+                                // Trovo l'indice dell'attributo selezionato
+                                attributeArray.forEach( ( d, idx ) => {
+                                    if ( d.attribute_id == attributeId ) { parentIndex = idx; }
+                                } );
+
+                                // Rimuovo eventuali attributi figli
+                                const i = parentIndex + 1;
+                                while ( i < attributeArray.length ) {
+                                    if ( attributeArray[i].level > attributeArray[parentIndex].level ) {
+                                        productItems.remove( attributeArray[i] );
+                                    } else {
+                                        break;
+                                    }
+                                }
+
+                                // Creo nuovo attributo se necessario
+                                if ( !attribute ) {
+                                    attribute = {
+                                        attribute_id: xhr.data[0].attribute.id,
+                                        attribute_name: xhr.data[0].attribute.name,
+                                        parentAttributeId: attributeId,
+                                        level: attributeArray[parentIndex].level + 1,
+                                        values: []
+                                    };
+                                    toInsert = true;
+                                }
+
+                                // Imposto selected sul parent
+                                if ( parentIndex !== -1 ) {
+                                    const parent = productItems.at( parentIndex );
+                                    parent.get( "values" ).forEach( v => {
+                                        v.selected = v.productItemId == originId;
+                                    } );
+                                }
+
+                                // Popolo i valori del nuovo attributo
+                                xhr.data.forEach( function( item ) {
+                                    attribute.values.push( {
+                                        attributeValue: item.attributeValue,
+                                        productItemId: item.id,
+                                        selected: false
+                                    } );
+                                } );
+
+                                // Inserisco attributo se nuovo
+                                if ( toInsert ) {
+                                    productItems.insert( parentIndex + 1, attribute );
+                                }
+                            } else {
+                                // Se non ci sono figli, setto selected sul parent
+                                let parentIndex = -1;
+                                attributeArray.forEach( ( d, idx ) => {
+                                    if ( d.attribute_id == attributeId ) { parentIndex = idx; }
+                                } );
+                                if ( parentIndex !== -1 ) {
+                                    const parent = productItems.at( parentIndex );
+                                    parent.get( "values" ).forEach( v => {
+                                        v.selected = v.productItemId == originId;
+                                    } );
+                                }
+                            }
+
+                            viewModel.renderProductItems();
+                            if ( productItems && productItems.data().length > 0 ) {
+                                viewModel.renderProductPreview( productItems );
+                            }
+                            NM.storage.set( "accessory.product.items", productItems.data() );
+                            resolve();
+                        },
+                        fail: function( err ) {
+                            reject( err );
+                        }
+                    }
+                } );
+            } );
+        },
+
+        loadProduct() {
+
+            var lineId   = viewModel.get( "detailForm.data.product.catalogBundle.line.id" );
+            var modelId  = viewModel.get( "detailForm.data.product.catalogBundle.model.id" );
+            var finishId = viewModel.get( "detailForm.data.product.finish.id" );
+
+            console.log( "loadProduct:lineId", lineId );
+            console.log( "loadProduct:modelId", modelId );
+            console.log( "loadProduct:finishId", finishId );
+
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotation-items/product/by-params" +
+                        "?categoryId=22" +
+                        "&lineId=" + lineId +
+                        "&modelId=" + modelId +
+                        "&finishId=" + finishId,
+                callback: {
+                    done: function( xhr ) {
+
+                        // set only what i need
+                        viewModel.set( "detailForm.data.product.id", xhr.data.id );
+                        viewModel.set( "detailForm.data.product.finish.id", xhr.data.finish.id );
+
+                        console.log( "xhr.data:catalogBundle", xhr.data );
+
+                        // set items
+                        viewModel.firstLoadProductItems();
+
+                    }
+                }
+            } );
+
+        },
+
+        renderProductItems: function() {
+            const container = $( "#quotation-plate-product-items" );
+            container.empty();
+
+            const productItems = viewModel.get( "detailForm.data.product.items" );
+            const attributeArray = productItems.data();
+
+            attributeArray.forEach( function( item ) {
+                const attrName = item.attribute_name;
+                const values = item.values;
+
+                const subContainer = $( "<div>" );
+                subContainer.attr( "id", "attribute-container-" + item.attribute_id );
+                container.append( subContainer );
+
+                const label = $( "<label>" );
+                label.addClass( "mb-1" );
+                label.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                label.text( attrName );
+                subContainer.append( label );
+
+                const select = $( "<select>" ).addClass( "form-control me-3 mb-2" ).on( "change", function() {
+                    const selectedId = $( this ).val();
+                    const attributeId = $( this ).data( "attribute-id" );
+                    viewModel.loadProductItems( selectedId, attributeId );
+                } );
+
+                select.attr( "data-attribute-id", item.attribute_id );
+
+                if ( item.level > 0 ) {
+                    select.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                    select.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
+                }
+
+                const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
+                select.append( emptyOption );
+
+                values.forEach( function( attrValue ) {
+                    const option = $( "<option>" )
+                        .val( attrValue.productItemId )
+                        .html( `<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}` );
+                    select.append( option );
+                } );
+
+                // Imposto la option selezionata
+                const selectedOption = values.find( attrValue => attrValue.selected === true );
+                if ( selectedOption ) {
+                    select.val( selectedOption.productItemId );
+                }
+
+                subContainer.append( select );
+            } );
+        },
+
+        loadLines: function( event ) {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/lines/22",
+                callback: {
+                    done: function( xhr ) {
+
+                        viewModel.get( "lines" ).data( xhr.data );
+
+                        // viewModel.set( "detailForm.data.product.catalogBundle.line", xhr.data[0] );
+
+                        NM.util.openModal( AP.plate.fields.modalRoot );
+                    },
+                },
+            } );
+        },
+
+        loadModels: function( event ) {
+
+            var lineId = viewModel.get( "detailForm.data.product.catalogBundle.line.id" );
+
+            console.log( "loadModels:line.id", lineId );
+
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/models/" + lineId,
                 callback: {
                     done: function( xhr ) {
                         console.log( "loadModels" );
                         viewModel.get( "models" ).data( xhr.data );
-                        viewModel.set( "detailForm.data.model.id", xhr.data );
+                        // viewModel.set( "detailForm.data.product.catalogBundle.model.id", xhr.data[0] );
 
                     },
                 },
@@ -1107,15 +1537,17 @@ AP.plate.modal = ( function() {
         },
 
         loadFinishes: function( event ) {
+
+            var lineId = viewModel.get( "detailForm.data.product.catalogBundle.line.id" );
+
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotations/finishes/22/" + viewModel.get( "detailForm.data.line.id" ),
+                url: "/manager/ajax/quotations/finishes/22/" + lineId,
                 callback: {
                     done: function( xhr ) {
+
                         console.log( "loadFinishes" );
                         viewModel.get( "finishes" ).data( xhr.data );
-
-                        viewModel.set( "detailForm.data.finish", xhr.data[0] );
 
                     },
                 },
@@ -1332,6 +1764,8 @@ AP.plate.modal = ( function() {
 
             const grid = [];
 
+            console.log( "selectedPlate.GRID", selectedPlate.GRID );
+
             for ( let iRow = 0; iRow < selectedPlate.GRID.length; iRow++ ) {
                 const row = [];
 
@@ -1384,19 +1818,7 @@ AP.plate.modal = ( function() {
             viewModel.set( "callback.onSave", onSave );
         }
 
-        NM.util.ajax( {
-            method: "GET",
-            url: "/manager/ajax/quotations/lines/22",
-            callback: {
-                done: function( xhr ) {
-                    viewModel.get( "lines" ).data( xhr.data );
-
-                    viewModel.set( "detailForm.data.line", xhr.data[0] );
-
-                    NM.util.openModal( AP.plate.fields.modalRoot );
-                },
-            },
-        } );
+        viewModel.loadLines();
 
     };
 

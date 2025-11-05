@@ -14,16 +14,15 @@
                     <div class="card-body">
 
                         <!--- 
-                            riga bundle 
+                            bundle / categorie
                         --->
-
                         <div class="mb-3 row">
                             <div class="col-4">
                                 <label class="col-sm-2 col-form-label">Linea</label>
-                                <select id="plateLineId" 
+                                <select id="plate-line" 
                                     required
                                     class="form-control"
-                                    data-bind="source: lines, value: detailForm.data.line, events: { change: loadModels }" 
+                                    data-bind="source: lines, value: detailForm.data.product.catalogBundle.line, events: { change: loadModels }" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -32,10 +31,10 @@
 
                             <div class="col-4">
                                 <label class="col-sm-2 col-form-label">Modello</label>
-                                <select id="plateModelId" 
+                                <select id="plate-model" 
                                     required
                                     class="form-control"
-                                    data-bind="source: models, value: detailForm.data.model, events: { change: loadFinishes }"
+                                    data-bind="source: models, value: detailForm.data.product.catalogBundle.model, events: { change: loadFinishes }"
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -44,10 +43,10 @@
 
                             <div class="col-4">
                                 <label class="col-sm-2 col-form-label">Finitura</label>
-                                <select id="plateFinishId" 
+                                <select id="plate-finish" 
                                     required
                                     class="form-control"
-                                    data-bind="source: finishes, value: detailForm.data.finish"
+                                    data-bind="source: finishes, value: detailForm.data.product.finish , events: { change: loadProduct }"
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -56,9 +55,14 @@
                         </div>
 
                         <div class="mb-3 row">
+
+                            <!--- 
+                                albero
+                            --->
                             <div class="col-3">    
-								<!--- other options --->
+								<div id="quotation-plate-product-items" style="max-width: 100%"></div>
                             </div>
+
                             <div class="col-9" style="height:500px">
 
                                 <div id="plate-designer-root">
