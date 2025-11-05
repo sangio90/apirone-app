@@ -253,37 +253,40 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productId );
 
 		if ( record.recordCount ) {
-
-			if ( IsNull( record.catalog_bundle_id ) ) {
-				var bean = super.bean( "ProductBase" );
-				
-				bean.setCode( record.code );
-				bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
-				bean.setPositionCount( record.position_count );
-				var lines = super.getLinesBeanByIds( record.lines );
-				bean.setLines( lines );
-			
-			} else {
-				
-				var bean = super.bean( "ProductComplex" );
-				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
-
-				bean.setLine( bean.getCatalogBundle().getLine() );
-				bean.setModel( bean.getCatalogBundle().getModel() );
-				bean.setCategory( bean.getCatalogBundle().getCategory() );
-
-				bean.setFinish( getFinishservice().get(  record.finish_id ) );
-
-			}
+			var bean = super.bean( "Product" );
 
 			bean.setId( record.product_id );
 			bean.setCreatedAt( record.created_at );
+			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
+
+			/*
+				complex (plates)
+			*/
+			bean.setModel( !IsNull( record.model_id ) ? getModelService().get( record.model_id ) : NullValue() );
+			bean.setLine( !IsNull( record.line_id ) ? getLineService().get( record.line_id ) : NullValue() );
+			bean.setFinish(
+				!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()
+			);
+			bean.setStatus( getStatusService().get( record.status_id ) );
+
+
+			/*
+				base (fruit)
+			*/
+			bean.setCode( record.code );
+			bean.setPositionCount( record.position_count );
+
+			var lines = super.getLinesBeanByIds( record.lines );
+			bean.setLines( lines );
+
+			bean.setSerial( record.serial );
+			
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
 			bean.setPrices( getPriceService().list( productId = record.product_id ) );
+            
 			var images = getFileService().list( productId = record.product_id );
-
 			if ( Len( images ) ) {
 				bean.setImages( images )
 			}
@@ -292,6 +295,48 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return NullValue();
+	}	
+
+	/*
+	private com.apirone.core.model.bean.Product function build( required String productId ){
+		var record = getDao().read( arguments.productId );
+
+		if ( record.recordCount ) {
+			if ( IsNull( record.catalog_bundle_id ) ) {
+				var bean = super.bean( "ProductBase" );
+				bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
+				bean.setCode( record.code );
+				bean.setPositionCount( record.position_count );
+				var lines = super.getLinesBeanByIds( record.lines );
+				bean.setLines( lines );
+			} else {
+				var bean = super.bean( "ProductComplex" );
+
+				ben.setModel( getModelService().get( record.model_id ) );
+				ben.setModel( getFinishService().get( record.finish_i ) );
+
+				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
+				bean.setFinish(
+					!IsNull( record.finish_id ) ? getFinishService().get( record.finish_id ) : NullValue()
+				);
+			}
+
+			bean.setId( record.product_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setTexts( getTextService().list( productId = record.product_id ) );
+
+			bean.setPrices( getPriceService().list( productId = record.product_id ) );
+			var images = getFileService().list( productId = record.product_id )
+			if (Len(images)) {
+				bean.setImage(images[1])
+			} 
+
+			return bean;
+		}
+
+		return NullValue();
 	}
+	*/
 
 }
