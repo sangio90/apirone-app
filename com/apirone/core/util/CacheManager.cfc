@@ -77,7 +77,16 @@ component accessors="true" {
 			);
 		}
 
-		var thisKey = IsSimpleValue( arguments.key ) ? arguments.key : arguments.key.toString();
+		try {
+			var thisKey = IsSimpleValue( arguments.key ) ? arguments.key : arguments.key.toString();
+		} catch ( any error ) {
+			Throw(
+				message = "The key for scope [#arguments.scope#] is not valid. Key: #SerializeJSON( arguments.key )#",
+				type    = "CacheManager.Errors.InvalidKey",
+				detail  = error.message
+			);
+            abort;
+		}
 
 		return "#arguments.scope#_#Hash( thisKey )#"
 	}
