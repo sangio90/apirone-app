@@ -15,7 +15,7 @@ component extends="com.apirone.core.controller.AbsController" {
         // prc.wineOptions = getAccessManager().exec( user, "option.list", { areaId = 'W' } ).getData();
 
 
-		prc.jsScripts.add( "app-country" );
+		prc.jsFiles.add( "app-country" );
 
         prc.title = "Nazioni";
 

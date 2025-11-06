@@ -42,8 +42,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.page[ "products" ] = memy.convertList( super.fire( "product.list", { lineId = lineId } ), "list" );
 
-		prc.jsScripts.add( "app-component-modal" );
-		prc.jsScripts.add( "app-signage-config-item" );
+		prc.jsFiles.add( "app-component-modal" );
+		prc.jsFiles.add( "app-signage-config-item" );
 
 		event.setView( "signage/signage-config-item" );
 	}

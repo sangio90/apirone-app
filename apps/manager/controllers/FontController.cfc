@@ -13,7 +13,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 		prc.page[ "fontFamilies" ] = parsedFontFamilies
 
-		prc.jsScripts.add( "app-font" );
+		prc.jsFiles.add( "app-font" );
 
 		event.setView( "font/list" );
 	}

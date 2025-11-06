@@ -11,7 +11,7 @@
 		prc.page[ "orientations" ] = super.getMementify().convertList( prc.orientations );
 		prc.page[ "types" ] = super.getMementify().convertList( prc.types );
 
-		prc.jsScripts.add( "app-frame" );
+		prc.jsFiles.add( "app-frame" );
 
 		event.setView( "frame/list" );
 	}

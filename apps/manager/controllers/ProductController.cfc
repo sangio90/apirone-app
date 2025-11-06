@@ -13,8 +13,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.title = "Prodotti complessi";
 
-		prc.jsScripts.add( "app-product-list" );
-		prc.jsScripts.add( "app-price" );
+		prc.jsFiles.add( "app-product-list" );
+		prc.jsFiles.add( "app-price" );
 
 		prc.page[ "methods" ] = memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );
 
@@ -78,11 +78,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
 
-		prc.jsScripts.add( "app-file" );
-		prc.jsScripts.add( "app-price" );
-		prc.jsScripts.add( "app-component-modal" );
-		prc.jsScripts.add( "app-attribute-detail" );
-		prc.jsScripts.add( "app-product-items" );
+		prc.jsFiles.add( "app-file" );
+		prc.jsFiles.add( "app-price" );
+		prc.jsFiles.add( "app-component-modal" );
+		prc.jsFiles.add( "app-attribute-detail" );
+		prc.jsFiles.add( "app-product-items" );
 
 		event.setView( "product/detail" );
 	}
@@ -108,8 +108,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title    = "Combinazioni";
 		prc.subtitle = "Linea -";
 
-		prc.jsScripts.add( "app-file" );
-		prc.jsScripts.add( "app-product-combinations" );
+		prc.jsFiles.add( "app-file" );
+		prc.jsFiles.add( "app-product-combinations" );
 
 		prc.page[ "statuses" ]  = prc.statuses;
 		prc.page[ "productId" ] = product.getId();

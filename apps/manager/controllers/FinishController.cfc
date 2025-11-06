@@ -17,7 +17,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.page["categories"] = categories;
         prc.page["statuses"] = prc.statuses;
 
-        prc.jsScripts.add( "app-finish" );
+        prc.jsFiles.add( "app-finish" );
 
         event.setView("finish/list");
 

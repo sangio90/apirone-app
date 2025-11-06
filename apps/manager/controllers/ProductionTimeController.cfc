@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var mm = super.getMementify();
 
-		prc.jsScripts.add( "app-production-time" );
+		prc.jsFiles.add( "app-production-time" );
 
 		prc.page[ "statuses" ] = mm.convertList( super.fire( "status.list", [ "PRODUCTION_TIME" ] ) );
 

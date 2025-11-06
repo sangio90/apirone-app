@@ -7,7 +7,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.thicknesses    = super.fire( "lookup.list", [ "thickness" ] );
 		prc.lineCategories = super.fire( "ProductCategory.list" );
 
-		prc.jsScripts.add( "app-line" );
+		prc.jsFiles.add( "app-line" );
 
 		prc.page[ "statuses" ]    = prc.statuses;
 		prc.page[ "thicknesses" ] = prc.thicknesses;
@@ -29,7 +29,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title      = "Linee per < #prc.category.getName()# >";
 		prc.statuses   = super.fire( "status.list", [ "LINE" ] );
 
-		prc.jsScripts.add( "app-line-category" );
+		prc.jsFiles.add( "app-line-category" );
 
 		prc.page[ "statuses" ]   = prc.statuses;
 		prc.page[ "categoryId" ] = prc.category.getId();
@@ -102,7 +102,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.existingProducts.add( "#product.getModel().getId()#__#product.getFinish().getId()#" );
 		}
 
-		prc.jsScripts.add( "app-line" );
+		prc.jsFiles.add( "app-line" );
 
 		event.setView( "line/products" );
 	}

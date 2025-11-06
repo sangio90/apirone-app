@@ -12,7 +12,7 @@
 
 		prc.title = "Gestione prezzi";
 
-		prc.jsScripts.add( "app-price-manage" );
+		prc.jsFiles.add( "app-price-manage" );
 
 		event.setView( "price/manage" );
 	}

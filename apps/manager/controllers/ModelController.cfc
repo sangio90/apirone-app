@@ -14,7 +14,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "statuses" ]   = mm.convertList( prc.statuses );
 		prc.page[ "categories" ] = mm.convertList( prc.categories );
 
-		prc.jsScripts.add( "app-model" );
+		prc.jsFiles.add( "app-model" );
 
 		event.setView( "model/list" );
 	}

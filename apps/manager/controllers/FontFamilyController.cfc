@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.pictogramCodes = super.fire( "lookup.list", { entity = "pictogramCode" } );
 		prc.page[ "pictogramCodes" ] = super.getMementify().convertList( prc.pictogramCodes );
 
-		prc.jsScripts.add( "app-font-family" );
+		prc.jsFiles.add( "app-font-family" );
 
 		event.setView( "font-family/list" );
 	}

@@ -8,7 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.entities = logger.entities;
 		prc.actions  = logger.actions;
 
-		prc.jsScripts.add( "app-audit-entry" );
+		prc.jsFiles.add( "app-audit-entry" );
 
 		event.setView( "audit-entry/list" );
 	}

@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.statuses = super.fire( "status.list", [ "ACCOUNT" ] );
 
-		prc.jsScripts.add( "app-component-list" );
+		prc.jsFiles.add( "app-component-list" );
 
 		event.setView( "component/list" );
 	}
@@ -13,7 +13,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function reassign( event, rc, prc ){
 		prc.title = "Gestione componenti";
 
-		prc.jsScripts.add( "app-component-reassign" );
+		prc.jsFiles.add( "app-component-reassign" );
 
 		event.setView( "component/reassign" );
 	}

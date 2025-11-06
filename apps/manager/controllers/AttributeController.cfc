@@ -9,10 +9,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "categories" ]          = super.getCategoriesAsJSON();
 		prc.page[ "attributeStatusList" ] = prc.statuses;
 
-		prc.jsScripts.add( "app-file" );
-		prc.jsScripts.add( "app-component-modal" );
-		prc.jsScripts.add( "app-attribute-detail" );
-		prc.jsScripts.add( "app-attribute-list" );
+		prc.jsFiles.add( "app-file" );
+		prc.jsFiles.add( "app-component-modal" );
+		prc.jsFiles.add( "app-attribute-detail" );
+		prc.jsFiles.add( "app-attribute-list" );
 
 		event.setView( "attribute/list" );
 	}

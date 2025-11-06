@@ -43,12 +43,22 @@
 
 <cffunction name="includeJSFiles">
 
-    <cfloop array="#prc.jsScripts#" index="thisScript">
+    <cfloop array="#prc.jsFiles#" index="local.thisScript">
         <cfoutput>
-            <script src="/assets/#prc.staticVersion#/manager/js/#thisScript#.js"></script>
-            <cfif  FileExists( ExpandPath( "/apps/manager/assets/js/tests/#thisScript#-test.js" ) ) && prc.isDev>
-                <script src="/assets/#prc.staticVersion#/manager/js/tests/#thisScript#-test.js"></script>
+            <script src="/assets/#prc.staticVersion#/manager/js/#local.thisScript#.js"></script>
+            <cfif  FileExists( ExpandPath( "/apps/manager/assets/js/tests/#local.thisScript#-test.js" ) ) && prc.isDev>
+                <script src="/assets/#prc.staticVersion#/manager/js/tests/#local.thisScript#-test.js"></script>
             </cfif>
+        </cfoutput>
+    </cfloop>
+
+</cffunction>
+
+<cffunction name="includeCssFiles">
+
+    <cfloop array="#prc.cssFiles#" index="local.theStyle">
+        <cfoutput>
+            <link rel="stylesheet" href="/assets/#prc.staticVersion#/manager/css/#local.theStyle#.css">
         </cfoutput>
     </cfloop>
 

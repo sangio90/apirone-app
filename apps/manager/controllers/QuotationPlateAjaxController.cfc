@@ -9,6 +9,7 @@
 		// by modelId, lineId, finishId, rc.categoryId
 
 		var result = super.getResult();
+		var memy   = super.getMementify();
 
 		var products = super
 			.service( "Product" )
@@ -25,7 +26,7 @@
 
 		product = products[ 1 ];
 
-		result.setData( product );
+		result.setData( memy.convert( product, "plate" ) );
 
 		event.setValue( "result", result );
 	}

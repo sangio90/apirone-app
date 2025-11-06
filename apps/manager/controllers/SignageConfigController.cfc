@@ -62,8 +62,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			"categoryId" = prc.category.getId()
 		};
 
-		prc.jsScripts.add( "app-component-modal" );
-		prc.jsScripts.add( "app-signage-config" );
+		prc.jsFiles.add( "app-component-modal" );
+		prc.jsFiles.add( "app-signage-config" );
 
 		event.setView( "signage/signage-config" );
 	}

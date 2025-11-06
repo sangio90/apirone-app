@@ -11,7 +11,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "statuses" ] = prc.statuses;
 		prc.page[ "modes" ]    = prc.modes;
 
-		prc.jsScripts.add( "app-product-category" );
+		prc.jsFiles.add( "app-product-category" );
 
 		event.setView( "product-category/list" );
 	}

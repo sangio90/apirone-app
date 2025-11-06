@@ -5,7 +5,7 @@
 
 		prc.statuses = super.fire( "status.list", [ "QUOTATION" ] );
 
-		prc.jsScripts.add( "app-quotation" );
+		prc.jsFiles.add( "app-quotation" );
 
 		event.setView( "quotation/list" );
 	}
@@ -73,7 +73,7 @@
 
 		prc.plates = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
 
-		prc.jsScripts.add( "app-quotation-detail" );
+		prc.jsFiles.add( "app-quotation-detail" );
 
 		event.setView( "quotation/detail" );
 	}
@@ -128,10 +128,12 @@
 		quotation.setValidityDate( DateFormat( quotation.getValidityDate(), "yyyy-mm-dd" ) );
 		prc.page[ "quotation" ] = quotation;
 
-		prc.jsScripts.add( "app-plate" );
-		prc.jsScripts.add( "app-quotation-detail" );
-		prc.jsScripts.add( "app-signage" );
-		prc.jsScripts.add( "app-accessory" );
+		prc.jsFiles.add( "app-plate" );
+		prc.jsFiles.add( "app-quotation-detail" );
+		prc.jsFiles.add( "app-signage" );
+		prc.jsFiles.add( "app-accessory" );
+
+		prc.cssFiles.add( "quotation-plate" );
 
 		event.setView( "quotation/detail" );
 	}

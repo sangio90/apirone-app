@@ -7,7 +7,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	){
 		prc.title = "Placche";
 
-		prc.jsScripts.add( "app-plate" );
+		prc.jsFiles.add( "app-plate" );
 
 		event.setView( "plate/list" );
 	}
@@ -24,7 +24,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.models       = super.fire( "model.list" );
 		prc.thicknesses = super.fire( "lookup.list", [ "thickness" ] );
 
-		prc.jsScripts.add( "app-line-detail" );
+		prc.jsFiles.add( "app-line-detail" );
 
 		event.setView( "line/detail" );
 	}
@@ -36,7 +36,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	){
 		prc.title = "Designer placche";
 
-		prc.jsScripts.add("app-plate");
+		prc.jsFiles.add("app-plate");
 
 		event.setView( "plate/designer" );
 	}
@@ -48,7 +48,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	){
 		prc.title = "Mappa placche";
 
-		prc.jsScripts.add("app-plate");
+		prc.jsFiles.add("app-plate");
 
 		event.setView( "plate/map" );
 	}

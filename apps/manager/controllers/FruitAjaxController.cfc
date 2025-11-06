@@ -3,7 +3,7 @@
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var mm     = super.getMementify();
+		var memy   = super.getMementify();
 
 		var params = super.paramsFromUrl();
 

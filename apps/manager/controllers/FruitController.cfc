@@ -10,7 +10,7 @@
 		prc.page[ "lines" ]      = super.fire( "line.list" );
 		prc.page[ "categories" ] = super.getMementify().convertList( prc.categories );
 
-		prc.jsScripts.add( "app-fruit-list" );
+		prc.jsFiles.add( "app-fruit-list" );
 
 		event.setView( "fruit/list" );
 	}

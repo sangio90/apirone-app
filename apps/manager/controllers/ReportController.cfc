@@ -5,7 +5,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		// prc.list = super.fire( "report.list" );
 
-		prc.jsScripts.add( "app-report" );
+		prc.jsFiles.add( "app-report" );
 
 		event.setView( "report/list" );
 	}
@@ -17,7 +17,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.title = "Report < #report.getName()# >";
 
-		prc.jsScripts.add( "app-report" );
+		prc.jsFiles.add( "app-report" );
 
 		// var document = DESerializeJSON( FileRead( '/assets/main/examples/example-#report.getId()#.json.cfm' ) );
 		var document = DeserializeJSON( FileRead( "/assets/main/examples/data/report-#rc.id#.json.cfm" ) );

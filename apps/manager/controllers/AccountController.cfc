@@ -11,7 +11,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "statuses" ] = prc.statuses;
 		prc.page[ "langs" ]    = prc.langs;
 
-		prc.jsScripts.add( "app-account" );
+		prc.jsFiles.add( "app-account" );
 
 		event.setView( "account/list" );
 	}

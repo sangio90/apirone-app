@@ -47,7 +47,8 @@ component extends="coldbox.system.Interceptor" {
         */
 		if ( module == "manager" ) {
 			prc.page      = {}; // current js config write in current html page
-			prc.jsScripts = []; // current js file for current html page
+			prc.jsFiles = []; // current js file for current html page
+			prc.cssFiles = []; // current css file for current html page
 
 			prc.user = session.user;
 

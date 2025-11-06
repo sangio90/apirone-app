@@ -14,7 +14,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page["methods"]  = memy.convertList( prc.methods, "list" );
 		prc.page["statuses"] = memy.convertList( prc.statuses, "list" );
 
-		prc.jsScripts.add( "app-price-type" );
+		prc.jsFiles.add( "app-price-type" );
 
 		event.setView( "price/type/list" );
 	}

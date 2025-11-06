@@ -5,8 +5,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.page[ "statusList" ] = super.fire( "status.list", [ "RAW_VALUE" ] );
 
-		prc.jsScripts.add( "app-metadata" );
-		prc.jsScripts.add( "app-raw-value" );
+		prc.jsFiles.add( "app-metadata" );
+		prc.jsFiles.add( "app-raw-value" );
 
 		event.setView( "raw-value/list" );
 	}
