@@ -14,7 +14,6 @@
 				"status",
 				"positionCount",
 				"createdAt",
-				"code",
 				"categories",
 				"category",
 				"lines",
@@ -41,6 +40,23 @@
 				"model.name",
 				"finish.id",
 				"finish.name",
+			]
+		},
+		plate = {
+			defaultIncludes = [
+				"id",
+				"code",
+				"shortId",
+				"status.id",
+				"line.id",
+				"line.name",
+				"model.id",
+				"model.name",
+				"model.code",
+				"finish.id",
+				"finish.name",
+				"horizontalImage",
+				"verticalImage"
 			]
 		}
 	}
