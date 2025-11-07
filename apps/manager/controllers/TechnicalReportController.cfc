@@ -1,13 +1,18 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function print(){
-		prc.title = "Placche";
-		var mem = super.getMementify();
+	function print( event, rc, prc ){
 
-		dump("remmove abort");
+		dump("print");
 		abort;
 
-		var quotations = service("Quotation").list(limit=2);
+		param rc.report = "quotation";
+
+		prc.title = "Preventivo";
+
+		var memy = super.getMementify();
+
+		var searchArgs = {};
+		var filters    = {};
 
 		for( var quote in quotations ) {
 			var itemsData = [];
@@ -23,25 +28,23 @@ component extends="com.apirone.core.controller.AbsController" {
 			quoteObj["items"] = itemsData;
 
 		}
-
-		var body = {
-			"token"   = "FIXED_TOKEN",
-			"jxml"    = "placche.jxml",
-			"payload" = quoteObj
+	
+		var params = {
+			title   = "Preventivo",
+			filters = filters,
+			data    = quoteObj,
+			pdfArgs = {
+				bookmark          = true,
+				backgroundVisible = true,
+				orientation       = "landscape",
+				pageType          = "A4",
+				overwrite         = true,
+				fontEmbed         = true,
+				saveAsName        = "#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
+			}
 		}
 
-		var tempFile = getTempFile( getTempDirectory(), "file_#CreateUUID()#.pdf" );
-
-		cfhttp( url="reportingUrl?activePrice=1", result="pdfReport", file=tempFile, method="post" ) {
-			cfhttpparam(type="header", name="Content-Type", value="application/json");
-			cfhttpparam(type="body", value="#SerializeJSON( body )#");
-		}
-
-		cfheader( name="Content-Disposition", value="attachment; filename=pdfReport.pdf" );
-		cfcontent( file=tempFile, type="application/pdf" );
-
-		return false;
-
+		event.renderData( data = renderView( view = "report/template/#rc.report#", args = params ), type = "PDF" );
 	}
 
 }
