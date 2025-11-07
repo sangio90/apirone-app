@@ -4,9 +4,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title = "Placche";
 		var mem = super.getMementify();
 
+		dump("remmove abort");
+		abort;
+
 		var quotations = service("Quotation").list(limit=2);
 
-		for( quote in quotations ) {
+		for( var quote in quotations ) {
 			var itemsData = [];
 			var quoteObj = mem.convert( quote, "detail" ) //struct
 
@@ -27,10 +30,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			"payload" = quoteObj
 		}
 
-		cfhttp( url="reportingUrl?activePrice=1",) {
+		var tempFile = getTempFile( getTempDirectory(), "file_#CreateUUID()#.pdf" );
+
+		cfhttp( url="reportingUrl?activePrice=1", result="pdfReport", file=tempFile, method="post" ) {
 			cfhttpparam(type="header", name="Content-Type", value="application/json");
 			cfhttpparam(type="body", value="#SerializeJSON( body )#");
 		}
+
+		cfheader( name="Content-Disposition", value="attachment; filename=pdfReport.pdf" );
+		cfcontent( file=tempFile, type="application/pdf" );
 
 		return false;
 
