@@ -6,6 +6,7 @@
                 <h2>#prc.title#</h2>
             </div>
 			<div class="col-6 text-end">
+				#button( bind = "click:exportQuotation", size = "md", label = "Esporta preventivo" )#
 				#button( bind = "click:list", size = "md", label = "Torna ai preventivi" )#
 			</div>
         </div>
