@@ -187,6 +187,7 @@
         <script src="/assets/#prc.staticVersion#/manager/js/app-widget.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-search.js"></script>
 
+        #includeCssFiles()#
         #includeJsFiles()#
 
         <cfif prc.isDev>
@@ -197,8 +198,6 @@
         #template( view="jstemplate/search/search-widget-suggest-row-tmpl", cache=true )#
 
         <iframe src="/manager/live" style="display:none;"></iframe> 
-        
-
     </body>
 </html>
 </cfoutput>

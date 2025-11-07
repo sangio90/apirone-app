@@ -1,5 +1,6 @@
 AP.namespace( "plate" );
 
+
 Object.assign( AP.plate.fields, {
     modalRoot: $( "#plate-modal-root" ),
 } );
@@ -7,23 +8,27 @@ Object.assign( AP.plate.fields, {
 $( document ).ready( function() {
 
     if ( AP.plate.fields.modalRoot.length ) {
-        AP.plate.constants = { GRID_CELL_DIMENSIONS: { "_": { "HEIGHT": 180, "WIDTH": 45 }, "0": { "HEIGHT": 105, "WIDTH": 52 } } };
+
         AP.plate.modal.init( { container: AP.plate.fields.modalRoot } );
     }
 
 } );
 
 AP.plate.modal = ( function() {
+
+    AP.plate.constants = { GRID_CELL_DIMENSIONS: { "_": { "height": 180, "width": 45 }, "0": { "height": 105, "width": 52 } } };
+    var constants = AP.plate.constants;
+
     let FREE_CELL_WIDTH;
     let FREE_CELL_HEIGHT;
 
     const MIN_DISTANCE_BEFORE_DRAGGING = 1;
 
-    const ORIENTATION = {
+    const orientation = {
         VERTICAL: "VER",
         HORIZONTAL: "HOR",
-        V: "VERTICAL",
-        H: "HORIZONTAL",
+        VER: "VERTICAL",
+        HOR: "HORIZONTAL",
     };
 
     const CELL_TYPE = {
@@ -88,43 +93,38 @@ AP.plate.modal = ( function() {
                             result.column = column - fruitWidth / FREE_CELL_WIDTH + 1;
                         }
                     } else if (
-                        ( newPositionDirection & MOVE_DIRECTION.LEFT ) ==
-                        MOVE_DIRECTION.LEFT
+                        ( newPositionDirection & MOVE_DIRECTION.LEFT ) == MOVE_DIRECTION.LEFT
                     ) {
                         if (
-                            cell.left <= fruitPosition.left &&
-                            fruitPosition.left <= cell.right
+                            cell.left <= fruitPosition.left
+                            && fruitPosition.left <= cell.right
                         ) {
                             result.column = column;
                         }
                     } else {
                         // STILL
                         if (
-                            cell.left <= fruitPosition.left &&
-                            fruitPosition.left <= cell.right
+                            cell.left <= fruitPosition.left
+                            && fruitPosition.left <= cell.right
                         ) {
                             result.column = column;
                         }
                     }
 
                     if (
-                        ( newPositionDirection & MOVE_DIRECTION.BOTTOM ) ==
-                        MOVE_DIRECTION.BOTTOM
+                        ( newPositionDirection & MOVE_DIRECTION.BOTTOM ) == MOVE_DIRECTION.BOTTOM
                     ) {
                         if (
-                            cell.top <= fruitPosition.bottom &&
-                            fruitPosition.bottom <= cell.bottom
+                            cell.top <= fruitPosition.bottom && fruitPosition.bottom <= cell.bottom
                         ) {
                             const fruitHeight = Math.abs(
                                 fruitPosition.top - fruitPosition.bottom,
                             );
 
-                            result.row =
-                                row - fruitHeight / FREE_CELL_HEIGHT + 1;
+                            result.row = row - fruitHeight / FREE_CELL_HEIGHT + 1;
                         }
                     } else if (
-                        ( newPositionDirection & MOVE_DIRECTION.TOP ) ==
-                        MOVE_DIRECTION.TOP
+                        ( newPositionDirection & MOVE_DIRECTION.TOP ) == MOVE_DIRECTION.TOP
                     ) {
                         if (
                             cell.top <= fruitPosition.top &&
@@ -249,8 +249,8 @@ AP.plate.modal = ( function() {
     class Rectangle {
         constructor( width, height, orientation ) {
             this.orientation = orientation;
-            this.width = orientation == ORIENTATION.VERTICAL ? height : width;
-            this.height = orientation == ORIENTATION.VERTICAL ? width : height;
+            this.width = orientation == orientation.VERTICAL ? height : width;
+            this.height = orientation == orientation.VERTICAL ? width : height;
 
             this._$element = null;
 
@@ -305,11 +305,11 @@ AP.plate.modal = ( function() {
         constructor( args ) {
             super( args.width, args.height, args.orientation );
 
-            this.uuid = args.uuid;
-            this.code = args.code;
-            this.img = args.img;
-            this.grid = args.grid;
-            this.isSpecial = args.isSpecial;
+            this.id              = args.id;
+            this.code            = args.code;
+            this.image           = args.image;
+            this.grid            = args.grid;
+            this.isSpecial       = args.isSpecial;
             this.cellOrientation = args.cellOrientation;
         }
 
@@ -319,12 +319,14 @@ AP.plate.modal = ( function() {
         drawGridWithin( $rootNode ) {
             $rootNode.empty();
 
+            console.log( "this.image", this.image );
+
             const $plateBackground = $( "<div/>", {
                 class: "plate-background",
                 css: {
                     width: `${this.width}px`,
                     height: `${this.height}px`,
-                    "background-image": `url('${this.img}')`,
+                    "background-image": `url('${this.image.uri}')`,
                 },
                 appendTo: $rootNode,
             } );
@@ -482,18 +484,18 @@ AP.plate.modal = ( function() {
             super( args.width, args.height, args.orientation );
 
             this.rowSpan =
-                this.orientation == ORIENTATION.VERTICAL
+                this.orientation == orientation.VERTICAL
                     ? args.columnSpan
                     : args.rowSpan;
             this.columnSpan =
-                this.orientation == ORIENTATION.VERTICAL
+                this.orientation == orientation.VERTICAL
                     ? args.rowSpan
                     : args.columnSpan;
 
             this.uuid = args.uuid;
             this.code = args.code;
             this.name = args.name;
-            this.img = args.img;
+            this.image = args.image;
 
             this._gridPosition = null;
             this._originalGridPosition = null;
@@ -525,7 +527,7 @@ AP.plate.modal = ( function() {
             self._$element.draggable( {
                 containment: "#fruits",
                 distance: MIN_DISTANCE_BEFORE_DRAGGING,
-                // grid: [ATOMIC_WIDTH],
+                // grid: [ATOMIC_width],
                 revertDuration: 250,
                 start: function( event, ui ) {
                     controller.onStartDragging( self, event, ui );
@@ -697,7 +699,7 @@ AP.plate.modal = ( function() {
                 height: `${this.height}px`,
             };
 
-            if ( this.orientation == ORIENTATION.VERTICAL ) {
+            if ( this.orientation == orientation.VERTICAL ) {
                 const tmp = imgCSS.width;
                 imgCSS.width = imgCSS.height;
                 imgCSS.height = tmp;
@@ -709,8 +711,8 @@ AP.plate.modal = ( function() {
                 }
             }
 
-            const $img = $( "<img/>", {
-                src: this.img,
+            const $image = $( "<img/>", {
+                src: this.image.uri,
                 class: "fruit-img",
                 css: imgCSS,
                 appendTo: $fruit,
@@ -897,7 +899,8 @@ AP.plate.modal = ( function() {
             );
         }
 
-        onSelectFruit( selectedFruit ) {
+        addFruitInPlate( selectedFruit ) {
+
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
                 height: selectedFruit.height,
@@ -923,6 +926,7 @@ AP.plate.modal = ( function() {
                 fruitObj.drawWithin( $( "#fruits" ) );
                 fruitObj.initDraggableWidget( this );
             }
+
         }
 
         /**
@@ -1067,37 +1071,40 @@ AP.plate.modal = ( function() {
                 finish: {
                     id: ""
                 },
-                catalogBundle: {
-                    category: {
-                        id: ""
-                    },
-                    line: {
-                        id: ""
-                    },
-                    model: {
-                        id: ""
-                    },
+                line: {
+                    id: ""
+                },
+                model: {
+                    id: "",
+                    code: ""
+                },
+                image: {
+                    id: "",
+                    uri: ""
                 },
                 items: new kendo.data.DataSource(),
             },
             zone: {
                 id: ""
-            }
+            },
+            fruits: new kendo.data.DataSource(),
         },
         // statuses: AP.page.statuses,
         title: "Carica placca",
         canSave: false,
     };
 
+    /*
+    by Stan
     var defaultPlate = {
-        UUID: "100",
-        CODE: "508",
+        id: "100",
+        code: "508",
         IMG: "/assets/fakes/img/508.jpg",
-        WIDTH: 1200, // in px
-        HEIGHT: 500, // in px
-        ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL //frame
-        CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
-        GRID: [
+        width: 1200, // in px
+        height: 500, // in px
+        orientation: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL //frame
+        orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
+        grid: [
             // LEGEND:
             // "_" - empty free space
             // "0" - prohibited space
@@ -1121,6 +1128,32 @@ AP.plate.modal = ( function() {
             ],
         ],
     };
+    */
+
+    var defaultPlate = {
+        id: "100",
+        code: "508",
+        image: {
+            uri: "",
+        },
+        width: 1200, // in px
+        height: 500, // in px
+        orientation: {
+            id: "HOR"
+        },
+        orientationCell: {
+            id: "HOR"
+        },
+        grid: [
+            // LEGEND:
+            // "_" - empty free space
+            // "0" - prohibited space
+            [
+                "_",
+                "_",
+            ],
+        ],
+    };
 
     var viewModel = new kendo.data.ObservableObject( {
 
@@ -1139,10 +1172,17 @@ AP.plate.modal = ( function() {
             onLoad: undefined,
         },
 
+        getFruitCount() {
+            return this.get( "detailForm.data.fruits" ).len();
+        },
+
         loadPlate: function() {
 
+            console.log( "constants", constants );
+
             // id from model
-            var modelId = "2X2";
+            var modelId = this.get( "detailForm.data.product.model.code" );
+            var image = this.get( "detailForm.data.product.image" );
 
             // get plate/frame by code
             // for plate, code of frame is the same code of model
@@ -1151,19 +1191,30 @@ AP.plate.modal = ( function() {
                 ?.id
                 || "";
 
+            if ( frameId == "" ) {
+                AP.widget.notify( "error", "Modello [" + frameId + "] non trovato. Impossibile continuare." );
+                return;
+            }
+
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/frames/" + frameId,
                 callback: {
                     done: function( xhr ) {
-                        viewModel.set( "plate.id", xhr.data );
-                        viewModel.set( "plate.code", xhr.data );
-                        viewModel.set( "plate.img", xhr.data );
-                        viewModel.set( "plate.width", xhr.data );
-                        viewModel.set( "plate.height", xhr.data );
-                        viewModel.set( "plate.orientation", xhr.data );
-                        viewModel.set( "plate.ORIENTATION", xhr.data.grid );
-                        viewModel.set( "plate.grid", [ xhr.data.grid ] );
+
+                        viewModel.set( "plate.id", xhr.data.id );
+                        viewModel.set( "plate.code", xhr.data.code );
+                        viewModel.set( "plate.width", xhr.data?.width ?? 1200 );
+                        viewModel.set( "plate.height", xhr.data?.height ?? 500 );
+                        viewModel.set( "plate.orientation", xhr.data.orientation );
+                        viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
+                        viewModel.set( "plate.grid", xhr.data.grid );
+
+                        viewModel.set( "plate.image", image ); // by product
+                        viewModel.set( "plate.grid", xhr.data.grid );
+
+                        viewModel.configPlate();
+
                     }
                 }
             } );
@@ -1181,7 +1232,7 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        var userItems = AP.getUserPref( "accessory.product.items" );
+                        var userItems = AP.getUserPref( "plate.product.items" );
 
                         if ( xhr.count > 0 ) {
                             if ( !viewModel.get( "detailForm.data.product.image" ) && xhr.data[0].horizontalImage ) {
@@ -1317,7 +1368,7 @@ AP.plate.modal = ( function() {
                         }
                     }
                     viewModel.renderProductItems();
-                    NM.storage.set( "accessory.product.items", productItems.data() );
+                    NM.storage.set( "plate.product.items", productItems.data() );
                     resolve();
                     return;
                 }
@@ -1399,7 +1450,7 @@ AP.plate.modal = ( function() {
                             if ( productItems && productItems.data().length > 0 ) {
                                 viewModel.renderProductPreview( productItems );
                             }
-                            NM.storage.set( "accessory.product.items", productItems.data() );
+                            NM.storage.set( "plate.product.items", productItems.data() );
                             resolve();
                         },
                         fail: function( err ) {
@@ -1412,13 +1463,13 @@ AP.plate.modal = ( function() {
 
         loadProduct() {
 
-            var lineId   = viewModel.get( "detailForm.data.product.catalogBundle.line.id" );
-            var modelId  = viewModel.get( "detailForm.data.product.catalogBundle.model.id" );
+            var lineId   = viewModel.get( "detailForm.data.product.line.id" );
+            var modelId  = viewModel.get( "detailForm.data.product.model.id" );
             var finishId = viewModel.get( "detailForm.data.product.finish.id" );
 
-            console.log( "loadProduct:lineId", lineId );
-            console.log( "loadProduct:modelId", modelId );
-            console.log( "loadProduct:finishId", finishId );
+            // console.log("loadProduct:lineId", lineId);
+            // console.log( "loadProduct:modelId", modelId );
+            // console.log( "loadProduct:finishId", finishId );
 
             NM.util.ajax( {
                 method: "GET",
@@ -1431,10 +1482,18 @@ AP.plate.modal = ( function() {
                     done: function( xhr ) {
 
                         // set only what i need
+
+                        console.log( "xhr.data.finish.id", xhr.data.finish.id );
+
                         viewModel.set( "detailForm.data.product.id", xhr.data.id );
                         viewModel.set( "detailForm.data.product.finish.id", xhr.data.finish.id );
+                        viewModel.set( "detailForm.data.product.model.id", xhr.data.model.id );
+                        viewModel.set( "detailForm.data.product.model.code", xhr.data.model.code ); // for frame
+                        viewModel.set( "detailForm.data.product.line.id", xhr.data.line.id );
+                        viewModel.set( "detailForm.data.product.image.id", xhr.data.horizontalImage.id );
+                        viewModel.set( "detailForm.data.product.image.uri", xhr.data.horizontalImage.uri );
 
-                        console.log( "xhr.data:catalogBundle", xhr.data );
+                        // console.log( "xhr.data:catalogBundle", xhr.data );
 
                         // set items
                         viewModel.firstLoadProductItems();
@@ -1444,6 +1503,42 @@ AP.plate.modal = ( function() {
             } );
 
         },
+
+        loadFruit( fruitId ) {
+
+            console.log( "loadFruit:fruitId", fruitId );
+
+            var fruits = viewModel.get( "detailForm.data.product.fruits" );
+
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/fruits/" + fruitId,
+                callback: {
+                    done: function( xhr ) {
+
+                        var fruit = new kendo.data.DataSource();
+
+                        fruit.data( xhr.data );
+
+                        // fruit.set( "id", xhr.data.id );
+                        // fruit.set( "name", xhr.data.name );
+                        // fruit.set( "height", 0 );
+                        // fruit.set( "weight", 0 );
+
+                        // fruits.set( "detailForm.data.product.image.id", xhr.data.horizontalImage.id );
+                        // fruits.set( "detailForm.data.product.image.uri", xhr.data.horizontalImage.uri );
+
+                        fruits.add( fruit );
+
+                        // viewModel.firstLoadProductItems();
+
+
+                    }
+                }
+            } );
+
+        },
+
 
         renderProductItems: function() {
             const container = $( "#quotation-plate-product-items" );
@@ -1518,7 +1613,7 @@ AP.plate.modal = ( function() {
 
         loadModels: function( event ) {
 
-            var lineId = viewModel.get( "detailForm.data.product.catalogBundle.line.id" );
+            var lineId = viewModel.get( "detailForm.data.product.line.id" );
 
             console.log( "loadModels:line.id", lineId );
 
@@ -1538,7 +1633,7 @@ AP.plate.modal = ( function() {
 
         loadFinishes: function( event ) {
 
-            var lineId = viewModel.get( "detailForm.data.product.catalogBundle.line.id" );
+            var lineId = viewModel.get( "detailForm.data.product.line.id" );
 
             NM.util.ajax( {
                 method: "GET",
@@ -1593,14 +1688,14 @@ AP.plate.modal = ( function() {
         plates: new kendo.data.DataSource( {
             data: [
                 {
-                    UUID: "100",
-                    CODE: "508",
+                    id: "100",
+                    code: "508",
                     IMG: "/assets/fakes/img/508.jpg",
-                    WIDTH: 1200, // in px
-                    HEIGHT: 500, // in px
-                    ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL //frame
-                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
-                    GRID: [
+                    width: 1200, // in px
+                    height: 500, // in px
+                    orientation: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL //frame
+                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
+                    grid: [
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
@@ -1625,14 +1720,14 @@ AP.plate.modal = ( function() {
                     ],
                 },
                 {
-                    UUID: "111",
-                    CODE: "1X3",
+                    id: "111",
+                    code: "1X3",
                     IMG: "/assets/fakes/img/1X3.jpg",
-                    WIDTH: 1200, // in px
-                    HEIGHT: 500, // in px
-                    ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
-                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
-                    GRID: [
+                    width: 1200, // in px
+                    height: 500, // in px
+                    orientation: "VER", // "VER" - VERTICAL, "HOR" - HORIZONTAL
+                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
+                    grid: [
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
@@ -1644,14 +1739,14 @@ AP.plate.modal = ( function() {
                     ],
                 },
                 {
-                    UUID: "200",
-                    CODE: "508V",
+                    id: "200",
+                    code: "508V",
                     IMG: "/assets/fakes/img/508VERTICALE.jpg",
-                    WIDTH: 1200, // in px
-                    HEIGHT: 500, // in px
-                    ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
-                    CELL_ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
-                    GRID: [
+                    width: 1200, // in px
+                    height: 500, // in px
+                    orientation: "VER", // "VER" - VERTICAL, "HOR" - HORIZONTAL
+                    orientationCell: "VER", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
+                    grid: [
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
@@ -1674,14 +1769,14 @@ AP.plate.modal = ( function() {
                     ],
                 },
                 {
-                    UUID: "300",
-                    CODE: "SPECIAL1",
+                    id: "300",
+                    code: "SPECIAL1",
                     IMG: "/assets/fakes/img/508.jpg",
-                    WIDTH: 1200, // in px
-                    HEIGHT: 500, // in px
-                    ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
-                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
-                    GRID: [
+                    width: 1200, // in px
+                    height: 500, // in px
+                    orientation: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL
+                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
+                    grid: [
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
@@ -1689,14 +1784,14 @@ AP.plate.modal = ( function() {
                     ],
                 },
                 {
-                    UUID: "400",
-                    CODE: "SPECIAL2",
+                    id: "400",
+                    code: "SPECIAL2",
                     IMG: "/assets/fakes/img/508VERTICALE.jpg",
-                    WIDTH: 1200, // in px
-                    HEIGHT: 500, // in px
-                    ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
-                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
-                    GRID: [
+                    width: 1200, // in px
+                    height: 500, // in px
+                    orientation: "VER", // "VER" - VERTICAL, "HOR" - HORIZONTAL
+                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
+                    grid: [
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
@@ -1706,14 +1801,14 @@ AP.plate.modal = ( function() {
                     ],
                 },
                 {
-                    UUID: "500",
-                    CODE: "SPECIAL3",
+                    id: "500",
+                    code: "SPECIAL3",
                     IMG: "/assets/fakes/img/508.jpg",
-                    WIDTH: 1200, // in px
-                    HEIGHT: 500, // in px
-                    ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
-                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
-                    GRID: [
+                    width: 1200, // in px
+                    height: 500, // in px
+                    orientation: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL
+                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
+                    grid: [
                         // LEGEND:
                         // "_" - empty free space
                         // "0" - prohibited space
@@ -1723,7 +1818,7 @@ AP.plate.modal = ( function() {
             ],
             schema: {
                 model: {
-                    id: "UUID",
+                    id: "id",
                 },
             },
         } ),
@@ -1736,27 +1831,37 @@ AP.plate.modal = ( function() {
         // ACTIONS
         // GETTERS
         // EVENTS
-        onSelectFruit: function( event ) {
-            event.preventDefault();
+        onSelectFruit: function( fruit ) {
+            // event.preventDefault();
 
+            console.log( "onSelectFruit:fruit", fruit );
+
+            viewModel.loadFruit( fruit.id );
+
+            /*
             if ( this.get( "isPlateDefined" ) ) {
                 pub.fruitsController.onSelectFruit( event.dataItem );
             } else {
                 alert( "Spingi prima 'Configura'" );
             }
+            */
         },
         onClickGenerali: function( event ) {},
         onClickListaFrutti: function( event ) {},
         onClickImmagine: function( event ) {},
-        onClickConfigura: function( event ) {
-            const selectedPlate = this.plates.get( this.get( "selectedPlate" ) );
+        configPlate: function( event ) {
 
-            FREE_CELL_WIDTH =
-                AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH;
-            FREE_CELL_HEIGHT =
-                AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT;
+            // var plate = this.plates.get( this.get( "plate" ) );
+            var plate = this.get( "plate" );
 
-            if ( selectedPlate.CELL_ORIENTATION == ORIENTATION.VERTICAL ) {
+            // console.log( "FREE_CELL_WIDTH", FREE_CELL_WIDTH );
+            // console.log( "AP.plate.constants", AP.plate.constants );
+            console.log( "constants.GRID_CELL_DIMENSIONS", constants.GRID_CELL_DIMENSIONS );
+
+            FREE_CELL_WIDTH = constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].width;
+            FREE_CELL_HEIGHT = constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].height;
+
+            if ( plate.orientationCell == orientation.VERTICAL ) {
                 const tmp = FREE_CELL_WIDTH;
                 FREE_CELL_WIDTH = FREE_CELL_HEIGHT;
                 FREE_CELL_HEIGHT = tmp;
@@ -1764,22 +1869,22 @@ AP.plate.modal = ( function() {
 
             const grid = [];
 
-            console.log( "selectedPlate.GRID", selectedPlate.GRID );
+            console.log( "plate", plate );
 
-            for ( let iRow = 0; iRow < selectedPlate.GRID.length; iRow++ ) {
+            for ( let iRow = 0; iRow < plate.grid.length; iRow++ ) {
                 const row = [];
 
                 for (
                     let iCol = 0;
-                    iCol < selectedPlate.GRID[iRow].length;
+                    iCol < plate.grid[iRow].length;
                     iCol++
                 ) {
-                    const cellType = selectedPlate.GRID[iRow][iCol];
+                    const cellType = plate.grid[iRow][iCol];
 
                     const cell = new Cell(
-                        AP.plate.constants.GRID_CELL_DIMENSIONS[cellType].WIDTH,
-                        AP.plate.constants.GRID_CELL_DIMENSIONS[cellType].HEIGHT,
-                        selectedPlate.CELL_ORIENTATION,
+                        constants.GRID_CELL_DIMENSIONS[ cellType ].width,
+                        constants.GRID_CELL_DIMENSIONS[ cellType ].height,
+                        plate.orientationCell,
                         cellType,
                     );
 
@@ -1789,20 +1894,22 @@ AP.plate.modal = ( function() {
                 grid.push( row );
             }
 
-            const plate = new Plate( {
-                width: selectedPlate.WIDTH,
-                height: selectedPlate.HEIGHT,
-                orientation: selectedPlate.ORIENTATION,
-                cellOrientation: selectedPlate.CELL_ORIENTATION,
-                uuid: selectedPlate.UUID,
-                code: selectedPlate.CODE,
-                img: selectedPlate.IMG,
+            console.log( "config:plate.image", plate.image );
+
+            const plateObj = new Plate( {
+                width: plate.width,
+                height: plate.height,
+                orientation: plate.orientation,
+                cellOrientation: plate.orientationCell,
+                id: plate.id,
+                code: plate.code,
+                image: plate.image,
                 grid: grid,
                 isSpecial: false,
             } );
 
             pub.fruitsController = new FruitsController( {
-                plate: plate,
+                plate: plateObj,
                 fruits: [],
             } );
 
@@ -1813,6 +1920,7 @@ AP.plate.modal = ( function() {
         // INITS
     } );
 
+
     pub.new = function( onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
@@ -1822,17 +1930,72 @@ AP.plate.modal = ( function() {
 
     };
 
-    pub.init = function( setup ) {
+    var initFruitsSuggest = function() {
 
-        console.log( "setup designer" );
+        var suggest = $( "#plate-fruit-suggest" );
+        var autocomplete = suggest.data( "kendoAutoComplete" );
+        var suggestTemplate = $( "#fruit-suggest-row-tmpl" ).html();
+
+        if ( autocomplete ) {
+            return;
+        }
+
+        suggest.keypress( function( event ) {
+            if( event.keyCode == 13 ){
+                return false;
+            }
+        } );
+
+        suggest.kendoAutoComplete( {
+            template: $.proxy( kendo.template( suggestTemplate ) ),
+            dataTextField: "term",
+            highlightFirst: true,
+            minLength: 3,
+            dataSource: new kendo.data.DataSource( {
+                serverFiltering: true,
+                transport: {
+                    read: {
+                        url: "/manager/ajax/fruits",
+                        data: {
+                            str: function() {
+                                return suggest.data( "kendoAutoComplete" ).value();
+                            },
+                        },
+                    },
+                    parameterMap : function( data, type ) {
+                        if ( type === "read" ) {
+                            return { "str": data.str() };
+                        }
+                    }
+                },
+                schema: {
+                    data: function( xhr ) {
+                        return xhr.data;
+                    }
+                },
+            } ),
+            select: function( event ) {
+                var item = this.dataItem( event.item.index() );
+
+                console.log( "selected fruit", item );
+
+                viewModel.onSelectFruit( item );
+            },
+            noDataTemplate: "<div>NESSUN RECORD</div>"
+        } );
+
+    };
+
+    pub.init = function( setup ) {
 
         settings.container = setup.container;
 
+        initFruitsSuggest();
+
         viewModel.set( "fruits", [
             {
-                width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
-                height:
-                    AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                width: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].width * 4,
+                height: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].height * 1,
                 columnSpan: 4,
                 rowSpan: 1,
                 uuid: "A",
@@ -1841,9 +2004,8 @@ AP.plate.modal = ( function() {
                 img: "/assets/fakes/img/foto_frutto_schuko.png",
             },
             {
-                width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-                height:
-                    AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                width: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].width * 2,
+                height: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].height * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "B",
@@ -1852,9 +2014,8 @@ AP.plate.modal = ( function() {
                 img: "/assets/fakes/img/foto_frutto_bipasso.png",
             },
             {
-                width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-                height:
-                    AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                width: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].width * 2,
+                height: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].height * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "C",
@@ -1863,8 +2024,8 @@ AP.plate.modal = ( function() {
                 img: "/assets/fakes/img/foto_frutto_cat6.png",
             },
             {
-                width: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
-                height: AP.plate.constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                width: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].width * 2,
+                height: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].height * 1,
                 columnSpan: 2,
                 rowSpan: 1,
                 uuid: "I",

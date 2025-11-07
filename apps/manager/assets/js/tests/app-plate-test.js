@@ -5,25 +5,29 @@ $( document ).ready( async function() {
         var helper = AP.test.helper;
 
         const lineId = "56906918-8a2a-4652-80fe-adc1ededacd1"; // linea: Square
-        const modelId = "9d3266f5-db0d-4044-a120-22bd400d899c"; // modello: 54x82 (1x2)
+        const modelId = "1ac1104f-0208-4a0c-bdca-7ba50df4756f"; // modello: 2X2
         const finishId = "7357f125-e556-467c-ba37-2a1e17abc6cf"; // finitura: Acciaio lucido
 
         const plateEle = $( "#plate-line" );
         const modelEle = $( "#plate-model" );
         const finishEle = $( "#plate-finish" );
+        const fruitSuggest = $( "#plate-fruit-suggest" );
 
         // Sequenza asincrona
-        await helper.wait( 500 );
+        await helper.wait( 600 );
         $( "body" ).find( "button[data-bind='click:addPlate']" ).click();
 
-        await helper.wait( 500 );
+        await helper.wait( 600 );
         plateEle.val( lineId ).trigger( "change" );
 
-        await helper.wait( 500 );
+        await helper.wait( 600 );
         modelEle.val( modelId ).trigger( "change" );
 
-        await helper.wait( 500 );
+        await helper.wait( 800 );
         finishEle.val( finishId ).trigger( "change" );
+
+        await helper.wait( 800 );
+        fruitSuggest.val( "schu" ).trigger( "keyup" );
     }
 
 } );

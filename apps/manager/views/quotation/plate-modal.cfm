@@ -22,7 +22,7 @@
                                 <select id="plate-line" 
                                     required
                                     class="form-control"
-                                    data-bind="source: lines, value: detailForm.data.product.catalogBundle.line, events: { change: loadModels }" 
+                                    data-bind="source: lines, value: detailForm.data.product.line, events: { change: loadModels }" 
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -34,7 +34,7 @@
                                 <select id="plate-model" 
                                     required
                                     class="form-control"
-                                    data-bind="source: models, value: detailForm.data.product.catalogBundle.model, events: { change: loadFinishes }"
+                                    data-bind="source: models, value: detailForm.data.product.model, events: { change: loadFinishes }"
                                     data-value-field="id"
                                     data-text-field="name"
                                     >
@@ -60,61 +60,58 @@
                                 albero
                             --->
                             <div class="col-3">    
-								<div id="quotation-plate-product-items" style="max-width: 100%"></div>
-                            </div>
 
-                            <div class="col-9" style="height:500px">
+                                <nav>
 
-                                <div id="plate-designer-root">
-                                    <div style="grid-column: 1 / 1; grid-row: 1 / 3; display: flex; flex-direction: column; width: 100%; align-items: stretch; z-index: 1;">
-                                        <button
-                                            type="button"
-                                            data-bind="click: onClickGenerali">
-                                            <div>
-                                                <i class="fas fa-info-circle"></i>
-                                            </div>
-                                            Generali
-                                        </button>
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item active">
+                                            <a class="nav-link active" id="plate-product-items-but" data-bs-toggle="tab" 
+                                                href="##plate-product-items-tab" role="tab" aria-controls="tab1" aria-selected="true">
+                                                Placca
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="plate-fruit-product-items-but" data-bs-toggle="tab" 
+                                                href="##plate-fruit-product-items-tab" role="tab" aria-controls="tab2" aria-selected="true">
+                                                Frutti <span data-bind="text: getFruitsCount"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
 
-                                        <label>Lista placche</label>
+                                </nav>
 
-                                        <div>
-                                            <input
-                                                data-role="dropdownlist"
-                                                data-value-field="UUID"
-                                                data-text-field="CODE"
-                                                data-bind="source: plates, value: selectedPlate" />
+                                <div class="tab-content" id="quotation-nav-tabContent">
+
+                                    <!--- plate ---->
+                                    <div class="tab-pane fade show active" id="plate-product-items-tab" role="tabpanel" aria-labelledby="plate-product-items-but">
+								        <div id="quotation-plate-product-items" style="max-width: 100%">
+                                            
                                         </div>
-
-                                        <button
-                                            type="button"
-                                            data-bind="click: onClickConfigura">
-                                            <div>
-                                                <i class="fas fa-cogs"></i>
-                                            </div>
-                                            Configura
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            data-bind="click: onClickListaFrutti">
-                                            <div>
-                                                <i class="fas fa-list"></i>
-                                            </div>
-                                            Lista frutti
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            data-bind="click: onClickImmagine">
-                                            <div>
-                                                <i class="far fa-image"></i>
-                                            </div>
-                                            Immagine
-                                        </button>
                                     </div>
 
-                                    <div style="grid-column: 2 / 3; grid-row: 1 / 2; display: flex; width: 100%; align-items: center; justify-content: flex-end; z-index: 1;">
+                                    <!--- fruits ---->
+                                    <div class="tab-pane fade" id="plate-fruit-product-items-tab" role="tabpanel" aria-labelledby="plate-fruit-product-items-but">
+								        <div id="quotation-plate-fruits-product-items" style="max-width: 100%">
+                                            <div data-template="fruit-row-tmpl" data-bind="source: detailForm.data.fruits">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-9">
+
+                                <div id="plate-designer-root">
+                                    <div id="plate-designer-header" class="mb-2">
+                                        <input 
+                                            type="text" 
+                                            id="plate-fruit-suggest" 
+                                            class="search-widget-input" 
+                                            placeholder="Aggiungi un frutto...">
+
+                                        <!---
                                         <input
                                             data-role="dropdownlist"
                                             data-value-field="uuid"
@@ -126,10 +123,11 @@
                                                     }"
                                             data-option-label="🔍 Cerca frutto..."
                                             style="width: 200px"/>
+                                        ------>
                                     </div>
 
                                     <!--- Dynamically populated container --->
-                                    <div class="plate-designer">
+                                    <div class="plate-designer" style="border: 1px solid;">
                                         <div style="width: 1200px; height: 500px; display: flex; align-items: center; justify-content: center;">
                                             <h1 style="opacity: 0.5;">Definire le impostazioni generali per iniziare</h1>
                                         </div>
@@ -158,5 +156,8 @@
         </section>
     
     </div>
+
+    #template( view="jstemplate/quotation/fruit-suggest-row-tmpl" )#
+    #template( view="jstemplate/quotation/fruit-row-tmpl" )#
 
 </cfoutput>

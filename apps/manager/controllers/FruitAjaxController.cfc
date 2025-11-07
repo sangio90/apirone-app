@@ -12,7 +12,7 @@
 		var rows = super.fire( "product.search", params );
 
 		for ( var obj in rows.getData() ) {
-			var row = mm.convert( obj, "list" );
+			var row = memy.convert( obj, "list" );
 			data.add( row );
 		}
 

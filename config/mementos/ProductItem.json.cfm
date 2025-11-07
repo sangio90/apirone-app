@@ -20,7 +20,9 @@
 			defaultIncludes = [
 				"id",
 				"shortId",
-				"status",
+				"status.id",
+				"status.color.id",
+				"status.color.hex",
 				"origin.id",
 				"level",
 				"attribute",
