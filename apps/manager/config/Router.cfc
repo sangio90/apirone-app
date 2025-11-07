@@ -310,6 +310,7 @@
 		*/
 		// TODO: should be "ajax/products/:id/product-items"
 		get( "/ajax/product-items" ).to( "ProductItemAjaxController.productItemsByProduct" ).end();
+		get( "/technical-reports/print" ).to( "TechnicalReportController.print" ).end();
 
 		/*
 			products

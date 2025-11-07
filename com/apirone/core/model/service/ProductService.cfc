@@ -271,8 +271,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setLine( bean.getCatalogBundle().getLine() );
 				bean.setModel( bean.getCatalogBundle().getModel() );
 				bean.setCategory( bean.getCatalogBundle().getCategory() );
-
-				bean.setFinish( getFinishservice().get(  record.finish_id ) );
+				bean.setFinish( getFinishService().get(  record.finish_id ) );
 
 			}
 

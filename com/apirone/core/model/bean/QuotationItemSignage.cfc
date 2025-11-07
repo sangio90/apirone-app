@@ -14,7 +14,7 @@ component extends="com.apirone.core.model.bean.QuotationItem" accessors="true" {
 					"id",
 					"price",
 					"quantity",
-					"product",
+					"product.finish",
 					"quotationZone",
 					"signageRows",
 					"signageConfigItem"

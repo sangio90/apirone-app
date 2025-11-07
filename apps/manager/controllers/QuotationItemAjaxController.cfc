@@ -62,6 +62,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			FileWrite( filePath, binaryData );
 
 			var id = json.quotationItem.id;
+			var type = json.type
 			try {
 				if ( !Len( id ) ) {
 					var quotationItemSignageBean = super.bean( "QuotationItemSignage" );

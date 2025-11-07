@@ -526,6 +526,7 @@ AP.accessory.modal = ( function() {
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             parsedData.quotationId = quotationId;
+            parsedData.type = 'accessory';
             var preview = $( "#accessory-preview-background" )[0];
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {

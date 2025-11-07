@@ -171,7 +171,8 @@ AP.signage.modal = ( function() {
         },
 
         parseLines: function( e ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) != "" ) {
+            //TODO UMBERTO
+            if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) != "" ) {
                 viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
                 if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
                     bootbox.confirm( {
@@ -661,11 +662,15 @@ AP.signage.modal = ( function() {
             var signageConfig = viewModel.getSignageConfig();
             if ( signageConfig ) {
                 this.firstLoadProductItems();
+                var fontSizes = []
                 const exists = viewModel.getSignageConfig().items.some( item => item.id === "" );
                 if ( !exists ) {
-                    viewModel.getSignageConfig().items.unshift( { id: "", height: "-- Dimensione" } );
+                    fontSizes.unshift( { id: "", name: "-- Dimensione" } );
                 }
-                viewModel.get( "fontSizes" ).data( viewModel.getSignageConfig().items );
+                viewModel.getSignageConfig().items.forEach(function (item) {
+                    fontSizes.push(item.size)
+                })
+                viewModel.get( "fontSizes" ).data( fontSizes );
                 if ( signageConfig.items.length == 2 ) {
                     viewModel.set( "detailForm.data.quotationItem.signageConfigItem", signageConfig.items[1] );
                     this.parseLines();
@@ -953,6 +958,7 @@ AP.signage.modal = ( function() {
                 return AP.widget.notify( "error", "C'è almeno una riga con più caratteri di quelli consentiti." );
             }
             parsedData.quotationId = quotationId;
+            parsedData.type = 'signage';
             var preview = $( "#signage-preview-background" )[0];
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
@@ -1171,17 +1177,17 @@ AP.signage.modal = ( function() {
                                             if (NM.storage.get('signage.signageConfigId')) {
                                                 setTimeout( function() {
                                                     viewModel.parseLines();
-                                                }, 100 );
+                                                }, 200 );
                                             }
-                                        }, 100 );
+                                        }, 200 );
                                     }
-                                }, 100 );
+                                }, 200 );
                             }
-                        }, 100 );
+                        }, 200 );
                     }
-                }, 100 );
+                }, 200 );
             }
-        }, 100 );
+        }, 200 );
     };
 
     pub.edit = function( { id, onSave } ) {
@@ -1252,12 +1258,12 @@ AP.signage.modal = ( function() {
                                                 } );
                                                 NM.util.openModal( AP.signage.fields.modalRoot );
                                                 viewModel.setSelectedTextAlignIcon();
-                                            }, 100 );
-                                        }, 100 );
-                                    }, 100 );
-                                }, 100 );
-                            }, 100 );
-                        }, 100 );
+                                            }, 200 );
+                                        }, 200 );
+                                    }, 200 );
+                                }, 200 );
+                            }, 200 );
+                        }, 200 );
                     }
                 },
             },
