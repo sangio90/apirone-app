@@ -171,7 +171,7 @@ AP.signage.modal = ( function() {
         },
 
         parseLines: function( e ) {
-            //TODO UMBERTO
+            // TODO UMBERTO
             if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) != "" ) {
                 viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
                 if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
@@ -242,8 +242,8 @@ AP.signage.modal = ( function() {
                 } );
             } );
             this.checkCanSave();
-            NM.storage.set('signage.signageConfigId', viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) );
-            NM.storage.set('signage.signageConfigRowCount', viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
+            NM.storage.set( "signage.signageConfigId", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) );
+            NM.storage.set( "signage.signageConfigRowCount", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
         },
 
         parsedLineContent: function( valore, id ) {
@@ -447,7 +447,7 @@ AP.signage.modal = ( function() {
                                             AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
                                             const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
                                             const row = ds.view().find( r => r.id === e.data.id );
-                                            isNewRow = row.hasOwnProperty('newRow') ? row.newRow : null;
+                                            isNewRow = row.hasOwnProperty( "newRow" ) ? row.newRow : null;
                                             if ( row ) {
                                                 ds.remove( row );
                                             }
@@ -499,7 +499,7 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            NM.storage.set('signage.categoryId', viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ));
+            NM.storage.set( "signage.categoryId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) );
         },
 
         loadModels: function( event ) {
@@ -530,7 +530,7 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            NM.storage.set('signage.lineId', viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ));
+            NM.storage.set( "signage.lineId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) );
         },
 
         loadFinishes: function( event ) {
@@ -584,7 +584,7 @@ AP.signage.modal = ( function() {
                 $( "#signageRow" ).prop( "disabled", false );
             }
             this.checkCanSave();
-            NM.storage.set('signage.modelId', viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ));
+            NM.storage.set( "signage.modelId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) );
         },
 
         loadSignageConfigs: function( event ) {
@@ -647,10 +647,10 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != NM.storage.get('signage.finishId') ) {
-                NM.storage.delete('signage.product.items')
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != NM.storage.get( "signage.finishId" ) ) {
+                NM.storage.delete( "signage.product.items" );
             }
-            NM.storage.set('signage.finishId', viewModel.get( "detailForm.data.quotationItem.product.finish.id" ));
+            NM.storage.set( "signage.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
         },
 
         loadFontSizes: function() {
@@ -662,14 +662,14 @@ AP.signage.modal = ( function() {
             var signageConfig = viewModel.getSignageConfig();
             if ( signageConfig ) {
                 this.firstLoadProductItems();
-                var fontSizes = []
+                var fontSizes = [];
                 const exists = viewModel.getSignageConfig().items.some( item => item.id === "" );
                 if ( !exists ) {
                     fontSizes.unshift( { id: "", name: "-- Dimensione" } );
                 }
-                viewModel.getSignageConfig().items.forEach(function (item) {
-                    fontSizes.push(item.size)
-                })
+                viewModel.getSignageConfig().items.forEach( function( item ) {
+                    fontSizes.push( item.size );
+                } );
                 viewModel.get( "fontSizes" ).data( fontSizes );
                 if ( signageConfig.items.length == 2 ) {
                     viewModel.set( "detailForm.data.quotationItem.signageConfigItem", signageConfig.items[1] );
@@ -677,7 +677,7 @@ AP.signage.modal = ( function() {
                 }
             }
             this.checkCanSave();
-            NM.storage.set('signage.fontId', viewModel.get( "detailForm.data.signageConfig.font.id" ));
+            NM.storage.set( "signage.fontId", viewModel.get( "detailForm.data.signageConfig.font.id" ) );
         },
 
         firstLoadProductItems: async function() {
@@ -691,13 +691,13 @@ AP.signage.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
-                            if ( quotationItemId != "" || !NM.storage.get('signage.product.items') || NM.storage.get('signage.product.items').length == 0 ) {
+                            if ( quotationItemId != "" || !NM.storage.get( "signage.product.items" ) || NM.storage.get( "signage.product.items" ).length == 0 ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             } else {
                                 if ( quotationItemId == "" ) {
-                                    const itemsDataSource = new kendo.data.DataSource({
-                                        data: NM.storage.get('signage.product.items')
-                                    });
+                                    const itemsDataSource = new kendo.data.DataSource( {
+                                        data: NM.storage.get( "signage.product.items" )
+                                    } );
                                     viewModel.set( "detailForm.data.quotationItem.product.items", itemsDataSource );
                                     viewModel.get( "detailForm.data.quotationItem.product.items" ).read();
                                 }
@@ -708,7 +708,7 @@ AP.signage.modal = ( function() {
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
                                 if ( existing ) {
-                                    if (!existing.values.find( v => v.product_item_id === item.id )) {
+                                    if ( !existing.values.find( v => v.product_item_id === item.id ) ) {
                                         existing.values.push( {
                                             attributeValue: item.attributeValue,
                                             product_item_id: item.id,
@@ -797,7 +797,7 @@ AP.signage.modal = ( function() {
                         }
                     }
                     viewModel.renderProductItems();
-                    NM.storage.set( 'signage.product.items', productItems.data() );
+                    NM.storage.set( "signage.product.items", productItems.data() );
                     resolve();
                     return;
                 }
@@ -876,7 +876,7 @@ AP.signage.modal = ( function() {
                             }
 
                             viewModel.renderProductItems();
-                            NM.storage.set( 'signage.product.items', productItems.data() );
+                            NM.storage.set( "signage.product.items", productItems.data() );
                             resolve();
                         },
                         fail: function( err ) {
@@ -958,7 +958,7 @@ AP.signage.modal = ( function() {
                 return AP.widget.notify( "error", "C'è almeno una riga con più caratteri di quelli consentiti." );
             }
             parsedData.quotationId = quotationId;
-            parsedData.type = 'signage';
+            parsedData.type = "signage";
             var preview = $( "#signage-preview-background" )[0];
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
@@ -992,128 +992,128 @@ AP.signage.modal = ( function() {
         },
 
         visibleUpperClearButton: function() {
-            const id = viewModel.get('detailForm.data.quotationItem.id');
+            const id = viewModel.get( "detailForm.data.quotationItem.id" );
             return id == "";
         },
-        
+
         visibleLowerClearButton: function() {
-            const signageConfigId = this.get('detailForm.data.quotationItem.signageConfigItem.id');
-            const id = viewModel.get('detailForm.data.quotationItem.id');
+            const signageConfigId = this.get( "detailForm.data.quotationItem.signageConfigItem.id" );
+            const id = viewModel.get( "detailForm.data.quotationItem.id" );
             return signageConfigId == "" && id == "";
         },
 
         clearFilters: function() {
             viewModel.resetForm();
-            NM.storage.delete('signage.categoryId');
-            NM.storage.delete('signage.lineId');
-            NM.storage.delete('signage.modelId');
-            NM.storage.delete('signage.finishId');
-            NM.storage.delete('signage.fontId');
-            NM.storage.delete('signage.signageConfigId');
-            NM.storage.delete('signage.product.items');
+            NM.storage.delete( "signage.categoryId" );
+            NM.storage.delete( "signage.lineId" );
+            NM.storage.delete( "signage.modelId" );
+            NM.storage.delete( "signage.finishId" );
+            NM.storage.delete( "signage.fontId" );
+            NM.storage.delete( "signage.signageConfigId" );
+            NM.storage.delete( "signage.product.items" );
             this.checkCanSave();
         },
 
         handleParamsUnset: function( param ) {
             if ( param === "category" ) {
                 setTimeout( function() {
-                    if ($('#signageFontSize').val() !== '') {
-                        $('#signageFontSize').val('');
-                        $('#signageFontSize').trigger('change');
+                    if ( $( "#signageFontSize" ).val() !== "" ) {
+                        $( "#signageFontSize" ).val( "" );
+                        $( "#signageFontSize" ).trigger( "change" );
                     }
                     setTimeout( function() {
-                        if ($('#signageFont').val() !== '') {
-                            $('#signageFont').val('');
-                            $('#signageFont').trigger('change');
+                        if ( $( "#signageFont" ).val() !== "" ) {
+                            $( "#signageFont" ).val( "" );
+                            $( "#signageFont" ).trigger( "change" );
                         }
                         setTimeout( function() {
-                            if ($('#signageFinish').val() !== '') {
-                                $('#signageFinish').val('');
-                                $('#signageFinish').trigger('change');
+                            if ( $( "#signageFinish" ).val() !== "" ) {
+                                $( "#signageFinish" ).val( "" );
+                                $( "#signageFinish" ).trigger( "change" );
                             }
                             setTimeout( function() {
-                                if ($('#signageModel').val() !== '') {
-                                    $('#signageModel').val('');
-                                    $('#signageModel').trigger('change');
+                                if ( $( "#signageModel" ).val() !== "" ) {
+                                    $( "#signageModel" ).val( "" );
+                                    $( "#signageModel" ).trigger( "change" );
                                 }
                                 setTimeout( function() {
-                                    if ($('#signageRow').val() !== '') {
-                                        $('#signageRow').val('');
-                                        $('#signageRow').trigger('change');
+                                    if ( $( "#signageRow" ).val() !== "" ) {
+                                        $( "#signageRow" ).val( "" );
+                                        $( "#signageRow" ).trigger( "change" );
                                     }
-                                }, 100);
-                            }, 100);
-                        }, 100);
-                    }, 100);
-                }, 100);
+                                }, 100 );
+                            }, 100 );
+                        }, 100 );
+                    }, 100 );
+                }, 100 );
             }
             if ( param === "line" ) {
                 setTimeout( function() {
-                    if ($('#signageFontSize').val() !== '') {
-                        $('#signageFontSize').val('');
-                        $('#signageFontSize').trigger('change');
+                    if ( $( "#signageFontSize" ).val() !== "" ) {
+                        $( "#signageFontSize" ).val( "" );
+                        $( "#signageFontSize" ).trigger( "change" );
                     }
                     setTimeout( function() {
-                        if ($('#signageFont').val() !== '') {
-                            $('#signageFont').val('');
-                            $('#signageFont').trigger('change');
+                        if ( $( "#signageFont" ).val() !== "" ) {
+                            $( "#signageFont" ).val( "" );
+                            $( "#signageFont" ).trigger( "change" );
                         }
                         setTimeout( function() {
-                            if ($('#signageFinish').val() !== '') {
-                                $('#signageFinish').val('');
-                                $('#signageFinish').trigger('change');
+                            if ( $( "#signageFinish" ).val() !== "" ) {
+                                $( "#signageFinish" ).val( "" );
+                                $( "#signageFinish" ).trigger( "change" );
                             }
                             setTimeout( function() {
-                                if ($('#signageModel').val() !== '') {
-                                    $('#signageModel').val('');
-                                    $('#signageModel').trigger('change');
+                                if ( $( "#signageModel" ).val() !== "" ) {
+                                    $( "#signageModel" ).val( "" );
+                                    $( "#signageModel" ).trigger( "change" );
                                 }
-                            }, 100);
-                        }, 100);
-                    }, 100);
-                }, 100);
+                            }, 100 );
+                        }, 100 );
+                    }, 100 );
+                }, 100 );
             }
             if ( param === "model" ) {
                 setTimeout( function() {
-                    if ($('#signageFontSize').val() !== '') {
-                        $('#signageFontSize').val('');
-                        $('#signageFontSize').trigger('change');
+                    if ( $( "#signageFontSize" ).val() !== "" ) {
+                        $( "#signageFontSize" ).val( "" );
+                        $( "#signageFontSize" ).trigger( "change" );
                     }
                     setTimeout( function() {
-                        if ($('#signageFont').val() !== '') {
-                            $('#signageFont').val('');
-                            $('#signageFont').trigger('change');
+                        if ( $( "#signageFont" ).val() !== "" ) {
+                            $( "#signageFont" ).val( "" );
+                            $( "#signageFont" ).trigger( "change" );
                         }
                         setTimeout( function() {
-                            if ($('#signageFinish').val() !== '') {
-                                $('#signageFinish').val('');
-                                $('#signageFinish').trigger('change');
+                            if ( $( "#signageFinish" ).val() !== "" ) {
+                                $( "#signageFinish" ).val( "" );
+                                $( "#signageFinish" ).trigger( "change" );
                             }
-                        }, 100);
-                    }, 100);
-                }, 100);
+                        }, 100 );
+                    }, 100 );
+                }, 100 );
             }
             if ( param === "finish" ) {
                 setTimeout( function() {
-                    if ($('#signageFontSize').val() !== '') {
-                        $('#signageFontSize').val('');
-                        $('#signageFontSize').trigger('change');
+                    if ( $( "#signageFontSize" ).val() !== "" ) {
+                        $( "#signageFontSize" ).val( "" );
+                        $( "#signageFontSize" ).trigger( "change" );
                     }
                     setTimeout( function() {
-                        if ($('#signageFont').val() !== '') {
-                            $('#signageFont').val('');
-                            $('#signageFont').trigger('change');
+                        if ( $( "#signageFont" ).val() !== "" ) {
+                            $( "#signageFont" ).val( "" );
+                            $( "#signageFont" ).trigger( "change" );
                         }
-                    }, 100);
-                }, 100);
+                    }, 100 );
+                }, 100 );
             }
             if ( param === "font" ) {
                 setTimeout( function() {
-                    if ($('#signageFontSize').val() !== '') {
-                        $('#signageFontSize').val('');
-                        $('#signageFontSize').trigger('change');
+                    if ( $( "#signageFontSize" ).val() !== "" ) {
+                        $( "#signageFontSize" ).val( "" );
+                        $( "#signageFontSize" ).trigger( "change" );
                     }
-                }, 100);
+                }, 100 );
             }
             this.checkCanSave();
         }
@@ -1140,41 +1140,41 @@ AP.signage.modal = ( function() {
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
 
-        if (NM.storage.get('signage.categoryId')) {
-            viewModel.set("detailForm.data.signageConfig.catalogBundle.category.id", NM.storage.get('signage.categoryId'));
+        if ( NM.storage.get( "signage.categoryId" ) ) {
+            viewModel.set( "detailForm.data.signageConfig.catalogBundle.category.id", NM.storage.get( "signage.categoryId" ) );
         }
-        if (NM.storage.get('signage.lineId')) {
-            viewModel.set("detailForm.data.signageConfig.catalogBundle.line.id", NM.storage.get('signage.lineId'));
+        if ( NM.storage.get( "signage.lineId" ) ) {
+            viewModel.set( "detailForm.data.signageConfig.catalogBundle.line.id", NM.storage.get( "signage.lineId" ) );
         }
-        if (NM.storage.get('signage.modelId')) {
-            viewModel.set("detailForm.data.signageConfig.catalogBundle.model.id", NM.storage.get('signage.modelId'));
+        if ( NM.storage.get( "signage.modelId" ) ) {
+            viewModel.set( "detailForm.data.signageConfig.catalogBundle.model.id", NM.storage.get( "signage.modelId" ) );
         }
-        if (NM.storage.get('signage.finishId')) {
-            viewModel.set("detailForm.data.quotationItem.product.finish.id", NM.storage.get('signage.finishId'));
+        if ( NM.storage.get( "signage.finishId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.finish.id", NM.storage.get( "signage.finishId" ) );
         }
-        if (NM.storage.get('signage.fontId')) {
-            viewModel.set("detailForm.data.signageConfig.font.id", NM.storage.get('signage.fontId'));
+        if ( NM.storage.get( "signage.fontId" ) ) {
+            viewModel.set( "detailForm.data.signageConfig.font.id", NM.storage.get( "signage.fontId" ) );
         }
-        if (NM.storage.get('signage.signageConfigId')) {
-            viewModel.set("detailForm.data.quotationItem.signageConfigItem.id", NM.storage.get('signage.signageConfigId'));
-            viewModel.set("detailForm.data.quotationItem.signageConfigItem.rowCount", NM.storage.get('signage.signageConfigRowCount'));
+        if ( NM.storage.get( "signage.signageConfigId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.signageConfigItem.id", NM.storage.get( "signage.signageConfigId" ) );
+            viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", NM.storage.get( "signage.signageConfigRowCount" ) );
         }
 
         viewModel.loadLines();
         setTimeout( function() {
-            if (NM.storage.get('signage.lineId')) {
+            if ( NM.storage.get( "signage.lineId" ) ) {
                 viewModel.loadModels();
                 setTimeout( function() {
-                    if (NM.storage.get('signage.modelId')) {
+                    if ( NM.storage.get( "signage.modelId" ) ) {
                         viewModel.loadFinishes();
                         setTimeout( function() {
-                            if (NM.storage.get('signage.finishId')) {
+                            if ( NM.storage.get( "signage.finishId" ) ) {
                                 viewModel.loadSignageConfigs();
                                 setTimeout( function() {
-                                    if (NM.storage.get('signage.fontId')) {
+                                    if ( NM.storage.get( "signage.fontId" ) ) {
                                         viewModel.loadFontSizes();
                                         setTimeout( function() {
-                                            if (NM.storage.get('signage.signageConfigId')) {
+                                            if ( NM.storage.get( "signage.signageConfigId" ) ) {
                                                 setTimeout( function() {
                                                     viewModel.parseLines();
                                                 }, 200 );
