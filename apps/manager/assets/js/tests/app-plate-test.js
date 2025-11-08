@@ -12,6 +12,7 @@ $( document ).ready( async function() {
         const modelEle = $( "#plate-model" );
         const finishEle = $( "#plate-finish" );
         const fruitSuggest = $( "#plate-fruit-suggest" );
+        const autocomplete = fruitSuggest.data( "kendoAutoComplete" );
 
         // Sequenza asincrona
         await helper.wait( 600 );
@@ -26,8 +27,41 @@ $( document ).ready( async function() {
         await helper.wait( 800 );
         finishEle.val( finishId ).trigger( "change" );
 
-        await helper.wait( 800 );
-        fruitSuggest.val( "schu" ).trigger( "keyup" );
+        // switch to fruits tab
+        await helper.wait( 200 );
+        $( ".nav-tabs a[href='#plate-fruit-product-items-tab']" ).tab( "show" );
+
+        // interaction with suggest
+        var terms = [ "schu", "levetta" ];
+
+        for ( var term of terms ) {
+
+
+            // 1. Imposta il valore nell'input (opzionale, ma pulito)
+            fruitSuggest.val( term );
+
+            // 2. Chiama il metodo search() del widget Kendo
+            autocomplete.search( term );
+
+            await helper.wait( 1200 );
+
+            autocomplete.list.find( "li:first" ).click();
+
+        }
+
+        return;
+
+        var ele = document.getElementById( "plate-fruit-suggest" );
+        console.log( "ele:suggest", ele );
+
+        // var evt = new KeyboardEvent( "keypress", { key: "s" } );
+        // var evt = new KeyboardEvent( "keypress", { key: "c" } );
+        ele.dispatchEvent( new KeyboardEvent( "keydown", { "key": "a" } ) );
+
+        // ele.dispatchEvent( evt );
+
+
+        // fruitSuggest.trigger( { type: "keypress", which: "189", keyCode: "189" } );
     }
 
 } );

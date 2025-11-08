@@ -1,4 +1,17 @@
-﻿#plate-designer-root {
+﻿.quotation-fruit-row {
+	margin-bottom: 20px;
+}
+
+.quotation-fruit-row-name {
+	font-weight: bold;
+	margin-top: 5px;
+	background-color: #EAEAEA;
+	padding: 5px 10px;
+	border-radius: 5px;
+	line-height: 18px;
+}
+
+#plate-designer-root {
 	width: 100%;
 	/*
 	display: grid;
@@ -9,6 +22,8 @@
 }
 
 .plate-designer {
+	border: 1px solid #ced4da;
+	border-radius: 8px;
 	grid-row: 1 / 3;
 	grid-column: 1 / 3;
 }
@@ -94,11 +109,11 @@
 	width: inherit;
 }
 
-.fruit-img {
+.plate-fruit-img {
 	object-fit: fill;
 }
 
-.draggable-fruit {
+.plate-draggable-fruit {
 	position: absolute;
 	z-index: 0;
 }
@@ -176,5 +191,3 @@
 .k-popup .k-list-item {
 	border-bottom: 1px solid #cecece;
 }
-
-/* END SEZIONE PER LA PAGINA: plate/map */

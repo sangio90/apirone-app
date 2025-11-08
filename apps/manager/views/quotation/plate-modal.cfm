@@ -92,7 +92,7 @@
                                     <!--- fruits ---->
                                     <div class="tab-pane fade" id="plate-fruit-product-items-tab" role="tabpanel" aria-labelledby="plate-fruit-product-items-but">
 								        <div id="quotation-plate-fruits-product-items" style="max-width: 100%">
-                                            <div data-template="fruit-row-tmpl" data-bind="source: detailForm.data.fruits">
+                                            <div data-template="quotation-fruit-row-tmpl" data-bind="source: detailForm.data.fruits">
                                             </div>
                                         </div>
                                     </div>
@@ -127,7 +127,7 @@
                                     </div>
 
                                     <!--- Dynamically populated container --->
-                                    <div class="plate-designer" style="border: 1px solid;">
+                                    <div class="plate-designer">
                                         <div style="width: 1200px; height: 500px; display: flex; align-items: center; justify-content: center;">
                                             <h1 style="opacity: 0.5;">Definire le impostazioni generali per iniziare</h1>
                                         </div>
@@ -157,7 +157,7 @@
     
     </div>
 
-    #template( view="jstemplate/quotation/fruit-suggest-row-tmpl" )#
-    #template( view="jstemplate/quotation/fruit-row-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-fruit-row-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-fruit-suggest-row-tmpl" )#
 
 </cfoutput>
