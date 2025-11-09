@@ -761,6 +761,8 @@ AP.plate.modal = ( function() {
 
         addFruitInPlate( selectedFruit ) {
 
+            console.log( "addFruitInPlate:fruit", selectedFruit );
+
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
                 height: selectedFruit.height,
@@ -773,7 +775,7 @@ AP.plate.modal = ( function() {
                 img: selectedFruit.img,
             } );
 
-            console.log( "utils", utils );
+            console.log( "fruitObj", fruitObj );
 
             const freePosition = utils.findFirstFreePosition( fruitObj );
 
@@ -1065,6 +1067,27 @@ AP.plate.modal = ( function() {
 
     const settings = {
         container: null,
+    };
+
+    var mapFruitForPlate = function( data ) {
+
+        // / RESTART HERE
+        // / RESTART HERE
+        // / RESTART HERE
+        // / RESTART HERE
+        var fruit = {
+            id        : data.id,
+            width     : data.width,
+            height    : data.height,
+            rowSpan   : 1,
+            columnSpan: data.positionCount *1,
+            code      : data.code,
+            name      : data.name,
+            img       : data.img,
+        };
+
+        return fruit;
+
     };
 
     var createFruit = function( data ) {
@@ -1607,6 +1630,9 @@ AP.plate.modal = ( function() {
 
                             var attributeArray = fruitItems.data();
 
+                            // INFO: we do it here because we need the first image
+                            pub.fruitsController.addFruitInPlate( thisFruit );
+
 
                             // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( function( item ) {
@@ -2051,8 +2077,6 @@ AP.plate.modal = ( function() {
             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
             viewModel.addProductItemsToFruit( newFruit.id );
-
-            pub.fruitsController.addFruitInPlate( newFruit );
 
             /*
             if ( this.get( "isPlateDefined" ) ) {
