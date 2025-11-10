@@ -119,9 +119,6 @@
 				if (record.char_count) {
 					bean.getSignageConfigItem().setCharCount(record.char_count);
 				}
-				if (record.height) {
-					bean.getSignageConfigItem().setHeight(record.height);
-				}
 				if (record.height_in_pixel) {
 					bean.getSignageConfigItem().setHeightInPixel(record.height_in_pixel);
 				}
