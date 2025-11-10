@@ -104,6 +104,58 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
+	public String function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
+		var success = false;
+		if (arguments.quotationItems.len() > 0) {
+			for ( var quotationItem in arguments.quotationItems ) {
+				var code = "";
+				var product = quotationItem.getProduct()
+				if (IsNull(product) || IsNull(product.getCategory())) {
+					return false;
+				}
+				var categoryCode = Trim( product.getCategory().getCode() );
+				code &= categoryCode;
+				if (IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" )) {
+					if (isNull(product.getLine())) {
+						return false;
+					}
+					var line = product.getLine();
+					var lineCode = Trim( line.getCode() );
+
+					code &= lineCode;
+					
+					if (isNull(product.getModel())) {
+						return false;
+					}
+					var model = product.getModel();
+					code &= Trim(model.getCode());
+					
+					if (isNull(product.getFinish())){ 
+						return false;
+					}
+					var finishCode = Trim( product.getFinish().getCode() );
+					code &= finishCode;
+
+					var description = "Categoria #product.getCategory().getName()#, Linea #product.getLine().getName()#, Modello #product.getModel().getName()# (#model.getCode()#), Finitura #product.getFinish().getName()# "
+					var data = {
+						'ARCODART': code,
+						'ARDESART': description,
+						'ARDATCAR': Now(),
+						'ARUNMIS1': 'PZ'
+					}
+					success = getDao().export( data );
+				}
+				if (IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" )) {
+					return false;
+				}
+				// var newId = getDao().export( arguments.quotationItems );
+			}
+		}
+
+		return success;
+	}
+
+
 	public String function clone(
 		required com.apirone.core.model.bean.Quotation quotation,
 		required String status

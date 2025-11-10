@@ -241,4 +241,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function export( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+
+		params[ "id" ]            = rc.id;
+		var quotationItems = super.fire( "QuotationItem.list", [ 'quotationId' = rc.id ] );
+		var result = super.fire( "Quotation.export", [ quotationItems ] );
+		dump( result );abort;
+		event.setValue( "result", result );
+	}
 }

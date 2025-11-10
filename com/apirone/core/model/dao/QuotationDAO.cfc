@@ -311,4 +311,33 @@
 
 		<cfreturn true>
 	</cffunction>
+
+	<cffunction name="export" returntype="Boolean">
+		<cfargument name="data" type="Struct" required="true">
+		<cfset var qCheck = "" />
+		<cfset var success = false />
+
+		<cfquery name="qCheck" datasource="verticaleExport">
+			SELECT ARCODART
+			FROM ARTICO_APIR
+    		WHERE ARCODART = '#arguments.data.ARCODART#'
+		</cfquery>
+
+		<cfif qCheck.recordCount EQ 0>
+			<cfquery datasource="verticaleExport">
+				INSERT INTO ARTICO_APIR (ARCODART, ARDESART, ARDATCAR, ARUNMIS1)
+				VALUES (
+					<cfqueryparam value="#arguments.data.ARCODART#" cfsqltype="cf_sql_varchar">,
+					<cfqueryparam value="#arguments.data.ARDESART#" cfsqltype="cf_sql_varchar">,
+					<cfqueryparam value="#arguments.data.ARDATCAR#" cfsqltype="cf_sql_timestamp">,
+					<cfqueryparam value="#arguments.data.ARUNMIS1#" cfsqltype="cf_sql_varchar">
+				)
+			</cfquery>
+
+			<cfset success = true />
+		</cfif>
+
+		<cfreturn success />
+	</cffunction>
+
 </cfcomponent>
