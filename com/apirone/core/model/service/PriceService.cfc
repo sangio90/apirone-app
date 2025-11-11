@@ -54,7 +54,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Outcome function delete( required String priceId ){
 		var outcome = super.bean( "Outcome" );
 
-		var obj = get( arguments.priceId, false );
+		var obj = get( arguments.priceId );
 
 		outcome.setData( { priceId = arguments.priceId } );
 
@@ -67,11 +67,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					payload = { "id" = arguments.priceId }
 				);
 				super.getCacheManager().remove( getCacheScope(), arguments.priceId );
+				removeEntityCache( obj.getEntity() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeletePrice" );
+				outcome.setType( "ApirOne.error.CannotDeletePrice" );
 				outcome.setMessage( "Cannot delete price [#arguments.priceId#]" );
+				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# PriceService: error delete #error.message#");
 			}
 		}
 
@@ -282,11 +284,33 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setType( getPriceTypeService().get( record.price_type_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setEntity( getEntity( record ) );
 
 			return bean;
 		}
 
 		return NullValue();
 	}
+
+	private com.apirone.core.model.bean.Entity function getEntity( required record ){
+		var entity = super.bean( "Entity" );
+
+		if ( Len( record.product_item_id ) ) {
+			entity.setKey( "productItem.id" );
+			entity.setValue( record.product_item_id );
+
+			return entity;
+		}
+
+		if ( Len( record.product_id ) ) {
+			entity.setKey( "product.id" );
+			entity.setValue( record.product_id );
+
+			return entity;
+		}
+
+		getLogger().error( "No entity linked to this price. Price Id: [#record.price_id#]" );
+
+	}	
 
 }
