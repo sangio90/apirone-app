@@ -257,6 +257,7 @@
 	</cffunction>
 
 	<cffunction name="deleteAllByParams" returntype="Boolean">
+		
 		<cfargument name="lineId" type="String" required="true">
 		<cfargument name="categoryId" type="String" required="true">
 
@@ -264,11 +265,11 @@
 			DELETE
 			FROM products
 			WHERE
-				 catalog_bundle_id in (
+				 catalog_bundle_id IN (
 					SELECT catalog_bundle_id
 					FROM catalog_bundles
 					WHERE
-						product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">::uuid AND
+						product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#"> AND
 						line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				)
 			RETURNING product_id
