@@ -2,12 +2,16 @@
 component extends="coldbox.system.Interceptor" {
 
 	// property name="userService" inject="userService";
-	property name="securityService" inject="SecurityService";
+	//property name="securityService" inject="SecurityService";
 
 	function preProcess( event, rc, prc ){
 		// --- A. Preparazione dei dati ---
 
+		var securityService = server["wirebox-apirone"].getInstance("securityService");
+
 		var start = Now();
+
+		//abort;
 
 		// Recupera l'utente loggato. Assumiamo che restituisca un oggetto User
 		// che risponde al metodo .hasPermission().
@@ -16,12 +20,6 @@ component extends="coldbox.system.Interceptor" {
 		var module     = event.getCurrentModule();
 		var eventName  = event.getCurrentEvent();
 		var controller = event.getCurrentHandler();
-
-		cffile(
-			action = "APPEND",
-			file   = "#ExpandPath( "/debug.log" )#",
-			output = "#Now()# #eventName#"
-		);
 
 		if ( module == "api" ) {
 			storeRequest( event )
@@ -92,10 +90,9 @@ component extends="coldbox.system.Interceptor" {
 						);
 					}
 				}
-
 				event.noRender(); // Assicura che ColdBox non provi a renderizzare l'evento bloccato
 				return;
-			}
+			} 
 		}
 
 		// TODO: manage here other modules. stop execution if not allowed

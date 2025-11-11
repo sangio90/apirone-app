@@ -30,6 +30,12 @@ component extends="coldbox.system.ioc.config.Binder" {
             .into( this.SCOPES.REQUEST );
 
 
+
+        map( "SecurityService" ).to( "com.apirone.core.model.service.SecurityService" )
+            .asSingleton();
+
+
+
         /* 
             service with decorator 
         */

@@ -63,16 +63,16 @@
                 <div id="userbox" class="userbox">
                     <a href="##" data-bs-toggle="dropdown">
                         <figure class="profile-picture">
-                            <img src="/modules/assets/template-admin/img/!logged-user.jpg" alt="#prc.user.getName()#" class="rounded-circle" 
+                            <img src="/modules/assets/template-admin/img/!logged-user.jpg" alt="#session.user.getName()#" class="rounded-circle" 
                                 data-lock-picture="/assets/template/img/!logged-user.jpg"
                             >
                         </figure>
-                        <div class="profile-info" data-lock-name="#prc.user.getName()#" data-lock-email="#prc.user.getName()#">
+                        <div class="profile-info" data-lock-name="#session.user.getName()#" data-lock-email="#session.user.getName()#">
                             <span class="name">
-                                #prc.user.getName()#<br>
+                                #session.user.getName()#<br>
                             </span>
                             <span class="role">
-                                #prc.user.getRole().getName()# - #prc.user.getShortId()#
+                                #session.user.getRole().getName()# - #session.user.getShortId()#
                             </span>
                         </div>
 
@@ -95,7 +95,7 @@
                                 <li class="divider"></li>
                                 <div id="user-other-roles">cambia ruolo</div>
                                 <cfloop array="#session.user.getAccount().getRoles()#" index="role">
-                                    <cfif ( role.getId() neq prc.user.getRole().getId() )>
+                                    <cfif ( role.getId() neq session.user.getRole().getId() )>
                                         <li>
                                             <a role="menuitem" tabindex="-1" href="/manager/change-role/#role.getId()#"><i class="bx bx-user"></i> #role.getName()#</a>
                                         </li>
