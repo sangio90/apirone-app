@@ -54,7 +54,7 @@ component {
 		class            = "com.microsoft.sqlserver.jdbc.SQLServerDriver",
 		bundleName       = "org.lucee.mssql",
 		bundleVersion    = "12.2.0.jre8",
-		connectionString = "jdbc:sqlserver://#variables.settings.get( "verticaledb.host" )#:#variables.settings.get( "verticaledb.port" )#;DATABASENAME=#variables.settings.get( "VERTICALE_WEB_DATA" )#;SelectMethod=direct",
+		connectionString = "jdbc:sqlserver://#variables.settings.get( "verticaledb.host" )#:#variables.settings.get( "verticaledb.port" )#;DATABASENAME=VERTICALE_WEB_DATA;SelectMethod=direct",
 		username         = variables.settings.get( "verticaledb.username" ),
 		password         = variables.settings.get( "verticaledb.pwd" ),
 		connectionLimit  = -1, // default:-1

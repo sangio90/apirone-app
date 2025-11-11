@@ -114,13 +114,10 @@
 				)
 			);
 
-			if (record.signage_config_item_id) {
+			if (Len(record.signage_config_item_id)) {
 				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_id ) );
 				if (record.char_count) {
 					bean.getSignageConfigItem().setCharCount(record.char_count);
-				}
-				if (record.height) {
-					bean.getSignageConfigItem().setHeight(record.height);
 				}
 				if (record.height_in_pixel) {
 					bean.getSignageConfigItem().setHeightInPixel(record.height_in_pixel);

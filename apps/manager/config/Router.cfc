@@ -399,6 +399,7 @@
 		/*
 			quotations
 		*/
+		get( "/ajax/quotations-export/:id" ).to( "QuotationAjaxController.export" ).end();
 		get( "/ajax/quotations/:id/total" ).to( "PriceAjaxController.calculateQuotation" ).end();
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
 		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();

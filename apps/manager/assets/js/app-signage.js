@@ -147,6 +147,19 @@ AP.signage.modal = ( function() {
             }
         },
 
+        getSignageConfigItems: function() {
+            if ( viewModel.getSignageConfig() ) {
+                var items = viewModel.getSignageConfig().items.map(item => ({
+                    ...item,
+                    sizeName: item.size.name
+                }));
+                items.unshift( { id: "", sizeName: "-- Dimensione" } );
+                return items;
+            }
+
+            return [];
+        },
+
         addSignageRow: function() {
             var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
             if ( ds && ds.data().length < viewModel.get( "maxRows" ) ) {
@@ -171,7 +184,6 @@ AP.signage.modal = ( function() {
         },
 
         parseLines: function( e ) {
-            // TODO UMBERTO
             if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) != "" ) {
                 viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
                 if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
@@ -258,8 +270,13 @@ AP.signage.modal = ( function() {
                 return config.id == viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" );
             } )[0];
 
+            if (
+                viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" )
+            ) {
+                signageConfigItem.size = viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" );
+            }
             const fontFamily = signageConfig.font && signageConfig.font.family ? signageConfig.font.family : "";
-            const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel : 16;
+            const heightPx = signageConfigItem && signageConfigItem.size?.name ? signageConfigItem.size.name : 16;
 
             // costruisco la regex solo con i nomi interni dei pictogram (senza <>), escapati
             const innerNames = pictogramNames.map( n => n.replace( /[<>]/g, "" ) );
@@ -302,6 +319,10 @@ AP.signage.modal = ( function() {
             contentSpanPreview.html( parts.join( "" ) );
 
             return false;
+        },
+
+        getSignageConfigItemSize: function() {
+            return viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" )
         },
 
         escapeHtml: function( text ) {
@@ -662,17 +683,23 @@ AP.signage.modal = ( function() {
             var signageConfig = viewModel.getSignageConfig();
             if ( signageConfig ) {
                 this.firstLoadProductItems();
-                var fontSizes = [];
-                const exists = viewModel.getSignageConfig().items.some( item => item.id === "" );
-                if ( !exists ) {
-                    fontSizes.unshift( { id: "", name: "-- Dimensione" } );
-                }
-                viewModel.getSignageConfig().items.forEach( function( item ) {
-                    fontSizes.push( item.size );
-                } );
-                viewModel.get( "fontSizes" ).data( fontSizes );
-                if ( signageConfig.items.length == 2 ) {
-                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem", signageConfig.items[1] );
+                // const exists = viewModel.getSignageConfig().items.some( item => item.id === "" );
+                // viewModel.getSignageConfig().items.forEach( function( item ) {
+                //     fontSizes.push( item.size );
+                // } );
+                // viewModel.get( "fontSizes" ).data( fontSizes );
+                viewModel.set( "detailForm.data.signageConfig.items", viewModel.getSignageConfigItems() );
+                $("#signageFontSize").select({
+                    dataSource: viewModel.get( "detailForm.data.signageConfig.items" ),
+                    value: viewModel.get( "detailForm.data.quotationItem.signageConfigItem" ),
+                    dataTextField: 'sizeName',
+                    dataValueField: 'id',
+                    change: function() {
+                        viewModel.parseLines();
+                    }
+                });
+                if ( viewModel.get( "detailForm.data.signageConfig.items" ).length == 2 ) {
+                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem", viewModel.get( "detailForm.data.signageConfig.items" )[1] );
                     this.parseLines();
                 }
             }

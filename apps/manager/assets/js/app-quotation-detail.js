@@ -194,6 +194,21 @@ AP.quotationDetail.detail = ( function() {
         list: function() {
             window.location.href = "/manager/quotations";
         },
+        exportQuotation: function() {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
+                callback: {
+                    done: function( xhr ) {
+                        if( xhr.status == "INVALID" ) {
+                            NM.form.showMessages( xhr.data );
+                            return;
+                        }
+                        AP.widget.notify( "success", "Preventivo Esportato correttamente." );
+                    }
+                }
+            } );
+        },
 
         getImageSrc: function( event ) {
 
