@@ -1,4 +1,4 @@
-﻿component extends=".Application" {
+﻿component extends="com.apirone.core.root.Application" {
 
     this.name        = "apirone-resources";
     this.nullSupport = true;
@@ -19,12 +19,12 @@
 
         }
 
-        if( url.KeyExists("fwreinit") AND fwreinit == 1 OR !application.keyExists("cbBootstrap") ) {
-            super.loadColdbox()
+        if( url.keyExists("fwreinit") AND fwreinit == 1 OR !application.keyExists("cbBootstrap") ) {
+            loadColdbox()
         }
 
-        if( url.KeyExists("reset") ) {
-            super.clearContainer();
+        if( url.keyExists("reset") ) {
+            //super.clearContainer();
         }
 
         application.cbBootstrap.onRequestStart( arguments.targetPage );
@@ -47,5 +47,25 @@
 		return Len( CGI.REMOTE_ADDR ) ? Trim( listFirst( CGI.REMOTE_ADDR ) ) : "999.999.999.999";
 
     }
+
+	private Void function loadColdbox(){
+		
+		var COLDBOX_APP_ROOT_PATH = GetDirectoryFromPath( GetCurrentTemplatePath() );
+		var COLDBOX_APP_MAPPING   = "";
+		var COLDBOX_CONFIG_FILE   = "config.Coldbox";
+		var COLDBOX_APP_KEY       = "";
+		var COLDBOX_FAIL_FAST     = false;
+
+		application.cbBootstrap = new coldbox.system.Bootstrap(
+			COLDBOX_CONFIG_FILE,
+			COLDBOX_APP_ROOT_PATH,
+			COLDBOX_APP_KEY,
+			COLDBOX_APP_MAPPING,
+			COLDBOX_FAIL_FAST
+		);
+
+		application.cbBootstrap.loadColdbox();
+	
+	}    
 
 }
