@@ -318,19 +318,20 @@
 		<cfset var success = false />
 
 		<cfquery name="qCheck" datasource="verticaleExport">
-			SELECT ARCODART
+			SELECT AR_CHIAVE
 			FROM ARTICO_APIR
-    		WHERE ARCODART = '#arguments.data.ARCODART#'
+    		WHERE ARCODART = '#arguments.data.AR_CHIAVE#'
 		</cfquery>
 
 		<cfif qCheck.recordCount EQ 0>
 			<cfquery datasource="verticaleExport">
-				INSERT INTO ARTICO_APIR (ARCODART, ARDESART, ARDATCAR, ARUNMIS1)
+				INSERT INTO ARTICO_APIR (AR_CHIAVE, ARCODART, ARDESART, ARDATCAR, ARUNMIS1)
 				VALUES (
-					<cfqueryparam value="#arguments.data.ARCODART#" cfsqltype="cf_sql_varchar">,
-					<cfqueryparam value="#arguments.data.ARDESART#" cfsqltype="cf_sql_varchar">,
-					<cfqueryparam value="#arguments.data.ARDATCAR#" cfsqltype="cf_sql_timestamp">,
-					<cfqueryparam value="#arguments.data.ARUNMIS1#" cfsqltype="cf_sql_varchar">
+					<cfqueryparam value="#arguments.data.AR_CHIAVE#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.ARCODART#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.ARDESART#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.ARDATCAR#" cfsqltype="date">,
+					<cfqueryparam value="#arguments.data.ARUNMIS1#" cfsqltype="varchar">
 				)
 			</cfquery>
 

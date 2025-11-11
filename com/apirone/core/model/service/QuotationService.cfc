@@ -136,8 +136,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					var finishCode = Trim( product.getFinish().getCode() );
 					code &= finishCode;
 
-					var description = "Categoria #product.getCategory().getName()#, Linea #product.getLine().getName()#, Modello #product.getModel().getName()# (#model.getCode()#), Finitura #product.getFinish().getName()# "
+					var description = "#product.getLine().getName()# #product.getModel().getName()# (#model.getCode()#) #product.getFinish().getName()#"
+					description = description.subString(0, 35);
 					var data = {
+						'AR_CHIAVE': code,
 						'ARCODART': code,
 						'ARDESART': description,
 						'ARDATCAR': Now(),
@@ -146,7 +148,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					success = getDao().export( data );
 				}
 				if (IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" )) {
-					return false;
+					var data = {
+						'AR_CHIAVE': product.getCode(),
+						'ARCODART': product.getCode(),
+						'ARDESART': product.getName(),
+						'ARDATCAR': Now(),
+						'ARUNMIS1': 'PZ'
+					}
+					success = getDao().export( data );
 				}
 				// var newId = getDao().export( arguments.quotationItems );
 			}
