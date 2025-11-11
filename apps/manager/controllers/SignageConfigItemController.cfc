@@ -40,7 +40,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "lineId" ]            = lineId;
 		prc.page[ "signageConfigItem" ] = memy.convert( item );
 
-		prc.page[ "products" ] = memy.convertList( super.fire( "product.list", { lineId = lineId } ), "list" );
+		//prc.page[ "products" ] = [];
+        //prc.page[ "products" ] = memy.convertList(  ), "list" );
+
+		var products = super.fire( "product.list", { lineId = lineId } );
+
+        prc.page[ "products" ] = super.eachParallelAndReorder(
+			products,
+			function(item, index) {
+				var row = super.getMementify().convert( item, "list" ); // TODO: use "treelight" instead?
+				return row;
+			}
+		);		
 
 		prc.jsFiles.add( "app-component-modal" );
 		prc.jsFiles.add( "app-signage-config-item" );
