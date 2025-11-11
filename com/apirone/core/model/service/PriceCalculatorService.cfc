@@ -59,6 +59,9 @@
 
 		var name = "#product.getLine().getName()# / #product.getModel().getName()# / #product.getFinish().getName()#";
 
+		//dump(product);
+		//abort;
+
 		appendLog(
 			message   = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#.",
 			productId = product.getSerial()
@@ -141,6 +144,18 @@
 
 			if ( !IsNull( productItemPrice ) ) {
 				var amount = productItemPrice.getAmount() ?: 0;
+
+				/*
+				try {
+					if ( productItemPrice.getMethod().getId() == "F" ) {
+						
+					}
+				} catch ( e ) {
+					dump(productItemPrice);
+					dump(e);
+					abort;
+				}
+				*/
 
 				if ( productItemPrice.getMethod().getId() == "F" ) {
 					appendLog(

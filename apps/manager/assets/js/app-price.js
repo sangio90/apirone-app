@@ -57,7 +57,7 @@ AP.price.modal = ( function() {
 
     var viewModel = kendo.observable( {
 
-        currentItem: { type: "", id: "" }, // all object with type, id, line, model, attribute, attributeValue
+        currentItem: { type: "", id: "", deleted: false }, // all object with type, id, line, model, attribute, attributeValue
         prices: prices,
         methods: AP.page.methods, // from ProductController
 
@@ -72,6 +72,20 @@ AP.price.modal = ( function() {
             return getCurrentConfig().modalTitle;
         },
 
+        delete: function( event ) {
+
+            var dataItem = viewModel.get( "prices" ).getByUid( event.data.uid );
+
+            if ( dataItem.deleted ) {
+                dataItem.set( "deleted", false );
+            } else {
+                dataItem.set( "deleted", true );
+            }
+
+            return false;
+
+        },
+
         save: function( event ) {
 
             var modal = fields.modal;
@@ -84,9 +98,7 @@ AP.price.modal = ( function() {
                 },
             } );
 
-
-            // thisForm.valid();
-            if ( true ) {
+            if ( modalForm.valid() ) {
 
                 status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 

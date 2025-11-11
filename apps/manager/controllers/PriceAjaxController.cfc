@@ -108,11 +108,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		var output = mm.convertList( output );
+		for( var item in output ){
+			var row = mm.convert( item );
+			row["deleted"] = false;
+			data.add( row );
+		}
 
-		result.setTotal( output.len() );
-		result.setCount( output.len() );
-		result.setData( output );
+		result.setTotal( data.len() );
+		result.setCount( data.len() );
+		result.setData( data );
 
 		event.setValue( "result", result );
 	}
@@ -153,14 +157,23 @@ component extends="com.apirone.core.controller.AbsController" {
 			price.setMethod( method.setId( item.method.id ) );
 			price.setEntity( entity.setKey( key ).setValue( value ) );
 
+
 			if ( Len( item?.id ) ) {
-				super.fire( "price.update", [ price ] );
+
+				if( item.deleted ) {
+					super.fire( "price.delete", [ item.id ] );
+				} else {
+					super.fire( "price.update", [ price ] );
+				}
+
 			} else {
-				var type = super.bean( "PriceType" );
 
-				price.setType( type.setId( item.type.id ) );
+				if( len( item.amount ) ) {
+					var type = super.bean( "PriceType" );
+					price.setType( type.setId( item.type.id ) );
+					super.fire( "price.create", [ price ] );
+				}
 
-				super.fire( "price.create", [ price ] );
 			}
 		}
 

@@ -933,6 +933,11 @@ h2 {
     background-color: #FFEE8C !important;
 }
 
+.price-deleted {
+    opacity: .4;
+    filter: grayscale(100%);
+}
+
 /*
     // price simulate log list 
 */
