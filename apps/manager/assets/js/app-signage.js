@@ -718,16 +718,8 @@ AP.signage.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
-                            if ( quotationItemId != "" || !NM.storage.get( "signage.product.items" ) || NM.storage.get( "signage.product.items" ).length == 0 ) {
+                            if ( quotationItemId != "" ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
-                            } else {
-                                if ( quotationItemId == "" ) {
-                                    const itemsDataSource = new kendo.data.DataSource( {
-                                        data: NM.storage.get( "signage.product.items" )
-                                    } );
-                                    viewModel.set( "detailForm.data.quotationItem.product.items", itemsDataSource );
-                                    viewModel.get( "detailForm.data.quotationItem.product.items" ).read();
-                                }
                             }
                             productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                             attributeArray = productItems.data();
@@ -740,6 +732,7 @@ AP.signage.modal = ( function() {
                                             attributeValue: item.attributeValue,
                                             product_item_id: item.id,
                                             parent_attribute_id: null,
+                                            parent_item_id: null,
                                             level: 0,
                                             selected: false
                                         } );
@@ -750,6 +743,7 @@ AP.signage.modal = ( function() {
                                         attribute_id: item.attribute.id,
                                         attribute_name: item.attribute.name,
                                         parent_attribute_id: null,
+                                        parent_item_id: null,
                                         level: 0,
                                         values: [
                                             {
@@ -762,7 +756,13 @@ AP.signage.modal = ( function() {
                                     productItems.add( parsedData );
                                 }
                             } );
-
+                            // Se è un nuovo quotation item, precompilo tutte le select di primo livello con il primo valore (come richiesto da loro)
+                            if ( quotationItemId == "" ) {
+                                productItems.data().forEach( d => {
+                                    d.values[0].selected = true;
+                                    viewModel.loadProductItems( d.values[0].product_item_id, d.attribute_id );
+                                })
+                            }
                             viewModel.renderProductItems();
                         }
                     }
@@ -824,7 +824,6 @@ AP.signage.modal = ( function() {
                         }
                     }
                     viewModel.renderProductItems();
-                    NM.storage.set( "signage.product.items", productItems.data() );
                     resolve();
                     return;
                 }
@@ -861,6 +860,7 @@ AP.signage.modal = ( function() {
                                         attribute_id: xhr.data[0].attribute.id,
                                         attribute_name: xhr.data[0].attribute.name,
                                         parent_attribute_id: attributeId,
+                                        parent_item_id: originId,
                                         level: attributeArray[parentIndex].level + 1,
                                         values: []
                                     };
@@ -893,6 +893,11 @@ AP.signage.modal = ( function() {
                                 let parentIndex = -1;
                                 attributeArray.forEach( ( d, idx ) => {
                                     if ( d.attribute_id == attributeId ) { parentIndex = idx; }
+                                    if ( d.parent_item_id ) {
+                                        if ( attributeArray[idx - 1].values.filter( v => v.selected == false && v.product_item_id == d.parent_item_id ).length > 0 ) {
+                                            productItems.remove( d );
+                                        }
+                                    }
                                 } );
                                 if ( parentIndex !== -1 ) {
                                     const parent = productItems.at( parentIndex );
@@ -900,10 +905,22 @@ AP.signage.modal = ( function() {
                                         v.selected = v.product_item_id == originId;
                                     } );
                                 }
+
+                                //aggiunto per cercare gli elementi dell'albero legati ad un parent non selezionato e rimuoverli
+                                var elementsToRemove = [];
+                                attributeArray.forEach( ( d, idx ) => {
+                                    if ( d.parent_item_id ) {
+                                        if ( attributeArray[idx - 1].values.filter( v => v.selected == false && v.product_item_id == d.parent_item_id ).length > 0 ) {
+                                            elementsToRemove.push( idx );
+                                        }
+                                    }
+                                } );
+                                elementsToRemove.forEach( function ( idx ) {
+                                    productItems.remove( productItems.at( idx ) );
+                                } );
                             }
 
                             viewModel.renderProductItems();
-                            NM.storage.set( "signage.product.items", productItems.data() );
                             resolve();
                         },
                         fail: function( err ) {
