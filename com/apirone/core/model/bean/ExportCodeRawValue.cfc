@@ -1,11 +1,11 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="important" type="Boolean";
-	property name="suffixCode" type="String";
 	property name="exportCode" type="com.apirone.core.model.bean.ExportCode";
 	property name="rawValue" type="com.apirone.core.model.bean.RawValue";
+	property name="attribute" type="com.apirone.core.model.bean.Attribute";
 
-	public ExportCode function init(){
+	public ExportCodeRawValue function init(){
 		return this;
 	}
 

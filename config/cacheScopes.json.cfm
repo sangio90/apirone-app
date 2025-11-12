@@ -11,6 +11,8 @@
     "Country.bean": {},
     "Currency.bean": {},
     "Customer.bean": {},
+    "ExportCode.bean": {},
+    "ExportCodeRawValue.bean": {},
     "File.bean": {},
     "FileType.bean": {},
     "Finish.bean": {},

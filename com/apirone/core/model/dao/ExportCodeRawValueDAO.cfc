@@ -7,6 +7,7 @@
 			    export_code_raw_value_id,
 			    export_code_id,
 				raw_value_id,
+				attribute_id::varchar,
 				*
 			FROM
 				export_code_raw_values
@@ -19,7 +20,8 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="exportCodeId" type="Numeric">
-		<cfargument name="rawValueId" type="String">
+		<cfargument name="rawValueId" type="Numeric">
+		<cfargument name="attributeId" type="String">
 		<cfargument name="str" type="String">
 
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
@@ -47,6 +49,10 @@
 					AND raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.rawValueId#">
 				</cfif>
 
+				<cfif !IsNull( arguments.attributeId )>
+					AND attribute_id = <cfqueryparam cfsqltype="Integer" value="#arguments.attributeId#">
+				</cfif>
+
 			ORDER BY
 				export_code_id ASC
 
@@ -68,14 +74,14 @@
 			INSERT INTO export_code_raw_values (
 				export_code_id,
 				raw_value_id,
-				important,
-				suffix_code
+				attribute_id,
+				important
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Integer" value="#arguments.exportCodeRawValue.getExportCode().getId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.exportCodeRawValue.getRawValue().getId()#">,
-				<cfqueryparam cfsqltype="Boolean" value="#arguments.exportCodeRawValue.getImportant()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.exportCodeRawValue.getSuffixCode()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.exportCodeRawValue.getAttribute().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.exportCodeRawValue.getImportant()#">
 			) RETURNING export_code_raw_value_id
 		</cfquery>
 
@@ -91,8 +97,8 @@
 			SET
 				export_code_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.exportCodeRawValue.getExportCode().getId()#">,
 				raw_value_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.exportCodeRawValue.getRawValue().getId()#">,
-				important = <cfqueryparam cfsqltype="Boolean" value="#arguments.exportCodeRawValue.getImportant()#">,
-				suffix_code = <cfqueryparam cfsqltype="Varchar" value="#arguments.exportCodeRawValue.getSuffixCode()#">
+				attribute_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.exportCodeRawValue.getAttribute().getId()#">::uuid,
+				important = <cfqueryparam cfsqltype="Boolean" value="#arguments.exportCodeRawValue.getImportant()#">
 			WHERE
 				export_code_raw_value_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.exportCodeRawValue.getId()#">
 		</cfquery>

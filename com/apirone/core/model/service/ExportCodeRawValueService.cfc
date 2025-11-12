@@ -2,9 +2,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ExportCodeRawValueDAO";
 	property name="RawValueService" inject="RawValueService";
+	property name="AttributeService" inject="AttributeService";
 	property name="ExportCodeService" inject="ExportCodeService";
 
-	property name="cacheScope" type="String" default="ExportCodeRawValueService.bean";
+	property name="cacheScope" type="String" default="ExportCodeRawValue.bean";
 
 	public com.apirone.core.model.bean.ExportCodeRawValue function get( required Numeric exportCodeRawValueId ){
 		var cm = getCacheManager();
@@ -22,7 +23,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.ExportCodeRawValue function getByParams(
-		Numeric exportCodeid,
 		Numeric rawValueId
 	){
 		var record = getDao().find( argumentCollection = arguments );
@@ -42,7 +42,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		Numeric exportCodeId,
 		Numeric rawValueId,
 		required Numeric limit    = 15,
 		required Numeric offset   = 0,
@@ -112,8 +111,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.export_code_raw_value_id );
 			bean.setExportCode( getExportCodeService().get( record.export_code_id ) );
 			bean.setRawValue( getRawValueService().get( record.raw_value_id ) );
+			bean.setAttribute( getAttributeService().get( record.attribute_id ) );
 			bean.setImportant( record.important );
-			bean.setSuffixCode( record.suffix_code );
 
 			return bean;
 		}
