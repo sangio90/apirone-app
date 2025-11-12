@@ -75,6 +75,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = memy.convertList( super.fire( "status.list", [ "attribute" ] ) );
 		prc.page[ "methods" ]             = memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );
+		prc.page[ "statuses" ]            = memy.convertList( super.fire( "status.list", ["PRODUCT"] ) );
+		prc.page[ "product" ]             = memy.convert( prc.product, "detail" );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
 

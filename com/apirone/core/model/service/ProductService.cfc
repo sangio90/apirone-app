@@ -192,34 +192,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public String function update( required com.apirone.core.model.bean.Product product ){
-		var product = this.handleCatalogBundle( arguments.product );
+	public String function updateDetail( required com.apirone.core.model.bean.Product product ){
 
-		getDao().update( product );
-
-		var id = product.getId();
-
-		if ( !IsNull( product.getTexts() ) ) {
-			for ( var text in product.getTexts() ) {
-				var entity = super.bean( "Entity" )
-
-				entity.setKey( "product.id" );
-				entity.setValue( id );
-
-				text.setEntity( entity );
-
-				if ( Len( text.getId() ) ) {
-					getTextService().update( text );
-				} else {
-					getTextService().create( text );
-				}
-			}
-		}
+		getDao().updateDetail( product );
 
 		super.getCacheManager().remove( getCacheScope(), product.getId() );
 
 		return product.getId();
 	}
+
 
 	public Void function removeCache( required String productId ){
 		var cm = super.getCacheManager();
@@ -279,6 +260,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setSerial( record.serial );
 			bean.setCreatedAt( record.created_at );
 			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setSpecial( BooleanFormat( record.special ) );
+			bean.setMinQuantity( record.min_quantity );
+			bean.setMaxQuantity( record.max_quantity );
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
 			bean.setPrices( getPriceService().list( productId = record.product_id ) );

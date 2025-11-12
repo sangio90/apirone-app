@@ -134,7 +134,7 @@
 		get( "/raw-values" ).to( "RawValueController.list" ).end();
 
 		/*
-			products
+			raw products
 		*/
 		get( "/ajax/raw-products" ).to( "RawProductAjaxController.list" ).end();
 
@@ -328,6 +328,7 @@
 		post( "/ajax/products/:id/values" ).to( "ProductAjaxController.addValue" ).end();
 		get( "/ajax/products/:id/items" ).to( "ProductAjaxController.listItems" ).end();
 		delete( "/ajax/products/:id/items" ).to( "ProductAjaxController.removeItems" ).end();
+		post( "/ajax/products/:id/detail" ).to( "ProductAjaxController.saveDetail" ).end();
 		get( "/ajax/products/:id" ).to( "ProductAjaxController.get" ).end();
 		delete( "/ajax/products" ).to( "ProductAjaxController.delete" ).end();
 		post( "/ajax/products" ).to( "ProductAjaxController.save" ).end();

@@ -298,6 +298,34 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function saveDetail( event, rc, prc ){
+		var result = super.getResult();
+
+		var product    = super.bean( "Product" );
+		var status     = super.bean( "Status" );
+
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+
+		product.setId( json.id );
+		product.setStatus( status.setId( json.status.id ) );
+		product.setMinQuantity( json?.minQuantity ?: 0 );
+		product.setMaxQuantity( json?.maxQuantity ?: 0 );
+		
+		if ( StructKeyExists( json, "special" ) ) {
+			product.setSpecial( json.special );
+		} else {
+			product.setSpecial( false );
+		}
+
+		var thisId = super.fire( "product.updateDetail", [ product ] )
+
+		var message = completeMessage( "product.updated" );
+
+		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+
+		event.setValue( "result", result );
+	}
 
 	function delete( event, rc, prc ){
 		var result    = super.getResult();
