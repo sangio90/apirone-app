@@ -1,42 +1,49 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	function print( event, rc, prc ){
-
-		dump("print");
-		abort;
+	function print(event, rc, prc) {
 
 		param rc.report = "quotation";
+		var idPreventivo = rc.id;
 
 		prc.title = "Preventivo";
 
-		var memy = super.getMementify();
+		var quotation = service("Quotation").get(quotationId = idPreventivo);
+		var quotationItems = super.fire("QuotationItem.list", [idPreventivo]);
 
-		var searchArgs = {};
-		var filters    = {};
+		var quoteObj = {
+			quotation      = quotation,
+			quotationItems = quotationItems
+		};
 
-		for( var quote in quotations ) {
-			var itemsData = [];
-			var quoteObj = mem.convert( quote, "detail" ) //struct
-
-			var items = service("QuotationItem").list( quotationId=quote.id ); 
-			
-			for( item in items ) {
-				var itemObj = mem.convert( item, "detail" ) //struct
-				itemsData.append( itemObj );
-			}
-
-			quoteObj["items"] = itemsData;
-
+		if ( IsNull( quotation.getCustomer() ) ) {
+			Throw(
+				message = "Preventivo con cliente non valido"
+			);
+			return;
 		}
-	
+
+		var zones = super.fire('QuotationZone.list', [ 'quotationId' = idPreventivo ]);
+		quoteObj.zones = zones;
+
+		customerShippingAddress = quotation.getCustomer().getShippingAddresses()[1];
+
+		for ( var i = 1; i LTE ArrayLen( zones ); i++ ) {
+			var zone = zones[i];
+			var zoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = zone.getId() ]);
+			zone.zoneItems = zoneItems;
+		}
+
+		quoteObj.customerShippingAddress = customerShippingAddress;
+
+		var saveAsName = "#rc.report#_#DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
+
 		var params = {
 			title   = "Preventivo",
-			filters = filters,
 			data    = quoteObj,
 			pdfArgs = {
 				bookmark          = true,
 				backgroundVisible = true,
-				orientation       = "landscape",
+				orientation       = "portrait",
 				pageType          = "A4",
 				overwrite         = true,
 				fontEmbed         = true,

@@ -1,64 +1,153 @@
 ﻿<cfoutput>
+	<cfdocument attributeCollection="#args.pdfArgs#"  marginLeft=".2" marginRight=".2">
+		<style>
+			td {
+				border: 1px solid black;
+				padding-left: .3em;
+				padding-right: .3em;
+			}
+			table {
+				border-collapse: collapse;
+			}
+			.stanza { page-break-inside: avoid; }
+			.oggetto { page-break-inside: avoid; }
 
-    <cfdocument attributeCollection="#args.pdfArgs#">
+			.item:first-of-type {
+				margin-top: 3.5in;
+			}
+		</style>
+		<div>
+			<cfdocumentitem type="header">
+				<table style="border: 0; width: 19cm;">
+					<tbody>
+						<tr style="border: 0;">
+							<td style="border: 0; width: 7cm;">
+								#getPrintFullHeader()#
+							</td>
+							<td style="border: 0; width: 12cm; padding-left: 1in; padding-top: .4in">
+								<h2>Preventivo N. #args.data.quotation.getQuotationNumber()#</h2>
+								<table style="width: 100%; border: 0;">
+									<tr>
+										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Data</td>
+										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#DateFormat( args.data.quotation.getQuotationDate(), "dd/mm/yyyy" )#</td>
+									</tr>
+									<tr>
+										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Validità offerta</td>
+										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#DateFormat( args.data.quotation.getValidityDate(), "dd/mm/yyyy" )#</td>
+									</tr>
+									<tr>
+										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Tipo Pagamento</td>
+										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#args.data.quotation.getDecodedPaymentMethod()#</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 
-        <cfdocumentitem type="header">
-            #getPrintHeader()#
-        </cfdocumentitem>
+			</cfdocumentitem>
 
-        <cfdocumentitem type="footer">
-            #getPrintFooter()#
-        </cfdocumentitem>
+			<cfdocumentitem type="footer">
+				#getPrintFooter()#
+			</cfdocumentitem>
 
-        #importPrintStyle()#
+			#importPrintStyle()#
 
-        <h2>#args.title#</h2>
+			<cfoutput>
+				<div style="padding-top: 1.2in;">
+					<!-- Nota, l'unica UM supportata per i margini sono gli inches, quindi per coerenza
+					li uso dappertutto, per allineare body a header uso un -.08in ---->
+					<table class="cstmtable" style="margin-top: 1em;width: 100%;">
+						<tr>
+							<td style="width: 50%;"></td>
+							<td style="width: 50%;"><strong>Referente</strong></td>
+						</tr>
+						<tr>
+							<td>
+								#args.data.quotation.getCustomer().getName()#<br>
+								#args.data.quotation.getCustomer().getStreet()#<br>
+								#args.data.quotation.getCustomer().getPostalCode()#<br>
+								#args.data.quotation.getCustomer().getCity()#<br>
+								#args.data.quotation.getCustomer().getState()#<br>
+								#args.data.quotation.getCustomer().getCountry()#<br>
+							</td>
+							<td rowspan="2">
+								Nome: #args.data.quotation.getCustomer().getContactPersonName()# <br>
+								Email: #args.data.quotation.getCustomer().getContactPersonEmail()# <br>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Luogo di consegna</strong><br>
+								#args.data.customerShippingAddress['name']#<br>
+								#args.data.customerShippingAddress['via']#<br>
+								#args.data.customerShippingAddress['cap']#<br>
+								#args.data.customerShippingAddress['citta']#<br>
+								#args.data.customerShippingAddress['provincia']#<br>
+								#args.data.customerShippingAddress['paese']#<br>
+							</td>
+						</tr>
+					</table>
 
-        <div>
-            <cfloop collection="#args.filters#" item="value" index="key">
-                Filtri: <b>#key#:</b> #value# &nbsp;&nbsp;
-            </cfloop>
-        </div>
+					<cfset blundlesPrinted = {}>
 
-        <cfset blundlesPrinted = {}>
+					<div style="border-bottom:1px solid ##EAEAEA; padding: 15px 0"></div>
+				</div>
+			</cfoutput>
 
-        <cfloop array="#args.data.products#" index="product">
+			<cfoutput>
+				<cfset i = 1>
+				<!--- LOOP sulle stanze --->
+				<cfloop array="#args.data.zones#" index="stanza">
+					<cfif stanza.zoneItems.len() EQ 0>
+						<cfcontinue>
+					</cfif>
+					<cfif i GT 1>
+						<!--- Ogni stanza comincia su nuova pagina --->
+						<div style="page-break-before: always; margin-top: 1.5in; border: 1px solid black; padding: .2em; font-size: 14pt; font-weight: bold;">#stanza.getName()#</div>
+					<cfelse>
+						<div style="border: 1px solid black; margin: 0; padding: .2em; width: fit-content; font-size: 14pt; font-weight: bold;">
+							#stanza.getName()#
+						</div>
+					</cfif>
+					<!--- Loop sugli oggetti della stanza --->
+					<cfset j = 1>
+					<cfloop array="#stanza.zoneItems#" index="oggetto">
+						<cfif (i EQ 1 and j EQ 3) or (i EQ 1 AND j EQ 6)>
+							<div style="page-break-before: always;"></div>
+							<div style="margin-top: 1.3in">&nbsp;</div>
+						<cfelseif i GT 1 and J GT 1 AND J MOD 3 EQ 1>
+							<div style="margin-top: 2.6in">&nbsp;</div>
+						</cfif>
 
-            <div style="border-bottom:1px solid ##EAEAEA; padding: 15px 0"></div>
-
-            <div><h3>Articolo: #product.title#</h3></div>
-
-            <cfset key = product.line.id & '__' & product.model.id>
-
-            <!--- lo stampiamo una volta soltanto --->
-            <cfif product.bundle.keyExists( key ) AND !blundlesPrinted.keyExists( key )>
-                <div style="background-color: ##EAEAEA; padding: 10px;">
-                    <h3>Linea/modello</h3>
-                    <div>
-                        #printComponents( product.bundle[ key ] )#
-                    </div>  
-
-                    <cfset blundlesPrinted[ "#lineId#__#modelId#" ] = true>
-                </div>
-
-            </cfif>
-
-            <h3>Dell'articolo</h3>
-            <div>
-                #printComponents( product.components )#
-            </div>  
-
-            <h3>Degli attributi</h3>
-            <div>
-                <cfloop array="#product.productItems#" item="productItem">
-                    <div style="margin-bottom: 7px;">
-                        <i style="display:block;">#productItem.attribute.name#: #productItem.attributeValue.rawValue.name# (#productItem.components.len()#) </i>
-                        #printComponents( productItem.components )#
-                    </div>
-                </cfloop>
-            </div>            
-        </cfloop>
-    
+						<!--- wrapper per evitare che venga spezzato su due pagine --->
+						<div class="item" style="page-break-inside: avoid;">
+							<table style="border-collapse: collapse; margin-bottom: .3in; width: 100%;">
+								<tr>
+									<td style="width: 4cm; border-right: 0;"><strong>Articolo</strong></td>
+									<td style="border-left: 0;"></td>
+									<td style="width: 2cm;"><strong>Qtà.</strong></td>
+									<td style="width: 2cm; text-align: right;"><strong>Prezzo</strong></td>
+									<td style="width: 2cm; text-align: right;"><strong>Totale</strong></td>
+								</tr>
+								<tr>
+									<td style="width: 4cm; text-align: center; border-right: 0;">
+										<!---<img src="#oggetto.getImage().getUri()#" style="width: 4cm; max-width: 100%; object-fit: contain;">--->
+										<img src="https://fastly.picsum.photos/id/826/200/200.jpg?hmac=WlCuCjxEhXh_s4IkOpulPoB-LOoGjfZwP4GjNnkzTLA" style="width: 4cm; max-width: 100%; object-fit: contain;">
+									</td>
+									<td style="border-left: 0; font-size: 20pt;">#oggetto.getProduct().getDescrizioneProdotto()#</td>
+									<td>Quantita</td>
+									<td style="text-align: right;">#oggetto.getPrice()# €</td>
+									<td style="text-align: right;">Totale</td>
+								</tr>
+							</table>
+						</div>
+						<cfset j = j + 1>
+					</cfloop>
+					<cfset i = i + 1>
+				</cfloop>
+			</cfoutput>
+		</div>
     </cfdocument>
 
 </cfoutput>

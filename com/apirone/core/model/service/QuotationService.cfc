@@ -123,14 +123,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					var lineCode = Trim( line.getCode() );
 
 					code &= lineCode;
-					
+
 					if (isNull(product.getModel())) {
 						return false;
 					}
 					var model = product.getModel();
 					code &= Trim(model.getCode());
-					
-					if (isNull(product.getFinish())){ 
+
+					if (isNull(product.getFinish())){
 						return false;
 					}
 					var finishCode = Trim( product.getFinish().getCode() );
@@ -277,9 +277,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCustomPaymentMethod( record.custom_payment_method );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setLang( getLangService().get( record.lang_id ) );
-
+			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
-			// bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 			// bean.setCurrency( getCurrencyService().get( record.currency_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
 			// bean.setShippingProfile( getProfileService().get( record.shipping_profile_id ) );

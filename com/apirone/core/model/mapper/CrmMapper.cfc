@@ -25,9 +25,11 @@
 		customer.setCountry( data.billing_address_country ?: "" );
 		var accountAddresses = data.indirizzi_spedizione;
 		if (Len(accountAddresses)) {
-			ArrayPrepend(accountAddresses, { "id": null, "name": '' });
 			customer.setShippingAddresses( accountAddresses ?: [] );
 		}
+
+		customer.setContactPersonName(data.referente_nome ?: "");
+		customer.setContactPersonEmail(data.referente_email ?: "");
 
 		return customer;
 	}

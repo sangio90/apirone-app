@@ -35,6 +35,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="SDI" type="String";
 	property name="shippingAddress" type="String";
 	property name="shippingAddresses" type="Array";
+	property name="contactPersonName" type="String";
+	property name="contactPersonEmail" type="String";
 
 	public Customer function init(){
 		return this;

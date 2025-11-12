@@ -10,7 +10,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			"billingProfile.name",
 			"name",
 			"active",
-			"status"
+			"status",
 		],
 		profiles = {}
 	}
@@ -38,6 +38,16 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	public Quotation function init(){
 		return this;
+	}
+
+	public String function getDecodedPaymentMethod(){
+		var paymentMethod = getPaymentMethod();
+		if ( !IsNull( paymentMethod )) {
+			return paymentMethod.getName();
+		} else {
+			return "ciao2";
+			return getCustomPaymentMethod();
+		}
 	}
 
 }
