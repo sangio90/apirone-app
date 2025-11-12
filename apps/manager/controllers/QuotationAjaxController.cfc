@@ -250,7 +250,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "id" ]            = rc.id;
 		var quotationItems = super.fire( "QuotationItem.list", [ 'quotationId' = rc.id ] );
 		var result = super.fire( "Quotation.export", [ quotationItems ] );
-		dump( result );abort;
+
 		event.setValue( "result", result );
 	}
 }

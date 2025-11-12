@@ -1,11 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ExportCodeDAO";
-	property name="ProductCategoryService" inject="ProductCategoryService";
-	property name="LineService" inject="LineService";
-	property name="ModelService" inject="ModelService";
-	property name="FinishService" inject="FinishService";
-	property name="ProductService" inject="ProductService";
+	property name="ExportCodeRawValueService" inject="ExportCodeRawValueService";
 
 	property name="cacheScope" type="String" default="ExportCode.bean";
 
@@ -18,26 +14,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return cache.data;
 		}
 
-		var bean = build( arguments.productId );
-		cm.put( getCacheScope(), arguments.productId, bean );
+		var bean = build( arguments.exportCodeId );
+		cm.put( getCacheScope(), arguments.exportCodeId, bean );
 
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.ExportCode function getByParams(
-		Numeric categoryId,
-		String lineId,
-		String modelId,
-		String finishId,
-		String productId
+	public Numeric function max(
+		String exportCode
 	){
-		var record = getDao().find( argumentCollection = arguments );
-
-		if ( record.recordcount == 1 ) {
-			return get( record.export_code_id );
-		}
-
-		return NullValue();
+		return getDao().max( argumentCollection = arguments );
 	}
 
 	public Array function list(){
@@ -48,11 +34,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		Numeric categoryId,
-		String lineId,
-		String modelId,
-		String finishId,
-		String productId,
 		required Numeric limit    = 15,
 		required Numeric offset   = 0,
 		required Array orderBy    = [ { field = "exportCode.id" } ]
@@ -65,7 +46,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( productId = record.export_code_id ) );
+			rows.add( get( exportCodeId = record.export_code_id ) );
 		} );
 
 		result.setData( rows );
@@ -102,15 +83,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create( required com.apirone.core.model.bean.ExportCode exportCode ){
-		return getDao().insert( exportCode );
+		return getDao().insert( arguments.exportCode );
 	}
 
 	public String function update( required com.apirone.core.model.bean.ExportCode exportCode ){
-		getDao().update( exportCode );
+		getDao().update( arguments.exportCode );
+		super.getCacheManager().remove( getCacheScope(), arguments.exportCode.getId() );
 
-		super.getCacheManager().remove( getCacheScope(), exportCode.getId() );
-
-		return exportCode.getId();
+		return arguments.exportCode.getId();
 	}
 
 	private com.apirone.core.model.bean.ExportCode function build( required Numeric exportCodeId ){
@@ -120,18 +100,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean = super.bean( "ExportCode" );
 			bean.setId( record.export_code_id );
 			bean.setName( record.export_code );
-
-			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
-			bean.setLine( getLineService().get( record.line_id ) );
-			if (!IsNull(record.model_id)) {
-				bean.setModel( getModelService().get( record.model_id ) );
-			}
-			if (!IsNull(record.finish_id)) {
-				bean.setFinish( getFinishService().get( record.finish_id ) );
-			}
-			if (!IsNull(record.product_id)) {
-				bean.setProduct( getProductService().get( record.product_id ) );
-			}
+			bean.setCounter( record.counter );
 
 			return bean;
 		}

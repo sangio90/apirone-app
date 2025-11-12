@@ -6,7 +6,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="RawValue.bean";
 
-	public com.apirone.core.model.bean.RawValue function get( required String rawValueId ){
+	public com.apirone.core.model.bean.RawValue function get( required rawValueId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.rawValueId );
