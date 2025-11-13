@@ -25,6 +25,14 @@ AP.price.modal = ( function() {
 
             switch( current.type ) {
 
+            case "productBase":
+
+                result.modalTitle = "Prezzi per l'articolo: " + current.name;
+                result.readUrl = baseUrl + "/products/" + current.id + "/prices";
+                result.modifyUrl = result.readUrl;
+
+                break;
+
             case "product":
 
                 result.modalTitle = "Prezzi per l'articolo: " + current.line.name + " / " + current.model.name + " / " + current.finish.name;

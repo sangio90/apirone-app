@@ -21,6 +21,13 @@
             <td class="text-end">
                 <span data-bind="text: positionCount"></span>
             </td>
+            <td>
+                <div  style="display: flex; align-items: center; justify-content: flex-end;" data-bind="events: { click: editPrices }">
+                    <div data-bind="source: prices" data-template="price-row-tmpl">
+                    </div>
+                    <div style="width: 30px; flex-shrink: 0;">#iconButton(icon="euro-sign")#</div>
+                </div>
+            </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
@@ -37,5 +44,6 @@
     </nmscript>
 
     #template( view="jstemplate/fruit/fruit-line-row-tmpl" )#
+    #template( view="jstemplate/price/price-row-tmpl" )#
     
 </cfoutput>

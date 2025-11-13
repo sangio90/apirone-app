@@ -54,6 +54,25 @@ AP.fruit.list = ( function() {
         rows: dataSources.items,
         detailForm: defaultDetailForm,
 
+        editPrices: function( event ) {
+
+            var onSave = function() {
+                viewModel.rows.read();
+            };
+
+
+            var item = {
+                type: "productBase",
+                id: event.data.id,
+                name: event.data.name,
+            };
+
+            console.log( "editPrices", item );
+
+            AP.price.modal.open( item, onSave );
+
+        },
+
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
         },
