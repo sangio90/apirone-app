@@ -1008,6 +1008,7 @@ AP.signage.modal = ( function() {
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
+                parsedData.mode = 'segnaletiche';
 
                 NM.util.ajax( {
                     method: "POST",
@@ -1328,12 +1329,12 @@ AP.signage.modal = ( function() {
                 done: function( xhr ) {
                     if( xhr.data ) {
                         if ( !xhr.data.id || xhr.data.id != quotationItemId ) {
-                            $( "#angolo" ).hide();
+                            $( "#totalsFloatingTab" ).hide();
                         } else {
                             viewModel.set( "detailForm.data.totals", xhr.data );
                             var totals = viewModel.get( "detailForm.data.totals" );
                             if ( xhr.data ) {
-                                const table = $( "#angolo" ).find( "table" )[0];
+                                const table = $( "#totalsFloatingTab" ).find( "table" )[0];
                                 totals.products.forEach( function( row ) {
                                     $( table ).append( `
                                         <tr>
@@ -1354,7 +1355,7 @@ AP.signage.modal = ( function() {
                                     `
                                 );
                             }
-                            $( "#angolo" ).show();
+                            $( "#totalsFloatingTab" ).show();
                         }
                     }
                 }

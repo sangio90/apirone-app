@@ -532,6 +532,7 @@ AP.accessory.modal = ( function() {
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
+                parsedData.mode = 'accessori';
 
                 NM.util.ajax( {
                     method: "POST",
@@ -649,16 +650,63 @@ AP.accessory.modal = ( function() {
                             viewModel.loadModels();
                             setTimeout( function() {
                                 viewModel.loadFinishes();
+                                setTimeout( function() {
+                                    viewModel.loadProduct();
+                                }, 100 );
                             }, 100 );
                         }, 100 );
                     }
                 },
             },
         } );
+        
+        renderQuotationItemTotals( id );
     };
 
     pub.init = function() {
         kendo.bind( AP.accessory.fields.modalRoot, viewModel );
+    };
+
+    renderQuotationItemTotals = function( quotationItemId ) {
+        NM.util.ajax( {
+            method: "GET",
+            url: `/manager/ajax/quotation-items/${quotationItemId}/total`,
+            callback: {
+                done: function( xhr ) {
+                    if( xhr.data ) {
+                        if ( !xhr.data.id || xhr.data.id != quotationItemId ) {
+                            $( "#totalsFloatingTab" ).hide();
+                        } else {
+                            viewModel.set( "detailForm.data.totals", xhr.data );
+                            var totals = viewModel.get( "detailForm.data.totals" );
+                            if ( xhr.data ) {
+                                const table = $( "#totalsFloatingTab" ).find( "table" )[0];
+                                totals.products.forEach( function( row ) {
+                                    $( table ).append( `
+                                        <tr>
+                                            <td>${row.id} - ${row.label}</td>
+                                            <td>${row.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
+                                        </tr>
+                                    ` );
+                                } );
+                                $( table ).append(
+                                    `<tr>
+                                        <td>${totals.quantity.label}</td>
+                                        <td>${totals.quantity.count}</td>
+                                    </tr>
+                                    <tr style="font-weight: bold">
+                                        <td>${totals.total.label}</td>
+                                        <td>${totals.total.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
+                                    </tr>
+                                    `
+                                );
+                            }
+                            $( "#totalsFloatingTab" ).show();
+                        }
+                    }
+                }
+            }
+        } );
     };
 
     return pub;
