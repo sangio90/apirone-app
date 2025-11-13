@@ -195,6 +195,38 @@ AP.product.items = ( function() {
 
         },
 
+        updateItems: function( event ) {
+
+            var checks = $( "#product-items-grid" ).find( "[name=important]:checked" );
+
+            if ( checks.length <= 2 ) {
+                var values = [];
+
+                checks.each( function() {
+                    values.push( $( this ).val() );
+                } );
+
+                var ids = values.toString();
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/products/" + AP.page.productId + "/items/importants",
+                    data: { items: ids },
+                    callback: {
+                        done: function( xhr ) {
+                            AP.widget.notify( "success", xhr.data.message.text );
+                            refreshDatasources();
+                        },
+                    },
+                } );
+            } else {
+                AP.widget.notify( "warning", "Puoi selezionare al massimo 2 attributi" );
+            }
+
+            return false;
+
+        },
+
 
         /*
             attributes methods

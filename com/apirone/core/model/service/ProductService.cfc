@@ -10,6 +10,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="PriceService" inject="PriceService";
 	property name="TextService" inject="TextService";
 	property name="FileService" inject="FileService";
+	property name="ProductItemService" inject="ProductItemService";
 
 	property name="cacheScope" type="String" default="Product.bean";
 
@@ -200,6 +201,46 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return product.getId();
 	}
+
+	public Boolean function updateImportants( required com.apirone.core.model.bean.Product product,  required Numeric[] ids ){
+
+		var itemService = getProductItemService();
+
+		```
+		<cfquery datasource="apirone">
+			UPDATE product_items
+			SET important = false
+			WHERE product_id = '#product.getId()#'
+		</cfquery>
+		```
+
+		var allItems = itemService.getFlatTree( productId = product.getId() );
+
+		for( var item in allItems ) {
+			if ( ArrayContains( ids, item.getId() ) ) {
+
+				var value = true;
+
+				//item.setImportant( true );
+			} else {
+				var value = false;
+			}
+
+			```
+			<cfquery datasource="apirone">
+				UPDATE product_items
+				SET important = #value#
+				WHERE product_item_id = '#item.getId()#'
+			</cfquery>
+			```
+
+			itemService.removeCache( item.getId() );
+
+		}
+
+
+		return true;
+	}	
 
 
 	public Void function removeCache( required String productId ){

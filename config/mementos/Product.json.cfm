@@ -65,6 +65,7 @@
 				"serial",
 				"shortId",
 				"status.id",
+				"status.color",
 				"minQuantity",
 				"maxQuantity",
 				"special$boolean",

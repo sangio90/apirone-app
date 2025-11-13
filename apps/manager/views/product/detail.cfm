@@ -261,11 +261,11 @@
 
                         </div>
 
-                        <div>
+                        <div class="row">
 
                             <!---- product grid ---->
 
-                            <div class="text-end mb-2">
+                            <div class="col-6 mb-2">
 
                                 <a href=""
                                     class="underline"
@@ -281,6 +281,15 @@
                                     Aggiungi attributo di base
                                 </a>
 
+                            </div>                                    
+
+                            <div class="text-end col-6 mb-2">
+
+                                #updateButton(
+                                    bind  = "click:updateItems",
+                                    size  = "sm",
+                                    class = "ms-2"
+                                )#
 
                                 #deleteButton(
                                     bind  = "click:removeAttributes",
@@ -312,6 +321,7 @@
                                         { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
                                         { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
                                         { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
+                                        { 'field':'', 'title':'Importante', width: '55px'},
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
@@ -325,9 +335,9 @@
 
                             </form>
 
-                        </div>
+                            <!---- // product grid ---->
 
-                        <!---- // product grid ---->      
+                        </div>                        
                     
                     </div>
 

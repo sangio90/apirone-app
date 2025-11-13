@@ -125,6 +125,22 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function updateImportants( event, rc, prc ){
+		var result = super.getResult();
+
+		param rc.items = "";
+
+		var bean = super.service("Product").get( rc.id );
+
+		var newId = super.fire( "Product.updateImportants", { product = bean, ids = ListToArray( rc.items ) } );
+
+		var message = completeMessage( "product.itemsUpdated" );
+
+		result.setData( { "message" = message } );
+
+		event.setValue( "result", result );
+	}
+
 	function addValue( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 

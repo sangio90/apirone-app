@@ -1,0 +1,2 @@
+﻿ALTER TABLE public.product_items
+ADD COLUMN important BOOLEAN DEFAULT FALSE NOT NULL;
