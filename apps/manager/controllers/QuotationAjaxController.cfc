@@ -10,7 +10,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "typeId" ] = rc.typeId;
 
 		var rows = super.fire( "productCategory.list", params );
-
 		var data = mem.convertList( rows, "list" );
 
 		result.setTotal( rows.len() );

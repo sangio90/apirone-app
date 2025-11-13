@@ -59,7 +59,7 @@
 				level,
 				origin_id
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItemId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">,
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
@@ -78,7 +78,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_item_product_items
 			SET
-				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItem().getId()#">::uuid,
+				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItemId()#">::uuid,
 				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
 				level = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">
 				<cfif !IsNull( arguments.productItem.getOrigin() )>

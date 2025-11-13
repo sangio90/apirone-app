@@ -348,10 +348,12 @@
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="nav-signage" role="tabpanel">
-                                                    <div data-role="listview" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems">
+                                                    <div data-role="listview" data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems">
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="nav-accessories" role="tabpanel">
+                                                    <div data-role="listview" data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </section>
@@ -362,7 +364,7 @@
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div> 
-                                    <div id="angolo" class="container py-3">
+                                    <div id="totalsFloatingTab" class="container py-3">
                                         <div class="d-flex align-items-center">
                                             <table style="width: 100%"></table>
                                         </div>
@@ -488,7 +490,8 @@
     #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal" )#
     #view( "quotation/zone-modal" )#
-    #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-item-accessory-preview-tmpl" )#
 </cfoutput>
 
 <script>
@@ -538,7 +541,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 <style>
-    #angolo {
+    #totalsFloatingTab {
         position: fixed;
         bottom: 50px;
         background-color: #2771e8;

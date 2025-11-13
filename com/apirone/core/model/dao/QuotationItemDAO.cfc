@@ -38,6 +38,8 @@
 				</cfif>
 				<cfif !IsNull( arguments.mode ) AND arguments.mode EQ 'segnaletiche'>
 					AND signage_config_item_id IS NOT NULL
+				<cfelse>
+					AND signage_config_item_id IS NULL
 				</cfif>
 			ORDER BY quotation_items.#super.sanitizeSQL( arguments.orderBy )#
 			<cfif arguments.limit GT 0>

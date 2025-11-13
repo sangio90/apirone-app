@@ -6,13 +6,10 @@
                 "id",
                 "price",
                 "quantity",
-                "category",
-                "finish",
-                "line",
-                "model",
-                "font",
-                "fontSize",
-                "quotationZone"
+                "product.finish",
+                "product.catalogBundle",
+                "quotationZone",
+                "items"
             ]
         }
     }

@@ -3,6 +3,7 @@
 	property name="dao" inject="QuotationItemDAO";
 	property name="QuotationService" inject="QuotationService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductService" inject="ProductService";
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="FileService" inject="FileService";
@@ -133,7 +134,12 @@
 			var images = getFileService().list( quotationItemId = record.quotation_item_id )
 			if (Len(images)) {
 				bean.setImage(images[1])
-			} 
+			}
+
+			var items = getQuotationItemProductItemService().list( quotationItemId = quotationItemId )
+			if (Len(items)) {
+				bean.setItems(items)
+			}
 
 			return bean;
 		}
