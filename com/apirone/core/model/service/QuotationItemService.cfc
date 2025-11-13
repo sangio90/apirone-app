@@ -127,11 +127,12 @@
 				}
 				var signageRows = getQuotationItemSignageRowService().list( quotationItemId = quotationItemId );
 				bean.setSignageRows( signageRows );
-				var images = getFileService().list( quotationItemId = record.quotation_item_id )
-				if (Len(images)) {
-					bean.setImage(images[1])
-				} 
 			}
+
+			var images = getFileService().list( quotationItemId = record.quotation_item_id )
+			if (Len(images)) {
+				bean.setImage(images[1])
+			} 
 
 			return bean;
 		}
