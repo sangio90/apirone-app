@@ -149,10 +149,10 @@ AP.signage.modal = ( function() {
 
         getSignageConfigItems: function() {
             if ( viewModel.getSignageConfig() ) {
-                var items = viewModel.getSignageConfig().items.map(item => ({
+                var items = viewModel.getSignageConfig().items.map( item => ( {
                     ...item,
                     sizeName: item.size.name
-                }));
+                } ) );
                 items.unshift( { id: "", sizeName: "-- Dimensione" } );
                 return items;
             }
@@ -322,7 +322,7 @@ AP.signage.modal = ( function() {
         },
 
         getSignageConfigItemSize: function() {
-            return viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" )
+            return viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" );
         },
 
         escapeHtml: function( text ) {
@@ -689,15 +689,15 @@ AP.signage.modal = ( function() {
                 // } );
                 // viewModel.get( "fontSizes" ).data( fontSizes );
                 viewModel.set( "detailForm.data.signageConfig.items", viewModel.getSignageConfigItems() );
-                $("#signageFontSize").select({
+                $( "#signageFontSize" ).select( {
                     dataSource: viewModel.get( "detailForm.data.signageConfig.items" ),
                     value: viewModel.get( "detailForm.data.quotationItem.signageConfigItem" ),
-                    dataTextField: 'sizeName',
-                    dataValueField: 'id',
+                    dataTextField: "sizeName",
+                    dataValueField: "id",
                     change: function() {
                         viewModel.parseLines();
                     }
-                });
+                } );
                 if ( viewModel.get( "detailForm.data.signageConfig.items" ).length == 2 ) {
                     viewModel.set( "detailForm.data.quotationItem.signageConfigItem", viewModel.get( "detailForm.data.signageConfig.items" )[1] );
                     this.parseLines();
@@ -761,7 +761,7 @@ AP.signage.modal = ( function() {
                                 productItems.data().forEach( d => {
                                     d.values[0].selected = true;
                                     viewModel.loadProductItems( d.values[0].product_item_id, d.attribute_id );
-                                })
+                                } );
                             }
                             viewModel.renderProductItems();
                         }
@@ -906,7 +906,7 @@ AP.signage.modal = ( function() {
                                     } );
                                 }
 
-                                //aggiunto per cercare gli elementi dell'albero legati ad un parent non selezionato e rimuoverli
+                                // aggiunto per cercare gli elementi dell'albero legati ad un parent non selezionato e rimuoverli
                                 var elementsToRemove = [];
                                 attributeArray.forEach( ( d, idx ) => {
                                     if ( d.parent_item_id ) {
@@ -915,7 +915,7 @@ AP.signage.modal = ( function() {
                                         }
                                     }
                                 } );
-                                elementsToRemove.forEach( function ( idx ) {
+                                elementsToRemove.forEach( function( idx ) {
                                     productItems.remove( productItems.at( idx ) );
                                 } );
                             }
@@ -1008,7 +1008,7 @@ AP.signage.modal = ( function() {
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
-                parsedData.mode = 'segnaletiche';
+                parsedData.mode = "segnaletiche";
 
                 NM.util.ajax( {
                     method: "POST",

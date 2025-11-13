@@ -48,14 +48,18 @@ AP.plate.modal = ( function() {
     const utils = {
         convertAbsolutePositionToGridPosition( ui, fruitPosition ) {
             let newPositionDirection = 0;
-            const deltaLeft = Math.sign( ui.position.left - ui.originalPosition.left );
+            const deltaLeft = Math.sign(
+                ui.position.left - ui.originalPosition.left,
+            );
             if ( deltaLeft > 0 ) {
                 newPositionDirection |= MOVE_DIRECTION.RIGHT;
             } else if ( deltaLeft < 0 ) {
                 newPositionDirection |= MOVE_DIRECTION.LEFT;
             }
 
-            const deltaTop = Math.sign( ui.position.top - ui.originalPosition.top );
+            const deltaTop = Math.sign(
+                ui.position.top - ui.originalPosition.top,
+            );
             if ( deltaTop > 0 ) {
                 newPositionDirection |= MOVE_DIRECTION.BOTTOM;
             } else if ( deltaTop < 0 ) {
@@ -74,41 +78,71 @@ AP.plate.modal = ( function() {
                 for ( let column = 0; column < grid[row].length; column++ ) {
                     const cell = grid[row][column];
 
-                    if ( ( newPositionDirection & MOVE_DIRECTION.RIGHT ) == MOVE_DIRECTION.RIGHT ) {
-                        if ( cell.left <= fruitPosition.right && fruitPosition.right <= cell.right ) {
-                            const fruitWidth = Math.abs( fruitPosition.left - fruitPosition.right );
+                    if (
+                        ( newPositionDirection & MOVE_DIRECTION.RIGHT ) ==
+                        MOVE_DIRECTION.RIGHT
+                    ) {
+                        if (
+                            cell.left <= fruitPosition.right &&
+                            fruitPosition.right <= cell.right
+                        ) {
+                            const fruitWidth = Math.abs(
+                                fruitPosition.left - fruitPosition.right,
+                            );
 
-                            result.column = ( column - ( fruitWidth / FREE_CELL_WIDTH ) ) + 1;
+                            result.column = column - fruitWidth / FREE_CELL_WIDTH + 1;
                         }
-                    } else if ( ( newPositionDirection & MOVE_DIRECTION.LEFT ) == MOVE_DIRECTION.LEFT ) {
-                        if ( cell.left <= fruitPosition.left && fruitPosition.left <= cell.right ) {
+                    } else if (
+                        ( newPositionDirection & MOVE_DIRECTION.LEFT ) == MOVE_DIRECTION.LEFT
+                    ) {
+                        if (
+                            cell.left <= fruitPosition.left
+                            && fruitPosition.left <= cell.right
+                        ) {
                             result.column = column;
                         }
-                    } else { // STILL
-                        if ( cell.left <= fruitPosition.left && fruitPosition.left <= cell.right ) {
+                    } else {
+                        // STILL
+                        if (
+                            cell.left <= fruitPosition.left
+                            && fruitPosition.left <= cell.right
+                        ) {
                             result.column = column;
                         }
                     }
 
-                    if ( ( newPositionDirection & MOVE_DIRECTION.BOTTOM ) == MOVE_DIRECTION.BOTTOM ) {
-                        if ( cell.top <= fruitPosition.bottom && fruitPosition.bottom <= cell.bottom ) {
-                            const fruitHeight = Math.abs( fruitPosition.top - fruitPosition.bottom );
+                    if (
+                        ( newPositionDirection & MOVE_DIRECTION.BOTTOM ) == MOVE_DIRECTION.BOTTOM
+                    ) {
+                        if (
+                            cell.top <= fruitPosition.bottom && fruitPosition.bottom <= cell.bottom
+                        ) {
+                            const fruitHeight = Math.abs(
+                                fruitPosition.top - fruitPosition.bottom,
+                            );
 
-                            result.row = ( row - ( fruitHeight / FREE_CELL_HEIGHT ) ) + 1;
+                            result.row = row - fruitHeight / FREE_CELL_HEIGHT + 1;
                         }
-                    } else if ( ( newPositionDirection & MOVE_DIRECTION.TOP ) == MOVE_DIRECTION.TOP ) {
-                        if ( cell.top <= fruitPosition.top && fruitPosition.top <= cell.bottom ) {
+                    } else if (
+                        ( newPositionDirection & MOVE_DIRECTION.TOP ) == MOVE_DIRECTION.TOP
+                    ) {
+                        if (
+                            cell.top <= fruitPosition.top &&
+                            fruitPosition.top <= cell.bottom
+                        ) {
                             result.row = row;
                         }
-                    } else { // STILL
-                        if ( cell.top <= fruitPosition.top && fruitPosition.top <= cell.bottom ) {
+                    } else {
+                        // STILL
+                        if (
+                            cell.top <= fruitPosition.top &&
+                            fruitPosition.top <= cell.bottom
+                        ) {
                             result.row = row;
                         }
                     }
                 }
             }
-
-            console.log( "convertAbsolutePositionToGridPosition:result", result );
 
             return result;
         },
@@ -137,16 +171,10 @@ AP.plate.modal = ( function() {
             const fruitsController = AP.plate.modal.fruitsController;
             const grid = fruitsController.plate.grid;
 
-            console.log( "extractTopLeftPositionFrom:gridPosition", gridPosition );
-            console.log( "extractTopLeftPositionFrom.plate", fruitsController.plate );
-            console.log( "extractTopLeftPositionFrom.plate.grid", fruitsController.plate.grid );
-
             const cell = grid[gridPosition.row][gridPosition.column];
 
             result.top = cell.top;
             result.left = cell.left;
-
-            console.log( "extractTopLeftPositionFrom:result", result );
 
             return result;
 
@@ -164,13 +192,6 @@ AP.plate.modal = ( function() {
             const grid = fruitsController.plate.grid;
 
             for ( let y = 0; y < grid.length; y++ ) {
-
-                // debugger;
-
-                console.log( "grid", grid );
-                console.log( "grid[y]", grid[y] );
-                console.log( "grid[y]y", y );
-
                 const row = grid[y];
 
                 let columnCount = 0;
@@ -184,21 +205,14 @@ AP.plate.modal = ( function() {
                         columnCount++;
                     }
 
-                    console.log( "grid:columnCount", columnCount );
-                    console.log( "grid:fruit.columnSpan", fruit.columnSpan );
-
                     if ( columnCount == fruit.columnSpan ) {
                         result.row = y;
                         result.column = x - columnCount + 1;
-
-                        console.log( "grid:result1", result );
 
                         return result;
                     }
                 }
             }
-
-            console.log( "grid:result2", result );
 
             return result;
         },
@@ -315,7 +329,7 @@ AP.plate.modal = ( function() {
                 css: {
                     width: `${this.width}px`,
                     height: `${this.height}px`,
-                    "background-image": `url('${this.image}')`,
+                    "background-image": `url('${this.image.uri}')`,
                 },
                 appendTo: $rootNode,
             } );
@@ -382,7 +396,7 @@ AP.plate.modal = ( function() {
             } );
 
             const $fruits = $( "<div/>", {
-                id: "quotation-plate-fruits",
+                id: "fruits",
                 appendTo: $plateLayers,
             } );
 
@@ -470,8 +484,6 @@ AP.plate.modal = ( function() {
 
     class Fruit extends Rectangle {
         constructor( args ) {
-            console.log( "constructor:Fruit:args", args );
-
             super( args.width, args.height, args.orientation );
 
             this.rowSpan =
@@ -503,9 +515,6 @@ AP.plate.modal = ( function() {
                 Math.sign( this._gridPosition.row ) >= 0 &&
                 Math.sign( this._gridPosition.column ) >= 0
             ) {
-
-                console.log( "this._gridPosition", this._gridPosition );
-
                 const { top, left } = utils.extractTopLeftPositionFrom(
                     this._gridPosition,
                 );
@@ -676,10 +685,6 @@ AP.plate.modal = ( function() {
         }
 
         drawWithin( $rootNode ) {
-
-            console.log( "drawWithin", $rootNode );
-            console.log( "this.image", this.image );
-
             const $fruit = $( "<div/>", {
                 id: this.id,
                 class: "plate-draggable-fruit",
@@ -710,8 +715,8 @@ AP.plate.modal = ( function() {
             }
 
             const $image = $( "<img/>", {
-                src: this.image,
-                class: "fruit-img",
+                src: this.image.uri,
+                class: "plate-fruit-img",
                 css: imgCSS,
                 appendTo: $fruit,
             } );
@@ -757,7 +762,6 @@ AP.plate.modal = ( function() {
         addFruitInPlate( selectedFruit ) {
 
             console.log( "addFruitInPlate:fruit", selectedFruit );
-            console.log( "addFruitInPlate:this.plate.cellOrientation", this.plate.cellOrientation );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
@@ -768,23 +772,18 @@ AP.plate.modal = ( function() {
                 id: selectedFruit.id,
                 code: selectedFruit.code,
                 name: selectedFruit.name,
-                image: selectedFruit.image,
+                img: selectedFruit.img,
             } );
 
+            console.log( "fruitObj", fruitObj );
 
             const freePosition = utils.findFirstFreePosition( fruitObj );
 
-            console.log( "freePosition", freePosition );
-
-            // qui funziona
             if ( freePosition.row != null && freePosition.column != null ) {
                 fruitObj.gridPosition = new FruitGridPosition(
                     freePosition.row,
                     freePosition.column,
                 );
-
-                console.log( "freePosition.row", freePosition.row );
-                console.log( "freePosition.column", freePosition.column );
 
                 this.fruits.push( fruitObj );
 
@@ -945,7 +944,6 @@ AP.plate.modal = ( function() {
          * @param {object} ui
          */
         onStartDragging( fruit, event, ui ) {
-
             fruit.startDragging();
 
             for ( const fruit of this.fruits ) {
@@ -967,20 +965,13 @@ AP.plate.modal = ( function() {
                 right: ui.position.left + fruit.width,
             };
 
-            console.log( "onDragging;newFruitPosition", newFruitPosition );
-            console.log( "onDragging;ui", ui );
-
             const { row, column } = utils.convertAbsolutePositionToGridPosition(
                 ui,
                 newFruitPosition,
             );
-
-            console.log( "onDragging:row", row );
-            console.log( "onDragging:column", column );
-
             const gridPosition = new FruitGridPosition( row, column );
-            const { top, left } = utils.extractTopLeftPositionFrom( gridPosition );
-
+            const { top, left } =
+                utils.extractTopLeftPositionFrom( gridPosition );
             newFruitPosition = {
                 top: top,
                 bottom: top + fruit.height,
@@ -1080,17 +1071,19 @@ AP.plate.modal = ( function() {
 
     var mapFruitForPlate = function( data ) {
 
-        console.log( "mapFruitForPlate:data", data );
-
+        // / RESTART HERE
+        // / RESTART HERE
+        // / RESTART HERE
+        // / RESTART HERE
         var fruit = {
             id        : data.id,
-            width     : constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].width * data.positionCount,
-            height    : constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].height,
-            columnSpan: data.positionCount,
+            width     : data.width,
+            height    : data.height,
             rowSpan   : 1,
+            columnSpan: data.positionCount *1,
             code      : data.code,
             name      : data.name,
-            image     : "/assets/main/img/generic-fruit.png",
+            img       : data.img,
         };
 
         return fruit;
@@ -1101,7 +1094,6 @@ AP.plate.modal = ( function() {
         var fruit = {
             id: data.id,
             name: data.name,
-            code: data.code,
             shortId: data.shortId,
             positionCount: data.positionCount,
             quantity: 1,
@@ -1639,7 +1631,8 @@ AP.plate.modal = ( function() {
                             var attributeArray = fruitItems.data();
 
                             // INFO: we do it here because we need the first image
-                            pub.fruitsController.addFruitInPlate( mapFruitForPlate( thisFruit ) );
+                            pub.fruitsController.addFruitInPlate( thisFruit );
+
 
                             // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( function( item ) {
@@ -2123,15 +2116,15 @@ AP.plate.modal = ( function() {
 
                 for (
                     let iCol = 0;
-                    iCol < plate.grid[ iRow ].length;
+                    iCol < plate.grid[iRow].length;
                     iCol++
                 ) {
-                    const cellType = plate.grid[ iRow ][ iCol ];
+                    const cellType = plate.grid[iRow][iCol];
 
                     const cell = new Cell(
                         constants.GRID_CELL_DIMENSIONS[ cellType ].width,
                         constants.GRID_CELL_DIMENSIONS[ cellType ].height,
-                        plate.orientationCell.id,
+                        plate.orientationCell,
                         cellType,
                     );
 
@@ -2146,11 +2139,11 @@ AP.plate.modal = ( function() {
             const plateObj = new Plate( {
                 width: plate.width,
                 height: plate.height,
-                orientation: plate.orientation.id,
-                cellOrientation: plate.orientationCell.id,
+                orientation: plate.orientation,
+                cellOrientation: plate.orientationCell,
                 id: plate.id,
                 code: plate.code,
-                image: plate.image.uri,
+                image: plate.image,
                 grid: grid,
                 isSpecial: false,
             } );

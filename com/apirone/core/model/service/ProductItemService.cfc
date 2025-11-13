@@ -163,9 +163,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.ProductItem productItem ){
 		var newId = getDao().update( arguments.productItem );
 
-		super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
+		//super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
 
-		removeCache( productId = arguments.productItem.getProductId() );
+		removeCache( arguments.productItem.getId() );
 
 		return newId;
 	}

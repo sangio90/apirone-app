@@ -921,7 +921,7 @@ h2 {
     /* minimum clickable area */
     /* same td height */
     min-height: 100%;
-    min-width: 100px;
+    min-width: 80px;
 }
 
 .prices-product-cell {

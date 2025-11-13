@@ -84,7 +84,7 @@ component {
 		var target = Duplicate( arguments.target );
 
 		var metadata   = $getCachedMetadata( target );
-		var entityName = metadata.keyExists( "fullname" ) ? ListLast( metadata.fullname, "." ) : "";
+		//var entityName = metadata.keyExists( "fullname" ) ? ListLast( metadata.fullname, "." ) : "";
 
 		var externalRules = $getRulesFromHierarchy( target ); // from files
 

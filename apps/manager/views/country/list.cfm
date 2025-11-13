@@ -63,13 +63,13 @@
                             #grid( 
                                 id="country-grid",
                                 columns="[
-                                    { 'field':'id', 'title':'ID', width: '10%', 'headerAttributes': { 'class': 'justify-content-center' } } ,
-                                    { 'field':'name', 'title':'Nome', width: '45%'},
-                                    { 'field':'code', 'title':'Codice', width: '30%'},
+                                    { 'field':'id', 'title':'ID', width: '80px', 'headerAttributes': { 'class': 'justify-content-center' } } ,
+                                    { 'field':'name', 'title':'Nome' },
+                                    { 'field':'code', 'title':'Codice' },
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
-                                        'width':'15%',
+                                        'width':'55px',
                                         'headerAttributes': { 'class': 'justify-content-center' }
                                     }
                                 ]",

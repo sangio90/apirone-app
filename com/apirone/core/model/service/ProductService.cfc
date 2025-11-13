@@ -218,10 +218,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		for( var item in allItems ) {
 			if ( ArrayContains( ids, item.getId() ) ) {
-
 				var value = true;
-
-				//item.setImportant( true );
 			} else {
 				var value = false;
 			}

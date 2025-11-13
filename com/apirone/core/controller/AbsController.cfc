@@ -204,6 +204,7 @@
 			user    = user,
 			payload = arguments.payload
 		);
+		
 		getContainer().getInstance( "CacheManager" );
 
 		return result;

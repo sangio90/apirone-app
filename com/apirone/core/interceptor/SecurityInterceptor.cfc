@@ -9,8 +9,6 @@ component extends="coldbox.system.Interceptor" {
 
 		var securityService = server["wirebox-apirone"].getInstance("securityService");
 
-		var start = Now();
-
 		//abort;
 
 		// Recupera l'utente loggato. Assumiamo che restituisca un oggetto User
@@ -96,14 +94,6 @@ component extends="coldbox.system.Interceptor" {
 		}
 
 		// TODO: manage here other modules. stop execution if not allowed
-
-		var end = Now();
-
-		cffile(
-			action = "APPEND",
-			file   = "#ExpandPath( "/debug.log" )#",
-			output = "#Now()# #eventName# security check #end - start#ms"
-		);
 
 		// Se hasAccess è true, l'esecuzione continua normalmente.
 	}
