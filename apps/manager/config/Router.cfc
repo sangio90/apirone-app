@@ -324,6 +324,7 @@
 		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();
 		get( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.listAttributesForSort" ).end();
 		post( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.sortAttributes" ).end();
+		post( "/ajax/products/:id/items/importants" ).to( "ProductAjaxController.updateImportants" ).end();
 		post( "/ajax/products/:id/items" ).to( "ProductAjaxController.addItem" ).end();
 		post( "/ajax/products/:id/values" ).to( "ProductAjaxController.addValue" ).end();
 		get( "/ajax/products/:id/items" ).to( "ProductAjaxController.listItems" ).end();
