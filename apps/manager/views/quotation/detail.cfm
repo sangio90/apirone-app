@@ -310,10 +310,10 @@
                                             <div class="card-body">
                                             <nav>
                                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                                    <div class="col-4 flex">
-                                                        <button class="nav-link active" id="nav-plate-tab" data-bs-toggle="tab" data-bs-target="##nav-plate" type="button" role="tab">Placche</button>
-                                                        <button class="nav-link" id="nav-signage-tab" data-bs-toggle="tab" data-bs-target="##nav-signage" type="button" role="tab">Segnaletiche</button>
-                                                        <button class="nav-link" id="nav-accessories-tab" data-bs-toggle="tab" data-bs-target="##nav-accessories" type="button" role="tab">Accessori</button>
+                                                    <div class="col-4 flex" id="quotationItemsMode">
+                                                        <button class="nav-link active" id="nav-plate-tab" data-bs-toggle="tab" data-bs-target="##nav-plate" type="button" role="tab" data-bind="click:changeMode">Placche</button>
+                                                        <button class="nav-link" id="nav-signage-tab" data-bs-toggle="tab" data-bs-target="##nav-signage" type="button" role="tab" data-bind="click:changeMode">Segnaletiche</button>
+                                                        <button class="nav-link" id="nav-accessories-tab" data-bs-toggle="tab" data-bs-target="##nav-accessories" type="button" role="tab" data-bind="click:changeMode">Accessori</button>
                                                     </div>
                                                     <div class="col-6 text-start">
                                                         <button id="addPlateButton" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>

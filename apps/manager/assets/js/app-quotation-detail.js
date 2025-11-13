@@ -209,7 +209,9 @@ AP.quotationDetail.detail = ( function() {
                 }
             } );
         },
-
+        changeMode: function( e ) {
+            viewModel.getItems();
+        },
         getImageSrc: function( event ) {
 
             const uri = event.image?.uri || "";
@@ -443,8 +445,9 @@ AP.quotationDetail.detail = ( function() {
         },
 
         getItems: function( e ) {
-            if ( viewModel.detailForm.data.zone.name != "" ) {
-                var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id;
+            var quotationItemsMode = $('#quotationItemsMode .nav-link.active').first().text().toLowerCase();
+            if ( viewModel.detailForm.data.zone?.name != "" ) {
+                var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id + "&mode=" + quotationItemsMode;
                 if ( viewModel.detailForm.data.zone ) {
                     url = url + "&quotationZoneId=" + viewModel.detailForm.data.zone.id;
                 }
@@ -464,7 +467,7 @@ AP.quotationDetail.detail = ( function() {
                 } );
             }
 
-            if ( viewModel.detailForm.data.zone.id != "" ) {
+            if ( viewModel.detailForm.data.zone?.id != "" ) {
                 NM.storage.set( "quotation.zone.id", viewModel.detailForm.data.zone.id );
                 NM.storage.set( "quotation.zone.name", viewModel.detailForm.data.zone.name );
                 $( "#addSignageButton" ).prop( "disabled", false );
