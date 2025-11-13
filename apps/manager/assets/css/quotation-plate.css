@@ -112,26 +112,26 @@
 	object-fit: fill;
 }
 
-.draggable-fruit {
+.plate-draggable-fruit {
 	position: absolute;
 	z-index: 0;
 }
 
-.draggable-fruit.is-dragging {
+.plate-draggable-fruit.is-dragging {
 	z-index: 1;
 }
 
-.draggable-fruit:hover {
+.plate-draggable-fruit:hover {
 	cursor: grab;
 	background-color: #a3fda170;
 	border: 1px dashed black;
 }
 
-.draggable-fruit:hover.is-dragging {
+.plate-draggable-fruit:hover.is-dragging {
 	cursor: grabbing;
 }
 
-.draggable-fruit:hover.is-dragging.is-in-prohibited-position {
+.plate-draggable-fruit:hover.is-dragging.is-in-prohibited-position {
 	cursor: no-drop;
 }
 
