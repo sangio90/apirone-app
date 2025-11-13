@@ -917,6 +917,19 @@ h2 {
     price simulate log list 
 */
 
+.price-container-list {
+    /* minimum clickable area */
+    /* same td height */
+    min-height: 100%;
+    min-width: 100px;
+}
+
+.prices-product-cell {
+    background-image: url(/assets/main/img/bg-prices-cell-euro.png);
+    background-repeat: no-repeat;
+    background-position: top right;
+}
+
 .price-log-table {
     width: 100%;
 }
