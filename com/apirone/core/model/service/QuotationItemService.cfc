@@ -35,6 +35,7 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
+		String mode = null,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotation.id" } ]
