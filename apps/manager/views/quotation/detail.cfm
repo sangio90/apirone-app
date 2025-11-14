@@ -8,16 +8,17 @@
 			<div class="col-6 text-end">
 				#button( bind = "click:exportQuotation", size = "md", label = "Esporta preventivo" )#
 				#button( bind = "click:list", size = "md", label = "Torna ai preventivi" )#
+				#button( bind = "click:printQuotation", size = "md", label = "Stampa preventivo" )#
 			</div>
         </div>
 
         <div class="row">
             <div class="col-lg-12">
-                
+
                 <form action="/manager/quotations" class="form-horizontal" method="post" id="quotation-header-form">
-                    
+
                     <section class="card">
-                        
+
                         <div class="card-body">
 
                             <nav>
@@ -35,9 +36,9 @@
                                 </div>
                             </nav>
                             <div class="tab-content" id="nav-tabContent">
-                                
-                                <!--- 
-                                    general 
+
+                                <!---
+                                    general
                                 --->
                                 <div class="tab-pane quotation-panel fade show active" id="nav-general" role="tabpanel">
 
@@ -143,14 +144,14 @@
                                            <!--- <button class="btn btn-primary changeTab" id="fiscal">Dati fiscali &raquo;</button> --->
                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
-                                    </div>        
+                                    </div>
 
                                 </div>
                                 <!---
                                     billing
                                 --->
                                 <div class="tab-pane quotation-panel fade" id="nav-billing" role="tabpanel">
-                                    
+
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-1 control-label text-sm-end pt-2">Nome</label>
                                         <div class="col-sm-7">
@@ -220,15 +221,15 @@
                                            <button class="btn btn-primary changeTab" id="shipment">Spedizione &raquo;</button>
                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
-                                    </div>                            
+                                    </div>
 
-                                </div>     
-                            
+                                </div>
+
                                 <!---
                                     shipment
                                 --->
                                 <div class="tab-pane quotation-panel fade" id="nav-shipment" role="tabpanel">
-                                                 
+
                                     <div class="form-group row mb-2">
                                         <label class="col-sm-1 control-label text-sm-end pt-2">Indirizzo</label>
                                         <div class="col-sm-7">
@@ -282,7 +283,7 @@
                                            <button class="btn btn-primary changeTab" id="products">Prodotti &raquo;</button>
                                            <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
 
                                 <!--- products --->
@@ -301,8 +302,8 @@
                                             </select>
                                         </div>
                                         <div class="col-2 mb-2 flex">
-                                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>                                        
-                                            <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>                                        
+                                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
+                                            <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
                                         </div>
                                     </div>
                                     <div class="form-group row mb-2">
@@ -342,7 +343,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>                                                        
+                                                            </div>
                                                         </cfloop>
 
                                                     </div>
@@ -363,7 +364,7 @@
                                             <button class="btn btn-default changeTab" id="shipment">&laquo; Precedente</button>
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
-                                    </div> 
+                                    </div>
                                     <div id="totalsFloatingTab" class="container py-3">
                                         <div class="d-flex align-items-center">
                                             <table style="width: 100%"></table>
@@ -372,7 +373,7 @@
                                 </div>
 
                                 <!---
-                                    dati fiscali 
+                                    dati fiscali
                                 --->
                                 <div class="tab-pane fade" id="nav-fiscal" role="tabpanel">
                                     <div class="form-group row mb-2">
@@ -435,9 +436,9 @@
                                            <button class="btn btn-default changeTab" id="shipment">&laquo; Precedente &raquo;</button>
                                            <button class="btn btn-primary changeTab" id="discount">Sconti/Costi &raquo;</button>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
-                            
+
                                 <!---
                                     cost / discount
                                 --->
@@ -448,7 +449,7 @@
                                            <button class="btn btn-default changeTab" id="print">&laquo; Precedente &raquo;</button>
                                            <button class="btn btn-primary changeTab" id="assignment">Assegnatario &raquo;</button>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
 
                                 <!---
@@ -472,15 +473,15 @@
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
 
                                         </div>
-                                    </div>                                    
+                                    </div>
 
-                                </div>                                
-                            </div>                         
-                            
+                                </div>
+                            </div>
+
                     </section>
-                
+
                 </form>
-            
+
             </div>
 
         </div>

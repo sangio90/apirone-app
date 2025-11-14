@@ -126,7 +126,11 @@
 								</tr>
 								<tr style="border-collapse: collapse;">
 									<td style="padding-top: .1in; text-align: center; border-right: 0;">
-										<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 3.6cm; max-width: 100%; object-fit: contain;">
+										<cfif IsNull( oggetto.getImage() )>
+											<img src="/assets/main/img/img-not-found.png" style="text-align: left; width: 3.6cm; max-width: 100%; object-fit: contain;">
+										<cfelse>
+											<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 3.6cm; max-width: 100%; object-fit: contain;">
+										</cfif>
 									</td>
 									<td style="vertical-align: top; padding-top: .2in; border-left: 0; font-size: 11pt;">#oggetto.getProduct().getProductDescription()#</td>
 									<td style="text-align: right;">#oggetto.getQuantity()#</td>

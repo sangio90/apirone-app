@@ -210,6 +210,12 @@ AP.quotationDetail.detail = ( function() {
                 }
             } );
         },
+        printQuotation: function() {
+			window.open(
+				"/manager/technical-reports/print?id=" + AP.page.quotation.id,
+				"_blank"
+			)
+        },
         changeMode: function( e ) {
             viewModel.set('mode', e.currentTarget.textContent.toLowerCase())
             viewModel.getItems();
