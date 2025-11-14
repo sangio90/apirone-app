@@ -26,6 +26,12 @@ $( document ).ready( function() {
     accessoryModal.addEventListener( "hide.bs.modal", ( e ) => {
         AP.quotationDetail.detail.renderTotals();
     } );
+
+    $("form#zone-form").on("submit", function(e) {
+        e.preventDefault();
+        AP.quotationDetail.zoneModal.methods().createZone();
+        return false;
+    });
 } );
 
 AP.quotationDetail.detail = ( function() {
@@ -736,6 +742,7 @@ AP.quotationDetail.zoneModal = ( function() {
             zones.unshift( { "id": "", "name": "-- seleziona una zona" } );
 
             viewModel.get( "zones" ).data( zones );
+            $('#zoneTitle').text("Elimina Zona");
 
             $( "#delete-zone-button" ).show();
             $( "#add-zone-button" ).hide();
@@ -767,6 +774,7 @@ AP.quotationDetail.zoneModal = ( function() {
 
             zones.unshift( { "id": "", "name": "-- nessuna" } );
             viewModel.get( "zones" ).data( zones );
+            $('#zoneTitle').text("Nuova Zona");
 
             $( "#delete-zone-button" ).hide();
             $( "#add-zone-button" ).show();

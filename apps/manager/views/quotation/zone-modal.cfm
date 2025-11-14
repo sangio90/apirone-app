@@ -8,7 +8,7 @@
                 <form id="zone-form" method="POST" name="zone-form">
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
-                        <h2 class="card-title" data-bind="text:detailForm.data.title"></h2>
+                        <h2 class="card-title" id="zoneTitle"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>                
                         
