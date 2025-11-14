@@ -160,7 +160,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								}
 								var rawValue = attributeValue.getRawValue();
 								//in assenza di una esplicita definizione di importanza, uso il fatto che siano al livello 0 come criterio.
-								if (!isNull(productItem.getOrigin())) {
+								if (productItem.getImportant() == 1) {
 									if (!isNull(rawValue)) {
 										productItems.add( {
 											'important' = false,
@@ -268,6 +268,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						success = getDao().export( data );
 					}
+
 					if (IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" )) {
 						var data = {
 							'AR_CHIAVE': product.getCode() & RepeatString("0", 31 - Len(product.getCode())),
