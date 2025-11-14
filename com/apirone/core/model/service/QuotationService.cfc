@@ -24,6 +24,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="OpportunityService" inject="OpportunityService";
 	property name="LeadService" inject="LeadService";
 	property name="cacheScope" type="String" default="Quotation.bean";
+	property name="productService" inject="ProductService";
+	property name="productItemService" inject="ProductItemService";
+	property name="componentService" inject="ComponentService";
+	property name="progressivoComponenti" type="Numeric";
 
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
 		var cm = getCacheManager();
@@ -150,6 +154,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						var quotationItemProductItems = quotationItemProductItemSvc.list( quotationItemId = quotationItem.getId(), orderBy = [ { field = "productItem.id" } ] );
 						var productItems = [];
+						var productItemIds = [];
 						//faccio passare tutti i product items e creo una struttura dove definisco quelli importanti (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
 						for ( var quotationItemProductItem in quotationItemProductItems ) {
 							var productItem = quotationItemProductItem.getProductItem();
@@ -168,6 +173,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 											'rawValueId' = rawValue.getId(),
 											'attributeId' = attributeValue.getAttributeId()
 										} );
+										productItemIds.add(productItem.getId());
 									}
 								} else {
 									if (varCode.len() < 10) {
@@ -177,17 +183,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 											'rawValueId' = rawValue.getId(),
 											'attributeId' = attributeValue.getAttributeId()
 										} );
+										productItemIds.add(productItem.getId());
 									} else {
 										productItems.add( {
 											'important' = false,
 											'rawValueId' = rawValue.getId(),
 											'attributeId' = attributeValue.getAttributeId()
 										} );
+										productItemIds.add(productItem.getId());
 									}
 								}
 							}
 							nota &= attribute.getName() & ': ' & rawValue.getName() & '; ';
 						}
+
+						var productComponents = getComponents(product.getId(), quotationItem.getQuantity(), productItemIds);
 						varCode &= RepeatString("0", 10 - Len(varCode))
 
 						//per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
@@ -300,6 +310,52 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return success;
+	}
+
+	public function getComponents(
+		required String productId,
+		required Numeric quantity = 1,
+		Array producItemtIds
+	) {
+		var itemsComponents = [];
+		var progressivo = 0
+
+		var productSvc   = getProductService();
+		var componentSvc = getComponentService();
+
+		var productId      = arguments.productId;
+		var productItemIds = arguments.producItemtIds;
+
+		var product = productSvc.get( productId );
+		if (IsInstanceOf(product, 'com.apirone.core.model.bean.ProductComplex')) {
+			var bundleComponents = componentSvc.list(
+				lineId                         = product.getLine().getId(),
+				modelId                        = product.getModel().getId(),
+				includeBaseAttributeComponents = true
+			);
+			for (var bundleComponent in bundleComponents) {
+				itemsComponents.add(parseComponent(bundleComponent, progressivo));
+			}
+		}
+		dump(itemsComponents);abort;
+	}
+
+	public function parseComponent(com.apirone.core.model.bean.Component component, progressivo) {
+		var progressivo = getProgressivoComponenti();
+		var componente = {
+			'DSCODMATI' = component.getRawProduct()?.getId(),
+			'DSVARMATI' = component.getVariant().getId(),
+			'DSCOLMAT' = component.getColor().getId(),
+			'DSQTAMOV' = component.getQuantity(),
+			'DSTIPMAT' = component.getRawProduct()?.getProcessingType()?.getId(),
+			'DSUNMIS1' = component.getRawProduct()?.getMeasurementUnit()?.getId(),
+			'CPROWNUM' = progressivo + 1,
+			'CPROWORDI' = (progressivo + 1) * 10,
+			'DSTIPMAT' = 'R'
+		};
+		setProgressivoComponenti(progressivo + 1)
+
+		return componente;
 	}
 
 
