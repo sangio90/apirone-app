@@ -39,6 +39,7 @@
 		var user = prc.user;
 
 		prc.title = "Nuovo preventivo";
+		prc.id = 0;
 
 		prc.page[ "statuses" ]       = super.fire( "status.list", [ "QUOTATION" ] );
 		prc.page[ "languages" ]      = super.fire( "lang.list" );
@@ -80,9 +81,10 @@
 
 	function edit( event, rc, prc ){
 		var user = prc.user;
-		var memy = super.getMementify()
+		var memy = super.getMementify();
 
 		prc.title = "Modifica preventivo";
+		prc.id = rc.id;
 
 		prc.page[ "statuses" ]       = super.fire( "status.list", [ "QUOTATION" ] );
 		prc.page[ "languages" ]      = super.fire( "lang.list" );
