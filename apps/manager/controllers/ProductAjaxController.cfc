@@ -131,8 +131,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		param rc.items = "";
 
 		var bean = super.service("Product").get( rc.id );
-
-		var newId = super.fire( "Product.updateImportants", { product = bean, ids = ListToArray( rc.items ) } );
+		var ids = [];
+		for (var productItemId in ListToArray( rc.items )) {
+			var productItem = super.service("ProductItem").get(productItemId);
+			var attributeValues = super.fire("ProductItem.list", { productId = productItem.getProductId(), attributeId = productItem.getAttribute().getId() } ).each( function( item ){
+				ids.add( item.getId() );
+			} );
+		}
+		var newId = super.fire( "Product.updateImportants", { product = bean, ids = ids } );
 
 		var message = completeMessage( "product.itemsUpdated" );
 

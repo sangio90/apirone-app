@@ -199,13 +199,33 @@ AP.product.items = ( function() {
 
             var checks = $( "#product-items-grid" ).find( "[name=important]:checked" );
 
-            if ( checks.length <= 2 ) {
-                var values = [];
+            var values = [];
+            checks.each( function() {
+                values.push( $( this ).val() );
+            } );
 
-                checks.each( function() {
-                    values.push( $( this ).val() );
-                } );
+            var checkedItems = viewModel.get('items').data().filter(
+                function (item) { 
+                    return values.includes(item.id.toString()); 
+                }
+            )
+            var checkedAttributes = checkedItems.map(
+                function (item) { 
+                    return item.attribute.id; 
+                }
+            )
 
+            checkedAttributes = $.unique(checkedAttributes)
+
+            if ( checkedAttributes.length > 2 ) {
+                AP.widget.notify( "warning", "Puoi selezionare al massimo 2 attributi" );
+            } else {
+                var productItemsWithCheckedAttributes = viewModel.get('items').data().filter(
+                    function (item) {
+                        return checkedAttributes.includes(item.attribute.id);
+                    }
+                )
+                debugger
                 var ids = values.toString();
 
                 NM.util.ajax( {
@@ -219,8 +239,6 @@ AP.product.items = ( function() {
                         },
                     },
                 } );
-            } else {
-                AP.widget.notify( "warning", "Puoi selezionare al massimo 2 attributi" );
             }
 
             return false;
