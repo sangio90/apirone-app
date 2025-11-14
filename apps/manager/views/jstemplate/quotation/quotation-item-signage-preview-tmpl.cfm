@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding="UTF-8">
 
-<script type="text/x-kendo-template" id="quotation-item-preview-tmpl">
-    <div class="quotation-item m-1" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editSignate">
+<script type="text/x-kendo-template" id="quotation-item-signage-preview-tmpl">
+    <div class="quotation-item m-1" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editSignage">
         <div class="quotation-item-inner">
             <div class="row">
                 <div class="col-12 d-flex justify-content-center mb-2" style="font-size: 14px; font-weight: bold;">

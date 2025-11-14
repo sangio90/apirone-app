@@ -86,7 +86,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemProductItem" );
 			bean.setId( record.quotation_item_product_item_id );
-			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
+			bean.setQuotationItemId( record.quotation_item_id );
 			bean.setProductItem( getProductItemService().get( record.product_item_id ) );
 			bean.setLevel( record.level );
 

@@ -10,6 +10,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="PriceService" inject="PriceService";
 	property name="TextService" inject="TextService";
 	property name="FileService" inject="FileService";
+	property name="ProductItemService" inject="ProductItemService";
 
 	property name="cacheScope" type="String" default="Product.bean";
 
@@ -192,34 +193,52 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public String function update( required com.apirone.core.model.bean.Product product ){
-		var product = this.handleCatalogBundle( arguments.product );
+	public String function updateDetail( required com.apirone.core.model.bean.Product product ){
 
-		getDao().update( product );
-
-		var id = product.getId();
-
-		if ( !IsNull( product.getTexts() ) ) {
-			for ( var text in product.getTexts() ) {
-				var entity = super.bean( "Entity" )
-
-				entity.setKey( "product.id" );
-				entity.setValue( id );
-
-				text.setEntity( entity );
-
-				if ( Len( text.getId() ) ) {
-					getTextService().update( text );
-				} else {
-					getTextService().create( text );
-				}
-			}
-		}
+		getDao().updateDetail( product );
 
 		super.getCacheManager().remove( getCacheScope(), product.getId() );
 
 		return product.getId();
 	}
+
+	public Boolean function updateImportants( required com.apirone.core.model.bean.Product product,  required Numeric[] ids ){
+
+		var itemService = getProductItemService();
+
+		```
+		<cfquery datasource="apirone">
+			UPDATE product_items
+			SET important = false
+			WHERE product_id = '#product.getId()#'
+		</cfquery>
+		```
+
+		var allItems = itemService.getFlatTree( productId = product.getId() );
+
+		for( var item in allItems ) {
+			if ( ArrayContains( ids, item.getId() ) ) {
+				var value = true;
+			} else {
+				var value = false;
+			}
+
+			```
+			<cfquery datasource="apirone">
+				UPDATE product_items
+				SET important = #value#
+				WHERE product_item_id = '#item.getId()#'
+			</cfquery>
+			```
+
+			itemService.removeCache( item.getId() );
+
+		}
+
+
+		return true;
+	}	
+
 
 	public Void function removeCache( required String productId ){
 		var cm = super.getCacheManager();
@@ -279,6 +298,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setSerial( record.serial );
 			bean.setCreatedAt( record.created_at );
 			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setSpecial( BooleanFormat( record.special ) );
+			bean.setMinQuantity( record.min_quantity );
+			bean.setMaxQuantity( record.max_quantity );
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
 			bean.setPrices( getPriceService().list( productId = record.product_id ) );

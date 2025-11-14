@@ -149,10 +149,10 @@ AP.signage.modal = ( function() {
 
         getSignageConfigItems: function() {
             if ( viewModel.getSignageConfig() ) {
-                var items = viewModel.getSignageConfig().items.map(item => ({
+                var items = viewModel.getSignageConfig().items.map( item => ( {
                     ...item,
                     sizeName: item.size.name
-                }));
+                } ) );
                 items.unshift( { id: "", sizeName: "-- Dimensione" } );
                 return items;
             }
@@ -322,7 +322,7 @@ AP.signage.modal = ( function() {
         },
 
         getSignageConfigItemSize: function() {
-            return viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" )
+            return viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" );
         },
 
         escapeHtml: function( text ) {
@@ -689,15 +689,15 @@ AP.signage.modal = ( function() {
                 // } );
                 // viewModel.get( "fontSizes" ).data( fontSizes );
                 viewModel.set( "detailForm.data.signageConfig.items", viewModel.getSignageConfigItems() );
-                $("#signageFontSize").select({
+                $( "#signageFontSize" ).select( {
                     dataSource: viewModel.get( "detailForm.data.signageConfig.items" ),
                     value: viewModel.get( "detailForm.data.quotationItem.signageConfigItem" ),
-                    dataTextField: 'sizeName',
-                    dataValueField: 'id',
+                    dataTextField: "sizeName",
+                    dataValueField: "id",
                     change: function() {
                         viewModel.parseLines();
                     }
-                });
+                } );
                 if ( viewModel.get( "detailForm.data.signageConfig.items" ).length == 2 ) {
                     viewModel.set( "detailForm.data.quotationItem.signageConfigItem", viewModel.get( "detailForm.data.signageConfig.items" )[1] );
                     this.parseLines();
@@ -718,16 +718,8 @@ AP.signage.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
-                            if ( quotationItemId != "" || !NM.storage.get( "signage.product.items" ) || NM.storage.get( "signage.product.items" ).length == 0 ) {
+                            if ( quotationItemId != "" ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
-                            } else {
-                                if ( quotationItemId == "" ) {
-                                    const itemsDataSource = new kendo.data.DataSource( {
-                                        data: NM.storage.get( "signage.product.items" )
-                                    } );
-                                    viewModel.set( "detailForm.data.quotationItem.product.items", itemsDataSource );
-                                    viewModel.get( "detailForm.data.quotationItem.product.items" ).read();
-                                }
                             }
                             productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                             attributeArray = productItems.data();
@@ -740,6 +732,7 @@ AP.signage.modal = ( function() {
                                             attributeValue: item.attributeValue,
                                             product_item_id: item.id,
                                             parent_attribute_id: null,
+                                            parent_item_id: null,
                                             level: 0,
                                             selected: false
                                         } );
@@ -750,6 +743,7 @@ AP.signage.modal = ( function() {
                                         attribute_id: item.attribute.id,
                                         attribute_name: item.attribute.name,
                                         parent_attribute_id: null,
+                                        parent_item_id: null,
                                         level: 0,
                                         values: [
                                             {
@@ -762,7 +756,13 @@ AP.signage.modal = ( function() {
                                     productItems.add( parsedData );
                                 }
                             } );
-
+                            // Se è un nuovo quotation item, precompilo tutte le select di primo livello con il primo valore (come richiesto da loro)
+                            if ( quotationItemId == "" ) {
+                                productItems.data().forEach( d => {
+                                    d.values[0].selected = true;
+                                    viewModel.loadProductItems( d.values[0].product_item_id, d.attribute_id );
+                                } );
+                            }
                             viewModel.renderProductItems();
                         }
                     }
@@ -824,7 +824,6 @@ AP.signage.modal = ( function() {
                         }
                     }
                     viewModel.renderProductItems();
-                    NM.storage.set( "signage.product.items", productItems.data() );
                     resolve();
                     return;
                 }
@@ -861,6 +860,7 @@ AP.signage.modal = ( function() {
                                         attribute_id: xhr.data[0].attribute.id,
                                         attribute_name: xhr.data[0].attribute.name,
                                         parent_attribute_id: attributeId,
+                                        parent_item_id: originId,
                                         level: attributeArray[parentIndex].level + 1,
                                         values: []
                                     };
@@ -893,6 +893,11 @@ AP.signage.modal = ( function() {
                                 let parentIndex = -1;
                                 attributeArray.forEach( ( d, idx ) => {
                                     if ( d.attribute_id == attributeId ) { parentIndex = idx; }
+                                    if ( d.parent_item_id ) {
+                                        if ( attributeArray[idx - 1].values.filter( v => v.selected == false && v.product_item_id == d.parent_item_id ).length > 0 ) {
+                                            productItems.remove( d );
+                                        }
+                                    }
                                 } );
                                 if ( parentIndex !== -1 ) {
                                     const parent = productItems.at( parentIndex );
@@ -900,10 +905,22 @@ AP.signage.modal = ( function() {
                                         v.selected = v.product_item_id == originId;
                                     } );
                                 }
+
+                                // aggiunto per cercare gli elementi dell'albero legati ad un parent non selezionato e rimuoverli
+                                var elementsToRemove = [];
+                                attributeArray.forEach( ( d, idx ) => {
+                                    if ( d.parent_item_id ) {
+                                        if ( attributeArray[idx - 1].values.filter( v => v.selected == false && v.product_item_id == d.parent_item_id ).length > 0 ) {
+                                            elementsToRemove.push( idx );
+                                        }
+                                    }
+                                } );
+                                elementsToRemove.forEach( function( idx ) {
+                                    productItems.remove( productItems.at( idx ) );
+                                } );
                             }
 
                             viewModel.renderProductItems();
-                            NM.storage.set( "signage.product.items", productItems.data() );
                             resolve();
                         },
                         fail: function( err ) {
@@ -991,6 +1008,7 @@ AP.signage.modal = ( function() {
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
+                parsedData.mode = "segnaletiche";
 
                 NM.util.ajax( {
                     method: "POST",
@@ -1311,12 +1329,12 @@ AP.signage.modal = ( function() {
                 done: function( xhr ) {
                     if( xhr.data ) {
                         if ( !xhr.data.id || xhr.data.id != quotationItemId ) {
-                            $( "#angolo" ).hide();
+                            $( "#totalsFloatingTab" ).hide();
                         } else {
                             viewModel.set( "detailForm.data.totals", xhr.data );
                             var totals = viewModel.get( "detailForm.data.totals" );
                             if ( xhr.data ) {
-                                const table = $( "#angolo" ).find( "table" )[0];
+                                const table = $( "#totalsFloatingTab" ).find( "table" )[0];
                                 totals.products.forEach( function( row ) {
                                     $( table ).append( `
                                         <tr>
@@ -1337,7 +1355,7 @@ AP.signage.modal = ( function() {
                                     `
                                 );
                             }
-                            $( "#angolo" ).show();
+                            $( "#totalsFloatingTab" ).show();
                         }
                     }
                 }

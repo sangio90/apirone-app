@@ -243,6 +243,36 @@
 		<cfreturn arguments.product.getId()>
 	</cffunction>
 
+	<cffunction name="updateDetail" returntype="String">
+		<cfargument name="product" type="com.apirone.core.model.bean.Product" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE
+				products
+			SET
+				min_quantity =
+					<cfif Val( arguments.product.getMinQuantity() )>
+						<cfqueryparam cfsqltype="Integer" value="#arguments.product.getMinQuantity()#">
+					<cfelse>
+						NULL
+					</cfif>
+				,
+				max_quantity =
+					<cfif Val( arguments.product.getMaxQuantity() )>
+						<cfqueryparam cfsqltype="Integer" value="#arguments.product.getMaxQuantity()#">
+					<cfelse>
+						NULL
+					</cfif>
+				,
+				special = <cfqueryparam cfsqltype="Boolean" value="#arguments.product.getSpecial()#">,
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
+			WHERE
+				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid
+		</cfquery>
+
+		<cfreturn arguments.product.getId()>
+	</cffunction>
+
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="productId" type="String">
 

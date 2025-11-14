@@ -310,10 +310,10 @@
                                             <div class="card-body">
                                             <nav>
                                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                                    <div class="col-4 flex">
-                                                        <button class="nav-link active" id="nav-plate-tab" data-bs-toggle="tab" data-bs-target="##nav-plate" type="button" role="tab">Placche</button>
-                                                        <button class="nav-link" id="nav-signage-tab" data-bs-toggle="tab" data-bs-target="##nav-signage" type="button" role="tab">Segnaletiche</button>
-                                                        <button class="nav-link" id="nav-accessories-tab" data-bs-toggle="tab" data-bs-target="##nav-accessories" type="button" role="tab">Accessori</button>
+                                                    <div class="col-4 flex" id="quotationItemsMode">
+                                                        <button class="nav-link active" id="nav-plate-tab" data-bs-toggle="tab" data-bs-target="##nav-plate" type="button" role="tab" data-bind="click:changeMode">Placche</button>
+                                                        <button class="nav-link" id="nav-signage-tab" data-bs-toggle="tab" data-bs-target="##nav-signage" type="button" role="tab" data-bind="click:changeMode">Segnaletiche</button>
+                                                        <button class="nav-link" id="nav-accessories-tab" data-bs-toggle="tab" data-bs-target="##nav-accessories" type="button" role="tab" data-bind="click:changeMode">Accessori</button>
                                                     </div>
                                                     <div class="col-6 text-start">
                                                         <button id="addPlateButton" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
@@ -348,10 +348,12 @@
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="nav-signage" role="tabpanel">
-                                                    <div data-role="listview" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems">
+                                                    <div data-role="listview" data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems">
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="nav-accessories" role="tabpanel">
+                                                    <div data-role="listview" data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </section>
@@ -362,7 +364,7 @@
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div> 
-                                    <div id="angolo" class="container py-3">
+                                    <div id="totalsFloatingTab" class="container py-3">
                                         <div class="d-flex align-items-center">
                                             <table style="width: 100%"></table>
                                         </div>
@@ -488,7 +490,8 @@
     #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal" )#
     #view( "quotation/zone-modal" )#
-    #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-item-accessory-preview-tmpl" )#
 </cfoutput>
 
 <script>
@@ -538,7 +541,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 <style>
-    #angolo {
+    #totalsFloatingTab {
         position: fixed;
         bottom: 50px;
         background-color: #2771e8;

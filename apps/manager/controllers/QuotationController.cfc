@@ -128,7 +128,7 @@
 		quotation.setValidityDate( DateFormat( quotation.getValidityDate(), "yyyy-mm-dd" ) );
 		prc.page[ "quotation" ] = quotation;
 
-		//prc.jsFiles.add( "FruitsController" );
+		//prc.jsFiles.add( "app-plate-designer" );
 		prc.jsFiles.add( "app-plate" );
 		prc.jsFiles.add( "app-quotation-detail" );
 		prc.jsFiles.add( "app-signage" );

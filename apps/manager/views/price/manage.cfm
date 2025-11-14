@@ -118,7 +118,7 @@
 
 										</div>
 
-										
+
 										<!---
 										TODO: add more options, e.g. modify current value by percentage
 										<div class="col-sm-3 d-flex align-items-center">
@@ -129,7 +129,7 @@
 											</select>
 										</div>
 										---->
-									
+
 									</div>
 
 									<div class="mb-3 row">

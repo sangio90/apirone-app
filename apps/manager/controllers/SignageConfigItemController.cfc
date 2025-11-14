@@ -48,7 +48,7 @@ component extends="com.apirone.core.controller.AbsController" {
         prc.page[ "products" ] = super.eachParallelAndReorder(
 			products,
 			function(item, index) {
-				var row = super.getMementify().convert( item, "list" ); // TODO: use "treelight" instead?
+				var row = super.getMementify().convert( item, "menu" );
 				return row;
 			}
 		);		

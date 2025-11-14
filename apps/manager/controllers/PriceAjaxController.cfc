@@ -160,6 +160,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			if ( Len( item?.id ) ) {
 
+				//var obj = get( item.id );
+				//price.setEntity( obj.getEntity() );
+
 				if( item.deleted ) {
 					super.fire( "price.delete", [ item.id ] );
 				} else {

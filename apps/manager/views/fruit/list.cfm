@@ -90,6 +90,7 @@
                                         { 'field':'name', 'title':'Categoria'},
                                         { 'field':'name', 'title':'Linee'},
                                         { 'field':'name', 'title':'Posizioni', width: '50px' },
+                                        { 'field':'prices', 'title':'Prezzi'},
                                         { 'field':'', 'title':'Tutti gli attributi', width: '55px'},
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 
@@ -110,6 +111,7 @@
 		</div>
 
 		#view( "fruit/detail-modal" )#
+		#view( "price/list-modal" )#
 
 	</div>
 

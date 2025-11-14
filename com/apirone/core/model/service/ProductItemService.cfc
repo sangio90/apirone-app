@@ -163,7 +163,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.ProductItem productItem ){
 		var newId = getDao().update( arguments.productItem );
 
-		super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
+		//super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
+
+		removeCache( arguments.productItem.getId() );
 
 		return newId;
 	}
@@ -348,6 +350,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.product_item_id );
 			bean.setProductId( record.product_id );
 			bean.setCreatedAt( record.created_at );
+			bean.setImportant( record.important );
 
 			bean.setOrigin( IsNull( record.origin_id ) ? NullValue() : get( record.origin_id ) );
 

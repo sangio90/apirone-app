@@ -10,7 +10,7 @@ $( document ).ready( function() {
     if ( AP.quotationDetail.fields.detailRoot.length ) {
         AP.quotationDetail.detail.init();
     }
-    $( ".k-listview-content" ).first().css( "display", "flex" );
+    $( ".k-listview-content" ).css( "display", "flex" );
 
     const signageModal = document.getElementById( "signage-modal" );
     signageModal.addEventListener( "hide.bs.modal", ( e ) => {
@@ -122,6 +122,7 @@ AP.quotationDetail.detail = ( function() {
     };
 
     var viewModel = kendo.observable( {
+        mode: null,
         detailForm: defaultDetailForm,
         languages: new kendo.data.DataSource(),
         statuses: new kendo.data.DataSource(),
@@ -209,7 +210,13 @@ AP.quotationDetail.detail = ( function() {
                 }
             } );
         },
-
+        changeMode: function( e ) {
+            viewModel.set('mode', e.currentTarget.textContent.toLowerCase())
+            viewModel.getItems();
+        },
+        getMode: function () {
+            return viewModel.get('mode');
+        },
         getImageSrc: function( event ) {
 
             const uri = event.image?.uri || "";
@@ -443,8 +450,9 @@ AP.quotationDetail.detail = ( function() {
         },
 
         getItems: function( e ) {
-            if ( viewModel.detailForm.data.zone.name != "" ) {
-                var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id;
+            var quotationItemsMode = viewModel.get('mode');
+            if ( viewModel.detailForm.data.zone?.name != "" ) {
+                var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id + "&mode=" + quotationItemsMode;
                 if ( viewModel.detailForm.data.zone ) {
                     url = url + "&quotationZoneId=" + viewModel.detailForm.data.zone.id;
                 }
@@ -464,7 +472,7 @@ AP.quotationDetail.detail = ( function() {
                 } );
             }
 
-            if ( viewModel.detailForm.data.zone.id != "" ) {
+            if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id != "" ) {
                 NM.storage.set( "quotation.zone.id", viewModel.detailForm.data.zone.id );
                 NM.storage.set( "quotation.zone.name", viewModel.detailForm.data.zone.name );
                 $( "#addSignageButton" ).prop( "disabled", false );
@@ -491,10 +499,17 @@ AP.quotationDetail.detail = ( function() {
             accessoryApp().new();
         },
 
-        editSignate: function( event ) {
+        editSignage: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
-            const tabellaTotali = $( "#angolo" ).find( "table" )[0];
+            const tabellaTotali = $( "#totalsFloatingTab" ).find( "table" )[0];
+            $( tabellaTotali ).empty();
+        },
+
+        editAccessory: function( event ) {
+            event.preventDefault();
+            accessoryApp().edit( { id: event.data.id } );
+            const tabellaTotali = $( "#totalsFloatingTab" ).find( "table" )[0];
             $( tabellaTotali ).empty();
         },
 
@@ -572,11 +587,11 @@ AP.quotationDetail.detail = ( function() {
                 done: function( xhr ) {
                     if( xhr.data ) {
                         if ( !xhr.data.id || xhr.data.id != viewModel.get( "detailForm.data.id" ) ) {
-                            $( "#angolo" ).hide();
+                            $( "#totalsFloatingTab" ).hide();
                         } else {
                             viewModel.set( "detailForm.data.totals", xhr.data );
                             var totals = viewModel.get( "detailForm.data.totals" );
-                            const table = $( "#angolo" ).find( "table" )[0];
+                            const table = $( "#totalsFloatingTab" ).find( "table" )[0];
                             $( table ).empty();
                             $( table ).append(
                                 `<tr>
@@ -589,7 +604,7 @@ AP.quotationDetail.detail = ( function() {
                                 </tr>
                                 `
                             );
-                            $( "#angolo" ).show();
+                            $( "#totalsFloatingTab" ).show();
                         }
                     }
                 }

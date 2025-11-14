@@ -15,11 +15,8 @@
             <!--- attivo --->
             ##if (status.id == 'ACT') {## 
 
-                <td>
-                    <div  style="display: flex; align-items: center; justify-content: flex-end;" data-bind="events: { click: editPrices }">
-                        <div data-bind="source: prices" data-template="price-row-tmpl" class="flex: 1">
-                        </div>
-                        <div style="width: 30px; flex-shrink: 0;">#iconButton(icon="euro-sign")#</div>
+                <td class="prices-product-cell">
+                    <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
                     </div>
                 </td>
                 <td class="text-center">
@@ -38,6 +35,13 @@
                         <i class="fas fa-window-restore"></i>
                         <i class="button-badge info" data-bind="text: componentCount"></i> 
                     </button>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input"
+                        name="important"
+                        data-bind="checked: important"
+                        value="##: id ##"
+                    >
                 </td>
                 <td class="text-center">
                     <input type="checkbox" class="form-check-input"

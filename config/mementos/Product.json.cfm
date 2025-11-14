@@ -58,6 +58,19 @@
 				"horizontalImage",
 				"verticalImage"
 			]
-		}
+		},
+		detail = {
+			defaultIncludes = [
+				"id",
+				"serial",
+				"shortId",
+				"status.id",
+				"status.color",
+				"minQuantity",
+				"maxQuantity",
+				"special$boolean",
+			]
+		},
+
 	}
 }

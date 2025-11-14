@@ -15,6 +15,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	public Price function init(){
 		return this;
+		setAmount( RandRange(1000, 2000 ));
 	}
 
 	public Numeric function getFinalPrice(){

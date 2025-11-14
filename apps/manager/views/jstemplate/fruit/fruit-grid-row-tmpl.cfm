@@ -21,6 +21,10 @@
             <td class="text-end">
                 <span data-bind="text: positionCount"></span>
             </td>
+            <td class="prices-product-cell">
+                <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
+                </div>
+            </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
@@ -37,5 +41,6 @@
     </nmscript>
 
     #template( view="jstemplate/fruit/fruit-line-row-tmpl" )#
+    #template( view="jstemplate/price/price-row-tmpl" )#
     
 </cfoutput>

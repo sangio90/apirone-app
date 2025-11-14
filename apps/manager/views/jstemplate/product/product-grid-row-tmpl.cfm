@@ -27,7 +27,6 @@
                     <div style="width: 30px; flex-shrink: 0;">#iconButton(icon="euro-sign")#</div>
                 </div>
             </td>
-            </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>

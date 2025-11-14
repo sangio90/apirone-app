@@ -30,7 +30,9 @@
 				"attributeValue.rawValue.id",
 				"attributeValue.rawValue.name",
 				"componentCount",
-				"prices"
+				"prices",
+				"important$boolean",
+				"childrenCount"
 			]
 		},
 		treelight = {
@@ -46,7 +48,8 @@
 				"attributeValue.verticalImage",
 				"attributeValue.rawValue.name",
 				"horizontalImage",
-				"verticalImage"
+				"verticalImage",
+				"important$boolean"
 			]
 		}
 	}

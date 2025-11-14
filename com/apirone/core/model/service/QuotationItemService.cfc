@@ -3,6 +3,7 @@
 	property name="dao" inject="QuotationItemDAO";
 	property name="QuotationService" inject="QuotationService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductService" inject="ProductService";
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="FileService" inject="FileService";
@@ -35,6 +36,7 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
+		String mode = null,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotation.id" } ]
@@ -127,10 +129,16 @@
 				}
 				var signageRows = getQuotationItemSignageRowService().list( quotationItemId = quotationItemId );
 				bean.setSignageRows( signageRows );
-				var images = getFileService().list( quotationItemId = record.quotation_item_id )
-				if (Len(images)) {
-					bean.setImage(images[1])
-				} 
+			}
+
+			var images = getFileService().list( quotationItemId = record.quotation_item_id )
+			if (Len(images)) {
+				bean.setImage(images[1])
+			}
+
+			var items = getQuotationItemProductItemService().list( quotationItemId = quotationItemId )
+			if (Len(items)) {
+				bean.setItems(items)
 			}
 
 			return bean;

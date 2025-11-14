@@ -7,6 +7,7 @@ AP.product.fields = {
     attributeModal: $( "#product-attributes-list-modal" ),
     imagesModal: $( "#product-images-list-modal" ),
     reorderingModal: $( "#product-sorting-modal" ),
+    detailForm: $( "#product-detail-form" ),
 };
 
 $( document ).ready( function() {
@@ -91,6 +92,19 @@ AP.product.items = ( function() {
     };
 
     var viewModel = kendo.observable( {
+
+        items: dataSources.items, // i need to run after user pref
+        orderingItems: dataSources.orderingItems,
+        attributesList: dataSources.attributesList,
+        orderingAttributes: dataSources.orderingAttributes,
+        itemForAttributes: undefined,
+        images: undefined,
+        currentImageEntity: undefined,
+        currentUploadUrl: undefined,
+        product: AP.page.product,
+        statuses: AP.page.statuses,
+        unlinkedCount: 0,
+
         textToggleLink: function() {
 
             var text = "";
@@ -115,19 +129,6 @@ AP.product.items = ( function() {
             return text;
         },
 
-        items: dataSources.items, // i need to run after user pref
-        orderingItems: dataSources.orderingItems,
-        attributesList: dataSources.attributesList,
-        orderingAttributes: dataSources.orderingAttributes,
-        itemForAttributes: undefined,
-        images: undefined,
-        currentImageEntity: undefined,
-        currentUploadUrl: undefined,
-        unlinkedCount: 0,
-
-        /*
-			attributes methods
-		*/
 
         simulatePrice: function( event ) {
 
@@ -166,6 +167,70 @@ AP.product.items = ( function() {
 
         },
 
+        save: function( event ) {
+
+            if ( fields.detailForm.valid() ) {
+
+                var status = fields.detailForm.find( ".status" );
+
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/products/" + AP.page.productId + "/detail",
+                    data: JSON.stringify( viewModel.get( "product" ) ),
+                    callback: {
+                        done: function( xhr ) {
+                            status.html( "" );
+
+                            AP.widget.notify( "success", "Articolo salvato con successo." );
+
+                        },
+                    },
+                } );
+
+            }
+
+            return false;
+
+        },
+
+        updateItems: function( event ) {
+
+            var checks = $( "#product-items-grid" ).find( "[name=important]:checked" );
+
+            if ( checks.length <= 2 ) {
+                var values = [];
+
+                checks.each( function() {
+                    values.push( $( this ).val() );
+                } );
+
+                var ids = values.toString();
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/products/" + AP.page.productId + "/items/importants",
+                    data: { items: ids },
+                    callback: {
+                        done: function( xhr ) {
+                            AP.widget.notify( "success", xhr.data.message.text );
+                            refreshDatasources();
+                        },
+                    },
+                } );
+            } else {
+                AP.widget.notify( "warning", "Puoi selezionare al massimo 2 attributi" );
+            }
+
+            return false;
+
+        },
+
+
+        /*
+            attributes methods
+        */
         toggleUnlinked: function( event ) {
 
             fireFilter();
@@ -577,6 +642,29 @@ AP.product.items = ( function() {
         } );
 
         kendo.bind( fields.rootDetail, viewModel );
+
+        fields.detailForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
+            },
+            rules: {
+                minQuantity: {
+                    digits: true, // number only
+                },
+                maxQuantity: {
+                    digits: true, // number only
+                },
+            },
+            messages: {
+                minQuantity: {
+                    digits: "Richiesto un intero",
+                },
+                maxQuantity: {
+                    digits: "Richiesto un intero",
+                },
+            },
+
+        } );
 
         initSorts();
     };

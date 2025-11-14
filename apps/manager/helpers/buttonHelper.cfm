@@ -55,6 +55,14 @@
     
     }
 
+    function updateButton( String bind, required String label="Salva" ){ 
+
+        arguments["icon"] = "save";
+
+        return getButton( argumentCollection = arguments );
+    
+    }
+
     function deleteButton( String bind, required String label="Cancella" ){ 
 
         arguments["icon"] = "trash";

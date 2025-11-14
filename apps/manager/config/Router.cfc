@@ -134,7 +134,7 @@
 		get( "/raw-values" ).to( "RawValueController.list" ).end();
 
 		/*
-			products
+			raw products
 		*/
 		get( "/ajax/raw-products" ).to( "RawProductAjaxController.list" ).end();
 
@@ -324,10 +324,12 @@
 		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();
 		get( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.listAttributesForSort" ).end();
 		post( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.sortAttributes" ).end();
+		post( "/ajax/products/:id/items/importants" ).to( "ProductAjaxController.updateImportants" ).end();
 		post( "/ajax/products/:id/items" ).to( "ProductAjaxController.addItem" ).end();
 		post( "/ajax/products/:id/values" ).to( "ProductAjaxController.addValue" ).end();
 		get( "/ajax/products/:id/items" ).to( "ProductAjaxController.listItems" ).end();
 		delete( "/ajax/products/:id/items" ).to( "ProductAjaxController.removeItems" ).end();
+		post( "/ajax/products/:id/detail" ).to( "ProductAjaxController.saveDetail" ).end();
 		get( "/ajax/products/:id" ).to( "ProductAjaxController.get" ).end();
 		delete( "/ajax/products" ).to( "ProductAjaxController.delete" ).end();
 		post( "/ajax/products" ).to( "ProductAjaxController.save" ).end();
@@ -428,6 +430,7 @@
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
 		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
+		get( "/ajax/quotation-items/accessory/:id" ).to( "QuotationItemAjaxController.editAccessory" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
 		get( "/ajax/quotation-items/:id/total" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
