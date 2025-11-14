@@ -106,11 +106,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		var texts     = [];
 
 		var result = super.getResult();
-
 		transaction {
 			try {
 				var quotation = super.bean( "Quotation" );
-
+				
 				quotation.setId( json.id );
 				quotation.setName( json.name );
 				quotation.setQuotationNumber( json.quotationNumber );
@@ -118,13 +117,19 @@ component extends="com.apirone.core.controller.AbsController" {
 				quotation.setQuotationDate( json.quotationDate );
 				quotation.setNotes( !isNull(json.notes) ? json.notes : null );
 				quotation.setValidityDate( json.validityDate );
-				quotation.setOpportunity( !isNull(json.opportunity) ? super.fire( "opportunity.get", [ json.opportunity.id ] ) : null );
-				quotation.setLead( !isNull(json.lead) ? super.fire( "lead.get", [ json.lead.id ] ) : null );
+				if (!isNull(json.opportunity) && !isNull(json.opportunity.id) && json.opportunity.id != '') {
+					quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
+				}
+				if (!isNull(json.lead) && !isNull(json.lead.id) && json.lead.id != '') {
+					quotation.setLead( super.fire( "lead.get", [ json.lead.id ] ) );
+				}
 				quotation.setActive( true );
 				var statusId = json.status.id != '' ? json.status.id : 'NEW';
 				quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
 				quotation.setCustomer( !isNull(json.customer) ? super.fire( "customer.get", [ json.customer.id ] ) : null );
-				quotation.setCustomerAddressId( !isNull(json.shippingAddress) ? json.shippingAddress.id : null );
+				if (!isNull(json.shippingAddress) && !isNull(json.shippingAddress.id) && json.shippingAddress.id != '') {
+					quotation.setCustomerAddressId( json.shippingAddress.id );
+				}
 				// quotation.setCustomPaymentMethod( json.custom_payment_method );
 				// quotation.setPricelist( type.setId( json.pricelist.id ) );
 				// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
@@ -133,7 +138,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
 				// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
 				// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
-
 				if ( !Len( json.id ) ) {
 					messageId = "quotation.created";
 					quotation.setStatus( super.fire( "status.get", [ statusId ] ) );
