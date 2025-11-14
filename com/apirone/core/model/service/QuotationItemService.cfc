@@ -131,14 +131,14 @@
 				bean.setSignageRows( signageRows );
 			}
 
-			var images = getFileService().list( quotationItemId = record.quotation_item_id )
+			var images = getFileService().list( quotationItemId = record.quotation_item_id );
 			if (Len(images)) {
-				bean.setImage(images[1])
+				bean.setImage(images[1]);
 			}
 
-			var items = getQuotationItemProductItemService().list( quotationItemId = quotationItemId )
+			var items = getQuotationItemProductItemService().list( quotationItemId = quotationItemId );
 			if (Len(items)) {
-				bean.setItems(items)
+				bean.setItems(items);
 			}
 
 			return bean;
