@@ -25,7 +25,17 @@ component extends="com.apirone.core.controller.AbsController" {
 		var zones = super.fire('QuotationZone.list', [ 'quotationId' = idPreventivo ]);
 		quoteObj.zones = zones;
 
-		customerShippingAddress = quotation.getCustomer().getShippingAddresses()[1];
+		var customerShippingAddress = [
+			'name' = null,
+			'via' = null,
+			'cap' = null,
+			'citta' = null,
+			'provincia' = null,
+			'paese' = null
+		];
+		if (!isNull(quotation.getCustomer().getShippingAddresses()) && quotation.getCustomer().getShippingAddresses().length > 0) {
+			customerShippingAddress = quotation.getCustomer().getShippingAddresses()[1];
+		}
 
 		for ( var i = 1; i LTE ArrayLen( zones ); i++ ) {
 			var zone = zones[i];
