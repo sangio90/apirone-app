@@ -410,7 +410,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCustomPaymentMethod( record.custom_payment_method );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setLang( getLangService().get( record.lang_id ) );
-			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
+			if (!isNull(record.payment_method_id)) {
+				bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
+			}
+			var calculatedAmount = 0;
+			bean.setCalculatedAmount(getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId()} ));
+
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setCurrency( getCurrencyService().get( record.currency_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );

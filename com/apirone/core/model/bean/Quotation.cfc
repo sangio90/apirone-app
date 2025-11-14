@@ -35,17 +35,17 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="shippingProfile" type="com.apirone.core.model.bean.ShippingProfile";
 	property name="salesAgentAccount" type="com.apirone.core.model.bean.Account";
 	property name="graphicTechnicianAccount" type="com.apirone.core.model.bean.Account";
+	property name="calculatedAmount" type="Numeric";
 
 	public Quotation function init(){
 		return this;
 	}
 
 	public String function getDecodedPaymentMethod(){
-		var paymentMethod = getPaymentMethod();
+		var paymentMethod = this.getPaymentMethod();
 		if ( !IsNull( paymentMethod )) {
 			return paymentMethod.getName();
 		} else {
-			return "ciao2";
 			return getCustomPaymentMethod();
 		}
 	}

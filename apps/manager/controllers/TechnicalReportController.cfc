@@ -8,16 +8,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title = "Preventivo";
 
 		var quotation = service("Quotation").get(quotationId = idPreventivo);
-		var quotationItems = super.fire("QuotationItem.list", [idPreventivo]);
 
 		var quoteObj = {
 			quotation      = quotation,
-			quotationItems = quotationItems
+			quotationItems = []
 		};
 
 		if ( IsNull( quotation.getCustomer() ) ) {
 			Throw(
-				message = "Preventivo con cliente non valido"
+				message = "
+				Preventivo con cliente non valido"
 			);
 			return;
 		}

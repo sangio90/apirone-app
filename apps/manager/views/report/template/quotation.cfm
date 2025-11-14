@@ -9,12 +9,6 @@
 			table {
 				border-collapse: collapse;
 			}
-			.stanza { page-break-inside: avoid; }
-			.oggetto { page-break-inside: avoid; }
-
-			.item:first-of-type {
-				margin-top: 3.5in;
-			}
 		</style>
 		<div>
 			<cfdocumentitem type="header">
@@ -113,32 +107,31 @@
 					<!--- Loop sugli oggetti della stanza --->
 					<cfset j = 1>
 					<cfloop array="#stanza.zoneItems#" index="oggetto">
-						<cfif (i EQ 1 and j EQ 3) or (i EQ 1 AND j EQ 6)>
+						<cfif (i EQ 1 and j EQ 3) or (i EQ 1 AND j EQ 7)>
 							<div style="page-break-before: always;"></div>
 							<div style="margin-top: 1.3in">&nbsp;</div>
-						<cfelseif i GT 1 and J GT 1 AND J MOD 3 EQ 1>
-							<div style="margin-top: 2.6in">&nbsp;</div>
+						<cfelseif i GT 1 and J GT 1 AND J MOD 4 EQ 1>
+							<div style="margin-top: 1.9in">&nbsp;</div>
 						</cfif>
 
 						<!--- wrapper per evitare che venga spezzato su due pagine --->
 						<div class="item" style="page-break-inside: avoid;">
-							<table style="border-collapse: collapse; margin-bottom: .3in; width: 100%;">
-								<tr>
-									<td style="width: 4cm; border-right: 0;"><strong>Articolo</strong></td>
+							<table style="border-collapse: collapse; width: 100%;">
+							<tr style="border-collapse: collapse;">
+									<td style="width: 3.6cm; border-right: 0;"><strong>Articolo</strong></td>
 									<td style="border-left: 0;"></td>
-									<td style="width: 2cm;"><strong>Qtà.</strong></td>
+									<td style="width: 2cm; text-align: right;"><strong>Qtà.</strong></td>
 									<td style="width: 2cm; text-align: right;"><strong>Prezzo</strong></td>
 									<td style="width: 2cm; text-align: right;"><strong>Totale</strong></td>
 								</tr>
-								<tr>
-									<td style="width: 4cm; text-align: center; border-right: 0;">
-										<!---<img src="#oggetto.getImage().getUri()#" style="width: 4cm; max-width: 100%; object-fit: contain;">--->
-										<img src="https://fastly.picsum.photos/id/826/200/200.jpg?hmac=WlCuCjxEhXh_s4IkOpulPoB-LOoGjfZwP4GjNnkzTLA" style="width: 4cm; max-width: 100%; object-fit: contain;">
+								<tr style="border-collapse: collapse;">
+									<td style="padding-top: .1in; text-align: center; border-right: 0;">
+										<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 3.6cm; max-width: 100%; object-fit: contain;">
 									</td>
-									<td style="border-left: 0; font-size: 20pt;">#oggetto.getProduct().getDescrizioneProdotto()#</td>
-									<td>Quantita</td>
+									<td style="vertical-align: top; padding-top: .2in; border-left: 0; font-size: 11pt;">#oggetto.getProduct().getProductDescription()#</td>
+									<td style="text-align: right;">#oggetto.getQuantity()#</td>
 									<td style="text-align: right;">#oggetto.getPrice()# €</td>
-									<td style="text-align: right;">Totale</td>
+									<td style="text-align: right;">#oggetto.getQuantity() * oggetto.getPrice()# €</td>
 								</tr>
 							</table>
 						</div>
@@ -146,6 +139,26 @@
 					</cfloop>
 					<cfset i = i + 1>
 				</cfloop>
+				<div style="width: 100%; text-align: right; position: relative;">
+					<table style="width: 4in; border-collapse: collapse; position: absolute; right: 0; top: .1in;">
+						<tr>
+							<td><strong>Totale merce</strong></td>
+							<td>#args.data.quotation.getCalculatedAmount()# €</td>
+						</tr>
+						<tr>
+							<td>IVA 20%</td>
+							<td>Ancora da definire</td>
+						</tr>
+						<tr>
+							<td>Sconto 50%</td>
+							<td>Ancora da definire</td>
+						</tr>
+						<tr>
+							<td><strong>Totale fattura</strong></td>
+							<td>#args.data.quotation.getCalculatedAmount()# €</td>
+						</tr>
+					</table>
+				</div>
 			</cfoutput>
 		</div>
     </cfdocument>
