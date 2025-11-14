@@ -325,7 +325,7 @@
 
 		<cfif qCheck.recordCount EQ 0>
 			<cfquery datasource="verticaleExport">
-				INSERT INTO ARTICO_APIR (AR_CHIAVE, ARCODART, ARDESART, ARDATCAR, ARUNMIS1, VARCOD, CLCODICE)
+				INSERT INTO ARTICO_APIR (AR_CHIAVE, ARCODART, ARDESART, ARDATCAR, ARUNMIS1, VARCOD, CLCODICE, CLANNOTA)
 				VALUES (
 					<cfqueryparam value="#arguments.data.AR_CHIAVE#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.ARCODART#" cfsqltype="varchar">,
@@ -333,7 +333,8 @@
 					<cfqueryparam value="#arguments.data.ARDATCAR#" cfsqltype="date">,
 					<cfqueryparam value="#arguments.data.ARUNMIS1#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.VARCOD#" cfsqltype="varchar">,
-					<cfqueryparam value="#arguments.data.CLCODICE#" cfsqltype="varchar">
+					<cfqueryparam value="#arguments.data.CLCODICE#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.CLANNOTA#" cfsqltype="varchar">
 				)
 			</cfquery>
 

@@ -121,6 +121,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					}
 					var categoryCode = Trim( product.getCategory().getCode() );
 					code &= categoryCode;
+					var nota = '';
 					//Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
 					if (IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" )) {
 						if (isNull(product.getLine())) {
@@ -185,6 +186,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 									}
 								}
 							}
+							nota &= attribute.getName() & ': ' & rawValue.getName() & '; ';
 						}
 						varCode &= RepeatString("0", 10 - Len(varCode))
 
@@ -263,7 +265,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							'ARDATCAR': Now(),
 							'ARUNMIS1': 'PZ',
 							'VARCOD': varCode,
-							'CLCODICE': colCode
+							'CLCODICE': colCode,
+							'CLANNOTA': nota
 						}
 
 						success = getDao().export( data );
@@ -277,7 +280,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							'ARDATCAR': Now(),
 							'ARUNMIS1': 'PZ',
 							'VARCOD': '0000000000',
-							'CLCODICE': '000000'
+							'CLCODICE': '000000',
+							'CLANNOTA': nota
 						}
 						success = getDao().export( data );
 
