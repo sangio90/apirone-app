@@ -4,6 +4,13 @@
 
 <cfoutput>
 
+<cfset runtime = CreateObject("java", "java.lang.Runtime").getRuntime()>
+
+<cfset jvm["Used memory"]  = (runtime.totalMemory() - runtime.freeMemory()) /1000000>
+<cfset jvm["Free memory"]  = runtime.freeMemory()/1000000>
+<cfset jvm["Total memory"] = runtime.totalMemory()/1000000>
+<cfset jvm["Max memory"]   = runtime.maxMemory()/1000000>
+
 <html class="theme-dark">
 <head>
 	<title>ApirOne - Routines</title>
@@ -26,11 +33,16 @@
 			<div class="column">
 				<b>Sistema</b>: Lucee #server.lucee.version#<br>
 				<b>Locale</b>: #GetLocaleInfo().name# - <b>Separatore</b>: #server.system.properties["file.separator"]#<br>
+				<br>
+				<cfloop collection="#jvm#" item="item">
+					<b>#item#</b>: #NumberFormat( jvm[item] )# MB<br>
+				</cfloop>
 			</div>
 		</div>
 
 		<div class="columns is-gapless">
 			<a href="?action=cache.empty" class="button is-primary mr-2">Svuota cache</a>
+			<a href="?action=cache.gc" class="button is-primary mr-2">GC</a>
 			<a href="?action=cache.list" class="button is-primary mr-2">Lista cache</a>
 			<a href="/resources/errors/list.cfm" class="button is-primary mr-2">Errori</a>
 			<a href="?action=info.read" class="button is-primary mr-2">Info</a>
@@ -47,6 +59,12 @@
 				<cfdump var="#key#">
 			</cfloop>
 
+		</cfif>
+
+		<cfif action IS "cache.gc">
+			<cfset objSystem = CreateObject( "java", "java.lang.System" )>
+			<cfset objSystem.gc()>
+			<p>Done</p>
 		</cfif>
 
 		<cfif action IS "info.read">
