@@ -108,7 +108,7 @@ AP.plate.modal = ( function() {
                 }
             }
 
-            console.log( "convertAbsolutePositionToGridPosition:result", result );
+            // console.log( "convertAbsolutePositionToGridPosition:result", result );
 
             return result;
         },
@@ -137,16 +137,16 @@ AP.plate.modal = ( function() {
             const fruitsController = AP.plate.modal.fruitsController;
             const grid = fruitsController.plate.grid;
 
-            console.log( "extractTopLeftPositionFrom:gridPosition", gridPosition );
-            console.log( "extractTopLeftPositionFrom.plate", fruitsController.plate );
-            console.log( "extractTopLeftPositionFrom.plate.grid", fruitsController.plate.grid );
+            // console.log( "extractTopLeftPositionFrom:gridPosition", gridPosition );
+            // console.log( "extractTopLeftPositionFrom.plate", fruitsController.plate );
+            // console.log( "extractTopLeftPositionFrom.plate.grid", fruitsController.plate.grid );
 
             const cell = grid[gridPosition.row][gridPosition.column];
 
             result.top = cell.top;
             result.left = cell.left;
 
-            console.log( "extractTopLeftPositionFrom:result", result );
+            // console.log( "extractTopLeftPositionFrom:result", result );
 
             return result;
 
@@ -158,7 +158,7 @@ AP.plate.modal = ( function() {
                 column: null,
             };
 
-            console.log( "AP.plate.modal", AP.plate.modal );
+            // console.log( "AP.plate.modal", AP.plate.modal );
 
             const fruitsController = AP.plate.modal.fruitsController;
             const grid = fruitsController.plate.grid;
@@ -167,9 +167,9 @@ AP.plate.modal = ( function() {
 
                 // debugger;
 
-                console.log( "grid", grid );
-                console.log( "grid[y]", grid[y] );
-                console.log( "grid[y]y", y );
+                // console.log( "grid", grid );
+                // console.log( "grid[y]", grid[y] );
+                // console.log( "grid[y]y", y );
 
                 const row = grid[y];
 
@@ -184,21 +184,21 @@ AP.plate.modal = ( function() {
                         columnCount++;
                     }
 
-                    console.log( "grid:columnCount", columnCount );
-                    console.log( "grid:fruit.columnSpan", fruit.columnSpan );
+                    // console.log( "grid:columnCount", columnCount );
+                    // console.log( "grid:fruit.columnSpan", fruit.columnSpan );
 
                     if ( columnCount == fruit.columnSpan ) {
                         result.row = y;
                         result.column = x - columnCount + 1;
 
-                        console.log( "grid:result1", result );
+                        // console.log( "grid:result1", result );
 
                         return result;
                     }
                 }
             }
 
-            console.log( "grid:result2", result );
+            // console.log( "grid:result2", result );
 
             return result;
         },
@@ -470,7 +470,7 @@ AP.plate.modal = ( function() {
 
     class Fruit extends Rectangle {
         constructor( args ) {
-            console.log( "constructor:Fruit:args", args );
+            // console.log( "constructor:Fruit:args", args );
 
             super( args.width, args.height, args.orientation );
 
@@ -504,7 +504,7 @@ AP.plate.modal = ( function() {
                 Math.sign( this._gridPosition.column ) >= 0
             ) {
 
-                console.log( "this._gridPosition", this._gridPosition );
+                // console.log( "this._gridPosition", this._gridPosition );
 
                 const { top, left } = utils.extractTopLeftPositionFrom(
                     this._gridPosition,
@@ -677,8 +677,8 @@ AP.plate.modal = ( function() {
 
         drawWithin( $rootNode ) {
 
-            console.log( "drawWithin", $rootNode );
-            console.log( "this.image", this.image );
+            // console.log( "drawWithin", $rootNode );
+            // console.log( "this.image", this.image );
 
             const $fruit = $( "<div/>", {
                 id: this.id,
@@ -712,6 +712,7 @@ AP.plate.modal = ( function() {
             const $image = $( "<img/>", {
                 src: this.image,
                 class: "fruit-img",
+                alt: this.id,
                 css: imgCSS,
                 appendTo: $fruit,
             } );
@@ -754,10 +755,11 @@ AP.plate.modal = ( function() {
             }
         }
 
+        // renamed from "onSelectFruit"
         addFruitInPlate( selectedFruit ) {
 
-            console.log( "addFruitInPlate:fruit", selectedFruit );
-            console.log( "addFruitInPlate:this.plate.cellOrientation", this.plate.cellOrientation );
+            // console.log( "addFruitInPlate:fruit", selectedFruit );
+            console.log( "addFruitInPlate:selectedFruit.image", selectedFruit.image );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
@@ -771,20 +773,15 @@ AP.plate.modal = ( function() {
                 image: selectedFruit.image,
             } );
 
-
             const freePosition = utils.findFirstFreePosition( fruitObj );
 
-            console.log( "freePosition", freePosition );
+            // console.log( "freePosition", freePosition );
 
-            // qui funziona
             if ( freePosition.row != null && freePosition.column != null ) {
                 fruitObj.gridPosition = new FruitGridPosition(
                     freePosition.row,
                     freePosition.column,
                 );
-
-                console.log( "freePosition.row", freePosition.row );
-                console.log( "freePosition.column", freePosition.column );
 
                 this.fruits.push( fruitObj );
 
@@ -793,6 +790,38 @@ AP.plate.modal = ( function() {
             }
 
         }
+
+        removeFruit( fruitId ) {
+            const index = this.fruits.findIndex( fruit => fruit.id === fruitId );
+            if ( index > -1 ) {
+                const fruit = this.fruits[index];
+                if ( fruit.$element ) {
+                    fruit.$element.remove();
+                }
+                this.fruits.splice( index, 1 ); // modifica in place
+            }
+        }
+
+        updateFruit( fruitId, changes = {} ) {
+            this.fruits.forEach( fruit => {
+                if ( fruit.id === fruitId ) {
+                    console.log( "trovato", fruit.id );
+                    Object.assign( fruit, changes );
+
+                    // Se l'immagine è cambiata, aggiorna il DOM
+                    if ( changes.image && fruit.$element ) {
+                        fruit.$element.find( "img.fruit-img" ).attr( "src", changes.image );
+                    }
+                }
+            } );
+        }
+
+
+        /*
+        removeFruit( fruitId ) {
+            this.fruits = this.fruits.filter( fruit => fruit.id !== fruitId );
+        }
+        */
 
         restoreAllFruitPositions() {
             for ( const fruit of this.fruits ) {
@@ -967,16 +996,16 @@ AP.plate.modal = ( function() {
                 right: ui.position.left + fruit.width,
             };
 
-            console.log( "onDragging;newFruitPosition", newFruitPosition );
-            console.log( "onDragging;ui", ui );
+            // console.log( "onDragging;newFruitPosition", newFruitPosition );
+            // console.log( "onDragging;ui", ui );
 
             const { row, column } = utils.convertAbsolutePositionToGridPosition(
                 ui,
                 newFruitPosition,
             );
 
-            console.log( "onDragging:row", row );
-            console.log( "onDragging:column", column );
+            // console.log( "onDragging:row", row );
+            // console.log( "onDragging:column", column );
 
             const gridPosition = new FruitGridPosition( row, column );
             const { top, left } = utils.extractTopLeftPositionFrom( gridPosition );
@@ -1090,7 +1119,7 @@ AP.plate.modal = ( function() {
             rowSpan   : 1,
             code      : data.code,
             name      : data.name,
-            image     : "/assets/main/img/generic-fruit.png",
+            image     : data?.horizontalImage?.uri,
         };
 
         return fruit;
@@ -1098,46 +1127,18 @@ AP.plate.modal = ( function() {
     };
 
     var createFruit = function( data ) {
-        var fruit = {
-            id: data.id,
-            name: data.name,
-            code: data.code,
-            shortId: data.shortId,
-            positionCount: data.positionCount,
-            quantity: 1,
-            price: 0,
+        var fruit = data; // object from api
 
-            image: {
-                id: "",
-                uri: ""
-            },
-
-            category: {
-                id: data.category.id,
-                name: data.category.name
-            },
-
-            status: {
-                id: data.status.id,
-                name: data.status.name,
-                color: {
-                    id: data.status.color.id,
-                    hex: data.status.color.hex
-                }
-            },
-
-            items: new kendo.data.DataSource( {
-                data: [],
-                schema: {
-                    model: { id: "id" } // than, can i use get()
-                }
-            } ),
-        };
+        fruit.items = new kendo.data.DataSource( {
+            data: [],
+            schema: {
+                model: { id: "id" } // than, can i use get()
+            }
+        } );
 
         return fruit;
 
     };
-
 
     var defaultDetailForm = {
         data: {
@@ -1176,42 +1177,6 @@ AP.plate.modal = ( function() {
         title: "Carica placca",
         canSave: false,
     };
-
-    /*
-    by Stan
-    var defaultPlate = {
-        id: "100",
-        code: "508",
-        IMG: "/assets/fakes/img/508.jpg",
-        width: 1200, // in px
-        height: 500, // in px
-        orientation: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL //frame
-        orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
-        grid: [
-            // LEGEND:
-            // "_" - empty free space
-            // "0" - prohibited space
-            [
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-                "_",
-            ],
-        ],
-    };
-    */
 
     var defaultPlate = {
         id: "100",
@@ -1258,8 +1223,15 @@ AP.plate.modal = ( function() {
         },
 
         getFruitCount() {
-            console.log( "fruit:count", this.get( "detailForm.data.fruits" ).len() );
-            return this.get( "detailForm.data.fruits" ).len();
+            console.log( "fruit:count", this.get( "detailForm.data.fruits" ).total() );
+            return this.get( "detailForm.data.fruits" ).total();
+        },
+
+        removeFruit( event ) {
+
+            viewModel.get( "detailForm.data.fruits" ).remove( event.data );
+            pub.fruitsController.removeFruit( event.data.id );
+
         },
 
         loadPlate: function() {
@@ -1286,6 +1258,9 @@ AP.plate.modal = ( function() {
                 method: "GET",
                 url: "/manager/ajax/frames/" + frameId,
                 callback: {
+                    before: function( event ) {
+                        alert( "ciao" );
+                    },
                     done: function( xhr ) {
 
                         viewModel.set( "plate.id", xhr.data.id );
@@ -1317,6 +1292,8 @@ AP.plate.modal = ( function() {
                 url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
                     done: function( xhr ) {
+
+                        // console.log( "xhr", xhr );
 
                         var userItems = AP.getUserPref( "plate.product.items" );
 
@@ -1430,9 +1407,9 @@ AP.plate.modal = ( function() {
                 var productItems = fruit.get( "items" );
             }
 
-            console.log( "loadProductItems:type", type );
-            console.log( "productId", productId );
-            console.log( "originId", originId );
+            // console.log( "loadProductItems:type", type );
+            // console.log( "productId", productId );
+            // console.log( "originId", originId );
 
             const attributeArray = productItems.data();
 
@@ -1448,7 +1425,7 @@ AP.plate.modal = ( function() {
             // Deselezionamento: originId vuoto
             if ( originId === "" ) {
 
-                console.log( "qui:originId vuoto" );
+                // console.log( "qui:originId vuoto" );
 
                 var actualIndex = null;
 
@@ -1553,7 +1530,7 @@ AP.plate.modal = ( function() {
                             }
                         }
 
-                        console.log( "loadProductItems:afterLoading:type", type );
+                        // console.log( "loadProductItems:afterLoading:type", type );
 
                         if ( type == "plate" ) {
                             viewModel.renderProductItemsPlate();
@@ -1622,26 +1599,22 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
+                        console.log( "addProductItemsToFruit:xhr", xhr );
+
                         if ( xhr.count > 0 ) {
 
                             var fruits = viewModel.get( "detailForm.data.fruits" );
 
                             var thisFruit = fruits.get( fruitId );
 
-                            thisFruit.set( "image", xhr.data[0].horizontalImage );
-
-                            // thisFruit.get( "items" ).add( xhr.data );
-
-                            console.log( "fruitItem", thisFruit );
+                            // Overwrite the product image if the item image exists
+                            if ( xhr.data[0].horizontalImage?.uri ) {
+                                pub.fruitsController.updateFruit( thisFruit.id, { image: xhr.data[0].horizontalImage.uri } );
+                            }
 
                             var fruitItems = thisFruit.get( "items" );
-
                             var attributeArray = fruitItems.data();
 
-                            // INFO: we do it here because we need the first image
-                            pub.fruitsController.addFruitInPlate( mapFruitForPlate( thisFruit ) );
-
-                            // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( function( item ) {
 
                                 const attributeExisting = attributeArray.find( d => d.attributeId === item.attribute.id );
@@ -1651,8 +1624,6 @@ AP.plate.modal = ( function() {
                                     attributeExisting.values.push( {
                                         attributeValue: item.attributeValue,
                                         productItemId: item.id,
-                                        // parentAttributeId: null,
-                                        // level: 0,
                                         selected: false
                                     } );
 
@@ -1663,20 +1634,16 @@ AP.plate.modal = ( function() {
                                     const itemAndValues = {
                                         attributeId: item.attribute.id,
                                         attributeName: item.attribute.name,
-                                        // parentAttributeId: null,
                                         level: 0,
                                         values: [
                                             {
                                                 attributeValue: item.attributeValue,
                                                 productItemId: item.id,
-                                                // parentAttributeId: null,
-                                                // level: 0,
                                                 selected: false
                                             }
                                         ]
                                     };
 
-                                    // console.log( "parsedData", itemAndValues );
                                     fruitItems.add( itemAndValues );
 
                                 }
@@ -1765,8 +1732,8 @@ AP.plate.modal = ( function() {
                     select.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
                 }
 
-                const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
-                select.append( emptyOption );
+                // const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
+                // select.append( emptyOption );
 
                 values.forEach( function( attrValue ) {
                     const option = $( "<option>" )
@@ -1778,7 +1745,11 @@ AP.plate.modal = ( function() {
                 // Imposto la option selezionata
                 const selectedOption = values.find( attrValue => attrValue.selected === true );
                 if ( selectedOption ) {
-                    select.val( selectedOption.productItemId );
+                    if ( selectedOption ) {
+                        select.val( selectedOption.productItemId );
+                    }
+                } else {
+                    select.prop( "selectedIndex", 0 ).trigger( "change" );
                 }
 
                 subContainer.append( select );
@@ -1820,8 +1791,8 @@ AP.plate.modal = ( function() {
                     select.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
                 }
 
-                const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
-                select.append( emptyOption );
+                // const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
+                // select.append( emptyOption );
 
                 values.forEach( function( attrValue ) {
                     const option = $( "<option>" )
@@ -1832,8 +1803,13 @@ AP.plate.modal = ( function() {
 
                 // Imposto la option selezionata
                 const selectedOption = values.find( attrValue => attrValue.selected === true );
+
                 if ( selectedOption ) {
-                    select.val( selectedOption.productItemId );
+                    if ( selectedOption ) {
+                        select.val( selectedOption.productItemId );
+                    }
+                } else {
+                    select.prop( "selectedIndex", 0 ).trigger( "change" );
                 }
 
                 subContainer.append( select );
@@ -2069,19 +2045,22 @@ AP.plate.modal = ( function() {
             },
         } ),
         selectedPlate: "100",
-        // CONDITIONS
         isPlateDefined: false,
-        // ACTIONS
-        // GETTERS
-        // EVENTS
+
         onSelectFruit: function( selectedFruit ) {
 
             console.log( "selectedFruit", selectedFruit );
 
             var newFruit = createFruit( selectedFruit );
 
+            console.log( "newFruit", newFruit );
+
             viewModel.set( "currentFruit", newFruit );
             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
+
+            // mapFruitForPlate( thisFruit );
+
+            pub.fruitsController.addFruitInPlate( mapFruitForPlate( newFruit ) );
 
             viewModel.addProductItemsToFruit( newFruit.id );
 
@@ -2093,9 +2072,6 @@ AP.plate.modal = ( function() {
             }
             */
         },
-        onClickGenerali: function( event ) {},
-        onClickListaFrutti: function( event ) {},
-        onClickImmagine: function( event ) {},
         configPlate: function( event ) {
 
             // var plate = this.plates.get( this.get( "plate" ) );
@@ -2141,7 +2117,7 @@ AP.plate.modal = ( function() {
                 grid.push( row );
             }
 
-            console.log( "config:plate.image", plate.image );
+            // console.log( "config:plate.image", plate.image );
 
             const plateObj = new Plate( {
                 width: plate.width,
@@ -2224,7 +2200,7 @@ AP.plate.modal = ( function() {
             select: function( event ) {
                 var item = this.dataItem( event.item.index() );
 
-                // console.log( "selected fruit", item );
+                console.log( "selected fruit", item );
 
                 viewModel.onSelectFruit( item );
             },

@@ -1,13 +1,20 @@
-AP.namespace( "plate" );
+﻿AP.plate = AP.plate || {};
 
-Object.assign( AP.plate.fields, {
+AP.plate.fields = {
     designerRoot: $( "#plate-designer-root" ),
-} );
+    mapRoot: $( "#plates-map-root" ),
+};
 
 $( document ).ready( function() {
     if ( AP.plate.fields.designerRoot.length ) {
         AP.plate.designer.init( {
             container: AP.plate.fields.designerRoot,
+        } );
+    }
+
+    if ( AP.plate.fields.mapRoot.length ) {
+        AP.plate.map.init( {
+            container: AP.plate.fields.mapRoot,
         } );
     }
 } );
@@ -19,10 +26,10 @@ AP.plate.designer = ( function() {
     const MIN_DISTANCE_BEFORE_DRAGGING = 1;
 
     const ORIENTATION = {
-        VERTICAL: "VER",
-        HORIZONTAL: "HOR",
-        "VER": "VERTICAL",
-        "HOR": "HORIZONTAL",
+        VERTICAL: "V",
+        HORIZONTAL: "H",
+        "V": "VERTICAL",
+        "H": "HORIZONTAL",
     };
 
     const CELL_TYPE = {
@@ -109,9 +116,9 @@ AP.plate.designer = ( function() {
 
             if (
                 rectA.right <= rectB.left
-				|| rectA.left >= rectB.right
-				|| rectA.bottom <= rectB.top
-				|| rectA.top >= rectB.bottom
+                || rectA.left >= rectB.right
+                || rectA.bottom <= rectB.top
+                || rectA.top >= rectB.bottom
             ) {
                 result = false;
             }
@@ -179,7 +186,7 @@ AP.plate.designer = ( function() {
 
                 if (
                     fruitPosition.column <= column && column <= fruitPosition.column + fruit.columnSpan - 1
-					&& fruitPosition.row <= row && row <= fruitPosition.row + fruit.rowSpan - 1
+                    && fruitPosition.row <= row && row <= fruitPosition.row + fruit.rowSpan - 1
                 ) {
                     result = true;
 
@@ -273,8 +280,8 @@ AP.plate.designer = ( function() {
         }
 
         /**
-		 * Creates HTML nodes and inserts them in the DOM to visualize grid property
-		 */
+         * Creates HTML nodes and inserts them in the DOM to visualize grid property
+         */
         drawGridWithin( $rootNode ) {
             $rootNode.empty();
 
@@ -461,7 +468,7 @@ AP.plate.designer = ( function() {
             const self = this;
 
             self._$element.draggable( {
-                containment: "#quotation-plate-fruits",
+                containment: "#fruits",
                 distance: MIN_DISTANCE_BEFORE_DRAGGING,
                 // grid: [ATOMIC_WIDTH],
                 revertDuration: 250,
@@ -500,9 +507,9 @@ AP.plate.designer = ( function() {
         canSwapWith( otherFruit ) {
             // Only if both are in the same position and are of equal size
             return this.gridPosition.row == otherFruit.gridPosition.row
-				&& this.gridPosition.column == otherFruit.gridPosition.column
-				&& this.top + this.height == otherFruit.top + otherFruit.height
-				&& this.left + this.width == otherFruit.left + otherFruit.width;
+                && this.gridPosition.column == otherFruit.gridPosition.column
+                && this.top + this.height == otherFruit.top + otherFruit.height
+                && this.left + this.width == otherFruit.left + otherFruit.width;
         }
 
         swapPositionWith( otherFruit ) {
@@ -522,14 +529,14 @@ AP.plate.designer = ( function() {
             };
 
             return 0 <= columnSpan.start && columnSpan.end <= containmentGrid[0].length
-				&& 0 <= rowSpan.start && rowSpan.end <= containmentGrid.length;
+                && 0 <= rowSpan.start && rowSpan.end <= containmentGrid.length;
         }
 
         /**
-		 * Calculates a separation vector that moves the given overlapping Fruit away from this Fruit
-		 * @param {Array} otherFruit
-		 * @returns Array of two elements: [x, y]
-		 */
+         * Calculates a separation vector that moves the given overlapping Fruit away from this Fruit
+         * @param {Array} otherFruit
+         * @returns Array of two elements: [x, y]
+         */
         calculateSeparation( otherFruit ) {
             const result = [ 0, 0 ];
 
@@ -567,7 +574,7 @@ AP.plate.designer = ( function() {
 
         hasChangedPosition() {
             return this._originalGridPosition.column != this.gridPosition.column
-				|| this._originalGridPosition.row != this.gridPosition.row;
+                || this._originalGridPosition.row != this.gridPosition.row;
         }
 
         makePositionSnapshot() {
@@ -635,8 +642,8 @@ AP.plate.designer = ( function() {
         }
 
         /**
-		 * Renders Fruit based on current position
-		 */
+         * Renders Fruit based on current position
+         */
         render() {
             this.$element.css( {
                 left: this.left,
@@ -652,8 +659,8 @@ AP.plate.designer = ( function() {
         }
 
         /**
-		 *	Creates HTML nodes and inserts them in the DOM to visualize fruits on the grid
-		 */
+         *    Creates HTML nodes and inserts them in the DOM to visualize fruits on the grid
+         */
         drawFruitsWithin( $rootNode ) {
             for ( const fruit of this.fruits ) {
                 fruit.drawWithin( $rootNode );
@@ -661,8 +668,8 @@ AP.plate.designer = ( function() {
         }
 
         /**
-		 * Initializes jQuery UI Draggable Widget for each fruit
-		 */
+         * Initializes jQuery UI Draggable Widget for each fruit
+         */
         makeFruitsDraggable() {
             for ( const fruit of this.fruits ) {
                 fruit.initDraggableWidget( this );
@@ -795,7 +802,7 @@ AP.plate.designer = ( function() {
             };
 
             return !this.isFruitInProhibitedPosition( fruitRectangle )
-				&& fruit.fitsWithin( this.plate.grid );
+                && fruit.fitsWithin( this.plate.grid );
         }
 
         onSelectFruit( selectedFruit ) {
@@ -818,17 +825,17 @@ AP.plate.designer = ( function() {
 
                 this.fruits.push( fruitObj );
 
-                fruitObj.drawWithin( $( "#quotation-plate-fruits" ) );
+                fruitObj.drawWithin( $( "#fruits" ) );
                 fruitObj.initDraggableWidget( this );
             }
         }
 
         /**
-		 * Triggered when dragging starts
-		 * @param {Fruit} fruit
-		 * @param {Event} event
-		 * @param {object} ui
-		 */
+         * Triggered when dragging starts
+         * @param {Fruit} fruit
+         * @param {Event} event
+         * @param {object} ui
+         */
         onStartDragging( fruit, event, ui ) {
             fruit.startDragging();
 
@@ -838,11 +845,11 @@ AP.plate.designer = ( function() {
         }
 
         /**
-		 * Triggered while the mouse is moved during the dragging, immediately before the current move happens.
-		 * @param {Fruit} fruit
-		 * @param {Event} event
-		 * @param {object} ui The values may be changed to modify where the element will be positioned. This is useful for custom containment, snapping, etc
-		 */
+         * Triggered while the mouse is moved during the dragging, immediately before the current move happens.
+         * @param {Fruit} fruit
+         * @param {Event} event
+         * @param {object} ui The values may be changed to modify where the element will be positioned. This is useful for custom containment, snapping, etc
+         */
         onDragging( fruit, event, ui ) {
             let newFruitPosition = {
                 top: ui.position.top,
@@ -876,11 +883,11 @@ AP.plate.designer = ( function() {
         }
 
         /**
-		 * Triggered when dragging stops
-		 * @param {Fruit} fruit
-		 * @param {Event} event
-		 * @param {object} ui
-		 */
+         * Triggered when dragging stops
+         * @param {Fruit} fruit
+         * @param {Event} event
+         * @param {object} ui
+         */
         onStopDragging( fruit, event, ui ) {
             for ( const row of this.plate.grid ) {
                 for ( const cell of row ) {
@@ -912,8 +919,8 @@ AP.plate.designer = ( function() {
                     if ( this.hasOverlappedFruits() ) {
                         const otherFruit = this.fruits.find( f =>
                             f != fruit
-							&& f.gridPosition.row == fruit.gridPosition.row
-							&& f.gridPosition.column == fruit.gridPosition.column
+                            && f.gridPosition.row == fruit.gridPosition.row
+                            && f.gridPosition.column == fruit.gridPosition.column
                         );
 
                         if ( otherFruit && fruit.canSwapWith( otherFruit ) ) {
@@ -946,7 +953,119 @@ AP.plate.designer = ( function() {
     priv.vm = new kendo.data.ObservableObject( {
         // DATA
         plates: new kendo.data.DataSource( {
-            data: [],
+            data: [
+                {
+                    UUID: "100",
+                    CODE: "508",
+                    IMG: "/assets/main/img/508.jpg",
+                    WIDTH: 1200, // in px
+                    HEIGHT: 500, // in px
+                    ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
+                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+                    GRID: [
+                        // LEGEND:
+                        // "_" - empty free space
+                        // "0" - prohibited space
+                        [ "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", "_", ],
+                    ],
+                },
+                {
+                    UUID: "111",
+                    CODE: "1X3",
+                    IMG: "/assets/main/img/1X3.jpg",
+                    WIDTH: 1200, // in px
+                    HEIGHT: 500, // in px
+                    ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
+                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+                    GRID: [
+                        // LEGEND:
+                        // "_" - empty free space
+                        // "0" - prohibited space
+                        [ "_", "_", ],
+                        [ "0", "0", ],
+                        [ "_", "_", ],
+                        [ "0", "0", ],
+                        [ "_", "_", ],
+                    ],
+                },
+                {
+                    UUID: "200",
+                    CODE: "508V",
+                    IMG: "/assets/main/img/508VERTICALE.jpg",
+                    WIDTH: 1200, // in px
+                    HEIGHT: 500, // in px
+                    ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
+                    CELL_ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+                    GRID: [
+                        // LEGEND:
+                        // "_" - empty free space
+                        // "0" - prohibited space
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                        [ "_" ],
+                    ],
+                },
+                {
+                    UUID: "300",
+                    CODE: "SPECIAL1",
+                    IMG: "/assets/main/img/508.jpg",
+                    WIDTH: 1200, // in px
+                    HEIGHT: 500, // in px
+                    ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
+                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+                    GRID: [
+                        // LEGEND:
+                        // "_" - empty free space
+                        // "0" - prohibited space
+                        [ "_", "_", "_", "_", "0", "_", "_", ],
+                    ],
+                },
+                {
+                    UUID: "400",
+                    CODE: "SPECIAL2",
+                    IMG: "/assets/main/img/508VERTICALE.jpg",
+                    WIDTH: 1200, // in px
+                    HEIGHT: 500, // in px
+                    ORIENTATION: "V", // "V" - VERTICAL, "H" - HORIZONTAL
+                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+                    GRID: [
+                        // LEGEND:
+                        // "_" - empty free space
+                        // "0" - prohibited space
+                        [ "0", "0", "_", "_", ],
+                        [ "_", "_", "0", "0", ],
+                        [ "_", "_", "_", "_", ],
+                    ],
+                },
+                {
+                    UUID: "500",
+                    CODE: "SPECIAL3",
+                    IMG: "/assets/main/img/508.jpg",
+                    WIDTH: 1200, // in px
+                    HEIGHT: 500, // in px
+                    ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL
+                    CELL_ORIENTATION: "H", // "V" - VERTICAL, "H" - HORIZONTAL. PS: CELL ORIENTATION IS INDIPENDENT FROM PLATE'S ORIENTATION,
+                    GRID: [
+                        // LEGEND:
+                        // "_" - empty free space
+                        // "0" - prohibited space
+                        [ "_", "_", "_", "_", "0", "_", "_", "0", "0", "0", "0", ],
+                    ],
+                },
+            ],
             schema: {
                 model: {
                     id: "UUID",
@@ -1040,6 +1159,49 @@ AP.plate.designer = ( function() {
     pub.init = function( setup ) {
         priv.container = setup.container;
 
+        priv.vm.set( "fruits", [
+            {
+                width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 4,
+                height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                columnSpan: 4,
+                rowSpan: 1,
+                uuid: "A",
+                code: "schuko",
+                name: "SCHK 2P + 1T",
+                img: "/assets/main/img/foto_frutto_schuko.png",
+            },
+            {
+                width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                columnSpan: 2,
+                rowSpan: 1,
+                uuid: "B",
+                code: "bipasso",
+                name: "BIPAS.",
+                img: "/assets/main/img/foto_frutto_bipasso.png",
+            },
+            {
+                width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                columnSpan: 2,
+                rowSpan: 1,
+                uuid: "C",
+                code: "cat6",
+                name: "CAT 6",
+                img: "/assets/main/img/foto_frutto_cat6.png",
+            },
+            {
+                width: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].WIDTH * 2,
+                height: pageData.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].HEIGHT * 1,
+                columnSpan: 2,
+                rowSpan: 1,
+                uuid: "I",
+                code: "switch",
+                name: "INT. Sottile",
+                img: "/assets/main/img/foto_frutto_interruttore.png",
+            },
+        ] );
+
         kendo.bind( priv.container, priv.vm );
     };
 
@@ -1050,3 +1212,219 @@ AP.plate.designer = ( function() {
     return pub;
 }() );
 
+AP.plate.map = ( function() {
+    const { MarkerArea, CustomImageMarker, ImageMarkerEditor } = markerjs3;
+
+    // Seguendo la guida: https://markerjs.com/docs-v3/documents/guides_and_tutorials.tutorials.custom_marker_types
+    // Estendo CustomImageMarker per sapere quale PlateMarker appartiene a quale Plate
+    class PlateMarker extends CustomImageMarker {
+        static typeName = "PlateMarker";
+        static title = "Plate marker";
+
+        #plateUUID = "";
+
+        get plateUUID() {
+            return this.#plateUUID;
+        }
+
+        set plateUUID( value ) {
+            this.#plateUUID = value;
+        }
+
+        constructor( container ) {
+            super( container );
+        }
+
+        getState() {
+            const result = Object.assign(
+                {
+                    plateUUID: this.plateUUID,
+                },
+                super.getState(),
+            );
+
+            return result;
+        }
+
+        restoreState( state ) {
+            const plateMarkerState = state;
+
+            if ( plateMarkerState.plateUUID !== undefined ) {
+                this.plateUUID = plateMarkerState.plateUUID;
+            }
+
+            super.restoreState( state );
+        }
+    }
+
+    const pub = {};
+    const priv = {
+        container: null,
+        markerArea: null,
+    };
+
+    priv.vm = new kendo.data.ObservableObject( {
+        // DATA
+        plates: [],
+        selectedPlate: null,
+        selectedPlateMarkersQuantity: 0,
+        // CONDITIONS
+        isEnabledUndo: false,
+        isEnabledRedo: false,
+        isEnabledRemoveMarker: false,
+        isEnabledAddMarker() {
+            return this.get( "selectedPlateMarkersQuantity" ) > 0;
+        },
+        // ACTIONS
+        updateUndoRedoButtons( event ) {
+            this.set( "isEnabledUndo", priv.markerArea.isUndoPossible );
+            this.set( "isEnabledRedo", priv.markerArea.isRedoPossible );
+        },
+        updateRemoveMarkerButton( event ) {
+            this.set( "isEnabledRemoveMarker", priv.markerArea.selectedMarkerEditors.length > 0 );
+        },
+        updatePlateMarkersQuantity( event ) {
+            const plate = this.plates.find( x => x.uuid == event.detail.markerEditor.marker.plateUUID );
+            const selectedPlate = this.get( "selectedPlate" );
+
+            if ( plate ) {
+                const oldQuantity = plate.get( "availableQuantity" );
+
+                let newQuantity = oldQuantity;
+
+                if ( event.type == "markerdelete" ) {
+                    newQuantity = oldQuantity + 1;
+                } else if ( event.type == "markercreate" ) {
+                    if ( oldQuantity > 0 ) {
+                        newQuantity = oldQuantity - 1;
+                    }
+                }
+
+                if ( newQuantity != oldQuantity ) {
+                    plate.set( "availableQuantity", newQuantity );
+
+                    if ( selectedPlate === plate ) {
+                        this.set( "selectedPlateMarkersQuantity", newQuantity );
+                    }
+                }
+            }
+        },
+        postUndoRedo() {
+            const selectedPlate = this.get( "selectedPlate" );
+            const plateAvailableQuantitiesMap = new Map();
+
+            for ( const plate of this.get( "plates" ) ) {
+                plate.set( "availableQuantity", plate.totalQuantity );
+
+                plateAvailableQuantitiesMap.set( plate.uuid, plate.availableQuantity );
+            }
+
+            for ( const editor of priv.markerArea.editors ) {
+                const currentPlateAvailableQuantity = plateAvailableQuantitiesMap.get( editor.marker.plateUUID );
+
+                plateAvailableQuantitiesMap.set( editor.marker.plateUUID, currentPlateAvailableQuantity - 1 );
+            }
+
+            for ( const plate of this.get( "plates" ) ) {
+                const newQuantity = plateAvailableQuantitiesMap.get( plate.uuid );
+
+                plate.set( "availableQuantity", newQuantity );
+
+                if ( selectedPlate === plate ) {
+                    this.set( "selectedPlateMarkersQuantity", newQuantity );
+                }
+            }
+        },
+        // GETTERS
+        getSelectedPlateMarkerImg( event ) {
+            let result = "../../../../assets/main/img/red_pin.png";
+
+            const selectedPlate = this.get( "selectedPlate" );
+
+            if ( selectedPlate != null ) {
+                result = selectedPlate.marker.img;
+            }
+
+            return result;
+        },
+        // EVENTS
+        onClickAddMarker( event ) {
+            const selectedPlate = this.get( "selectedPlate" );
+
+            if ( selectedPlate != null ) {
+                const markerEditor = priv.markerArea.createMarker( PlateMarker );
+
+                markerEditor.marker.plateUUID = selectedPlate.uuid;
+                markerEditor.marker.defaultSize = selectedPlate.marker.size;
+                markerEditor.marker.imageSrc = selectedPlate.marker.img;
+            }
+        },
+        onClickRemoveMarker( event ) {
+            priv.markerArea.deleteSelectedMarkers();
+        },
+        onClickUndo( event ) {
+            if ( priv.markerArea.isUndoPossible ) {
+                priv.markerArea.undo();
+
+                this.postUndoRedo();
+            }
+        },
+        onClickRedo( event ) {
+            if ( priv.markerArea.isRedoPossible ) {
+                priv.markerArea.redo();
+
+                this.postUndoRedo();
+            }
+        },
+        onClickZoomIn( event ) {
+            priv.markerArea.zoomLevel += 0.1;
+        },
+        onClickZoomOut( event ) {
+            if ( priv.markerArea.zoomLevel > 0.2 ) {
+                priv.markerArea.zoomLevel -= 0.1;
+            }
+        },
+        onClickZoomReset( event ) {
+            priv.markerArea.zoomLevel = 1;
+        },
+        onClickExport( event ) {
+            priv.state = JSON.stringify( priv.markerArea.getState() );
+        },
+        onClickImport( event ) {
+            priv.markerArea.restoreState( JSON.parse( priv.state ) );
+        },
+        onSelectPlate( event ) {
+            this.set( "selectedPlateMarkersQuantity", event.dataItem.availableQuantity );
+        },
+        // INITS
+    } );
+
+    pub.init = function( setup ) {
+        priv.container = setup.container;
+
+        priv.vm.set( "plates", pageData.plates );
+
+        kendo.bind( setup.container, priv.vm );
+
+        priv.targetImg = document.createElement( "img" );
+        priv.targetImg.src = pageData.platesMap.img;
+
+        const platesMap = document.querySelector( ".plates-map-body" );
+
+        priv.markerArea = new MarkerArea();
+        priv.markerArea.registerMarkerType( PlateMarker, ImageMarkerEditor );
+        priv.markerArea.targetImage = priv.targetImg;
+        platesMap.appendChild( priv.markerArea );
+
+        priv.markerArea.addEventListener( "areastatechange", priv.vm.updateUndoRedoButtons.bind( priv.vm ) );
+
+        priv.markerArea.addEventListener( "markerdelete", priv.vm.updateRemoveMarkerButton.bind( priv.vm ) );
+        priv.markerArea.addEventListener( "markerselect", priv.vm.updateRemoveMarkerButton.bind( priv.vm ) );
+        priv.markerArea.addEventListener( "markerdeselect", priv.vm.updateRemoveMarkerButton.bind( priv.vm ) );
+
+        priv.markerArea.addEventListener( "markerdelete", priv.vm.updatePlateMarkersQuantity.bind( priv.vm ) );
+        priv.markerArea.addEventListener( "markercreate", priv.vm.updatePlateMarkersQuantity.bind( priv.vm ) );
+    };
+
+    return pub;
+}() );

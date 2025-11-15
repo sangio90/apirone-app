@@ -94,6 +94,9 @@
 								        <div id="quotation-plate-fruits-product-items" style="max-width: 100%">
                                             <div data-template="quotation-fruit-row-tmpl" data-bind="source: detailForm.data.fruits">
                                             </div>
+                                            <div data-bind="invisible: getFruitCount" class="text-center mt-4">
+                                                <h3 style="opacity: 0.5;">Nessun frutto ancora aggiunto</h3>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -102,34 +105,18 @@
                             </div>
 
                             <div class="col-9">
-
+                                <div id="plate-designer-header" class="mb-2 pb-2">
+                                    <input 
+                                        type="text" 
+                                        id="plate-fruit-suggest" 
+                                        class="search-widget-input" 
+                                        placeholder="Aggiungi un frutto...">
+                                </div>
                                 <div id="plate-designer-root">
-                                    <div id="plate-designer-header" class="mb-2">
-                                        <input 
-                                            type="text" 
-                                            id="plate-fruit-suggest" 
-                                            class="search-widget-input" 
-                                            placeholder="Aggiungi un frutto...">
-
-                                        <!---
-                                        <input
-                                            data-role="dropdownlist"
-                                            data-value-field="uuid"
-                                            data-text-field="name"
-                                            data-filter="contains"
-                                            data-bind="source: fruits,
-                                                    events: {
-                                                        select: onSelectFruit
-                                                    }"
-                                            data-option-label="🔍 Cerca frutto..."
-                                            style="width: 200px"/>
-                                        ------>
-                                    </div>
-
                                     <!--- Dynamically populated container --->
                                     <div class="plate-designer">
-                                        <div style="width: 1200px; height: 500px; display: flex; align-items: center; justify-content: center;">
-                                            <h1 style="opacity: 0.5;">Definire le impostazioni generali per iniziare</h1>
+                                        <div class="plate-designer-canvas">
+                                            <h1 style="opacity: 0.5;">Definisci le impostazioni in alto per iniziare</h1>
                                         </div>
                                     </div>
                                 </div>                                

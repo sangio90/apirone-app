@@ -32,7 +32,8 @@ $( document ).ready( async function() {
         $( ".nav-tabs a[href='#plate-fruit-product-items-tab']" ).tab( "show" );
 
         // interaction with suggest
-        var terms = [ "schu", "levetta" ];
+        // var terms = [ "schu", "CONNETTORE VIDEO RCA" ];
+        var terms = [ "schu", "CONNETTORE RJ11" ];
 
         for ( var term of terms ) {
 
