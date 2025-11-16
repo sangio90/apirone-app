@@ -1012,7 +1012,7 @@ AP.signage.modal = ( function() {
 
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/quotation-items",
+                    url: "/manager/ajax/quotation-items/signage",
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
