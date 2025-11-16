@@ -306,17 +306,6 @@ AP.fontFamily.pictogram = ( function() {
             viewModel.set( "detailForm", defaultDetailForm );
         },
 
-        /*
-        setDescription: function( event ) {
-            $( "#pictogramDescription" ).text( viewModel.get( "detailForm.data.pictogram.name" ) );
-            viewModel.checkCanSave();
-        },
-        */
-
-        checkCanSave: function( event ) {
-            return viewModel.get( "detailForm.data.pictogram.id" ) == "" || viewModel.get( "detailForm.data.pictogram.image" ) == null;
-        },
-
         remove: function( event ) {
             const name = event.data.name;
             const id = event.data.id;
@@ -421,9 +410,8 @@ AP.fontFamily.pictogram = ( function() {
                         viewModel.get( "detailForm.data.fontFamilyPictograms" ).data( xhr.data );
                         viewModel.set( "detailForm.title", "Pittogrammi per < " + name + " >" );
 
-                        var pictograms = viewModel.get( "pictograms" );
-
-                        const filtered = pictograms.filter( function( p ) {
+                        var allPictograns = AP.page.pictogramCodes;
+                        const filtered = allPictograns.filter( function( p ) {
                             return !xhr.data.some( s => s.code === p.id );
                         } );
 
