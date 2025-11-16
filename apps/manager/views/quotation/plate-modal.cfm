@@ -73,14 +73,14 @@
                                         <li class="nav-item">
                                             <a class="nav-link" id="plate-fruit-product-items-but" data-bs-toggle="tab" 
                                                 href="##plate-fruit-product-items-tab" role="tab" aria-controls="tab2" aria-selected="true">
-                                                Frutti <span data-bind="text: getFruitsCount"></span>
+                                                Frutti <span>(<span data-bind="text: getFruitCount"></span>)</span>
                                             </a>
                                         </li>
                                     </ul>
 
                                 </nav>
 
-                                <div class="tab-content" id="quotation-nav-tabContent">
+                                <div class="tab-content" id="quotation-nav-tab-content">
 
                                     <!--- plate ---->
                                     <div class="tab-pane fade show active" id="plate-product-items-tab" role="tabpanel" aria-labelledby="plate-product-items-but">

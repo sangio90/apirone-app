@@ -308,8 +308,6 @@ AP.plate.modal = ( function() {
         drawGridWithin( $rootNode ) {
             $rootNode.empty();
 
-            console.log( "this.image", this.image );
-
             const $plateBackground = $( "<div/>", {
                 class: "plate-background",
                 css: {
@@ -1236,8 +1234,6 @@ AP.plate.modal = ( function() {
 
         loadPlate: function() {
 
-            console.log( "constants", constants );
-
             // id from model
             var modelId = this.get( "detailForm.data.product.model.code" );
             var image = this.get( "detailForm.data.product.image" );
@@ -1286,6 +1282,8 @@ AP.plate.modal = ( function() {
             const quotationItemId = viewModel.get( "detailForm.data.id" );
             const productId = viewModel.get( "detailForm.data.product.id" );
 
+            console.log( "firstLoadProductItems" );
+
             // Chiamata AJAX iniziale per ottenere tutti i product items
             NM.util.ajax( {
                 method: "GET",
@@ -1293,11 +1291,10 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        // console.log( "xhr", xhr );
-
                         var userItems = AP.getUserPref( "plate.product.items" );
 
                         if ( xhr.count > 0 ) {
+                            /*
                             if ( !viewModel.get( "detailForm.data.product.image" ) && xhr.data[0].horizontalImage ) {
                                 viewModel.set( "detailForm.data.product.image", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
@@ -1315,6 +1312,7 @@ AP.plate.modal = ( function() {
                                     viewModel.renderProductPreview( viewModel.get( "detailForm.data.product.items" ) );
                                 }
                             }
+                            */
 
                             var productItems = viewModel.get( "detailForm.data.product.items" );
 
@@ -1550,10 +1548,6 @@ AP.plate.modal = ( function() {
             var modelId  = viewModel.get( "detailForm.data.product.model.id" );
             var finishId = viewModel.get( "detailForm.data.product.finish.id" );
 
-            // console.log("loadProduct:lineId", lineId);
-            // console.log( "loadProduct:modelId", modelId );
-            // console.log( "loadProduct:finishId", finishId );
-
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotation-items/product/by-params" +
@@ -1604,12 +1598,14 @@ AP.plate.modal = ( function() {
                         if ( xhr.count > 0 ) {
 
                             var fruits = viewModel.get( "detailForm.data.fruits" );
+                            var thisImage = xhr.data[0].horizontalImage;
 
                             var thisFruit = fruits.get( fruitId );
 
                             // Overwrite the product image if the item image exists
-                            if ( xhr.data[0].horizontalImage?.uri ) {
-                                pub.fruitsController.updateFruit( thisFruit.id, { image: xhr.data[0].horizontalImage.uri } );
+                            if ( thisImage ) {
+                                thisFruit.set( "horizontalImage", thisImage );
+                                pub.fruitsController.updateFruit( thisFruit.id, { image:  thisImage.uri } );
                             }
 
                             var fruitItems = thisFruit.get( "items" );
@@ -1651,7 +1647,6 @@ AP.plate.modal = ( function() {
                             } );
 
                             thisFruit.set( "items", fruitItems );
-                            // console.log( "thisFruit:items:end", thisFruit.get( "items" ).data() );
 
                             viewModel.renderProductItemsFruit( fruitId );
 
@@ -1907,6 +1902,7 @@ AP.plate.modal = ( function() {
         },
 
         // DATA
+        /*
         plates: new kendo.data.DataSource( {
             data: [
                 {
@@ -2045,6 +2041,7 @@ AP.plate.modal = ( function() {
             },
         } ),
         selectedPlate: "100",
+        */
         isPlateDefined: false,
 
         onSelectFruit: function( selectedFruit ) {
@@ -2072,7 +2069,7 @@ AP.plate.modal = ( function() {
             }
             */
         },
-        configPlate: function( event ) {
+        configPlate: function() {
 
             // var plate = this.plates.get( this.get( "plate" ) );
             var plate = this.get( "plate" );
@@ -2092,8 +2089,7 @@ AP.plate.modal = ( function() {
 
             const grid = [];
 
-            // console.log( "plate", plate );
-
+            // create grid
             for ( let iRow = 0; iRow < plate.grid.length; iRow++ ) {
                 const row = [];
 
@@ -2117,8 +2113,6 @@ AP.plate.modal = ( function() {
                 grid.push( row );
             }
 
-            // console.log( "config:plate.image", plate.image );
-
             const plateObj = new Plate( {
                 width: plate.width,
                 height: plate.height,
@@ -2131,6 +2125,8 @@ AP.plate.modal = ( function() {
                 isSpecial: false,
             } );
 
+            // console.log( "fruits:fruitList", fruitList );
+
             pub.fruitsController = new FruitsController( {
                 plate: plateObj,
                 fruits: [],
@@ -2138,11 +2134,23 @@ AP.plate.modal = ( function() {
 
             pub.fruitsController.plate.drawGridWithin( $( ".plate-designer" ) );
 
+            // se ci sono frutti li reinserisco
+            // var fruitList = [];
+
+            var fruits = viewModel.get( "detailForm.data.fruits" );
+
+            if ( fruits.total() ) {
+                for ( var thisFruit of fruits.data() ) {
+                    console.log( "thisFruit:" + thisFruit.shortId, thisFruit?.horizontalImage?.uri );
+                    var obj = mapFruitForPlate( thisFruit );
+                    console.log( "obj", obj );
+                    pub.fruitsController.addFruitInPlate( obj );
+                };
+            }
+
             this.set( "isPlateDefined", true );
         },
-        // INITS
     } );
-
 
     pub.new = function( onSave ) {
         if ( onSave ) {
