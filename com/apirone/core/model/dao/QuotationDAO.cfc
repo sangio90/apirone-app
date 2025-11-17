@@ -344,6 +344,48 @@
 		<cfreturn success />
 	</cffunction>
 
+	<cffunction name="exportDiba" returntype="Boolean">
+		<cfargument name="data" type="Struct" required="true">
+		<cfset var qCheck = "" />
+		<cfset var success = false />
+		<cfset var uniqueKey = arguments.data.DS_CHIAVE &
+			arguments.data.DSCODMAT &
+			arguments.data.DSVARMAT &
+			arguments.data.DSCOLMAT
+		>
+
+		<cfquery name="qCheck" datasource="verticaleExport">
+			SELECT DS_CHIAVE
+			FROM DISBAS_APIR
+			WHERE CONCAT(DS_CHIAVE, DSCODMAT, DSVARMAT, DSCOLMAT) = '#uniqueKey#'
+		</cfquery>
+
+
+		<cfif qCheck.recordCount EQ 0>
+			<cfquery datasource="verticaleExport">
+				INSERT INTO DISBAS_APIR (DS_CHIAVE, DSCODART, DSCODVAR, DSCODCOL, DSCODMAT, DSVARMAT, DSCOLMAT, DSQTAMOV, DSTIPMAT, DSUNMIS1, CPROWNUM, CPROWORD)
+				VALUES (
+					<cfqueryparam value="#arguments.data.DS_CHIAVE#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSCODART#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSCODVAR#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSCODCOL#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSCODMAT#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSVARMAT#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSCOLMAT#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSQTAMOV#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSTIPMAT#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSUNMIS1#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.CPROWNUM#" cfsqltype="numeric">,
+					<cfqueryparam value="#arguments.data.CPROWORD#" cfsqltype="numeric">
+				)
+			</cfquery>
+
+			<cfset success = true />
+		</cfif>
+
+		<cfreturn success />
+	</cffunction>
+
 	<cffunction name="getQuotationTotal" access="public" returntype="numeric">
 		<cfargument name="quotationId" type="String" required="true">
 
