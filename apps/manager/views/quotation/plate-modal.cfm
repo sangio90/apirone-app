@@ -114,8 +114,8 @@
                                 </div>
                                 <div id="plate-designer-root">
                                     <!--- Dynamically populated container --->
-                                    <div class="plate-designer">
-                                        <div class="plate-designer-canvas">
+                                    <div class="plate-designer" id="plate-designer">
+                                        <div class="plate-designer-canvas" id="plate-designer-canvas">
                                             <h1 style="opacity: 0.5;">Definisci le impostazioni in alto per iniziare</h1>
                                         </div>
                                     </div>

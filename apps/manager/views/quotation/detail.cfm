@@ -367,9 +367,18 @@
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div>
+                                    <!---
                                     <div id="totalsFloatingTab" class="container py-3">
                                         <div class="d-flex align-items-center">
                                             <table style="width: 100%"></table>
+                                        </div>
+                                    </div>
+                                    ---->
+                                    <div id="totalsFloatingTab" class="container py-3">
+                                        <div class="d-flex align-items-center">
+                                            <table style="width: 100%">
+                                                <tbody data-bind="source: items" data-template="quotation-pricing-totals-item-tmpl"></tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -471,9 +480,8 @@
 
                                     <div class="form-group row mb-2">
                                         <div class="col-sm-9 offset-sm-3">
-                                           <button class="btn btn-primary changeTab" id="discount">Precendete &raquo;</button>
+                                            <button class="btn btn-primary changeTab" id="discount">Precendete &raquo;</button>
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
-
                                         </div>
                                     </div>
 
@@ -489,12 +497,15 @@
         </div>
 
     </div>
+    
     #view( "quotation/signage-modal" )#
     #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal" )#
     #view( "quotation/zone-modal" )#
+
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-accessory-preview-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
 </cfoutput>
 
 <script>
@@ -553,7 +564,7 @@ document.addEventListener("DOMContentLoaded", function () {
         padding: 10px 20px;
         border-radius: 10px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        z-index: 9999;
+        z-index: 999999;
     }
     .quotation-panel {
         min-height: 55vh !important;

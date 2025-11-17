@@ -6,6 +6,13 @@
 LAV-VERNPOLVLIS
 
 <cfquery name="i" datasource="verticaleExport">
+    SELECT * FROM artico_apir;
+</cfquery>
+
+<cfdump var="#i#">
+<cfabort>
+
+<cfquery name="i" datasource="verticaleExport">
     SELECT * FROM INFORMATION_SCHEMA.TABLES;
 </cfquery>
 

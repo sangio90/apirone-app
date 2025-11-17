@@ -44,6 +44,7 @@
     "QuotationItemProduct.bean": {},
     "QuotationItemProductItem.bean": {},
     "QuotationItemSignageRow.bean": {},
+    "QuotationItemFruit.bean": {},
     "QuotationZone.bean": {},
     "RawProduct.bean": {},
     "RawProductType.bean": {},

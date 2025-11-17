@@ -16,6 +16,9 @@ $( document ).ready( async function() {
 
         // Sequenza asincrona
         await helper.wait( 600 );
+        $( "body" ).find( "#nav-products-tab" ).click();
+
+        await helper.wait( 600 );
         $( "body" ).find( "button[data-bind='click:addPlate']" ).click();
 
         await helper.wait( 600 );

@@ -27,11 +27,11 @@ $( document ).ready( function() {
         AP.quotationDetail.detail.renderTotals();
     } );
 
-    $("form#zone-form").on("submit", function(e) {
+    $( "form#zone-form" ).on( "submit", function( e ) {
         e.preventDefault();
         AP.quotationDetail.zoneModal.methods().createZone();
         return false;
-    });
+    } );
 } );
 
 AP.quotationDetail.detail = ( function() {
@@ -217,17 +217,17 @@ AP.quotationDetail.detail = ( function() {
             } );
         },
         printQuotation: function() {
-			window.open(
-				"/manager/technical-reports/print?id=" + AP.page.quotation.id,
-				"_blank"
-			)
+            window.open(
+                "/manager/technical-reports/print?id=" + AP.page.quotation.id,
+                "_blank"
+            );
         },
         changeMode: function( e ) {
-            viewModel.set('mode', e.currentTarget.textContent.toLowerCase())
+            viewModel.set( "mode", e.currentTarget.textContent.toLowerCase() );
             viewModel.getItems();
         },
-        getMode: function () {
-            return viewModel.get('mode');
+        getMode: function() {
+            return viewModel.get( "mode" );
         },
         getImageSrc: function( event ) {
 
@@ -462,7 +462,7 @@ AP.quotationDetail.detail = ( function() {
         },
 
         getItems: function( e ) {
-            var quotationItemsMode = viewModel.get('mode');
+            var quotationItemsMode = viewModel.get( "mode" );
             if ( viewModel.detailForm.data.zone?.name != "" ) {
                 var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id + "&mode=" + quotationItemsMode;
                 if ( viewModel.detailForm.data.zone ) {
@@ -511,6 +511,10 @@ AP.quotationDetail.detail = ( function() {
             accessoryApp().new();
         },
 
+        addPlate: function() {
+            plateApp().new();
+        },
+
         editSignage: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
@@ -525,9 +529,13 @@ AP.quotationDetail.detail = ( function() {
             $( tabellaTotali ).empty();
         },
 
-        addPlate: function() {
-            plateApp().new();
+        editPlate: function( event ) {
+            event.preventDefault();
+            signageApp().edit( { id: event.data.id } );
+            const tabellaTotali = $( "#totalsFloatingTab" ).find( "table" )[0];
+            $( tabellaTotali ).empty();
         },
+
 
         openAddZoneModal: function() {
             if ( AP.quotationDetail.fields.zoneModalRoot.length ) {
@@ -592,6 +600,7 @@ AP.quotationDetail.detail = ( function() {
     // la prossima volta lo facciamo con mvvm
 
     pub.renderTotals = function() {
+        /*
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/total",
@@ -622,6 +631,7 @@ AP.quotationDetail.detail = ( function() {
                 }
             }
         } );
+        */
     };
 
     return pub;
@@ -742,7 +752,7 @@ AP.quotationDetail.zoneModal = ( function() {
             zones.unshift( { "id": "", "name": "-- seleziona una zona" } );
 
             viewModel.get( "zones" ).data( zones );
-            $('#zoneTitle').text("Elimina Zona");
+            $( "#zoneTitle" ).text( "Elimina Zona" );
 
             $( "#delete-zone-button" ).show();
             $( "#add-zone-button" ).hide();
@@ -774,7 +784,7 @@ AP.quotationDetail.zoneModal = ( function() {
 
             zones.unshift( { "id": "", "name": "-- nessuna" } );
             viewModel.get( "zones" ).data( zones );
-            $('#zoneTitle').text("Nuova Zona");
+            $( "#zoneTitle" ).text( "Nuova Zona" );
 
             $( "#delete-zone-button" ).hide();
             $( "#add-zone-button" ).show();

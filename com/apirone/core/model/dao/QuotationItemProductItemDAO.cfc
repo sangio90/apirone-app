@@ -19,6 +19,7 @@
 		<cfargument name="orderBy" type="String" required="true" default="quotation_item_product_item_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
+
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				quotation_item_product_item_id::varchar,
@@ -30,16 +31,24 @@
 			FROM
 				quotation_item_product_items
 			WHERE 1=1
-				<cfif !IsNull( arguments.quotationItemId )>
-					AND quotation_item_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemId#">::uuid
+
+				<cfif !IsNull( arguments.quotationItemFruitId )>
+					AND quotation_item_fruit_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruitId#">
 				</cfif>
+
+				<cfif !IsNull( arguments.quotationItemId )>
+					AND quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
+				</cfif>
+
 				<cfif !IsNull( arguments.productItemId )>
 					AND product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItemId#">
 				</cfif>
+
 				<cfif !IsNull( arguments.originId )>
-					AND origin_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.originId#">
+					AND origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.originId#">
 				</cfif>
-			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
+			ORDER BY
+				#super.sanitizeSQL( arguments.orderBy )#
 
 			<cfif arguments.limit GT 0>
 				LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
@@ -55,18 +64,32 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_product_items (
 				quotation_item_id,
+				quotation_item_fruit_id,
+				origin_id,
 				product_item_id,
-				level,
-				origin_id
+				level
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItemId()#">::uuid,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">,
+
+				<cfif !IsNull( arguments.productItem.getQuotationItemId() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItemId()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+
+				<cfif !IsNull( arguments.productItem.getQuotationItemFruitId() )>
+					<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getQuotationItemFruitId()#">
+				<cfelse>
+					NULL
+				</cfif>,
+
 				<cfif !IsNull( arguments.productItem.getOrigin() )>
 					<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getOrigin().getId()#">
 				<cfelse>
 					NULL
-				</cfif>
+				</cfif>,
+
+				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">
 			)
 			RETURNING quotation_item_product_item_id
 		</cfquery>
@@ -76,15 +99,34 @@
 	<cffunction name="update" returntype="String">
 		<cfargument name="productItem" type="com.apirone.core.model.bean.QuotationItemProductItem" required="true">
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE quotation_item_product_items
+			UPDATE
+				quotation_item_product_items
 			SET
-				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItemId()#">::uuid,
 				product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
-				level = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">
-				<cfif !IsNull( arguments.productItem.getOrigin() )>
-					,origin_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getOrigin().getId()#">
-				</cfif>
-			WHERE quotation_item_product_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getId()#">::uuid
+				level = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">,
+
+				quotation_item_id =
+					<cfif !IsNull( arguments.productItem.getQuotationItemId() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getQuotationItemId()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>,
+
+				quotation_item_fruit_id =
+					<cfif !IsNull( arguments.productItem.getQuotationItemFruitId() )>
+						<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getQuotationItemFruitId()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				origin_id =
+					<cfif !IsNull( arguments.productItem.getOrigin() )>
+						<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getOrigin().getId()#">
+					<cfelse>
+						NULL
+					</cfif>
+			WHERE
+				quotation_item_product_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getId()#">::uuid
 		</cfquery>
 		<cfreturn arguments.productItem.getId()>
 	</cffunction>

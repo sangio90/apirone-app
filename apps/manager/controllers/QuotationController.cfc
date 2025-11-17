@@ -133,6 +133,7 @@
 		//prc.jsFiles.add( "app-plate-designer" );
 		prc.jsFiles.add( "app-plate" );
 		prc.jsFiles.add( "app-quotation-detail" );
+		prc.jsFiles.add( "app-quotation-pricing" );
 		prc.jsFiles.add( "app-signage" );
 		prc.jsFiles.add( "app-accessory" );
 

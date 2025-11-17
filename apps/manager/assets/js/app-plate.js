@@ -17,7 +17,9 @@ $( document ).ready( function() {
 AP.plate.modal = ( function() {
 
     AP.plate.constants = { GRID_CELL_DIMENSIONS: { "_": { "height": 180, "width": 45 }, "0": { "height": 105, "width": 52 } } };
+
     var constants = AP.plate.constants;
+    var fields = AP.plate.fields;
 
     let FREE_CELL_WIDTH;
     let FREE_CELL_HEIGHT;
@@ -310,6 +312,7 @@ AP.plate.modal = ( function() {
 
             const $plateBackground = $( "<div/>", {
                 class: "plate-background",
+                id: "plate-background",
                 css: {
                     width: `${this.width}px`,
                     height: `${this.height}px`,
@@ -1107,7 +1110,7 @@ AP.plate.modal = ( function() {
 
     var mapFruitForPlate = function( data ) {
 
-        console.log( "mapFruitForPlate:data", data );
+        // console.log( "mapFruitForPlate:data", data );
 
         var fruit = {
             id        : data.id,
@@ -1161,8 +1164,12 @@ AP.plate.modal = ( function() {
                 },
                 items: new kendo.data.DataSource(),
             },
-            zone: {
+            quotationZone: {
                 id: ""
+            },
+            status: {
+                id: "ACT",
+                name: ""
             },
             fruits:  new kendo.data.DataSource( {
                 data: [],
@@ -1221,7 +1228,6 @@ AP.plate.modal = ( function() {
         },
 
         getFruitCount() {
-            console.log( "fruit:count", this.get( "detailForm.data.fruits" ).total() );
             return this.get( "detailForm.data.fruits" ).total();
         },
 
@@ -1593,7 +1599,7 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        console.log( "addProductItemsToFruit:xhr", xhr );
+                        // console.log( "addProductItemsToFruit:xhr", xhr );
 
                         if ( xhr.count > 0 ) {
 
@@ -1869,34 +1875,30 @@ AP.plate.modal = ( function() {
         resetForm: function() {},
 
         save: function( event ) {
-            var detailForm = AP.signage.fields.detailForm;
-            var status = detailForm.find( ".status" );
 
-            status.html( "<img src='/assets/fakes/img/ajax-loading.svg' width=20 height=20>" );
+            const parsedData = viewModel.get( "detailForm.data" );
 
-            if ( detailForm.valid() ) {
+            parsedData.quotationId = AP.page.quotation.id;
+            parsedData.type = "plate";
+            var preview = $( "#plate-background" )[0];
+
+            html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
+                const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
+                parsedData.imageBase64 = imgData;
+
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/signages",
-                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    url: "/manager/ajax/quotation-items/plate",
+                    data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
-                            if ( xhr.status == "SUCCESS" ) {
-                                NM.util.autoHideMessage( status, "<span class='green'>Segnaletica salvata</span>" );
-
-                                setTimeout( () => $( "#signage-detail-modal" ).modal( "hide" ),
-                                    1000,
-                                );
-
-                                AP.util.fireCallback(
-                                    "onSave",
-                                    viewModel.get( "callback" ),
-                                );
-                            }
-                        },
-                    },
+                            AP.widget.notify( "success", "Placca salvata correttamente." );
+                            viewModel.set( "detailForm", defaultDetailForm );
+                            // setTimeout( () => window.location.reload(), 1000 );
+                        }
+                    }
                 } );
-            }
+            } );
 
             return false;
         },
@@ -2046,7 +2048,7 @@ AP.plate.modal = ( function() {
 
         onSelectFruit: function( selectedFruit ) {
 
-            console.log( "selectedFruit", selectedFruit );
+            // console.log( "selectedFruit", selectedFruit );
 
             var newFruit = createFruit( selectedFruit );
 
@@ -2156,6 +2158,8 @@ AP.plate.modal = ( function() {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
+
+        viewModel.set( "detailForm.data.quotationZone", AP.quotationDetail.detail.config().zone );
 
         viewModel.loadLines();
 
