@@ -197,7 +197,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							nota &= attribute.getName() & ': ' & rawValue.getName() & '; ';
 						}
 
-						var productComponents = getComponents(product.getId(), quotationItem.getQuantity(), productItemIds);
+						var productComponents = getComponents(product.getId(), quotationItem, productItemIds);
+							
 						varCode &= RepeatString("0", 10 - Len(varCode))
 
 						//per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
@@ -304,7 +305,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						exportCode.setCounter( '000000' );
 						exportCodeSvc.create( 'exportCode' = exportCode );
 					}
-					// var newId = getDao().export( arguments.quotationItems );
+
+					for ( var productComponent in productComponents ) {
+						productComponent.DS_CHIAVE = data.AR_CHIAVE;
+						productComponent.DSCODART = data.ARCODART;
+						productComponent.DSCODVAR = data.VARCOD;
+						productComponent.DSCODCOL = data.CLCODICE;
+						success = getDao().exportDiba( productComponent )
+					}
 				}
 			}
 		}
@@ -314,10 +322,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public function getComponents(
 		required String productId,
-		required Numeric quantity = 1,
+		required quotationItem,
 		Array producItemtIds
 	) {
-		var itemsComponents = [];
+		var quantity = quotationItem.getQuantity() ? quotationItem.getQuantity() : 1;
+		var allComponents = [];
 		var progressivo = 0
 
 		var productSvc   = getProductService();
@@ -334,23 +343,69 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				includeBaseAttributeComponents = true
 			);
 			for (var bundleComponent in bundleComponents) {
-				itemsComponents.add(parseComponent(bundleComponent, progressivo));
+				allComponents.add(parseComponent(bundleComponent, progressivo));
+			}
+			if (IsInstanceOf(quotationItem, 'com.apirone.core.model.bean.QuotationItemSignage')) {
+				var signageComponents = componentSvc.list(
+					signageConfigItemId            = quotationItem.getSignageConfigItem().getId(),
+					includeBaseAttributeComponents = true
+				);
+
+				if (producItemtIds.len() > 0) {
+					for ( var productItemId in productItemIds ) {
+						var signageProductComponents = componentSvc.list(
+							signageItemProduct = {
+								signageConfigItemId = quotationItem.getSignageConfigItem().getId(),
+								productItemId = productItemId
+							},
+							includeBaseAttributeComponents = true
+						);
+						for (var signageProductComponent in signageProductComponents) {
+							allComponents.add(parseComponent(signageProductComponent, progressivo));
+						}
+					}
+				}
+
+				for (var signageComponent in signageComponents) {
+					allComponents.add(parseComponent(signageComponent, progressivo));
+				}
 			}
 		}
-		dump(itemsComponents);abort;
+		var productComponents = componentSvc.list(
+			productId                      = product.getId(),
+			includeBaseAttributeComponents = true
+		);
+		for (var productComponent in productComponents) {
+			allComponents.add(parseComponent(productComponent, progressivo));
+		}
+
+		if (producItemtIds.len() > 0) {
+			for ( var productItemId in productItemIds ) {
+				var productItemComponents = componentSvc.list( productItemId = productItemId, includeBaseAttributeComponents = true );
+				for (var productItemComponent in productItemComponents) {
+					allComponents.add(parseComponent(productItemComponent, progressivo));
+				}
+			}
+		}
+
+		return allComponents;
 	}
 
 	public function parseComponent(com.apirone.core.model.bean.Component component, progressivo) {
 		var progressivo = getProgressivoComponenti();
 		var componente = {
-			'DSCODMATI' = component.getRawProduct()?.getId(),
-			'DSVARMATI' = component.getVariant().getId(),
+			'DS_CHIAVE' = '',
+			'DSCODART' = '',
+			'DSCODVAR' = '',
+			'DSCODCOL' = '',
+			'DSCODMAT' = component.getRawProduct()?.getId(),
+			'DSVARMAT' = component.getVariant().getId(),
 			'DSCOLMAT' = component.getColor().getId(),
 			'DSQTAMOV' = component.getQuantity(),
 			'DSTIPMAT' = component.getRawProduct()?.getProcessingType()?.getId(),
 			'DSUNMIS1' = component.getRawProduct()?.getMeasurementUnit()?.getId(),
 			'CPROWNUM' = progressivo + 1,
-			'CPROWORDI' = (progressivo + 1) * 10,
+			'CPROWORD' = (progressivo + 1) * 10,
 			'DSTIPMAT' = 'R'
 		};
 		setProgressivoComponenti(progressivo + 1)
