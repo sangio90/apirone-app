@@ -57,11 +57,11 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 		}
 	}
 
-	public String function getProductDescription(){
-		if (IsInstanceOf( this, "com.apirone.core.model.bean.ProductComplex" ) ) {
+	public String function getDescription(){
+		if ( IsInstanceOf( this, "com.apirone.core.model.bean.ProductComplex" ) ) {
 			return "#getLine().getName()# #getModel().getName()# (#getModel().getCode()#) #getFinish().getName()#";
 		} else {
-			return getCode();
+			return getName();
 		}
 	}
 

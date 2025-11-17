@@ -2,8 +2,8 @@
 	<div id="totalsFloatingTab" class="container py-3">
 		<div>
 			<h3>Totali</h3>
-			<table style="width: 100%" style="">
-				<tbody data-bind="source: pricing.items" data-template="quotation-pricing-totals-item-tmpl"></tbody>
+			<table style="width: 100%" class="quotation-table-item-prices-totals">
+				<tbody data-bind="source: pricing.lines" data-template="quotation-pricing-totals-item-tmpl"></tbody>
 			</table>
 			<div class="row mt-3 mb-2">
 				<div class="col-4">Sconti</div>

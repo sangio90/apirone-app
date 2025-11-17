@@ -262,8 +262,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		FileWrite( filePath, binaryData );
 
 
-		var id   = json.id;
-		//var type = json.type;
+		var id = json.id;
+		// var type = json.type;
 
 		var bean = super.bean( "QuotationItemPlate" );
 
@@ -278,7 +278,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setPrice( 20.2 );
 		bean.setQuantity( json.quantity );
 
-		json.delete("imageBase64");
+		json.delete( "imageBase64" );
 
 		var product = super
 			.fire(
@@ -304,13 +304,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotationItem.update", [ bean ] )
 		}
 
+		var position = 0;
 		for ( var thisFruit in json.fruits._data ) {
 			var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
-
-
-			dump(thisFruit);
-			abort;
-
 
 			if ( !Len( fruitBean ) ) {
 				var fruitBean = super.bean( "QuotationItemFruit" );
@@ -322,7 +318,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			var product = super.fire( "product.get", [ thisFruit.id ] );
 
 			fruitBean.setProduct( product );
-			fruitBean.setPosition( fruit.position );
+			fruitBean.setPosition( position++ );
 
 			super.fire( action, [ fruitBean ] );
 		}
@@ -330,13 +326,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		var files = super.fire( "File.search", { quotationItemId = thisId } );
 		if ( Len( files.getData() ) ) {
 			for ( var file in files.getData() ) {
-				super.fire( "File.delete", { fileId = file.getId() } );
+				super.fire( "file.delete", { fileId = file.getId() } );
 			}
 		}
 
 		var entity = super.bean( "Entity" );
 
-		var kindId = "quotationItem";
 		entity.setKey( "quotationItem.id" );
 		entity.setValue( thisId );
 
@@ -351,27 +346,30 @@ component extends="com.apirone.core.controller.AbsController" {
 		);
 
 		var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId } );
+
 		quotationItemProductItems.each( function( quotationItemProductItem ){
 			super.fire( "quotationItemProductItem.delete", { "productItemId" = quotationItemProductItem.getId() } )
 		} );
 
 		var productItemsData = json.quotationItem.product.items._data;
+
 		productItemsData.each( function( productItemRow ){
-			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
-				return v.selected;
+			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
+				return value.selected;
 			} )
+
 			if ( Len( selectedValue ) > 0 ) {
 				selectedValue   = selectedValue[ 1 ];
 				var productItem = super.fire( "productItem.get", { "productItemId" = selectedValue.product_item_id } );
 
-				var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
-				quotationItemProductItemBean.setQuotationItemId( thisId );
-				quotationItemProductItemBean.setProductItem( productItem );
-				quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
-				quotationItemProductItemBean.setLevel( productItemRow.level );
-				quotationItemProductItemBean.setId( thisId )
+				var bean = super.bean( "QuotationItemProductItem" );
+				bean.setQuotationItemId( thisId );
+				bean.setProductItem( productItem );
+				bean.setOrigin( productItem.getOrigin() );
+				bean.setLevel( productItemRow.level );
+				bean.setId( thisId )
 
-				super.fire( "quotationItemProductItem.create", { "productItem" = quotationItemProductItemBean } )
+				super.fire( "quotationItemProductItem.create", { "productItem" = bean } )
 			}
 		} )
 

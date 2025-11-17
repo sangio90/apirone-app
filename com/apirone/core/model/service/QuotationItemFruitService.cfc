@@ -4,7 +4,7 @@
 	property name="productService" inject="ProductService";
 	property name="cacheScope" type="String" default="QuotationItemFruit.bean";
 
-	public com.apirone.core.model.bean.QuotationItemFruit function get( required String quotationItemFruitId ){
+	public com.apirone.core.model.bean.QuotationItemFruit function get( required Numeric quotationItemFruitId ){
 		var cm    = getCacheManager();
 		var cache = cm.get( getCacheScope(), arguments.quotationItemFruitId );
 
@@ -30,10 +30,9 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		String mode             = null,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotation.id" } ]
+		required Array orderBy  = [ { field = "quotationItemFruit.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
@@ -42,7 +41,7 @@
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( quotationItemFruitId = record.quotation_item_id ) );
+			rows.add( get( record.quotation_item_fruit_id ) );
 		} );
 
 		result.setData( rows );
@@ -52,9 +51,8 @@
 		return result;
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete( required String quotationItemFruitId ){
+	public com.apirone.core.model.bean.Outcome function delete( required Numeric quotationItemFruitId ){
 		var outcome = super.bean( "Outcome" );
-		var obj     = get( arguments.quotationItemFruitId );
 
 		outcome.setData( { quotationItemFruitId = arguments.quotationItemFruitId } );
 		getDao().delete( arguments.quotationItemFruitId );
@@ -88,7 +86,7 @@
 		return arguments.quotationItemFruit.getId();
 	}
 
-	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemFruitId ){
+	private com.apirone.core.model.bean.QuotationItem function build( required Numeric quotationItemFruitId ){
 		var record = getDao().read( arguments.quotationItemFruitId );
 
 		if ( record.recordCount ) {
@@ -96,7 +94,7 @@
 
 			bean.setId( record.quotation_item_fruit_id );
 			bean.setPosition( record.position );
-			bean.setProduct( getProductService().get( record.product_id ) );
+			bean.setFruit( getProductService().get( record.fruit_id ) );
 
 			var items = getQuotationItemProductItemService().list( quotationItemFruitId = quotationItemFruitId );
 

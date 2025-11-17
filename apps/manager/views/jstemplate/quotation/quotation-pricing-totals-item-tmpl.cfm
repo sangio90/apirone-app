@@ -1,12 +1,13 @@
 ﻿<cfprocessingdirective pageEncoding="UTF-8">
 
 <cfoutput>
-    <nmscript type="text/x-kendo-template" id="quotation-pricing-totals-item-tmpl">
+
+	<nmscript type="text/x-kendo-template" id="quotation-pricing-totals-item-tmpl">
 		<tr>
 			<td>
 				<span data-bind="text: name"></span>
 			</td>
-			<td width="30" class="text-end">
+			<td width="30" class="text-end" nowrap>
 				<span data-bind="text: amount"></span>
 			</td>
 		</tr>

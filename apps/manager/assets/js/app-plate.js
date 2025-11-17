@@ -1894,7 +1894,7 @@ AP.plate.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             AP.widget.notify( "success", "Placca salvata correttamente." );
-                            viewModel.set( "detailForm", defaultDetailForm );
+                            // viewModel.set( "detailForm", defaultDetailForm );
                             // setTimeout( () => window.location.reload(), 1000 );
                         }
                     }

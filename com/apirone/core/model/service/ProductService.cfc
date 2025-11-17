@@ -194,7 +194,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function updateDetail( required com.apirone.core.model.bean.Product product ){
-
 		getDao().updateDetail( product );
 
 		super.getCacheManager().remove( getCacheScope(), product.getId() );
@@ -202,8 +201,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return product.getId();
 	}
 
-	public Boolean function updateImportants( required com.apirone.core.model.bean.Product product,  required Numeric[] ids ){
-
+	public Boolean function updateImportants(
+		required com.apirone.core.model.bean.Product product,
+		required Numeric[] ids
+	){
 		var itemService = getProductItemService();
 
 		```
@@ -216,7 +217,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var allItems = itemService.getFlatTree( productId = product.getId() );
 
-		for( var item in allItems ) {
+		for ( var item in allItems ) {
 			if ( ArrayContains( ids, item.getId() ) ) {
 				var value = true;
 			} else {
@@ -232,12 +233,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			```
 
 			itemService.removeCache( item.getId() );
-
 		}
 
 
 		return true;
-	}	
+	}
 
 
 	public Void function removeCache( required String productId ){
@@ -272,26 +272,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productId );
 
 		if ( record.recordCount ) {
-
 			if ( IsNull( record.catalog_bundle_id ) ) {
 				var bean = super.bean( "ProductBase" );
-				
+
 				bean.setCode( record.code );
 				bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
 				bean.setPositionCount( record.position_count );
-				var lines = super.getLinesBeanByIds( record.lines );
-				bean.setLines( lines );
-			
+				bean.setLines( super.getLinesBeanByIds( record.lines ) );
 			} else {
-				
 				var bean = super.bean( "ProductComplex" );
+
 				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
 
 				bean.setLine( bean.getCatalogBundle().getLine() );
 				bean.setModel( bean.getCatalogBundle().getModel() );
 				bean.setCategory( bean.getCatalogBundle().getCategory() );
-				bean.setFinish( getFinishService().get(  record.finish_id ) );
-
+				bean.setFinish( getFinishService().get( record.finish_id ) );
 			}
 
 			bean.setId( record.product_id );

@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="amount" type="Numeric";
 
-	public PriceItem function init(){
+	public PriceLine function init(){
 		return this;
 	}
 

@@ -14,12 +14,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function calculateQuotationItem( event, rc, prc ){
-		var result     = super.getResult();
-		var memy       = super.getMementify();
+		var result = super.getResult();
+		var memy   = super.getMementify();
+
 		var calculator = super.service( "PriceCalculator" );
 		var pricing    = super.bean( "QuotationPrice" );
-
-		var totalGoods = 0;
+		var lines      = [];
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
@@ -43,13 +43,10 @@ component extends="com.apirone.core.controller.AbsController" {
 			productItemsIds
 		);
 
-		dump( platePrice );
-		abort;
-
-		var line = super.bean( "PriceItem" );
+		var line = super.bean( "PriceLine" );
 
 		line.setName( "Prezzo placca" );
-		line.setAmount( platePrice.getFinalPrice() );
+		line.setAmount( platePrice );
 
 		lines.add( line );
 
@@ -58,11 +55,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			fruits price
 		*/
 
-		var fruitsLines = [];
-
-		for ( var fruit in json.fruits_data ) {
+		for ( var fruit in json.fruits._data ) {
 			var fruitItemsIds = [];
-			var line          = super.bean( "PriceItem" );
+			var line          = super.bean( "PriceLine" );
 
 			for ( var item in fruit.items._data ) {
 				for ( var value in item.values ) {
@@ -72,23 +67,23 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 			}
 
-			var fruitPrice = super.service( "PriceCalculator" ).simulate( fruit.id, 1, fruitItemsIds );
+			var fruitPrice = calculator.calculate( fruit.id, 1, fruitItemsIds );
 
-			line.setName( "Prezzo #fruit.name#" );
-			line.setAmount( fruitPrice.getFinalPrice() );
+			line.setName( "Prezzo #fruit?.name#" );
+			line.setAmount( fruitPrice );
 
-			totalGoods = totalGoods + fruitPrice.getFinalPrice();
+			// totalGoods = totalGoods + fruitPrice;
 
-			fruitsLines.add( line );
+			lines.add( line );
 		}
 
-		fruitsLines.menge( lines );
+		pricing.setLines( lines );
 
-		quotationPrice.setItems( fruitsLines );
+		var data = memy.convert( pricing );
 
-		result.setData( quotationPrice );
+		// result.setData( quotationPrice );
 
-		event.setValue( "result", result );
+		event.setValue( "result", data );
 	}
 
 	function calculateQuotation( event, rc, prc ){

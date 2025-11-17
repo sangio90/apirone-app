@@ -12,16 +12,12 @@
 	display: flex;
 }
 
-.quotation-fruit-row-name {}
-
-.quotation-fruit-row-remove {}
-
 #plate-designer-header {
 	border-bottom: 1px solid #eeeeee;
 }
 
 
-/* SEZIONE PER LA PAGINA: plate/designer */
+/* plate/designer */
 
 #plate-designer-root {
 	width: 100%;
@@ -152,4 +148,17 @@
 	cursor: no-drop;
 }
 
-/* END SEZIONE PER LA PAGINA: plate/designer */
+/* END plate/designer */
+
+.quotation-table-item-prices-totals tbody tr {
+	border-bottom: 1px solid #6B96DB;
+}
+
+.quotation-table-item-prices-totals tbody tr:last-child {
+	border-bottom: none;
+}
+
+.quotation-table-item-prices-totals tbody td {
+	padding: 8px 0px;
+	line-height: 15px;
+}

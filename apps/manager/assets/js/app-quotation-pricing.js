@@ -21,11 +21,7 @@ AP.quotation.pricing = ( function() {
     var viewModel = kendo.observable( {
 
         pricing: {
-            items: [
-                { name: "Frutto 1", amount: 10.5 },
-                { name: "Frutto 2", amount: 10.3 },
-                { name: "Frutto 3", amount: 10.4 }
-            ],
+            lines: [], // es. { name: "Frutto 1", amount: 10.5 },
 
             discounts: {
                 value1: "",
@@ -54,7 +50,8 @@ AP.quotation.pricing = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data ) {
-                            viewModel.get( "items", xhr.data );
+                            viewModel.set( "pricing.lines", xhr.data.lines );
+                            viewModel.set( "pricing.total", xhr.data.total );
                         }
                     }
                 }

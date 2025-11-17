@@ -8,5 +8,10 @@
         id: "M",
         name: "Moltiplic.",
         simbol: "X"
+    },
+    {
+        id: "A",
+        name: "Auto",
+        simbol: "€"
     }
 ]

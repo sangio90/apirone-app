@@ -132,7 +132,7 @@
 											<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 3.6cm; max-width: 100%; object-fit: contain;">
 										</cfif>
 									</td>
-									<td style="vertical-align: top; padding-top: .2in; border-left: 0; font-size: 11pt;">#oggetto.getProduct().getProductDescription()#</td>
+									<td style="vertical-align: top; padding-top: .2in; border-left: 0; font-size: 11pt;">#oggetto.getProduct().getDescription()#</td>
 									<td style="text-align: right;">#oggetto.getQuantity()#</td>
 									<td style="text-align: right;">#oggetto.getPrice()# €</td>
 									<td style="text-align: right;">#oggetto.getQuantity() * oggetto.getPrice()# €</td>

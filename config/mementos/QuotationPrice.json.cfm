@@ -1,0 +1,7 @@
+{
+    defaultIncludes = [
+        "totalGoods",
+        "lines",
+        "total",
+    ],
+}
