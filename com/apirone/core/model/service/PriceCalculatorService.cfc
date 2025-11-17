@@ -62,7 +62,7 @@
 		var product = productSvc.get( productId );
 		var price   = product.getPrice( "PRICE" );
 
-		var name = "#product.getLine().getName()# / #product.getModel().getName()# / #product.getFinish().getName()#";
+		var name = "#product.getDescription()# (#product.getCode()#)";
 
 		// dump(product);
 		// abort;
@@ -92,13 +92,17 @@
 			cost bundle
 		*/
 
-		var bundleComponents = componentSvc.list(
-			lineId                         = product.getLine().getId(),
-			modelId                        = product.getModel().getId(),
-			includeBaseAttributeComponents = true
-		);
+		if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProdutComplex" ) ) {
+			var bundleComponents = componentSvc.list(
+				lineId                         = product.getLine().getId(),
+				modelId                        = product.getModel().getId(),
+				includeBaseAttributeComponents = true
+			);
 
-		var bundleCost = calculateComponentsTotal( bundleComponents );
+			var bundleCost = calculateComponentsTotal( bundleComponents );
+		} else {
+			var bundleCost = 0;
+		}
 
 		// appendLog( message = "Costo componenti bundle #bundleCost#;Totale unitario: #formatExtended( bundleComponents )#" );
 
