@@ -5,35 +5,88 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var description = prepareDescription( result.logFile );
 
-		var output = { "price" = result.price, "description" = description }
+		var output = {
+			"price"       = result.values.finalPrice,
+			"description" = description
+		}
 
 		event.setValue( "result", output );
 	}
 
 	function calculateQuotationItem( event, rc, prc ){
-		var params          = {};
-		var data            = [];
-		var result          = super.getResult();
-		var mm              = super.getMementify();
-		var quotationItemId = rc.id;
+		var result     = super.getResult();
+		var memy       = super.getMementify();
+		var calculator = super.service( "PriceCalculator" );
+		var pricing    = super.bean( "QuotationPrice" );
 
-		var output = {
-			"id"       = quotationItemId,
-			"products" = [
-				{
-					"id"     = "ART",
-					"label"  = "Prezzo articolo",
-					"amount" = 31.7
-				},
-				{ "id" = "P1", "label" = "Riga 1", "amount" = 3.5 },
-				{ "id" = "P2", "label" = "Riga 2", "amount" = 4.6 },
-				{ "id" = "P2", "label" = "Riga 3", "amount" = 5.7 }
-			],
-			"quantity" = { "label" = "Quantità prodotti", "count" = 3 },
-			"total"    = { "label" = "TOTALE", "amount" = 45.50 }
+		var totalGoods = 0;
+
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		/*
+			plate price
+		*/
+
+		var productItemsIds = [];
+
+		for ( var item in json.product.items._data ) {
+			for ( var value in item.values ) {
+				if ( value.selected ) {
+					productItemsIds.add( value.productItemId );
+				}
+			}
 		}
 
-		result.setData( output );
+		var platePrice = calculator.calculate(
+			json.product.id,
+			json.quantity,
+			productItemsIds
+		);
+
+		dump( platePrice );
+		abort;
+
+		var line = super.bean( "PriceItem" );
+
+		line.setName( "Prezzo placca" );
+		line.setAmount( platePrice.getFinalPrice() );
+
+		lines.add( line );
+
+
+		/*
+			fruits price
+		*/
+
+		var fruitsLines = [];
+
+		for ( var fruit in json.fruits_data ) {
+			var fruitItemsIds = [];
+			var line          = super.bean( "PriceItem" );
+
+			for ( var item in fruit.items._data ) {
+				for ( var value in item.values ) {
+					if ( value.selected ) {
+						fruitItemsIds.add( value.productItemId );
+					}
+				}
+			}
+
+			var fruitPrice = super.service( "PriceCalculator" ).simulate( fruit.id, 1, fruitItemsIds );
+
+			line.setName( "Prezzo #fruit.name#" );
+			line.setAmount( fruitPrice.getFinalPrice() );
+
+			totalGoods = totalGoods + fruitPrice.getFinalPrice();
+
+			fruitsLines.add( line );
+		}
+
+		fruitsLines.menge( lines );
+
+		quotationPrice.setItems( fruitsLines );
+
+		result.setData( quotationPrice );
 
 		event.setValue( "result", result );
 	}
@@ -108,9 +161,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		for( var item in output ){
-			var row = mm.convert( item );
-			row["deleted"] = false;
+		for ( var item in output ) {
+			var row          = mm.convert( item );
+			row[ "deleted" ] = false;
 			data.add( row );
 		}
 
@@ -159,24 +212,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 			if ( Len( item?.id ) ) {
+				// var obj = get( item.id );
+				// price.setEntity( obj.getEntity() );
 
-				//var obj = get( item.id );
-				//price.setEntity( obj.getEntity() );
-
-				if( item.deleted ) {
+				if ( item.deleted ) {
 					super.fire( "price.delete", [ item.id ] );
 				} else {
 					super.fire( "price.update", [ price ] );
 				}
-
 			} else {
-
-				if( len( item.amount ) ) {
+				if ( Len( item.amount ) ) {
 					var type = super.bean( "PriceType" );
 					price.setType( type.setId( item.type.id ) );
 					super.fire( "price.create", [ price ] );
 				}
-
 			}
 		}
 

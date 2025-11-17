@@ -714,6 +714,7 @@ AP.plate.modal = ( function() {
                 src: this.image,
                 class: "fruit-img",
                 alt: this.id,
+                title: this.id,
                 css: imgCSS,
                 appendTo: $fruit,
             } );

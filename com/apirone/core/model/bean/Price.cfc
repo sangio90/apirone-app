@@ -1,12 +1,5 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [ "id", "type", "method", "amount" ],
-		profiles        = {
-			list = { defaultIncludes = [ "id", "type", "method", "amount" ] }
-		}
-	}
-
 	property name="amount" type="Numeric";
 	property name="type" type="com.apirone.core.model.bean.PriceType";
 	property name="method" type="com.apirone.core.model.bean.PriceMethod";

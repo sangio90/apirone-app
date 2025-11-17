@@ -374,13 +374,9 @@
                                         </div>
                                     </div>
                                     ---->
-                                    <div id="totalsFloatingTab" class="container py-3">
-                                        <div class="d-flex align-items-center">
-                                            <table style="width: 100%">
-                                                <tbody data-bind="source: items" data-template="quotation-pricing-totals-item-tmpl"></tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+
+                                    #view( "quotation/totals" )#
+
                                 </div>
 
                                 <!---
@@ -511,28 +507,6 @@
 <script>
 //TODO: direi di spostarlo nella app-
 document.addEventListener("DOMContentLoaded", function () {
-    // Cerca tutti i bottoni con classe `changeTab`
-    document.querySelectorAll("button.changeTab").forEach(function (button) {
-        button.addEventListener("click", function (e) {
-            e.preventDefault();
-
-            // Recupera l'id del bottone, es: "fiscal"
-            const targetName = this.id;
-
-            // Costruisce l'id del tab corrispondente
-            const targetTabId = `nav-${targetName}-tab`;
-
-            // Trova il pulsante di tab nella barra
-            const tabTrigger = document.getElementById(targetTabId);
-
-            if (tabTrigger) {
-                const tab = new bootstrap.Tab(tabTrigger);
-                tab.show();
-            } else {
-                console.warn(`Nessun tab trovato con id ${targetTabId}`);
-            }
-        });
-    });
 
     document.querySelector('#nav-plate-tab').addEventListener("click", function (e) {
         e.preventDefault();
@@ -566,9 +540,18 @@ document.addEventListener("DOMContentLoaded", function () {
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         z-index: 999999;
     }
+
+    #totalsFloatingTab h3 {
+        color: White;
+        font-size: 20px;
+        margin-top: 0;
+        padding-top: 0;
+    }
+
     .quotation-panel {
         min-height: 55vh !important;
     }
+
     .button-box {
         position: absolute;
         bottom: 30px;

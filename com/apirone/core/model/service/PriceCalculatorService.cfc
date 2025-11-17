@@ -8,8 +8,13 @@
 	variables.logConfig = {};
 	variables.costs     = [];
 
-	public Numeric function calculate( required String productId, Array producItemtIds ){
-		return simulate( argumentCollection = arguments ).price;
+	public Numeric function calculate(
+		required String productId,
+		required Numeric quantity = 1,
+		Array producItemtIds
+	){
+		var price = simulate( argumentCollection = arguments );
+		return price.values.finalPrice;
 	}
 
 	public Struct function simulate(
@@ -59,8 +64,8 @@
 
 		var name = "#product.getLine().getName()# / #product.getModel().getName()# / #product.getFinish().getName()#";
 
-		//dump(product);
-		//abort;
+		// dump(product);
+		// abort;
 
 		appendLog(
 			message   = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#.",
@@ -133,8 +138,6 @@
 
 			var productItem = getProductItemService().get( itemId );
 
-			// appendLog( "" );
-
 			var attributeName = "Item: #itemId#, Attributo: #productItem.getAttribute().getName()# / #productItem
 				.getAttributeValue()
 				.getRawValue()
@@ -144,18 +147,6 @@
 
 			if ( !IsNull( productItemPrice ) ) {
 				var amount = productItemPrice.getAmount() ?: 0;
-
-				/*
-				try {
-					if ( productItemPrice.getMethod().getId() == "F" ) {
-						
-					}
-				} catch ( e ) {
-					dump(productItemPrice);
-					dump(e);
-					abort;
-				}
-				*/
 
 				if ( productItemPrice.getMethod().getId() == "F" ) {
 					appendLog(
@@ -206,18 +197,28 @@
 			final price
 		*/
 
+		var totalCostItems = calculateTotalCostItems()
+
 
 		// appendLog( message = " ;Totale costi prodotto: #formatExtended( costProduct )#" );
 
-		var finalCost = ( ( bundleCost + productCost ) * markup ) + calculateTotalCostItems() + unitFixedCost;
+		var finalPrice = ( ( bundleCost + productCost ) * markup ) + totalCostItems + unitFixedCost;
 
 		appendLog(
-			message    = "Prezzo finale. ( Bundle: #bundleCost# + prodotto base: #productCost# ) * markup: #markup# ) + prezzo items: #calculateTotalCostItems()# + costo fisso: #unitFixedCost#;Prezzo finale: #formatExtended( finalCost )#",
+			message    = "Prezzo finale. ( Bundle: #bundleCost# + prodotto base: #productCost# ) * markup: #markup# ) + prezzo items: #calculateTotalCostItems()# + costo fisso: #unitFixedCost#;Prezzo finale: #formatExtended( finalPrice )#",
 			lineTypeId = "H"
 		);
 
 		var output = {
-			"price"   = price,
+			values = {
+				"finalCost"      = finalCost,
+				"bundleCost"     = bundleCost,
+				"productCost"    = productCost,
+				"totalCostItems" = totalCostItems,
+				"unitFixedCost"  = unitFixedCost,
+				"finalPrice"     = finalPrice,
+				"markup"         = markup
+			},
 			"logFile" = variables.logConfig.filePath
 		};
 

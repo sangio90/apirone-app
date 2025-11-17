@@ -1,8 +1,8 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	property name="simbol" type="String";
+	property name="amount" type="Numeric";
 
-	public PriceMethod function init(){
+	public PriceItem function init(){
 		return this;
 	}
 

@@ -99,14 +99,6 @@
 
         <cfset var dataAttr = "">
         <cfif data.len()>
-            <!---
-                TODO: da testare, ma dovrebbe andare
-            <cfloop array="#data#" item="item">
-                <cfloop collection="#item#" item="key">
-                    <cfset dataAttr = ListAppend(dataAttr, 'data-#key#="#item[key]#"', " ")>
-                </cfloop>
-            </cfloop>
-            --->
             <cfloop collection="#data#" item="key">
                 <cfset dataAttr = ListAppend(dataAttr, 'data-#key#="#data[key]#"', " ")>
             </cfloop>

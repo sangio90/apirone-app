@@ -437,7 +437,7 @@
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
 		get( "/ajax/quotation-items/accessory/:id" ).to( "QuotationItemAjaxController.editAccessory" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
-		get( "/ajax/quotation-items/:id/total" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
+		post( "/ajax/quotation-items/:id/total" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
 
