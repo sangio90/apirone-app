@@ -50,18 +50,11 @@
 				COUNT(model_id) OVER() AS total
 			FROM
 				models
-					<cfif !IsNull( arguments.lineId )>
-						-- TODO passare da catalog_bundles
-						INNER JOIN products USING ( model_id )
-					</cfif>
-					<cfif !IsNull( arguments.catalogBundleLineId )>
-						INNER JOIN catalog_bundles USING (model_id)
-					</cfif>
-
+					INNER JOIN catalog_bundles USING (model_id)
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.lineId )>
-					AND products.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
+					AND catalog_bundles.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.typeId )>

@@ -56,6 +56,7 @@
 
 				<cfif !IsNull( arguments.lineId )>
 					INNER JOIN products USING ( finish_id )
+						LEFT JOIN catalog_bundles USING ( catalog_bundle_id )
 				</cfif>
 
 			WHERE 1=1
@@ -70,11 +71,11 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.lineId )>
-					AND products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+					AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.productCategoryId )>
-					AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productCategoryId#">
+					AND catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productCategoryId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>
