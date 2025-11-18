@@ -33,25 +33,19 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.signageConfigItemId = item.getId()
 
-		prc.title    = "Configurazione per < #prc.product.getLine().getName()#, #prc.product.getModel().getName()# / #signage.getFont().getName()#, #item.getSize().getName()#mm >";
+		prc.title    = "Configurazione per < #prc.product.getLine().getName()#, #prc.product.getModel().getName()#, #prc.product.getFinish().getName()# / #signage.getFont().getName()#, #item.getSize().getName()#mm >";
 		prc.subtitle = "#signage.getCategory().getName()# / ALTEZZA FONT";
 
 		prc.page[ "productId" ]         = prc.product.getId();
 		prc.page[ "lineId" ]            = lineId;
 		prc.page[ "signageConfigItem" ] = memy.convert( item );
 
-		//prc.page[ "products" ] = [];
-        //prc.page[ "products" ] = memy.convertList(  ), "list" );
-
 		var products = super.fire( "product.list", { lineId = lineId } );
 
-        prc.page[ "products" ] = super.eachParallelAndReorder(
-			products,
-			function(item, index) {
-				var row = super.getMementify().convert( item, "menu" );
-				return row;
-			}
-		);		
+		prc.page[ "products" ] = super.eachParallelAndReorder( products, function( item, index ){
+			var row = super.getMementify().convert( item, "menu" );
+			return row;
+		} );
 
 		prc.jsFiles.add( "app-component-modal" );
 		prc.jsFiles.add( "app-signage-config-item" );

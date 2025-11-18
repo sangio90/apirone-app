@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="lines" type="com.apirone.core.model.bean.PriceLine[]";
-	property name="price" type="com.apirone.core.model.bean.Price";
+	// property name="price" type="com.apirone.core.model.bean.Price";
 
 	property name="discount1" type="Numeric";
 	property name="discount2" type="Numeric";
@@ -9,6 +9,11 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="priceMethod" type="com.apirone.core.model.bean.PriceMethod";
 
 	public QuotationPrice function init(){
+		var method = new com.apirone.core.model.bean.PriceMethod();
+
+		// A = Auto, F = fixed
+		setPriceMethod( method.setId( "A" ) );
+
 		return this;
 	}
 
@@ -27,7 +32,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		var total      = totalGoods;
 
 		if ( getPriceMethod().getId() == "F" ) {
-			// Fixed
+			// fixed price
 			return getAmount();
 		}
 

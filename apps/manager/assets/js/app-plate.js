@@ -758,10 +758,10 @@ AP.plate.modal = ( function() {
         }
 
         // renamed from "onSelectFruit"
-        addFruitInPlate( selectedFruit ) {
+        addFruitToPlate( selectedFruit ) {
 
-            // console.log( "addFruitInPlate:fruit", selectedFruit );
-            console.log( "addFruitInPlate:selectedFruit.image", selectedFruit.image );
+            // console.log( "addFruitToPlate:fruit", selectedFruit );
+            console.log( "addFruitToPlate:selectedFruit.image", selectedFruit.image );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
@@ -1114,14 +1114,14 @@ AP.plate.modal = ( function() {
         // console.log( "mapFruitForPlate:data", data );
 
         var fruit = {
-            id        : data.id,
-            width     : constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].width * data.positionCount,
+            id        : data.fruit.id,
+            width     : constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].width * data.fruit.positionCount,
             height    : constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].height,
-            columnSpan: data.positionCount,
+            columnSpan: data.fruit.positionCount,
             rowSpan   : 1,
-            code      : data.code,
-            name      : data.name,
-            image     : data?.horizontalImage?.uri,
+            code      : data.fruit.code,
+            name      : data.fruit.name,
+            image     : data.fruit?.horizontalImage?.uri ?? "/assets/main/img/fruit-generic.png"
         };
 
         return fruit;
@@ -1129,7 +1129,13 @@ AP.plate.modal = ( function() {
     };
 
     var createFruit = function( data ) {
-        var fruit = data; // object from api
+        // QuotationItemFruis
+        // data: { position: 1, fruit: { id: "", name: "" }, items: [] }
+        if ( !data.id ) {
+            data.id = NM.util.uuid();
+        }
+
+        var fruit = data;
 
         fruit.items = new kendo.data.DataSource( {
             data: [],
@@ -1137,6 +1143,8 @@ AP.plate.modal = ( function() {
                 model: { id: "id" } // than, can i use get()
             }
         } );
+
+        console.log( "createFruit", fruit );
 
         return fruit;
 
@@ -1172,7 +1180,7 @@ AP.plate.modal = ( function() {
                 id: "ACT",
                 name: ""
             },
-            fruits:  new kendo.data.DataSource( {
+            fruits:  new kendo.data.DataSource( { // es. data: { position: 1, { fruit: { id: , name: } } }
                 data: [],
                 schema: {
                     model: { id: "id" }
@@ -1590,28 +1598,23 @@ AP.plate.modal = ( function() {
 
         addProductItemsToFruit: function( fruitId ) {
 
-            const fruit = viewModel.get( "currentFruit" );
-            // const productId = viewModel.get( "detailForm.data.product.id" );
+            var fruits = viewModel.get( "detailForm.data.fruits" );
+            var thisFruit = fruits.get( fruitId );
+            var productId = thisFruit.fruit.id;
 
-            // i product items del frutto
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/product-items?productId=" + fruitId,
+                url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
                     done: function( xhr ) {
 
-                        // console.log( "addProductItemsToFruit:xhr", xhr );
-
                         if ( xhr.count > 0 ) {
 
-                            var fruits = viewModel.get( "detailForm.data.fruits" );
                             var thisImage = xhr.data[0].horizontalImage;
-
-                            var thisFruit = fruits.get( fruitId );
 
                             // Overwrite the product image if the item image exists
                             if ( thisImage ) {
-                                thisFruit.set( "horizontalImage", thisImage );
+                                thisFruit.set( "fruit.horizontalImage", thisImage );
                                 pub.fruitsController.updateFruit( thisFruit.id, { image:  thisImage.uri } );
                             }
 
@@ -1629,8 +1632,6 @@ AP.plate.modal = ( function() {
                                         productItemId: item.id,
                                         selected: false
                                     } );
-
-                                    // fruitItems.trigger( "change" );
 
                                 } else {
 
@@ -1652,6 +1653,8 @@ AP.plate.modal = ( function() {
                                 }
 
                             } );
+
+                            console.log( "fruitItems", fruitItems );
 
                             thisFruit.set( "items", fruitItems );
 
@@ -1698,9 +1701,9 @@ AP.plate.modal = ( function() {
             var fruits = viewModel.get( "detailForm.data.fruits" );
             var fruit = fruits.get( fruitId );
 
-            // console.log( "fruit:byId", fruit );
-
             const attributeArray = fruit.get( "items" ).data();
+
+            console.log( "fruit:attributeArray", fruitId, attributeArray );
 
             attributeArray.forEach( function( item ) {
 
@@ -1734,9 +1737,6 @@ AP.plate.modal = ( function() {
                     select.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
                 }
 
-                // const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
-                // select.append( emptyOption );
-
                 values.forEach( function( attrValue ) {
                     const option = $( "<option>" )
                         .val( attrValue.productItemId )
@@ -1757,7 +1757,6 @@ AP.plate.modal = ( function() {
                 subContainer.append( select );
             } );
         },
-
 
         renderProductItemsPlate: function() {
             const container = $( "#quotation-plate-product-items" );
@@ -2051,7 +2050,7 @@ AP.plate.modal = ( function() {
 
             // console.log( "selectedFruit", selectedFruit );
 
-            var newFruit = createFruit( selectedFruit );
+            var newFruit = createFruit( { position: 1, fruit: selectedFruit } );
 
             console.log( "newFruit", newFruit );
 
@@ -2060,7 +2059,7 @@ AP.plate.modal = ( function() {
 
             // mapFruitForPlate( thisFruit );
 
-            pub.fruitsController.addFruitInPlate( mapFruitForPlate( newFruit ) );
+            pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
 
             viewModel.addProductItemsToFruit( newFruit.id );
 
@@ -2147,7 +2146,7 @@ AP.plate.modal = ( function() {
                     console.log( "thisFruit:" + thisFruit.shortId, thisFruit?.horizontalImage?.uri );
                     var obj = mapFruitForPlate( thisFruit );
                     console.log( "obj", obj );
-                    pub.fruitsController.addFruitInPlate( obj );
+                    pub.fruitsController.addFruitToPlate( obj );
                 };
             }
 

@@ -67,9 +67,9 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 			}
 
-			var fruitPrice = calculator.calculate( fruit.id, 1, fruitItemsIds );
+			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds );
 
-			line.setName( "Prezzo #fruit?.name#" );
+			line.setName( "Prezzo #fruit.fruit?.name#" );
 			line.setAmount( fruitPrice );
 
 			// totalGoods = totalGoods + fruitPrice;

@@ -23,7 +23,7 @@
 			</div>
 			<div class="d-flex justify-content-end gap-2">
 				<div class="py-2 text-end">
-					#saveButton(bind="click:update", variant="default", label="Aggiorna", size="sm")#
+					#button(bind="click:update", variant="default", label="Aggiorna", size="sm", icon="sync-alt")#
 				</div>
 			</div>
 		</div>
