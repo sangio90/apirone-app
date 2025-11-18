@@ -145,7 +145,7 @@ NM.util.autoHideMessage = function( ele, message ) {
 
 };
 
-NM.util.copyText = function( text ) {
+NM.util.copyText = function( text, onSuccess ) {
 
     return new Promise( ( resolve, reject ) => {
 
@@ -153,7 +153,11 @@ NM.util.copyText = function( text ) {
         if ( typeof window !== "undefined" && typeof window.navigator !== "undefined" && window.navigator.clipboard && window.navigator.clipboard.writeText ) {
             window.navigator.clipboard.writeText( text )
                 .then( () => {
-                    resolve( { "result": "success", "text": text } );
+                    const result = { "result": "success", "text": text };
+                    if ( onSuccess && typeof onSuccess === "function" ) {
+                        onSuccess( result );
+                    }
+                    resolve( result );
                 } )
                 .catch( ( err ) => {
                     console.error( "Errore API moderna:", err );
@@ -184,7 +188,11 @@ NM.util.copyText = function( text ) {
                 document.body.removeChild( textArea );
 
                 if ( success ) {
-                    resolve( { "result": "success", "text": text } );
+                    const result = { "result": "success", "text": text };
+                    if ( onSuccess && typeof onSuccess === "function" ) {
+                        onSuccess( result );
+                    }
+                    resolve( result );
                 } else {
                     reject( { "result": "error" } );
                 }

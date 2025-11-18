@@ -201,6 +201,15 @@
                                                 <form id="product-detail-form">
 
                                                     <div class="form-group pb-3 row align-items-center">
+                                                        <label class="col-3" for="qta">ID</label>
+                                                        <div class="d-flex col-9 align-items-center">
+                                                            <span class="col-5" data-bind="text: product.id" id="product-id">
+                                                            </span>
+                                                            <a href="##" data-bind="click:copyId" class="underline col-7">Copia</a>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group pb-3 row align-items-center">
                                                         <label class="col-3" for="qta">Status</label>
                                                         <div class="col-9">
                                                             <select type="text" class="form-control" name="statusId"
@@ -281,6 +290,14 @@
                                     Aggiungi attributo di base
                                 </a>
 
+                                |
+
+                                <a href="" class="underline" 
+                                    data-product-name="Attributo radice" 
+                                    data-bind="click:showCloneModal">
+                                    Clona albero
+                                </a>
+
                             </div>                                    
 
                             <div class="text-end col-6 mb-2">
@@ -346,16 +363,16 @@
             </div>
         </div>
 
-        #view("product/attributes-list-modal")#
-        <!--- #view("product/images-list-modal")# ---->
-        #view("product/sorting-modal")#
+        #view( "product/attributes-list-modal" )#
+        #view( "product/sorting-modal" )#
+        #view( "product/clone-modal" )#
 
     </div>
 
-    #view("attribute/detail-modal")#
-    #view("component/list-modal")#
-    #view("file/list-modal")#
-    #view("price/list-modal")#
-    #view("price/simulate-modal")#
+    #view( "attribute/detail-modal" )#
+    #view( "component/list-modal" )#
+    #view( "file/list-modal" )#
+    #view( "price/list-modal" )#
+    #view( "price/simulate-modal" )#
 
 </cfoutput>

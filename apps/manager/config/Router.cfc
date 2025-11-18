@@ -322,6 +322,7 @@
 		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
 		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();
+		post( "/ajax/products/:id/items/clone" ).to( "ProductAjaxController.cloneItems" ).end();
 		get( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.listAttributesForSort" ).end();
 		post( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.sortAttributes" ).end();
 		post( "/ajax/products/:id/items/importants" ).to( "ProductAjaxController.updateImportants" ).end();

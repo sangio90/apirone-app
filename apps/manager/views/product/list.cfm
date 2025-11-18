@@ -118,7 +118,6 @@
 
 	</div>
 
-	#view( "product/detail-modal" )#
 	#view( "price/list-modal" )#
 
 </cfoutput>

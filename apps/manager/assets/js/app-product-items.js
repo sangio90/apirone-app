@@ -8,6 +8,8 @@ AP.product.fields = {
     imagesModal: $( "#product-images-list-modal" ),
     reorderingModal: $( "#product-sorting-modal" ),
     detailForm: $( "#product-detail-form" ),
+    cloneModal: $( "#product-clone-modal" ),
+    cloneForm: $( "#product-clone-form" ),
 };
 
 $( document ).ready( function() {
@@ -105,24 +107,82 @@ AP.product.items = ( function() {
         statuses: AP.page.statuses,
         unlinkedCount: 0,
 
+        cloneForm: {
+            fromProductId: AP.page.productId,
+            toProductId: ""
+        },
+
+        copyId: function() {
+            var id = $( "#product-id" ).text();
+            NM.util.copyText( id, function() {
+                AP.widget.notify( "success", "ID copiato." );
+            } );
+        },
+
+        showCloneModal: function( event ) {
+
+            fields.cloneForm.validate( {
+                onfocusout: function( element ) {
+                    $( element ).valid();
+                },
+                rules: {
+                    toProductId: {
+                        required: true,
+                        rangelength: [ 36, 36 ],
+                    },
+                },
+                messages: {
+                    toProductId: {
+                        required: "Prodotto di arrivo richiesto",
+                        rangelength: "L'ID deve essere di 36 caratteri"
+                    },
+                },
+
+            } );
+
+            viewModel.set( "cloneForm.toProductId", "" );
+
+            NM.util.openModal( fields.cloneModal );
+
+            return false;
+        },
+
+        clone: function( event ) {
+
+            var thisForm = fields.cloneForm;
+
+            var status = thisForm.find( ".status" );
+
+            if ( thisForm.valid() ) {
+
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/products/" + AP.page.productId + "/items/clone",
+                    data: JSON.stringify( viewModel.get( "cloneForm" ) ),
+                    callback: {
+                        done: function( xhr ) {
+                            status.html( "" );
+                            // AP.widget.notify( "success", "Albero copiato con successo." );
+                            NM.util.autoHideMessage( status, "<span class='green'>Albero copiato con successo</span>" );
+
+                            setTimeout( () =>
+                                $( fields.cloneModal ).modal( "hide" ), 1000
+                            );
+                        },
+                    },
+                } );
+            }
+            return false;
+        },
+
+
         textToggleLink: function() {
 
             var text = "";
 
-            // var filterState = AP.getUserPref( "product.items.showUnlinked" );
-
             var count = viewModel.get( "unlinkedCount" );
-
-            /*
-            TODO: non riesco ad aggiornare "text", mentre "count" viene aggiornato
-            if ( !filterState ) {
-                console.log( "nascondi" );
-                var text = "Nascondi " + count + " attributi non collegati";
-            } else {
-                console.log( "mostra" );
-                var text = "Mostra " + count + " attributi non collegati";
-            }
-            */
 
             var text = "Mostra/nascondi " + count + " attributi non collegati";
 
@@ -204,28 +264,28 @@ AP.product.items = ( function() {
                 values.push( $( this ).val() );
             } );
 
-            var checkedItems = viewModel.get('items').data().filter(
-                function (item) { 
-                    return values.includes(item.id.toString()); 
+            var checkedItems = viewModel.get( "items" ).data().filter(
+                function( item ) {
+                    return values.includes( item.id.toString() );
                 }
-            )
+            );
             var checkedAttributes = checkedItems.map(
-                function (item) { 
-                    return item.attribute.id; 
+                function( item ) {
+                    return item.attribute.id;
                 }
-            )
+            );
 
-            checkedAttributes = $.unique(checkedAttributes)
+            checkedAttributes = $.unique( checkedAttributes );
 
             if ( checkedAttributes.length > 2 ) {
                 AP.widget.notify( "warning", "Puoi selezionare al massimo 2 attributi" );
             } else {
-                var productItemsWithCheckedAttributes = viewModel.get('items').data().filter(
-                    function (item) {
-                        return checkedAttributes.includes(item.attribute.id);
+                var productItemsWithCheckedAttributes = viewModel.get( "items" ).data().filter(
+                    function( item ) {
+                        return checkedAttributes.includes( item.attribute.id );
                     }
-                )
-                debugger
+                );
+                debugger;
                 var ids = values.toString();
 
                 NM.util.ajax( {

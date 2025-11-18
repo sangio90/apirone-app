@@ -11,6 +11,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="TextService" inject="TextService";
 	property name="FileService" inject="FileService";
 	property name="ProductItemService" inject="ProductItemService";
+	property name="componentService" inject="ComponentService";
+	property name="componentOverrideService" inject="ComponentOverrideService";
 
 	property name="cacheScope" type="String" default="Product.bean";
 
@@ -191,6 +193,117 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return newId;
+	}
+
+	public Struct function cloneTree( required String fromProductId, required String toProductId ){
+		
+		if ( fromProductId == toProductId ) {
+			Throw(
+				type    = "ApirOne.errors.productService.InvalidArgument",
+				message = "fromProductId and toProductId cannot be the same"
+			);
+		}
+
+		super.logEvent(
+			event   = "product.CLONED_TREE",
+			message = "Start clone tree of product [#arguments.fromProductId#] to [#arguments.toProductId#]",
+			payload = {
+				"fromProductId" = arguments.fromProductId,
+				"toProductId"   = arguments.toProductId
+			}
+		);
+
+		var componentService         = getComponentService();
+		var componentOverrideService = getComponentOverrideService();
+
+		function createProductItem(
+			required String productId,
+			required com.apirone.core.model.bean.ProductItem productItem,
+			required Numeric level = 1
+		){
+			arguments.productItem.setProductId( arguments.productId );
+
+			var newProductItemId = getProductItemService().create( arguments.productItem );
+
+			var components = componentService.list(
+				productItemId                  = arguments.productItem.getId(),
+				includeBaseAttributeComponents = true
+			);
+
+			// TODO: move this logic tu ComponentService
+			// We have in ComponentAjaxController too
+			for ( var thisComponent in components ) {
+				getLogger().debug( "Override [#thisComponent.getId()#] typeId [#thisComponent.getTypeId()#]" );
+
+				// **
+				// override components
+				// **
+
+				if ( thisComponent.getTypeId() == "base" ) {
+					var overrideBean = super.bean( "ComponentOverride" );
+
+					overrideBean.setId( "" );
+					overrideBean.setDeleted( thisComponent.getOverride().getDeleted() );
+					overrideBean.setQuantity( thisComponent.getOverride().getQuantity() );
+					overrideBean.setComponentId( thisComponent.getId() );
+					overrideBean.setProductItemId( newProductItemId );
+
+					componentOverrideService.create( overrideBean );
+				} else {
+					var newComponent = Duplicate( thisComponent );
+
+					newComponent.setId( "" );
+					newComponent.getProductItem().setId( newProductItemId );
+
+					componentService.create( newComponent );
+				}
+			}
+
+			if ( arguments.productItem.getChildren().len() ) {
+				for ( var child in arguments.productItem.getChildren() ) {
+					child.getOrigin().setId( newProductItemId );
+
+					createProductItem(
+						productItem = child,
+						level       = arguments.level + 1,
+						productId   = arguments.productId
+					);
+				}
+			}
+		}
+
+		transaction {
+			getProductItemService().delete( productId = arguments.toProductId );
+
+			var productItems = getProductItemService().getTree( productId = arguments.fromProductId );
+
+			for ( var productItem in productItems ) {
+				createProductItem(
+					productItem = productItem,
+					level       = 1,
+					productId   = arguments.toProductId
+				);
+			}
+		}
+
+		getCacheManager().removeAll();
+
+		super.logEvent(
+			event   = "product.CLONED_TREE",
+			message = "End clone tree of product [#arguments.fromProductId#] to [#arguments.toProductId#]",
+			payload = {
+				"fromProductId" = arguments.fromProductId,
+				"toProductId"   = arguments.toProductId
+			}
+		);
+
+		return {
+			"status"  = "success",
+			"payload" = {
+				"fromProductId" = arguments.fromProductId,
+				"toProductId"   = arguments.toProductId
+			}
+		};
 	}
 
 	public String function updateDetail( required com.apirone.core.model.bean.Product product ){

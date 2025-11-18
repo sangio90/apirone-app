@@ -40,6 +40,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function cloneItems( event, rc, prc ){
+		param rc.id = "";
+		var json    = DeserializeJSON( GetHTTPRequestData().content );
+
+		var result = super.fire( "Product.cloneTree", { fromProductId = rc.id, toProductId = json.toProductId } );
+
+		event.setValue( "result", result );
+	}
+
 	// used by app-signage-config-item too, with missingValues=false
 	function listItems( event, rc, prc ){
 		param rc.missingValues = true;
@@ -130,13 +139,21 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		param rc.items = "";
 
-		var bean = super.service("Product").get( rc.id );
-		var ids = [];
-		for (var productItemId in ListToArray( rc.items )) {
-			var productItem = super.service("ProductItem").get(productItemId);
-			var attributeValues = super.fire("ProductItem.list", { productId = productItem.getProductId(), attributeId = productItem.getAttribute().getId() } ).each( function( item ){
-				ids.add( item.getId() );
-			} );
+		var bean = super.service( "Product" ).get( rc.id );
+		var ids  = [];
+		for ( var productItemId in ListToArray( rc.items ) ) {
+			var productItem     = super.service( "ProductItem" ).get( productItemId );
+			var attributeValues = super
+				.fire(
+					"ProductItem.list",
+					{
+						productId   = productItem.getProductId(),
+						attributeId = productItem.getAttribute().getId()
+					}
+				)
+				.each( function( item ){
+					ids.add( item.getId() );
+				} );
 		}
 		var newId = super.fire( "Product.updateImportants", { product = bean, ids = ids } );
 
@@ -323,8 +340,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	function saveDetail( event, rc, prc ){
 		var result = super.getResult();
 
-		var product    = super.bean( "Product" );
-		var status     = super.bean( "Status" );
+		var product = super.bean( "Product" );
+		var status  = super.bean( "Status" );
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
@@ -333,7 +350,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		product.setStatus( status.setId( json.status.id ) );
 		product.setMinQuantity( json?.minQuantity ?: 0 );
 		product.setMaxQuantity( json?.maxQuantity ?: 0 );
-		
+
 		if ( StructKeyExists( json, "special" ) ) {
 			product.setSpecial( json.special );
 		} else {
@@ -505,15 +522,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var items = super.fire( "ProductItem.getFlatTree", params );
 
-		var data = super.eachParallelAndReorder(
-			items,
-			function(item, index) {
-				var row = super.getMementify().convert( item, "tree" ); // TODO: use "treelight" instead?
-				row[ "spaces" ] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
-				//item.processed = true;
-				return row;
-			}
-		);
+		var data = super.eachParallelAndReorder( items, function( item, index ){
+			var row         = super.getMementify().convert( item, "tree" ); // TODO: use "treelight" instead?
+			row[ "spaces" ] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
+			// item.processed = true;
+			return row;
+		} );
 
 		result.setTotal( data.len() );
 		result.setCount( data.len() );
