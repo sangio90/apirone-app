@@ -1,6 +1,6 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" inject="QuotationItemDAO";
+	property name="dao" inject="QuotationItemFruitDAO";
 	property name="productService" inject="ProductService";
 	property name="cacheScope" type="String" default="QuotationItemFruit.bean";
 
@@ -73,20 +73,20 @@
 		return outcome;
 	}
 
-	public String function create( required quotationItemFruit ){
+	public Numeric function create( required quotationItemFruit ){
 		var newId = getDao().insert( arguments.quotationItemFruit );
 
 		return newId;
 	}
 
-	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItemFruit ){
+	public Numeric function update( required com.apirone.core.model.bean.QuotationItemFruit quotationItemFruit ){
 		getDao().update( arguments.quotationItemFruit );
 		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemFruit.getId() );
 
 		return arguments.quotationItemFruit.getId();
 	}
 
-	private com.apirone.core.model.bean.QuotationItem function build( required Numeric quotationItemFruitId ){
+	private com.apirone.core.model.bean.QuotationItemFruit function build( required Numeric quotationItemFruitId ){
 		var record = getDao().read( arguments.quotationItemFruitId );
 
 		if ( record.recordCount ) {

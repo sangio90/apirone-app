@@ -47,11 +47,11 @@
 			INSERT INTO quotation_item_fruits (
 				quotation_item_id,
 				position,
-				product_id,
+				fruit_id
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getQuotationItemId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruit.getPosition()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getProduct().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getFruit().getId()#">::uuid
 			)
 			RETURNING quotation_item_fruit_id
 		</cfquery>
@@ -59,46 +59,26 @@
 	</cffunction>
 
 	<cffunction name="update" returntype="String">
-		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="true">
+		<cfargument name="quotationItemFruit" type="com.apirone.core.model.bean.QuotationItemFruit" required="true">
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE quotation_items
+			UPDATE quotation_item_fruits
 			SET
-				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
-				quotation_zone_id =
-					<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
-						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid
-					<cfelse>
-						NULL
-					</cfif>,
-				product_id =
-					<cfif NOT IsNull( arguments.quotationItem.getProduct() )>
-						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getProduct().getId()#">::uuid
-					<cfelse>
-						NULL
-					</cfif>,
-				price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
-				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">
-				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
-					,
-					signage_config_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getId()#">,
-					char_count             = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getCharCount()#">,
-					height                 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeight()#">,
-					height_in_pixel        = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeightInPixel()#">,
-					row_count              = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getRowCount()#">
-				</cfif>
+				position = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruit.getPosition()#">,
+				fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getFruit().getId()#">::uuid
 			WHERE
-				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getId()#">::uuid
+				quotation_item_fruit_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruit.getId()#">
 		</cfquery>
-		<cfreturn arguments.quotationItem.getId()>
+		<cfreturn arguments.quotationItemFruit.getId()>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="quotationItemFruitId" type="String" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			DELETE
-			FROM quotation_items
+			FROM
+				quotation_item_fruits
 			WHERE
-				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruitId#">::uuid
+				quotation_item_fruit_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruitId#">
 		</cfquery>
 		<cfreturn true>
 	</cffunction>

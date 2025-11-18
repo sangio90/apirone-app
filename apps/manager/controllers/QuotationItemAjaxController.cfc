@@ -254,22 +254,19 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 
-		var tmpDir = getTempDir();
-		fileName   = "preview_plate_id_" & CreateUUID() & ".png";
-		filePath   = tmpDir & "/" & fileName;
-		binaryData = ToBinary( json.imageBase64 );
+		var tmpDir     = getTempDir();
+		var fileName   = "preview_plate_id_" & CreateUUID() & ".png";
+		var filePath   = tmpDir & "/" & fileName;
+		var binaryData = ToBinary( json.imageBase64 );
 
 		FileWrite( filePath, binaryData );
 
-
 		var id = json.id;
-		// var type = json.type;
 
 		var bean = super.bean( "QuotationItemPlate" );
 
 		if ( Len( id ) ) {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
-			bean     = super.bean( "QuotationItemPlate" );
 		}
 
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
@@ -304,26 +301,28 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotationItem.update", [ bean ] )
 		}
 
-		var position = 0;
 		for ( var thisFruit in json.fruits._data ) {
-			var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
-
-			if ( !Len( fruitBean ) ) {
+			if ( IsNumeric( thisFruit.id ) ) {
+				// update
+				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
+				var action    = "QuotationItemFruit.update";
+			} else {
+				// create
 				var fruitBean = super.bean( "QuotationItemFruit" );
 				var action    = "QuotationItemFruit.create";
-			} else {
-				var action = "QuotationItemFruit.update";
 			}
 
-			var product = super.fire( "product.get", [ thisFruit.id ] );
+			var product = super.fire( "product.get", [ thisFruit.fruit.id ] );
 
-			fruitBean.setProduct( product );
-			fruitBean.setPosition( position++ );
+			fruitBean.setFruit( product );
+			fruitBean.setQuotationItemId( thisId );
+			fruitBean.setPosition( thisFruit.position );
 
 			super.fire( action, [ fruitBean ] );
 		}
 
 		var files = super.fire( "File.search", { quotationItemId = thisId } );
+
 		if ( Len( files.getData() ) ) {
 			for ( var file in files.getData() ) {
 				super.fire( "file.delete", { fileId = file.getId() } );
@@ -351,7 +350,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			super.fire( "quotationItemProductItem.delete", { "productItemId" = quotationItemProductItem.getId() } )
 		} );
 
-		var productItemsData = json.quotationItem.product.items._data;
+		var productItemsData = json.product.items._data;
 
 		productItemsData.each( function( productItemRow ){
 			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
@@ -359,17 +358,18 @@ component extends="com.apirone.core.controller.AbsController" {
 			} )
 
 			if ( Len( selectedValue ) > 0 ) {
-				selectedValue   = selectedValue[ 1 ];
-				var productItem = super.fire( "productItem.get", { "productItemId" = selectedValue.product_item_id } );
+				selectedValue = selectedValue[ 1 ];
 
-				var bean = super.bean( "QuotationItemProductItem" );
+				var bean        = super.bean( "QuotationItemProductItem" );
+				var productItem = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
+
 				bean.setQuotationItemId( thisId );
 				bean.setProductItem( productItem );
 				bean.setOrigin( productItem.getOrigin() );
 				bean.setLevel( productItemRow.level );
-				bean.setId( thisId )
+				// bean.setId( thisId )
 
-				super.fire( "quotationItemProductItem.create", { "productItem" = bean } )
+				super.fire( "quotationItemProductItem.create", [ bean ] )
 			}
 		} )
 

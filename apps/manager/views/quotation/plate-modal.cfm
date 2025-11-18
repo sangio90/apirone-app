@@ -132,7 +132,7 @@
                                     <i class="fas fa-save"></i> Salva
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
-                                <div class="status errors-counter mt-1 float-end me-3"></div>
+                                <div class="save-status errors-counter mt-1 float-end me-3"></div>
                             </div>
                         </div>
                     </footer>

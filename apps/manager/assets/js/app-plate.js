@@ -1114,7 +1114,8 @@ AP.plate.modal = ( function() {
         // console.log( "mapFruitForPlate:data", data );
 
         var fruit = {
-            id        : data.fruit.id,
+            id        : data.id,
+            fruitId   : data.fruit.id,
             width     : constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].width * data.fruit.positionCount,
             height    : constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].height,
             columnSpan: data.fruit.positionCount,
@@ -1152,7 +1153,7 @@ AP.plate.modal = ( function() {
 
     var defaultDetailForm = {
         data: {
-            // quotationItem
+            // quotationItemId: "",
             id: "",
             quantity: 1,
             price: 0,
@@ -1874,12 +1875,16 @@ AP.plate.modal = ( function() {
 
         resetForm: function() {},
 
-        save: function( event ) {
+        save: function() {
 
             const parsedData = viewModel.get( "detailForm.data" );
+            var status = fields.modalRoot.find( ".save-status" );
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
             parsedData.quotationId = AP.page.quotation.id;
             parsedData.type = "plate";
+
             var preview = $( "#plate-background" )[0];
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
@@ -1892,6 +1897,7 @@ AP.plate.modal = ( function() {
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
+                            status.html( "" );
                             AP.widget.notify( "success", "Placca salvata correttamente." );
                             // viewModel.set( "detailForm", defaultDetailForm );
                             // setTimeout( () => window.location.reload(), 1000 );
@@ -1902,149 +1908,6 @@ AP.plate.modal = ( function() {
 
             return false;
         },
-
-        // DATA
-        /*
-        plates: new kendo.data.DataSource( {
-            data: [
-                {
-                    id: "100",
-                    code: "508",
-                    IMG: "/assets/fakes/img/508.jpg",
-                    width: 1200, // in px
-                    height: 500, // in px
-                    orientation: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL //frame
-                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
-                    grid: [
-                        // LEGEND:
-                        // "_" - empty free space
-                        // "0" - prohibited space
-                        [
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                            "_",
-                        ],
-                    ],
-                },
-                {
-                    id: "111",
-                    code: "1X3",
-                    IMG: "/assets/fakes/img/1X3.jpg",
-                    width: 1200, // in px
-                    height: 500, // in px
-                    orientation: "VER", // "VER" - VERTICAL, "HOR" - HORIZONTAL
-                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
-                    grid: [
-                        // LEGEND:
-                        // "_" - empty free space
-                        // "0" - prohibited space
-                        [ "_", "_" ],
-                        [ "0", "0" ],
-                        [ "_", "_" ],
-                        [ "0", "0" ],
-                        [ "_", "_" ],
-                    ],
-                },
-                {
-                    id: "200",
-                    code: "508V",
-                    IMG: "/assets/fakes/img/508VERTICALE.jpg",
-                    width: 1200, // in px
-                    height: 500, // in px
-                    orientation: "VER", // "VER" - VERTICAL, "HOR" - HORIZONTAL
-                    orientationCell: "VER", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
-                    grid: [
-                        // LEGEND:
-                        // "_" - empty free space
-                        // "0" - prohibited space
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                        [ "_" ],
-                    ],
-                },
-                {
-                    id: "300",
-                    code: "SPECIAL1",
-                    IMG: "/assets/fakes/img/508.jpg",
-                    width: 1200, // in px
-                    height: 500, // in px
-                    orientation: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL
-                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
-                    grid: [
-                        // LEGEND:
-                        // "_" - empty free space
-                        // "0" - prohibited space
-                        [ "_", "_", "_", "_", "0", "_", "_" ],
-                    ],
-                },
-                {
-                    id: "400",
-                    code: "SPECIAL2",
-                    IMG: "/assets/fakes/img/508VERTICALE.jpg",
-                    width: 1200, // in px
-                    height: 500, // in px
-                    orientation: "VER", // "VER" - VERTICAL, "HOR" - HORIZONTAL
-                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
-                    grid: [
-                        // LEGEND:
-                        // "_" - empty free space
-                        // "0" - prohibited space
-                        [ "0", "0", "_", "_" ],
-                        [ "_", "_", "0", "0" ],
-                        [ "_", "_", "_", "_" ],
-                    ],
-                },
-                {
-                    id: "500",
-                    code: "SPECIAL3",
-                    IMG: "/assets/fakes/img/508.jpg",
-                    width: 1200, // in px
-                    height: 500, // in px
-                    orientation: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL
-                    orientationCell: "HOR", // "VER" - VERTICAL, "HOR" - HORIZONTAL. PS: CELL orientation IS INDIPENDENT FROM PLATE'S orientation,
-                    grid: [
-                        // LEGEND:
-                        // "_" - empty free space
-                        // "0" - prohibited space
-                        [ "_", "_", "_", "_", "0", "_", "_", "0", "0", "0", "0" ],
-                    ],
-                },
-            ],
-            schema: {
-                model: {
-                    id: "id",
-                },
-            },
-        } ),
-        selectedPlate: "100",
-        */
-        isPlateDefined: false,
 
         onSelectFruit: function( selectedFruit ) {
 
@@ -2143,14 +2006,11 @@ AP.plate.modal = ( function() {
 
             if ( fruits.total() ) {
                 for ( var thisFruit of fruits.data() ) {
-                    console.log( "thisFruit:" + thisFruit.shortId, thisFruit?.horizontalImage?.uri );
                     var obj = mapFruitForPlate( thisFruit );
-                    console.log( "obj", obj );
                     pub.fruitsController.addFruitToPlate( obj );
                 };
             }
 
-            this.set( "isPlateDefined", true );
         },
     } );
 
