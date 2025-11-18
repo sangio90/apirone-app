@@ -45,10 +45,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.ProductItemProduct(){
 		var result = [];
 
-		var baseTree = getProductItemService().getTree(
-			productId = arguments.productId,
-			fruitId   = arguments.fruitId
-		);
+		var baseTree = getProductItemService().getTree( productId = arguments.productId, fruitId = arguments.fruitId );
 
 		var baseAttributes = {};
 
@@ -118,10 +115,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 	private Struct function getBaseAttributes( required String productId, required String fruitId ){
-		var items = getProductItemService().getFlatTree(
-			productId = arguments.productId,
-			fruitId   = arguments.fruitId
-		);
+		var items = getProductItemService().getFlatTree( productId = arguments.productId, fruitId = arguments.fruitId );
 
 		// dump( DESerializeJSON( SerializeJSON( items ) ) );
 
@@ -192,7 +186,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public com.smartvillage.core.model.bean.Outcome function delete(
+	public com.apirone.core.model.bean.Outcome function delete(
 		String productId,
 		String attributeId,
 		String fruitId

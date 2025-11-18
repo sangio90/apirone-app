@@ -53,7 +53,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			var newId = getDao().insert( arguments.finish );
 
-
 			for ( var text in arguments.finish.getTexts() ) {
 				var entity = super.bean( "Entity" );
 

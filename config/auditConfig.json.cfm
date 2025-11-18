@@ -30,6 +30,7 @@
 		"VIEWED": {},
 		"PAID": {},
 		"CLONED": {},
+		"CLONED_TREE": {},
 		"SEARCH": {},
 	}
 }

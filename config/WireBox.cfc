@@ -49,12 +49,14 @@ component extends="coldbox.system.ioc.config.Binder" {
         
             /**/
 
+            /*
         map( "LineServiceBase" ).to( "com.apirone.core.model.service.LineService" )
             .asSingleton();
         
         map( "LineService" ).to( "com.apirone.core.decorator.LoggerServiceDecorator" )
             .asSingleton()
             .initArg( name="wrappedService", ref="LineServiceBase" );
+            */
 
             /**/
 

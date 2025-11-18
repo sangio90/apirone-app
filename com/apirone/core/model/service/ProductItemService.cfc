@@ -128,25 +128,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public com.smartvillage.core.model.bean.Outcome function delete( String productId, String attributeId ){
+	public com.apirone.core.model.bean.Outcome function delete(
+		Numeric productItemId,
+		String productId,
+		String attributeId
+	){
+		if ( IsNull( arguments.productItemId ) && IsNull( arguments.productId ) && IsNull( arguments.attributeId ) ) {
+			Throw( message = "At least one parameter is required to delete", type = "apirone.error.NoArgumentsPassed" );
+		}
+
 		var outcome = super.bean( "Outcome" );
 
-		var obj = get( arguments.productId );
-
-		outcome.setData( { productId = arguments.productId } );
+		outcome.setData( arguments );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
+				getDao().delete( argumentCollection = arguments );
 
-				getDao().delete( getCacheScope(), arguments.productId );
-
-				cm.remove( getCacheScope(), obj.getId() );
+				cm.removeByScope( "product.bean" );
+				cm.removeByScope( "productItem.bean" );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteProductItem" );
-				outcome.setMessage( "Cannot delete product item [#arguments.productId#]" );
+				outcome.setMessage( "Cannot delete product items by [#SerializeJSON( arguments )#]" );
 			}
 		}
 
@@ -163,7 +168,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.ProductItem productItem ){
 		var newId = getDao().update( arguments.productItem );
 
-		//super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
+		// super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
 
 		removeCache( arguments.productItem.getId() );
 
@@ -220,9 +225,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Void function removeCache( required Numeric productItemId ){
-
 		super.getCacheManager().remove( getCacheScope(), arguments.productItemId );
-
 	}
 
 
@@ -370,13 +373,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setPrices( getPriceService().list( productItemId = record.product_item_id ) );
 
 			var images = getFileService().list( productItemId = record.product_item_id )
-			if (Len(images)) {
-				bean.setImages(images)
+			if ( Len( images ) ) {
+				bean.setImages( images )
 			} else {
 				var images = getFileService().list( attributeValueId = record.attribute_raw_value_id )
-				if (Len(images)) {
-					bean.setImages(images)
-				} 
+				if ( Len( images ) ) {
+					bean.setImages( images )
+				}
 			}
 
 			return bean;

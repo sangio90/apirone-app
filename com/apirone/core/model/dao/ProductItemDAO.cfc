@@ -102,13 +102,11 @@
 		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="String">
 
-		<cfif IsNull( arguments.productItemId )
-		AND IsNull( arguments.productId )
-		AND IsNull( arguments.attributeId )>
+		<cfif IsNull( arguments.productItemId ) AND IsNull( arguments.productId ) AND IsNull( arguments.attributeId )>
 			<cfthrow type="apirone.error.NoArgumentsPassed" message="At least one parameter is required to delete">
 		</cfif>
 
-		<cfquery datasource="apirone">
+		<cfquery datasource="apirone" result="result" name="local.q">
 			DELETE
 			FROM product_items
 			WHERE 1=1
@@ -118,7 +116,7 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.productId )>
-					AND product_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productId#">
+					AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.attributeId )>
@@ -128,17 +126,8 @@
 						WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
 					)
 				</cfif>
+			RETURNING product_item_id
 		</cfquery>
-
-		<!---
-			<cfquery name="local.q" datasource="apirone">
-			DELETE
-			FROM product_items
-			WHERE
-			product_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItemId#">
-			</cfquery>
-			-
-		--->
 
 		<cfreturn true>
 	</cffunction>
