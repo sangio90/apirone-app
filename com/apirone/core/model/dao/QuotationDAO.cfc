@@ -197,98 +197,98 @@
 				active = <cfqueryparam cfsqltype="INTEGER" value="#arguments.quotation.getActive()#">
 				,
 				pricelist_id =
-					<cfif !isNull(arguments.quotation.getPricelist())>
+					<cfif !IsNull( arguments.quotation.getPricelist() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getPricelist().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				payment_method_id =
-					<cfif !isNull(arguments.quotation.getPaymentMethod())>
+					<cfif !IsNull( arguments.quotation.getPaymentMethod() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getPaymentMethod().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				custom_payment_method =
-					<cfif !isNull(arguments.quotation.getCustomPaymentMethod())>
+					<cfif !IsNull( arguments.quotation.getCustomPaymentMethod() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getCustomPaymentMethod()#">
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				currency_id =
-					<cfif !isNull(arguments.quotation.getCurrency())>
+					<cfif !IsNull( arguments.quotation.getCurrency() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getCurrency().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				status_id =
-					<cfif !isNull(arguments.quotation.getStatus())>
+					<cfif !IsNull( arguments.quotation.getStatus() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getStatus().getId()#">
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				lang_id =
-					<cfif !isNull(arguments.quotation.getLang())>
+					<cfif !IsNull( arguments.quotation.getLang() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getLang().getId()#">
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				customer_id =
-					<cfif !isNull(arguments.quotation.getCustomer())>
+					<cfif !IsNull( arguments.quotation.getCustomer() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomer().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				customer_address_id =
-					<cfif !isNull(arguments.quotation.getCustomerAddressId())>
+					<cfif !IsNull( arguments.quotation.getCustomerAddressId() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerAddressId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				opportunity_id =
-					<cfif !isNull(arguments.quotation.getOpportunity())>
+					<cfif !IsNull( arguments.quotation.getOpportunity() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getOpportunity().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				lead_id =
-					<cfif !isNull(arguments.quotation.getLead())>
+					<cfif !IsNull( arguments.quotation.getLead() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getLead().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				billing_profile_id =
-					<cfif !isNull(arguments.quotation.getBillingProfile())>
+					<cfif !IsNull( arguments.quotation.getBillingProfile() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getBillingProfile().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				shipping_profile_id =
-					<cfif !isNull(arguments.quotation.getShippingProfile())>
+					<cfif !IsNull( arguments.quotation.getShippingProfile() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getShippingProfile().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				sales_agent_account_id =
-					<cfif !isNull(arguments.quotation.getSalesAgentAccount())>
+					<cfif !IsNull( arguments.quotation.getSalesAgentAccount() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getSalesAgentAccount().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				graphic_technician_account_id =
-					<cfif !isNull(arguments.quotation.getGraphicTechnicianAccount())>
+					<cfif !IsNull( arguments.quotation.getGraphicTechnicianAccount() )>
 						<cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotation.getGraphicTechnicianAccount().getId()#">::uuid
 					<cfelse>
 						NULL
@@ -314,13 +314,13 @@
 
 	<cffunction name="export" returntype="Boolean">
 		<cfargument name="data" type="Struct" required="true">
-		<cfset var qCheck = "" />
-		<cfset var success = false />
+		<cfset var qCheck = ""/>
+		<cfset var success = false/>
 
 		<cfquery name="qCheck" datasource="verticaleExport">
 			SELECT AR_CHIAVE
 			FROM ARTICO_APIR
-    		WHERE AR_CHIAVE = '#arguments.data.AR_CHIAVE#'
+			WHERE AR_CHIAVE = '#arguments.data.AR_CHIAVE#'
 		</cfquery>
 
 		<cfif qCheck.recordCount EQ 0>
@@ -338,28 +338,26 @@
 				)
 			</cfquery>
 
-			<cfset success = true />
+			<cfset success = true/>
 		</cfif>
 
-		<cfreturn success />
+		<cfreturn success/>
 	</cffunction>
 
 	<cffunction name="exportDiba" returntype="Boolean">
 		<cfargument name="data" type="Struct" required="true">
-		<cfset var qCheck = "" />
-		<cfset var success = false />
+		<cfset var qCheck = ""/>
+		<cfset var success = false/>
 		<cfset var uniqueKey = arguments.data.DS_CHIAVE &
-			arguments.data.DSCODMAT &
-			arguments.data.DSVARMAT &
-			arguments.data.DSCOLMAT
-		>
+		arguments.data.DSCODMAT &
+		arguments.data.DSVARMAT &
+		arguments.data.DSCOLMAT>
 
 		<cfquery name="qCheck" datasource="verticaleExport">
 			SELECT DS_CHIAVE
 			FROM DISBAS_APIR
 			WHERE CONCAT(DS_CHIAVE, DSCODMAT, DSVARMAT, DSCOLMAT) = '#uniqueKey#'
 		</cfquery>
-
 
 		<cfif qCheck.recordCount EQ 0>
 			<cfquery datasource="verticaleExport">
@@ -380,10 +378,10 @@
 				)
 			</cfquery>
 
-			<cfset success = true />
+			<cfset success = true/>
 		</cfif>
 
-		<cfreturn success />
+		<cfreturn success/>
 	</cffunction>
 
 	<cffunction name="getQuotationTotal" access="public" returntype="numeric">
@@ -400,5 +398,4 @@
 
 		<cfreturn local.qTotal.total_amount>
 	</cffunction>
-
 </cfcomponent>

@@ -116,148 +116,154 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
 		var success = false;
 		transaction {
-			if (arguments.quotationItems.len() > 0) {
+			if ( arguments.quotationItems.len() > 0 ) {
 				for ( var quotationItem in arguments.quotationItems ) {
-					var code = "";
+					var code    = "";
 					var product = quotationItem.getProduct()
-					if (IsNull(product) || IsNull(product.getCategory())) {
+					if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
 						return false;
 					}
 					var categoryCode = Trim( product.getCategory().getCode() );
 					code &= categoryCode;
-					var nota = '';
-					//Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
-					if (IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" )) {
-						if (isNull(product.getLine())) {
+					var nota = "";
+					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
+					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
+						if ( IsNull( product.getLine() ) ) {
 							return false;
 						}
-						var line = product.getLine();
+						var line     = product.getLine();
 						var lineCode = Trim( line.getCode() );
 
-					code &= lineCode;
+						code &= lineCode;
 
-					if (isNull(product.getModel())) {
-						return false;
-					}
-					var model = product.getModel();
-					code &= Trim(model.getCode());
+						if ( IsNull( product.getModel() ) ) {
+							return false;
+						}
+						var model = product.getModel();
+						code &= Trim( model.getCode() );
 
-					if (isNull(product.getFinish())){
-						return false;
-					}
-					var finishCode = Trim( product.getFinish().getCode() );
-					code &= finishCode;description = product.getProductDescription().subString(0, 35);
+						if ( IsNull( product.getFinish() ) ) {
+							return false;
+						}
+						var finishCode = Trim( product.getFinish().getCode() );
+						code &= finishCode;
+						description = product.getProductDescription().subString( 0, 35 );
 
 						var arChiave = code;
-						var varCode = '';
-						var colCode = '000000';
+						var varCode  = "";
+						var colCode  = "000000";
 
-						var quotationItemProductItems = quotationItemProductItemSvc.list( quotationItemId = quotationItem.getId(), orderBy = [ { field = "productItem.id" } ] );
-						var productItems = [];
+						var quotationItemProductItems = quotationItemProductItemSvc.list(
+							quotationItemId = quotationItem.getId(),
+							orderBy         = [ { field = "productItem.id" } ]
+						);
+						var productItems   = [];
 						var productItemIds = [];
-						//faccio passare tutti i product items e creo una struttura dove definisco quelli importanti (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
+						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
 						for ( var quotationItemProductItem in quotationItemProductItems ) {
 							var productItem = quotationItemProductItem.getProductItem();
-							if (!isNull(productItem)) {
+							if ( !IsNull( productItem ) ) {
 								var attributeValue = productItem.getAttributeValue();
-								var attribute = attributeSvc.get( attributeId = attributeValue.getAttributeId() );
-								if (isNull(attribute)) {
+								var attribute      = attributeSvc.get( attributeId = attributeValue.getAttributeId() );
+								if ( IsNull( attribute ) ) {
 									return false;
 								}
 								var rawValue = attributeValue.getRawValue();
-								//in assenza di una esplicita definizione di importanza, uso il fatto che siano al livello 0 come criterio.
-								if (productItem.getImportant() == 1) {
-									if (!isNull(rawValue)) {
+								// in assenza di una esplicita definizione di importanza, uso il fatto che siano al livello 0 come criterio.
+								if ( productItem.getImportant() == 1 ) {
+									if ( !IsNull( rawValue ) ) {
 										productItems.add( {
-											'important' = false,
-											'rawValueId' = rawValue.getId(),
-											'attributeId' = attributeValue.getAttributeId()
+											"important"   = false,
+											"rawValueId"  = rawValue.getId(),
+											"attributeId" = attributeValue.getAttributeId()
 										} );
-										productItemIds.add(productItem.getId());
+										productItemIds.add( productItem.getId() );
 									}
 								} else {
-									if (varCode.len() < 10) {
+									if ( varCode.len() < 10 ) {
 										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
 										productItems.add( {
-											'important' = true,
-											'rawValueId' = rawValue.getId(),
-											'attributeId' = attributeValue.getAttributeId()
+											"important"   = true,
+											"rawValueId"  = rawValue.getId(),
+											"attributeId" = attributeValue.getAttributeId()
 										} );
-										productItemIds.add(productItem.getId());
+										productItemIds.add( productItem.getId() );
 									} else {
 										productItems.add( {
-											'important' = false,
-											'rawValueId' = rawValue.getId(),
-											'attributeId' = attributeValue.getAttributeId()
+											"important"   = false,
+											"rawValueId"  = rawValue.getId(),
+											"attributeId" = attributeValue.getAttributeId()
 										} );
-										productItemIds.add(productItem.getId());
+										productItemIds.add( productItem.getId() );
 									}
 								}
 							}
-							nota &= attribute.getName() & ': ' & rawValue.getName() & '; ';
+							nota &= attribute.getName() & ": " & rawValue.getName() & "; ";
 						}
 
-						var productComponents = getComponents(product.getId(), quotationItem, productItemIds);
-							
-						varCode &= RepeatString("0", 10 - Len(varCode))
+						var productComponents = getComponents( product.getId(), quotationItem, productItemIds );
 
-						//per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
+						varCode &= RepeatString( "0", 10 - Len( varCode ) )
+
+						// per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
 						var existingCodes = exportCodeSvc.list( str = code & varCode );
-						if (existingCodes.len() > 0) {
-							//se ne esiste almeno uno, per ognuno di questi verifico che tutti i product items (anche quelli non importanti) siano presenti in exportCodeRawValue,
-							//se almeno uno non si trova, passo al successivo. Se non trovo nessun exportCode
-							//cosa che verifico controllando che il colCode rimanga vuoto, allora creo un nuovo exportCode e le relative exportCodeRawValue
-							for (var existingCode in existingCodes) {
-								var exportCodeRawValues = exportCodeRawValueSvc.list( exportCodeId = existingCode.getId() );
+						if ( existingCodes.len() > 0 ) {
+							// se ne esiste almeno uno, per ognuno di questi verifico che tutti i product items (anche quelli non importanti) siano presenti in exportCodeRawValue,
+							// se almeno uno non si trova, passo al successivo. Se non trovo nessun exportCode
+							// cosa che verifico controllando che il colCode rimanga vuoto, allora creo un nuovo exportCode e le relative exportCodeRawValue
+							for ( var existingCode in existingCodes ) {
+								var exportCodeRawValues = exportCodeRawValueSvc.list(
+									exportCodeId = existingCode.getId()
+								);
 								var allFound = true;
-								for (var item in productItems) {
+								for ( var item in productItems ) {
 									var found = false;
-									for (var exportCodeRawValue in exportCodeRawValues) {
-										if (exportCodeRawValue.getRawValue().getId() == item.rawValueId) {
+									for ( var exportCodeRawValue in exportCodeRawValues ) {
+										if ( exportCodeRawValue.getRawValue().getId() == item.rawValueId ) {
 											found = true;
 											break;
 										}
 									}
-									if (!found) {
+									if ( !found ) {
 										allFound = false;
 										break;
 									}
 								}
-								if (allFound) {
+								if ( allFound ) {
 									colCode = existingCode.getCounter()
 									break;
 								}
 							}
-							if (colCode == '000000') {
-								//visto che ci troviamo nel caso in cui esiste almeno un exportCode con quel varCode, cerco il massimo counter e ne creo uno nuovo incrementandolo di uno
+							if ( colCode == "000000" ) {
+								// visto che ci troviamo nel caso in cui esiste almeno un exportCode con quel varCode, cerco il massimo counter e ne creo uno nuovo incrementandolo di uno
 								var maxCounter = exportCodeSvc.max( exportCode = code & varCode );
-								maxCounter = NumberFormat(maxCounter + 1, "000000")
-								colCode = maxCounter
+								maxCounter     = NumberFormat( maxCounter + 1, "000000" )
+								colCode        = maxCounter
 
 								var exportCode = super.bean( "ExportCode" );
 								exportCode.setName( code & varCode );
 								exportCode.setCounter( maxCounter );
-								var exportCodeId = exportCodeSvc.create( 'exportCode' = exportCode );
+								var exportCodeId = exportCodeSvc.create( "exportCode" = exportCode );
 								exportCode.setId( exportCodeId );
 
-								for (var item in productItems) {
+								for ( var item in productItems ) {
 									var exportCodeRawValue = super.bean( "ExportCodeRawValue" );
-									exportCodeRawValue.setExportCode(exportCode);
+									exportCodeRawValue.setExportCode( exportCode );
 									exportCodeRawValue.setRawValue( rawValueSvc.get( item.rawValueId ) );
 									exportCodeRawValue.setAttribute( attributeSvc.get( item.attributeId ) );
-									exportCodeRawValue.setImportant(item.important);
+									exportCodeRawValue.setImportant( item.important );
 									exportCodeRawValueSvc.create( exportCodeRawValue );
 								}
 							}
 						} else {
-							//non esiste nessun exportCode con quel varCode, ne creo uno nuovo con counter = '000001' e le relative exportCodeRawValue
+							// non esiste nessun exportCode con quel varCode, ne creo uno nuovo con counter = '000001' e le relative exportCodeRawValue
 							var exportCode = super.bean( "ExportCode" );
 							exportCode.setName( code & varCode );
-							exportCode.setCounter( '000001' );
-							var exportCodeId = exportCodeSvc.create( 'exportCode' = exportCode );
+							exportCode.setCounter( "000001" );
+							var exportCodeId = exportCodeSvc.create( "exportCode" = exportCode );
 							exportCode.setId( exportCodeId );
-							colCode = '000001'
-							for (var item in productItems) {
+							colCode = "000001"
+							for ( var item in productItems ) {
 								var exportCodeRawValue = super.bean( "ExportCodeRawValue" );
 								exportCodeRawValue.setExportCode( exportCode );
 								exportCodeRawValue.setRawValue( rawValueSvc.get( item.rawValueId ) );
@@ -270,48 +276,53 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						arChiave = code & varCode & colCode;
 
 						var data = {
-							'AR_CHIAVE': arChiave,
-							'ARCODART': code & RepeatString("0", 15 - Len(code)),
-							'ARDESART': description,
-							'ARDATCAR': Now(),
-							'ARUNMIS1': 'PZ',
-							'VARCOD': varCode,
-							'CLCODICE': colCode,
-							'CLANNOTA': nota
+							"AR_CHIAVE" = arChiave,
+							"ARCODART"  = code & RepeatString( "0", 15 - Len( code ) ),
+							"ARDESART"  = description,
+							"ARDATCAR"  = Now(),
+							"ARUNMIS1"  = "PZ",
+							"VARCOD"    = varCode,
+							"CLCODICE"  = colCode,
+							"CLANNOTA"  = nota
 						}
 
 						success = getDao().export( data );
 					}
 
-					if (IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" )) {
+					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
 						var data = {
-							'AR_CHIAVE': product.getCode() & RepeatString("0", 31 - Len(product.getCode())),
-							'ARCODART': product.getCode() & RepeatString("0", 15 - Len(product.getCode())),
-							'ARDESART': product.getName().subString(0, 35) & RepeatString("0", 35 - Len(product.getName().subString(0, 35))),
-							'ARDATCAR': Now(),
-							'ARUNMIS1': 'PZ',
-							'VARCOD': '0000000000',
-							'CLCODICE': '000000',
-							'CLANNOTA': nota
+							"AR_CHIAVE" = product.getCode() & RepeatString( "0", 31 - Len( product.getCode() ) ),
+							"ARCODART"  = product.getCode() & RepeatString( "0", 15 - Len( product.getCode() ) ),
+							"ARDESART"  = product.getName().subString( 0, 35 ) & RepeatString(
+								"0",
+								35 - Len( product.getName().subString( 0, 35 ) )
+							),
+							"ARDATCAR" = Now(),
+							"ARUNMIS1" = "PZ",
+							"VARCOD"   = "0000000000",
+							"CLCODICE" = "000000",
+							"CLANNOTA" = nota
 						}
 						success = getDao().export( data );
 
-						var existingCodes = exportCodeSvc.list( str = product.getCode() & RepeatString("0", 25 - Len(product.getCode())) );
-						if (existingCodes.len() > 0) {
+						var existingCodes = exportCodeSvc.list(
+							str = product.getCode() & RepeatString( "0", 25 - Len( product.getCode() ) )
+						);
+						if ( existingCodes.len() > 0 ) {
 							continue;
 						}
 						var exportCode = super.bean( "ExportCode" );
-						exportCode.setName( product.getCode() & RepeatString("0", 25 - Len(product.getCode())) );
-						exportCode.setCounter( '000000' );
-						exportCodeSvc.create( 'exportCode' = exportCode );
+						exportCode.setName( product.getCode() & RepeatString( "0", 25 - Len( product.getCode() ) ) );
+						exportCode.setCounter( "000000" );
+						exportCodeSvc.create( "exportCode" = exportCode );
 					}
 
 					for ( var productComponent in productComponents ) {
 						productComponent.DS_CHIAVE = data.AR_CHIAVE;
-						productComponent.DSCODART = data.ARCODART;
-						productComponent.DSCODVAR = data.VARCOD;
-						productComponent.DSCODCOL = data.CLCODICE;
-						success = getDao().exportDiba( productComponent )
+						productComponent.DSCODART  = data.ARCODART;
+						productComponent.DSCODVAR  = data.VARCOD;
+						productComponent.DSCODCOL  = data.CLCODICE;
+						success                    = getDao().exportDiba( productComponent )
 					}
 				}
 			}
@@ -324,10 +335,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required String productId,
 		required quotationItem,
 		Array producItemtIds
-	) {
-		var quantity = quotationItem.getQuantity() ? quotationItem.getQuantity() : 1;
+	){
+		var quantity      = quotationItem.getQuantity() ? quotationItem.getQuantity() : 1;
 		var allComponents = [];
-		var progressivo = 0
+		var progressivo   = 0
 
 		var productSvc   = getProductService();
 		var componentSvc = getComponentService();
@@ -336,54 +347,54 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productItemIds = arguments.producItemtIds;
 
 		var product = productSvc.get( productId );
-		if (IsInstanceOf(product, 'com.apirone.core.model.bean.ProductComplex')) {
+		if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
 			var bundleComponents = componentSvc.list(
 				lineId                         = product.getLine().getId(),
 				modelId                        = product.getModel().getId(),
 				includeBaseAttributeComponents = true
 			);
-			for (var bundleComponent in bundleComponents) {
-				allComponents.add(parseComponent(bundleComponent, progressivo));
+			for ( var bundleComponent in bundleComponents ) {
+				allComponents.add( parseComponent( bundleComponent, progressivo ) );
 			}
-			if (IsInstanceOf(quotationItem, 'com.apirone.core.model.bean.QuotationItemSignage')) {
+			if ( IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
 				var signageComponents = componentSvc.list(
 					signageConfigItemId            = quotationItem.getSignageConfigItem().getId(),
 					includeBaseAttributeComponents = true
 				);
 
-				if (producItemtIds.len() > 0) {
+				if ( producItemtIds.len() > 0 ) {
 					for ( var productItemId in productItemIds ) {
 						var signageProductComponents = componentSvc.list(
 							signageItemProduct = {
 								signageConfigItemId = quotationItem.getSignageConfigItem().getId(),
-								productItemId = productItemId
+								productItemId       = productItemId
 							},
 							includeBaseAttributeComponents = true
 						);
-						for (var signageProductComponent in signageProductComponents) {
-							allComponents.add(parseComponent(signageProductComponent, progressivo));
+						for ( var signageProductComponent in signageProductComponents ) {
+							allComponents.add( parseComponent( signageProductComponent, progressivo ) );
 						}
 					}
 				}
 
-				for (var signageComponent in signageComponents) {
-					allComponents.add(parseComponent(signageComponent, progressivo));
+				for ( var signageComponent in signageComponents ) {
+					allComponents.add( parseComponent( signageComponent, progressivo ) );
 				}
 			}
 		}
-		var productComponents = componentSvc.list(
-			productId                      = product.getId(),
-			includeBaseAttributeComponents = true
-		);
-		for (var productComponent in productComponents) {
-			allComponents.add(parseComponent(productComponent, progressivo));
+		var productComponents = componentSvc.list( productId = product.getId(), includeBaseAttributeComponents = true );
+		for ( var productComponent in productComponents ) {
+			allComponents.add( parseComponent( productComponent, progressivo ) );
 		}
 
-		if (producItemtIds.len() > 0) {
+		if ( producItemtIds.len() > 0 ) {
 			for ( var productItemId in productItemIds ) {
-				var productItemComponents = componentSvc.list( productItemId = productItemId, includeBaseAttributeComponents = true );
-				for (var productItemComponent in productItemComponents) {
-					allComponents.add(parseComponent(productItemComponent, progressivo));
+				var productItemComponents = componentSvc.list(
+					productItemId                  = productItemId,
+					includeBaseAttributeComponents = true
+				);
+				for ( var productItemComponent in productItemComponents ) {
+					allComponents.add( parseComponent( productItemComponent, progressivo ) );
 				}
 			}
 		}
@@ -391,33 +402,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return allComponents;
 	}
 
-	public function parseComponent(com.apirone.core.model.bean.Component component, progressivo) {
+	public function parseComponent( com.apirone.core.model.bean.Component component, progressivo ){
 		var progressivo = getProgressivoComponenti();
-		var componente = {
-			'DS_CHIAVE' = '',
-			'DSCODART' = '',
-			'DSCODVAR' = '',
-			'DSCODCOL' = '',
-			'DSCODMAT' = component.getRawProduct()?.getId(),
-			'DSVARMAT' = component.getVariant().getId(),
-			'DSCOLMAT' = component.getColor().getId(),
-			'DSQTAMOV' = component.getQuantity(),
-			'DSTIPMAT' = component.getRawProduct()?.getProcessingType()?.getId(),
-			'DSUNMIS1' = component.getRawProduct()?.getMeasurementUnit()?.getId(),
-			'CPROWNUM' = progressivo + 1,
-			'CPROWORD' = (progressivo + 1) * 10,
-			'DSTIPMAT' = 'R'
+		var componente  = {
+			"DS_CHIAVE" = "",
+			"DSCODART"  = "",
+			"DSCODVAR"  = "",
+			"DSCODCOL"  = "",
+			"DSCODMAT"  = component.getRawProduct()?.getId(),
+			"DSVARMAT"  = component.getVariant().getId(),
+			"DSCOLMAT"  = component.getColor().getId(),
+			"DSQTAMOV"  = component.getQuantity(),
+			"DSTIPMAT"  = component
+				.getRawProduct()
+				?.getProcessingType()
+				?.getId(),
+			"DSUNMIS1" = component
+				.getRawProduct()
+				?.getMeasurementUnit()
+				?.getId(),
+			"CPROWNUM" = progressivo + 1,
+			"CPROWORD" = ( progressivo + 1 ) * 10,
+			"DSTIPMAT" = "R"
 		};
-		setProgressivoComponenti(progressivo + 1)
+		setProgressivoComponenti( progressivo + 1 )
 
 		return componente;
 	}
 
 
-	public String function clone(
-		required com.apirone.core.model.bean.Quotation quotation,
-		required String status
-	){
+	public String function clone( required com.apirone.core.model.bean.Quotation quotation, required String status ){
 		var originalQuotation = arguments.quotation;
 		var clonedQuotation   = Duplicate( originalQuotation );
 		originalQuotation.setActive( 0 );
@@ -466,9 +480,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			clonedItem.setId( LCase( CreateUUID() ) );
 			var newQuotationItemId = quotationItemSvc.create( clonedItem );
 
-			var quotationItemSignageRows = quotationItemSignageRowSvc.list(
-				quotationItemId = quotationItem.getId()
-			);
+			var quotationItemSignageRows = quotationItemSignageRowSvc.list( quotationItemId = quotationItem.getId() );
 			for ( quotationItemSignageRow in quotationItemSignageRows ) {
 				var clonedQuotationItemSignageRow = Duplicate( quotationItemSignageRow );
 				clonedQuotationItemSignageRow.setQuotationItemId( newQuotationItemId );
@@ -510,27 +522,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setQuotationDate( record.quotation_date );
 			bean.setNotes( record.notes );
 			bean.setValidityDate( record.validity_date );
-			if (!isNull(record.opportunity_id)) {
+			if ( !IsNull( record.opportunity_id ) ) {
 				bean.setOpportunity( getOpportunityService().get( record.opportunity_id ) );
 			}
-			if (!isNull(record.lead_id)) {
+			if ( !IsNull( record.lead_id ) ) {
 				bean.setLead( getLeadService().get( record.lead_id ) );
 			}
-			if (!isNull(record.customer_id)) {
+			if ( !IsNull( record.customer_id ) ) {
 				bean.setCustomer( getCustomerService().get( record.customer_id ) );
 			}
-			if (!isNull(record.customer_address_id)) {
+			if ( !IsNull( record.customer_address_id ) ) {
 				bean.setCustomerAddressId( record.customer_address_id );
 			}
 			bean.setActive( record.active );
 			bean.setCustomPaymentMethod( record.custom_payment_method );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 			bean.setLang( getLangService().get( record.lang_id ) );
-			if (!isNull(record.payment_method_id)) {
+			if ( !IsNull( record.payment_method_id ) ) {
 				bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 			}
 			var calculatedAmount = 0;
-			bean.setCalculatedAmount(getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId()} ));
+			bean.setCalculatedAmount(
+				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
+			);
 
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setCurrency( getCurrencyService().get( record.currency_id ) );
