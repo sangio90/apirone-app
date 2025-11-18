@@ -33,9 +33,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.product = product;
 
-		prc.model  = product.getModel();
-		prc.finish = product.getFinish();
-		prc.line   = product.getLine();
 
 		// frutti
 		if (
@@ -48,13 +45,34 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.subtitle = product.getCategory().getName();
 			prc.textLink = "Componenti per #product.getCategory().getName()# / #product.getName()#";
 		} else {
+			prc.model    = product.getModel();
+			prc.finish   = product.getFinish();
+			prc.line     = product.getLine();
+			prc.category = product.getCategory();
+
 			prc.title    = "Modello #product.getModel().getName()# (#product.getModel().getCode()#), finitura #product.getFinish().getName()#";
 			prc.subtitle = "Categoria #product.getCategory().getName()#, linea #product.getLine().getName()#";
 			prc.textLink = "Componenti per #product.getLine().getName()# / #product.getModel().getCode()# / #product.getFinish().getName()#";
 
 			prc.statusList = super.fire( "status.list", [ "line" ] );
-			prc.models     = super.fire( "model.list", { lineId = prc.line.getId() } );
-			prc.finishes   = super.fire( "finish.list", { lineId = prc.line.getId() } );
+			// TODO: passare anche la categoria
+			prc.models     = super.fire(
+				"model.list",
+				{
+					lineId     = prc.line.getId(),
+					categoryId = prc.category.getId()
+				}
+			);
+			prc.finishes = super.fire( "finish.list", { lineId = prc.line.getId() } );
+
+			/*
+			for ( var model in prc.models ) {
+				dump( model.getId() )
+				dump( model.getCode() )
+			}
+			// dump( prc.models )
+			abort;
+			*/
 
 			prc.page[ "lineId" ] = prc.line.getId();
 
@@ -75,7 +93,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = memy.convertList( super.fire( "status.list", [ "attribute" ] ) );
 		prc.page[ "methods" ]             = memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );
-		prc.page[ "statuses" ]            = memy.convertList( super.fire( "status.list", ["PRODUCT"] ) );
+		prc.page[ "statuses" ]            = memy.convertList( super.fire( "status.list", [ "PRODUCT" ] ) );
 		prc.page[ "product" ]             = memy.convert( prc.product, "detail" );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
