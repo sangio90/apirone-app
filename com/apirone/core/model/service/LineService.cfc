@@ -59,11 +59,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	/**
-	 * @auditEvent line.created
-	 * @auditMessage Line [@return@] created
-	 * @auditPayload { "id": "@return@" }
-	 */
 	public String function create( required com.apirone.core.model.bean.Line line ){
 		transaction {
 			var newId = getDao().insert( arguments.line );
@@ -80,24 +75,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getTextService().bulkCreate( arguments.line.getTexts() );
 		}
 
+		super.logEvent(
+			event   = "line.created",
+			message = "Line [#newId#] created",
+			payload = { "id" = newId }
+		);
+
 		return newId;
 	}
 
-	/**
-	 * @auditEvent line.cloned
-	 * @auditMessage Line [@fromLineId@] cloned to [@toLineId@]
-	 * @auditPayload { "fromLineId": "@fromLineId@", "toLineId": "@toLineId@", "categoryId": "@categoryId@" }
-	 */
 	public Struct function clone(
 		required String fromLineId,
 		required String toLineId,
 		required Numeric categoryId
 	){
-		// recursive function to create product items
+		var payload = {
+			"fromLineId" = arguments.fromLineId,
+			"toLineId"   = arguments.toLineId,
+			"categoryId" = arguments.categoryId
+		};
+
+		super.logEvent(
+			event   = "line.CLONED",
+			message = "Start clone line from [#arguments.fromLineId#] to [#arguments.toLineId#]",
+			payload = payload
+		);
 
 		var productService   = getProductService();
 		var componentService = getComponentService();
 
+		/*
 		function createProductItem(
 			required String productId,
 			required Struct productItem,
@@ -157,6 +164,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 		}
+		*/
 
 		productService.deleteAllByParams( lineId = toLineId, categoryId = categoryId );
 
@@ -180,6 +188,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				getComponentService().create( newProductComponent );
 			}
 
+			// clone all productItems and components
+			getProductService().cloneTree( fromProductId = product.getId(), toProductId = newId );
+
+			/*
 			// duplicate productItems
 			var productItems = getProductItemService().getTree( productId = product.getId() );
 
@@ -190,27 +202,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					productId   = newId
 				);
 			}
+			*/
 		}
 
 		getCacheManager().removeAll();
 
-		// super.logAction( type = "LINE.CLONED", message = "Line [#arguments.fromLineId#] cloned" )
+		super.logEvent(
+			event   = "line.CLONED",
+			message = "End clone line from [#arguments.fromLineId#] to [#arguments.toLineId#]",
+			payload = payload
+		);
 
-		return {
-			"status"  = "success",
-			"payload" = {
-				"fromLineId" = arguments.fromLineId,
-				"toLineId"   = arguments.toLineId,
-				"categoryId" = arguments.categoryId
-			}
-		};
+		return { "status" = "success", "payload" = payload };
 	}
 
-	/**
-	 * @auditEvent line.updated
-	 * @auditMessage Line [@line.id@] updated
-	 * @auditPayload { "id": "@line.id@" }
-	 */
 	public String function update( required com.apirone.core.model.bean.Line line ){
 		getDao().update( arguments.line );
 
@@ -231,6 +236,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
+		super.logEvent(
+			event   = "line.updated",
+			message = "Line [#arguments.line.getId()#] updated",
+			payload = { "id" = arguments.line.getId() }
+		);
+
 		super.getCacheManager().remove( getCacheScope(), arguments.line.getId() );
 
 		return arguments.line.getId();
@@ -249,11 +260,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return false;
 	}
 
-	/**
-	 * @auditEvent line.deleted
-	 * @auditMessage Line [@lineId@] deleted
-	 * @auditPayload { "id": "@lineId@" }
-	 */
 	public com.apirone.core.model.bean.Outcome function delete( required String lineId ){
 		var outcome = super.bean( "Outcome" );
 
@@ -276,6 +282,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setMessage( "Cannot delete line [#arguments.lineId#]" );
 			}
 		}
+
+		super.logEvent(
+			event   = "line.deleted",
+			message = "Line [#arguments.lineId#] deleted",
+			payload = { "id" = arguments.lineId }
+		);
 
 		return outcome;
 	}
