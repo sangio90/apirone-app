@@ -548,6 +548,7 @@ AP.accessory.modal = ( function() {
                                 }
                             }
                             if ( xhr.status == "SUCCESS" ) {
+                                $('#accessory-modal').hide()
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                                 viewModel.set( "detailForm", defaultDetailForm );
                                 setTimeout( () => window.location.reload(), 1000 );

@@ -1024,6 +1024,7 @@ AP.signage.modal = ( function() {
                                 }
                             }
                             if ( xhr.status == "SUCCESS" ) {
+                                $('#signage-modal').hide()
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                                 viewModel.set( "detailForm", defaultDetailForm );
                                 setTimeout( () => window.location.reload(), 1000 );
