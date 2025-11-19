@@ -39,7 +39,7 @@
 		var user = prc.user;
 
 		prc.title = "Nuovo preventivo";
-		prc.id = 0;
+		prc.id    = 0;
 
 		prc.page[ "statuses" ]       = super.fire( "status.list", [ "QUOTATION" ] );
 		prc.page[ "languages" ]      = super.fire( "lang.list" );
@@ -84,7 +84,7 @@
 		var memy = super.getMementify();
 
 		prc.title = "Modifica preventivo";
-		prc.id = rc.id;
+		prc.id    = rc.id;
 
 		prc.page[ "statuses" ]       = super.fire( "status.list", [ "QUOTATION" ] );
 		prc.page[ "languages" ]      = super.fire( "lang.list" );
@@ -94,7 +94,7 @@
 
 		prc.page[ "frames" ] = memy.convertList( super.fire( "frame.list" ), "minimal" );
 
-		var countries                = [
+		var countries = [
 			{ "id" = 1, "name" = "Italia" },
 			{ "id" = 2, "name" = "Francia" },
 			{ "id" = 3, "name" = "Germania" },
@@ -130,12 +130,12 @@
 		quotation.setValidityDate( DateFormat( quotation.getValidityDate(), "yyyy-mm-dd" ) );
 		prc.page[ "quotation" ] = quotation;
 
-		//prc.jsFiles.add( "app-plate-designer" );
-		prc.jsFiles.add( "app-plate" );
+		// prc.jsFiles.add( "app-plate-designer" );
+		prc.jsFiles.add( "app-quotation-plate" );
 		prc.jsFiles.add( "app-quotation-detail" );
 		prc.jsFiles.add( "app-quotation-pricing" );
-		prc.jsFiles.add( "app-signage" );
-		prc.jsFiles.add( "app-accessory" );
+		prc.jsFiles.add( "app-quotation-signage" );
+		prc.jsFiles.add( "app-quotation-accessory" );
 
 		prc.cssFiles.add( "quotation-plate" );
 
