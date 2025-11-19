@@ -111,6 +111,7 @@ AP.signage.modal = ( function() {
 
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
+            viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
             $( "#signangeProductCategory" ).prop( "disabled", false );
             $( "#signageRow" ).prop( "disabled", false );
             $( "#signageModel" ).prop( "disabled", false );
@@ -254,8 +255,8 @@ AP.signage.modal = ( function() {
                 } );
             } );
             this.checkCanSave();
-            NM.storage.set( "signage.signageConfigId", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) );
-            NM.storage.set( "signage.signageConfigRowCount", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
+            AP.setUserPref( "signage.signageConfigId", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) );
+            AP.setUserPref( "signage.signageConfigRowCount", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
         },
 
         parsedLineContent: function( valore, id ) {
@@ -520,7 +521,7 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            NM.storage.set( "signage.categoryId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) );
+            AP.setUserPref( "signage.categoryId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) );
         },
 
         loadModels: function( event ) {
@@ -551,7 +552,7 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            NM.storage.set( "signage.lineId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) );
+            AP.setUserPref( "signage.lineId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) );
         },
 
         loadFinishes: function( event ) {
@@ -605,7 +606,7 @@ AP.signage.modal = ( function() {
                 $( "#signageRow" ).prop( "disabled", false );
             }
             this.checkCanSave();
-            NM.storage.set( "signage.modelId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) );
+            AP.setUserPref( "signage.modelId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) );
         },
 
         loadSignageConfigs: function( event ) {
@@ -668,10 +669,10 @@ AP.signage.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != NM.storage.get( "signage.finishId" ) ) {
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != AP.getUserPref( "signage.finishId" ) ) {
                 NM.storage.delete( "signage.product.items" );
             }
-            NM.storage.set( "signage.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
+            AP.setUserPref( "signage.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
         },
 
         loadFontSizes: function() {
@@ -704,7 +705,7 @@ AP.signage.modal = ( function() {
                 }
             }
             this.checkCanSave();
-            NM.storage.set( "signage.fontId", viewModel.get( "detailForm.data.signageConfig.font.id" ) );
+            AP.setUserPref( "signage.fontId", viewModel.get( "detailForm.data.signageConfig.font.id" ) );
         },
 
         firstLoadProductItems: async function() {
@@ -1185,41 +1186,41 @@ AP.signage.modal = ( function() {
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
 
-        if ( NM.storage.get( "signage.categoryId" ) ) {
-            viewModel.set( "detailForm.data.signageConfig.catalogBundle.category.id", NM.storage.get( "signage.categoryId" ) );
+        if ( AP.getUserPref( "signage.categoryId" ) ) {
+            viewModel.set( "detailForm.data.signageConfig.catalogBundle.category.id", AP.getUserPref( "signage.categoryId" ) );
         }
-        if ( NM.storage.get( "signage.lineId" ) ) {
-            viewModel.set( "detailForm.data.signageConfig.catalogBundle.line.id", NM.storage.get( "signage.lineId" ) );
+        if ( AP.getUserPref( "signage.lineId" ) ) {
+            viewModel.set( "detailForm.data.signageConfig.catalogBundle.line.id", AP.getUserPref( "signage.lineId" ) );
         }
-        if ( NM.storage.get( "signage.modelId" ) ) {
-            viewModel.set( "detailForm.data.signageConfig.catalogBundle.model.id", NM.storage.get( "signage.modelId" ) );
+        if ( AP.getUserPref( "signage.modelId" ) ) {
+            viewModel.set( "detailForm.data.signageConfig.catalogBundle.model.id", AP.getUserPref( "signage.modelId" ) );
         }
-        if ( NM.storage.get( "signage.finishId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.finish.id", NM.storage.get( "signage.finishId" ) );
+        if ( AP.getUserPref( "signage.finishId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.finish.id", AP.getUserPref( "signage.finishId" ) );
         }
-        if ( NM.storage.get( "signage.fontId" ) ) {
-            viewModel.set( "detailForm.data.signageConfig.font.id", NM.storage.get( "signage.fontId" ) );
+        if ( AP.getUserPref( "signage.fontId" ) ) {
+            viewModel.set( "detailForm.data.signageConfig.font.id", AP.getUserPref( "signage.fontId" ) );
         }
-        if ( NM.storage.get( "signage.signageConfigId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.signageConfigItem.id", NM.storage.get( "signage.signageConfigId" ) );
-            viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", NM.storage.get( "signage.signageConfigRowCount" ) );
+        if ( AP.getUserPref( "signage.signageConfigId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.signageConfigItem.id", AP.getUserPref( "signage.signageConfigId" ) );
+            viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", AP.getUserPref( "signage.signageConfigRowCount" ) );
         }
 
         viewModel.loadLines();
         setTimeout( function() {
-            if ( NM.storage.get( "signage.lineId" ) ) {
+            if ( AP.getUserPref( "signage.lineId" ) ) {
                 viewModel.loadModels();
                 setTimeout( function() {
-                    if ( NM.storage.get( "signage.modelId" ) ) {
+                    if ( AP.getUserPref( "signage.modelId" ) ) {
                         viewModel.loadFinishes();
                         setTimeout( function() {
-                            if ( NM.storage.get( "signage.finishId" ) ) {
+                            if ( AP.getUserPref( "signage.finishId" ) ) {
                                 viewModel.loadSignageConfigs();
                                 setTimeout( function() {
-                                    if ( NM.storage.get( "signage.fontId" ) ) {
+                                    if ( AP.getUserPref( "signage.fontId" ) ) {
                                         viewModel.loadFontSizes();
                                         setTimeout( function() {
-                                            if ( NM.storage.get( "signage.signageConfigId" ) ) {
+                                            if ( AP.getUserPref( "signage.signageConfigId" ) ) {
                                                 setTimeout( function() {
                                                     viewModel.parseLines();
                                                 }, 200 );
@@ -1249,7 +1250,7 @@ AP.signage.modal = ( function() {
                 },
             },
         } );
-
+debugger
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotation-items/signage/" + id,

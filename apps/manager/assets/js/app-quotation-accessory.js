@@ -80,6 +80,7 @@ AP.accessory.modal = ( function() {
 
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
+            viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
             $( "#accessoryProductCategory" ).prop( "disabled", false );
             $( "#accessoryRow" ).prop( "disabled", false );
             $( "#accessoryModel" ).prop( "disabled", false );
@@ -99,7 +100,7 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            NM.storage.set( "accessory.categoryId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) );
+            AP.setUserPref( "accessory.categoryId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) );
         },
 
         loadModels: function( event ) {
@@ -123,7 +124,7 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            NM.storage.set( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) );
+            AP.setUserPref( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) );
         },
 
         loadFinishes: function( event ) {
@@ -171,7 +172,7 @@ AP.accessory.modal = ( function() {
 
             }
             this.checkCanSave();
-            NM.storage.set( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) );
+            AP.setUserPref( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) );
         },
 
         loadProduct: function() {
@@ -208,10 +209,10 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != NM.storage.get( "accessory.finishId" ) ) {
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != AP.getUserPref( "accessory.finishId" ) ) {
                 NM.storage.delete( "accessory.product.items" );
             }
-            NM.storage.set( "accessory.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
+            AP.setUserPref( "accessory.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
         },
 
         firstLoadProductItems: async function() {
@@ -230,12 +231,12 @@ AP.accessory.modal = ( function() {
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
                             }
-                            if ( quotationItemId != "" || !NM.storage.get( "accessory.product.items" ) || NM.storage.get( "accessory.product.items" ).length == 0 ) {
+                            if ( quotationItemId != "" || !AP.getUserPref( "accessory.product.items" ) || AP.getUserPref( "accessory.product.items" ).length == 0 ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             } else {
                                 if ( quotationItemId == "" ) {
                                     const itemsDataSource = new kendo.data.DataSource( {
-                                        data: NM.storage.get( "accessory.product.items" )
+                                        data: AP.getUserPref( "accessory.product.items" )
                                     } );
                                     viewModel.set( "detailForm.data.quotationItem.product.items", itemsDataSource );
                                     viewModel.get( "detailForm.data.quotationItem.product.items" ).read();
@@ -337,7 +338,7 @@ AP.accessory.modal = ( function() {
                         }
                     }
                     viewModel.renderProductItems();
-                    NM.storage.set( "accessory.product.items", productItems.data() );
+                    AP.setUserPref( "accessory.product.items", productItems.data() );
                     resolve();
                     return;
                 }
@@ -419,7 +420,7 @@ AP.accessory.modal = ( function() {
                             if ( productItems && productItems.data().length > 0 ) {
                                 viewModel.renderProductPreview( productItems );
                             }
-                            NM.storage.set( "accessory.product.items", productItems.data() );
+                            AP.setUserPref( "accessory.product.items", productItems.data() );
                             resolve();
                         },
                         fail: function( err ) {
@@ -583,29 +584,29 @@ AP.accessory.modal = ( function() {
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
 
 
-        if ( NM.storage.get( "accessory.categoryId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.category.id", NM.storage.get( "accessory.categoryId" ) );
+        if ( AP.getUserPref( "accessory.categoryId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.category.id", AP.getUserPref( "accessory.categoryId" ) );
         }
-        if ( NM.storage.get( "accessory.lineId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.line.id", NM.storage.get( "accessory.lineId" ) );
+        if ( AP.getUserPref( "accessory.lineId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.line.id", AP.getUserPref( "accessory.lineId" ) );
         }
-        if ( NM.storage.get( "accessory.modelId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.model.id", NM.storage.get( "accessory.modelId" ) );
+        if ( AP.getUserPref( "accessory.modelId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.model.id", AP.getUserPref( "accessory.modelId" ) );
         }
-        if ( NM.storage.get( "accessory.finishId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.finish.id", NM.storage.get( "accessory.finishId" ) );
+        if ( AP.getUserPref( "accessory.finishId" ) ) {
+            viewModel.set( "detailForm.data.quotationItem.product.finish.id", AP.getUserPref( "accessory.finishId" ) );
         }
 
-        if ( NM.storage.get( "accessory.categoryId" ) ) {
+        if ( AP.getUserPref( "accessory.categoryId" ) ) {
             viewModel.loadLines();
             setTimeout( function() {
-                if ( NM.storage.get( "accessory.lineId" ) ) {
+                if ( AP.getUserPref( "accessory.lineId" ) ) {
                     viewModel.loadModels();
                     setTimeout( function() {
-                        if ( NM.storage.get( "accessory.modelId" ) ) {
+                        if ( AP.getUserPref( "accessory.modelId" ) ) {
                             viewModel.loadFinishes();
                             setTimeout( function() {
-                                if ( NM.storage.get( "accessory.finishId" ) ) {
+                                if ( AP.getUserPref( "accessory.finishId" ) ) {
                                     viewModel.loadProduct();
                                     setTimeout( function() {
 
