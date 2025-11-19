@@ -990,6 +990,7 @@ AP.signage.modal = ( function() {
         },
 
         save: function( event ) {
+            Loading.show()
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             const signageRows = parsedData.quotationItem.signageRows.data();
@@ -1017,6 +1018,7 @@ AP.signage.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERRORE" ) {
+                                Loading.hide()
                                 if ( xhr.data && xhr.data.error ) {
                                     AP.widget.notify( "error", xhr.data.error );
                                 } else {
@@ -1027,7 +1029,11 @@ AP.signage.modal = ( function() {
                                 $('#signage-modal').hide()
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                                 viewModel.set( "detailForm", defaultDetailForm );
-                                setTimeout( () => window.location.reload(), 1000 );
+                                setTimeout( function () {
+                                    Loading.hide()
+                                    window.location.reload()
+                                }
+                                , 1000 );
                             }
                         }
                     }

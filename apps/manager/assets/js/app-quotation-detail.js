@@ -679,7 +679,7 @@ AP.quotationDetail.zoneModal = ( function() {
             var zoneForm = $( "#zone-form" );
 
             if ( zoneForm.valid() ) {
-
+                Loading.show()
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotations/zones",
@@ -687,12 +687,16 @@ AP.quotationDetail.zoneModal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "INVALID" ) {
+                                Loading.show()
                                 NM.form.showMessages( xhr.data );
                                 return;
                             }
 
                             AP.widget.notify( "success", "Zona salvata correttamente." );
-                            setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
+                            setTimeout( function () {
+                                $( "#zone-modal-root" ).modal( "hide" )
+                                Loading.hide()   
+                            }, 200 );
                             AP.quotationDetail.detail.methods().getZones();
                         }
                     }
@@ -712,6 +716,7 @@ AP.quotationDetail.zoneModal = ( function() {
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
             if ( zoneForm.valid() ) {
+                Loading.show()
                 NM.util.ajax( {
                     method: "DELETE",
                     url: "/manager/ajax/quotations/zones",
@@ -727,7 +732,10 @@ AP.quotationDetail.zoneModal = ( function() {
                             }
 
                             AP.widget.notify( "success", xhr.data.message );
-                            setTimeout( () => $( "#zone-modal-root" ).modal( "hide" ), 1000 );
+                            setTimeout( function () {
+                                $( "#zone-modal-root" ).modal( "hide" )
+                                Loading.hide()   
+                            }, 200 );
                             AP.quotationDetail.detail.methods().getZones();
 
                         }
