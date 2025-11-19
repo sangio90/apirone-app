@@ -54,5 +54,5 @@ AP.getUserPref = function( key, defaultValue ) {
 
 AP.deleteUserPref = function( key ) {
     var user = AP.config.account.shortId;
-    NM.storage.remove( "apirOne:" + user + ":" + key );
+    NM.storage.delete( "apirOne:" + user + ":" + key );
 };
