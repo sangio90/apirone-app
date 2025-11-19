@@ -1249,7 +1249,7 @@ AP.signage.modal = ( function() {
                 },
             },
         } );
-debugger
+
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotation-items/signage/" + id,
