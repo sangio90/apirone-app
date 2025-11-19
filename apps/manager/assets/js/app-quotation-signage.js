@@ -670,7 +670,7 @@ AP.signage.modal = ( function() {
             } );
             this.checkCanSave();
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != AP.getUserPref( "signage.finishId" ) ) {
-                NM.storage.delete( "signage.product.items" );
+                AP.deleteUserPref( "signage.product.items" );
             }
             AP.setUserPref( "signage.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
         },
@@ -1009,7 +1009,6 @@ AP.signage.modal = ( function() {
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
-                parsedData.mode = "segnaletiche";
 
                 NM.util.ajax( {
                     method: "POST",
@@ -1050,13 +1049,13 @@ AP.signage.modal = ( function() {
 
         clearFilters: function() {
             viewModel.resetForm();
-            NM.storage.delete( "signage.categoryId" );
-            NM.storage.delete( "signage.lineId" );
-            NM.storage.delete( "signage.modelId" );
-            NM.storage.delete( "signage.finishId" );
-            NM.storage.delete( "signage.fontId" );
-            NM.storage.delete( "signage.signageConfigId" );
-            NM.storage.delete( "signage.product.items" );
+            AP.deleteUserPref( "signage.categoryId" );
+            AP.deleteUserPref( "signage.lineId" );
+            AP.deleteUserPref( "signage.modelId" );
+            AP.deleteUserPref( "signage.finishId" );
+            AP.deleteUserPref( "signage.fontId" );
+            AP.deleteUserPref( "signage.signageConfigId" );
+            AP.deleteUserPref( "signage.product.items" );
             this.checkCanSave();
         },
 

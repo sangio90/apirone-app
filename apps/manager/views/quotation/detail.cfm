@@ -367,13 +367,6 @@
                                             <button class="btn btn-primary" data-bind="click: save"><i class="fa fa-save"></i> Salva</button>
                                         </div>
                                     </div>
-                                    <!---
-                                    <div id="totalsFloatingTab" class="container py-3">
-                                        <div class="d-flex align-items-center">
-                                            <table style="width: 100%"></table>
-                                        </div>
-                                    </div>
-                                    ---->
 
                                     #view( "quotation/totals" )#
 

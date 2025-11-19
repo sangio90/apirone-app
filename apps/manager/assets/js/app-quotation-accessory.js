@@ -210,7 +210,7 @@ AP.accessory.modal = ( function() {
             } );
             this.checkCanSave();
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != AP.getUserPref( "accessory.finishId" ) ) {
-                NM.storage.delete( "accessory.product.items" );
+                AP.deleteUserPref( "accessory.product.items" );
             }
             AP.setUserPref( "accessory.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
         },
@@ -515,11 +515,11 @@ AP.accessory.modal = ( function() {
 
         clearFilters: function() {
             viewModel.resetForm();
-            NM.storage.delete( "accessory.categoryId" );
-            NM.storage.delete( "accessory.lineId" );
-            NM.storage.delete( "accessory.modelId" );
-            NM.storage.delete( "accessory.finishId" );
-            NM.storage.delete( "accessory.product.items" );
+            AP.deleteUserPref( "accessory.categoryId" );
+            AP.deleteUserPref( "accessory.lineId" );
+            AP.deleteUserPref( "accessory.modelId" );
+            AP.deleteUserPref( "accessory.finishId" );
+            AP.deleteUserPref( "accessory.product.items" );
             this.checkCanSave();
         },
 
@@ -533,11 +533,10 @@ AP.accessory.modal = ( function() {
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
-                parsedData.mode = 'accessori';
 
                 NM.util.ajax( {
                     method: "POST",
-                    url: "/manager/ajax/quotation-items",
+                    url: "/manager/ajax/quotation-items/accessory",
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
