@@ -57,6 +57,17 @@ AP.quotation.pricing = ( function() {
                 }
             } );
 
+        },
+
+        collapseTotals: function( event ) {
+            if ($('#totalsFloatingTabContent').is(':hidden')) {
+                $('#totalsFloatingTabContent').show()
+                $('#symbol').text('▼')
+            } else {
+                $('#totalsFloatingTabContent').hide()
+                $('#symbol').text('▲')
+            }
+            return false
         }
 
     } );
