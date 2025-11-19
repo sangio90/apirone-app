@@ -202,15 +202,18 @@ AP.quotationDetail.detail = ( function() {
             window.location.href = "/manager/quotations";
         },
         exportQuotation: function() {
+            Loading.show()
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
                 callback: {
                     done: function( xhr ) {
                         if( xhr.status == "INVALID" ) {
+                            Loading.hide()
                             NM.form.showMessages( xhr.data );
                             return;
                         }
+                        Loading.hide()
                         AP.widget.notify( "success", "Preventivo Esportato correttamente." );
                     }
                 }

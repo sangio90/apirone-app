@@ -118,6 +118,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			if ( arguments.quotationItems.len() > 0 ) {
 				for ( var quotationItem in arguments.quotationItems ) {
+					setProgressivoComponenti(0)
 					var code    = "";
 					var product = quotationItem.getProduct()
 					if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
@@ -147,7 +148,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						}
 						var finishCode = Trim( product.getFinish().getCode() );
 						code &= finishCode;
-						description = product.getProductDescription().subString( 0, 35 );
+						description = product.getDescription().len() >= 35 ? product.getDescription().subString( 0, 35 ) : product.getDescription();
 
 						var arChiave = code;
 						var varCode  = "";
@@ -338,7 +339,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		var quantity      = quotationItem.getQuantity() ? quotationItem.getQuantity() : 1;
 		var allComponents = [];
-		var progressivo   = 0
 
 		var productSvc   = getProductService();
 		var componentSvc = getComponentService();
@@ -354,7 +354,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				includeBaseAttributeComponents = true
 			);
 			for ( var bundleComponent in bundleComponents ) {
-				allComponents.add( parseComponent( bundleComponent, progressivo ) );
+				allComponents.add( parseComponent( bundleComponent ) );
 			}
 			if ( IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
 				var signageComponents = componentSvc.list(
@@ -372,19 +372,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							includeBaseAttributeComponents = true
 						);
 						for ( var signageProductComponent in signageProductComponents ) {
-							allComponents.add( parseComponent( signageProductComponent, progressivo ) );
+							allComponents.add( parseComponent( signageProductComponent ) );
 						}
 					}
 				}
 
 				for ( var signageComponent in signageComponents ) {
-					allComponents.add( parseComponent( signageComponent, progressivo ) );
+					allComponents.add( parseComponent( signageComponent ) );
 				}
 			}
 		}
 		var productComponents = componentSvc.list( productId = product.getId(), includeBaseAttributeComponents = true );
 		for ( var productComponent in productComponents ) {
-			allComponents.add( parseComponent( productComponent, progressivo ) );
+			allComponents.add( parseComponent( productComponent ) );
 		}
 
 		if ( producItemtIds.len() > 0 ) {
@@ -394,7 +394,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					includeBaseAttributeComponents = true
 				);
 				for ( var productItemComponent in productItemComponents ) {
-					allComponents.add( parseComponent( productItemComponent, progressivo ) );
+					allComponents.add( parseComponent( productItemComponent ) );
 				}
 			}
 		}
@@ -402,7 +402,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return allComponents;
 	}
 
-	public function parseComponent( com.apirone.core.model.bean.Component component, progressivo ){
+	public function parseComponent( com.apirone.core.model.bean.Component component ){
 		var progressivo = getProgressivoComponenti();
 		var componente  = {
 			"DS_CHIAVE" = "",

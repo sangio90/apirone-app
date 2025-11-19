@@ -348,15 +348,12 @@
 		<cfargument name="data" type="Struct" required="true">
 		<cfset var qCheck = ""/>
 		<cfset var success = false/>
-		<cfset var uniqueKey = arguments.data.DS_CHIAVE &
-		arguments.data.DSCODMAT &
-		arguments.data.DSVARMAT &
-		arguments.data.DSCOLMAT>
+		<cfset var uniqueKey = arguments.data.DS_CHIAVE & arguments.data.CPROWNUM>
 
 		<cfquery name="qCheck" datasource="verticaleExport">
-			SELECT DS_CHIAVE
+			SELECT CONCAT(DS_CHIAVE, CPROWNUM)
 			FROM DISBAS_APIR
-			WHERE CONCAT(DS_CHIAVE, DSCODMAT, DSVARMAT, DSCOLMAT) = '#uniqueKey#'
+			WHERE CONCAT(DS_CHIAVE, CPROWNUM) = '#uniqueKey#'
 		</cfquery>
 
 		<cfif qCheck.recordCount EQ 0>
