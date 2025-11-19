@@ -221,7 +221,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				if ( !Len( id ) ) {
 					var bean = super.bean( "QuotationItemSignage" );
 				} else {
-					var bean = super.bean( "QuotationItemSignage" );
+					var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 				}
 
 				bean.setSignageConfigItem(
@@ -243,7 +243,6 @@ component extends="com.apirone.core.controller.AbsController" {
 							}
 						)
 				.getData();
-
 				if ( !Len( product ) || Len( product ) > 1 ) {
 					var message = "Combinazione Linea/Modello/Categoria/Finitura non disponibile.";
 					result.setData( { "error" = message } );
