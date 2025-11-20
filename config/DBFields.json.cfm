@@ -319,4 +319,12 @@
         "name": "export_code_raw_value_id",
         "type": "Integer"
     },
+    "quotationItemExported.exportDate": {
+        "name": "ARDATCAR",
+        "type": "Date"
+    },
+    "quotationItemExportedRows.rowNumber": {
+        "name": "CPRWONUM",
+        "type": "Integer"
+    },
 }

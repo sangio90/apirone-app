@@ -5,8 +5,8 @@
                 <h2>#prc.title#</h2>
             </div>
 			<div class="col-6 text-end">
-				#button( bind = "click:exportQuotation", size = "md", label = "Esporta preventivo" )#
 				#button( bind = "click:list", size = "md", label = "Torna ai preventivi" )#
+				#button( bind = "click:exportQuotation", size = "md", label = "Esporta preventivo" )#
 				<cfif prc.id NEQ 0>
 					#button( bind = "click:printQuotation", size = "md", label = "Stampa preventivo" )#
 				</cfif>

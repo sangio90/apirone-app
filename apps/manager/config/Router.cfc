@@ -427,6 +427,12 @@
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
 
+		get( "/quotation-items-exported" ).to( "QuotationItemExportedController.list" ).end();
+		get( "/ajax/quotation-items-exported/:key" ).to( "QuotationItemExportedAjaxController.listRows" ).end();
+		delete( "/ajax/quotation-items-exported/:key" ).to( "QuotationItemExportedAjaxController.delete" ).end();
+		post( "/ajax/quotation-items-exported" ).to( "QuotationItemExportedAjaxController.deleteMulti" ).end();
+		get( "/ajax/quotation-items-exported" ).to( "QuotationItemExportedAjaxController.list" ).end();
+		delete( "/ajax/quotation-item-exported-rows" ).to( "QuotationItemExportedAjaxController.deleteRow" ).end();
 
 		/*
 			quotation items

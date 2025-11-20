@@ -197,6 +197,11 @@
 				icon: "fas fa-stream",
 				title: "Gestione componenti",
 			},
+			{
+				href: "/manager/quotation-items-exported",
+				icon: "fas fa-stream",
+				title: "Prodotti Preventivi Esportati",
+			},
 		]
 	},	
 
