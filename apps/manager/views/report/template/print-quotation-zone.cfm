@@ -152,7 +152,7 @@
 												<td style="width: 3.5cm;">
 													<cfif IsNull( oggetto.getImage() )>
 														<!--- <img src="/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain;"> --->
-														<img src="https://fastly.picsum.photos/id/826/200/200.jpg?hmac=WlCuCjxEhXh_s4IkOpulPoB-LOoGjfZwP4GjNnkzTLA" style="text-align: left; width: 100%; object-fit: contain;">
+														<img src="https://test.apirone.cc/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain;">
 													<cfelse>
 														<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 100%; object-fit: contain;">
 													</cfif>
