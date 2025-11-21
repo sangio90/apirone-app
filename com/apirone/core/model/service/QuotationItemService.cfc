@@ -1,6 +1,7 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemDAO";
+	property name="quotationItemFruitService" inject="QuotationItemFruitService";
 	property name="QuotationService" inject="QuotationService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
@@ -47,7 +48,20 @@
 		var records            = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( quotationItemId = record.quotation_item_id ) );
+			var quotationItem = get( quotationItemId = record.quotation_item_id )
+			if ( mode == null ) {
+				rows.add( quotationItem )
+			} else {
+				if ( mode == 'placche') {
+					if (IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate' )) {
+						rows.add( quotationItem );
+					}
+				} else {
+					if (!IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate' )) {
+						rows.add( quotationItem );
+					}
+				}
+			}
 		} );
 
 		result.setData( rows );
@@ -95,12 +109,17 @@
 
 	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){
 		var record = getDao().read( arguments.quotationItemId );
-
+		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.quotationItemId )
 		if ( record.recordCount ) {
-			if (Len(record.signage_config_item_id)) {
-				var bean = super.bean( "QuotationItemSignage" );
+			if (fruits.len() > 0) {
+				var bean = super.bean( "QuotationItemPlate" );
+				bean.setFruits(fruits)
 			} else {
-				var bean = super.bean( "QuotationItem" );
+				if (Len(record.signage_config_item_id)) {
+					var bean = super.bean( "QuotationItemSignage" );
+				} else {
+					var bean = super.bean( "QuotationItem" );
+				}
 			}
 
 			bean.setId( record.quotation_item_id );

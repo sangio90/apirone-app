@@ -4,6 +4,7 @@ Object.assign( AP.quotationDetail.fields, {
     detailRoot: $( "#quotation-detail-root" ),
     detailForm: $( "#quotation-header-form" ),
     zoneModalRoot: $( "#zone-modal-root" ),
+    printModalRoot: $( "#print-modal-root" ),
 } );
 
 $( document ).ready( function() {
@@ -218,12 +219,6 @@ AP.quotationDetail.detail = ( function() {
                     }
                 }
             } );
-        },
-        printQuotation: function() {
-            window.open(
-                "/manager/technical-reports/print?id=" + AP.page.quotation.id,
-                "_blank"
-            );
         },
         changeMode: function( e ) {
             viewModel.set( "mode", e.currentTarget.textContent.toLowerCase() );
@@ -466,6 +461,9 @@ AP.quotationDetail.detail = ( function() {
 
         getItems: function( e ) {
             var quotationItemsMode = viewModel.get( "mode" );
+            if (quotationItemsMode == null) {
+                quotationItemsMode = $('#quotationItemsMode').find('.active')[0].innerHTML.toLowerCase()
+            }
             if ( viewModel.detailForm.data.zone?.name != "" ) {
                 var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id + "&mode=" + quotationItemsMode;
                 if ( viewModel.detailForm.data.zone ) {
@@ -553,7 +551,15 @@ AP.quotationDetail.detail = ( function() {
                 AP.quotationDetail.zoneModal.init( "delete" );
             }
             NM.util.openModal( AP.quotationDetail.fields.zoneModalRoot );
-        }
+        },
+
+        openPrintModal: function() {
+            if ( AP.quotationDetail.fields.printModalRoot.length ) {
+                AP.quotationDetail.printModal.methods().resetForm();
+                AP.quotationDetail.printModal.init();
+            }
+            NM.util.openModal( AP.quotationDetail.fields.printModalRoot );
+        },
     } );
 
     pub.config = function( options ) {
@@ -820,6 +826,117 @@ AP.quotationDetail.zoneModal = ( function() {
             } );
 
         }
+    };
+
+    pub.methods = function( options ) {
+        return viewModel;
+    };
+    return pub;
+} () );
+
+AP.quotationDetail.printModal = ( function() {
+    var pub = {};
+    // REF: il nome è errato
+    var fields = AP.quotationDetail.fields;
+
+    var defaultDetailForm = {
+        data: {
+            id: "",
+            report: {
+                    'id': 'classic',
+                    'name': 'Classica'
+                },
+            reports: [
+                {
+                    'id': 'classic',
+                    'name': 'Classica'
+                },
+                {
+                    'id': 'proforma',
+                    'name': 'Proforma'
+                },
+                {
+                    'id': 'zone',
+                    'name': 'Zone'
+                },
+                {
+                    'id': 'technical',
+                    'name': 'Tecnica'
+                },
+                {
+                    'id': 'internal',
+                    'name': 'Interna'
+                }
+            ]
+        }
+    };
+
+    var viewModel = kendo.observable( {
+        detailForm: defaultDetailForm,
+
+        printQuotation: function() {
+            let report = viewModel.get('detailForm.data.report.id');
+            let url = "/manager/technical-reports/print?id=" + AP.page.quotation.id + "&report=" + report
+            const images = $('#imagesCheckbox')[0].checked
+            const grouped = $('#groupedCheckbox')[0].checked
+            const notes = $('#notesCheckbox')[0].checked
+            const discounts = $('#discountsCheckbox')[0].checked
+            if (images) { url += '&images=true' } else { url += '&images=false' }
+            if (grouped) { url += '&grouped=true' } else { url += '&grouped=false' }
+            if (notes) { url += '&notes=true' } else { url += '&notes=false' }
+            if (discounts) { url += '&discounts=true' } else { url += '&discounts=false' }
+            window.open(
+                url,
+                "_blank"
+            );
+        },
+
+        toggleOptions: function() {
+            const report = viewModel.get('detailForm.data.report.id');
+            $('#imagesCheckbox')[0].checked = false
+            $('#groupedCheckbox')[0].checked = false
+            $('#notesCheckbox')[0].checked = false
+            $('#discountsCheckbox')[0].checked = false
+            if (report == 'classic') {
+                $('#imagesDiv').css('display', 'block')
+                $('#groupedDiv').css('display', 'block')
+                $('#notesDiv').css('display', 'block')
+                $('#discountsDiv').css('display', 'block')
+            }
+            if (report == 'proforma') {
+                $('#imagesDiv').css('display', 'none')
+                $('#groupedDiv').css('display', 'block')
+                $('#notesDiv').css('display', 'block')
+                $('#discountsDiv').css('display', 'block')
+            }
+            if (report == 'zone') {
+                $('#imagesDiv').css('display', 'none')
+                $('#groupedDiv').css('display', 'block')
+                $('#notesDiv').css('display', 'block')
+                $('#notesCheckbox')[0].checked = true
+                $('#discountsDiv').css('display', 'block')
+            }
+            if (report == 'technical') {
+                $('#imagesDiv').css('display', 'block')
+                $('#groupedDiv').css('display', 'block')
+                $('#notesDiv').css('display', 'block')
+                $('#discountsDiv').css('display', 'none')
+            }
+            if (report == 'internal') {
+                $('#imagesDiv').css('display', 'none')
+                $('#groupedDiv').css('display', 'none')
+                $('#notesDiv').css('display', 'none')
+                $('#discountsDiv').css('display', 'none')
+            }
+        },
+
+        resetForm: function() {
+            viewModel.set( "detailForm", defaultDetailForm );
+        }
+    } );
+
+    pub.init = function() {
+        kendo.bind( fields.printModalRoot, viewModel );
     };
 
     pub.methods = function( options ) {

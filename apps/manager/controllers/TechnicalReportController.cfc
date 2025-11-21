@@ -2,8 +2,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function print(event, rc, prc) {
 
-		param rc.report = "quotation";
 		var idPreventivo = rc.id;
+		var printParams = {
+			'report' = rc.report,
+			'images' = rc.images == 'true',
+			'notes' = rc.notes == 'true',
+			'grouped' = rc.grouped == 'true',
+			'discounts' = rc.discounts == 'true',
+		}
 
 		prc.title = "Preventivo";
 
@@ -45,7 +51,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		quoteObj.customerShippingAddress = customerShippingAddress;
 
-		var saveAsName = "#rc.report#_#DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
+		var saveAsName = "print-quotation-#printParams.report#_#DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
 
 		var params = {
 			title   = "Preventivo",
@@ -57,11 +63,11 @@ component extends="com.apirone.core.controller.AbsController" {
 				pageType          = "A4",
 				overwrite         = true,
 				fontEmbed         = true,
-				saveAsName        = "#rc.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
+				saveAsName        = "#printParams.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
 			}
 		}
 
-		event.renderData( data = renderView( view = "report/template/#rc.report#", args = params ), type = "PDF" );
+		event.renderData( data = renderView( view = "report/template/print-quotation-#rc.report#", args = params ), type = "PDF" );
 	}
 
 }

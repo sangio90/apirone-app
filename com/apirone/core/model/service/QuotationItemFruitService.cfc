@@ -2,6 +2,7 @@
 
 	property name="dao" inject="QuotationItemFruitDAO";
 	property name="productService" inject="ProductService";
+	property name="quotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="cacheScope" type="String" default="QuotationItemFruit.bean";
 
 	public com.apirone.core.model.bean.QuotationItemFruit function get( required Numeric quotationItemFruitId ){
