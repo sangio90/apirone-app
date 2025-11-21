@@ -8,7 +8,7 @@
 				#button( bind = "click:list", size = "md", label = "Torna ai preventivi" )#
 				#button( bind = "click:exportQuotation", size = "md", label = "Esporta preventivo" )#
 				<cfif prc.id NEQ 0>
-					#button( bind = "click:printQuotation", size = "md", label = "Stampa preventivo" )#
+					#button( bind = "click:openPrintModal", size = "md", label = "Stampa preventivo" )#
 				</cfif>
 			</div>
         </div>
@@ -490,6 +490,7 @@
     #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal" )#
     #view( "quotation/zone-modal" )#
+    #view( "quotation/print-modal" )#
 
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-accessory-preview-tmpl" )#

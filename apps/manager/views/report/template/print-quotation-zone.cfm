@@ -9,6 +9,22 @@
 			table {
 				border-collapse: collapse;
 			}
+			.hiddenTable {
+				border-collapse: collapse;
+				border: 0;
+				width: 100%;        /* usa tutta la larghezza della cella contenitore */
+				table-layout: fixed;/* evita ricalcoli dinamici delle colonne */
+				box-sizing: border-box;
+			}
+
+			.hiddenTable td,
+			.hiddenTable th {
+				border: 0 !important;
+				padding: 0;         /* rimuovi padding interni, gestiscilo a livello della cella esterna se serve */
+				vertical-align: top;
+				box-sizing: border-box;
+				line-height: 10px;
+			}
 		</style>
 		<div>
 			<cfdocumentitem type="header">
@@ -51,7 +67,7 @@
 				<div style="padding-top: 1.2in;">
 					<!-- Nota, l'unica UM supportata per i margini sono gli inches, quindi per coerenza
 					li uso dappertutto, per allineare body a header uso un -.08in ---->
-					<table class="cstmtable" style="margin-top: 1em;width: 100%;">
+					<table class="cstmtable" style="margin-top: .1in; width: 100%;">
 						<tr>
 							<td style="width: 50%;"></td>
 							<td style="width: 50%;"><strong>Referente</strong></td>
@@ -84,8 +100,6 @@
 					</table>
 
 					<cfset blundlesPrinted = {}>
-
-					<div style="border-bottom:1px solid ##EAEAEA; padding: 15px 0"></div>
 				</div>
 			</cfoutput>
 
@@ -100,7 +114,7 @@
 						<!--- Ogni stanza comincia su nuova pagina --->
 						<div style="page-break-before: always; margin-top: 1.5in; border: 1px solid black; padding: .2em; font-size: 14pt; font-weight: bold;">#stanza.getName()#</div>
 					<cfelse>
-						<div style="border: 1px solid black; margin: 0; padding: .2em; width: fit-content; font-size: 14pt; font-weight: bold;">
+						<div style="border: 1px solid black; margin: 0; margin-top: .1in; padding: .2em; width: fit-content; font-size: 14pt; font-weight: bold;">
 							#stanza.getName()#
 						</div>
 					</cfif>
@@ -110,32 +124,65 @@
 						<cfif (i EQ 1 and j EQ 3) or (i EQ 1 AND j EQ 7)>
 							<div style="page-break-before: always;"></div>
 							<div style="margin-top: 1.3in">&nbsp;</div>
-						<cfelseif i GT 1 and J GT 1 AND J MOD 4 EQ 1>
-							<div style="margin-top: 1.9in">&nbsp;</div>
+						<cfelseif i GT 1 and J GT 1 AND J MOD 3 EQ 1>
+							<div style="margin-top: 2.5in">&nbsp;</div>
 						</cfif>
 
 						<!--- wrapper per evitare che venga spezzato su due pagine --->
 						<div class="item" style="page-break-inside: avoid;">
 							<table style="border-collapse: collapse; width: 100%;">
-							<tr style="border-collapse: collapse;">
-									<td style="width: 3.6cm; border-right: 0;"><strong>Articolo</strong></td>
-									<td style="border-left: 0;"></td>
-									<td style="width: 2cm; text-align: right;"><strong>Qtà.</strong></td>
-									<td style="width: 2cm; text-align: right;"><strong>Prezzo</strong></td>
-									<td style="width: 2cm; text-align: right;"><strong>Totale</strong></td>
+								<tr>
+									<td style="width: 10cm; border-right: 0;"><strong>Articolo</strong></td>
+									<td style="width: 1cm; text-align: right;"><strong>Qtà.</strong></td>
+									<td style="width: 3cm; text-align: right;"><strong>Prezzo</strong></td>
+									<td style="width: 3cm; text-align: right;"><strong>Totale</strong></td>
 								</tr>
-								<tr style="border-collapse: collapse;">
-									<td style="padding-top: .1in; text-align: center; border-right: 0;">
-										<cfif IsNull( oggetto.getImage() )>
-											<img src="/assets/main/img/img-not-found.png" style="text-align: left; width: 3.6cm; max-width: 100%; object-fit: contain;">
-										<cfelse>
-											<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 3.6cm; max-width: 100%; object-fit: contain;">
-										</cfif>
+								<tr>
+									<td style="width: 10cm; padding-top: 5pt; padding-left: 0">
+										<table class="hiddenTable">
+											<tr>
+												<td style="width: 3.5cm;">
+													<cfif IsNull( oggetto.getImage() )>
+														<!--- <img src="/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain;"> --->
+														<img src="https://fastly.picsum.photos/id/826/200/200.jpg?hmac=WlCuCjxEhXh_s4IkOpulPoB-LOoGjfZwP4GjNnkzTLA" style="text-align: left; width: 100%; object-fit: contain;">
+													<cfelse>
+														<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 100%; object-fit: contain;">
+													</cfif>
+												</td>
+												<td style="width: 5.5cm; padding-left: 2pt; padding-right: 0">
+													<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+													<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
+														<cfset itemsCount = ArrayLen( oggetto.getItems() ) GTE 9 ? 9 : ArrayLen( oggetto.getItems() )>
+														<cfloop from="1"  to="#itemsCount#" index="item">
+															<cfset item = oggetto.getItems()[item]>
+															<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
+														</cfloop>
+														<cfif itemsCount GT 9>...</cfif>
+													</cfif>
+												</td>
+											</tr>
+											<tr>
+												<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
+													<td colspan="2" style="padding-left: 2pt; font-size: 8pt; line-height: 20px;">
+														<b>Lista Frutti: </b>
+														<cfif NOT isNull(oggetto.getFruits())>
+															<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
+															<cfloop from="1" to="#fruitsCount#" index="fi">
+																<cfset fruit = oggetto.getFruits()[fi]>
+																Cod. <span style="text-transform: lowercase; font-size: 8pt;">
+																	#fruit.getFruit().getCode()#<cfif fi LT fruitsCount>, </cfif>
+																</span>
+																<cfif fi LT fruitsCount> </cfif>
+															</cfloop>
+														</cfif>
+													</td>
+												</cfif>
+											</tr>
+										</table>
 									</td>
-									<td style="vertical-align: top; padding-top: .2in; border-left: 0; font-size: 11pt;">#oggetto.getProduct().getDescription()#</td>
-									<td style="text-align: right;">#oggetto.getQuantity()#</td>
-									<td style="text-align: right;">#oggetto.getPrice()# €</td>
-									<td style="text-align: right;">#oggetto.getQuantity() * oggetto.getPrice()# €</td>
+									<td style="width: 1cm; text-align: right;">#oggetto.getQuantity()#</td>
+									<td style="width: 3cm; text-align: right;">#oggetto.getPrice()# €</td>
+									<td style="width: 3cm; text-align: right;">#oggetto.getQuantity() * oggetto.getPrice()# €</td>
 								</tr>
 							</table>
 						</div>

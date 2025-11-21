@@ -327,4 +327,8 @@
         "name": "CPRWONUM",
         "type": "Integer"
     },
+    "quotationItemFruit.id": {
+        "name": "quotation_item_fruit_id",
+        "type": "Integer"
+    },
 }
