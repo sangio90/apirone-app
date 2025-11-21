@@ -18,6 +18,7 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationId" type="String" required="false">
 		<cfargument name="quotationZoneId" type="String" required="false">
+		<cfargument name="quotationZoneOriginId" type="String" required="false">
 		<cfargument name="mode" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_items.quotation_item_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">

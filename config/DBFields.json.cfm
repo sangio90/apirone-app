@@ -331,4 +331,8 @@
         "name": "quotation_item_fruit_id",
         "type": "Integer"
     },
+    "quotationItemZone.originId": {
+        "name": "origin_id",
+        "type": "uuid"
+    },
 }
