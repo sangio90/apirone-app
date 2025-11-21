@@ -49,13 +49,17 @@
 
 		records.each( function( record ){
 			var quotationItem = get( quotationItemId = record.quotation_item_id )
-			if ( mode == 'placche') {
-				if (IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate' )) {
-					rows.add( quotationItem );
-				}
+			if ( mode == null ) {
+				rows.add( quotationItem )
 			} else {
-				if (!IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate' )) {
-					rows.add( quotationItem );
+				if ( mode == 'placche') {
+					if (IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate' )) {
+						rows.add( quotationItem );
+					}
+				} else {
+					if (!IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate' )) {
+						rows.add( quotationItem );
+					}
 				}
 			}
 		} );
