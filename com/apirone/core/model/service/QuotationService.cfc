@@ -413,17 +413,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"DSVARMAT"  = component.getVariant().getId(),
 			"DSCOLMAT"  = component.getColor().getId(),
 			"DSQTAMOV"  = component.getQuantity(),
-			"DSTIPMAT"  = component
-				.getRawProduct()
-				?.getProcessingType()
-				?.getId(),
 			"DSUNMIS1" = component
 				.getRawProduct()
 				?.getMeasurementUnit()
 				?.getId(),
 			"CPROWNUM" = progressivo + 1,
 			"CPROWORD" = ( progressivo + 1 ) * 10,
-			"DSTIPMAT" = "R"
+			"DSTIPRIG" = "R"
 		};
 		setProgressivoComponenti( progressivo + 1 )
 

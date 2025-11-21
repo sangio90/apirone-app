@@ -358,7 +358,7 @@
 
 		<cfif qCheck.recordCount EQ 0>
 			<cfquery datasource="verticaleExport">
-				INSERT INTO DISBAS_APIR (DS_CHIAVE, DSCODART, DSCODVAR, DSCODCOL, DSCODMAT, DSVARMAT, DSCOLMAT, DSQTAMOV, DSTIPMAT, DSUNMIS1, CPROWNUM, CPROWORD)
+				INSERT INTO DISBAS_APIR (DS_CHIAVE, DSCODART, DSCODVAR, DSCODCOL, DSCODMAT, DSVARMAT, DSCOLMAT, DSQTAMOV, DSUNMIS1, CPROWNUM, CPROWORD, DSTIPRIG)
 				VALUES (
 					<cfqueryparam value="#arguments.data.DS_CHIAVE#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.DSCODART#" cfsqltype="varchar">,
@@ -368,10 +368,10 @@
 					<cfqueryparam value="#arguments.data.DSVARMAT#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.DSCOLMAT#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.DSQTAMOV#" cfsqltype="varchar">,
-					<cfqueryparam value="#arguments.data.DSTIPMAT#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.DSUNMIS1#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.CPROWNUM#" cfsqltype="numeric">,
-					<cfqueryparam value="#arguments.data.CPROWORD#" cfsqltype="numeric">
+					<cfqueryparam value="#arguments.data.CPROWORD#" cfsqltype="numeric">,
+					<cfqueryparam value="#arguments.data.DSTIPRIG#" cfsqltype="varchar">
 				)
 			</cfquery>
 
