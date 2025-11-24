@@ -99,78 +99,69 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		var categories = [];
-
 		var thisId    = "";
 		var messageId = "";
+		var result    = super.getResult();
 
-		var result = super.getResult();
-				
-		var quotation = super.bean( "Quotation" );
-		
+		var currency      = super.bean( "Currency" );
+		var quotation     = super.bean( "Quotation" );
+		var paymentMethod = super.bean( "PaymentMethod" );
+
 		quotation.setId( json.id );
 		quotation.setName( json.name );
-		quotation.setQuotationNumber( json.quotationNumber );
-		quotation.setVersionNumber( json.versionNumber );
 		quotation.setQuotationDate( json.quotationDate );
 		quotation.setNotes( !IsNull( json.notes ) ? json.notes : null );
 		quotation.setValidityDate( json.validityDate );
-		
-		if (!IsNull(json.opportunity) && !IsNull(json.opportunity.id) && json.opportunity.id != '') {
+
+		if ( !IsNull( json.opportunity ) && !IsNull( json.opportunity.id ) && json.opportunity.id != "" ) {
 			quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
 		}
-		
-		if (!IsNull(json.lead) && !IsNull(json.lead.id) && json.lead.id != '') {
+
+		if ( !IsNull( json.lead ) && !IsNull( json.lead.id ) && json.lead.id != "" ) {
 			quotation.setLead( super.fire( "lead.get", [ json.lead.id ] ) );
 		}
-		
+
 		quotation.setActive( true );
-		
-		var statusId = json.status.id != '' ? json.status.id : 'NEW';
-		
+
 		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
-		
-		quotation.setCustomer( !IsNull(json.customer) ? super.fire( "customer.get", [ json.customer.id ] ) : null );
-		
-		if (!IsNull( json.shippingAddress ) && !IsNull( json.shippingAddress.id ) && json.shippingAddress.id != '') {
+
+		quotation.setCustomer(
+			!IsNull( json.customer ) ? super.fire( "customer.get", [ json.customer.id ] ) : NullValue()
+		);
+
+		if ( !IsNull( json.shippingAddress ) && !IsNull( json.shippingAddress.id ) && json.shippingAddress.id != "" ) {
 			quotation.setCustomerAddressId( json.shippingAddress.id );
 		}
-		
-		// quotation.setCustomPaymentMethod( json.custom_payment_method );
-		// quotation.setPricelist( type.setId( json.pricelist.id ) );
-		// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
-		// quotation.setCurrency( type.setId( json.currency.id ) );
+
+		quotation.setPaymentMethod( paymentMethod.setId( json.paymentMethod.id ) );
+		quotation.setCurrency( currency.setId( json.currency.id ) );
 		// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
 		// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
 		// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
 		// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
-		
+
 		if ( !Len( json.id ) ) {
-			messageId = "quotation.created";
-			quotation.setStatus( super.fire( "status.get", [ statusId ] ) );
+			// create
+			quotation.setQuotationNumber( 1 );
+			quotation.setVersionNumber( 1 );
+			quotation.setStatus( super.fire( "status.get", [ "LAV" ] ) );
 			thisId    = super.fire( "quotation.create", [ quotation ] );
+			messageId = "quotation.created";
 		} else {
+			// update
 			var bean = super.fire( "Quotation.get", [ rc.id ] );
-			
-			if ( json.status.id != bean.getStatus().getId() ) {
-				quotation.setActive( 0 );
-				quotation.setStatus( bean.getStatus() );
-				thisId    = super.fire( "quotation.clone", [ quotation, statusId ] );
-				super.fire( "quotation.update", [ quotation ] )
-				messageId = "quotation.updated";
-			} else {
-				quotation.setStatus( bean.getStatus() );
-				messageId = "quotation.updated";
-				thisId    = super.fire( "quotation.update", [ quotation ] )
-			}
-		
+
+			// quotation.setActive( 0 );
+			// quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
+			// thisId = super.fire( "quotation.clone", [ quotation, statusId ] );
+			thisId    = super.fire( "quotation.update", [ quotation ] )
+			messageId = "quotation.updated";
 		}
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message,  "payload" = { id = thisId } } );
+		result.setData( { "message" = message, "payload" = { "id" = thisId } } );
 		event.setValue( "result", result );
-
 	}
 
 	function delete( event, rc, prc ){
@@ -204,8 +195,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function crmCustomers( event, rc, prc ){
-		var data = [];
-		var name = rc.str;
+		var data   = [];
+		var name   = rc.str;
 		var result = super.getResult();
 		var mem    = super.getMementify();
 
@@ -218,8 +209,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function crmOpportunities( event, rc, prc ){
-		var data = [];
-		var name = rc.str;
+		var data   = [];
+		var name   = rc.str;
 		var result = super.getResult();
 		var mem    = super.getMementify();
 
@@ -232,8 +223,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function crmLeads( event, rc, prc ){
-		var data = [];
-		var name = rc.str;
+		var data   = [];
+		var name   = rc.str;
 		var result = super.getResult();
 		var mem    = super.getMementify();
 
@@ -251,10 +242,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
 
-		params[ "id" ]            = rc.id;
-		var quotationItems = super.fire( "QuotationItem.list", [ 'quotationId' = rc.id ] );
-		var result = super.fire( "Quotation.export", [ quotationItems ] );
+		params[ "id" ]     = rc.id;
+		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
+		var result         = super.fire( "Quotation.export", [ quotationItems ] );
 
 		event.setValue( "result", result );
 	}
+
 }

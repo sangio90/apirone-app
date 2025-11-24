@@ -54,71 +54,74 @@ AP.quotation.detail = ( function() {
             id: "",
             name: "",
             customer: {
-                "id":"",
-                "name":""
+                id:"",
+                name:""
             },
             shippingAddress: {
-                "id": null,
-                "name": ""
+                id: null,
+                name: ""
             },
             quotationNumber: "",
             versionNumber: 1,
             lang: {
-                "id":""
+                id:"IT"
             },
             zone: {
-                "id":"",
-                "name":""
+                id:"",
+                name:""
             },
             zones: new kendo.data.DataSource(),
             quotationDate: new Date(),
             validityDate: new Date(),
             notes: "",
             status: {
-                "id":""
+                id:"LAV"
             },
             opportunity: {
-                "id":"",
-                "name":""
+                id:"",
+                name:""
             },
             lead: {
-                "id":"",
-                "name":""
+                id:"",
+                name:""
             },
             pricelist: {
-                "id":""
+                id:""
             },
             paymentMethod: {
-                "id":""
+                id: 18 // BB 60 GG FM
             },
             customPaymentMethod: "",
             vatNumber: "",
             currency: {
-                "id":""
+                id: 1
+            },
+            vatCode: {
+                id: 22
             },
             invoiceData: {
-                "name":"",
-                "company":"",
-                "vatNumber":"",
-                "email":"",
-                "phone":"",
-                "street":"",
-                "city":"",
-                "postalCode":"",
-                "country": { "id":"" },
-                "state": { "id":"" }
+                name:"",
+                company:"",
+                vatNumber:"",
+                email:"",
+                phone:"",
+                street:"",
+                city:"",
+                postalCode:"",
+                country: { id:"" },
+                state: { id:"" }
             },
             shipmentData: {
-                "name":"",
-                "company":"",
-                "vatNumber":"",
-                "email":"",
-                "phone":"",
-                "street":"",
-                "city":"",
-                "postalCode":"",
-                "country": { "id":"", "name":"" },
-                "state": { "id":"", "name":"" }
+                name:"",
+                company:"",
+                vatNumber:"",
+                email:"",
+                phone:"",
+                street:"",
+                city:"",
+                postalCode:"",
+                country: { id:"", name:"" },
+                state: { id:"", name:"" }
             },
             title: this.id ? "Modifica Preventivo" : "Nuovo Preventivo",
             totals: {
@@ -131,7 +134,9 @@ AP.quotation.detail = ( function() {
         mode: null,
         detailForm: defaultDetailForm,
         languages: new kendo.data.DataSource(),
+        varCodes: new kendo.data.DataSource(),
         statuses: new kendo.data.DataSource(),
+        vatCodes: new kendo.data.DataSource(),
         pricelists: new kendo.data.DataSource(),
         paymentMethods: new kendo.data.DataSource(),
         currencies: new kendo.data.DataSource(),
@@ -141,6 +146,7 @@ AP.quotation.detail = ( function() {
         filteredShipmentStates: new kendo.data.DataSource(),
         zones: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
+
         crmCustomers: new kendo.data.DataSource( {
             serverFiltering: true,
             transport: {
@@ -159,6 +165,7 @@ AP.quotation.detail = ( function() {
                 }
             }
         } ),
+
         crmOpportunities: new kendo.data.DataSource( {
             serverFiltering: true,
             transport: {
@@ -177,6 +184,7 @@ AP.quotation.detail = ( function() {
                 }
             }
         } ),
+
         crmLeads: new kendo.data.DataSource( {
             serverFiltering: true,
             transport: {
@@ -324,13 +332,9 @@ AP.quotation.detail = ( function() {
                                         NM.form.showMessages( xhr.data );
                                         return;
                                     }
-                                    // REF: fare il check su "SUCCESS" non occorre: te lo fa la libreria.
-                                    // se è "ERROR" (500) viene mostrato un messaggio generico di errore.
-                                    // if ( xhr.status == "SUCCESS" ) {
                                     AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
                                     viewModel.set( "detailForm", defaultDetailForm );
                                     window.location.href = "/manager/quotations/" + AP.page.quotation.id;
-                                    // }
                                 }
                             }
                         } );
@@ -362,11 +366,27 @@ AP.quotation.detail = ( function() {
                     validityDate: {
                         required: true
                     },
+                    requireAnyOfCustomerLeadOrOpportunity: {
+                        required: function() {
+
+                            var leadId = viewModel.get( "detailForm.data.lead.id" );
+                            var customerId =  viewModel.get( "detailForm.data.customer.id" );
+                            var opportunityId = viewModel.get( "detailForm.data.opportunity.id" );
+
+                            console.log( "leadId", leadId );
+                            console.log( "customerId", customerId );
+                            console.log( "opportunityId", opportunityId );
+
+                            if ( customerId || leadId || opportunityId ) {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                    },
                 },
                 messages: {
                     name: {
-                        // REF: ho tolto "preventivo" dappertutto
-                        // siamo già nel dominio, abbiamo poco spazio ed è inutile ripeterlo
                         required: "Nome richiesto.",
                     },
                     number: {
@@ -378,6 +398,11 @@ AP.quotation.detail = ( function() {
                     validityDate: {
                         required: "Data validità richiesta."
                     },
+
+                    requireAnyOfCustomerLeadOrOpportunity: {
+                        required: "Compilare almeno un campo fra cliente, lead o opportunità"
+                    }
+
                 }
             } );
 
@@ -579,6 +604,7 @@ AP.quotation.detail = ( function() {
         viewModel.get( "currencies" ).data( AP.page.currencies );
         viewModel.get( "countries" ).data( AP.page.countries );
         viewModel.get( "states" ).data( AP.page.states );
+        viewModel.get( "vatCodes" ).data( AP.page.vatCodes );
 
         viewModel.getZones();
 
@@ -597,15 +623,30 @@ AP.quotation.detail = ( function() {
             // $( "#nav-plan-tab" ).removeAttr("hidden");
             $( "#nav-products-tab" ).removeAttr( "hidden" );
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
+
+            document.querySelector( "#nav-plate-tab" ).addEventListener( "click", function( e ) {
+                e.preventDefault();
+                $( "#addSignageButton" ).hide();
+                $( "#addAccessoryButton" ).hide();
+                $( "#addPlateButton" ).show();
+            } );
+
+            document.querySelector( "#nav-signage-tab" ).addEventListener( "click", function( e ) {
+                e.preventDefault();
+                $( "#addPlateButton" ).hide();
+                $( "#addAccessoryButton" ).hide();
+                $( "#addSignageButton" ).show();
+            } );
+
+            document.querySelector( "#nav-accessories-tab" ).addEventListener( "click", function( e ) {
+                e.preventDefault();
+                $( "#addPlateButton" ).hide();
+                $( "#addSignageButton" ).hide();
+                $( "#addAccessoryButton" ).show();
+            } );
+
         }
     };
-
-    // era: renderQuotationTotals()
-    // REF: davantia lla funzione manca il "var" perchè avevi
-    // la necessità che fosse pubblica
-    // è sufficiente metterlo in "pub" per averlo in:
-    // AP.quotation.detail.renderQuotationTotals()
-    // la prossima volta lo facciamo con mvvm
 
     pub.renderTotals = function() {
         /*
