@@ -35,7 +35,7 @@
 								#getPrintFullHeader()#
 							</td>
 							<td style="border: 0; width: 12cm; padding-left: 1in; padding-top: .4in">
-								<h2>Preventivo N. #args.data.quotation.getQuotationNumber()#</h2>
+								<h2>Preventivo N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
 								<table style="width: 100%; border: 0;">
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Data</td>
@@ -112,9 +112,17 @@
 					</cfif>
 					<cfif i GT 1>
 						<!--- Ogni stanza comincia su nuova pagina --->
-						<div style="page-break-before: always; margin-top: 1.5in; border: 1px solid black; padding: .2em; font-size: 14pt; font-weight: bold;">#stanza.getName()#</div>
+						<div style="page-break-before: always; margin-top: 1.5in; border: 1px solid black; padding: .2em; font-size: 14pt; font-weight: bold;">
+							<cfif !isNull(stanza.getOrigin())>
+								#stanza.getOrigin().getName()# -
+							</cfif>
+							#stanza.getName()#
+						</div>
 					<cfelse>
 						<div style="border: 1px solid black; margin: 0; margin-top: .1in; padding: .2em; width: fit-content; font-size: 14pt; font-weight: bold;">
+							<cfif !isNull(stanza.getOrigin())>
+								#stanza.getOrigin().getName()# -
+							</cfif>
 							#stanza.getName()#
 						</div>
 					</cfif>
@@ -144,7 +152,7 @@
 												<td style="width: 3.5cm;">
 													<cfif IsNull( oggetto.getImage() )>
 														<!--- <img src="/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain;"> --->
-														<img src="https://fastly.picsum.photos/id/826/200/200.jpg?hmac=WlCuCjxEhXh_s4IkOpulPoB-LOoGjfZwP4GjNnkzTLA" style="text-align: left; width: 100%; object-fit: contain;">
+														<img src="https://test.apirone.cc/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain;">
 													<cfelse>
 														<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 100%; object-fit: contain;">
 													</cfif>
@@ -157,7 +165,11 @@
 															<cfset item = oggetto.getItems()[item]>
 															<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 														</cfloop>
-														<cfif itemsCount GT 9>...</cfif>
+														<cfif args.params.notes>
+															<div style="font-size: 8pt; margin-top: 8pt;">
+																<b>Note: </b>
+															</div>
+														</cfif>
 													</cfif>
 												</td>
 											</tr>
@@ -174,15 +186,20 @@
 																</span>
 																<cfif fi LT fruitsCount> </cfif>
 															</cfloop>
+															<cfif args.params.notes>
+																<div style="font-size: 8pt; margin-top: 4pt;">
+																	<b>Note: </b>
+																</div>
+															</cfif>
 														</cfif>
 													</td>
 												</cfif>
 											</tr>
 										</table>
 									</td>
-									<td style="width: 1cm; text-align: right;">#oggetto.getQuantity()#</td>
-									<td style="width: 3cm; text-align: right;">#oggetto.getPrice()# €</td>
-									<td style="width: 3cm; text-align: right;">#oggetto.getQuantity() * oggetto.getPrice()# €</td>
+									<td style="width: 1cm; text-align: right; font-size: 8pt;">#oggetto.getQuantity()#</td>
+									<td style="width: 3cm; text-align: right; font-size: 8pt;">#LSNumberFormat( oggetto.getPrice(), ".99", "it_IT" )# €</td>
+									<td style="width: 3cm; text-align: right; font-size: 8pt;">#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice(), ".99", "it_IT" )# €</td>
 								</tr>
 							</table>
 						</div>
@@ -194,7 +211,7 @@
 					<table style="width: 4in; border-collapse: collapse; position: absolute; right: 0; top: .1in;">
 						<tr>
 							<td><strong>Totale merce</strong></td>
-							<td>#args.data.quotation.getCalculatedAmount()# €</td>
+							<td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td>
 						</tr>
 						<tr>
 							<td>IVA 20%</td>
@@ -206,7 +223,7 @@
 						</tr>
 						<tr>
 							<td><strong>Totale fattura</strong></td>
-							<td>#args.data.quotation.getCalculatedAmount()# €</td>
+							<td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td>
 						</tr>
 					</table>
 				</div>

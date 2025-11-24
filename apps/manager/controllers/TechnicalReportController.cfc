@@ -28,8 +28,18 @@ component extends="com.apirone.core.controller.AbsController" {
 			return;
 		}
 
-		var zones = super.fire('QuotationZone.list', [ 'quotationId' = idPreventivo ]);
-		quoteObj.zones = zones;
+		var zones = super.fire('QuotationZone.list', [ 'quotationId' = idPreventivo, 'orderby' = [ { field = "quotationItemZone.originId", dir = "desc" } ] ]);
+		
+		var sortedZones = [];
+		for (var zone in zones) {
+			if (isNull(zone.getOrigin())) {
+				sortedZones.add(zone)
+				var subZones = super.fire('QuotationZone.list', [ 'quotationId' = idPreventivo, 'originId' = zone.getId() ])
+				for ( var subZone in subZones ) {
+					sortedZones.add(subZone)
+				}
+			}
+		}
 
 		var customerShippingAddress = [
 			'name' = null,
@@ -43,11 +53,33 @@ component extends="com.apirone.core.controller.AbsController" {
 			customerShippingAddress = quotation.getCustomer().getShippingAddresses()[1];
 		}
 
-		for ( var i = 1; i LTE ArrayLen( zones ); i++ ) {
-			var zone = zones[i];
-			var zoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = zone.getId() ]);
+		for ( var i = 1; i LTE ArrayLen( sortedZones ); i++ ) {
+			var zone = sortedZones[i];
+			if (printParams.grouped) {
+				if (!isNull((zone.getOrigin()))) {
+					continue;
+				}
+				var zoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = zone.getId() ]);
+				var subZones = zones.filter(function(item) {
+					return !isNull(item.getOrigin()) && item.getOrigin().getId() == zone.getId()
+				})
+				for ( var subZone in subZones ) {
+					var thisSubZoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = subZone.getId() ]);
+					arrayAppend(zoneItems, thisSubZoneItems, true);
+				}
+			} else {
+				var zoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = zone.getId() ]);
+			}
 			zone.zoneItems = zoneItems;
 		}
+
+		if (printParams.grouped) {
+			sortedZones = sortedZones.filter(function(item) {
+				return isNull(item.getOrigin())
+			})
+		}
+
+		quoteObj.zones = sortedZones;
 
 		quoteObj.customerShippingAddress = customerShippingAddress;
 
@@ -56,6 +88,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = {
 			title   = "Preventivo",
 			data    = quoteObj,
+			params  = printParams,
 			pdfArgs = {
 				bookmark          = true,
 				backgroundVisible = true,
