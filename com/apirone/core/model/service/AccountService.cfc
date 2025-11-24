@@ -9,16 +9,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="cacheScope" type="String" default="Account.bean";
 
 	public com.apirone.core.model.bean.Account function get( required String accountId ){
-		// var cm = getCacheManager();
+		var cm = getCacheManager();
 
-		// var cache = cm.get( getCacheScope(), arguments.accountId );
+		var cache = cm.get( getCacheScope(), arguments.accountId );
 
-		// if ( cache.status ) {
-		// 	return cache.data;
-		// }
+		if ( cache.status ) {
+			return cache.data;
+		}
 
 		var account = build( arguments.accountId );
-		// cm.put( getCacheScope(), arguments.accountId, account );
+		cm.put( getCacheScope(), arguments.accountId, account );
 
 		return account;
 	}

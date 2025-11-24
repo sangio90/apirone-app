@@ -160,6 +160,8 @@
 				bean.setItems(items);
 			}
 
+			bean.setNotes( record.notes );
+
 			return bean;
 		}
 		return NullValue();

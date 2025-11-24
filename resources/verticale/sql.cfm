@@ -5,19 +5,38 @@
 
 LAV-VERNPOLVLIS
 
+<!--- <cfquery name="i" datasource="verticaleExport">
+   TRUNCATE TABLE ARTICO_APIR
+</cfquery>
+<cfquery name="y" datasource="verticaleExport">
+   TRUNCATE TABLE DISBAS_APIR
+</cfquery>
+<cfabort> --->
+
 <cfquery name="i" datasource="verticaleExport">
-    SELECT * FROM artico_apir;
+    SELECT * FROM DISBAS_APIR
+</cfquery>
+<cfquery name="y" datasource="verticaleExport">
+    SELECT * FROM ARTICO_APIR
+</cfquery>
+<cfdump var="#i#">
+<cfdump var="#y#">
+<cfabort>
+<cfquery name="i" datasource="verticaleExport">
+SELECT 
+    COLUMN_NAME,
+    DATA_TYPE,
+    CHARACTER_MAXIMUM_LENGTH,
+    IS_NULLABLE,
+    COLUMN_DEFAULT
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'DISBAS_APIR'
+ORDER BY ORDINAL_POSITION;
 </cfquery>
 
 <cfdump var="#i#">
 <cfabort>
 
-<cfquery name="i" datasource="verticaleExport">
-    SELECT * FROM INFORMATION_SCHEMA.TABLES;
-</cfquery>
-
-<cfdump var="#i#">
-<cfabort>
 
 <cfquery name="i" datasource="verticale">
     SELECT TOP 10 *

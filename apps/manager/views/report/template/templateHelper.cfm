@@ -4,16 +4,10 @@
 </cffunction>
 
 <cffunction name="getPrintFullHeader">
-	<style>
-		.blue {
-			color: #007bff;
-			text-decoration: none;
-		}
-	</style>
 	<cfoutput>
 		<div style="width: 8cm">
 			<br>
-			<img src='https://test.apirone.cc/assets/main/img/logo.png' alt='Apir' style='6cm; height: 40px;'>
+			<img src='https://apir.co.uk/wp-content/uploads/2024/10/APIR_since1918.png' alt='Apir' style='6cm; height: 40px;'>
 			<br>
 			<strong style="font-size: 11pt;">APIR s.r.l. a socio unico</strong>
 			<div style="line-height: 8pt;">
@@ -38,12 +32,6 @@
 		</div>
 
 	</cfoutput>
-</cffunction>
-
-
-
-<cffunction name="importPrintStyle">
-    <cfreturn "<style>body, td, th, span, div, p { font-family: 'Poppins'; font-size: 13px };</style>">
 </cffunction>
 
 <cffunction name="getPrintFooter">
@@ -80,4 +68,222 @@
             - #component.color.name# (<i>#component.color.id#</i>)<br/>
         </cfoutput>
     </cfloop>
+</cffunction>
+
+
+
+<cffunction name="getFinalForm">
+	<cfoutput>
+			<div class="top-note">L'ordine si intende confermato solo dopo il ricevimento dello stesso timbrato e firmato per accettazione, dell'eventuale conferma bozze e del pagamento anticipato ove previsto</div>
+
+			<div class="bank" aria-label="Coordinate bancarie">
+				<table role="table" summary="Coordinate bancarie">
+				<thead><tr><th colspan="2">Coordinate Bancarie</th></tr></thead>
+				<tbody>
+					<tr><td class="label">Banca</td><td class="value">INTESA SANPAOLO SPA<br/><small>filiale di Rimini Via della Fiera</small></td></tr>
+					<tr><td class="label">IBAN</td><td class="value">IT43 S030 6924 2321 0000 0001 234</td></tr>
+					<tr><td class="label">BIC</td><td class="value">BCITITMM</td></tr>
+				</tbody>
+				</table>
+			</div>
+
+			<h2 class="section-title">Leggere e compilare</h2>
+
+			<div class="important-box" role="region" aria-label="Importante">
+				<div class="important-header">IMPORTANTE</div>
+				<div class="important-content" style="padding: 0 0 0.1in 0.1in;">
+					<p style="font-size: 9px;">Per confermare l'ordine si prega di compilare i seguenti campi:</p>
+					<div>
+						<table style="width: 95%">
+							<tr>
+								<td style="width: 35%; border: 0;">Indirizzo di fatturazione :</td>
+								<td style="width: 65%; border: 0; border-bottom: 1px dotted black;">&nbsp;</td>
+							</tr>
+						</table>
+					</div>
+					<div>
+						<table style="width: 95%">
+							<tr>
+								<td style="width: 35%; border: 0;">N° P.IVA :</td>
+								<td style="width: 65%; border: 0; border-bottom: 1px dotted black;">&nbsp;</td>
+							</tr>
+						</table>
+					</div>
+					<div>
+						<table class="field-row" style="width: 95%">
+							<tr>
+								<td style="width: 35%; border: 0;">N° SDI :</td>
+								<td style="width: 65%; border: 0; border-bottom: 1px dotted black;">&nbsp;</td>
+							</tr>
+						</table>
+					</div>
+					<div>
+						<table class="field-row" style="width: 95%">
+							<tr>
+								<td style="width: 35%; border: 0;">Indirizzo di consegna :</td>
+								<td style="width: 65%; border: 0; border-bottom: 1px dotted black;">&nbsp;</td>
+							</tr>
+						</table>
+					</div>
+					<div>
+						<table class="field-row" style="width: 95%">
+							<tr>
+								<td style="width: 35%; border: 0; line-height: 14px;">Nome e Numero di telefono <br> della persona incaricata del <br> ricevimento merce :</td>
+								<td style="width: 65%; border: 0; border-bottom: 1px dotted black;">&nbsp;</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="small-print">
+				<strong>CONDIZIONI GENERALI DI VENDITA</strong>
+				<ol style="padding-left:14px; margin:6px 0 0 0;">
+				<li style="margin-bottom:6px;">CONFERMA D'ORDINE: il presente modulo costituisce una conferma delle condizioni definitive per l'evasione dell'ordine e le parti riconoscono la sua efficacia anche se l'invio ad APIR SRL viene effettuato a mezzo telefax oppure a mezzo e-mail.(*) L'ordine si intende confermato solo dopo il ricevimento dello stesso timbrato e firmato per accettazione, dell'eventuale conferma bozze e del pagamento anticipato ove previsto.</li>
+				<li style="margin-bottom:6px;">VARIAZIONE DELL'ORDINE: ogni eventuale richiesta di modifica dell'ordine, deve avvenire immediatamente dopo la ricezione della presente conferma. APIR SRL si riserva la facoltà di rifiutarla a suo insindacabile giudizio.</li>
+				<li style="margin-bottom:6px;">CONSEGNA: L'eventuale data di consegna indicata da APIR SRL è solo una data stimata ed approssimativa, non vincolante per APIR SRL...</li>
+				<li style="margin-bottom:6px;">RECLAMI: il cliente dovrà controllare la merce al momento della presa in consegna e le eventuali contestazioni per difetti o mancanze di materiali dovranno essere formalizzate esclusivamente per iscritto e dovranno pervenire ad APIR SRL entro 8 (otto) giorni dalla data di consegna della merce...</li>
+				<li style="margin-bottom:6px;">RITARDO PAGAMENTO: in applicazione del D.L. n° 231 del 09/10/2002 attuante la direttiva 2000/35/CE, in caso di ritardo pagamento saranno automaticamente addebitati gli interessi di mora che decorreranno dal giorno successivo alla scadenza del termine di pagamento...</li>
+				<li style="margin-bottom:6px;">FORO COMPETENTE: per qualsiasi controversia relativa alla esecuzione ed in generale a tutto ciò che comporta l'applicazione ed interpretazione del presente accordo è sempre competente il Foro di Rimini.</li>
+				</ol>
+			</div>
+
+			<div class="sign-rows">
+				<table class="sign-rows-table">
+					<tr>
+						<td style="width: 50%; text-align: center">
+							<p style="margin-top:6px; font-size: 9px;">Ad ogni effetto di legge dichiaro di approvare in modo espresso la clausola relativa al Foro competente e quella relativa ai reclami.</p>
+						</td>
+						<td style="width: 10%">
+							&nbsp;
+						</td>
+						<td style="width: 10%;">
+							&nbsp;
+						</td>
+						<td style="width: 10%; text-align: right">
+							Data
+						</td>
+						<td style="width: 20%; text-align: center">Firma e Timbro</td>
+					</tr>
+					<tr>
+						<td style="width: 50%; border-bottom: 1px solid black !important;"></td>
+						<td style="width: 10%; text-align: center;">
+							<img src="http://apirone.local:8080/assets/main/img/quotation-arrow-left.png" style="height: 0.5in; width: 0.5in;">
+						</td>
+						<td style="width: 10%; text-align: center;">
+							<img src="http://apirone.local:8080/assets/main/img/quotation-arrow-right.png" style="height: 0.5in; width: 0.5in;">
+						</td>
+						<td style="width: 10%; border-bottom: 1px solid black !important;">
+							&nbsp;
+						</td>
+						<td style="width: 20%; border-bottom: 1px solid black !important;"></td>
+					</tr>
+				</table>
+			</div>
+	</cfoutput>
+</cffunction>
+
+<cffunction name="printStyle">
+	<style>
+		body, td, th, span, div, p { font-family: 'Poppins'; font-size: 13px }
+		td {
+			border: 1px solid black;
+			padding-left: .3em;
+			padding-right: .3em;
+		}
+		table {
+			border-collapse: collapse;
+		}
+
+		.blue {
+			color: #007bff;
+			text-decoration: none;
+		}
+		/* tabella dentro td articolo */
+		.hiddenTable {
+			border-collapse: collapse;
+			border: 0;
+			width: 100%;        /* usa tutta la larghezza della cella contenitore */
+			table-layout: fixed;/* evita ricalcoli dinamici delle colonne */
+			box-sizing: border-box;
+		}
+		.hiddenTable td,
+		.hiddenTable th {
+			border: 0 !important;
+			padding: 0;         /* rimuovi padding interni, gestiscilo a livello della cella esterna se serve */
+			vertical-align: top;
+			box-sizing: border-box;
+			line-height: 10px;
+		}
+		/* fine */
+
+		/* form finale con iban banca e firme */
+		.top-note {
+			margin-top: 1.5in;
+			font-size: 10px;
+			page-break-before: always;
+		}
+		.bank {
+			width: 4.5in;
+			float: right;
+			margin-right: 20px;
+			text-align: left;
+		}
+		.bank table {
+			width:100%;
+			border:1px solid #000;
+			border-collapse: collapse;
+			text-align:left;
+		}
+		.bank th {
+			background:#f0f0f0;
+			text-align:center;
+			font-size: 11px;
+			border-bottom:1px solid #000;
+		}
+		.bank td { padding:6px 8px; border-top:1px solid #000; vertical-align: middle; }
+		.bank .label { width:120px; font-weight:600; border-right:1px solid #000; text-align:left; padding-left:8px; }
+		.bank .value { padding-left:10px; }
+		.section-title {
+			clear: both;
+			margin-top:0.2in;
+			font-size:12px;
+			font-weight: 700;
+		}
+		.important-box {
+			border:1px solid #000;
+			margin-top:0.1in;
+			padding:0;
+		}
+		.important-header {
+			background:#f3f3f3;
+			border-bottom:1px solid #000;
+			text-align:center;
+			font-weight:800;
+			padding:8px 6px;
+			font-size:12px;
+		}
+		.important-content {
+			padding:3px 10px;
+			line-height:1.4;
+		}
+		.small-print {
+			clear: both;
+			margin-top:0.2in;
+			font-size:8px;
+			line-height:1.05;
+		}
+		.sign-rows {
+			margin-top: 0.4in;
+		}
+		.sign-rows-table {
+			border-collapse: collapse;
+			border: 0;
+		}
+		.sign-rows-table td,
+		.sign-rows-table tr {
+			border: 0 !important;
+		}
+		/* fine */
+	</style>
 </cffunction>

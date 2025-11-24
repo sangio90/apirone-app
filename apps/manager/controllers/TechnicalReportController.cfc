@@ -11,6 +11,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			'discounts' = rc.discounts == 'true',
 		}
 
+		var templatePath = "report/template/print-quotation-#rc.report#";
+
 		prc.title = "Preventivo";
 
 		var quotation = service("Quotation").get(quotationId = idPreventivo);
@@ -28,10 +30,12 @@ component extends="com.apirone.core.controller.AbsController" {
 			return;
 		}
 
+		//ordiniamo le zone in modo da avere prima quelle padre
 		var zones = super.fire('QuotationZone.list', [ 'quotationId' = idPreventivo, 'orderby' = [ { field = "quotationItemZone.originId", dir = "desc" } ] ]);
 		
 		var sortedZones = [];
 		for (var zone in zones) {
+			//aggiungiamo le zone figlie ad ogni zona padre
 			if (isNull(zone.getOrigin())) {
 				sortedZones.add(zone)
 				var subZones = super.fire('QuotationZone.list', [ 'quotationId' = idPreventivo, 'originId' = zone.getId() ])
@@ -49,24 +53,29 @@ component extends="com.apirone.core.controller.AbsController" {
 			'provincia' = null,
 			'paese' = null
 		];
-		if (!isNull(quotation.getCustomer().getShippingAddresses()) && quotation.getCustomer().getShippingAddresses().length > 0) {
+
+		if (!isNull(quotation.getCustomer().getShippingAddresses()) && quotation.getCustomer().getShippingAddresses().len() > 0) {
 			customerShippingAddress = quotation.getCustomer().getShippingAddresses()[1];
 		}
 
 		for ( var i = 1; i LTE ArrayLen( sortedZones ); i++ ) {
 			var zone = sortedZones[i];
+			//se stampa raggruppata
 			if (printParams.grouped) {
 				if (!isNull((zone.getOrigin()))) {
 					continue;
 				}
+				//delle zone padre aggiungiamo gli items
 				var zoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = zone.getId() ]);
 				var subZones = zones.filter(function(item) {
 					return !isNull(item.getOrigin()) && item.getOrigin().getId() == zone.getId()
 				})
+				//aggiungiamo gli items delle zone figlie
 				for ( var subZone in subZones ) {
 					var thisSubZoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = subZone.getId() ]);
 					arrayAppend(zoneItems, thisSubZoneItems, true);
 				}
+				//se stampa non raggruppata ad ogni zona o sottozona assegnamo gli items
 			} else {
 				var zoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = zone.getId() ]);
 			}
@@ -100,7 +109,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		event.renderData( data = renderView( view = "report/template/print-quotation-#rc.report#", args = params ), type = "PDF" );
+		event.renderData( data = renderView( view = templatePath, args = params ), type = "PDF" );
 	}
 
 }
