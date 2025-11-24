@@ -1,11 +1,9 @@
 <cfcomponent extends="com.apirone.core.model.dao.VerticaleDAO" accessors="true">
-
 	<cffunction returntype="Query" name="read">
-
 		<cfargument name="paymentMethodId" type="String" required="true">
-		
+
 		<cfquery name="local.q" datasource="verticale">
-			SELECT 
+			SELECT
 				pagcod AS payment_method_id,
 				pagdes AS payment_method
 			FROM
@@ -18,8 +16,6 @@
 	</cffunction>
 
 	<cffunction returntype="Query" name="find">
-		
-		<cfargument name="typeId" type="String">
 		<cfargument name="str" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
@@ -27,7 +23,7 @@
 		<cfargument name="orderby" required="true" type="String" default="pagdes">
 
 		<cfquery name="local.q" datasource="verticale">
-			SELECT 
+			SELECT
 				pagcod AS payment_method_id,
 				pagdes AS payment_method,
 				COUNT(pagcod) OVER() AS total
@@ -52,5 +48,4 @@
 
 		<cfreturn local.q>
 	</cffunction>
-
 </cfcomponent>

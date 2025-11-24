@@ -24,18 +24,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public Array function list(){
 		arguments[ "limit" ] = -1;
-		return read( argumentCollection = arguments ).getData()
+		return search( argumentCollection = arguments ).getData()
 	}
 
-	private com.apirone.core.model.bean.Result function read(
-		String paymentMethodId,
+	private com.apirone.core.model.bean.Result function search(
+		String str,
 		required Numeric limit  = 20,
 		required Numeric offset = 0
 	){
 		var rows   = [];
 		var result = super.getResult();
 
-		var records = getDao().read( argumentCollection = arguments );
+		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
 			rows.add( get( paymentMethodId = record.payment_method_id ) );

@@ -31,7 +31,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
-		var records = getDao().read( argumentCollection = arguments );
+		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
 			rows.add( get( currencyId = record.currency_id ) );

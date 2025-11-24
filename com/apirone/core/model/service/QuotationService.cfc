@@ -118,7 +118,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			if ( arguments.quotationItems.len() > 0 ) {
 				for ( var quotationItem in arguments.quotationItems ) {
-					setProgressivoComponenti(0)
+					setProgressivoComponenti( 0 )
 					var code    = "";
 					var product = quotationItem.getProduct()
 					if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
@@ -413,7 +413,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"DSVARMAT"  = component.getVariant().getId(),
 			"DSCOLMAT"  = component.getColor().getId(),
 			"DSQTAMOV"  = component.getQuantity(),
-			"DSUNMIS1" = component
+			"DSUNMIS1"  = component
 				.getRawProduct()
 				?.getMeasurementUnit()
 				?.getId(),
@@ -518,32 +518,41 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setQuotationDate( record.quotation_date );
 			bean.setNotes( record.notes );
 			bean.setValidityDate( record.validity_date );
-			if ( !IsNull( record.opportunity_id ) ) {
-				bean.setOpportunity( getOpportunityService().get( record.opportunity_id ) );
-			}
-			if ( !IsNull( record.lead_id ) ) {
-				bean.setLead( getLeadService().get( record.lead_id ) );
-			}
+
+			bean.setActive( record.active );
+			
+			bean.setStatus( getStatusService().get( record.status_id ) );
+			bean.setLang( getLangService().get( record.lang_id ) );
+			
+
 			if ( !IsNull( record.customer_id ) ) {
 				bean.setCustomer( getCustomerService().get( record.customer_id ) );
 			}
+
+			if ( !IsNull( record.opportunity_id ) ) {
+				bean.setOpportunity( getOpportunityService().get( record.opportunity_id ) );
+			}
+
+			if ( !IsNull( record.lead_id ) ) {
+				bean.setLead( getLeadService().get( record.lead_id ) );
+			}
+
+
 			if ( !IsNull( record.customer_address_id ) ) {
 				bean.setCustomerAddressId( record.customer_address_id );
 			}
-			bean.setActive( record.active );
-			bean.setCustomPaymentMethod( record.custom_payment_method );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setLang( getLangService().get( record.lang_id ) );
-			if ( !IsNull( record.payment_method_id ) ) {
-				bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
-			}
+			// bean.setCustomPaymentMethod( record.custom_payment_method );
+
 			var calculatedAmount = 0;
+
 			bean.setCalculatedAmount(
 				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
 			);
 
+			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
+			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
+
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
-			// bean.setCurrency( getCurrencyService().get( record.currency_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
 			// bean.setShippingProfile( getProfileService().get( record.shipping_profile_id ) );
 			// bean.setSalesAgentAccount( getAccountService().get( record.sales_agent_account_id ) );

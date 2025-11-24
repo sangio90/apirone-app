@@ -1,14 +1,13 @@
 <cfcomponent extends="com.apirone.core.model.dao.VerticaleDAO" accessors="true">
-
 	<cffunction returntype="Query" name="read">
 		<cfargument name="currencyId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="verticale">
-			SELECT 
+			SELECT
 				valcod AS currency_id,
 				valdes AS currency,
 				valsim AS simbol
-			FROM 
+			FROM
 				codval
 			WHERE
 				valcod = <cfqueryparam cfsqltype="Integer" value="#arguments.currencyId#">
@@ -21,14 +20,14 @@
 		<cfargument name="currencyId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="verticale">
-			SELECT 
+			SELECT
 				valcod AS currency_id,
 				valdes AS currency,
 				valsim AS simbol,
-				COUNT(pagcod) OVER() AS total
-			FROM 
+				COUNT(valcod) OVER() AS total
+			FROM
 				codval
-			ORDER BY 
+			ORDER BY
 				valdes
 		</cfquery>
 

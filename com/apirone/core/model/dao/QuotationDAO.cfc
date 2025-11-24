@@ -135,7 +135,9 @@
 				status_id,
 				lang_id,
 				customer_id,
-				customer_address_id
+				customer_address_id,
+				payment_method_id,
+				currency_id
 				<cfif true == false>
 					,pricelist_id,
 					payment_method_id,
@@ -153,18 +155,29 @@
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getQuotationDate()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNotes()#">,
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getValidityDate()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOpportunity().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLead().getId()#">::uuid,
+				<cfif !IsNull( arguments.quotation.getOpportunity()?.getId() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOpportunity().getId()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>
+				,
+				<cfif !IsNull( arguments.quotation.getLead()?.getId() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLead().getId()#">::uuid,
+				<cfelse>
+					NULL
+				</cfif>
+				,
+
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getActive()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLang().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomer().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerAddressId()#">::uuid
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerAddressId()#">::uuid,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getPaymentMethod().getId()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getCurrency().getId()#">
 				<cfif true == false>
 					,<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPricelist().getId()#">::uuid,
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPaymentMethod().getId()#">::uuid,
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomPaymentMethod()#">,
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCurrency().getId()#">::uuid,
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getBillingProfile().getId()#">::uuid,
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getShippingProfile().getId()#">::uuid,
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getSalesAgentAccount().getId()#">::uuid,
