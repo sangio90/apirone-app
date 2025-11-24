@@ -1,14 +1,56 @@
-<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-	<cffunction returntype="Query" name="read">
-		<cfargument name="paymentMethodId" type="String" required="true">
+<cfcomponent extends="com.apirone.core.model.dao.VerticaleDAO" accessors="true">
 
-		<cfquery name="local.q" datasource="apirone">
-			SELECT *
-			FROM payment_methods
+	<cffunction returntype="Query" name="read">
+
+		<cfargument name="paymentMethodId" type="String" required="true">
+		
+		<cfquery name="local.q" datasource="verticale">
+			SELECT 
+				pagcod AS payment_method_id,
+				pagdes AS payment_method
+			FROM
+				codpag
 			WHERE
-				payment_method_id = <cfqueryparam cfsqltype="varchar" value="#arguments.paymentMethodId#">::uuid
+				pagcod = <cfqueryparam cfsqltype="Integer" value="#arguments.paymentMethodId#">
 		</cfquery>
 
 		<cfreturn local.q>
 	</cffunction>
+
+	<cffunction returntype="Query" name="find">
+		
+		<cfargument name="typeId" type="String">
+		<cfargument name="str" type="String">
+
+		<cfargument name="limit" required="true" type="Numeric" default="0">
+		<cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="orderby" required="true" type="String" default="pagdes">
+
+		<cfquery name="local.q" datasource="verticale">
+			SELECT 
+				pagcod AS payment_method_id,
+				pagdes AS payment_method,
+				COUNT(pagcod) OVER() AS total
+			FROM
+				codpag
+			WHERE 1=1
+
+			<cfif !IsNull( arguments.str )>
+				AND (
+						pagdes LIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="varchar">
+					)
+			</cfif>
+
+			ORDER BY
+				#super.sanitizeSQL( arguments.orderby )#
+
+			<cfif arguments.limit GT 0>
+				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS
+				FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY;
+			</cfif>
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>
