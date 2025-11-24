@@ -1,5 +1,5 @@
 ﻿<cfoutput>
-    <div id="signage-modal" class="modal fade" tabindex="-1">
+    <div id="signage-modal" class="modal fade quotation-item-modal" tabindex="-1">
         
         <section class="modal-dialog modalxl">
             <div class="modal-content">

@@ -1,5 +1,5 @@
 ﻿<cfoutput>
-	<div id="quotation-totals" class="container py-3 quotation-totals">
+	<div id="quotation-totals-item" class="container py-3 quotation-totals-box">
 		<div>
 			<div class="flex" style="width: 100%">
 				<div class="justify-content-start" style="width: 95%">
@@ -7,7 +7,7 @@
 				</div>
 				<div style="font-size: 1.5em; cursor: pointer" id="symbol" data-bind="click: collapseTotals">▼</div>
 			</div>
-			<div id="quotation-totalsContent">
+			<div id="quotation-totals-item-content">
 				<table style="width: 100%" class="quotation-table-item-prices-totals">
 					<tbody data-bind="source: pricing.lines" data-template="quotation-pricing-totals-item-tmpl"></tbody>
 				</table>
@@ -32,7 +32,7 @@
 					</div>
 					<div class="col-6">
 						<div class="input-group">
-							<input class="form-control text-end" name="total" id="quotation-item-totals"
+							<input class="form-control text-end" name="total" id="input-total"
 								placeholder="Totale preventivo"
 								data-format="0.00"
 								data-bind="value: pricing.total">
@@ -45,7 +45,7 @@
 				</div>
 				<div class="d-flex justify-content-end gap-2">
 					<div class="py-2 text-end d-flex align-items-center gap-2">
-						<div class="status" id="quotation-item-totals-loading"></div>
+						<div class="status" id="quotation-totals-item-loading"></div>
 						#button(bind="click:update", variant="default", label="Aggiorna", size="sm", icon="sync-alt")#
 					</div>
 				</div>

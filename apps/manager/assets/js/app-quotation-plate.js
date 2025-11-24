@@ -143,7 +143,10 @@ AP.plate.modal = ( function() {
             // console.log( "extractTopLeftPositionFrom.plate", fruitsController.plate );
             // console.log( "extractTopLeftPositionFrom.plate.grid", fruitsController.plate.grid );
 
-            const cell = grid[gridPosition.row][gridPosition.column];
+            const cell = grid[ gridPosition.row ][ gridPosition.column ];
+
+            // console.log( "cell", cell );
+            // console.log( "gridPosition", gridPosition );
 
             result.top = cell.top;
             result.left = cell.left;
@@ -761,7 +764,7 @@ AP.plate.modal = ( function() {
         addFruitToPlate( selectedFruit ) {
 
             // console.log( "addFruitToPlate:fruit", selectedFruit );
-            console.log( "addFruitToPlate:selectedFruit.image", selectedFruit.image );
+            // console.log( "addFruitToPlate:selectedFruit.image", selectedFruit.image );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
@@ -1145,7 +1148,7 @@ AP.plate.modal = ( function() {
             }
         } );
 
-        console.log( "createFruit", fruit );
+        // console.log( "createFruit", fruit );
 
         return fruit;
 
@@ -1704,7 +1707,7 @@ AP.plate.modal = ( function() {
 
             const attributeArray = fruit.get( "items" ).data();
 
-            console.log( "fruit:attributeArray", fruitId, attributeArray );
+            // console.log( "fruit:attributeArray", fruitId, attributeArray );
 
             attributeArray.forEach( function( item ) {
 
@@ -1720,6 +1723,7 @@ AP.plate.modal = ( function() {
                 container.append( subContainer );
 
                 const label = $( "<label>" );
+
                 label.addClass( "mb-1" );
                 label.css( "margin-left", newLevel );
                 label.text( item.level + " " + attrName );
@@ -1839,7 +1843,7 @@ AP.plate.modal = ( function() {
 
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
 
-            console.log( "loadModels:line.id", lineId );
+            // console.log( "loadModels:line.id", lineId );
 
             NM.util.ajax( {
                 method: "GET",
@@ -1911,29 +1915,17 @@ AP.plate.modal = ( function() {
 
         onSelectFruit: function( selectedFruit ) {
 
-            // console.log( "selectedFruit", selectedFruit );
-
             var newFruit = createFruit( { position: 1, fruit: selectedFruit } );
-
-            console.log( "newFruit", newFruit );
 
             viewModel.set( "currentFruit", newFruit );
             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
-
-            // mapFruitForPlate( thisFruit );
 
             pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
 
             viewModel.addProductItemsToFruit( newFruit.id );
 
-            /*
-            if ( this.get( "isPlateDefined" ) ) {
-                pub.fruitsController.onSelectFruit( event.dataItem );
-            } else {
-                alert( "Spingi prima 'Configura'" );
-            }
-            */
         },
+
         configPlate: function() {
 
             // var plate = this.plates.get( this.get( "plate" ) );
@@ -2019,7 +2011,7 @@ AP.plate.modal = ( function() {
             viewModel.set( "callback.onSave", onSave );
         }
 
-        viewModel.set( "detailForm.data.quotationZone", AP.quotationDetail.detail.config().zone );
+        viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
 
         viewModel.loadLines();
 
@@ -2072,7 +2064,7 @@ AP.plate.modal = ( function() {
             select: function( event ) {
                 var item = this.dataItem( event.item.index() );
 
-                console.log( "selected fruit", item );
+                // console.log( "selected fruit", item );
 
                 viewModel.onSelectFruit( item );
             },

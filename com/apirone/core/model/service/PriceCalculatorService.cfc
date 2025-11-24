@@ -64,9 +64,6 @@
 
 		var name = "#product.getDescription()# (#product.getCode()#)";
 
-		// dump(product);
-		// abort;
-
 		appendLog(
 			message   = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#.",
 			productId = product.getSerial()
@@ -92,7 +89,9 @@
 			cost bundle
 		*/
 
-		if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProdutComplex" ) ) {
+		var bundleCost = 0;
+
+		if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
 			var bundleComponents = componentSvc.list(
 				lineId                         = product.getLine().getId(),
 				modelId                        = product.getModel().getId(),
@@ -100,14 +99,13 @@
 			);
 
 			var bundleCost = calculateComponentsTotal( bundleComponents );
-		} else {
-			var bundleCost = 0;
 		}
 
-		// appendLog( message = "Costo componenti bundle #bundleCost#;Totale unitario: #formatExtended( bundleComponents )#" );
+		// il log viene scritto da in calculateComponentsTotal()
+		// appendLog( "Costo componenti per bundle;Totale attributi: #formatExtended( bundleCost )#" );
 
 		addCost(
-			"Costo componenti componenti linea / modello",
+			"Costo componenti linea / modello",
 			bundleCost,
 			"P"
 		);
@@ -228,6 +226,7 @@
 
 		return output;
 	}
+
 
 	/*
 		private methods

@@ -113,6 +113,9 @@ AP.quotation.list = ( function() {
     } );
 
     pub.init = function() {
+
+        console.log( "qt:init" );
+
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 
         viewModel.get( "rows" ).fetch( function() {

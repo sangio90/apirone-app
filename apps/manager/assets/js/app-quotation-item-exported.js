@@ -60,19 +60,19 @@ AP.quotationItem.list = ( function() {
             e.preventDefault();
 
             let data = {
-                'key': '',
-                'code': '',
-                'description': '',
-            }
+                "key": "",
+                "code": "",
+                "description": "",
+            };
 
-            const row = $(e.currentTarget.parentElement.parentElement)
+            const row = $( e.currentTarget.parentElement.parentElement );
 
-            if (row.length > 0) {
+            if ( row.length > 0 ) {
                 data = {
-                    'key': row.find('.key')[0].innerHTML,
-                    'code': row.find('.code')[0].innerHTML,
-                    'description': row.find('.description')[0].innerHTML
-                }
+                    "key": row.find( ".key" )[0].innerHTML,
+                    "code": row.find( ".code" )[0].innerHTML,
+                    "description": row.find( ".description" )[0].innerHTML
+                };
             }
 
             if ( AP.quotationItem.fields.modalRoot.length ) {
@@ -85,8 +85,8 @@ AP.quotationItem.list = ( function() {
         delete: function( e ) {
             e.preventDefault();
 
-            const row = $(e.currentTarget.parentElement.parentElement)
-            const key = row.find('.key')[0].innerHTML
+            const row = $( e.currentTarget.parentElement.parentElement );
+            const key = row.find( ".key" )[0].innerHTML;
 
             bootbox.confirm( {
                 title: "Cancellazione Elemento Preventivo Esportato",
@@ -109,18 +109,18 @@ AP.quotationItem.list = ( function() {
                             callback: {
                                 done: function( xhr ) {
                                     if( xhr.status == "ERRORE" ) {
-                                        Loading.hide()
+                                        Loading.hide();
                                         AP.widget.notify( "error", "Errore durante la cancellazione della riga." );
                                     }
                                     if ( xhr.status == "SUCCESS" ) {
-                                        window.location.reload()
+                                        window.location.reload();
                                     }
                                 }
                             }
                         } );
                     }
                 }
-            } )
+            } );
 
             return false;
         },
@@ -134,10 +134,10 @@ AP.quotationItem.list = ( function() {
             }
 
             var selected = [];
-            
+
             for ( var check of checks ) {
                 check = $( check );
-                selected.push(check.val())
+                selected.push( check.val() );
             }
 
             bootbox.confirm( {
@@ -162,18 +162,18 @@ AP.quotationItem.list = ( function() {
                             callback: {
                                 done: function( xhr ) {
                                     if( xhr.status == "ERRORE" ) {
-                                        Loading.hide()
+                                        Loading.hide();
                                         AP.widget.notify( "error", "Errore durante la cancellazione multipla." );
                                     }
                                     if ( xhr.status == "SUCCESS" ) {
-                                        window.location.reload()
+                                        window.location.reload();
                                     }
                                 }
                             }
                         } );
                     }
                 }
-            } )
+            } );
 
             return false;
         }
@@ -215,13 +215,13 @@ AP.quotationItem.modal = ( function() {
         delete: async function( e ) {
             e.preventDefault();
 
-            const row = $(e.currentTarget.parentElement.parentElement)
-            const rowNumber = row.find('.rowNumber')[0].innerHTML
+            const row = $( e.currentTarget.parentElement.parentElement );
+            const rowNumber = row.find( ".rowNumber" )[0].innerHTML;
 
 
             bootbox.confirm( {
                 title: "Cancellazione Elemento Distinta Base Esportato",
-                message: "Sei sicuro di voler cancellare questo elemento dalla distinta base esportata per il prodotto " + viewModel.get('detailForm.description') +  "?",
+                message: "Sei sicuro di voler cancellare questo elemento dalla distinta base esportata per il prodotto " + viewModel.get( "detailForm.description" ) +  "?",
                 buttons: {
                     confirm: {
                         label: "Si, confermo",
@@ -236,47 +236,47 @@ AP.quotationItem.modal = ( function() {
                     if ( result ) {
                         await NM.util.ajax( {
                             method: "DELETE",
-                            url: "/manager/ajax/quotation-item-exported-rows/?key=" + viewModel.get('detailForm.key') + "&rowNumber=" + rowNumber,
+                            url: "/manager/ajax/quotation-item-exported-rows/?key=" + viewModel.get( "detailForm.key" ) + "&rowNumber=" + rowNumber,
                             callback: {
                                 done: function( xhr ) {
                                     if( xhr.status == "ERRORE" ) {
-                                        Loading.hide()
+                                        Loading.hide();
                                         AP.widget.notify( "error", "Errore durante la cancellazione della riga." );
                                     }
                                     if ( xhr.status == "SUCCESS" ) {
-                                        window.location.reload()
+                                        window.location.reload();
                                     }
                                 }
                             }
                         } );
                     }
                 }
-            } )
+            } );
 
             return false;
         }
     } );
 
     pub.init = async function( data ) {
-        Loading.show()
+        Loading.show();
         kendo.bind( fields.modalRoot, viewModel );
-        viewModel.set('detailForm.key', data.key)
-        viewModel.set('detailForm.code', data.code)
-        viewModel.set('detailForm.description', data.description)
+        viewModel.set( "detailForm.key", data.key );
+        viewModel.set( "detailForm.code", data.code );
+        viewModel.set( "detailForm.description", data.description );
         $( "#modalTitle" ).text( "Distinta Base di " + data.description );
 
         await NM.util.ajax( {
             method: "GET",
-            url: "/manager/ajax/quotation-items-exported/" + viewModel.get('detailForm.key'),
+            url: "/manager/ajax/quotation-items-exported/" + viewModel.get( "detailForm.key" ),
             callback: {
                 done: function( xhr ) {
                     if( xhr.status == "ERRORE" ) {
-                        Loading.hide()
+                        Loading.hide();
                         AP.widget.notify( "error", "Errore nel recupero delle righe." );
                     }
                     if ( xhr.status == "SUCCESS" ) {
                         viewModel.set( "detailForm.items", xhr.data );
-                        Loading.hide()
+                        Loading.hide();
                     }
                 }
             }

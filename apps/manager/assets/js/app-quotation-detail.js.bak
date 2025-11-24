@@ -4,15 +4,14 @@ Object.assign( AP.quotation.fields, {
     detailRoot: $( "#quotation-detail-root" ),
     detailForm: $( "#quotation-header-form" ),
     zoneModalRoot: $( "#zone-modal-root" ),
-    printModalRoot: $( "#print-modal-root" ),
 } );
 
 $( document ).ready( function() {
     if ( AP.quotation.fields.detailRoot.length ) {
         AP.quotation.detail.init();
     }
-
     const signageModal = document.getElementById( "signage-modal" );
+
     signageModal.addEventListener( "hide.bs.modal", ( e ) => {
         AP.quotation.detail.renderTotals();
     } );
@@ -218,6 +217,12 @@ AP.quotation.detail = ( function() {
                     }
                 }
             } );
+        },
+        printQuotation: function() {
+            window.open(
+                "/manager/technical-reports/print?id=" + AP.page.quotation.id,
+                "_blank"
+            );
         },
         changeMode: function( e ) {
             viewModel.set( "mode", e.currentTarget.textContent.toLowerCase() );
@@ -460,9 +465,6 @@ AP.quotation.detail = ( function() {
 
         getItems: function( e ) {
             var quotationItemsMode = viewModel.get( "mode" );
-            if ( quotationItemsMode == null ) {
-                quotationItemsMode = $( "#quotationItemsMode" ).find( ".active" )[0].innerHTML.toLowerCase();
-            }
             if ( viewModel.detailForm.data.zone?.name != "" ) {
                 var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id + "&mode=" + quotationItemsMode;
                 if ( viewModel.detailForm.data.zone ) {
@@ -550,15 +552,7 @@ AP.quotation.detail = ( function() {
                 AP.quotation.zoneModal.init( "delete" );
             }
             NM.util.openModal( AP.quotation.fields.zoneModalRoot );
-        },
-
-        openPrintModal: function() {
-            if ( AP.quotation.fields.printModalRoot.length ) {
-                AP.quotation.printModal.methods().resetForm();
-                AP.quotation.printModal.init();
-            }
-            NM.util.openModal( AP.quotation.fields.printModalRoot );
-        },
+        }
     } );
 
     pub.config = function( options ) {
@@ -580,6 +574,15 @@ AP.quotation.detail = ( function() {
         viewModel.get( "countries" ).data( AP.page.countries );
         viewModel.get( "states" ).data( AP.page.states );
 
+        $( ".quotation-item-modal" ).on( "shown.bs.modal", function() {
+            $( "#quotation-totals-item" ).show();
+        } );
+
+
+        $( ".quotation-item-modal" ).on( "hidden.bs.modal", function() {
+            $( "#quotation-totals-item" ).hide();
+        } );
+
         viewModel.getZones();
 
         if ( AP.page.quotation ) {
@@ -599,13 +602,6 @@ AP.quotation.detail = ( function() {
             // $( "#nav-shipments-tab" ).removeAttr("hidden");
         }
     };
-
-    // era: renderQuotationTotals()
-    // REF: davantia lla funzione manca il "var" perchè avevi
-    // la necessità che fosse pubblica
-    // è sufficiente metterlo in "pub" per averlo in:
-    // AP.quotation.detail.renderQuotationTotals()
-    // la prossima volta lo facciamo con mvvm
 
     pub.renderTotals = function() {
         /*
@@ -675,14 +671,6 @@ AP.quotation.zoneModal = ( function() {
         },
 
         createZone: function( event ) {
-            // REF: è sufficiente configurarlo con jquery validator,
-            // senza check manuali
-
-            // const parsedData = viewModel.get( "detailForm.data" );
-            // if ( parsedData.name.trim() == "" ) {
-            //    AP.widget.notify( "error", "Specificare un nome per la zona." );
-            //    return false;
-            // }
 
             var zoneForm = $( "#zone-form" );
 
@@ -755,6 +743,9 @@ AP.quotation.zoneModal = ( function() {
     } );
 
     pub.init = function( mode ) {
+
+        console.log( "detail:init", mode );
+
         kendo.bind( fields.zoneModalRoot, viewModel );
 
         var zoneForm = $( "#zone-form" );
@@ -825,115 +816,7 @@ AP.quotation.zoneModal = ( function() {
             } );
 
         }
-    };
 
-    pub.methods = function( options ) {
-        return viewModel;
-    };
-    return pub;
-} () );
-
-AP.quotation.printModal = ( function() {
-    var pub = {};
-    // REF: il nome è errato
-    var fields = AP.quotation.fields;
-
-    var defaultDetailForm = {
-        data: {
-            id: "",
-            report: {
-                "id": "classic",
-                "name": "Classica"
-            },
-            reports: [
-                {
-                    "id": "classic",
-                    "name": "Classica"
-                },
-                {
-                    "id": "proforma",
-                    "name": "Proforma"
-                },
-                {
-                    "id": "zone",
-                    "name": "Zone"
-                },
-                {
-                    "id": "technical",
-                    "name": "Tecnica"
-                },
-                {
-                    "id": "internal",
-                    "name": "Interna"
-                }
-            ]
-        }
-    };
-
-    var viewModel = kendo.observable( {
-        detailForm: defaultDetailForm,
-
-        printQuotation: function() {
-            const report = viewModel.get( "detailForm.data.report.id" );
-            let url = "/manager/technical-reports/print?id=" + AP.page.quotation.id + "&report=" + report;
-            const images = $( "#imagesCheckbox" )[0].checked;
-            const grouped = $( "#groupedCheckbox" )[0].checked;
-            const notes = $( "#notesCheckbox" )[0].checked;
-            const discounts = $( "#discountsCheckbox" )[0].checked;
-            if ( images ) { url += "&images=true"; } else { url += "&images=false"; }
-            if ( grouped ) { url += "&grouped=true"; } else { url += "&grouped=false"; }
-            if ( notes ) { url += "&notes=true"; } else { url += "&notes=false"; }
-            if ( discounts ) { url += "&discounts=true"; } else { url += "&discounts=false"; }
-
-            window.open( url, "_blank" );
-        },
-
-        toggleOptions: function() {
-            const report = viewModel.get( "detailForm.data.report.id" );
-            $( "#imagesCheckbox" )[0].checked = false;
-            $( "#groupedCheckbox" )[0].checked = false;
-            $( "#notesCheckbox" )[0].checked = false;
-            $( "#discountsCheckbox" )[0].checked = false;
-            if ( report == "classic" ) {
-                $( "#imagesDiv" ).css( "display", "block" );
-                $( "#groupedDiv" ).css( "display", "block" );
-                $( "#notesDiv" ).css( "display", "block" );
-                $( "#discountsDiv" ).css( "display", "block" );
-            }
-            if ( report == "proforma" ) {
-                $( "#imagesDiv" ).css( "display", "none" );
-                $( "#groupedDiv" ).css( "display", "block" );
-                $( "#notesDiv" ).css( "display", "block" );
-                $( "#discountsDiv" ).css( "display", "block" );
-            }
-            if ( report == "zone" ) {
-                $( "#imagesDiv" ).css( "display", "none" );
-                $( "#groupedDiv" ).css( "display", "block" );
-                $( "#notesDiv" ).css( "display", "block" );
-                $( "#notesCheckbox" )[0].checked = true;
-                $( "#discountsDiv" ).css( "display", "block" );
-            }
-            if ( report == "technical" ) {
-                $( "#imagesDiv" ).css( "display", "block" );
-                $( "#groupedDiv" ).css( "display", "block" );
-                $( "#notesDiv" ).css( "display", "block" );
-                $( "#discountsDiv" ).css( "display", "none" );
-            }
-            if ( report == "internal" ) {
-                $( "#imagesDiv" ).css( "display", "none" );
-                $( "#groupedDiv" ).css( "display", "none" );
-                $( "#notesDiv" ).css( "display", "none" );
-                $( "#discountsDiv" ).css( "display", "none" );
-            }
-        },
-
-        resetForm: function() {
-            viewModel.set( "detailForm", defaultDetailForm );
-        }
-    } );
-
-    pub.init = function() {
-        kendo.bind( fields.printModalRoot, viewModel );
     };
 
     pub.methods = function( options ) {

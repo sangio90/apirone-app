@@ -111,7 +111,7 @@ AP.signage.modal = ( function() {
 
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
-            viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
+            viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
             $( "#signangeProductCategory" ).prop( "disabled", false );
             $( "#signageRow" ).prop( "disabled", false );
             $( "#signageModel" ).prop( "disabled", false );
@@ -990,7 +990,7 @@ AP.signage.modal = ( function() {
         },
 
         save: function( event ) {
-            Loading.show()
+            Loading.show();
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             const signageRows = parsedData.quotationItem.signageRows.data();
@@ -1018,7 +1018,7 @@ AP.signage.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if( xhr.status == "ERRORE" ) {
-                                Loading.hide()
+                                Loading.hide();
                                 if ( xhr.data && xhr.data.error ) {
                                     AP.widget.notify( "error", xhr.data.error );
                                 } else {
@@ -1026,12 +1026,12 @@ AP.signage.modal = ( function() {
                                 }
                             }
                             if ( xhr.status == "SUCCESS" ) {
-                                $('#signage-modal').hide()
+                                $( "#signage-modal" ).hide();
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                                 viewModel.set( "detailForm", defaultDetailForm );
-                                setTimeout( function () {
-                                    Loading.hide()
-                                    window.location.reload()
+                                setTimeout( function() {
+                                    Loading.hide();
+                                    window.location.reload();
                                 }
                                 , 1000 );
                             }
@@ -1190,7 +1190,7 @@ AP.signage.modal = ( function() {
             },
         } );
         viewModel.resetForm();
-        viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotationDetail.detail.config().zone );
+        viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
 
         if ( AP.getUserPref( "signage.categoryId" ) ) {
             viewModel.set( "detailForm.data.signageConfig.catalogBundle.category.id", AP.getUserPref( "signage.categoryId" ) );
@@ -1336,12 +1336,12 @@ AP.signage.modal = ( function() {
                 done: function( xhr ) {
                     if( xhr.data ) {
                         if ( !xhr.data.id || xhr.data.id != quotationItemId ) {
-                            $( "#totalsFloatingTab" ).hide();
+                            $( "#quotation-totals-item" ).hide();
                         } else {
                             viewModel.set( "detailForm.data.totals", xhr.data );
                             var totals = viewModel.get( "detailForm.data.totals" );
                             if ( xhr.data ) {
-                                const table = $( "#totalsFloatingTab" ).find( "table" )[0];
+                                const table = $( "#quotation-totals-item" ).find( "table" )[0];
                                 totals.products.forEach( function( row ) {
                                     $( table ).append( `
                                         <tr>
@@ -1362,7 +1362,7 @@ AP.signage.modal = ( function() {
                                     `
                                 );
                             }
-                            $( "#totalsFloatingTab" ).show();
+                            $( "#quotation-totals-item" ).show();
                         }
                     }
                 }

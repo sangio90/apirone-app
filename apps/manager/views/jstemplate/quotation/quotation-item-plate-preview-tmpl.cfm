@@ -1,12 +1,12 @@
 <cfprocessingdirective pageEncoding="UTF-8">
 
-<nmscript type="text/x-kendo-template" id="quotation-item-accessory-preview-tmpl">
-    <div class="quotation-item m-1 col-3" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editAccessory">
+<nmscript type="text/x-kendo-template" id="quotation-item-plate-preview-tmpl">
+    <div class="quotation-item m-1 col-3" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editPlate">
         <div class="quotation-item-inner">
             <div class="row">
                 <div class="col-12 d-flex justify-content-center mb-2" style="font-size: 14px; font-weight: bold;">
                     <div>
-                        Accessorio
+                        Placca
                     </div>
                     <div class="ms-2 d-flex justify-content-center p-1" style="border: 1px solid red; height: 25px; width: 25px; border-radius: 5px" data-bind="click:delete" data-id="#: id#">
                         <i class="fas fa-trash" style="color: red; cursor: pointer"></i>
@@ -26,4 +26,4 @@
             </div>
         </div>
     </div>
-</script>
+</nmscript>

@@ -103,73 +103,74 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var thisId    = "";
 		var messageId = "";
-		var texts     = [];
 
 		var result = super.getResult();
-		transaction {
-			try {
-				var quotation = super.bean( "Quotation" );
 				
-				quotation.setId( json.id );
-				quotation.setName( json.name );
-				quotation.setQuotationNumber( json.quotationNumber );
-				quotation.setVersionNumber( json.versionNumber );
-				quotation.setQuotationDate( json.quotationDate );
-				quotation.setNotes( !isNull(json.notes) ? json.notes : null );
-				quotation.setValidityDate( json.validityDate );
-				if (!isNull(json.opportunity) && !isNull(json.opportunity.id) && json.opportunity.id != '') {
-					quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
-				}
-				if (!isNull(json.lead) && !isNull(json.lead.id) && json.lead.id != '') {
-					quotation.setLead( super.fire( "lead.get", [ json.lead.id ] ) );
-				}
-				quotation.setActive( true );
-				var statusId = json.status.id != '' ? json.status.id : 'NEW';
-				quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
-				quotation.setCustomer( !isNull(json.customer) ? super.fire( "customer.get", [ json.customer.id ] ) : null );
-				if (!isNull(json.shippingAddress) && !isNull(json.shippingAddress.id) && json.shippingAddress.id != '') {
-					quotation.setCustomerAddressId( json.shippingAddress.id );
-				}
-				// quotation.setCustomPaymentMethod( json.custom_payment_method );
-				// quotation.setPricelist( type.setId( json.pricelist.id ) );
-				// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
-				// quotation.setCurrency( type.setId( json.currency.id ) );
-				// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
-				// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
-				// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
-				// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
-				if ( !Len( json.id ) ) {
-					messageId = "quotation.created";
-					quotation.setStatus( super.fire( "status.get", [ statusId ] ) );
-					thisId    = super.fire( "quotation.create", [ quotation ] );
-				} else {
-					var bean = super.fire( "Quotation.get", [ rc.id ] );
-					if ( json.status.id != bean.getStatus().getId() ) {
-						quotation.setActive( 0 );
-						quotation.setStatus( bean.getStatus() );
-						thisId    = super.fire( "quotation.clone", [ quotation, statusId ] );
-						super.fire( "quotation.update", [ quotation ] )
-						messageId = "quotation.updated";
-					} else {
-						quotation.setStatus( bean.getStatus() );
-						messageId = "quotation.updated";
-						thisId    = super.fire( "quotation.update", [ quotation ] )
-					}
-				}
-
-				var message = completeMessage( messageId );
-				result.setData( { "message" = message,  "payload" = { id = thisId } } );
-				event.setValue( "result", result );
-				return;
-			} catch ( any e ) {
-				transaction action="rollback";
-				var message = "Errore nella creazione/aggiornamento del Preventivo: #e.message#";
-				result.setData( { "error" = message } );
-				result.setStatus( "ERRORE" );
-				event.setValue( "result", result );
-				return;
-			}
+		var quotation = super.bean( "Quotation" );
+		
+		quotation.setId( json.id );
+		quotation.setName( json.name );
+		quotation.setQuotationNumber( json.quotationNumber );
+		quotation.setVersionNumber( json.versionNumber );
+		quotation.setQuotationDate( json.quotationDate );
+		quotation.setNotes( !IsNull( json.notes ) ? json.notes : null );
+		quotation.setValidityDate( json.validityDate );
+		
+		if (!IsNull(json.opportunity) && !IsNull(json.opportunity.id) && json.opportunity.id != '') {
+			quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
 		}
+		
+		if (!IsNull(json.lead) && !IsNull(json.lead.id) && json.lead.id != '') {
+			quotation.setLead( super.fire( "lead.get", [ json.lead.id ] ) );
+		}
+		
+		quotation.setActive( true );
+		
+		var statusId = json.status.id != '' ? json.status.id : 'NEW';
+		
+		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
+		
+		quotation.setCustomer( !IsNull(json.customer) ? super.fire( "customer.get", [ json.customer.id ] ) : null );
+		
+		if (!IsNull( json.shippingAddress ) && !IsNull( json.shippingAddress.id ) && json.shippingAddress.id != '') {
+			quotation.setCustomerAddressId( json.shippingAddress.id );
+		}
+		
+		// quotation.setCustomPaymentMethod( json.custom_payment_method );
+		// quotation.setPricelist( type.setId( json.pricelist.id ) );
+		// quotation.setPaymentMethod( type.setId( json.paymentMethod.id ) );
+		// quotation.setCurrency( type.setId( json.currency.id ) );
+		// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
+		// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
+		// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
+		// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
+		
+		if ( !Len( json.id ) ) {
+			messageId = "quotation.created";
+			quotation.setStatus( super.fire( "status.get", [ statusId ] ) );
+			thisId    = super.fire( "quotation.create", [ quotation ] );
+		} else {
+			var bean = super.fire( "Quotation.get", [ rc.id ] );
+			
+			if ( json.status.id != bean.getStatus().getId() ) {
+				quotation.setActive( 0 );
+				quotation.setStatus( bean.getStatus() );
+				thisId    = super.fire( "quotation.clone", [ quotation, statusId ] );
+				super.fire( "quotation.update", [ quotation ] )
+				messageId = "quotation.updated";
+			} else {
+				quotation.setStatus( bean.getStatus() );
+				messageId = "quotation.updated";
+				thisId    = super.fire( "quotation.update", [ quotation ] )
+			}
+		
+		}
+
+		var message = completeMessage( messageId );
+
+		result.setData( { "message" = message,  "payload" = { id = thisId } } );
+		event.setValue( "result", result );
+
 	}
 
 	function delete( event, rc, prc ){

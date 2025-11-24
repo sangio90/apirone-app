@@ -1,10 +1,12 @@
 AP.namespace( "quotation" );
 
 Object.assign( AP.quotation.fields, {
-    boxPricing: $( "#totalsFloatingTab" )
+    boxPricing: $( "#quotation-totals-item" )
 } );
 
 $( document ).ready( function() {
+
+    console.log( "AP.quotation.fields.boxPricing", AP.quotation.fields.boxPricing );
 
     if ( AP.quotation.fields.boxPricing.length ) {
 
@@ -16,6 +18,7 @@ $( document ).ready( function() {
 
 AP.quotation.pricing = ( function() {
 
+    var pub = {};
     var fields = AP.quotation.fields;
 
     var viewModel = kendo.observable( {
@@ -23,25 +26,38 @@ AP.quotation.pricing = ( function() {
         pricing: {
             lines: [], // es. { name: "Frutto 1", amount: 10.5 },
 
-            discounts: {
-                value1: "",
-                value2: ""
-            },
+            discount1: "",
+            discount2: "",
 
-            priceType: {
+            priceMethod: {
                 id: "F"
             },
 
             total: "0"
         },
 
+        changePriceMethod: function( event ) {
+
+            console.log( "event", event );
+
+            if ( event.id ) {
+
+            }
+
+        },
+
+        change: function( event ) {
+
+            console.log( "change:event", event );
+
+        },
+
         update: function( event ) {
 
-            console.log( "update", event );
+            var status = $( "#quotation-totals-item-loading" );
+            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width='20' height='20'>" );
 
             var data = AP.plate.modal.getVM().detailForm;
-
-            console.log( "data", data );
 
             NM.util.ajax( {
                 method: "POST",
@@ -50,6 +66,9 @@ AP.quotation.pricing = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data ) {
+
+                            status.html( "" );
+
                             viewModel.set( "pricing.lines", xhr.data.lines );
                             viewModel.set( "pricing.total", xhr.data.total );
                         }
@@ -60,19 +79,39 @@ AP.quotation.pricing = ( function() {
         },
 
         collapseTotals: function( event ) {
-            if ($('#totalsFloatingTabContent').is(':hidden')) {
-                $('#totalsFloatingTabContent').show()
-                $('#symbol').text('▼')
+
+            var container = $( "#quotation-totals-item-content" );
+
+            if ( container.is( ":hidden" ) ) {
+                container.show();
+                $( "#symbol" ).text( "▼" );
             } else {
-                $('#totalsFloatingTabContent').hide()
-                $('#symbol').text('▲')
+                container.hide();
+                $( "#symbol" ).text( "▲" );
             }
-            return false
+
+            return false;
         }
 
     } );
 
-    var pub = {};
+    viewModel.bind( "change", function( event ) {
+
+        var value = this.get( event.field );
+        var input = fields.boxPricing.find( "#input-total" );
+
+        console.log( "input", input );
+
+        if ( value == "A" ) {
+            input.prop( "readonly", true );
+
+            this.update();
+
+        } else {
+            input.prop( "readonly", false );
+        }
+
+    } );
 
     pub.update = function() {
 
@@ -81,6 +120,10 @@ AP.quotation.pricing = ( function() {
     };
 
     pub.init = function() {
+
+        console.log( "pricing" );
+
+        // fields.boxPricing.show();
 
     	kendo.bind( AP.quotation.fields.boxPricing, viewModel );
 

@@ -8,7 +8,7 @@
 				#button( bind = "click:list", size = "md", label = "Torna ai preventivi" )#
 				#button( bind = "click:exportQuotation", size = "md", label = "Esporta preventivo" )#
 				<cfif prc.id NEQ 0>
-					#button( bind = "click:openPrintModal", size = "md", label = "Stampa preventivo" )#
+					#button( bind = "click:printQuotation", size = "md", label = "Stampa preventivo" )#
 				</cfif>
 			</div>
         </div>
@@ -325,16 +325,19 @@
                                                 </div>
                                             </nav>
                                             <div class="tab-content" id="nav-tabContent">
+
                                                 <div class="tab-pane show active" id="nav-plate" role="tabpanel">
-                                                    <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems">
+                                                    <div data-template="quotation-item-plate-preview-tmpl" data-bind="source: quotationItems" class="row">
                                                     </div>
                                                 </div>
+
                                                 <div class="tab-pane fade" id="nav-signage" role="tabpanel">
-                                                    <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems">
+                                                    <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems" class="row">
                                                     </div>
                                                 </div>
+
                                                 <div class="tab-pane fade" id="nav-accessories" role="tabpanel">
-                                                    <div data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems">
+                                                    <div data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems" class="row">
                                                     </div>
                                                 </div>
                                             </div>
@@ -347,6 +350,7 @@
                                         </div>
                                     </div>
 
+                                    #view( "quotation/totals-item" )#
                                     #view( "quotation/totals" )#
 
                                 </div>
@@ -470,7 +474,6 @@
     #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal" )#
     #view( "quotation/zone-modal" )#
-    #view( "quotation/print-modal" )#
 
     #template( view="jstemplate/quotation/quotation-item-plate-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#

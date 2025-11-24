@@ -55,17 +55,6 @@ $( document ).ready( async function() {
 
         return;
 
-        var ele = document.getElementById( "plate-fruit-suggest" );
-        console.log( "ele:suggest", ele );
-
-        // var evt = new KeyboardEvent( "keypress", { key: "s" } );
-        // var evt = new KeyboardEvent( "keypress", { key: "c" } );
-        ele.dispatchEvent( new KeyboardEvent( "keydown", { "key": "a" } ) );
-
-        // ele.dispatchEvent( evt );
-
-
-        // fruitSuggest.trigger( { type: "keypress", which: "189", keyCode: "189" } );
     }
 
 } );

@@ -1,5 +1,5 @@
 ﻿<cfoutput>
-    <div id="plate-modal-root" class="modal fade">
+    <div id="plate-modal-root" class="modal fade quotation-item-modal">
         
         <section class="modal-dialog modal-xl">
             <div class="modal-content">

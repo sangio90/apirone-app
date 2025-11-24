@@ -5,7 +5,7 @@
 
 		prc.statuses = super.fire( "status.list", [ "QUOTATION" ] );
 
-		prc.jsFiles.add( "app-quotation" );
+		prc.jsFiles.add( "app-quotation-list" );
 
 		event.setView( "quotation/list" );
 	}
@@ -46,6 +46,7 @@
 		prc.page[ "pricelists" ]     = super.fire( "pricelist.list" );
 		prc.page[ "paymentMethods" ] = super.fire( "paymentMethod.list" );
 		prc.page[ "currencies" ]     = super.fire( "currency.list" );
+
 		var countries                = [
 			{ "id" = 1, "name" = "Italia" },
 			{ "id" = 2, "name" = "Francia" },
@@ -53,7 +54,9 @@
 			{ "id" = 4, "name" = "Spagna" },
 			{ "id" = 5, "name" = "Regno Unito" }
 		];
+		
 		prc.page[ "countries" ] = countries;
+
 		prc.page[ "states" ]    = [
 			{ "id" = 1, "name" = "Roma", "countryId" = 1 },
 			{ "id" = 2, "name" = "Milano", "countryId" = 1 },
@@ -94,33 +97,6 @@
 
 		prc.page[ "frames" ] = memy.convertList( super.fire( "frame.list" ), "minimal" );
 
-		var countries = [
-			{ "id" = 1, "name" = "Italia" },
-			{ "id" = 2, "name" = "Francia" },
-			{ "id" = 3, "name" = "Germania" },
-			{ "id" = 4, "name" = "Spagna" },
-			{ "id" = 5, "name" = "Regno Unito" }
-		];
-		prc.page[ "countries" ] = countries;
-		prc.page[ "states" ]    = [
-			{ "id" = 1, "name" = "Roma", "countryId" = 1 },
-			{ "id" = 2, "name" = "Milano", "countryId" = 1 },
-			{ "id" = 3, "name" = "Napoli", "countryId" = 1 },
-			{ "id" = 4, "name" = "Parigi", "countryId" = 2 },
-			{ "id" = 5, "name" = "Lione", "countryId" = 2 },
-			{ "id" = 6, "name" = "Marsiglia", "countryId" = 2 },
-			{ "id" = 7, "name" = "Berlino", "countryId" = 3 },
-			{ "id" = 8, "name" = "Monaco di Baviera", "countryId" = 3 },
-			{ "id" = 9, "name" = "Amburgo", "countryId" = 3 },
-			{ "id" = 10, "name" = "Madrid", "countryId" = 4 },
-			{ "id" = 11, "name" = "Barcellona", "countryId" = 4 },
-			{ "id" = 12, "name" = "Valencia", "countryId" = 4 },
-			{ "id" = 13, "name" = "Londra", "countryId" = 5 },
-			{ "id" = 14, "name" = "Manchester", "countryId" = 5 },
-			{ "id" = 15, "name" = "Birmingham", "countryId" = 5 }
-		];
-
-
 		// prc.vatCodeList = super.service( "VatCode" ).list();
 		prc.plates = DeserializeJSON( FileRead( "/config/data/fake/plates.json.cfm" ) );
 
@@ -131,13 +107,14 @@
 		prc.page[ "quotation" ] = quotation;
 
 		// prc.jsFiles.add( "app-plate-designer" );
-		prc.jsFiles.add( "app-quotation-plate" );
 		prc.jsFiles.add( "app-quotation-detail" );
 		prc.jsFiles.add( "app-quotation-pricing" );
+		
+		prc.jsFiles.add( "app-quotation-plate" );
 		prc.jsFiles.add( "app-quotation-signage" );
 		prc.jsFiles.add( "app-quotation-accessory" );
 
-		prc.cssFiles.add( "quotation-plate" );
+		prc.cssFiles.add( "quotation" );
 
 		event.setView( "quotation/detail" );
 	}
