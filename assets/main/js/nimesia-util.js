@@ -3,6 +3,8 @@ NM.form = NM.form || {};
 
 NM.util.openModal = function( ele, onShow ) {
 
+    console.log( "ele", ele );
+
     var dialogs = $( ".modal.show" ); // opened dialog
     var currentId = ele.attr( "id" );
 

@@ -38,6 +38,7 @@
 		prc.page[ "quotation" ] = quotation;
 
 		// prc.jsFiles.add( "app-plate-designer" );
+		// prc.jsFiles.add( "app-quotation-header" );
 		prc.jsFiles.add( "app-quotation-detail" );
 		prc.jsFiles.add( "app-quotation-pricing" );
 
@@ -47,6 +48,7 @@
 
 		prc.cssFiles.add( "quotation" );
 
+		// event.setView( "quotation/header" );
 		event.setView( "quotation/detail" );
 	}
 

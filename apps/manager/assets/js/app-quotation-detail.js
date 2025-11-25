@@ -2,7 +2,7 @@ AP.namespace( "quotation" );
 
 Object.assign( AP.quotation.fields, {
     detailRoot: $( "#quotation-detail-root" ),
-    detailForm: $( "#quotation-header-form" ),
+    detailForm: $( "#quotation-detail-header-form" ),
     zoneModalRoot: $( "#zone-modal-root" ),
     printModalRoot: $( "#print-modal-root" ),
 } );
@@ -13,6 +13,7 @@ $( document ).ready( function() {
     }
 
     const signageModal = document.getElementById( "signage-modal" );
+
     signageModal.addEventListener( "hide.bs.modal", ( e ) => {
         AP.quotation.detail.renderTotals();
     } );
@@ -49,101 +50,19 @@ AP.quotation.detail = ( function() {
         return AP.accessory.modal;
     }
 
-    var defaultDetailForm = {
-        data: {
-            id: "",
-            name: "",
-            customer: {
-                id:"",
-                name:""
-            },
-            shippingAddress: {
-                id: null,
-                name: ""
-            },
-            quotationNumber: "",
-            versionNumber: 1,
-            lang: {
-                id:"IT"
-            },
-            zone: {
-                id:"",
-                name:""
-            },
-            zones: new kendo.data.DataSource(),
-            quotationDate: new Date(),
-            validityDate: new Date(),
-            notes: "",
-            status: {
-                id:"LAV"
-            },
-            opportunity: {
-                id:"",
-                name:""
-            },
-            lead: {
-                id:"",
-                name:""
-            },
-            pricelist: {
-                id:""
-            },
-            paymentMethod: {
-                id: 18 // BB 60 GG FM
-            },
-            customPaymentMethod: "",
-            vatNumber: "",
-            currency: {
-                id: 1
-            },
-            vatCode: {
-                id: 22
-            },
-            invoiceData: {
-                name:"",
-                company:"",
-                vatNumber:"",
-                email:"",
-                phone:"",
-                street:"",
-                city:"",
-                postalCode:"",
-                country: { id:"" },
-                state: { id:"" }
-            },
-            shipmentData: {
-                name:"",
-                company:"",
-                vatNumber:"",
-                email:"",
-                phone:"",
-                street:"",
-                city:"",
-                postalCode:"",
-                country: { id:"", name:"" },
-                state: { id:"", name:"" }
-            },
-            title: this.id ? "Modifica Preventivo" : "Nuovo Preventivo",
-            totals: {
-                "id": null
-            }
-        }
-    };
+    function headerApp() {
+        return AP.accessory.header;
+    }
 
     var viewModel = kendo.observable( {
+        detailForm: {
+            data: {
+                zone: {
+                    id: ""
+                }
+            }
+        },
         mode: null,
-        detailForm: defaultDetailForm,
-        languages: new kendo.data.DataSource(),
-        varCodes: new kendo.data.DataSource(),
-        statuses: new kendo.data.DataSource(),
-        vatCodes: new kendo.data.DataSource(),
-        pricelists: new kendo.data.DataSource(),
-        paymentMethods: new kendo.data.DataSource(),
-        currencies: new kendo.data.DataSource(),
-        countries: new kendo.data.DataSource(),
-        states: new kendo.data.DataSource(),
-        filteredInvoiceStates: new kendo.data.DataSource(),
-        filteredShipmentStates: new kendo.data.DataSource(),
         zones: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
 
@@ -209,6 +128,11 @@ AP.quotation.detail = ( function() {
         list: function() {
             window.location.href = "/manager/quotations";
         },
+
+        showHeader: function() {
+            NM.util.openModal( $( "#quotation-header-modal" ) );
+        },
+
         exportQuotation: function() {
             Loading.show();
             NM.util.ajax( {
@@ -597,32 +521,9 @@ AP.quotation.detail = ( function() {
     pub.init = function() {
         kendo.bind( AP.quotation.fields.detailRoot, viewModel );
 
-        viewModel.get( "languages" ).data( AP.page.languages );
-        viewModel.get( "statuses" ).data( AP.page.statuses );
-        viewModel.get( "pricelists" ).data( AP.page.pricelists );
-        viewModel.get( "paymentMethods" ).data( AP.page.paymentMethods );
-        viewModel.get( "currencies" ).data( AP.page.currencies );
-        viewModel.get( "countries" ).data( AP.page.countries );
-        viewModel.get( "states" ).data( AP.page.states );
-        viewModel.get( "vatCodes" ).data( AP.page.vatCodes );
-
         viewModel.getZones();
 
         if ( AP.page.quotation ) {
-            if ( AP.page.quotation.lead && AP.page.quotation.lead.firstName && AP.page.quotation.lead.firstName != "" ) {
-                AP.page.quotation.lead.fullName = AP.page.quotation.lead.firstName + " " + AP.page.quotation.lead.lastName;
-            }
-            this.renderTotals();
-            viewModel.set( "detailForm.data", AP.page.quotation );
-            if ( AP.page.quotation.customerAddressId && AP.page.quotation.customer.shippingAddresses ) {
-                const shippingAddress = AP.page.quotation.customer.shippingAddresses.find( item => item.id === AP.page.quotation.customerAddressId );
-                if ( shippingAddress ) {
-                    viewModel.set( "detailForm.data.shippingAddress", shippingAddress );
-                }
-            }
-            // $( "#nav-plan-tab" ).removeAttr("hidden");
-            $( "#nav-products-tab" ).removeAttr( "hidden" );
-            // $( "#nav-shipments-tab" ).removeAttr("hidden");
 
             document.querySelector( "#nav-plate-tab" ).addEventListener( "click", function( e ) {
                 e.preventDefault();
@@ -649,38 +550,6 @@ AP.quotation.detail = ( function() {
     };
 
     pub.renderTotals = function() {
-        /*
-        NM.util.ajax( {
-            method: "GET",
-            url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/total",
-            callback: {
-                done: function( xhr ) {
-                    if( xhr.data ) {
-                        if ( !xhr.data.id || xhr.data.id != viewModel.get( "detailForm.data.id" ) ) {
-                            $( "#quotation-totals-item" ).hide();
-                        } else {
-                            viewModel.set( "detailForm.data.totals", xhr.data );
-                            var totals = viewModel.get( "detailForm.data.totals" );
-                            const table = $( "#quotation-totals-item" ).find( "table" )[0];
-                            $( table ).empty();
-                            $( table ).append(
-                                `<tr>
-                                    <td>${totals.quantity.label}</td>
-                                    <td>${totals.quantity.count}</td>
-                                </tr>
-                                <tr style="font-weight: bold">
-                                    <td>${totals.total.label}</td>
-                                    <td>${totals.total.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
-                                </tr>
-                                `
-                            );
-                            $( "#quotation-totals-item" ).show();
-                        }
-                    }
-                }
-            }
-        } );
-        */
     };
 
     return pub;
