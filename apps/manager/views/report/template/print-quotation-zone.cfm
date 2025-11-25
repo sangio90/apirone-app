@@ -127,50 +127,70 @@
 					<!--- Loop sugli oggetti della stanza --->
 					<cfset j = 1>
 					<cfloop array="#stanza.zoneItems#" index="oggetto">
-						<cfif (i EQ 1 and j EQ 3) or (i EQ 1 AND j EQ 7)>
+						<cfset itemsCount = stanza.zoneItems.len()>
+						<cfif (i EQ 1 and j EQ 3) >
 							<div style="page-break-before: always;"></div>
-							<div style="margin-top: 1.3in">&nbsp;</div>
-						<cfelseif i GT 1 and J GT 1 AND J MOD 3 EQ 1>
-							<div style="margin-top: 2.5in">&nbsp;</div>
+							<div style="margin-top: 1.4in">&nbsp;</div>
+						</cfif>
+						<cfif (i EQ 1 and j GT 3 and j MOD 3 EQ 0) >
+							<div style="page-break-before: always;"></div>
+							<div style="margin-top: 1.4in">&nbsp;</div>
 						</cfif>
 
 						<!--- wrapper per evitare che venga spezzato su due pagine --->
-						<div class="item" style="page-break-inside: avoid;">
+						<div class="item" style="page-break-inside: avoid; <cfif ( i GT 1 AND j MOD 3 EQ 0 AND itemsCount GT j AND args.data.zones.len() GT i )> page-break-after: always; </cfif><cfif ( j NEQ 1 and i GT 1 AND j MOD 3 EQ 1 )>margin-top: 1.4in;</cfif>">
 							<table style="border-collapse: collapse; width: 100%;">
 								<tr>
-									<td style="width: 10cm; border-right: 0;"><strong>Articolo</strong></td>
-									<td style="width: 1cm; text-align: right;"><strong>Qtà.</strong></td>
-									<td style="width: 3cm; text-align: right;"><strong>Prezzo</strong></td>
-									<td style="width: 3cm; text-align: right;"><strong>Totale</strong></td>
+									<td style="width: 4in; border-right: 0;"><strong>Articolo</strong></td>
+									<td style="width: 0.4cm; text-align: right;"><strong>Qtà.</strong></td>
+									<td style="width: 1.2cm; text-align: right;"><strong>Prezzo</strong></td>
+									<td style="width: 1.2cm; text-align: right;"><strong>Totale</strong></td>
 								</tr>
-								<tr>
-									<td style="width: 10cm; padding-top: 5pt; padding-left: 0; padding-bottom: 5pt;">
+								<tr style="height: 1.3in !important">
+									<td style="width: 4in; padding-top: 5pt; padding-left: 5pt; padding-bottom: 5pt; height: 1.3in !important;">
 										<table class="hiddenTable">
 											<tr>
-												<td style="width: 3.5cm;">
-													<cfif IsNull( oggetto.getImage() )>
-														<img src="https://test.apirone.cc/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain; min-width: 3.5cm; min-height: 4cm;">
-													<cfelse>
-														<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 100%; object-fit: contain; min-width: 3.5cm; min-height: 4cm;">
-													</cfif>
-												</td>
-												<td style="width: 5.5cm; padding-left: 2pt; padding-right: 0">
-													<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
-													<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
-														<cfset itemsCount = ArrayLen( oggetto.getItems() ) GTE 9 ? 9 : ArrayLen( oggetto.getItems() )>
-														<cfloop from="1"  to="#itemsCount#" index="item">
-															<cfset item = oggetto.getItems()[item]>
-															<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
-														</cfloop>
-														<cfif !isNull(oggetto.getNotes()) && args.params.notes>
-															<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNotes()#</span>
+												<cfif args.params.images>
+													<td style="width: 1.1in;">
+														<cfif IsNull( oggetto.getImage() )>
+															<img src="https://test.apirone.cc/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;">
+														<cfelse>
+															<!--- <img src="https://test.apirone.cc/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;"> --->
+															<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;">
 														</cfif>
-													</cfif>
-												</td>
+													</td>
+													<td style="width: 2.9in; padding-left: 2pt; padding-right: 0">
+														<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+														<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
+															<cfset itemsCount = ArrayLen( oggetto.getItems() ) GTE 9 ? 9 : ArrayLen( oggetto.getItems() )>
+															<cfloop from="1"  to="#itemsCount#" index="item">
+																<cfset item = oggetto.getItems()[item]>
+																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
+															</cfloop>
+															<cfif !isNull(oggetto.getNotes()) && args.params.notes>
+																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNotes()#</span>
+															</cfif>
+														</cfif>
+													</td>
+												<cfelse>
+													<td style="width: 4in; padding-left: 2pt; padding-right: 0">
+														<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+														<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
+															<cfset itemsCount = ArrayLen( oggetto.getItems() ) GTE 9 ? 9 : ArrayLen( oggetto.getItems() )>
+															<cfloop from="1"  to="#itemsCount#" index="item">
+																<cfset item = oggetto.getItems()[item]>
+																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
+															</cfloop>
+															<cfif !isNull(oggetto.getNotes()) && args.params.notes>
+																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNotes()#</span>
+															</cfif>
+														</cfif>
+													</td>
+												</cfif>
 											</tr>
 											<tr>
 												<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
-													<td colspan="2" style="padding-left: 2pt; font-size: 8pt; line-height: 20px;">
+													<td colspan="2" style="font-size: 8pt; line-height: 20px; padding-top: 2pt !important; padding-left: 2pt;">
 														<b>Lista Frutti: </b>
 														<cfif NOT isNull(oggetto.getFruits())>
 															<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
@@ -191,9 +211,9 @@
 											</tr>
 										</table>
 									</td>
-									<td style="width: 1cm; text-align: right; font-size: 8pt;">#oggetto.getQuantity()#</td>
-									<td style="width: 3cm; text-align: right; font-size: 8pt;">#LSNumberFormat( oggetto.getPrice(), ".99", "it_IT" )# €</td>
-									<td style="width: 3cm; text-align: right; font-size: 8pt;">#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice(), ".99", "it_IT" )# €</td>
+									<td style="width: 0.4in; text-align: right; font-size: 8pt;">#oggetto.getQuantity()#</td>
+									<td style="width: 1.2in; text-align: right; font-size: 8pt;">#LSNumberFormat( oggetto.getPrice(), ".99", "it_IT" )# €</td>
+									<td style="width: 1.2in; text-align: right; font-size: 8pt;">#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice(), ".99", "it_IT" )# €</td>
 								</tr>
 							</table>
 						</div>

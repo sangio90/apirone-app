@@ -37,6 +37,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			case 'classic':
 				quoteObj = printClassic( quoteObj, printParams );
 				break;
+			case 'proforma':
+				quoteObj = printClassic( quoteObj, printParams );
+				break;
 			default:
 				return;
 		}

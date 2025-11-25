@@ -806,18 +806,20 @@ AP.quotation.printModal = ( function() {
             $( "#discountsCheckbox" )[0].checked = false;
             if ( report == "classic" ) {
                 $( "#imagesDiv" ).css( "display", "block" );
+                $( "#imagesCheckbox" )[0].checked = true;
                 $( "#groupedDiv" ).css( "display", "block" );
                 $( "#notesDiv" ).css( "display", "block" );
                 $( "#discountsDiv" ).css( "display", "block" );
             }
             if ( report == "proforma" ) {
-                $( "#imagesDiv" ).css( "display", "none" );
+                $( "#imagesDiv" ).css( "display", "block" );
+                $( "#imagesCheckbox" )[0].checked = false;
                 $( "#groupedDiv" ).css( "display", "block" );
                 $( "#notesDiv" ).css( "display", "block" );
                 $( "#discountsDiv" ).css( "display", "block" );
             }
             if ( report == "zone" ) {
-                $( "#imagesDiv" ).css( "display", "none" );
+                $( "#imagesCheckbox" )[0].checked = true;
                 $( "#groupedDiv" ).css( "display", "block" );
                 $( "#notesDiv" ).css( "display", "block" );
                 $( "#notesCheckbox" )[0].checked = true;
@@ -825,12 +827,14 @@ AP.quotation.printModal = ( function() {
             }
             if ( report == "technical" ) {
                 $( "#imagesDiv" ).css( "display", "block" );
+                $( "#imagesCheckbox" )[0].checked = false;
                 $( "#groupedDiv" ).css( "display", "block" );
                 $( "#notesDiv" ).css( "display", "block" );
                 $( "#discountsDiv" ).css( "display", "none" );
             }
             if ( report == "internal" ) {
                 $( "#imagesDiv" ).css( "display", "none" );
+                $( "#imagesCheckbox" )[0].checked = false;
                 $( "#groupedDiv" ).css( "display", "none" );
                 $( "#notesDiv" ).css( "display", "none" );
                 $( "#discountsDiv" ).css( "display", "none" );
@@ -844,6 +848,7 @@ AP.quotation.printModal = ( function() {
 
     pub.init = function() {
         kendo.bind( fields.printModalRoot, viewModel );
+        viewModel.toggleOptions()
     };
 
     pub.methods = function( options ) {
