@@ -45,6 +45,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			obj.setId( record.status_id );
 			obj.setName( record.status );
+			obj.setOrderBy( record.orderby );
 			obj.setColor( getSystemColorService().get( record.color_id ) );
 
 			return obj;
