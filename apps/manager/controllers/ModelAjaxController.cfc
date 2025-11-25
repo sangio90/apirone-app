@@ -10,9 +10,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "model.search", params );
 
 		for ( var row in rows.getData() ) {
-			dump( DeserializeJSON( SerializeJSON( row ) ) );
-			// abort;
-
 			var obj = memy.convert( row, "list" );
 			data.add( obj );
 		}
