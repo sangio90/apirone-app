@@ -20,13 +20,16 @@
             <td>
                 <span data-bind="text: finish.name"></span>
             </td>
+            <!---
             <td>
-                <div  style="display: flex; align-items: center; justify-content: flex-end;" data-bind="events: { click: editPrices }">
-                    <div data-bind="source: prices" data-template="price-row-tmpl" class="flex: 1">
-                    </div>
-                    <div style="width: 30px; flex-shrink: 0;">#iconButton(icon="euro-sign")#</div>
+                <div data-bind="events: { click: editPrices }" class="hand price-container-list">
                 </div>
             </td>
+            --->
+            <td class="prices-product-cell">
+                <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
+                </div>
+            </td>            
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
