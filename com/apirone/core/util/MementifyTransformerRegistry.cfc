@@ -75,6 +75,10 @@ component {
 			transformer = function( value, memento ){
 				var result = [];
 
+				if ( !IsArray( arguments.memento.categories ) ) {
+					return result;
+				}
+
 				for ( var category in arguments.memento.categories ) {
 					result.add( { "id" = category.id, "name" = category.name } );
 				}

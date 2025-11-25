@@ -3,14 +3,17 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var mm     = getMementify();
+		var memy   = getMementify();
 
 		var params = super.paramsFromUrl();
 
 		var rows = super.fire( "model.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = mm.convert( row, "list" );
+			dump( DeserializeJSON( SerializeJSON( row ) ) );
+			// abort;
+
+			var obj = memy.convert( row, "list" );
 			data.add( obj );
 		}
 

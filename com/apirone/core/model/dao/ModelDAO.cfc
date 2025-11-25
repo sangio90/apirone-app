@@ -50,7 +50,9 @@
 				COUNT(model_id) OVER() AS total
 			FROM
 				models
-					INNER JOIN catalog_bundles USING (model_id)
+					<cfif !IsNull( arguments.lineId ) OR !IsNull( arguments.catalogBundleLineId )>
+						INNER JOIN catalog_bundles USING (model_id)
+					</cfif>
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.lineId )>
