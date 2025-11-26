@@ -196,7 +196,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Struct function cloneTree( required String fromProductId, required String toProductId ){
-		
 		if ( fromProductId == toProductId ) {
 			Throw(
 				type    = "ApirOne.errors.productService.InvalidArgument",
@@ -307,51 +306,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function updateDetail( required com.apirone.core.model.bean.Product product ){
-		getDao().updateDetail( product );
+
+		getDao().updateDetail( arguments.product );
 
 		super.getCacheManager().remove( getCacheScope(), product.getId() );
 
 		return product.getId();
 	}
-
-	public Boolean function updateImportants(
-		required com.apirone.core.model.bean.Product product,
-		required Numeric[] ids
-	){
-		var itemService = getProductItemService();
-
-		```
-		<cfquery datasource="apirone">
-			UPDATE product_items
-			SET important = false
-			WHERE product_id = '#product.getId()#'
-		</cfquery>
-		```
-
-		var allItems = itemService.getFlatTree( productId = product.getId() );
-
-		for ( var item in allItems ) {
-			if ( ArrayContains( ids, item.getId() ) ) {
-				var value = true;
-			} else {
-				var value = false;
-			}
-
-			```
-			<cfquery datasource="apirone">
-				UPDATE product_items
-				SET important = #value#
-				WHERE product_item_id = '#item.getId()#'
-			</cfquery>
-			```
-
-			itemService.removeCache( item.getId() );
-		}
-
-
-		return true;
-	}
-
 
 	public Void function removeCache( required String productId ){
 		var cm = super.getCacheManager();
@@ -407,10 +368,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setSerial( record.serial );
 			bean.setCreatedAt( record.created_at );
 			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setSpecial( BooleanFormat( record.special ) );
+			bean.setSpecial( BooleanFormat( record.special ) ); //TODO: to remove
 			bean.setMinQuantity( record.min_quantity );
 			bean.setMaxQuantity( record.max_quantity );
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
+
+			bean.setImportantAttributes( super.getAttributesBeanByIds( record.attributes_important ) );
 
 			bean.setPrices( getPriceService().list( productId = record.product_id ) );
 			var images = getFileService().list( productId = record.product_id );

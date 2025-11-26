@@ -38,13 +38,6 @@
                 </td>
                 <td class="text-center">
                     <input type="checkbox" class="form-check-input"
-                        name="important"
-                        data-bind="checked: important"
-                        value="##: id ##"
-                    >
-                </td>
-                <td class="text-center">
-                    <input type="checkbox" class="form-check-input"
                         name="selected"
                         value="##: id ##"
                     >

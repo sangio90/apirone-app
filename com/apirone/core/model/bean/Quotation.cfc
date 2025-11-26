@@ -18,7 +18,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="quotationNumber" type="String";
 	property name="versionNumber" type="Numeric";
 	property name="quotationDate" type="Date";
-	property name="notes" type="String" de;
+	property name="notes" type="String";
 	property name="validityDate" type="Date";
 	property name="active" type="Numeric";
 	property name="pricelist" type="com.apirone.core.model.bean.Pricelist";
@@ -43,7 +43,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	public String function getDecodedPaymentMethod(){
 		var paymentMethod = this.getPaymentMethod();
-		if ( !IsNull( paymentMethod ) ) {
+		if ( !IsNull( paymentMethod )) {
 			return paymentMethod.getName();
 		} else {
 			return getCustomPaymentMethod();

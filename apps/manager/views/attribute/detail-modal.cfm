@@ -104,71 +104,71 @@
                         <!--- panel 2 ---->
                         <div class="tab-pane fade" id="attribute-nav-values-tab" role="tabpanel" aria-labelledby="attribute-nav-values-but">
 
-                                <div class="col-12">
+                            <div class="col-12">
 
-                                    <div class="divider mb-3">aggiungi valore</div>
+                                <div class="divider mb-3">aggiungi valore</div>
 
-                                    <form id="attribute-values-suggest-form" method="POST" name="attribute-values-suggest-form">
+                                <form id="attribute-values-suggest-form" method="POST" name="attribute-values-suggest-form">
 
-                                        <div class="col-sm-7 col-sx-12 mb-3  box-search-small">
+                                    <div class="col-sm-7 col-sx-12 mb-3  box-search-small">
 
-                                            <input type="text" 
-                                                class="form-control" 
-                                                id="attribute-suggest-raw-values"
-                                                name="attribute-suggest-raw-values" 
-                                                placeholder="Cerca e aggiungi un valore..."
-                                                maxlength="150" 
-                                                data-bind="value: suggestForm.data.name"
-                                                data-rule-required="true"
-                                                data-msg-required="Valore richiesto">
+                                        <input type="text" 
+                                            class="form-control" 
+                                            id="attribute-suggest-raw-values"
+                                            name="attribute-suggest-raw-values" 
+                                            placeholder="Cerca e aggiungi un valore..."
+                                            maxlength="150" 
+                                            data-bind="value: suggestForm.data.name"
+                                            data-rule-required="true"
+                                            data-msg-required="Valore richiesto">
 
-                                        </div>
-                                        
-                                    </form>
-
-                                </div>
-
-                                <div data-bind="invisible: isValuesGridVisible" class="mb-3 alert alert-warning">
-                                    <span>Nessun valore ancora caricato</span>
-                                </div>
-
-                                <form id="attribute-values-form" method="POST" name="attribute-values-form" data-bind="visible: isValuesGridVisible">
-
-                                    <div class="row mb-2">
-                                        <div class="status col-6">
-                                        </div>
-                                        <div class="text-end col-6">
-                                            <button type="button" class="btn btn-default btn-sm float-end" data-bind="click:deleteValues">
-                                                <i class="fas fa-trash"></i> <span>Cancella valori</span>
-                                            </button>
-
-                                            <div class="status-delete mt-1 float-end me-3" id="attribute-values-delete-status"></div>
-                                        </div>
                                     </div>
-
-                                    #grid( 
-                                        id="attribute-values-grid",
-                                        class="no-pager",
-                                        columns="[
-                                            { 'field':'id', 'title':'ID', width: '60px' },
-                                            { 'field':'code', 'title':'Codice', width: '100px' },
-                                            { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
-                                            { 'field':'', 'width':'40px', 'title':'Attiva note' },
-                                            { 'field':'', 'width':'40px', 'title':'Questo valore modifica l\'immagine' },
-                                            { 'field':'', 'width':'50px', 'title':'Immagini'},
-                                            { 'field':'', 'width':'50px', 'title':'Numeri di componenti'},
-                                            { 
-                                                'field':'', 
-                                                'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
-                                                'width':'40px',
-                                                'headerAttributes': { 'class': 'text-center' }
-                                            }
-                                        ]",
-                                        source="detailForm.data.values",
-                                        rowTemplate="attribute/attribute-values-list-row-tmpl"
-                                    )#
-
+                                        
                                 </form>
+
+                            </div>
+
+                            <div data-bind="invisible: isValuesGridVisible" class="mb-3 alert alert-warning">
+                                <span>Nessun valore ancora caricato</span>
+                            </div>
+
+                            <form id="attribute-values-form" method="POST" name="attribute-values-form" data-bind="visible: isValuesGridVisible">
+
+                                <div class="row mb-2">
+                                    <div class="status col-6">
+                                    </div>
+                                    <div class="text-end col-6">
+                                        <button type="button" class="btn btn-default btn-sm float-end" data-bind="click:deleteValues">
+                                            <i class="fas fa-trash"></i> <span>Cancella valori</span>
+                                        </button>
+
+                                        <div class="status-delete mt-1 float-end me-3" id="attribute-values-delete-status"></div>
+                                    </div>
+                                </div>
+
+                                #grid( 
+                                    id="attribute-values-grid",
+                                    class="no-pager",
+                                    columns="[
+                                        { 'field':'id', 'title':'ID', width: '60px' },
+                                        { 'field':'code', 'title':'Codice', width: '100px' },
+                                        { 'field':'name', 'title':'Descrizione', 'sortable': 'true'},
+                                        { 'field':'', 'width':'40px', 'title':'Attiva note' },
+                                        { 'field':'', 'width':'40px', 'title':'Questo valore modifica l\'immagine' },
+                                        { 'field':'', 'width':'50px', 'title':'Immagini'},
+                                        { 'field':'', 'width':'50px', 'title':'Numeri di componenti'},
+                                        { 
+                                            'field':'', 
+                                            'title':'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
+                                            'width':'40px',
+                                            'headerAttributes': { 'class': 'text-center' }
+                                        }
+                                    ]",
+                                    source="detailForm.data.values",
+                                    rowTemplate="attribute/attribute-values-list-row-tmpl"
+                                )#
+
+                            </form>
 
                         </div>
                     </div>
