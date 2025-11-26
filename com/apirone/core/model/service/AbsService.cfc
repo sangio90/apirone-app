@@ -94,6 +94,24 @@ component output="false" accessors="true" {
 		return util.prettyString( arguments.str );
 	}
 
+	private Array function getAttributesBeanByIds( required String attributes ){
+
+		var result     = [];
+		var attrs = DeserializeJSON( arguments.attributes );
+
+		if ( !IsNull( attrs ) AND Len( attrs ) ) {
+			for ( var thisAttribute in attrs ) {
+				var beanAttribute = this.service( "Attribute" ).get( thisAttribute );
+
+				if ( !IsNull( beanAttribute ) ) {
+					result.add( beanAttribute );
+				}
+			}
+		}
+
+		return result.len() ? result : NullValue();
+	}
+
 	private Array function getCategoriesBeanByIds( required String categories ){
 		// [2,3,4,5]
 

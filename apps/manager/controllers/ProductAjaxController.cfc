@@ -134,36 +134,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function updateImportants( event, rc, prc ){
-		var result = super.getResult();
-
-		param rc.items = "";
-
-		var bean = super.service( "Product" ).get( rc.id );
-		var ids  = [];
-		for ( var productItemId in ListToArray( rc.items ) ) {
-			var productItem     = super.service( "ProductItem" ).get( productItemId );
-			var attributeValues = super
-				.fire(
-					"ProductItem.list",
-					{
-						productId   = productItem.getProductId(),
-						attributeId = productItem.getAttribute().getId()
-					}
-				)
-				.each( function( item ){
-					ids.add( item.getId() );
-				} );
-		}
-		var newId = super.fire( "Product.updateImportants", { product = bean, ids = ids } );
-
-		var message = completeMessage( "product.itemsUpdated" );
-
-		result.setData( { "message" = message } );
-
-		event.setValue( "result", result );
-	}
-
 	function addValue( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
@@ -343,13 +313,21 @@ component extends="com.apirone.core.controller.AbsController" {
 		var product = super.bean( "Product" );
 		var status  = super.bean( "Status" );
 
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+		var attrList = [];
 
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		product.setId( json.id );
 		product.setStatus( status.setId( json.status.id ) );
 		product.setMinQuantity( json?.minQuantity ?: 0 );
 		product.setMaxQuantity( json?.maxQuantity ?: 0 );
+
+		for ( var attr in json?.importantAttributes ?: [] ) {
+			var attribute = super.bean( "Attribute" );
+			attrList.add( attribute.setId( attr.id ) );
+		}
+
+		product.setImportantAttributes( attrList );
 
 		if ( StructKeyExists( json, "special" ) ) {
 			product.setSpecial( json.special );

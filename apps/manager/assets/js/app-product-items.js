@@ -30,6 +30,7 @@ AP.product.items = ( function() {
         items: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items" } ),
         orderingItems: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items/order" } ),
         orderingAttributes: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order" } ),
+        // attributesForSuggest: NM.kendo.dataSource( { url: "/manager/ajax/attributes" } ),
         attributesList: undefined,
     };
 
@@ -96,6 +97,42 @@ AP.product.items = ( function() {
     var viewModel = kendo.observable( {
 
         items: dataSources.items, // i need to run after user pref
+        attributesForSuggest: new kendo.data.DataSource( {
+            serverFiltering: true,
+            transport: {
+                read: {
+                    url: "/manager/ajax/attributes",
+                    data: {
+                        str: function() {
+                            var suggest = $( "#product-important-attributes" );
+                            var autocomplete = suggest.data( "kendoMultiSelect" );
+                            var thisValue = suggest.data( "kendoMultiSelect" ).input.val();
+
+                            console.log( "data:str", autocomplete );
+                            console.log( "data:str:val", thisValue );
+
+                            if ( thisValue.includes( "--" ) ) {
+                                return "";
+                            }
+
+                            return thisValue;
+                        },
+                    },
+                },
+                parameterMap: function( data, type ) {
+                    console.log( "parameterMap:data", data );
+                    console.log( "parameterMap:type", type );
+                    if ( type === "read" ) {
+                        return { "str": data.str() };
+                    }
+                }
+            },
+            schema: {
+                data: function( xhr ) {
+                    return xhr.data;
+                }
+            },
+        } ),
         orderingItems: dataSources.orderingItems,
         attributesList: dataSources.attributesList,
         orderingAttributes: dataSources.orderingAttributes,
@@ -225,6 +262,8 @@ AP.product.items = ( function() {
                 },
             } );
 
+            return false;
+
         },
 
         save: function( event ) {
@@ -254,57 +293,6 @@ AP.product.items = ( function() {
             return false;
 
         },
-
-        updateItems: function( event ) {
-
-            var checks = $( "#product-items-grid" ).find( "[name=important]:checked" );
-
-            var values = [];
-            checks.each( function() {
-                values.push( $( this ).val() );
-            } );
-
-            var checkedItems = viewModel.get( "items" ).data().filter(
-                function( item ) {
-                    return values.includes( item.id.toString() );
-                }
-            );
-            var checkedAttributes = checkedItems.map(
-                function( item ) {
-                    return item.attribute.id;
-                }
-            );
-
-            checkedAttributes = $.unique( checkedAttributes );
-
-            if ( checkedAttributes.length > 2 ) {
-                AP.widget.notify( "warning", "Puoi selezionare al massimo 2 attributi" );
-            } else {
-                var productItemsWithCheckedAttributes = viewModel.get( "items" ).data().filter(
-                    function( item ) {
-                        return checkedAttributes.includes( item.attribute.id );
-                    }
-                );
-                debugger;
-                var ids = values.toString();
-
-                NM.util.ajax( {
-                    method: "POST",
-                    url: "/manager/ajax/products/" + AP.page.productId + "/items/importants",
-                    data: { items: ids },
-                    callback: {
-                        done: function( xhr ) {
-                            AP.widget.notify( "success", xhr.data.message.text );
-                            refreshDatasources();
-                        },
-                    },
-                } );
-            }
-
-            return false;
-
-        },
-
 
         /*
             attributes methods
@@ -744,7 +732,10 @@ AP.product.items = ( function() {
 
         } );
 
+        // viewModel.set( "product.importantAttributes", [] );
+
         initSorts();
+        // initSuggest();
     };
 
 

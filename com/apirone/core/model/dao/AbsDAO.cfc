@@ -44,6 +44,18 @@
 		<cfreturn items.len() ? items : NullValue()>
 	</cffunction>
 
+	<cffunction access="private" name="getAttributesAsArray" returntype="Array">
+		<cfargument name="attributes" required="true">
+
+		<cfset var items = []>
+
+		<cfloop array="#arguments.attributes#" item="local.thisItem">
+			<cfset items.add( local.thisItem.getId() )>
+		</cfloop>
+
+		<cfreturn items.len() ? items : NullValue()>
+	</cffunction>
+
 	<cffunction access="private" name="getCategoriesAsArray" returntype="Array">
 		<cfargument name="categories" required="true">
 

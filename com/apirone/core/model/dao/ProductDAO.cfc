@@ -9,6 +9,7 @@
 				line_id::varchar,
 				finish_id::varchar,
 				catalog_bundle_id::varchar,
+				attributes_important::varchar,
 				*
 			FROM
 				products
@@ -232,6 +233,7 @@
 					</cfif>
 				,
 				lines = <cfqueryparam cfsqltype="Other" value="#SerializeJSON( lines )#">,
+
 				<cfif IsInstanceOf( arguments.product, "com.apirone.core.model.bean.ProductBase" )>
 					product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
 				</cfif>
@@ -245,6 +247,8 @@
 
 	<cffunction name="updateDetail" returntype="String">
 		<cfargument name="product" type="com.apirone.core.model.bean.Product" required="true">
+
+		<cfset var importantAttributes = super.getAttributesAsArray( arguments.product.getImportantAttributes() )>
 
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
@@ -265,7 +269,8 @@
 					</cfif>
 				,
 				special = <cfqueryparam cfsqltype="Boolean" value="#arguments.product.getSpecial()#">,
-				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">,
+				attributes_important = <cfqueryparam cfsqltype="Other" value="#SerializeJSON( importantAttributes )#">
 			WHERE
 				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid
 		</cfquery>
@@ -287,7 +292,6 @@
 	</cffunction>
 
 	<cffunction name="deleteAllByParams" returntype="Boolean">
-		
 		<cfargument name="lineId" type="String" required="true">
 		<cfargument name="categoryId" type="String" required="true">
 
