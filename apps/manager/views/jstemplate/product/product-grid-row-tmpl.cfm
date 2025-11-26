@@ -20,7 +20,7 @@
             <td>
                 <span data-bind="text: finish.name"></span>
             </td>
-            <td class="prices-product-cell">
+            <td class="prices-product-cell text-end">
                 <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
                 </div>
             </td>            

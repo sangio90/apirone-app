@@ -89,23 +89,28 @@
 
                             <div class="col-12">
 
-                                <div class="tab-content">
+                                <form id="product-detail-form">
 
-                                    <div class="tab-pane p-2 fade show active" id="product-general" role="tabpanel" aria-labelledby="product-general-tab">
+                                    <div class="tab-content">
 
-                                        <div class="col-md-4 mb-3">
-                                            <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
-                                        </div>
 
-                                        <div class="col-md-12">
+                                        <!---
+                                            Generale
+                                        --->
 
-                                            <div>
+                                        <div class="tab-pane p-2 fade show active" id="product-general" role="tabpanel" aria-labelledby="product-general-tab">
 
-                                                <div class="row d-flex mb-2">
+                                            <div class="col-md-4 mb-3">
+                                                <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
+                                            </div>
 
-                                                    <div class="col-sm-6">
+                                            <div class="col-md-12">
 
-                                                        <p>
+                                                <div>
+
+                                                    <div class="row d-flex mb-2">
+
+                                                        <div class="col-sm-6 border-end">
 
                                                             <cfif prc.product.getCategory().getType().getId() == "SEG">
                                                                 - <a href="/manager/signages/rows-config?lineId=#prc.line.getId()#&modelId=#prc.model.getId()#&categoryId=#prc.product.getCategory().getId()#" target="_blank" class="underline">
@@ -157,31 +162,46 @@
                                                             - <a href="/manager/products/#rc.id#/combinations" class="underline">
                                                                     Tutte le combinazioni &raquo;
                                                                 </a>
-                                                        </p>
-
-                                                    </div>
-
-                                                    <div class="col-sm-6">
-                                                    
-                                                        <div class="row">
-                                                        
-                                                            <div class="col-12  d-flex gap-2 justify-content-end align-items-center">
-
-                                                                <div id="product-simulate-loading"></div>
-                                                                
-                                                                <input class="form-control col-sm-2 text-end" style="width: 100px" id="product-simulate-quantity" value="1" type="number" min="1" />
-
-                                                                #button(
-                                                                    label="Simula prezzo",
-                                                                    bind  = "click:simulatePrice",
-                                                                    size  = "sm",
-                                                                    class = "ms-2"
-                                                                )#
-
-                                                            </div>
 
                                                         </div>
-                                                    
+
+                                                        <div class="col-sm-6">
+                                                        
+                                                            <div class="row">
+                                                            
+                                                                <div class="col-12 ">
+                                                                
+                                                                    <div class="d-flex gap-2 align-items-center">
+
+                                                                    
+                                                                        <input class="form-control col-sm-2 text-end" 
+                                                                            id="product-simulate-quantity" value="1" type="number" min="1" style="width: 100px">
+
+                                                                        #button(
+                                                                            label="Simula prezzo",
+                                                                            bind  = "click:simulatePrice",
+                                                                            size  = "sm",
+                                                                            class = "ms-2"
+                                                                        )#
+
+                                                                        <div id="product-simulate-loading"></div>
+
+                                                                    </div>
+                                                                    
+                                                                    <div>
+
+                                                                        <h3>Prezzi</h3>
+                                                                        <div data-bind="source: product.prices" data-template="price-row-tmpl">
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+                                                        
+                                                        </div>
+
                                                     </div>
 
                                                 </div>
@@ -190,81 +210,101 @@
 
                                         </div>
 
-                                    </div>
-
-                                    <div class="tab-pane p-2 fade" id="product-detail" role="tabpanel" aria-labelledby="product-detail-tab">
                                         
-                                        <div class="row">
+                                        <!---
+                                            Altri dati
+                                        --->
 
-                                            <div class="col-md-6 mb-3">
+                                        <div class="tab-pane p-2 fade" id="product-detail" role="tabpanel" aria-labelledby="product-detail-tab">
+                                            
+                                            <div class="row">
 
-                                                <form id="product-detail-form">
+                                                <div class="col-md-12 mb-3 col-lg-6">
 
-                                                    <div class="form-group pb-3 row align-items-center">
-                                                        <label class="col-3" for="qta">ID</label>
-                                                        <div class="d-flex col-9 align-items-center">
-                                                            <span class="col-5" data-bind="text: product.id" id="product-id">
-                                                            </span>
-                                                            <a href="##" data-bind="click:copyId" class="underline col-7">Copia</a>
+                                                    
+
+                                                        <div class="form-group pb-3 row align-items-center">
+                                                            <label class="col-3 text-end" for="qta">ID</label>
+                                                            <div class="d-flex col-9 align-items-center">
+                                                                <span data-bind="text: product.id" id="product-id" class="me-2">
+                                                                </span>
+                                                                <a href="##" data-bind="click:copyId" class="underline">Copia</a>
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="form-group pb-3 row align-items-center">
-                                                        <label class="col-3" for="qta">Status</label>
-                                                        <div class="col-9">
-                                                            <select type="text" class="form-control" name="statusId"
-                                                                required
-                                                                data-bind="source: statuses, value: product.status.id"
-                                                                data-value-field="id"
-                                                                data-text-field="name">
-                                                            </select>
+                                                        <div class="form-group pb-3 row align-items-center">
+                                                            <label class="col-3 text-end" for="qta">Status</label>
+                                                            <div class="col-9">
+                                                                <select type="text" class="form-control" name="statusId"
+                                                                    required
+                                                                    data-bind="source: statuses, value: product.status.id"
+                                                                    data-value-field="id"
+                                                                    data-text-field="name">
+                                                                </select>
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="form-group pb-3 row align-items-center">
-                                                        <label class="col-3" for="qta">Quantità minima</label>
-                                                        <div class="col-9">
-                                                            <input class="form-control col-9" name="minQuantity" id="minQuantity" 
-                                                                data-bind="value: product.minQuantity"
-                                                                >
+                                                        <div class="form-group pb-3 row align-items-center">
+                                                            <label class="col-3 text-end" for="qta">Quantità minima</label>
+                                                            <div class="col-9">
+                                                                <input class="form-control col-9" name="minQuantity" id="minQuantity" 
+                                                                    data-bind="value: product.minQuantity"
+                                                                    >
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="form-group pb-3 row align-items-center">
-                                                        <label class="col-3" for="qta">Quantità massima</label>
-                                                        <div class="col-9">
-                                                            <input class="form-control col-9" name="maxQuantity" id="maxQuantity" 
-                                                                data-bind="value: product.maxQuantity"
-                                                                >
+                                                        <div class="form-group pb-3 row align-items-center">
+                                                            <label class="col-3 text-end" for="qta">Quantità massima</label>
+                                                            <div class="col-9">
+                                                                <input class="form-control col-9" name="maxQuantity" id="maxQuantity" 
+                                                                    data-bind="value: product.maxQuantity"
+                                                                    >
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="form-group pb-3 row align-items-center">
-                                                        <label class="col-3" for="special">Speciale</label>
-                                                        <div class="col-9">
-                                                            <input class="me-4 ms-2" type="checkbox" name="special" id="special" 
-                                                                data-bind="checked: product.special">                                                        
-                                                        </div>
-                                                    </div>
+                                                        <div class="form-group pb-3 row align-items-center">
+                                                            <label class="col-3 text-end" for="special">Attributi da esportare</label>
+                                                            <div class="col-9">
 
-                                                    <div class="form-group pb-3 row align-items-center">
-                                                        <label class="col-3" for="special"></label>
-                                                        <div class="col-9 d-flex align-items-center">
-                                                            #saveButton( bind="click:save", size="sm" )#
-                                                            <div class="status errors-counter ms-2"></div>
+                                                                <select id="product-important-attributes" 
+                                                                    data-placeholder="-- Seleziona gli attributi"
+                                                                    data-role="multiselect" 
+                                                                    data-bind="source: attributesForSuggest, value: product.importantAttributes" 
+                                                                    data-value-field="id"
+                                                                    data-text-field="name">
+                                                                </select>
+
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                
-                                                </form>
+
+                                                        <div class="form-group pb-3 row align-items-center">
+                                                            <label class="col-3 text-end" for="special">Speciale</label>
+                                                            <div class="col-9">
+                                                                <input class="me-4 ms-2" type="checkbox" name="special" id="special" 
+                                                                    data-bind="checked: product.special">                                                        
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group pb-3 row align-items-center">
+                                                            <label class="col-3" for="special"></label>
+                                                            <div class="col-9 d-flex align-items-center">
+                                                                #saveButton( bind="click:save", size="sm" )#
+                                                                <div class="status errors-counter ms-2"></div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                    
+
+                                                </div>
 
                                             </div>
 
-                                        </div>
 
+                                        </div>
 
                                     </div>
 
-                                </div>
+                                </form>
                             
                             </div>
 
@@ -302,12 +342,6 @@
 
                             <div class="text-end col-6 mb-2">
 
-                                #updateButton(
-                                    bind  = "click:updateItems",
-                                    size  = "sm",
-                                    class = "ms-2"
-                                )#
-
                                 #deleteButton(
                                     bind  = "click:removeAttributes",
                                     size  = "sm",
@@ -338,7 +372,6 @@
                                         { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
                                         { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
                                         { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
-                                        { 'field':'', 'title':'Importante', width: '55px'},
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
@@ -369,6 +402,9 @@
 
     </div>
 
+    #template("jstemplate/attribute/attribute-suggest-list-row-tmpl")#
+    #template("jstemplate/price/price-row-tmpl")#
+    
     #view( "attribute/detail-modal" )#
     #view( "component/list-modal" )#
     #view( "file/list-modal" )#
