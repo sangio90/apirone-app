@@ -68,6 +68,8 @@
 				"status.color",
 				"minQuantity",
 				"maxQuantity",
+				"importantAttributes",
+				"prices",
 				"special$boolean",
 			]
 		},

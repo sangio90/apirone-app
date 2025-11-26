@@ -12,6 +12,14 @@
 				"values",
 				"categories"
 			]
+		},
+		suggest = {
+			defaultIncludes = [
+				"id",
+				"name",
+				"shortId",
+				"code",
+			]
 		}
 	}
 }

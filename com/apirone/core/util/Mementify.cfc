@@ -643,7 +643,7 @@ component {
 		variables.stats.cacheMisses.rules++;
 
 		var rules    = {};
-		var filePath = ExpandPath( variables.configDirectory & "/" & arguments.entityName & ".json.cfm" );
+		var filePath = ExpandPath( variables.configDirectory & "/" & arguments.entityName & "Memento.json.cfm" );
 
 		// Controlla se il file esiste
 		if ( FileExists( filePath ) ) {
@@ -670,7 +670,7 @@ component {
 	 * Questo assicura che un'entità derivata erediti le regole dal suo antenato
 	 * se non ha un proprio file di configurazione specifico.
 	 * * @targetObject L'istanza dell'oggetto da serializzare.
-	 * @return struct La configurazione Memento più specifica trovata (es. Product.json).
+	 * @return struct La configurazione Memento più specifica trovata (es. ProductMemento.json).
 	 */
 	private struct function $getRulesFromHierarchy( required Any targetObject ){
 		var metadata      = $getCachedMetadata( arguments.targetObject );
