@@ -45,7 +45,7 @@
 							<div class="col-12">
 								#grid(
 									id      = "product-combinations",
-									pageSizes = "false",
+									pageSizes = "[ '15', '30', '50' ]",
 									columns = "[
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'name', 'title':'Descrizione' },

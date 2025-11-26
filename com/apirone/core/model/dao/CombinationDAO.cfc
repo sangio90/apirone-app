@@ -18,14 +18,24 @@
 
 	<cffunction name="getByProductId" output="false">
 		<cfargument name="productId" type="String" required="true">
+		<cfargument name="limit" required="true" type="Numeric" default="15">
+		<cfargument name="offset" required="true" type="Numeric" default="0">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-			    combination_id::varchar
+			    combination_id::varchar,
+				COUNT(combination_id) OVER() AS total
 			FROM
     			combinations
 			WHERE
 	    		product_id = <cfqueryparam cfsqltype="varchar" value="#arguments.productId#">::uuid
+
+			<cfif arguments.limit GTE 0>
+				LIMIT
+					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
+				OFFSET
+					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
+			</cfif>
 		</cfquery>
 
 		<cfreturn local.q>
