@@ -24,11 +24,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	// TODO: use search( productId )
-	public com.apirone.core.model.bean.Result function getByProductId( required String productId ){
+	public com.apirone.core.model.bean.Result function getByProductId(){
 		var rows   = [];
 		var result = super.getResult();
 
-		var records = getDao().getByProductId( arguments.productId );
+		var records = getDao().getByProductId( argumentCollection = arguments[1] );
 
 		records.each( function( record ){
 			rows.add( get( record.combination_id ) );
@@ -36,7 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
-		result.setTotal( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
 		return result;
 	}
