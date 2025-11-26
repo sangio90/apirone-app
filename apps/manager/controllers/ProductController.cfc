@@ -65,15 +65,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			);
 			prc.finishes = super.fire( "finish.list", { lineId = prc.line.getId() } );
 
-			/*
-			for ( var model in prc.models ) {
-				dump( model.getId() )
-				dump( model.getCode() )
-			}
-			// dump( prc.models )
-			abort;
-			*/
-
 			prc.page[ "lineId" ] = prc.line.getId();
 
 			var products = super.fire( "product.list", { lineId = prc.line.getId() } );
@@ -94,6 +85,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "attributeStatusList" ] = memy.convertList( super.fire( "status.list", [ "attribute" ] ) );
 		prc.page[ "methods" ]             = memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );
 		prc.page[ "statuses" ]            = memy.convertList( super.fire( "status.list", [ "PRODUCT" ] ) );
+		// prc.page[ "attributes" ]          = memy.convertList( super.fire( "attribute.list" ), "suggest" );
 		prc.page[ "product" ]             = memy.convert( prc.product, "detail" );
 
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
