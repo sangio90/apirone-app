@@ -184,9 +184,12 @@ component extends="com.apirone.core.controller.AbsController" {
 					}
 				} )
 
-				var hash = super.fire( "productHash.createHash", { "quotationItem" = bean } );
-				bean.setHash( hash );
-				super.fire( "quotationItem.update", [ bean ] );
+				var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
+				if (!isNull( hash )) {
+					bean.setHash( hash );
+					bean.setId( thisId );
+					super.fire( "quotationItem.update", [ bean ] );
+				}
 				var message = completeMessage( messageId );
 			} catch ( any e ) {
 				var message = "Errore nella creazione/aggiornamento della riga di preventivo: #e.message#";
@@ -344,9 +347,12 @@ component extends="com.apirone.core.controller.AbsController" {
 					}
 				} )
 
-				var hash = super.fire( "productHash.createHash", { "quotationItem" = bean } );
-				bean.setHash( hash );
-				super.fire( "quotationItem.update", [ bean ] );
+				var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
+				if (!isNull( hash )) {
+					bean.setHash( hash );
+					bean.setId( thisId );
+					super.fire( "quotationItem.update", [ bean ] );
+				}
 				var message = completeMessage( messageId );
 			} catch ( any e ) {
 				var message = "Errore nella creazione/aggiornamento della riga di preventivo: #e.message#";
@@ -488,9 +494,12 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} )
 
-		var hash = super.fire( "productHash.createHash", { "quotationItem" = bean } );
-		bean.setHash( hash );
-		super.fire( "quotationItem.update", [ bean ] );
+		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
+		if (!isNull( hash )) {
+			bean.setHash( hash );
+			bean.setId( thisId );
+			super.fire( "quotationItem.update", [ bean ] );
+		}
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );

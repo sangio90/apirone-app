@@ -1,9 +1,10 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ProductHashDAO";
+	property name="QuotationItemService" inject="QuotationItemService";
 	property name="cacheScope" type="String" default="ProductHash.bean";
 
-	public com.apirone.core.model.bean.Role function get( required Numeric productHashId ){
+	public com.apirone.core.model.bean.ProductHash function get( required Numeric productHashId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.productHashId );
@@ -96,7 +97,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	public String function createHash( required quotationItem ){
+	public String function createHash( required quotationItemId ){
+		var quotationItem = getQuotationItemService().get( quotationItemId );
+
+		if (isNull(quotationItem)) {
+			return null;
+		}
 		var bean = null
 		var jsonData = prepareQuotationItemJson( quotationItem );
 		if (IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemSignage')) {
@@ -107,7 +113,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var bean = prepareBean(jsonData);
-		if (!IsNull( bean )) {
+
+		if (IsNull( bean.getId() )) {
 			create( bean );
 		}
 
@@ -180,7 +187,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			for (var fruitRow in fruitRows) {
 				fruitItems.append( fruitRow.getId() );
 			}
-			quotationItemFruits.append( { 'position' = Trim( row.getPosition() ), 'notes' = Trim( row.getNotes(), 'product' = row.getFruit().getId(), 'productItems' = fruitItems ) } );
+			quotationItemFruits.append( { 'position' = Trim( row.getPosition() ), 'notes' = Trim( row.getNotes() ), 'product' = row.getFruit().getId(), 'productItems' = fruitItems } );
 		}
 		jsonData['fruits'] = quotationItemFruits;
 
@@ -192,10 +199,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		
 		var hashValue = hash(jsonData, "MD5");
 
-		var existProdutHash = search( hash = hashValue ).getCount();
+		var existProdutHash = search( hash = hashValue );
 		
-		if ( existProdutHash > 0 ) {
-			return null;
+		if ( existProdutHash.getCount() > 0 ) {
+			return existProdutHash.getData()[1]
 		}
 		
 		var bean = super.bean( "ProductHash" );
