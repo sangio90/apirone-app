@@ -162,6 +162,9 @@
 
 			bean.setNotes( record.notes );
 			bean.setHash( record.hash );
+			if (Len(record.position)) {
+				bean.setPosition( record.position );
+			}
 
 			return bean;
 		}
