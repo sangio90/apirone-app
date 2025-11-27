@@ -184,6 +184,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					}
 				} )
 
+				var hash = super.fire( "productHash.createHash", { "quotationItem" = bean } );
+				bean.setHash( hash );
+				super.fire( "quotationItem.update", [ bean ] );
 				var message = completeMessage( messageId );
 			} catch ( any e ) {
 				var message = "Errore nella creazione/aggiornamento della riga di preventivo: #e.message#";
@@ -341,6 +344,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					}
 				} )
 
+				var hash = super.fire( "productHash.createHash", { "quotationItem" = bean } );
+				bean.setHash( hash );
+				super.fire( "quotationItem.update", [ bean ] );
 				var message = completeMessage( messageId );
 			} catch ( any e ) {
 				var message = "Errore nella creazione/aggiornamento della riga di preventivo: #e.message#";
@@ -469,19 +475,22 @@ component extends="com.apirone.core.controller.AbsController" {
 			if ( Len( selectedValue ) > 0 ) {
 				selectedValue = selectedValue[ 1 ];
 
-				var bean        = super.bean( "QuotationItemProductItem" );
+				var productItemBean        = super.bean( "QuotationItemProductItem" );
 				var productItem = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
 
-				bean.setQuotationItemId( thisId );
-				bean.setProductItem( productItem );
-				bean.setOrigin( productItem.getOrigin() );
-				bean.setLevel( productItemRow.level );
-				// bean.setId( thisId )
+				productItemBean.setQuotationItemId( thisId );
+				productItemBean.setProductItem( productItem );
+				productItemBean.setOrigin( productItem.getOrigin() );
+				productItemBean.setLevel( productItemRow.level );
+				// productItemBean.setId( thisId )
 
-				super.fire( "quotationItemProductItem.create", [ bean ] )
+				super.fire( "quotationItemProductItem.create", [ productItemBean ] )
 			}
 		} )
 
+		var hash = super.fire( "productHash.createHash", { "quotationItem" = bean } );
+		bean.setHash( hash );
+		super.fire( "quotationItem.update", [ bean ] );
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );

@@ -382,6 +382,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setImages( images )
 			}
 
+			var items = getProductItemService().list( productId = record.product_id );
+			if ( Len( items ) ) {
+				bean.setItems( items );
+			}
+
 			return bean;
 		}
 

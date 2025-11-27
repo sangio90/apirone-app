@@ -35,6 +35,7 @@
     "Product.bean": {},
     "ProductCategory.bean": {},
     "ProductCategoryType.bean": {},
+    "ProductHash.bean": {},
     "ProductItem.bean": {},
     "ProductionTime.bean": {},
     "Profile.bean": {},

@@ -161,6 +161,7 @@
 			}
 
 			bean.setNotes( record.notes );
+			bean.setHash( record.hash );
 
 			return bean;
 		}
