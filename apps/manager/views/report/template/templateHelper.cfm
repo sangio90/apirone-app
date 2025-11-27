@@ -197,8 +197,6 @@
 		body, td, th, span, div, p { font-family: 'Poppins'; font-size: 13px }
 		td {
 			border: 1px solid black;
-			padding-left: .3em;
-			padding-right: .3em;
 		}
 		table {
 			border-collapse: collapse;
@@ -223,6 +221,11 @@
 			vertical-align: top;
 			box-sizing: border-box;
 			line-height: 10px;
+		}
+		.hiddenTable td img {
+			max-width: 100%;   /* mai oltre la larghezza della cella */
+			height: auto;      /* mantiene il rapporto */
+			display: block;    /* evita spazi extra dai baseline */
 		}
 		/* fine */
 

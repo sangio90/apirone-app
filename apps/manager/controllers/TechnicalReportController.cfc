@@ -12,6 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		var templatePath = "report/template/print-quotation-#rc.report#";
+		templatePath = templatePath & (printParams.grouped ? '-grouped' : '')
 
 		prc.title = "Preventivo";
 
@@ -40,6 +41,16 @@ component extends="com.apirone.core.controller.AbsController" {
 			case 'proforma':
 				quoteObj = printClassic( quoteObj, printParams );
 				break;
+				case 'technical':
+				if (printParams.grouped) {
+					quoteObj = printClassic( quoteObj, printParams );
+				} else {
+					quoteObj = printZone( quoteObj, printParams );
+				}
+				break;
+			case 'internal':
+				quoteObj = printZone( quoteObj, printParams );
+				break;
 			default:
 				return;
 		}
@@ -59,7 +70,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		quoteObj.customerShippingAddress = customerShippingAddress;
 
-		var saveAsName = "print-quotation-#printParams.report#_#DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
+		var saveAsName = "print-quotation-#printParams.report##printParams.grouped ? '_grouped_' : '_'##DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
 
 		var params = {
 			title   = "Preventivo",
@@ -72,7 +83,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				pageType          = "A4",
 				overwrite         = true,
 				fontEmbed         = true,
-				saveAsName        = "#printParams.report#_#DateTimeFormat( Now(), "yyyyMMdd-HHnnss" )#.pdf"
+				saveAsName        = saveAsName
 			}
 		}
 
@@ -138,7 +149,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotation = quoteObj.quotation;
 		var idPreventivo = quotation.getId();
 		var items = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo ]);
-		quoteObj.items = items.sort(sortByCategory);
+		var items = items.sort(sortByCategory);
+		if (printParams.grouped) {
+			items = groupItems(items);
+		}
+		quoteObj.items = items;
 
 		return quoteObj;
 	}
@@ -150,5 +165,34 @@ component extends="com.apirone.core.controller.AbsController" {
 		if (idA LT idB) return -1;
 		if (idA GT idB) return 1;
 		return 0;
+	}
+
+	function groupItems( quotationItems ) {
+		groupedItems = {};
+
+		for ( quotationItem in quotationItems ) {
+			hashKey = quotationItem.getHash();
+			if ( !structKeyExists(groupedItems, hashKey) ) {
+				groupedItems[hashKey] = {
+					'item' = quotationItem,
+					'quantity' = quotationItem.getQuantity(),
+					'zones' = {}
+				};
+			} else {
+				groupedItems[hashKey].quantity += quotationItem.getQuantity();
+			}
+			var zoneName = quotationItem.getQuotationZone().getName();
+			var position = quotationItem.getPosition();
+
+			if ( !structKeyExists(groupedItems[hashKey].zones, zoneName) ) {
+				groupedItems[hashKey].zones[ zoneName ] = [];
+			}
+
+			if ( !arrayContains(groupedItems[hashKey].zones[zoneName], position) ) {
+				arrayAppend(groupedItems[hashKey].zones[zoneName], position);
+			}
+		}
+
+		return groupedItems;
 	}
 }
