@@ -113,8 +113,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var bean = prepareBean(jsonData);
-
-		if (IsNull( bean.getId() )) {
+		if (IsNull( bean.getId() ) or Trim(bean.getId()) == '') {
 			create( bean );
 		}
 
