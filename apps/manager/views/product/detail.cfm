@@ -221,8 +221,6 @@
 
                                                 <div class="col-md-12 mb-3 col-lg-6">
 
-                                                    
-
                                                         <div class="form-group pb-3 row align-items-center">
                                                             <label class="col-3 text-end" for="qta">ID</label>
                                                             <div class="d-flex col-9 align-items-center">
@@ -273,6 +271,14 @@
                                                                     data-value-field="id"
                                                                     data-text-field="name">
                                                                 </select>
+                                                                
+                                                                <script type="text/template" id="product-attribute-suggest-list-row-xx">
+                                                                    <div>
+                                                                        <span data-bind="text: name"></span>
+                                                                    </div>
+                                                                </script>
+
+                                                                <div data-bind="source:  product.importantAttributes" data-template="product-attribute-suggest-list-row-xx"></div>
 
                                                             </div>
                                                         </div>

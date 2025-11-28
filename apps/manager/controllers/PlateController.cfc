@@ -36,7 +36,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	){
 		prc.title = "Designer placche";
 
-		prc.jsFiles.add("app-plate");
+		prc.jsFiles.add("stan/app-plate");
+		prc.cssFiles.add("stan-plate");
 
 		event.setView( "plate/designer" );
 	}
@@ -48,7 +49,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	){
 		prc.title = "Mappa placche";
 
-		prc.jsFiles.add("app-plate");
+		prc.jsFiles.add("stan/app-plate");
+		prc.cssFiles.add("stan/app-plate");
 
 		event.setView( "plate/map" );
 	}

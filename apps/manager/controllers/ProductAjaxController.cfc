@@ -386,8 +386,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 		var memy   = super.getMementify();
 
-		params['productId'] = rc.id
-		var rows = super.service( "Combination" ).getByProductId( params );
+		params["productId"] = rc.id
+		var rows = super.service( "Combination" ).search( params );
 
 		for ( var row in rows.getData() ) {
 			var obj = memy.convert( row );

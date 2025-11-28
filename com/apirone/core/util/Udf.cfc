@@ -94,4 +94,70 @@
 
 		<cfreturn q.unique_id>
 	</cffunction>
+
+	<cfscript>
+	/**
+	 * Elabora un array usando array.each() in parallelo, mantenendo l'ordine iniziale.
+	 * Rispettando la struttura della callback: function(item, index) { return result; }
+	 * * @param sourceArray L'array di input.
+	 * @param callbackFunction La funzione da applicare a ogni elemento, deve restituire il risultato.
+	 * @return Un nuovo array con i risultati elaborati e nell'ordine corretto.
+	 */
+	public Array function eachParallelAndReorder(
+		required Array sourceArray,
+		required Function callbackFunction,
+		required Numeric maxThreads = 4
+	) {
+
+		// 1. Array di preparazione: crea una struttura {index: N, item: X} per ogni elemento.
+		// Questo è l'array su cui eseguiremo l'iterazione parallela.
+
+		var callback = arguments.callbackFunction; // Per evitare problemi di ambito nelle closure.
+
+		var indexedItems = arguments.sourceArray.map(function(item, index) {
+			return {
+				index: arguments.index, // L'indice di posizione (1, 2, 3...)
+				item: arguments.item    // Il valore/oggetto originale
+			};
+		});
+		
+		// 2. Esegui l'elaborazione in parallelo usando array.each() sull'array indicizzato.
+		// L'ordine di completamento è casuale.
+		indexedItems.each(
+			function(indexedStruct) {
+				// Qui adattiamo la chiamata per la tua callback esterna (arguments.callbackFunction).
+				// La tua callback riceve (item, index) e restituisce il risultato elaborato.
+				var processedResult = callback(
+					indexedStruct.item, // item
+					indexedStruct.index // index
+				);
+				
+				// Salviamo il risultato elaborato all'interno della struttura indicizzata.
+				indexedStruct.result = processedResult;
+			}, 
+			true, // parallel=true
+			arguments.maxThreads
+		);
+		
+		// 3. Riordina l'array di struct in base all'indice di posizione ('index').
+		// Questo garantisce che l'ordine originale sia ripristinato.
+		indexedItems.sort(function(a, b){
+			if (a.index < b.index) {
+				return -1;
+			} else if (a.index > b.index) {
+				return 1;
+			}
+			return 0;
+		});
+		
+		// 4. Estrai i soli risultati elaborati nell'ordine corretto.
+		var resultArray = indexedItems.map(function(item) {
+			return item.result;
+		});
+		
+		return resultArray;
+	}			
+	</cfscript>
+
+
 </cfcomponent>

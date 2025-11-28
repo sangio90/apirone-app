@@ -49,6 +49,7 @@
 		var total  = 0;
 		var cost   = 0;
 		var markup = 0;
+		var method = 0;
 		var costs  = [];
 
 		var itemsComponents = {};
@@ -64,13 +65,15 @@
 
 		var name = "#product.getDescription()# (#product.getCode()#)";
 
+		var isFixedPrice = ( price.getMethod().getId() == "F" );
+		var markup = price?.getAmount() ?: 0;
+
 		appendLog(
-			message   = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#.",
+			message   = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#. Prezzo: fisso: #isFixedPrice#, valore: #markup#",
 			productId = product.getSerial()
 		);
 
-		var markup = price?.getAmount() ?: 0;
-
+		
 		/*
 			fixed cost
 		*/
@@ -199,17 +202,32 @@
 			final price
 		*/
 
-		var totalCostItems = calculateTotalCostItems()
+		var totalCostItems = calculateTotalCostItems();
 
 
 		// appendLog( message = " ;Totale costi prodotto: #formatExtended( costProduct )#" );
 
-		var finalPrice = ( ( bundleCost + productCost ) * markup ) + totalCostItems + unitFixedCost;
+		if( isFixedPrice ) {
 
-		appendLog(
-			message    = "Prezzo finale. ( Bundle: #bundleCost# + prodotto base: #productCost# ) * markup: #markup# ) + prezzo items: #calculateTotalCostItems()# + costo fisso: #unitFixedCost#;Prezzo finale: #formatExtended( finalPrice )#",
-			lineTypeId = "H"
-		);
+			var finalPrice =  ( bundleCost + productCost + totalCostItems + unitFixedCost ) + markup;
+
+			appendLog(
+				message    = "Prezzo finale fisso. ( Bundle: #bundleCost# + prodotto base: #productCost# + prezzo items: #totalCostItems# + costo fisso: #unitFixedCost# ) + markup fisso: #markup#;Prezzo finale: #formatExtended( finalPrice )#",
+				lineTypeId = "H"
+			);
+
+		} else {
+
+			var finalPrice = ( ( bundleCost + productCost ) * markup ) + totalCostItems + unitFixedCost;
+
+			appendLog(
+				message    = "Prezzo finale. ( Bundle: #bundleCost# + prodotto base: #productCost# ) * markup: #markup# ) + prezzo items: #totalCostItems# + costo fisso: #unitFixedCost#;Prezzo finale: #formatExtended( finalPrice )#",
+				lineTypeId = "H"
+			);
+
+		}
+
+
 
 		var output = {
 			values = {
@@ -219,7 +237,7 @@
 				"totalCostItems" = totalCostItems,
 				"unitFixedCost"  = unitFixedCost,
 				"finalPrice"     = finalPrice,
-				"markup"         = markup
+				"priceType"      = price
 			},
 			"logFile" = variables.logConfig.filePath
 		};

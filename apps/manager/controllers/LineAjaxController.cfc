@@ -53,7 +53,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function clone( event, rc, prc ){
-		setting requesttimeout=240;
+		setting requesttimeout=600;
 
 		var data = DeserializeJSON( GetHTTPRequestData().content );
 

@@ -24,11 +24,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	// TODO: use search( productId )
-	public com.apirone.core.model.bean.Result function getByProductId(){
+	public com.apirone.core.model.bean.Result function search(
+		String productId,
+		required Numeric limit    = 15,
+		required Numeric offset   = 0,
+		required Array orderBy    = [ { field = "combination.id" } ]
+
+	){
 		var rows   = [];
 		var result = super.getResult();
 
-		var records = getDao().getByProductId( argumentCollection = arguments[1] );
+		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
 			rows.add( get( record.combination_id ) );

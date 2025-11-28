@@ -67,7 +67,8 @@ component {
 		bundleName    = "ehcache.extension",
 		bundleVersion = "2.10.0.31",
 		storage       = false,
-		default       = "object"
+		default       = "object",
+		custom        = { maxElementsInMemory: 2000 }
 	};
 
 	this.cache.object = "DefaultCache";
@@ -83,11 +84,7 @@ component {
 	public Void function clearContainer(){
 		if ( server.keyExists( "wireBox-apirone" ) ) {
 			server[ "wireBox-apirone" ].clearSingletons();
-			cffile(
-				action = "APPEND",
-				file   = "#ExpandPath( "/debug.log" )#",
-				output = "#Now()# - clearContainer"
-			);
+			FileAppend( ExpandPath( "/debug.log" ), "#Now()# - clearContainer" );
 		}
 	}
 

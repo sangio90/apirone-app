@@ -79,7 +79,6 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getDirectory()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.font.getHeightWidthRatio()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.font.getFamily()#">
 				<cfif !IsNull( arguments.font.getFontFamily() )>
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.font.getFontFamily().getId()#">
 				<cfelse>

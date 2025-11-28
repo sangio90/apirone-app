@@ -104,72 +104,46 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productService   = getProductService();
 		var componentService = getComponentService();
 
+
+		var toLineId = arguments.toLineId;
+
+		productService.deleteAllByParams( lineId = toLineId, categoryId = arguments.categoryId );
+
+		var products = productService.list( lineId = arguments.fromLineId, categoryId = arguments.categoryId );
+
+		cffile( action="APPEND" file="#ExpandPath('{web-root-directory}/debug.log')#" output="#now()# clone: productCount: #products.len()#");
+
+		super.eachParallelAndReorder(
+			sourceArray      = products,
+			callbackFunction = function( product, index ) {
+				var newProduct = Duplicate( product );
+				newProduct.getLine().setId( toLineId );
+
+				var newId = productService.create( newProduct );
+
+				cffile( action="APPEND" file="#ExpandPath('{web-root-directory}/debug.log')#" output="#now()# clone: each: #product.getId()#");
+
+				// duplicate components of product
+				var productComponents = componentService.list( productId = product.getId() );
+
+				for ( var itemProductComponent in productComponents ) {
+					var newProductComponent = Duplicate( itemProductComponent );
+
+					newProductComponent.setId( "" );
+					newProductComponent.getProduct().setId( newId );
+
+					componentService.create( newProductComponent );
+				}
+
+				// clone all productItems and components
+				productService.cloneTree( fromProductId = product.getId(), toProductId = newId, deleteCache = false );
+
+				return true;
+			},
+			maxThreads = 1
+		);
+
 		/*
-		function createProductItem(
-			required String productId,
-			required Struct productItem,
-			required Numeric level = 1
-		){
-			arguments.productItem.setProductId( arguments.productId );
-
-			var newProductItemId = getProductItemService().create( arguments.productItem );
-
-			// **
-			// duplicate components of productItem
-			// **
-
-			var components = componentService.list(
-				productItemId                  = arguments.productItem.getId(),
-				includeBaseAttributeComponents = true
-			);
-
-			// TODO: move this logic tu ComponentService
-			// We have in ComponentAjaxController too
-			for ( var thisComponent in components ) {
-				getLogger().debug( "Override [#thisComponent.getId()#] typeId [#thisComponent.getTypeId()#]" );
-
-				// **
-				// override components
-				// **
-
-				if ( thisComponent.getTypeId() == "base" ) {
-					var overrideBean = super.bean( "ComponentOverride" );
-
-					overrideBean.setId( "" );
-					overrideBean.setDeleted( thisComponent.getOverride().getDeleted() );
-					overrideBean.setQuantity( thisComponent.getOverride().getQuantity() );
-					overrideBean.setComponentId( thisComponent.getId() );
-					overrideBean.setProductItemId( newProductItemId );
-
-					getComponentOverrideService().create( overrideBean );
-				} else {
-					var newComponent = Duplicate( thisComponent );
-
-					newComponent.setId( "" );
-					newComponent.getProductItem().setId( newProductItemId );
-
-					componentService.create( newComponent );
-				}
-			}
-
-			if ( arguments.productItem.getChildren().len() ) {
-				for ( var child in arguments.productItem.getChildren() ) {
-					child.getOrigin().setId( newProductItemId );
-
-					createProductItem(
-						productItem = child,
-						level       = arguments.level + 1,
-						productId   = arguments.productId
-					);
-				}
-			}
-		}
-		*/
-
-		productService.deleteAllByParams( lineId = toLineId, categoryId = categoryId );
-
-		var products = productService.list( lineId = fromLineId, categoryId = categoryId );
-
 		for ( var product in products ) {
 			var newProduct = Duplicate( product );
 			newProduct.getLine().setId( arguments.toLineId );
@@ -191,19 +165,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// clone all productItems and components
 			getProductService().cloneTree( fromProductId = product.getId(), toProductId = newId );
 
-			/*
-			// duplicate productItems
-			var productItems = getProductItemService().getTree( productId = product.getId() );
-
-			for ( var productItem in productItems ) {
-				createProductItem(
-					productItem = productItem,
-					level       = 1,
-					productId   = newId
-				);
-			}
-			*/
 		}
+		*/
 
 		getCacheManager().removeAll();
 

@@ -30,7 +30,6 @@ AP.product.items = ( function() {
         items: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items" } ),
         orderingItems: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items/order" } ),
         orderingAttributes: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order" } ),
-        // attributesForSuggest: NM.kendo.dataSource( { url: "/manager/ajax/attributes" } ),
         attributesList: undefined,
     };
 
@@ -104,12 +103,9 @@ AP.product.items = ( function() {
                     url: "/manager/ajax/attributes",
                     data: {
                         str: function() {
-                            var suggest = $( "#product-important-attributes" );
-                            var autocomplete = suggest.data( "kendoMultiSelect" );
-                            var thisValue = suggest.data( "kendoMultiSelect" ).input.val();
-
-                            console.log( "data:str", autocomplete );
-                            console.log( "data:str:val", thisValue );
+                            var multi = $( "#product-important-attributes" );
+                            // var autocomplete = suggest.data( "kendoMultiSelect" );
+                            var thisValue = multi.data( "kendoMultiSelect" ).input.val();
 
                             if ( thisValue.includes( "--" ) ) {
                                 return "";
@@ -120,8 +116,6 @@ AP.product.items = ( function() {
                     },
                 },
                 parameterMap: function( data, type ) {
-                    console.log( "parameterMap:data", data );
-                    console.log( "parameterMap:type", type );
                     if ( type === "read" ) {
                         return { "str": data.str() };
                     }
@@ -360,8 +354,6 @@ AP.product.items = ( function() {
                     callback: {
                         done: function( xhr ) {
                             AP.widget.notify( "success", xhr.data.message.text );
-
-                            // viewModel.items.read();
                             refreshDatasources();
                         },
                     },

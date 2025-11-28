@@ -195,7 +195,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public Struct function cloneTree( required String fromProductId, required String toProductId ){
+	public Struct function cloneTree( required String fromProductId, required String toProductId, required Boolean deleteCache = true ){
 		if ( fromProductId == toProductId ) {
 			Throw(
 				type    = "ApirOne.errors.productService.InvalidArgument",
@@ -285,8 +285,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		getCacheManager().removeAll();
-
+		if( arguments.deleteCache ) {
+			getCacheManager().removeAll();
+		}
 		super.logEvent(
 			event   = "product.CLONED_TREE",
 			message = "End clone tree of product [#arguments.fromProductId#] to [#arguments.toProductId#]",

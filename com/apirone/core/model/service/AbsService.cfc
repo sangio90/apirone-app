@@ -94,6 +94,20 @@ component output="false" accessors="true" {
 		return util.prettyString( arguments.str );
 	}
 
+	public Array function eachParallelAndReorder(
+			required array sourceArray,
+			required function callbackFunction 
+		){
+			
+		var udf = new com.apirone.core.util.Udf();
+
+		var result = udf.eachParallelAndReorder( 
+			argumentCollection = arguments 
+		);
+	
+		return result;
+	}	
+
 	private Array function getAttributesBeanByIds( required String attributes ){
 
 		var result     = [];

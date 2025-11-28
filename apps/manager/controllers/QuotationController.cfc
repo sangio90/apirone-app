@@ -65,7 +65,7 @@
 		page[ "languages" ]      = memy.convertList( super.fire( "lang.list" ) );
 		page[ "paymentMethods" ] = memy.convertList( super.fire( "paymentMethod.list" ) );
 		page[ "currencies" ]     = memy.convertList( super.fire( "currency.list" ) );
-		// page[ "frames" ]         = memy.convertList( super.fire( "frame.list" ), "minimal" );
+		page[ "frames" ]         = memy.convertList( super.fire( "frame.list" ), "minimal" );
 		page[ "vatCodes" ]       = memy.convertList( super.fire( "vatCode.list" ) );
 
 		return { "page" = page }
