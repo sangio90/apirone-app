@@ -110,19 +110,19 @@
 					<cfset arrayAppend(itemsArray, args.data.items[hashKey])>
 				</cfloop>
 				<cfloop array="#itemsArray#" index="oggetto">
-					<cfset zones = oggetto.zones>
-					<cfset quantity = oggetto.quantity>
-					<cfset oggetto = oggetto.item>
-					<div class="item" style="page-break-inside: avoid;">
+					<div class="item" style="page-break-inside: avoid !important;">
+						<cfset zones = oggetto.zones>
+						<cfset quantity = oggetto.quantity>
+						<cfset oggetto = oggetto.item>
 						<table style="border-collapse: collapse; width: 100%;">
 							<tr>
-								<td style="width: 11cm; border-right: 0; padding-left: 0.1in;">Articolo</td>
-								<td style="width: 3cm; border-left: 0; border-right: 0; text-align: right; padding-right: 0.1in;">Qty.</td>
+								<td style="width: 12cm; border-right: 0; padding-left: 0.1in;">Articolo</td>
+								<td style="width: 2cm; border-left: 0; border-right: 0; text-align: right; padding-right: 0.1in;">Qty.</td>
 								<td style="width: 3cm; border-left: 0; border-right: 0; text-align: right; padding-right: 0.1in;">Prezzo</td>
 								<td style="width: 3cm; border-left: 0; text-align: right; padding-right: 0.1in;">Totale</td>
 							</tr>
 							<tr>
-								<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; width: 11cm !important;">
+								<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; width: 12cm !important;">
 									<table class="hiddenTable">
 										<tr>
 
@@ -151,7 +151,7 @@
 											</td>
 										</tr>
 										<tr>
-											<td style="vertical-align: bottom; padding-bottom: 5px;">
+											<td style="vertical-align: bottom; padding: 3pt;">
 												<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 													<div style="font-size: 8pt; line-height: 15px;">
 														<b>Lista Frutti: </b>
@@ -161,15 +161,14 @@
 																<cfloop from="1" to="#fruitsCount#" index="fi">
 																	<cfset fruit = oggetto.getFruits()[fi]>
 																	<li style="padding: 0">
-																		Cod. 
+																		<b>P.#fruit.getPosition()#</b> : Cod. 
 																		<span style="text-transform: lowercase; font-size: 8pt;">
 																			#fruit.getFruit().getCode()#
 																			<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
 																				<span style="font-size: 8pt; text-transform: lowecase">
-																					#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()# 
-																					&nbsp;</span>
+																					#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#
+																				</span>
 																			</cfloop>
-																			<cfif fi LT fruitsCount>, </cfif>
 																			<cfif !isNull(fruit.getNotes()) && args.params.notes>
 																				<span style="font-size: 8pt; margin-top: 4pt;">
 																					<i>( Note: #fruit.getNotes()# )</i>
@@ -183,7 +182,7 @@
 													</div>
 												</cfif>
 												<cfif structCount(zones) gt 0>
-													<div style="font-size: 8pt; line-height: 15px; margin-top: 0.1in;">
+													<div style="font-size: 8pt; line-height: 15px;">
 														<b>Posizioni: </b>
 														<cfloop collection="#zones#" item="zoneName">
 															<div style="font-size: 8pt; line-height: 15px">

@@ -1,5 +1,5 @@
 ﻿<cfoutput>
-	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="2.6" marginLeft="0.1" marginRight="0.1">
+	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
 		<div>
 			<cfdocumentitem type="header">

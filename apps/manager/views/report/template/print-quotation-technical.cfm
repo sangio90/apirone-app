@@ -1,5 +1,5 @@
 ﻿<cfoutput>
-	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="2.6" marginLeft="0.1" marginRight="0.1">
+	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
 		<div>
 			<cfdocumentitem type="header">
@@ -80,7 +80,7 @@
 											</cfif>
 										</cfif>
 									</td>
-									<td style="vertical-align: top; padding-top: 5pt; border-left: 0; padding-bottom: 5pt; padding-left: 5pt; width: 9cm !important;">
+									<td style="vertical-align: top; padding: 5pt; border-left: 0; width: 9cm !important;">
 										<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 											<div style="font-size: 8pt; line-height: 15px;">
 												<b>Lista Frutti: </b>
@@ -90,15 +90,13 @@
 														<cfloop from="1" to="#fruitsCount#" index="fi">
 															<cfset fruit = oggetto.getFruits()[fi]>
 															<li style="padding: 0">
-																Cod. 
+																<b>P.#fruit.getPosition()#</b> : Cod. 
 																<span style="text-transform: lowercase; font-size: 8pt;">
 																	#fruit.getFruit().getCode()#
 																	<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
 																		<span style="font-size: 8pt; text-transform: lowecase">
-																			#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()# 
-																			&nbsp;</span>
+																			#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#</span>
 																	</cfloop>
-																	<cfif fi LT fruitsCount>, </cfif>
 																	<cfif !isNull(fruit.getNotes()) && args.params.notes>
 																		<span style="font-size: 8pt; margin-top: 4pt;">
 																			<i>( Note: #fruit.getNotes()# )</i>
