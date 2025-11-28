@@ -5,7 +5,7 @@
 
 <cffunction name="getPrintFullHeader">
 	<cfoutput>
-		<div style="width: 8cm">
+		<div style="width: 10cm">
 			<br>
 			<img src='https://apir.co.uk/wp-content/uploads/2024/10/APIR_since1918.png' alt='Apir' style='6cm; height: 40px;'>
 			<br>
@@ -74,6 +74,7 @@
 
 <cffunction name="getFinalForm">
 	<cfoutput>
+		<div style="page-break-inside: avoid !important;">
 			<div class="top-note">L'ordine si intende confermato solo dopo il ricevimento dello stesso timbrato e firmato per accettazione, dell'eventuale conferma bozze e del pagamento anticipato ove previsto</div>
 
 			<div class="bank" aria-label="Coordinate bancarie">
@@ -180,6 +181,7 @@
 					</tr>
 				</table>
 			</div>
+		</div>
 	</cfoutput>
 </cffunction>
 
@@ -231,9 +233,7 @@
 
 		/* form finale con iban banca e firme */
 		.top-note {
-			margin-top: 1.5in;
 			font-size: 10px;
-			page-break-before: always;
 		}
 		.bank {
 			width: 4.5in;

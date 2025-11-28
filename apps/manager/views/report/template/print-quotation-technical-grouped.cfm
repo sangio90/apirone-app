@@ -6,25 +6,11 @@
 				<table style="border: 0; width: 100%; margin-left: 0.1in; margin-right: 0.1in;">
 					<tbody>
 						<tr style="border: 0; width: 100%;">
-							<td style="border: 0; width: 50%;">
-								#getPrintFullHeader()#
+							<td style="border: 0; width: 15%;">
+								<img src='https://apir.co.uk/wp-content/uploads/2024/10/APIR_since1918.png' alt='Apir' style='6cm; height: 40px;'>
 							</td>
-							<td style="border: 0; width: 50%">
-								<h2>Preventivo N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
-								<table style="width: 95%; border: 0;">
-									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Data</td>
-										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 0.05in;">#DateFormat( args.data.quotation.getQuotationDate(), "dd/mm/yyyy" )#</td>
-									</tr>
-									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Validità offerta</td>
-										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 0.05in;">#DateFormat( args.data.quotation.getValidityDate(), "dd/mm/yyyy" )#</td>
-									</tr>
-									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Tipo Pagamento</td>
-										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 0.05in;">#args.data.quotation.getDecodedPaymentMethod()#</td>
-									</tr>
-								</table>
+							<td style="border: 0; text-align: right; padding-right: 60px;">
+								<h2>Stampa Tecnica: Offerta N° #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
 							</td>
 						</tr>
 					</tbody>
@@ -35,69 +21,6 @@
 			<cfdocumentitem type="footer">
 				#getPrintFooter()#
 			</cfdocumentitem>
-
-			<cfoutput>
-				<div>
-					<table class="cstmtable" style="margin-top: .1in; width: 100%;">
-						<tr>
-							<td style="width: 50%;"></td>
-							<td style="width: 50%; padding-left: 0.05in;"><strong>Indirizzo Spedizione</strong></td>
-						</tr>
-						<tr>
-							<td>
-								<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Ragione Sociale: </td>
-										<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getCustomer().getCompany()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Telefono: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getPhoneCell()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Email: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getContactPersonEmail()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Partita IVA: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getVatNumber()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
-										<td style="border: 0">
-											#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
-											#args.data.quotation.getCustomer().getCity()#<br>
-											#args.data.quotation.getCustomer().getState()#<br>
-											#args.data.quotation.getCustomer().getCountry()#
-										</td>
-									</tr>
-								</table>
-							</td>
-							<td>
-								<cfif structKeyExists(args.data, "customerShippingAddress")>
-									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
-										<tr style="border: 0">
-											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Nome: </td>
-											<td style="border: 0; width: 75%">#args.data.quotation.getCustomer().getCompany()#</td>
-										</tr>
-										<tr style="border: 0">
-											<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
-											<td style="border: 0">
-												#args.data.customerShippingAddress['name']#<br>
-												#args.data.customerShippingAddress['via']# #args.data.customerShippingAddress['cap']#<br>
-												#args.data.customerShippingAddress['provincia']#<br>
-												#args.data.customerShippingAddress['paese']#<br>
-											</td>
-										</tr>
-									</table>
-								</cfif>
-							</td>
-						</tr>
-					</table>
-
-					<cfset blundlesPrinted = {}>
-				</div>
-			</cfoutput>
 
 			<cfoutput>
 				<cfset itemsArray = []>

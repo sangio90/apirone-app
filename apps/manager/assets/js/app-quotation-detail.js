@@ -807,7 +807,8 @@ AP.quotation.printModal = ( function() {
             if ( report == "classic" ) {
                 $( "#imagesDiv" ).css( "display", "block" );
                 $( "#imagesCheckbox" )[0].checked = true;
-                $( "#groupedDiv" ).css( "display", "block" );
+                $( "#groupedCheckbox" )[0].checked = false;
+                $( "#groupedDiv" ).css( "display", "none" );
                 $( "#notesDiv" ).css( "display", "block" );
                 $( "#discountsDiv" ).css( "display", "block" );
             }
@@ -820,7 +821,8 @@ AP.quotation.printModal = ( function() {
             }
             if ( report == "zone" ) {
                 $( "#imagesCheckbox" )[0].checked = true;
-                $( "#groupedDiv" ).css( "display", "block" );
+                $( "#groupedCheckbox" )[0].checked = false;
+                $( "#groupedDiv" ).css( "display", "none" );
                 $( "#notesDiv" ).css( "display", "block" );
                 $( "#notesCheckbox" )[0].checked = true;
                 $( "#discountsDiv" ).css( "display", "block" );

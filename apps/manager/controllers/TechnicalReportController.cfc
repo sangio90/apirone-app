@@ -41,7 +41,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			case 'proforma':
 				quoteObj = printClassic( quoteObj, printParams );
 				break;
-				case 'technical':
+			case 'technical':
 				if (printParams.grouped) {
 					quoteObj = printClassic( quoteObj, printParams );
 				} else {
@@ -49,7 +49,11 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 				break;
 			case 'internal':
-				quoteObj = printZone( quoteObj, printParams );
+				if (printParams.grouped) {
+					quoteObj = printClassic( quoteObj, printParams );
+				} else {
+					quoteObj = printZone( quoteObj, printParams );
+				}
 				break;
 			default:
 				return;
@@ -150,9 +154,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var idPreventivo = quotation.getId();
 		var items = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo ]);
 		var items = items.sort(sortByCategory);
-		if (printParams.grouped) {
-			items = groupItems(items);
-		}
+		items = groupItems(items);
 		quoteObj.items = items;
 
 		return quoteObj;
