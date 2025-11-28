@@ -27,6 +27,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
 	property name="componentService" inject="ComponentService";
+	property name="CrmApiService" inject="CrmApiService";
 	property name="progressivoComponenti" type="Numeric";
 
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
@@ -116,7 +117,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
 		var success = false;
 		transaction {
+			var quotationData = {};
+			if (quotationItems.len() > 0) {
+				var quotation = quotationItems[1].getQuotation();
+				quotationData = prepareExportData(quotation);
+			}
 			if ( arguments.quotationItems.len() > 0 ) {
+				var allProductItems = [];
+				var index = 1;
 				for ( var quotationItem in arguments.quotationItems ) {
 					setProgressivoComponenti( 0 )
 					var code    = "";
@@ -288,6 +296,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						}
 
 						success = getDao().export( data );
+
+						quotationData['CPROWNUM'] = index;
+						quotationData['CPROWORD'] = index * 10;
+						quotationData['MMCODART'] = data['ARCODART'];
+						quotationData['MMCODVAR'] = data['VARCOD'];
+						quotationData['MMCODCOL'] = data['CLCODICE'];
+						quotationData['ARUNMIS1'] = 'PZ';
+						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
+						quotationData['MMVALUNI'] = quotationItem.getPrice();
+						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
+						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
+						quotationData['MMEVASIO'] = '';
+						quotationData['MM_STATO'] = 'N';
+
+						allProductItems.append(quotationData);
 					}
 
 					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
@@ -304,7 +327,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLCODICE" = "000000",
 							"CLANNOTA" = nota
 						}
+
 						success = getDao().export( data );
+
+						quotationData['CPROWNUM'] = index;
+						quotationData['CPROWORD'] = index * 10;
+						quotationData['MMCODART'] = data['ARCODART'];
+						quotationData['MMCODVAR'] = data['VARCOD'];
+						quotationData['MMCODCOL'] = data['CLCODICE'];
+						quotationData['ARUNMIS1'] = 'PZ';
+						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
+						quotationData['MMVALUNI'] = quotationItem.getPrice();
+						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
+						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
+						quotationData['MMEVASIO'] = quotation.getValidityDate();
+						quotationData['MM_STATO'] = 'N';
+
+						allProductItems.append(quotationData);
 
 						var existingCodes = exportCodeSvc.list(
 							str = product.getCode() & RepeatString( "0", 25 - Len( product.getCode() ) )
@@ -325,10 +364,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						productComponent.DSCODCOL  = data.CLCODICE;
 						success                    = getDao().exportDiba( productComponent )
 					}
+
+					index++;
 				}
 			}
 		}
 
+		dump(allProductItems);abort;
 		return success;
 	}
 
@@ -426,6 +468,60 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return componente;
 	}
 
+	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation ){
+		var customer = quotation.getCustomer();
+		var fullCustomer = getCrmApiService().getCustomer( customer.getId() );
+		if (isNull(fullCustomer) && structKeyExists(fullCustomer, 'data')) {
+			return {
+				'MMSERIAL' = quotation.getSerial(),
+				'MMNUMDOC' = quotation.getQuotationNumber() & '/' & quotation.getVersionNumber(),
+				'MMDATDOC' = quotation.getCreatedAt(),
+				'MMDATEVA' = quotation.getValidityDate(),
+				'MMRIFORD' = !isNull(quotation.getOpportunity()) ? quotation.getOpportunity().getName() : '',
+				'MMNUMLIS' = 1,
+				'MMCODAGE' = 'campo mail account da mapper su tab verticale codage',
+				'MMCODPAG' = quotation.getPaymentMethod().getId(),
+				'MMCODVAL' = quotation.getCurrency().getId(),
+			};
+		}
+		fullCustomer = fullCustomer['data'];
+
+		var quotationData = {
+			'MMSERIAL' = quotation.getSerial(),
+			'MMNUMDOC' = quotation.getQuotationNumber() & '/' & quotation.getVersionNumber(),
+			'MMDATDOC' = quotation.getCreatedAt(),
+			'MMDATEVA' = quotation.getValidityDate(),
+			'MMRIFORD' = !isNull(quotation.getOpportunity()) ? quotation.getOpportunity().getName() : '',
+			'MMNUMLIS' = 1,
+			'MMCODAGE' = 'campo mail account da mapper su tab verticale codage',
+			'MMCODPAG' = quotation.getPaymentMethod().getId(),
+			'MMCODVAL' = quotation.getCurrency().getId(),
+			'CF_IDCLI' = fullCustomer['id'],
+			'CFDESCR1' = fullCustomer['name'],
+			'CFINDIRI' = fullCustomer['billing_address_street'],
+			'CFLOCALI' = fullCustomer['billing_address_city'],
+			'CFPROVIN' = fullCustomer['billing_address_state'],
+			'CFSTAISO' = structKeyExists(fullCustomer, 'custom') ? fullCustomer['custom']['assignablecountry_c'] : '',
+			'CFPARIVA' = structKeyExists(fullCustomer, 'custom') ? fullCustomer['custom']['partita_iva_c'] : '',
+			'CFTELEFO' = structKeyExists(fullCustomer, 'custom') ? fullCustomer['custom']['phone_cell_c'] : '',
+			'CFBLOCCO' = 'N',
+			'CFMOROSO' = 'N',
+			'DEDESDOD' = fullCustomer['name'],
+			'DEINDDOD' = fullCustomer['billing_address_street'],
+			'DELOCDOD' = fullCustomer['billing_address_city'],
+			'DEPRODOD' = fullCustomer['billing_address_state'],
+			'DENAZDOD' = structKeyExists(fullCustomer, 'custom') ? fullCustomer['custom']['assignablecountry_c'] : '',
+			'DEIDDMER' = structKeyExists(fullCustomer, 'indirizzi_spedizione') AND fullCustomer['indirizzi_spedizione'].len() > 0 ? fullCustomer['indirizzi_spedizione'][1]['id'] : '',
+			'DEDESMER' = structKeyExists(fullCustomer, 'indirizzi_spedizione') AND fullCustomer['indirizzi_spedizione'].len() > 0 ? fullCustomer['indirizzi_spedizione'][1]['name'] : '',
+			'DEINDMER' = structKeyExists(fullCustomer, 'indirizzi_spedizione') AND fullCustomer['indirizzi_spedizione'].len() > 0 ? fullCustomer['indirizzi_spedizione'][1]['via'] : '',
+			'DELOCMER' = structKeyExists(fullCustomer, 'indirizzi_spedizione') AND fullCustomer['indirizzi_spedizione'].len() > 0 ? fullCustomer['indirizzi_spedizione'][1]['citta'] : '',
+			'DEPROMER' = structKeyExists(fullCustomer, 'indirizzi_spedizione') AND fullCustomer['indirizzi_spedizione'].len() > 0 ? fullCustomer['indirizzi_spedizione'][1]['provincia'] : '',
+			'DENAZMER' = structKeyExists(fullCustomer, 'indirizzi_spedizione') AND fullCustomer['indirizzi_spedizione'].len() > 0 ? fullCustomer['indirizzi_spedizione'][1]['paese'] : ''
+		};
+
+
+		return quotationData
+	}
 
 	public String function clone( required com.apirone.core.model.bean.Quotation quotation, required String status ){
 		var originalQuotation = arguments.quotation;
@@ -512,6 +608,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean = super.bean( "Quotation" );
 
 			bean.setId( record.quotation_id );
+			bean.setSerial( record.serial );
 			bean.setName( record.quotation );
 			bean.setQuotationNumber( record.quotation_number );
 			bean.setVersionNumber( record.version_number );

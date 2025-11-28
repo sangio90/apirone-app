@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	this.memento = {
 		defaultIncludes = [
 			"id",
+			"serial",
 			"shortId",
 			"quotationNumber",
 			"versionNumber",
@@ -36,6 +37,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="salesAgentAccount" type="com.apirone.core.model.bean.Account";
 	property name="graphicTechnicianAccount" type="com.apirone.core.model.bean.Account";
 	property name="calculatedAmount" type="Numeric";
+	property name="serial" type="Numeric";
 
 	public Quotation function init(){
 		return this;

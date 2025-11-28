@@ -124,6 +124,8 @@
 
 			bean.setId( record.quotation_item_id );
 			bean.setPrice( record.price );
+			bean.setDiscount1( record.discount1 );
+			bean.setDiscount2( record.discount2 );
 			bean.setQuantity( record.quantity );
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
 			if (Len(record.product_id)) {
