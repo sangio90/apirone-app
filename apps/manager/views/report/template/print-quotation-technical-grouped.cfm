@@ -108,7 +108,7 @@
 										<div style="font-size: 8pt; line-height: 15px">
 											Posizioni: 
 											<cfloop collection="#zones#" item="zoneName">
-												<div style="font-size: 8pt; line-height: 15px">
+												<div style="font-size: 8pt; line-height: 15px; padding-left: 3px;">
 													#zoneName#: 
 													#arrayToList(zones[zoneName], ", ")#
 												</div>

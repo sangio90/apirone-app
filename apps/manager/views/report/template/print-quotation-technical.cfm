@@ -83,7 +83,7 @@
 									<td style="vertical-align: top; padding: 5pt; border-left: 0; width: 9cm !important;">
 										<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 											<div style="font-size: 8pt; line-height: 15px;">
-												<b>Lista Frutti: </b>
+												Lista Frutti: 
 												<cfif NOT isNull(oggetto.getFruits())>
 													<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
 													<ul style="padding: 0 0 0 14px;">

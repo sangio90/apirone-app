@@ -761,8 +761,8 @@ AP.quotation.printModal = ( function() {
                     "name": "Classica"
                 },
                 {
-                    "id": "proforma",
-                    "name": "Proforma"
+                    "id": "photo",
+                    "name": "Foto"
                 },
                 {
                     "id": "zone",
@@ -771,10 +771,6 @@ AP.quotation.printModal = ( function() {
                 {
                     "id": "technical",
                     "name": "Tecnica"
-                },
-                {
-                    "id": "internal",
-                    "name": "Interna"
                 }
             ]
         }
@@ -812,12 +808,15 @@ AP.quotation.printModal = ( function() {
                 $( "#notesDiv" ).css( "display", "block" );
                 $( "#discountsDiv" ).css( "display", "block" );
             }
-            if ( report == "proforma" ) {
-                $( "#imagesDiv" ).css( "display", "block" );
+            if ( report == "photo" ) {
                 $( "#imagesCheckbox" )[0].checked = false;
+                $( "#groupedCheckbox" )[0].checked = false;
+                $( "#notesCheckbox" )[0].checked = false;
+                $( "#discountsCheckbox" )[0].checked = false;
+                $( "#imagesDiv" ).css( "display", "none" );
                 $( "#groupedDiv" ).css( "display", "block" );
-                $( "#notesDiv" ).css( "display", "block" );
-                $( "#discountsDiv" ).css( "display", "block" );
+                $( "#notesDiv" ).css( "display", "none" );
+                $( "#discountsDiv" ).css( "display", "none" );
             }
             if ( report == "zone" ) {
                 $( "#imagesCheckbox" )[0].checked = true;
@@ -832,13 +831,6 @@ AP.quotation.printModal = ( function() {
                 $( "#imagesCheckbox" )[0].checked = false;
                 $( "#groupedDiv" ).css( "display", "block" );
                 $( "#notesDiv" ).css( "display", "block" );
-                $( "#discountsDiv" ).css( "display", "none" );
-            }
-            if ( report == "internal" ) {
-                $( "#imagesDiv" ).css( "display", "none" );
-                $( "#imagesCheckbox" )[0].checked = false;
-                $( "#groupedDiv" ).css( "display", "none" );
-                $( "#notesDiv" ).css( "display", "none" );
                 $( "#discountsDiv" ).css( "display", "none" );
             }
         },

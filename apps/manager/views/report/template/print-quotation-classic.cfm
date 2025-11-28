@@ -129,7 +129,7 @@
 											<cfif args.params.images>
 												<td style="vertical-align: middle; width: 6cm;" rowspan="2">
 													<cfif IsNull( oggetto.getImage() )>
-														<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 6cm !important; max-height: 6cm !important;">
+														<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 6cm !important; max-height: 6cm !important;">
 													<cfelse>
 														<img src="#expandPath('/assets/main/img/fototesthorizontal.png')#" style="object-fit: contain; width: 6cm !important; max-height: 6cm !important;">
 														<!--- <img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 6cm !important;"> --->
@@ -151,10 +151,10 @@
 											</td>
 										</tr>
 										<tr>
-											<td style="vertical-align: bottom; padding: 3pt;">
+											<td style="vertical-align: bottom; padding: 3pt 0 3px 0;">
 												<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 													<div style="font-size: 8pt; line-height: 15px;">
-														<b>Lista Frutti: </b>
+														Lista Frutti: 
 														<cfif NOT isNull(oggetto.getFruits())>
 															<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
 															<ul style="padding: 0 0 0 14px;">
@@ -183,9 +183,9 @@
 												</cfif>
 												<cfif structCount(zones) gt 0>
 													<div style="font-size: 8pt; line-height: 15px;">
-														<b>Posizioni: </b>
+														Posizioni:
 														<cfloop collection="#zones#" item="zoneName">
-															<div style="font-size: 8pt; line-height: 15px">
+															<div style="font-size: 8pt; line-height: 15px; padding-left: 3px;">
 																#zoneName#: 
 																#arrayToList(zones[zoneName], ", ")#
 															</div>

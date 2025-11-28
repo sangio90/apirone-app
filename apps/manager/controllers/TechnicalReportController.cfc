@@ -38,9 +38,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			case 'classic':
 				quoteObj = printClassic( quoteObj, printParams );
 				break;
-			case 'proforma':
-				quoteObj = printClassic( quoteObj, printParams );
-				break;
 			case 'technical':
 				if (printParams.grouped) {
 					quoteObj = printClassic( quoteObj, printParams );
@@ -48,7 +45,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					quoteObj = printZone( quoteObj, printParams );
 				}
 				break;
-			case 'internal':
+			case 'photo':
 				if (printParams.grouped) {
 					quoteObj = printClassic( quoteObj, printParams );
 				} else {
