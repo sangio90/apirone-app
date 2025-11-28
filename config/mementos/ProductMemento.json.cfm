@@ -22,8 +22,7 @@
 				"finish",
 				"prices",
 				"horizontalImage",
-				"verticalImage",
-				"items"
+				"verticalImage"
 			]
 		},
 		menu = {
