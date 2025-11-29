@@ -37,6 +37,7 @@
         "setup:devel": "task run taskFile=tasks/Build.cfc target=setup :env=devel",
         "setup:prod": "task run taskFile=tasks/Build.cfc target=setup :env=prod",
         "setup:test": "task run taskFile=tasks/Build.cfc target=setup :env=test",
+        "setup:remote": "task run taskFile=tasks/Build.cfc target=setup :env=remote",
         "format": "cfformat run /apps/**/controllers/**,/com/** --overwrite",
         "format:watch": "cfformat watch /apps/**/controllers/**,/apps/**/config/**,/com/apirone/**",
         "format:check": "cfformat check /apps/**/controllers/**,/com/apirone/**",
