@@ -47,6 +47,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.currencyId );
 
 		if ( record.RecordCount ) {
+
+			var record = trimQueryFields( record );
+
 			var obj = super.bean( "Currency" );
 
 			obj.setId( record.currency_id.toString() );

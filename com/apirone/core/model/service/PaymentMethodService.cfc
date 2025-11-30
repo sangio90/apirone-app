@@ -51,6 +51,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.paymentMethodId );
 
 		if ( record.RecordCount ) {
+
+			var record = trimQueryFields( record );
+
 			var obj = super.bean( "PaymentMethod" );
 
 			obj.setId( record.payment_method_id.toString() );
