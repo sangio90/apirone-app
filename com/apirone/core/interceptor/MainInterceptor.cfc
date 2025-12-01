@@ -11,12 +11,9 @@ component extends="coldbox.system.Interceptor" {
 			Location( url = "/manager/login" );
 		}
 
-		/*
 		if ( !rc.keyExists( "currentRoutedModule" ) ) {
-			Location( url = "/manager/login" );
+			Location( url = "/manager/dashboard" );
 		}
-		*/
-
 
 		cfheader( name = "Access-Control-Allow-Origin", value = "*" );
 		cfheader( name = "Access-Control-Allow-Methods", value = "GET, POST, OPTIONS" );
@@ -46,8 +43,8 @@ component extends="coldbox.system.Interceptor" {
             MANAGER module
         */
 		if ( module == "manager" ) {
-			prc.page      = {}; // current js config write in current html page
-			prc.jsFiles = []; // current js file for current html page
+			prc.page     = {}; // current js config write in current html page
+			prc.jsFiles  = []; // current js file for current html page
 			prc.cssFiles = []; // current css file for current html page
 
 			prc.user = session.user;
@@ -252,10 +249,7 @@ component extends="coldbox.system.Interceptor" {
 		required prefix  = "api",
 		required service = "apirone"
 	){
-		var code = "#arguments.prefix#_" & DateTimeFormat( Now(), "yyyy-mm-dd_HH-nn-ss" ) & "_" & RandRange(
-			0,
-			99999
-		);
+		var code = "#arguments.prefix#_" & DateTimeFormat( Now(), "yyyy-mm-dd_HH-nn-ss" ) & "_" & RandRange( 0, 99999 );
 
 		var dayPath  = DateTimeFormat( Now(), "yyyy/mm" );
 		var response = "";

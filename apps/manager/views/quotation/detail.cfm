@@ -70,7 +70,7 @@
                                     </nav>
                                     <div class="tab-content" id="nav-tabContent">
                                         <div class="tab-pane show active" id="nav-plate" role="tabpanel">
-                                            <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems">
+                                            <div data-template="quotation-item-plate-preview-tmpl" data-bind="source: quotationItems" class="row">
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-signage" role="tabpanel">
@@ -110,7 +110,7 @@
     #view( "quotation/zone-modal" )#
     #view( "quotation/print-modal" )#
 
-    #view( "quotation/totals" )#
+    #view( "quotation/totals-item" )#
 
     #template( view="jstemplate/quotation/quotation-item-plate-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
