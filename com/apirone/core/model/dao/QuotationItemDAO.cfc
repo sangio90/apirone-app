@@ -60,12 +60,14 @@
 
 	<cffunction name="insert" returntype="String">
 		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="true">
+
+		<cfset var price = arguments.quotationItem.getPrice()>
+
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_items (
 				quotation_id,
 				quotation_zone_id,
 				product_id,
-				price,
 				discount1,
 				discount2,
 				price_method_id,
@@ -93,7 +95,11 @@
 				<cfelse>
 					NULL,
 				</cfif>
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
+				<cfqueryparam cfsqltype="Float" value="#price.getDiscount1()#">,
+				<cfqueryparam cfsqltype="Float" value="#price.getDiscount2()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#price.getMethod().getId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#price.getTotalGoods()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#price.getTotal()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">,
 				<cfif NOT IsNull( arguments.quotationItem.getHash() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getHash()#">
@@ -132,7 +138,7 @@
 					<cfelse>
 						NULL
 					</cfif>,
-				price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">,
+				<!---- price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">, ---->
 				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">,
 				"hash" =
 					<cfif NOT IsNull( arguments.quotationItem.getHash() )>

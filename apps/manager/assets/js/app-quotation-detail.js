@@ -295,13 +295,11 @@ AP.quotation.detail = ( function() {
                     requireAnyOfCustomerLeadOrOpportunity: {
                         required: function() {
 
+                            // almeno uno dei
+
                             var leadId = viewModel.get( "detailForm.data.lead.id" );
                             var customerId =  viewModel.get( "detailForm.data.customer.id" );
                             var opportunityId = viewModel.get( "detailForm.data.opportunity.id" );
-
-                            console.log( "leadId", leadId );
-                            console.log( "customerId", customerId );
-                            console.log( "opportunityId", opportunityId );
 
                             if ( customerId || leadId || opportunityId ) {
                                 return false;

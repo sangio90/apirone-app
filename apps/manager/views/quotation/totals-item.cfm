@@ -27,7 +27,7 @@
 				<div class="row mt-3 mb-2">
 					<div class="col-6">
 						<select name="priceMethod" class="form-control" 
-							data-bind="value: pricing.data.method.id">
+							data-bind="value: pricing.data.method.id, events: { change: changeMethod }">
 							<option value="C">Prezzo calcolato</option>
 							<option value="F">Prezzo fisso</option>
 						</select>
@@ -36,7 +36,6 @@
 						<div class="input-group">
 							<input class="form-control text-end" name="total" id="input-total"
 								placeholder="Totale preventivo"
-								data-format="0.00"
 								data-bind="value: pricing.data.total">
 							<span class="input-group-text">
 								<i class="fas fa-euro-sign"></i>

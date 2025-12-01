@@ -33,7 +33,7 @@ AP.quotation.pricing = ( function() {
                 discount2: "",
 
                 method: {
-                    id: "C"
+                    id: "C" // calculated
                 },
 
                 total: "0",
@@ -41,21 +41,36 @@ AP.quotation.pricing = ( function() {
             },
         },
 
-        changePriceMethod: function( event ) {
+        changeMethod: function( event ) {
 
-            console.log( "event", event );
+            var ele = $( event.currentTarget );
 
-            if ( event.id ) {
+            var value = ele.val();
+            var input = fields.boxPricing.find( "#input-total" );
 
+            if ( value == "C" ) {
+                this.update();
+
+                input.prop( "readonly", true );
+            } else {
+                input.prop( "readonly", false );
             }
 
         },
 
-        change: function( event ) {
+        /*
+        formatTotal: function( event ) {
 
-            console.log( "change:event", event );
+            viewModel.set( "a" );
+
+            console.log( "formatTotal:event", event );
+
+            if ( event ) {
+                NM.kendo.formatCurrency( event );
+            }
 
         },
+        */
 
         update: function( event ) {
 
@@ -76,7 +91,6 @@ AP.quotation.pricing = ( function() {
                             status.html( "" );
 
                             viewModel.set( "pricing.data", xhr.data );
-                            // viewModel.set( "pricing.data", xhr.data );
                         }
                     }
                 }
@@ -103,21 +117,6 @@ AP.quotation.pricing = ( function() {
     } );
 
     viewModel.bind( "change", function( event ) {
-
-        var value = this.get( event.field );
-        var input = fields.boxPricing.find( "#input-total" );
-
-        console.log( "input", input );
-
-        if ( value == "A" ) {
-            input.prop( "readonly", true );
-
-            this.update();
-
-        } else {
-            input.prop( "readonly", false );
-        }
-
     } );
 
     pub.update = function() {
@@ -138,6 +137,11 @@ AP.quotation.pricing = ( function() {
 
     };
 
+    pub.getData = function( itemId ) {
+
+        return viewModel.get( "pricing" );
+
+    };
+
     return pub;
 } () );
-

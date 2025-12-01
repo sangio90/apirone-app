@@ -71,6 +71,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 
+
 		transaction {
 			var tmpDir = getTempDir();
 			fileName   = "preview_accessori_id_" & json.quotationItem.id & ".png";
@@ -90,7 +91,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
 				bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
-				bean.setPrice( 20.1 );
+				bean.setPrice( price );
 				bean.setQuantity( json.quotationItem.quantity );
 
 				var product = super
@@ -373,8 +374,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "";
 
 		var result = super.getResult();
+		var tmpDir = super.getTempDir();
+		var price  = super.bean( "QuotationPrice" );
+		var method = super.bean( "PriceMethod" );
 
-		var tmpDir     = getTempDir();
+		price.setAmount( json.price.total );
+		price.setDiscount1( json.price.discount1 );
+		price.setDiscount2( json.price.discount1 );
+		price.setMethod( method.setId( json.price.method.id ) );
+		price.setAmount( json.price.total );
+
 		var fileName   = "preview_plate_id_" & CreateUUID() & ".png";
 		var filePath   = tmpDir & "/" & fileName;
 		var binaryData = ToBinary( json.imageBase64 );
@@ -384,6 +393,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var id = json.id;
 
 		var bean = super.bean( "QuotationItemPlate" );
+		bean.setPrice( price );
 
 		if ( Len( id ) ) {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
@@ -391,13 +401,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		json.delete( "imageBase64" );
 
-
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationZone.id ) );
 
-		bean.setPrice( 20.2 );
 		bean.setQuantity( json.quantity );
-
 
 		var product = super
 			.fire(

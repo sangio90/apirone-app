@@ -37,7 +37,7 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		String mode = null,
+		String mode             = null,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotation.id" } ]
@@ -52,12 +52,12 @@
 			if ( mode == null ) {
 				rows.add( quotationItem )
 			} else {
-				if ( mode == 'placche') {
-					if (IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate' )) {
+				if ( mode == "placche" ) {
+					if ( IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 						rows.add( quotationItem );
 					}
 				} else {
-					if (!IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate' )) {
+					if ( !IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 						rows.add( quotationItem );
 					}
 				}
@@ -111,11 +111,11 @@
 		var record = getDao().read( arguments.quotationItemId );
 		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.quotationItemId )
 		if ( record.recordCount ) {
-			if (fruits.len() > 0) {
+			if ( fruits.len() > 0 ) {
 				var bean = super.bean( "QuotationItemPlate" );
-				bean.setFruits(fruits)
+				bean.setFruits( fruits )
 			} else {
-				if (Len(record.signage_config_item_id)) {
+				if ( Len( record.signage_config_item_id ) ) {
 					var bean = super.bean( "QuotationItemSignage" );
 				} else {
 					var bean = super.bean( "QuotationItem" );
@@ -128,7 +128,7 @@
 			bean.setDiscount2( record.discount2 );
 			bean.setQuantity( record.quantity );
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
-			if (Len(record.product_id)) {
+			if ( Len( record.product_id ) ) {
 				bean.setProduct( getProductService().get( record.product_id ) );
 			}
 			bean.setQuotationZone(
@@ -137,34 +137,34 @@
 				)
 			);
 
-			if (Len(record.signage_config_item_id)) {
+			if ( Len( record.signage_config_item_id ) ) {
 				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_id ) );
-				if (record.char_count) {
-					bean.getSignageConfigItem().setCharCount(record.char_count);
+				if ( record.char_count ) {
+					bean.getSignageConfigItem().setCharCount( record.char_count );
 				}
-				if (record.height_in_pixel) {
-					bean.getSignageConfigItem().setHeightInPixel(record.height_in_pixel);
+				if ( record.height_in_pixel ) {
+					bean.getSignageConfigItem().setHeightInPixel( record.height_in_pixel );
 				}
-				if (record.row_count) {
-					bean.getSignageConfigItem().setRowCount(record.row_count);
+				if ( record.row_count ) {
+					bean.getSignageConfigItem().setRowCount( record.row_count );
 				}
 				var signageRows = getQuotationItemSignageRowService().list( quotationItemId = quotationItemId );
 				bean.setSignageRows( signageRows );
 			}
 
 			var images = getFileService().list( quotationItemId = record.quotation_item_id );
-			if (Len(images)) {
-				bean.setImage(images[1]);
+			if ( Len( images ) ) {
+				bean.setImage( images[ 1 ] );
 			}
 
 			var items = getQuotationItemProductItemService().list( quotationItemId = quotationItemId );
-			if (Len(items)) {
-				bean.setItems(items);
+			if ( Len( items ) ) {
+				bean.setItems( items );
 			}
 
 			bean.setNotes( record.notes );
 			bean.setHash( record.hash );
-			if (Len(record.position)) {
+			if ( Len( record.position ) ) {
 				bean.setPosition( record.position );
 			}
 

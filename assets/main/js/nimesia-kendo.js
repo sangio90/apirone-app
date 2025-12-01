@@ -136,3 +136,12 @@ NM.kendo.formatISODate = function( date, type = "normal" ) {
 
     return ret;
 };
+
+// for Mementify dates (ISO 8601)
+NM.kendo.formatCurrency = function( amount, type = "normal" ) {
+
+    console.log( "formatCurrency", amount );
+
+    // return amount.toFixed( 2 );
+
+};
