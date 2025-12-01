@@ -56,14 +56,14 @@ component extends="com.apirone.core.controller.AbsController" {
 				return;
 		}
 
-		var customerShippingAddress = [
+		var customerShippingAddress = {
 			'name' = null,
 			'via' = null,
 			'cap' = null,
 			'citta' = null,
 			'provincia' = null,
 			'paese' = null
-		];
+		};
 
 		if (!isNull(quotation.getCustomer().getShippingAddresses()) && quotation.getCustomer().getShippingAddresses().len() > 0) {
 			customerShippingAddress = quotation.getCustomer().getShippingAddresses()[1];

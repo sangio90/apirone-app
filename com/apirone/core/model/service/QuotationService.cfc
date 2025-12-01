@@ -27,7 +27,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
 	property name="componentService" inject="ComponentService";
-	property name="CrmApiService" inject="CrmApiService";
+	property name="CountryService" inject="CountryService";
 	property name="vatCodeService" inject="VatCodeService";
 	property name="progressivoComponenti" type="Numeric";
 
@@ -181,9 +181,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								var rawValue = attributeValue.getRawValue();
 								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
 								// se lo trovo lo imposto come importante, a patto che non ne siano gia stati trovati 2 (len 10)
-								var isImportant = importantAttributes.some(function(item) {
-									return item.getId() == attr.getId();
-								});
+								
+								var isImportant = false;
+								if (!isNull(importantAttributes)) {
+									isImportant = importantAttributes.some(function(item) {
+										return item.getId() == attribute.getId();
+									});
+								}
 								if (isImportant) {
 									if ( varCode.len() < 10 ) {
 										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
@@ -407,32 +411,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								var rawValue = attributeValue.getRawValue();
 								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
 								// se lo trovo lo imposto come importante, a patto che non ne siano gia stati trovati 2 (len 10)
-								var isImportant = importantAttributes.some(function(item) {
-									return item.getId() == attr.getId();
-								});
+								var isImportant = false;
+								if (!isNull(importantAttributes)) {
+									isImportant = importantAttributes.some(function(item) {
+										return item.getId() == attribute.getId();
+									});
+								}
 								if (isImportant) {
 									if ( varCode.len() < 10 ) {
 										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-										productItems.add( {
-											"important"   = true,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-									} else {
-										productItems.add( {
-											"important"   = false,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
 									}
-								} else {
-									productItems.add( {
-										"important"   = false,
-										"rawValueId"  = rawValue.getId(),
-										"attributeId" = attributeValue.getAttributeId()
-									} );
 								}
-								productItemIds.add( productItem.getId() );
 							}
 							nota &= attribute.getName() & ": " & rawValue.getName() & "; ";
 						}
@@ -535,7 +524,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						allProductItems.append(quotationData);
 					}
 
-					success = getDao().exportQuotation( quotationData );
+					// success = getDao().exportQuotation( quotationData );
 					index++;
 				}
 			}
@@ -642,24 +631,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation ){
 		var customer = quotation.getCustomer();
-
-		var fullCustomer = getCrmApiService().getCustomer( customer.getId() );
-
-		if ( IsNull( fullCustomer ) && StructKeyExists( fullCustomer, "data" ) ) {
-			return {
-				"MMSERIAL" = quotation.getSerial(),
-				"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
-				"MMDATDOC" = quotation.getCreatedAt(),
-				"MMDATEVA" = quotation.getValidityDate(),
-				"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
-				"MMNUMLIS" = 1,
-				"MMCODAGE" = "campo mail account da mapper su tab verticale codage",
-				"MMCODPAG" = quotation.getPaymentMethod().getId(),
-				"MMCODVAL" = quotation.getCurrency().getId()
-			};
+		if (!isNull(quotation.getShippingProfile())) {
+			return false;
 		}
-		fullCustomer = fullCustomer[ "data" ];
-
 		var quotationData = {
 			"MMSERIAL" = quotation.getSerial(),
 			"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
@@ -670,39 +644,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMCODAGE" = "campo mail account da mapper su tab verticale codage",
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
-			"CF_IDCLI" = fullCustomer[ "id" ],
-			"CFDESCR1" = fullCustomer[ "name" ],
-			"CFINDIRI" = fullCustomer[ "billing_address_street" ],
-			"CFLOCALI" = fullCustomer[ "billing_address_city" ],
-			"CFPROVIN" = fullCustomer[ "billing_address_state" ],
-			"CFSTAISO" = StructKeyExists( fullCustomer, "custom" ) ? fullCustomer[ "custom" ][ "assignablecountry_c" ] : "",
-			"CFPARIVA" = StructKeyExists( fullCustomer, "custom" ) ? fullCustomer[ "custom" ][ "partita_iva_c" ] : "",
-			"CFTELEFO" = StructKeyExists( fullCustomer, "custom" ) ? fullCustomer[ "custom" ][ "phone_cell_c" ] : "",
+			"CF_IDCLI" = customer.getId(),
+			"CFDESCR1" = customer.getCompany(),
+			"CFINDIRI" = customer.getStreet(),
+			"CFLOCALI" = customer.getCity(),
+			"CFPROVIN" = customer.getState(),
+			"CFSTAISO" = customer.getCountry(),
+			"CFPARIVA" = customer.getVatNumber(),
+			"CFTELEFO" = customer.getPhone(),
 			"CFBLOCCO" = "N",
 			"CFMOROSO" = "N",
-			"DEDESDOD" = fullCustomer[ "name" ],
-			"DEINDDOD" = fullCustomer[ "billing_address_street" ],
-			"DELOCDOD" = fullCustomer[ "billing_address_city" ],
-			"DEPRODOD" = fullCustomer[ "billing_address_state" ],
-			"DENAZDOD" = StructKeyExists( fullCustomer, "custom" ) ? fullCustomer[ "custom" ][ "assignablecountry_c" ] : "",
-			"DEIDDMER" = StructKeyExists( fullCustomer, "indirizzi_spedizione" ) AND fullCustomer[ "indirizzi_spedizione" ].len() > 0 ? fullCustomer[
-				"indirizzi_spedizione"
-			][ 1 ][ "id" ] : "",
-			"DEDESMER" = StructKeyExists( fullCustomer, "indirizzi_spedizione" ) AND fullCustomer[ "indirizzi_spedizione" ].len() > 0 ? fullCustomer[
-				"indirizzi_spedizione"
-			][ 1 ][ "name" ] : "",
-			"DEINDMER" = StructKeyExists( fullCustomer, "indirizzi_spedizione" ) AND fullCustomer[ "indirizzi_spedizione" ].len() > 0 ? fullCustomer[
-				"indirizzi_spedizione"
-			][ 1 ][ "via" ] : "",
-			"DELOCMER" = StructKeyExists( fullCustomer, "indirizzi_spedizione" ) AND fullCustomer[ "indirizzi_spedizione" ].len() > 0 ? fullCustomer[
-				"indirizzi_spedizione"
-			][ 1 ][ "citta" ] : "",
-			"DEPROMER" = StructKeyExists( fullCustomer, "indirizzi_spedizione" ) AND fullCustomer[ "indirizzi_spedizione" ].len() > 0 ? fullCustomer[
-				"indirizzi_spedizione"
-			][ 1 ][ "provincia" ] : "",
-			"DENAZMER" = StructKeyExists( fullCustomer, "indirizzi_spedizione" ) AND fullCustomer[ "indirizzi_spedizione" ].len() > 0 ? fullCustomer[
-				"indirizzi_spedizione"
-			][ 1 ][ "paese" ] : ""
+			"DEDESDOD" = customer.getCompany(),
+			"DEINDDOD" = customer.getStreet(),
+			"DELOCDOD" = customer.getCity(),
+			"DEPRODOD" = customer.getState(),
+			"DENAZDOD" = customer.getCountry(),
+			"DEIDDMER" = quotation.getShippingProfile().getId(),
+			"DEDESMER" = quotation.getShippingProfile().getCompany(),
+			"DEINDMER" = quotation.getShippingProfile().getStreet(),
+			"DELOCMER" = quotation.getShippingProfile().getCity(),
+			"DEPROMER" = quotation.getShippingProfile().getState(),
+			"DENAZMER" = quotation.getShippingProfile().getCountry()
 		};
 
 
@@ -810,7 +772,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 			if ( !IsNull( record.customer_id ) ) {
-				bean.setCustomer( getCustomerService().get( record.customer_id ) );
+				var customer = getCustomerService().get( record.customer_id );
+				bean.setCustomer( customer );
+				if (
+					!isNull(customer.getShippingAddresses()) AND 
+					customer.getShippingAddresses().len() > 0 AND 
+					!isNull(record.customer_address_id)
+				) {
+					var shippingAddressIndex = ArrayFind( customer.getShippingAddresses(), function(item) {
+						return item['id'] == record.customer_address_id;
+					})
+					if (shippingAddressIndex > 0) {
+						var shippingAddress = customer.getShippingAddresses()[shippingAddressIndex]
+						var shippingProfile = super.bean( "ShippingProfile" );
+						shippingProfile.setId( shippingAddress[ "id" ]);
+						shippingProfile.setCompany( shippingAddress[ "name" ]);
+						shippingProfile.setStreet( shippingAddress[ "via" ]);
+						shippingProfile.setCity( shippingAddress[ "citta" ]);
+						shippingProfile.setPostalCode( shippingAddress[ "cap" ]);
+						shippingProfile.setState( shippingAddress[ "provincia" ]);
+						// shippingProfile.setCountry( getCountryService.get( shippingAddress[ "paese" ] ) );
+						shippingProfile.setCountry( getCountryService().get( "693a3dda-bf35-4556-9a12-2c693afce836" ) );
+						bean.setShippingProfile( shippingProfile );
+					}
+				}
 			}
 
 			if ( !IsNull( record.opportunity_id ) ) {
