@@ -83,8 +83,8 @@ component {
 
 		var target = Duplicate( arguments.target );
 
-		var metadata   = $getCachedMetadata( target );
-		//var entityName = metadata.keyExists( "fullname" ) ? ListLast( metadata.fullname, "." ) : "";
+		var metadata = $getCachedMetadata( target );
+		// var entityName = metadata.keyExists( "fullname" ) ? ListLast( metadata.fullname, "." ) : "";
 
 		var externalRules = $getRulesFromHierarchy( target ); // from files
 
@@ -269,9 +269,7 @@ component {
 						result[ thisAlias ] = DateTimeFormat( dateInstance, "yyyy-MM-dd" ) & "T" & timeFormat;
 					} else {
 						var timeFormat      = TimeFormat( dateInstance, timeMask );
-						result[ thisAlias ] = Trim(
-							DateFormat( dateInstance, arguments.dateMask ) & " " & timeFormat
-						);
+						result[ thisAlias ] = Trim( DateFormat( dateInstance, arguments.dateMask ) & " " & timeFormat );
 					}
 				} catch ( any e ) {
 					result[ thisAlias ] = dateInstance;
@@ -296,7 +294,7 @@ component {
 
 				for ( var thisIndex = 1; thisIndex <= ArrayLen( thisValue ); thisIndex++ ) {
 					var arrayItem = thisValue[ thisIndex ];
-					
+
 					// Se l'elemento è un simple value, usalo direttamente
 					if ( IsSimpleValue( arrayItem ) ) {
 						result[ thisAlias ][ thisIndex ] = arrayItem;
@@ -351,7 +349,7 @@ component {
 				// Determine if we should ignore defaults for the child
 				// - If nestedIncludes has entries (e.g., ["id", "name"]), force ignoreDefaults=true (use ONLY those properties)
 				// - If nestedIncludes is empty, force ignoreDefaults=false (use the child's defaultIncludes)
- 				// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
+				// This prevents the parent's ignoreDefaults from cascading incorrectly when no specific nested properties are requested
 				var shouldIgnoreDefaults = nestedIncludes.len() > 0;
 
 				// Process the item memento
@@ -403,9 +401,7 @@ component {
 				;
 			} else {
 				// Check for null values
-				result[ item ] = ( !result.keyExists( item ) || IsNull( result[ item ] ) ) ? NullValue() : result[
-					item
-				];
+				result[ item ] = ( !result.keyExists( item ) || IsNull( result[ item ] ) ) ? NullValue() : result[ item ];
 			}
 		}
 
@@ -495,10 +491,8 @@ component {
 			Se vedi percentuali basse, significa che stai facendo tante chiamate a GetMetaData() o tanti caricamenti di file JSON, rallentando l'app.
 		*/
 		stats[ "cacheHitRate" ] = {
-			"metadata" = totalMetadataRequests > 0 ? Round(
-				( stats.cacheHits.metadata / totalMetadataRequests ) * 100
-			) : 0,
-			"rules" = totalRulesRequests > 0 ? Round( ( stats.cacheHits.rules / totalRulesRequests ) * 100 ) : 0
+			"metadata" = totalMetadataRequests > 0 ? Round( ( stats.cacheHits.metadata / totalMetadataRequests ) * 100 ) : 0,
+			"rules"    = totalRulesRequests > 0 ? Round( ( stats.cacheHits.rules / totalRulesRequests ) * 100 ) : 0
 		};
 
 		// Per-target summaries (avg, p95, p99, max)

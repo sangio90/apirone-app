@@ -30,7 +30,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	public String function getDecodedPaymentMethod(){
 		var paymentMethod = this.getPaymentMethod();
-		if ( !IsNull( paymentMethod )) {
+		if ( !IsNull( paymentMethod ) ) {
 			return paymentMethod.getName();
 		} else {
 			return getCustomPaymentMethod();

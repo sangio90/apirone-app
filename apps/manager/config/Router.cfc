@@ -413,7 +413,6 @@
 		get( "/ajax/quotations/finishes/:categoryId/:lineId" ).to( "QuotationAjaxController.listFinishes" ).end();
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();
-		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
@@ -424,9 +423,12 @@
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
 		delete( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.delete" ).end();
 
+		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
+
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
 		post( "/ajax/quotations" ).to( "QuotationAjaxController.save" ).end();
+
 
 		get( "/quotation-items-exported" ).to( "QuotationItemExportedController.list" ).end();
 		get( "/ajax/quotation-items-exported/:key" ).to( "QuotationItemExportedAjaxController.listRows" ).end();
@@ -445,8 +447,8 @@
 		post( "/ajax/quotation-items/accessory" ).to( "QuotationItemAjaxController.saveAccessory" ).end();
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
 		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
+		post( "/ajax/quotation-items/pricing" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
-		post( "/ajax/quotation-items/:id/total" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
 

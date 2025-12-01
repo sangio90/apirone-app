@@ -8,7 +8,7 @@
 				<span data-bind="text: name"></span>
 			</td>
 			<td width="30" class="text-end" nowrap>
-				<span data-bind="text: amount" data-format="0.00"></span>
+				<span data-bind="text: amount" data-format="0.00"></span> €
 			</td>
 		</tr>
     </nmscript>

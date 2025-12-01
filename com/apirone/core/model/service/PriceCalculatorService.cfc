@@ -57,23 +57,30 @@
 		var productSvc   = getProductService();
 		var componentSvc = getComponentService();
 
+
 		var productId      = arguments.productId;
 		var productItemIds = arguments.producItemtIds;
 
 		var product = productSvc.get( productId );
 		var price   = product.getPrice( "PRICE" );
 
-		var name = "#product.getDescription()# (#product.getCode()#)";
+		// TODO: verificare come gestire la mancanza di prezzo
+		var isFixedPrice = ( price?.getMethod()?.getId() == "F" ?: true );
+		var markup       = price?.getAmount() ?: 0;
 
-		var isFixedPrice = ( price.getMethod().getId() == "F" );
-		var markup = price?.getAmount() ?: 0;
+		var name = "#product.getDescription()# (#product.getCode()#)";
+		// dump( name );
+		// dump( isFixedPrice );
+		// abort;
+
+		// var isFixedPrice = ( price.getMethod().getId() == "F" );
+		// var markup       = price?.getAmount() ?: 0;
 
 		appendLog(
 			message   = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#. Prezzo: fisso: #isFixedPrice#, valore: #markup#",
 			productId = product.getSerial()
 		);
 
-		
 		/*
 			fixed cost
 		*/
@@ -207,27 +214,21 @@
 
 		// appendLog( message = " ;Totale costi prodotto: #formatExtended( costProduct )#" );
 
-		if( isFixedPrice ) {
-
-			var finalPrice =  ( bundleCost + productCost + totalCostItems + unitFixedCost ) + markup;
+		if ( isFixedPrice ) {
+			var finalPrice = ( bundleCost + productCost + totalCostItems + unitFixedCost ) + markup;
 
 			appendLog(
 				message    = "Prezzo finale fisso. ( Bundle: #bundleCost# + prodotto base: #productCost# + prezzo items: #totalCostItems# + costo fisso: #unitFixedCost# ) + markup fisso: #markup#;Prezzo finale: #formatExtended( finalPrice )#",
 				lineTypeId = "H"
 			);
-
 		} else {
-
 			var finalPrice = ( ( bundleCost + productCost ) * markup ) + totalCostItems + unitFixedCost;
 
 			appendLog(
 				message    = "Prezzo finale. ( Bundle: #bundleCost# + prodotto base: #productCost# ) * markup: #markup# ) + prezzo items: #totalCostItems# + costo fisso: #unitFixedCost#;Prezzo finale: #formatExtended( finalPrice )#",
 				lineTypeId = "H"
 			);
-
 		}
-
-
 
 		var output = {
 			values = {

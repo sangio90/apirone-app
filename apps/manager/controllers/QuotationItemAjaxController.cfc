@@ -64,7 +64,6 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function saveAccessory( event, rc, prc ){
-
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
 		var thisId    = "";
 		var messageId = "";
@@ -104,7 +103,7 @@ component extends="com.apirone.core.controller.AbsController" {
 							finishId   = json.quotationItem.product.finish.id
 						}
 					)
-				.getData();
+					.getData();
 
 				if ( !Len( product ) || Len( product ) > 1 ) {
 					var message = "Combinazione Linea/Modello/Categoria/Finitura non disponibile.";
@@ -185,7 +184,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				} )
 
 				var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
-				if (!isNull( hash )) {
+				if ( !IsNull( hash ) ) {
 					bean.setHash( hash );
 					bean.setId( thisId );
 					super.fire( "quotationItem.update", [ bean ] );
@@ -239,16 +238,16 @@ component extends="com.apirone.core.controller.AbsController" {
 				bean.setQuantity( json.quotationItem.quantity );
 
 				var product = super
-						.fire(
-							"Product.search",
-							{
-								lineId     = json.signageConfig.catalogBundle.line.id,
-								modelId    = json.signageConfig.catalogBundle.model.id,
-								categoryId = json.signageConfig.catalogBundle.category.id,
-								finishId   = json.quotationItem.product.finish.id
-							}
-						)
-				.getData();
+					.fire(
+						"Product.search",
+						{
+							lineId     = json.signageConfig.catalogBundle.line.id,
+							modelId    = json.signageConfig.catalogBundle.model.id,
+							categoryId = json.signageConfig.catalogBundle.category.id,
+							finishId   = json.quotationItem.product.finish.id
+						}
+					)
+					.getData();
 				if ( !Len( product ) || Len( product ) > 1 ) {
 					var message = "Combinazione Linea/Modello/Categoria/Finitura non disponibile.";
 					result.setData( { "error" = message } );
@@ -348,7 +347,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				} )
 
 				var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
-				if (!isNull( hash )) {
+				if ( !IsNull( hash ) ) {
 					bean.setHash( hash );
 					bean.setId( thisId );
 					super.fire( "quotationItem.update", [ bean ] );
@@ -390,13 +389,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
 
+		json.delete( "imageBase64" );
+
+
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationZone.id ) );
 
 		bean.setPrice( 20.2 );
 		bean.setQuantity( json.quantity );
 
-		json.delete( "imageBase64" );
 
 		var product = super
 			.fire(
@@ -481,8 +482,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			if ( Len( selectedValue ) > 0 ) {
 				selectedValue = selectedValue[ 1 ];
 
-				var productItemBean        = super.bean( "QuotationItemProductItem" );
-				var productItem = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
+				var productItemBean = super.bean( "QuotationItemProductItem" );
+				var productItem     = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
 
 				productItemBean.setQuotationItemId( thisId );
 				productItemBean.setProductItem( productItem );
@@ -495,7 +496,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		} )
 
 		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
-		if (!isNull( hash )) {
+		if ( !IsNull( hash ) ) {
 			bean.setHash( hash );
 			bean.setId( thisId );
 			super.fire( "quotationItem.update", [ bean ] );

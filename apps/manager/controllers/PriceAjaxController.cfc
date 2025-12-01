@@ -18,10 +18,22 @@ component extends="com.apirone.core.controller.AbsController" {
 		var memy   = super.getMementify();
 
 		var calculator = super.service( "PriceCalculator" );
-		var pricing    = super.bean( "QuotationPrice" );
-		var lines      = [];
+
+		var pricing = super.bean( "QuotationPrice" );
+		var method  = super.bean( "PriceMethod" );
+
+		var lines = [];
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
+		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+		pricing.setMethod( method.setId( json.pricing.method.id ) );
+		if ( pricing.isFixed() ) {
+			pricing.setAmount( Val( json.pricing.total ) ? json.pricing.total : 0 );
+		} else {
+			pricing.setAmount( 0 );
+		}
 
 		/*
 			plate price
@@ -69,7 +81,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds );
 
-			line.setName( "Prezzo #fruit.fruit?.name#" );
+			line.setName( "#fruit.fruit?.name#" );
 			line.setAmount( fruitPrice );
 
 			// totalGoods = totalGoods + fruitPrice;

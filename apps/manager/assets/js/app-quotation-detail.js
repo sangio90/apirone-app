@@ -5,6 +5,7 @@ Object.assign( AP.quotation.fields, {
     detailForm: $( "#quotation-detail-header-form" ),
     zoneModalRoot: $( "#zone-modal-root" ),
     printModalRoot: $( "#print-modal-root" ),
+    totalItemBox: $( "#quotation-totals-item" ),
 } );
 
 $( document ).ready( function() {
@@ -37,6 +38,7 @@ $( document ).ready( function() {
 
 AP.quotation.detail = ( function() {
     var pub = {};
+    var fields = AP.quotation.fields;
 
     function signageApp() {
         return AP.signage.modal;
@@ -462,12 +464,20 @@ AP.quotation.detail = ( function() {
 
         addPlate: function() {
             plateApp().new();
+
+            console.log( "id", viewModel.get( "detailForm.data.id" ) );
+
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ) );
+
+            // fields.totalItemBox.show();
+            // const tabellaTotali = fields.totalItemBox.find( "table" )[0];
+            // $( tabellaTotali ).empty();
         },
 
         editSignage: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
-            const tabellaTotali = $( "#quotation-totals-item" ).find( "table" )[0];
+            const tabellaTotali = fields.totalItemBox.find( "table" )[0];
             $( tabellaTotali ).empty();
         },
 
@@ -481,7 +491,8 @@ AP.quotation.detail = ( function() {
         editPlate: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
-            const tabellaTotali = $( "#quotation-totals-item" ).find( "table" )[0];
+            fields.totalItemBox.show();
+            const tabellaTotali = fields.totalItemBox.find( "table" )[0];
             $( tabellaTotali ).empty();
         },
 

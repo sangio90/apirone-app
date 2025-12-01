@@ -5,28 +5,30 @@
 				<div class="justify-content-start" style="width: 95%">
 					<h3>Totali</h3>
 				</div>
-				<div style="font-size: 1.5em; cursor: pointer" id="symbol" data-bind="click: collapseTotals">▼</div>
+				<div style="font-size: 1.5em; cursor: pointer" 
+					id="qt-item-totals-symbol" data-bind="click: collapseTotals">▼</div>
 			</div>
 			<div id="quotation-totals-item-content">
 				<table style="width: 100%" class="quotation-table-item-prices-totals">
-					<tbody data-bind="source: pricing.lines" data-template="quotation-pricing-totals-item-tmpl"></tbody>
+					<tbody data-bind="source: pricing.data.lines" 
+						data-template="quotation-pricing-totals-item-tmpl"></tbody>
 				</table>
 				<div class="row mt-3 mb-2 align-items-center d-flex">
 					<div class="col-4">Sconti</div>
 					<div class="col-4">
 						<input class="form-control" name="discount1" 
-							placeholder="%" data-bind="value: pricing.discount1">
+							placeholder="%" data-bind="value: pricing.data.discount1">
 					</div>
 					<div class="col-4">
 						<input class="form-control" name="discount2" 
-							placeholder="%" data-bind="value: pricing.discount2">
+							placeholder="%" data-bind="value: pricing.data.discount2">
 					</div>
 				</div>
 				<div class="row mt-3 mb-2">
 					<div class="col-6">
 						<select name="priceMethod" class="form-control" 
-							data-bind="value: pricing.priceMethod.id">
-							<option value="A">Prezzo calcolato</option>
+							data-bind="value: pricing.data.method.id">
+							<option value="C">Prezzo calcolato</option>
 							<option value="F">Prezzo fisso</option>
 						</select>
 					</div>
@@ -35,7 +37,7 @@
 							<input class="form-control text-end" name="total" id="input-total"
 								placeholder="Totale preventivo"
 								data-format="0.00"
-								data-bind="value: pricing.total">
+								data-bind="value: pricing.data.total">
 							<span class="input-group-text">
 								<i class="fas fa-euro-sign"></i>
 							</span>

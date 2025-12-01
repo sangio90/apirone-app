@@ -5,14 +5,15 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="amount" type="Numeric";
 	property name="discount1" type="Numeric";
 	property name="discount2" type="Numeric";
-	
-	property name="priceMethod" type="com.apirone.core.model.bean.PriceMethod";
+
+	property name="method" type="com.apirone.core.model.bean.PriceMethod";
 
 	public QuotationPrice function init(){
 		var method = new com.apirone.core.model.bean.PriceMethod();
 
-		// A = Auto, F = fixed
-		setPriceMethod( method.setId( "A" ) );
+		// C = Calculated, F = fixed
+		setMethod( method.setId( "C" ) );
+		setLines( [] );
 
 		return this;
 	}
@@ -31,8 +32,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		var totalGoods = getTotalGoods();
 		var total      = totalGoods;
 
-		if ( getPriceMethod().getId() == "F" ) {
-			// fixed price
+		if ( isFixed() ) {
 			return getAmount();
 		}
 
@@ -45,6 +45,13 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		}
 
 		return total;
+	}
+
+	public Boolean function isFixed(){
+		if ( getMethod().getId() == "F" ) {
+			return true;
+		}
+		return false;
 	}
 
 }

@@ -8,12 +8,14 @@ component extends="coldbox.system.Interceptor" {
 		prc
 	){
 		if ( prc.keyExists( "currentRoutedURL" ) AND prc.currentRoutedURL == "manager/" ) {
-			Location( url = "/manager/login" );
+			Location( url = "/manager/login", addToken = false );
 		}
 
+		/*
 		if ( !rc.keyExists( "currentRoutedModule" ) ) {
-			Location( url = "/manager/dashboard" );
+			Location( url = "/manager/dashboard", addToken = false );
 		}
+		*/
 
 		cfheader( name = "Access-Control-Allow-Origin", value = "*" );
 		cfheader( name = "Access-Control-Allow-Methods", value = "GET, POST, OPTIONS" );

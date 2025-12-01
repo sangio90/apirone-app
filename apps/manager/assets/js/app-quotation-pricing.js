@@ -10,7 +10,7 @@ $( document ).ready( function() {
 
     if ( AP.quotation.fields.boxPricing.length ) {
 
-        AP.quotation.pricing.init();
+        // AP.quotation.pricing.init();
     }
 
 } );
@@ -23,17 +23,22 @@ AP.quotation.pricing = ( function() {
 
     var viewModel = kendo.observable( {
 
+        item: {
+            id: ""
+        },
+
         pricing: {
-            lines: [], // es. { name: "Frutto 1", amount: 10.5 },
+            data: {
+                discount1: "",
+                discount2: "",
 
-            discount1: "",
-            discount2: "",
+                method: {
+                    id: "C"
+                },
 
-            priceMethod: {
-                id: "F"
+                total: "0",
+                lines: [], // es. { name: "Frutto 1", amount: 10.5 },
             },
-
-            total: "0"
         },
 
         changePriceMethod: function( event ) {
@@ -58,10 +63,11 @@ AP.quotation.pricing = ( function() {
             status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width='20' height='20'>" );
 
             var data = AP.plate.modal.getVM().detailForm;
+            data.data.pricing = viewModel.get( "pricing.data" );
 
             NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax/quotation-items/000000/total",
+                url: "/manager/ajax/quotation-items/pricing",
                 data: JSON.stringify( data.data ),
                 callback: {
                     done: function( xhr ) {
@@ -69,8 +75,8 @@ AP.quotation.pricing = ( function() {
 
                             status.html( "" );
 
-                            viewModel.set( "pricing.lines", xhr.data.lines );
-                            viewModel.set( "pricing.total", xhr.data.total );
+                            viewModel.set( "pricing.data", xhr.data );
+                            // viewModel.set( "pricing.data", xhr.data );
                         }
                     }
                 }
@@ -81,13 +87,14 @@ AP.quotation.pricing = ( function() {
         collapseTotals: function( event ) {
 
             var container = $( "#quotation-totals-item-content" );
+            var symbol = $( "#qt-item-totals-symbol" );
 
             if ( container.is( ":hidden" ) ) {
                 container.show();
-                $( "#symbol" ).text( "▼" );
+                symbol.text( "▼" );
             } else {
                 container.hide();
-                $( "#symbol" ).text( "▲" );
+                symbol.text( "▲" );
             }
 
             return false;
@@ -119,13 +126,15 @@ AP.quotation.pricing = ( function() {
 
     };
 
-    pub.init = function() {
+    pub.init = function( itemId ) {
 
         console.log( "pricing" );
 
-        // fields.boxPricing.show();
+        kendo.bind( AP.quotation.fields.boxPricing, viewModel );
 
-    	kendo.bind( AP.quotation.fields.boxPricing, viewModel );
+        AP.quotation.fields.boxPricing.show();
+
+        viewModel.set( "item.id", itemId );
 
     };
 
