@@ -119,13 +119,13 @@
 							<cfset oggetto = stanza.zoneItems[zoneItem]>
 							<table style="border-collapse: collapse; width: 100%;">
 								<tr>
-									<td style="width: 12cm; border-right: 0; padding-left: 0.1in;">Articolo</td>
-									<td style="width: 2cm; border-left: 0; border-right: 0; text-align: right; padding-right: 0.1in;">Qty.</td>
-									<td style="width: 3cm; border-left: 0; border-right: 0; text-align: right; padding-right: 0.1in;">Prezzo</td>
-									<td style="width: 3cm; border-left: 0; text-align: right; padding-right: 0.1in;">Totale</td>
+									<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">Articolo</td>
+									<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">Qty.</td>
+									<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">Prezzo</td>
+									<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">Totale</td>
 								</tr>
 								<tr>
-									<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; width: 12cm !important;">
+									<td style="margin: 0 !important; padding: 3px; align-items: center; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; width: 12cm !important;">
 										<table class="hiddenTable">
 											<tr>
 												<cfif args.params.images>
@@ -190,13 +190,13 @@
 											</tr>
 										</table>
 									</td>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; line-height: 12px; width: 2cm !important; text-align: right; padding-right: 0.1in;">
+									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 2cm !important; text-align: right; padding-right: 0.1in;">
 										#oggetto.getQuantity()#
 									</td>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 										#LSNumberFormat( oggetto.getPrice(), ".99", "it_IT" )# €
 									</td>
-									<td style="padding-right: 0; border-left: 0; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+									<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 										#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice(), ".99", "it_IT" )# €
 									</td>
 								</tr>

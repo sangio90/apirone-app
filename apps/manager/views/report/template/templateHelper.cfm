@@ -197,9 +197,7 @@
 			}
 		</cfif>
 		body, td, th, span, div, p { font-family: 'Poppins'; font-size: 13px }
-		td {
-			border: 1px solid black;
-		}
+		
 		table {
 			border-collapse: collapse;
 		}

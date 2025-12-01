@@ -39,18 +39,18 @@
 							<table style="border-collapse: collapse; width: 100%;">
 								<tr>
 									<cfif args.params.images>
-										<td style="width: 6cm; border-right: 0; text-align: left; padding-left: 0.1in"><strong>Articolo</strong></td>
-										<td style="width: 5cm; border-left: 0; border-right: 0;"></td>
-										<td style="width: 9cm; border-left: 0; text-align: right;"></td>
+										<td style="width: 6cm; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; text-align: left; padding-left: 0.1in"><strong>Articolo</strong></td>
+										<td style="width: 5cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0;"></td>
+										<td style="width: 9cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right;"></td>
 									<cfelse>
-										<td style="width: 0.01cm; border-right: 0;"></td>
-										<td style="width: 10.99cm; border-left: 0; border-right: 0; padding-left: 0.1in;"><strong>Articolo</strong></td>
-										<td style="width: 9cm; border-left: 0; text-align: right;"></td>
+										<td style="width: 0.1cm; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+										<td style="width: 10.90cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-left: 0.1in;"><strong>Articolo</strong></td>
+										<td style="width: 9cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right;"></td>
 									</cfif>
 								</tr>
 								<tr>
 									<cfif args.params.images>
-										<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; width: 6cm !important;">
+										<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 6cm !important;">
 											<cfif IsNull( oggetto.getImage() )>
 												<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 6cm !important;">
 											<cfelse>
@@ -59,9 +59,9 @@
 											</cfif>
 										</td>
 									<cfelse>
-										<td style="padding: 0; margin: 0; border-right: 0; width: 0.01cm !important;"></td>
+										<td style="padding: 0; margin: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 0.1cm !important;"></td>
 									</cfif>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">
+									<td style="padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.9cm </cfif> !important;">
 										<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 										<cfif !isNull(oggetto.getPosition())>
 											<div style="font-size: 8pt; margin-top: 3px; text-transform: lowecase">Posizione: #oggetto.getPosition()#</div>
@@ -80,7 +80,7 @@
 											</cfif>
 										</cfif>
 									</td>
-									<td style="vertical-align: top; padding: 5pt; border-left: 0; width: 9cm !important;">
+									<td style="vertical-align: top; padding: 5pt; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 0; width: 9cm !important;">
 										<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 											<div style="font-size: 8pt; line-height: 15px;">
 												Lista Frutti: 
