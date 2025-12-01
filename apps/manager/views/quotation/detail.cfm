@@ -7,7 +7,7 @@
 			
             <div class="col-6 text-end mt-3">
 				#button( bind = "click:list", size = "sm", label = "Torna ai preventivi", icon="arrow-left" )#
-				#button( bind = "click:showHeader", size = "sm", label = "Dettaglio", icon="edit" )#
+				#button( bind = "click:showHeader", size = "sm", label = "Dettaglio", icon="edit", class="me-4" )#
 				#button( bind = "click:exportQuotation", size = "sm", label = "Esporta", icon="file-export" )#
 				#button( bind = "click:openPrintModal", size = "sm", label = "Stampa", icon="print" )#
 			</div>
@@ -51,7 +51,6 @@
 
                             </div>
 
-
                             <div class="form-group row mb-3">
                                 <section class="card">
                                     <div class="card-body">
@@ -86,8 +85,6 @@
                                 </section>
                             </div>
 
-                            #view( "quotation/totals" )#
-                            
                             <div class="form-group button-box">
                                 <div class="mt-2">
                                     <button class="btn btn-primary" data-bind="click:save"><i class="fa fa-save"></i> Salva</button>
@@ -112,6 +109,8 @@
     #view( "quotation/plate-modal" )#
     #view( "quotation/zone-modal" )#
     #view( "quotation/print-modal" )#
+
+    #view( "quotation/totals" )#
 
     #template( view="jstemplate/quotation/quotation-item-plate-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#

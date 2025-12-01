@@ -51,7 +51,7 @@ AP.quotation.detail = ( function() {
     }
 
     function headerApp() {
-        return AP.accessory.header;
+        return AP.quotation.header;
     }
 
     var viewModel = kendo.observable( {
@@ -130,7 +130,7 @@ AP.quotation.detail = ( function() {
         },
 
         showHeader: function() {
-            NM.util.openModal( $( "#quotation-header-modal" ) );
+            headerApp().edit( AP.page.quotation.id );
         },
 
         exportQuotation: function() {
@@ -796,10 +796,12 @@ AP.quotation.printModal = ( function() {
 
         toggleOptions: function() {
             const report = viewModel.get( "detailForm.data.report.id" );
+
             $( "#imagesCheckbox" )[0].checked = false;
             $( "#groupedCheckbox" )[0].checked = false;
             $( "#notesCheckbox" )[0].checked = false;
             $( "#discountsCheckbox" )[0].checked = false;
+
             if ( report == "classic" ) {
                 $( "#imagesDiv" ).css( "display", "block" );
                 $( "#imagesCheckbox" )[0].checked = true;
@@ -842,11 +844,12 @@ AP.quotation.printModal = ( function() {
 
     pub.init = function() {
         kendo.bind( fields.printModalRoot, viewModel );
-        viewModel.toggleOptions()
+        viewModel.toggleOptions();
     };
 
     pub.methods = function( options ) {
         return viewModel;
     };
+
     return pub;
 } () );

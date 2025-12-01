@@ -1,27 +1,5 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [
-			"id",
-			"shortId",
-			"name",
-			"company",
-			"description",
-			"phone",
-			"phoneCell",
-			"vatNumber",
-			"street",
-			"postalCode",
-			"city",
-			"state",
-			"country",
-			"SDI",
-			"shippingAddress",
-			"shippingAddresses"
-		],
-		profiles = {}
-	}
-
 	property name="company" type="String";
 	property name="description" type="String";
 	property name="phone" type="String";

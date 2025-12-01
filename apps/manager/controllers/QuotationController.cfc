@@ -31,14 +31,15 @@
 
 		prc.isEditing = true;
 		prc.title     = "Modifica preventivo";
-		prc.page      = getData().page;
 
+		var quotation = super.fire( "Quotation.get", [ rc.id ] );
 
-		var quotation           = super.fire( "Quotation.get", [ rc.id ] );
-		prc.page[ "quotation" ] = quotation;
+		prc.page = getData().page;
+		prc.page[ "quotation" ]["id"] = quotation.getId();
 
 		// prc.jsFiles.add( "app-plate-designer" );
 		// prc.jsFiles.add( "app-quotation-header" );
+		prc.jsFiles.add( "app-quotation-header" );
 		prc.jsFiles.add( "app-quotation-detail" );
 		prc.jsFiles.add( "app-quotation-pricing" );
 

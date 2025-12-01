@@ -21,8 +21,8 @@ AP.quotation.header = ( function() {
             id: "",
             name: "",
             customer: {
-                id:"",
-                name:""
+                id: "",
+                name: ""
             },
             shippingAddress: {
                 id: null,
@@ -31,28 +31,28 @@ AP.quotation.header = ( function() {
             quotationNumber: "",
             versionNumber: 1,
             lang: {
-                id:"IT"
+                id: "IT"
             },
             zone: {
-                id:"",
-                name:""
+                id: "",
+                name: ""
             },
             quotationDate: new Date(),
             validityDate: new Date(),
             notes: "",
             status: {
-                id:"LAV"
+                id: "LAV"
             },
             opportunity: {
-                id:"",
-                name:""
+                id: "",
+                name: ""
             },
             lead: {
-                id:"",
-                name:""
+                id: "",
+                name: ""
             },
             pricelist: {
-                id:""
+                id: ""
             },
             paymentMethod: {
                 id: 18 // BB 60 GG FM
@@ -66,33 +66,33 @@ AP.quotation.header = ( function() {
                 id: 22
             },
             invoiceData: {
-                name:"",
-                company:"",
-                vatNumber:"",
-                email:"",
-                phone:"",
-                street:"",
-                city:"",
-                postalCode:"",
-                country: { id:"" },
-                state: { id:"" }
+                name: "",
+                company: "",
+                vatNumber: "",
+                email: "",
+                phone: "",
+                street: "",
+                city: "",
+                postalCode: "",
+                country: { id: "" },
+                state: { id: "" }
             },
             shipmentData: {
-                name:"",
-                company:"",
-                vatNumber:"",
-                email:"",
-                phone:"",
-                street:"",
-                city:"",
-                postalCode:"",
-                country: { id:"", name:"" },
-                state: { id:"", name:"" }
+                name: "",
+                company: "",
+                vatNumber: "",
+                email: "",
+                phone: "",
+                street: "",
+                city: "",
+                postalCode: "",
+                country: { id: "", name: "" },
+                state: { id: "", name: "" }
             },
-            title: this.id ? "Modifica Preventivo" : "Nuovo Preventivo",
-            totals: {
-                "id": null
-            }
+        },
+        title: "Modifica preventivo",
+        totals: {
+            "id": null
         }
     };
 
@@ -113,11 +113,16 @@ AP.quotation.header = ( function() {
             serverFiltering: true,
             transport: {
                 read: {
-                    url: "/manager/ajax/quotations/crmcustomers/",
+                    url: "/manager/ajax/quotations/crmcustomers",
                     data: {
                         str: function() {
-                            return $( "#customer" ).val();
+                            return $( "#qt-customer" ).val();
                         },
+                    }
+                },
+                parameterMap: function( data, type ) {
+                    if ( type === "read" ) {
+                        return { "str": data.str() };
                     }
                 }
             },
@@ -132,11 +137,16 @@ AP.quotation.header = ( function() {
             serverFiltering: true,
             transport: {
                 read: {
-                    url: "/manager/ajax/quotations/crmopportunities/",
+                    url: "/manager/ajax/quotations/crmopportunities",
                     data: {
                         str: function() {
-                            return $( "#opportunity" ).val();
+                            return $( "#qt-opportunity" ).val();
                         },
+                    }
+                },
+                parameterMap: function( data, type ) {
+                    if ( type === "read" ) {
+                        return { "str": data.str() };
                     }
                 }
             },
@@ -151,11 +161,16 @@ AP.quotation.header = ( function() {
             serverFiltering: true,
             transport: {
                 read: {
-                    url: "/manager/ajax/quotations/crmleads/",
+                    url: "/manager/ajax/quotations/crmleads",
                     data: {
                         str: function() {
-                            return $( "#lead" ).val();
+                            return $( "#qt-lead" ).val();
                         },
+                    }
+                },
+                parameterMap: function( data, type ) {
+                    if ( type === "read" ) {
+                        return { "str": data.str() };
                     }
                 }
             },
@@ -184,7 +199,7 @@ AP.quotation.header = ( function() {
                             return;
                         }
                         Loading.hide();
-                        AP.widget.notify( "success", "Preventivo Esportato correttamente." );
+                        AP.widget.notify( "success", "Preventivo esportato correttamente." );
                     }
                 }
             } );
@@ -293,9 +308,7 @@ AP.quotation.header = ( function() {
                             var customerId =  viewModel.get( "detailForm.data.customer.id" );
                             var opportunityId = viewModel.get( "detailForm.data.opportunity.id" );
 
-                            console.log( "leadId", leadId );
-                            console.log( "customerId", customerId );
-                            console.log( "opportunityId", opportunityId );
+                            console.log( "lead", viewModel.get( "detailForm.data.lead" ) );
 
                             if ( customerId || leadId || opportunityId ) {
                                 return false;
@@ -339,7 +352,7 @@ AP.quotation.header = ( function() {
                         done: function( xhr ) {
                             status.html( "" );
                             AP.widget.notify( "success", "Preventivo salvato correttamente." );
-                            window.location.href = "/manager/quotations/" + xhr.data.payload.id;
+                            // window.location.href = "/manager/quotations/" + xhr.data.payload.id;
                         }
                     }
                 } );
@@ -354,9 +367,37 @@ AP.quotation.header = ( function() {
         return viewModel.get( "detailForm.data" );
     };
 
+    pub.edit = function( id, onsSave ) {
+        NM.util.openModal( $( "#quotation-header-modal" ) );
+
+        // var status = $( "#quotation-header-modal .save-status" );
+
+        Loading.show();
+
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/quotations/" + id,
+            callback: {
+                done: function( xhr ) {
+
+                    viewModel.set( "detailForm.data", xhr.data );
+
+                    setTimeout( function() {
+                        Loading.hide();
+                    }, 1000 );
+
+                }
+            }
+        } );
+
+
+    };
+
     pub.init = function() {
 
         kendo.bind( fields.headerRoot, viewModel );
+
+        console.log( "headerRoot:init" );
 
         viewModel.get( "languages" ).data( AP.page.languages );
         viewModel.get( "statuses" ).data( AP.page.statuses );

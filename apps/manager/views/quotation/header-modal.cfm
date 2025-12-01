@@ -2,12 +2,12 @@
     <div id="quotation-header-modal" class="modal fade">
         
         <section class="modal-dialog modal-xl">
-            <div class="modal-content">
+            <div class="modal-content" id="quotation-header-root">
 
-                <!--- <form id="quotation-header-detail-form" method="POST" name="quotation-header-detail-form"> ---->
+                <form id="quotation-header-form" method="POST" name="quotation-header-form">
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
-                        <h2 class="card-title" data-bind="text:detailForm.title"></h2>
+                        <h2 class="card-title" data-bind="text: detailForm.title"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>                
                         
@@ -29,7 +29,7 @@
                         </div>
                     </footer>
 
-                <!--- </form> ---->
+                </form>
 
             </div>
         </section>

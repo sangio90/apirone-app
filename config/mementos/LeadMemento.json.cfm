@@ -4,7 +4,8 @@
 			"shortId",
 			"firstName",
 			"lastName",
-			"description"
+			"description",
+			"name"
 		],
 		profiles = {}
 }

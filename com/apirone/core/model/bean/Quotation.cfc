@@ -1,21 +1,5 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [
-			"id",
-			"serial",
-			"shortId",
-			"quotationNumber",
-			"versionNumber",
-			"quotationDate",
-			"billingProfile.name",
-			"name",
-			"active",
-			"status"
-		],
-		profiles = {}
-	}
-
 	property name="quotationNumber" type="String";
 	property name="versionNumber" type="Numeric";
 	property name="quotationDate" type="Date";
@@ -23,6 +7,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="validityDate" type="Date";
 	property name="active" type="Numeric";
 	property name="pricelist" type="com.apirone.core.model.bean.Pricelist";
+	property name="vatCode" type="com.apirone.core.model.bean.VatCode";
 	property name="customer" type="com.apirone.core.model.bean.Customer";
 	property name="customerAddressId" type="String";
 	property name="opportunity" type="com.apirone.core.model.bean.Opportunity";

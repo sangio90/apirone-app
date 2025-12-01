@@ -109,9 +109,13 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		quotation.setId( json.id );
 		quotation.setName( json.name );
-		quotation.setQuotationDate( json.quotationDate );
-		quotation.setNotes( !IsNull( json.notes ) ? json.notes : null );
-		quotation.setValidityDate( json.validityDate );
+
+		quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
+		quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
+		quotation.setNotes( Len( json?.notes ) ? json.notes : NullValue() );
+		quotation.setVatCode(
+			Len( json?.vatCode?.id ) ? super.fire( "vatCode.get", [ json.vatCode.id ] ) : NullValue()
+		);
 
 		if ( !IsNull( json.opportunity ) && !IsNull( json.opportunity.id ) && json.opportunity.id != "" ) {
 			quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
@@ -126,7 +130,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
 
 		quotation.setCustomer(
-			!IsNull( json.customer ) ? super.fire( "customer.get", [ json.customer.id ] ) : NullValue()
+			Len( json?.customer?.id ) ? super.fire( "customer.get", [ json.customer.id ] ) : NullValue()
 		);
 
 		if ( !IsNull( json.shippingAddress ) && !IsNull( json.shippingAddress.id ) && json.shippingAddress.id != "" ) {
@@ -145,6 +149,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			quotation.setQuotationNumber( 1 );
 			quotation.setVersionNumber( 1 );
 			quotation.setStatus( super.fire( "status.get", [ "LAV" ] ) );
+
 			thisId    = super.fire( "quotation.create", [ quotation ] );
 			messageId = "quotation.created";
 		} else {
@@ -154,6 +159,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			// quotation.setActive( 0 );
 			// quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
 			// thisId = super.fire( "quotation.clone", [ quotation, statusId ] );
+
+
 			thisId    = super.fire( "quotation.update", [ quotation ] )
 			messageId = "quotation.updated";
 		}
@@ -195,13 +202,14 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function crmCustomers( event, rc, prc ){
-		var data   = [];
-		var name   = rc.str;
+		param rc.str = "";
+
 		var result = super.getResult();
 		var mem    = super.getMementify();
 
-		var rows = super.fire( "customer.search", [ name ] );
+		var rows = super.fire( "customer.search", [ rc.str ] );
 		var data = mem.convertList( rows.getData() );
+
 		result.setTotal( rows.getTotal() );
 		result.setData( data );
 
@@ -209,13 +217,14 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function crmOpportunities( event, rc, prc ){
-		var data   = [];
-		var name   = rc.str;
+		param rc.str = "";
+
 		var result = super.getResult();
 		var mem    = super.getMementify();
 
-		var rows = super.fire( "opportunity.search", [ name ] );
+		var rows = super.fire( "opportunity.search", [ rc.str ] );
 		var data = mem.convertList( rows.getData() );
+
 		result.setTotal( rows.getTotal() );
 		result.setData( data );
 
@@ -223,17 +232,29 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function crmLeads( event, rc, prc ){
-		var data   = [];
-		var name   = rc.str;
-		var result = super.getResult();
-		var mem    = super.getMementify();
+		param rc.str = "";
 
-		var rows = super.fire( "lead.search", [ name ] );
-		var data = mem.convertList( rows.getData() );
+		var result = super.getResult();
+		var memy   = super.getMementify();
+
+		var rows = super.fire( "lead.search", [ rc.str ] );
+
+		var data = memy.convertList( rows.getData() );
+
 		result.setTotal( rows.getTotal() );
 		result.setData( data );
 
 		event.setValue( "result", result );
+	}
+
+	function get( event, rc, prc ){
+		var result = super.getResult();
+		var memy   = super.getMementify();
+
+		var bean = super.fire( "Quotation.get", [ rc.id ] );
+		var data = memy.convert( bean, "detail" );
+
+		event.setValue( "result", data );
 	}
 
 	function export( event, rc, prc ){
