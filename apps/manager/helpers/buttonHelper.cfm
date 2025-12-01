@@ -84,6 +84,7 @@
     private function getButton( 
         required String label,
                  String bind="", 
+                 String href="", 
                  String iconBind="", 
                  String size="md", 
                  String type="submit", 
@@ -98,6 +99,7 @@
         ```
 
         <cfset var dataAttr = "">
+        
         <cfif data.len()>
             <cfloop collection="#data#" item="key">
                 <cfset dataAttr = ListAppend(dataAttr, 'data-#key#="#data[key]#"', " ")>
@@ -110,6 +112,7 @@
                     title="#arguments.title#" 
                     #dataAttr#
                     #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#
+                    #Len( arguments.href ) ? 'onClick="location.href=''#arguments.href#''"' : ''#
                     #Len( arguments.id ) ? 'id="#arguments.id#"' : ''#>
                     <i class="fas fa-#arguments.icon#"
                         #Len( arguments.iconBind ) ? 'data-bind="#arguments.iconBind#"' : ''#
