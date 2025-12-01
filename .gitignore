@@ -20,3 +20,6 @@ docker-compose.yml
 /scripts
 dump_db.sh
 restore_db.sh
+assets/main/img/fototesthorizontal.png
+assets/main/img/fototestmedia.png
+assets/main/img/fototestvertical.png

@@ -5,9 +5,7 @@
 
 	public Boolean function OnRequestStart( string targetPage ) {
 
-        //super.onRequestStart();
-
-        var allowedIPs = "127.0.0.*,185.6.241.249,79.19.179.30,194.183.87.112,185.52.113.41,192.168.*,10.0.*";
+        var allowedIPs = "127.0.0.*,185.6.241.249,79.19.179.30,194.183.87.112,185.52.113.41,192.168.*,10.0.*, 192.168.165.1";
 
         var ip = getRealIP();
         

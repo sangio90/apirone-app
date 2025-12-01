@@ -13,6 +13,10 @@ $( document ).ready( function() {
         AP.quotation.detail.init();
     }
 
+    if (AP.page.quotation.exported) {
+        $('.export-button').hide();
+    }
+
     const signageModal = document.getElementById( "signage-modal" );
 
     signageModal.addEventListener( "hide.bs.modal", ( e ) => {
@@ -135,7 +139,26 @@ AP.quotation.detail = ( function() {
             headerApp().edit( AP.page.quotation.id );
         },
 
-        exportQuotation: function() {
+        exportProducts: function() {
+            Loading.show();
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations-export-products/" + AP.page.quotation.id,
+                callback: {
+                    done: function( xhr ) {
+                        if( xhr.status == "INVALID" ) {
+                            Loading.hide();
+                            NM.form.showMessages( xhr.data );
+                            return;
+                        }
+                        Loading.hide();
+                        AP.widget.notify( "success", "Articoli Preventivo Esportati correttamente." );
+                    }
+                }
+            } );
+        },
+
+        export: function() {
             Loading.show();
             NM.util.ajax( {
                 method: "GET",

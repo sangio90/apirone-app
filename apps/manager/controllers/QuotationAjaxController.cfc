@@ -257,6 +257,19 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", data );
 	}
 
+	function exportProducts( event, rc, prc ){
+		var data = [];
+
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+
+		params[ "id" ]     = rc.id;
+		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
+		var result         = super.fire( "Quotation.exportProducts", [ quotationItems ] );
+
+		event.setValue( "result", result );
+	}
+
 	function export( event, rc, prc ){
 		var data = [];
 
@@ -266,6 +279,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "id" ]     = rc.id;
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
 		var result         = super.fire( "Quotation.export", [ quotationItems ] );
+
+		if (result) {
+			var quotation = super.fire( "Quotation.get",[ rc.id ]);
+			quotation.setExported( true );
+			super.fire( "quotation.update", [ quotation ] );
+		}
 
 		event.setValue( "result", result );
 	}
