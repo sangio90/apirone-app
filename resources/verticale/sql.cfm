@@ -14,6 +14,14 @@ LAV-VERNPOLVLIS
 <cfabort> --->
 
 <cfquery name="i" datasource="verticaleExport">
+    SELECT TABLE_SCHEMA, TABLE_NAME
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_TYPE = 'BASE TABLE'
+    ORDER BY TABLE_SCHEMA, TABLE_NAME;
+</cfquery>
+<cfdump var="#i#">
+<cfabort>
+<cfquery name="i" datasource="verticaleExport">
     SELECT * FROM DISBAS_APIR
 </cfquery>
 <cfquery name="y" datasource="verticaleExport">

@@ -57,6 +57,8 @@ component extends="com.apirone.core.root.Application" {
 
 			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# reset all");
 
+			url.fwreinit = 1;
+
 			CacheRemoveAll();
 
 			onApplicationStart();
@@ -86,7 +88,7 @@ component extends="com.apirone.core.root.Application" {
 		var COLDBOX_APP_MAPPING   = "";
 		var COLDBOX_CONFIG_FILE   = "config.Coldbox";
 		var COLDBOX_APP_KEY       = "";
-		var COLDBOX_FAIL_FAST     = false;
+		var COLDBOX_FAIL_FAST     = true;
 
 		application.cbBootstrap = new coldbox.system.Bootstrap(
 			COLDBOX_CONFIG_FILE,

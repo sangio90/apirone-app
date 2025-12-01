@@ -6,10 +6,14 @@
             </div>
 			
             <div class="col-6 text-end mt-3">
-				#button( bind = "click:list", size = "sm", label = "Torna ai preventivi", icon="arrow-left" )#
-				#button( bind = "click:showHeader", size = "sm", label = "Dettaglio", icon="edit", class="me-4" )#
-				#button( bind = "click:exportQuotation", size = "sm", label = "Esporta", icon="file-export" )#
+				#button( bind = "click:list", size = "sm", label = "Torna ai preventivi", icon="arrow-left", class="me-4" )#
+				#button( bind = "click:showHeader", size = "sm", label = "Dettaglio", icon="edit" )#
+                #button( bind = "click:export", size = "sm", label = "Esporta Articoli", icon="file-export", class="export-button" )#
+                #button( bind = "click:exportProducts", size = "sm", label = "Esporta Preventivo", icon="file-export", class="export-button" )#
 				#button( bind = "click:openPrintModal", size = "sm", label = "Stampa", icon="print" )#
+			</div>
+            <div class="export-button-tooltip col-6 text-end">
+				<p class="export-button-tooltip" style="color: red; display: none">Il preventivo è già stato esportato</p>
 			</div>
         
         </div>

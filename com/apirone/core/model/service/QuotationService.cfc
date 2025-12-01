@@ -114,8 +114,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.quotation.getId();
 	}
 
-
-	public String function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
+	public String function exportProducts( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
 		var success = false;
 		transaction {
 			var quotationData = {};
@@ -125,7 +124,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 			if ( arguments.quotationItems.len() > 0 ) {
 				var allProductItems = [];
-				var index           = 1;
+				var index = 1;
 				for ( var quotationItem in arguments.quotationItems ) {
 					setProgressivoComponenti( 0 )
 					var code    = "";
@@ -169,6 +168,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						);
 						var productItems   = [];
 						var productItemIds = [];
+						var importantAttributes = product.getImportantAttributes();
 						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
 						for ( var quotationItemProductItem in quotationItemProductItems ) {
 							var productItem = quotationItemProductItem.getProductItem();
@@ -179,17 +179,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 									return false;
 								}
 								var rawValue = attributeValue.getRawValue();
-								// in assenza di una esplicita definizione di importanza, uso il fatto che siano al livello 0 come criterio.
-								if ( productItem.getImportant() == 1 ) {
-									if ( !IsNull( rawValue ) ) {
-										productItems.add( {
-											"important"   = false,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-										productItemIds.add( productItem.getId() );
-									}
-								} else {
+								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
+								// se lo trovo lo imposto come importante, a patto che non ne siano gia stati trovati 2 (len 10)
+								var isImportant = importantAttributes.some(function(item) {
+									return item.getId() == attr.getId();
+								});
+								if (isImportant) {
 									if ( varCode.len() < 10 ) {
 										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
 										productItems.add( {
@@ -197,16 +192,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 											"rawValueId"  = rawValue.getId(),
 											"attributeId" = attributeValue.getAttributeId()
 										} );
-										productItemIds.add( productItem.getId() );
 									} else {
 										productItems.add( {
 											"important"   = false,
 											"rawValueId"  = rawValue.getId(),
 											"attributeId" = attributeValue.getAttributeId()
 										} );
-										productItemIds.add( productItem.getId() );
 									}
+								} else {
+									productItems.add( {
+										"important"   = false,
+										"rawValueId"  = rawValue.getId(),
+										"attributeId" = attributeValue.getAttributeId()
+									} );
 								}
+								productItemIds.add( productItem.getId() );
 							}
 							nota &= attribute.getName() & ": " & rawValue.getName() & "; ";
 						}
@@ -297,21 +297,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						}
 
 						success = getDao().export( data );
-
-						quotationData[ "CPROWNUM" ] = index;
-						quotationData[ "CPROWORD" ] = index * 10;
-						quotationData[ "MMCODART" ] = data[ "ARCODART" ];
-						quotationData[ "MMCODVAR" ] = data[ "VARCOD" ];
-						quotationData[ "MMCODCOL" ] = data[ "CLCODICE" ];
-						quotationData[ "ARUNMIS1" ] = "PZ";
-						quotationData[ "MMQTAMOV" ] = quotationItem.getQuantity();
-						quotationData[ "MMVALUNI" ] = quotationItem.getPrice();
-						quotationData[ "MMSCOAR1" ] = quotationItem.getDiscount1();
-						quotationData[ "MMSCOAR2" ] = quotationItem.getDiscount2();
-						quotationData[ "MMEVASIO" ] = "";
-						quotationData[ "MM_STATO" ] = "N";
-
-						allProductItems.append( quotationData );
 					}
 
 					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
@@ -328,23 +313,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLCODICE" = "000000",
 							"CLANNOTA" = nota
 						}
-
 						success = getDao().export( data );
-
-						quotationData[ "CPROWNUM" ] = index;
-						quotationData[ "CPROWORD" ] = index * 10;
-						quotationData[ "MMCODART" ] = data[ "ARCODART" ];
-						quotationData[ "MMCODVAR" ] = data[ "VARCOD" ];
-						quotationData[ "MMCODCOL" ] = data[ "CLCODICE" ];
-						quotationData[ "ARUNMIS1" ] = "PZ";
-						quotationData[ "MMQTAMOV" ] = quotationItem.getQuantity();
-						quotationData[ "MMVALUNI" ] = quotationItem.getPrice();
-						quotationData[ "MMSCOAR1" ] = quotationItem.getDiscount1();
-						quotationData[ "MMSCOAR2" ] = quotationItem.getDiscount2();
-						quotationData[ "MMEVASIO" ] = quotation.getValidityDate();
-						quotationData[ "MM_STATO" ] = "N";
-
-						allProductItems.append( quotationData );
 
 						var existingCodes = exportCodeSvc.list(
 							str = product.getCode() & RepeatString( "0", 25 - Len( product.getCode() ) )
@@ -365,14 +334,215 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						productComponent.DSCODCOL  = data.CLCODICE;
 						success                    = getDao().exportDiba( productComponent )
 					}
+				}
+			}
+		}
 
+		return success;
+	}
+
+	public String function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
+		var success = false;
+		transaction {
+			var quotationData = {};
+			if (quotationItems.len() > 0) {
+				var quotation = quotationItems[1].getQuotation();
+				quotationData = prepareExportData(quotation);
+			}
+			if ( arguments.quotationItems.len() > 0 ) {
+				var allProductItems = [];
+				var index = 1;
+				for ( var quotationItem in arguments.quotationItems ) {
+					setProgressivoComponenti( 0 )
+					var code    = "";
+					var product = quotationItem.getProduct()
+					if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
+						return false;
+					}
+					var categoryCode = Trim( product.getCategory().getCode() );
+					code &= categoryCode;
+					var nota = "";
+					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
+					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
+						if ( IsNull( product.getLine() ) ) {
+							return false;
+						}
+						var line     = product.getLine();
+						var lineCode = Trim( line.getCode() );
+
+						code &= lineCode;
+
+						if ( IsNull( product.getModel() ) ) {
+							return false;
+						}
+						var model = product.getModel();
+						code &= Trim( model.getCode() );
+
+						if ( IsNull( product.getFinish() ) ) {
+							return false;
+						}
+						var finishCode = Trim( product.getFinish().getCode() );
+						code &= finishCode;
+						description = product.getDescription().len() >= 35 ? product.getDescription().subString( 0, 35 ) : product.getDescription();
+
+						var arChiave = code;
+						var varCode  = "";
+						var colCode  = "000000";
+
+						var quotationItemProductItems = quotationItemProductItemSvc.list(
+							quotationItemId = quotationItem.getId(),
+							orderBy         = [ { field = "productItem.id" } ]
+						);
+						var productItems   = [];
+						var importantAttributes = product.getImportantAttributes();
+						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
+						for ( var quotationItemProductItem in quotationItemProductItems ) {
+							var productItem = quotationItemProductItem.getProductItem();
+							if ( !IsNull( productItem ) ) {
+								var attributeValue = productItem.getAttributeValue();
+								var attribute      = attributeSvc.get( attributeId = attributeValue.getAttributeId() );
+								if ( IsNull( attribute ) ) {
+									return false;
+								}
+								var rawValue = attributeValue.getRawValue();
+								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
+								// se lo trovo lo imposto come importante, a patto che non ne siano gia stati trovati 2 (len 10)
+								var isImportant = importantAttributes.some(function(item) {
+									return item.getId() == attr.getId();
+								});
+								if (isImportant) {
+									if ( varCode.len() < 10 ) {
+										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
+										productItems.add( {
+											"important"   = true,
+											"rawValueId"  = rawValue.getId(),
+											"attributeId" = attributeValue.getAttributeId()
+										} );
+									} else {
+										productItems.add( {
+											"important"   = false,
+											"rawValueId"  = rawValue.getId(),
+											"attributeId" = attributeValue.getAttributeId()
+										} );
+									}
+								} else {
+									productItems.add( {
+										"important"   = false,
+										"rawValueId"  = rawValue.getId(),
+										"attributeId" = attributeValue.getAttributeId()
+									} );
+								}
+								productItemIds.add( productItem.getId() );
+							}
+							nota &= attribute.getName() & ": " & rawValue.getName() & "; ";
+						}
+
+						varCode &= RepeatString( "0", 10 - Len( varCode ) )
+
+						// per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
+						var existingCodes = exportCodeSvc.list( str = code & varCode );
+						if ( existingCodes.len() > 0 ) {
+							// se ne esiste almeno uno, per ognuno di questi verifico che tutti i product items (anche quelli non importanti) siano presenti in exportCodeRawValue,
+							// se almeno uno non si trova, passo al successivo. Se non trovo nessun exportCode
+							// cosa che verifico controllando che il colCode rimanga vuoto, allora creo un nuovo exportCode e le relative exportCodeRawValue
+							for ( var existingCode in existingCodes ) {
+								var exportCodeRawValues = exportCodeRawValueSvc.list(
+									exportCodeId = existingCode.getId()
+								);
+								var allFound = true;
+								for ( var item in productItems ) {
+									var found = false;
+									for ( var exportCodeRawValue in exportCodeRawValues ) {
+										if ( exportCodeRawValue.getRawValue().getId() == item.rawValueId ) {
+											found = true;
+											break;
+										}
+									}
+									if ( !found ) {
+										allFound = false;
+										break;
+									}
+								}
+								if ( allFound ) {
+									colCode = existingCode.getCounter()
+									break;
+								}
+							}
+							//se non esiste questo varCode con questa combinazione di colCode, vuol dire che sicuramente non sono stati esportati ancora gli articoli quindi torno errore
+							return false;
+						} else {
+							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
+							return false;
+						}
+
+						arChiave = code & varCode & colCode;
+
+						var data = {
+							"AR_CHIAVE" = arChiave,
+							"ARCODART"  = code & RepeatString( "0", 15 - Len( code ) ),
+							"ARDESART"  = description,
+							"ARDATCAR"  = Now(),
+							"ARUNMIS1"  = "PZ",
+							"VARCOD"    = varCode,
+							"CLCODICE"  = colCode,
+							"CLANNOTA"  = nota
+						}
+
+						quotationData['CPROWNUM'] = index;
+						quotationData['CPROWORD'] = index * 10;
+						quotationData['MMCODART'] = data['ARCODART'];
+						quotationData['MMCODVAR'] = data['VARCOD'];
+						quotationData['MMCODCOL'] = data['CLCODICE'];
+						quotationData['ARUNMIS1'] = 'PZ';
+						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
+						quotationData['MMVALUNI'] = quotationItem.getPrice();
+						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
+						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
+						quotationData['MMEVASIO'] = '';
+						quotationData['MM_STATO'] = 'N';
+
+						allProductItems.append(quotationData);
+					}
+
+					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
+						var data = {
+							"AR_CHIAVE" = product.getCode() & RepeatString( "0", 31 - Len( product.getCode() ) ),
+							"ARCODART"  = product.getCode() & RepeatString( "0", 15 - Len( product.getCode() ) ),
+							"ARDESART"  = product.getName().subString( 0, 35 ) & RepeatString(
+								"0",
+								35 - Len( product.getName().subString( 0, 35 ) )
+							),
+							"ARDATCAR" = Now(),
+							"ARUNMIS1" = "PZ",
+							"VARCOD"   = "0000000000",
+							"CLCODICE" = "000000",
+							"CLANNOTA" = nota
+						}
+
+						quotationData['CPROWNUM'] = index;
+						quotationData['CPROWORD'] = index * 10;
+						quotationData['MMCODART'] = data['ARCODART'];
+						quotationData['MMCODVAR'] = data['VARCOD'];
+						quotationData['MMCODCOL'] = data['CLCODICE'];
+						quotationData['ARUNMIS1'] = 'PZ';
+						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
+						quotationData['MMVALUNI'] = quotationItem.getPrice();
+						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
+						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
+						quotationData['MMEVASIO'] = quotation.getValidityDate();
+						quotationData['MM_STATO'] = 'N';
+
+						allProductItems.append(quotationData);
+					}
+
+					success = getDao().exportQuotation( quotationData );
 					index++;
 				}
 			}
 		}
 
-		dump( allProductItems );
-		abort;
+		dump(allProductItems);abort;
+
 		return success;
 	}
 
@@ -631,6 +801,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setQuotationDate( record.quotation_date );
 			bean.setNotes( record.notes );
 			bean.setValidityDate( record.validity_date );
+			bean.setExported( record.exported );
 
 			bean.setActive( record.active );
 

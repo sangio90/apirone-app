@@ -23,6 +23,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="graphicTechnicianAccount" type="com.apirone.core.model.bean.Account";
 	property name="calculatedAmount" type="Numeric";
 	property name="serial" type="Numeric";
+	property name="exported" type="Boolean";
 
 	public Quotation function init(){
 		return this;

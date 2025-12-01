@@ -36,6 +36,7 @@
 
 		prc.page = getData().page;
 		prc.page[ "quotation" ]["id"] = quotation.getId();
+		prc.page[ "quotation" ]["exported"] = quotation.getExported();
 
 		// prc.jsFiles.add( "app-plate-designer" );
 		// prc.jsFiles.add( "app-quotation-header" );
