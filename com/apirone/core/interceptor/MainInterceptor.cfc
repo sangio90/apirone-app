@@ -217,34 +217,6 @@ component extends="coldbox.system.Interceptor" {
 		abort;
 	}
 
-	/*
-	private function canAccess( event ){
-		hostCanAccess();
-		userAgentCanAccess();
-
-		var currentEvent = arguments.event.getContext().event;
-
-		var allowedEvents = DeserializeJSON( FileRead( ExpandPath( "/config/allowedEvents.json.cfm" ) ) );
-
-		var allowedEventsForUnlogged = allowedEvents.forUnlogged;
-		var allowedEventsForCustomer = ArrayMerge( allowedEvents.forUnlogged, allowedEvents.forCustomer );
-
-		if ( event.getCurrentModule() == "manager" ) {
-			if ( session.user.isLogged() ) {
-				if ( session.user.getRole().getId() == "CST" ) {
-					if ( !ArrayFindNoCase( allowedEventsForCustomer, currentEvent ) ) {
-						Location( "/manager/dashboard?msg=page-not-auth&event=#currentEvent#", false );
-					}
-				}
-			} else {
-				if ( !ArrayFindNoCase( allowedEventsForUnlogged, currentEvent ) ) {
-					Location( "/manager/login?msg=not-auth", false );
-				}
-			}
-		}
-	}
-		*/
-
 	// TODO: use this in SecurityInterceptor
 	private String function storeRequest(
 		required event,
