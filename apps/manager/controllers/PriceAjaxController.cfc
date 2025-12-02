@@ -19,8 +19,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var calculator = super.service( "PriceCalculator" );
 
-		var pricing = super.bean( "QuotationPrice" );
 		var method  = super.bean( "PriceMethod" );
+		var pricing = super.bean( "QuotationItemPrice" );
 
 		var lines = [];
 

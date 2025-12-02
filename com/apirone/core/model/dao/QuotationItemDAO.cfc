@@ -68,11 +68,13 @@
 				quotation_id,
 				quotation_zone_id,
 				product_id,
+				<!---
 				discount1,
 				discount2,
 				price_method_id,
 				price_goods,
 				price_final,
+				---->
 				quantity,
 				"hash"
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
@@ -95,11 +97,13 @@
 				<cfelse>
 					NULL,
 				</cfif>
+				<!-----
 				<cfqueryparam cfsqltype="Float" value="#price.getDiscount1()#">,
 				<cfqueryparam cfsqltype="Float" value="#price.getDiscount2()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#price.getMethod().getId()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#price.getTotalGoods()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#price.getTotal()#">,
+				----->
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">,
 				<cfif NOT IsNull( arguments.quotationItem.getHash() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getHash()#">

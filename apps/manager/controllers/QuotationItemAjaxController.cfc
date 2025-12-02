@@ -375,18 +375,30 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 		var tmpDir = super.getTempDir();
-		var price  = super.bean( "QuotationPrice" );
 		var method = super.bean( "PriceMethod" );
+		var price  = super.bean( "QuotationItemPrice" );
+
+		var lines = [];
 
 		price.setAmount( json.price.total );
 		price.setDiscount1( json.price.discount1 );
 		price.setDiscount2( json.price.discount1 );
 		price.setMethod( method.setId( json.price.method.id ) );
-		price.setAmount( json.price.total );
+
+		for( var thisLine in json.price.lines ) {
+			var line  = super.bean( "PriceLine" );
+			line.setName( thisLine.name );
+			line.setAmount( thisLine.amount );
+			
+			lines.add( line );
+		}
+
+		price.setLines( lines );
 
 		var fileName   = "preview_plate_id_" & CreateUUID() & ".png";
 		var filePath   = tmpDir & "/" & fileName;
 		var binaryData = ToBinary( json.imageBase64 );
+		var beanFruits = [];
 
 		FileWrite( filePath, binaryData );
 
@@ -422,6 +434,30 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setProduct( product );
 
+		for ( var thisFruit in json.fruits._data ) {
+			if ( IsNumeric( thisFruit.id ) ) {
+				// update
+				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
+				//var action    = "QuotationItemFruit.update";
+			} else {
+				// create
+				var fruitBean = super.bean( "QuotationItemFruit" );
+				//var action    = "QuotationItemFruit.create";
+			}
+
+			var product = super.fire( "product.get", [ thisFruit.fruit.id ] );
+
+			fruitBean.setFruit( product );
+			//fruitBean.setQuotationItemId( thisId );
+			fruitBean.setPosition( thisFruit.position );
+
+			beanFruits.add( fruitBean );
+
+			//super.fire( action, [ fruitBean ] );
+		}
+
+		bean.setFruits( beanFruits );		
+
 		if ( !Len( id ) ) {
 			messageId = "quotationItem.created";
 			thisId    = super.fire( "quotationItem.create", [ bean ] )
@@ -430,26 +466,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotationItem.update", [ bean ] )
 		}
 
-		for ( var thisFruit in json.fruits._data ) {
-			if ( IsNumeric( thisFruit.id ) ) {
-				// update
-				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
-				var action    = "QuotationItemFruit.update";
-			} else {
-				// create
-				var fruitBean = super.bean( "QuotationItemFruit" );
-				var action    = "QuotationItemFruit.create";
-			}
-
-			var product = super.fire( "product.get", [ thisFruit.fruit.id ] );
-
-			fruitBean.setFruit( product );
-			fruitBean.setQuotationItemId( thisId );
-			fruitBean.setPosition( thisFruit.position );
-
-			super.fire( action, [ fruitBean ] );
-		}
-
+		
 		var files = super.fire( "File.search", { quotationItemId = thisId } );
 
 		if ( Len( files.getData() ) ) {
@@ -503,6 +520,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		} )
 
 		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
+
 		if ( !IsNull( hash ) ) {
 			bean.setHash( hash );
 			bean.setId( thisId );

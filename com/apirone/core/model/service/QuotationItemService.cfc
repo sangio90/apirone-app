@@ -2,6 +2,7 @@
 
 	property name="dao" inject="QuotationItemDAO";
 	property name="quotationItemFruitService" inject="QuotationItemFruitService";
+	property name="quotationItemPriceService" inject="QuotationItemPriceService";
 	property name="QuotationService" inject="QuotationService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
@@ -9,6 +10,7 @@
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="FileService" inject="FileService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
+
 	property name="cacheScope" type="String" default="QuotationItem.bean";
 
 	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId ){
@@ -95,7 +97,24 @@
 	}
 
 	public String function create( required quotationItem ){
-		var newId = getDao().insert( arguments.quotationItem );
+
+		transaction {
+			var newId = getDao().insert( arguments.quotationItem );
+
+			//dump( arguments.quotationItem.getFruits());
+			//abort;
+
+			for( var thisFruit in arguments.quotationItem.getFruits() ) {
+				thisFruit.setQuotationItemId( newId );
+				getQuotationItemFruitService().create( thisFruit );
+			}
+
+			var price = arguments.quotationItem.getPrice();
+
+			price.setQuotationItemId( newId );
+			getQuotationItemPriceService().create( price );
+
+		}
 
 		return newId;
 	}
@@ -111,26 +130,41 @@
 		var record = getDao().read( arguments.quotationItemId );
 		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.quotationItemId )
 		if ( record.recordCount ) {
+			
+			var pricing = super.bean( "QuotationItemPrice" );
+			
 			if ( fruits.len() > 0 ) {
+				
 				var bean = super.bean( "QuotationItemPlate" );
 				bean.setFruits( fruits )
+			
 			} else {
+				
 				if ( Len( record.signage_config_item_id ) ) {
 					var bean = super.bean( "QuotationItemSignage" );
 				} else {
 					var bean = super.bean( "QuotationItem" );
 				}
+			
 			}
 
+			pricing.setDiscount1( record.discount1 );
+			pricing.setDiscount2( record.discount2 );
+			pricing.setAmount( record.price );
+
 			bean.setId( record.quotation_item_id );
-			bean.setPrice( record.price );
-			bean.setDiscount1( record.discount1 );
-			bean.setDiscount2( record.discount2 );
+			//bean.setPrice( record.price );
+			//bean.setDiscount1( record.discount1 );
+			//bean.setDiscount2( record.discount2 );
 			bean.setQuantity( record.quantity );
+			
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
+			bean.setPrice( pricing );
+
 			if ( Len( record.product_id ) ) {
 				bean.setProduct( getProductService().get( record.product_id ) );
 			}
+			
 			bean.setQuotationZone(
 				IsNull( record.quotation_zone_id ) ? NullValue() : getQuotationZoneService().get(
 					record.quotation_zone_id
@@ -153,17 +187,20 @@
 			}
 
 			var images = getFileService().list( quotationItemId = record.quotation_item_id );
+			
 			if ( Len( images ) ) {
 				bean.setImage( images[ 1 ] );
 			}
 
 			var items = getQuotationItemProductItemService().list( quotationItemId = quotationItemId );
+			
 			if ( Len( items ) ) {
 				bean.setItems( items );
 			}
 
 			bean.setNotes( record.notes );
 			bean.setHash( record.hash );
+			
 			if ( Len( record.position ) ) {
 				bean.setPosition( record.position );
 			}
