@@ -171,6 +171,7 @@ AP.quotation.detail = ( function() {
                 url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
                 callback: {
                     done: function( xhr ) {
+                        Loading.hide();
                         if( xhr.status == "INVALID" ) {
                             Loading.hide();
                             NM.form.showMessages( xhr.data );
@@ -183,7 +184,6 @@ AP.quotation.detail = ( function() {
                             return;
                         }
                         $('.export-button').hide();
-                        Loading.hide();
                         AP.widget.notify( "success", "Preventivo Esportato correttamente." );
                     }
                 }
