@@ -1,30 +1,12 @@
-component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" {
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	this.memento = {
-		defaultIncludes = [ "id", "shortId", "name", "code" ],
-		mappers         = {
-			"nameItem" = function( value ){
-				return value ?: {
-					"id"   = "",
-					"name" = "",
-					"lang" = { "id" = "IT", "name" = "" }
-				};
-			}
-		},
-		profiles = {
-			list = {
-				defaultIncludes = [
-					"id",
-                    "shortId",
-					"name",
-					"nameItem",
-					"code"
-				]
-			}
-		}
+		defaultIncludes = [ "id", "shortId", "name", "code", "isoCode" ]
 	}
 
 	property name="code" type="String";
+	property name="isoCode" type="String";
+	property name="name" type="String";
 
     public Country function init(){
         return this;

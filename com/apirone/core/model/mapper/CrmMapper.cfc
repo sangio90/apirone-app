@@ -1,6 +1,7 @@
 ﻿component extends="com.apirone.core.model.mapper.AbsMapper" accessors="true" {
 
 	property name="statusService" inject="StatusService";
+	property name="CountryService" inject="CountryService";
 
 	/**
 	 * Mappa dati cliente CRM su bean Customer interno
@@ -11,18 +12,25 @@
 		customer.setId( data.id );
 		customer.setName( data.name ?: "" );
 		customer.setDescription( data.description ?: "" );
+		var country = null;
 		if (Len(accountCustom)) {
 			customer.setCompany( accountCustom.ragione_sociale_c ?: "" );
 			customer.setVatNumber( accountCustom.partita_iva_c ?: "" );
 			customer.setSDI( accountCustom.sdi_c ?: "" );
 			customer.setPhoneCell( accountCustom.phone_cell_c ?: "" );
+			country = accountCustom.assignablecountry_c;
 		}
 		customer.setPhone( data.phone_office ?: data.phone_alternate ?: "" );
 		customer.setStreet( data.billing_address_street ?: "" );
 		customer.setPostalCode( data.billing_address_postalcode ?: "" );
 		customer.setCity( data.billing_address_city ?: "" );
 		customer.setState( data.billing_address_state ?: "" );
-		customer.setCountry( data.billing_address_country ?: "" );
+		if (!isNull(country)) {
+			country = getCountryService().get( Trim(country) );
+			customer.setCountry( country );
+		} else {
+			customer.setCountry( "" );
+		}
 		var accountAddresses = data.indirizzi_spedizione;
 		if (Len(accountAddresses)) {
 			customer.setShippingAddresses( accountAddresses ?: [] );

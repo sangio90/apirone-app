@@ -152,7 +152,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteQuotationExportedRow" );
+				outcome.setType( "ApirOne.CannotDeleteQuotationExported" );
 				outcome.setMessage( "Cannot delete quotation exported row [#arguments.key# row: #arguments.rowNumber#]" );
 			}
 		}

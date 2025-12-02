@@ -151,6 +151,12 @@ AP.quotation.detail = ( function() {
                             NM.form.showMessages( xhr.data );
                             return;
                         }
+
+                        if (xhr.data.success == false) {     
+                            AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del Preventivo." );
+                            Loading.hide();
+                            return
+                        }
                         Loading.hide();
                         AP.widget.notify( "success", "Articoli Preventivo Esportati correttamente." );
                     }
@@ -170,6 +176,13 @@ AP.quotation.detail = ( function() {
                             NM.form.showMessages( xhr.data );
                             return;
                         }
+                        
+                        if (xhr.data.success == false) {     
+                            AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del Preventivo." );
+                            Loading.hide();
+                            return;
+                        }
+                        $('.export-button').hide();
                         Loading.hide();
                         AP.widget.notify( "success", "Preventivo Esportato correttamente." );
                     }

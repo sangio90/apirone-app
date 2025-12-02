@@ -29,6 +29,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="CountryService" inject="CountryService";
 	property name="vatCodeService" inject="VatCodeService";
+	property name="CountryService" inject="CountryService";
 	property name="progressivoComponenti" type="Numeric";
 
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
@@ -114,14 +115,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.quotation.getId();
 	}
 
-	public String function exportProducts( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
-		var success = false;
+	public Struct function exportProducts( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
+		var result = {
+			'success' = false,
+			'error' = null
+		};
 		transaction {
-			var quotationData = {};
-			if ( quotationItems.len() > 0 ) {
-				var quotation = quotationItems[ 1 ].getQuotation();
-				quotationData = prepareExportData( quotation );
-			}
 			if ( arguments.quotationItems.len() > 0 ) {
 				var allProductItems = [];
 				var index = 1;
@@ -130,7 +129,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					var code    = "";
 					var product = quotationItem.getProduct()
 					if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
-						return false;
+						result.error = 'Prodotto o Categoria Prodotto non trovata.'
+						return result;
 					}
 					var categoryCode = Trim( product.getCategory().getCode() );
 					code &= categoryCode;
@@ -138,7 +138,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
 					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
 						if ( IsNull( product.getLine() ) ) {
-							return false;
+							result.error = 'Linea Prodotto non trovata.'
+							return result;
 						}
 						var line     = product.getLine();
 						var lineCode = Trim( line.getCode() );
@@ -146,13 +147,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						code &= lineCode;
 
 						if ( IsNull( product.getModel() ) ) {
-							return false;
+							result.error = 'Modello Prodotto non trovato.'
+							return result;
 						}
 						var model = product.getModel();
 						code &= Trim( model.getCode() );
 
 						if ( IsNull( product.getFinish() ) ) {
-							return false;
+							result.error = 'Finitura Prodotto non trovata.'
+							return result;
 						}
 						var finishCode = Trim( product.getFinish().getCode() );
 						code &= finishCode;
@@ -176,7 +179,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								var attributeValue = productItem.getAttributeValue();
 								var attribute      = attributeSvc.get( attributeId = attributeValue.getAttributeId() );
 								if ( IsNull( attribute ) ) {
-									return false;
+									result.error = 'Attributo Prodotto non trovato.';
+									return result;
 								}
 								var rawValue = attributeValue.getRawValue();
 								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
@@ -300,7 +304,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLANNOTA"  = nota
 						}
 
-						success = getDao().export( data );
+						result.success = getDao().export( data );
 					}
 
 					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
@@ -317,7 +321,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLCODICE" = "000000",
 							"CLANNOTA" = nota
 						}
-						success = getDao().export( data );
+						result.success = getDao().export( data );
 
 						var existingCodes = exportCodeSvc.list(
 							str = product.getCode() & RepeatString( "0", 25 - Len( product.getCode() ) )
@@ -336,32 +340,42 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						productComponent.DSCODART  = data.ARCODART;
 						productComponent.DSCODVAR  = data.VARCOD;
 						productComponent.DSCODCOL  = data.CLCODICE;
-						success                    = getDao().exportDiba( productComponent )
+						result.success = getDao().exportDiba( productComponent );
 					}
 				}
 			}
 		}
 
-		return success;
+		return result;
 	}
 
-	public String function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
-		var success = false;
+	public Struct function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
+		var result = {
+			'success' = false,
+			'error' = null
+		};
 		transaction {
-			var quotationData = {};
 			if (quotationItems.len() > 0) {
 				var quotation = quotationItems[1].getQuotation();
-				quotationData = prepareExportData(quotation);
+				quotationDataResult = prepareExportData(quotation);
+				if (!isNull(quotationDataResult.error)) {
+					result.error = quotationDataResult.error;
+					return result;
+				}
+				quotationDataHead = quotationDataResult.data;
 			}
-			if ( arguments.quotationItems.len() > 0 ) {
+			if ( quotationItems.len() > 0 ) {
 				var allProductItems = [];
 				var index = 1;
 				for ( var quotationItem in arguments.quotationItems ) {
+					var quotationData = {}
+					quotationData.append(quotationDataHead);
 					setProgressivoComponenti( 0 )
 					var code    = "";
 					var product = quotationItem.getProduct()
 					if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
-						return false;
+						result.error = 'Prodotto o Categoria Prodotto non trovata.'
+						return result;
 					}
 					var categoryCode = Trim( product.getCategory().getCode() );
 					code &= categoryCode;
@@ -369,7 +383,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
 					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
 						if ( IsNull( product.getLine() ) ) {
-							return false;
+							result.error = 'Linea Prodotto non trovata.'
+							return result;
 						}
 						var line     = product.getLine();
 						var lineCode = Trim( line.getCode() );
@@ -377,13 +392,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						code &= lineCode;
 
 						if ( IsNull( product.getModel() ) ) {
-							return false;
+							result.error = 'Modello Prodotto non trovato.'
+							return result;
 						}
 						var model = product.getModel();
 						code &= Trim( model.getCode() );
 
 						if ( IsNull( product.getFinish() ) ) {
-							return false;
+							result.error = 'Finitura Prodotto non trovata.'
+							return result;
 						}
 						var finishCode = Trim( product.getFinish().getCode() );
 						code &= finishCode;
@@ -406,7 +423,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								var attributeValue = productItem.getAttributeValue();
 								var attribute      = attributeSvc.get( attributeId = attributeValue.getAttributeId() );
 								if ( IsNull( attribute ) ) {
-									return false;
+									result.error = 'Attributo Prodotto non trovato.';
+									return result;
 								}
 								var rawValue = attributeValue.getRawValue();
 								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
@@ -420,7 +438,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								if (isImportant) {
 									if ( varCode.len() < 10 ) {
 										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
+										productItems.add( {
+											"important"   = true,
+											"rawValueId"  = rawValue.getId(),
+											"attributeId" = attributeValue.getAttributeId()
+										} );
+									} else {
+										productItems.add( {
+											"important"   = false,
+											"rawValueId"  = rawValue.getId(),
+											"attributeId" = attributeValue.getAttributeId()
+										} );
 									}
+								} else {
+									productItems.add( {
+										"important"   = false,
+										"rawValueId"  = rawValue.getId(),
+										"attributeId" = attributeValue.getAttributeId()
+									} );
 								}
 							}
 							nota &= attribute.getName() & ": " & rawValue.getName() & "; ";
@@ -453,17 +488,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 									}
 								}
 								if ( allFound ) {
-									colCode = existingCode.getCounter()
+									colCode = existingCode.getCounter();
 									break;
 								}
+								//se non esiste questo varCode con questa combinazione di colCode, vuol dire che sicuramente non sono stati esportati ancora gli articoli quindi torno errore
+								result.error = 'Esporta gli Articoli prima.';
+								return result;
 							}
-							//se non esiste questo varCode con questa combinazione di colCode, vuol dire che sicuramente non sono stati esportati ancora gli articoli quindi torno errore
-							return false;
 						} else {
 							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
-							return false;
+							result.error = 'Esporta gli Articoli prima.';
+							return result;
 						}
-
 						arChiave = code & varCode & colCode;
 
 						var data = {
@@ -525,14 +561,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					}
 
 					// success = getDao().exportQuotation( quotationData );
-					index++;
+					index = index + 1;
 				}
 			}
 		}
-
 		dump(allProductItems);abort;
+		result.success = true;
 
-		return success;
+		return result;
 	}
 
 	public function getComponents(
@@ -630,9 +666,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation ){
+		var result = {
+			'data' = {},
+			'error' = null
+		};
+		
 		var customer = quotation.getCustomer();
-		if (!isNull(quotation.getShippingProfile())) {
-			return false;
+		if (isNull(quotation.getShippingProfile())) {
+			result.error = 'Dati Spedizione non trovati.'
+			return result;
 		}
 		var quotationData = {
 			"MMSERIAL" = quotation.getSerial(),
@@ -649,7 +691,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFINDIRI" = customer.getStreet(),
 			"CFLOCALI" = customer.getCity(),
 			"CFPROVIN" = customer.getState(),
-			"CFSTAISO" = customer.getCountry(),
+			"CFSTAISO" = customer.getCountry()?.getIsoCode(),
 			"CFPARIVA" = customer.getVatNumber(),
 			"CFTELEFO" = customer.getPhone(),
 			"CFBLOCCO" = "N",
@@ -658,17 +700,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"DEINDDOD" = customer.getStreet(),
 			"DELOCDOD" = customer.getCity(),
 			"DEPRODOD" = customer.getState(),
-			"DENAZDOD" = customer.getCountry(),
+			"DENAZDOD" = customer.getCountry()?.getIsoCode(),
 			"DEIDDMER" = quotation.getShippingProfile().getId(),
 			"DEDESMER" = quotation.getShippingProfile().getCompany(),
 			"DEINDMER" = quotation.getShippingProfile().getStreet(),
 			"DELOCMER" = quotation.getShippingProfile().getCity(),
 			"DEPROMER" = quotation.getShippingProfile().getState(),
-			"DENAZMER" = quotation.getShippingProfile().getCountry()
+			"DENAZMER" = quotation.getShippingProfile().getCountry()?.getIsoCode()
 		};
 
 
-		return quotationData
+		result.data = quotationData;
+		return result;
 	}
 
 	public String function clone( required com.apirone.core.model.bean.Quotation quotation, required String status ){
@@ -791,8 +834,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						shippingProfile.setCity( shippingAddress[ "citta" ]);
 						shippingProfile.setPostalCode( shippingAddress[ "cap" ]);
 						shippingProfile.setState( shippingAddress[ "provincia" ]);
-						// shippingProfile.setCountry( getCountryService.get( shippingAddress[ "paese" ] ) );
-						shippingProfile.setCountry( getCountryService().get( "693a3dda-bf35-4556-9a12-2c693afce836" ) );
+						shippingProfile.setCountry( getCountryService().get( Trim(shippingAddress[ "paese" ]) ) );
 						bean.setShippingProfile( shippingProfile );
 					}
 				}

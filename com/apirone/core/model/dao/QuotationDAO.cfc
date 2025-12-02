@@ -330,6 +330,13 @@ NULL
 					<cfelse>
 						NULL
 					</cfif>
+				,
+				exported =
+					<cfif !IsNull( arguments.quotation.getExported() )>
+						<cfqueryparam cfsqltype="Boolean" value="#arguments.quotation.getExported()#">
+					<cfelse>
+						NULL
+					</cfif>
 
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getId()#">::uuid

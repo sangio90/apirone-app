@@ -438,6 +438,13 @@
 		get( "/ajax/quotation-items-exported" ).to( "QuotationItemExportedAjaxController.list" ).end();
 		delete( "/ajax/quotation-item-exported-rows" ).to( "QuotationItemExportedAjaxController.deleteRow" ).end();
 
+		get( "/quotations-exported" ).to( "QuotationExportedController.list" ).end();
+		get( "/ajax/quotations-exported/:key" ).to( "QuotationExportedAjaxController.listRows" ).end();
+		delete( "/ajax/quotations-exported/:key" ).to( "QuotationExportedAjaxController.delete" ).end();
+		post( "/ajax/quotations-exported" ).to( "QuotationExportedAjaxController.deleteMulti" ).end();
+		get( "/ajax/quotations-exported" ).to( "QuotationExportedAjaxController.list" ).end();
+		delete( "/ajax/quotation-exported-rows" ).to( "QuotationExportedAjaxController.deleteRow" ).end();
+
 		/*
 			quotation items
 		*/

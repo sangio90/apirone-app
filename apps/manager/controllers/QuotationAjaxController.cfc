@@ -280,7 +280,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
 		var result         = super.fire( "Quotation.export", [ quotationItems ] );
 
-		if (result) {
+		if (result.success) {
 			var quotation = super.fire( "Quotation.get",[ rc.id ]);
 			quotation.setExported( true );
 			super.fire( "quotation.update", [ quotation ] );
