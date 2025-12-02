@@ -57,8 +57,6 @@ component extends="com.apirone.core.root.Application" {
 
 			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# reset all");
 
-			url.fwreinit = 1;
-
 			CacheRemoveAll();
 
 			onApplicationStart();
