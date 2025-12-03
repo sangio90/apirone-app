@@ -103,72 +103,141 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "";
 		var result    = super.getResult();
 
-		var currency      = super.bean( "Currency" );
-		var quotation     = super.bean( "Quotation" );
-		var paymentMethod = super.bean( "PaymentMethod" );
+		transaction {
+			var currency      = super.bean( "Currency" );
+			var quotation     = super.bean( "Quotation" );
+			var paymentMethod = super.bean( "PaymentMethod" );
+			quotation.setId( json.id );
+			quotation.setName( json.name );
 
-		quotation.setId( json.id );
-		quotation.setName( json.name );
+			quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
+			quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
+			quotation.setNotes( Len( json?.notes ) ? json.notes : NullValue() );
+			quotation.setVatCode(
+				Len( json?.vatCode?.id ) ? super.fire( "vatCode.get", [ json.vatCode.id ] ) : NullValue()
+			);
 
-		quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
-		quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
-		quotation.setNotes( Len( json?.notes ) ? json.notes : NullValue() );
-		quotation.setVatCode(
-			Len( json?.vatCode?.id ) ? super.fire( "vatCode.get", [ json.vatCode.id ] ) : NullValue()
-		);
+			if ( !IsNull( json.opportunity ) && !IsNull( json.opportunity.id ) && json.opportunity.id != "" ) {
+				quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
+			}
 
-		if ( !IsNull( json.opportunity ) && !IsNull( json.opportunity.id ) && json.opportunity.id != "" ) {
-			quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
-		}
+			if ( !IsNull( json.lead ) && !IsNull( json.lead.id ) && json.lead.id != "" ) {
+				quotation.setLead( super.fire( "lead.get", [ json.lead.id ] ) );
+			}
 
-		if ( !IsNull( json.lead ) && !IsNull( json.lead.id ) && json.lead.id != "" ) {
-			quotation.setLead( super.fire( "lead.get", [ json.lead.id ] ) );
-		}
+			quotation.setActive( true );
 
-		quotation.setActive( true );
+			quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
 
-		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
+			quotation.setCustomer(
+				Len( json?.customer?.id ) ? super.fire( "customer.get", [ json.customer.id ] ) : NullValue()
+			);
 
-		quotation.setCustomer(
-			Len( json?.customer?.id ) ? super.fire( "customer.get", [ json.customer.id ] ) : NullValue()
-		);
+			if ( !IsNull( json.shippingAddress ) && !IsNull( json.shippingAddress.id ) && json.shippingAddress.id != "" ) {
+				quotation.setCustomerAddressId( json.shippingAddress.id );
+			}
 
-		if ( !IsNull( json.shippingAddress ) && !IsNull( json.shippingAddress.id ) && json.shippingAddress.id != "" ) {
-			quotation.setCustomerAddressId( json.shippingAddress.id );
-		}
+			quotation.setPaymentMethod( paymentMethod.setId( json.paymentMethod.id ) );
+			quotation.setCurrency( currency.setId( json.currency.id ) );
+			// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
+			// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
+			// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
+			// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
+			if ( !Len( json.id ) ) {
+				// create
+				quotation.setQuotationNumber( 1 );
+				quotation.setVersionNumber( 1 );
+				var status = super.fire( "status.get", [ "LAV" ] );
+				quotation.setStatus( status );
+				
+				thisId    = super.fire( "quotation.create", [ quotation ] );
+				messageId = "quotation.created";
+				
+				var quotationStatusHistory = super.bean( "QuotationStatusHistory" );
+				quotationStatusHistory.setQuotationId( thisId );
+				quotationStatusHistory.setStatus( status );
+				quotationStatusHistory.setAccount( session.user.getAccount() );
+				
+				super.fire( "QuotationStatusHistory.create", [ quotationStatusHistory ] );
+			} else {
+				// update
+				var bean = super.fire( "Quotation.get", [ rc.id ] );
 
-		quotation.setPaymentMethod( paymentMethod.setId( json.paymentMethod.id ) );
-		quotation.setCurrency( currency.setId( json.currency.id ) );
-		// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
-		// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
-		// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
-		// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
-
-		if ( !Len( json.id ) ) {
-			// create
-			quotation.setQuotationNumber( 1 );
-			quotation.setVersionNumber( 1 );
-			quotation.setStatus( super.fire( "status.get", [ "LAV" ] ) );
-
-			thisId    = super.fire( "quotation.create", [ quotation ] );
-			messageId = "quotation.created";
-		} else {
-			// update
-			var bean = super.fire( "Quotation.get", [ rc.id ] );
-
-			// quotation.setActive( 0 );
-			// quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
-			// thisId = super.fire( "quotation.clone", [ quotation, statusId ] );
-
-
-			thisId    = super.fire( "quotation.update", [ quotation ] )
-			messageId = "quotation.updated";
+				// quotation.setActive( 0 );
+				// thisId = super.fire( "quotation.clone", [ quotation, statusId ] );
+				
+				if ( !isNull(json.status.id) && ( json.status.id != bean.getStatus().getId() ) ) {
+					var errorMessage = this.setQuotationStatusHistory(json);
+					if (!isNull(errorMessage)) {
+						result.setData( { "error" = errorMessage } );
+						return event.setValue( "result", result );
+					}
+				}
+				var status = super.fire( "status.get", [ json.status.id ] );
+				quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
+				thisId    = super.fire( "quotation.update", [ quotation ] )
+				messageId = "quotation.updated";
+			}
 		}
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message, "payload" = { "id" = thisId } } );
+		result.setData( { "message" = message, "payload" = { "id" = thisId }, "error" = {} } );
 		event.setValue( "result", result );
+	}
+
+	function setQuotationStatusHistory(json) {
+		var quotationStatusHistories = super.fire( "QuotationStatusHistory.list", [ "quotationId" = json.id ] );
+		//gli status history sono ordinati per data creazione decrescente, quindi cerco l'ultimo e verifico che lo status sia diverso. Se è diverso ne creo uno nuovo, altrimenti sono in modifica.
+		if ( quotationStatusHistories.len() > 0 && quotationStatusHistories[1].getStatus().getId() == json.status.id ) {
+			var quotationStatusHistory = quotationStatusHistories[1];
+			thisId = quotationStatusHistory.getId();
+		} else {
+			var quotationStatusHistory = super.bean( "QuotationStatusHistory" );
+			quotationStatusHistory.setQuotationId( json.id );
+			quotationStatusHistory.setAccount( session.user.getAccount() );
+			quotationStatusHistory.setStatus( super.service( "Status" ).get( json.status.id ) );
+			messageId = "quotationStatusHistory.created";
+			thisId    = super.fire( "quotationStatusHistory.create", [ quotationStatusHistory ] );
+		}
+
+		if ( StructKeyExists( json, "statusFile" ) AND json.status.id == 'CCN' ) {
+			var tmpDir = getTempDir();
+			var extension = super.fire( "File.getExtensionFromDataUrl", [ json.statusFile.file ] );
+			if (IsNull(extension)) {
+				return "Formato File non valido.";
+			}
+			fileName   = "quotation_status_history_" & json.id & "_" & json.status.id & "." & extension;
+			filePath   = tmpDir & "/" & fileName;
+			binaryData = ToBinary( json.statusFile.file );
+
+			FileWrite( filePath, binaryData );
+
+			var files = super.fire( "File.search", { quotationStatusHistoryId = thisId } );
+			if ( Len( files.getData() ) ) {
+				for ( var file in files.getData() ) {
+					super.fire( "File.delete", { fileId = file.getId() } );
+				}
+			}
+
+			var entity = super.bean( "Entity" );
+
+			var kindId = "quotationStatusHistory";
+			entity.setKey( "quotationStatusHistory.id" );
+			entity.setValue( thisId );
+
+			var fileId = super.fire(
+				"file.create",
+				{
+					filePath = filePath,
+					typeId   = "default",
+					kindId   = kindId,
+					entity   = entity
+				}
+			);
+		}
+
+		return null;
 	}
 
 	function delete( event, rc, prc ){

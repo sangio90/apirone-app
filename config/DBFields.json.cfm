@@ -218,6 +218,12 @@
         "name": "quotation_item_position_id",
         "type": "uuid"
     },
+
+    "quotationStatusHistory.id": {
+        "name": "quotation_status_history_id",
+        "type": "Integer"
+    },
+
     "auditEntry.id": {
         "name": "audit_log_id",
         "type": "Integer"
@@ -272,6 +278,10 @@
         "type": "String"
     },
     "frame.createdAt": {
+        "name": "created_at",
+        "type": "Date"
+    },
+    "createdAt": {
         "name": "created_at",
         "type": "Date"
     },

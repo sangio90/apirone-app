@@ -424,6 +424,10 @@
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
 		delete( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.delete" ).end();
 
+		get( "/ajax/quotation-status-history/:quotationId" ).to( "QuotationStatusHistoryAjaxController.list" ).end();
+		post( "/ajax/quotation-status-history" ).to( "QuotationStatusHistoryAjaxController.save" ).end();
+		delete( "/ajax/quotation-status-history" ).to( "QuotationStatusHistoryAjaxController.delete" ).end();
+
 		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();

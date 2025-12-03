@@ -64,7 +64,13 @@ component output="true" accessors="true" {
 					"types" = {
 						"default" = { "sizes" = [] }
 					}
-				}
+				},
+				"quotationStatusHistory" = {
+					"path"  = "quotation-status-history",
+					"types" = {
+						"default" = { "sizes" = [ { "width" = "500" } ] }
+					}
+				},
 			},
 			"encryptKey" = settings.get( "db.encryptKey" )
 		};

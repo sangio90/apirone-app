@@ -38,6 +38,7 @@
 				"graphicTechnicianAccount",
 				"shippingProfile",
 				"createdAt",
+				"statusFile"
 			]
 		}
 	}

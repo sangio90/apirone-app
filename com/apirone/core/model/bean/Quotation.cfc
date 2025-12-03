@@ -21,6 +21,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="shippingProfile" type="com.apirone.core.model.bean.ShippingProfile";
 	property name="salesAgentAccount" type="com.apirone.core.model.bean.Account";
 	property name="graphicTechnicianAccount" type="com.apirone.core.model.bean.Account";
+	property name="statusFile" type="com.apirone.core.model.bean.File";
 	property name="calculatedAmount" type="Numeric";
 	property name="serial" type="Numeric";
 	property name="exported" type="Boolean";

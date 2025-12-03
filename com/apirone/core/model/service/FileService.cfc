@@ -33,6 +33,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String productItemId,
 		String combinationId,
 		String quotationItemId,
+		String quotationStatusHistoryId,
 		String pictogramId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0
@@ -103,7 +104,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		);
 
 		var fileInfo = FileInfo( "#destination#/#name#" );
-
 		bean.setName( name );
 		bean.setDescription( "" );
 		bean.setDirectory( dayPath );
@@ -140,8 +140,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var thisFile = get( newId );
 
-			for ( var size in imageType.sizes ) {
-				resize( thisFile.getPath(), size.width );
+			if (fileExt != 'pdf') {
+				for ( var size in imageType.sizes ) {
+					resize( thisFile.getPath(), size.width );
+				}
 			}
 		}
 
@@ -199,6 +201,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return NullValue();
+	}
+
+	function getExtensionFromDataUrl(dataUrl) {
+		var mime = listGetAt(dataUrl, 1, ",");          // "data:application/pdf;base64"
+		mime = replace(mime, "data:", "", "one");      // "application/pdf"
+		mime = listGetAt(mime, 1, ";");                // "application/pdf"
+
+		var mapping = {
+			"application/pdf": "pdf",
+			"image/jpeg": "jpg",
+			"image/png": "png",
+			"image/gif": "gif",
+			"image/webp": "webp"
+		};
+
+		return mapping[mime] ?: null;
 	}
 
 }

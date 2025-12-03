@@ -30,6 +30,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="CountryService" inject="CountryService";
 	property name="vatCodeService" inject="VatCodeService";
 	property name="CountryService" inject="CountryService";
+	property name="QuotationStatusHistoryService" inject="QuotationStatusHistoryService";
+	property name="FileService" inject="FileService";
 	property name="progressivoComponenti" type="Numeric";
 
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
@@ -811,6 +813,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setActive( record.active );
 
 			bean.setStatus( getStatusService().get( record.status_id ) );
+			var quotationStatusHistories = getQuotationStatusHistoryService().list( quotationId = record.quotation_id, statusId = record.status_id );
+			if ( quotationStatusHistories.len() > 0 && record.status_id == 'CCN' ) {
+				var statusFiles = getFileService().list( quotationStatusHistoryId = quotationStatusHistories[1].getId() );
+				if ( statusFiles.len() > 0 ) {
+					bean.setStatusFile( statusFiles[1] )
+				}
+			}
 			bean.setLang( getLangService().get( record.lang_id ) );
 
 

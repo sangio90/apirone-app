@@ -253,14 +253,13 @@ NULL
 						NULL
 					</cfif>
 				,
-				<!----		
-status_id =		
-<cfif !IsNull( arguments.quotation.getStatus() )>		
-<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getStatus().getId()#">		
-<cfelse>		
-NULL		
-</cfif>		
----->
+				status_id =		
+					<cfif !IsNull( arguments.quotation.getStatus() )>		
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getStatus().getId()#">		
+					<cfelse>		
+						NULL		
+					</cfif>
+				,
 				lang_id =
 					<cfif !IsNull( arguments.quotation.getLang() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLang().getId()#">

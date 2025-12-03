@@ -19,6 +19,7 @@
 		<cfargument name="combinationId" type="String">
 		<cfargument name="typeId" type="String">
 		<cfargument name="quotationItemId" type="String">
+		<cfargument name="quotationStatusHistoryId" type="String">
 		<cfargument name="pictogramId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
@@ -54,6 +55,10 @@
 			
 			<cfif !IsNull( arguments.quotationItemId )>
 				AND quotation_item_id = <cfqueryparam value="#arguments.quotationItemId#" cfsqltype="Varchar">::uuid
+			</cfif>
+			
+			<cfif !IsNull( arguments.quotationStatusHistoryId )>
+				AND quotation_status_history_id = <cfqueryparam value="#arguments.quotationStatusHistoryId#" cfsqltype="Integer">
 			</cfif>
 
 			<cfif !IsNull( arguments.pictogramId )>
