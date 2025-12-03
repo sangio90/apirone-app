@@ -4,13 +4,13 @@ component {
 
 	variables.settings = new config.Settings();
 
-	this.name                 = "apirone-core";
-	this.nullSupport          = true;
-	this.sessionManagement    = true;
-	this.sessionTimeout       = CreateTimespan( 0, 1, 0, 0 );
-	this.scriptProtect        = "url,cookie,cgi";
-	this.searchResults        = false;
-	this.whiteSpaceManagement = "smart";
+	this.name                = "apirone-core";
+	this.nullSupport         = true;
+	this.sessionManagement   = true;
+	this.sessionTimeout      = CreateTimespan( 0, 1, 0, 0 );
+	this.scriptProtect       = "url,cookie,cgi";
+	this.searchResults       = false;
+	this.suppressWhiteSpaces = true;
 
 	this.charset.web      = "UTF-8";
 	this.charset.resource = "UTF-8";
