@@ -4,6 +4,7 @@ component extends="com.apirone.core.root.Application" {
 	this.nullSupported = true;
 	this.pdf.fontDirectory = "/assets/main/fonts";
 	this.customtagPaths = [ "/apps/utils/ctags/" ];
+	this.suppressWhiteSpaces = true;
 
 	this.bufferOutput = false;
 	this.compression = true;
