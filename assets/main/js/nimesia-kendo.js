@@ -12,9 +12,11 @@ NM.kendo.dataSource = function( config = {} ) {
         serverPaging: config?.serverPaging ? config.serverPaging : true,
 
         change: function() {
-            $.each( this.data(), function( index, item ) {
-                item.set( "index", index+1 );
-            } );
+            // Batch update senza triggering individual observable events
+            var items = this.data();
+            for( var i = 0; i < items.length; i++ ) {
+                items[i].index = i + 1; // Set diretto senza .set() per evitare re-rendering
+            }
         }
     };
 
