@@ -31,7 +31,6 @@
 				"attributeValue.rawValue.name",
 				"componentCount",
 				"prices",
-				"important$boolean",
 				"childrenCount"
 			]
 		},
