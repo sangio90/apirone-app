@@ -43,7 +43,7 @@ AP.quotation.header = ( function() {
             notes: "",
             status: {
                 id: null,
-                name: '',
+                name: "",
             },
             statusFile: {
                 id: null,
@@ -117,45 +117,45 @@ AP.quotation.header = ( function() {
         quotationItems: new kendo.data.DataSource(),
 
         toggleQuotationStatusHistoryDocument: function() {
-            const statusId = viewModel.get('detailForm.data.status.id');
-            if (statusId == 'CCN') {
+            const statusId = viewModel.get( "detailForm.data.status.id" );
+            if ( statusId == "CCN" ) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
+
         },
 
         toggleDownloadDocumentButton: function() {
-            const statusFileId = viewModel.get('detailForm.data.statusFile.id');
-            if (!statusFileId) {
+            const statusFileId = viewModel.get( "detailForm.data.statusFile.id" );
+            if ( !statusFileId ) {
                 return false;
-            } else {
-                return true;
             }
+            return true;
+
         },
 
         downloadFile: function() {
             var uri = viewModel.detailForm.data.statusFile.uri;
-            if (!uri) return;
+            if ( !uri ) { return; }
 
-            var link = document.createElement("a");
+            var link = document.createElement( "a" );
             link.href = uri;
             link.download = viewModel.detailForm.data.statusFile.name || "document.pdf";
-            document.body.appendChild(link);
+            document.body.appendChild( link );
             link.click();
-            document.body.removeChild(link);
+            document.body.removeChild( link );
         },
 
-        downloadGridFile: function(event) {
+        downloadGridFile: function( event ) {
             var uri = event.data?.fileUri;
-            if (!uri) return;
+            if ( !uri ) { return; }
 
-            var link = document.createElement("a");
+            var link = document.createElement( "a" );
             link.href = uri;
             link.download = viewModel.detailForm.data.statusFile.name || "document.pdf";
-            document.body.appendChild(link);
+            document.body.appendChild( link );
             link.click();
-            document.body.removeChild(link);
+            document.body.removeChild( link );
         },
 
         crmCustomers: new kendo.data.DataSource( {
@@ -371,7 +371,7 @@ AP.quotation.header = ( function() {
 
                             var statusId = viewModel.get( "detailForm.data.status.id" );
                             var statusFile = viewModel.get( "detailForm.data.statusFile" );
-                            if ( statusId == 'CCN' && !statusFile ) {
+                            if ( statusId == "CCN" && !statusFile ) {
                                 return true;
                             }
 
@@ -396,7 +396,7 @@ AP.quotation.header = ( function() {
                     requireAnyOfCustomerLeadOrOpportunity: {
                         required: "Compilare almeno un campo fra cliente, lead o opportunità"
                     },
-                    
+
                     status: {
                         required: "Caricare il documento."
                     }
@@ -415,16 +415,16 @@ AP.quotation.header = ( function() {
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
-                            if (xhr.data.error?.length > 0) {
+                            if ( xhr.data.error?.length > 0 ) {
                                 return AP.widget.notify( "error", xhr.data.error );
                             }
-                            if (parsedData.status.id != 'CCN') {
-                                viewModel.set('detailForm.data.statusFile', null)
+                            if ( parsedData.status.id != "CCN" ) {
+                                viewModel.set( "detailForm.data.statusFile", null );
                             }
                             status.html( "" );
                             AP.widget.notify( "success", "Preventivo salvato correttamente." );
                             // window.location.href = "/manager/quotations/" + xhr.data.payload.id;
-                            if (viewModel.get('detailForm.data.id') != '') {
+                            if ( viewModel.get( "detailForm.data.id" ) != "" ) {
                                 window.location.reload();
                             } else {
                                 window.location.href = "/manager/quotations";
@@ -455,7 +455,7 @@ AP.quotation.header = ( function() {
             url: "/manager/ajax/quotations/" + id,
             callback: {
                 done: function( xhr ) {
-debugger
+                    debugger;
                     viewModel.set( "detailForm.data", xhr.data );
 
                     setTimeout( function() {
@@ -472,19 +472,19 @@ debugger
             callback: {
                 done: function( xhr ) {
                     const data = xhr.data;
-                    let parsedData = [];
+                    const parsedData = [];
 
                     data.forEach( function( item ) {
-                        let parsedItem = {
-                            'status': item.status.name,
-                            'account': item.account.email,
-                            'fileName': item.file?.name,
-                            'fileUri': item.file?.uri,
-                            'createdAt': item.createdAt
-                        }
-                        parsedData.push(parsedItem)
+                        const parsedItem = {
+                            "status": item.status.name,
+                            "account": item.account.email,
+                            "fileName": item.file?.name,
+                            "fileUri": item.file?.uri,
+                            "createdAt": item.createdAt
+                        };
+                        parsedData.push( parsedItem );
                     } );
-                    
+
                     viewModel.set( "detailForm.data.quotationStatusHistory", parsedData );
 
                     setTimeout( function() {
@@ -495,9 +495,8 @@ debugger
             }
         } );
 
-        debugger
-        $( "#quotationNameInput" ).prop('readonly', true);
-        $( "#quotationNumberInput" ).prop('readonly', true);
+        $( "#quotationNameInput" ).prop( "readonly", true );
+        $( "#quotationNumberInput" ).prop( "readonly", true );
     };
 
     pub.init = function() {
@@ -530,8 +529,8 @@ debugger
         } );
 
         $( "#nav-status-tab" ).on( "click", function( event ) {
-            $( "#nav-actual-tab").trigger( "click" );
-        });
+            $( "#nav-actual-tab" ).trigger( "click" );
+        } );
     };
 
     return pub;
