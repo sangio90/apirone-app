@@ -144,19 +144,9 @@ AP.signageConfig.detail = ( function() {
         },
 
         isDeleted: function( row ) {
-            var value = false;
-            var deleted = row.get( "deleted" );
-
-            if ( deleted == false ) {
-                value =  false;
-            }
-
-            if ( deleted == true ) {
-                value = true;
-            }
-
-            return value;
+            return row.get( "deleted" ) ?? false;
         },
+
 
         getFontFamilySizes: function( event ) {
 
@@ -174,8 +164,6 @@ AP.signageConfig.detail = ( function() {
         },
 
         save: function( event ) {
-
-            console.log( "save" );
 
             var selectedForm = AP.signageConfig.fields.selectedForm;
             var status = selectedForm.find( ".status" );
@@ -213,7 +201,7 @@ AP.signageConfig.detail = ( function() {
 
 
         for ( var font of AP.page.selectedFonts ) {
-            console.log( "font.items", font.items );
+        
             var newRow = {
                 id: font.id,
                 font: font.font,

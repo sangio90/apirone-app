@@ -28,8 +28,10 @@ AP.product.items = ( function() {
 
     var dataSources = {
         items: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items" } ),
-        orderingItems: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items/order" } ),
-        orderingAttributes: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order" } ),
+        // orderingItems: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/items/order" } ),
+        // orderingAttributes: NM.kendo.dataSource( { url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order" } ),
+        orderingItems: undefined,
+        orderingAttributes: undefined,
         attributesList: undefined,
     };
 
@@ -409,7 +411,39 @@ AP.product.items = ( function() {
         },
 
         openReorderingModal: function( event ) {
-            NM.util.openModal( fields.reorderingModal );
+
+            Loading.show();
+
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/products/" + AP.page.productId + "/items/order",
+                callback: {
+                    done: function( xhr ) {
+
+                        viewModel.set( "orderingItems", xhr.data );
+
+                        NM.util.ajax( {
+                            method: "GET",
+                            url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order",
+                            callback: {
+                                done: function( xhr ) {
+                                    Loading.hide();
+                                    viewModel.set( "orderingAttributes", xhr.data );
+
+                                    NM.util.openModal( fields.reorderingModal );
+
+                                },
+                            },
+                        } );
+
+                        // AP.widget.notify( "success", xhr.data.message.text );
+
+                        NM.util.openModal( fields.reorderingModal );
+
+                    },
+                },
+            } );
+
 
             return false;
         },
