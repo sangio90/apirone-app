@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="quotationItemId" type="String";
 	
-	property name="amount" type="Numeric";
+	property name="amount" type="Numeric"; <!--- use getTotal() for total :-) ---> 
 	property name="discount1" type="Numeric";
 	property name="discount2" type="Numeric";
 
@@ -52,7 +52,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		if ( getMethod().getId() == "F" ) {
 			return true;
 		}
+		
 		return false;
+	
 	}
 
 }

@@ -86,7 +86,8 @@
 			SET
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getQuotationId()#">::uuid,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getStatus().getId()#">,
-				account_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getAccount().getId()#">::uuid
+				account_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getAccount().getId()#">::uuid,
+				updated_at = now()
 			WHERE
 				quotation_status_history_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationStatusHistory.getId()#">
 		</cfquery>

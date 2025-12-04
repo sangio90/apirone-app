@@ -99,6 +99,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( Len( files ) ) {
 				bean.setFile( files[ 1 ] );
 			}
+			
 			bean.setCreatedAt( record.created_at );
 
 			return bean;
