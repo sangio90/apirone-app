@@ -18,5 +18,9 @@
             "enable":true,
             "config":"config/urlrewrite.xml"
         }
+    },
+    "jvm":{
+        "minHeapSize":"1024",
+        "heapSize":"3072"
     }
 }
