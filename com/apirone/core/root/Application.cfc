@@ -68,7 +68,7 @@ component {
 		bundleVersion = "2.10.0.31",
 		storage       = false,
 		default       = "object",
-		custom        = { maxElementsInMemory: 2000 }
+		custom        = { maxElementsInMemory: 10000 }
 	};
 
 	this.cache.object = "DefaultCache";
