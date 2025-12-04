@@ -25,6 +25,27 @@
 				<div class="col-6 co-md-12">
 
 					<div class="row d-flex align-items-center mb-3">
+						<label class="col-3 text-end">Nome </label>
+						<div class="col-9">
+							<input type="text" name="name" id="quotationNameInput" class="form-control" data-bind="value: detailForm.data.name">
+						</div>
+					</div>
+
+					<div class="row d-flex align-items-center mb-3">
+						<label class="col-3 text-end">Numero </label>
+						<div class="col-9">
+							<input type="text" name="quotationNumber" id="quotationNumberInput" class="form-control" data-bind="value: detailForm.data.quotationNumber">
+						</div>
+					</div>
+
+					<div class="row d-flex align-items-center mb-3">
+						<label class="col-3 text-end">Versione </label>
+						<div class="col-9">
+							<input type="text" class="form-control" data-bind="value: detailForm.data.versionNumber" readonly>
+						</div>
+					</div>
+
+					<div class="row d-flex align-items-center mb-3">
 						<label class="col-3 text-end">Lingua </label>
 						<div class="col-9">
 							<select name="langId" class="form-control"

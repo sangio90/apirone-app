@@ -340,7 +340,7 @@ AP.quotation.header = ( function() {
                     name: {
                         required: true
                     },
-                    number: {
+                    quotationNumber: {
                         required: true
                     },
                     langId: {
@@ -382,7 +382,7 @@ AP.quotation.header = ( function() {
                     name: {
                         required: "Nome richiesto.",
                     },
-                    number: {
+                    quotationNumber: {
                         required: "Numero richiesto."
                     },
                     langId: {
@@ -423,8 +423,11 @@ AP.quotation.header = ( function() {
                             status.html( "" );
                             AP.widget.notify( "success", "Preventivo salvato correttamente." );
                             // window.location.href = "/manager/quotations/" + xhr.data.payload.id;
-
-                            window.location.reload()
+                            if (viewModel.get('detailForm.data.id') != '') {
+                                window.location.reload();
+                            } else {
+                                window.location.href = "/manager/quotations";
+                            }
                         }
                     }
                 } );
@@ -491,7 +494,8 @@ AP.quotation.header = ( function() {
             }
         } );
 
-
+        $( "#quotationNameInput" ).prop('readonly', true);
+        $( "#quotationNumberInput" ).prop('readonly', true);
     };
 
     pub.init = function() {

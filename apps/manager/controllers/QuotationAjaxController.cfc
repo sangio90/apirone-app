@@ -109,6 +109,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			var paymentMethod = super.bean( "PaymentMethod" );
 			quotation.setId( json.id );
 			quotation.setName( json.name );
+			quotation.setQuotationNumber( json.quotationNumber );
 
 			quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
 			quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
@@ -145,7 +146,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
 			if ( !Len( json.id ) ) {
 				// create
-				quotation.setQuotationNumber( 1 );
 				quotation.setVersionNumber( 1 );
 				var status = super.fire( "status.get", [ "LAV" ] );
 				quotation.setStatus( status );
