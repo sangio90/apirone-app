@@ -2,13 +2,12 @@
 
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="signage-config-font-selected-size-list-row-tmpl">
-        <tr class="k-master-row">
+        <tr class="k-master-row" data-bind="css: { row-deleted: isDeleted }">
             <td width="50">
                 <span data-bind="text: id"></span>
             </td>
             <td width="55%">
                 <div class="d-flex align-items-center">
-                    [<span data-bind="text: height"></span>]
                     <select 
                         class="form-control width-150 ms-1"
                         data-text-field="name"

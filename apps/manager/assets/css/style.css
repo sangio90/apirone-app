@@ -955,6 +955,11 @@ h2 {
     filter: grayscale(100%);
 }
 
+.row-deleted {
+    opacity: .4;
+    filter: grayscale(100%);
+}
+
 /*
     // price simulate log list 
 */

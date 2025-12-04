@@ -33,7 +33,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			for ( var item in fonts ) {
 				var obj = memy.convert( item, "list" );
+
 				selectedFonts.add( obj );
+				
 			}
 		}
 
@@ -66,9 +68,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.jsFiles.add( "app-signage-config" );
 
 		event.setView( "signage/signage-config" );
-	}
-
-	function list( event, rc, prc ){
 	}
 
 }

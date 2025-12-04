@@ -57,6 +57,7 @@ AP.signageConfig.detail = ( function() {
         id: "",
         height: "",
         heightInPx: "",
+        deleted: false,
         size: { "id": "", "name": "-- Seleziona Font Size" },
         charCount: "",
         rowCount: ""
@@ -126,18 +127,35 @@ AP.signageConfig.detail = ( function() {
 
         delete: function( event ) {
             var row = event.data.parent().parent();
-            var items = row.items; // DataSource delle sizes
+            // var items = row.items; // DataSource delle sizes
+            var rowSize = row.items.getByUid( event.data.uid );
 
-            if ( items.data().length === 1 ) {
-                // Se c'è solo una size, rimuovi tutto il font
-                var dataItem = viewModel.get( "selectedFonts" ).getByUid( row.uid );
-                viewModel.get( "selectedFonts" ).remove( dataItem );
-            } else {
-                // Rimuovi solo la size selezionata
-                var sizeRow = items.getByUid( event.data.uid );
-                items.remove( sizeRow );
+            var deleted = rowSize.get( "deleted" );
+
+            var newValue = false;
+
+            if ( !deleted ) {
+                newValue = true;
             }
+
+            rowSize.set( "deleted", newValue );
+
             return false;
+        },
+
+        isDeleted: function( row ) {
+            var value = false;
+            var deleted = row.get( "deleted" );
+
+            if ( deleted == false ) {
+                value =  false;
+            }
+
+            if ( deleted == true ) {
+                value = true;
+            }
+
+            return value;
         },
 
         getFontFamilySizes: function( event ) {
@@ -156,12 +174,13 @@ AP.signageConfig.detail = ( function() {
         },
 
         save: function( event ) {
+
+            console.log( "save" );
+
             var selectedForm = AP.signageConfig.fields.selectedForm;
             var status = selectedForm.find( ".status" );
 
             if ( selectedForm.valid() ) {
-
-                // status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
                 NM.util.ajax( {
                     method: "POST",
@@ -171,7 +190,6 @@ AP.signageConfig.detail = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
-                                // viewModel.get( "selectedFonts" ).read();
                                 AP.widget.notify( "success", "Configurazione salvata correttamente" );
 
                                 setTimeout( function() {
@@ -193,7 +211,9 @@ AP.signageConfig.detail = ( function() {
 
         var selected = new kendo.data.DataSource();
 
+
         for ( var font of AP.page.selectedFonts ) {
+            console.log( "font.items", font.items );
             var newRow = {
                 id: font.id,
                 font: font.font,

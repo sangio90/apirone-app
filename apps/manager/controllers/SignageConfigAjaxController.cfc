@@ -26,12 +26,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		var json   = DeserializeJSON( GetHTTPRequestData().content );
 		var result = super.getResult();
 
+		//dump( json );
+
 		var thisId     = "";
 		var messageId  = "";
 		var newIds     = [];
+		var deletedIds = [];
 		var updatedIds = [];
 
 		for ( var thisConfig in json.configs ) {
+
 			var sizes         = [];
 			var font          = super.bean( "Font" );
 			var signageConfig = super.bean( "SignageConfig" );
@@ -47,12 +51,20 @@ component extends="com.apirone.core.controller.AbsController" {
 				var line     = super.bean( "Line" );
 				var category = super.bean( "ProductCategory" );
 
+				signageConfig.setLine( line.setId( json.catalogBundle.lineId ) );
 				signageConfig.setModel( model.setId( json.catalogBundle.modelId ) );
 				signageConfig.setCategory( category.setId( json.catalogBundle.categoryId ) );
-				signageConfig.setLine( line.setId( json.catalogBundle.lineId ) );
 			}
 
 			for ( var item in thisConfig.items._data ) {
+
+				if( item.keyExists( "deleted" ) AND item.deleted ) {
+					
+					super.fire( "signageConfigItem.delete", [ item.id ] );
+					deletedIds.add( item.id );		
+					continue;
+				}
+
 				var bean = super.bean( "signageConfigItem" );
 
 				bean.setId( item.id );
@@ -78,15 +90,14 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 
 			newIds.add( thisId );
+			
 		}
 
 		var message = completeMessage( messageId );
 
 		result.setData(
 			{ "message" = message },
-			{
-				"payload" = { "updatedIds" = updatedIds, "newIds" = newIds }
-			}
+			{ "payload" = { "updatedIds" = updatedIds, "newIds" = newIds, "deletedIds" = deletedIds } }
 		);
 
 		event.setValue( "result", result );
