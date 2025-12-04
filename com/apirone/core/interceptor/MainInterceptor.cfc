@@ -7,20 +7,18 @@ component extends="coldbox.system.Interceptor" {
 		rc,
 		prc
 	){
-		if ( prc.keyExists( "currentRoutedURL" ) AND prc.currentRoutedURL == "manager/" ) {
-			Location( url = "/manager/login", addToken = false );
-		}
 
-		/*
-		if ( !rc.keyExists( "currentRoutedModule" ) ) {
-			Location( url = "/manager/dashboard", addToken = false );
+		if ( 
+			( prc.keyExists( "currentRoutedURL" ) AND prc.currentRoutedURL == "manager/" ) 
+			OR 
+			( !prc.keyExists( "currentRoutedModule" ) ) 
+		) {
+			location( url = "/manager/login", addToken = false );
 		}
-		*/
 
 		cfheader( name = "Access-Control-Allow-Origin", value = "*" );
 		cfheader( name = "Access-Control-Allow-Methods", value = "GET, POST, OPTIONS" );
 		cfheader( name = "Access-Control-Allow-Headers", value = "Content-Type, X-Requested-With" );
-
 
 		event.prc.eventId = CreateUUID()
 
