@@ -31,7 +31,8 @@ AP.quotation.header = ( function() {
             quotationNumber: "",
             versionNumber: 1,
             lang: {
-                id: "IT"
+                id: "",
+                name: ""
             },
             zone: {
                 id: "",
@@ -343,7 +344,7 @@ AP.quotation.header = ( function() {
                     quotationNumber: {
                         required: true
                     },
-                    langId: {
+                    lang: {
                         required: true
                     },
                     validityDate: {
@@ -385,7 +386,7 @@ AP.quotation.header = ( function() {
                     quotationNumber: {
                         required: "Numero richiesto."
                     },
-                    langId: {
+                    lang: {
                         required: "Lingua richiesta."
                     },
                     validityDate: {
@@ -454,7 +455,7 @@ AP.quotation.header = ( function() {
             url: "/manager/ajax/quotations/" + id,
             callback: {
                 done: function( xhr ) {
-
+debugger
                     viewModel.set( "detailForm.data", xhr.data );
 
                     setTimeout( function() {
@@ -494,6 +495,7 @@ AP.quotation.header = ( function() {
             }
         } );
 
+        debugger
         $( "#quotationNameInput" ).prop('readonly', true);
         $( "#quotationNumberInput" ).prop('readonly', true);
     };

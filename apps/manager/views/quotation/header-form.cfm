@@ -48,7 +48,7 @@
 					<div class="row d-flex align-items-center mb-3">
 						<label class="col-3 text-end">Lingua </label>
 						<div class="col-9">
-							<select name="langId" class="form-control"
+							<select name="lang" class="form-control"
 								data-bind="source: languages, value: detailForm.data.lang"
 								data-value-field="id"
 								data-text-field="name"

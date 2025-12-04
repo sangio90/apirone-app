@@ -822,7 +822,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 			bean.setLang( getLangService().get( record.lang_id ) );
 
-
 			if ( !IsNull( record.customer_id ) ) {
 				var customer = getCustomerService().get( record.customer_id );
 				bean.setCustomer( customer );

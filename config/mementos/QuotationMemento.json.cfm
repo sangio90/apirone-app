@@ -27,6 +27,7 @@
 				"status",
 				"vatCode",
 				"lead",
+				"lang",
 				"customer",
 				"customerAddressId",
 				"opportunity",
