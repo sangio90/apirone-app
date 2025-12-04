@@ -127,8 +127,6 @@ AP.quotation.pricing = ( function() {
 
     pub.init = function( itemId ) {
 
-        console.log( "pricing" );
-
         kendo.bind( AP.quotation.fields.boxPricing, viewModel );
 
         AP.quotation.fields.boxPricing.show();

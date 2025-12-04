@@ -37,6 +37,8 @@
 				<cfloop collection="#jvm#" item="item">
 					<b>#item#</b>: #NumberFormat( jvm[item] )# MB<br>
 				</cfloop>
+				<br>
+				<b>Cache keys</b>: #cm.list().len()#<br>
 			</div>
 		</div>
 
