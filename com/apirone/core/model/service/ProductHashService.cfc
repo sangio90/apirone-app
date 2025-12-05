@@ -1,6 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ProductHashDAO";
+	property name="ProductItemService" inject="ProductItemService";
 	property name="QuotationItemService" inject="QuotationItemService";
 	property name="cacheScope" type="String" default="ProductHash.bean";
 
@@ -103,8 +104,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if (isNull(quotationItem)) {
 			return null;
 		}
-		var bean = null
+
+		var bean = null;
 		var jsonData = prepareQuotationItemJson( quotationItem );
+
 		if (IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemSignage')) {
 			jsonData = prepareQuotationItemSignageJson( quotationItem, jsonData );
 
@@ -126,9 +129,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var modelId = quotationItem.getProduct().getModel().getId();
 		var finishId = quotationItem.getProduct().getFinish().getId();
 		var notes = quotationItem.getNotes();
-		var items = quotationItem.getProduct().getItems();
+		var items = getProductItemService().list( quotationItem.getProduct().getId() );
 
-		arraySort(items, function(a, b) {
+		ArraySort( items, function(a, b) {
 			return compare(a.getId(), b.getId());
 		});
 
@@ -176,7 +179,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var quotationItemFruits = [];
 		for (var row in rows) {
 			var fruit = row.getFruit()
-			var fruitRows = fruit.getItems()
+			//var fruitRows = fruit.getItems()
+			var fruitRows = getProductItemService().list( fruit.getId() );
 
 			arraySort(fruitRows, function(a, b) {
 				return compare(a.getId(), b.getId());
