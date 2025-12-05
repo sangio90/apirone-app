@@ -6,18 +6,6 @@ Object.assign( AP.quotation.fields, {
     boxGeneralPricing: $( "#quotation-totals-general-content" ),
 } );
 
-$( document ).ready( function() {
-
-    console.log( "AP.quotation.fields.boxPricing", AP.quotation.fields.boxPricing );
-
-    if ( AP.quotation.fields.boxPricing.length ) {
-
-        // AP.quotation.pricing.init();
-    }
-
-} );
-
-
 AP.quotation.pricing = ( function() {
 
     var pub = {};
@@ -53,6 +41,24 @@ AP.quotation.pricing = ( function() {
 
         var newSymbol = !status ? "▲" : "▼";
         model.set( "common.symbol", newSymbol );
+
+        return false;
+
+    };
+
+    var loadGeneral = function() {
+
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
+            callback: {
+                done: function( xhr ) {
+
+                    console.log( "xhr.data", xhr.data );
+
+                }
+            }
+        } );
 
         return false;
 
@@ -136,6 +142,14 @@ AP.quotation.pricing = ( function() {
 
         isItem: false,
         isGeneral: true,
+
+        init: function( event ) {
+
+            console.log( "viewModelGeneral:init. Load data..." );
+
+            loadGeneral();
+
+        },
 
         changeMethod: function( event ) {
 

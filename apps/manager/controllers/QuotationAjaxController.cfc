@@ -326,6 +326,46 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", data );
 	}
 
+	function totals( event, rc, prc ){
+
+		var params = {};
+		var data   = [];
+		var result = super.getResult();
+		var memy   = super.getMementify();
+
+		var method  = super.bean( "PriceMethod" );
+
+		var pricing = super.bean( "QuotationPrice" );
+
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
+		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+		
+		pricing.setShippingCost( Len( json.pricing?.shippingMethod?.cost ) ? json.pricing.shippingMethod.cost : 0 );
+
+		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
+		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+
+
+		result.setData( output );
+
+		event.setValue( "result", output );
+
+
+		var result = super.getResult();
+
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		var data = super.fire( "QuotationPrice.calculateTotals", [ rc.id ] );
+
+		result.setData( data );
+
+		event.setValue( "result", result );
+
+	}
+
+
 	function exportProducts( event, rc, prc ){
 		var data = [];
 

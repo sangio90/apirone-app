@@ -24,7 +24,7 @@ AP.quotation.header = ( function() {
                 id: "",
                 name: ""
             },
-            shippingAddress: {
+            shippingProfile: {
                 id: null,
                 name: ""
             },
@@ -455,7 +455,6 @@ AP.quotation.header = ( function() {
             url: "/manager/ajax/quotations/" + id,
             callback: {
                 done: function( xhr ) {
-                    debugger;
                     viewModel.set( "detailForm.data", xhr.data );
 
                     setTimeout( function() {

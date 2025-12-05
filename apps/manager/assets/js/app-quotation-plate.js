@@ -1577,10 +1577,6 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        // set only what i need
-
-                        console.log( "xhr.data.finish.id", xhr.data.finish.id );
-
                         viewModel.set( "detailForm.data.product.id", xhr.data.id );
                         viewModel.set( "detailForm.data.product.finish.id", xhr.data.finish.id );
                         viewModel.set( "detailForm.data.product.model.id", xhr.data.model.id );
@@ -1588,8 +1584,6 @@ AP.plate.modal = ( function() {
                         viewModel.set( "detailForm.data.product.line.id", xhr.data.line.id );
                         viewModel.set( "detailForm.data.product.image.id", xhr.data.horizontalImage.id );
                         viewModel.set( "detailForm.data.product.image.uri", xhr.data.horizontalImage.uri );
-
-                        // console.log( "xhr.data:catalogBundle", xhr.data );
 
                         // set items
                         viewModel.firstLoadProductItems();

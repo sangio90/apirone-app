@@ -517,8 +517,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				super.fire( "quotationItemProductItem.create", [ productItemBean ] )
 			}
-		} )
+		} );
 
+
+		//var svc = super.service( "QuotationItem" );
+		//dump( DESerializeJSON(SerializeJSON( svc.get( thisId ).getProduct().getItems() ) ));
+		//dump(thisId);
+		//abort;
+
+		//TODO: move to service
 		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
 
 		if ( !IsNull( hash ) ) {
@@ -526,6 +533,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			bean.setId( thisId );
 			super.fire( "quotationItem.update", [ bean ] );
 		}
+		
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );

@@ -20,13 +20,11 @@ $( document ).ready( function() {
     const signageModal = document.getElementById( "signage-modal" );
     signageModal.addEventListener( "hide.bs.modal", ( event ) => {
         AP.quotation.detail.showTotals();
-        // AP.quotation.detail.renderTotals();
     } );
 
     const plateModal = document.getElementById( "plate-modal-root" );
     plateModal.addEventListener( "hide.bs.modal", ( event ) => {
         AP.quotation.detail.showTotals();
-        // AP.quotation.detail.renderTotals();
     } );
 
     const accessoryModal = document.getElementById( "accessory-modal" );
@@ -172,9 +170,7 @@ AP.quotation.detail = ( function() {
                 url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
                 callback: {
                     done: function( xhr ) {
-                        Loading.hide();
                         if( xhr.status == "INVALID" ) {
-                            Loading.hide();
                             NM.form.showMessages( xhr.data );
                             return;
                         }
@@ -186,6 +182,9 @@ AP.quotation.detail = ( function() {
                         }
                         $( ".export-button" ).hide();
                         AP.widget.notify( "success", "Preventivo Esportato correttamente." );
+                    },
+                    always: function() {
+                        Loading.hide();
                     }
                 }
             } );
@@ -569,6 +568,8 @@ AP.quotation.detail = ( function() {
 
         viewModel.getZones();
 
+        AP.quotation.detail.showTotals();
+
         if ( AP.page.quotation ) {
 
             document.querySelector( "#nav-plate-tab" ).addEventListener( "click", function( e ) {
@@ -883,9 +884,6 @@ AP.quotation.printModal = ( function() {
     pub.init = function() {
         kendo.bind( fields.printModalRoot, viewModel );
         viewModel.toggleOptions();
-
-        AP.quotation.detail.showTotals();
-
     };
 
     pub.methods = function( options ) {

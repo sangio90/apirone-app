@@ -404,7 +404,6 @@
 		*/
 		get( "/ajax/quotations-export/:id" ).to( "QuotationAjaxController.export" ).end();
 		get( "/ajax/quotations-export-products/:id" ).to( "QuotationAjaxController.exportProducts" ).end();
-		get( "/ajax/quotations/:id/total" ).to( "PriceAjaxController.calculateQuotation" ).end();
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
 		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();
 		get( "/ajax/quotations/models/:lineId" ).to( "QuotationAjaxController.listModels" ).end();
@@ -419,6 +418,9 @@
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
 		post( "/quotations" ).to( "QuotationController.create" ).end(); // Da togliere
 		get( "/quotations" ).to( "QuotationController.list" ).end();
+
+		post( "/ajax/quotations/:id/total" ).to( "QuotationAjaxController.calculatePrice" ).end();
+		get( "/ajax/quotations/:id/total" ).to( "QuotationAjaxController.getPrice" ).end();
 
 		get( "/ajax/quotations/:quotationId/zones" ).to( "QuotationZoneAjaxController.list" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();

@@ -3,7 +3,13 @@
 <cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
-LAV-VERNPOLVLIS
+<cfquery name="i" datasource="verticale">
+    SELECT TOP 10 *
+    FROM codnaz
+</cfquery>
+
+<cfdump var="#i#">
+<cfabort>
 
 <!--- <cfquery name="i" datasource="verticaleExport">
    TRUNCATE TABLE ARTICO_APIR
