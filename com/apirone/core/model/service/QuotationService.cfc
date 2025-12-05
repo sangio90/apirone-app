@@ -306,7 +306,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLANNOTA"  = nota
 						}
 
-						result.success = getDao().export( data );
+						result.success = getDao().exportProduct( data );
 					}
 
 					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
@@ -323,7 +323,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLCODICE" = "000000",
 							"CLANNOTA" = nota
 						}
-						result.success = getDao().export( data );
+						result.success = getDao().exportProduct( data );
 
 						var existingCodes = exportCodeSvc.list(
 							str = product.getCode() & RepeatString( "0", 25 - Len( product.getCode() ) )
@@ -522,10 +522,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData['MMCODCOL'] = data['CLCODICE'];
 						quotationData['ARUNMIS1'] = 'PZ';
 						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
-						quotationData['MMVALUNI'] = quotationItem.getPrice();
+						quotationData['MMVALUNI'] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
 						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
 						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
-						quotationData['MMEVASIO'] = '';
+						// quotationData['MMEVASIO'] = quotation.getValidityDate();
+						quotationData['MMEVASIO'] = null;
 						quotationData['MM_STATO'] = 'N';
 
 						allProductItems.append(quotationData);
@@ -553,21 +554,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData['MMCODCOL'] = data['CLCODICE'];
 						quotationData['ARUNMIS1'] = 'PZ';
 						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
-						quotationData['MMVALUNI'] = quotationItem.getPrice();
+						quotationData['MMVALUNI'] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
 						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
 						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
-						quotationData['MMEVASIO'] = quotation.getValidityDate();
+						// quotationData['MMEVASIO'] = quotation.getValidityDate();
+						quotationData['MMEVASIO'] = null;
 						quotationData['MM_STATO'] = 'N';
 
 						allProductItems.append(quotationData);
 					}
 
-					// success = getDao().exportQuotation( quotationData );
+					getDao().export( quotationData );
 					index = index + 1;
 				}
 			}
 		}
-		dump(allProductItems);abort;
+
 		result.success = true;
 
 		return result;
@@ -678,14 +680,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			result.error = 'Dati Spedizione non trovati.'
 			return result;
 		}
+
 		var quotationData = {
 			"MMSERIAL" = quotation.getSerial(),
 			"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
 			"MMDATDOC" = quotation.getCreatedAt(),
-			"MMDATEVA" = quotation.getValidityDate(),
+			// "MMDATEVA" = quotation.getValidityDate(),
+			"MMDATEVA" = null,
 			"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
 			"MMNUMLIS" = 1,
-			"MMCODAGE" = "campo mail account da mapper su tab verticale codage",
+			"MMCODAGE" = (!isNull(quotation.getSalesAgentAccount())) ? quotation.getSalesAgentAccount().getEmail() : null, //trovata tabella AZAPI_AGENTI campo id AGECOD, campo mail AGEMAI
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
 			"CF_IDCLI" = customer.getId(),
@@ -877,7 +881,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
 			// bean.setShippingProfile( getProfileService().get( record.shipping_profile_id ) );
-			// bean.setSalesAgentAccount( getAccountService().get( record.sales_agent_account_id ) );
+			if (!isNull(record.sales_agent_account_id)) {
+				bean.setSalesAgentAccount( getAccountService().get( record.sales_agent_account_id ) );
+			}
 			// bean.setGraphicTechnicianAccount( getAccountService().get( record.graphic_technician_account_id ) );
 
 			return bean;

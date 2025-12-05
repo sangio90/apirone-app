@@ -24,7 +24,7 @@ AP.quotation.header = ( function() {
                 id: "",
                 name: ""
             },
-            shippingAddress: {
+            shippingProfile: {
                 id: null,
                 name: ""
             },
