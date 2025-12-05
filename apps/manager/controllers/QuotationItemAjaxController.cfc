@@ -381,8 +381,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var lines = [];
 
 		price.setAmount( json.price.total );
-		price.setDiscount1( json.price.discount1 );
-		price.setDiscount2( json.price.discount1 );
+		price.setDiscount1( Len( json.price?.discount1 ) ? json.price?.discount1 : 0 );
+		price.setDiscount2( Len( json.price?.discount2 ) ? json.price?.discount2 : 0 );
 		price.setMethod( method.setId( json.price.method.id ) );
 
 		for( var thisLine in json.price.lines ) {

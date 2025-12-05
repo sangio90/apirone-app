@@ -13,28 +13,29 @@ $( document ).ready( function() {
         AP.quotation.detail.init();
     }
 
-    if (AP.page.quotation.exported) {
-        $('.export-button').hide();
+    if ( AP.page.quotation.exported ) {
+        $( ".export-button" ).hide();
     }
 
     const signageModal = document.getElementById( "signage-modal" );
-
-    signageModal.addEventListener( "hide.bs.modal", ( e ) => {
-        AP.quotation.detail.renderTotals();
+    signageModal.addEventListener( "hide.bs.modal", ( event ) => {
+        AP.quotation.detail.showTotals();
+        // AP.quotation.detail.renderTotals();
     } );
 
     const plateModal = document.getElementById( "plate-modal-root" );
-    plateModal.addEventListener( "hide.bs.modal", ( e ) => {
-        AP.quotation.detail.renderTotals();
+    plateModal.addEventListener( "hide.bs.modal", ( event ) => {
+        AP.quotation.detail.showTotals();
+        // AP.quotation.detail.renderTotals();
     } );
 
     const accessoryModal = document.getElementById( "accessory-modal" );
-    accessoryModal.addEventListener( "hide.bs.modal", ( e ) => {
-        AP.quotation.detail.renderTotals();
+    accessoryModal.addEventListener( "hide.bs.modal", ( event ) => {
+        AP.quotation.detail.showTotals();
     } );
 
-    $( "form#zone-form" ).on( "submit", function( e ) {
-        e.preventDefault();
+    $( "form#zone-form" ).on( "submit", function( event ) {
+        event.preventDefault();
         AP.quotation.zoneModal.methods().createZone();
         return false;
     } );
@@ -152,10 +153,10 @@ AP.quotation.detail = ( function() {
                             return;
                         }
 
-                        if (xhr.data.success == false) {     
+                        if ( xhr.data.success == false ) {
                             AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del Preventivo." );
                             Loading.hide();
-                            return
+                            return;
                         }
                         Loading.hide();
                         AP.widget.notify( "success", "Articoli Preventivo Esportati correttamente." );
@@ -177,13 +178,13 @@ AP.quotation.detail = ( function() {
                             NM.form.showMessages( xhr.data );
                             return;
                         }
-                        
-                        if (xhr.data.success == false) {     
+
+                        if ( xhr.data.success == false ) {
                             AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del Preventivo." );
                             Loading.hide();
                             return;
                         }
-                        $('.export-button').hide();
+                        $( ".export-button" ).hide();
                         AP.widget.notify( "success", "Preventivo Esportato correttamente." );
                     }
                 }
@@ -501,11 +502,8 @@ AP.quotation.detail = ( function() {
 
             console.log( "id", viewModel.get( "detailForm.data.id" ) );
 
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ) );
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
 
-            // fields.totalItemBox.show();
-            // const tabellaTotali = fields.totalItemBox.find( "table" )[0];
-            // $( tabellaTotali ).empty();
         },
 
         editSignage: function( event ) {
@@ -530,7 +528,6 @@ AP.quotation.detail = ( function() {
             $( tabellaTotali ).empty();
         },
 
-
         openAddZoneModal: function() {
             if ( AP.quotation.fields.zoneModalRoot.length ) {
                 AP.quotation.zoneModal.methods().resetForm();
@@ -554,6 +551,10 @@ AP.quotation.detail = ( function() {
             NM.util.openModal( AP.quotation.fields.printModalRoot );
         },
     } );
+
+    pub.showTotals = function( options ) {
+        AP.quotation.pricing.init( undefined, "general" );
+    };
 
     pub.config = function( options ) {
         return viewModel.get( "detailForm.data" );
@@ -630,14 +631,6 @@ AP.quotation.zoneModal = ( function() {
         },
 
         createZone: function( event ) {
-            // REF: è sufficiente configurarlo con jquery validator,
-            // senza check manuali
-
-            // const parsedData = viewModel.get( "detailForm.data" );
-            // if ( parsedData.name.trim() == "" ) {
-            //    AP.widget.notify( "error", "Specificare un nome per la zona." );
-            //    return false;
-            // }
 
             var zoneForm = $( "#zone-form" );
 
@@ -890,6 +883,9 @@ AP.quotation.printModal = ( function() {
     pub.init = function() {
         kendo.bind( fields.printModalRoot, viewModel );
         viewModel.toggleOptions();
+
+        AP.quotation.detail.showTotals();
+
     };
 
     pub.methods = function( options ) {

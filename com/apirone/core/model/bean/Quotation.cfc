@@ -7,6 +7,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="validityDate" type="Date";
 	property name="active" type="Numeric";
 	property name="pricelist" type="com.apirone.core.model.bean.Pricelist";
+	property name="price" type="com.apirone.core.model.bean.QuotationPrice";
 	property name="vatCode" type="com.apirone.core.model.bean.VatCode";
 	property name="customer" type="com.apirone.core.model.bean.Customer";
 	property name="customerAddressId" type="String";

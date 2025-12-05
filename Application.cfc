@@ -77,6 +77,7 @@ component extends="com.apirone.core.root.Application" {
 	/*
 		private
 	*/
+	
 	private Void function startUser(){
 		session.user = new com.apirone.core.model.bean.User();
 	}
@@ -87,7 +88,7 @@ component extends="com.apirone.core.root.Application" {
 		var COLDBOX_APP_MAPPING   = "";
 		var COLDBOX_CONFIG_FILE   = "config.Coldbox";
 		var COLDBOX_APP_KEY       = "";
-		var COLDBOX_FAIL_FAST     = true;
+		var COLDBOX_FAIL_FAST     = false;
 
 		application.cbBootstrap = new coldbox.system.Bootstrap(
 			COLDBOX_CONFIG_FILE,

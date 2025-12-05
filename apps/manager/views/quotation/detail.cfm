@@ -114,7 +114,7 @@
     #view( "quotation/zone-modal" )#
     #view( "quotation/print-modal" )#
 
-    #view( "quotation/totals-item" )#
+    #view( "quotation/totals" )#
 
     #template( view="jstemplate/quotation/quotation-item-plate-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
