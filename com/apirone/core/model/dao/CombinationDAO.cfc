@@ -17,13 +17,12 @@
 	</cffunction>
 
 	<cffunction name="find" output="false">
-		
 		<cfargument name="productId" type="String" required="true">
-		
+		<cfargument name="statusId" type="String">
+		<cfargument name="str" type="String">
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
-
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 			    combination_id::varchar,
@@ -32,6 +31,14 @@
     			combinations
 			WHERE
 	    		product_id = <cfqueryparam cfsqltype="varchar" value="#arguments.productId#">::uuid
+
+				<cfif !IsNull( arguments.statusId )>
+					AND status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.str )>
+					AND combination ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+				</cfif>
 
 			<cfif arguments.limit GTE 0>
 				LIMIT
@@ -59,6 +66,21 @@
 		</cfquery>
 
 		<cfreturn local.q.combination_id.toString()>
+	</cffunction>
+
+	<cffunction name="update" returntype="String">
+		<cfargument name="combination" type="com.apirone.core.model.bean.Combination" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE 
+				combinations 
+			SET 
+				combination = <cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getName()#">
+			WHERE
+				combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getId()#">::uuid
+		</cfquery>
+
+		<cfreturn arguments.combination.getId()>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">

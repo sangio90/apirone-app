@@ -25,15 +25,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	// TODO: use search( productId )
 	public com.apirone.core.model.bean.Result function search(
+		String str,
 		String productId,
+		String statusId,
 		required Numeric limit    = 15,
 		required Numeric offset   = 0,
 		required Array orderBy    = [ { field = "combination.id" } ]
-
 	){
 		var rows   = [];
 		var result = super.getResult();
-
+		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
@@ -77,15 +78,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var combinationId = create( combination );
 
+			var name = "";
+			var index = 1;
 			for ( var productItemId in node ) {
 				var item    = super.bean( "CombinationProductItem" );
-				var product = super.bean( "productItem" );
+				var product = getProductItemService().get( productItemId );
 
 				item.setCombinationId( combinationId );
-				item.setProductItem( product.setId( productItemId ) );
+				item.setProductItem( product );
 
 				getCombinationProductItemService().create( item );
+
+				name &= product
+					.getAttribute()
+					.getName();
+
+				name &= ": ";
+
+				name &= product
+					.getAttributeValue()
+					.getRawValue()
+					.getName();
+
+				name &= node.len() == index ? "" : " - ";
+				index++;
 			}
+			combination.setName( name );
+			combination.setId( combinationId );
+			update( combination );
 		}
 		// Converto l'albero in un array di combinazioni uniche
 
@@ -297,26 +317,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setProductItems( productItemsData );
 
-			var name = "";
+			if (!isNull(record.combination)) {
+				bean.setName( record.combination );
+			} else {
+				var name = "";
+				productItemsData.each( function( combinationProductItem, index ){
+					name &= combinationProductItem
+						.getProductItem()
+						.getAttribute()
+						.getName();
 
-			productItemsData.each( function( combinationProductItem, index ){
-				name &= combinationProductItem
-					.getProductItem()
-					.getAttribute()
-					.getName();
+					name &= ": ";
 
-				name &= ": ";
+					name &= combinationProductItem
+						.getProductItem()
+						.getAttributeValue()
+						.getRawValue()
+						.getName();
 
-				name &= combinationProductItem
-					.getProductItem()
-					.getAttributeValue()
-					.getRawValue()
-					.getName();
+					name &= productItemsData.len() == index ? "" : " - ";
+				} );
 
-				name &= productItemsData.len() == index ? "" : " - ";
-			} );
-
-			bean.setName( name );
+				bean.setName( name );
+			}
 
 			return bean;
 		}

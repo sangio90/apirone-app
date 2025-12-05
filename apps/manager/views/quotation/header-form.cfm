@@ -223,7 +223,7 @@
 							<label class="col-3 control-label text-sm-end pt-2">Indirizzo</label>
 							<div class="col-9">
 								<select class="form-control"
-									data-bind="source: detailForm.data.customer.shippingAddresses, value: detailForm.data.shippingAddress"
+									data-bind="source: detailForm.data.customer.shippingAddresses, value: detailForm.data.shippingProfile"
 									data-value-field="id"
 									data-text-field="name"
 								>
@@ -234,35 +234,35 @@
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Indirizzo</label>
 							<div class="col-9">
-								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.via" disabled>
+								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingProfile.street" disabled>
 							</div>
 						</div>
 
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Città</label>
 							<div class="col-9">
-								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.citta" disabled>
+								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingProfile.city" disabled>
 							</div>
 						</div>
 
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">CAP</label>
 							<div class="col-9">
-								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.cap" disabled>
+								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingProfile.postalCode" disabled>
 							</div>
 						</div>
 
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Nazione</label>
 							<div class="col-9">
-								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.paese" disabled>
+								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingProfile.country.isoCode" disabled>
 							</div>
 						</div>
 
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Provincia</label>
 							<div class="col-9">
-								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingAddress.provincia" disabled>
+								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingProfile.state" disabled>
 							</div>
 						</div>                                            
 						

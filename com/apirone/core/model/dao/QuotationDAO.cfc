@@ -355,10 +355,10 @@ NULL
 		<cfreturn true>
 	</cffunction>
 
-	<cffunction name="export" returntype="Boolean">
+	<cffunction name="exportProduct" returntype="Boolean">
 		<cfargument name="data" type="Struct" required="true">
 		<cfset var qCheck = ""/>
-		<cfset var success = false/>
+		<cfset var success = true/>
 
 		<cfquery name="qCheck" datasource="verticaleExport">
 			SELECT AR_CHIAVE
@@ -380,8 +380,6 @@ NULL
 					<cfqueryparam value="#arguments.data.CLANNOTA#" cfsqltype="varchar">
 				)
 			</cfquery>
-
-			<cfset success = true/>
 		</cfif>
 
 		<cfreturn success/>
@@ -390,7 +388,7 @@ NULL
 	<cffunction name="exportDiba" returntype="Boolean">
 		<cfargument name="data" type="Struct" required="true">
 		<cfset var qCheck = ""/>
-		<cfset var success = false/>
+		<cfset var success = true/>
 		<cfset var uniqueKey = arguments.data.DS_CHIAVE & arguments.data.CPROWNUM>
 
 		<cfquery name="qCheck" datasource="verticaleExport">
@@ -417,9 +415,81 @@ NULL
 					<cfqueryparam value="#arguments.data.DSTIPRIG#" cfsqltype="varchar">
 				)
 			</cfquery>
-
-			<cfset success = true/>
 		</cfif>
+
+		<cfreturn success/>
+	</cffunction>
+
+	<cffunction name="export" returntype="Boolean">
+		<cfargument name="data" type="Struct" required="true">
+		<cfset var success = true/>
+
+		<cfquery name="agents" datasource="verticale">
+			SELECT AGECOD
+			FROM AZAPI_AGENTI
+			WHERE
+				TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAGE#" cfsqltype="varchar">
+		</cfquery>
+
+		<cfset agentCode = 0 />
+
+		<cfif agents.recordCount>
+			<cfset agentCode = val(agents.AGECOD[1]) />
+		</cfif>
+
+		<cfquery datasource="verticaleExport">
+			INSERT INTO ORDINI_APIR (
+				CF_IDCLI, CFBLOCCO, CFDESCR1, CFINDIRI, CFLOCALI, CFMOROSO, CFPARIVA,
+				CFPROVIN, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
+				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
+				DEPRODOD, DEPROMER, MM_STATO, MMCODAGE, MMCODART, MMCODCOL, MMCODPAG,
+				MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA, MMEVASIO, MMNUMDOC, MMNUMLIS,
+				MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2, MMSERIAL, MMVALUNI
+			)
+			VALUES (
+				<cfqueryparam value="#left(arguments.data.CF_IDCLI,7)#" cfsqltype="varchar">, --deve diventare 36
+				<cfqueryparam value="#left(arguments.data.CFBLOCCO,1)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFDESCR1,40)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFINDIRI,35)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFLOCALI,30)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFMOROSO,1)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFPARIVA,11)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFPROVIN,2)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFSTAISO,3)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFTELEFO,18)#" cfsqltype="varchar">,
+				<cfqueryparam value="#arguments.data.CPROWNUM ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.CPROWORD ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#left(arguments.data.DEDESDOD,35)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DEDESMER,35)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DEIDDMER,10)#" cfsqltype="varchar">, --deve diventare 36
+				<cfqueryparam value="#left(arguments.data.DEINDDOD,30)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DEINDMER,30)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DELOCDOD,35)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DELOCMER,35)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DENAZDOD,3)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DENAZMER,3)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DEPRODOD,2)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DEPROMER,2)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.MM_STATO,1)#" cfsqltype="varchar">,
+				<cfqueryparam value="#agentCode#" cfsqltype="integer">,
+				<cfqueryparam value="#left(arguments.data.MMCODART,15)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.MMCODCOL,6)#" cfsqltype="varchar">,
+				<cfqueryparam value="#arguments.data.MMCODPAG ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMCODVAL ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#left(arguments.data.MMCODVAR,10)#" cfsqltype="varchar">,
+				<cfqueryparam value="#arguments.data.MMDATDOC#" cfsqltype="date">,
+				<cfqueryparam value="#arguments.data.MMDATEVA#" cfsqltype="timestamp">, --deve diventare datetime
+				<cfqueryparam value="#left(arguments.data.MMEVASIO,18)#" cfsqltype="varchar">, --deve diventare datetime
+				<cfqueryparam value="#left(arguments.data.MMNUMDOC,10)#" cfsqltype="varchar">,
+				<cfqueryparam value="#arguments.data.MMNUMLIS ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMQTAMOV ?: 0#" cfsqltype="decimal" scale="6">,
+				<cfqueryparam value="#left(arguments.data.MMRIFORD,25)#" cfsqltype="varchar">,
+				<cfqueryparam value="#arguments.data.MMSCOAR1 ?: 0#" cfsqltype="decimal" scale="6">,
+				<cfqueryparam value="#arguments.data.MMSCOAR2 ?: 0#" cfsqltype="decimal" scale="6">,
+				<cfqueryparam value="#left(arguments.data.MMSERIAL,12)#" cfsqltype="varchar">,
+				<cfqueryparam value="#arguments.data.MMVALUNI ?: 0#" cfsqltype="decimal" scale="6">
+			)
+		</cfquery>
 
 		<cfreturn success/>
 	</cffunction>

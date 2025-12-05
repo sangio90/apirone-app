@@ -10,7 +10,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" default="ProductItem.bean";
 
-	public com.apirone.core.model.bean.ProductItem function get( required String productItemId ){
+	public com.apirone.core.model.bean.ProductItem function get( required productItemId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.productItemId );
