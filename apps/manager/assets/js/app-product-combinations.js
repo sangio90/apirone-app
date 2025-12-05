@@ -32,33 +32,17 @@ AP.product.combination = ( function() {
         search: function( event ) {
             var thisForm = fields.searchForm;
             var params = thisForm.serializeJSON();
-            var filters = [];
 
             var dataSource = viewModel.get( "rows" );
 
-            var filterDataSource = new kendo.data.DataSource( {
-                data: dataSource.data().toJSON(),
+            var params = thisForm.serializeJSON();
+
+            var dataSource = NM.kendo.dataSource( {
+                url: "/manager/ajax/products/" + AP.page.productId + "/combinations",
+                params: params
             } );
 
-            if ( params.statusId.length ) {
-                filters.push( {
-                    field: "status.id",
-                    operator: "equal",
-                    value: params.statusId,
-                } );
-            }
-
-            if ( params.str.length ) {
-                filters.push( {
-                    field: "name",
-                    operator: "contains",
-                    value: params.str,
-                } );
-            }
-
-            filterDataSource.filter( filters );
-
-            viewModel.set( "rows", filterDataSource );
+            viewModel.set( "rows", dataSource );
 
             return false;
         },
