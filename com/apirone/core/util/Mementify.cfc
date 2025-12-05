@@ -84,7 +84,7 @@ component {
 		var target = Duplicate( arguments.target );
 
 		var metadata = $getCachedMetadata( target );
-		// var entityName = metadata.keyExists( "fullname" ) ? ListLast( metadata.fullname, "." ) : "";
+		var entityName = metadata.keyExists( "fullname" ) ? ListLast( metadata.fullname, "." ) : "";
 
 		var externalRules = $getRulesFromHierarchy( target ); // from files
 
@@ -414,7 +414,7 @@ component {
 		try {
 			if ( Len( entityName ) ) {
 				if ( NOT StructKeyExists( variables.stats.targets, entityName ) ) {
-					variables.stats.targets[ entityName ] = {
+					variables.stats["targets"][ entityName ] = {
 						"count"       = 0,
 						"totalTimeMs" = 0,
 						"maxTimeMs"   = 0,
@@ -422,7 +422,7 @@ component {
 					};
 				}
 
-				var tstat         = variables.stats.targets[ entityName ];
+				var tstat         = variables.stats["targets"][ entityName ];
 				tstat.count       = tstat.count + 1;
 				tstat.totalTimeMs = tstat.totalTimeMs + duration;
 				if ( duration gt tstat.maxTimeMs ) {
@@ -433,7 +433,7 @@ component {
 				if ( ArrayLen( tstat.durations ) gt 200 ) {
 					ArrayDeleteAt( tstat.durations, 1 );
 				}
-				variables.stats.targets[ entityName ] = tstat;
+				variables.stats["targets"][ entityName ] = tstat;
 			}
 		} catch ( any e ) {
 			// non-fatal: ensure stats update doesn't break conversion
@@ -496,7 +496,7 @@ component {
 		};
 
 		// Per-target summaries (avg, p95, p99, max)
-		stats[ "targets" ] = {};
+		StructInsert( stats, "targets", {}, true );
 
 		for ( var target in variables.stats.targets ) {
 			var raw     = variables.stats.targets[ target ];
@@ -526,7 +526,7 @@ component {
 				summary[ "p99" ] = 0;
 			}
 
-			stats[ "targets" ][ target ] = summary;
+			StructInsert( stats.targets, target, summary, true );
 		}
 
 		return stats;
@@ -545,7 +545,7 @@ component {
 			"startedAt"        = Now()
 		};
 		// reset per-target stats
-		variables.stats.targets = {};
+		variables.stats["targets"] = {};
 	}
 
 
