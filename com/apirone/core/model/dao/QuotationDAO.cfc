@@ -368,7 +368,19 @@ NULL
 
 		<cfif qCheck.recordCount EQ 0>
 			<cfquery datasource="verticaleExport">
-				INSERT INTO ARTICO_APIR (AR_CHIAVE, ARCODART, ARDESART, ARDATCAR, ARUNMIS1, VARCOD, CLCODICE, CLANNOTA)
+				INSERT INTO ARTICO_APIR (
+					AR_CHIAVE, 
+					ARCODART, 
+					ARDESART, 
+					ARDATCAR, 
+					ARUNMIS1, 
+					VARCOD, 
+					CLCODICE, 
+					CLANNOTA,
+					AR_STATO,
+					CL_STATO,
+					VR_STATO
+				)
 				VALUES (
 					<cfqueryparam value="#arguments.data.AR_CHIAVE#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.ARCODART#" cfsqltype="varchar">,
@@ -377,7 +389,10 @@ NULL
 					<cfqueryparam value="#arguments.data.ARUNMIS1#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.VARCOD#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.CLCODICE#" cfsqltype="varchar">,
-					<cfqueryparam value="#arguments.data.CLANNOTA#" cfsqltype="varchar">
+					<cfqueryparam value="#arguments.data.CLANNOTA#" cfsqltype="varchar">,
+					'N', <!--- nuovo ---->
+					'N',
+					'N' 
 				)
 			</cfquery>
 		</cfif>
@@ -399,7 +414,21 @@ NULL
 
 		<cfif qCheck.recordCount EQ 0>
 			<cfquery datasource="verticaleExport">
-				INSERT INTO DISBAS_APIR (DS_CHIAVE, DSCODART, DSCODVAR, DSCODCOL, DSCODMAT, DSVARMAT, DSCOLMAT, DSQTAMOV, DSUNMIS1, CPROWNUM, CPROWORD, DSTIPRIG)
+				INSERT INTO DISBAS_APIR (
+					DS_CHIAVE, 
+					DSCODART, 
+					DSCODVAR, 
+					DSCODCOL, 
+					DSCODMAT, 
+					DSVARMAT, 
+					DSCOLMAT, 
+					DSQTAMOV, 
+					DSUNMIS1, 
+					CPROWNUM, 
+					CPROWORD, 
+					DSTIPRIG, 
+					DS_STATO
+				)
 				VALUES (
 					<cfqueryparam value="#arguments.data.DS_CHIAVE#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.DSCODART#" cfsqltype="varchar">,
@@ -408,11 +437,12 @@ NULL
 					<cfqueryparam value="#arguments.data.DSCODMAT#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.DSVARMAT#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.DSCOLMAT#" cfsqltype="varchar">,
-					<cfqueryparam value="#arguments.data.DSQTAMOV#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.DSQTAMOV#" cfsqltype="numeric">,
 					<cfqueryparam value="#arguments.data.DSUNMIS1#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.CPROWNUM#" cfsqltype="numeric">,
 					<cfqueryparam value="#arguments.data.CPROWORD#" cfsqltype="numeric">,
-					<cfqueryparam value="#arguments.data.DSTIPRIG#" cfsqltype="varchar">
+					<cfqueryparam value="#arguments.data.DSTIPRIG#" cfsqltype="varchar">,
+					'N' <!--- nuovo --->
 				)
 			</cfquery>
 		</cfif>
@@ -481,7 +511,7 @@ NULL
 				<cfqueryparam value="#arguments.data.MMDATEVA#" cfsqltype="timestamp">, --deve diventare datetime
 				<cfqueryparam value="#left(arguments.data.MMEVASIO,18)#" cfsqltype="varchar">, --deve diventare datetime
 				<cfqueryparam value="#left(arguments.data.MMNUMDOC,10)#" cfsqltype="varchar">,
-				<cfqueryparam value="#arguments.data.MMNUMLIS ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMNUMLIS ?: 1#" cfsqltype="integer">,
 				<cfqueryparam value="#arguments.data.MMQTAMOV ?: 0#" cfsqltype="decimal" scale="6">,
 				<cfqueryparam value="#left(arguments.data.MMRIFORD,25)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMSCOAR1 ?: 0#" cfsqltype="decimal" scale="6">,
