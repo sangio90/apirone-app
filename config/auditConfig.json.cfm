@@ -1,6 +1,7 @@
 ﻿{
 	entities: {
 		"ACCOUNT": {},
+		"ARTICLE": {},
 		"AUTH": {},
 		"ATTRIBUTE": {},
 		"FONT": {},

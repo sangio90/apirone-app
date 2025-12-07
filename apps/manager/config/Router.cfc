@@ -106,6 +106,20 @@
 
 
 		/*
+			articles (servizi)
+		*/
+		get( "/ajax/articles/code-exists" ).to( "ArticleAjaxController.codeExists" ).end();
+		// TODO: consider to remove the 2 follow routes ("/items")
+		post( "/ajax/articles/:id/items" ).to( "ArticleAjaxController.addItem" ).end();
+		get( "/ajax/articles/:id/items" ).to( "ArticleAjaxController.listItems" ).end();
+		get( "/ajax/articles/:id" ).to( "ArticleAjaxController.get" ).end();
+		get( "/ajax/articles" ).to( "ArticleAjaxController.list" ).end();
+		post( "/ajax/articles" ).to( "ArticleAjaxController.save" ).end();
+		delete( "/ajax/articles" ).to( "ArticleAjaxController.delete" ).end();
+		get( "/articles" ).to( "ArticleController.list" ).end();
+
+
+		/*
 			current account
 		*/
 		post( "/ajax/change-pwd" ).to( "CurrentUserAjaxController.changePwd" ).end();

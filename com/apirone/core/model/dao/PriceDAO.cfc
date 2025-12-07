@@ -15,6 +15,7 @@
 		<cfargument name="str" type="String">
 		<cfargument name="productId" type="String">
 		<cfargument name="productItemId" type="Numeric">
+		<cfargument name="articleId" type="String">
 		<cfargument name="typeId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
@@ -40,6 +41,10 @@
 
 			<cfif !IsNull( arguments.productId )>
 				AND prices.product_id = <cfqueryparam value="#arguments.productId#" cfsqltype="varchar">::uuid
+			</cfif>
+
+			<cfif !IsNull( arguments.articleId )>
+				AND prices.article_id = <cfqueryparam value="#arguments.articleId#" cfsqltype="varchar">::uuid
 			</cfif>
 
 			<cfif !IsNull( arguments.productItemId )>

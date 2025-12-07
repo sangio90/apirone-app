@@ -5,7 +5,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
 	property name="priceTypeService" inject="PriceTypeService";
-	property name="lookupService" inject="lookupService";
+	property name="lookupService" inject="LookupService";
+	property name="articleService" inject="ArticleService";
 
 	property name="cacheScope" type="String" default="Price.bean";
 
@@ -33,7 +34,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Result function search(
 		String productId,
 		Numeric productItemId,
-		String statusId
+		String statusId,
+		String articleId,
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -255,14 +257,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if( entity.getKey() == "product.id" ) {
 			getProductService().removeCache( entity.getValue() );
-			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# price: delete cache for #entity.getKey()#: #entity.getValue()#");
 			result = { key = "product.id", value = entity.getValue() }
 		}
 
 		if( entity.getKey() == "productItem.id" ) {
 			getProductItemService().removeCache( entity.getValue() );
-			cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# price: delete cache for #entity.getKey()#: #entity.getValue()#");
 			result = { key = "productItem.id", value = entity.getValue() }
+		}
+
+		if( entity.getKey() == "article.id" ) {
+			getArticleService().removeCache( entity.getValue() );
+			result = { key = "article.id", value = entity.getValue() }
 		}
 
 		return result;

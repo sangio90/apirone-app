@@ -66,6 +66,11 @@
 				title: "Prodotti per linea",
 			},
 			
+			{
+				href: "/manager/articles",
+				icon: "far fa-lemon",
+				title: "Servizi",
+			},
 		]
 	},	
 	{

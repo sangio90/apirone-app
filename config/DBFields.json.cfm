@@ -345,4 +345,16 @@
         "name": "origin_id",
         "type": "uuid"
     },
+    "article.code": {
+        "name": "code",
+        "type": "String"
+    },
+    "article.id": {
+        "name": "article_id",
+        "type": "uuid"
+    },
+    "article.externalId": {
+        "name": "external_id",
+        "type": "varchar"
+    },
 }

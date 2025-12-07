@@ -370,10 +370,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data = [];
 
 		var result = super.getResult();
-		var params = super.paramsFromUrl();
-
-		params[ "id" ]     = rc.id;
+		
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
+
 		var result         = super.fire( "Quotation.exportProducts", [ quotationItems ] );
 
 		event.setValue( "result", result );

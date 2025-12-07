@@ -34,11 +34,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String lineId,
 		String attributeId,
 		Numeric attributeValueId,
-		Numeric ProductCategoryId,
+		Numeric productCategoryId,
 		String countryId,
 		String langId,
 		String productId,
 		String finishId,
+		String articleId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "lang.orderBy", dir = "asc" } ]
@@ -202,12 +203,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return entity;
 		}
 
+		if ( Len( record.article_id ) ) {
+			entity.setKey( "article.id" );
+			entity.setValue( record.article_id );
+
+			return entity;
+		}
+
 		getLogger().error( "No entity linked to this translation. Text Id: [#record.text_id#]" );
 
 		/*
 		dump( record );
 		abort;
-
 
 		Throw(
 			type    = "apirone.error.textWithoutEntity",

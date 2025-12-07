@@ -1,45 +1,30 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
+	// cfformat-ignore-start
 	variables.config = {
-		"color"        = { "bean" = "color", "file" = "colors.json.cfm" },
-		"customerType" = {
-			"bean" = "customerType",
-			"file" = "customerTypes.json.cfm"
-		},
-		"fileType"     = { "bean" = "fileType", "file" = "fileTypes.json.cfm" },
-		"fileKind"     = { "bean" = "fileKind", "file" = "fileKinds.json.cfm" },
-		"priceType"    = { "bean" = "priceType", "file" = "priceTypes.json.cfm" },
-		"documentType" = {
-			"bean" = "documentType",
-			"file" = "documentTypes.json.cfm"
-		},
-		"thickness"      = { "bean" = "thickness", "file" = "thicknesses.json.cfm" },
-		"processingType" = {
-			"bean" = "processingType",
-			"file" = "processingTypes.json.cfm"
-		},
-		"measurementUnit" = {
-			"bean" = "measurementUnit",
-			"file" = "measurementUnits.json.cfm"
-		},
-		"modelType"     = { "bean" = "modelType", "file" = "modelTypes.json.cfm" },
-		"permission"    = { "bean" = "Permission", "file" = "permissions.json.cfm" },
-		"pictogramCode" = { "bean" = "pictogramCode", "file" = "pictogramCodes.json.cfm" },
-		"profileType"   = { "bean" = "profileType", "file" = "profileTypes.json.cfm" },
-		"textKind"      = { "bean" = "textKind", "file" = "textKinds.json.cfm" },
-		"dataType"      = { "bean" = "dataType", "file" = "dataTypes.json.cfm" },
-		"entity"        = { "bean" = "entity", "file" = "entities.json.cfm" },
-		"orientation"   = { "bean" = "orientation", "file" = "orientations.json.cfm" },
-		"priceMethod"   = { "bean" = "priceMethod", "file" = "priceMethods.json.cfm" },
-		"frameCellType" = {
-			"bean" = "frameCellType",
-			"file" = "frameCellTypes.json.cfm"
-		},
-		"productCategoryMode" = {
-			"bean" = "productCategoryMode",
-			"file" = "productCategoryModes.json.cfm"
-		}
+		"color"               = { "bean" = "color", "file" = "colors.json.cfm" },
+		"customerType"        = { "bean" = "customerType", "file" = "customerTypes.json.cfm" },
+		"fileType"            = { "bean" = "fileType", "file" = "fileTypes.json.cfm" },
+		"fileKind"            = { "bean" = "fileKind", "file" = "fileKinds.json.cfm" },
+		"priceType"           = { "bean" = "priceType", "file" = "priceTypes.json.cfm" },
+		"documentType"        = { "bean" = "documentType", "file" = "documentTypes.json.cfm"},
+		"thickness"           = { "bean" = "thickness", "file" = "thicknesses.json.cfm" },
+		"processingType"      = { "bean" = "processingType", "file" = "processingTypes.json.cfm" },
+		"measurementUnit"     = { "bean" = "measurementUnit", "file" = "measurementUnits.json.cfm" },
+		"modelType"           = { "bean" = "modelType", "file" = "modelTypes.json.cfm" },
+		"permission"          = { "bean" = "Permission", "file" = "permissions.json.cfm" },
+		"pictogramCode"       = { "bean" = "pictogramCode", "file" = "pictogramCodes.json.cfm" },
+		"profileType"         = { "bean" = "profileType", "file" = "profileTypes.json.cfm" },
+		"textKind"            = { "bean" = "textKind", "file" = "textKinds.json.cfm" },
+		"dataType"            = { "bean" = "dataType", "file" = "dataTypes.json.cfm" },
+		"entity"              = { "bean" = "entity", "file" = "entities.json.cfm" },
+		"orientation"         = { "bean" = "orientation", "file" = "orientations.json.cfm" },
+		"priceMethod"         = { "bean" = "priceMethod", "file" = "priceMethods.json.cfm" },
+		"articleType"         = { "bean" = "articleType", "file" = "articleTypes.json.cfm" },
+		"frameCellType"       = { "bean" = "frameCellType", "file" = "frameCellTypes.json.cfm" },
+		"productCategoryMode" = { "bean" = "productCategoryMode", "file" = "productCategoryModes.json.cfm" }
 	}
+	// cfformat-ignore-end
 
 	property name="data" type="Struct";
 

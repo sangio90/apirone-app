@@ -32,6 +32,7 @@
 		<cfargument name="productId" type="String">
 		<cfargument name="fontId" type="Numeric">
 		<cfargument name="countryId" type="String">
+		<cfargument name="articleId" type="String">
 
 		<cfargument name="fromDate" type="Date">
 		<cfargument name="toDate" type="Date">
@@ -85,6 +86,10 @@
 
 			<cfif !IsNull( arguments.modelId )>
 				AND model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
+			</cfif>
+
+			<cfif !IsNull( arguments.articleId )>
+				AND article_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.articleId#">::uuid
 			</cfif>
 
 			<cfif !IsNull( arguments.rawValueId )>
