@@ -1027,3 +1027,26 @@ h2 {
 .k-popup .k-list-item {
     border-bottom: 1px solid #cecece;
 }
+
+#global-loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, .75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1060 !important;
+
+}
+
+#global-loading-spinner-circle {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #d4d4d4;
+    border-top-color: #007bff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}

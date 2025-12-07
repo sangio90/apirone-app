@@ -412,7 +412,7 @@ AP.product.items = ( function() {
 
         openReorderingModal: function( event ) {
 
-            Loading.show();
+            AP.loading.show();
 
             NM.util.ajax( {
                 method: "GET",
@@ -427,7 +427,7 @@ AP.product.items = ( function() {
                             url: "/manager/ajax/products/" + AP.page.productId + "/attributes/order",
                             callback: {
                                 done: function( xhr ) {
-                                    Loading.hide();
+                                    AP.loading.hide();
                                     viewModel.set( "orderingAttributes", xhr.data );
 
                                     NM.util.openModal( fields.reorderingModal );

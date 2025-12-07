@@ -109,7 +109,7 @@ AP.quotationItem.list = ( function() {
                             callback: {
                                 done: function( xhr ) {
                                     if( xhr.status == "ERRORE" ) {
-                                        Loading.hide();
+                                        AP.loading.hide();
                                         AP.widget.notify( "error", "Errore durante la cancellazione della riga." );
                                     }
                                     if ( xhr.status == "SUCCESS" ) {
@@ -162,7 +162,7 @@ AP.quotationItem.list = ( function() {
                             callback: {
                                 done: function( xhr ) {
                                     if( xhr.status == "ERRORE" ) {
-                                        Loading.hide();
+                                        AP.loading.hide();
                                         AP.widget.notify( "error", "Errore durante la cancellazione multipla." );
                                     }
                                     if ( xhr.status == "SUCCESS" ) {
@@ -240,7 +240,7 @@ AP.quotationItem.modal = ( function() {
                             callback: {
                                 done: function( xhr ) {
                                     if( xhr.status == "ERRORE" ) {
-                                        Loading.hide();
+                                        AP.loading.hide();
                                         AP.widget.notify( "error", "Errore durante la cancellazione della riga." );
                                     }
                                     if ( xhr.status == "SUCCESS" ) {
@@ -258,7 +258,7 @@ AP.quotationItem.modal = ( function() {
     } );
 
     pub.init = async function( data ) {
-        Loading.show();
+        AP.loading.show();
         kendo.bind( fields.modalRoot, viewModel );
         viewModel.set( "detailForm.key", data.key );
         viewModel.set( "detailForm.code", data.code );
@@ -271,12 +271,12 @@ AP.quotationItem.modal = ( function() {
             callback: {
                 done: function( xhr ) {
                     if( xhr.status == "ERRORE" ) {
-                        Loading.hide();
+                        AP.loading.hide();
                         AP.widget.notify( "error", "Errore nel recupero delle righe." );
                     }
                     if ( xhr.status == "SUCCESS" ) {
                         viewModel.set( "detailForm.items", xhr.data );
-                        Loading.hide();
+                        AP.loading.hide();
                     }
                 }
             }

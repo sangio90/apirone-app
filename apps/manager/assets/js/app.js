@@ -56,3 +56,12 @@ AP.deleteUserPref = function( key ) {
     var user = AP.config.account.shortId;
     NM.storage.delete( "apirOne:" + user + ":" + key );
 };
+
+AP.loading = {
+    show: function() {
+        $( "#global-loading-spinner" ).css( "display", "flex" );
+    },
+    hide: function() {
+        $( "#global-loading-spinner" ).css( "display", "none" );
+    }
+};

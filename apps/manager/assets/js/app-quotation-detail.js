@@ -139,24 +139,24 @@ AP.quotation.detail = ( function() {
         },
 
         exportProducts: function() {
-            Loading.show();
+            AP.loading.show();
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations-export-products/" + AP.page.quotation.id,
                 callback: {
                     done: function( xhr ) {
                         if( xhr.status == "INVALID" ) {
-                            Loading.hide();
+                            AP.loading.hide();
                             NM.form.showMessages( xhr.data );
                             return;
                         }
 
                         if ( xhr.data.success == false ) {
                             AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del Preventivo." );
-                            Loading.hide();
+                            AP.loading.hide();
                             return;
                         }
-                        Loading.hide();
+                        AP.loading.hide();
                         AP.widget.notify( "success", "Articoli Preventivo Esportati correttamente." );
                     }
                 }
@@ -164,7 +164,7 @@ AP.quotation.detail = ( function() {
         },
 
         export: function() {
-            Loading.show();
+            AP.loading.show();
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
@@ -177,14 +177,14 @@ AP.quotation.detail = ( function() {
 
                         if ( xhr.data.success == false ) {
                             AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del Preventivo." );
-                            Loading.hide();
+                            AP.loading.hide();
                             return;
                         }
                         $( ".export-button" ).hide();
                         AP.widget.notify( "success", "Preventivo Esportato correttamente." );
                     },
                     always: function() {
-                        Loading.hide();
+                        AP.loading.hide();
                     }
                 }
             } );
@@ -636,7 +636,7 @@ AP.quotation.zoneModal = ( function() {
             var zoneForm = $( "#zone-form" );
 
             if ( zoneForm.valid() ) {
-                Loading.show();
+                AP.loading.show();
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotations/zones",
@@ -644,7 +644,7 @@ AP.quotation.zoneModal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "INVALID" ) {
-                                Loading.show();
+                                AP.loading.show();
                                 NM.form.showMessages( xhr.data );
                                 return;
                             }
@@ -652,7 +652,7 @@ AP.quotation.zoneModal = ( function() {
                             AP.widget.notify( "success", "Zona salvata correttamente." );
                             setTimeout( function() {
                                 $( "#zone-modal-root" ).modal( "hide" );
-                                Loading.hide();
+                                AP.loading.hide();
                             }, 200 );
                             AP.quotation.detail.methods().getZones();
                         }
@@ -673,7 +673,7 @@ AP.quotation.zoneModal = ( function() {
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
             if ( zoneForm.valid() ) {
-                Loading.show();
+                AP.loading.show();
                 NM.util.ajax( {
                     method: "DELETE",
                     url: "/manager/ajax/quotations/zones",
@@ -691,7 +691,7 @@ AP.quotation.zoneModal = ( function() {
                             AP.widget.notify( "success", xhr.data.message );
                             setTimeout( function() {
                                 $( "#zone-modal-root" ).modal( "hide" );
-                                Loading.hide();
+                                AP.loading.hide();
                             }, 200 );
                             AP.quotation.detail.methods().getZones();
 

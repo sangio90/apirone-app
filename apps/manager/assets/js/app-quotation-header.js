@@ -236,18 +236,18 @@ AP.quotation.header = ( function() {
             window.location.href = "/manager/quotations";
         },
         exportQuotation: function() {
-            Loading.show();
+            AP.loading.show();
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
                 callback: {
                     done: function( xhr ) {
                         if( xhr.status == "INVALID" ) {
-                            Loading.hide();
+                            AP.loading.hide();
                             NM.form.showMessages( xhr.data );
                             return;
                         }
-                        Loading.hide();
+                        AP.loading.hide();
                         AP.widget.notify( "success", "Preventivo esportato correttamente." );
                     }
                 }
@@ -448,7 +448,7 @@ AP.quotation.header = ( function() {
 
         // var status = $( "#quotation-header-modal .save-status" );
 
-        Loading.show();
+        AP.loading.show();
 
         NM.util.ajax( {
             method: "GET",
@@ -458,7 +458,7 @@ AP.quotation.header = ( function() {
                     viewModel.set( "detailForm.data", xhr.data );
 
                     setTimeout( function() {
-                        Loading.hide();
+                        AP.loading.hide();
                     }, 1000 );
 
                 }
@@ -487,7 +487,7 @@ AP.quotation.header = ( function() {
                     viewModel.set( "detailForm.data.quotationStatusHistory", parsedData );
 
                     setTimeout( function() {
-                        Loading.hide();
+                        AP.loading.hide();
                     }, 1000 );
 
                 }

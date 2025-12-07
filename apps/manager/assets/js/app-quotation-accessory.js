@@ -524,7 +524,7 @@ AP.accessory.modal = ( function() {
         },
 
         save: function( event ) {
-            Loading.show()
+            AP.loading.show()
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             parsedData.quotationId = quotationId;
@@ -547,14 +547,14 @@ AP.accessory.modal = ( function() {
                                 } else {
                                     AP.widget.notify( "error", "Errore nel salvataggio della segnaletica." );
                                 }
-                                Loading.hide()
+                                AP.loading.hide()
                             }
                             if ( xhr.status == "SUCCESS" ) {
                                 $('#accessory-modal').hide()
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                                 viewModel.set( "detailForm", defaultDetailForm );
                                 setTimeout( function () {
-                                    Loading.hide()
+                                    AP.loading.hide()
                                     window.location.reload()
                                 }
                                 , 1000 );
