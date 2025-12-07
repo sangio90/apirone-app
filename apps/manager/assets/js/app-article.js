@@ -87,22 +87,16 @@ AP.article.detail = ( function() {
                     data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
                         done: function( xhr ) {
-                            if ( xhr.status == "SUCCESS" ) {
-                                NM.util.autoHideMessage(
-                                    status,
-                                    "<span class='green'>Articolo salvata</span>",
-                                );
+                            NM.util.autoHideMessage( status, "<span class='green'>Valore salvato</span>" );
 
-                                setTimeout(
-                                    () => fields.detailRoot.modal( "hide" ),
-                                    1000,
-                                );
+                            setTimeout( () => {
+                                $( "#article-detail-root" ).modal( "hide" );
+                            }, 1000 );
 
-                                AP.util.fireCallback(
-                                    "onSave",
-                                    viewModel.get( "callback" ),
-                                );
-                            }
+                            AP.util.fireCallback(
+                                "onSave",
+                                viewModel.get( "callback" ),
+                            );
                         },
                     },
                 } );
@@ -142,7 +136,7 @@ AP.article.detail = ( function() {
                 done: function( xhr ) {
 
                     viewModel.set( "detailForm.data", xhr.data );
-                    viewModel.set( "detailForm.title", "Modifica linea" );
+                    viewModel.set( "detailForm.title", "Modifica articolo" );
 
                     NM.util.openModal( fields.detailRoot );
                 },
@@ -207,7 +201,7 @@ AP.article.list = ( function() {
         rows: dataSources.items,
 
         search: function( event ) {
-            var thisForm = AP.article.fields.searchListForm;
+            var thisForm = $( "#article-grid-search-form" );
 
             var params = thisForm.serializeJSON();
 
@@ -238,7 +232,7 @@ AP.article.list = ( function() {
         },
 
         delete: function( event ) {
-            var checks = $( "#line-grid" ).find( "[name=selected]:checked" );
+            var checks = $( "#article-grid" ).find( "[name=selected]:checked" );
 
             if ( checks.length ) {
                 var values = [];

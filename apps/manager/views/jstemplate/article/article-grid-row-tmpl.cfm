@@ -15,8 +15,8 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
-            <td>
-                <span data-format="{0:n2}" data-bind="text: price"> &euro;</span>
+            <td class="text-end">
+                <span data-format="0.00" data-bind="text: price.amount"></span> &euro;
             </td>
             <td>
                 <span data-bind="text: type.name"></span>

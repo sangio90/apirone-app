@@ -5,11 +5,11 @@
 
 		var memy = super.getMementify();
 
-		prc.statuses   = super.fire( "status.list", [ "ARTICLE" ] );
 		prc.types = super.fire( "lookup.list", ["articleType"] );
+		prc.statuses   = super.fire( "status.list", [ "ARTICLE" ] );
 
-		prc.page[ "statuses" ]   = prc.statuses;
 		prc.page[ "types" ] = memy.convertList( prc.types );
+		prc.page[ "statuses" ]   = memy.convertList( prc.statuses );
 
 		prc.jsFiles.add( "app-article" );
 

@@ -70,29 +70,25 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var nameItem        = super.buildTextBean( json.nameItem, "NAME" );
 		var descriptionItem = super.buildTextBean( json.descriptionItem, "DESC" );
-
+		
 		article.setTexts( [ nameItem, descriptionItem ] );
 
-		//price.setEntity( entity.setKey( "article.id" ) );
-		//price.setEntity( entity.setValue( thisId ) );
-
 		price.setId( json.price.id );
-		price.setAmount( json?.price?.amount ?: 0 );
+		price.setAmount( Val( json?.price?.amount ) ? json.price.amount : 0 );
 		
 		article.setPrice( price );
 
 		if ( !Len( json.id ) ) {
 			messageId = "article.created";
-			thisId    = super.fire( "article.create", [ article ] )
+			thisId    = super.fire( "article.create", [ article ] );
 		} else {
 			messageId = "article.updated";
-			thisId    = super.fire( "article.update", [ article ] )
+			thisId    = super.fire( "article.update", [ article ] );
 		}
-
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
 
 		event.setValue( "result", result );
 	}

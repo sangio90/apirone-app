@@ -62,13 +62,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var newId = getDao().insert( arguments.article );
 
-			for ( var text in arguments.article.getTexts() ) {
-				var entity = super.bean( "Entity" );
+			for( var text in arguments.article.getTexts() ) {
+				var entity = super.bean( "Entity" )
 
-				entity.setKey( "price.id" );
+				entity.setKey( "article.id" );
 				entity.setValue( newId );
 
 				text.setEntity( entity );
+
+				getTextService().create( text );
 			}
 
 			var entity = super.bean( "Entity" );
@@ -90,8 +92,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public String function update( required com.apirone.core.model.bean.Article line ){
-		getDao().update( arguments.line );
+	public String function update( required com.apirone.core.model.bean.Article article ){
+		getDao().update( arguments.article );
 
 		var id = arguments.article.getId();
 
@@ -109,14 +111,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				getTextService().create( text );
 			}
 
-			var entity = super.bean( "Entity" );
-			var price = arguments.article.getPrice();
-			
-			price.setEntity( entity.setKey( "article.id" ) );
-			price.setEntity( entity.setValue( newId ) );
-
-			savePrice( price );			
 		}
+
+		var entity = super.bean( "Entity" );
+		var price = arguments.article.getPrice();
+		
+		price.setEntity( entity.setKey( "article.id" ) );
+		price.setEntity( entity.setValue( id ) );
+
+		savePrice( price );			
 
 		super.logEvent(
 			event   = "article.updated",

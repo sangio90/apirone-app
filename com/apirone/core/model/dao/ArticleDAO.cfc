@@ -31,7 +31,8 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
-		<cfargument name="typeId" type="Numeric">
+		<cfargument name="typeId" type="String">
+		<cfargument name="statusId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">

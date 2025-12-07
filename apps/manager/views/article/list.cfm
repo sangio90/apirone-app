@@ -53,8 +53,8 @@
 											<select class="form-control me-2" name="orderBy">
 												<option value="article.code-asc" SELECTED>Codice [A-Z]</option>
 												<option value="article.code-desc">Codice [Z-A]</option>
-												<option value="article.name-asc">Nome [A-Z]</option>
-												<option value="article.name-desc">Nome [Z-A]</option>
+												<option value="article.externalId-asc">Codice esterno [A-Z]</option>
+												<option value="article.externalId-desc">Codice esterno [Z-A]</option>
 											</select>
 										</div>
 
@@ -81,9 +81,10 @@
 									columns = "[
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '100px' },
-                                        { 'field':'externalId', 'title':'Codice esterno', width: '100px' },
-                                        { 'field':'name', 'title':'Nome' },
-                                        { 'field':'type.name', 'title':'Tipo' },
+                                        { 'field':'externalId', 'title':'Codice esterno', width: '120px' },
+                                        { 'field':'nameItem.name', 'title':'Nome' },
+                                        { 'field':'price.amount', 'title':'Prezzo', width: '90px' },
+                                        { 'field':'type.name', 'title':'Tipo', width: '110px'  },
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 
                                             'field'           :'', 
