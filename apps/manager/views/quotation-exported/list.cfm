@@ -45,7 +45,7 @@
                                         { 'field':'quotationSeriale', 'title':'Descrizione', width: '10%' },
                                         { 'field':'quotationCode', 'title':'Preventivo', width: '5%' },
                                         { 'field':'billingAddress', 'title':'Indirizzo Fatturazione', width: '20%'},
-                                        { 'field':'shippingAddress', 'title':'Indirizzo Spedizione', width: '20%'},
+                                        { 'field':'shippingProfile', 'title':'Indirizzo Spedizione', width: '20%'},
                                         { 'field':'opportunity', 'title':'Note', width: '10%'},
                                         { 'field':'agent', 'title':'Note', width: '10%'},
                                         { 'field':'', 'title':'Azioni', width: '10%', 'headerAttributes': { 'class': 'justify-content-center' }},

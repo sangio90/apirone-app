@@ -6,7 +6,6 @@
 		"company",
 		"description",
 		"phone",
-		"phoneCell",
 		"vatNumber",
 		"street",
 		"postalCode",
@@ -14,8 +13,7 @@
 		"state",
 		"country",
 		"SDI",
-		"shippingAddress",
-		"shippingAddresses"
+		"shippingProfiles"
 	],
 	profiles = {}
 }

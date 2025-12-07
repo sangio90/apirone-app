@@ -17,6 +17,12 @@ component output="false" accessors="true" {
 		return bean;
 	}
 
+	private Struct function getLogger(){
+		var bean = getContainer().getInstance( "Logger" );
+
+		return bean;
+	}
+
 	private Struct function getContainer(){
 		return server[ "wireBox-apirone" ];
 	}

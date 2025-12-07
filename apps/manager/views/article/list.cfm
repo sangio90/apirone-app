@@ -80,11 +80,11 @@
 									id      = "article-grid",
 									columns = "[
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
-                                        { 'field':'code', 'title':'Codice', width: '100px' },
-                                        { 'field':'externalId', 'title':'Codice esterno', width: '120px' },
+                                        { 'field':'code', 'title':'Codice', width: '130px' },
+                                        { 'field':'externalId', 'title':'Codice esterno', width: '130px' },
                                         { 'field':'nameItem.name', 'title':'Nome' },
                                         { 'field':'price.amount', 'title':'Prezzo', width: '90px' },
-                                        { 'field':'type.name', 'title':'Tipo', width: '110px'  },
+                                        { 'field':'type.name', 'title':'Tipo', width: '150px'  },
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 
                                             'field'           :'', 

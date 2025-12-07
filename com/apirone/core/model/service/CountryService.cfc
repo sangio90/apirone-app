@@ -30,15 +30,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	*/
 
 	private com.apirone.core.model.bean.Country function build( required String countryId ){
-		var record = getDao().read( arguments.countryId );
+		var record = getDao().read( arguments.countryId & "x" );
 
 		if ( record.recordCount ) {
+
 			var bean = super.bean( "Country" );
+			var record = super.trimQueryFields( record );
+
 			bean.setIsoCode( record.ISONAZ );
 			bean.setCode( record.CODNAZ );
 			bean.setName( record.DESNAZ );
 			
 			return bean;
+		}
+
+		if( IsNull( country ) ) {
+			getLogger().error( "CountryService. Country code [#countryId#] not found from Verticale." );
 		}
 
 		return NullValue();

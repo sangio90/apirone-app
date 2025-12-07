@@ -56,7 +56,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				return;
 		}
 
-		var customerShippingAddress = {
+		var customerShippingProfile = {
 			'name' = null,
 			'via' = null,
 			'cap' = null,
@@ -65,11 +65,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			'paese' = null
 		};
 
-		if (!isNull(quotation.getCustomer().getShippingAddresses()) && quotation.getCustomer().getShippingAddresses().len() > 0) {
-			customerShippingAddress = quotation.getCustomer().getShippingAddresses()[1];
+		if (!isNull(quotation.getCustomer().getShippingProfiles()) && quotation.getCustomer().getShippingProfiles().len() > 0) {
+			customerShippingProfile = quotation.getCustomer().getShippingProfiles()[1];
 		}
 
-		quoteObj.customerShippingAddress = customerShippingAddress;
+		quoteObj.customerShippingProfile = customerShippingProfile;
 
 		var saveAsName = "print-quotation-#printParams.report##printParams.grouped ? '_grouped_' : '_'##DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
 

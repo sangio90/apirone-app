@@ -18,11 +18,12 @@
 
 		// Recupera da CRM e mappa
 		var crmData  = getCrmApiService().getCustomer( customerId );
-		var customer = new com.apirone.core.model.bean.Customer();
+		var customer = super.service("Customer");
 
 		if ( !IsNull( crmData ) && !IsNull( crmData.data ) ) {
 			crmData  = crmData.data;
 			customer = getCrmMapper().mapCustomer( crmData );
+			
 			cm.put( getCacheScope(), customerId, customer );
 		}
 

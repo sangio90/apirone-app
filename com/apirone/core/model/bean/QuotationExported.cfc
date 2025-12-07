@@ -70,7 +70,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return getBillingStreet() & " " & getBillingCity() & " " & getBillingState() & " " & getBillingCountry();
 	}
 
-	public String function getShippingAddress(){
+	public String function getShippingProfile(){
 		return getShippingStreet() & " " & getShippingCity() & " " & getShippingState() & " " & getShippingCountry();
 	}
 }

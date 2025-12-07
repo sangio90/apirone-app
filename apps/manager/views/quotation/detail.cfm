@@ -89,12 +89,6 @@
                                 </section>
                             </div>
 
-                            <div class="form-group button-box">
-                                <div class="mt-2">
-                                    <button class="btn btn-primary" data-bind="click:save"><i class="fa fa-save"></i> Salva</button>
-                                </div>
-                            </div>
-
                         </div>
 
                     </section>

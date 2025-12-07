@@ -22,7 +22,7 @@
 									</tr>
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Tipo Pagamento</td>
-										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#args.data.quotation.getDecodedPaymentMethod()#</td>
+										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#args.data.quotation.getPaymentMethodName()#</td>
 									</tr>
 								</table>
 							</td>
@@ -54,7 +54,7 @@
 									</tr>
 									<tr style="border: 0">
 										<td style="border: 0; font-weight: bold;">Telefono: </td>
-										<td style="border: 0">#args.data.quotation.getCustomer().getPhoneCell()#</td>
+										<td style="border: 0">#args.data.quotation.getCustomer().getPhone()#</td>
 									</tr>
 									<tr style="border: 0">
 										<td style="border: 0; font-weight: bold;">Email: </td>
@@ -76,7 +76,7 @@
 								</table>
 							</td>
 							<td>
-								<cfif structKeyExists(args.data, "customerShippingAddress")>
+								<cfif structKeyExists(args.data, "customerShippingProfile")>
 									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
 										<tr style="border: 0">
 											<td style="border: 0; font-weight: bold;">Nome: </td>
@@ -85,10 +85,10 @@
 										<tr style="border: 0">
 											<td style="border: 0; vertical-align: top; font-weight: bold;"">Indirizzo: </td>
 											<td style="border: 0">
-												#args.data.customerShippingAddress['name']#<br>
-												#args.data.customerShippingAddress['via']# #args.data.customerShippingAddress['cap']#<br>
-												#args.data.customerShippingAddress['provincia']#<br>
-												#args.data.customerShippingAddress['paese']#<br>
+												#args.data.customerShippingProfile['name']#<br>
+												#args.data.customerShippingProfile['via']# #args.data.customerShippingProfile['cap']#<br>
+												#args.data.customerShippingProfile['provincia']#<br>
+												#args.data.customerShippingProfile['paese']#<br>
 											</td>
 										</tr>
 									</table>

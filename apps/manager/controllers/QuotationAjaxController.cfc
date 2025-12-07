@@ -103,81 +103,80 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "";
 		var result    = super.getResult();
 
-		transaction {
-			var currency      = super.bean( "Currency" );
-			var quotation     = super.bean( "Quotation" );
-			var paymentMethod = super.bean( "PaymentMethod" );
-			quotation.setId( json.id );
-			quotation.setName( json.name );
-			quotation.setQuotationNumber( json.quotationNumber );
+		var currency      = super.bean( "Currency" );
+		var quotation     = super.bean( "Quotation" );
+		var paymentMethod = super.bean( "PaymentMethod" );
+		quotation.setId( json.id );
+		quotation.setName( json.name );
+		quotation.setQuotationNumber( json.quotationNumber );
 
-			quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
-			quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
-			quotation.setNotes( Len( json?.notes ) ? json.notes : NullValue() );
-			quotation.setVatCode(
-				Len( json?.vatCode?.id ) ? super.fire( "vatCode.get", [ json.vatCode.id ] ) : NullValue()
-			);
+		quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
+		quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
+		quotation.setNotes( Len( json?.notes ) ? json.notes : NullValue() );
+		
+		if ( Len( json?.vatCode?.id ) ) {
+			quotation.setVatCode( super.fire( "vatCode.get", [ json.vatCode.id ] ) );
+		};
 
-			if ( !IsNull( json.opportunity ) && !IsNull( json.opportunity.id ) && json.opportunity.id != "" ) {
-				quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
-			}
+		if ( Len( json?.opportunity?.id ) ) {
+			quotation.setOpportunity( super.fire( "opportunity.get", [ json.opportunity.id ] ) );
+		};
 
-			if ( !IsNull( json.lead ) && !IsNull( json.lead.id ) && json.lead.id != "" ) {
-				quotation.setLead( super.fire( "lead.get", [ json.lead.id ] ) );
-			}
+		if ( Len( json?.lead?.id ) ) {
+			quotation.setLead( super.fire( "lead.get", [ json.lead.id ] ) );
+		};
 
-			quotation.setActive( true );
+		quotation.setActive( true );
 
-			quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
+		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
 
-			quotation.setCustomer(
-				Len( json?.customer?.id ) ? super.fire( "customer.get", [ json.customer.id ] ) : NullValue()
-			);
+		if ( Len( json?.customer?.id ) ) {
+			quotation.setCustomer( super.fire( "customer.get", [ json.customer.id ] ) )
+		}
 
-			if ( !IsNull( json.shippingAddress ) && !IsNull( json.shippingAddress.id ) && json.shippingAddress.id != "" ) {
-				quotation.setCustomerAddressId( json.shippingAddress.id );
-			}
+		if ( !IsNull( json.shippingProfile ) && !IsNull( json.shippingProfile.id ) && json.shippingProfile.id != "" ) {
+			quotation.setCustomerAddressId( json.shippingProfile.id );
+		}
 
-			quotation.setPaymentMethod( paymentMethod.setId( json.paymentMethod.id ) );
-			quotation.setCurrency( currency.setId( json.currency.id ) );
-			// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
-			// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
-			// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
-			// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
-			if ( !Len( json.id ) ) {
-				// create
-				quotation.setVersionNumber( 1 );
-				var status = super.fire( "status.get", [ "LAV" ] );
-				quotation.setStatus( status );
-				
-				thisId    = super.fire( "quotation.create", [ quotation ] );
-				messageId = "quotation.created";
-				
-				var quotationStatusHistory = super.bean( "QuotationStatusHistory" );
-				quotationStatusHistory.setQuotationId( thisId );
-				quotationStatusHistory.setStatus( status );
-				quotationStatusHistory.setAccount( session.user.getAccount() );
-				
-				super.fire( "QuotationStatusHistory.create", [ quotationStatusHistory ] );
-			} else {
-				// update
-				var bean = super.fire( "Quotation.get", [ rc.id ] );
+		quotation.setPaymentMethod( paymentMethod.setId( json.paymentMethod.id ) );
+		quotation.setCurrency( currency.setId( json.currency.id ) );
+		// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
+		// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
+		// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
+		// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
+		if ( !Len( json.id ) ) {
+			// create
+			quotation.setVersionNumber( 1 );
+			var status = super.fire( "status.get", [ "LAV" ] );
+			quotation.setStatus( status );
+			
+			thisId    = super.fire( "quotation.create", [ quotation ] );
+			messageId = "quotation.created";
+			
+			var quotationStatusHistory = super.bean( "QuotationStatusHistory" );
+			quotationStatusHistory.setQuotationId( thisId );
+			quotationStatusHistory.setStatus( status );
+			quotationStatusHistory.setAccount( session.user.getAccount() );
+			
+			super.fire( "QuotationStatusHistory.create", [ quotationStatusHistory ] );
+		} else {
+			// update
+			var bean = super.fire( "Quotation.get", [ rc.id ] );
 
-				// quotation.setActive( 0 );
-				// thisId = super.fire( "quotation.clone", [ quotation, statusId ] );
-				
-				if ( !isNull(json.status.id) && ( json.status.id != bean.getStatus().getId() ) ) {
-					var errorMessage = this.setQuotationStatusHistory(json);
-					if (!isNull(errorMessage)) {
-						result.setData( { "error" = errorMessage } );
-						return event.setValue( "result", result );
-					}
+			// quotation.setActive( 0 );
+			// thisId = super.fire( "quotation.clone", [ quotation, statusId ] );
+			
+			if ( !isNull(json.status.id) && ( json.status.id != bean.getStatus().getId() ) ) {
+				var errorMessage = this.setQuotationStatusHistory(json);
+				if (!isNull(errorMessage)) {
+					result.setData( { "error" = errorMessage } );
+					return event.setValue( "result", result );
 				}
-				var status = super.fire( "status.get", [ json.status.id ] );
-				quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
-				thisId    = super.fire( "quotation.update", [ quotation ] )
-				messageId = "quotation.updated";
 			}
+			var status = super.fire( "status.get", [ json.status.id ] );
+			quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
+			thisId    = super.fire( "quotation.update", [ quotation ] )
+			messageId = "quotation.updated";
 		}
 
 		var message = completeMessage( messageId );

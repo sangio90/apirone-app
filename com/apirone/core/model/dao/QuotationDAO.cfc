@@ -14,7 +14,7 @@
 				shipping_profile_id::varchar,
 				sales_agent_account_id::varchar,
 				graphic_technician_account_id::varchar,
-				customer_address_id::varchar,
+				shipping_address_id::varchar,
 				*
 			FROM quotations
 			WHERE quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
@@ -57,7 +57,7 @@
 				shipping_profile_id::varchar,
 				sales_agent_account_id::varchar,
 				graphic_technician_account_id::varchar,
-				customer_address_id::varchar,
+				shipping_address_id::varchar,
 				COUNT( quotation_id ) OVER() AS total
 			FROM quotations
 			WHERE 1=1
@@ -135,7 +135,7 @@
 				status_id,
 				lang_id,
 				customer_id,
-				customer_address_id,
+				shipping_address_id,
 				payment_method_id,
 				currency_id
 				<cfif true == false>
@@ -172,7 +172,7 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getLang().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomer().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerAddressId()#">::uuid,
+				<!--- <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerAddressId()#">::uuid, --->
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getPaymentMethod().getId()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getCurrency().getId()#">
 				<cfif true == false>
@@ -274,7 +274,7 @@ NULL
 						NULL
 					</cfif>
 				,
-				customer_address_id =
+				shipping_address_id =
 					<cfif !IsNull( arguments.quotation.getCustomerAddressId() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerAddressId()#">::uuid
 					<cfelse>

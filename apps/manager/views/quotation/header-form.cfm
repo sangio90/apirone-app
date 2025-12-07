@@ -5,14 +5,14 @@
 		<nav>
 			<div class="nav nav-tabs" id="nav-tab" role="tablist">
 				<button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="##nav-general" type="button" role="tab">Dati generali</button>
-				<button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Indirizzo di Fatturazione</button>
-				<button class="nav-link" id="nav-shipment-tab" data-bs-toggle="tab" data-bs-target="##nav-shipment" type="button" role="tab">Indirizzo di Spedizione</button>
+				<button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Indirizzo di fatturazione</button>
+				<button class="nav-link" id="nav-shipping-tab" data-bs-toggle="tab" data-bs-target="##nav-shipping" type="button" role="tab">Indirizzo di spedizione</button>
 				<button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button>
 				<button class="nav-link" id="nav-status-tab" data-bs-toggle="tab" data-bs-target="##nav-status" type="button" role="tab">Stato</button>
 				<!--- <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button> --->
 				<!--- <button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatario</button> --->
 				<!--- <button class="nav-link" id="nav-plan-tab" data-bs-toggle="tab" data-bs-target="##nav-plan" type="button" role="tab" hidden>Planimentria</button> --->
-				<!--- <button class="nav-link" id="nav-shipments-tab" data-bs-toggle="tab" data-bs-target="##nav-shipments" type="button" role="tab" hidden>Spedizioni</button> --->
+				<!--- <button class="nav-link" id="nav-shippings-tab" data-bs-toggle="tab" data-bs-target="##nav-shippings" type="button" role="tab" hidden>Spedizioni</button> --->
 			</div>
 		</nav>
 		<div class="tab-content" id="nav-tabContent">
@@ -204,7 +204,13 @@
 							<div class="col-9">
 								<input type="text" class="form-control" data-bind="value: detailForm.data.customer.state" readonly>
 							</div>
-						</div>                                            
+						</div>
+
+						<div class="mb-3 row" data-bind="visible: detailForm.data.id">
+							<div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
+								ID: <span data-bind="text: detailForm.data.customer.id"></span><br>
+							</div>
+						</div>
 
 					</div>
 				</div>
@@ -212,9 +218,9 @@
 			</div>
 
 			<!---
-				shipment
+				shipping
 			--->
-			<div class="tab-pane quotation-panel fade" id="nav-shipment" role="tabpanel">
+			<div class="tab-pane quotation-panel fade" id="nav-shipping" role="tabpanel">
 
 				<div class="row">
 					<div class="col-6">
@@ -223,7 +229,7 @@
 							<label class="col-3 control-label text-sm-end pt-2">Indirizzo</label>
 							<div class="col-9">
 								<select class="form-control"
-									data-bind="source: detailForm.data.customer.shippingAddresses, value: detailForm.data.shippingProfile"
+									data-bind="source: detailForm.data.customer.shippingProfiles, value: detailForm.data.shippingProfile"
 									data-value-field="id"
 									data-text-field="name"
 								>

@@ -39,8 +39,8 @@
 
 </head>
 <body>
-    <div id="globalLoadingSpinner" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 255, 255, .75); display: none; justify-content: center; align-items: center; z-index: 1060 !important;">
-        <div style="width: 60px; height: 60px; border: 6px solid ##d4d4d4; border-top-color: ##007bff; border-radius: 50%; animation: spin 0.7s linear infinite;"></div>
+    <div id="global-loading-spinner">
+        <div id="global-loading-spinner-circle"></div>
     </div>
     <section class="body">
 
@@ -204,17 +204,5 @@
     </body>
 </html>
 </cfoutput>
-
-
-<script>
-    window.Loading = {
-        show: function () {
-            $("#globalLoadingSpinner").css('display', 'flex');
-        },
-        hide: function () {
-            $("#globalLoadingSpinner").css('display', 'none');
-        }
-    };
-</script>
 
 </cfprocessingdirective>

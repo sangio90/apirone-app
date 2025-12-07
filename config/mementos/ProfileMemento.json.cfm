@@ -1,6 +1,7 @@
 ﻿{
 	defaultIncludes = [
 		"id",
+		"name",
 		"shortId",
 		"firstName",
 		"lastName",
@@ -19,6 +20,7 @@
 		detail = {
 			defaultIncludes = [
 				"id",
+				"name",
 				"shortId",
 				"firstName",
 				"lastName",

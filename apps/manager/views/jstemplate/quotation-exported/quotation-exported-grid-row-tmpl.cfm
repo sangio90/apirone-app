@@ -16,7 +16,7 @@
                 <span data-bind="text: billingAddress"></span>
             </td>
             <td>
-                <span data-bind="text: shippingAddress"></span>
+                <span data-bind="text: shippingProfile"></span>
             </td>
             <td>
                 <span data-bind="text: opportunity"></span>
