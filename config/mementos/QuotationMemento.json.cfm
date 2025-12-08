@@ -11,7 +11,8 @@
 		"name",
 		"active",
 		"status",
-		"vatCode"
+		"vatCode",
+		"owner.email"
 	],
 	profiles = {
 		detail = {
@@ -39,7 +40,8 @@
 				"graphicTechnicianAccount",
 				"shippingProfile",
 				"createdAt",
-				"statusFile"
+				"statusFile",
+				"owner.email"
 			]
 		}
 	}

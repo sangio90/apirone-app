@@ -110,6 +110,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setId( json.id );
 		quotation.setName( json.name );
 		//quotation.setQuotationNumber( json.quotationNumber );
+		quotation.setOwner( session.user.getAccount() );
 
 		quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
 		quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );

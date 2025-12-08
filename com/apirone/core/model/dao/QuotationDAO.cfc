@@ -138,7 +138,8 @@
 				payment_method_id,
 				currency_id,
 				shipping_profile_id,
-				vat_code_id
+				vat_code_id,
+				owner_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -178,7 +179,8 @@
 					<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVatCode().getId()#">
 				<cfelse>
 					NULL
-				</cfif>
+				</cfif>,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOwner().getId()#">::uuid
 			)
 			RETURNING quotation_id
 		</cfquery>

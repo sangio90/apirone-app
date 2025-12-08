@@ -982,6 +982,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setActive( record.active );
 			bean.setLang( getLangService().get( record.lang_id ) );
 			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
+			bean.setOwner( getAccountService().get( record.owner_id ) );
 			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 
 			//by a trigger from history
