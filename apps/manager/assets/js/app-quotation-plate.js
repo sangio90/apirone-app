@@ -1898,8 +1898,8 @@ AP.plate.modal = ( function() {
                         done: function( xhr ) {
                             status.html( "" );
                             AP.widget.notify( "success", "Placca salvata correttamente." );
-                            // viewModel.set( "detailForm", defaultDetailForm );
-                            // setTimeout( () => window.location.reload(), 1000 );
+                            viewModel.set( "detailForm", defaultDetailForm );
+                            setTimeout( () => window.location.reload(), 1000 );
                         }
                     }
                 } );
@@ -1925,10 +1925,6 @@ AP.plate.modal = ( function() {
 
             // var plate = this.plates.get( this.get( "plate" ) );
             var plate = this.get( "plate" );
-
-            // console.log( "FREE_CELL_WIDTH", FREE_CELL_WIDTH );
-            // console.log( "AP.plate.constants", AP.plate.constants );
-            // console.log( "constants.GRID_CELL_DIMENSIONS", constants.GRID_CELL_DIMENSIONS );
 
             FREE_CELL_WIDTH = constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].width;
             FREE_CELL_HEIGHT = constants.GRID_CELL_DIMENSIONS[ CELL_TYPE.FREE ].height;

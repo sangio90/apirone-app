@@ -24,8 +24,8 @@ AP.quotation.list = ( function() {
     var viewModel = kendo.observable( {
         rows: dataSources.items,
 
-        getDate: function( event ) {
-            return NM.kendo.formatISODate( event.quotationDate, "date-only" );
+        getCreatedAt: function( event ) {
+            return NM.kendo.formatISODate( event.createdAt );
         },
 
         search: function( event ) {

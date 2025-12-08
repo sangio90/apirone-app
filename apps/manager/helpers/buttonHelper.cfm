@@ -98,6 +98,12 @@
 
         ```
 
+        <cfset var ele = "button">
+        
+        <cfif Len(href)>
+            <cfset ele = "a">
+        </cfif>
+
         <cfset var dataAttr = "">
         
         <cfif data.len()>
@@ -108,16 +114,16 @@
 
         <cfsavecontent variable="local.html">
             <cfoutput>
-                <button type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size# #arguments.class#" 
+                <#ele# type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size# #arguments.class#" 
                     title="#arguments.title#" 
                     #dataAttr#
                     #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#
-                    #Len( arguments.href ) ? 'onClick="location.href=''#arguments.href#''"' : ''#
+                    #Len( arguments.href ) ? 'href="#arguments.href#"' : ''#
                     #Len( arguments.id ) ? 'id="#arguments.id#"' : ''#>
                     <i class="fas fa-#arguments.icon#"
                         #Len( arguments.iconBind ) ? 'data-bind="#arguments.iconBind#"' : ''#
                     ></i> #arguments.label#
-                </button>
+                </#ele#>
             </cfoutput>
         </cfsavecontent>
         ```

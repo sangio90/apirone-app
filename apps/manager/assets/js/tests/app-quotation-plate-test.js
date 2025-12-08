@@ -8,6 +8,8 @@ $( document ).ready( async function() {
         const modelId = "1ac1104f-0208-4a0c-bdca-7ba50df4756f"; // modello: 2X2
         const finishId = "7357f125-e556-467c-ba37-2a1e17abc6cf"; // finitura: Acciaio lucido
 
+        var fruits = [ "schu", "CONNETTORE RJ11" ];
+
         const plateEle = $( "#plate-line" );
         const modelEle = $( "#plate-model" );
         const finishEle = $( "#plate-finish" );
@@ -36,10 +38,8 @@ $( document ).ready( async function() {
 
         // interaction with suggest
         // var terms = [ "schu", "CONNETTORE VIDEO RCA" ];
-        var terms = [ "schu", "CONNETTORE RJ11" ];
 
-        for ( var term of terms ) {
-
+        for ( var term of fruits ) {
 
             // 1. Imposta il valore nell'input (opzionale, ma pulito)
             fruitSuggest.val( term );

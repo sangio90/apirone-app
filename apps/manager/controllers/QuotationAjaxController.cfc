@@ -118,7 +118,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setActive( true );
 		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
 
-		if ( Len( json?.vatCode?.id ) ) {
+
+		if ( Val( json?.vatCode?.id ) ) {
 			quotation.setVatCode( super.fire( "vatCode.get", [ json.vatCode.id ] ) );
 		};
 

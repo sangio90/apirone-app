@@ -490,19 +490,18 @@ AP.quotation.detail = ( function() {
 
         addSignage: function() {
             signageApp().new();
+            console.log( "detaiLForm", viewModel.get( "detailForm.data.id" ) );
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
         addAccessory: function() {
             accessoryApp().new();
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
         addPlate: function() {
             plateApp().new();
-
-            console.log( "id", viewModel.get( "detailForm.data.id" ) );
-
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
-
         },
 
         editSignage: function( event ) {

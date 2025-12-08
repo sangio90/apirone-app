@@ -70,7 +70,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String str,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotation.id" } ]
+		required Array orderBy  = [ { field = "quotation.createdAt", dir = "desc" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -975,6 +975,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setQuotationNumber( record.quotation_number );
 			bean.setVersionNumber( record.version_number );
 			bean.setQuotationDate( record.quotation_date );
+			bean.setCreatedAt( record.created_at );
 			bean.setNotes( record.notes );
 			bean.setValidityDate( record.validity_date );
 			bean.setExported( record.exported );

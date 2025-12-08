@@ -42,7 +42,7 @@ AP.signage.modal = ( function() {
             signageConfig: {
                 catalogBundle: {
                     category: {
-                        id: ""
+                        id: 20 // segnaletica interna
                     },
                     line: {
                         id: ""

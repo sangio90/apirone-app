@@ -69,7 +69,6 @@ AP.quotation.header = ( function() {
                 id: 18 // BB 60 GG FM
             },
             customPaymentMethod: "",
-            vatNumber: "",
             currency: {
                 id: 1
             },

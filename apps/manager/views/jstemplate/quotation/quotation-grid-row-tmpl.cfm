@@ -16,7 +16,7 @@
                 <span data-bind="text: quotationNumber"></span>/<span data-bind="text: versionNumber"></span>
             </td>
             <td>
-                <span data-bind="text: getDate"></span>
+                <span data-bind="text: getCreatedAt"></span>
             </td>
             <td>
                 <span data-bind="text: status.name"></span>

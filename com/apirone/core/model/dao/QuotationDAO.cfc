@@ -137,7 +137,8 @@
 				customer_id,
 				payment_method_id,
 				currency_id,
-				shipping_profile_id
+				shipping_profile_id,
+				vat_code_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -172,6 +173,11 @@
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getShippingProfile().getId()#">::uuid
 				<cfelse>
 					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getVatCode()?.getId() ) >
+					<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVatCode().getId()#">
+				<cfelse>
+					NULL
 				</cfif>
 			)
 			RETURNING quotation_id
@@ -183,7 +189,7 @@
 	<cffunction name="update" returntype="String">
 		<cfargument name="quotation" type="com.apirone.core.model.bean.Quotation" required="true">
 
-		<cfquery name="local.q" datasource="apirone">
+		<cfquery name="local.q" datasource="apirone" result="result">
 			UPDATE quotations
 			SET
 				updated_at = now(),

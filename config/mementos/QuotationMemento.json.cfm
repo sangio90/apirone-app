@@ -7,6 +7,7 @@
 		"quotationNumber",
 		"versionNumber",
 		"quotationDate",
+		"createdAt",
 		"name",
 		"active",
 		"status",

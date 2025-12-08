@@ -60,7 +60,7 @@
                                         { 'field':'name', 'title':'Nome' },
                                         { 'field':'referentName', 'title':'Referente' },
                                         { 'field':'quotationNumber', 'title':'Numero', width: '15%' },
-                                        { 'field':'quotationDate', 'title':'Data', width: '15%'},
+                                        { 'field':'createdAt', 'title':'Creato il', width: '15%'},
                                         { 'field':'status', 'title':'Stato', width: '15%'},
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 
