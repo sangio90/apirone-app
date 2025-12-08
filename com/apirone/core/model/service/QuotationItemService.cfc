@@ -104,9 +104,11 @@
 			//dump( arguments.quotationItem.getFruits());
 			//abort;
 
-			for( var thisFruit in arguments.quotationItem.getFruits() ) {
-				thisFruit.setQuotationItemId( newId );
-				getQuotationItemFruitService().create( thisFruit );
+			if( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+				for( var thisFruit in arguments.quotationItem.getFruits() ) {
+					thisFruit.setQuotationItemId( newId );
+					getQuotationItemFruitService().create( thisFruit );
+				}
 			}
 
 			var price = arguments.quotationItem.getPrice();

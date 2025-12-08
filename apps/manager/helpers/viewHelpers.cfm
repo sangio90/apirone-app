@@ -4,6 +4,12 @@
     <cfreturn Replace( renderView( view="#arguments.view#" ), "nmscript", "script", "ALL" )>
 </cffunction>
 
+<cffunction name="templateQuotationItem">
+    <cfargument required="true" type="String" name="view">
+
+    <cfreturn Replace( renderView( view="#arguments.view#" ), "nmscript", "script", "ALL" )>
+</cffunction>
+
 <cffunction name="relevantPath">
     <cfargument required="true" type="String" name="fullPath">
 

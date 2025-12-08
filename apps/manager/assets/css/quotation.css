@@ -199,3 +199,28 @@
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
+
+.qt-item-trash-rounded {
+	border: 1px solid red;
+	height: 25px;
+	width: 25px;
+	border-radius: 5px
+}
+
+.qt-item-image {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+}
+
+.qt-item-image-container {
+	min-width: 200px;
+	max-width: 200px;
+	max-height: 200px;
+	min-height: 200px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: white;
+}

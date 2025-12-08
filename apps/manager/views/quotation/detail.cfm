@@ -78,11 +78,11 @@
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-signage" role="tabpanel">
-                                            <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems">
+                                            <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems" class="row">
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-accessories" role="tabpanel">
-                                            <div data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems">
+                                            <div data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems" class="row">
                                             </div>
                                         </div>
                                     </div>

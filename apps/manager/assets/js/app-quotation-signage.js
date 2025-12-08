@@ -990,7 +990,7 @@ AP.signage.modal = ( function() {
         },
 
         save: function( event ) {
-            AP.loading.show();
+            // AP.loading.show();
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             const signageRows = parsedData.quotationItem.signageRows.data();
@@ -1010,6 +1010,7 @@ AP.signage.modal = ( function() {
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
+                parsedData.price = AP.quotation.pricing.getData().data;
 
                 NM.util.ajax( {
                     method: "POST",
@@ -1017,25 +1018,15 @@ AP.signage.modal = ( function() {
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
-                            if( xhr.status == "ERRORE" ) {
-                                AP.loading.hide();
-                                if ( xhr.data && xhr.data.error ) {
-                                    AP.widget.notify( "error", xhr.data.error );
-                                } else {
-                                    AP.widget.notify( "error", "Errore nel salvataggio della segnaletica." );
-                                }
-                            }
-                            if ( xhr.status == "SUCCESS" ) {
-                                $( "#signage-modal" ).hide();
-                                AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
-                                viewModel.set( "detailForm", defaultDetailForm );
-                                setTimeout( function() {
-                                    AP.loading.hide();
-                                    window.location.reload();
-                                }
-                                , 1000 );
-                            }
-                        }
+                            $( "#signage-modal" ).hide();
+                            AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
+                            viewModel.set( "detailForm", defaultDetailForm );
+
+                            setTimeout( function() {
+                                // AP.loading.hide();
+                                window.location.reload();
+                            }, 1000 );
+                        },
                     }
                 } );
             } );

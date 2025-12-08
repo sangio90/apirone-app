@@ -57,7 +57,7 @@
 									id      = "quotation-grid",
 									columns = "[
                                         { 'field':'shortId', 'title':'ID',  width: '80px' },
-                                        { 'field':'quotationNumber', 'title':'##', width: '80px' },
+                                        { 'field':'quotationNumber', 'title':'##', width: '70px' },
                                         { 'field':'name', 'title':'Nome' },
                                         { 'field':'referentName', 'title':'Referente' },
                                         { 'field':'owner.email', 'title':'Account', width: '15%'},
