@@ -579,7 +579,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = {	
 			"fileId"   = fileId,
-			"filePath" = filePath,
+			"fileName" = fileName,
 			"type" = type
 		};
 

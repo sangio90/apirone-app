@@ -41,7 +41,8 @@
 								#grid(
 									id      = "quotation-item-exported-grid",
 									columns = "[
-                                        { 'field':'key', 'title':'ID', width: '10%' },
+                                        { 'field':'key', 'title':'ID', width: '250px' },
+                                        { 'field':'status', 'title':'Status', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '10%' },
                                         { 'field':'description', 'title':'Descrizione', width: '15%' },
                                         { 'field':'exportDate', 'title':'Data', width: '10%' },

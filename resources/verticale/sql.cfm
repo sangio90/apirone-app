@@ -11,6 +11,10 @@
     SELECT * FROM DISBAS_APIR
 </cfquery>
 <cfdump var="#i#">
+<cfquery name="i" datasource="verticaleExport">
+    SELECT * FROM ORDINI_APIR
+</cfquery>
+<cfdump var="#i#">
 <cfabort>
 
 

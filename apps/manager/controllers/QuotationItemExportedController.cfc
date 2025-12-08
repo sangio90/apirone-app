@@ -1,7 +1,7 @@
 ﻿component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
-		prc.title = "Prodotti Preventivi Esportati";
+		prc.title = "Prodotti esportati";
 
 		prc.jsFiles.add( "app-quotation-item-exported" );
 

@@ -28,7 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String str,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotationItemExported.exportDate" } ]
+		required Array orderBy  = [ { field = "quotationItemExported.exportDate", dir = "DESC" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -90,6 +90,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setColor( record.CLCODICE );
 			bean.setExportDate( record.ARDATCAR );
 			bean.setNotes( record.CLANNOTA );
+			bean.setStatus( record.AR_STATO );
 
 			return bean;
 		}

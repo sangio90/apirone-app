@@ -8,6 +8,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var mem    = super.getMementify();
 
 		var rows = super.fire( "quotationItemExported.search", params );
+
 		var data = mem.convertList( rows.getData() );
 
 		result.setTotal( rows.getTotal() );

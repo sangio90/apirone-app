@@ -344,7 +344,7 @@
 					CLANNOTA,
 					AR_STATO,
 					CL_STATO,
-					VR_STATO
+					VAR_STATO
 				)
 				VALUES (
 					<cfqueryparam value="#arguments.data.AR_CHIAVE#" cfsqltype="varchar">,

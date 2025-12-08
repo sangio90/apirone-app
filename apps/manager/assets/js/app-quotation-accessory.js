@@ -524,16 +524,17 @@ AP.accessory.modal = ( function() {
         },
 
         save: function( event ) {
-            AP.loading.show()
+            AP.loading.show();
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
             parsedData.quotationId = quotationId;
-            parsedData.type = 'accessory';
+            parsedData.type = "accessory";
             var preview = $( "#accessory-preview-background" )[0];
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
+                parsedData.price = AP.quotation.pricing.getData().data;
 
                 NM.util.ajax( {
                     method: "POST",
@@ -547,15 +548,15 @@ AP.accessory.modal = ( function() {
                                 } else {
                                     AP.widget.notify( "error", "Errore nel salvataggio della segnaletica." );
                                 }
-                                AP.loading.hide()
+                                AP.loading.hide();
                             }
                             if ( xhr.status == "SUCCESS" ) {
-                                $('#accessory-modal').hide()
+                                $( "#accessory-modal" ).hide();
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                                 viewModel.set( "detailForm", defaultDetailForm );
-                                setTimeout( function () {
-                                    AP.loading.hide()
-                                    window.location.reload()
+                                setTimeout( function() {
+                                    AP.loading.hide();
+                                    window.location.reload();
                                 }
                                 , 1000 );
                             }
@@ -666,7 +667,7 @@ AP.accessory.modal = ( function() {
                 },
             },
         } );
-        
+
         renderQuotationItemTotals( id );
     };
 

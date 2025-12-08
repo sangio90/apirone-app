@@ -7,6 +7,9 @@
                 <span class="key" data-bind="text: key"></span>
             </td>
             <td>
+                <span data-bind="text: status"></span>
+            </td>
+            <td>
                 <span class="code" data-bind="text: code"></span>
             </td>
             <td>
