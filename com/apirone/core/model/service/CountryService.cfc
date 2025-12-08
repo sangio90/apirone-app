@@ -30,7 +30,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	*/
 
 	private com.apirone.core.model.bean.Country function build( required String countryId ){
-		var record = getDao().read( arguments.countryId & "x" );
+		var record = getDao().read( arguments.countryId );
 
 		if ( record.recordCount ) {
 

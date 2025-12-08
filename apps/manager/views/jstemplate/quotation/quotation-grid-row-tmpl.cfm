@@ -10,6 +10,9 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
+                <span data-bind="text: referentName"></span>
+            </td>
+            <td>
                 <span data-bind="text: quotationNumber"></span>/<span data-bind="text: versionNumber"></span>
             </td>
             <td>

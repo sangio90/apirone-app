@@ -5,7 +5,7 @@
                 <h2>#prc.title#</h2>
             </div>
 			<div class="col-6 text-end mt-3">
-				#button( href = "/manager/quotations", size = "sm", label = "Torna ai preventivi" )#
+				#button( href = "/manager/quotations", size = "sm", label = "Torna ai preventivi", icon="arrow-left" )#
 			</div>
         </div>
 

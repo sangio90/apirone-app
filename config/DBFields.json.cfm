@@ -183,6 +183,10 @@
         "name": "quotation_id",
         "type": "uuid"
     },
+    "quotation.createdAt": {
+        "name": "quotations.created_at",
+        "type": "Date"
+    },
 
     "quotationItem.id": {
         "name": "quotation_item_id",

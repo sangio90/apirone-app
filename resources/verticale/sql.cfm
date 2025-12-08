@@ -3,6 +3,17 @@
 <cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
+<cfquery name="i" datasource="verticaleExport">
+    SELECT * FROM ARTICO_APIR
+</cfquery>
+<cfdump var="#i#">
+<cfquery name="i" datasource="verticaleExport">
+    SELECT * FROM DISBAS_APIR
+</cfquery>
+<cfdump var="#i#">
+<cfabort>
+
+
 <cfquery name="i" datasource="verticale">
     SELECT TOP 10 *
     FROM codnaz

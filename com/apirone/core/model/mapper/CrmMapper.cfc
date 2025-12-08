@@ -89,11 +89,11 @@
 		var country = getCountryService().get( Trim( data.paese ) );
 
 		if( IsNull( country ) ) {
-			getLogger().error( "CrmMapping. Country code [#data.paese#] not found for address ID [#data.id#]." );
+			getLogger().error( "CrmMapping. Country code [#data.paese#] not found for address id [#data.id#]." );
 		}
 
 		bean.setId( data.id );
-		bean.setName( data.name ?: "" ); 
+		bean.setCompany( data.name );  //"name" is shorthand
 		bean.setFirstName( "" ); 
 		bean.setLastName( "" ); 
 		bean.setVatNumber( "" ); 

@@ -17,6 +17,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="contactPersonEmail" type="String";
 
 	public Customer function init(){
+
+		setShippingProfiles( [] );
+
 		return this;
 	}
 

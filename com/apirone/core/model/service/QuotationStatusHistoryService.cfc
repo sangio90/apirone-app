@@ -71,6 +71,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function create( required com.apirone.core.model.bean.QuotationStatusHistory quotationStatusHistory ){
+		//arguments.quotationStatusHistory.getAccount().setId( getCurrentAccountId() );
 		var newId = getDao().insert( arguments.quotationStatusHistory );
 
 		return newId;

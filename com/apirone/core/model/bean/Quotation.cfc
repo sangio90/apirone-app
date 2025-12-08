@@ -40,4 +40,21 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		}
 	}
 
+	public String function getReferentName() {
+		if ( Len( getCustomer()?.getName() ) ) {
+			return getCustomer().getName();
+		}
+		
+		if ( Len( getLead()?.getName() ) ) {
+			return getLead().getName();
+		}
+		
+		if ( Len( getOpportunity()?.getName() ) ) {
+			return getOpportunity().getName();
+		}
+		
+		// Se non c'è nessuna delle tre o se manca il campo nome specifico
+		return "Nessun referente" 
+	}
+
 }

@@ -12,6 +12,11 @@ $( document ).ready( function() {
 
 } );
 
+var quotationDate = new Date();
+var validityDate = new Date( quotationDate );
+
+validityDate.setMonth( validityDate.getMonth() + 1 );
+
 AP.quotation.header = ( function() {
     var pub = {};
     var fields = AP.quotation.fields;
@@ -31,15 +36,15 @@ AP.quotation.header = ( function() {
             quotationNumber: "",
             versionNumber: 1,
             lang: {
-                id: "",
+                id: "IT",
                 name: ""
             },
             zone: {
                 id: "",
                 name: ""
             },
-            quotationDate: new Date(),
-            validityDate: new Date(),
+            quotationDate: quotationDate,
+            validityDate: validityDate,
             notes: "",
             status: {
                 id: null,
@@ -329,7 +334,7 @@ AP.quotation.header = ( function() {
         save: function() {
             var thisForm = fields.haderForm;
 
-            console.log( "fields.haderForm", fields.haderForm );
+            // console.log( "fields.haderForm", fields.haderForm );
 
             var status = thisForm.find( ".save-status" );
 
@@ -494,7 +499,7 @@ AP.quotation.header = ( function() {
             }
         } );
 
-        $( "#quotationNameInput" ).prop( "readonly", true );
+        // $( "#quotationNameInput" ).prop( "readonly", true );
         $( "#quotationNumberInput" ).prop( "readonly", true );
     };
 

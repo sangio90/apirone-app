@@ -27,10 +27,11 @@
 					<div class="row d-flex align-items-center mb-3">
 						<label class="col-3 text-end">Nome </label>
 						<div class="col-9">
-							<input type="text" name="name" id="quotationNameInput" class="form-control" data-bind="value: detailForm.data.name">
+							<input type="text" name="name" id="quotationNameInput" class="form-control" data-bind="value: detailForm.data.name" required>
 						</div>
 					</div>
 
+					<!----
 					<div class="row d-flex align-items-center mb-3">
 						<label class="col-3 text-end">Numero </label>
 						<div class="col-9">
@@ -44,6 +45,7 @@
 							<input type="text" class="form-control" data-bind="value: detailForm.data.versionNumber" readonly>
 						</div>
 					</div>
+					----->
 
 					<div class="row d-flex align-items-center mb-3">
 						<label class="col-3 text-end">Lingua </label>
@@ -207,7 +209,7 @@
 						</div>
 
 						<div class="mb-3 row" data-bind="visible: detailForm.data.id">
-							<div class="col-sm-10 offset-sm-2 mt-1 fs-10 le-14">
+							<div class="col-sm-9 offset-sm-3 mt-1 fs-10 le-14">
 								ID: <span data-bind="text: detailForm.data.customer.id"></span><br>
 							</div>
 						</div>

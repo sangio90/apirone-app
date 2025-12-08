@@ -49,6 +49,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
+	public Number function getLastNumber(){
+
+		var rows = search( orderBy = [ { field = "quotation.createdAt", dir = "desc" } ], limit = 1 );
+
+		if( IsNull( rows.getData() ) OR !Len( rows.getData() ) ) {
+			return 99;
+		}
+
+		return rows.getData()[1].getQuotationNumber();
+	}
+
 	public Array function list(){
 		arguments[ "limit" ] = -1;
 
@@ -104,8 +115,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	public String function create( required com.apirone.core.model.bean.Quotation quotation ){
-		var newId = getDao().insert( arguments.quotation );
+	// questa firma no è pulita ma è il miglior adattamento
+	// questo metodo andrà usato anche da sistemi esterni e legarsi alla session non è consentito
+	public String function create( 
+		required com.apirone.core.model.bean.Quotation quotation, 
+		required String accountId
+	){
+
+		arguments.quotation.setQuotationNumber( getLastNumber() + 1 );
+		arguments.quotation.setVersionNumber( 0 );
+
+		//TODO: remove this, get status from last record of history
+		//arguments.quotation.setStatus( status );
+
+		transaction {
+
+			var newId = getDao().insert( arguments.quotation );
+			
+			// add status to history
+			var history = super.bean( "QuotationStatusHistory" );
+			var status = getStatusService().get( "LAV" );
+			
+			history.setQuotationId( newId );
+			history.setStatus( status );
+			history.setAccount( getAccountService().get( arguments.accountId ) );
+
+			getQuotationStatusHistoryService().create( history );
+
+		}
 
 		return newId;
 	}
@@ -943,9 +980,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setExported( record.exported );
 			bean.setActive( record.active );
 			bean.setLang( getLangService().get( record.lang_id ) );
+			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
+			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 
-			// TODO: get last from statusHistory
-			bean.setStatus( getStatusService().get( record.status_id ) );
+			//by a trigger from history
+			bean.setStatus( getStatusService().get( record.status_id ) ); 
 
 			if ( !IsNull( record.customer_id ) ) {
 				
@@ -953,9 +992,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setCustomer( customer );
 
 				// cerco l'indirizzo di spedizione tra gli indirizzi del customer
-				if ( !IsNull( record.shipping_address_id ) ) {
+				if ( !IsNull( record.shipping_profile_id ) ) {
 					for( var thisAddress in customer.getShippingProfiles() ) {
-						if ( thisAddress.getId() == record.shipping_address_id ) {
+						if ( thisAddress.getId() == record.shipping_profile_id ) {
 							bean.setShippingProfile( thisAddress );
 							break;
 						}
@@ -964,6 +1003,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				
 			}
 
+			/*
 			var quotationStatusHistories = getQuotationStatusHistoryService().list( quotationId = record.quotation_id, statusId = record.status_id );
 
 			if ( quotationStatusHistories.len() > 0 && record.status_id == 'CCN' ) {
@@ -972,6 +1012,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					bean.setStatusFile( statusFiles[1] )
 				}
 			}
+			*/
 
 			if ( !IsNull( record.opportunity_id ) ) {
 				bean.setOpportunity( getOpportunityService().get( record.opportunity_id ) );
@@ -985,19 +1026,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setVatCode( getVatCodeService().get( record.vat_code_id ) );
 			}
 
+			if (!isNull(record.sales_agent_account_id)) {
+				bean.setSalesAgentAccount( getAccountService().get( record.sales_agent_account_id ) );
+			}
+
 			bean.setCalculatedAmount(
 				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
 			);
 
-			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
-			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
-
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
 			// bean.setShippingProfile( getProfileService().get( record.shipping_profile_id ) );
-			if (!isNull(record.sales_agent_account_id)) {
-				bean.setSalesAgentAccount( getAccountService().get( record.sales_agent_account_id ) );
-			}
 			// bean.setGraphicTechnicianAccount( getAccountService().get( record.graphic_technician_account_id ) );
 
 			return bean;
