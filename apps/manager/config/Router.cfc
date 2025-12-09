@@ -428,13 +428,14 @@
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();
 
+		get( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.totals" ).end();
+		
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
 		post( "/quotations" ).to( "QuotationController.create" ).end(); // Da togliere
 		get( "/quotations" ).to( "QuotationController.list" ).end();
 
-		post( "/ajax/quotations/:id/total" ).to( "QuotationAjaxController.calculatePrice" ).end();
-		get( "/ajax/quotations/:id/total" ).to( "QuotationAjaxController.getPrice" ).end();
+		//get( "/ajax/quotations/:id/total" ).to( "QuotationAjaxController.getPrice" ).end();
 
 		get( "/ajax/quotations/:quotationId/zones" ).to( "QuotationZoneAjaxController.list" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();

@@ -72,7 +72,7 @@
 											#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
 											#args.data.quotation.getCustomer().getCity()#<br>
 											#args.data.quotation.getCustomer().getState()#<br>
-											#args.data.quotation.getCustomer().getCountry()#
+											#args.data.quotation.getCustomer().getCountry().getIsoCode()#
 										</td>
 									</tr>
 								</table>
@@ -169,15 +169,17 @@
 																			<b>P.#fruit.getPosition()#</b> : Cod. 
 																			<span style="text-transform: lowercase; font-size: 8pt;">
 																				#fruit.getFruit().getCode()#
-																				<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
-																					<span style="font-size: 8pt; text-transform: lowecase">
-																						#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#
-																					</span>
-																				</cfloop>
-																				<cfif !isNull(fruit.getNotes()) && args.params.notes>
-																					<span style="font-size: 8pt; margin-top: 4pt;">
-																						<i>( Note: #fruit.getNotes()# )</i>
-																					</span>
+																				<cfif IsArray( fruit.getFruit().getItems() )>
+																					<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
+																						<span style="font-size: 8pt; text-transform: lowecase">
+																							#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#
+																						</span>
+																					</cfloop>
+																					<cfif !isNull(fruit.getNotes()) && args.params.notes>
+																						<span style="font-size: 8pt; margin-top: 4pt;">
+																							<i>( Note: #fruit.getNotes()# )</i>
+																						</span>
+																					</cfif>
 																				</cfif>
 																			</span>
 																		</li>
@@ -194,10 +196,10 @@
 										#oggetto.getQuantity()#
 									</td>
 									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
-										#LSNumberFormat( oggetto.getPrice(), ".99", "it_IT" )# €
+										#LSNumberFormat( oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
 									</td>
 									<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
-										#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice(), ".99", "it_IT" )# €
+										#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
 									</td>
 								</tr>
 							</table>

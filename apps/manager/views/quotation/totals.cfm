@@ -12,7 +12,7 @@
 			<div class="quotation-totals-content" id="quotation-totals-content" data-bind="invisible:common.isCollapsed">
 			
 				<!--- 
-					quotation item princing
+					item princing
 				--->
 				<div id="quotation-totals-item-content" data-bind="visible: isItem">
 					<table style="width: 100%" class="quotation-table-item-prices-totals">
@@ -47,7 +47,6 @@
 									<i class="fas fa-euro-sign"></i>
 								</span>
 							</div>
-
 						</div>
 					</div>
 					<div class="d-flex justify-content-end gap-2">
@@ -59,14 +58,27 @@
 				</div>
 
 				<!--- 
-					quotation princing
+					total princing
 				--->
 				<div id="quotation-totals-general-content" data-bind="visible: isGeneral">
+					<div class="d-flex align-items-center justify-content-between" >
+						<div>
+							<div>Placche:</div>
+							<span data-bind="text: pricing.counters.plates"></span>
+						</div>
+						<div>
+							<div>Segnaletiche:</div>
+							<span data-bind="text: pricing.counters.signages"></span>
+						</div>
+						<div>
+							<div>Accessori:</div>
+							<span data-bind="text: pricing.counters.accessories"></span>
+						</div>
+					</div>
 					<div class="row mt-3 mb-2">
 						<div class="col-8">Totale merce</div>
-						<div class="col-4">
-							<input class="form-control" name="shippingCost" 
-								placeholder="%" data-bind="value: pricing.data.goodsTotal">
+						<div class="col-4 text-end">
+							<span data-bind="text: pricing.data.totalGoods"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2 align-items-center d-flex">
@@ -84,7 +96,13 @@
 						<div class="col-8">Spese di trasporto</div>
 						<div class="col-4">
 							<input class="form-control" name="shippingCost" 
-								placeholder="%" data-bind="value: pricing.data.shippingMethod.cost">
+								placeholder="%" data-bind="value: pricing.data.shippingCost">
+						</div>
+					</div>
+					<div class="row mt-3 mb-2">
+						<div class="col-6"><b>TOTALE</b></div>
+						<div class="col-6 text-end fs-16" >
+							<b><span data-bind="text: pricing.data.total"></span> &euro;</b>
 						</div>
 					</div>
 					<div class="d-flex justify-content-end gap-2">

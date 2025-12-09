@@ -93,14 +93,16 @@
 																<b>P.#fruit.getPosition()#</b> : Cod. 
 																<span style="text-transform: lowercase; font-size: 8pt;">
 																	#fruit.getFruit().getCode()#
-																	<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
-																		<span style="font-size: 8pt; text-transform: lowecase">
-																			#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#</span>
-																	</cfloop>
-																	<cfif !isNull(fruit.getNotes()) && args.params.notes>
-																		<span style="font-size: 8pt; margin-top: 4pt;">
-																			<i>( Note: #fruit.getNotes()# )</i>
-																		</span>
+																	<cfif IsArray( fruit.getFruit().getItems() )>
+																		<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
+																			<span style="font-size: 8pt; text-transform: lowecase">
+																				#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#</span>
+																		</cfloop>
+																		<cfif !isNull(fruit.getNotes()) && args.params.notes>
+																			<span style="font-size: 8pt; margin-top: 4pt;">
+																				<i>( Note: #fruit.getNotes()# )</i>
+																			</span>
+																		</cfif>
 																	</cfif>
 																</span>
 															</li>

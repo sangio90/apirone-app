@@ -72,7 +72,11 @@
 											#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
 											#args.data.quotation.getCustomer().getCity()#<br>
 											#args.data.quotation.getCustomer().getState()#<br>
-											#args.data.quotation.getCustomer().getCountry()#
+											<!---- TODO: set country
+											<cfif len( args.data.quotation?.getCustomer()?.getCountry() )>
+												#args.data.quotation.getCustomer().getCountry()#
+											</cfif>
+											---->
 										</td>
 									</tr>
 								</table>
@@ -87,10 +91,10 @@
 										<tr style="border: 0">
 											<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
 											<td style="border: 0">
-												#args.data.customerShippingProfile['name']#<br>
-												#args.data.customerShippingProfile['via']# #args.data.customerShippingProfile['cap']#<br>
-												#args.data.customerShippingProfile['provincia']#<br>
-												#args.data.customerShippingProfile['paese']#<br>
+												#args.data.customerShippingProfile.getCompany()#<br>
+												#args.data.customerShippingProfile.getAddress()# #args.data.customerShippingProfile.getPostalCode()#<br>
+												#args.data.customerShippingProfile.getState()#<br>
+												#args.data.customerShippingProfile.getCountry().getIsoCode()#<br>
 											</td>
 										</tr>
 									</table>
@@ -164,11 +168,13 @@
 																		<b>P.#fruit.getPosition()#</b> : Cod. 
 																		<span style="text-transform: lowercase; font-size: 8pt;">
 																			#fruit.getFruit().getCode()#
-																			<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
-																				<span style="font-size: 8pt; text-transform: lowecase">
-																					#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#
-																				</span>
-																			</cfloop>
+																			<cfif IsArray( fruit.getFruit().getItems() )>
+																				<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
+																					<span style="font-size: 8pt; text-transform: lowecase">
+																						#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#
+																					</span>
+																				</cfloop>
+																			</cfif>
 																			<cfif !isNull(fruit.getNotes()) && args.params.notes>
 																				<span style="font-size: 8pt; margin-top: 4pt;">
 																					<i>( Note: #fruit.getNotes()# )</i>
@@ -200,10 +206,10 @@
 									#quantity#
 								</td>
 								<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
-									#LSNumberFormat( oggetto.getPrice(), ".99", "it_IT" )# €
+									#LSNumberFormat( oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
 								</td>
 								<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
-									#LSNumberFormat( quantity * oggetto.getPrice(), ".99", "it_IT" )# €
+									#LSNumberFormat( quantity * oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
 								</td>
 							</tr>
 						</table>

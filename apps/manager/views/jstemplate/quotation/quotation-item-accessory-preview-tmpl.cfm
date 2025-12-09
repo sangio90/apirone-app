@@ -21,7 +21,7 @@
                     Quantità: #: quantity #
                 </div>
                 <div class="col-6 mt-2 d-flex justify-content-center">
-                    Prezzo: #: price #
+                    Prezzo: #: price.total #
                 </div>
             </div>
         </div>

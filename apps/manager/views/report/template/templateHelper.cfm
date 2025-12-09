@@ -169,10 +169,10 @@
 					<tr>
 						<td style="width: 50%; border-bottom: 1px solid black !important;"></td>
 						<td style="width: 10%; text-align: center;">
-							<img src="http://apirone.local:8080/assets/main/img/quotation-arrow-left.png" style="height: 0.5in; width: 0.5in;">
+							<img src="/assets/main/img/quotation-arrow-left.png" style="height: 0.5in; width: 0.5in;">
 						</td>
 						<td style="width: 10%; text-align: center;">
-							<img src="http://apirone.local:8080/assets/main/img/quotation-arrow-right.png" style="height: 0.5in; width: 0.5in;">
+							<img src="/assets/main/img/quotation-arrow-right.png" style="height: 0.5in; width: 0.5in;">
 						</td>
 						<td style="width: 10%; border-bottom: 1px solid black !important;">
 							&nbsp;
@@ -187,15 +187,14 @@
 
 <cffunction name="printStyle">
 	<style>
-		<cfif #args.data.quotation.getStatus().getOrderBy() < 40#>
-			@page {
-				background-image: url('http://apirone.local:8080/assets/main/img/quotation-watermark-2.jpg');
-				background-repeat: repeat;
-				background-size: 1920px;
-				z-index: -1;
-				background-color:rgba(0, 0, 0, 0.1);
-			}
-		</cfif>
+		@page {
+			background-image: url('http://apirone.local:7110/assets/main/img/quotation-watermark-2.jpg');
+			background-repeat: repeat;
+			background-size: 1920px;
+			z-index: -1;
+			background-color:rgba(0, 0, 0, 0.1);
+		}
+		
 		body, td, th, span, div, p { font-family: 'Poppins'; font-size: 13px }
 		
 		table {

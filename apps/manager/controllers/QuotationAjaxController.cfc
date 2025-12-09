@@ -319,6 +319,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function totals( event, rc, prc ){
 
+		/*
 		var params = {};
 		var data   = [];
 		var result = super.getResult();
@@ -351,8 +352,64 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data = super.fire( "QuotationPrice.calculateTotals", [ rc.id ] );
 
 		result.setData( data );
+		*/
 
-		event.setValue( "result", result );
+
+		```
+		<cfquery name="qQuotationAccessory" datasource="apirone">
+			SELECT *
+			FROM quotation_items
+				INNER JOIN products ON quotation_items.product_id = products.product_id
+				INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+				INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
+			WHERE product_categories.product_category_type_id = 'ACC'
+				AND quotation_items.quotation_id = '#rc.id#'
+		</cfquery>
+
+		<cfquery name="qQuotationPlate" datasource="apirone">
+			SELECT *
+			FROM quotation_items
+				INNER JOIN products ON quotation_items.product_id = products.product_id
+				INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+				INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
+			WHERE product_categories.product_category_type_id = 'PLA'
+				AND quotation_items.quotation_id = '#rc.id#'
+		</cfquery>
+
+		<cfquery name="qQuotationSignage" datasource="apirone">
+			SELECT *
+			FROM quotation_items
+				INNER JOIN products ON quotation_items.product_id = products.product_id
+				INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+				INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
+			WHERE product_categories.product_category_type_id = 'SEG'
+				AND quotation_items.quotation_id = '#rc.id#'
+		</cfquery>
+
+		<cfquery name="total" datasource="apirone">
+			SELECT SUM(amount) AS total
+			FROM quotation_items
+				INNER JOIN quotation_item_prices ON quotation_items.quotation_item_id = quotation_item_prices.quotation_item_id
+			WHERE 1=1
+				AND quotation_items.quotation_id = '#rc.id#'
+		</cfquery>
+
+		```
+
+		var data = {
+			"counters" = {
+				"accessories" = qQuotationAccessory.recordcount,
+				"plates" = qQuotationPlate.recordcount,
+				"signages" = qQuotationSignage.recordcount,
+			},
+			"pricing" = {
+				"totalGoods": total.total,
+				"shippingCost": 15,
+				"total": total.total + 15,
+			}
+		}
+
+		event.setValue( "result", data );
 
 	}
 

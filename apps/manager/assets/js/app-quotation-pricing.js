@@ -46,24 +46,6 @@ AP.quotation.pricing = ( function() {
 
     };
 
-    var loadGeneral = function() {
-
-        NM.util.ajax( {
-            method: "GET",
-            url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
-            callback: {
-                done: function( xhr ) {
-
-                    console.log( "xhr.data", xhr.data );
-
-                }
-            }
-        } );
-
-        return false;
-
-    };
-
     var viewModelItem = kendo.observable( {
 
         common: getCommonData(),
@@ -127,6 +109,9 @@ AP.quotation.pricing = ( function() {
         common: getCommonData(),
 
         pricing: {
+            counters: {
+                a: 1
+            },
             data: {
                 discount1: "",
                 discount2: "",
@@ -135,8 +120,9 @@ AP.quotation.pricing = ( function() {
                     id: "C" // calculated
                 },
 
-                total: "0",
-                lines: [], // es. { name: "Frutto 1", amount: 10.5 },
+                shippingCost: 0,
+                totalGoods: 0,
+                total: 0
             },
         },
 
@@ -147,7 +133,21 @@ AP.quotation.pricing = ( function() {
 
             console.log( "viewModelGeneral:init. Load data..." );
 
-            loadGeneral();
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
+                callback: {
+                    done: function( xhr ) {
+                        console.log( xhr.data );
+                        console.log( xhr.data.counters );
+                        viewModelGeneral.set( "pricing.counters", xhr.data.counters );
+
+                        viewModelGeneral.set( "pricing.data.total", xhr.data.pricing.total );
+                        viewModelGeneral.set( "pricing.data.totalGoods", xhr.data.pricing.totalGoods );
+                        viewModelGeneral.set( "pricing.data.shippingCost", xhr.data.pricing.shippingCost );
+                    }
+                }
+            } );
 
         },
 
@@ -170,6 +170,7 @@ AP.quotation.pricing = ( function() {
 
         update: function( event ) {
 
+            /*
             var status = $( "#quotation-totals-item-loading" );
             status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width='20' height='20'>" );
 
@@ -191,13 +192,12 @@ AP.quotation.pricing = ( function() {
                     }
                 }
             } );
+            */
 
         },
 
         collapseTotals: function() {
-
             collapseBox();
-
         }
 
     } );
@@ -219,8 +219,10 @@ AP.quotation.pricing = ( function() {
             viewModelItem.set( "item.id", id );
             viewModelItem.set( "common.title", "Totali di questa riga" );
         } else {
+            console.log( "general" );
             var model = viewModelGeneral;
             viewModelGeneral.set( "common.title", "Totali preventivo" );
+            viewModelGeneral.init();
         }
 
         kendo.bind( fields.boxPricing, model );

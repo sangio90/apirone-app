@@ -57,19 +57,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		var customerShippingProfile = {
-			'name' = null,
-			'via' = null,
-			'cap' = null,
-			'citta' = null,
-			'provincia' = null,
-			'paese' = null
+			'name' = '',
+			'via' = '',
+			'cap' = '',
+			'citta' = '',
+			'provincia' = '',
+			'paese' = ''
 		};
 
 		if (!isNull(quotation.getCustomer().getShippingProfiles()) && quotation.getCustomer().getShippingProfiles().len() > 0) {
+			//TODO: NON CAPISCO, perchè non il profile del preventivo?
 			customerShippingProfile = quotation.getCustomer().getShippingProfiles()[1];
 		}
-
-		quoteObj.customerShippingProfile = customerShippingProfile;
 
 		var saveAsName = "print-quotation-#printParams.report##printParams.grouped ? '_grouped_' : '_'##DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
 
