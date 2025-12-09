@@ -349,6 +349,10 @@
         "name": "origin_id",
         "type": "uuid"
     },
+    "quotationExported.shippingDate": {
+        "name": "MMDATDOC",
+        "type": "Date"
+    },
     "article.code": {
         "name": "code",
         "type": "String"

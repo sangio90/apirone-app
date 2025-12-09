@@ -80,6 +80,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var name = "";
 			var index = 1;
+            
 			for ( var productItemId in node ) {
 				var item    = super.bean( "CombinationProductItem" );
 				var product = getProductItemService().get( productItemId );

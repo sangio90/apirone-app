@@ -23,6 +23,7 @@
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
+        
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 			    combination_id::varchar,

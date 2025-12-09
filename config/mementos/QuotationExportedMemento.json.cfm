@@ -1,0 +1,29 @@
+﻿{
+	defaultIncludes = [
+		"key",
+		"company",
+		"billingStreet",
+		"billingCity",
+		"billingState",
+		"billingCountry",
+		"vatNumber",
+		"shippingStreet",
+		"shippingCity",
+		"shippingState",
+		"shippingCountry",
+		"shippingDate",
+		"opportunity",
+		"pricelist",
+		"agent",
+		"notes",
+		"rowNumber",
+		"productCode",
+		"variantCode",
+		"colorCode",
+		"um",
+		"quantity",
+		"price",
+		"discount1",
+		"discount2"
+	]
+}

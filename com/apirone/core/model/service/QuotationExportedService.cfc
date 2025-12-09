@@ -7,7 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.QuotationExported function get( required String quotationSerial ){
 		var cm = getCacheManager();
 
-		var cache = cm.get( getCacheScope(), arguments.key );
+		var cache = cm.get( getCacheScope(), arguments.quotationSerial );
 		if ( cache.status ) {
 			return cache.data;
 		}
@@ -26,10 +26,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		required String quotationSerial, 
+		String quotationSerial, 
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotationExported.shippingDate" } ]
+		required Array orderBy  = [ { field = "quotationExported.shippingDate", dir = "desc" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -107,7 +107,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setProductCode( record.MMCODART );
 			bean.setVariantCode( record.MMCODVAR );
 			bean.setColorCode( record.MMCODCOL );
-			bean.setUm( record.MMUNIMIS );
+			<!--- bean.setUm( record.MMUNIMIS ); ---->
 			bean.setQuantity( record.MMQTAMOV );
 			bean.setPrice( record.MMVALUNI );
 			bean.setDiscount1( record.MMSCOAR1 );

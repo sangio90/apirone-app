@@ -471,6 +471,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			'success' = false,
 			'error' = null
 		};
+		
 		transaction {
 			if (quotationItems.len() > 0) {
 				var quotation = quotationItems[1].getQuotation();
@@ -481,6 +482,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 				quotationDataHead = quotationDataResult.data;
 			}
+
 			if ( quotationItems.len() > 0 ) {
 				var allProductItems = [];
 				var index = 1;
@@ -638,8 +640,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData['ARUNMIS1'] = 'PZ';
 						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
 						quotationData['MMVALUNI'] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
-						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
-						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
+						//quotationData['MMSCOAR1'] = quotationItem.getDiscount1(); TODO: add discount
+						//quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
+						quotationData['MMSCOAR1'] = 0;
+						quotationData['MMSCOAR2'] = 0;
 						// quotationData['MMEVASIO'] = quotation.getValidityDate();
 						quotationData['MMEVASIO'] = null;
 						quotationData['MM_STATO'] = 'N';
@@ -797,6 +801,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		};
 		
 		var customer = quotation.getCustomer();
+
 		if (isNull(quotation.getShippingProfile())) {
 			result.error = "Dati spedizione non trovati."
 			return result;

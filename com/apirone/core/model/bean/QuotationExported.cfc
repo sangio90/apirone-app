@@ -1,36 +1,5 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [
-			"key",
-			"company",
-			"billingStreet",
-			"billingCity",
-			"billingState",
-			"billingCountry",
-			"vatNumber",
-			"shippingStreet",
-			"shippingCity",
-			"shippingState",
-			"shippingCountry",
-			"shippingDate",
-			"opportunity",
-			"pricelist",
-			"agent",
-			"notes",
-			"rowNumber",
-			"productCode",
-			"variantCode",
-			"colorCode",
-			"um",
-			"quantity",
-			"price",
-			"discount1",
-			"discount2"
-		]
-	}
-
-
 	//testa
 	property name="key" type="String";
 	property name="company" type="String";
@@ -50,6 +19,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="pricelist" type="String";
 	property name="agent" type="String";
 	property name="notes" type="String";
+
 	//riga
 	property name="rowNumber" type="Numeric";
 	property name="productCode" type="String";
@@ -60,7 +30,6 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="price" type="Numeric";
 	property name="discount1" type="Numeric";
 	property name="discount2" type="Numeric";
-
 
 	public QuotationExported function init(){
 		return this;
@@ -73,4 +42,5 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	public String function getShippingProfile(){
 		return getShippingStreet() & " " & getShippingCity() & " " & getShippingState() & " " & getShippingCountry();
 	}
+
 }

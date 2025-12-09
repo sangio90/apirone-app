@@ -8,6 +8,7 @@ AP.quotation.fields = {
 
 $( document ).ready( function() {
     if ( AP.quotation.fields.listRoot.length ) {
+        console.log( "export" );
         AP.quotation.list.init();
     }
 } );
@@ -218,7 +219,6 @@ AP.quotation.modal = ( function() {
             const row = $( e.currentTarget.parentElement.parentElement );
             const rowNumber = row.find( ".rowNumber" )[0].innerHTML;
 
-
             bootbox.confirm( {
                 title: "Cancellazione Elemento dal Preventivo Esportato",
                 message: "Sei sicuro di voler cancellare questo Articolo dal Preventivo Esportato?",
@@ -263,7 +263,7 @@ AP.quotation.modal = ( function() {
         viewModel.set( "detailForm.code", data.code );
         viewModel.set( "detailForm.quotationSerial", data.quotationSerial );
         viewModel.set( "detailForm.quotationCode", data.quotationCode );
-        $( "#modalTitle" ).text( "Articolli del Preventivo " + data.quotationCode + " per " + data.code);
+        $( "#modalTitle" ).text( "Articolli del Preventivo " + data.quotationCode + " per " + data.code );
 
         await NM.util.ajax( {
             method: "GET",
