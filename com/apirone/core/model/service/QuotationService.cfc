@@ -644,8 +644,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						//quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
 						quotationData['MMSCOAR1'] = 0;
 						quotationData['MMSCOAR2'] = 0;
-						// quotationData['MMEVASIO'] = quotation.getValidityDate();
-						quotationData['MMEVASIO'] = null;
+						quotationData['MMEVASIO'] = quotation.getValidityDate();
 						quotationData['MM_STATO'] = 'N';
 
 						allProductItems.append(quotationData);
@@ -676,8 +675,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData['MMVALUNI'] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
 						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
 						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
-						// quotationData['MMEVASIO'] = quotation.getValidityDate();
-						quotationData['MMEVASIO'] = null;
+						quotationData['MMEVASIO'] = quotation.getValidityDate();
 						quotationData['MM_STATO'] = 'N';
 
 						allProductItems.append(quotationData);
@@ -811,8 +809,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMSERIAL" = quotation.getSerial(),
 			"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
 			"MMDATDOC" = quotation.getCreatedAt(),
-			// "MMDATEVA" = quotation.getValidityDate(),
-			"MMDATEVA" = null,
+			"MMDATEVA" = quotation.getValidityDate(),
 			"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
 			"MMNUMLIS" = 1,
 			"MMCODAGE" = (!isNull(quotation.getSalesAgentAccount())) ? quotation.getSalesAgentAccount().getEmail() : null, //trovata tabella AZAPI_AGENTI campo id AGECOD, campo mail AGEMAI

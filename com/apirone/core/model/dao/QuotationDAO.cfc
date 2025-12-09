@@ -442,7 +442,7 @@
 				MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2, MMSERIAL, MMVALUNI
 			)
 			VALUES (
-				<cfqueryparam value="#left(arguments.data.CF_IDCLI,7)#" cfsqltype="varchar">, --deve diventare 36
+				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFBLOCCO,1)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFDESCR1,40)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFINDIRI,35)#" cfsqltype="varchar">,
@@ -456,7 +456,7 @@
 				<cfqueryparam value="#arguments.data.CPROWORD ?: 0#" cfsqltype="integer">,
 				<cfqueryparam value="#left(arguments.data.DEDESDOD,35)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.DEDESMER,35)#" cfsqltype="varchar">,
-				<cfqueryparam value="#left(arguments.data.DEIDDMER,10)#" cfsqltype="varchar">, --deve diventare 36
+				<cfqueryparam value="#left(arguments.data.DEIDDMER,36)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.DEINDDOD,30)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.DEINDMER,30)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.DELOCDOD,35)#" cfsqltype="varchar">,
@@ -473,8 +473,8 @@
 				<cfqueryparam value="#arguments.data.MMCODVAL ?: 0#" cfsqltype="integer">,
 				<cfqueryparam value="#left(arguments.data.MMCODVAR,10)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMDATDOC#" cfsqltype="date">,
-				<cfqueryparam value="#arguments.data.MMDATEVA#" cfsqltype="timestamp">, --deve diventare datetime
-				<cfqueryparam value="#left(arguments.data.MMEVASIO,18)#" cfsqltype="varchar">, --deve diventare datetime
+				<cfqueryparam value="#arguments.data.MMDATEVA#" cfsqltype="date">,
+				<cfqueryparam value="#arguments.data.MMEVASIO#" cfsqltype="date">,
 				<cfqueryparam value="#left(arguments.data.MMNUMDOC,10)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMNUMLIS ?: 1#" cfsqltype="integer">,
 				<cfqueryparam value="#arguments.data.MMQTAMOV ?: 0#" cfsqltype="decimal" scale="6">,
