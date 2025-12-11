@@ -29,7 +29,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 
 	property name="prices" type="com.apirone.core.model.bean.Price[]" default=[];
 	property name="images" type="com.apirone.core.model.bean.File[]";
-	property name="items" type="com.apirone.core.model.bean.ProductItem[]";
+	//property name="items" type="com.apirone.core.model.bean.ProductItem[]";
 
 	property name="minQuantity" type="Numeric" default=0;
 	property name="maxQuantity" type="Numeric" default=0;
