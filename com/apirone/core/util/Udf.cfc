@@ -106,7 +106,7 @@
 	public Array function eachParallelAndReorder(
 		required Array sourceArray,
 		required Function callbackFunction,
-		required Numeric maxThreads = 4
+		required Numeric maxThreads = 2
 	) {
 
 		// 1. Array di preparazione: crea una struttura {index: N, item: X} per ogni elemento.
