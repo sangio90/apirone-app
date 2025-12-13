@@ -1,2 +1,2 @@
 ALTER TABLE combinations
-    ADD COLUMN combination text; 
+ADD COLUMN combination text;

@@ -1,7 +1,54 @@
 <cfcomponent accessors="true">
 
+	<cffunction name="createOrConditions" access="public" returntype="string" output="false">
+        <cfargument name="str" type="string" required="true">
+        <cfargument name="fields" type="any" required="true">
+        
+        <cfset var searchTerms = listToArray(trim(arguments.str), " ")>
+        <cfset var columnArray = isArray(arguments.fields) ? arguments.fields : listToArray(arguments.fields)>
+
+		<cfset result = "(">
+		<cfset termIndex = 0>
+		
+		<cfloop array="#searchTerms#" index="term">
+			<cfset termIndex++>
+			<cfset trimmedTerm = trim(term)>
+			
+			<cfif len(trimmedTerm)>
+				<cfsavecontent variable="columnConditions">
+					<cfoutput>
+						<cfset columnCount = arrayLen(columnArray)>
+						<cfset colIndex = 0>
+						
+						<cfloop array="#columnArray#" index="columnName">
+							<cfset colIndex++>
+							<cfset trimmedColumn = trim(columnName)>
+							
+							#trimmedColumn# ILIKE <cfqueryparam cfsqltype="varchar" value="%#trimmedTerm#%">
+							
+							<cfif colIndex LT columnCount>
+								OR
+							</cfif>
+						</cfloop>
+					</cfoutput>
+				</cfsavecontent>
+				
+				<cfif termIndex NEQ 1>
+					<cfset result = result & " AND ">
+				</cfif>
+				
+				<cfset result = result & " ( " & trim(columnConditions) & " ) ">
+			</cfif>
+		</cfloop>
+
+		<cfset result = result & ")">
+
+        <cfreturn result>
+    </cffunction>
+
+
 	<!--- 
-		CONVERTERS 
+		CONVERTERS FROM JSONB
 	---->
 
 	<cffunction access="private" name="getLinesAsArray" returntype="Array">
@@ -111,5 +158,22 @@
 		<cfreturn loader>
 
 	</cffunction>
+
+	<cfscript>
+	private function getRealIP(){
+
+        var headers = GetHTTPRequestData().headers;
+
+        if ( StructKeyExists( headers, "x-cluster-client-ip" ) ) {
+			return headers[ "x-cluster-client-ip" ];
+		}
+		if ( StructKeyExists( headers, "X-Forwarded-For" ) ) {
+			return headers[ "X-Forwarded-For" ];
+		}
+
+		return Len( CGI.REMOTE_ADDR ) ? Trim( listFirst( CGI.REMOTE_ADDR ) ) : "999.999.999.999";
+
+    }		
+	</cfscript>
 
 </cfcomponent>

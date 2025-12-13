@@ -16,14 +16,14 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction name="find" output="false">
+	<cffunction name="find">
 		<cfargument name="productId" type="String" required="true">
 		<cfargument name="statusId" type="String">
 		<cfargument name="str" type="String">
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
-        
+
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 			    combination_id::varchar,
@@ -38,7 +38,7 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
-					AND combination ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+					AND #super.createOrConditions( arguments.str, "combination" )#
 				</cfif>
 
 			<cfif arguments.limit GTE 0>
@@ -57,10 +57,12 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO combinations (
+				combination,
 	    		product_id,
 		    	status_id
 			)
 			VALUES (
+			    <cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getName()#">,
 			    <cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getProductId()#">::uuid,
     			<cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getStatus().getId()#">
 			) RETURNING combination_id

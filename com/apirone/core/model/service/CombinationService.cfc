@@ -32,9 +32,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required Numeric offset   = 0,
 		required Array orderBy    = [ { field = "combination.id" } ]
 	){
+
 		var rows   = [];
 		var result = super.getResult();
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
+
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
@@ -48,21 +50,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public Array function calculateCombinations( required String productId ){
+	public Array function calculateCombinations( required String productId, attributeIds=[] ){
 		var items = getProductItemService().getFlatTree(
 			productId            = arguments.productId,
 			includeMissingValues = false
 		);
 		// Trasformo il flat tree in un array di righe
-		var rows = flattenTreeToRows( items );
+		var rows = flattenTreeToRows( items, attributeIds );
 
 		// Costruisco l'albero delle combinazioni di prodotti cartesiani ricorsivi
 
 		var tree = buildTree( rows );
 		tree     = parseTree( tree );
 
+		//dump(var="#tree#", label="tree");
+
 		for ( var node in tree ) {
 			var combinationAlreadyExists = getCombinationProductItemDao().exists( node );
+		
+			//dump(var="#combinationAlreadyExists#", label="combinationAlreadyExists");
 
 			if ( combinationAlreadyExists ) {
 				// loggo che la combinazione esiste già
@@ -73,8 +79,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// Cerco se esiste già una combinazione per il prodotto
 
 			var combination = super.bean( "Combination" );
+
 			combination.setProductId( arguments.productId );
 			combination.setStatus( getStatusService().get( "ACT" ) );
+			combination.setName( "" );
 
 			var combinationId = create( combination );
 
@@ -85,27 +93,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var item    = super.bean( "CombinationProductItem" );
 				var product = getProductItemService().get( productItemId );
 
-				item.setCombinationId( combinationId );
-				item.setProductItem( product );
+				//dump(var="#item.getId()#", label="item");
 
-				getCombinationProductItemService().create( item );
+				//if(  ArrayFind(argumnents.attributeIds, product.getAttribute().getId() ) ){
 
-				name &= product
-					.getAttribute()
-					.getName();
+					item.setCombinationId( combinationId );
+					item.setProductItem( product );
 
-				name &= ": ";
+					getCombinationProductItemService().create( item );
 
-				name &= product
-					.getAttributeValue()
-					.getRawValue()
-					.getName();
+					name &= product
+						.getAttribute()
+						.getName();
 
-				name &= node.len() == index ? "" : " - ";
-				index++;
+					name &= ": ";
+
+					name &= product
+						.getAttributeValue()
+						.getRawValue()
+						.getName();
+
+					name &= node.len() == index ? "" : " - ";
+					index++;
+
+				//}
+
 			}
+			
 			combination.setName( name );
 			combination.setId( combinationId );
+			
 			update( combination );
 		}
 		// Converto l'albero in un array di combinazioni uniche
@@ -203,12 +220,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			combinations = [ [ node.id ] ];
 		} else {
 			var childCombos = [];
-			for ( child in node.children ) {
+			for ( var child in node.children ) {
 				childCombos.append( expandCombinations( child ), true );
 			}
 
 			// Aggiunge il nodo attuale a ogni combinazione figlia
-			for ( combo in childCombos ) {
+			for ( var combo in childCombos ) {
 				ArrayPrepend( combo, node.id );
 				ArrayAppend( combinations, combo );
 			}
@@ -242,20 +259,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	private function flattenTreeToRows(
 		nodes,
+		attributeIds=[],
 		level = 1,
 		rows  = []
 	){
 		for ( var node in nodes ) {
-			var row = {
-				id    = node.getId(),
-				attr  = node.getAttribute().getId(),
-				value = node.getAttributeValue().getId(),
-				level = node.getLevel()
-			};
 
-			ArrayAppend( rows, row );
+			if( ArrayFind( arguments.attributeIds, node.getAttribute().getId() )  ) {
+				var row = {
+					id    = node.getId(),
+					attr  = node.getAttribute().getId(),
+					value = node.getAttributeValue().getId(),
+					level = node.getLevel()
+				};
+
+				ArrayAppend( rows, row );
+			}
 		}
-
 		return rows;
 	}
 

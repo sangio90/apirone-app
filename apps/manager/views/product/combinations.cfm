@@ -36,7 +36,7 @@
 								</div>
 							</div>
 							<div class="col-sm-6 text-end">
-								#button(icon="list", label="Calcola combinazioni", class="k-ml-2", bind = "click:calculate" )#
+								#button(icon="list", label="Calcola combinazioni", class="k-ml-2", bind = "click:openConfig" )#
 								#deleteButton(label="Cancella", class="k-ml-2", bind = "click:delete" )#
 							</div>
 						</div>
@@ -67,8 +67,10 @@
 			</div>
 		</div>
 
-	</div>
+		#view( view="product/combination-config-modal" )#
 
-	#view( view="file/list-modal" )#
+	</div>
+    
+	#view( "file/list-modal" )#
 
 </cfoutput>
