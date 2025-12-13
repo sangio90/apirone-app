@@ -27,13 +27,16 @@ NM.util.openModal = function( ele, onShow ) {
     }
 
     ele.modal( "show" );
+    // ele.handleUpdate();
 
     if ( onShow ) {
         onShow();
     }
 
-    ele.css( { left: 0, top: 0 } );
-    ele.offset( { left: currentLeft, top: currentTop } );
+    // sulle pagine molto lunghe posiziona la modale in alto quando viene redisegnata.
+    // su initUpload ad esempio.
+    // ele.css({ left: 0, top: 0 });
+    // ele.offset( { left: currentLeft, top: currentTop } );
 
 };
 
