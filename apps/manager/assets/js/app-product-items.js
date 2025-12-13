@@ -787,8 +787,6 @@ AP.product.items = ( function() {
 
     var refreshDatasources = function() {
         viewModel.get( "items" ).read();
-        viewModel.get( "orderingItems" ).read();
-        viewModel.get( "orderingAttributes" ).read();
     };
 
     var sortableChanged = function( entity, widget ) {
