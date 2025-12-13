@@ -331,7 +331,7 @@
 		*/
 		get( "/ajax/products/get-id-and-file-by-params" ).to( "ProductAjaxController.getIdAndFileByParams" ).end();
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
-		get( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();
+		post( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();
 		delete( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.deleteCombinations" ).end();
 		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
@@ -477,6 +477,8 @@
 		post( "/ajax/quotation-items/accessory" ).to( "QuotationItemAjaxController.saveAccessory" ).end();
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
 		post( "/ajax/quotation-items/pricing" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
+		//post( "/ajax/quotation-items/pricing/accessory" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
+		//post( "/ajax/quotation-items/pricing/signage" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
