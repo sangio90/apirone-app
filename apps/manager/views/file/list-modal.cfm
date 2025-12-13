@@ -7,8 +7,9 @@
 
                 <form id="documents-form" name="documents-form" autocomplete="off">
 
-                    <header class="card-header">
-                        <h2 class="card-title" data-bind="text: title"></h2>
+                    <header class="card-header d-flex align-elements-center justify-content-between">
+                        <h2 class="card-title" data-bind="text:title"></h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
                     </header>
 
                     <div class="card-body">
