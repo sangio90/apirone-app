@@ -20,9 +20,10 @@ component extends="coldbox.system.Interceptor" {
 		var controller = event.getCurrentHandler();
 
 		if ( module == "api" ) {
-			storeRequest( event )
+			// TODO: use this
+			//storeRequest( event )
 
-			var svc = model.getInstance( "APIService" );
+			//var svc = model.getInstance( "APIService" );
 
 			try {
 				var authToken = Trim( GetHTTPRequestData().Headers.authorization.replace( "Bearer", "" ) );
@@ -97,5 +98,72 @@ component extends="coldbox.system.Interceptor" {
 
 		// Se hasAccess è true, l'esecuzione continua normalmente.
 	}
+
+	// TODO: use this in SecurityInterceptor
+	private String function storeRequest(
+		required event,
+		required prefix  = "api",
+		required service = "apirone"
+	){
+		var code = "#arguments.prefix#_" & DateTimeFormat( Now(), "yyyy-mm-dd_HH-nn-ss" ) & "_" & RandRange( 0, 99999 );
+
+		var dayPath  = DateTimeFormat( Now(), "yyyy/mm" );
+		var response = "";
+
+		var thisRequest = GetHTTPRequestData();
+
+		var body = thisRequest.keyExists( "content" ) ? thisRequest.content : "not-exists";
+
+		var meta = {
+			"apiKey"    = "not-exists",
+			"eventName" = event.getContext().event,
+			"route"     = event.getPrivateContext().currentRoutedURL,
+			"method"    = thisRequest.method,
+			"eventId"   = event.prc.eventId
+		};
+
+		if ( thisRequest.keyExists( "headers" ) ) {
+			if ( thisRequest.headers.keyExists( "authorization" ) ) {
+				meta.apiKey = Trim(
+					Replace(
+						thisRequest.headers.authorization,
+						"Bearer",
+						""
+					)
+				);
+			}
+		}
+
+		cffile(
+			action = "append",
+			file   = "#ExpandPath( "/../repository/private/logs/api.log" )#",
+			output = "#Now()#;#cgi.REMOTE_ADDR#;#cgi.HTTP_USER_AGENT#;#meta.route#;#meta.eventName#;#meta.method#;#meta.apiKey#"
+		);
+
+		// TODO: nalla path "service" o "api"?
+		var thisPath = ExpandPath( "/../repository/private/api/#arguments.service#/#dayPath#" );
+
+		DirectoryCreate( thisPath, true, true );
+
+		savecontent variable="report" {
+			Echo( "<h2>ID: #code#</h2><br>Data: #Now()#" );
+
+			Echo( "<h3>Meta</h3>" );
+			cfdump( var = "#meta#", label = "meta" );
+
+			Echo( "<h3>Request</h3>" );
+			cfdump( var = "#body#", label = "Request body" );
+
+			Echo( "<h3>Response</h3>" );
+			cfdump( var = "#response#", label = "Response" );
+
+			Echo( "<h3>CGI</h3>" );
+			cfdump( var = "#cgi#", label = "CGI" );
+		}
+
+		FileWrite( "#thisPath#/#code#.html", report );
+
+		return code;
+	}	
 
 }
