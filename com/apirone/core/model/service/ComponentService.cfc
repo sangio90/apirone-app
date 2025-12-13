@@ -95,9 +95,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( paramCategory == "rawProductId" ) {
 			params = { "paramCategory" = paramCategory, "newParam" = newParam }
 		}
+
 		if ( paramCategory == "variantId" ) {
 			params = { "paramCategory" = paramCategory, "newParam" = newParam }
 		}
+
 		if ( paramCategory == "colorId" ) {
 			params = { "paramCategory" = paramCategory, "newParam" = newParam }
 		}
@@ -114,8 +116,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		records.each( function( record ){
 			var rowParams              = params;
 			rowParams[ "componentId" ] = record.component_id;
+			
 			getDao().reassign( argumentCollection = rowParams );
+			
 			super.getCacheManager().remove( getCacheScope(), record.component_id );
+			
 			super.logEvent(
 				event   = "component.UPDATED",
 				message = "Component [#rowParams[ "componentId" ]#] updated.",
@@ -126,6 +131,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					"newValue" = rowParams[ "newParam" ]
 				}
 			);
+		
 		} );
 
 		super.logEvent(

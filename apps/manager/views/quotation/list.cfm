@@ -61,7 +61,7 @@
                                         { 'field':'name', 'title':'Nome' },
                                         { 'field':'referentName', 'title':'Referente' },
                                         { 'field':'owner.email', 'title':'Account', width: '15%'},
-                                        { 'field':'createdAt', 'title':'Creato il', width: '130px'},
+                                        { 'field':'createdAt', 'title':'Creato il', width: '140px'},
                                         { 'field':'status', 'title':'Stato', width: '15%'},
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 

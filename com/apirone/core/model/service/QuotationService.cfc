@@ -2,9 +2,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationDAO";
 	property name="exportCodeDao" inject="ExportCodeDAO";
-	property name="quotationSvc" inject="QuotationService";
+
+	property name="quotationService" inject="QuotationService";
 	property name="quotationItemSvc" inject="QuotationItemService";
-	property name="quotationItemProductSvc" inject="QuotationItemProductService";
 	property name="quotationItemProductItemSvc" inject="QuotationItemProductItemService";
 	property name="quotationZoneSvc" inject="QuotationZoneService";
 	property name="quotationItemPositionSvc" inject="QuotationItemPositionService";
@@ -13,24 +13,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="exportCodeRawValueService" inject="ExportCodeRawValueService";
 	property name="rawValueService" inject="RawValueService";
 	property name="attributeService" inject="AttributeService";
-	property name="AccountService" inject="AccountService";
-	property name="ProfileService" inject="ProfileService";
-	property name="LangService" inject="LangService";
-	property name="StatusService" inject="StatusService";
-	property name="PricelistService" inject="PricelistService";
-	property name="PaymentMethodService" inject="PaymentMethodService";
-	property name="CurrencyService" inject="CurrencyService";
-	property name="CustomerService" inject="CustomerService";
-	property name="OpportunityService" inject="OpportunityService";
-	property name="LeadService" inject="LeadService";
+	property name="accountService" inject="AccountService";
+	property name="profileService" inject="ProfileService";
+	property name="langService" inject="LangService";
+	property name="statusService" inject="StatusService";
+	property name="pricelistService" inject="PricelistService";
+	property name="paymentMethodService" inject="PaymentMethodService";
+	property name="currencyService" inject="CurrencyService";
+	property name="customerService" inject="CustomerService";
+	property name="opportunityService" inject="OpportunityService";
+	property name="leadService" inject="LeadService";
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
 	property name="componentService" inject="ComponentService";
-	property name="CountryService" inject="CountryService";
 	property name="vatCodeService" inject="VatCodeService";
-	property name="CountryService" inject="CountryService";
-	property name="QuotationStatusHistoryService" inject="QuotationStatusHistoryService";
-	property name="FileService" inject="FileService";
+	property name="countryService" inject="CountryService";
+	property name="quotationStatusHistoryService" inject="QuotationStatusHistoryService";
+	property name="fileService" inject="FileService";
 	
 	property name="componentCounter" type="Numeric";
 	property name="cacheScope" type="String" default="Quotation.bean";
@@ -806,7 +805,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var quotationData = {
-			"MMSERIAL" = quotation.getSerial(),
+			//"MMSERIAL" = quotation.getSerial(),
+			"MMSERIAL" = quotation.getQuotationNumber(), // i need the same code 
 			"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
 			"MMDATDOC" = quotation.getCreatedAt(),
 			"MMDATEVA" = quotation.getValidityDate(),
@@ -843,49 +843,61 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public String function clone( required com.apirone.core.model.bean.Quotation quotation, required String status ){
+	public String function clone( required com.apirone.core.model.bean.Quotation quotation, required String statusId ){
 		var originalQuotation = arguments.quotation;
-		var clonedQuotation   = Duplicate( originalQuotation );
+		var clonedQuotation = Duplicate( originalQuotation );
+		var quotationZoneIdsMap = {};
+
 		originalQuotation.setActive( 0 );
-		quotationSvc.update( originalQuotation );
+		quotationService.update( originalQuotation );
 		clonedQuotation.setId( LCase( CreateUUID() ) );
 		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
 		clonedQuotation.setActive( 1 );
-		var status = StatusService.get( status );
+		
+		var status = StatusService.get( arguments.statusId );
 		clonedQuotation.setStatus( status );
 
 		var newQuotationId = getDao().insert( clonedQuotation );
 
-		var quotationZoneIdsMap         = {};
-		var quotationZones              = quotationZoneSvc.list( quotationId = originalQuotation.getId() );
+		var quotationZones = quotationZoneSvc.list( quotationId = originalQuotation.getId() );
+
 		var quotationZonesWithoutParent = ArrayFilter( quotationZones, function( quotationZone ){
 			return IsNull( quotationZone.getOrigin() );
 		} )
+		
 		for ( var quotationZone in quotationZonesWithoutParent ) {
 			var clonedZone = Duplicate( quotationZone );
-			clonedZone.setQuotation( quotationSvc.get( newQuotationId ) );
+			clonedZone.setQuotation( quotationService.get( newQuotationId ) );
 			clonedZone.setId( LCase( CreateUUID() ) );
-			var newQuotationZoneId                       = quotationZoneSvc.create( clonedZone );
+			var newQuotationZoneId = quotationZoneSvc.create( clonedZone );
 			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
 		}
 
 		var quotationZonesWithParent = ArrayFilter( quotationZones, function( quotationZone ){
 			return !IsNull( quotationZone.getOrigin() );
 		} )
+		
 		for ( var quotationZone in quotationZonesWithParent ) {
 			var clonedZone = Duplicate( quotationZone );
-			clonedZone.setQuotation( quotationSvc.get( newQuotationId ) );
+			
+			// Set the quotation for the cloned zone
+			clonedZone.setQuotation( quotationService.get( newQuotationId ) );
 			clonedZone.setId( LCase( CreateUUID() ) );
+
 			var newOriginId = quotationZoneIdsMap[ quotationZone.getOrigin().getId() ];
+			
 			clonedZone.setOrigin( quotationZoneSvc.get( newOriginId ) );
-			var newQuotationZoneId                       = quotationZoneSvc.create( clonedZone );
+			
+			var newQuotationZoneId = quotationZoneSvc.create( clonedZone );
+			
 			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
 		}
 
 		var quotationItems = quotationItemSvc.list( quotationId = originalQuotation.getId() );
+		
 		for ( var quotationItem in quotationItems ) {
 			var clonedItem = Duplicate( quotationItem );
-			clonedItem.setQuotation( quotationSvc.get( newQuotationId ) );
+			clonedItem.setQuotation( quotationService.get( newQuotationId ) );
 			clonedItem.setQuotationZone(
 				quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] )
 			);
@@ -900,6 +912,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			var quotationItemPositions = quotationItemPositionSvc.list( quotationItemId = quotationItem.getId() );
+			
 			for ( quotationItemPosition in quotationItemPositions ) {
 				var clonedQuotationItemPosition = Duplicate( quotationItemPosition );
 				clonedQuotationItemPosition.setQuotationItem( clonedItem );
@@ -911,6 +924,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return newQuotationId;
+
 		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
 
 		return arguments.quotation;
@@ -1040,7 +1054,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
-			// bean.setShippingProfile( getProfileService().get( record.shipping_profile_id ) );
 			// bean.setGraphicTechnicianAccount( getAccountService().get( record.graphic_technician_account_id ) );
 
 			return bean;

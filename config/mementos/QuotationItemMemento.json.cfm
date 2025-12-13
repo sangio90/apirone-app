@@ -5,6 +5,7 @@
             defaultIncludes = [
                 "id",
                 "price",
+                "price.total",
                 "quantity",
                 "product.finish",
                 "product.catalogBundle",

@@ -46,6 +46,7 @@
 			WHERE 1=1
 				<cfif !IsNull( arguments.str )>
 					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+						OR attributes.code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>
@@ -55,6 +56,8 @@
 				<cfif !IsNull( arguments.categoryId )>
 					AND categories @> ANY ('{[#sanitizeSQL( arguments.categoryId )#]}')
 				</cfif>
+			GROUP BY 
+				attribute_id
 			ORDER BY
 				attribute_id
 
