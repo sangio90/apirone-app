@@ -19,8 +19,11 @@
 		<cfargument name="productId" type="String">
 		<cfargument name="originId" type="Numeric">
 		<cfargument name="attributeId" type="String">
+		<cfargument name="skipOriginId" type="Boolean" default="false">
 
-		<cfquery name="local.q" datasource="apirone">
+		<cffile action="APPEND" file="#ExpandPath('/productItemDAO-find-params.log')#" output="#now()# #SerializeJSON( arguments )#">
+
+		<cfquery name="local.q" datasource="apirone" result="local.result">
 			SELECT
 				product_item_id, origin_id
 			FROM
@@ -29,15 +32,17 @@
 					INNER JOIN attributes_raw_values USING ( attribute_raw_value_id )
 						INNER JOIN attributes USING ( attribute_id )
 				</cfif>
-					--INNER JOIN attributes_raw_values USING ( attribute_raw_value_id )
 			WHERE 1=1
 
-				AND origin_id
-					<cfif IsNull( arguments.originId )>
-						IS NULL
-					<cfelse>
-						= <cfqueryparam cfsqltype="Integer" value="#arguments.originId#">
-					</cfif>
+				<!--- TODO: use 'O' for "IS NULL" --->
+				<cfif !arguments.skipOriginId>
+					AND origin_id
+						<cfif IsNull( arguments.originId )>
+							IS NULL
+						<cfelse>
+							= <cfqueryparam cfsqltype="Integer" value="#arguments.originId#">
+						</cfif>
+				</cfif>
 
 				<cfif !IsNull( arguments.productId )>
 					AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
@@ -50,6 +55,11 @@
 			ORDER BY
 				product_items.orderby ASC
 		</cfquery>
+
+		<cfif super.getRealIP() EQ "185.52.113.41">
+			<cfdump var="#local.q#">
+			<cfdump var="#local.result#">
+		</cfif>
 
 		<cfreturn local.q>
 	</cffunction>
@@ -126,7 +136,8 @@
 						WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
 					)
 				</cfif>
-			RETURNING product_item_id
+			RETURNING 
+				product_item_id
 		</cfquery>
 
 		<cfreturn true>

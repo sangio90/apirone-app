@@ -316,9 +316,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 		var tmpDir = super.getTempDir();
+		var bean = super.bean( "QuotationItemPlate" );
 
 		var price = populatePriceItem( json );
-		
+
 		bean.setPrice( price );
 
 		var fileName   = "preview_plate_id_" & CreateUUID() & ".png";
@@ -330,7 +331,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var id = json.id;
 
-		var bean = super.bean( "QuotationItemPlate" );
 
 		if ( Len( id ) ) {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
@@ -507,14 +507,14 @@ component extends="com.apirone.core.controller.AbsController" {
 	private com.apirone.core.model.bean.QuotationItemPrice function populatePriceItem( data ){
 
 		var method = super.bean( "PriceMethod" );
-		var price  = super.bean( "QuotationItemPrice" );
+		var bean  = super.bean( "QuotationItemPrice" );
 
 		var lines = [];
 
-		price.setAmount( data.price.total );
-		price.setDiscount1( Len( data.price?.discount1 ) ? data.price?.discount1 : 0 );
-		price.setDiscount2( Len( data.price?.discount2 ) ? data.price?.discount2 : 0 );
-		price.setMethod( method.setId( data.price.method.id ) );
+		bean.setAmount( data.price.total );
+		bean.setDiscount1( Len( data.price?.discount1 ) ? data.price?.discount1 : 0 );
+		bean.setDiscount2( Len( data.price?.discount2 ) ? data.price?.discount2 : 0 );
+		bean.setMethod( method.setId( data.price.method.id ) );
 
 		for( var thisLine in data.price.lines ) {
 			var line  = super.bean( "PriceLine" );
@@ -524,9 +524,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			lines.add( line );
 		}
 
-		price.setLines( lines );
+		bean.setLines( lines );
 
-		return price;
+		return bean;
 
 	}
 

@@ -200,10 +200,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var orderby = 10;
 
 		for ( var attr in attrs ) {
-			var items = super.fire( "ProductItem.list", { productId = rc.id, attributeId = attr } );
+			var items = super.fire( "ProductItem.list", { productId = rc.id, attributeId = attr, skipOriginId = true } );
+
+			var thisAttr = super.service("Attribute").get( attr );
 
 			for ( var item in items ) {
 				var bean = super.fire( "ProductItem.get", { productItemId = item.getId() } );
+				
 				bean.setOrderBy( orderby );
 
 				super.fire( "ProductItem.update", { productItem = bean } );
@@ -402,8 +405,21 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function calculateCombinations( event, rc, prc ){
+
+		setting requesttimeout=60; //integer for seconds
+
+		var raw = GetHTTPRequestData().content;
+		var rows = DeserializeJSON( raw );
+
+		var attributeIds = [];
+
+		for( var row in rows ) {
+			attributeIds.add( row.id )
+		}
+
 		var result = super.getResult();
-		super.service( "Combination" ).calculateCombinations( rc.id );
+		super.service( "Combination" ).calculateCombinations( rc.id, attributeIds );
+		
 		event.setValue( "result", result );
 	}
 
