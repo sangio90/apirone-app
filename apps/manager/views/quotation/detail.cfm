@@ -60,10 +60,31 @@
                                     <div class="card-body">
                                     <nav>
                                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                            <div class="col-4 flex" id="quotationItemsMode">
-                                                <button class="nav-link active" id="nav-plate-tab" data-bs-toggle="tab" data-bs-target="##nav-plate" type="button" role="tab" data-bind="click:changeMode">Placche</button>
-                                                <button class="nav-link" id="nav-signage-tab" data-bs-toggle="tab" data-bs-target="##nav-signage" type="button" role="tab" data-bind="click:changeMode">Segnaletiche</button>
-                                                <button class="nav-link" id="nav-accessories-tab" data-bs-toggle="tab" data-bs-target="##nav-accessories" type="button" role="tab" data-bind="click:changeMode">Accessori</button>
+                                            <div class="col-4 flex">
+                                                <button class="nav-link active" data-bs-toggle="tab" type="button" role="tab" 
+                                                    id="nav-plate-tab" 
+                                                    data-type="PLA"
+                                                    data-bs-target="##nav-plate" 
+                                                    data-bind="click:changeType">
+                                                    Placche
+                                                </button>
+                                                
+                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
+                                                    id="nav-signage-tab" 
+                                                    data-type="SEG"
+                                                    data-bs-target="##nav-signage" 
+                                                    data-bind="click:changeType">
+                                                    Segnaletiche
+                                                </button>
+                                                
+                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
+                                                    id="nav-accessories-tab"
+                                                    data-type="ACC"
+                                                    data-bs-target="##nav-accessories" 
+                                                    data-bind="click:changeType">
+                                                    Accessori
+                                                </button>
+
                                             </div>
                                             <div class="col-6 text-start">
                                                 <button id="addPlateButton" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
@@ -73,18 +94,39 @@
                                         </div>
                                     </nav>
                                     <div class="tab-content" id="nav-tabContent">
-                                        <div class="tab-pane show active" id="nav-plate" role="tabpanel">
-                                            <div data-template="quotation-item-plate-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                        <div class="tab-pane fade show active" id="nav-plate" role="tabpanel">
+                                            <div data-bind="visible: showItems">
+                                                <div data-template="quotation-item-plate-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                                </div>
+                                            </div>
+                                            <div data-bind="visible: hideItems">
+                                                <div class="qt-no-items">NESSUNA PLACCA</div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-signage" role="tabpanel">
-                                            <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                            <div data-bind="visible: showItems">
+                                                <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                                </div>
+                                            </div>
+                                            <div data-bind="visible: hideItems">
+                                                <div class="qt-no-items">NESSUNA SEGNALATICA</div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-accessories" role="tabpanel">
-                                            <div data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                            <div data-bind="visible: showItems">
+                                                <div data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                                </div>
+                                            </div>
+                                            <div data-bind="visible: hideItems">
+                                                <div class="qt-no-items">NESSUN ACCESSORIO</div>
                                             </div>
                                         </div>
+                                        <!---
+                                        <div class="tab-pane fade" id="nav-articles" role="tabpanel">
+                                            <div data-template="quotation-item-article-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                            </div>
+                                        </div>
+                                        --->
                                     </div>
                                 </section>
                             </div>
@@ -102,9 +144,11 @@
     </div>
     
     #view( "quotation/header-modal" )#
+
     #view( "quotation/signage-modal" )#
     #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal" )#
+
     #view( "quotation/zone-modal" )#
     #view( "quotation/print-modal" )#
 
@@ -113,5 +157,34 @@
     #template( view="jstemplate/quotation/quotation-item-plate-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-accessory-preview-tmpl" )#
+    
     #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
+
+    <script>
+        /*
+        document.addEventListener('DOMContentLoaded', function() {
+            // Attiva il tab in base all'hash nell'URL
+            const hash = window.location.hash;
+            if (hash) {
+                const tabTrigger = document.querySelector(`button[data-bs-target="${hash}"]`);
+                if (tabTrigger) {
+                    const tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            }
+
+            // Aggiungi hash all'URL quando si clicca su un tab
+            const tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const target = this.getAttribute('data-bs-target');
+                    if (target) {
+                        window.location.hash = target;
+                    }
+                });
+            });
+        });
+        */
+    </script>
 </cfoutput>

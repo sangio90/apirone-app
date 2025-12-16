@@ -1816,7 +1816,7 @@ AP.plate.modal = ( function() {
             } );
         },
 
-        loadLines: function( event ) {
+        loadLines: function( onLoad ) {
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/lines/22",
@@ -1824,10 +1824,11 @@ AP.plate.modal = ( function() {
                     done: function( xhr ) {
 
                         viewModel.get( "lines" ).data( xhr.data );
-
-                        // viewModel.set( "detailForm.data.product.catalogBundle.line", xhr.data[0] );
-
                         NM.util.openModal( AP.plate.fields.modalRoot );
+
+                        if ( onLoad !== undefined ) {
+                            onLoad();
+                        }
                     },
                 },
             } );
@@ -2005,6 +2006,105 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
 
         viewModel.loadLines();
+
+    };
+
+    pub.edit = function( { id, onSave } ) {
+
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/quotation-items/plate/" + id,
+            callback: {
+                done: function( xhr ) {
+
+                    const delay = ( ms ) => new Promise( resolve => setTimeout( resolve, ms ) );
+
+                    viewModel.loadLines();
+
+                    async function loadAll() {
+                        await delay( 200 );
+                        viewModel.loadModels();
+
+                        await delay( 200 );
+                        viewModel.loadFinishes();
+
+                        await delay( 200 );
+                        viewModel.parseLines();
+
+
+                    }
+
+                    loadAll();
+
+                },
+            },
+        } );
+
+        /*
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/quotation-items/signage/" + id,
+            callback: {
+                done: function( xhr ) {
+                    if ( xhr.status == "SUCCESS" ) {
+                        var data = xhr.data;
+                        var signageRowsArray = data.quotationItem.signageRows;
+                        if ( data.quotationItem && Array.isArray( signageRowsArray ) ) {
+                            data.quotationItem.signageRows = new kendo.data.DataSource( {
+                                data: signageRowsArray.slice(),
+                                schema: {
+                                    model: {
+                                        id: "id"
+                                    }
+                                }
+                            } );
+                        } else {
+                            data.quotationItem.signageRows = new kendo.data.DataSource( {
+                                data: [],
+                                schema: { model: { id: "id" } }
+                            } );
+                        }
+                        data.quotationItem.signageRows.read();
+                        viewModel.set( "detailForm.data", data );
+                        var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+                        if ( ds && ds.data().length ) {
+                            ds.data().forEach( function( row, i ) {
+                                row.set( "index", i + 1 );
+                            } );
+                        }
+                        viewModel.set( "detailForm.title", "Modifica segnaletica" );
+
+                        viewModel.loadLines();
+
+                        setTimeout( function() {
+                            viewModel.loadModels();
+                            setTimeout( function() {
+                                viewModel.loadFinishes();
+                                setTimeout( function() {
+                                    viewModel.loadSignageConfigs();
+                                    setTimeout( function() {
+                                        viewModel.loadFontSizes();
+                                        setTimeout( function() {
+                                            setTimeout( function() {
+                                                viewModel.parseLines();
+                                                ds.data().forEach( row => {
+                                                    viewModel.updateCharCounter( {
+                                                        currentTarget: document.getElementById( row.uid + "_contentInput" )
+                                                    } );
+                                                } );
+                                                NM.util.openModal( AP.signage.fields.modalRoot );
+                                                viewModel.setSelectedTextAlignIcon();
+                                            }, 200 );
+                                        }, 200 );
+                                    }, 200 );
+                                }, 200 );
+                            }, 200 );
+                        }, 200 );
+                    }
+                },
+            },
+        } );
+        */
 
     };
 
