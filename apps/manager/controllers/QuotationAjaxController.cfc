@@ -316,103 +316,35 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", data );
 	}
+	
+	function updateTotals( event, rc, prc ){
 
-	function totals( event, rc, prc ){
-
-		/*
-		var params = {};
-		var data   = [];
-		var result = super.getResult();
-		var memy   = super.getMementify();
-
-		var method  = super.bean( "PriceMethod" );
+		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		var pricing = super.bean( "QuotationPrice" );
+		var service = super.service( "QuotationPrice" );
 
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+		pricing.setQuotationId( rc.id );
+		pricing.setDiscount1( Val( json.pricing?.discount1 ) ? json.pricing.discount1 : 0 );
+		pricing.setDiscount2( Val( json.pricing?.discount2 ) ? json.pricing.discount2 : 0 );
 
-		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
-		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
-		
-		pricing.setShippingCost( Len( json.pricing?.shippingMethod?.cost ) ? json.pricing.shippingMethod.cost : 0 );
+		pricing.setShippingCost( Len( json.pricing?.shippingCost ) ? json.pricing.shippingCost : 0 );
 
-		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
-		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+		service.save( pricing );
 
-
-		result.setData( output );
-
-		event.setValue( "result", output );
-
-
-		var result = super.getResult();
-
-		var json = DeserializeJSON( GetHTTPRequestData().content );
-
-		var data = super.fire( "QuotationPrice.calculateTotals", [ rc.id ] );
-
-		result.setData( data );
-		*/
-
-
-		```
-		<cfquery name="qQuotationAccessory" datasource="apirone">
-			SELECT *
-			FROM quotation_items
-				INNER JOIN products ON quotation_items.product_id = products.product_id
-				INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
-				INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
-			WHERE product_categories.product_category_type_id = 'ACC'
-				AND quotation_items.quotation_id = '#rc.id#'
-		</cfquery>
-
-		<cfquery name="qQuotationPlate" datasource="apirone">
-			SELECT *
-			FROM quotation_items
-				INNER JOIN products ON quotation_items.product_id = products.product_id
-				INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
-				INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
-			WHERE product_categories.product_category_type_id = 'PLA'
-				AND quotation_items.quotation_id = '#rc.id#'
-		</cfquery>
-
-		<cfquery name="qQuotationSignage" datasource="apirone">
-			SELECT *
-			FROM quotation_items
-				INNER JOIN products ON quotation_items.product_id = products.product_id
-				INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
-				INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
-			WHERE product_categories.product_category_type_id = 'SEG'
-				AND quotation_items.quotation_id = '#rc.id#'
-		</cfquery>
-
-		<cfquery name="total" datasource="apirone">
-			SELECT SUM(amount) AS total
-			FROM quotation_items
-				INNER JOIN quotation_item_prices ON quotation_items.quotation_item_id = quotation_item_prices.quotation_item_id
-			WHERE 1=1
-				AND quotation_items.quotation_id = '#rc.id#'
-		</cfquery>
-
-		```
-
-		var data = {
-			"counters" = {
-				"accessories" = qQuotationAccessory.recordcount,
-				"plates" = qQuotationPlate.recordcount,
-				"signages" = qQuotationSignage.recordcount,
-			},
-			"pricing" = {
-				"totalGoods": total.total,
-				"shippingCost": 15,
-				"total": total.total + 15,
-			}
-		}
+		var data = getTotals( rc.id );
 
 		event.setValue( "result", data );
 
 	}
 
+	function totals( event, rc, prc ){
+
+		var data = getTotals( rc.id );
+
+		event.setValue( "result", data );
+
+	}
 
 	function exportProducts( event, rc, prc ){
 		var data = [];
@@ -445,5 +377,44 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
+
+	
+	/*
+		private methods
+	*/
+	
+	private Struct function getQuantities( quotationId ){
+
+		var acc = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "ACC" );
+		var pla = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "PLA" );
+		var seg = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "SEG" );
+
+		var data = {
+			"accessories" = acc.len(),
+			"plates" = pla.len(),
+			"signages" = seg.len(),
+		}
+
+		return data;
+		
+	}
+	
+	private Struct function getTotals( quotationId ){
+
+		var service = super.service( "QuotationPrice" );
+
+		var result = service.calculate( quotationId );
+		var counters = getQuantities( quotationId );
+
+		var values = result.getCalculatedTotals();
+
+		var data = {
+			"counters" = counters,
+			"pricing" = values
+		}
+
+		return data;
+		
+	}	
 
 }

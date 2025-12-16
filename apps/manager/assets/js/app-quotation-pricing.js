@@ -24,10 +24,12 @@ AP.quotation.pricing = ( function() {
 
     var getCommonData = function() {
 
+        var isCollapsed = AP.getUserPref( "quotation.pricing.isCollapsed", false );
+
         return kendo.observable( {
             title: "",
-            isCollapsed: false,
-            symbol: "▼"
+            isCollapsed: isCollapsed,
+            symbol: isCollapsed ? "▲" : "▼"
         } );
 
     };
@@ -36,11 +38,14 @@ AP.quotation.pricing = ( function() {
 
         var model = getCurrentViewModel();
         var status = model.get( "common.isCollapsed" );
+        var newStatus = !status;
 
-        model.set( "common.isCollapsed", !status );
+        model.set( "common.isCollapsed", newStatus );
 
-        var newSymbol = !status ? "▲" : "▼";
+        var newSymbol = newStatus ? "▲" : "▼";
         model.set( "common.symbol", newSymbol );
+
+        AP.setUserPref( "quotation.pricing.isCollapsed", newStatus );
 
         return false;
 
@@ -71,10 +76,10 @@ AP.quotation.pricing = ( function() {
         isItem: true,
         isGeneral: false,
 
-        update: function( event ) {
+        updateItem: function( event ) {
 
             var status = $( "#quotation-totals-item-loading" );
-            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width='20' height='20'>" );
+            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
 
             var data = AP.plate.modal.getVM().detailForm;
             data.data.pricing = viewModelItem.get( "pricing.data" );
@@ -110,7 +115,9 @@ AP.quotation.pricing = ( function() {
 
         pricing: {
             counters: {
-                a: 1
+                plates: 0,
+                signages: 0,
+                accessories: 0
             },
             data: {
                 discount1: "",
@@ -131,20 +138,19 @@ AP.quotation.pricing = ( function() {
 
         init: function( event ) {
 
-            console.log( "viewModelGeneral:init. Load data..." );
+            var status = $( "#quotation-totals-general-loading" );
+            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
 
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
                 callback: {
                     done: function( xhr ) {
-                        console.log( xhr.data );
-                        console.log( xhr.data.counters );
-                        viewModelGeneral.set( "pricing.counters", xhr.data.counters );
 
-                        viewModelGeneral.set( "pricing.data.total", xhr.data.pricing.total );
-                        viewModelGeneral.set( "pricing.data.totalGoods", xhr.data.pricing.totalGoods );
-                        viewModelGeneral.set( "pricing.data.shippingCost", xhr.data.pricing.shippingCost );
+                        status.html( "" );
+
+                        viewModelGeneral.set( "pricing.counters", xhr.data.counters );
+                        viewModelGeneral.set( "pricing.data", xhr.data.pricing );
                     }
                 }
             } );
@@ -168,31 +174,28 @@ AP.quotation.pricing = ( function() {
 
         },
 
-        update: function( event ) {
+        updateTotals: function( event ) {
 
-            /*
-            var status = $( "#quotation-totals-item-loading" );
-            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width='20' height='20'>" );
+            var status = $( "#quotation-totals-general-loading" );
+            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
 
             var data = AP.plate.modal.getVM().detailForm;
             data.data.pricing = viewModelGeneral.get( "pricing.data" );
 
             NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax/quotation-items/pricing",
+                url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
                 data: JSON.stringify( data.data ),
                 callback: {
                     done: function( xhr ) {
-                        if ( xhr.data ) {
 
-                            status.html( "" );
+                        status.html( "" );
 
-                            viewModelGeneral.set( "pricing.data", xhr.data );
-                        }
+                        viewModelGeneral.set( "pricing.counters", xhr.data.counters );
+                        viewModelGeneral.set( "pricing.data", xhr.data.pricing );
                     }
                 }
             } );
-            */
 
         },
 
@@ -219,7 +222,6 @@ AP.quotation.pricing = ( function() {
             viewModelItem.set( "item.id", id );
             viewModelItem.set( "common.title", "Totali di questa riga" );
         } else {
-            console.log( "general" );
             var model = viewModelGeneral;
             viewModelGeneral.set( "common.title", "Totali preventivo" );
             viewModelGeneral.init();

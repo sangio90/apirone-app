@@ -52,7 +52,7 @@
 					<div class="d-flex justify-content-end gap-2">
 						<div class="py-2 text-end d-flex align-items-center gap-2">
 							<div class="status" id="quotation-totals-item-loading"></div>
-							#button(bind="click:update", variant="default", label="Aggiorna", size="sm", icon="sync-alt")#
+							#button(bind="click:updateItem", variant="default", label="Aggiorna", size="sm", icon="sync-alt")#
 						</div>
 					</div>
 				</div>
@@ -78,37 +78,37 @@
 					<div class="row mt-3 mb-2">
 						<div class="col-8">Totale merce</div>
 						<div class="col-4 text-end">
-							<span data-bind="text: pricing.data.totalGoods"></span> &euro;
+							<span data-bind="text: pricing.data.totalGoods" data-format="0.00"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2 align-items-center d-flex">
 						<div class="col-4">Sconti</div>
 						<div class="col-4">
-							<input class="form-control" name="discount1" 
+							<input class="form-control text-end" name="discount1"
 								placeholder="%" data-bind="value: pricing.data.discount1">
 						</div>
 						<div class="col-4">
-							<input class="form-control" name="discount2" 
+							<input class="form-control text-end" name="discount2" 
 								placeholder="%" data-bind="value: pricing.data.discount2">
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
 						<div class="col-8">Spese di trasporto</div>
 						<div class="col-4">
-							<input class="form-control" name="shippingCost" 
+							<input class="form-control text-end" name="shippingCost" 
 								placeholder="%" data-bind="value: pricing.data.shippingCost">
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
 						<div class="col-6"><b>TOTALE</b></div>
 						<div class="col-6 text-end fs-16" >
-							<b><span data-bind="text: pricing.data.total"></span> &euro;</b>
+							<b><span data-bind="text: pricing.data.total" data-format="0.00"></span> &euro;</b>
 						</div>
 					</div>
 					<div class="d-flex justify-content-end gap-2">
 						<div class="py-2 text-end d-flex align-items-center gap-2">
-							<div class="status" id="quotation-totals-item-loading"></div>
-							#button(bind="click:update", variant="default", label="Aggiorna", size="sm", icon="sync-alt")#
+							<div class="status" id="quotation-totals-general-loading"></div>
+							#button(bind="click:updateTotals", variant="default", label="Aggiorna", size="sm", icon="sync-alt")#
 						</div>
 					</div>
 				</div>			

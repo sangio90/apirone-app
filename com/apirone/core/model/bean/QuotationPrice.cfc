@@ -6,29 +6,17 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="discount1" type="Numeric";
 	property name="discount2" type="Numeric";
 	property name="shippingCost" type="Numeric";
+	property name="totalGoods" type="Numeric";
 
 	property name="lines" type="com.apirone.core.model.bean.PriceLine[]";
 	property name="vatCode" type="com.apirone.core.model.bean.VatCode";
-	property name="items" type="com.apirone.core.model.bean.QuotationItemPrice[]";
+	//property name="items" type="com.apirone.core.model.bean.QuotationItemPrice[]";
 
-	public QuotationItemPrice function init(){
-		var method = new com.apirone.core.model.bean.PriceMethod();
+	public QuotationPrice function init(){
 
-		// C = Calculated, F = fixed
-		setMethod( method.setId( "C" ) );
 		setLines( [] );
 
 		return this;
-	}
-
-	public Numeric function getTotalGoods(){
-		var total = 0;
-
-		for ( var item in getItems() ) {
-			total = total + item.getTotal();
-		}
-
-		return total;
 	}
 
 	public Numeric function getTaxable(){
@@ -71,21 +59,21 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		
 		// 1. Recupera i valori calcolati (richiama le funzioni che abbiamo definito)
 		var totalGoods = getTotalGoods();
-		var taxableAmount = getTaxableAmount(); // Naming aggiornato
+		var taxable = getTaxable(); // Naming aggiornato
 		var total = getTotal();
 
 		// Nota: Il Vat Code, Discount, e Shipping cost sono proprietà,
 		// quindi li possiamo recuperare direttamente con i getter.
 		
 		// 2. Popola la struttura con tutte le informazioni rilevanti
-		totals.totalGoods = totalGoods;                 // Totale prima di sconti/spedizione
-		totals.shippingCost = getShippingCost();
-		totals.discount1 = getDiscount1();
-		totals.discount2 = getDiscount2();
-		totals.taxableAmount = taxableAmount;           // Base imponibile (il nostro getTaxable() rinominato)
-		totals.vatPercentage = getVatCode().getValue(); // Percentuale IVA
-		totals.vatAmount = total - taxableAmount;       // Importo IVA calcolato
-		totals.total = total;                           // Totale finale (imponibile + IVA)
+		totals["totalGoods"]    = totalGoods;               // Totale prima di sconti/spedizione
+		totals["shippingCost"]  = getShippingCost();
+		totals["discount1"]     = getDiscount1();
+		totals["discount2"]     = getDiscount2();
+		totals["taxable"]       = getTaxable();             // Base imponibile (il nostro getTaxable() rinominato)
+		totals["vatPercentage"] = getVatCode().getValue();  // Percentuale IVA
+		totals["vatAmount"]     = total - taxable;          // Importo IVA calcolato
+		totals["total"]         = total;                    // Totale finale (imponibile + IVA)
 
 		return totals;
 	}	

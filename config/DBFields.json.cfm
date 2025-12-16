@@ -337,6 +337,10 @@
         "name": "ARDATCAR",
         "type": "Date"
     },
+    "quotationPrice.createdAt": {
+        "name": "created_at",
+        "type": "Date"
+    },
     "quotationItemExportedRows.rowNumber": {
         "name": "CPRWONUM",
         "type": "Integer"

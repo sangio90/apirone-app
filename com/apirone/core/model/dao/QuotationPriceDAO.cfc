@@ -46,22 +46,18 @@
 		<cfargument name="quotationPrice" type="com.apirone.core.model.bean.QuotationPrice" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO quotation_pricess (
-				name,
+			INSERT INTO quotation_prices (
 				amount,
 				quotation_id,
 				discount1,
 				discount2,
-				shipment_cost,
-				price_method_id
+				shipment_cost
 			) VALUES (
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getName()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getAmount()#">,
+				0,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationPrice.getQuotationId()#">::uuid,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount1()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount2()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationPrice.getShippingMethod().getCost()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationPrice.getMethod().getId()#">
+				<cfqueryparam cfsqltype="Float" value="#arguments.quotationPrice.getShippingCost()#">
 			)
 			RETURNING quotation_price_id
 		</cfquery>
@@ -75,11 +71,10 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_prices
 			SET
-				amount = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getAmount()#">,
-				quotation_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount1()#">,
+				<!--- amount = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getAmount()#">, ---->
 				discount1 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount1()#">,
 				discount2 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount2()#">,
-				shipment_cost = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationPrice.getShippingMethod().getCost()#">
+				shipment_cost = <cfqueryparam cfsqltype="Float" value="#arguments.quotationPrice.getShippingCost()#">
 			WHERE
 				quotation_price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationPrice.getId()#">
 		</cfquery>
