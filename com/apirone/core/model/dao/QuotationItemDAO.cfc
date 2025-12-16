@@ -19,7 +19,7 @@
 		<cfargument name="quotationId" type="String" required="false">
 		<cfargument name="quotationZoneId" type="String" required="false">
 		<cfargument name="quotationZoneOriginId" type="String" required="false">
-		<cfargument name="mode" type="String" required="false">
+		<cfargument name="typeId" type="String" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_items.quotation_item_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
@@ -31,22 +31,23 @@
 				quotation_zone_id::varchar,
 				COUNT(quotation_item_id) OVER() AS total
 			FROM quotation_items
-				LEFT JOIN signage_config_items USING (signage_config_item_id)
+				<!--- LEFT JOIN signage_config_items USING (signage_config_item_id) ---->
+				<cfif !IsNull( arguments.typeId )>
+					INNER JOIN products ON quotation_items.product_id = products.product_id
+					INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+					INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
+				</cfif>
 			WHERE 1=1
 				<cfif !IsNull( arguments.quotationId )>
-					AND quotation_items.quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationId#">::uuid
+					AND quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.quotationZoneId )>
-					AND quotation_zone_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationZoneId#">::uuid
+					AND quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationZoneId#">::uuid
 				</cfif>
 
-				<cfif !IsNull( arguments.mode )>
-					<cfif arguments.mode EQ "segnaletiche">
-						AND signage_config_item_id IS NOT NULL
-					<cfelse>
-						AND signage_config_item_id IS NULL
-					</cfif>
+				<cfif !IsNull( arguments.typeId )>
+					AND product_categories.product_category_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.typeId#">
 				</cfif>
 			ORDER BY
 				quotation_items.#super.sanitizeSQL( arguments.orderBy )#
@@ -55,6 +56,7 @@
 				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 		</cfquery>
+
 		<cfreturn local.q>
 	</cffunction>
 
