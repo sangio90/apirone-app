@@ -361,7 +361,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			var outcome = super.fire( "product.delete", [ id ] );
 
 			if ( outcome.getStatus() == "ERROR" ) {
-				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+				errors.add( { "message" = "Non sono riuscito a cancellare l'id #id#" } )
 			}
 		}
 

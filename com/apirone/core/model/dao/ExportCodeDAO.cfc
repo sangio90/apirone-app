@@ -102,4 +102,5 @@
 
 		<cfreturn true>
 	</cffunction>
+
 </cfcomponent>

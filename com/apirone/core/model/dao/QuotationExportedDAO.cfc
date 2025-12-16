@@ -20,7 +20,8 @@
 			SELECT
 				*
 			FROM ORDINI_APIR
-			WHERE MMSERIAL = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationSerial#"> AND CPROWNUM = <cfqueryparam cfsqltype="Integer" value="#arguments.rowNumber#">
+			WHERE MMSERIAL = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationSerial#"> 
+				AND CPROWNUM = <cfqueryparam cfsqltype="Integer" value="#arguments.rowNumber#">
 		</cfquery>
 
 		<cfreturn local.q>

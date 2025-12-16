@@ -75,7 +75,7 @@
                                 <div class="col-sm-10">
                                     <select id="signageFont" 
                                         class="form-control"
-                                        data-placeholder="-- Seleziona la font"
+                                        data-placeholder="-- Seleziona il font"
                                         data-bind="source: fonts, value: detailForm.data.signageConfig.font, events: { change: loadFontSizes }"
                                         data-value-field="id"
                                         data-text-field="name"
@@ -120,7 +120,8 @@
                             <div id="signage-rows-container" class="col-5" style="max-height: 600px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
                                 <!--- qui dentro vanno gli items --->
                             </div>
-                            <div id="signage-preview-background"
+
+                            <div id="quotation-signage-preview-background"
                                 class="col-3 d-flex justify-content-center align-items-center"
                                 data-bind="visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
                                 <div id="signage-preview-container"
@@ -130,6 +131,7 @@
                                     <!-- qui dentro vanno gli items di preview -->
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
@@ -151,7 +153,7 @@
             </div>
         </section>
         <div class="modal fade" tabindex="-1" id="pictogram-helper-modal" data-bs-backdrop="true">
-            <div class="modal-dialog" style="position: fixed; left: calc(50% + 400px); top: 20px; z-index: 200;">
+            <div class="modal-dialog pictogram-helper-modal">
                 <div class="modal-content" style="width: 300px;">
                     <div class="modal-header">
                         <h5 class="modal-title">Elenco pittogrammi</h5>
@@ -169,15 +171,7 @@
             </div>
         </div>
     </div>
+
     #template( view="jstemplate/quotation/signage-line-row-tmpl" )#
     #template( view="jstemplate/quotation/signage-line-preview-row-tmpl" )#
 </cfoutput>
-<style>
-    #signage-preview-background {
-        min-width: 500px;
-        min-height: 500px;
-        background-repeat: no-repeat !important;
-        background-position: center !important;
-        background-size: auto !important;
-    }
-</style>

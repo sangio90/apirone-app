@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding="UTF-8">
 
 <nmscript type="text/x-kendo-template" id="quotation-item-plate-preview-tmpl">
-    <div class="quotation-item m-1 col-3" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editPlate">
+    <div class="quotation-item m-1 col-md-3" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editPlate">
         <div class="quotation-item-inner">
             <div class="row">
                 <div class="col-12 d-flex justify-content-center mb-2">

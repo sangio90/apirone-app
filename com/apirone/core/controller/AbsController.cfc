@@ -253,12 +253,6 @@
 				var count = ListLen( value, "-" );
 				var field = ListFirst( value, "-" );
 
-				/* prefix from UI
-                if( Len( arguments.prefix ) ) {
-                    field = arguments.prefix & "." & listFirst( value, "-" );
-                }
-                */
-
 				if ( count > 1 ) {
 					dir = ListLast( value, "-" );
 				}

@@ -63,7 +63,7 @@
 
                                 <nav>
 
-                                    <ul class="nav nav-tabs" role="tablist">
+                                    <ul class="nav nav-tabs" role="tablist" id="quotation-plate-product-items-tabs">
                                         <li class="nav-item active">
                                             <a class="nav-link active" id="plate-product-items-but" data-bs-toggle="tab" 
                                                 href="##plate-product-items-tab" role="tab" aria-controls="tab1" aria-selected="true">
