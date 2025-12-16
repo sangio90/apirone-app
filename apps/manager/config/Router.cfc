@@ -428,7 +428,11 @@
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();
 
+		get( "/ajax/quotations/:id/items/:typeId" ).to( "QuotationItemAjaxController.list" ).end();
+
 		get( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.totals" ).end();
+		post( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.updateTotals" ).end();
+		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 		
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
@@ -445,7 +449,6 @@
 		post( "/ajax/quotation-status-history" ).to( "QuotationStatusHistoryAjaxController.save" ).end();
 		delete( "/ajax/quotation-status-history" ).to( "QuotationStatusHistoryAjaxController.delete" ).end();
 
-		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();
@@ -471,6 +474,7 @@
 		*/
 		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
+		get( "/ajax/quotation-items/plate/:id" ).to( "QuotationItemAjaxController.editPlate" ).end();
 		post( "/ajax/quotation-items/signage" ).to( "QuotationItemAjaxController.saveSignage" ).end();
 		post( "/ajax/quotation-items/plate" ).to( "QuotationItemAjaxController.savePlate" ).end();
 		get( "/ajax/quotation-items/accessory/:id" ).to( "QuotationItemAjaxController.editAccessory" ).end();
@@ -481,7 +485,7 @@
 		//post( "/ajax/quotation-items/pricing/signage" ).to( "PriceAjaxController.calculateQuotationItem" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
-		get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
+		//get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
 
 
 		/*
