@@ -5,7 +5,7 @@
 
 .quotation-totals-box {
 	position: fixed;
-	bottom: 50px;
+	bottom: 20px;
 	background-color: #2771e8;
 	width: 400px;
 	color: white;
@@ -223,4 +223,27 @@
 	align-items: center;
 	justify-content: center;
 	background: white;
+}
+
+#quotation-signage-preview-background {
+	min-width: 500px;
+	min-height: 500px;
+	background-repeat: no-repeat !important;
+	background-position: center !important;
+	background-size: auto !important;
+}
+
+.pictogram-helper-modal {
+	position: fixed;
+	left: calc(50% + 400px);
+	top: 20px;
+	z-index: 200;
+}
+
+.qt-no-items {
+	text-align: center;
+	font-size: 16px;
+	color: #888888;
+	padding: 20px;
+	text-transform: uppercase;
 }

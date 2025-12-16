@@ -13,10 +13,6 @@ $( document ).ready( function() {
         AP.quotation.detail.init();
     }
 
-    if ( AP.page.quotation.exported ) {
-        $( ".export-button" ).hide();
-    }
-
     const signageModal = document.getElementById( "signage-modal" );
     signageModal.addEventListener( "hide.bs.modal", ( event ) => {
         AP.quotation.detail.showTotals();
@@ -60,6 +56,7 @@ AP.quotation.detail = ( function() {
     }
 
     var viewModel = kendo.observable( {
+        typeId: "",
         detailForm: {
             data: {
                 zone: {
@@ -67,9 +64,18 @@ AP.quotation.detail = ( function() {
                 }
             }
         },
-        mode: null,
+
+        target: null,
         zones: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
+
+        showItems: function() {
+            return this.get( "quotationItems" ).total() > 0;
+        },
+
+        hideItems: function() {
+            return this.get( "quotationItems" ).total() == 0;
+        },
 
         crmCustomers: new kendo.data.DataSource( {
             serverFiltering: true,
@@ -152,12 +158,14 @@ AP.quotation.detail = ( function() {
                         }
 
                         if ( xhr.data.success == false ) {
-                            AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del Preventivo." );
+                            AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo." );
                             AP.loading.hide();
                             return;
                         }
+
                         AP.loading.hide();
-                        AP.widget.notify( "success", "Articoli Preventivo Esportati correttamente." );
+
+                        AP.widget.notify( "success", "Articoli esportati correttamente." );
                     }
                 }
             } );
@@ -189,13 +197,15 @@ AP.quotation.detail = ( function() {
                 }
             } );
         },
-        changeMode: function( e ) {
-            viewModel.set( "mode", e.currentTarget.textContent.toLowerCase() );
-            viewModel.getItems();
+
+        changeType: function( event ) {
+
+            var target = $( event.currentTarget );
+
+            viewModel.set( "typeId", target.data( "type" ) );
+            viewModel.loadItems();
         },
-        getMode: function() {
-            return viewModel.get( "mode" );
-        },
+
         getImageSrc: function( event ) {
 
             const uri = event.image?.uri || "";
@@ -432,7 +442,7 @@ AP.quotation.detail = ( function() {
                                     viewModel.set( "detailForm.data.zone", zones[0] );
                                 }
                                 viewModel.set( "detailForm.data.zones", zones );
-                                viewModel.getItems();
+                                viewModel.loadItems();
                             }
                         }
                     }
@@ -443,40 +453,37 @@ AP.quotation.detail = ( function() {
             return false;
         },
 
-        getItems: function( e ) {
-            var quotationItemsMode = viewModel.get( "mode" );
-            if ( quotationItemsMode == null ) {
-                quotationItemsMode = $( "#quotationItemsMode" ).find( ".active" )[0].innerHTML.toLowerCase();
-            }
+        loadItems: function( e ) {
+            var typeId = viewModel.get( "typeId" );
+            var container = $( "#quotation-plate-product-items-tabs" );
+
             if ( viewModel.detailForm.data.zone?.name != "" ) {
-                var url = "/manager/ajax/quotation-items?quotationId=" + AP.page.quotation.id + "&mode=" + quotationItemsMode;
+
+                var url = "/manager/ajax/quotations/" + AP.page.quotation.id + "/items/" + typeId;
+
                 if ( viewModel.detailForm.data.zone ) {
-                    url = url + "&quotationZoneId=" + viewModel.detailForm.data.zone.id;
+                    url = url + "?quotationZoneId=" + viewModel.detailForm.data.zone.id;
                 }
+
                 NM.util.ajax( {
                     method: "GET",
                     url: url,
                     callback: {
                         done: function( xhr ) {
-                            if( xhr.status == "ERRORE" ) {
-                                AP.widget.notify( "error", "Errore nel recupero delle righe." );
-                            }
-                            if ( xhr.status == "SUCCESS" ) {
-                                viewModel.get( "quotationItems" ).data( xhr.data );
-                            }
+                            viewModel.get( "quotationItems" ).data( xhr.data );
                         }
                     }
                 } );
             }
 
             if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id != "" ) {
-                NM.storage.set( "quotation.zone.id", viewModel.detailForm.data.zone.id );
-                NM.storage.set( "quotation.zone.name", viewModel.detailForm.data.zone.name );
+                AP.setUserPref( "quotation.zone.id", viewModel.detailForm.data.zone.id );
+                AP.setUserPref( "quotation.zone.name", viewModel.detailForm.data.zone.name );
                 $( "#addSignageButton" ).prop( "disabled", false );
                 $( "#addAccessoryButton" ).prop( "disabled", false );
             } else {
-                NM.storage.delete( "quotation.zone.id" );
-                NM.storage.delete( "quotation.zone.name" );
+                AP.deleteUserPref( "quotation.zone.id" );
+                AP.deleteUserPref( "quotation.zone.name" );
                 $( "#addSignageButton" ).prop( "disabled", true );
                 $( "#addAccessoryButton" ).prop( "disabled", true );
             }
@@ -488,9 +495,10 @@ AP.quotation.detail = ( function() {
             viewModel.set( "detailForm.data", quotation );
         },
 
+        // add
+
         addSignage: function() {
             signageApp().new();
-            console.log( "detaiLForm", viewModel.get( "detailForm.data.id" ) );
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
@@ -504,26 +512,25 @@ AP.quotation.detail = ( function() {
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
+        // edit
+
         editSignage: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
-            const tabellaTotali = fields.totalItemBox.find( "table" )[0];
-            $( tabellaTotali ).empty();
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
         editAccessory: function( event ) {
             event.preventDefault();
             accessoryApp().edit( { id: event.data.id } );
-            const tabellaTotali = $( "#quotation-totals-item" ).find( "table" )[0];
-            $( tabellaTotali ).empty();
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
         editPlate: function( event ) {
             event.preventDefault();
-            signageApp().edit( { id: event.data.id } );
+            plateApp().edit( { id: event.data.id } );
             fields.totalItemBox.show();
-            const tabellaTotali = fields.totalItemBox.find( "table" )[0];
-            $( tabellaTotali ).empty();
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
         openAddZoneModal: function() {
@@ -531,6 +538,7 @@ AP.quotation.detail = ( function() {
                 AP.quotation.zoneModal.methods().resetForm();
                 AP.quotation.zoneModal.init( "add" );
             }
+
             NM.util.openModal( AP.quotation.fields.zoneModalRoot );
         },
 
@@ -538,6 +546,7 @@ AP.quotation.detail = ( function() {
             if ( AP.quotation.fields.zoneModalRoot.length ) {
                 AP.quotation.zoneModal.init( "delete" );
             }
+
             NM.util.openModal( AP.quotation.fields.zoneModalRoot );
         },
 
@@ -546,6 +555,7 @@ AP.quotation.detail = ( function() {
                 AP.quotation.printModal.methods().resetForm();
                 AP.quotation.printModal.init();
             }
+
             NM.util.openModal( AP.quotation.fields.printModalRoot );
         },
     } );
@@ -565,7 +575,11 @@ AP.quotation.detail = ( function() {
     pub.init = function() {
         kendo.bind( AP.quotation.fields.detailRoot, viewModel );
 
+        // plates by default
+        $( "body" ).find( "button#nav-plate-tab" ).click();
+
         viewModel.getZones();
+        console.log( "typeId", viewModel.get( "typeId" ) );
 
         AP.quotation.detail.showTotals();
 
@@ -593,9 +607,6 @@ AP.quotation.detail = ( function() {
             } );
 
         }
-    };
-
-    pub.renderTotals = function() {
     };
 
     return pub;
@@ -817,17 +828,15 @@ AP.quotation.printModal = ( function() {
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
 
-        printQuotation: function() {
+        print: function() {
             const report = viewModel.get( "detailForm.data.report.id" );
-            let url = "/manager/technical-reports/print?id=" + AP.page.quotation.id + "&report=" + report;
-            const images = $( "#imagesCheckbox" )[0].checked;
-            const grouped = $( "#groupedCheckbox" )[0].checked;
-            const notes = $( "#notesCheckbox" )[0].checked;
-            const discounts = $( "#discountsCheckbox" )[0].checked;
-            if ( images ) { url += "&images=true"; } else { url += "&images=false"; }
-            if ( grouped ) { url += "&grouped=true"; } else { url += "&grouped=false"; }
-            if ( notes ) { url += "&notes=true"; } else { url += "&notes=false"; }
-            if ( discounts ) { url += "&discounts=true"; } else { url += "&discounts=false"; }
+            const images = $( "#qt-print-image-checkbox" )[0].checked;
+            const grouped = $( "#qt-print-grouped-checkbox" )[0].checked;
+            const notes = $( "#qt-print-notes-checkbox" )[0].checked;
+            const discounts = $( "#qt-print-discounts-checked" )[0].checked;
+
+            const url = `/manager/technical-reports/print?id=${AP.page.quotation.id}&report=${report}` +
+                `&images=${images}&grouped=${grouped}&notes=${notes}&discounts=${discounts}`;
 
             window.open( url, "_blank" );
         },
@@ -835,43 +844,54 @@ AP.quotation.printModal = ( function() {
         toggleOptions: function() {
             const report = viewModel.get( "detailForm.data.report.id" );
 
-            $( "#imagesCheckbox" )[0].checked = false;
-            $( "#groupedCheckbox" )[0].checked = false;
-            $( "#notesCheckbox" )[0].checked = false;
-            $( "#discountsCheckbox" )[0].checked = false;
+            const imageCheckbox = $( "#qt-print-image-checkbox" );
+            const groupedCheckbox = $( "#qt-print-grouped-checkbox" );
+            const notesCheckbox = $( "#qt-print-notes-checkbox" );
+            const discountsCheckbox = $( "#qt-print-discounts-checkbox" );
 
-            if ( report == "classic" ) {
-                $( "#imagesDiv" ).css( "display", "block" );
-                $( "#imagesCheckbox" )[0].checked = true;
-                $( "#groupedCheckbox" )[0].checked = false;
-                $( "#groupedDiv" ).css( "display", "none" );
-                $( "#notesDiv" ).css( "display", "block" );
-                $( "#discountsDiv" ).css( "display", "block" );
-            }
-            if ( report == "photo" ) {
-                $( "#imagesCheckbox" )[0].checked = false;
-                $( "#groupedCheckbox" )[0].checked = false;
-                $( "#notesCheckbox" )[0].checked = false;
-                $( "#discountsCheckbox" )[0].checked = false;
-                $( "#imagesDiv" ).css( "display", "none" );
-                $( "#groupedDiv" ).css( "display", "block" );
-                $( "#notesDiv" ).css( "display", "none" );
-                $( "#discountsDiv" ).css( "display", "none" );
-            }
-            if ( report == "zone" ) {
-                $( "#imagesCheckbox" )[0].checked = true;
-                $( "#groupedCheckbox" )[0].checked = false;
-                $( "#groupedDiv" ).css( "display", "none" );
-                $( "#notesDiv" ).css( "display", "block" );
-                $( "#notesCheckbox" )[0].checked = true;
-                $( "#discountsDiv" ).css( "display", "block" );
-            }
-            if ( report == "technical" ) {
-                $( "#imagesDiv" ).css( "display", "block" );
-                $( "#imagesCheckbox" )[0].checked = false;
-                $( "#groupedDiv" ).css( "display", "block" );
-                $( "#notesDiv" ).css( "display", "block" );
-                $( "#discountsDiv" ).css( "display", "none" );
+            const imagesDiv = $( "#qt-print-images-cont" );
+            const groupedDiv = $( "#qt-print-grouped-cont" );
+            const notesDiv = $( "#qt-print-note-cont" );
+            const discountsDiv = $( "#qt-print-discounts-cont" );
+
+            // Reset tutto
+            imageCheckbox.checked = false;
+            groupedCheckbox.checked = false;
+            notesCheckbox.checked = false;
+            discountsCheckbox.checked = false;
+
+            // Configurazione per ogni tipo di report
+            const config = {
+                classic: {
+                    checkboxes: { image: true, grouped: false, notes: false, discounts: false },
+                    divs: { images: "block", grouped: "none", notes: "block", discounts: "block" }
+                },
+                photo: {
+                    checkboxes: { image: false, grouped: false, notes: false, discounts: false },
+                    divs: { images: "none", grouped: "block", notes: "none", discounts: "none" }
+                },
+                zone: {
+                    checkboxes: { image: true, grouped: false, notes: true, discounts: false },
+                    divs: { images: "block", grouped: "none", notes: "block", discounts: "block" }
+                },
+                technical: {
+                    checkboxes: { image: false, grouped: false, notes: false, discounts: false },
+                    divs: { images: "block", grouped: "block", notes: "block", discounts: "none" }
+                }
+            };
+
+            const reportConfig = config[report];
+
+            if ( reportConfig ) {
+                imageCheckbox.checked = reportConfig.checkboxes.image;
+                groupedCheckbox.checked = reportConfig.checkboxes.grouped;
+                notesCheckbox.checked = reportConfig.checkboxes.notes;
+                discountsCheckbox.checked = reportConfig.checkboxes.discounts;
+
+                imagesDiv.css( "display", reportConfig.divs.images );
+                groupedDiv.css( "display", reportConfig.divs.grouped );
+                notesDiv.css( "display", reportConfig.divs.notes );
+                discountsDiv.css( "display", reportConfig.divs.discounts );
             }
         },
 
