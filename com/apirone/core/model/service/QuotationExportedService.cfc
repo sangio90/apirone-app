@@ -51,9 +51,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Outcome function delete( required String quotationSerial ){
 		var outcome = super.bean( "Outcome" );
-		var obj     = get( arguments.key );
+		var obj     = get( arguments.quotationSerial );
 
-		outcome.setData( { key = arguments.key } );
+		outcome.setData( { quotationSerial = arguments.quotationSerial } );
 
 		transaction {
 			try {
