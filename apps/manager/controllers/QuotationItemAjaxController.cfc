@@ -1,18 +1,45 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
-		var data   = [];
+		
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var mm     = super.getMementify();
-		var rows   = super.fire( "QuotationItem.search", params );
+		var memy   = super.getMementify();
+		
+		param rc.id = "";
+		param rc.categoryId = "";
+		param rc.quotationZoneId = "";
 
-		var rowsData = ( mm.convertList( rows.getData() ) );
+		params[ "typeId" ] = rc.typeId;
+		params[ "quotationId" ] = rc.id;
+		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
+
+		var rows = super.fire( "QuotationItem.search", params );
+
+		var data = ( memy.convertList( rows.getData() ) );
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );
-		result.setData( rowsData );
+		result.setData( data );
+		event.setValue( "result", result );
+	}
 
+	function editPlate( event, rc, prc ){
+		
+		var data   = {};
+		var result = super.getResult();
+		var memy   = super.getMementify();
+
+		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
+
+		var parsedQuotationItemData = memy.convert( quotationItem, "edit" );
+
+		data.append( {
+			"quotationItem" = parsedQuotationItemData,
+			"plate" = {}
+		} );
+
+		result.setData( data );
 		event.setValue( "result", result );
 	}
 

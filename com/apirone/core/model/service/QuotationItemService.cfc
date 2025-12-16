@@ -131,9 +131,11 @@
 	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){
 		var record = getDao().read( arguments.quotationItemId );
 		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.quotationItemId )
+		
 		if ( record.recordCount ) {
 			
 			var pricing = super.bean( "QuotationItemPrice" );
+			var priceMethod = super.bean( "PriceMethod" );
 			
 			if ( fruits.len() > 0 ) {
 				
@@ -150,14 +152,30 @@
 			
 			}
 
+			```
+			<cfquery name="total" datasource="apirone">
+				SELECT SUM(amount) AS total
+				FROM quotation_items
+					INNER JOIN quotation_item_prices ON quotation_items.quotation_item_id = quotation_item_prices.quotation_item_id
+				WHERE 1=1
+					AND quotation_items.quotation_item_id = '#record.quotation_item_id#'
+			</cfquery>
+
+			<cfquery name="total" datasource="apirone">
+				SELECT SUM(amount) AS total
+				FROM quotation_items
+					INNER JOIN quotation_item_prices ON quotation_items.quotation_item_id = quotation_item_prices.quotation_item_id
+				WHERE 1=1
+					AND quotation_items.quotation_item_id = '#record.quotation_item_id#'
+			</cfquery>
+			```
+
 			pricing.setDiscount1( record.discount1 );
 			pricing.setDiscount2( record.discount2 );
-			pricing.setAmount( record.price );
+			pricing.setAmount( total.total );
+			pricing.setMethod( priceMethod.setId("F") );
 
 			bean.setId( record.quotation_item_id );
-			//bean.setPrice( record.price );
-			//bean.setDiscount1( record.discount1 );
-			//bean.setDiscount2( record.discount2 );
 			bean.setQuantity( record.quantity );
 			
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
@@ -175,6 +193,7 @@
 
 			if ( Len( record.signage_config_item_id ) ) {
 				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_id ) );
+				
 				if ( record.char_count ) {
 					bean.getSignageConfigItem().setCharCount( record.char_count );
 				}
@@ -184,6 +203,7 @@
 				if ( record.row_count ) {
 					bean.getSignageConfigItem().setRowCount( record.row_count );
 				}
+
 				var signageRows = getQuotationItemSignageRowService().list( quotationItemId = quotationItemId );
 				bean.setSignageRows( signageRows );
 			}
