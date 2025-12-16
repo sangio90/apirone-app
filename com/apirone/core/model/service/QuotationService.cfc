@@ -1,7 +1,11 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
+	variables.verticaleUser = "apikey";
+	variables.verticalePwd = "Gs16072001!";
+	variables.verticaleSecret = ToBase64('#variables.verticaleUser#:#variables.verticalePwd#');
+
+
 	property name="dao" inject="QuotationDAO";
-	property name="exportCodeDao" inject="ExportCodeDAO";
 
 	property name="quotationService" inject="QuotationService";
 	property name="quotationItemSvc" inject="QuotationItemService";
@@ -230,8 +234,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var productItemIds = [];
 						var importantAttributes = product.getImportantAttributes();
 
-
-
 						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
 						for ( var quotationItemProductItem in quotationItemProductItems ) {
 							var productItem = quotationItemProductItem.getProductItem();
@@ -339,14 +341,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 									TODO: create createExportCode
 								*/
 
+								/*
 								createExportCodeAndRawValues(
 									code         = code,
 									varCode      = varCode,
 									counterValue = maxCounter,
 									productItems = productItems
 								)
+								*/
 
-								/*
 								var exportCode = super.bean( "ExportCode" );
 								exportCode.setName( code & varCode );
 								exportCode.setCounter( maxCounter );
@@ -361,10 +364,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 									exportCodeRawValue.setAttribute( attributeService.get( item.attributeId ) );
 									exportCodeRawValue.setImportant( item.important );
 									exportCodeRawValueService.create( exportCodeRawValue );
-								}
-								*/
-							}
+								}								
 
+							}
 
 						} else {
 							// non esiste nessun exportCode con quel varCode, 
@@ -374,14 +376,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								TODO: create createExportCode
 							*/
 
+							/*
 							createExportCodeAndRawValues(
 								code         = code,
 								varCode      = varCode,
 								counterValue = "000001",
 								productItems = productItems
-							)							
+							)
 
-							/*
+							colCode = "000001";
+							*/
+
 							var exportCode = super.bean( "ExportCode" );
 							exportCode.setName( code & varCode );
 							exportCode.setCounter( "000001" );
@@ -397,8 +402,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								exportCodeRawValue.setAttribute( attributeService.get( item.attributeId ) );
 								exportCodeRawValue.setImportant( item.important );
 								exportCodeRawValueService.create( exportCodeRawValue );
-							}
-							*/
+							}							
+
 						}
 
 						arKey = code & varCode & colCode;
@@ -456,11 +461,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						productComponent.DSCODART  = dataExport.ARCODART;
 						productComponent.DSCODVAR  = dataExport.VARCOD;
 						productComponent.DSCODCOL  = dataExport.CLCODICE;
+
 						result.success = getDao().exportDiba( productComponent );
 					}
+
+					
+
 				}
 			}
 		}
+
+		notifyProductsVerticale();
 
 		return result;
 	}
@@ -498,6 +509,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					var categoryCode = Trim( product.getCategory().getCode() );
 					code &= categoryCode;
 					var nota = "";
+
 					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
 					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
 						if ( IsNull( product.getLine() ) ) {
@@ -532,9 +544,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							quotationItemId = quotationItem.getId(),
 							orderBy         = [ { field = "productItem.id" } ]
 						);
+
 						var productItems   = [];
 						var importantAttributes = product.getImportantAttributes();
-						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
+						
+						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti 
+						// (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
 						for ( var quotationItemProductItem in quotationItemProductItems ) {
 							var productItem = quotationItemProductItem.getProductItem();
 							if ( !IsNull( productItem ) ) {
@@ -581,8 +596,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						varCode &= RepeatString( "0", 10 - Len( varCode ) )
 
-						// per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
+						// per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode 
+						// ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
 						var existingCodes = exportCodeService.list( str = code & varCode );
+
 						if ( existingCodes.len() > 0 ) {
 							// se ne esiste almeno uno, per ognuno di questi verifico che tutti i product items (anche quelli non importanti) siano presenti in exportCodeRawValue,
 							// se almeno uno non si trova, passo al successivo. Se non trovo nessun exportCode
@@ -591,7 +608,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								var exportCodeRawValues = exportCodeRawValueService.list(
 									exportCodeId = existingCode.getId()
 								);
+
 								var allFound = true;
+								
 								for ( var item in productItems ) {
 									var found = false;
 									for ( var exportCodeRawValue in exportCodeRawValues ) {
@@ -609,13 +628,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 									colCode = existingCode.getCounter();
 									break;
 								}
-								//se non esiste questo varCode con questa combinazione di colCode, vuol dire che sicuramente non sono stati esportati ancora gli articoli quindi torno errore
-								result.error = 'Esporta gli Articoli prima.';
+								//se non esiste questo varCode con questa combinazione di colCode, 
+								// vuol dire che sicuramente non sono stati esportati ancora gli articoli quindi torno errore
+								result.error = 'Prima esporta gli articoli.';
 								return result;
 							}
 						} else {
 							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
-							result.error = 'Esporta gli Articoli prima.';
+							result.error = 'Prima esporta gli articoli.';
 							return result;
 						}
 						arKey = code & varCode & colCode;
@@ -636,7 +656,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData['MMCODART'] = data['ARCODART'];
 						quotationData['MMCODVAR'] = data['VARCOD'];
 						quotationData['MMCODCOL'] = data['CLCODICE'];
-						quotationData['ARUNMIS1'] = 'PZ';
+						quotationData['ARUNMIS1'] = "PZ";
 						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
 						quotationData['MMVALUNI'] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
 						//quotationData['MMSCOAR1'] = quotationItem.getDiscount1(); TODO: add discount
@@ -664,18 +684,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLANNOTA" = nota
 						}
 
-						quotationData['CPROWNUM'] = index;
-						quotationData['CPROWORD'] = index * 10;
-						quotationData['MMCODART'] = data['ARCODART'];
-						quotationData['MMCODVAR'] = data['VARCOD'];
-						quotationData['MMCODCOL'] = data['CLCODICE'];
-						quotationData['ARUNMIS1'] = 'PZ';
-						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
-						quotationData['MMVALUNI'] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
-						quotationData['MMSCOAR1'] = quotationItem.getDiscount1();
-						quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
-						quotationData['MMEVASIO'] = quotation.getValidityDate();
-						quotationData['MM_STATO'] = 'N';
+						quotationData["CPROWNUM"] = index;
+						quotationData["CPROWORD"] = index * 10;
+						quotationData["MMCODART"] = data["ARCODART"];
+						quotationData["MMCODVAR"] = data["VARCOD"];
+						quotationData["MMCODCOL"] = data["CLCODICE"];
+						quotationData["ARUNMIS1"] = "PZ";
+						quotationData["MMQTAMOV"] = quotationItem.getQuantity();
+						quotationData["MMVALUNI"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
+						quotationData["MMSCOAR1"] = quotationItem.getDiscount1();
+						quotationData["MMSCOAR2"] = quotationItem.getDiscount2();
+						quotationData["MMEVASIO"] = quotation.getValidityDate();
+						quotationData["MM_STATO"] = "N";
 
 						allProductItems.append(quotationData);
 					}
@@ -687,6 +707,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		result.success = true;
+
+		notifyOrdersVerticale();
 
 		return result;
 	}
@@ -806,7 +828,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var quotationData = {
 			//"MMSERIAL" = quotation.getSerial(),
-			"MMSERIAL" = quotation.getQuotationNumber(), // i need the same code 
+			"MMSERIAL" = quotation.getSerial(), // i need the same code 
+			"MM_IDRIF" = quotation.getQuotationNumber(), // i need the same code 
 			"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
 			"MMDATDOC" = quotation.getCreatedAt(),
 			"MMDATEVA" = quotation.getValidityDate(),
@@ -816,6 +839,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
 			"CF_IDCLI" = customer.getId(),
+			"CF___CAP" = customer.getPostalCode(),
 			"CFDESCR1" = customer.getCompany(),
 			"CFINDIRI" = customer.getStreet(),
 			"CFLOCALI" = customer.getCity(),
@@ -825,17 +849,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFTELEFO" = customer.getPhone(),
 			"CFBLOCCO" = "N",
 			"CFMOROSO" = "N",
+			"DECAPDES" = customer.getPostalCode(),
 			"DEDESDOD" = customer.getCompany(),
 			"DEINDDOD" = customer.getStreet(),
 			"DELOCDOD" = customer.getCity(),
 			"DEPRODOD" = customer.getState(),
 			"DENAZDOD" = customer.getCountry()?.getIsoCode(),
+			"DECAPDOC" = quotation.getShippingProfile().getPostalCode(),
 			"DEIDDMER" = quotation.getShippingProfile().getId(),
 			"DEDESMER" = quotation.getShippingProfile().getCompany(),
 			"DEINDMER" = quotation.getShippingProfile().getStreet(),
 			"DELOCMER" = quotation.getShippingProfile().getCity(),
 			"DEPROMER" = quotation.getShippingProfile().getState(),
-			"DENAZMER" = quotation.getShippingProfile().getCountry()?.getIsoCode()
+			"DENAZMER" = quotation.getShippingProfile().getCountry()?.getIsoCode(),
 		};
 
 
@@ -937,7 +963,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	/**
 	 * Crea un oggetto ExportCode e i relativi ExportCodeRawValue.
-	 * * @param code Il codice base per il nome.
+	 * @param code Il codice base per il nome.
 	 * @param varCode La variabile del codice da concatenare.
 	 * @param productItems Array di oggetti item con rawValueId, attributeId e important.
 	 * @param counterValue Il valore del contatore. Di default è '000001', ma può essere maxCounter.
@@ -976,6 +1002,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			exportCodeRawValueService.create( exportCodeRawValue );
 		}
 	}
+
+	private Void function notifyProductsVerticale(){
+
+		cfhttp( url = "http://194.183.87.112:8080/verticale_web_data/servlet/api/v1/apir_update_articoli/ALL", method = "POST", result="result" ) {
+			cfhttpparam( type = "header", name = "Content-Type", value = "application/json" );						
+			cfhttpparam( type = "header", name = "Authorization", value = "Basic #variables.verticaleSecret#" );							
+		}
+
+		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# notifyVerticale: apir_update_articoli: status: #result.status_code#");
+
+	}	
+	
+	private Void function notifyOrdersVerticale(){
+
+		var user = "apikey";
+		var pwd = "Gs16072001!";
+		var secret = ToBase64('#user#:#pwd#');
+
+		cfhttp( url = "http://194.183.87.112:8080/verticale_web_data/servlet/api/v1/apir_update_ordini/ALL", method = "POST", result="result" ) {
+			cfhttpparam( type = "header", name = "Content-Type", value = "application/json" );						
+			cfhttpparam( type = "header", name = "Authorization", value = "Basic #variables.verticaleSecret#" );							
+		}
+
+		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# notifyVerticale: apir_update_ordini: status: #result.status_code#");
+		
+	}	
 	
 	private com.apirone.core.model.bean.Quotation function build( required String quotationId ){
 		var record = getDao().read( arguments.quotationId );
