@@ -288,6 +288,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if( arguments.deleteCache ) {
 			getCacheManager().removeAll();
 		}
+		
 		super.logEvent(
 			event   = "product.CLONED_TREE",
 			message = "End clone tree of product [#arguments.fromProductId#] to [#arguments.toProductId#]",
@@ -314,6 +315,35 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return product.getId();
 	}
+
+	public String function update( required com.apirone.core.model.bean.Product product ){
+		var product = this.handleCatalogBundle( arguments.product );
+
+		getDao().update( arguments.product );
+
+		var id = product.getId();
+
+		if ( !IsNull( arguments.product.getTexts() ) ) {
+			for ( var text in arguments.product.getTexts() ) {
+				var entity = super.bean( "Entity" )
+
+				entity.setKey( "product.id" );
+				entity.setValue( id );
+
+				text.setEntity( entity );
+
+				if ( Len( text.getId() ) ) {
+					getTextService().update( text );
+				} else {
+					getTextService().create( text );
+				}
+			}
+		}
+
+		super.getCacheManager().remove( getCacheScope(), product.getId() );
+
+		return product.getId();
+	}	
 
 	public Void function removeCache( required String productId ){
 		var cm = super.getCacheManager();
