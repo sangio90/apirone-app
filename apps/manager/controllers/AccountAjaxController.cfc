@@ -4,19 +4,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
         var data = [];
         var result = super.getResult();
-        var dm = super.getDataMapper()
+        var memy = super.getMementify()
 
         var args = super.paramsFromUrl()
         
         var rows = super.fire("account.search", args).getData();
+
+		var data = memy.convertList( rows, "list" );
         
-        for ( var row in rows ) {
-
-            var obj = dm.convert( row, "Account", true );
-            data.add( obj );
-
-        }
-
         result.setTotal( data.len() );
         result.setData( data );
 
@@ -50,10 +45,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		account.setEmail( json.email );
 		account.setName( json?.name );
 		account.setPwd( json?.pwd );
-		account.setPhone( json?.phone );
-		account.setLang( lang.setId( json.lang.id ) );
+		//account.setPhone( json?.phone );
+		//account.setLang( lang.setId( json.lang.id ) );
 		account.setStatus( status.setId( json.status.id ) );
 
+		/*
 		for ( var thisRole in json.selectedRoles ) {
 
 			var role   = super.bean( "Role" );
@@ -61,9 +57,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			role.setId( thisRole.id );
 			roles.add( role );
 		}
-
-
 		account.setRoles( roles );
+		*/
 
 		if ( !len( json.id ) ) {
 			messageId = "account.created";
