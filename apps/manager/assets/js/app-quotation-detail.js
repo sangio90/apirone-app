@@ -6,6 +6,9 @@ Object.assign( AP.quotation.fields, {
     zoneModalRoot: $( "#zone-modal-root" ),
     printModalRoot: $( "#print-modal-root" ),
     totalItemBox: $( "#quotation-totals-item" ),
+    addPlateBtn: $( "#qt-add-plate" ),
+    addSignageBtn: $( "#qt-add-signage" ),
+    addAccessoryBtn: $( "#qt-add-accessory" ),
 } );
 
 $( document ).ready( function() {
@@ -14,6 +17,7 @@ $( document ).ready( function() {
     }
 
     const signageModal = document.getElementById( "signage-modal" );
+
     signageModal.addEventListener( "hide.bs.modal", ( event ) => {
         AP.quotation.detail.showTotals();
     } );
@@ -479,13 +483,13 @@ AP.quotation.detail = ( function() {
             if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id != "" ) {
                 AP.setUserPref( "quotation.zone.id", viewModel.detailForm.data.zone.id );
                 AP.setUserPref( "quotation.zone.name", viewModel.detailForm.data.zone.name );
-                $( "#addSignageButton" ).prop( "disabled", false );
-                $( "#addAccessoryButton" ).prop( "disabled", false );
+                $( "#qt-add-signage" ).prop( "disabled", false );
+                $( "#qt-add-accessory" ).prop( "disabled", false );
             } else {
                 AP.deleteUserPref( "quotation.zone.id" );
                 AP.deleteUserPref( "quotation.zone.name" );
-                $( "#addSignageButton" ).prop( "disabled", true );
-                $( "#addAccessoryButton" ).prop( "disabled", true );
+                $( "#qt-add-signage" ).prop( "disabled", true );
+                $( "#qt-add-accessory" ).prop( "disabled", true );
             }
 
             return false;
@@ -579,31 +583,30 @@ AP.quotation.detail = ( function() {
         $( "body" ).find( "button#nav-plate-tab" ).click();
 
         viewModel.getZones();
-        console.log( "typeId", viewModel.get( "typeId" ) );
 
         AP.quotation.detail.showTotals();
 
         if ( AP.page.quotation ) {
 
-            document.querySelector( "#nav-plate-tab" ).addEventListener( "click", function( e ) {
-                e.preventDefault();
-                $( "#addSignageButton" ).hide();
-                $( "#addAccessoryButton" ).hide();
-                $( "#addPlateButton" ).show();
+            document.querySelector( "#nav-plate-tab" ).addEventListener( "click", function( event ) {
+                event.preventDefault();
+                fields.addSignageBtn.hide();
+                fields.addAccessoryBtn.hide();
+                fields.addPlateBtn.show();
             } );
 
-            document.querySelector( "#nav-signage-tab" ).addEventListener( "click", function( e ) {
-                e.preventDefault();
-                $( "#addPlateButton" ).hide();
-                $( "#addAccessoryButton" ).hide();
-                $( "#addSignageButton" ).show();
+            document.querySelector( "#nav-signage-tab" ).addEventListener( "click", function( event ) {
+                event.preventDefault();
+                fields.addPlateBtn.hide();
+                fields.addAccessoryBtn.hide();
+                fields.addSignageBtn.show();
             } );
 
-            document.querySelector( "#nav-accessories-tab" ).addEventListener( "click", function( e ) {
-                e.preventDefault();
-                $( "#addPlateButton" ).hide();
-                $( "#addSignageButton" ).hide();
-                $( "#addAccessoryButton" ).show();
+            document.querySelector( "#nav-accessories-tab" ).addEventListener( "click", function( event ) {
+                event.preventDefault();
+                fields.addPlateBtn.hide();
+                fields.addSignageBtn.hide();
+                fields.addAccessoryBtn.show();
             } );
 
         }

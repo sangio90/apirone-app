@@ -209,7 +209,7 @@
 									#LSNumberFormat( oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
 								</td>
 								<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
-									#LSNumberFormat( quantity * oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
+									#LSNumberFormat( quantity * oggetto.getPrice().getAmount(), ".99", "it_IT" )# €
 								</td>
 							</tr>
 						</table>
@@ -224,7 +224,8 @@
 								<table style="width: 4in; border-collapse: collapse;">
 									<tr>
 										<td><strong>Totale merce</strong></td>
-										<td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td>
+										<!--- <td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td> --->
+										#args.data.totalSpent#
 									</tr>
 									<tr>
 										<td>IVA 20%</td>
@@ -236,7 +237,8 @@
 									</tr>
 									<tr>
 										<td><strong>Totale fattura</strong></td>
-										<td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td>
+										<!--- <td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td> --->
+										#args.data.totalSpent#
 									</tr>
 								</table>
 							</td>

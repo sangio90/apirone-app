@@ -310,6 +310,14 @@ h2 {
     background-color: #ffffff !important;
 }
 
+.user-change-role-item {
+    margin-top: 10px;
+}
+
+.header-right {
+    margin-right: 70px !important;
+}
+
 #user-other-roles {
     font-size: 11px;
     text-transform: uppercase;
@@ -318,7 +326,7 @@ h2 {
     margin-right: 10px;
     background: white;
     position: absolute;
-    right: 20px;
+    right: 40px;
     top: 165px;
     padding: 5px 10px;
     color: #ACACAC;

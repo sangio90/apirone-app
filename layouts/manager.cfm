@@ -56,7 +56,7 @@
 
             </div>
 
-            <div class="header-right d-flex align-items-center me-3">
+            <div class="header-right d-flex align-items-center">
 
                 <div id="search-widget-root" class="me-3 d-flex align-items-center d-none">
                     <div id="search-widget-suggest-status" class="me-2"></div>
@@ -94,13 +94,15 @@
                             <li>
                                 <a role="menuitem" tabindex="-1" href="/manager/logout"><i class="bx bx-power-off"></i> Esci</a>
                             </li>
-                            <cfif Len( session.user.getAccount().getRoles() )>
+                            <cfif prc.users.len()>
                                 <li class="divider"></li>
-                                <div id="user-other-roles">cambia ruolo</div>
-                                <cfloop array="#session.user.getAccount().getRoles()#" index="role">
-                                    <cfif ( role.getId() neq session.user.getRole().getId() )>
-                                        <li>
-                                            <a role="menuitem" tabindex="-1" href="/manager/change-role/#role.getId()#"><i class="bx bx-user"></i> #role.getName()#</a>
+                                <div id="user-other-roles">cambia profilo</div>
+                                <cfloop array="#prc.users#" index="user">
+                                    <cfif ( user.getId() neq session.user.getId() )>
+                                        <li class="user-change-role-item">
+                                            <a role="menuitem" tabindex="-1" href="/manager/change-user/#user.getId()#"><i class="bx bx-user"></i> 
+                                                #user.getName()# (#user.getRole().getName()#)
+                                            </a>
                                         </li>
                                     </cfif>
                                 </cfloop>

@@ -86,10 +86,10 @@
                                                 </button>
 
                                             </div>
-                                            <div class="col-6 text-start">
-                                                <button id="addPlateButton" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
-                                                <button id="addSignageButton" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none" disabled>Aggiungi segnaletica</button>
-                                                <button id="addAccessoryButton" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addAccessory" style="display: none" disabled>Aggiungi accessorio</button>
+                                            <div class="col-8 text-end">
+                                                <button id="qt-add-plate" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
+                                                <button id="qt-add-signage" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none" disabled>Aggiungi segnaletica</button>
+                                                <button id="qt-add-accessory" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addAccessory" style="display: none" disabled>Aggiungi accessorio</button>
                                             </div>
                                         </div>
                                     </nav>

@@ -16,7 +16,7 @@
                 <span data-bind="text: referentName"></span>
             </td>
             <td>
-                <span data-bind="text: owner.email"></span>
+                <span data-bind="text: owner.name"></span>
             </td>
             <td>
                 <span data-bind="text: getCreatedAt"></span>

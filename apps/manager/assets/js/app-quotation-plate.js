@@ -1838,7 +1838,7 @@ AP.plate.modal = ( function() {
 
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
 
-            // console.log( "loadModels:line.id", lineId );
+            console.log( "loadModels:line.id", lineId );
 
             NM.util.ajax( {
                 method: "GET",
@@ -2030,7 +2030,6 @@ AP.plate.modal = ( function() {
 
                         await delay( 200 );
                         viewModel.parseLines();
-
 
                     }
 

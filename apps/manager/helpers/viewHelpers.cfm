@@ -46,7 +46,7 @@
     <cfloop array="#prc.jsFiles#" index="local.thisScript">
         <cfoutput>
             <script src="/assets/#prc.staticVersion#/manager/js/#local.thisScript#.js"></script>
-            <cfif  FileExists( ExpandPath( "/apps/manager/assets/js/tests/#local.thisScript#-test.js" ) ) && prc.isDev>
+            <cfif FileExists( ExpandPath( "/apps/manager/assets/js/tests/#local.thisScript#-test.js" ) ) && prc.isDev>
                 <script src="/assets/#prc.staticVersion#/manager/js/tests/#local.thisScript#-test.js"></script>
             </cfif>
         </cfoutput>

@@ -92,7 +92,7 @@
                                     { 'field':'action', 'title':'Azione', width: '130px'},
                                     { 'field':'message', 'title':'Messagge'},
                                     { 'field':'ipAddress', 'title':'IP', width: '120px' },
-                                    { 'field':'account.name', 'title':'Account', width: '200px' },
+                                    { 'field':'user.name', 'title':'Utente', width: '200px' },
                                     { 'field':'', 'title':'', width: '55px'}
                                 ]",
                                 rowTemplate="audit-entry/audit-entry-grid-row-tmpl"
