@@ -85,36 +85,38 @@
 	*/
 
 
-	public Any function changeRole( required String roleId ){
+	public Any function changeUser( required String userId ){
 		var found = false;
+		var accountId = session.user.getAccount().getId();
 
-		for ( var role in session.user.getAccount().getRoles() ) {
-			if ( role.getId() == roleId ) {
+		var users = service("User").list( accountId = accountId, statusId = "ACT" );
+
+		if( users.len() == 0 ){
+			showNoUsersMessage( accountId );
+		}
+
+		for ( var user in users ) {
+			if ( user.getId() == userId ) {
+				session.user = user;
 				found = true;
 				break;
 			}
 		}
 
-		if ( found ) {
-			var role = service( "Role" ).get( roleId );
-			session.user.setRole( role );
-
-			return true;
-		}
-
-		return false;
+		return found;
 	}
 
 	public Any function setAuthUser( required com.apirone.core.model.bean.Account account ){
-		var user = bean( "User" );
 
-		user.setAccount( arguments.account );
+		var accountId = arguments.account.getId();
 
-		user.setId( arguments.account.getId() );
-		user.setName( arguments.account.getEmail() );
-		user.setRole( arguments.account.getRoles()[ 1 ] );
+		var users = service("User").list( accountId = accountId, statusId = "ACT" );
 
-		session.user = user;
+		if( users.len() == 0 ){
+			showNoUsersMessage( accountId );
+		}
+
+		session.user = users[1];
 
 		return true;
 	}
@@ -412,6 +414,13 @@
 		}
 
 		return true;
+	}
+
+	private Boolean function showNoUsersMessage( accountId ){
+		var message = "No active users for account [#accountId#]";
+		echo( message );
+		getLogger().warn( message );
+		abort;
 	}
 
 }

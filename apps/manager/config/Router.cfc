@@ -11,7 +11,6 @@
 		} );
 
 		get( "/ajax/search" ).to( "SearchAjaxController.list" ).end();
-
 		get( "/batch/update-terms" ).to( "BatchController.updateSearchTerms" ).end();
 
 		/*
@@ -227,7 +226,7 @@
 		get( "/login/pincode" ).toHandler( "AuthController.pincode" );
 		get( "/login" ).toHandler( "AuthController.login" );
 		get( "/logout" ).toHandler( "AuthController.logout" );
-		get( "/change-role/:id" ).toHandler( "AuthController.changeRole" );
+		get( "/change-user/:id" ).toHandler( "AuthController.changeUser" );
 
 
 		/*
@@ -240,6 +239,16 @@
 		delete( "/ajax/accounts" ).to( "AccountAjaxController.delete" ).end();
 		get( "/accounts" ).to( "AccountController.list" ).end();
 		get( "/accounts/print" ).to( "AccountController.print" ).end();
+
+
+		/*
+			users
+		*/
+		get( "/ajax/users" ).to( "UserAjaxController.list" ).end();
+		post( "/ajax/users" ).to( "UserAjaxController.save" ).end();
+		delete( "/ajax/users" ).to( "UserAjaxController.delete" ).end();
+		get( "/users" ).to( "UserController.list" ).end();
+		get( "/users/print" ).to( "UserController.print" ).end();
 
 
 		/*

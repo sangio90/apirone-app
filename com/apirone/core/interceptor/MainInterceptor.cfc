@@ -34,12 +34,6 @@ component extends="coldbox.system.Interceptor" {
 		param url.count = 15;
 
 		/*
-            API module
-        */
-
-
-
-		/*
             MANAGER module
         */
 		if ( module == "manager" ) {
@@ -54,7 +48,8 @@ component extends="coldbox.system.Interceptor" {
 			prc.lang     = request.lang;
 			prc.subtitle = "";
 
-			prc.config        = getGlobalConfiguration(); // js global config
+			// js global config
+			prc.config = getGlobalConfiguration();
 			prc.staticVersion = ( prc.isDev ? RandRange( 1000, 9999 ) : DateFormat( Now(), "yyyymmdd" ) ) & application.counter;
 		}
 	}

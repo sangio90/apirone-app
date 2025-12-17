@@ -132,6 +132,11 @@ component{
 				name    = "Main",
 				class   = "com.apirone.core.interceptor.MainInterceptor",
 				properties = {}
+			},
+			{
+				name    = "UserAuthenticated",
+				class   = "com.apirone.core.interceptor.CurrentUserInterceptor",
+				properties = {}
 			}
 		
 		];

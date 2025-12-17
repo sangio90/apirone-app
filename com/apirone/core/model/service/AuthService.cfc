@@ -4,6 +4,7 @@ component extends="AbsService" accessors="true" {
 	// property name="PwdTokenService" inject="PwdTokenService";
 
 	public com.apirone.core.model.bean.LoginResult function login( required String email, required String pwd ){
+		
 		var result   = super.bean( "LoginResult" );
 		var error    = super.getError();
 		var hasError = false;

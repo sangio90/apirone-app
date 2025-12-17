@@ -13,7 +13,7 @@
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
 				) AS email,
 				account_id::varchar,
-				roles,
+				--roles,
 				*
 			FROM
 				accounts
@@ -50,8 +50,10 @@
 
 		<cfargument name="email" type="String">
 		<cfargument name="str" type="String">
+		<!---
 		<cfargument name="roleId" type="String">
 		<cfargument name="langId" type="String">
+		---->
 		<cfargument name="statusId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
@@ -82,6 +84,7 @@
 					AND status_id ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.statusId#">
 				</cfif>
 
+				<!----
 				<cfif !IsNull( arguments.langId )>
 					AND lang_id ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.langId#">
 				</cfif>
@@ -89,6 +92,7 @@
 				<cfif !IsNull( arguments.roleId )>
 					AND role_id ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.roleId#">
 				</cfif>
+				----->
 
 			ORDER BY
 				serial DESC
@@ -108,16 +112,10 @@
 
 		<cfargument name="account" type="com.apirone.core.model.bean.Account" required="true">
 
-		<cfset var roles = SerializeJSON( getRolesAsArray( account.getRoles() ) )>
-
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO accounts (
 				email,
-				api_key,
 				status_id,
-				role_id,
-				roles,
-				phone,
 				account
 			)
 			VALUES (
@@ -125,11 +123,7 @@
 					<cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">,
 					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'>
 				)::varchar,
-				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
-				NULL,
-				<cfqueryparam cfsqltype="Other" value="#roles#">,
-				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getPhone()#">,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">
 			) RETURNING account_id::varchar
 		</cfquery>
@@ -141,25 +135,21 @@
 
 		<cfargument name="account" type="com.apirone.core.model.bean.Account" required="true">
 
-		<cfset var roles = SerializeJSON( getRolesAsArray( account.getRoles() ) )>
-
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE accounts
 			SET
-				phone = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getPhone()#">,
 				account = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">,
-				email = pgp_sym_encrypt( <cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">,  <cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'> )::varchar,
-				api_key = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getApiKey()#">,
-				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
-				role_id = NULL,
-				roles = <cfqueryparam cfsqltype="Other" value="#roles#">
+				email = pgp_sym_encrypt( 
+					<cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">,  
+					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'> 
+				)::varchar,
+				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">
 			WHERE
-				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.account.getId()#">::uuid
+				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.account.getId()#">
 		</cfquery>
 
 		<cfreturn arguments.account.getId()>
 	</cffunction>
-
 
 	<cffunction name="delete" returntype="Numeric">
 		<cfargument name="lineId" type="String" required="true">
@@ -168,13 +158,12 @@
 			DELETE FROM
 				accounts
 			WHERE
-				account_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.lineId#">
 			RETURNING account_id
 		</cfquery>
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
-
 
 	<cffunction name="updatePassword" output="No" returntype="Boolean">
 
@@ -186,25 +175,11 @@
 			SET
 				pwd = <cfqueryparam cfsqltype="varchar" value="#trim(arguments.pwd)#">
 			WHERE
-				account_id = <cfqueryparam cfsqltype="varchar" value="#arguments.accountId#">::uuid
+				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.accountId#">
 		</cfquery>
 
 		<cfreturn true>
 
 	</cffunction>
-
-
-	<cffunction access="private" name="getRolesAsArray" returntype="Array">
-		<cfargument name="roles" required="true">
-
-		<cfset var items = []>
-
-		<cfloop array="#arguments.roles#" item="local.thisItem">
-			<cfset items.add( local.thisItem.getId() )>
-		</cfloop>
-
-		<cfreturn items.len() ? items : NullValue()>
-	</cffunction>
-
 
 </cfcomponent>

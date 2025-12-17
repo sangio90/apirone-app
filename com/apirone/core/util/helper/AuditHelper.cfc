@@ -12,19 +12,20 @@ component extends="com.apirone.core.util.helper.AbsHelper" {
 		required String message,
 		Any payload,
 		String severity = "INFO",
-		String accountId,
+		String userId,
 		Boolean allowAnonymous = false
 	){
 		var logger = getContainer().getInstance( "AuditLogger" );
 
 		// TODO: better than this
 
-		var accountId = getCurrentAccountId( accountId, allowAnonymous );
+		
+		var currUserId = getCurrentUserId( userId, allowAnonymous );
 
 		var result = logger.log(
 			event     = arguments.event,
 			message   = arguments.message,
-			accountId = accountId,
+			userId    = currUserId,
 			payload   = payload,
 			severity  = severity,
 			ipAddress = getRealIP(),
@@ -35,17 +36,17 @@ component extends="com.apirone.core.util.helper.AbsHelper" {
 	}
 
 	// Recupera l'ID utente o fallback
-	private any function getCurrentAccountId( String accountId = "", boolean allowAnonymous = false ){
-		if ( !IsNull( arguments.accountId ) && Len( arguments.accountId ) ) {
-			return arguments.accountId;
+	private any function getCurrentUserId( String userId = "", boolean allowAnonymous = false ){
+		if ( !IsNull( arguments.userId ) AND ( userId != "ANONYMOUS") ) {
+			return arguments.userId;
 		}
 
-		if ( StructKeyExists( session, "user" ) && !IsNull( session.user.getAccount() ) ) {
-			return session.user.getAccount().getId();
+		if ( StructKeyExists( session, "user" ) AND ( session.user.getId() != "ANONYMOUS" ) ) {
+			return session.user.getId();
 		}
 
-		if ( arguments.allowAnonymous ) {
-			return "e702bf0b-d047-4ed7-bd64-5975efab123a"; // utente di servizio
+		if ( arguments.allowAnonymous OR !session.user.isLogged() ) {
+			return "91ba7bf0-3fa6-4473-9fa2-380bfcc900c4"; // utente di servizio
 		}
 
 		//return "e702bf0b-d047-4ed7-bd64-5975efab123a";

@@ -1,6 +1,11 @@
 component accessors="true" extends="AbsBean" {
 
+	property name="phone" type="String";
+	property name="serial" type="Numeric";
+
+	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="role" type="com.apirone.core.model.bean.Role";
+	property name="lang" type="com.apirone.core.model.bean.Lang";
 	property name="account" type="com.apirone.core.model.bean.Account";
 
 	public User function init(){

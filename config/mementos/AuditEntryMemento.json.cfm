@@ -4,9 +4,9 @@
 		list = {
 			defaultIncludes = [
 				"id",
-				"account.id",
-				"account.name",
-				"account.shortId",
+				"user.id",
+				"user.name",
+				"user.shortId",
 				"message",
 				"severity",
 				"entity",
@@ -18,9 +18,9 @@
 		detail = {
 			defaultIncludes = [
 				"id",
-				"account.id",
-				"account.name",
-				"account.shortId",
+				"user.id",
+				"user.name",
+				"user.shortId",
 				"message",
 				"severity",
 				"entity",

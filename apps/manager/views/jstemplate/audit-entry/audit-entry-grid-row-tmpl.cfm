@@ -22,8 +22,8 @@
                 <span data-bind="text: ipAddress"></span>
             </td>
             <td>
-                <span data-bind="text: account.name"></span>
-                <span class="small-code">(<span data-bind="text: account.shortId"></span>)</span>
+                <span data-bind="text: user.name"></span>
+                <span class="small-code">(<span data-bind="text: user.shortId"></span>)</span>
             </td>
             <td class="text-center">
                 #iconButton(bind="click:show", icon="eye")#

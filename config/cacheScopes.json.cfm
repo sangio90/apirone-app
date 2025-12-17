@@ -76,5 +76,6 @@
     "Price.bean": {},
     "PriceType.bean": {},
     "verticale.query": {},
-    "Variant.bean": {}
+    "Variant.bean": {},
+    "User.bean": {}
 }

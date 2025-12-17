@@ -16,7 +16,7 @@
 	public Struct function log(
 		required String event,
 		required String message,
-		required String accountId,
+		required String userId,
 		Any payload,
 		String severity  = "INFO",
 		String ipAddress = "",
@@ -48,7 +48,7 @@
 		bean.setAction( result.action );
 		bean.setEntity( result.entity );
 		bean.setSeverity( arguments.severity );
-		bean.setAccountId( arguments.accountId );
+		bean.setUserId( arguments.userId );
 		bean.setCreatedAt( Now() );
 		bean.setIpAddress( arguments.ipAddress );
 		bean.setUserAgent( arguments.userAgent );

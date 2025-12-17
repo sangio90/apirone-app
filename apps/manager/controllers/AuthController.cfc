@@ -81,8 +81,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	// security: AUTHENTICATED
-	function changeRole( event, rc, prc ){
-		var result = super.changeRole( rc.id );
+	function changeUser( event, rc, prc ){
+		var result = super.changeUser( rc.id );
 
 		if ( result ) {
 			setMessage( "Hai modificato il tuo ruolo.", "success" );

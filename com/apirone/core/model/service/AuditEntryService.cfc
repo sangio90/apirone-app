@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="AuditEntryDAO";
-	property name="accountService" inject="AccountService";
+	property name="userService" inject="UserService";
 
 	property name="cacheScope" type="String" default="AuditEntry.bean";
 
@@ -72,7 +72,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setAction( record.action );
 			bean.setEntity( record.entity );
 			bean.setSeverity( record.severity );
-			bean.setAccount( getAccountService().get( record.account_id ) );
+			bean.setUser( getUserService().get( record.user_id ) );
 			bean.setCreatedAt( record.created_at );
 			bean.setIpAddress( record.ip_address );
 			bean.setUserAgent( record.user_agent );

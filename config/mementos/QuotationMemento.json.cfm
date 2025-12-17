@@ -12,7 +12,8 @@
 		"active",
 		"status",
 		"vatCode",
-		"owner.email"
+		"owner.name",
+		"owner.shortId"
 	],
 	profiles = {
 		detail = {
@@ -41,7 +42,8 @@
 				"shippingProfile",
 				"createdAt",
 				"statusFile",
-				"owner.email"
+				"owner.name",
+				"owner.shortId"
 			]
 		}
 	}

@@ -185,7 +185,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( record.RecordCount ) {
 			var account = super.bean( "Account" );
-			var roles   = [];
 
 			account.setId( record.account_id );
 			account.setEmail( record.email );
@@ -193,30 +192,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setPwd( record.pwd );
 			account.setSerial( record.serial );
 
-			account.setApiKey( record.api_key );
 			account.setCreatedAt( record.created_at );
 
 			account.setStatus( getStatusService().get( record.status_id ) );
-			//account.setRole( getRoleService().get( record.role_id ) );
-
-			// INFO:
-			// roles::varchar converts null value to "null" word. I didn't find anything better.
-			// I didn't want to bring the org.postgresql.util.PGobject object into the service.
-
-			// if( !IsNull( record.roles ) AND IsJSON( record.roles.toString() != 'null' ) {
-
-			var thisRoles = DeserializeJSON( record.roles );
-
-			if ( !IsNull( thisRoles ) ) {
-				thisRoles.each( function( item ){
-					var role = getRoleService().get( item );
-					roles.add( role );
-				} );
-			}
-
-			account.setRoles( roles );
-
-			account.setLang( getLangService().get( record.lang_id ) );
 		}
 
 		return account;
