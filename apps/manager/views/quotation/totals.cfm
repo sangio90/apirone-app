@@ -1,7 +1,7 @@
 ﻿<cfoutput>
 	<div id="quotation-totals" class="container py-3 quotation-totals-box">
 		<div>
-			<div class="flex" style="width: 100%">
+			<div class="d-flex" style="width: 100%">
 				<div class="justify-content-start" style="width: 95%" id="qt-totals-title">
 					<h3 data-bind="text: common.title"></h3>
 				</div>

@@ -60,7 +60,7 @@
                                     <div class="card-body">
                                     <nav>
                                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                            <div class="col-4 flex">
+                                            <div class="col-4 d-flex">
                                                 <button class="nav-link active" data-bs-toggle="tab" type="button" role="tab" 
                                                     id="nav-plate-tab" 
                                                     data-type="PLA"

@@ -127,7 +127,10 @@
 
                     <footer class="card-footer">
                         <div class="row">
-                            <div class="col-md-12 float-end">
+                            <div class="col-md-6">
+                                <span data-bind="text: detailForm.data.id"></span>                                
+                            </div>
+                            <div class="col-md-6 float-end">
                                 <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
                                     <i class="fas fa-save"></i> Salva
                                 </button>

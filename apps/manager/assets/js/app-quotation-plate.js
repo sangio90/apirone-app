@@ -1241,7 +1241,7 @@ AP.plate.modal = ( function() {
         },
 
         getFruitCount() {
-            return this.get( "detailForm.data.fruits" ).total();
+            // return this.get( "detailForm.data.fruits" ).total();
         },
 
         removeFruit( event ) {
@@ -1301,8 +1301,6 @@ AP.plate.modal = ( function() {
             const quotationItemId = viewModel.get( "detailForm.data.id" );
             const productId = viewModel.get( "detailForm.data.product.id" );
 
-            console.log( "firstLoadProductItems" );
-
             // Chiamata AJAX iniziale per ottenere tutti i product items
             NM.util.ajax( {
                 method: "GET",
@@ -1310,15 +1308,20 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
+                        console.log( "firstLoadProductItems:xhr.data", xhr.data );
+
                         var userItems = AP.getUserPref( "plate.product.items" );
 
+                        console.log( "xhr.count", xhr.count );
+
                         if ( xhr.count > 0 ) {
-                            /*
+
                             if ( !viewModel.get( "detailForm.data.product.image" ) && xhr.data[0].horizontalImage ) {
                                 viewModel.set( "detailForm.data.product.image", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
                             }
+
                             if ( quotationItemId != "" || !userItems || userItems.length == 0 ) {
                                 viewModel.set( "detailForm.data.product.items", new kendo.data.DataSource() );
                             } else {
@@ -1331,7 +1334,6 @@ AP.plate.modal = ( function() {
                                     viewModel.renderProductPreview( viewModel.get( "detailForm.data.product.items" ) );
                                 }
                             }
-                            */
 
                             var productItems = viewModel.get( "detailForm.data.product.items" );
 
@@ -1384,13 +1386,19 @@ AP.plate.modal = ( function() {
                     }
                 }
             } ).then( async function() {
+
+                console.log( "selected" );
+
                 // Se ci sono quotation items pre-selezionati, li carichiamo
-                if ( quotationItemId != "" ) {
-                    await NM.util.ajax( {
+                if ( quotationItemId.length ) {
+                    NM.util.ajax( {
                         method: "GET",
                         url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
                         callback: {
-                            done: async function( xhr ) {
+                            done: function( xhr ) {
+
+                                console.log( "selected:callback" );
+
                                 xhr.data.sort( ( a, b ) => a.productItem.orderby - b.productItem.orderby );
                                 if ( xhr.data.length > 0 ) {
                                     for ( const qipi of xhr.data ) {
@@ -1398,7 +1406,8 @@ AP.plate.modal = ( function() {
                                         if ( select.length > 0 ) {
                                             select.val( qipi.productItem.id );
                                             // Carichiamo eventuali figli ricorsivamente
-                                            await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id );
+                                            console.log( "ricorsivamente" );
+                                            viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id );
                                         }
                                     }
                                 }
@@ -1440,7 +1449,7 @@ AP.plate.modal = ( function() {
             }
 
             // Deselezionamento: originId vuoto
-            if ( originId === "" ) {
+            if ( originId == "" ) {
 
                 // console.log( "qui:originId vuoto" );
 
@@ -1475,6 +1484,7 @@ AP.plate.modal = ( function() {
                 url: url,
                 callback: {
                     done: function( xhr ) {
+
                         if ( xhr.data.length > 0 ) {
 
                             let attribute = null;
@@ -1496,6 +1506,8 @@ AP.plate.modal = ( function() {
                                     break;
                                 }
                             }
+
+                            console.log( "att", xhr.data[0].attribute.name );
 
                             // Creo nuovo attributo se necessario
                             if ( !attribute ) {
@@ -1550,8 +1562,12 @@ AP.plate.modal = ( function() {
                         // console.log( "loadProductItems:afterLoading:type", type );
 
                         if ( type == "plate" ) {
+
+                            console.log( "renderProductItemsPlate" );
+
                             viewModel.renderProductItemsPlate();
                         } else {
+                            console.log( "renderProductItemsFruit" );
                             viewModel.renderProductItemsFruit( productId );
                         }
 
@@ -1562,6 +1578,8 @@ AP.plate.modal = ( function() {
         },
 
         loadProduct() {
+
+            console.log( "loadProduct" );
 
             var lineId   = viewModel.get( "detailForm.data.product.line.id" );
             var modelId  = viewModel.get( "detailForm.data.product.model.id" );
@@ -1838,8 +1856,6 @@ AP.plate.modal = ( function() {
 
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
 
-            console.log( "loadModels:line.id", lineId );
-
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/models/" + lineId,
@@ -1847,7 +1863,7 @@ AP.plate.modal = ( function() {
                     done: function( xhr ) {
                         // console.log( "loadModels" );
                         viewModel.get( "models" ).data( xhr.data );
-                        // viewModel.set( "detailForm.data.product.catalogBundle.model.id", xhr.data[0] );
+                        // viewModel.set( "detailForm.data.product.model.id", xhr.data[0] );
 
                     },
                 },
@@ -2017,11 +2033,22 @@ AP.plate.modal = ( function() {
             callback: {
                 done: function( xhr ) {
 
+                    viewModel.set( "detailForm.data", xhr.data.quotationItem );
+
+                    console.log( "productItems", "xhr.data.quotationItem.items" );
+
+                    var items = new kendo.data.DataSource();
+                    viewModel.set( "detailForm.data.items", items.data( xhr.data.items ) );
+
+                    console.log( "edit:get:items", viewModel.get( "detailForm.data.items" ) );
+
+
                     const delay = ( ms ) => new Promise( resolve => setTimeout( resolve, ms ) );
 
                     viewModel.loadLines();
 
                     async function loadAll() {
+
                         await delay( 200 );
                         viewModel.loadModels();
 
@@ -2029,7 +2056,11 @@ AP.plate.modal = ( function() {
                         viewModel.loadFinishes();
 
                         await delay( 200 );
-                        viewModel.parseLines();
+                        viewModel.firstLoadProductItems();
+
+
+                        // loop on fruits
+                        // viewModel.addProductItemsToFruit();
 
                     }
 
@@ -2038,72 +2069,6 @@ AP.plate.modal = ( function() {
                 },
             },
         } );
-
-        /*
-        NM.util.ajax( {
-            method: "GET",
-            url: "/manager/ajax/quotation-items/signage/" + id,
-            callback: {
-                done: function( xhr ) {
-                    if ( xhr.status == "SUCCESS" ) {
-                        var data = xhr.data;
-                        var signageRowsArray = data.quotationItem.signageRows;
-                        if ( data.quotationItem && Array.isArray( signageRowsArray ) ) {
-                            data.quotationItem.signageRows = new kendo.data.DataSource( {
-                                data: signageRowsArray.slice(),
-                                schema: {
-                                    model: {
-                                        id: "id"
-                                    }
-                                }
-                            } );
-                        } else {
-                            data.quotationItem.signageRows = new kendo.data.DataSource( {
-                                data: [],
-                                schema: { model: { id: "id" } }
-                            } );
-                        }
-                        data.quotationItem.signageRows.read();
-                        viewModel.set( "detailForm.data", data );
-                        var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
-                        if ( ds && ds.data().length ) {
-                            ds.data().forEach( function( row, i ) {
-                                row.set( "index", i + 1 );
-                            } );
-                        }
-                        viewModel.set( "detailForm.title", "Modifica segnaletica" );
-
-                        viewModel.loadLines();
-
-                        setTimeout( function() {
-                            viewModel.loadModels();
-                            setTimeout( function() {
-                                viewModel.loadFinishes();
-                                setTimeout( function() {
-                                    viewModel.loadSignageConfigs();
-                                    setTimeout( function() {
-                                        viewModel.loadFontSizes();
-                                        setTimeout( function() {
-                                            setTimeout( function() {
-                                                viewModel.parseLines();
-                                                ds.data().forEach( row => {
-                                                    viewModel.updateCharCounter( {
-                                                        currentTarget: document.getElementById( row.uid + "_contentInput" )
-                                                    } );
-                                                } );
-                                                NM.util.openModal( AP.signage.fields.modalRoot );
-                                                viewModel.setSelectedTextAlignIcon();
-                                            }, 200 );
-                                        }, 200 );
-                                    }, 200 );
-                                }, 200 );
-                            }, 200 );
-                        }, 200 );
-                    }
-                },
-            },
-        } );
-        */
 
     };
 

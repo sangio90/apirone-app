@@ -277,11 +277,8 @@ AP.quotation.detail = ( function() {
         },
 
         delete: function( event ) {
-            // REF: non servono più ma lascio per sicurezza
-            // event.stopPropagation();
-            // event.preventDefault();
 
-            var id = event.currentTarget.dataset.id;
+            var itemId = event.currentTarget.dataset.id;
 
             bootbox.confirm( {
                 title: "Conferma eliminazione",
@@ -301,15 +298,15 @@ AP.quotation.detail = ( function() {
                         NM.util.ajax( {
                             method: "DELETE",
                             url: "/manager/ajax/quotation-items",
-                            data: id,
+                            data: itemId,
                             callback: {
                                 done: function( xhr ) {
-                                    if( xhr.status == "INVALID" ) {
+                                    if ( xhr.status == "INVALID" ) {
                                         NM.form.showMessages( xhr.data );
                                         return;
                                     }
-                                    AP.widget.notify( "success", "Riga di preventivo cancellata correttamente." );
-                                    viewModel.set( "detailForm", defaultDetailForm );
+
+                                    AP.widget.notify( "success", "Riga cancellata correttamente." );
                                     window.location.href = "/manager/quotations/" + AP.page.quotation.id;
                                 }
                             }
@@ -318,7 +315,6 @@ AP.quotation.detail = ( function() {
                 },
             } );
 
-            // REF: per evitare che il click sul link faccia anche il redirect
             return false;
         },
 

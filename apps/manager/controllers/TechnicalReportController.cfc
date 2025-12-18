@@ -70,6 +70,20 @@ component extends="com.apirone.core.controller.AbsController" {
 			customerShippingProfile = quotation.getCustomer().getShippingProfiles()[1];
 		}
 
+		<!--- quoteObj.customerShippingProfile = customerShippingProfile; ---->
+
+
+		```
+		<cfquery name="total" datasource="apirone">
+			SELECT SUM(amount) AS total
+			FROM quotation_items
+				INNER JOIN quotation_item_prices ON quotation_items.quotation_item_id = quotation_item_prices.quotation_item_id
+			WHERE 1=1
+				AND quotation_items.quotation_id = '#idPreventivo#'
+		</cfquery>
+		```
+		quoteObj.totalSpent = total.total;
+
 		var saveAsName = "print-quotation-#printParams.report##printParams.grouped ? '_grouped_' : '_'##DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
 
 		var params = {
