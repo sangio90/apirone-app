@@ -7,8 +7,10 @@
                 "price",
                 "price.total",
                 "quantity",
+                "product.id",
                 "product.finish",
-                "product.catalogBundle",
+                "product.model",
+                "product.line",
                 "quotationZone",
                 "items"
             ]

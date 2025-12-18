@@ -373,6 +373,11 @@
 		return bean;
 	}
 
+	public Any function transformer( required String transformer ){
+		var class = CreateObject( "com.apirone.core.util.transformer.#arguments.transformer#Transformer" );
+		return class;
+	}
+
 	public Any function bean( required String type, Struct values = {} ){
 		var bean = CreateObject( "com.apirone.core.model.bean.#arguments.type#" ).init();
 		return bean;

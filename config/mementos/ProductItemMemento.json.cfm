@@ -29,9 +29,7 @@
 				"attributeValue.id",
 				"attributeValue.rawValue.id",
 				"attributeValue.rawValue.name",
-				"componentCount",
-				"prices",
-				"childrenCount"
+				"componentCount"
 			]
 		},
 		treelight = {

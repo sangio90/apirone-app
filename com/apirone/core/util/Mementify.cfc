@@ -1,6 +1,13 @@
 ﻿/*
 	Thanks to:
 	https://github.com/coldbox-modules/mementifier
+
+	TODO:
+		- add Transformer Bean concept Registry like TransformerProductItem
+		  (add transformer argument in memento and search that method in relative class)
+		- use multi-thread each() function in convert list for better performance
+		- create a package/module for this utility
+
 */
 
 component {

@@ -366,17 +366,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setAttributeValue( attributeValue );
 
 			bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
-			bean.setComponentCount( getComponentService().count( productItemId = record.product_item_id ) );
+			//bean.setComponentCount( getComponentService().count( productItemId = record.product_item_id ) );
+			bean.setComponentCount( 0 )
 
 			bean.setChildren( [] );
 
 			bean.setPrices( getPriceService().list( productItemId = record.product_item_id ) );
 
-			var images = getFileService().list( productItemId = record.product_item_id )
+			var images = getFileService().list( productItemId = record.product_item_id );
+
 			if ( Len( images ) ) {
 				bean.setImages( images )
 			} else {
-				var images = getFileService().list( attributeValueId = record.attribute_raw_value_id )
+				var images = getFileService().list( attributeValueId = record.attribute_raw_value_id );
 				if ( Len( images ) ) {
 					bean.setImages( images )
 				}
