@@ -56,10 +56,7 @@
 				product_items.orderby ASC
 		</cfquery>
 
-		<cfif super.getRealIP() EQ "185.52.113.41">
-			<cfdump var="#local.q#">
-			<cfdump var="#local.result#">
-		</cfif>
+
 
 		<cfreturn local.q>
 	</cffunction>

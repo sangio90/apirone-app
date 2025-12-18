@@ -1,6 +1,6 @@
 $( document ).ready( async function() {
 
-    if ( AP.config.user.id == "a3c69ebc-b06e-49b0-ac97-5e7004cd1cf8__" ) { // Roberto
+    if ( AP.config.user.id == "ca86ba6d-34fe-4541-9f75-8200f665b9e6" ) { // Roberto
 
         var helper = AP.test.helper;
 
@@ -16,6 +16,12 @@ $( document ).ready( async function() {
         const fruitSuggest = $( "#plate-fruit-suggest" );
         const autocomplete = fruitSuggest.data( "kendoAutoComplete" );
 
+        console.log( "quotation-plate-test" );
+
+        await helper.wait( 1000 );
+        $( "body" ).find( ".quotation-item:first" ).click();
+
+        /*
         // Sequenza asincrona
         await helper.wait( 600 );
         $( "body" ).find( "#nav-products-tab" ).click();
@@ -54,6 +60,7 @@ $( document ).ready( async function() {
         }
 
         return;
+        */
 
     }
 

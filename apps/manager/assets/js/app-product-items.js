@@ -729,9 +729,12 @@ AP.product.items = ( function() {
 
     pub.init = function() {
 
+        /*
+        // fa due volte la chianata "/items"
         dataSources.items.one( "change", function() {
             fireFilter();
         } );
+        */
 
         kendo.bind( fields.rootDetail, viewModel );
 

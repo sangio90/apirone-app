@@ -777,34 +777,6 @@ h2 {
     padding: 3px;
 }
 
-.text-left {
-    text-align: left !important;
-}
-
-.text-center {
-    text-align: center !important;
-}
-
-.text-right {
-    text-align: right !important;
-}
-
-.flex {
-    display: flex !important;
-}
-
-.align-items-center {
-    align-items: center !important;
-}
-
-.justify-content-end {
-    justify-content: end !important;
-}
-
-
-.align-items-end {
-    align-items: end !important;
-}
 
 /*
     frames

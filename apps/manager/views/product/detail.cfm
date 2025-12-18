@@ -320,7 +320,7 @@
 
                             <!---- product grid ---->
 
-                            <div class="col-6 mb-2">
+                            <div class="col-8 mb-2">
 
                                 <a href=""
                                     class="underline"
@@ -346,7 +346,7 @@
 
                             </div>                                    
 
-                            <div class="text-end col-6 mb-2">
+                            <div class="text-end col-4 mb-2">
 
                                 #deleteButton(
                                     bind  = "click:removeAttributes",

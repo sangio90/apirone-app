@@ -515,13 +515,16 @@ component extends="com.apirone.core.controller.AbsController" {
 			includeMissingValues = arguments.includeMissingValues
 		};
 
+		var transformer = super.transformer( "ProductItem" );
 		var items = super.fire( "ProductItem.getFlatTree", params );
-
+		
 		var data = super.eachParallelAndReorder( items, function( item, index ){
-			var row         = super.getMementify().convert( item, "tree" ); // TODO: use "treelight" instead?
+
+			var row = transformer.convert( profile = "tree", bean = item );
 			row[ "spaces" ] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
-			// item.processed = true;
+			
 			return row;
+		
 		} );
 
 		result.setTotal( data.len() );
