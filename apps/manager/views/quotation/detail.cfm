@@ -1,11 +1,11 @@
 ﻿<cfoutput>
     <div id="quotation-detail-root">
         <div class="row mb-3">
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <h2>#prc.title#</h2>
             </div>
 			
-            <div class="col-6 text-end mt-3">
+            <div class="col-8 text-end mt-3">
 				#button( href = "/manager/quotations", size = "sm", label = "Torna ai preventivi", icon="arrow-left", class="me-4" )#
 				#button( bind = "click:showHeader", size = "sm", label = "Dettaglio", icon="edit" )#
                 #button( bind = "click:exportProducts", size = "sm", label = "Esporta Articoli", icon="file-export", class="export-button" )#
@@ -86,10 +86,10 @@
                                                 </button>
 
                                             </div>
-                                            <div class="col-8 text-end">
-                                                <button id="qt-add-plate" type="button" class="col-3 btn btn-primary btn-sm mr-2" data-bind="click:addPlate">Aggiungi placca</button>
-                                                <button id="qt-add-signage" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addSignage" style="display: none" disabled>Aggiungi segnaletica</button>
-                                                <button id="qt-add-accessory" type="button" class="col-4 btn btn-primary btn-sm" data-bind="click:addAccessory" style="display: none" disabled>Aggiungi accessorio</button>
+                                            <div class="col-8 text-end mb-2">
+                                                <button id="qt-add-plate" type="button" class="btn btn-primary" data-bind="click:addPlate">Aggiungi placca</button>
+                                                <button id="qt-add-signage" type="button" class="btn btn-primary" data-bind="click:addSignage" style="display: none" disabled>Aggiungi segnaletica</button>
+                                                <button id="qt-add-accessory" type="button" class="btn btn-primary" data-bind="click:addAccessory" style="display: none" disabled>Aggiungi accessorio</button>
                                             </div>
                                         </div>
                                     </nav>
