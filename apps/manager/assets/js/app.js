@@ -1,6 +1,6 @@
 AP.core = AP.core || {};
 
-$( document ).ready( function(){
+$( document ).ready( function() {
 
     /* dom inits */
 
@@ -22,18 +22,28 @@ AP.core = ( function() {
 
     var pub = {};
 
-    pub.init = function() {};
+    pub.init = function() { };
 
-    pub.setSidebar = function(){};
+    pub.setSidebar = function() { };
 
     return pub;
 
 }() );
 
 AP.namespace = function( name ) {
-    AP[name] = AP[name] || {};
-    AP[name].fields = AP[name].fields || {};
-    return AP[name];
+    var parts = name.split( "." );
+    var current = AP;
+
+    for ( var i = 0; i < parts.length; i++ ) {
+        if ( !current[parts[i]] ) {
+            current[parts[i]] = {};
+        }
+        current = current[parts[i]];
+    }
+
+    current.fields = current.fields || {};
+
+    return current;
 };
 
 /*
@@ -42,18 +52,18 @@ AP.namespace = function( name ) {
 
 AP.setUserPref = function( key, value ) {
 
-    var user = AP.config.account.shortId;
+    var user = AP.config.user.shortId;
     NM.storage.set( "apirOne:" + user + ":" + key, value );
 };
 
 AP.getUserPref = function( key, defaultValue ) {
 
-    var user = AP.config.account.shortId;
+    var user = AP.config.user.shortId;
     return NM.storage.get( "apirOne:" + user + ":" + key, defaultValue );
 };
 
 AP.deleteUserPref = function( key ) {
-    var user = AP.config.account.shortId;
+    var user = AP.config.user.shortId;
     NM.storage.delete( "apirOne:" + user + ":" + key );
 };
 
