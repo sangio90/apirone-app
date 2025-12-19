@@ -12,12 +12,6 @@ $( document ).ready( function() {
 
 AP.signage.modal = ( function() {
     var pub = {};
-    function generateUUID() {
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace( /[xy]/g, function( c ) {
-            var r = Math.random() * 16 | 0; var v = c === "x" ? r : ( r & 0x3 | 0x8 );
-            return v.toString( 16 );
-        } );
-    }
     var defaultDetailForm = {
         data: {
             id: "",
@@ -165,7 +159,7 @@ AP.signage.modal = ( function() {
             var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
             if ( ds && ds.data().length < viewModel.get( "maxRows" ) ) {
                 var defaultSignageRow = {
-                    id: generateUUID(),
+                    id: NM.util.uuid(),
                     textAlign: "center",
                     content: "",
                     charCount: 0,
@@ -1312,53 +1306,10 @@ AP.signage.modal = ( function() {
             },
         } );
 
-        renderQuotationItemTotals( id );
     };
 
     pub.init = function() {
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
-    };
-
-    renderQuotationItemTotals = function( quotationItemId ) {
-        NM.util.ajax( {
-            method: "GET",
-            url: `/manager/ajax/quotation-items/${quotationItemId}/total`,
-            callback: {
-                done: function( xhr ) {
-                    if( xhr.data ) {
-                        if ( !xhr.data.id || xhr.data.id != quotationItemId ) {
-                            $( "#quotation-totals-item" ).hide();
-                        } else {
-                            viewModel.set( "detailForm.data.totals", xhr.data );
-                            var totals = viewModel.get( "detailForm.data.totals" );
-                            if ( xhr.data ) {
-                                const table = $( "#quotation-totals-item" ).find( "table" )[0];
-                                totals.products.forEach( function( row ) {
-                                    $( table ).append( `
-                                        <tr>
-                                            <td>${row.id} - ${row.label}</td>
-                                            <td>${row.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
-                                        </tr>
-                                    ` );
-                                } );
-                                $( table ).append(
-                                    `<tr>
-                                        <td>${totals.quantity.label}</td>
-                                        <td>${totals.quantity.count}</td>
-                                    </tr>
-                                    <tr style="font-weight: bold">
-                                        <td>${totals.total.label}</td>
-                                        <td>${totals.total.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
-                                    </tr>
-                                    `
-                                );
-                            }
-                            $( "#quotation-totals-item" ).show();
-                        }
-                    }
-                }
-            }
-        } );
     };
 
     return pub;

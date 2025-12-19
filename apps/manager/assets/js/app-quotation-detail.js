@@ -278,6 +278,7 @@ AP.quotation.detail = ( function() {
 
         delete: function( event ) {
 
+            event.stopPropagation();
             var itemId = event.currentTarget.dataset.id;
 
             bootbox.confirm( {
@@ -414,36 +415,37 @@ AP.quotation.detail = ( function() {
                     url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/zones",
                     callback: {
                         done: function( xhr ) {
-                            if( xhr.status == "ERRORE" ) {
-                                AP.widget.notify( "error", "Errore nel recupero delle zone." );
+                            if ( xhr.data.length ) {
+                                var zones = xhr.data;
+                                zones.unshift( { "id": "", "name": "-- Tutte le zone" } );
+                            } else {
+                                var zones = [ { "id": "", "name": "-- Tutte le zone" } ];
                             }
-                            if ( xhr.status == "SUCCESS" ) {
-                                if ( xhr.data.length ) {
-                                    var zones = xhr.data;
-                                    zones.unshift( { "id": "", "name": "Tutte le zone" } );
-                                } else {
-                                    var zones = [ { "id": "", "name": "Tutte le zone" } ];
+
+                            zones.forEach( function( zone ) {
+                                if ( zone.origin ) {
+                                    zone.name = "\u00A0\u00A0- " + zone.name;
                                 }
-                                zones.forEach( function( zone ) {
-                                    if ( zone.origin ) {
-                                        zone.name = "\u00A0\u00A0- " + zone.name;
-                                    }
-                                } );
-                                viewModel.get( "zones" ).data( zones );
-                                if ( NM.storage.get( "quotation.zone.id" ) ) {
-                                    var selectedZone = zones.find( zone => zone.id == NM.storage.get( "quotation.zone.id" ) );
-                                    if ( !selectedZone ) {
-                                        NM.storage.delete( "quotation.zone.id" );
-                                        NM.storage.delete( "quotation.zone.name" );
-                                        selectedZone = zones[0];
-                                    }
-                                    viewModel.set( "detailForm.data.zone", selectedZone );
-                                } else {
-                                    viewModel.set( "detailForm.data.zone", zones[0] );
+                            } );
+
+                            viewModel.get( "zones" ).data( zones );
+
+                            // la prima zona viene caricata con il preventivo
+
+                            if ( NM.storage.get( "quotation.zone.id" ) ) {
+                                var selectedZone = zones.find( zone => zone.id == NM.storage.get( "quotation.zone.id" ) );
+                                if ( !selectedZone ) {
+                                    NM.storage.delete( "quotation.zone.id" );
+                                    NM.storage.delete( "quotation.zone.name" );
+                                    selectedZone = zones[1];
                                 }
-                                viewModel.set( "detailForm.data.zones", zones );
-                                viewModel.loadItems();
+                                viewModel.set( "detailForm.data.zone", selectedZone );
+                            } else {
+                                viewModel.set( "detailForm.data.zone", zones[1] );
                             }
+
+                            viewModel.set( "detailForm.data.zones", zones );
+                            viewModel.loadItems();
                         }
                     }
                 } );
@@ -529,6 +531,14 @@ AP.quotation.detail = ( function() {
         editPlate: function( event ) {
             event.preventDefault();
             plateApp().edit( { id: event.data.id } );
+            fields.totalItemBox.show();
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+        },
+
+        clonePlate: function( event ) {
+            event.preventDefault();
+            event.stopPropagation();
+            plateApp().edit( { id: event.data.id, clone: true } );
             fields.totalItemBox.show();
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
@@ -832,7 +842,7 @@ AP.quotation.printModal = ( function() {
             const images = $( "#qt-print-image-checkbox" )[0].checked;
             const grouped = $( "#qt-print-grouped-checkbox" )[0].checked;
             const notes = $( "#qt-print-notes-checkbox" )[0].checked;
-            const discounts = $( "#qt-print-discounts-checked" )[0].checked;
+            const discounts = $( "#qt-print-discounts-checkbox" )[0].checked;
 
             const url = `/manager/technical-reports/print?id=${AP.page.quotation.id}&report=${report}` +
                 `&images=${images}&grouped=${grouped}&notes=${notes}&discounts=${discounts}`;

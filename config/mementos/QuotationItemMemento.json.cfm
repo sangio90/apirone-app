@@ -12,7 +12,8 @@
                 "product.model",
                 "product.line",
                 "quotationZone",
-                "items"
+                "items",
+                "createdAt",
             ]
         }
     }

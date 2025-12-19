@@ -419,19 +419,20 @@ AP.quotation.header = ( function() {
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
-                            if ( xhr.data.error?.length > 0 ) {
-                                return AP.widget.notify( "error", xhr.data.error );
-                            }
+
                             if ( parsedData.status.id != "CCN" ) {
                                 viewModel.set( "detailForm.data.statusFile", null );
                             }
+
                             status.html( "" );
                             AP.widget.notify( "success", "Preventivo salvato correttamente." );
+
                             // window.location.href = "/manager/quotations/" + xhr.data.payload.id;
+                            //console.log( "id", viewModel.get( "detailForm.data.id" ) );
                             if ( viewModel.get( "detailForm.data.id" ) != "" ) {
                                 window.location.reload();
                             } else {
-                                window.location.href = "/manager/quotations";
+                                window.location.href = "/manager/quotations/" + xhr.data.payload.id;
                             }
                         }
                     }

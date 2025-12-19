@@ -1,7 +1,6 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
-		var categories = [];
 		var mm         = super.getMementify();
 
 		prc.title = "Modelli";
