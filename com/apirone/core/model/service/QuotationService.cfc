@@ -8,11 +8,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="QuotationDAO";
 
 	property name="quotationService" inject="QuotationService";
-	property name="quotationItemSvc" inject="QuotationItemService";
-	property name="quotationItemProductItemSvc" inject="QuotationItemProductItemService";
-	property name="quotationZoneSvc" inject="QuotationZoneService";
-	property name="quotationItemPositionSvc" inject="QuotationItemPositionService";
-	property name="quotationItemSignageRowSvc" inject="QuotationItemSignageRowService";
+	property name="QuotationItemService" inject="QuotationItemService";
+	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
+	property name="quotationZoneService" inject="QuotationZoneService";
+	property name="QuotationItemPositionService" inject="QuotationItemPositionService";
+	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
 	property name="exportCodeService" inject="ExportCodeService";
 	property name="exportCodeRawValueService" inject="ExportCodeRawValueService";
 	property name="rawValueService" inject="RawValueService";
@@ -122,32 +122,51 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	// questo metodo andrà usato anche da sistemi esterni e legarsi alla session non è consentito
 	public String function create( 
 		required com.apirone.core.model.bean.Quotation quotation, 
-		required String accountId
+		required String userId
 	){
 
 		arguments.quotation.setQuotationNumber( getLastNumber() + 1 );
-		arguments.quotation.setVersionNumber( 0 );
+		arguments.quotation.setVersionNumber( 1 );
 
-		//TODO: remove this, get status from last record of history
-		//arguments.quotation.setStatus( status );
+		//transaction {
 
-		transaction {
+			//TODO: remove this, get status from last record of history
+			//arguments.quotation.setStatus( status );
 
 			var newId = getDao().insert( arguments.quotation );
-			
-			// add status to history
+
+			/*
+				add first status to history
+			*/
 			var history = super.bean( "QuotationStatusHistory" );
 			var status = getStatusService().get( "LAV" );
 			
 			history.setQuotationId( newId );
 			history.setStatus( status );
-			history.setAccount( getAccountService().get( arguments.accountId ) );
+			history.setUser( getUserService().get( arguments.userId ) );
 
 			getQuotationStatusHistoryService().create( history );
 
-		}
+			//get after first status
+			//var newQuotation = get( newId );
+
+
+			/*
+				add first zone
+			*/
+			var zone = super.bean( "QuotationZone" );
+			var newQuotation = super.bean( "Quotation" );
+			newQuotation.setId( newId );
+			
+			zone.setQuotation( newQuotation );
+			zone.setName( "Prima zona" );
+
+			getQuotationZoneService().create( zone );			
+
+		//}
 
 		return newId;
+	
 	}
 
 
@@ -225,7 +244,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var varCode  = "";
 						var colCode  = "000000";
 
-						var quotationItemProductItems = quotationItemProductItemSvc.list(
+						var quotationItemProductItems = QuotationItemProductItemService.list(
 							quotationItemId = quotationItem.getId(),
 							orderBy         = [ { field = "productItem.id" } ]
 						);
@@ -540,7 +559,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var varCode  = "";
 						var colCode  = "000000";
 
-						var quotationItemProductItems = quotationItemProductItemSvc.list(
+						var quotationItemProductItems = QuotationItemProductItemService.list(
 							quotationItemId = quotationItem.getId(),
 							orderBy         = [ { field = "productItem.id" } ]
 						);
@@ -919,7 +938,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
 		}
 
-		var quotationItems = quotationItemSvc.list( quotationId = originalQuotation.getId() );
+		var quotationItems = QuotationItemService.list( quotationId = originalQuotation.getId() );
 		
 		for ( var quotationItem in quotationItems ) {
 			var clonedItem = Duplicate( quotationItem );
@@ -928,16 +947,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] )
 			);
 			clonedItem.setId( LCase( CreateUUID() ) );
-			var newQuotationItemId = quotationItemSvc.create( clonedItem );
+			var newQuotationItemId = QuotationItemService.create( clonedItem );
 
-			var quotationItemSignageRows = quotationItemSignageRowSvc.list( quotationItemId = quotationItem.getId() );
+			var quotationItemSignageRows = QuotationItemSignageRowService.list( quotationItemId = quotationItem.getId() );
 			for ( quotationItemSignageRow in quotationItemSignageRows ) {
 				var clonedQuotationItemSignageRow = Duplicate( quotationItemSignageRow );
 				clonedQuotationItemSignageRow.setQuotationItemId( newQuotationItemId );
-				quotationItemSignageRowSvc.create( clonedQuotationItemSignageRow );
+				QuotationItemSignageRowService.create( clonedQuotationItemSignageRow );
 			}
 
-			var quotationItemPositions = quotationItemPositionSvc.list( quotationItemId = quotationItem.getId() );
+			var quotationItemPositions = QuotationItemPositionService.list( quotationItemId = quotationItem.getId() );
 			
 			for ( quotationItemPosition in quotationItemPositions ) {
 				var clonedQuotationItemPosition = Duplicate( quotationItemPosition );
@@ -945,7 +964,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				clonedQuotationItemPosition.setQuotationZone(
 					quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] )
 				);
-				quotationItemPositionSvc.create( clonedQuotationItemPosition );
+				QuotationItemPositionService.create( clonedQuotationItemPosition );
 			}
 		}
 
