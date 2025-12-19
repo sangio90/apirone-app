@@ -1,66 +1,94 @@
+AP.test = AP.test || {};
+AP.test.quotation = {};
+
 $( document ).ready( async function() {
 
-    if ( AP.config.user.id == "ca86ba6d-34fe-4541-9f75-8200f665b9e6" ) { // Roberto
+    if ( AP.config.user.id == "88d5709f-902c-490d-854d-0ab0fb2f7981_" ) { // Roberto (admin)
 
-        var helper = AP.test.helper;
+        AP.test.quotation = ( function() {
 
-        const lineId = "56906918-8a2a-4652-80fe-adc1ededacd1"; // linea: Square
-        const modelId = "1ac1104f-0208-4a0c-bdca-7ba50df4756f"; // modello: 2X2
-        const finishId = "7357f125-e556-467c-ba37-2a1e17abc6cf"; // finitura: Acciaio lucido
+            var pub = {};
 
-        var fruits = [ "schu", "CONNETTORE RJ11" ];
+            var helper = AP.test.helper;
 
-        const plateEle = $( "#plate-line" );
-        const modelEle = $( "#plate-model" );
-        const finishEle = $( "#plate-finish" );
-        const fruitSuggest = $( "#plate-fruit-suggest" );
-        const autocomplete = fruitSuggest.data( "kendoAutoComplete" );
 
-        console.log( "quotation-plate-test" );
+            pub.new = async function() {
 
-        await helper.wait( 1000 );
-        $( "body" ).find( ".quotation-item:first" ).click();
+                console.log( "test:new" );
 
-        /*
-        // Sequenza asincrona
-        await helper.wait( 600 );
-        $( "body" ).find( "#nav-products-tab" ).click();
+                const lineId = "56906918-8a2a-4652-80fe-adc1ededacd1"; // linea: Square
+                const modelId = "1ac1104f-0208-4a0c-bdca-7ba50df4756f"; // modello: 2X2
+                const finishId = "7357f125-e556-467c-ba37-2a1e17abc6cf"; // finitura: Acciaio lucido
 
-        await helper.wait( 600 );
-        $( "body" ).find( "button[data-bind='click:addPlate']" ).click();
+                var fruits = [ "schu", "CONNETTORE RJ11" ];
 
-        await helper.wait( 600 );
-        plateEle.val( lineId ).trigger( "change" );
+                const plateEle = $( "#plate-line" );
+                const modelEle = $( "#plate-model" );
+                const finishEle = $( "#plate-finish" );
+                const fruitSuggest = $( "#plate-fruit-suggest" );
+                const autocomplete = fruitSuggest.data( "kendoAutoComplete" );
 
-        await helper.wait( 600 );
-        modelEle.val( modelId ).trigger( "change" );
 
-        await helper.wait( 800 );
-        finishEle.val( finishId ).trigger( "change" );
+                await helper.wait( 1000 );
+                $( "body" ).find( ".quotation-item:first" ).click();
 
-        // switch to fruits tab
-        await helper.wait( 200 );
-        $( ".nav-tabs a[href='#plate-fruit-product-items-tab']" ).tab( "show" );
+                // Sequenza asincrona
+                await helper.wait( 600 );
+                $( "body" ).find( "#nav-products-tab" ).click();
 
-        // interaction with suggest
-        // var terms = [ "schu", "CONNETTORE VIDEO RCA" ];
+                await helper.wait( 600 );
+                $( "body" ).find( "button[data-bind='click:addPlate']" ).click();
 
-        for ( var term of fruits ) {
+                await helper.wait( 600 );
+                plateEle.val( lineId ).trigger( "change" );
 
-            // 1. Imposta il valore nell'input (opzionale, ma pulito)
-            fruitSuggest.val( term );
+                await helper.wait( 600 );
+                modelEle.val( modelId ).trigger( "change" );
 
-            // 2. Chiama il metodo search() del widget Kendo
-            autocomplete.search( term );
+                await helper.wait( 800 );
+                finishEle.val( finishId ).trigger( "change" );
 
-            await helper.wait( 1200 );
+                // switch to fruits tab
+                await helper.wait( 200 );
+                $( ".nav-tabs a[href='#plate-fruit-product-items-tab']" ).tab( "show" );
 
-            autocomplete.list.find( "li:first" ).click();
+                // interaction with suggest
+                // var terms = [ "schu", "CONNETTORE VIDEO RCA" ];
 
-        }
+                for ( var term of fruits ) {
 
-        return;
-        */
+                    // 1. Imposta il valore nell'input (opzionale, ma pulito)
+                    fruitSuggest.val( term );
+
+                    // 2. Chiama il metodo search() del widget Kendo
+                    autocomplete.search( term );
+
+                    await helper.wait( 1200 );
+
+                    autocomplete.list.find( "li:first" ).click();
+
+                }
+
+                return;
+
+            };
+
+
+            pub.edit = async function() {
+
+                console.log( "test:edit" );
+
+                await helper.wait( 1000 );
+                $( "body" ).find( ".quotation-item" ).eq( 1 )
+                    .click();
+
+            };
+
+            return pub;
+
+        }() );
+
+        AP.test.quotation.edit();
 
     }
 
