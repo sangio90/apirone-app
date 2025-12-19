@@ -1,4 +1,4 @@
-component accessors="true" extends="AbsBean" {
+component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="phone" type="String";
 	property name="serial" type="Numeric";

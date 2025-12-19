@@ -110,7 +110,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setId( json.id );
 		quotation.setName( json.name );
 		//quotation.setQuotationNumber( json.quotationNumber );
-		quotation.setOwner( session.user.getAccount() );
+		quotation.setOwner( session.user );
 
 		quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
 		quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
@@ -148,7 +148,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
 		if ( !Len( json.id ) ) {
 			
-			thisId = super.fire( "quotation.create", [ quotation, session.user.getAccount().getId() ] );
+			thisId = super.fire( "quotation.create", [ quotation, session.user.getId() ] );
 			messageId = "quotation.created";
 			
 		} else {

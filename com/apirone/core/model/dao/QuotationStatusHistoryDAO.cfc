@@ -7,7 +7,7 @@
 				quotation_status_history_id,
 				quotation_id::varchar,
 				status_id::varchar,
-				account_id::varchar,
+				user_id::varchar,
 				*
 			FROM quotation_status_history
 			WHERE quotation_status_history_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationStatusHistoryId#">
@@ -17,7 +17,7 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationId" type="String" required="false">
-		<cfargument name="accountId" type="String" required="false">
+		<cfargument name="userId" type="String" required="false">
 		<cfargument name="statusId" type="String" required="false">
         <cfargument name="from" type="Date" required="false">
         <cfargument name="to" type="Date" required="false">
@@ -30,7 +30,7 @@
 				quotation_status_history_id,
 				quotation_id::varchar,
 				status_id::varchar,
-				account_id::varchar,
+				user_id::varchar,
 				COUNT(quotation_status_history_id) OVER() AS total
 			FROM
 				quotation_status_history
@@ -38,15 +38,19 @@
 				<cfif !IsNull( arguments.quotationId )>
 					AND quotation_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationId#">::uuid
 				</cfif>
-				<cfif !IsNull( arguments.accountId )>
-					AND account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.accountId#">::uuid
+
+				<cfif !IsNull( arguments.userId )>
+					AND user_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.userId#">::uuid
 				</cfif>
+
 				<cfif !IsNull( arguments.statusId )>
 					AND status_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.statusId#">
 				</cfif>
+
 				<cfif !isNull( arguments.from )>
 					AND created_at >= <cfqueryparam value="#arguments.from#" cfsqltype="Date">
 				</cfif>
+
 				<cfif !isNull( arguments.from )>
 					AND created_at <= <cfqueryparam value="#arguments.to#" cfsqltype="Date">
 				</cfif>
@@ -68,11 +72,11 @@
 			INSERT INTO quotation_status_history (
 				quotation_id,
 				status_id,
-				account_id
+				user_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getQuotationId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getAccount().getId()#">::uuid
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getUser().getId()#">::uuid
 			)
 			RETURNING quotation_status_history_id
 		</cfquery>
@@ -86,7 +90,7 @@
 			SET
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getQuotationId()#">::uuid,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getStatus().getId()#">,
-				account_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getAccount().getId()#">::uuid,
+				user_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationStatusHistory.getUser().getId()#">::uuid,
 				updated_at = now()
 			WHERE
 				quotation_status_history_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationStatusHistory.getId()#">

@@ -177,6 +177,7 @@
 
 			bean.setId( record.quotation_item_id );
 			bean.setQuantity( record.quantity );
+			bean.setCreatedAt( record.created_at );
 			
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
 			bean.setPrice( pricing );

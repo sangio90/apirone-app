@@ -2,7 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationStatusHistoryDAO";
 	property name="QuotationService" inject="QuotationService";
-	property name="AccountService" inject="AccountService";
+	property name="UserService" inject="UserService";
 	property name="StatusService" inject="StatusService";
 	property name="FileService" inject="FileService";
 	property name="cacheScope" type="String" default="QuotationStatusHistory.bean";
@@ -92,7 +92,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.quotation_status_history_id );
 			bean.setQuotationId( record.quotation_id );
-			bean.setAccount( getAccountService().get( record.account_id ) );
+			bean.setUser( getUserService().get( record.user_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
 			var files = getFileService().list( quotationStatusHistoryId = record.quotation_status_history_id );
