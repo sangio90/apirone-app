@@ -76,6 +76,23 @@ AP.quotation.pricing = ( function() {
         isItem: true,
         isGeneral: false,
 
+        changeMethod: function( event ) {
+
+            var ele = $( event.currentTarget );
+
+            var value = ele.val();
+            var price = fields.boxPricing.find( "#input-item-total" );
+
+            if ( value == "C" ) {
+                this.updateItem();
+
+                price.prop( "readonly", true );
+            } else {
+                price.prop( "readonly", false );
+            }
+
+        },
+
         updateItem: function( event ) {
 
             var status = $( "#quotation-totals-item-loading" );
@@ -220,7 +237,7 @@ AP.quotation.pricing = ( function() {
         if ( type == "item" ) {
             var model = viewModelItem;
             viewModelItem.set( "item.id", id );
-            viewModelItem.set( "common.title", "Totali di questa riga" );
+            viewModelItem.set( "common.title", "Dettaglio riga" );
         } else {
             var model = viewModelGeneral;
             viewModelGeneral.set( "common.title", "Totali preventivo" );

@@ -24,6 +24,27 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function listFruits( event, rc, prc ){
+		
+		var data   = {};
+		var result = super.getResult();
+		var memy   = super.getMementify();
+
+		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
+		var fruits = quotationItem.getFruits();
+
+		/*
+		quotationItem.getFruits().each( function( fruit ){
+			data.append( memy.convert( fruit ) );
+		} );
+		*/
+
+		//var parsedQuotationItemData = memy.convert( , "edit" );
+
+		result.setData( fruits );
+		event.setValue( "result", result );
+	}	
+
 	function editPlate( event, rc, prc ){
 		
 		var data   = {};
@@ -410,7 +431,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setFruits( beanFruits );		
 
-		if ( !Len( id ) ) {
+		if ( !Len( id ) OR json.isClone ) {
 			messageId = "quotationItem.created";
 			thisId    = super.fire( "quotationItem.create", [ bean ] )
 		} else {
@@ -525,6 +546,95 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", result );
 	}
+
+	function calculate( event, rc, prc ){
+
+		var result = super.getResult();
+		var memy   = super.getMementify();
+
+		var calculator = super.service( "PriceCalculator" );
+
+		var method  = super.bean( "PriceMethod" );
+		var pricing = super.bean( "QuotationItemPrice" );
+
+		var lines = [];
+
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
+		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+        
+		pricing.setMethod( method.setId( json.pricing.method.id ) );
+		
+        if ( pricing.isFixed() ) {
+			pricing.setAmount( Val( json.pricing.total ) ? json.pricing.total : 0 );
+		} else {
+			pricing.setAmount( 0 );
+		}
+
+		/*
+			plate price
+		*/
+
+		var productItemsIds = [];
+
+		for ( var item in json.product.items._data ) {
+			for ( var value in item.values ) {
+				if ( value.selected ) {
+					productItemsIds.add( value.productItemId );
+				}
+			}
+		}
+
+		var platePrice = calculator.calculate(
+			json.product.id,
+			json.quantity,
+			productItemsIds
+		);
+
+		var line = super.bean( "PriceLine" );
+
+		line.setName( "Prezzo placca" );
+		line.setAmount( platePrice );
+
+		lines.add( line );
+
+
+		/*
+			fruits price
+		*/
+
+		for ( var fruit in json.fruits._data ) {
+			var fruitItemsIds = [];
+			var line          = super.bean( "PriceLine" );
+
+			for ( var item in fruit.items._data ) {
+				for ( var value in item.values ) {
+					if ( value.selected ) {
+						fruitItemsIds.add( value.productItemId );
+					}
+				}
+			}
+
+			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds );
+
+			line.setName( "#fruit.fruit?.name#" );
+			line.setAmount( fruitPrice );
+
+			// totalGoods = totalGoods + fruitPrice;
+
+			lines.add( line );
+		}
+
+		pricing.setLines( lines );
+
+		var data = memy.convert( pricing );
+
+		// result.setData( quotationPrice );
+
+		event.setValue( "result", data );
+	}
+
 
 
 	/*

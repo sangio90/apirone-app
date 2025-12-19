@@ -3,8 +3,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="quotationId" type="String";
 	
 	//property name="amount" type="Numeric";
-	property name="discount1" type="Numeric";
-	property name="discount2" type="Numeric";
+	property name="discount1" type="Numeric" ;
+	property name="discount2" type="Numeric" ;
 	property name="shippingCost" type="Numeric";
 	property name="totalGoods" type="Numeric";
 
@@ -15,6 +15,10 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	public QuotationPrice function init(){
 
 		setLines( [] );
+
+		setShippingCost( 0 );
+		setDiscount1( 0 );
+		setDiscount2( 0 );
 
 		return this;
 	}

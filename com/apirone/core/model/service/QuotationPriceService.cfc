@@ -45,6 +45,11 @@
 		var pricing = getByQuotationId( quotationId = arguments.quotationId );
 		var quotation = getQuotationService().get( quotationId = arguments.quotationId );
 
+		if ( IsNull( pricing ) ) {
+			pricing = super.bean( "QuotationPrice" );
+			pricing.setQuotationId( arguments.quotationId );
+		}
+
 		var items = getQuotationItemService().list( quotationId = arguments.quotationId );
 
 		for( var item in items ) {

@@ -32,7 +32,7 @@
 					</div>
 					<div class="row mt-3 mb-2">
 						<div class="col-6">
-							<select name="priceMethod" class="form-control" 
+							<select name="priceMethod" class="form-control" id="input-price-method"
 								data-bind="value: pricing.data.method.id, events: { change: changeMethod }">
 								<option value="C">Prezzo calcolato</option>
 								<option value="F">Prezzo fisso</option>
@@ -40,7 +40,7 @@
 						</div>
 						<div class="col-6">
 							<div class="input-group">
-								<input class="form-control text-end" name="total" id="input-total"
+								<input class="form-control text-end" name="total" id="input-item-total"
 									placeholder="Totale preventivo"
 									data-bind="value: pricing.data.total">
 								<span class="input-group-text">
