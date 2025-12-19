@@ -85,9 +85,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.changeUser( rc.id );
 
 		if ( result ) {
-			setMessage( "Hai modificato il tuo ruolo.", "success" );
+			setMessage( "Hai modificato il tuo utente.", "success" );
 		} else {
-			setMessage( "Non puoi accedere a questo ruolo.", "warning" );
+			setMessage( "Non puoi accedere a questo utente.", "warning" );
 		}
 
 		relocate(

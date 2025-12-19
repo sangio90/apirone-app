@@ -182,4 +182,21 @@
 
 	</cffunction>
 
+	<cffunction name="updateLastLoggedUserId" output="No" returntype="Boolean">
+
+		<cfargument name="accountId" required="Yes" type="String">
+		<cfargument name="userId" required="Yes" type="String">
+
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE accounts
+			SET
+				last_logged_user_id = <cfqueryparam cfsqltype="Other" value="#trim(arguments.userId)#">
+			WHERE
+				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.accountId#">
+		</cfquery>
+
+		<cfreturn true>
+
+	</cffunction>
+
 </cfcomponent>

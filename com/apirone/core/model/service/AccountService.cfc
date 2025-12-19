@@ -57,6 +57,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return id;
 	}
 
+	public String function updateLastLoggedUserId( required String accountId, required String userId ){
+		var id = getDao().updateLastLoggedUserId( arguments.accountId, arguments.userId );
+
+		getCacheManager().remove( getCacheScope(), arguments.accountId );
+
+		return id;
+	}
+
 	public Boolean function updatePassword(
 		required String accountId,
 		required String pwd
@@ -191,7 +199,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setName( record.account );
 			account.setPwd( record.pwd );
 			account.setSerial( record.serial );
-
+			account.setLastLoggedUserId( record.last_logged_user_id );
 			account.setCreatedAt( record.created_at );
 
 			account.setStatus( getStatusService().get( record.status_id ) );

@@ -99,6 +99,9 @@
 			if ( user.getId() == userId ) {
 				session.user = user;
 				found = true;
+
+				service("Account").updateLastLoggedUserId( user.getAccount().getId(), user.getId() );
+
 				break;
 			}
 		}
@@ -108,6 +111,7 @@
 
 	public Any function setAuthUser( required com.apirone.core.model.bean.Account account ){
 
+		var user = null;
 		var accountId = arguments.account.getId();
 
 		var users = service("User").list( accountId = accountId, statusId = "ACT" );
@@ -116,7 +120,15 @@
 			showNoUsersMessage( accountId );
 		}
 
-		session.user = users[1];
+		if ( !IsNull( account.getLastLoggedUserId() ) ) {
+			user = service("User").get( account.getLastLoggedUserId() );
+		} else {
+			user = users[1];
+		}
+
+		session.user = user;
+
+		service("Account").updateLastLoggedUserId( user.getAccount().getId(), user.getId() );
 
 		return true;
 	}
@@ -334,6 +346,20 @@
 		};
 	}
 
+	public Array function eachParallelAndReorder( 		
+			required array sourceArray,
+			required function callbackFunction 
+		){
+			
+		var udf = new com.apirone.core.util.Udf();
+
+		var result = udf.eachParallelAndReorder( 
+			argumentCollection = arguments 
+		);
+	
+		return result;
+	}
+
 
 	/*
         some shorthads
@@ -383,30 +409,16 @@
 		return bean;
 	}
 
-	public Array function eachParallelAndReorder( 		
-			required array sourceArray,
-			required function callbackFunction 
-		){
-			
-		var udf = new com.apirone.core.util.Udf();
-
-		var result = udf.eachParallelAndReorder( 
-			argumentCollection = arguments 
-		);
-	
-		return result;
-	}
-
-
-	/*
-        private methods
-    */
-
 	public Struct function getContainer(){
 		// TODO: use GetSystemPropOrEnvVar from Lucee 6.2.1
 		return server[ "wireBox-apirone" ];
 	}
-
+	
+	
+	/*
+		private methods
+	*/
+	
 	private Boolean function keyPathExists( structure, path ){
 		var keys    = ListToArray( path, "." );
 		var current = structure;

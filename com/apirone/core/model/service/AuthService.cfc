@@ -1,7 +1,6 @@
 component extends="AbsService" accessors="true" {
 
 	property name="AccountService" inject="AccountService";
-	// property name="PwdTokenService" inject="PwdTokenService";
 
 	public com.apirone.core.model.bean.LoginResult function login( required String email, required String pwd ){
 		
@@ -47,7 +46,8 @@ component extends="AbsService" accessors="true" {
 				event          = "auth.failed",
 				message        = "Email [#arguments.email#] failed to log in. Type: [#error.getType()#] message: #error.getMessage()#",
 				allowAnonymous = true
-			);
+			)
+
 		} else {
 			result.setAccount( account );
 			result.setStatus( true );
@@ -61,6 +61,7 @@ component extends="AbsService" accessors="true" {
 				accountId = account.getId(),
 				message   = "Account [#account.getId()#] email [#account.getEmail()#] logged in"
 			);
+
 		}
 
 		return result;
