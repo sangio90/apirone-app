@@ -1,0 +1,7 @@
+﻿{
+	defaultIncludes = [
+		"id",
+		"width",
+		"height",
+	]
+}

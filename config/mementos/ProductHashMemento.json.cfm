@@ -1,0 +1,7 @@
+﻿{
+		defaultIncludes = [
+			"id",
+			"hash",
+			"jsonData"
+		]
+	}

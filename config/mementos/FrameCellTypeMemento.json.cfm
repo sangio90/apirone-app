@@ -1,0 +1,6 @@
+﻿{
+	defaultIncludes = [
+		"id",
+		"name"
+	]
+}
