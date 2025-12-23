@@ -14,14 +14,18 @@
 
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item active">
-                            <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="##tab1" role="tab" aria-controls="tab1" aria-selected="true"
-                                data-bind="click:showDetail"
-                            >Generale</a>
+                            <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="##tab1" role="tab" aria-controls="tab1" 
+                                aria-selected="true" 
+                                data-bind="click:showDetail" >
+                                    Generale
+                                </a>
                         </li>
                         <li class="nav-item" data-bind="visible:isTabPasswordVisible">
-                            <a class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="##tab2" role="tab" aria-controls="tab2" aria-selected="true"
-                                data-bind="click:showPassword"
-                            >Cambia password</a>
+                            <a class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="##tab2" role="tab" aria-controls="tab2" 
+                                aria-selected="true" 
+                                data-bind="click:showPassword">
+                                    Cambia password
+                                </a>
                         </li>
                     </ul>
 
@@ -31,11 +35,11 @@
 
                             <form id="account-detail-form">
 
-                                <div class="row">
+                                <div>
 
-                                    <div class="col-6">
-                                        <div class="form-group pb-3">
-                                            <label class="col-form-label" for="account-desc">Nome</label>
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-2 col-form-label text-end">Nome</label>
+                                        <div class="col-sm-10">
                                             <input class="form-control" name="name" id="name" 
                                                 required
                                                 data-rule-required="true"
@@ -45,81 +49,48 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-6">
-                                        <div class="form-group pb-3">
-                                            <label class="col-form-label" for="account-desc">Lingua</label>
-                                            <select required
-                                                class="form-control"
-                                                data-bind="source: detailForm.langs, value: detailForm.data.lang.id" 
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                                >
-                                            </select>                                        
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-2 col-form-label text-end">Email</label>
+                                        <div class="col-sm-10">
+                                            <input class="form-control" name="email" id="email" required
+                                                data-bind="value: detailForm.data.email">
                                         </div>
                                     </div>
 
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-group pb-3">
-                                            <label class="col-form-label">Email</label>
-                                            <input class="form-control" name="email" id="email" data-bind="value: detailForm.data.email" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-6">
-                                        <div class="form-group pb-3">
-                                            <label class="col-form-label">Telefono</label>
-                                            <input class="form-control" name="phone" id="phone" data-bind="value: detailForm.data.phone">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-group pb-3">
-                                            <label class="col-form-label">Ruoli</label>
-                                            <select id="roles" required
-                                                data-role="multiselect"
-                                                data-bind="source: detailForm.roles, value: detailForm.data.selectedRoles" 
-                                                data-value-field="id"
-                                                data-text-field="name"
-                                                >
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-6">
-                                        <div class="form-group pb-3">
-                                            <label class="col-form-label" for="account-desc">Stato</label>
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-2 col-form-label text-end">Stato</label>
+                                        <div class="col-sm-10">
                                             <select type="text" class="form-control" name="status" 
                                                 required
                                                 data-bind="value: detailForm.data.status.id, source: detailForm.statuses"
                                                 data-value-field="id"
                                                 data-text-field="name"
                                             >
-                                            </select>
+                                            </select>                                        
                                         </div>
                                     </div>
 
                                 </div>
 
-                                <div class="row" data-bind="invisible: isUpdate">
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Password</label>
+                                <div data-bind="invisible: isUpdate">
+
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-2 col-form-label text-end">Password</label>
+                                        <div class="col-sm-10">
                                             <input class="form-control" id="pwd" name="pwd" type="password" required>
                                         </div>
                                     </div>
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Conferma password</label>
+
+
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-2 col-form-label text-end">Conferma password</label>
+                                        <div class="col-sm-10">
                                             <input class="form-control" name="pwd2" type="password" required
                                                 data-bind="value: detailForm.data.pwd"
-                                            >
+                                            >                                        
                                         </div>
                                     </div>
+
                                 </div>
 
                             </form>

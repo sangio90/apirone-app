@@ -170,6 +170,11 @@
 		roles: "ADM",
 		items: [
 			{
+				href: "/manager/account",
+				icon: "fas fa-running",
+				title: "Lista degli account",
+			},
+			{
 				href: "/manager/users",
 				icon: "fas fa-user",
 				title: "Lista degli utenti",

@@ -4,7 +4,6 @@ Object.assign( AP.user.fields, {
     listRoot: $( "#user-list-root" ),
     detailRoot: $( "#user-detail-modal" ),
     detailForm: $( "#user-detail-form" ),
-    passwordForm: $( "#user-password-form" ),
     searchListForm: $( "#user-grid-search-form" )
 } );
 
@@ -35,58 +34,53 @@ AP.user.detail = ( function() {
                 id: "IT",
             },
             selectedRoles: [],
-            pwd: "",
+            account: {
+                id: ""
+            }
         },
 
         roles: AP.page.roles,
         langs: AP.page.langs,
         statuses: AP.page.statuses,
+        accounts: undefined,
+
 
         title: "Carica utente",
         buttonLabel: "Salva"
     };
 
+    var loadAccounts = function() {
+        NM.util.ajax( {
+            url: "/manager/ajax/accounts",
+            callback: {
+                done: function( xhr ) {
+
+                    xhr.data.unshift( {
+                        id: "",
+                        email: "-- Seleziona un account",
+                    } );
+
+                    console.log( "xhr.data", xhr.data );
+
+                    viewModel.set( "detailForm.accounts", xhr.data );
+                },
+            },
+        } );
+    };
+
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
 
-        showPassword: function() {
-            setTimeout( function() {
-                viewModel.set( "detailForm.buttonLabel", "Modifica password" );
-            }, 150 );
+        isNewAccount: function() {
 
-        },
+            var action = viewModel.get( "detailForm.data.accountAction" );
 
-        isTabPasswordVisible: function() {
-            return viewModel.get( "detailForm.data.id" ).length > 0;
-        },
-
-        togglePassword: function() {
-
-            var thisForm = fields.passwordForm;
-
-            var pwd = thisForm.find( "input[name=newPwd]" );
-            var label = thisForm.find( "#label-change-type" );
-
-            var type = pwd.prop( "type" );
-
-            if ( type == "password" ) {
-
-                pwd.prop( "type", "text" );
-                label.html( "Nascondi" );
-
-            } else {
-
-                pwd.prop( "type", "password" );
-                label.html( "Mostra password" );
-
+            if( action == "NEW" ) {
+                return true;
             }
 
-        },
+            return false;
 
-        showDetail: function() {
-            setTimeout( function() {
-                viewModel.set( "detailForm.buttonLabel", "Salva" );
-            }, 150 );
         },
 
         resetForm: function() {
@@ -110,70 +104,30 @@ AP.user.detail = ( function() {
 
         save: function( event ) {
             var detailForm = fields.detailForm;
-            var passwordForm = fields.passwordForm;
             var status = $( ".errors-counter" );
 
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
-            // update general
-            if ( detailForm.is( ":visible" ) ) {
+            if ( detailForm.validate() ) {
 
-                if ( detailForm.validate() ) {
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/users",
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
 
-                    NM.util.ajax( {
-                        method: "POST",
-                        url: "/manager/ajax/users",
-                        data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
-                        callback: {
-                            done: function( xhr ) {
+                            status.html( "" );
+                            AP.widget.notify( "success", "Utente salvato con successo" );
 
-                                AP.widget.notify( "success", "Account salvato con successo" );
-                                status.html( "" );
+                            setTimeout( () => {
+                                $( "#user-detail-modal" ).modal( "hide" );
+                                AP.user.list.refresh();
+                            }, 1000 );
 
-                                setTimeout( () => {
-
-                                    $( "#user-detail-modal" ).modal( "hide" );
-                                    AP.user.list.refresh();
-                                }, 1000 );
-
-                            },
                         },
-                    } );
-                }
-
-            // update password
-            } else {
-
-                var valid = passwordForm.valid();
-
-                if ( valid ) {
-
-                    var data = JSON.stringify( { pwd: $( "#newPwd" ).val(), accountId: viewModel.detailForm.data.id } );
-
-                    NM.util.ajax( {
-                        method: "POST",
-                        url: "/manager/ajax/accounts/pwd",
-                        data: data,
-                        callback: {
-                            done: function() {
-                                AP.widget.notify( "success", "Password aggiornata con successo" );
-                                status.html( "" );
-
-                                setTimeout( () => {
-                                    $( "#user-detail-modal" ).modal( "hide" );
-                                    AP.user.list.refresh();
-                                }, 1000 );
-
-                            }
-                        }
-                    } );
-
-                    setTimeout( () => {
-                        fields.detailRoot.modal( "hide" );
-                    }, 1000 );
-
-                }
-
+                    },
+                } );
             }
 
             return false;
@@ -193,116 +147,66 @@ AP.user.detail = ( function() {
     };
 
     pub.edit = function( event ) {
-        // viewModel.resetForm();
+
+        loadAccounts();
 
         viewModel.set( "detailForm.data", event.data );
-        viewModel.set(
-            "detailForm.title",
-            "Modifica di < " + event.data.email + " >",
-        );
-
-        var selectedRoles = [];
-
-        if ( event.data.roles ) {
-            for ( var role of event?.data?.roles ) {
-                selectedRoles.push( role );
-            }
-        }
-
-        viewModel.set( "detailForm.data.selectedRoles", selectedRoles );
+        viewModel.set( "detailForm.title", "Modifica utente < " + event.data.name + " >" );
 
         NM.util.openModal( fields.detailRoot );
     };
 
     pub.init = function() {
 
+        var detailForm = fields.detailForm;
+
+        AP.page.roles.unshift( { id: "", name: "-- Seleziona un ruolo" } );
+
+        viewModel.set( "detailForm.roles", AP.page.roles );
+
+        AP.page.langs.unshift( { id: "", name: "-- Seleziona una lingua" } );
+
+        viewModel.set( "detailForm.langs", AP.page.langs );
+
+        AP.page.statuses.unshift( { id: "", name: "-- Seleziona uno stato" } );
+
+        viewModel.set( "detailForm.statuses", AP.page.statuses );
+
         kendo.bind( fields.detailRoot, viewModel );
 
-        var detailForm = fields.detailForm;
-        var passwordForm = fields.passwordForm;
-
         detailForm.validate( {
-            ignore: ".ignore", // for change action, skip password.
             onfocusout: function( element ) {
                 $( element ).valid();
             },
             rules: {
-                pwd: {
-                    required: function() {
-                        return viewModel.isUpdate() ? false : true;
-                    },
-                    pwdRule: function() {
-                        return viewModel.isUpdate() ? false : true;
-                    }
+                name: {
+                    required: true
                 },
-                pwd2: {
-                    required: function() {
-                        return viewModel.isUpdate() ? false : true;
-                    },
-                    equalTo: "#pwd"
+                roleId: {
+                    required: true
                 },
-                email: {
-                    required: true,
-                    email: true,
-                    remote: {
-                        url: "/manager/ajax/accounts/email-exists",
-                        data: {
-                            id: function() {
-                                return viewModel.get( "detailForm.data.id" );
-                            },
-                        },
-                        dataFilter: function( xhr ) {
-                            var json = JSON.parse( xhr );
-                            return json.data == false;
-                        },
-                    },
+                langId: {
+                    required: true
+                },
+                accountId: {
+                    required: true
                 },
             },
             messages: {
-                pwd: {
-                    required: "Password richiesta",
-                    pwdRule: "Almeno otto caratteri con almeno una lettera, un numero e un carattere speciale",
+                name: {
+                    required: "Nome richiesto",
                 },
-                pwd2: {
-                    required: "Password di conferma richiesta",
-                    pwdRule: "Le password non coincidono",
+                roleId: {
+                    required: "Ruolo richiesto",
                 },
-                email: {
-                    required: "Email richiesta",
-                    checkCode: "Email non valida",
-                    remote: "L'email è già in uso",
+                langId: {
+                    required: "Lingua richiesta",
                 },
-            },
+                accountId: {
+                    required: "Account richiesto",
+                },
+            }
         } );
-
-        passwordForm.validate( {
-            onfocusout: function( element ) {
-                $( element ).valid();
-            },
-            rules: {
-                newPwd: {
-                    required: true,
-                    pwdRule: true
-                },
-                newPwd2: {
-                    required: true,
-                    equalTo: "#newPwd"
-                },
-
-            },
-            messages: {
-                newPwd: {
-                    required: "Password richiesta",
-                    pwdRule: "Almeno otto caratteri con almeno una lettera, un numero e un carattere speciale",
-                },
-                newPwd2: {
-                    required: "Password di conferma richiesta",
-                    pwdRule: "Le password non coincidono",
-                }
-            },
-
-        } );
-
     };
 
     return pub;

@@ -1,4 +1,4 @@
-AP.account = AP.account || {};
+AP.namespace( "account" );
 
 AP.account.fields = {
     listRoot: $( "#account-list-root" ),
@@ -26,20 +26,13 @@ AP.account.detail = ( function() {
         data: {
             id: "",
             name: "",
-            phone: "",
             email: "",
-            status: {
-                id: "ACT",
-            },
-            lang: {
-                id: "IT",
-            },
-            selectedRoles: [],
             pwd: "",
+            status: {
+                id: "ACT"
+            }
         },
 
-        roles: AP.page.roles,
-        langs: AP.page.langs,
         statuses: AP.page.statuses,
 
         title: "Carica account",
@@ -90,12 +83,18 @@ AP.account.detail = ( function() {
         },
 
         resetForm: function() {
+
+            console.log( "resetForm" );
+
             var detailForm = fields.detailForm;
+
+            $( ".nav-tabs a[href='#tab1']" ).tab( "show" );
+
+            $( ".status" ).html( "" );
+            $( ".errors-counter" ).html( "" );
 
             var validator = detailForm.validate();
             validator.resetForm();
-
-            detailForm.find( ".status" ).html( "" );
 
             viewModel.set( "detailForm", defaultDetailForm );
         },
@@ -196,20 +195,7 @@ AP.account.detail = ( function() {
         // viewModel.resetForm();
 
         viewModel.set( "detailForm.data", event.data );
-        viewModel.set(
-            "detailForm.title",
-            "Modifica di < " + event.data.email + " >",
-        );
-
-        var selectedRoles = [];
-
-        if ( event.data.roles ) {
-            for ( var role of event?.data?.roles ) {
-                selectedRoles.push( role );
-            }
-        }
-
-        viewModel.set( "detailForm.data.selectedRoles", selectedRoles );
+        viewModel.set( "detailForm.title", "Modifica di < " + event.data.email + " >"  );
 
         NM.util.openModal( fields.detailRoot );
     };
@@ -322,7 +308,7 @@ AP.account.list = ( function() {
         rows: dataSources.items,
 
         getCreatedAt: function( event ) {
-            return NM.kendo.formatDate( event.createdAt );
+            return NM.kendo.formatISODate( event.createdAt );
         },
 
         search: function( event ) {

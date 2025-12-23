@@ -11,6 +11,7 @@
 				"role",
 				"status",
 				"lang",
+				"account.id",
 				"account.email",
 				"account.shortId",
 			]

@@ -10,6 +10,7 @@
 				"serial",
 				"status",
 				"shortId",
+				"createdAt",
 			]
 		}
 	}

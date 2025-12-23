@@ -13,12 +13,6 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
-                <div data-bind="source: roles" data-template="role-row-tmpl"></div>
-            </td>
-            <td>
-                <span data-bind="text: lang.name"></span>
-            </td>
-            <td>
                 <span data-bind="text: getCreatedAt"></span>
             </td>
             <td>
@@ -34,8 +28,6 @@
             </td>
         </tr>
     </nmscript>
-
-    #template( view="jstemplate/role/role-row-tmpl" )#
 
 </cfoutput>
 

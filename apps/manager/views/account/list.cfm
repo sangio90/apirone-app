@@ -71,8 +71,6 @@
                                     { 'field':'shortId', 'title':'ID', width: '80px'},
                                     { 'field':'email', 'title':'Email'},
                                     { 'field':'name', 'title':'Nome'},
-                                    { 'field':'role.id', 'title':'Ruoli', width: '140px' },
-                                    { 'field':'lang.id', 'title':'Lingua', width: '120px' },
                                     { 'field':'createdAt', 'title':'Creato il', width: '140px' },
                                     { 'field':'', 'title':'', width: '50px'},
                                     { 
