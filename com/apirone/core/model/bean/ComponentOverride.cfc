@@ -1,15 +1,5 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [
-			"id",
-			"quantity",
-			"deleted",
-			"productItemId",
-			"componentId"
-		]
-	}
-
 	property name="componentId" type="Numeric";
 	property name="productItemId" type="Numeric";
 

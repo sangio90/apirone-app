@@ -1,19 +1,10 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = { defaultIncludes = [ "id", "code", "value", "type" ] }
-
 	property name="code" type="String";
 	property name="createdAt" type="Date";
 
 	property name="type" type="com.apirone.core.model.bean.MetadataType";
 	property name="entity" type="com.apirone.core.model.bean.Entity";
-
-	/*
-	property name="textValue" type="String" getter="false" setter="false";
-	property name="booleanValue" type="Boolean" getter="false" setter="false";
-	property name="integerValue" type="Numeric" getter="false" setter="false";
-	property name="decimalValue" type="Numeric" getter="false" setter="false";
-	*/
 
 	variables.textValue    = NullValue();
 	variables.booleanValue = NullValue();

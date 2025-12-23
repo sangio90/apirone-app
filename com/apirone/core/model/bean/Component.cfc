@@ -1,36 +1,5 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
-	this.memento = {
-		defaultIncludes = [
-			"id",
-			"shortId",
-			"rawProduct",
-			"variant",
-			"color",
-			"quantity",
-			"typeId",
-			"cost"
-		],
-		profiles = {
-			list = {
-				defaultIncludes = [
-					"id",
-					"shortId",
-					"rawProduct",
-					"variant",
-					"color",
-					"quantity",
-					"override",
-					"status",
-					"typeId",
-					"totalQuantity",
-					"cost",
-					"kindId"
-				]
-			}
-		}
-	}
-
 	property name="rawProduct" type="com.apirone.core.model.bean.RawProduct"; // arriva da Verticale
 	property name="variant" type="com.apirone.core.model.bean.Variant"; // arriva da Verticale
 	property name="color" type="com.apirone.core.model.bean.Color"; // arriva da Verticale
