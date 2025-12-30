@@ -31,8 +31,11 @@
 
                             <div class="col-6">
                                 <div class="form-group pb-3">
-                                    <label class="col-form-label" for="audit-entry-desc">Account</label>
-                                    <div class="form-control-static" data-bind="text: detailForm.data.account.name"></div>
+                                    <label class="col-form-label" for="audit-entry-desc">Utente / account</label>
+                                    <div class="form-control-static">
+                                        <span data-bind="text: detailForm.data.user.name"></span>
+                                        (<span data-bind="text: detailForm.data.user.account.email"></span>)
+                                    </div>
                                 </div>
                             </div>
                             
