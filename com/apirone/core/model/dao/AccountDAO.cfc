@@ -58,11 +58,13 @@
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="orderby" required="true" type="String" default="code">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				account_id::varchar,
-				COUNT(account_id) OVER() AS total
+				COUNT(account_id) OVER() AS total,
+				pgp_sym_decrypt( email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#"> ) AS email
 			FROM
 				accounts
 			WHERE 1=1
@@ -95,7 +97,8 @@
 				----->
 
 			ORDER BY
-				serial DESC
+				#super.sanitizeSQL( arguments.orderby )#
+
 			<cfif arguments.limit GTE 0>
 				LIMIT
 					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">

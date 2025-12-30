@@ -22,28 +22,33 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var result  = super.getResult();
 
+		var user    = super.bean( "User" );
 		var account = super.bean( "Account" );
+		var role    = super.bean( "Role" );
 		var status  = super.bean( "Status" );
 		var lang    = super.bean( "Lang" );
 
 		var thisId    = "";
 		var messageId = "";
-		var roles     = [];
 
 		var json = DeserializeJSON( getHTTPRequestData().content );
 
-		account.setId( json.id );
-		account.setEmail( json.email );
-		account.setName( json?.name );
-		account.setPwd( json?.pwd );
-		account.setStatus( status.setId( json.status.id ) );
+		user.setId( json.id );
+		//user.setEmail( json.email );
+		user.setName( json?.name );
+		//user.setPwd( json?.pwd );
+		user.setPhone( json?.phone );
+		user.setStatus( status.setId( json.status.id ) );
+		user.setAccount( account.setId( json.account.id ) );
+		user.setLang( lang.setId( json.lang.id ) );
+		user.setRole( role.setId( json.role.id ) );
 
 		if ( !len( json.id ) ) {
 			messageId = "user.created";
-			thisId    = super.fire( "user.create", [ account ] );
+			thisId    = super.fire( "user.create", [ user ] );
 		} else {
 			messageId = "user.updated";
-			thisId    = super.fire( "user.update", [ account ] );
+			thisId    = super.fire( "user.update", [ user ] );
 		}
 
 		var message = completeMessage( messageId );
@@ -58,7 +63,7 @@ component extends="com.apirone.core.controller.AbsController" {
         
         var result = super.getResult();
         var list = GetHTTPRequestData().content;
-        var messageId = "account.deletedAllRecords";
+        var messageId = "user.deletedAllRecords";
 
         var errors = [];
         var payload = "";
@@ -66,10 +71,10 @@ component extends="com.apirone.core.controller.AbsController" {
         var ids = ListToArray( list );
 
         for( var id in ids ) {
-            var outcome = super.fire( "account.delete", [ id ] );
+            var outcome = super.fire( "user.delete", [ id ] );
 
             if( outcome.getStatus() == "ERROR"  ) {
-                errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+                errors.add( { "message" = "Non sono riuscito a cancellare l'id #id#" } )
             }
 
         }
@@ -85,24 +90,5 @@ component extends="com.apirone.core.controller.AbsController" {
         
 		event.setValue( "result", result );
 	}    
-
-    function updatePwd( event, rc, prc ){
-
-        var user = prc.user;
-        var result = super.getResult();
-		var messageId = "line.deletedNotAllRecords"
-
-        var raw  = GetHTTPRequestData().content;
-        var json = DESerializeJSON( raw );
-
-        var id = super.fire( "account.setPassword", { newPwd: json.pwd , accountId: json.accountId } );
-
-		var message = super.completeMessage( "account.passwordUpdated" );
-
-        result.setData( { "message" = message } );
-
-        event.setValue( "result", result );
-
-    }    
 
 }

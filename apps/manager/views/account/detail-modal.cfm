@@ -83,7 +83,7 @@
 
 
                                     <div class="mb-3 row">
-                                        <label class="col-sm-2 col-form-label text-end">Conferma password</label>
+                                        <label class="col-sm-2 col-form-label text-end">Conferma pass.</label>
                                         <div class="col-sm-10">
                                             <input class="form-control" name="pwd2" type="password" required
                                                 data-bind="value: detailForm.data.pwd"
@@ -111,7 +111,10 @@
                                                 </div>
 
                                                 <div class="col-sm-4 text-end">
-                                                    <a href="javascript:;" data-bind="click:togglePassword" class="underline float-end fs-12" tabindex="-1" id="label-change-type">Mostra password</a>
+                                                    <a href="javascript:;" data-bind="click:togglePassword" class="underline float-end fs-12" 
+                                                        tabindex="-1" id="label-change-type">
+                                                        Mostra password
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>

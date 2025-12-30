@@ -7,21 +7,13 @@ component extends="com.apirone.core.controller.AbsController" {
         var payload = {};
         var result = super.getResult();
 
+        var thisAccount = prc.user.getAccount();
 
-        var login = super.fire( "auth.login",
-             { 
-                email =  session.user.getAccount().getEmail() , 
-                pwd = rc.currentPwd 
-            } );
+        var login = super.fire( "auth.login", { email = thisAccount.getEmail() , pwd = rc.currentPwd } );
 
         if( login.getStatus() ) {
 
-            super.fire( "account.setPassword", 
-                { 
-                    accountId = session.user.getAccount().getId(),
-                    newPwd = rc.newPwd
-                } 
-            )
+            super.fire( "account.updatePassword", { accountId = thisAccount.getId(), newPwd = rc.newPwd } );
 
             var messageId = "my.passwordChanged";
     

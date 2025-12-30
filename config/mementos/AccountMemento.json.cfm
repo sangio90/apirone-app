@@ -7,6 +7,7 @@
 				"id",
 				"name",
 				"email",
+				"userCount",
 				"serial",
 				"status",
 				"shortId",

@@ -1,7 +1,7 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function get( event, rc, prc ){
-		prc.title = "Il mio account";
+		prc.title = "Il mio profilo";
 
 		prc.jsFiles.add( "app-my" );
 

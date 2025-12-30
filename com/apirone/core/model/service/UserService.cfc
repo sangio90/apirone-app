@@ -27,7 +27,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = getDao().insert( argumentCollection = arguments );
 
-		setPassword( id, arguments.user.getPwd() );
+		getAccountService().removeCache( arguments.user.getAccount().getId() );
 
 		return id;
 	}
@@ -36,7 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = getDao().update( argumentCollection = arguments );
 
-		getCacheManager().remove( getCacheScope(), arguments.user.getId() );
+		removeCache( id );
 
 		return id;
 	}
@@ -53,7 +53,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.userId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getCacheScope(), arguments.userId );
+				removeCache( arguments.userId );
+
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -98,6 +99,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
 		private methods
 	*/
+
+	public Void function removeCache( required String id ){
+
+		var cm = super.getCacheManager();
+
+		var bean = get( arguments.id );
+
+		getCacheManager().remove( getCacheScope(), arguments.id );
+
+		getAccountService().removeCache( bean.getAccount().getId() )
+
+	}
+
 	private com.apirone.core.model.bean.User function build( required String userId ){
 		var record = getDao().read( userId = arguments.userId );
 

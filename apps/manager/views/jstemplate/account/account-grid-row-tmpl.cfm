@@ -12,6 +12,9 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
+            <td class="text-center">
+                <span data-bind="text: userCount"></span>
+            </td>
             <td>
                 <span data-bind="text: getCreatedAt"></span>
             </td>

@@ -69,8 +69,9 @@
                                 id="account-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px'},
-                                    { 'field':'email', 'title':'Email'},
+                                    { 'field':'email', 'title':'Email', width: '35%'},
                                     { 'field':'name', 'title':'Nome'},
+                                    { 'field':'userCount', 'title':'Utenti collegati', width: '50px' },
                                     { 'field':'createdAt', 'title':'Creato il', width: '140px' },
                                     { 'field':'', 'title':'', width: '50px'},
                                     { 

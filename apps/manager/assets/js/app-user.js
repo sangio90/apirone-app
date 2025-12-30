@@ -33,7 +33,9 @@ AP.user.detail = ( function() {
             lang: {
                 id: "IT",
             },
-            selectedRoles: [],
+            role: {
+                id: "",
+            },
             account: {
                 id: ""
             }
@@ -59,8 +61,6 @@ AP.user.detail = ( function() {
                         id: "",
                         email: "-- Seleziona un account",
                     } );
-
-                    console.log( "xhr.data", xhr.data );
 
                     viewModel.set( "detailForm.accounts", xhr.data );
                 },
@@ -106,9 +106,12 @@ AP.user.detail = ( function() {
             var detailForm = fields.detailForm;
             var status = $( ".errors-counter" );
 
+
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
-            if ( detailForm.validate() ) {
+            console.log( "detailForm", detailForm.valid() );
+
+            if ( detailForm.valid() ) {
 
                 NM.util.ajax( {
                     method: "POST",
@@ -134,7 +137,7 @@ AP.user.detail = ( function() {
         },
 
         print: function( item ) {
-            window.open( "/manager/account/print", "_blank" );
+            window.open( "/manager/users/print", "_blank" );
 
             return false;
         },
@@ -142,6 +145,8 @@ AP.user.detail = ( function() {
 
     pub.new = function() {
         viewModel.resetForm();
+
+        loadAccounts();
 
         NM.util.openModal( fields.detailRoot );
     };
@@ -268,12 +273,12 @@ AP.user.list = ( function() {
 
                 NM.util.ajax( {
                     method: "DELETE",
-                    url: "/manager/ajax/accounts",
+                    url: "/manager/ajax/users",
                     data: ids,
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
-                                AP.widget.notify( "error", "Non riesco a cancellare tutti gli account" );
+                                AP.widget.notify( "error", "Non riesco a cancellare tutti gli utenti" );
                             } else {
                                 AP.widget.notify( "success", "Cancellazione avvenuta con successo" );
                             }

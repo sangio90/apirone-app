@@ -79,7 +79,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO users (
-				"user"
+				"user",
 				status_id,
 				role_id,
 				phone,

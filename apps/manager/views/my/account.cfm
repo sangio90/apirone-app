@@ -16,7 +16,7 @@
                             <div class="row">
 
                                 <div class="col-lg-12">
-                                    <h3>Dettagli</h3>
+                                    <h3>Dettagli profilo</h3>
                                 </div>
 
                                 <hr class="mt-3">
@@ -25,7 +25,7 @@
                                     <b>ID:</b>
                                 </div>
                                 <div class="col-9">
-                                    #prc.user.getAccount().getShortId()#
+                                    #prc.user.getShortId()#
                                 </div>
 
                                 <hr class="mt-3">
@@ -52,7 +52,7 @@
                                     <b>Lingua:</b>
                                 </div>
                                 <div class="col-9">
-                                    #prc.user.getAccount().getLang().getName()#
+                                    #prc.user.getLang().getName()#
                                 </div>
 
                                 <hr class="mt-3">
@@ -69,6 +69,15 @@
 
                                     <div class="col-lg-12">
                                         <h3>Modifica la password</h3>
+                                    </div>
+
+                                    <hr class="mt-3">
+
+                                    <div class="col-3 text-end">
+                                        <b>ID account:</b>
+                                    </div>
+                                    <div class="col-9">
+                                        #prc.user.getAccount().getShortId()#
                                     </div>
 
                                     <hr class="mt-3">
@@ -113,9 +122,12 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-12 mt-3 d-flex align-elements-baseline justify-content-start">
+                                    <div class="col-12 mt-3">
                                         #saveButton( label="Modifica password", size="md", bind="click:save")#
-                                        <div class="status ms-2 mt-2"></div>
+
+                                        <br clear="all">
+
+                                        <div class="status mt-2"></div>
                                     </div>
 
                                 </div>

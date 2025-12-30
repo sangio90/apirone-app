@@ -8,6 +8,7 @@
 				"shortId",
 				"createdAt",
 				"serial",
+				"phone",
 				"role",
 				"status",
 				"lang",

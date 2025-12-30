@@ -117,7 +117,7 @@ AP.account.detail = ( function() {
             // update general
             if ( detailForm.is( ":visible" ) ) {
 
-                if ( detailForm.validate() ) {
+                if ( detailForm.valid() ) {
 
                     NM.util.ajax( {
                         method: "POST",
@@ -143,11 +143,15 @@ AP.account.detail = ( function() {
             // update password
             } else {
 
-                var valid = passwordForm.valid();
 
-                if ( valid ) {
+                if ( passwordForm.valid() ) {
 
-                    var data = JSON.stringify( { pwd: $( "#newPwd" ).val(), accountId: viewModel.detailForm.data.id } );
+                    var data = JSON.stringify(
+                        {
+                            pwd: $( "#newPwd" ).val(),
+                            accountId: viewModel.detailForm.data.id
+                        }
+                    );
 
                     NM.util.ajax( {
                         method: "POST",
@@ -206,6 +210,8 @@ AP.account.detail = ( function() {
 
         var detailForm = fields.detailForm;
         var passwordForm = fields.passwordForm;
+
+        console.log( "detailForm", detailForm );
 
         detailForm.validate( {
             ignore: ".ignore", // for change action, skip password.
@@ -284,6 +290,7 @@ AP.account.detail = ( function() {
                 newPwd2: {
                     required: "Password di conferma richiesta",
                     pwdRule: "Le password non coincidono",
+                    equalTo: "Le password non coincidono"
                 }
             },
 

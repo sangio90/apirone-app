@@ -35,9 +35,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			Throw( type = "apirone.accountService.PasswordNotProvided", message = "Password is required" );
 		};
 
-		var id = getDao().insert( argumentCollection = arguments );
+		transaction {
+			var id = getDao().insert( argumentCollection = arguments );
 
-		setPassword( id, arguments.account.getPwd() );
+			updatePassword( id, arguments.account.getPwd() );
+		}
 
 		return id;
 	}
@@ -52,7 +54,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = getDao().update( argumentCollection = arguments );
 
-		getCacheManager().remove( getCacheScope(), arguments.account.getId() );
+		removeCache( id );
 
 		return id;
 	}
@@ -60,7 +62,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function updateLastLoggedUserId( required String accountId, required String userId ){
 		var id = getDao().updateLastLoggedUserId( arguments.accountId, arguments.userId );
 
-		getCacheManager().remove( getCacheScope(), arguments.accountId );
+		removeCache( id );
 
 		return id;
 	}
@@ -98,28 +100,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	/*
-		TODO: replace name with updatePassword
-	*/
-	public Boolean function setPassword( required String accountId, required String newPwd ){
-		var obj = get( arguments.accountId )
+	public Boolean function updatePassword( required String accountId, required String newPwd ){
+		var obj = get( arguments.accountId );
+		var StringUtil = new com.apirone.core.util.String();
 
 		if ( IsNull( obj ) ) {
 			Throw(
-				type    = "apirone.accountService.AccountNotExists",
+				type    = "ApirOne.errors.accountService.AccountNotExists",
 				message = "AccountId [#arguments.accountId#] not exists"
 			);
 		}
 
 		if ( !Len( arguments.newPwd ) ) {
-			Throw( type = "apirone.accountService.PasswordNotProvided", message = "Password is required" );
+			Throw( type = "ApirOne.errors.accountService.PasswordNotProvided", message = "Password is required" );
 		};
 
 		var pwd = createPassword( arguments.accountId, arguments.newPwd );
 
 		getDao().updatePassword( arguments.accountId, pwd );
 
-		getCacheManager().remove( getCacheScope(), arguments.accountId );
+		removeCache( arguments.accountId );
+
+		super.logEvent(
+			event   = "account.UPDATED",
+			message = "Password for account [#arguments.accountId#] updated",
+			payload = { "id" = arguments.accountId, "newPwd" = StringUtil.maskString( arguments.newPwd ) }
+		);		
 
 		return true;
 	}
@@ -155,12 +161,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Result function search(
 		String email,
 		required Numeric limit  = 50,
-		required Numeric offset = 0
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "account.id", desc = "asc" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
 
+		arguments["orderBy"] = super.createOrderBy( arguments[ "orderby" ] );
+
 		var records = getDao().find( argumentCollection = arguments );
+
 
 		for ( var record in records ) {
 			rows.add( get( accountId = record.account_id ) )
@@ -183,9 +193,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return Hash( token, "SHA-512" );
 	}
 
+	public Void function removeCache( required String id ){
+
+		getCacheManager().remove( getCacheScope(), id );
+	}
+
+
 	/**
 	 * @private
 	 */
+
 	private com.apirone.core.model.bean.Account function build( required String accountId ){
 		var record = getDao().read( accountId = arguments.accountId );
 
@@ -201,6 +218,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setSerial( record.serial );
 			account.setLastLoggedUserId( record.last_logged_user_id );
 			account.setCreatedAt( record.created_at );
+			account.setUserCount( record.user_count );
 
 			account.setStatus( getStatusService().get( record.status_id ) );
 		}

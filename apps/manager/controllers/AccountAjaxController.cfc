@@ -7,8 +7,10 @@ component extends="com.apirone.core.controller.AbsController" {
         var memy = super.getMementify()
 
         var args = super.paramsFromUrl()
+
+		args["orderBy"] = [ { field = "account.email", desc = "asc" } ]
         
-        var rows = super.fire("account.search", args).getData();
+        var rows = super.fire("account.search", args ).getData();
 
 		var data = memy.convertList( rows, "list" );
         
@@ -33,11 +35,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var account = super.bean( "Account" );
 		var status  = super.bean( "Status" );
-		var lang    = super.bean( "Lang" );
 
 		var thisId    = "";
 		var messageId = "";
-		var roles     = [];
 
 		var json = DeserializeJSON( getHTTPRequestData().content );
 
@@ -45,20 +45,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		account.setEmail( json.email );
 		account.setName( json?.name );
 		account.setPwd( json?.pwd );
-		//account.setPhone( json?.phone );
-		//account.setLang( lang.setId( json.lang.id ) );
 		account.setStatus( status.setId( json.status.id ) );
-
-		/*
-		for ( var thisRole in json.selectedRoles ) {
-
-			var role   = super.bean( "Role" );
-
-			role.setId( thisRole.id );
-			roles.add( role );
-		}
-		account.setRoles( roles );
-		*/
 
 		if ( !len( json.id ) ) {
 			messageId = "account.created";
@@ -117,7 +104,7 @@ component extends="com.apirone.core.controller.AbsController" {
         var raw  = GetHTTPRequestData().content;
         var json = DESerializeJSON( raw );
 
-        var id = super.fire( "account.setPassword", { newPwd: json.pwd , accountId: json.accountId } );
+        var id = super.fire( "account.updatePassword", { newPwd: json.pwd , accountId: json.accountId } );
 
 		var message = super.completeMessage( "account.passwordUpdated" );
 
