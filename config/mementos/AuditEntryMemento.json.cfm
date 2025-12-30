@@ -21,6 +21,7 @@
 				"user.id",
 				"user.name",
 				"user.shortId",
+				"user.account.email",
 				"message",
 				"severity",
 				"entity",

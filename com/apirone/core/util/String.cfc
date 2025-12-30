@@ -27,4 +27,18 @@
     
     }
 
+	public String function maskString( required String value, Numeric visibleChars = 3 ){
+		var len = Len( arguments.value );
+
+		if ( len <= arguments.visibleChars ) {
+			return arguments.value;
+		}
+
+		var maskedLength = len - arguments.visibleChars;
+		var masked       = RepeatString( "*", maskedLength );
+		var visible      = Right( arguments.value, arguments.visibleChars );
+
+		return masked & visible;
+	}    
+
 }

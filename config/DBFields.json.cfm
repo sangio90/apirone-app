@@ -369,4 +369,16 @@
         "name": "external_id",
         "type": "varchar"
     },
+    "account.id": {
+        "name": "account_id",
+        "type": "varchar"
+    },
+    "account.email": {
+        "name": "email",
+        "type": "varchar"
+    },
+    "account.createdAt": {
+        "name": "created_at",
+        "type": "Date"
+    },
 }
