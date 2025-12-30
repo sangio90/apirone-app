@@ -395,6 +395,7 @@ h2 {
 .divider::after {
     flex: 1;
     content: "";
+    height: 1px;
     /* padding: 0.5px; */
     background-color: #cccccc;
 }

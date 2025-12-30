@@ -100,7 +100,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 		var mm     = super.getMementify();
 
-		params[ "quotationItemId" ] = rc.id;
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 

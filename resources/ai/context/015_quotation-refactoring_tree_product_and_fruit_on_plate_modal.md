@@ -23,4 +23,3 @@ POST /api/register
 ```
 
 (Successo - 201): { "status": "success", "data": { "id": 123, "createdAt": "2025-12-19" } } 
-
