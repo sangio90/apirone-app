@@ -6,7 +6,7 @@
 			SELECT
 				*
 			FROM
-				roles_permissions
+				membership.roles_permissions
 			WHERE
 				role_permission_id = <cfqueryparam cfsqltype="Integer" value="#arguments.rolePermissionId#">
 		</cfquery>
@@ -18,23 +18,25 @@
 		<cfargument name="roleId" type="String">
 		<cfargument name="permissionId" type="String">
 
-		<cfargument name="orderby" required="true" type="String" default="role_permission_id desc">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="orderby" required="true" type="String" default="role_permission_id desc">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				role_permission_id,
 				COUNT(role_permission_id) OVER() AS total
 			FROM
-				roles_permissions
+				membership.roles_permissions
 			WHERE 1=1
 				<cfif !IsNull( arguments.roleId )>
 					AND role_id = <cfqueryparam value="#arguments.roleId#" cfsqltype="varchar">
 				</cfif>
+
 				<cfif !IsNull( arguments.permissionId )>
 					AND permission_id = <cfqueryparam value="#arguments.permissionId#" cfsqltype="varchar">
 				</cfif>
+			
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
 
@@ -53,7 +55,7 @@
 		<cfargument name="rolePermission" type="com.apirone.core.model.bean.RolePermission" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO roles_permissions (
+			INSERT INTO membership.roles_permissions (
 				role_id,
 				permission_id
 			)
@@ -71,7 +73,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM
-				roles_permissions
+				membership.roles_permissions
 			WHERE
 				role_permission_id = <cfqueryparam cfsqltype="Integer" value="#arguments.rolePermissionId#">
 			RETURNING role_permission_id
@@ -79,4 +81,5 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
+
 </cfcomponent>

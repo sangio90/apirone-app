@@ -1,6 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	//property name="lookupService" inject="LookupService";
+	property name="dao" inject="RoleDAO";
 	property name="rolePermissionService" inject="RolePermissionService";
 	property name="cacheScope" type="String" default="Role.bean";
 
@@ -19,15 +19,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public Array function list(){
+	public Array function list(
+		String str,
+		required Array orderBy  = [ { field = "role.id", desc = "asc" } ]
+	){
 		
-		var rows = [];
-		
-		var roles = getRawList();
+		var rows   = [];
 
-		roles.each( function ( item ){
-			rows.add( get( item.id ) );
-		}); 
+		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
+
+		var records = getDao().find( argumentCollection = arguments );
+
+		records.each( function( record ){
+			rows.add( get( roleId = record.role_id ) );
+		} );
 
 		return rows;
 	}
@@ -44,32 +49,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		private methods
 	*/
 
-	private com.apirone.core.model.bean.Role function build( required roleId ){
+	private com.apirone.core.model.bean.Role function build( required String roleId ){
+		var record = getDao().read( arguments.roleId );
 
-		var bean = super.bean( "Role" );
-		var role = getRawItem( roleId );
+		if ( record.recordCount ) {
+			var bean = super.bean( "Role" );
 
-		bean.setId( role.id );
-		bean.setName( role.name );
+			bean.setName( record.role );
 
-		bean.setPermissions( getRolePermissionService().list( roleId = role.id ) );
-		
-		return bean;
-	}
+			bean.setId( record.role_id );
+			bean.setCreatedAt( record.created_at );
 
-	private Array function getRawList(){
-		var list   = DeserializeJSON( FileRead( ExpandPath( "/config/data/roles.json.cfm" ) ) );
+			bean.setPermissions( getRolePermissionService().list( roleId = arguments.roleId ) );
 
-		return list;
-	}
-
-	private Struct function getRawItem( roleId ){
-		var list = getRawList();
-
-		for( var item in list ) {
-			if( item.id == arguments.roleId ) {
-				return item;
-			}
+			return bean;
 		}
 
 		return NullValue();

@@ -11,7 +11,7 @@
 				user_id::varchar,
 				*
 			FROM
-				users
+				membership.users
 			WHERE
 				user_id = <cfqueryparam cfsqltype="Other" value="#arguments.userId#">
 		</cfquery>
@@ -36,11 +36,11 @@
 				user_id::varchar,
 				COUNT(user_id) OVER() AS total
 			FROM
-				users
+				membership.users
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.str )>
-					AND "user" ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+					AND user_name ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>
@@ -78,8 +78,8 @@
 		<cfargument name="user" type="com.apirone.core.model.bean.User" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO users (
-				"user",
+			INSERT INTO membership.users (
+				user_name,
 				status_id,
 				role_id,
 				phone,
@@ -104,9 +104,9 @@
 		<cfargument name="user" type="com.apirone.core.model.bean.User" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE users
+			UPDATE membership.users
 			SET
-				"user" = <cfqueryparam cfsqltype="varchar" value="#arguments.user.getName()#">,
+				user_name = <cfqueryparam cfsqltype="varchar" value="#arguments.user.getName()#">,
 				phone = <cfqueryparam cfsqltype="varchar" value="#arguments.user.getPhone()#">,
 				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.user.getStatus().getId()#">,
 				role_id = <cfqueryparam cfsqltype="varchar" value="#arguments.user.getRole().getId()#">,
@@ -123,7 +123,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM
-				users
+				membership.users
 			WHERE
 				user_id = <cfqueryparam cfsqltype="Other" value="#arguments.userId#">
 			RETURNING user_id

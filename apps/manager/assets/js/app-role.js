@@ -1,4 +1,4 @@
-AP.role = AP.role || {};
+AP.namespace( "role" );
 
 AP.role.fields = {
     rolesList: $( "#role-list-root" ),
@@ -49,7 +49,7 @@ AP.role.detail = ( function() {
 
         selectAll: function( event ) {
             NM.util.checkAll( event.currentTarget );
-            viewModel.get('detailForm.data.entity.permissions').forEach((permission) => permission.active = event.currentTarget.checked);
+            viewModel.get( "detailForm.data.entity.permissions" ).forEach( ( permission ) => permission.active = event.currentTarget.checked );
 
             return false;
         },
@@ -60,10 +60,8 @@ AP.role.detail = ( function() {
                 url: "/manager/ajax/roles/" + viewModel.get( "detailForm.data.id" ) + "/permissions?entityId=" + viewModel.get( "detailForm.data.entity.id" ),
                 callback: {
                     done: function( xhr ) {
-                        if ( xhr.status == "SUCCESS" ) {
-                            viewModel.set( "detailForm.data.entity.permissions", xhr.data );
-                            $( "#permission-grid" ).removeClass( "hidden" );
-                        }
+                        viewModel.set( "detailForm.data.entity.permissions", xhr.data );
+                        $( "#permission-grid" ).removeClass( "hidden" );
                     },
                 },
             } );
@@ -81,10 +79,11 @@ AP.role.detail = ( function() {
                 data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                 callback: {
                     done: function( xhr ) {
-                        if ( xhr.status == "SUCCESS" ) {
-                            NM.util.autoHideMessage( status );
-                            AP.widget.notify( "success", xhr.data.message.text );
-                        }
+                        status.html( "" );
+                        AP.widget.notify( "success", xhr.data.message.text );
+
+                        viewModel.getPermissions();
+
                     },
                 },
             } );
@@ -96,12 +95,13 @@ AP.role.detail = ( function() {
     pub.edit = function( role ) {
         viewModel.set( "detailForm", getDefaultDetailForm() );
 
-        // $('#permission-grid').addClass('hidden')
+        var entities = AP.page.entities.slice();
+
         viewModel.set( "detailForm.title", "Modifica Ruoli < " + role.name + " >" );
         viewModel.set( "detailForm.data.id", role.id );
         viewModel.set( "detailForm.data.name", role.name );
-        var entities = AP.page.entities.slice();
-        entities.unshift( { "id": "", "name": "-- Seleziona un Entità" } );
+
+        entities.unshift( { "id": "", "name": "-- Seleziona una entità" } );
         viewModel.set( "detailForm.entities", entities );
 
         NM.util.openModal( fields.rolePermissions );
@@ -110,9 +110,9 @@ AP.role.detail = ( function() {
     pub.init = function() {
 
         kendo.bind( AP.role.fields.rolePermissions, viewModel );
-        $(document).on('click', '[name="selectAll"]', function (e) {
-            viewModel.selectAll(e);
-        });
+        $( document ).on( "click", "[name=\"selectAll\"]", function( e ) {
+            viewModel.selectAll( e );
+        } );
 
     };
 
@@ -125,6 +125,7 @@ AP.role.list = ( function() {
 
     var pub = {};
     var rolePermissions = AP.role.detail;
+    var fields = AP.role.fields;
 
     var dataSources = {
         items: AP.page.roles,
@@ -133,6 +134,7 @@ AP.role.list = ( function() {
     var viewModel = kendo.observable( {
         rows: dataSources.items,
         edit: function( event ) {
+
             rolePermissions.edit( event.data );
 
             return false;
@@ -140,7 +142,7 @@ AP.role.list = ( function() {
     } );
 
     pub.init = function() {
-        kendo.bind( AP.role.fields.rolesList, viewModel );
+        kendo.bind( fields.rolesList, viewModel );
     };
 
     return pub;

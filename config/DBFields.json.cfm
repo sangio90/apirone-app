@@ -381,4 +381,12 @@
         "name": "created_at",
         "type": "Date"
     },
+    "role.id": {
+        "name": "role_id",
+        "type": "Varchar"
+    },
+    "permission.id": {
+        "name": "permission_id",
+        "type": "Varchar"
+    },
 }

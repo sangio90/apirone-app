@@ -50,7 +50,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create( required com.apirone.core.model.bean.RolePermission rolePermission ){
 		var newId = getDao().insert( arguments.rolePermission );
+
 		getRoleService().removeCache( getRoleService().get( rolePermission.getRoleId() ) );
+
 
 		return newId;
 	}
@@ -65,7 +67,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.rolePermissionId );
 				outcome.setData( { "deletedCount" = result } )
-				super.getCacheManager().remove( getCacheScope(), arguments.rolePermissionId );
+				//super.getCacheManager().remove( getCacheScope(), arguments.rolePermissionId );
+				removeCache( get( arguments.rolePermissionId ) );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -77,6 +80,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+	public Void function removeCache( required com.apirone.core.model.bean.RolePermission rolePermission ){
+
+		getRoleService().removeCache( getRoleService().get( rolePermission.getRoleId() ) );
+		super.getCacheManager().remove( getCacheScope(), arguments.rolePermission.getId() );
+
+	}
+
+
 	private com.apirone.core.model.bean.RolePermission function build( required String rolePermissionId ){
 		var record = getDao().read( arguments.rolePermissionId );
 
@@ -86,7 +97,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.role_permission_id );
 			bean.setPermission( getLookupService().get( "permission", record.permission_id ) );
 			bean.setRoleId( record.role_id );
-			bean.setActive( true );
+			//bean.setActive( true );
 			bean.setCreatedAt( record.created_at );
 
 			return bean;

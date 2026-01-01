@@ -16,7 +16,7 @@
 				--roles,
 				*
 			FROM
-				accounts
+				membership.accounts
 			WHERE
 				account_id = <cfqueryparam cfsqltype="varchar" value="#arguments.accountId#">::uuid
 		</cfquery>
@@ -37,7 +37,7 @@
 					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
 				) AS email
 			FROM
-				accounts
+				membership.accounts
 			WHERE
 				pgp_sym_decrypt(email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get("encryptKey")#">) = <cfqueryparam cfsqltype="varchar" value="#arguments.email#">
 		</cfquery>
@@ -66,7 +66,7 @@
 				COUNT(account_id) OVER() AS total,
 				pgp_sym_decrypt( email::bytea, <cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#"> ) AS email
 			FROM
-				accounts
+				membership.accounts
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.email )>
@@ -116,7 +116,7 @@
 		<cfargument name="account" type="com.apirone.core.model.bean.Account" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO accounts (
+			INSERT INTO membership.accounts (
 				email,
 				status_id,
 				account
@@ -139,7 +139,7 @@
 		<cfargument name="account" type="com.apirone.core.model.bean.Account" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE accounts
+			UPDATE membership.accounts
 			SET
 				account = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">,
 				email = pgp_sym_encrypt( 
@@ -159,7 +159,7 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE FROM
-				accounts
+				membership.accounts
 			WHERE
 				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.lineId#">
 			RETURNING account_id
@@ -174,7 +174,7 @@
 		<cfargument name="pwd" required="Yes" type="String">
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE accounts
+			UPDATE membership.accounts
 			SET
 				pwd = <cfqueryparam cfsqltype="varchar" value="#trim(arguments.pwd)#">
 			WHERE
@@ -191,7 +191,7 @@
 		<cfargument name="userId" required="Yes" type="String">
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE accounts
+			UPDATE membership.accounts
 			SET
 				last_logged_user_id = <cfqueryparam cfsqltype="Other" value="#trim(arguments.userId)#">
 			WHERE

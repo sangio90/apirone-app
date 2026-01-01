@@ -1,12 +1,11 @@
 ﻿{
-	defaultIncludes = [ "id", "permission", "roleId", "active", "createdAt" ],
+	defaultIncludes = [ "id", "permission", "roleId", "createdAt" ],
 	profiles = {
 		list = {
 			defaultIncludes = [
 				"id",
 				"permission",
 				"roleId",
-				"active",
 				"createdAt"
 			]
 		}

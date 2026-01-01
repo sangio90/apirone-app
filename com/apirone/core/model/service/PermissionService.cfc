@@ -1,57 +1,61 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
+	property name="dao" inject="PermissionDAO";
 	property name="lookupService" inject="LookupService";
 
 	property name="cacheScope" type="String" default="Permission.bean";
 
-	public com.apirone.core.model.bean.Permission function get( permission ){
+	public com.apirone.core.model.bean.Permission function get( required String permissionId ){
 		var cm = getCacheManager();
 
-		var cache = cm.get( getCacheScope(), arguments.permission.id );
+		var cache = cm.get( getCacheScope(), arguments.permissionId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
-		var bean = build( arguments.permission );
-		cm.put( getCacheScope(), arguments.permission.id, bean );
+		var bean = build( arguments.permissionId );
+		cm.put( getCacheScope(), arguments.permissionId, bean );
 
 		return bean;
 	}
 
-	public Array function list( String permissionId, String entityId ){
-		var rows        = [];
-		var result      = super.getResult();
-		var permissions = DeserializeJSON( FileRead( "/config/data/permissions.json.cfm" ) );
+	public Array function list(
+		String str,
+		String permissionId,
+		String entityId,
+		required Array orderBy  = [ { field = "permission.id", desc = "asc" } ]
+	){
+		
+		var rows   = [];
 
-		if ( !IsNull( entityId ) ) {
-			permissions = permissions.filter( function( item ){
-				return item.entityId == entityId;
-			} );
-		}
+		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-		if ( !IsNull( permissionId ) ) {
-			permissions = permissions.filter( function( item ){
-				return item.id == permissionId;
-			} );
-		}
+		var records = getDao().find( argumentCollection = arguments );
 
-		permissions.each( function( record ){
-			rows.add( get( record ) );
+		records.each( function( record ){
+			rows.add( get( permissionId = record.permission_id ) );
 		} );
 
 		return rows;
 	}
 
-	private com.apirone.core.model.bean.Permission function build( required permission ){
-		var bean = super.bean( "Permission" );
+	private com.apirone.core.model.bean.Permission function build( required String permissionId ){
+		var record = getDao().read( arguments.permissionId );
 
-		bean.setId( permission.id );
+		if ( record.recordCount ) {
+			var bean = super.bean( "Permission" );
 
-		bean.setName( permission.name );
-		bean.setEntity( getLookupService().get( "entity", permission.entityId ) );
+			bean.setId( record.permission_id );
+			bean.setName( record.permission );
+			bean.setCreatedAt( record.created_at );
 
-		return bean;
+			bean.setEntity( getLookupService().get( "entity", record.entity_id ) );
+
+			return bean;
+		}
+
+		return NullValue();
 	}
 
 }

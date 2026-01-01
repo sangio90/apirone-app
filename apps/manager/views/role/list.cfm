@@ -16,16 +16,18 @@
 
                         <form name="role-grid-form" id="role-grid-form" method="get">
                             <div class="col-12">
-								#table(
+
+								#grid(
+									id    = "role-grid",
                                     class = "no-pager",
-									id = "role-grid",
 									columns = "[
-                                        { 'title':'ID',  width: '10%' },
+                                        { 'title':'ID',  width: '70px' },
                                         { 'title':'Nome' },
-                                        { 'title':'Modifica', width: '10%'}
+                                        { 'title':'', 'width' :'50px', 'headerAttributes': { 'class': 'text-center' } }
                                     ]",
 									rowTemplate = "role/role-grid-row-tmpl"
 								)#
+
 							</div>
 
                         </form>
@@ -37,6 +39,6 @@
 
     </div>
     
-    #view("role/detail")#
+    #view("role/detail-modal")#
 
 </cfoutput>

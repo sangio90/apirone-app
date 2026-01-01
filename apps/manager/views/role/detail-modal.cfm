@@ -35,11 +35,11 @@
                                 columns="[
                                     { 'field':'id', 'title':'ID', width: '30%' },
                                     { 'field':'name', 'title':'Nome', width: '30%'},
-                                    { 'field':'created_at', 'title':'Data', width: '30%'},
+                                    { 'field':'createdAt', 'title':'Data', width: '30%'},
                                     { 
                                         'field':'', 
                                         'title':'<input type=checkbox name=selectAll>',
-                                        'width':'10%',
+                                        'width':'35px',
                                         'headerAttributes': { 'class': 'justify-content-center' }
                                     }
                                 ]",

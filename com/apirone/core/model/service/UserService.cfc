@@ -119,7 +119,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var user = super.bean( "User" );
 
 			user.setId( record.user_id );
-			user.setName( record.user );
+			user.setName( record.user_name );
 			user.setSerial( record.serial );
 			user.setPhone( record.phone );
 			//user.setApiKey( record.api_key );
