@@ -1,7 +1,8 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="RolePermissionDAO";
-	property name="lookupService" inject="lookupService";
+	property name="lookupService" inject="LookupService";
+	property name="permissionService" inject="PermissionService";
 	property name="roleService" inject="RoleService";
 
 	property name="cacheScope" type="String" default="RolePermission.bean";
@@ -95,7 +96,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bean = super.bean( "RolePermission" );
 
 			bean.setId( record.role_permission_id );
-			bean.setPermission( getLookupService().get( "permission", record.permission_id ) );
+			bean.setPermission( getPermissionService().get( record.permission_id ) );
 			bean.setRoleId( record.role_id );
 			//bean.setActive( true );
 			bean.setCreatedAt( record.created_at );

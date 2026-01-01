@@ -22,6 +22,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		"priceMethod"         = { "bean" = "priceMethod", "file" = "priceMethods.json.cfm" },
 		"articleType"         = { "bean" = "articleType", "file" = "articleTypes.json.cfm" },
 		"frameCellType"       = { "bean" = "frameCellType", "file" = "frameCellTypes.json.cfm" },
+		"roleType"            = { "bean" = "roleType", "file" = "roleTypes.json.cfm" },
 		"productCategoryMode" = { "bean" = "productCategoryMode", "file" = "productCategoryModes.json.cfm" }
 	}
 	// cfformat-ignore-end

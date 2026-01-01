@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="RoleDAO";
 	property name="rolePermissionService" inject="RolePermissionService";
+	property name="lookupService" inject="LookupService";
 	property name="cacheScope" type="String" default="Role.bean";
 
 	public com.apirone.core.model.bean.Role function get( required String roleId ){
@@ -59,6 +60,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.role_id );
 			bean.setCreatedAt( record.created_at );
+			bean.setType( getLookupService().get( "roleType", record.role_type_id ) );
 
 			bean.setPermissions( getRolePermissionService().list( roleId = arguments.roleId ) );
 

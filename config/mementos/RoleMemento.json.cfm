@@ -1,3 +1,3 @@
 ﻿{
-	defaultIncludes = [ "id", "name", "permissions" ],
+	defaultIncludes = [ "id", "name", "permissions", "type" ],
 }

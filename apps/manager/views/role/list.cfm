@@ -17,12 +17,13 @@
                         <form name="role-grid-form" id="role-grid-form" method="get">
                             <div class="col-12">
 
-								#grid(
+								#grid(  
 									id    = "role-grid",
                                     class = "no-pager",
 									columns = "[
                                         { 'title':'ID',  width: '70px' },
                                         { 'title':'Nome' },
+                                        { 'title':'Tipo' },
                                         { 'title':'', 'width' :'50px', 'headerAttributes': { 'class': 'text-center' } }
                                     ]",
 									rowTemplate = "role/role-grid-row-tmpl"

@@ -9,6 +9,10 @@
             <td>
                 <span data-bind="text: name"></span>
             </td>
+            <td>
+                <span data-bind="text: type.name"></span>
+                <span class="small-code">(<span data-bind="text: type.id"></span>)</span>
+            </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
             </td>
