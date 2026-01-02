@@ -1,15 +1,16 @@
 ﻿<cfoutput>
     <div id="quotation-detail-root">
         <div class="row mb-3">
-            <div class="col-lg-4">
+            <div class="col-lg-3">
                 <h2>#prc.title#</h2>
             </div>
 			
-            <div class="col-8 text-end mt-3">
+            <div class="col-9 text-end mt-3">
 				#button( href = "/manager/quotations", size = "sm", label = "Torna ai preventivi", icon="arrow-left", class="me-4" )#
 				#button( bind = "click:showHeader", size = "sm", label = "Dettaglio", icon="edit" )#
-                #button( bind = "click:exportProducts", size = "sm", label = "Esporta Articoli", icon="file-export", class="export-button" )#
-                #button( bind = "click:export", size = "sm", label = "Esporta Preventivo", icon="file-export", class="export-button" )#
+                #button( bind = "click:exportProducts", size = "sm", label = "Esporta articoli", icon="file-export", class="export-button" )#
+                #button( bind = "click:export", size = "sm", label = "Esporta preventivo", icon="file-export", class="export-button" )#
+				#button( bind = "click:openStatusModal", size = "sm", label = "Status", icon="check-circle" )#
 				#button( bind = "click:openPrintModal", size = "sm", label = "Stampa", icon="print" )#
 			</div>
             <div class="export-button-tooltip col-6 text-end">
@@ -151,6 +152,7 @@
 
     #view( "quotation/zone-modal" )#
     #view( "quotation/print-modal" )#
+    #view( "quotation/status-modal" )#
 
     #view( "quotation/totals" )#
 
@@ -160,31 +162,4 @@
     
     #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
 
-    <script>
-        /*
-        document.addEventListener('DOMContentLoaded', function() {
-            // Attiva il tab in base all'hash nell'URL
-            const hash = window.location.hash;
-            if (hash) {
-                const tabTrigger = document.querySelector(`button[data-bs-target="${hash}"]`);
-                if (tabTrigger) {
-                    const tab = new bootstrap.Tab(tabTrigger);
-                    tab.show();
-                }
-            }
-
-            // Aggiungi hash all'URL quando si clicca su un tab
-            const tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
-            
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const target = this.getAttribute('data-bs-target');
-                    if (target) {
-                        window.location.hash = target;
-                    }
-                });
-            });
-        });
-        */
-    </script>
 </cfoutput>

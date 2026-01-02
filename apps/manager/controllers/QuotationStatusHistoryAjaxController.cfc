@@ -30,39 +30,36 @@ component extends="com.apirone.core.controller.AbsController" {
 		transaction {
 			var tmpDir = getTempDir();
 			var extension = super.fire( "File.getExtensionFromDataUrl", [ json.statusFile ] );
-			if (IsNull(extension)) {
-				return "Formato File non valido.";
-			}
+
 			fileName   = "quotation_status_history_" & json.id & "_" & json.status.id & extension;
 			filePath   = tmpDir & "/" & fileName;
 			binaryData = ToBinary( json.fileBase64 );
 
 			FileWrite( filePath, binaryData );
 
-			var quotationStatusHistory = super.bean( "QuotationStatusHistory" );
+			var bean = super.bean( "QuotationStatusHistory" );
+			var entity = super.bean( "Entity" );
 
-			quotationStatusHistory.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
-			quotationStatusHistory.setAccount( super.service( "Account" ).get( json.account.id ) );
-			quotationStatusHistory.setStatus( super.service( "Status" ).get( json.status.id ) );
+			bean.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
+			bean.setAccount( super.service( "Account" ).get( json.account.id ) );
+			bean.setStatus( super.service( "Status" ).get( json.status.id ) );
 
 			if ( !Len( json.id ) ) {
 				messageId = "quotationStatusHistory.created";
-				thisId    = super.fire( "quotationStatusHistory.create", [ quotationStatusHistory ] )
+				thisId    = super.fire( "quotationStatusHistory.create", [ bean ] )
 			} else {
 				messageId = "quotationStatusHistory.updated";
-				thisId    = super.fire( "quotationStatusHistory.update", [ quotationStatusHistory ] )
+				thisId    = super.fire( "quotationStatusHistory.update", [ bean ] )
 			}
 
 			var files = super.fire( "File.search", { quotationStatusHistoryId = thisId } );
+
 			if ( Len( files.getData() ) ) {
 				for ( var file in files.getData() ) {
 					super.fire( "File.delete", { fileId = file.getId() } );
 				}
 			}
 
-			var entity = super.bean( "Entity" );
-
-			var kindId = "quotationStatusHistory";
 			entity.setKey( "quotationStatusHistory.id" );
 			entity.setValue( thisId );
 
@@ -71,7 +68,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				{
 					filePath = filePath,
 					typeId   = "default",
-					kindId   = kindId,
+					kindId   = "quotationStatusHistory",
 					entity   = entity
 				}
 			);

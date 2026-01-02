@@ -10,7 +10,7 @@
 		"createdAt",
 		"name",
 		"active",
-		"status",
+		"statusHistory",
 		"vatCode",
 		"owner.name",
 		"owner.shortId"
@@ -27,7 +27,7 @@
 				"quotationDate",
 				"name",
 				"active",
-				"status",
+				"statusHistory",
 				"vatCode",
 				"lead",
 				"lang",
@@ -41,7 +41,6 @@
 				"graphicTechnicianAccount",
 				"shippingProfile",
 				"createdAt",
-				"statusFile",
 				"owner.name",
 				"owner.shortId"
 			]

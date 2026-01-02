@@ -445,20 +445,17 @@
 
 		get( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.totals" ).end();
 		post( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.updateTotals" ).end();
+
+		get( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.list" ).end();
+		post( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.save" ).end();
+		delete( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.delete" ).end();
+
 		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 		
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
 		post( "/quotations" ).to( "QuotationController.create" ).end(); // Da togliere
 		get( "/quotations" ).to( "QuotationController.list" ).end();
-
-		//get( "/ajax/quotations/:id/total" ).to( "QuotationAjaxController.getPrice" ).end();
-
-
-		get( "/ajax/quotation-status-history/:quotationId" ).to( "QuotationStatusHistoryAjaxController.list" ).end();
-		post( "/ajax/quotation-status-history" ).to( "QuotationStatusHistoryAjaxController.save" ).end();
-		delete( "/ajax/quotation-status-history" ).to( "QuotationStatusHistoryAjaxController.delete" ).end();
-
 
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();

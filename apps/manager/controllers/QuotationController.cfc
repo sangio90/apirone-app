@@ -41,6 +41,7 @@
 		// prc.jsFiles.add( "app-plate-designer" );
 		// prc.jsFiles.add( "app-quotation-header" );
 		prc.jsFiles.add( "app-quotation-header" );
+		prc.jsFiles.add( "app-quotation-status" );
 		prc.jsFiles.add( "app-quotation-detail" );
 		prc.jsFiles.add( "app-quotation-pricing" );
 

@@ -5,6 +5,7 @@ Object.assign( AP.quotation.fields, {
     detailForm: $( "#quotation-detail-header-form" ),
     zoneModalRoot: $( "#zone-modal-root" ),
     printModalRoot: $( "#print-modal-root" ),
+    statusModalRoot: $( "#qt-status-modal-root" ),
     totalItemBox: $( "#quotation-totals-item" ),
     addPlateBtn: $( "#qt-add-plate" ),
     addSignageBtn: $( "#qt-add-signage" ),
@@ -57,6 +58,10 @@ AP.quotation.detail = ( function() {
 
     function headerApp() {
         return AP.quotation.header;
+    }
+
+    function statusApp() {
+        return AP.quotation.status;
     }
 
     var viewModel = kendo.observable( {
@@ -567,6 +572,12 @@ AP.quotation.detail = ( function() {
             }
 
             NM.util.openModal( AP.quotation.fields.printModalRoot );
+        },
+
+        openStatusModal: function() {
+
+            statusApp().edit();
+
         },
     } );
 

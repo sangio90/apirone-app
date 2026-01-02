@@ -13,14 +13,14 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="lead" type="com.apirone.core.model.bean.Lead";
 	property name="paymentMethod" type="com.apirone.core.model.bean.PaymentMethod";
 	property name="currency" type="com.apirone.core.model.bean.Currency";
-	property name="status" type="com.apirone.core.model.bean.Status";
+	property name="statusHistory" type="com.apirone.core.model.bean.QuotationStatusHistory";
 	property name="lang" type="com.apirone.core.model.bean.Lang";
 	//property name="billingProfile" type="com.apirone.core.model.bean.BillingProfile";
 	property name="shippingProfile" type="com.apirone.core.model.bean.ShippingProfile";
 	property name="owner" type="com.apirone.core.model.bean.User";
 	property name="salesAgentAccount" type="com.apirone.core.model.bean.User";
 	property name="graphicTechnicianAccount" type="com.apirone.core.model.bean.User";
-	property name="statusFile" type="com.apirone.core.model.bean.File"; //TODO: remove
+	//property name="statusFile" type="com.apirone.core.model.bean.File"; //TODO: remove
 	property name="calculatedAmount" type="Numeric";
 	property name="serial" type="Numeric";
 	property name="exported" type="Boolean";

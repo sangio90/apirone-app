@@ -46,10 +46,6 @@ AP.quotation.header = ( function() {
             quotationDate: quotationDate,
             validityDate: validityDate,
             notes: "",
-            status: {
-                id: null,
-                name: "",
-            },
             statusFile: {
                 id: null,
                 file: null
@@ -101,7 +97,6 @@ AP.quotation.header = ( function() {
             },
         },
         title: "Modifica preventivo",
-        quotationStatusHistory: new kendo.data.DataSource(),
         totals: {
             "id": null
         }
@@ -119,48 +114,6 @@ AP.quotation.header = ( function() {
         countries: new kendo.data.DataSource(),
         states: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
-
-        toggleQuotationStatusHistoryDocument: function() {
-            const statusId = viewModel.get( "detailForm.data.status.id" );
-            if ( statusId == "CCN" ) {
-                return true;
-            }
-            return false;
-
-        },
-
-        toggleDownloadDocumentButton: function() {
-            const statusFileId = viewModel.get( "detailForm.data.statusFile.id" );
-            if ( !statusFileId ) {
-                return false;
-            }
-            return true;
-
-        },
-
-        downloadFile: function() {
-            var uri = viewModel.detailForm.data.statusFile.uri;
-            if ( !uri ) { return; }
-
-            var link = document.createElement( "a" );
-            link.href = uri;
-            link.download = viewModel.detailForm.data.statusFile.name || "document.pdf";
-            document.body.appendChild( link );
-            link.click();
-            document.body.removeChild( link );
-        },
-
-        downloadGridFile: function( event ) {
-            var uri = event.data?.fileUri;
-            if ( !uri ) { return; }
-
-            var link = document.createElement( "a" );
-            link.href = uri;
-            link.download = viewModel.detailForm.data.statusFile.name || "document.pdf";
-            document.body.appendChild( link );
-            link.click();
-            document.body.removeChild( link );
-        },
 
         crmCustomers: new kendo.data.DataSource( {
             serverFiltering: true,
@@ -331,10 +284,8 @@ AP.quotation.header = ( function() {
         },
 
         save: function() {
+
             var thisForm = fields.haderForm;
-
-            // console.log( "fields.haderForm", fields.haderForm );
-
             var status = thisForm.find( ".save-status" );
 
             thisForm.validate( {
@@ -420,15 +371,9 @@ AP.quotation.header = ( function() {
                     callback: {
                         done: function( xhr ) {
 
-                            if ( parsedData.status.id != "CCN" ) {
-                                viewModel.set( "detailForm.data.statusFile", null );
-                            }
-
                             status.html( "" );
                             AP.widget.notify( "success", "Preventivo salvato correttamente." );
 
-                            // window.location.href = "/manager/quotations/" + xhr.data.payload.id;
-                            //console.log( "id", viewModel.get( "detailForm.data.id" ) );
                             if ( viewModel.get( "detailForm.data.id" ) != "" ) {
                                 window.location.reload();
                             } else {
@@ -470,35 +415,6 @@ AP.quotation.header = ( function() {
             }
         } );
 
-        NM.util.ajax( {
-            method: "GET",
-            url: "/manager/ajax/quotation-status-history/" + id,
-            callback: {
-                done: function( xhr ) {
-                    const data = xhr.data;
-                    const parsedData = [];
-
-                    data.forEach( function( item ) {
-                        const parsedItem = {
-                            "status": item.status.name,
-                            "account": item.account.email,
-                            "fileName": item.file?.name,
-                            "fileUri": item.file?.uri,
-                            "createdAt": item.createdAt
-                        };
-                        parsedData.push( parsedItem );
-                    } );
-
-                    viewModel.set( "detailForm.data.quotationStatusHistory", parsedData );
-
-                    setTimeout( function() {
-                        AP.loading.hide();
-                    }, 1000 );
-
-                }
-            }
-        } );
-
         // $( "#quotationNameInput" ).prop( "readonly", true );
         $( "#quotationNumberInput" ).prop( "readonly", true );
     };
@@ -516,21 +432,6 @@ AP.quotation.header = ( function() {
         viewModel.get( "countries" ).data( AP.page.countries );
         viewModel.get( "states" ).data( AP.page.states );
         viewModel.get( "vatCodes" ).data( AP.page.vatCodes );
-
-        $( "#quotationStatusHistoryFile" ).on( "change", function( event ) {
-
-            const file = event.target.files[0];
-
-            if ( file ) {
-                const reader = new FileReader();
-                reader.readAsDataURL( file );
-                reader.onload = function( evt ) {
-                    const base64 = evt.target.result;
-                    viewModel.set( "detailForm.data.statusFile", { "file": base64, "id": null } );
-                };
-
-            }
-        } );
 
         $( "#nav-status-tab" ).on( "click", function( event ) {
             $( "#nav-actual-tab" ).trigger( "click" );

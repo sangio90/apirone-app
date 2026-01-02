@@ -8,7 +8,6 @@
 				<button class="nav-link" id="nav-billing-tab" data-bs-toggle="tab" data-bs-target="##nav-billing" type="button" role="tab">Indirizzo di fatturazione</button>
 				<button class="nav-link" id="nav-shipping-tab" data-bs-toggle="tab" data-bs-target="##nav-shipping" type="button" role="tab">Indirizzo di spedizione</button>
 				<button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button>
-				<button class="nav-link" id="nav-status-tab" data-bs-toggle="tab" data-bs-target="##nav-status" type="button" role="tab">Stato</button>
 				<!--- <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button> --->
 				<!--- <button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatario</button> --->
 				<!--- <button class="nav-link" id="nav-plan-tab" data-bs-toggle="tab" data-bs-target="##nav-plan" type="button" role="tab" hidden>Planimentria</button> --->
@@ -323,90 +322,6 @@
 							</div>
 						</div>
 					
-					</div>
-
-				</div>
-
-			</div>
-
-			<!---
-				status
-			--->
-			<div class="tab-pane fade" id="nav-status" role="tabpanel">
-
-				<div class="row mb-3">
-					<nav>
-						<div class="nav nav-tabs" id="nav-tab" role="tablist">
-							<button class="nav-link" id="nav-actual-tab" data-bs-toggle="tab" data-bs-target="##nav-actual" type="button" role="tab">Stato Attuale</button>
-							<button class="nav-link" id="nav-history-tab" data-bs-toggle="tab" data-bs-target="##nav-history" type="button" role="tab">Cronologia</button>
-						</div>
-					</nav>
-				</div>
-				
-				<div class="tab-content" id="nav-tabContent">
-
-					<div class="tab-pane fade" id="nav-actual" role="tabpanel">
-						<div class="row mb-3">
-
-							<div class="col-6">
-
-								<div class="form-group row mb-3">
-									<label class="col-3 control-label text-sm-end pt-2">Stato</label>
-									<div class="col-9">
-										<select name="status" class="form-control"
-											data-bind="source: statuses, value: detailForm.data.status"
-											data-value-field="id"
-											data-text-field="name"
-										>
-										</select>
-									</div>
-								</div>
-								<div class="form-group row mb-3" id="statusDocumentRow" data-bind="visible: toggleQuotationStatusHistoryDocument">
-									<label class="col-3 control-label text-sm-end pt-2">Documento</label>
-									<div class="col-9">
-										<input type="file" id="quotationStatusHistoryFile" class="mb-1 form-control">
-									</div>
-									<label class="col-3 control-label text-sm-end pt-2"></label>
-									<div class="col-9">
-										<div data-bind="text: detailForm.data.statusFile.name">
-										</div>
-										<span 
-											class="btn btn-default btn-sm" 
-											id="documentDownloadButton" 
-											data-bind="click: downloadFile, visible: toggleDownloadDocumentButton"
-										>
-											Scarica Documento
-										</span>
-									</div>
-								</div>
-							
-							</div>
-						</div>
-
-					</div>
-					<div class="tab-pane fade" id="nav-history" role="tabpanel">
-						<div class="row mb-3">
-
-							<div class="col-12">
-								<form name="quotation-status-history-grid-form" id="quotation-status-history-grid-form" method="get">
-
-									#grid( 
-										id="quotation-status-history-grid",
-                                        class="no-pager",
-										columns="[
-											{ 'field':'createdAt', 'title':'Data', width: '10%'},
-											{ 'field':'account', 'title':'Operatore', width: '20%'},
-											{ 'field':'status', 'title':'Stato', width: '20%'},
-											{ 'field':'', 'title':'', width: '10%'}
-										]",
-                                    	source="detailForm.data.quotationStatusHistory",
-										rowTemplate="quotation/quotation-status-history-grid-row-tmpl"
-									)#
-
-								</form>
-							</div>
-
-						</div>
 					</div>
 
 				</div>

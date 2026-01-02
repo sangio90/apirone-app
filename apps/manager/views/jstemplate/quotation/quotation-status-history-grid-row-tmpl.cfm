@@ -16,7 +16,7 @@
                 <span 
                     class="btn btn-default btn-sm" 
                     id="documentDownloadButton" 
-                    data-bind="click: downloadGridFile, visible: fileName"
+                    data-bind="click: download, visible: fileName"
                 >
                     <i class="fas fa-download"></i>
                 </span>
