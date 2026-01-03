@@ -30,8 +30,12 @@
 	public String function maskString( required String value, Numeric visibleChars = 3 ){
 		var len = Len( arguments.value );
 
+		if ( len == 0 ) {
+			return "";
+		}
+
 		if ( len <= arguments.visibleChars ) {
-			return arguments.value;
+			return RepeatString( "*", len );
 		}
 
 		var maskedLength = len - arguments.visibleChars;

@@ -18,6 +18,7 @@ module.exports = {
             "pageData": "readonly",
             "markerjs3": "readonly",
             "setTimeout": "readonly",
+            "FileReader": "readonly",
             "html2canvas": "readonly",
             "localStorage": "readonly"
         }

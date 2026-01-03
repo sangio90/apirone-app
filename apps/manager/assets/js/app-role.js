@@ -97,7 +97,7 @@ AP.role.detail = ( function() {
 
         var entities = AP.page.entities.slice();
 
-        viewModel.set( "detailForm.title", "Modifica Ruoli < " + role.name + " >" );
+        viewModel.set( "detailForm.title", "Modifica permessi per < " + role.name + " >" );
         viewModel.set( "detailForm.data.id", role.id );
         viewModel.set( "detailForm.data.name", role.name );
 

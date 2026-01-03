@@ -69,7 +69,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		getCacheManager().remove( getCacheScope(), arguments.fileId );
 	}
 
-
 	public String function create(
 		required String filePath, // full path of file, from /tmp for example
 		required String typeId, // configurated in Configuration.imagesConfig
@@ -203,20 +202,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	function getExtensionFromDataUrl(dataUrl) {
-		var mime = listGetAt(dataUrl, 1, ",");          // "data:application/pdf;base64"
-		mime = replace(mime, "data:", "", "one");      // "application/pdf"
-		mime = listGetAt(mime, 1, ";");                // "application/pdf"
+	public String function getExtensionFromDataUrl( required String dataUrl ) {
+		var mime = listGetAt(dataUrl, 1, ",");         // "data:application/pdf;base64"
+		    mime = replace(mime, "data:", "", "one");  // "application/pdf"
+		    mime = listGetAt(mime, 1, ";");            // "application/pdf"
 
 		var mapping = {
 			"application/pdf": "pdf",
-			"image/jpeg": "jpg",
-			"image/png": "png",
-			"image/gif": "gif",
-			"image/webp": "webp"
+			"image/jpeg"     : "jpg",
+			"image/jpg"      : "jpg",
+			"image/png"      : "png",
+			"image/gif"      : "gif",
+			"image/webp"     : "webp"
 		};
 
-		return mapping[mime] ?: null;
+		return mapping[ mime ] ?: null;
 	}
 
 }

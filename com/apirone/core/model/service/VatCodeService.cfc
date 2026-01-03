@@ -53,6 +53,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( record.RecordCount ) {
 			var bean = super.bean( "VatCode" );
+			
+			var record = trimQueryFields( record );
 
 			bean.setId( record.ivacod );
 			bean.setName( record.ivades );

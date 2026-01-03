@@ -1,12 +1,12 @@
 ﻿<cfoutput>
 	<div id="quotation-totals" class="container py-3 quotation-totals-box">
 		<div>
-			<div class="d-flex" style="width: 100%">
+			<div class="d-flex hand" data-bind="click: collapseTotals">
 				<div class="justify-content-start" style="width: 95%" id="qt-totals-title">
 					<h3 data-bind="text: common.title"></h3>
 				</div>
-				<div style="font-size: 1.5em; cursor: pointer" 
-					id="qt-item-totals-symbol" data-bind="click:collapseTotals, text:common.symbol"></div>
+				<div style="font-size: 1.5em;"
+					id="qt-item-totals-symbol" data-bind="text:common.symbol"></div>
 			</div>
 
 			<div class="quotation-totals-content" id="quotation-totals-content" data-bind="invisible:common.isCollapsed">
