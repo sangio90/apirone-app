@@ -4,19 +4,22 @@
     <nmscript type="text/x-kendo-template" id="quotation-status-history-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td>
-                <span data-bind="text: createdAt"></span>
+                <span data-bind="text: id"></span>
             </td>
             <td>
-                <span data-bind="text: account"></span>
+                <span data-bind="text: status.name"></span>
+                <span class="small-code">(<span data-bind="text: status.id"></span>)</span>
             </td>
             <td>
-                <span data-bind="text: status"></span>
+                <span data-bind="text: getCreatedAt"></span>
+            </td>
+            <td>
+                <span data-bind="text: user.name"></span>
             </td>
             <td class="text-center">
                 <span 
                     class="btn btn-default btn-sm" 
-                    id="documentDownloadButton" 
-                    data-bind="click: download, visible: fileName"
+                    data-bind="click: download, visible: file.id"
                 >
                     <i class="fas fa-download"></i>
                 </span>

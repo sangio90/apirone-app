@@ -23,45 +23,55 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
-		var json = DeserializeJSON( GetHTTPRequestData().content );
-		
+
 		var result = super.getResult();
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+		
+		var bean = super.bean( "QuotationStatusHistory" );
+		
+		bean.setQuotationId( json.quotation.id );
+		bean.setStatus( super.service( "Status" ).get( json.newStatus.id ) );
+		bean.setUser( super.service( "User" ).get( session.user.getId() ) );
 
-		transaction {
+		if ( !Len( json.id ) ) {
+			messageId = "quotationStatusHistory.created";
+			thisId    = super.fire( "quotationStatusHistory.create", [ bean ] )
+		} else {
+			messageId = "quotationStatusHistory.updated";
+			thisId    = super.fire( "quotationStatusHistory.update", [ bean ] );
+		}
+
+		//var files = super.fire( "File.search", { quotationStatusHistoryId = thisId } );
+
+		/*
+		if ( Len( files.getData() ) ) {
+			for ( var file in files.getData() ) {
+				super.fire( "file.delete", { fileId = file.getId() } );
+			}
+		}
+		*/
+
+		if( Len( json.statusFile.base64 ) AND ( json.newStatus.id == "CCN" ) ) {
+
 			var tmpDir = getTempDir();
-			var extension = super.fire( "File.getExtensionFromDataUrl", [ json.statusFile ] );
-
-			fileName   = "quotation_status_history_" & json.id & "_" & json.status.id & extension;
-			filePath   = tmpDir & "/" & fileName;
-			binaryData = ToBinary( json.fileBase64 );
-
-			FileWrite( filePath, binaryData );
-
-			var bean = super.bean( "QuotationStatusHistory" );
 			var entity = super.bean( "Entity" );
-
-			bean.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
-			bean.setAccount( super.service( "Account" ).get( json.account.id ) );
-			bean.setStatus( super.service( "Status" ).get( json.status.id ) );
-
-			if ( !Len( json.id ) ) {
-				messageId = "quotationStatusHistory.created";
-				thisId    = super.fire( "quotationStatusHistory.create", [ bean ] )
-			} else {
-				messageId = "quotationStatusHistory.updated";
-				thisId    = super.fire( "quotationStatusHistory.update", [ bean ] )
-			}
-
-			var files = super.fire( "File.search", { quotationStatusHistoryId = thisId } );
-
-			if ( Len( files.getData() ) ) {
-				for ( var file in files.getData() ) {
-					super.fire( "File.delete", { fileId = file.getId() } );
-				}
-			}
 
 			entity.setKey( "quotationStatusHistory.id" );
 			entity.setValue( thisId );
+
+			var extension  = super.fire( "file.getExtensionFromDataUrl", [ json.statusFile.base64 ] );
+
+			var base64String = ReReplaceNoCase(
+				json.statusFile.base64,
+				"^data:[^;]+;base64,",
+				""
+			);
+
+			var fileName   = "quotation_status_history_" & thisId & "." & extension;
+			var filePath   = tmpDir & "/" & fileName;
+			var binaryData = ToBinary( base64String );
+
+			FileWrite( filePath, binaryData );
 
 			var fileId = super.fire(
 				"file.create",
@@ -74,7 +84,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			);
 
 		}
-		
+
 		var message = getMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );

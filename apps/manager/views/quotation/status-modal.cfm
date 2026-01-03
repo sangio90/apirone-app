@@ -57,11 +57,13 @@
 									</div>
 								</div>
 
-								<div class="form-group row mb-3" id="statusDocumentRow">
+								<div class="form-group row mb-3" id="statusDocumentRow" data-bind="visible: showDocumentRequired">
 									<label class="col-3 control-label text-sm-end pt-2">Documento</label>
 								
 									<div class="col-9">
-										<input type="file" id="statusFile" class="mb-1 form-control" name="statusFile">
+										<input type="file" id="qt-status-file" class="mb-1 form-control" 
+											name="qt-status-file"
+											data-bind="events: { change: onFileChange }">
 									</div>
 								
 									<label class="col-3 control-label text-sm-end pt-2"></label>
@@ -83,29 +85,28 @@
 
 							<div class="tab-pane fade" id="qt-status-nav-grid-tab" role="tabpanel" aria-labelledby="qt-status-nav-grid-but">
 
-								<div class="tab-pane fade" id="nav-history" role="tabpanel">
-									<div class="row mb-3">
+								<div class="row mb-3">
 
-										<div class="col-12">
-											<form name="qt-status-history-grid-form" id="qt-status-history-grid-form" method="get">
+									<div class="col-12">
+										<form name="qt-status-history-grid-form" id="qt-status-history-grid-form" method="get">
 
-												#grid( 
-													id="qt-status-history-grid",
-													class="no-pager",
-													columns="[
-														{ 'field':'createdAt', 'title':'Data', width: '10%'},
-														{ 'field':'account', 'title':'Operatore', width: '20%'},
-														{ 'field':'status', 'title':'Stato', width: '20%'},
-														{ 'field':'', 'title':'', width: '10%'}
-													]",
-													source="rows",
-													rowTemplate="quotation/quotation-status-history-grid-row-tmpl"
-												)#
+											#grid( 
+												id="qt-status-history-grid",
+												class="no-pager",
+												columns="[
+													{ 'field':'id', 'title':'ID', width: '50px'},
+													{ 'field':'status', 'title':'Stato'},
+													{ 'field':'createdAt', 'title':'Data', width: '135px'},
+													{ 'field':'user.name', 'title':'Operatore'},
+													{ 'field':'file.name', 'title':'Documento', width: '50px'}
+												]",
+												source="rows",
+												rowTemplate="quotation/quotation-status-history-grid-row-tmpl"
+											)#
 
-											</form>
-										</div>
-
+										</form>
 									</div>
+
 								</div>
 
 							</div>

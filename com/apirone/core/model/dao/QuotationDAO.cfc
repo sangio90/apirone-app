@@ -4,8 +4,8 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				quotation_id::varchar,
-				status_id::varchar,
+				quotations.quotation_id::varchar,
+				<!--- status_id::varchar, ---->
 				lang_id::varchar,
 				pricelist_id::varchar,
 				payment_method_id::varchar,
@@ -17,7 +17,8 @@
 				shipping_profile_id::varchar,
 				*
 			FROM quotations
-			WHERE quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
+				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
+			WHERE quotations.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
 		</cfquery>
 
 		<cfreturn local.q>
@@ -47,8 +48,8 @@
 
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
-				quotation_id::varchar,
-				status_id::varchar,
+				quotations.quotation_id::varchar,
+				<!--- status_id::varchar, ---->
 				lang_id::varchar,
 				pricelist_id::varchar,
 				payment_method_id::varchar,
@@ -58,8 +59,9 @@
 				sales_agent_account_id::varchar,
 				graphic_technician_account_id::varchar,
 				shipping_profile_id::varchar,
-				COUNT( quotation_id ) OVER() AS total
+				COUNT( quotations.quotation_id ) OVER() AS total
 			FROM quotations
+				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
 			WHERE 1=1
 
 			<cfif !IsNull( arguments.str )>
@@ -70,7 +72,7 @@
 			</cfif>
 
 			<cfif !IsNull( arguments.statusId )>
-				AND status_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.statusId#">
+				AND quotation_status_history.status_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.statusId#">
 			</cfif>
 
 			<cfif !IsNull( arguments.langId )>

@@ -10,7 +10,7 @@
 				#button( bind = "click:showHeader", size = "sm", label = "Dettaglio", icon="edit" )#
                 #button( bind = "click:exportProducts", size = "sm", label = "Esporta articoli", icon="file-export", class="export-button" )#
                 #button( bind = "click:export", size = "sm", label = "Esporta preventivo", icon="file-export", class="export-button" )#
-				#button( bind = "click:openStatusModal", size = "sm", label = "Status", icon="check-circle" )#
+				#button( bind = "click:openStatusModal", size = "sm", label = "Status: #prc.quotation.getStatusHistory().getStatus().getName()#", icon="check-circle" )#
 				#button( bind = "click:openPrintModal", size = "sm", label = "Stampa", icon="print" )#
 			</div>
             <div class="export-button-tooltip col-6 text-end">

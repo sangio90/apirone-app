@@ -33,13 +33,12 @@
 		prc.title     = "Modifica preventivo";
 
 		var quotation = super.fire( "Quotation.get", [ rc.id ] );
+		prc.quotation = quotation;
 
 		prc.page = getData().page;
 		prc.page[ "quotation" ]["id"] = quotation.getId();
 		prc.page[ "quotation" ]["exported"] = quotation.getExported();
 
-		// prc.jsFiles.add( "app-plate-designer" );
-		// prc.jsFiles.add( "app-quotation-header" );
 		prc.jsFiles.add( "app-quotation-header" );
 		prc.jsFiles.add( "app-quotation-status" );
 		prc.jsFiles.add( "app-quotation-detail" );

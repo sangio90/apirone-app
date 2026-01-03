@@ -41,6 +41,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		records.each( function( record ){
 			rows.add( get( quotationStatusHistoryId = record.quotation_status_history_id ) );
 		} );
+
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );
@@ -63,16 +64,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteQuotationStatusHistory" );
-				outcome.setMessage( "Cannot delete Quotation Status History [#arguments.quotationStatusHistoryId#]" );
+				outcome.setType( "ApirOne.errors.QuotationStatusHistoryService.CannotDeleteQuotationStatusHistory" );
+				outcome.setMessage( "Cannot delete quotation status history [#arguments.quotationStatusHistoryId#]" );
 			}
 		}
 		return outcome;
 	}
 
 	public String function create( required com.apirone.core.model.bean.QuotationStatusHistory quotationStatusHistory ){
-		//arguments.quotationStatusHistory.getAccount().setId( getCurrentAccountId() );
 		var newId = getDao().insert( arguments.quotationStatusHistory );
+
+		getQuotationService().removeCache( quotationStatusHistory.getQuotationId() );
 
 		return newId;
 	}

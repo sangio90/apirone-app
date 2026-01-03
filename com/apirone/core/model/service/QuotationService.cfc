@@ -4,7 +4,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	variables.verticalePwd = "Gs16072001!";
 	variables.verticaleSecret = ToBase64('#variables.verticaleUser#:#variables.verticalePwd#');
 
-
 	property name="dao" inject="QuotationDAO";
 
 	property name="quotationService" inject="QuotationService";
@@ -128,10 +127,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		arguments.quotation.setQuotationNumber( getLastNumber() + 1 );
 		arguments.quotation.setVersionNumber( 1 );
 
-		//transaction {
-
-			//TODO: remove this, get status from last record of history
-			//arguments.quotation.setStatus( status );
+		transaction {
 
 			var newId = getDao().insert( arguments.quotation );
 
@@ -147,9 +143,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getQuotationStatusHistoryService().create( history );
 
-			//get after first status
-			//var newQuotation = get( newId );
-
 
 			/*
 				add first zone
@@ -163,7 +156,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getQuotationZoneService().create( zone );			
 
-		//}
+		}
 
 		return newId;
 	
@@ -975,11 +968,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.quotation;
 	}
 
-
-	/*
-		private method
-	*/
-
 	/**
 	 * Crea un oggetto ExportCode e i relativi ExportCodeRawValue.
 	 * @param code Il codice base per il nome.
@@ -1021,6 +1009,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			exportCodeRawValueService.create( exportCodeRawValue );
 		}
 	}
+
+	public Void function removeCache( required String quotationId ){
+		
+		super.getCacheManager().remove( getCacheScope(), arguments.quotationId );
+
+	}	
+
+	/*
+		private method
+	*/
 
 	private Void function notifyProductsVerticale(){
 
@@ -1073,7 +1071,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 
 			//by a trigger from history
-			bean.setStatus( getStatusService().get( record.status_id ) ); 
+			//bean.setStatus( getStatusService().get( record.status_id ) ); 
+			bean.setStatusHistory( getQuotationStatusHistoryService().get( record.quotation_status_history_id ) ); 
 
 			if ( !IsNull( record.customer_id ) ) {
 				
@@ -1122,6 +1121,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCalculatedAmount(
 				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
 			);
+
+
 
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );

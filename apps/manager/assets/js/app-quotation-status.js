@@ -5,11 +5,18 @@ Object.assign( AP.quotation.fields, {
     statusForm: $( "#qt-status-detail-form" ),
 } );
 
+$( document ).ready( function() {
+    if ( AP.quotation.fields.statusModalRoot.length ) {
+        AP.quotation.status.init();
+    }
+} );
+
+
 AP.quotation.status = ( function() {
     var pub = {};
     var fields = AP.quotation.fields;
 
-    var loadStatusHistory = function() {
+    var loadHistory = function() {
 
         NM.util.ajax( {
             method: "GET",
@@ -31,32 +38,19 @@ AP.quotation.status = ( function() {
 
         kendo.bind( fields.statusModalRoot, viewModel );
 
-        AP.page.statuses.unshift( { id: "", name: "-- Seleziona uno stato" } );
+        // AP.page.statuses.unshift( { id: "", name: "-- Seleziona uno stato" } );
 
         viewModel.set( "statuses", AP.page.statuses );
 
-        $( "#statusFile" ).on( "change", function( event ) {
-
-            const file = event.target.files[0];
-
-            if ( file ) {
-                const reader = new FileReader();
-                reader.readAsDataURL( file );
-                reader.onload = function( evt ) {
-                    const base64 = evt.target.result;
-                    viewModel.set( "detailForm.data.statusFile", { "file": base64, "id": null } );
-                };
-
-            }
-        } );
-
     };
-
 
     var viewModel = kendo.observable( {
         detailForm: {
             data: {
                 id: "",
+                quotation: {
+                    id: AP.page.quotation.id
+                },
                 statusHistory: {
                     id: "",
                     status: {
@@ -65,6 +59,10 @@ AP.quotation.status = ( function() {
                 },
                 newStatus: {
                     id: "",
+                },
+                statusFile: {
+                    id: "",
+                    base64: ""
                 }
             }
         },
@@ -79,16 +77,41 @@ AP.quotation.status = ( function() {
             onLoad: undefined,
         },
 
+        onFileChange: function( event ) {
+
+            const file = event.target.files[0];
+
+            if ( file ) {
+                const reader = new FileReader();
+                reader.readAsDataURL( file );
+                reader.onload = function( evt ) {
+                    const base64 = evt.target.result;
+                    viewModel.set( "detailForm.data.statusFile.base64", base64 );
+                };
+
+            }
+        },
+
         showDocumentRequired: function( event ) {
 
-            const statusId = viewModel.get( "detailForm.data.newStatus.status.id" );
-            console.log( "documentRequired", statusId );
+            const statusId = viewModel.get( "detailForm.data.newStatus.id" );
 
             if ( statusId == "CCN" ) {
                 return true;
             }
             return false;
 
+        },
+
+        getCreatedAt: function( event ) {
+            return NM.kendo.formatISODate( event.createdAt );
+        },
+
+        getFileId: function( event ) {
+
+            console.log( "event:getFileId", event );
+
+            return "";
         },
 
         toggleDownloadDocumentButton: function() {
@@ -101,77 +124,16 @@ AP.quotation.status = ( function() {
         },
 
         download: function( event ) {
-            var uri = event.data?.fileUri;
+
+            var uri = event.data?.file?.uri;
             if ( !uri ) { return; }
 
-            var link = document.createElement( "a" );
-            link.href = uri;
-            link.download = viewModel.detailForm.data.statusFile.name || "document.pdf";
-            document.body.appendChild( link );
-            link.click();
-            document.body.removeChild( link );
-        },
+            window.open( uri, "_blank" ).focus();
 
-        downloadFile: function() {
-            var uri = viewModel.detailForm.data.statusFile.uri;
-            if ( !uri ) { return; }
-
-            var link = document.createElement( "a" );
-            link.href = uri;
-            link.download = viewModel.detailForm.data.statusFile.name || "document.pdf";
-            document.body.appendChild( link );
-            link.click();
-            document.body.removeChild( link );
-        },
-
-
-        delete: function( event ) {
-
-            event.stopPropagation();
-            var itemId = event.currentTarget.dataset.id;
-
-            bootbox.confirm( {
-                title: "Conferma eliminazione",
-                message: "Sei sicuro di voler cancellare questa riga del preventivo?",
-                buttons: {
-                    confirm: {
-                        label: "Si, confermo",
-                        className: "btn-primary",
-                    },
-                    cancel: {
-                        label: "No, chiudi",
-                        className: "btn-danger",
-                    },
-                },
-                callback: function( result ) {
-                    if ( result ) {
-                        NM.util.ajax( {
-                            method: "DELETE",
-                            url: "/manager/ajax/quotation-items",
-                            data: itemId,
-                            callback: {
-                                done: function( xhr ) {
-                                    if ( xhr.status == "INVALID" ) {
-                                        NM.form.showMessages( xhr.data );
-                                        return;
-                                    }
-
-                                    AP.widget.notify( "success", "Stato cancellato correttamente." );
-                                    window.location.href = "/manager/quotations/" + AP.page.quotation.id + "/statuses";
-                                }
-                            }
-                        } );
-                    }
-                },
-            } );
-
-            return false;
         },
 
         save: function( event ) {
             var thisForm = fields.statusForm;
-
-            console.log( "save", thisForm );
 
             thisForm.validate( {
                 onfocusout: function( element ) {
@@ -199,7 +161,7 @@ AP.quotation.status = ( function() {
                         required: "Stato richiesto.",
                     },
                     statusFile: {
-                        required: "Carica il documento del cliente"
+                        required: "Carica il documento di conferma del cliente"
                     }
 
                 }
@@ -207,7 +169,10 @@ AP.quotation.status = ( function() {
 
             if ( thisForm.valid() ) {
 
-                const data = viewModel.get( "detailForm.data" );
+                var data = viewModel.get( "detailForm.data" );
+                var status = thisForm.find( ".status" );
+
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
                 NM.util.ajax( {
                     method: "POST",
@@ -215,10 +180,14 @@ AP.quotation.status = ( function() {
                     data: JSON.stringify( data ),
                     callback: {
                         done: function( xhr ) {
-                            AP.widget.notify( "success", "Stato salvato correttamente." );
-                            viewModel.set( "detailForm", {} );
 
-                            loadStatuses();
+                            status.html( "" );
+
+                            AP.widget.notify( "success", "Stato salvato correttamente." );
+
+                            setTimeout( function() {
+                                window.location.reload();
+                            }, 1000 );
 
                         }
                     }
@@ -232,23 +201,40 @@ AP.quotation.status = ( function() {
 
     pub.edit = function() {
 
-        init();
-
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/" + AP.page.quotation.id,
             callback: {
                 done: function( xhr ) {
                     viewModel.set( "detailForm.data.statusHistory", xhr.data.statusHistory );
+
+                    // Trova lo stato successivo nell'array
+                    var currentStatusId = viewModel.get( "detailForm.data.statusHistory.status.id" );
+
+                    var currentIndex = AP.page.statuses.findIndex( function( status ) {
+                        return status.id === currentStatusId;
+                    } );
+
+                    var nextStatus = "";
+                    if ( currentIndex !== -1 && currentIndex < AP.page.statuses.length - 1 ) {
+                        nextStatus = AP.page.statuses[currentIndex + 1];
+                    }
+
+                    viewModel.set( "detailForm.data.newStatus", nextStatus );
+
                 }
             }
         } );
 
-        loadStatusHistory();
-
-        // kendo.bind( fields.statusModalRoot, viewModel );
+        loadHistory();
 
         NM.util.openModal( fields.statusModalRoot );
+
+    };
+
+    pub.init = function() {
+
+        init();
 
     };
 
