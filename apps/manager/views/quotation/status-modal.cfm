@@ -65,20 +65,7 @@
 											name="qt-status-file"
 											data-bind="events: { change: onFileChange }">
 									</div>
-								
-									<label class="col-3 control-label text-sm-end pt-2"></label>
-									<div class="col-9">
-										<div data-bind="text: detailForm.data.statusFile.name">
-										</div>
-										<span 
-											class="btn btn-default btn-sm" 
-											id="documentDownloadButton" 
-											data-bind="click: downloadFile, visible: toggleDownloadDocumentButton"
-										>
-											Scarica Documento
-										</span>
-									</div>
-								
+									
 								</div>
 
 							</div>
@@ -96,9 +83,10 @@
 												columns="[
 													{ 'field':'id', 'title':'ID', width: '50px'},
 													{ 'field':'status', 'title':'Stato'},
-													{ 'field':'createdAt', 'title':'Data', width: '135px'},
+													{ 'field':'createdAt', 'title':'Data', width: '145px'},
 													{ 'field':'user.name', 'title':'Operatore'},
-													{ 'field':'file.name', 'title':'Documento', width: '50px'}
+													{ 'field':'file.name', 'title':'Scarica', width: '50px'},
+													{ 'field':'file.name', 'title':'Modifica', width: '50px'}
 												]",
 												source="rows",
 												rowTemplate="quotation/quotation-status-history-grid-row-tmpl"
@@ -132,6 +120,8 @@
             </div>
         </section>
     
-    </div>
+		#view( "quotation/status-file-modal" )#
+
+	</div>
 
 </cfoutput>

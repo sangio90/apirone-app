@@ -22,6 +22,24 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function saveFile( event, rc, prc ){
+
+		var result = super.getResult();
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+
+		super.fire( "file.delete", [ json.statusHistory.file.currentId ] );
+
+		var fileId = storeFile( json.statusHistory.file.newFileBase64, json.statusHistory.id );
+
+		super.fire( "QuotationStatusHistory.removeCache", [ json.statusHistory.id ] );
+
+		var message = getMessage( "QuotationStatusHistory.fileSaved" );
+
+		result.setData( { "message" = message }, { "payload" = { id = fileId } } );
+
+		event.setValue( "result", result );
+	}	
+
 	function save( event, rc, prc ){
 
 		var result = super.getResult();
@@ -41,47 +59,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotationStatusHistory.update", [ bean ] );
 		}
 
-		//var files = super.fire( "File.search", { quotationStatusHistoryId = thisId } );
-
-		/*
-		if ( Len( files.getData() ) ) {
-			for ( var file in files.getData() ) {
-				super.fire( "file.delete", { fileId = file.getId() } );
-			}
-		}
-		*/
-
 		if( Len( json.statusFile.base64 ) AND ( json.newStatus.id == "CCN" ) ) {
 
-			var tmpDir = getTempDir();
-			var entity = super.bean( "Entity" );
-
-			entity.setKey( "quotationStatusHistory.id" );
-			entity.setValue( thisId );
-
-			var extension  = super.fire( "file.getExtensionFromDataUrl", [ json.statusFile.base64 ] );
-
-			var base64String = ReReplaceNoCase(
-				json.statusFile.base64,
-				"^data:[^;]+;base64,",
-				""
-			);
-
-			var fileName   = "quotation_status_history_" & thisId & "." & extension;
-			var filePath   = tmpDir & "/" & fileName;
-			var binaryData = ToBinary( base64String );
-
-			FileWrite( filePath, binaryData );
-
-			var fileId = super.fire(
-				"file.create",
-				{
-					filePath = filePath,
-					typeId   = "default",
-					kindId   = "quotationStatusHistory",
-					entity   = entity
-				}
-			);
+			var fileId = storeFile( json.statusFile.base64, thisId );
 
 		}
 
@@ -113,6 +93,44 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( { "message" = getMessage( "quotationStatusHistory.deleted" )  } );
 
 		event.setValue( "result", result );
+	}
+
+	/*
+		private methods
+	*/
+
+	private String function storeFile( base64String, quotationStatusHistoryId ){
+		var tmpDir = getTempDir();
+		var entity = super.bean( "Entity" );
+
+		entity.setKey( "quotationStatusHistory.id" );
+		entity.setValue( quotationStatusHistoryId );
+
+		var extension  = super.fire( "file.getExtensionFromDataUrl", [ arguments.base64String ] );
+
+		var base64String = ReReplaceNoCase(
+			arguments.base64String,
+			"^data:[^;]+;base64,",
+			""
+		);
+
+		var fileName   = "quotation_status_history_" & quotationStatusHistoryId & "." & extension;
+		var filePath   = tmpDir & "/" & fileName;
+		var binaryData = ToBinary( base64String );
+
+		FileWrite( filePath, binaryData );
+
+		var fileId = super.fire(
+			"file.create",
+			{
+				filePath = filePath,
+				typeId   = "default",
+				kindId   = "quotationStatusHistory",
+				entity   = entity
+			}
+		);
+
+		return fileId;
 	}
 
 }

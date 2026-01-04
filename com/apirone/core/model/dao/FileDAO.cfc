@@ -24,6 +24,7 @@
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
+		<cfargument name="orderBy" required="true" type="String" default="created_at">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -31,7 +32,7 @@
 				COUNT(file_id) OVER() AS total
 			FROM
 				files
-			WHERE deleted_at IS NULL 
+			WHERE deleted_at IS NULL
 
 			<cfif !IsNull( arguments.productId )>
 				AND product_id = <cfqueryparam value="#arguments.productId#" cfsqltype="Varchar">::uuid
@@ -66,7 +67,7 @@
 			</cfif>
 
 			ORDER BY
-				created_at
+				#super.sanitizeSQL( arguments.orderBy )#
 
 			<cfif arguments.limit GT 0>
 				LIMIT
@@ -117,12 +118,17 @@
 		<cfreturn q.file_id>
 	</cffunction>
 
-	<cffunction returntype="Void" name="delete">
+	<cffunction returntype="Boolean" name="delete">
 		<cfargument name="fileId" type="String" required="true">
+		
 		<cfquery name="local.q" datasource="apirone" result="result">
 			UPDATE files
 			SET deleted_at = CURRENT_TIMESTAMP(0)
 			WHERE file_id = <cfqueryparam cfsqltype="varchar" value="#arguments.fileId#">::uuid
 		</cfquery>
+
+		<cfreturn true>
+
 	</cffunction>
+
 </cfcomponent>

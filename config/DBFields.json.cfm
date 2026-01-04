@@ -63,7 +63,14 @@
         "name": "file_kind_id",
         "type": "Varchar"
     },
-
+    "file.id": {
+        "name": "file_id",
+        "type": "Integer"
+    },
+    "file.createdAt": {
+        "name": "created_at",
+        "type": "Date"
+    },
     "model.id": {
         "name": "model_id",
         "type": "uuid"

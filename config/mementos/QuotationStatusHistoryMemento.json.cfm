@@ -1,4 +1,4 @@
 ﻿{
-	defaultIncludes = [ "id", "shortId", "quotationId", "status", "user", "file", "createdAt" ]
+	defaultIncludes = [ "id", "quotationId", "status", "user", "file", "createdAt" ]
 }
 

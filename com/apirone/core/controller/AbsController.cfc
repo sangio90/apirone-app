@@ -219,7 +219,7 @@
 			payload = arguments.payload
 		);
 		
-		getContainer().getInstance( "CacheManager" );
+		//getContainer().getInstance( "CacheManager" );
 
 		return result;
 	}

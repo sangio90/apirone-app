@@ -86,6 +86,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.quotationStatusHistory.getId();
 	}
 
+	public Boolean function removeCache( required String quotationStatusHistoryId ){
+
+		super.getCacheManager().remove( getCacheScope(), quotationStatusHistoryId );
+
+		return true;
+	}
+
 	private com.apirone.core.model.bean.QuotationStatusHistory function build( required String quotationStatusHistoryId ){
 		var record = getDao().read( arguments.quotationStatusHistoryId );
 		if ( record.recordCount ) {
@@ -97,9 +104,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setUser( getUserService().get( record.user_id ) );
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
-			var files = getFileService().list( quotationStatusHistoryId = record.quotation_status_history_id );
+			var params = {
+				quotationStatusHistoryId = record.quotation_status_history_id,
+				orderBy  = [ { field = "file.createdAt", dir = "desc" } ]
+			}
+
+			var files = getFileService().list( argumentCollection = params );
 
 			if ( Len( files ) ) {
+
 				bean.setFile( files[ 1 ] );
 			}
 			

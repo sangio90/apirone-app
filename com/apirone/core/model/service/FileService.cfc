@@ -36,15 +36,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String quotationStatusHistoryId,
 		String pictogramId,
 		required Numeric limit  = 20,
-		required Numeric offset = 0
+		required Numeric offset = 0,
+		required Array orderBy  = [ { field = "file.createdAt", desc = "asc" } ]
 	){
 		var rows   = [];
 		var result = super.getResult();
 
+		arguments["orderBy"] = super.createOrderBy( arguments.orderBy );
+
 		var records = getDao().find( argumentCollection = arguments );
+		
 		records.each( function( record ){
 			rows.add( get( fileId = record.file_id ) );
 		} );
+		
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );
@@ -122,24 +127,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var newId = getDao().insert( file = bean, entity = arguments.entity ).toString();
 
-		cffile(
-			action = "APPEND",
-			file   = "#ExpandPath( "/debug.log" )#",
-			output = "#Now()# image inserted"
-		);
-
 		var imageType = config.types[ typeId ];
 
 		if ( imageType.keyExists( "sizes" ) ) {
-			cffile(
-				action = "APPEND",
-				file   = "#ExpandPath( "/debug.log" )#",
-				output = "#Now()# key sizes exists"
-			);
-
 			var thisFile = get( newId );
 
-			if (fileExt != 'pdf') {
+			if ( fileExt != "pdf" ) {
 				for ( var size in imageType.sizes ) {
 					resize( thisFile.getPath(), size.width );
 				}

@@ -3,6 +3,8 @@ AP.namespace( "quotation" );
 Object.assign( AP.quotation.fields, {
     statusModalRoot: $( "#qt-status-modal-root" ),
     statusForm: $( "#qt-status-detail-form" ),
+    changeFileModal: $( "#qt-status-file-root" ),
+    changeFileForm: $( "#qt-status-file-form" ),
 } );
 
 $( document ).ready( function() {
@@ -34,17 +36,46 @@ AP.quotation.status = ( function() {
 
     };
 
+    var setFileChange = function( event, field ) {
+
+        const file = event.target.files[0];
+
+        if ( file ) {
+            const reader = new FileReader();
+            reader.readAsDataURL( file );
+            reader.onload = function( evt ) {
+                const base64 = evt.target.result;
+                viewModel.set( field, base64 );
+            };
+
+        }
+
+    };
+
     var init = function() {
 
         kendo.bind( fields.statusModalRoot, viewModel );
-
-        // AP.page.statuses.unshift( { id: "", name: "-- Seleziona uno stato" } );
 
         viewModel.set( "statuses", AP.page.statuses );
 
     };
 
     var viewModel = kendo.observable( {
+        fileForm: {
+            data: {
+                quotation: {
+                    id: AP.page.quotation.id
+                },
+                statusHistory: {
+                    id: "",
+                    file: {
+                        currentId: "",
+                        newFileBase64: "",
+                    }
+                },
+            },
+            title: ""
+        },
         detailForm: {
             data: {
                 id: "",
@@ -79,17 +110,27 @@ AP.quotation.status = ( function() {
 
         onFileChange: function( event ) {
 
-            const file = event.target.files[0];
+            setFileChange( event, "detailForm.data.statusFile.base64" );
 
-            if ( file ) {
-                const reader = new FileReader();
-                reader.readAsDataURL( file );
-                reader.onload = function( evt ) {
-                    const base64 = evt.target.result;
-                    viewModel.set( "detailForm.data.statusFile.base64", base64 );
-                };
+        },
 
-            }
+        onFileRowChange: function( event ) {
+
+            setFileChange( event, "fileForm.data.statusHistory.file.newFileBase64" );
+
+        },
+
+        editFile: function( event ) {
+
+            console.log( "editFile:event", event );
+
+            viewModel.set( "fileForm.title", "Modifica il documento per lo stato < " + event.data.id + " >" );
+
+            viewModel.set( "fileForm.data.statusHistory.id", event.data.id );
+            viewModel.set( "fileForm.data.statusHistory.file.currentId", event.data.file.id );
+
+            NM.util.openModal( fields.changeFileModal, null, true );
+
         },
 
         showDocumentRequired: function( event ) {
@@ -107,22 +148,6 @@ AP.quotation.status = ( function() {
             return NM.kendo.formatISODate( event.createdAt );
         },
 
-        getFileId: function( event ) {
-
-            console.log( "event:getFileId", event );
-
-            return "";
-        },
-
-        toggleDownloadDocumentButton: function() {
-            const statusFileId = viewModel.get( "detailForm.data.statusFile.id" );
-            if ( !statusFileId ) {
-                return false;
-            }
-            return true;
-
-        },
-
         download: function( event ) {
 
             var uri = event.data?.file?.uri;
@@ -130,6 +155,59 @@ AP.quotation.status = ( function() {
 
             window.open( uri, "_blank" ).focus();
 
+        },
+
+        saveFile: function( event ) {
+            var thisForm = fields.changeFileForm;
+
+            console.log( "thisForm", thisForm );
+
+            thisForm.validate( {
+                onfocusout: function( element ) {
+                    $( element ).valid();
+                },
+                rules: {
+                    statusFile: {
+                        required: true
+                    },
+                },
+                messages: {
+                    statusFile: {
+                        required: "Carica il documento"
+                    }
+                }
+            } );
+
+
+            if ( thisForm.valid() ) {
+
+                var data = viewModel.get( "fileForm.data" );
+                var status = thisForm.find( ".status" );
+                var statusId = viewModel.get( "fileForm.data.statusHistory.id" );
+
+                console.log( "statusId", statusId );
+
+                status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/statuses/" + statusId + "/files",
+                    data: JSON.stringify( data ),
+                    callback: {
+                        done: function( xhr ) {
+
+                            status.html( "" );
+
+                            AP.widget.notify( "success", "File salvato correttamente." );
+
+                            // setTimeout(function () { window.location.reload() }, 1000);
+
+                        }
+                    }
+                } );
+            }
+
+            return false;
         },
 
         save: function( event ) {

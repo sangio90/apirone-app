@@ -446,6 +446,7 @@
 		get( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.totals" ).end();
 		post( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.updateTotals" ).end();
 
+		post( "/ajax/quotations/:quotationId/statuses/:statusId/files" ).to( "QuotationStatusHistoryAjaxController.saveFile" ).end();
 		get( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.list" ).end();
 		post( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.save" ).end();
 		delete( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.delete" ).end();
