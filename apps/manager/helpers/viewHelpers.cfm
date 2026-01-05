@@ -1,7 +1,8 @@
+
 <cffunction name="template">
     <cfargument required="true" type="String" name="view">
-
-    <cfreturn Replace( renderView( view="#arguments.view#" ), "nmscript", "script", "ALL" )>
+    <!--- I need "variables" scope to access the view() method --->
+    <cfreturn Replace( variables.view( view="#arguments.view#" ), "nmscript", "script", "ALL" )>
 </cffunction>
 
 <cffunction name="relevantPath">

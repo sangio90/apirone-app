@@ -241,7 +241,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		event.renderData( data = renderView( view = "report/template/#rc.report#", args = params ), type = "PDF" );
+		event.renderData( data = view( view = "report/template/#rc.report#", args = params ), type = "PDF" );
 	}
 
 

@@ -1,3 +1,3 @@
 ﻿<cfoutput>
-    #renderView()#
+    #view()#
 </cfoutput>                   

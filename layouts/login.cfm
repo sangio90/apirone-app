@@ -30,7 +30,7 @@
         <body>
 
             <section class="body-sign">
-                #renderView()#
+                #view()#
             </section>
 
             <cfmodule template="/apps/utils/ctags/loadAssets.cfm" 

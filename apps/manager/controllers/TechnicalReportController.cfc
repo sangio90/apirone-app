@@ -101,7 +101,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		event.renderData( data = renderView( view = templatePath, args = params ), type = "PDF" );
+		event.renderData( data = view( view = templatePath, args = params ), type = "PDF" );
 	}
 
 	function printZone( quoteObj, printParams ) {

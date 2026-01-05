@@ -14,7 +14,7 @@
 
         <h2 style="font-family: Poppins Light">#prc.printParams.title#</h2>
 
-        #renderView()#
+        #view()#
 
         <cfdocumentitem type="footer">
             #getPrintFooter()#
