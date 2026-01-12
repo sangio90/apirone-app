@@ -1,26 +1,26 @@
 AP.text = AP.text || {};
 
 AP.text.fields = {
-    listRoot   : $("#text-list-root"),
-    listSearch : $("#text-search-form"),
-    detailModal: $("#text-detail-modal")
+    listRoot   : $( "#text-list-root" ),
+    listSearch : $( "#text-search-form" ),
+    detailModal: $( "#text-detail-modal" )
 };
 
-$(document).ready(function (){
+$( document ).ready( function(){
 
-	if (AP.text.fields.listRoot.length) {
+    if ( AP.text.fields.listRoot.length ) {
 
 	    AP.text.list.init();
 
-	}
+    }
 
-});
+} );
 
-AP.text.list = (function () {
+AP.text.list = ( function() {
 
-	var pub = {};
+    var pub = {};
 
-	var viewModel = kendo.observable({
+    var viewModel = kendo.observable( {
 
         rows: undefined,
 
@@ -32,54 +32,99 @@ AP.text.list = (function () {
             labelButton: "Salva"
         },
 
-        edit: function (event) {
+        isTranslated: function( event ) {
+            if ( event.status.id == "TRA" ) {
+                return true;
+            }
 
-            NM.util.ajax({
+            return false;
+        },
+
+        isUntranslated: function( event ) {
+            if ( event.status.id == "TOT" ) {
+                return true;
+            }
+
+            return false;
+        },
+
+        edit: function( event ) {
+
+            NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/texts/" + event.data.id + "/all",
                 callback: {
-                    done: function (xhr) {
+                    done: function( xhr ) {
 
-                        viewModel.set("detailForm.data.texts", xhr.data);
-                        NM.util.openModal(AP.text.fields.detailModal);
+                        viewModel.set( "detailForm.data.texts", xhr.data );
+                        NM.util.openModal( AP.text.fields.detailModal );
 
                     }
                 }
-            });
+            } );
 
+            return false;
 
         },
 
-		print: function (item) {
+        print: function( item ) {
 
-            window.open("/manager/lines/print", "_blank");
+            window.open( "/manager/lines/print", "_blank" );
 
             return false;
-		},
+        },
 
-        search: function () {
+        search: function() {
 
             var qs = AP.text.fields.listSearch.serialize();
 
-            var dataSource = NM.kendo.dataSource({ url: "/manager/ajax/texts?" + qs });
+            var dataSource = NM.kendo.dataSource( { url: "/manager/ajax/texts?" + qs } );
 
-            viewModel.set("rows", dataSource);
+            viewModel.set( "rows", dataSource );
+
+            return false;
+
+        },
+
+        save: function( event ) {
+
+            NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/texts",
+                data: JSON.stringify( viewModel.get( "detailForm.data.texts" ) ),
+                callback: {
+                    done: function( xhr ) {
+
+                        AP.widget.notify( "success", "Traduzione salvata successo" );
+
+                        setTimeout( () => {
+
+                            $( "#account-detail-modal" ).modal( "hide" );
+                            // viewModel.get( "rows" ).read();
+                            // TODO better than this. remove single cache
+                            window.location.href = window.location.pathname+"?"+$.param( { "reset":1, "fwreinit":1 } );
+
+
+                        }, 1000 );
+                    }
+                }
+            } );
 
             return false;
 
         }
 
 
-	});
+    } );
 
 
-	pub.init = function () {
+    pub.init = function() {
 
-        kendo.bind(AP.text.fields.listRoot, viewModel);
+        kendo.bind( AP.text.fields.listRoot, viewModel );
 
         viewModel.search();
 
-	};
+    };
 
     return pub;
-}());
+}() );

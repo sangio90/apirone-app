@@ -1,20 +1,71 @@
+/*
+	TODO: 
+		
+		-1
+		use status not ""** To translate" (e il select relativo)
+		
+		un traduttore potrebbe evitare di mettere online 
+		la traduzione anche se l'ha scritta ma non l'ha approvata
+
+		-2
+		aggiungere il kind nella modale (es: nome, descrizione)
+
+		-3
+		cache delle text
+		(adesso c'è un brutto reload sul client al salvataggio)
+		window.location.href = window.location.pathname+"?"+$.param( { "reset":1, "fwreinit":1 } );
+
+		-4 
+		miglioare ui per la finestra di modifica
+
+		-5
+		nella lista mostra getEntityName() lasciando i riferimenti dell'entity
+
+*/
+
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
-		var dm     = getDataMapper();
+		var memy = super.getMementify();
 
 		var params = paramsFromUrl();
 
 		var rows = super.fire( "text.search", params );
 
-		for ( var obj in rows.getData() ) {
-			var row = dm.convert( obj, "Text", true );
+		for ( var row in rows.getData() ) {
 
-			row[ "entity" ] = "generale";
+			var statuses = [];
 
-			data.add( row );
+			var langs = super.fire( "text.list", { entity = row.getEntity() } );
+
+			for( var lang in langs ) {
+
+					var status = {
+						"id"  = "TRA",
+						"hex" = "##32CD32"
+					}
+
+				if( lang.getName() == "** To translate" ) {
+					var status = {
+						"id"  = "TOT",
+						"hex" = "##B2BEB5"
+					}
+				};
+
+				statuses.add( {
+					"text"   = lang.getName(),
+					"lang"   = lang.getLang(),
+					"status" = status
+				} );
+
+			}
+
+			var obj = memy.convert( row, "list" );
+			obj["statuses"] = statuses;
+
+			data.add( obj );
 		}
 
 		result.setTotal( rows.getTotal() );
@@ -61,38 +112,27 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function save( event, rc, prc ){
+
 		var result = super.getResult();
-		var attr   = super.bean( "Attribute" );
-
-		var text   = super.bean( "Text" );
-		var lang   = super.bean( "Lang" );
-		var status = super.bean( "Status" );
-
 		var thisId    = "";
-		var messageId = "";
-		var texts     = [];
+		var messageId = "text.saved";
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		var nameItem = json.data.nameItem;
+		for( var row in json ) {
 
-		text.setId( nameItem.id )
-		text.setName( nameItem.name )
-		text.setLang( lang.setId( mainText.lang.id ) );
+			var text   = super.bean( "Text" );
+			var lang   = super.bean( "Lang" );
+			var status = super.bean( "Status" );
 
-		texts.add( text );
+			text.setId( row.id )
+			text.setName( row.name )
+			text.setLang( lang.setId( row.lang.id ) );
+			text.setStatus( status.setId( row.status.id ) );
 
-		attr.setId( json.data.id );
-		attr.setTexts( texts );
-		attr.setStatus( status.setId( json.data.status.id ) );
+			thisId = super.fire( "text.update", [ text ] )
 
-		if ( json.action == "create" ) {
-			messageId = "attribute.created";
-			thisId    = super.fire( "attribute.create", [ attr ] )
-		} else {
-			messageId = "attribute.updated";
-			thisId    = super.fire( "attribute.update", [ attr ] )
-		}
+		} 
 
 		var message = completeMessage( messageId );
 

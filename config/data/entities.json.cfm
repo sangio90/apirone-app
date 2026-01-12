@@ -15,4 +15,8 @@
         id: "PRODUCT_ITEM",
         name: "Albero nei prodotti"
     },
+    {
+        id: "GLOBAL",
+        name: "Valori globali"
+    },
 ]

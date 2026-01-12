@@ -16,6 +16,7 @@ $( document ).ready( function() {
 AP.plate.modal = ( function() {
 
     const gridModule = AP.plate.grid;
+
     const {
         constants,
         orientation,
@@ -28,7 +29,6 @@ AP.plate.modal = ( function() {
 
     // Maintain access to fields for UI interaction parts
     const fields = AP.plate.fields;
-
 
     var pub = {
         fruitsController: null,
@@ -43,8 +43,8 @@ AP.plate.modal = ( function() {
         var fruit = {
             id: data.id,
             fruitId: data.fruit.id,
-            width: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].width * data.fruit.positionCount,
-            height: constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].height,
+            width: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].width * data.fruit.positionCount,
+            height: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].height,
             columnSpan: data.fruit.positionCount,
             rowSpan: 1,
             code: data.fruit.code,
@@ -72,9 +72,97 @@ AP.plate.modal = ( function() {
             }
         } );
 
+        fruit.expanded = true; // Default: accordion aperto
+
         // console.log( "createFruit", fruit );
 
         return fruit;
+
+    };
+
+    var configPlate = function() {
+
+        // var plate = this.plates.get( this.get( "plate" ) );
+        var plate = viewModel.get( "plate" );
+
+        //plate.orientation.id = "VER"; // for test
+        //plate.orientationCell.id = "VER"; // for test
+
+        let freeCellWidth = constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].width;
+        let freeCellHeight = constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].height;
+
+        console.log("configPlate:CELL_TYPE.FREE", gridModule.CELL_TYPE.FREE)
+        console.log("configPlate:plate.orientationCell.id", plate.orientationCell.id)
+        console.log("configPlate:orientation.VERTICAL", orientation.VERTICAL)
+
+        if ( plate.orientationCell.id == orientation.VERTICAL ) {
+            const tmp = freeCellWidth;
+            freeCellWidth = freeCellHeight;
+            freeCellHeight = tmp;
+        }
+
+        gridModule.setCellDimensions( freeCellWidth, freeCellHeight );
+
+        const grid = [];
+
+        // create grid
+        for ( let iRow = 0; iRow < plate.grid.length; iRow++ ) {
+            const row = [];
+
+            for (
+                let iCol = 0;
+                iCol < plate.grid[iRow].length;
+                iCol++
+            ) {
+                const cellType = plate.grid[iRow][iCol];
+
+                const cell = new Cell(
+                    constants.GRID_CELL_DIMENSIONS[cellType].width,
+                    constants.GRID_CELL_DIMENSIONS[cellType].height,
+                    plate.orientationCell.id,
+                    cellType,
+                );
+
+                row.push( cell );
+            }
+
+            grid.push( row );
+        }
+
+        const plateObj = new Plate( {
+            width: plate.width,
+            height: plate.height,
+            orientation: plate.orientation.id,
+            cellOrientation: plate.orientationCell.id,
+            id: plate.id,
+            code: plate.code,
+            image: plate.image.uri,
+            grid: grid,
+            isSpecial: false,
+        } );
+
+        // console.log( "fruits:fruitList", fruitList );
+
+        pub.fruitsController = new FruitsController( {
+            plate: plateObj,
+            fruits: [],
+        } );
+
+        pub.fruitsController.plate.drawGridWithin( $( ".plate-designer" ) );
+
+        // se ci sono frutti li reinserisco
+        // var fruitList = [];
+
+        var fruits = viewModel.get( "detailForm.data.fruits" );
+
+        if ( fruits.total() ) {
+            for ( var thisFruit of fruits.data() ) {
+                var obj = mapFruitForPlate( thisFruit );
+                pub.fruitsController.addFruitToPlate( obj );
+            };
+        }
+
+        viewModel.set( "isPlateDefined", true );
 
     };
 
@@ -85,6 +173,12 @@ AP.plate.modal = ( function() {
             quantity: 1,
             price: 0,
             product: {
+                orientation: {
+                    id: "HOR"
+                },
+                frame: {
+                    id: ""
+                },
                 finish: {
                     id: ""
                 },
@@ -107,6 +201,9 @@ AP.plate.modal = ( function() {
             status: {
                 id: "ACT",
                 name: ""
+            },
+            selectedOrientation: {
+                id: "HOR"
             },
             fruits: new kendo.data.DataSource( { // es. data: { position: 1, { fruit: { id: , name: } } }
                 data: [],
@@ -154,10 +251,11 @@ AP.plate.modal = ( function() {
         finishes: new kendo.data.DataSource(),
 
         plate: defaultPlate,
-
-        // productItems: new kendo.data.DataSource(),
+        availableOrientations: [],
 
         currentFruit: {},
+
+        toggleFruitsLabel: "Comprimi tutti",
 
         callback: {
             onCreate: undefined,
@@ -176,23 +274,80 @@ AP.plate.modal = ( function() {
 
         },
 
+        toggleFruit( event ) {
+            event.data.set( "expanded", !event.data.get( "expanded" ) );
+        },
+
+        changeOrientation( event ) {
+            console.log("changeOrientation:event", event);
+
+            var orientationId = this.get( "detailForm.data.product.orientation.id" );
+
+            console.log("orientationId", orientationId);
+            
+            var frameId = viewModel.get( "detailForm.data.product.frame.id" );
+            var productId = viewModel.get( "detailForm.data.product.id" );
+            
+            console.log("frameId", frameId)
+            console.log("productId", productId)
+
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/frames/" + frameId + "?orientation=" + orientationId + "&productId=" + productId,
+                callback: {
+                    done: function( xhr ) {
+
+                        viewModel.set( "plate.orientation", xhr.data.orientation );
+                        viewModel.set( "plate.grid", xhr.data.grid );
+
+                        console.log("xhr.data.image", xhr.data.image)
+
+                        viewModel.set( "plate.image", xhr.data.image ); // by product
+
+                        configPlate();
+
+                    }
+                }
+            } );
+
+        },
+
+        toggleFruits( event ) {
+            var fruits = this.get( "detailForm.data.fruits" );
+            var currentLabel = this.get( "toggleFruitsLabel" );
+            var newExpandedState = currentLabel === "Espandi tutti";
+
+            fruits.data().forEach( function( fruit ) {
+                fruit.set( "expanded", newExpandedState );
+            } );
+
+            this.set( "toggleFruitsLabel", newExpandedState ? "Comprimi tutti" : "Espandi tutti" );
+        },
+
         loadPlate: function() {
 
             // id from model
             var modelId = this.get( "detailForm.data.product.model.code" );
             var image = this.get( "detailForm.data.product.image" );
 
+            console.log( "modelId", modelId );
+
             // get plate/frame by code
             // for plate, code of frame is the same code of model
-            const frameId = AP.page.frames
+            const frame = AP.page.frames
                 .find( frame => frame.code === modelId )
-                ?.id
-                || "";
+                ?? "";
 
-            if ( frameId == "" ) {
-                AP.widget.notify( "error", "Modello [" + frameId + "] non trovato. Impossibile continuare." );
+            if ( !frame ) {
+                AP.widget.notify( "error", "Modello [" + modelId + "] non trovato. Impossibile continuare." );
                 return;
             }
+
+            console.log("frame", frame);
+
+            var frameId = frame.id;
+
+            this.set( "detailForm.data.product.frame.id", frameId );
 
             return NM.util.ajax( {
                 method: "GET",
@@ -206,12 +361,13 @@ AP.plate.modal = ( function() {
                         viewModel.set( "plate.height", xhr.data?.height ?? 500 );
                         viewModel.set( "plate.orientation", xhr.data.orientation );
                         viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
+                        viewModel.set( "availableOrientations", xhr.data.availableOrientations );
                         viewModel.set( "plate.grid", xhr.data.grid );
 
                         viewModel.set( "plate.image", image ); // by product
                         viewModel.set( "plate.grid", xhr.data.grid );
 
-                        viewModel.configPlate();
+                        configPlate();
 
                     }
                 }
@@ -345,21 +501,27 @@ AP.plate.modal = ( function() {
             if ( fruitId == undefined ) {
                 var type = "plate";
                 var productId = viewModel.get( "detailForm.data.product.id" );
+                var prodyctIdForCall = productId;
                 var productItems = viewModel.get( "detailForm.data.product.items" );
             } else {
                 var type = "fruit";
                 var fruits = viewModel.get( "detailForm.data.fruits" );
                 var fruit = fruits.get( fruitId );
 
+                console.log( "loadProductItems:fruit", fruit );
+
                 var productId = fruit.get( "id" );
                 var productItems = fruit.get( "items" );
+                var prodyctIdForCall = fruit.get( "fruit.id" );
             }
+
+            //console.log( "type", type );
 
             const attributeArray = productItems.data();
 
             var originId = originId || "";
 
-            let url = "/manager/ajax/product-items?productId=" + productId;
+            let url = "/manager/ajax/product-items?productId=" + prodyctIdForCall;
 
             // TODO: check if they are not all with the originId
             if ( originId ) {
@@ -481,12 +643,10 @@ AP.plate.modal = ( function() {
                         // console.log( "loadProductItems:afterLoading:type", type );
 
                         if ( type == "plate" ) {
-
-                            console.log( "renderProductItemsPlate" );
-
+                            // console.log( "renderProductItemsPlate" );
                             viewModel.renderProductItemsPlate();
                         } else {
-                            console.log( "renderProductItemsFruit" );
+                            // console.log( "renderProductItemsFruit" );
                             viewModel.renderProductItemsFruit( productId );
                         }
 
@@ -502,7 +662,7 @@ AP.plate.modal = ( function() {
 
         populateProduct( product ) { // without items
 
-            console.log( "populateProduct", product );
+            // console.log( "populateProduct", product );
 
             viewModel.set( "detailForm.data.product.id", product?.id ); // "" = nuovo
             viewModel.set( "detailForm.data.product.finish.id", product.finish.id );
@@ -691,7 +851,8 @@ AP.plate.modal = ( function() {
                 values.forEach( function( attrValue ) {
                     const option = $( "<option>" )
                         .val( attrValue.productItemId )
-                        .html( `<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}` );
+                        // .html( `<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}` );
+                        .html( `${attrValue.attributeValue.rawValue.name}` );
                     select.append( option );
                 } );
 
@@ -898,88 +1059,14 @@ AP.plate.modal = ( function() {
             viewModel.set( "currentFruit", newFruit );
             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
+            console.log("pub.fruitsController", pub.fruitsController );
+
             pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
 
             viewModel.addProductItemsToFruit( newFruit.id );
 
         },
 
-        configPlate: function() {
-
-            // var plate = this.plates.get( this.get( "plate" ) );
-            var plate = this.get( "plate" );
-
-            let freeCellWidth = constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].width;
-            let freeCellHeight = constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE].height;
-
-            if ( plate.orientationCell == orientation.VERTICAL ) {
-                const tmp = freeCellWidth;
-                freeCellWidth = freeCellHeight;
-                freeCellHeight = tmp;
-            }
-
-            gridModule.setCellDimensions( freeCellWidth, freeCellHeight );
-
-            const grid = [];
-
-            // create grid
-            for ( let iRow = 0; iRow < plate.grid.length; iRow++ ) {
-                const row = [];
-
-                for (
-                    let iCol = 0;
-                    iCol < plate.grid[iRow].length;
-                    iCol++
-                ) {
-                    const cellType = plate.grid[iRow][iCol];
-
-                    const cell = new Cell(
-                        constants.GRID_CELL_DIMENSIONS[cellType].width,
-                        constants.GRID_CELL_DIMENSIONS[cellType].height,
-                        plate.orientationCell.id,
-                        cellType,
-                    );
-
-                    row.push( cell );
-                }
-
-                grid.push( row );
-            }
-
-            const plateObj = new Plate( {
-                width: plate.width,
-                height: plate.height,
-                orientation: plate.orientation.id,
-                cellOrientation: plate.orientationCell.id,
-                id: plate.id,
-                code: plate.code,
-                image: plate.image.uri,
-                grid: grid,
-                isSpecial: false,
-            } );
-
-            // console.log( "fruits:fruitList", fruitList );
-
-            pub.fruitsController = new FruitsController( {
-                plate: plateObj,
-                fruits: [],
-            } );
-
-            pub.fruitsController.plate.drawGridWithin( $( ".plate-designer" ) );
-
-            // se ci sono frutti li reinserisco
-            // var fruitList = [];
-
-            var fruits = viewModel.get( "detailForm.data.fruits" );
-
-            if ( fruits.total() ) {
-                for ( var thisFruit of fruits.data() ) {
-                    var obj = mapFruitForPlate( thisFruit );
-                    pub.fruitsController.addFruitToPlate( obj );
-                };
-            }
-
-        },
     } );
 
     pub.new = function( onSave ) {
@@ -1088,7 +1175,7 @@ AP.plate.modal = ( function() {
                     },
                     parameterMap: function( data, type ) {
                         if ( type === "read" ) {
-                            return { "str": data.str() };
+                            return { "str": data.str(), "lineId": viewModel.get( "detailForm.data.product.line.id" ) };
                         }
                     }
                 },
@@ -1100,8 +1187,6 @@ AP.plate.modal = ( function() {
             } ),
             select: function( event ) {
                 var item = this.dataItem( event.item.index() );
-
-                // console.log( "selected fruit", item );
 
                 viewModel.onSelectFruit( item );
             },

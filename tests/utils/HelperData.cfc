@@ -143,8 +143,8 @@ component extends="testbox.system.BaseSpec"{
         raw.lang = { id = random.getRandomByTableName(limit=1, tableName='langs').lang_id.toString() };
         raw.billingProfile = { id = random.getRandomProfilesByType(limit=1, type='B').profile_id.toString() };
         raw.shippingProfile = { id = random.getRandomProfilesByType(limit=1, type='S').profile_id.toString() };
-        raw.salesAgentAccount = { id = random.getRandomByTableName(limit=1, tableName='accounts').account_id.toString() };
-        raw.graphicTechnicianAccount = { id = random.getRandomByTableName(limit=1, tableName='accounts').account_id.toString() };
+        raw.salesAgent = { id = random.getRandomByTableName(limit=1, tableName='accounts').account_id.toString() };
+        raw.graphicTechnician = { id = random.getRandomByTableName(limit=1, tableName='accounts').account_id.toString() };
 
         var bean = factory.createInstance( "Quotation", raw );
 

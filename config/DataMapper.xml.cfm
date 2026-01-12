@@ -128,8 +128,8 @@
         <map from="lang" to="lang" ref="Lang" />
         <map from="billingProfile" to="billingProfile" ref="BillingProfile" />
         <map from="shippingProfile" to="shippingProfile" ref="ShippingProfile" />
-        <map from="salesAgentAccount" to="salesAgentAccount" ref="Account" />
-        <map from="graphicTechnicianAccount" to="graphicTechnicianAccount" ref="Account" />
+        <map from="salesAgent" to="salesAgent" ref="Account" />
+        <map from="graphicTechnician" to="graphicTechnician" ref="Account" />
     </mapper>
 
     <mapper id="QuotationItem" source="Cf:Struct" target="Cfc:com.apirone.core.model.bean.QuotationItem">

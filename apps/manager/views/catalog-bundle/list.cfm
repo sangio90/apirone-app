@@ -89,7 +89,7 @@
                                     { 'field':'createdAt', 'title':'Creato il', width: '140px' },
                                     { 'field':'category.name', 'title':'Categoria'},
                                     { 'field':'line.name', 'title':'Linea' },
-                                    { 'field':'model.name', 'title':'Modello' },
+                                    { 'field':'model.name', 'title':'Finitura' },
                                     { 'field':'Markup', 'title':'Markup %', width: '120px'  },
                                 ]",
                                 rowTemplate="catalog-bundle/catalog-bundle-grid-row-tmpl"

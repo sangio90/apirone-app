@@ -231,10 +231,12 @@
 										<td>IVA 20%</td>
 										<td>Ancora da definire</td>
 									</tr>
+									<!---
 									<tr>
 										<td>Sconto 50%</td>
 										<td>Ancora da definire</td>
 									</tr>
+									---->
 									<tr>
 										<td><strong>Totale fattura</strong></td>
 										<!--- <td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td> --->

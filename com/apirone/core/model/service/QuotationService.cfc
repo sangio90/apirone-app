@@ -51,15 +51,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public Number function getLastNumber(){
+	public Number function getNextNumber(){
 
-		var rows = search( orderBy = [ { field = "quotation.createdAt", dir = "desc" } ], limit = 1 );
+		return getDao().readNextNumber();
 
-		if( IsNull( rows.getData() ) OR !Len( rows.getData() ) ) {
-			return 99;
-		}
-
-		return rows.getData()[1].getQuotationNumber();
 	}
 
 	public Array function list(){
@@ -124,7 +119,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required String userId
 	){
 
-		arguments.quotation.setQuotationNumber( getLastNumber() + 1 );
+		arguments.quotation.setQuotationNumber( getNextNumber() );
 		arguments.quotation.setVersionNumber( 1 );
 
 		transaction {
@@ -847,7 +842,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMDATEVA" = quotation.getValidityDate(),
 			"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
 			"MMNUMLIS" = 1,
-			"MMCODAGE" = (!isNull(quotation.getSalesAgentAccount())) ? quotation.getSalesAgentAccount().getEmail() : null, //trovata tabella AZAPI_AGENTI campo id AGECOD, campo mail AGEMAI
+			"MMCODAGE" = (!isNull(quotation.getsalesAgent())) ? quotation.getsalesAgent().getEmail() : null, //trovata tabella AZAPI_AGENTI campo id AGECOD, campo mail AGEMAI
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
 			"CF_IDCLI" = customer.getId(),
@@ -1115,7 +1110,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			if (!isNull(record.sales_agent_account_id)) {
-				bean.setSalesAgentAccount( getUserService().get( record.sales_agent_account_id ) );
+				bean.setsalesAgent( getUserService().get( record.sales_agent_account_id ) );
 			}
 
 			bean.setCalculatedAmount(
@@ -1126,7 +1121,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
-			// bean.setGraphicTechnicianAccount( getAccountService().get( record.graphic_technician_account_id ) );
+			// bean.setgraphicTechnician( getAccountService().get( record.graphic_technician_account_id ) );
 
 			return bean;
 		}

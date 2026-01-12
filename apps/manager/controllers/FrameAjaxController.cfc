@@ -19,6 +19,9 @@
 
 	function get( event, rc, prc ){
 		param rc.id = "___";
+		param rc.orientation = "HOR";
+		param rc.productId = "";
+
 		var result  = super.getResult();
 
 		if ( !super.isUuid( rc.id ) ) {
@@ -27,7 +30,46 @@
 
 		var bean = super.fire( "frame.get", [ rc.id ] );
 
+		var code = bean.getCode();
+		//var orientation = rc.orientation ?: bean.getOrientation().getId();
+		var orientation = rc.orientation;
+
+		var beanOrientation = super.service("Lookup").get( "orientation",  rc.orientation );
+
+
+		//bean.setOrientation( super.service("lookup").get( "orientation",  "VER" ) )
+		//bean.setCellOrientation( super.service("lookup").get( "orientation",  "VER" ) )
+
 		var obj = super.getMementify().convert( bean, "detail" );
+		obj["image"] = "";
+
+		var config = DeserializeJSON( FileRead( ExpandPath( "/config/data/plates/grid_#code#.json.cfm" ) ) );
+
+		//var bean.getOrientation() = super.service("Lookup").get( "orientation",  orientation );
+
+        var orientationsMap = {
+            "HAV": [ 
+                { "id": "HOR", "name": "Orizzontale" }, 
+                { "id": "VER", "name": "Verticale" } 
+            ],
+            "HOR": [ { "id": "HOR", "name": "Orizzontale" } ],
+            "VER": [ { "id": "VER", "name": "Verticale" } ]
+        };
+
+
+		var orientations = []
+		
+		obj["availableOrientations"] = orientationsMap[ bean.getOrientation().getId() ];
+
+		obj["orientation"]     = beanOrientation;
+		obj["cellOrientation"] = beanOrientation;
+		obj["grid"]            = config["grid"][ rc.orientation ];
+		
+		if ( Len( rc.productId ) ) {
+			var product = super.fire( "product.get", [ rc.productId ] );
+			obj["image"] = super.getMementify().convert( product.getImage( typeId = (rc.orientation == 'HOR' ? 'horizontal' : 'vertical') ) );
+		}
+
 
 		result.setData( obj );
 

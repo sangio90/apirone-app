@@ -106,6 +106,7 @@ AP.signage.modal = ( function() {
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
             viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
+
             $( "#signangeProductCategory" ).prop( "disabled", false );
             $( "#signageRow" ).prop( "disabled", false );
             $( "#signageModel" ).prop( "disabled", false );
@@ -1156,10 +1157,14 @@ AP.signage.modal = ( function() {
         }
     } );
 
+    pub.new2 = function() { };
+
     pub.new = function( onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
+
+        console.log( "new" );
 
         NM.util.ajax( {
             method: "GET",

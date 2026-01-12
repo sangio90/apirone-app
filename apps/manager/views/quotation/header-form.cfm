@@ -9,7 +9,7 @@
 				<button class="nav-link" id="nav-shipping-tab" data-bs-toggle="tab" data-bs-target="##nav-shipping" type="button" role="tab">Indirizzo di spedizione</button>
 				<button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button>
 				<!--- <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button> --->
-				<!--- <button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatario</button> --->
+				<button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatari</button>
 				<!--- <button class="nav-link" id="nav-plan-tab" data-bs-toggle="tab" data-bs-target="##nav-plan" type="button" role="tab" hidden>Planimentria</button> --->
 				<!--- <button class="nav-link" id="nav-shippings-tab" data-bs-toggle="tab" data-bs-target="##nav-shippings" type="button" role="tab" hidden>Spedizioni</button> --->
 			</div>
@@ -336,9 +336,21 @@
 				<div class="form-group row mb-3">
 					<label class="col-sm-3 control-label text-sm-end pt-2">Commerciale</label>
 					<div class="col-sm-9">
-						<select name="statusId" class="form-control">
-							<option value="">-- selezionare</option>
-							<option value="REF">22%</option>
+						<select name="saleUser" class="form-control"
+							data-bind="source: saleUsers, value: detailForm.data.salesAgent"
+							data-value-field="id"
+							data-text-field="name">
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group row mb-3">
+					<label class="col-sm-3 control-label text-sm-end pt-2">Tecnico</label>
+					<div class="col-sm-9">
+						<select name="saleUser" class="form-control"
+							data-bind="source: techUsers, value: detailForm.data.graphicTechnician"
+							data-value-field="id"
+							data-text-field="name">
 						</select>
 					</div>
 				</div>

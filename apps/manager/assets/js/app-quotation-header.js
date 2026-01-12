@@ -71,6 +71,14 @@ AP.quotation.header = ( function() {
             vatCode: {
                 id: 22
             },
+            graphicTechnician: {
+                id: "",
+                name: ""
+            },
+            salesAgent: {
+                id: "",
+                name: ""
+            },
             invoiceData: {
                 name: "",
                 company: "",
@@ -105,7 +113,7 @@ AP.quotation.header = ( function() {
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
         languages: new kendo.data.DataSource(),
-        varCodes: new kendo.data.DataSource(),
+        // varCodes: new kendo.data.DataSource(),
         statuses: new kendo.data.DataSource(),
         vatCodes: new kendo.data.DataSource(),
         pricelists: new kendo.data.DataSource(),
@@ -114,6 +122,8 @@ AP.quotation.header = ( function() {
         countries: new kendo.data.DataSource(),
         states: new kendo.data.DataSource(),
         quotationItems: new kendo.data.DataSource(),
+        saleUsers: new kendo.data.DataSource(),
+        techUsers: new kendo.data.DataSource(),
 
         crmCustomers: new kendo.data.DataSource( {
             serverFiltering: true,
@@ -243,7 +253,9 @@ AP.quotation.header = ( function() {
             var country = this.detailForm.data.invoiceData.country;
             if ( country && country.id ) {
                 this.filteredInvoiceStates.data( [] );
+
                 var that = this;
+
                 viewModel.states.fetch( function() {
                     var data = that.states.data().filter( function( item ) {
                         return item.countryId == country.id;
@@ -255,7 +267,9 @@ AP.quotation.header = ( function() {
                         that.detailForm.data.invoiceData.state = { id: "" };
                     }
                 } );
+
             } else {
+
                 this.filteredInvoiceStates.data( [] );
                 this.detailForm.data.invoiceData.state = { id: "" };
             }
@@ -432,6 +446,14 @@ AP.quotation.header = ( function() {
         viewModel.get( "countries" ).data( AP.page.countries );
         viewModel.get( "states" ).data( AP.page.states );
         viewModel.get( "vatCodes" ).data( AP.page.vatCodes );
+
+        AP.page.saleUsers.unshift( { "id": "", "name": "-- seleziona" } );
+
+        viewModel.get( "saleUsers" ).data( AP.page.saleUsers );
+
+        AP.page.techUsers.unshift( { "id": "", "name": "-- seleziona" } );
+
+        viewModel.get( "techUsers" ).data( AP.page.techUsers );
 
         $( "#nav-status-tab" ).on( "click", function( event ) {
             $( "#nav-actual-tab" ).trigger( "click" );

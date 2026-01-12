@@ -1,3 +1,4 @@
+
 <cfoutput>
 
     <div id="text-list-root">
@@ -92,10 +93,11 @@
                             #grid( 
                                 id="text-list-grid",
                                 columns="[
-                                    { 'field':'id', 'title':'ID', width: '50px' },
+                                    { 'field':'id', 'title':'ID', width: '70px' },
                                     { 'field':'name', 'title':'Traduzione'},
                                     { 'field':'name', 'title':'Lingua'},
-                                    { 'field':'entity', 'title':'Categoria'},
+                                    { 'field':'entity', 'title':'Riferimento'},
+                                    { 'field':'', 'title':'Stati', width: '300px' },
                                     { 'field':'', 'title':'', width: '55px'},
                                     { 
                                         'field':'', 

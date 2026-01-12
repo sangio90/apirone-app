@@ -97,10 +97,10 @@
 									id      = "metadata-type-grid",
 									columns = "[
                                         { 'field':'id', 'title':'ID', width: '50px' },
-                                        { 'field':'code', 'title':'Codice', width: '100px' },
+                                        { 'field':'code', 'title':'Codice', width: '150px' },
                                         { 'field':'name', 'title':'Nome' },
                                         { 'field':'dataType.name', 'title':'Tipo di dato', 'width': '160px'  },
-                                        { 'field':'unit', 'title':'Unità', 'width': '130px' },
+                                        { 'field':'unit', 'title':'Unità', 'width': '160px' },
                                         { 'field':'entities', 'title':'Entità' },
                                         { 'field':'', 'title':'Modifica', width: '55px'},
                                         { 

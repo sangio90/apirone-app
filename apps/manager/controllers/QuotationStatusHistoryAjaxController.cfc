@@ -31,6 +31,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var fileId = storeFile( json.statusHistory.file.newFileBase64, json.statusHistory.id );
 
+		// TODO: move to fileService
+		// 		 create a method for remove cache by entity 
 		super.fire( "QuotationStatusHistory.removeCache", [ json.statusHistory.id ] );
 
 		var message = getMessage( "QuotationStatusHistory.fileSaved" );

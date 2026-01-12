@@ -32,8 +32,8 @@
 		<cfargument name="currencyId" type="String" required="false">
 		<cfargument name="billingProfileId" type="String" required="false">
 		<cfargument name="shippingProfileId" type="String" required="false">
-		<cfargument name="salesAgentAccountId" type="String" required="false">
-		<cfargument name="graphicTechnicianAccountId" type="String" required="false">
+		<cfargument name="salesAgentId" type="String" required="false">
+		<cfargument name="graphicTechnicianId" type="String" required="false">
 		<cfargument name="str" type="String" required="false">
 
 		<cfargument
@@ -99,12 +99,12 @@
 				AND shipping_profile_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.shippingProfileId#">::uuid
 			</cfif>
 
-			<cfif !IsNull( arguments.salesAgentAccountId )>
-				AND sales_agent_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.salesAgentAccountId#">::uuid
+			<cfif !IsNull( arguments.salesAgentId )>
+				AND sales_agent_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.salesAgentId#">::uuid
 			</cfif>
 
-			<cfif !IsNull( arguments.graphicTechnicianAccountId )>
-				AND graphic_technician_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.graphicTechnicianAccountId#">::uuid
+			<cfif !IsNull( arguments.graphicTechnicianId )>
+				AND graphic_technician_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.graphicTechnicianId#">::uuid
 			</cfif>
 
 			ORDER BY
@@ -277,15 +277,15 @@
 					</cfif>
 				,
 				sales_agent_account_id =
-					<cfif !IsNull( arguments.quotation.getSalesAgentAccount() )>
-						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getSalesAgentAccount().getId()#">::uuid
+					<cfif !IsNull( arguments.quotation.getsalesAgent() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getsalesAgent().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
 				,
 				graphic_technician_account_id =
-					<cfif !IsNull( arguments.quotation.getGraphicTechnicianAccount() )>
-						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getGraphicTechnicianAccount().getId()#">::uuid
+					<cfif !IsNull( arguments.quotation.getgraphicTechnician() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getgraphicTechnician().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
@@ -504,5 +504,14 @@
 		</cfquery>
 
 		<cfreturn local.qTotal.total_amount>
+	</cffunction>
+
+	<cffunction name="readNextNumber" access="public" returntype="numeric">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT nextval('quotation_number_seq');
+		</cfquery>
+
+		<cfreturn local.q.nextval>
 	</cffunction>
 </cfcomponent>

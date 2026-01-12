@@ -128,7 +128,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Numeric function update( required com.apirone.core.model.bean.Text text ){
 		var id = getDao().update( arguments.text );
 
-		getCacheManager().remove( getCacheScope(), id );
+		getCacheManager().remove( getCacheScope(), arguments.text.getId() );
 
 		return id;
 	}
@@ -143,84 +143,64 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( Len( record.attribute_id ) ) {
 			entity.setKey( "attribute.id" );
 			entity.setValue( record.attribute_id.toString() );
-
-			return entity;
 		}
 
 		if ( Len( record.raw_value_id ) ) {
 			entity.setKey( "rawValue.id" );
-			entity.setValue( record.raw_value_id );
-
-			return entity;
+			entity.setValue( record.raw_value_id.toString() );
 		}
 
 		if ( Len( record.finish_id ) ) {
 			entity.setKey( "finish.id" );
-			entity.setValue( record.finish_id );
-
-			return entity;
+			entity.setValue( record.finish_id.toString() );
 		}
 
 		if ( Len( record.model_id ) ) {
 			entity.setKey( "model.id" );
-			entity.setValue( record.model_id );
-
-			return entity;
+			entity.setValue( record.model_id.toString() );
 		}
 
 		if ( Len( record.product_category_id ) ) {
 			entity.setKey( "productCategory.id" );
-			entity.setValue( record.product_category_id );
-
-			return entity;
+			entity.setValue( record.product_category_id.toString() );
 		}
 
 		if ( Len( record.product_id ) ) {
 			entity.setKey( "product.id" );
-			entity.setValue( record.product_id );
-
-			return entity;
+			entity.setValue( record.product_id.toString() );
 		}
 
 		if ( Len( record.line_id ) ) {
 			entity.setKey( "line.id" );
-			entity.setValue( record.line_id );
-
-			return entity;
+			entity.setValue( record.line_id.toString() );
 		}
 
 		if ( Len( record.font_id ) ) {
 			entity.setKey( "font.id" );
-			entity.setValue( record.font_id );
-
-			return entity;
+			entity.setValue( record.font_id.toString() );
 		}
 
 		if ( Len( record.country_id ) ) {
 			entity.setKey( "country.id" );
-			entity.setValue( record.country_id );
-
-			return entity;
+			entity.setValue( record.country_id.toString() );
 		}
 
 		if ( Len( record.article_id ) ) {
 			entity.setKey( "article.id" );
-			entity.setValue( record.article_id );
-
-			return entity;
+			entity.setValue( record.article_id.toString() );
 		}
+
+		/*
+		if( record.text_id == 1782 ) {
+			dump( entity );
+			abort;
+		}
+		*/
 
 		getLogger().error( "No entity linked to this translation. Text Id: [#record.text_id#]" );
 
-		/*
-		dump( record );
-		abort;
+		return entity;
 
-		Throw(
-			type    = "apirone.error.textWithoutEntity",
-			message = "No entity linked to this translation. Text Id: [#record.text_id#]"
-		);
-		*/
 	}
 
 	private com.apirone.core.model.bean.Text function build( required String textId ){

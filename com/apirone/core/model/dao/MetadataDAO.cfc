@@ -17,6 +17,7 @@
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
 		<cfargument name="rawValueId" type="Numeric">
+		<cfargument name="typeId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="20">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -32,6 +33,10 @@
 
 				<cfif !IsNull( arguments.rawValueId )>
 					AND metadata.raw_value_id = <cfqueryparam cfsqltype="Integer" value="#arguments.rawValueId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.typeId )>
+					AND metadata_type_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.typeId#">
 				</cfif>
 
 			ORDER BY

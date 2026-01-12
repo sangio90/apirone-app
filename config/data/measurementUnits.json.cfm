@@ -35,4 +35,8 @@
         id: "KG",
         name: "Kg"
     },
+    {
+        id: "EU",
+        name: "Valuta in Euro"
+    },
 ]

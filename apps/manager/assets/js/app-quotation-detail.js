@@ -1,15 +1,17 @@
 AP.namespace( "quotation" );
 
 Object.assign( AP.quotation.fields, {
-    detailRoot: $( "#quotation-detail-root" ),
-    detailForm: $( "#quotation-detail-header-form" ),
-    zoneModalRoot: $( "#zone-modal-root" ),
-    printModalRoot: $( "#print-modal-root" ),
+    detailRoot     : $( "#quotation-detail-root" ),
+    detailForm     : $( "#quotation-detail-header-form" ),
+    zoneModalRoot  : $( "#zone-modal-root" ),
+    printModalRoot : $( "#print-modal-root" ),
     statusModalRoot: $( "#qt-status-modal-root" ),
-    totalItemBox: $( "#quotation-totals-item" ),
-    addPlateBtn: $( "#qt-add-plate" ),
-    addSignageBtn: $( "#qt-add-signage" ),
+    totalItemBox   : $( "#quotation-totals-item" ),
+
+    addPlateBtn    : $( "#qt-add-plate" ),
+    addSignageBtn  : $( "#qt-add-signage" ),
     addAccessoryBtn: $( "#qt-add-accessory" ),
+    addArticleBtn  : $( "#qt-add-article" ),
 } );
 
 $( document ).ready( function() {
@@ -17,20 +19,10 @@ $( document ).ready( function() {
         AP.quotation.detail.init();
     }
 
-    const signageModal = document.getElementById( "signage-modal" );
-
-    signageModal.addEventListener( "hide.bs.modal", ( event ) => {
-        AP.quotation.detail.showTotals();
-    } );
-
-    const plateModal = document.getElementById( "plate-modal-root" );
-    plateModal.addEventListener( "hide.bs.modal", ( event ) => {
-        AP.quotation.detail.showTotals();
-    } );
-
-    const accessoryModal = document.getElementById( "accessory-modal" );
-    accessoryModal.addEventListener( "hide.bs.modal", ( event ) => {
-        AP.quotation.detail.showTotals();
+    [ "signage-modal", "plate-modal-root", "accessory-modal", "article-modal" ].forEach( id => {
+        document.getElementById( id )?.addEventListener( "hide.bs.modal", () => {
+            AP.quotation.detail.showTotals();
+        } );
     } );
 
     $( "form#zone-form" ).on( "submit", function( event ) {
@@ -54,6 +46,10 @@ AP.quotation.detail = ( function() {
 
     function accessoryApp() {
         return AP.accessory.modal;
+    }
+
+    function articleApp() {
+        return AP.article.modal;
     }
 
     function headerApp() {
@@ -504,19 +500,34 @@ AP.quotation.detail = ( function() {
 
         // add
 
+        addPlate: function() {
+            plateApp().new();
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            return false;
+        },
+
+
         addSignage: function() {
+            console.log( "addSignage:new" );
+
+
+            console.log( "signageApp", signageApp() );
+
             signageApp().new();
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            return false;
         },
 
         addAccessory: function() {
             accessoryApp().new();
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            return false;
         },
 
-        addPlate: function() {
-            plateApp().new();
+        addArticle: function() {
+            articleApp().new();
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            return false;
         },
 
         // edit
@@ -538,6 +549,12 @@ AP.quotation.detail = ( function() {
             plateApp().edit( { id: event.data.id } );
             fields.totalItemBox.show();
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+        },
+
+        editArticle: function( event ) {
+            event.preventDefault();
+            articleApp().edit( { id: event.data.id } );
+            fields.totalItemBox.show();
         },
 
         clonePlate: function( event ) {
@@ -603,20 +620,25 @@ AP.quotation.detail = ( function() {
 
         AP.quotation.detail.showTotals();
 
+        console.log( "AP.page.quotation" );
+
         if ( AP.page.quotation ) {
 
             document.querySelector( "#nav-plate-tab" ).addEventListener( "click", function( event ) {
+                console.log( "nav-plate-tab" );
                 event.preventDefault();
+                fields.addPlateBtn.show();
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.hide();
-                fields.addPlateBtn.show();
+                fields.addArticleBtn.hide();
             } );
 
             document.querySelector( "#nav-signage-tab" ).addEventListener( "click", function( event ) {
                 event.preventDefault();
                 fields.addPlateBtn.hide();
-                fields.addAccessoryBtn.hide();
                 fields.addSignageBtn.show();
+                fields.addAccessoryBtn.hide();
+                fields.addArticleBtn.hide();
             } );
 
             document.querySelector( "#nav-accessories-tab" ).addEventListener( "click", function( event ) {
@@ -624,6 +646,15 @@ AP.quotation.detail = ( function() {
                 fields.addPlateBtn.hide();
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.show();
+                fields.addArticleBtn.hide();
+            } );
+
+            document.querySelector( "#nav-articles-tab" ).addEventListener( "click", function( event ) {
+                event.preventDefault();
+                fields.addPlateBtn.hide();
+                fields.addSignageBtn.hide();
+                fields.addAccessoryBtn.hide();
+                fields.addArticleBtn.show();
             } );
 
         }

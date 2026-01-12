@@ -24,6 +24,55 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function editArticle( event, rc, prc ){
+		var data   = {}
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+		var mm     = super.getMementify();
+
+
+		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
+
+		var parsedQuotationItemData = mm.convert( quotationItem, "edit" );
+
+		data.append( { "quotationItem" = parsedQuotationItemData } );
+
+		result.setData( data );
+		event.setValue( "result", result );
+	}
+
+	function saveArticle( event, rc, prc ){
+		var json      = DeserializeJSON( GetHTTPRequestData().content );
+		var thisId    = "";
+		var messageId = "";
+		var texts     = [];
+
+		var result = super.getResult();
+
+		var id   = json.quotationItem.id;
+		var type = json.type
+
+		if ( !Len( id ) ) {
+			var bean = super.bean( "QuotationItem" );
+		} else {
+			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
+		}
+
+		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
+		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
+		bean.setQuantity( json.quotationItem.quantity );
+
+		var price = populatePriceItem( json );
+		bean.setPrice( price );
+
+		var message = completeMessage( messageId );
+
+		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
+
+		event.setValue( "result", result );
+	}
+
+
 	function listFruits( event, rc, prc ){
 		
 		var data   = {};

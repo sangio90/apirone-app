@@ -2,6 +2,7 @@
 
 	property name="code" type="String";
 	property name="orientation" type="com.apirone.core.model.bean.Orientation";
+	property name="orientationAvailable" type="com.apirone.core.model.bean.Orientation[]";
 	property name="cellOrientation" type="com.apirone.core.model.bean.Orientation";
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="cells" type="com.apirone.core.model.bean.FrameCell[]";
@@ -175,7 +176,7 @@
 		// raggruppa le celle per row
 		for( var cell in getCells() ){
 			var rowNum = cell.getRow();
-			if( !structKeyExists(rowMap, rowNum) ){
+			if( ! StructKeyExists( rowMap, rowNum ) ){
 				rowMap[rowNum] = [];
 			}
 			
@@ -197,7 +198,34 @@
 			grid.append( rowMap[rowNum] );
 		}
 
+		// Se cellOrientation è VERTICAL, trasponi la matrice
+		if( !isNull(getCellOrientation()) && getCellOrientation().getId() == "VER" ) {
+			grid = transposeGrid(grid);
+		}
+
 		return grid;
+	}
+
+	private Array function transposeGrid( required Array grid ){
+		var transposed = [];
+		
+		if( arrayLen(grid) == 0 ) {
+			return transposed;
+		}
+		
+		var numRows = arrayLen(grid);
+		var numCols = arrayLen(grid[1]);
+		
+		// Crea la matrice trasposta: colonne diventano righe
+		for( var col = 1; col <= numCols; col++ ){
+			var newRow = [];
+			for( var row = 1; row <= numRows; row++ ){
+				newRow.append( grid[row][col] );
+			}
+			transposed.append( newRow );
+		}
+		
+		return transposed;
 	}
 
 }

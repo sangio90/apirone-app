@@ -152,6 +152,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var entity = super.bean( "Entity" );
 
 		if ( Len( record.raw_value_id ) ) {
+			
 			entity.setKey( "rawValue.id" );
 			entity.setValue( record.raw_value_id );
 
@@ -159,6 +160,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		getLogger().error( "No entity linked to this metadata. Metadata id: [#record.metadata_id#]" );
+
+		return NullValue();
 	}
 
 }

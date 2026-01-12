@@ -29,6 +29,7 @@
 				"id",
 				"name",
 				"code",
+				"orientation",
 			]
 		},
 	}

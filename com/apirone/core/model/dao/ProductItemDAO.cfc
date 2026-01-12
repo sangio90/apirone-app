@@ -34,6 +34,10 @@
 				</cfif>
 			WHERE 1=1
 
+				<cfif !IsNull( arguments.productId )>
+					AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+				</cfif>
+
 				<!--- TODO: use 'O' for "IS NULL" --->
 				<cfif !arguments.skipOriginId>
 					AND origin_id
@@ -44,10 +48,6 @@
 						</cfif>
 				</cfif>
 
-				<cfif !IsNull( arguments.productId )>
-					AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
-				</cfif>
-
 				<cfif !IsNull( arguments.attributeId )>
 					AND attributes.attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
 				</cfif>
@@ -55,8 +55,6 @@
 			ORDER BY
 				product_items.orderby ASC
 		</cfquery>
-
-
 
 		<cfreturn local.q>
 	</cffunction>
@@ -107,7 +105,7 @@
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="attributeId" type="String">
 		<cfargument name="productId" type="String">
-		<cfargument name="productItemId" type="String">
+		<cfargument name="productItemId" type="String">	
 
 		<cfif IsNull( arguments.productItemId ) AND IsNull( arguments.productId ) AND IsNull( arguments.attributeId )>
 			<cfthrow type="apirone.error.NoArgumentsPassed" message="At least one parameter is required to delete">

@@ -144,8 +144,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setCurrency( currency.setId( json.currency.id ) );
 		// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
 		// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
-		// quotation.setSalesAgentAccount( type.setId( json.salesAgentAccount.id ) );
-		// quotation.setGraphicTechnicianAccount( type.setId( json.graphicTechnicianAccount.id ) );
+		// quotation.setsalesAgent( type.setId( json.salesAgent.id ) );
+		// quotation.setgraphicTechnician( type.setId( json.graphicTechnician.id ) );
 		if ( !Len( json.id ) ) {
 			
 			thisId = super.fire( "quotation.create", [ quotation, session.user.getId() ] );

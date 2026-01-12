@@ -31,7 +31,6 @@
 }
 
 .quotation-fruit-row-header {
-	font-weight: bold;
 	margin-top: 5px;
 	background-color: #EAEAEA;
 	padding: 5px 10px;
@@ -255,3 +254,27 @@
 	padding: 20px;
 	text-transform: uppercase;
 }
+
+/*
+    search fruit 
+*/
+.fruit-suggest-widget-input {
+    width: 400px;
+	height: 39px;
+}
+
+.fruit-suggest-widget-suggest-row,
+.fruit-suggest-widget-suggest-row * {
+    font-size: 11px;
+
+}
+
+.fruit-suggest-widget-suggest-row {
+    height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+    search fruit 
+*/

@@ -129,7 +129,8 @@
 			</cfif>
 
 			ORDER BY
-				#super.sanitizeSQL( arguments.orderby )#
+				<!--- #super.sanitizeSQL( arguments.orderby )# ---->
+				text_id DESC
 
 			<cfif arguments.limit GT 0>
 				LIMIT
@@ -177,15 +178,16 @@
 	<cffunction name="update" returntype="Numeric">
 		<cfargument name="text" type="com.apirone.core.model.bean.Text" required="true">
 
-		<cfset field = getDBField( arguments.text.getEntity().getKey() )>
+		<!--- <cfset field = getDBField( arguments.text.getEntity().getKey() )> --->
 
-		<cfquery name="local.q" datasource="apirone">
+		<cfquery name="local.q" datasource="apirone" result="local.result">
 			UPDATE texts
 			SET
 				text	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getName()#">,
-				lang_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">,
-				text_kind_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getKind().getId()#">,
-				<!--- status_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getStatus().getId()#">, --->
+				lang_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">
+				<!---
+				text_kind_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getKind().getId()#">
+				status_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getStatus().getId()#">, 
 				#field.name# =
 
 					<cfif field.type == "uuid">
@@ -193,10 +195,14 @@
 					<cfelse>
 						<cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
 					</cfif>
+				--->
 
 			WHERE
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>
+
+		<cfdump var="#local.result#">
+		<cfabort>
 
 		<cfreturn arguments.text.getId()>
 	</cffunction>

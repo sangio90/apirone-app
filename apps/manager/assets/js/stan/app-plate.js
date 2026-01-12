@@ -806,6 +806,12 @@ AP.plate.designer = ( function() {
         }
 
         onSelectFruit( selectedFruit ) {
+
+            console.log("onSelectFruit:selectedFruit", selectedFruit );
+            console.log("this.plate.cellOrientation", this.plate.cellOrientation );
+
+            //console.log("this.plate.cellOrientation", this.plate.cellOrientation );
+
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
                 height: selectedFruit.height,
@@ -978,6 +984,27 @@ AP.plate.designer = ( function() {
                 },
 
                 {
+                    UUID: "999",
+                    CODE: "2X2V",
+                    IMG: "/assets/fakes/img/508VERTICALE.jpg",
+                    WIDTH: 1200, // in px
+                    HEIGHT: 500, // in px
+                    ORIENTATION: "V",
+                    CELL_ORIENTATION: "V",
+                    GRID: [
+                            "_",
+                            "_",
+                            "_",
+                            "_",
+                            "0",
+                            "_",
+                            "_",
+                            "_",
+                            "_"
+                    ],
+                },
+
+                {
                     UUID: "100",
                     CODE: "508",
                     IMG: "/assets/fakes/img/508.jpg",
@@ -1134,6 +1161,10 @@ AP.plate.designer = ( function() {
                 FREE_CELL_HEIGHT = tmp;
             }
 
+            //console.log("configPlate:CELL_TYPE.FREE", gridModule.CELL_TYPE.FREE)
+            console.log("selectedPlate.CELL_ORIENTATION", selectedPlate.CELL_ORIENTATION)
+            console.log("selectedPlate.ORIENTATION", selectedPlate.ORIENTATION)
+
             const grid = [];
 
             for ( let iRow = 0; iRow < selectedPlate.GRID.length; iRow++ ) {
@@ -1141,6 +1172,9 @@ AP.plate.designer = ( function() {
 
                 for ( let iCol = 0; iCol < selectedPlate.GRID[iRow].length; iCol++ ) {
                     const cellType = selectedPlate.GRID[iRow][iCol];
+
+                    console.log("constants.GRID_CELL_DIMENSIONS", pageData.GRID_CELL_DIMENSIONS[cellType].width)
+                    console.log("pageData.GRID_CELL_DIMENSIONS", pageData.GRID_CELL_DIMENSIONS[cellType].height)
 
                     const cell = new Cell(
                         pageData.GRID_CELL_DIMENSIONS[cellType].WIDTH,

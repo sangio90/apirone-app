@@ -13,7 +13,12 @@
                 <span data-bind="text: lang.name"></span>
             </td>
             <td>
-                <span data-bind="text: entity"></span>
+                <span data-bind="text: entity.key"></span><br>
+                <span class="small-code">(<span data-bind="text: entity.shortValue"></span>)</span>
+            </td>
+            <td>
+                <div data-bind="source: statuses" data-template="text-status-row-tmpl">
+                </div>
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:edit">
@@ -28,4 +33,7 @@
             </td>
         </tr>
     </nmscript>
+
+    #template( view="jstemplate/text/text-status-row-tmpl" )#
+
 </cfoutput>

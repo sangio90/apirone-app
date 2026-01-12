@@ -1027,3 +1027,21 @@ h2 {
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
 }
+
+.status-translation {
+    border-radius: 10px;
+    width: 15px;
+    height: 15px;
+    display: block;
+    float: left;
+    margin-right: 7px;
+    margin-top: 3px
+}
+
+.translated {
+    background-color: Green;
+}
+
+.untranslated {
+    background-color: Red;
+}

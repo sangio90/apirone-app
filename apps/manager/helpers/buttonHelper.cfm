@@ -92,6 +92,7 @@
                  String title="",
                  String icon="",
                  String class="",
+                 String style="",
                  String id="",
                  Array data=[] // { "key" = "value" }
     ){ 
@@ -117,6 +118,7 @@
                 <#ele# type="#arguments.type#" class="btn btn-#arguments.variant# btn-#arguments.size# #arguments.class#" 
                     title="#arguments.title#" 
                     #dataAttr#
+                    #Len( arguments.style ) ? 'style="#arguments.style#"' : ''#
                     #Len( arguments.bind ) ? 'data-bind="#arguments.bind#"' : ''#
                     #Len( arguments.href ) ? 'href="#arguments.href#"' : ''#
                     #Len( arguments.id ) ? 'id="#arguments.id#"' : ''#>

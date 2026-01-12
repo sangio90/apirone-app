@@ -30,9 +30,11 @@
 		var memy = super.getMementify();
 
 		prc.isEditing = true;
-		prc.title     = "Modifica preventivo";
-
+		
 		var quotation = super.fire( "Quotation.get", [ rc.id ] );
+
+		prc.title     = "Modifica preventivo < #quotation.getQuotationNumber()# / #quotation.getVersionNumber()# > ";
+
 		prc.quotation = quotation;
 
 		prc.page = getData().page;
@@ -48,6 +50,7 @@
 		prc.jsFiles.add( "app-quotation-plate" );
 		prc.jsFiles.add( "app-quotation-signage" );
 		prc.jsFiles.add( "app-quotation-accessory" );
+		prc.jsFiles.add( "app-quotation-article" );
 
 		prc.cssFiles.add( "quotation" );
 
@@ -61,8 +64,8 @@
 	*/
 
 	private function getData(){
-		var memy = super.getMementify();
 		var page = {};
+		var memy = super.getMementify();
 
 		page[ "statuses" ]       = memy.convertList( super.fire( "status.list", [ "QUOTATION" ] ) );
 		page[ "languages" ]      = memy.convertList( super.fire( "lang.list" ) );
@@ -70,8 +73,11 @@
 		page[ "currencies" ]     = memy.convertList( super.fire( "currency.list" ) );
 		page[ "frames" ]         = memy.convertList( super.fire( "frame.list" ), "minimal" );
 		page[ "vatCodes" ]       = memy.convertList( super.fire( "vatCode.list" ) );
+		page[ "techUsers" ]      = memy.convertList( super.fire( "user.list", { roleTypeId="TEC" } ) );
+		page[ "saleUsers" ]      = memy.convertList( super.fire( "user.list", { roleTypeId="COM" } ) );
 
 		return { "page" = page }
+	
 	}
 
 }

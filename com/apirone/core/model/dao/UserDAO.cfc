@@ -27,6 +27,7 @@
 		<cfargument name="langId" type="String">
 		<cfargument name="statusId" type="String">
 		<cfargument name="accountId" type="String">
+		<cfargument name="roleTypeId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -37,6 +38,7 @@
 				COUNT(user_id) OVER() AS total
 			FROM
 				membership.users
+					INNER JOIN membership.roles USING ( role_id )
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.str )>
@@ -53,6 +55,10 @@
 
 				<cfif !IsNull( arguments.roleId )>
 					AND role_id = <cfqueryparam cfsqltype="varchar" value="#arguments.roleId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.roleTypeId )>
+					AND role_type_id = <cfqueryparam cfsqltype="varchar" value="#arguments.roleTypeId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.accountId )>

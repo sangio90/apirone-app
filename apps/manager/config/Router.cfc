@@ -10,6 +10,8 @@
 				Live #Now()#";
 		} );
 
+		get( "/util/tmp" ).to( "MainController.tmp" ).end();
+
 		get( "/ajax/search" ).to( "SearchAjaxController.list" ).end();
 		get( "/batch/update-terms" ).to( "BatchController.updateSearchTerms" ).end();
 
@@ -62,6 +64,14 @@
 		post( "/ajax/signages/rows-config" ).to( "SignageConfigAjaxController.save" ).end();
 		get( "/signages/rows-config/:id" ).to( "SignageConfigController.rowConfig" ).end();
 		get( "/signages/rows-config" ).to( "SignageConfigController.rowConfig" ).end();
+
+		/*
+			metadata global
+		*/
+		get( "/global-metadata" ).to( "GlobalMetadataController.list" ).end();
+		get( "/ajax/global-metadata/:id" ).to( "GlobalMetadataAjaxController.get" ).end();
+		post( "/ajax/global-metadata" ).to( "GlobalMetadataAjaxController.save" ).end();
+		get( "/ajax/global-metadata" ).to( "GlobalMetadataAjaxController.list" ).end();
 
 		/*
 			metadata type
@@ -284,10 +294,11 @@
 		/*
 			texts
 		*/
-		get( "/ajax/texts/:id/all" ).toHandler( "TextAjaxController.all" );
-		get( "/ajax/texts/:id" ).toHandler( "TextAjaxController.get" );
-		get( "/ajax/texts" ).toHandler( "TextAjaxController.list" );
-		get( "/texts" ).toHandler( "TextController.list" );
+		get( "/ajax/texts/:id/all" ).to( "TextAjaxController.all" ).end();
+		get( "/ajax/texts/:id" ).to( "TextAjaxController.get" ).end();
+		get( "/ajax/texts" ).to( "TextAjaxController.list" ).end();
+		post( "/ajax/texts" ).to( "TextAjaxController.save" ).end();
+		get( "/texts" ).to( "TextController.list" ).end();
 
 
 		/*
@@ -374,7 +385,16 @@
 		delete( "/ajax/product-categories" ).to( "ProductCategoryAjaxController.delete" ).end();
 		get( "/product-categories" ).to( "ProductCategoryController.list" ).end();
 
+		/*
+			lines costs
+		*/
+		get( "/ajax/lines/costs" ).to( "LineCostAjaxController.list" ).end();
 
+		post( "/lines/costs/add" ).to( "LineCostController.add" ).end();
+		post( "/lines/costs" ).to( "LineCostController.save" ).end();
+		get( "/lines/costs" ).to( "LineCostController.list" ).end();
+
+		
 		/*
 			lines
 		*/
@@ -488,6 +508,9 @@
 		post( "/ajax/quotation-items/plate" ).to( "QuotationItemAjaxController.savePlate" ).end();
 		get( "/ajax/quotation-items/accessory/:id" ).to( "QuotationItemAjaxController.editAccessory" ).end();
 		post( "/ajax/quotation-items/accessory" ).to( "QuotationItemAjaxController.saveAccessory" ).end();
+		get( "/ajax/quotation-items/article/:id" ).to( "QuotationItemAjaxController.editArticle" ).end();
+		post( "/ajax/quotation-items/article" ).to( "QuotationItemAjaxController.saveArticle" ).end();
+		
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
 		post( "/ajax/quotation-items/pricing" ).to( "QuotationItemAjaxController.calculate" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();

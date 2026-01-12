@@ -129,7 +129,6 @@
 				icon: "fas fa-dollar-sign",
 				title: "Tipo prezzi",
 			},
-
 			{
 				href: "/manager/production-times",
 				icon: "fas fa-clock",
@@ -146,9 +145,19 @@
 				title: "Font Family",
 			},
 			{
+				href: "/manager/lines/costs",
+				icon: "fas fa-cogs",
+				title: "Costi per linea",
+			},
+			{
 				href: "/manager/metadata-types",
 				icon: "fas fa-fan",
 				title: "Metadata",
+			},
+			{
+				href: "/manager/global-metadata",
+				icon: "fas fa-cogs",
+				title: "Setting generali",
 			},
 			{
 				href: "/manager/texts",

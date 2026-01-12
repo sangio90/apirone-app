@@ -91,6 +91,7 @@
 
                                     <!--- fruits ---->
                                     <div class="tab-pane fade" id="plate-fruit-product-items-tab" role="tabpanel" aria-labelledby="plate-fruit-product-items-but">
+                                        <div class="text-end"><a href="##" data-bind="click:toggleFruits, text:toggleFruitsLabel" class="hand"></a></div>
 								        <div id="quotation-plate-fruits-product-items" style="max-width: 100%">
                                             <div data-template="quotation-fruit-row-tmpl" data-bind="source: detailForm.data.fruits">
                                             </div>
@@ -106,11 +107,26 @@
 
                             <div class="col-9">
                                 <div id="plate-designer-header" class="mb-2 pb-2">
-                                    <input 
-                                        type="text" 
-                                        id="plate-fruit-suggest" 
-                                        class="search-widget-input" 
-                                        placeholder="Aggiungi un frutto...">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input 
+                                                type="text" 
+                                                id="plate-fruit-suggest" 
+                                                class="fruit-suggest-widget-input" 
+                                                placeholder="Aggiungi un frutto...">
+                                        </div>    
+                                        <div class="col-md-2 float-end">
+
+                                            <select id="plate-orientation" 
+                                                required
+                                                class="form-control"
+                                                data-bind="source: availableOrientations, value: detailForm.data.product.orientation, events: { change: changeOrientation }" 
+                                                data-value-field="id"
+                                                data-text-field="name"
+                                                >
+                                            </select>
+                                        </div>    
+                                    </div>
                                 </div>
                                 <div id="plate-designer-root">
                                     <!--- Dynamically populated container --->

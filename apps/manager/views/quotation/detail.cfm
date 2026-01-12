@@ -6,15 +6,18 @@
             </div>
 			
             <div class="col-9 text-end mt-3">
-				#button( href = "/manager/quotations", size = "sm", label = "Torna ai preventivi", icon="arrow-left", class="me-4" )#
-				#button( bind = "click:showHeader", size = "sm", label = "Dettaglio", icon="edit" )#
-                #button( bind = "click:exportProducts", size = "sm", label = "Esporta articoli", icon="file-export", class="export-button" )#
-                #button( bind = "click:export", size = "sm", label = "Esporta preventivo", icon="file-export", class="export-button" )#
-				#button( bind = "click:openStatusModal", size = "sm", label = "Status: #prc.quotation.getStatusHistory().getStatus().getName()#", icon="check-circle" )#
-				#button( bind = "click:openPrintModal", size = "sm", label = "Stampa", icon="print" )#
+				#button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left", class="me-4" )#
+				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
+                #button( bind="click:exportProducts", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
+                #button( bind="click:export", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
+				#button( bind="click:openStatusModal", size="sm", label="Status: #prc.quotation.getStatusHistory().getStatus().getName()#", icon="check-circle" )#
+				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
 			</div>
+            
             <div class="export-button-tooltip col-6 text-end">
-				<p class="export-button-tooltip" style="color: red; display: none">Il preventivo è già stato esportato</p>
+				<p class="export-button-tooltip" style="color: red; display: none">
+                    Il preventivo è già stato esportato
+                </p>
 			</div>
         
         </div>
@@ -86,11 +89,22 @@
                                                     Accessori
                                                 </button>
 
+                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
+                                                    id="nav-articles-tab"
+                                                    data-type="ART"
+                                                    data-bs-target="##nav-articles" 
+                                                    data-bind="click:changeType">
+                                                    Servizi
+                                                </button>
+
                                             </div>
                                             <div class="col-8 text-end mb-2">
-                                                <button id="qt-add-plate" type="button" class="btn btn-primary" data-bind="click:addPlate">Aggiungi placca</button>
-                                                <button id="qt-add-signage" type="button" class="btn btn-primary" data-bind="click:addSignage" style="display: none" disabled>Aggiungi segnaletica</button>
-                                                <button id="qt-add-accessory" type="button" class="btn btn-primary" data-bind="click:addAccessory" style="display: none" disabled>Aggiungi accessorio</button>
+
+                                                #addButton( label="Aggiungi placca", id="qt-add-plate", bind="click:addPlate")#
+                                                #addButton( label="Aggiungi segnaletica", id="qt-add-signage", bind="click:addSignage", style="display: none" )#
+                                                #addButton( label="Aggiungi accessorio", id="qt-add-accessory", bind="click:addAccessory", style="display: none" )#
+                                                #addButton( label="Aggiungi servizio", id="qt-add-article", bind="click:addArticle", style="display: none" )#
+
                                             </div>
                                         </div>
                                     </nav>
@@ -122,12 +136,15 @@
                                                 <div class="qt-no-items">NESSUN ACCESSORIO</div>
                                             </div>
                                         </div>
-                                        <!---
                                         <div class="tab-pane fade" id="nav-articles" role="tabpanel">
-                                            <div data-template="quotation-item-article-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                            <div data-bind="visible: showItems">
+                                                <div data-template="quotation-item-article-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                                </div>
+                                            </div>
+                                            <div data-bind="visible: hideItems">
+                                                <div class="qt-no-items">NESSUN SERVIZIO</div>
                                             </div>
                                         </div>
-                                        --->
                                     </div>
                                 </section>
                             </div>
@@ -149,6 +166,7 @@
     #view( "quotation/signage-modal" )#
     #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal" )#
+    #view( "quotation/article-modal" )#
 
     #view( "quotation/zone-modal" )#
     #view( "quotation/print-modal" )#
@@ -159,6 +177,7 @@
     #template( view="jstemplate/quotation/quotation-item-plate-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-accessory-preview-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-item-article-preview-tmpl" )#
     
     #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
 

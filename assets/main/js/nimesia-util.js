@@ -1,7 +1,7 @@
 NM.util = NM.util || {};
 NM.form = NM.form || {};
 
-NM.util.openModal = function( ele, onShow ) {
+NM.util.openModal = function( ele, onShow, useOverlap=false ) {
 
     var dialogs = $( ".modal.show" ); // opened dialog
     var currentId = ele.attr( "id" );
@@ -35,8 +35,11 @@ NM.util.openModal = function( ele, onShow ) {
 
     // sulle pagine molto lunghe posiziona la modale in alto quando viene redisegnata.
     // su initUpload ad esempio.
-    // ele.css({ left: 0, top: 0 });
-    // ele.offset( { left: currentLeft, top: currentTop } );
+    if ( useOverlap ) {
+        ele.css( { left: 0, top: 0 } );
+        ele.offset( { left: currentLeft, top: currentTop } );
+
+    }
 
 };
 

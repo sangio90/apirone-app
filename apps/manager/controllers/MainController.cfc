@@ -9,10 +9,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	function tmp( event, rc, prc ){
 		prc.title = "Tmp";
 
-		dump( prc );
+
+		view( "/apps/manager/views/util/tmp" );
 		abort;
 
-		event.setView( "util/tmp" );
+
+		//event.setView( "util/tmp" );
 	}
 
 	/*

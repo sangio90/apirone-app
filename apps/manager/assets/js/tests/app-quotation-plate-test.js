@@ -11,8 +11,11 @@ $( document ).ready( async function() {
 
         var helper = AP.test.helper;
 
+        //console.log("helper", helper);
 
         pub.new = async function() {
+
+            await helper.wait( 2000 );
 
             console.log( "test:new" );
 
@@ -20,30 +23,33 @@ $( document ).ready( async function() {
             const modelId = "1ac1104f-0208-4a0c-bdca-7ba50df4756f"; // modello: 2X2
             const finishId = "7357f125-e556-467c-ba37-2a1e17abc6cf"; // finitura: Acciaio lucido
 
-            // var fruits = [ "schu", "CONNETTORE RJ11" ];
-            var fruits = [ "schu", "PULSANTE SINGOLO INF" ];
+            var fruits = []; // Default: nessun fruit
+            var fruits = [ "schu", "CONNETTORE RJ11" ];
+            //var fruits = [ "PULSANTE SINGOLO INF", "schu" ];
+            // var fruits = [ "P40", "CONNETTORE RJ11" ];
+            // var fruits = [ "schu" ];
+            // var fruits = [ "schu", "PULSANTE SINGOLO INF" ];
 
-            const plateEle = $( "#plate-line" );
+            const lineEle = $( "#plate-line" );
             const modelEle = $( "#plate-model" );
             const finishEle = $( "#plate-finish" );
             const fruitSuggest = $( "#plate-fruit-suggest" );
             const autocomplete = fruitSuggest.data( "kendoAutoComplete" );
 
-
-            await helper.wait( 600 );
-            $( "body" ).find( ".quotation-item:first" ).click();
+            // first item, if editing existing item
+            //$( "body" ).find( ".quotation-item:first" ).click();
 
             // Sequenza asincrona
-            await helper.wait( 600 );
-            $( "body" ).find( "#nav-products-tab" ).click();
+            //await helper.wait( 600 );
+            //$( "body" ).find( "#nav-products-tab" ).click();
 
             await helper.wait( 600 );
             $( "body" ).find( "button[data-bind='click:addPlate']" ).click();
 
-            await helper.wait( 600 );
-            plateEle.val( lineId ).trigger( "change" );
+            await helper.wait( 500 );
+            lineEle.val( lineId ).trigger( "change" );
 
-            await helper.wait( 600 );
+            await helper.wait( 500 );
             modelEle.val( modelId ).trigger( "change" );
 
             await helper.wait( 600 );
@@ -74,14 +80,12 @@ $( document ).ready( async function() {
 
         };
 
-
         pub.edit = async function() {
 
             console.log( "test:edit" );
 
             await helper.wait( 600 );
-            $( "body" ).find( ".quotation-item" ).eq( 1 )
-                .click();
+            $( "body" ).find( ".quotation-item" ).eq( 1 ).click();
 
         };
 
@@ -90,9 +94,6 @@ $( document ).ready( async function() {
     }() );
 
     // fire correct test here:
-
     AP.test.quotation.new();
-
-    // }
 
 } );

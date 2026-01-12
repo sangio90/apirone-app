@@ -19,4 +19,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return obj.setRawMemento( data, GetMetadata( this ) );
 	}
 
+	public String function getShortValue(){
+		return Right( this.getValue(), 6 );
+	}
+
 }

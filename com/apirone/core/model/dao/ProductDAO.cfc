@@ -85,12 +85,16 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.lineId )>
-					AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+					<cfif !IsNull( arguments.categoryModeId ) AND arguments.categoryModeId EQ "BAS">
+						AND jsonb_exists_any( lines, ARRAY[<cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">] )
+					<cfelse>
+						AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
+					</cfif>
 				</cfif>
 
 				<cfif !IsNull( arguments.categoryId )>
 					AND (
-						(products.catalog_bundle_id IS NULL AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
+						( products.catalog_bundle_id IS NULL AND products.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
 						OR (catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.categoryId#">)
 					)
 				</cfif>
