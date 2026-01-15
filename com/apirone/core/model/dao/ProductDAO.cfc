@@ -51,25 +51,28 @@
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 
 		<cfquery name="local.q" datasource="apirone" result="result">
-			SELECT
-				product_id::varchar,
+			SELECT DISTINCT
+				products.product_id,
+				products.product_id::varchar,
+				products.code,
 				COUNT(product_id) OVER() AS total
 			FROM
 				products
 					LEFT JOIN catalog_bundles USING ( catalog_bundle_id )
-					INNER JOIN product_categories
-						ON (
-							(products.catalog_bundle_id IS NULL AND product_categories.product_category_id = products.product_category_id)
-							OR (products.catalog_bundle_id IS NOT NULL AND product_categories.product_category_id = catalog_bundles.product_category_id)
-					 )
-					<cfif !IsNull( arguments.str )>
-						INNER JOIN texts USING ( product_id )
-					</cfif>
+						INNER JOIN product_categories
+							ON (
+								(products.catalog_bundle_id IS NULL AND product_categories.product_category_id = products.product_category_id)
+								OR (products.catalog_bundle_id IS NOT NULL AND product_categories.product_category_id = catalog_bundles.product_category_id)
+						)
+						<cfif !IsNull( arguments.str )>
+							INNER JOIN texts USING ( product_id )
+						</cfif>
 
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.str )>
 					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+					OR products.code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 				</cfif>
 
 				<cfif !IsNull( arguments.finishId )>
@@ -113,7 +116,7 @@
 			ORDER BY
 				<!--- #super.sanitizeSQL( arguments.orderBy )# - --->
 				<!--- TODO: dovrei fare la inner se l'ordinamento prevede product.name --->
-				products.code
+				products.product_id
 
 			<cfif arguments.limit GTE 0>
 				LIMIT

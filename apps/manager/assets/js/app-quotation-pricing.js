@@ -11,6 +11,7 @@ AP.quotation.pricing = ( function() {
     var pub = {};
     var fields = AP.quotation.fields;
     var type = undefined; // set by init()
+    var saveMethod = undefined; // set by init()
 
     var getCurrentViewModel = function() {
 
@@ -130,6 +131,16 @@ AP.quotation.pricing = ( function() {
 
         common: getCommonData(),
 
+        getFormattedTotal: function() {
+
+            var value = this.get( "pricing.data.total" );
+
+            if( value ) { console.log( "getFormattedTotal:value", value ); }
+
+            return value;
+
+        },
+
         pricing: {
             counters: {
                 plates: 0,
@@ -223,6 +234,11 @@ AP.quotation.pricing = ( function() {
     } );
 
     pub.updateItem = function() {
+
+        // console.log( "saveMethod", saveMethod );
+
+        // saveMethod();
+
     	viewModelItem.update();
     };
 
@@ -230,7 +246,9 @@ AP.quotation.pricing = ( function() {
     	viewModelGeneral.update();
     };
 
-    pub.init = function( id, initType ) { // type: item, quotation
+    pub.init = function( id, initType, saveMethod ) { // type: item, quotation
+
+        // console.log( "saveMethod", saveMethod );
 
         type = initType; // Imposta la variabile type
 

@@ -6,6 +6,7 @@
 .quotation-totals-box {
 	position: fixed;
 	bottom: 20px;
+	right: 20px;
 	background-color: #2771e8;
 	width: 400px;
 	color: white;
@@ -83,6 +84,7 @@
 	position: relative;
 	overflow: hidden;
 	display: grid;
+	z-index: 2147483647;
 }
 
 #plate-grid {
@@ -92,6 +94,10 @@
 	display: grid;
 	height: inherit;
 	width: inherit;
+}
+
+input#input-item-total[readonly] {
+	background-color: #CCCCCC;
 }
 
 .plate-background:hover .grid-column.prohibited {
@@ -259,20 +265,20 @@
     search fruit 
 */
 .fruit-suggest-widget-input {
-    width: 400px;
+	width: 400px;
 	height: 39px;
 }
 
 .fruit-suggest-widget-suggest-row,
 .fruit-suggest-widget-suggest-row * {
-    font-size: 11px;
+	font-size: 11px;
 
 }
 
 .fruit-suggest-widget-suggest-row {
-    height: 20px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+	height: 20px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 /*

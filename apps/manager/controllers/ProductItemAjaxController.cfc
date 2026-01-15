@@ -83,8 +83,9 @@ component extends="com.apirone.core.controller.AbsController" {
     }
 
     public function productItemsByProduct( event, rc, prc ) {
-		var result = super.getResult();
-		//var memy = super.getMementify();
+
+        var result = super.getResult();
+	    var memy = super.getMementify();
         var transformer = super.transformer( "ProductItem" );
 
 		var productId = rc.productId;
@@ -95,7 +96,7 @@ component extends="com.apirone.core.controller.AbsController" {
         };
 
 		var items = super.fire( "ProductItem.list", params );
-		//var data = ( memy.convertList( items, "treelight" ) );
+	    //var data = ( memy.convertList( items, "treelight" ) );
 
         var data = transformer.convertList( items, "tree" );
 

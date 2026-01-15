@@ -152,21 +152,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			messageId = "quotation.created";
 			
 		} else {
-			// update
-			var bean = super.fire( "Quotation.get", [ rc.id ] );
-
-			// quotation.setActive( 0 );
-			// thisId = super.fire( "quotation.clone", [ quotation, statusId ] );
-			
-			if ( !isNull(json.status.id) && ( json.status.id != bean.getStatus().getId() ) ) {
-				var errorMessage = this.setQuotationStatusHistory(json);
-				if (!isNull(errorMessage)) {
-					result.setData( { "error" = errorMessage } );
-					return event.setValue( "result", result );
-				}
-			}
-			var status = super.fire( "status.get", [ json.status.id ] );
-			quotation.setStatus( super.fire( "status.get", [ json.status.id ] ) );
 			thisId    = super.fire( "quotation.update", [ quotation ] )
 			messageId = "quotation.updated";
 		}

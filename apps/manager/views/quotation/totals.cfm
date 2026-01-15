@@ -20,6 +20,15 @@
 							data-template="quotation-pricing-totals-item-tmpl"></tbody>
 					</table>
 					<div class="row mt-3 mb-2 align-items-center d-flex">
+						<div class="col-4">Posizione</div>
+						<div class="col-4">
+						</div>
+						<div class="col-4">
+							<input class="form-control" name="positionCode" 
+								placeholder="Posizione" data-bind="value: pricing.data.positionCode">
+						</div>
+					</div>
+					<div class="row mt-3 mb-2 align-items-center d-flex">
 						<div class="col-4">Sconti</div>
 						<div class="col-4">
 							<input class="form-control" name="discount1" 
@@ -42,6 +51,7 @@
 							<div class="input-group">
 								<input class="form-control text-end" name="total" id="input-item-total"
 									placeholder="Totale preventivo"
+									data-format="0.00"
 									data-bind="value: pricing.data.total">
 								<span class="input-group-text">
 									<i class="fas fa-euro-sign"></i>
@@ -108,7 +118,7 @@
 					<div class="d-flex justify-content-end gap-2">
 						<div class="py-2 text-end d-flex align-items-center gap-2">
 							<div class="status" id="quotation-totals-general-loading"></div>
-							#button(bind="click:updateTotals", variant="default", label="Aggiorna", size="sm", icon="sync-alt")#
+							#button(bind="click:updateTotals", variant="default", label="Salva", size="sm", icon="fa-save")#
 						</div>
 					</div>
 				</div>			

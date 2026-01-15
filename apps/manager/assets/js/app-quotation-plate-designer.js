@@ -344,7 +344,11 @@ AP.plate.grid = ( function() {
             for ( let i = 0; i < this.grid.length; i++ ) {
                 const row = this.grid[i];
 
+                console.log( "this.grid[i]", this.grid[i] );
+
                 const maxCellHeight = Math.max( ...row.map( ( x ) => x.height ) );
+
+                console.log( "cell.maxCellHeight", maxCellHeight );
 
                 gridTemplateRows[i] = maxCellHeight;
             }
@@ -413,13 +417,16 @@ AP.plate.grid = ( function() {
                         } );
                     }
 
+                    // console.log("cell.gridTemplateRows", gridTemplateRows)
+                    // console.log( "cell.gridTemplateRows", gridTemplateColumns );
+
                     cell.height = gridTemplateRows[y - 1];
                     cell.width = gridTemplateColumns[x - 1];
 
                     const cellPosition = $plateCell.position();
 
-                    console.log("cell.height", cell.height)
-                    console.log("cell.width", cell.width)
+                    // console.log( "cell.height", cell.height );
+                    // console.log( "cell.width", cell.width );
 
                     cell.top = cellPosition.top;
                     cell.left = cellPosition.left;
@@ -472,8 +479,8 @@ AP.plate.grid = ( function() {
 
             super( args.width, args.height, args.orientation );
 
-            console.log("Fruit:orientation", orientation.VERTICAL);
-            console.log("this.orientation", this.orientation);
+            console.log( "Fruit:orientation", orientation.VERTICAL );
+            console.log( "this.orientation", this.orientation );
 
             this.rowSpan =
                 this.orientation == orientation.VERTICAL
@@ -697,16 +704,16 @@ AP.plate.grid = ( function() {
                 width: `${this.width}px`,
                 height: `${this.height}px`,
             };
-            
-            console.log("drawWithin:imgCSS", imgCSS);
-            console.log("drawWithin:this.orientation", this.orientation);
-            console.log("drawWithin:orientation.VERTICAL", orientation.VERTICAL);
 
-            //console.log("Fruit:drawWithin:this.orientation", orientation.VERTICAL);
-            //console.log("Fruit:drawWithin:this.orientation", this.orientation);
+            console.log( "drawWithin:imgCSS", imgCSS );
+            console.log( "drawWithin:this.orientation", this.orientation );
+            console.log( "drawWithin:orientation.VERTICAL", orientation.VERTICAL );
+
+            // console.log("Fruit:drawWithin:this.orientation", orientation.VERTICAL);
+            // console.log("Fruit:drawWithin:this.orientation", this.orientation);
 
             if ( this.orientation == orientation.VERTICAL ) {
-                console.log("drawWithin:rotated");
+                console.log( "drawWithin:rotated" );
                 const tmp = imgCSS.width;
                 imgCSS.width = imgCSS.height;
                 imgCSS.height = tmp;
@@ -744,7 +751,7 @@ AP.plate.grid = ( function() {
     class FruitsController {
         constructor( args ) {
 
-            console.log("FruitsController initialized", args.plate);
+            console.log( "FruitsController initialized", args.plate );
 
             this.plate = args.plate;
             this.fruits = args.fruits;
@@ -773,8 +780,10 @@ AP.plate.grid = ( function() {
 
             // console.log( "addFruitToPlate:fruit", selectedFruit );
             // console.log( "addFruitToPlate:selectedFruit.image", selectedFruit.image );
-            
+
             console.log( "addFruitToPlate:this.plate.orientation", this.plate.orientation );
+
+            console.log( "addFruitToPlate:selectedFruit.image.uri", selectedFruit.image?.uri );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,

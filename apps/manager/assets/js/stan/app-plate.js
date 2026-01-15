@@ -326,6 +326,8 @@ AP.plate.designer = ( function() {
 
                 const maxCellHeight = Math.max( ...row.map( x => x.height ) );
 
+                console.log("cell.maxCellHeight", maxCellHeight)
+
                 gridTemplateRows[i] = maxCellHeight;
             }
 
@@ -384,6 +386,9 @@ AP.plate.designer = ( function() {
                             "appendTo": $plateCell,
                         } );
                     }
+
+                    console.log("cell.gridTemplateRows", gridTemplateRows)
+                    console.log("cell.gridTemplateRows", gridTemplateColumns)
 
                     cell.height = gridTemplateRows[y - 1];
                     cell.width = gridTemplateColumns[x - 1];

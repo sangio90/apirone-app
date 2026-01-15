@@ -85,17 +85,13 @@ AP.plate.modal = ( function() {
         // var plate = this.plates.get( this.get( "plate" ) );
         var plate = viewModel.get( "plate" );
 
-        //plate.orientation.id = "VER"; // for test
-        //plate.orientationCell.id = "VER"; // for test
+        // plate.orientation.id = "VER"; // for test
+        // plate.orientationCell.id = "VER"; // for test
 
-        let freeCellWidth = constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].width;
-        let freeCellHeight = constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].height;
+        let freeCellWidth = constants.GRID_CELL_DIMENSIONS[ gridModule.CELL_TYPE.FREE ].width;
+        let freeCellHeight = constants.GRID_CELL_DIMENSIONS[ gridModule.CELL_TYPE.FREE ].height;
 
-        console.log("configPlate:CELL_TYPE.FREE", gridModule.CELL_TYPE.FREE)
-        console.log("configPlate:plate.orientationCell.id", plate.orientationCell.id)
-        console.log("configPlate:orientation.VERTICAL", orientation.VERTICAL)
-
-        if ( plate.orientationCell.id == orientation.VERTICAL ) {
+        if ( plate.cellOrientation.id == orientation.VERTICAL ) {
             const tmp = freeCellWidth;
             freeCellWidth = freeCellHeight;
             freeCellHeight = tmp;
@@ -119,7 +115,7 @@ AP.plate.modal = ( function() {
                 const cell = new Cell(
                     constants.GRID_CELL_DIMENSIONS[cellType].width,
                     constants.GRID_CELL_DIMENSIONS[cellType].height,
-                    plate.orientationCell.id,
+                    plate.cellOrientation.id,
                     cellType,
                 );
 
@@ -133,7 +129,7 @@ AP.plate.modal = ( function() {
             width: plate.width,
             height: plate.height,
             orientation: plate.orientation.id,
-            cellOrientation: plate.orientationCell.id,
+            cellOrientation: plate.cellOrientation.id,
             id: plate.id,
             code: plate.code,
             image: plate.image.uri,
@@ -202,9 +198,11 @@ AP.plate.modal = ( function() {
                 id: "ACT",
                 name: ""
             },
+            /*
             selectedOrientation: {
                 id: "HOR"
             },
+            */
             fruits: new kendo.data.DataSource( { // es. data: { position: 1, { fruit: { id: , name: } } }
                 data: [],
                 schema: {
@@ -229,7 +227,7 @@ AP.plate.modal = ( function() {
         orientation: {
             id: "HOR"
         },
-        orientationCell: {
+        cellOrientation: {
             id: "HOR"
         },
         grid: [
@@ -279,17 +277,17 @@ AP.plate.modal = ( function() {
         },
 
         changeOrientation( event ) {
-            console.log("changeOrientation:event", event);
+            console.log( "changeOrientation:event", event );
 
             var orientationId = this.get( "detailForm.data.product.orientation.id" );
 
-            console.log("orientationId", orientationId);
-            
+            console.log( "orientationId", orientationId );
+
             var frameId = viewModel.get( "detailForm.data.product.frame.id" );
             var productId = viewModel.get( "detailForm.data.product.id" );
-            
-            console.log("frameId", frameId)
-            console.log("productId", productId)
+
+            console.log( "frameId", frameId );
+            console.log( "productId", productId );
 
             NM.util.ajax( {
                 method: "GET",
@@ -298,11 +296,11 @@ AP.plate.modal = ( function() {
                     done: function( xhr ) {
 
                         viewModel.set( "plate.orientation", xhr.data.orientation );
+                        viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
                         viewModel.set( "plate.grid", xhr.data.grid );
-
-                        console.log("xhr.data.image", xhr.data.image)
-
                         viewModel.set( "plate.image", xhr.data.image ); // by product
+
+                        // console.log("xhr.data.image", xhr.data.image)
 
                         configPlate();
 
@@ -343,7 +341,7 @@ AP.plate.modal = ( function() {
                 return;
             }
 
-            console.log("frame", frame);
+            console.log( "frame", frame );
 
             var frameId = frame.id;
 
@@ -379,6 +377,8 @@ AP.plate.modal = ( function() {
             const quotationItemId = viewModel.get( "detailForm.data.id" );
             const productId = viewModel.get( "detailForm.data.product.id" );
 
+            console.log( "firstLoadProductItems:productId", productId );
+
             // Chiamata AJAX iniziale per ottenere tutti i product items
             NM.util.ajax( {
                 method: "GET",
@@ -395,6 +395,7 @@ AP.plate.modal = ( function() {
                         if ( xhr.count > 0 ) {
 
                             if ( !viewModel.get( "detailForm.data.product.image" ) && xhr.data[0].horizontalImage ) {
+
                                 viewModel.set( "detailForm.data.product.image", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
@@ -420,12 +421,16 @@ AP.plate.modal = ( function() {
                             // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attributeId === item.attribute.id );
+
+                                console.log( "existing:item", item );
+
                                 if ( existing ) {
                                     if ( !existing.values.find( v => v.productItemId === item.id ) ) {
 
                                         existing.values.push( {
                                             attributeValue: item.attributeValue,
                                             productItemId: item.id,
+                                            images: item.images,
                                             // parentAttributeId: null,
                                             selected: false
                                         } );
@@ -437,12 +442,14 @@ AP.plate.modal = ( function() {
                                     const parsedData = {
                                         attributeId: item.attribute.id,
                                         attributeName: item.attribute.name,
+
                                         // parentAttributeId: null,
                                         level: 0,
                                         values: [
                                             {
                                                 attributeValue: item.attributeValue,
                                                 productItemId: item.id,
+                                                images: item.images,
                                                 selected: false
                                             }
                                         ]
@@ -496,29 +503,24 @@ AP.plate.modal = ( function() {
 
         loadProductItems: function( originId, attributeId, fruitId ) {
 
-            // return new Promise( ( resolve, reject ) => {
-
             if ( fruitId == undefined ) {
                 var type = "plate";
-                var productId = viewModel.get( "detailForm.data.product.id" );
-                var prodyctIdForCall = productId;
+                var product = viewModel.get( "detailForm.data.product" );
                 var productItems = viewModel.get( "detailForm.data.product.items" );
+                var prodyctIdForCall = product.get( "id" );
             } else {
                 var type = "fruit";
                 var fruits = viewModel.get( "detailForm.data.fruits" );
                 var fruit = fruits.get( fruitId );
 
-                console.log( "loadProductItems:fruit", fruit );
-
-                var productId = fruit.get( "id" );
+                var product = fruit;
+                // var productId = fruit.get( "id" );
                 var productItems = fruit.get( "items" );
                 var prodyctIdForCall = fruit.get( "fruit.id" );
             }
 
-            //console.log( "type", type );
-
+            var productId = product.get( "id" );
             const attributeArray = productItems.data();
-
             var originId = originId || "";
 
             let url = "/manager/ajax/product-items?productId=" + prodyctIdForCall;
@@ -574,11 +576,15 @@ AP.plate.modal = ( function() {
 
                             // Trovo l'indice dell'attributo selezionato
                             attributeArray.forEach( ( d, idx ) => {
-                                if ( d.attributeId == attributeId ) { parentIndex = idx; }
+                                if ( d.attributeId == attributeId ) {
+                                    parentIndex = idx;
+                                }
                             } );
 
                             // Rimuovo eventuali attributi figli
                             const i = parentIndex + 1;
+
+                            console.log( "attributeArray.parentIndex", attributeArray[parentIndex] );
 
                             while ( i < attributeArray.length ) {
                                 if ( attributeArray[i].level > attributeArray[parentIndex].level ) {
@@ -587,8 +593,6 @@ AP.plate.modal = ( function() {
                                     break;
                                 }
                             }
-
-                            console.log( "att", xhr.data[0].attribute.name );
 
                             // Creo nuovo attributo se necessario
                             if ( !attribute ) {
@@ -711,6 +715,8 @@ AP.plate.modal = ( function() {
             var thisFruit = fruits.get( fruitId );
             var productId = thisFruit.fruit.id;
 
+            console.log( "addProductItemsToFruit:productId", productId );
+
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/product-items?productId=" + productId,
@@ -736,9 +742,12 @@ AP.plate.modal = ( function() {
 
                                 if ( attributeExisting ) {
 
+                                    console.log( "attributeExisting:item", item );
+
                                     attributeExisting.values.push( {
                                         attributeValue: item.attributeValue,
                                         productItemId: item.id,
+                                        images: item.images,
                                         selected: false
                                     } );
 
@@ -748,6 +757,7 @@ AP.plate.modal = ( function() {
                                         attributeId: item.attribute.id,
                                         attributeName: item.attribute.name,
                                         level: 0,
+                                        images: item.images,
                                         values: [
                                             {
                                                 attributeValue: item.attributeValue,
@@ -796,6 +806,54 @@ AP.plate.modal = ( function() {
                     } );
                 }
             } );
+
+        },
+
+        changeImage: function( attribute ) {
+
+            var uri = "";
+
+            var orientationId = viewModel.get( "detailForm.data.product.orientation.id" );
+
+            if ( attribute?.images ) {
+                const orientationMap = { "HOR": "horizontal", "VER": "vertical" };
+                const targetOrientation = orientationMap[orientationId];
+
+
+                if ( targetOrientation ) {
+
+                    for ( var img of attribute.images ) {
+
+                        if ( img.type.id == targetOrientation ) {
+                            uri = img.uri;
+                        }
+                    }
+
+                }
+            }
+
+            // Crea div con background impostato all'uri
+            if ( uri && attribute.productItemId ) {
+                const imageLayer = $( "<div>" )
+                    .attr( "id", "productItem-image-" + attribute.productItemId )
+                    .css( {
+                        "background-image": "url('" + uri + "')",
+                        "background-size": "cover",
+                        "background-position": "center",
+                        "position": "absolute",
+                        "top": 0,
+                        "left": 0,
+                        "width": "100%",
+                        "height": "100%",
+                        "z-index": attribute.productItemId
+                    } );
+
+                // Inserisce prima di #plate-layers
+                $( "#plate-layers" ).before( imageLayer );
+            } else if ( uri == "" && attribute.productItemId ) {
+                // Se uri è vuoto, rimuove il div se esiste
+                $( "#productItem-image-" + attribute.productItemId ).remove();
+            }
 
         },
 
@@ -894,6 +952,18 @@ AP.plate.modal = ( function() {
                 const select = $( "<select>" ).addClass( "form-control me-3 mb-2" ).on( "change", function() {
                     const selectedId = $( this ).val();
                     const attributeId = $( this ).data( "attribute-id" );
+
+                    var value;
+
+                    for ( var thisValue of item.values ) {
+
+                        if ( thisValue.productItemId == selectedId ) {
+                            value = thisValue;
+                        }
+                    }
+
+                    viewModel.changeImage( value );
+
                     viewModel.loadProductItems( selectedId, attributeId );
                 } );
 
@@ -975,7 +1045,6 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        // console.log( "loadFinishes" );
                         viewModel.get( "finishes" ).data( xhr.data );
 
                     },
@@ -986,6 +1055,8 @@ AP.plate.modal = ( function() {
         resetForm: function() { },
 
         save: function() {
+
+            console.log( "plate:save" );
 
             const parsedData = viewModel.get( "detailForm.data" );
             var status = fields.modalRoot.find( ".save-status" );
@@ -1059,7 +1130,7 @@ AP.plate.modal = ( function() {
             viewModel.set( "currentFruit", newFruit );
             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
-            console.log("pub.fruitsController", pub.fruitsController );
+            console.log( "pub.fruitsController", pub.fruitsController );
 
             pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
 
@@ -1159,6 +1230,7 @@ AP.plate.modal = ( function() {
 
         suggest.kendoAutoComplete( {
             template: $.proxy( kendo.template( suggestTemplate ) ),
+            height: "auto",
             dataTextField: "term",
             highlightFirst: true,
             minLength: 3,

@@ -42,6 +42,24 @@
 
 	private Struct function tree( required Struct bean  ){
 
+        var images = [];
+        if( !IsNull( bean.getImages() ) ) {
+
+            for( var image in bean.getImages() ) {
+                images.add({
+                    "id"     = image.getId(),
+                    "uri"    = image.getUri(),
+                    "width"  = image.getWidth(),
+                    "height" = image.getHeight(),
+                    "type" = {
+                        "id"   = image.getType().getId(),
+                        "name" = image.getType().getName()
+                    }
+                });
+            }
+
+        }
+
         var row = {
             "id"                = bean.getId(),
             "shortId"           = bean.getShortId(),
@@ -68,6 +86,7 @@
                 }
             },
             "componentCount" = bean.getComponentCount(),
+            "images" = images,
             "prices" = bean.getPrices()
         };
 

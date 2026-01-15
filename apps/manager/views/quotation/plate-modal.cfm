@@ -125,9 +125,11 @@
                                                 data-text-field="name"
                                                 >
                                             </select>
+
                                         </div>    
                                     </div>
                                 </div>
+
                                 <div id="plate-designer-root">
                                     <!--- Dynamically populated container --->
                                     <div class="plate-designer" id="plate-designer">
@@ -136,6 +138,7 @@
                                         </div>
                                     </div>
                                 </div>                                
+                            
                             </div>
                         </div>
 

@@ -42,9 +42,7 @@
 
 		get( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.list" ).end();
 		post( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.save" ).end();
-		post( "/ajax/:by-regex:(products|product-items)/:id/price/calculate" )
-			.to( "PriceAjaxController.calculate" )
-			.end();
+		post( "/ajax/:by-regex:(products|product-items)/:id/price/calculate" ).to( "PriceAjaxController.calculate" ).end();
 
 
 		/*

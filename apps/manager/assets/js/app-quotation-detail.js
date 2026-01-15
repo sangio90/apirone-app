@@ -506,7 +506,6 @@ AP.quotation.detail = ( function() {
             return false;
         },
 
-
         addSignage: function() {
             console.log( "addSignage:new" );
 
@@ -548,7 +547,7 @@ AP.quotation.detail = ( function() {
             event.preventDefault();
             plateApp().edit( { id: event.data.id } );
             fields.totalItemBox.show();
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item", viewModel.get( "save" ) );
         },
 
         editArticle: function( event ) {

@@ -21,10 +21,10 @@
                     </div>
                 </div>
                 <div class="col-6 mt-2 d-flex justify-content-center">
-                    Quantità: #: quantity #
+                    Quantità: &nbsp; <span data-bind="text: quantity"></span>
                 </div>
                 <div class="col-6 mt-2 d-flex justify-content-center">
-                    Prezzo: #: price.total #
+                    Prezzo: &nbsp; <span data-bind="text: price.total" data-format="0.00"></span> &nbsp; &euro;
                 </div>
             </div>
         </div>
