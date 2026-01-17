@@ -110,7 +110,8 @@ AP.plate.modal = ( function() {
                 iCol < plate.grid[iRow].length;
                 iCol++
             ) {
-                const cellType = plate.grid[iRow][iCol];
+                const cellData = plate.grid[iRow][iCol];
+                const cellType = cellData.type;
 
                 const cell = new Cell(
                     constants.GRID_CELL_DIMENSIONS[cellType].width,
@@ -159,6 +160,21 @@ AP.plate.modal = ( function() {
         }
 
         viewModel.set( "isPlateDefined", true );
+
+    };
+
+    var defaultPricingForm = {
+        data: {
+            discount1: "",
+            discount2: "",
+
+            method: {
+                id: "C" // calculated
+            },
+
+            total: "0",
+            lines: [], // es. { name: "Frutto 1", amount: 10.5 },
+        },
 
     };
 
@@ -236,8 +252,8 @@ AP.plate.modal = ( function() {
             // "_" - empty free space
             // "0" - prohibited space
             [
-                "_",
-                "_",
+                { type: "_", id: "default-cell-1" },
+                { type: "_", id: "default-cell-2" },
             ],
         ],
     };
@@ -245,6 +261,8 @@ AP.plate.modal = ( function() {
     var viewModel = new kendo.data.ObservableObject( {
 
         detailForm: defaultDetailForm,
+        pricingForm: defaultPricingForm,
+
         lines: new kendo.data.DataSource(),
         models: new kendo.data.DataSource(),
         finishes: new kendo.data.DataSource(),
@@ -923,11 +941,9 @@ AP.plate.modal = ( function() {
                 label.text( attrName );
                 subContainer.append( label );
 
-                const select = $( "<select>" ).addClass( "form-control me-3 mb-2" ).on( "change", function() {
+                const select = $( "<select>" ).addClass( "form-control form-control-sm me-3 mb-2" ).on( "change", function() {
                     const selectedId = $( this ).val();
                     const attributeId = $( this ).data( "attribute-id" );
-
-                    // console.log("changeFruitImage", )
 
                     console.log( "changeFruitImage:values", item.values );
 
@@ -994,7 +1010,7 @@ AP.plate.modal = ( function() {
                 label.text( item.level + " " + attrName );
                 subContainer.append( label );
 
-                const select = $( "<select>" ).addClass( "form-control me-3 mb-2" ).on( "change", function() {
+                const select = $( "<select>" ).addClass( "form-control form-control-sm me-3 mb-2" ).on( "change", function() {
                     const selectedId = $( this ).val();
                     const attributeId = $( this ).data( "attribute-id" );
 
@@ -1117,6 +1133,7 @@ AP.plate.modal = ( function() {
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
+
                 parsedData.imageBase64 = imgData;
                 parsedData.price = AP.quotation.pricing.getData().data;
 

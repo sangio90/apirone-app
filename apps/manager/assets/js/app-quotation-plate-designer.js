@@ -325,6 +325,18 @@ AP.plate.grid = ( function() {
                 appendTo: $plateBackground,
             } );
 
+            // Inizializza le dimensioni delle celle basandosi sul tipo
+            for ( let i = 0; i < this.grid.length; i++ ) {
+                for ( let j = 0; j < this.grid[i].length; j++ ) {
+                    const cell = this.grid[i][j];
+                    const cellDimensions = constants.GRID_CELL_DIMENSIONS[cell.type];
+                    if ( cellDimensions ) {
+                        cell.height = cellDimensions.height;
+                        cell.width = cellDimensions.width;
+                    }
+                }
+            }
+
             const plateCSS = {
                 "grid-template-rows": "",
                 "grid-template-columns": "",

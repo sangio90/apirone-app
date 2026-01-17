@@ -439,9 +439,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setQuantity( json.quantity );
 
-		var product = super
-			.fire(
-				"Product.search",
+		var product = super.fire( "Product.search",
 				{
 					categoryId = 22,
 					lineId     = json.product.line.id,
