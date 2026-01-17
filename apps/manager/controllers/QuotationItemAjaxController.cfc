@@ -477,7 +477,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			//super.fire( action, [ fruitBean ] );
 		}
 
-		bean.setFruits( beanFruits );		
+		bean.setFruits( beanFruits );
 
 		if ( !Len( id ) OR json.isClone ) {
 			messageId = "quotationItem.created";

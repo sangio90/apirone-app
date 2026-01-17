@@ -428,7 +428,7 @@
 				TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAGE#" cfsqltype="varchar">
 		</cfquery>
 
-		<cfset agentCode = 0 />
+		<cfset var agentCode = 0 />
 
 		<cfif agents.recordCount>
 			<cfset agentCode = val(agents.AGECOD[1]) />

@@ -171,7 +171,7 @@ AP.plate.grid = ( function() {
 
                 let columnCount = 0;
                 for ( let x = 0; x < row.length; x++ ) {
-                    const cell = row[x];
+                    const cell = row[ x ];
                     const cellHasFruit = utils.cellHasFruit( y, x );
 
                     if ( cell.type == CELL_TYPE.PROHIBITED || cellHasFruit ) {
@@ -714,6 +714,7 @@ AP.plate.grid = ( function() {
 
             if ( this.orientation == orientation.VERTICAL ) {
                 console.log( "drawWithin:rotated" );
+
                 const tmp = imgCSS.width;
                 imgCSS.width = imgCSS.height;
                 imgCSS.height = tmp;
@@ -976,6 +977,7 @@ AP.plate.grid = ( function() {
                 fruit.gridPosition.row - convertedGridPosition.row,
                 fruit.gridPosition.column - convertedGridPosition.column,
             );
+
 
             const fruitRectangle = {
                 top: fruit.top,

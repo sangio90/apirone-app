@@ -113,10 +113,10 @@
 		return { "action": action, "id": thisId };
 	}
 
-	public String function create( required QuotationPrice ){
-		var newId = getDao().insert( arguments.QuotationPrice );
+	public String function create( required com.apirone.core.model.bean.QuotationPrice quotationPrice ){
+		var newId = getDao().insert( arguments.quotationPrice );
 
-		for( var line in QuotationPrice.getLines() ) {
+		for( var line in quotationPrice.getLines() ) {
 			line.setQuotationPriceId( newId );
 			getQuotationPriceLineService().create( line );
 		}
@@ -149,6 +149,7 @@
 			bean.setDiscount1( record.discount1 );
 			bean.setDiscount2( record.discount2 );
 			bean.setShippingCost( record.shipment_cost );
+			bean.setFlatDiscount( record.flat_discount );
 			bean.setCreatedAt( record.created_at );
 
 			return bean;

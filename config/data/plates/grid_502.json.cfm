@@ -1,0 +1,26 @@
+{
+    "frame": {
+        "orientations": {
+            "HOR": {
+                "cellOrientation": "HOR",
+                "grid": [
+                    [
+                        "_",
+                        "_",
+                        "_",
+                        "_"
+                    ]
+                ]
+            },
+            "VER": {
+                "cellOrientation": "HOR",
+                "grid": [
+                    [ "_" ],
+                    [ "_" ],
+                    [ "_" ],
+                    [ "_" ]
+                ]
+            }
+        }
+    }
+}

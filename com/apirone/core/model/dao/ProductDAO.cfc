@@ -52,7 +52,7 @@
 
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT DISTINCT
-				products.product_id,
+				--products.product_id,
 				products.product_id::varchar,
 				products.code,
 				COUNT(product_id) OVER() AS total
@@ -71,8 +71,10 @@
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.str )>
-					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
-					OR products.code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+					AND 
+					( 	texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+						OR products.code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+					)
 				</cfif>
 
 				<cfif !IsNull( arguments.finishId )>
@@ -88,11 +90,13 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.lineId )>
+					
 					<cfif !IsNull( arguments.categoryModeId ) AND arguments.categoryModeId EQ "BAS">
 						AND jsonb_exists_any( lines, ARRAY[<cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">] )
 					<cfelse>
 						AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 					</cfif>
+					
 				</cfif>
 
 				<cfif !IsNull( arguments.categoryId )>
@@ -116,7 +120,7 @@
 			ORDER BY
 				<!--- #super.sanitizeSQL( arguments.orderBy )# - --->
 				<!--- TODO: dovrei fare la inner se l'ordinamento prevede product.name --->
-				products.product_id
+				products.product_id::varchar
 
 			<cfif arguments.limit GTE 0>
 				LIMIT

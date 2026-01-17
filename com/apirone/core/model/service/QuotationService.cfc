@@ -149,7 +149,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			zone.setQuotation( newQuotation );
 			zone.setName( "Prima zona" );
 
-			getQuotationZoneService().create( zone );			
+			getQuotationZoneService().create( zone );
 
 		}
 
@@ -1116,8 +1116,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCalculatedAmount(
 				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
 			);
-
-
 
 			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
 			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );

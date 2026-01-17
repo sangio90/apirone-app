@@ -106,6 +106,7 @@
 													<select class="form-control" name="newMethodId">
 														<option value="P">%</option>
 														<option value="F">Fisso</option>
+														<option value="M">Moltiplicatore</option>
 													</select>
 												</div>
 												

@@ -57,7 +57,14 @@ AP.quotation.pricing = ( function() {
         common: getCommonData(),
 
         item: {
-            id: ""
+            id: "",
+            status: {
+                id: "ACT"
+            },
+            special: false,
+            position: {
+                code: ""
+            }
         },
 
         pricing: {

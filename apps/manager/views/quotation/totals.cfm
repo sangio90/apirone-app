@@ -15,19 +15,38 @@
 					item princing
 				--->
 				<div id="quotation-totals-item-content" data-bind="visible: isItem">
+					<div class="row mb-2">
+						<div class="col-4">
+							<div class="mb-1">Stato:</div>
+							<div>
+								<select name="status" class="form-control form-control-sm" id="input-price-status"
+									data-bind="value: item.status">
+									<option value="ACT" SELECTED>Attivo</option>
+									<option value="BLK">Bloccato</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="mb-1">Posizione:</div>
+							<div>
+								<input class="form-control form-control-sm" name="position" 
+									placeholder="Posizione" data-bind="value: pricing.data.position.code">
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="mb-1">Speciale:</div>
+							<div>
+								<input class="form-check-input" type="checkbox"
+									name="special" 
+									data-bind="value: item.special">
+							</div>
+						</div>
+					</div>
+
 					<table style="width: 100%" class="quotation-table-item-prices-totals">
 						<tbody data-bind="source: pricing.data.lines" 
 							data-template="quotation-pricing-totals-item-tmpl"></tbody>
 					</table>
-					<div class="row mt-3 mb-2 align-items-center d-flex">
-						<div class="col-4">Posizione</div>
-						<div class="col-4">
-						</div>
-						<div class="col-4">
-							<input class="form-control" name="positionCode" 
-								placeholder="Posizione" data-bind="value: pricing.data.positionCode">
-						</div>
-					</div>
 					<div class="row mt-3 mb-2 align-items-center d-flex">
 						<div class="col-4">Sconti</div>
 						<div class="col-4">
@@ -107,6 +126,19 @@
 						<div class="col-4">
 							<input class="form-control text-end" name="shippingCost" 
 								placeholder="%" data-bind="value: pricing.data.shippingCost">
+						</div>
+					</div>
+					<div class="row mt-3 mb-2">
+						<div class="col-8">Sconto incondizionato</div>
+						<div class="col-4">
+							<input class="form-control text-end" name="flatDiscount" 
+								placeholder="%" data-bind="value: pricing.data.flatDiscount">
+						</div>
+					</div>
+					<div class="row mt-3 mb-2">
+						<div class="col-8">Iva <span data-bind="text: pricing.data.vatPercentage"></span>%</div>
+						<div class="col-4 text-end">
+							<span data-bind="text: pricing.data.vatAmount" data-format="0.00"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">

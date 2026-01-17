@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	//property name="amount" type="Numeric";
 	property name="discount1" type="Numeric" ;
 	property name="discount2" type="Numeric" ;
+	property name="flatDiscount" type="Numeric" ;
 	property name="shippingCost" type="Numeric";
 	property name="totalGoods" type="Numeric";
 
@@ -19,21 +20,29 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		setShippingCost( 0 );
 		setDiscount1( 0 );
 		setDiscount2( 0 );
+		setFlatDiscount( 0 );
 
 		return this;
 	}
 
 	public Numeric function getTaxable(){
+
+		var total = getSubtotalBeforeFlat();
+
+		var flatDiscount = getFlatDiscount();
+		
+		if ( IsNumeric( flatDiscount ) && flatDiscount > 0 ) {
+			total = total - flatDiscount;
+		}
+
+		return total;
+	}
+
+	public Numeric function getSubtotalBeforeFlat(){
 		
 		var total = getTotalGoods();
 		
-		// --- Gestione Spese di Spedizione ---
-		var shippingCost = getShippingCost();
-		// Verifichiamo che sia un Numero e che sia maggiore di zero
-		if ( IsNumeric( shippingCost ) && shippingCost > 0 ) {
-			total = total + shippingCost;
-		} 
-
+		// --- Gestione Sconti Percentuali (solo sulla merce) ---
 		var discount1 = getDiscount1();
 		// Se non è un numero, lo trattiamo come 0, altrimenti usiamo il valore
 		if ( IsNumeric( discount1 ) && discount1 > 0 ) {
@@ -43,6 +52,13 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		var discount2 = getDiscount2();
 		if ( IsNumeric( discount2 ) && discount2 > 0 ) {
 			total = total - ( total * discount2 / 100 );
+		}
+
+		// --- Gestione Spese di Spedizione (dopo gli sconti percentuali) ---
+		var shippingCost = getShippingCost();
+		// Verifichiamo che sia un Numero e che sia maggiore di zero
+		if ( IsNumeric( shippingCost ) && shippingCost > 0 ) {
+			total = total + shippingCost;
 		}
 
 		return total;
@@ -70,14 +86,16 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		// quindi li possiamo recuperare direttamente con i getter.
 		
 		// 2. Popola la struttura con tutte le informazioni rilevanti
-		totals["totalGoods"]    = totalGoods;               // Totale prima di sconti/spedizione
-		totals["shippingCost"]  = getShippingCost();
-		totals["discount1"]     = getDiscount1();
-		totals["discount2"]     = getDiscount2();
-		totals["taxable"]       = getTaxable();             // Base imponibile (il nostro getTaxable() rinominato)
-		totals["vatPercentage"] = getVatCode().getValue();  // Percentuale IVA
-		totals["vatAmount"]     = total - taxable;          // Importo IVA calcolato
-		totals["total"]         = total;                    // Totale finale (imponibile + IVA)
+		totals["totalGoods"]         = totalGoods;               // Totale prima di sconti/spedizione
+		totals["shippingCost"]       = getShippingCost();
+		totals["discount1"]          = getDiscount1();
+		totals["discount2"]          = getDiscount2();
+		totals["flatDiscount"]       = getFlatDiscount();
+		totals["subtotalBeforeFlat"] = getSubtotalBeforeFlat();
+		totals["taxable"]            = getTaxable();             // Base imponibile (il nostro getTaxable() rinominato)
+		totals["vatPercentage"]      = getVatCode().getValue();  // Percentuale IVA
+		totals["vatAmount"]          = total - taxable;          // Importo IVA calcolato
+		totals["total"]              = total;                    // Totale finale (imponibile + IVA)
 
 		return totals;
 	}	

@@ -173,6 +173,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var prices = list( productId = product.getId(), typeId = arguments.typeId );
 
 			if ( prices.len() ) {
+				
 				for ( var price in prices ) {
 					var bean   = super.bean( "Price" );
 					var entity = super.bean( "Entity" );
@@ -241,6 +242,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				);
 			}
 		};
+
+		super.getCacheManager().removeAll();
 
 		return { "inserted" = insertedRecords, "updated" = updatedRecords };
 	}

@@ -45,7 +45,6 @@ AP.price.manage = ( function() {
 
                 status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
-
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/prices/reassign",
@@ -53,7 +52,6 @@ AP.price.manage = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.status == "SUCCESS" ) {
-                                // NM.util.autoHideMessage(status, "<span class='green'>Prezi salvati</span>");
                                 AP.widget.notify( "success", "Prezzi salvati con successo" );
                                 status.html( "" );
                             }

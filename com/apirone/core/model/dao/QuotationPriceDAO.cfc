@@ -51,13 +51,15 @@
 				quotation_id,
 				discount1,
 				discount2,
-				shipment_cost
+				shipment_cost,
+				flat_discount
 			) VALUES (
 				0,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationPrice.getQuotationId()#">::uuid,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount1()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount2()#">,
-				<cfqueryparam cfsqltype="Float" value="#arguments.quotationPrice.getShippingCost()#">
+				<cfqueryparam cfsqltype="Float" value="#arguments.quotationPrice.getShippingCost()#">,
+				<cfqueryparam cfsqltype="Float" value="#arguments.quotationPrice.getFlatDiscount()#">
 			)
 			RETURNING quotation_price_id
 		</cfquery>
@@ -74,7 +76,8 @@
 				<!--- amount = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getAmount()#">, ---->
 				discount1 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount1()#">,
 				discount2 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationPrice.getDiscount2()#">,
-				shipment_cost = <cfqueryparam cfsqltype="Float" value="#arguments.quotationPrice.getShippingCost()#">
+				shipment_cost = <cfqueryparam cfsqltype="Float" value="#arguments.quotationPrice.getShippingCost()#">,
+				flat_discount = <cfqueryparam cfsqltype="Float" value="#arguments.quotationPrice.getFlatDiscount()#">
 			WHERE
 				quotation_price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationPrice.getId()#">
 		</cfquery>

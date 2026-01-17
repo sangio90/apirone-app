@@ -326,7 +326,7 @@ AP.plate.designer = ( function() {
 
                 const maxCellHeight = Math.max( ...row.map( x => x.height ) );
 
-                console.log("cell.maxCellHeight", maxCellHeight)
+                console.log( "cell.maxCellHeight", maxCellHeight );
 
                 gridTemplateRows[i] = maxCellHeight;
             }
@@ -387,8 +387,8 @@ AP.plate.designer = ( function() {
                         } );
                     }
 
-                    console.log("cell.gridTemplateRows", gridTemplateRows)
-                    console.log("cell.gridTemplateRows", gridTemplateColumns)
+                    console.log( "cell.gridTemplateRows", gridTemplateRows );
+                    console.log( "cell.gridTemplateRows", gridTemplateColumns );
 
                     cell.height = gridTemplateRows[y - 1];
                     cell.width = gridTemplateColumns[x - 1];
@@ -812,10 +812,10 @@ AP.plate.designer = ( function() {
 
         onSelectFruit( selectedFruit ) {
 
-            console.log("onSelectFruit:selectedFruit", selectedFruit );
-            console.log("this.plate.cellOrientation", this.plate.cellOrientation );
+            console.log( "onSelectFruit:selectedFruit", selectedFruit );
+            console.log( "this.plate.cellOrientation", this.plate.cellOrientation );
 
-            //console.log("this.plate.cellOrientation", this.plate.cellOrientation );
+            // console.log("this.plate.cellOrientation", this.plate.cellOrientation );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
@@ -991,21 +991,30 @@ AP.plate.designer = ( function() {
                 {
                     UUID: "999",
                     CODE: "2X2V",
-                    IMG: "/assets/fakes/img/508VERTICALE.jpg",
+                    IMG: "/assets/fakes/img/2x2VERTICALE.jpg",
                     WIDTH: 1200, // in px
                     HEIGHT: 500, // in px
                     ORIENTATION: "V",
-                    CELL_ORIENTATION: "V",
+                    CELL_ORIENTATION: "H",
                     GRID: [
+                        [
                             "_",
                             "_",
                             "_",
                             "_",
+                        ],
+                        [
                             "0",
+                            "0",
+                            "0",
+                            "0",
+                        ],
+                        [
                             "_",
                             "_",
                             "_",
-                            "_"
+                            "_",
+                        ],
                     ],
                 },
 
@@ -1166,9 +1175,9 @@ AP.plate.designer = ( function() {
                 FREE_CELL_HEIGHT = tmp;
             }
 
-            //console.log("configPlate:CELL_TYPE.FREE", gridModule.CELL_TYPE.FREE)
-            console.log("selectedPlate.CELL_ORIENTATION", selectedPlate.CELL_ORIENTATION)
-            console.log("selectedPlate.ORIENTATION", selectedPlate.ORIENTATION)
+            // console.log("configPlate:CELL_TYPE.FREE", gridModule.CELL_TYPE.FREE)
+            // console.log( "selectedPlate.CELL_ORIENTATION", selectedPlate.CELL_ORIENTATION );
+            // console.log( "selectedPlate.ORIENTATION", selectedPlate.ORIENTATION );
 
             const grid = [];
 
@@ -1178,8 +1187,8 @@ AP.plate.designer = ( function() {
                 for ( let iCol = 0; iCol < selectedPlate.GRID[iRow].length; iCol++ ) {
                     const cellType = selectedPlate.GRID[iRow][iCol];
 
-                    console.log("constants.GRID_CELL_DIMENSIONS", pageData.GRID_CELL_DIMENSIONS[cellType].width)
-                    console.log("pageData.GRID_CELL_DIMENSIONS", pageData.GRID_CELL_DIMENSIONS[cellType].height)
+                    console.log( "constants.GRID_CELL_DIMENSIONS", pageData.GRID_CELL_DIMENSIONS[cellType].width );
+                    console.log( "pageData.GRID_CELL_DIMENSIONS", pageData.GRID_CELL_DIMENSIONS[cellType].height );
 
                     const cell = new Cell(
                         pageData.GRID_CELL_DIMENSIONS[cellType].WIDTH,

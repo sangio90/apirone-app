@@ -3,6 +3,26 @@
 <cfset art="LAV-PL-GRAFICA">    <!--- senza colore con varianti --->
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
+<cfquery name="j" datasource="verticale">
+    SELECT lisart, liscvr, liscol, lispre
+    FROM azapi_listin
+    WHERE lisart='SEMLASOTTOROLOG'
+    --WHERE lisart='MATTPZHIT000001'
+    ORDER BY lisart, liscvr, liscol
+</cfquery>
+
+<cfquery name="i" datasource="verticale">
+    SELECT lisart, liscvr, liscol, lispre
+    FROM azapi_listin
+    --WHERE lisart='SEMLASOTTOROLOG'
+    WHERE lisart='MATTPZHIT000001'
+    ORDER BY lisart, liscvr, liscol
+</cfquery>
+
+<cfdump var="#j#">
+<cfdump var="#i#">
+<cfabort>
+
 <cfquery name="i" datasource="verticaleExport">
     SELECT * FROM ARTICO_APIR
 </cfquery>

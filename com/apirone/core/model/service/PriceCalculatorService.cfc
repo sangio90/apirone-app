@@ -3,6 +3,7 @@
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
 	property name="componentService" inject="ComponentService";
+	property name="metadataService" inject="MetadataService";
 	// property name="priceTypeService" inject="PriceTypeService";
 
 	variables.logConfig = {};
@@ -52,17 +53,23 @@
 		var method = 0;
 		var costs  = [];
 
-		var itemsComponents = {};
+		//var itemsComponents = {};
 
 		var productSvc   = getProductService();
 		var componentSvc = getComponentService();
-
+		var metadataSvc  = getMetadataService();
 
 		var productId      = arguments.productId;
 		var productItemIds = arguments.producItemtIds;
 
-		var product = productSvc.get( productId );
-		var price   = product.getPrice( "PRICE" );
+		var product       = productSvc.get( productId );
+		var price         = product.getPrice( "PRICE" );
+		//var metadata	  = product.getMetadata();
+		//var generalMarkup = metadataSvc.get( 115 );
+		
+		//TODO: change this bullshit!
+		var settings = metadataSvc.list( typeId=107 );
+		var generalMarkup = settings[1].getValue()
 
 		// TODO: verificare come gestire la mancanza di prezzo
 		var isFixedPrice = ( price?.getMethod()?.getId() == "F" ?: true );
@@ -215,17 +222,17 @@
 		// appendLog( message = " ;Totale costi prodotto: #formatExtended( costProduct )#" );
 
 		if ( isFixedPrice ) {
-			var finalPrice = ( bundleCost + productCost + totalCostItems + unitFixedCost ) + markup;
+			var finalPrice = ( ( bundleCost + productCost + totalCostItems + unitFixedCost ) + markup) * generalMarkup;
 
 			appendLog(
-				message    = "Prezzo finale fisso. ( Bundle: #bundleCost# + prodotto base: #productCost# + prezzo items: #totalCostItems# + costo fisso: #unitFixedCost# ) + markup fisso: #markup#;Prezzo finale: #formatExtended( finalPrice )#",
+				message    = "Prezzo finale fisso. ( ( bundle: #bundleCost# + prodotto: #productCost# + totale items: #totalCostItems# + costo fisso: #unitFixedCost# ) + markup: #markup#) * costo generale: #generalMarkup#;Prezzo finale: #formatExtended( finalPrice )#",
 				lineTypeId = "H"
 			);
 		} else {
-			var finalPrice = ( ( bundleCost + productCost ) * markup ) + totalCostItems + unitFixedCost;
+			var finalPrice = ( ( ( bundleCost + productCost ) * markup ) + totalCostItems + unitFixedCost ) * generalMarkup;
 
 			appendLog(
-				message    = "Prezzo finale. ( Bundle: #bundleCost# + prodotto base: #productCost# ) * markup: #markup# ) + prezzo items: #totalCostItems# + costo fisso: #unitFixedCost#;Prezzo finale: #formatExtended( finalPrice )#",
+				message    = "Prezzo finale. ( ( ( bundle: #bundleCost# + prodotto: #productCost# ) * markup: #markup# ) + totale items: #totalCostItems# + costo fisso: #unitFixedCost# ) * costo generale: #generalMarkup#;Prezzo finale: #formatExtended( finalPrice )#",
 				lineTypeId = "H"
 			);
 		}

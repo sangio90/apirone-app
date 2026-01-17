@@ -169,8 +169,9 @@ AP.plate.modal = ( function() {
             quantity: 1,
             price: 0,
             product: {
+                id: "",
                 orientation: {
-                    id: "HOR"
+                    id: ""
                 },
                 frame: {
                     id: ""
@@ -225,10 +226,10 @@ AP.plate.modal = ( function() {
         width: 1200, // in px
         height: 500, // in px
         orientation: {
-            id: "HOR"
+            id: ""
         },
         cellOrientation: {
-            id: "HOR"
+            id: ""
         },
         grid: [
             // LEGEND:
@@ -266,10 +267,16 @@ AP.plate.modal = ( function() {
         },
 
         removeFruit( event ) {
-
             viewModel.get( "detailForm.data.fruits" ).remove( event.data );
             pub.fruitsController.removeFruit( event.data.id );
+        },
 
+        goToProduct( event ) {
+
+            var id = this.get( "detailForm.data.product.id" );
+            var uri = "/manager/products/" + id + "/detail";
+
+            window.open( uri, "_blank" ).focus();
         },
 
         toggleFruit( event ) {
@@ -277,21 +284,19 @@ AP.plate.modal = ( function() {
         },
 
         changeOrientation( event ) {
-            console.log( "changeOrientation:event", event );
+            // console.log( "changeOrientation:event", event );
 
             var orientationId = this.get( "detailForm.data.product.orientation.id" );
-
-            console.log( "orientationId", orientationId );
 
             var frameId = viewModel.get( "detailForm.data.product.frame.id" );
             var productId = viewModel.get( "detailForm.data.product.id" );
 
-            console.log( "frameId", frameId );
-            console.log( "productId", productId );
+            // console.log( "frameId", frameId );
+            // console.log( "productId", productId );
 
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/frames/" + frameId + "?orientation=" + orientationId + "&productId=" + productId,
+                url: "/manager/ajax/frames/" + frameId + "?orientationId=" + orientationId + "&productId=" + productId,
                 callback: {
                     done: function( xhr ) {
 
@@ -300,7 +305,7 @@ AP.plate.modal = ( function() {
                         viewModel.set( "plate.grid", xhr.data.grid );
                         viewModel.set( "plate.image", xhr.data.image ); // by product
 
-                        // console.log("xhr.data.image", xhr.data.image)
+                        viewModel.set( "detailForm.data.product.orientation", xhr.data.orientation );
 
                         configPlate();
 
@@ -341,8 +346,6 @@ AP.plate.modal = ( function() {
                 return;
             }
 
-            console.log( "frame", frame );
-
             var frameId = frame.id;
 
             this.set( "detailForm.data.product.frame.id", frameId );
@@ -358,6 +361,8 @@ AP.plate.modal = ( function() {
                         viewModel.set( "plate.width", xhr.data?.width ?? 1200 );
                         viewModel.set( "plate.height", xhr.data?.height ?? 500 );
                         viewModel.set( "plate.orientation", xhr.data.orientation );
+                        viewModel.set( "detailForm.data.product.orientation", xhr.data.orientation );
+
                         viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
                         viewModel.set( "availableOrientations", xhr.data.availableOrientations );
                         viewModel.set( "plate.grid", xhr.data.grid );
@@ -377,7 +382,7 @@ AP.plate.modal = ( function() {
             const quotationItemId = viewModel.get( "detailForm.data.id" );
             const productId = viewModel.get( "detailForm.data.product.id" );
 
-            console.log( "firstLoadProductItems:productId", productId );
+            // console.log( "firstLoadProductItems:productId", productId );
 
             // Chiamata AJAX iniziale per ottenere tutti i product items
             NM.util.ajax( {
@@ -386,11 +391,11 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        console.log( "firstLoadProductItems:xhr.data", xhr.data );
+                        // console.log( "firstLoadProductItems:xhr.data", xhr.data );
 
                         var userItems = AP.getUserPref( "plate.product.items" );
 
-                        console.log( "xhr.count", xhr.count );
+                        // console.log( "xhr.count", xhr.count );
 
                         if ( xhr.count > 0 ) {
 
@@ -422,7 +427,7 @@ AP.plate.modal = ( function() {
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attributeId === item.attribute.id );
 
-                                console.log( "existing:item", item );
+                                // console.log( "existing:item", item );
 
                                 if ( existing ) {
                                     if ( !existing.values.find( v => v.productItemId === item.id ) ) {
@@ -472,7 +477,7 @@ AP.plate.modal = ( function() {
                 }
             } ).then( async function() {
 
-                console.log( "selected" );
+                // console.log( "selected" );
 
                 // Se ci sono quotation items pre-selezionati, li carichiamo
                 if ( quotationItemId.length ) {
@@ -511,12 +516,14 @@ AP.plate.modal = ( function() {
             } else {
                 var type = "fruit";
                 var fruits = viewModel.get( "detailForm.data.fruits" );
-                var fruit = fruits.get( fruitId );
+                var product = fruits.get( fruitId );
 
-                var product = fruit;
-                // var productId = fruit.get( "id" );
-                var productItems = fruit.get( "items" );
-                var prodyctIdForCall = fruit.get( "fruit.id" );
+                // var product = fruit;
+                var productItems = product.get( "items" );
+                var prodyctIdForCall = product.get( "fruit.id" );
+
+                // console.log( "loadProductItems:fruit" );
+
             }
 
             var productId = product.get( "id" );
@@ -584,7 +591,7 @@ AP.plate.modal = ( function() {
                             // Rimuovo eventuali attributi figli
                             const i = parentIndex + 1;
 
-                            console.log( "attributeArray.parentIndex", attributeArray[parentIndex] );
+                            // console.log( "attributeArray.parentIndex", attributeArray[parentIndex] );
 
                             while ( i < attributeArray.length ) {
                                 if ( attributeArray[i].level > attributeArray[parentIndex].level ) {
@@ -609,8 +616,8 @@ AP.plate.modal = ( function() {
                             // Imposto selected sul parent
                             if ( parentIndex !== -1 ) {
                                 const parent = productItems.at( parentIndex );
-                                parent.get( "values" ).forEach( v => {
-                                    v.selected = v.productItemId == originId;
+                                parent.get( "values" ).forEach( value => {
+                                    value.selected = value.productItemId == originId;
                                 } );
                             }
 
@@ -715,8 +722,6 @@ AP.plate.modal = ( function() {
             var thisFruit = fruits.get( fruitId );
             var productId = thisFruit.fruit.id;
 
-            console.log( "addProductItemsToFruit:productId", productId );
-
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/product-items?productId=" + productId,
@@ -726,6 +731,8 @@ AP.plate.modal = ( function() {
                         if ( xhr.count > 0 ) {
 
                             var thisImage = xhr.data[0].horizontalImage;
+
+                            console.log( "addProductItemsToFruit:xhr.data", xhr.data );
 
                             // Overwrite the product image if the item image exists
                             if ( thisImage ) {
@@ -740,9 +747,18 @@ AP.plate.modal = ( function() {
 
                                 const attributeExisting = attributeArray.find( d => d.attributeId === item.attribute.id );
 
+                                var thisImage = item.images[0];
+
+                                if ( thisImage ) {
+                                    thisFruit.set( "fruit.horizontalImage", thisImage );
+                                    pub.fruitsController.updateFruit( thisFruit.id, { image: thisImage.uri } );
+                                }
+
+
+                                console.log( "attribute:item", item );
+
                                 if ( attributeExisting ) {
 
-                                    console.log( "attributeExisting:item", item );
 
                                     attributeExisting.values.push( {
                                         attributeValue: item.attributeValue,
@@ -756,12 +772,13 @@ AP.plate.modal = ( function() {
                                     const itemAndValues = {
                                         attributeId: item.attribute.id,
                                         attributeName: item.attribute.name,
+                                        // images: item.images,
                                         level: 0,
-                                        images: item.images,
                                         values: [
                                             {
                                                 attributeValue: item.attributeValue,
                                                 productItemId: item.id,
+                                                images: item.images,
                                                 selected: false
                                             }
                                         ]
@@ -773,7 +790,7 @@ AP.plate.modal = ( function() {
 
                             } );
 
-                            console.log( "fruitItems", fruitItems );
+                            console.log( "fruitItems", fruitItems.data() );
 
                             thisFruit.set( "items", fruitItems );
 
@@ -811,6 +828,8 @@ AP.plate.modal = ( function() {
 
         changeImage: function( attribute ) {
 
+            // console.log( "changeImage", attribute );
+
             var uri = "";
 
             var orientationId = viewModel.get( "detailForm.data.product.orientation.id" );
@@ -818,7 +837,6 @@ AP.plate.modal = ( function() {
             if ( attribute?.images ) {
                 const orientationMap = { "HOR": "horizontal", "VER": "vertical" };
                 const targetOrientation = orientationMap[orientationId];
-
 
                 if ( targetOrientation ) {
 
@@ -857,26 +875,39 @@ AP.plate.modal = ( function() {
 
         },
 
+        changeFruitImage: function( fruitId, value ) {
+
+            if ( value?.images ) {
+
+                var uri = value.images[0]?.uri;
+
+                if ( uri ) {
+                    pub.fruitsController.updateFruit( fruitId, { image: uri } );
+
+                }
+
+            }
+
+        },
+
         renderProductItemsFruit: function( fruitId ) {
             const container = $( "#quotation-fruit-row-items_" + fruitId );
 
             container.empty();
 
-            // console.log( "fruit:container:id", fruitId );
-            // console.log( "fruit:container", container );
-
             var fruits = viewModel.get( "detailForm.data.fruits" );
             var fruit = fruits.get( fruitId );
 
+            // console.log( "fruitItems:renderProductItemsFruit:fruit", fruit );
+
             const attributeArray = fruit.get( "items" ).data();
 
-            // console.log( "fruit:attributeArray", fruitId, attributeArray );
+            // console.log( "fruitItems:renderProductItemsFruit:attributeArray", attributeArray );
+            // return;
 
-            attributeArray.forEach( function( item ) {
+            attributeArray.forEach( function( item ) { // i select
 
                 var newLevel = ( 1.5 * item.level ) + "rem";
-
-                // console.log( "renderProductItemsFruit:attributeArray:item", item );
 
                 const attrName = item.attributeName;
                 const values = item.values;
@@ -889,13 +920,27 @@ AP.plate.modal = ( function() {
 
                 label.addClass( "mb-1" );
                 label.css( "margin-left", newLevel );
-                // label.text( item.level + " " + attrName );
                 label.text( attrName );
                 subContainer.append( label );
 
                 const select = $( "<select>" ).addClass( "form-control me-3 mb-2" ).on( "change", function() {
                     const selectedId = $( this ).val();
                     const attributeId = $( this ).data( "attribute-id" );
+
+                    // console.log("changeFruitImage", )
+
+                    console.log( "changeFruitImage:values", item.values );
+
+                    var value;
+
+                    for ( var thisValue of item.values ) {
+                        if ( thisValue.productItemId == selectedId ) {
+                            value = thisValue;
+                        }
+                    }
+
+                    viewModel.changeFruitImage( fruitId, value );
+
                     viewModel.loadProductItems( selectedId, attributeId, fruitId );
                 } );
 
@@ -980,7 +1025,8 @@ AP.plate.modal = ( function() {
                 values.forEach( function( attrValue ) {
                     const option = $( "<option>" )
                         .val( attrValue.productItemId )
-                        .html( `<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}` );
+                        // .html( `<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}` );
+                        .html( `${attrValue.attributeValue.rawValue.name}` );
                     select.append( option );
                 } );
 
@@ -1131,6 +1177,8 @@ AP.plate.modal = ( function() {
             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
             console.log( "pub.fruitsController", pub.fruitsController );
+
+            console.log( "newFruit", newFruit );
 
             pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
 

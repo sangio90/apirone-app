@@ -11,7 +11,7 @@ $( document ).ready( async function() {
 
         var helper = AP.test.helper;
 
-        //console.log("helper", helper);
+        // console.log("helper", helper);
 
         pub.new = async function() {
 
@@ -25,7 +25,7 @@ $( document ).ready( async function() {
 
             var fruits = []; // Default: nessun fruit
             var fruits = [ "schu", "CONNETTORE RJ11" ];
-            //var fruits = [ "PULSANTE SINGOLO INF", "schu" ];
+            // var fruits = [ "PULSANTE SINGOLO INF", "schu" ];
             // var fruits = [ "P40", "CONNETTORE RJ11" ];
             // var fruits = [ "schu" ];
             // var fruits = [ "schu", "PULSANTE SINGOLO INF" ];
@@ -37,11 +37,11 @@ $( document ).ready( async function() {
             const autocomplete = fruitSuggest.data( "kendoAutoComplete" );
 
             // first item, if editing existing item
-            //$( "body" ).find( ".quotation-item:first" ).click();
+            // $( "body" ).find( ".quotation-item:first" ).click();
 
             // Sequenza asincrona
-            //await helper.wait( 600 );
-            //$( "body" ).find( "#nav-products-tab" ).click();
+            // await helper.wait( 600 );
+            // $( "body" ).find( "#nav-products-tab" ).click();
 
             await helper.wait( 600 );
             $( "body" ).find( "button[data-bind='click:addPlate']" ).click();
@@ -85,7 +85,8 @@ $( document ).ready( async function() {
             console.log( "test:edit" );
 
             await helper.wait( 600 );
-            $( "body" ).find( ".quotation-item" ).eq( 1 ).click();
+            $( "body" ).find( ".quotation-item" ).eq( 1 )
+                .click();
 
         };
 

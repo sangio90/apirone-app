@@ -7,6 +7,9 @@
 
 		var params = super.paramsFromUrl();
 
+		//dump(params);
+		//abort;
+
 		params[ "categoryModeId" ] = "BAS";
 
 		var rows = super.fire( "product.search", params );

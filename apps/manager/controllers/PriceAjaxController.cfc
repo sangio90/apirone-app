@@ -151,7 +151,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		for ( var key in rc ) {
 			if ( Len( rc[ key ] ) ) {
-				// only non empty
 				args[ key ] = rc[ key ];
 			}
 		}

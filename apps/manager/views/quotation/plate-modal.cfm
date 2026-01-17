@@ -9,7 +9,7 @@
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:detailForm.title"></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
-                    </header>                
+                    </header>
                         
                     <div class="card-body">
 
@@ -36,7 +36,7 @@
                                     class="form-control"
                                     data-bind="source: models, value: detailForm.data.product.model, events: { change: loadFinishes }"
                                     data-value-field="id"
-                                    data-text-field="name"
+                                    data-text-field="code"
                                     >
                                 </select>
                             </div>
@@ -84,6 +84,9 @@
 
                                     <!--- plate ---->
                                     <div class="tab-pane fade show active" id="plate-product-items-tab" role="tabpanel" aria-labelledby="plate-product-items-but">
+                                        <div data-bind="visible: detailForm.data.product.id" class="text-end mb-2">
+                                            <a href="##" data-bind="click: goToProduct" target="_blank">Vai al prodotto</a>
+                                        </div>
 								        <div id="quotation-plate-product-items" style="max-width: 100%">
                                             
                                         </div>
@@ -108,15 +111,7 @@
                             <div class="col-9">
                                 <div id="plate-designer-header" class="mb-2 pb-2">
                                     <div class="row">
-                                        <div class="col-md-4">
-                                            <input 
-                                                type="text" 
-                                                id="plate-fruit-suggest" 
-                                                class="fruit-suggest-widget-input" 
-                                                placeholder="Aggiungi un frutto...">
-                                        </div>    
                                         <div class="col-md-2 float-end">
-
                                             <select id="plate-orientation" 
                                                 required
                                                 class="form-control"
@@ -125,7 +120,13 @@
                                                 data-text-field="name"
                                                 >
                                             </select>
-
+                                        </div>    
+                                        <div class="col-md-4">
+                                            <input 
+                                                type="text" 
+                                                id="plate-fruit-suggest" 
+                                                class="fruit-suggest-widget-input" 
+                                                placeholder="Aggiungi un frutto...">
                                         </div>    
                                     </div>
                                 </div>
