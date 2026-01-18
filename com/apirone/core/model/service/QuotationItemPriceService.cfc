@@ -5,23 +5,35 @@
 	
 	property name="cacheScope" type="String" default="QuotationItemPrice.bean";
 
-	public com.apirone.core.model.bean.QuotationItemPrice function get( required String quotationItemPriceId ){
+	public com.apirone.core.model.bean.QuotationItemPrice function get( required Numeric quotationItemPriceId ){
 		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.quotationItemId );
+		var cache = cm.get( getCacheScope(), arguments.quotationItemPriceId );
 
 		if ( cache.status ) {
 			return cache.data;
 		}
 
-		var bean = build( arguments.quotationItemId );
+		var bean = build( arguments.quotationItemPriceId );
 
 		cm.put(
 			getCacheScope(),
-			arguments.quotationItemId,
+			arguments.quotationItemPriceId,
 			bean
 		);
 
 		return bean;
+
+	}
+
+	public com.apirone.core.model.bean.QuotationItemPrice function getByQuotationItemId( required String quotationItemId ){
+
+		var rows = list( quotationItemId = arguments.quotationItemId );
+
+		if( rows.len() EQ 0 ){
+			return NullValue();
+		}
+
+		return rows[1];
 
 	}
 
@@ -66,7 +78,7 @@
 		return outcome;
 	}
 
-	public String function create( required quotationItemPrice ){
+	public String function create( required com.apirone.core.model.bean.QuotationItemPrice quotationItemPrice ){
 		var newId = getDao().insert( arguments.quotationItemPrice );
 
 		for( var line in quotationItemPrice.getLines() ) {
@@ -95,6 +107,8 @@
 			bean.setDiscount1( record.discount1 );
 			bean.setDiscount2( record.discount2 );
 			bean.setAmount( record.price );
+			bean.setFlatDiscount( record.flat_discount );
+			bean.setMethod( method.setId( record.price_method_id ) );
 
 			bean.setId( record.quotation_item_price_id );
 

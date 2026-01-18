@@ -183,17 +183,20 @@
 			</cfquery>
 			```
 
-			pricing.setDiscount1( record.discount1 );
-			pricing.setDiscount2( record.discount2 );
-			pricing.setAmount( total.total );
-			pricing.setMethod( priceMethod.setId("F") );
+			//pricing.setDiscount1( record.discount1 );
+			//pricing.setDiscount2( record.discount2 );
+			//pricing.setAmount( total.total );
+			//pricing.setMethod( priceMethod.setId("F") );
+
+			var pricing = getQuotationItemPriceService().getByQuotationItemId( quotationItemId = arguments.quotationItemId );
+			bean.setPrice( pricing );
 
 			bean.setId( record.quotation_item_id );
 			bean.setQuantity( record.quantity );
 			bean.setCreatedAt( record.created_at );
 			
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
-			bean.setPrice( pricing );
+			//bean.setPrice( pricing );
 
 			if ( Len( record.product_id ) ) {
 				bean.setProduct( getProductService().get( record.product_id ) );
