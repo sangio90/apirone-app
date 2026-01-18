@@ -6,11 +6,14 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	//property name="discount2" type="Numeric";
 	property name="notes" type="String";
 	property name="hash" type="String";
+	property name="special" type="Boolean" default="false";
+
+	property name="position" type="String";
 
 	property name="quotation" type="com.apirone.core.model.bean.Quotation";
 	property name="quotationZone" type="com.apirone.core.model.bean.QuotationZone";
 	property name="price" type="com.apirone.core.model.bean.QuotationItemPrice";
-	property name="position" type="String";
+	property name="status" type="com.apirone.core.model.bean.Status";
 
 	property name="items" type="com.apirone.core.model.bean.QuotationItemProductItem[]";
 	property name="product" type="com.apirone.core.model.bean.Product";

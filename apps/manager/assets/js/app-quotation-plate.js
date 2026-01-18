@@ -163,6 +163,7 @@ AP.plate.modal = ( function() {
 
     };
 
+    /*
     var defaultPricingForm = {
         data: {
             discount1: "",
@@ -173,17 +174,36 @@ AP.plate.modal = ( function() {
             },
 
             total: "0",
-            lines: [], // es. { name: "Frutto 1", amount: 10.5 },
+            // lines: [], // es. { name: "Frutto 1", amount: 10.5 },
         },
 
     };
+    */
 
     var defaultDetailForm = {
         data: {
             // quotationItemId: "",
             id: "",
             quantity: 1,
-            price: 0,
+            // price: 0,
+            special: false,
+            status: {
+                id: "ACT"
+            },
+            position: {
+                id: "",
+                code: ""
+            },
+            pricing: {
+                discount1: "",
+                discount2: "",
+                flateDiscount: "",
+                subtotalBeforeFlat: "",
+                method: {
+                    id: "C" // calculated
+                },
+                total: 0,
+            },
             product: {
                 id: "",
                 orientation: {
@@ -210,10 +230,6 @@ AP.plate.modal = ( function() {
             },
             quotationZone: {
                 id: ""
-            },
-            status: {
-                id: "ACT",
-                name: ""
             },
             /*
             selectedOrientation: {
@@ -261,7 +277,7 @@ AP.plate.modal = ( function() {
     var viewModel = new kendo.data.ObservableObject( {
 
         detailForm: defaultDetailForm,
-        pricingForm: defaultPricingForm,
+        // pricing: defaultPricingForm,
 
         lines: new kendo.data.DataSource(),
         models: new kendo.data.DataSource(),

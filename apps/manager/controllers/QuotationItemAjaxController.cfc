@@ -434,10 +434,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		json.delete( "imageBase64" );
 
+		bean.setQuantity( json.quantity );
+		bean.setStatus( status.setId( json.status.id ) );
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationZone.id ) );
-
-		bean.setQuantity( json.quantity );
 
 		var product = super.fire( "Product.search",
 				{
@@ -537,14 +537,18 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} );
 
+		/*
 		//TODO: move to service
 		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
 
 		if ( !IsNull( hash ) ) {
+
 			bean.setHash( hash );
 			bean.setId( thisId );
+			
 			super.fire( "quotationItem.update", [ bean ] );
 		}
+		*/
 		
 		var message = completeMessage( messageId );
 

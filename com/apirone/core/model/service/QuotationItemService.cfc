@@ -7,6 +7,7 @@
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductService" inject="ProductService";
+	property name="ProductHashService" inject="ProductHashService";
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="FileService" inject="FileService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
@@ -39,22 +40,23 @@
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		String mode             = null,
+		String mode,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotation.id" } ]
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
+
 		var rows               = [];
 		var result             = super.getResult();
 		var records            = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			var quotationItem = get( quotationItemId = record.quotation_item_id )
-			if ( mode == null ) {
-				rows.add( quotationItem )
+			var quotationItem = get( quotationItemId = record.quotation_item_id );
+			if ( IsNull( mode ) ) {
+				rows.add( quotationItem );
 			} else {
-				if ( mode == "placche" ) {
+				if ( mode == "plate" ) {
 					if ( IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 						rows.add( quotationItem );
 					}
@@ -96,7 +98,7 @@
 		return outcome;
 	}
 
-	public String function create( required quotationItem ){
+	public String function create( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 
 		transaction {
 			var newId = getDao().insert( arguments.quotationItem );
@@ -115,6 +117,17 @@
 
 			price.setQuotationItemId( newId );
 			getQuotationItemPriceService().create( price );
+
+			//TODO: move to service
+			var hash = getProductHashService().createHash( newId );
+
+			if ( !IsNull( hash ) ) {
+
+				quotationItem.setHash( hash );
+				quotationItem.setId( newId );
+				getProductItemService().update( newId );
+				
+			}
 
 		}
 

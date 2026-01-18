@@ -67,6 +67,8 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_items (
+				special,
+				status_id,
 				quotation_id,
 				quotation_zone_id,
 				product_id,
@@ -88,6 +90,8 @@
 					row_count
 				</cfif>
 			) VALUES (
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getSpecial()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
 				<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid,
@@ -132,6 +136,8 @@
 			UPDATE quotation_items
 			SET
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
+				special = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getSpecial()#">,
+				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getStatus().getId()#">,
 				quotation_zone_id =
 					<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid

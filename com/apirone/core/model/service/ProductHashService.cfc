@@ -98,24 +98,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	public String function createHash( required quotationItemId ){
+	public String function createHash( required String quotationItemId ){
 		var quotationItem = getQuotationItemService().get( quotationItemId );
 
-		if (isNull(quotationItem)) {
-			return null;
-		}
-
-		var bean = null;
 		var jsonData = prepareQuotationItemJson( quotationItem );
 
-		if (IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemSignage')) {
+		if (IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
 			jsonData = prepareQuotationItemSignageJson( quotationItem, jsonData );
 
-		} elseif (IsInstanceOf( quotationItem, 'com.apirone.core.model.bean.QuotationItemPlate')) {
+		} elseif (IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
 			jsonData = prepareQuotationItemPlateJson( quotationItem, jsonData );
 		}
 
 		var bean = prepareBean(jsonData);
+		
 		if (IsNull( bean.getId() ) or Trim(bean.getId()) == '') {
 			create( bean );
 		}
