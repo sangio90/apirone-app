@@ -590,6 +590,53 @@ AP.quotation.detail = ( function() {
         AP.quotation.pricing.init( undefined, "general" );
     };
 
+    pub.checkUrlHash = function() {
+        // Pattern: /manager/quotations/{quotationId}#$TYPE/{itemId}
+        // Esempio: /manager/quotations/c7b80d01-6169-4050-b25a-8883d17c3126#plate/c7b80d01-6169-4050-b25a-8883d17c3126
+        var hash = window.location.hash;
+
+        if ( hash && hash.length > 1 ) {
+            // Rimuove il # iniziale
+            hash = hash.substring( 1 );
+
+            // Divide per ottenere tipo e ID
+            var parts = hash.split( "/" );
+
+            if ( parts.length === 2 ) {
+                var type = parts[0];
+                var itemId = parts[1];
+
+                console.log( "URL hash detected - Type:", type, "ID:", itemId );
+
+                // Chiama la funzione edit corrispondente
+                switch ( type.toLowerCase() ) {
+                case "plate":
+                    if ( AP.plate && AP.plate.modal && AP.plate.modal.edit ) {
+                        AP.plate.modal.edit( { id: itemId } );
+                    }
+                    break;
+                case "signage":
+                    if ( AP.signage && AP.signage.modal && AP.signage.modal.edit ) {
+                        AP.signage.modal.edit( { id: itemId } );
+                    }
+                    break;
+                case "accessory":
+                    if ( AP.accessory && AP.accessory.modal && AP.accessory.modal.edit ) {
+                        AP.accessory.modal.edit( { id: itemId } );
+                    }
+                    break;
+                case "article":
+                    if ( AP.article && AP.article.modal && AP.article.modal.edit ) {
+                        AP.article.modal.edit( { id: itemId } );
+                    }
+                    break;
+                default:
+                    console.warn( "Unknown type in URL hash:", type );
+                }
+            }
+        }
+    };
+
     pub.config = function( options ) {
         return viewModel.get( "detailForm.data" );
     };
@@ -609,6 +656,10 @@ AP.quotation.detail = ( function() {
         AP.quotation.detail.showTotals();
 
         console.log( "AP.page.quotation" );
+
+        // Controlla URL hash per auto-aprire edit modal
+        // console.log( "init:checkUrlHash" );
+        pub.checkUrlHash();
 
         if ( AP.page.quotation ) {
 

@@ -1273,12 +1273,18 @@ AP.plate.modal = ( function() {
 
         console.log( "edit" );
 
+        // Aggiorna URL hash per checkUrlHash()
+        window.location.hash = "plate/" + id;
+
         viewModel.set( "detailForm", defaultDetailForm );
 
         viewModel.set( "detailForm.isClone", clone );
 
+
         if ( clone ) {
             viewModel.set( "detailForm.title", "Duplica placca" );
+        } else {
+            viewModel.set( "detailForm.title", "Modifica placca" );
         }
 
         NM.util.ajax( {

@@ -95,6 +95,6 @@ $( document ).ready( async function() {
     }() );
 
     // fire correct test here:
-    AP.test.quotation.new();
+    // AP.test.quotation.new();
 
 } );
