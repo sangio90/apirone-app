@@ -723,9 +723,9 @@ AP.plate.modal = ( function() {
                         console.log( "select:lenght", selects.length );
 
                         $( "select.select-item" ).each( function() {
-                            console.log( "change.calculatePrice:before" );
+                            // console.log( "change.calculatePrice:before" );
                             $( this ).off( "change.calculatePrice" ).on( "change.calculatePrice", function() {
-                                console.log( "change.calculatePrice:after" );
+                                // console.log( "change.calculatePrice:after" );
                                 updatePrice();
                             } );
                         } );

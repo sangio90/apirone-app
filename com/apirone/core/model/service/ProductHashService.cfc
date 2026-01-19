@@ -124,7 +124,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var lineId = quotationItem.getProduct().getLine().getId();
 		var modelId = quotationItem.getProduct().getModel().getId();
 		var finishId = quotationItem.getProduct().getFinish().getId();
-		var note = quotationItem.getNotes();
+		var note = quotationItem.getNote();
 		var items = getProductItemService().list( quotationItem.getProduct().getId() );
 
 		ArraySort( items, function(a, b) {
@@ -186,7 +186,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			for (var fruitRow in fruitRows) {
 				fruitItems.append( fruitRow.getId() );
 			}
-			quotationItemFruits.append( { 'position' = Trim( row.getPosition() ), 'note' = Trim( row.getNotes() ), 'product' = row.getFruit().getId(), 'productItems' = fruitItems } );
+			quotationItemFruits.append( { 'position' = Trim( row.getPosition() ), 'note' = Trim( row.getNote() ), 'product' = row.getFruit().getId(), 'productItems' = fruitItems } );
 		}
 		jsonData['fruits'] = quotationItemFruits;
 

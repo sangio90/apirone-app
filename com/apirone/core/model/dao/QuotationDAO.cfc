@@ -215,7 +215,7 @@
 					</cfif>
 				,
 
-				note = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNotes()#">
+				note = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNote()#">
 				,
 
 				payment_method_id =

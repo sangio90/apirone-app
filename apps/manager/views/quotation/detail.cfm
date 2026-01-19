@@ -65,9 +65,10 @@
                                     <nav>
                                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                             <div class="col-4 d-flex">
+
                                                 <button class="nav-link active" data-bs-toggle="tab" type="button" role="tab" 
                                                     id="nav-plate-tab" 
-                                                    data-type="PLA"
+                                                    data-type="plate"
                                                     data-bs-target="##nav-plate" 
                                                     data-bind="click:changeType">
                                                     Placche
@@ -75,24 +76,24 @@
                                                 
                                                 <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
                                                     id="nav-signage-tab" 
-                                                    data-type="SEG"
+                                                    data-type="signage"
                                                     data-bs-target="##nav-signage" 
                                                     data-bind="click:changeType">
                                                     Segnaletiche
                                                 </button>
                                                 
                                                 <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
-                                                    id="nav-accessories-tab"
-                                                    data-type="ACC"
-                                                    data-bs-target="##nav-accessories" 
+                                                    id="nav-accessory-tab"
+                                                    data-type="accessory"
+                                                    data-bs-target="##nav-accessory" 
                                                     data-bind="click:changeType">
                                                     Accessori
                                                 </button>
 
                                                 <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
-                                                    id="nav-articles-tab"
-                                                    data-type="ART"
-                                                    data-bs-target="##nav-articles" 
+                                                    id="nav-article-tab"
+                                                    data-type="article"
+                                                    data-bs-target="##nav-article" 
                                                     data-bind="click:changeType">
                                                     Servizi
                                                 </button>
@@ -108,10 +109,11 @@
                                             </div>
                                         </div>
                                     </nav>
+
                                     <div class="tab-content" id="nav-tabContent">
                                         <div class="tab-pane fade show active" id="nav-plate" role="tabpanel">
                                             <div data-bind="visible: showItems">
-                                                <div data-template="quotation-item-plate-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems" class="row">
                                                 </div>
                                             </div>
                                             <div data-bind="visible: hideItems">
@@ -120,23 +122,23 @@
                                         </div>
                                         <div class="tab-pane fade" id="nav-signage" role="tabpanel">
                                             <div data-bind="visible: showItems">
-                                                <div data-template="quotation-item-signage-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems" class="row">
                                                 </div>
                                             </div>
                                             <div data-bind="visible: hideItems">
                                                 <div class="qt-no-items">NESSUNA SEGNALATICA</div>
                                             </div>
                                         </div>
-                                        <div class="tab-pane fade" id="nav-accessories" role="tabpanel">
+                                        <div class="tab-pane fade" id="nav-accessory" role="tabpanel">
                                             <div data-bind="visible: showItems">
-                                                <div data-template="quotation-item-accessory-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems" class="row">
                                                 </div>
                                             </div>
                                             <div data-bind="visible: hideItems">
                                                 <div class="qt-no-items">NESSUN ACCESSORIO</div>
                                             </div>
                                         </div>
-                                        <div class="tab-pane fade" id="nav-articles" role="tabpanel">
+                                        <div class="tab-pane fade" id="nav-article" role="tabpanel">
                                             <div data-bind="visible: showItems">
                                                 <div data-template="quotation-item-article-preview-tmpl" data-bind="source: quotationItems" class="row">
                                                 </div>

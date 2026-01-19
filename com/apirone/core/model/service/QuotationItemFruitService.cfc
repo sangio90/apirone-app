@@ -103,7 +103,7 @@
 				bean.setItems( items );
 			}
 
-			bean.setNotes( record.note );
+			bean.setNote( record.note );
 
 			return bean;
 		}

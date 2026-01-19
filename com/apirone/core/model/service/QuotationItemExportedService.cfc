@@ -89,7 +89,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setVariant( record.VARCOD );
 			bean.setColor( record.CLCODICE );
 			bean.setExportDate( record.ARDATCAR );
-			bean.setNotes( record.CLANNOTA );
+			bean.setNote( record.CLANNOTA );
 			bean.setStatus( record.AR_STATO );
 
 			return bean;
@@ -174,7 +174,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setVariant( record.DSVARMAT );
 			bean.setColor( record.DSCOLMAT );
 			bean.setQuantity( record.DSQTAMOV );
-			bean.setNotes( record.DSANNOTA );
+			bean.setNote( record.DSANNOTA );
 
 			return bean;
 		}

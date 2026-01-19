@@ -10,7 +10,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		param rc.categoryId = "";
 		param rc.quotationZoneId = "";
 
-		params[ "typeId" ] = rc.typeId;
+		params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
 		params[ "quotationId" ] = rc.id;
 		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
 
@@ -751,6 +751,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		var entity = super.bean( "Entity" );
+		
 		entity.setKey( "quotationItem.id" );
 		entity.setValue( arguments.quotationItemId );
 
@@ -773,6 +774,20 @@ component extends="com.apirone.core.controller.AbsController" {
 		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# saveImage: #SerializeJSON( result )#");
 		
 		return result;
+
+	}
+
+	private String function getTypeIdBySlug( 
+			required String slug
+		){
+
+		var params = {
+			"plate"     = "PLA",
+			"accessory" = "ACC",
+			"signage"   = "SIG"
+		}
+
+		return params[ arguments.slug ];		
 
 	}
 

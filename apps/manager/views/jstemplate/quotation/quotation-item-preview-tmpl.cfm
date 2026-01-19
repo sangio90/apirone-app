@@ -5,10 +5,10 @@
         <div class="quotation-item-inner">
             <div class="row">
                 <div class="col-12 d-flex justify-content-end mb-3">
-                    <div class="ms-2 d-flex justify-content-center p-1 qt-item-clone-rounded" data-bind="click:editPlate" data-id="#: id#" title="Modifica">
+                    <div class="ms-2 d-flex justify-content-center p-1 qt-item-clone-rounded" data-bind="click:edit" data-id="#: id#" title="Modifica">
                         <i class="fas fa-edit" style="cursor: pointer"></i>
                     </div>
-                    <div class="ms-2 d-flex justify-content-center p-1 qt-item-clone-rounded" data-bind="click:clonePlate" data-id="#: id#" title="Duplica">
+                    <div class="ms-2 d-flex justify-content-center p-1 qt-item-clone-rounded" data-bind="click:clone" data-id="#: id#" title="Duplica">
                         <i class="fas fa-clone" style="cursor: pointer"></i>
                     </div>
                     <div class="ms-2 d-flex justify-content-center p-1 qt-item-trash-rounded" data-bind="click:delete" data-id="#: id#" title="Cancella">
@@ -17,7 +17,7 @@
                 </div>
                 <div class="col-12 d-flex justify-content-center">
                     <div class="qt-item-image-container">
-                        <img data-bind="attr: { src: getImageSrc }, click:editPlate" class="qt-item-image">
+                        <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image">
                     </div>
                 </div>
                 <div class="col-6 mt-2 d-flex justify-content-center">

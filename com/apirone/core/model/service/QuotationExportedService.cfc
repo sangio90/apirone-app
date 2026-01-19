@@ -101,7 +101,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setOpportunity( record.MMRIFORD );
 			bean.setPricelist( record.MMNUMLIS );
 			bean.setAgent( record.MMCODAGE );
-			bean.setNotes( record.MMANNTES );
+			bean.setNote( record.MMANNTES );
 			//riga
 			bean.setRowNumber( record.CPROWNUM );
 			bean.setProductCode( record.MMCODART );
@@ -206,7 +206,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setOpportunity( record.MMRIFORD );
 			bean.setPricelist( record.MMNUMLIS );
 			bean.setAgent( record.MMCODAGE );
-			bean.setNotes( record.MMANNTES );
+			bean.setNote( record.MMANNTES );
 			//riga
 			bean.setRowNumber( record.CPROWNUM );
 			bean.setProductCode( record.MMCODART );

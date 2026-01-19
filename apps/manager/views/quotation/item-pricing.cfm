@@ -35,6 +35,7 @@
 						>
 						<option value="ACT" SELECTED>Attivo</option>
 						<option value="BLK">Bloccato</option>
+						<option value="IGN">Ignora</option>
 					</select>
 				</div>
 			</div>
@@ -97,6 +98,13 @@
 						<i class="fas fa-euro-sign"></i>
 					</span>
 				</div>
+			</div>
+		</div>
+
+		<div class="row mb-2 mt-2">
+			<div class="col-12">
+				<textarea class="form-control" name="notes" placeholder="Note" rows="4"
+					data-bind="value: detailForm.data.note"></textarea>
 			</div>
 		</div>
 

@@ -13,6 +13,7 @@
                 "product.line",
                 "quotationZone",
                 "items",
+                "note",
                 "createdAt",
             ]
         }

@@ -61,7 +61,7 @@ AP.quotation.detail = ( function() {
     }
 
     var viewModel = kendo.observable( {
-        typeId: "",
+        typeId: "plate",
         detailForm: {
             data: {
                 zone: {
@@ -189,10 +189,11 @@ AP.quotation.detail = ( function() {
                         }
 
                         if ( xhr.data.success == false ) {
-                            AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del Preventivo." );
+                            AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo." );
                             AP.loading.hide();
                             return;
                         }
+
                         $( ".export-button" ).hide();
                         AP.widget.notify( "success", "Preventivo Esportato correttamente." );
                     },
@@ -475,11 +476,13 @@ AP.quotation.detail = ( function() {
             if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id != "" ) {
                 AP.setUserPref( "quotation.zone.id", viewModel.detailForm.data.zone.id );
                 AP.setUserPref( "quotation.zone.name", viewModel.detailForm.data.zone.name );
+
                 $( "#qt-add-signage" ).prop( "disabled", false );
                 $( "#qt-add-accessory" ).prop( "disabled", false );
             } else {
                 AP.deleteUserPref( "quotation.zone.id" );
                 AP.deleteUserPref( "quotation.zone.name" );
+
                 $( "#qt-add-signage" ).prop( "disabled", true );
                 $( "#qt-add-accessory" ).prop( "disabled", true );
             }
@@ -519,6 +522,57 @@ AP.quotation.detail = ( function() {
 
         // edit
 
+        edit: function( event ) {
+
+            var typeId = viewModel.get( "typeId" );
+
+            console.log( "edit:typeId", typeId );
+
+            if ( typeId == "plate" ) {
+                plateApp().edit( { id: event.data.id } );
+            }
+
+            if ( typeId == "accessory" ) {
+                accessoryApp().edit( { id: event.data.id } );
+            }
+
+            if ( typeId == "signage" ) {
+                signageApp().edit( { id: event.data.id } );
+            }
+
+            if ( typeId == "article" ) {
+                articleApp().edit( { id: event.data.id } );
+            }
+
+            event.preventDefault();
+
+        },
+
+        clone: function( event ) {
+
+            var typeId = viewModel.get( "typeId" );
+
+            if ( typeId == "plate" ) {
+                plateApp().clone( { id: event.data.id, clone: true  } );
+            }
+
+            if ( typeId == "accessory" ) {
+                accessoryApp().clone( { id: event.data.id, clone: true  } );
+            }
+
+            if ( typeId == "signage" ) {
+                signageApp().clone( { id: event.data.id, clone: true  } );
+            }
+
+            if ( typeId == "article" ) {
+                articleApp().clone( { id: event.data.id, clone: true  } );
+            }
+
+            event.preventDefault();
+
+        },
+
+        /*
         editSignage: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
@@ -544,6 +598,7 @@ AP.quotation.detail = ( function() {
             articleApp().edit( { id: event.data.id } );
             fields.totalItemBox.show();
         },
+        */
 
         clonePlate: function( event ) {
             event.preventDefault();
@@ -680,7 +735,7 @@ AP.quotation.detail = ( function() {
                 fields.addArticleBtn.hide();
             } );
 
-            document.querySelector( "#nav-accessories-tab" ).addEventListener( "click", function( event ) {
+            document.querySelector( "#nav-accessory-tab" ).addEventListener( "click", function( event ) {
                 event.preventDefault();
                 fields.addPlateBtn.hide();
                 fields.addSignageBtn.hide();
@@ -688,7 +743,7 @@ AP.quotation.detail = ( function() {
                 fields.addArticleBtn.hide();
             } );
 
-            document.querySelector( "#nav-articles-tab" ).addEventListener( "click", function( event ) {
+            document.querySelector( "#nav-article-tab" ).addEventListener( "click", function( event ) {
                 event.preventDefault();
                 fields.addPlateBtn.hide();
                 fields.addSignageBtn.hide();
@@ -993,6 +1048,9 @@ AP.quotation.printModal = ( function() {
     pub.init = function() {
         kendo.bind( fields.printModalRoot, viewModel );
         viewModel.toggleOptions();
+
+        console.log( "typeId", viewModel.get( "typeId" ) );
+
     };
 
     pub.methods = function( options ) {

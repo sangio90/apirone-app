@@ -236,7 +236,7 @@
 				bean.setItems( items );
 			}
 
-			bean.setNotes( record.note );
+			bean.setNote( record.note );
 			bean.setHash( record.hash );
 			
 			if ( Len( record.position ) ) {
