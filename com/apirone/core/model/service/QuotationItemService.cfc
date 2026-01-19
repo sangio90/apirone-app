@@ -8,6 +8,7 @@
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductService" inject="ProductService";
 	property name="ProductHashService" inject="ProductHashService";
+	//property name="ProductItemService" inject="ProductItemService";
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="FileService" inject="FileService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
@@ -103,9 +104,6 @@
 		transaction {
 			var newId = getDao().insert( arguments.quotationItem );
 
-			//dump( arguments.quotationItem.getFruits());
-			//abort;
-
 			if( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 				for( var thisFruit in arguments.quotationItem.getFruits() ) {
 					thisFruit.setQuotationItemId( newId );
@@ -125,7 +123,8 @@
 
 				quotationItem.setHash( hash );
 				quotationItem.setId( newId );
-				getProductItemService().update( newId );
+				
+				update( quotationItem );
 				
 			}
 

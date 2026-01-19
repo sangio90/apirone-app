@@ -184,8 +184,8 @@ input#input-item-total[readonly] {
 /* END plate/designer */
 
 .quotation-table-item-prices-totals tbody tr {
-	border-top: 1px solid #6B96DB;
-	border-bottom: 1px solid #6B96DB;
+	border-top: 1px solid #858585;
+	border-bottom: 1px solid #858585;
 }
 
 .quotation-table-item-prices-totals tbody td {

@@ -41,6 +41,15 @@
 		</div>
 
 		<div class="row mb-2">
+			<div class="col-12">
+				<table style="width: 100%" class="quotation-table-item-prices-totals">
+					<tbody data-bind="source: detailForm.data.pricing.lines" 
+						data-template="quotation-pricing-totals-item-tmpl"></tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="row mb-2">
 			<div class="col-4 mt-2">Sconti</div>
 			<div class="col-4">
 				<input class="form-control" name="discount1" 
@@ -79,6 +88,15 @@
 						<i class="fas fa-euro-sign"></i>
 					</span>
 				</div>
+			</div>
+		</div>
+
+		<div class="row mb-2 mt-2">
+			<div class="col-12">
+				<button type="button" class="btn btn-sm btn-primary w-100 mt-3"
+					data-bind="click: updatePricing">
+					Aggiorna prezzo
+				</button>
 			</div>
 		</div>
 

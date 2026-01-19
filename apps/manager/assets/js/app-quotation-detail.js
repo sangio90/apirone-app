@@ -390,8 +390,8 @@ AP.quotation.detail = ( function() {
 
                             AP.widget.notify( "success", "Preventivo salvato correttamente." );
                             viewModel.set( "detailForm", defaultDetailForm );
-                            //window.location.href = "/manager/quotations/" + xhr.data.payload.ID;
- 
+                            // window.location.href = "/manager/quotations/" + xhr.data.payload.ID;
+
                         }
                     }
                 } );
@@ -495,30 +495,25 @@ AP.quotation.detail = ( function() {
 
         addPlate: function() {
             plateApp().new();
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addSignage: function() {
-            console.log( "addSignage:new" );
-
-
-            console.log( "signageApp", signageApp() );
-
             signageApp().new();
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addAccessory: function() {
             accessoryApp().new();
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addArticle: function() {
             articleApp().new();
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
@@ -527,21 +522,21 @@ AP.quotation.detail = ( function() {
         editSignage: function( event ) {
             event.preventDefault();
             signageApp().edit( { id: event.data.id } );
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
         editAccessory: function( event ) {
             event.preventDefault();
             accessoryApp().edit( { id: event.data.id } );
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
         editPlate: function( event ) {
             event.preventDefault();
-            //console.logx("editPlate")
+            // console.logx("editPlate")
             plateApp().edit( { id: event.data.id } );
             fields.totalItemBox.show();
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item", viewModel.get( "save" ) );
+            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item", viewModel.get( "save" ) );
         },
 
         editArticle: function( event ) {
@@ -555,7 +550,7 @@ AP.quotation.detail = ( function() {
             event.stopPropagation();
             plateApp().edit( { id: event.data.id, clone: true } );
             fields.totalItemBox.show();
-            AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
+            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
         openAddZoneModal: function() {

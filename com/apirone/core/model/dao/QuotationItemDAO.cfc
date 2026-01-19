@@ -63,7 +63,7 @@
 	<cffunction name="insert" returntype="String">
 		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="true">
 
-		<cfset var price = arguments.quotationItem.getPrice()>
+		<!--- <cfset var price = arguments.quotationItem.getPrice()> ---->
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_items (
@@ -182,4 +182,5 @@
 		</cfquery>
 		<cfreturn true>
 	</cffunction>
+
 </cfcomponent>

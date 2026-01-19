@@ -101,32 +101,6 @@ AP.quotation.pricing = ( function() {
 
         },
 
-        updateItem: function( event ) {
-
-            var status = $( "#quotation-totals-item-loading" );
-            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
-
-            var data = AP.plate.modal.getVM().detailForm;
-            data.data.pricing = viewModelItem.get( "pricing.data" );
-
-            NM.util.ajax( {
-                method: "POST",
-                url: "/manager/ajax/quotation-items/pricing",
-                data: JSON.stringify( data.data ),
-                callback: {
-                    done: function( xhr ) {
-                        if ( xhr.data ) {
-
-                            status.html( "" );
-
-                            viewModelItem.set( "pricing.data", xhr.data );
-                        }
-                    }
-                }
-            } );
-
-        },
-
         collapseTotals: function() {
 
             collapseBox();

@@ -47,13 +47,7 @@
 			prezzo finale = s1 + sT + costo fisso;
 		*/
 
-		var total  = 0;
-		var cost   = 0;
 		var markup = 0;
-		var method = 0;
-		var costs  = [];
-
-		//var itemsComponents = {};
 
 		var productSvc   = getProductService();
 		var componentSvc = getComponentService();
@@ -64,12 +58,10 @@
 
 		var product       = productSvc.get( productId );
 		var price         = product.getPrice( "PRICE" );
-		//var metadata	  = product.getMetadata();
-		//var generalMarkup = metadataSvc.get( 115 );
 		
 		//TODO: change this bullshit!
 		var settings = metadataSvc.list( typeId=107 );
-		var generalMarkup = settings[1].getValue()
+		var generalMarkup = settings[1].getValue();
 
 		// TODO: verificare come gestire la mancanza di prezzo
 		var isFixedPrice = ( price?.getMethod()?.getId() == "F" ?: true );
@@ -147,7 +139,7 @@
 
 		var attributePrice = product.getPrice( "PROD_ITEM_GEN" );
 
-		appendLog( "** Inizio del calcolo del prezzo degli attributi" );
+		appendLog( "** Inizio del calcolo del prezzo degli attributi: #ArrayToList(productItemIds)#" );
 
 		for ( var itemId in productItemIds ) {
 			var itemComponents = componentSvc.list( productItemId = itemId, includeBaseAttributeComponents = true );
@@ -164,6 +156,8 @@
 
 			var productItemPrice = productItem.getPrice( "PROD_ITEM_PRICE" );
 
+			var priceProcessed = false;
+
 			if ( !IsNull( productItemPrice ) ) {
 				var amount = productItemPrice.getAmount() ?: 0;
 
@@ -173,6 +167,7 @@
 					);
 
 					itemCost = amount;
+					priceProcessed = true;
 				} else if ( productItemPrice.getMethod().getId() == "M" ) {
 					var compCost = calculateComponentsTotal( itemComponents );
 					itemCost     = compCost * productItemPrice.getAmount();
@@ -180,6 +175,8 @@
 					appendLog(
 						message = "#attributeName#. Markup per questo attributo: #productItemPrice.getAmount()#. Totale componenti: #compCost# * markup: #productItemPrice.getAmount()#;Costo attributo: #formatExtended( itemCost )#"
 					);
+
+					priceProcessed = true;
 				}
 			} else {
 				if ( !IsNull( attributePrice ) ) {
@@ -192,7 +189,15 @@
 					appendLog(
 						message = "Markup generale per questo attributo: #productItem.getId()#. Totale componenti: #compCost# * markup: #amount#;Costo attributo: #formatExtended( itemCost )#"
 					);
+					
+					priceProcessed = true;
 				}
+			}
+
+			if ( !priceProcessed ) {
+				appendLog(
+					message = "ATTENZIONE: Nessun prezzo (nè generale, nè specifico) trovato per l'attributo #attributeName# (id: #itemId#);Costo attributo: 0"
+				);
 			}
 
 			addCost( "Costo attributo #itemId#", itemCost, "I" );
@@ -249,6 +254,9 @@
 			},
 			"logFile" = variables.logConfig.filePath
 		};
+
+		dump(output);
+		//abort;
 
 		return output;
 	}

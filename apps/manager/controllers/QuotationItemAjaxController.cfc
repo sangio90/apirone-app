@@ -408,14 +408,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		var bean = super.bean( "QuotationItemPlate" );
 		var status = super.bean( "Status" );
 
-		//json.delete( "imageBase64" );	
-
-		var fileName   = "preview_plate_id_" & CreateUUID() & ".png";
-		var filePath   = tmpDir & "/" & fileName;
-		var binaryData = ToBinary( json.imageBase64 );
 		var beanFruits = [];
 
-		FileWrite( filePath, binaryData );
+		//FileWrite( filePath, binaryData );
 
 		var id = json.id;
 
@@ -423,15 +418,19 @@ component extends="com.apirone.core.controller.AbsController" {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
 
-		json.delete( "imageBase64" );
-
+		bean.setQuotation( super.fire( "Quotation.get", [ json.quotationId ] ) ); //TODO: move to QuotationId
 		bean.setQuantity( json.quantity );
 		bean.setStatus( status.setId( json.status.id ) );
 		bean.setSpecial( json.special );
 
-		var price = populatePriceItem( json );
+		//var price = populatePriceItem( json );
+		var price = getPricing( json );
 
 		bean.setPrice( price );
+
+		//json.delete( "imageBase64" )
+		//dump( json );
+		//abort;
 
 		var product = super.fire( "Product.search",
 				{
@@ -440,8 +439,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					modelId    = json.product.model.id,
 					finishId   = json.product.finish.id
 				}
-			)
-			.getData();
+			).getData();
 
 		product = product[ 1 ];
 
@@ -479,28 +477,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotationItem.update", [ bean ] )
 		}
 
-		var files = super.fire( "File.search", { quotationItemId = thisId } );
-
-		if ( Len( files.getData() ) ) {
-			for ( var file in files.getData() ) {
-				super.fire( "file.delete", { fileId = file.getId() } );
-			}
-		}
-
-		var entity = super.bean( "Entity" );
-
-		entity.setKey( "quotationItem.id" );
-		entity.setValue( thisId );
-
-		var fileId = super.fire(
-			"file.create",
-			{
-				filePath = filePath,
-				typeId   = "default",
-				kindId   = "quotationItem",
-				entity   = entity
-			}
-		);
+		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId );
 
 		var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId } );
 
@@ -593,21 +570,39 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function calculate( event, rc, prc ){
 
-		var result = super.getResult();
-		var memy   = super.getMementify();
+		var json = DeserializeJSON( GetHTTPRequestData().content )
+
+		var price = getPricing( json );
+
+		var memy = super.getMementify();
+		var data = memy.convert( price );
+
+		event.setValue( "result", data );
+	}
+
+
+
+	/*
+		private methods
+	*/
+
+	function getPricing( json ){
+
+		//var result = super.getResult();
+		
+		var json = arguments.json
 
 		var calculator = super.service( "PriceCalculator" );
+		//var memy   = super.getMementify();
 
 		var method  = super.bean( "PriceMethod" );
 		var pricing = super.bean( "QuotationItemPrice" );
 
 		var lines = [];
 
-		var json = DeserializeJSON( GetHTTPRequestData().content );
-
 		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
 		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
-        
+		        
 		pricing.setMethod( method.setId( json.pricing.method.id ) );
 		
         if ( pricing.isFixed() ) {
@@ -630,6 +625,13 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
+		/*
+		dump( json.product.id );
+		dump( json.quantity );
+		dump( productItemsIds );
+		abort;
+		*/
+
 		var platePrice = calculator.calculate(
 			json.product.id,
 			json.quantity,
@@ -650,7 +652,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		for ( var fruit in json.fruits._data ) {
 			var fruitItemsIds = [];
-			var line          = super.bean( "PriceLine" );
+			
+			var line = super.bean( "PriceLine" );
 
 			for ( var item in fruit.items._data ) {
 				for ( var value in item.values ) {
@@ -665,45 +668,41 @@ component extends="com.apirone.core.controller.AbsController" {
 			line.setName( "#fruit.fruit?.name#" );
 			line.setAmount( fruitPrice );
 
-			// totalGoods = totalGoods + fruitPrice;
-
 			lines.add( line );
 		}
 
 		pricing.setLines( lines );
 
-		var data = memy.convert( pricing );
-
-		// result.setData( quotationPrice );
-
-		event.setValue( "result", data );
-	}
-
-
-
-	/*
-		private methods
-	*/
+		return pricing;
+	}	
 	
 	private com.apirone.core.model.bean.QuotationItemPrice function populatePriceItem( data ){
 
 		var method = super.bean( "PriceMethod" );
 		var bean  = super.bean( "QuotationItemPrice" );
 
-		var lines = [];
+		var lines = data.pricing.keyExists("lines") ? data.pricing.lines : [];
+
+		//var lines = [];
 
 		bean.setAmount( data.pricing.total );
 		bean.setDiscount1( Len( data.pricing?.discount1 ) ? data.pricing?.discount1 : 0 );
 		bean.setDiscount2( Len( data.pricing?.discount2 ) ? data.pricing?.discount2 : 0 );
 		bean.setMethod( method.setId( data.pricing.method.id ) );
 
-		for( var thisLine in data.price.lines ) {
-			var line  = super.bean( "PriceLine" );
-			line.setName( thisLine.name );
-			line.setAmount( thisLine.amount );
+		//var i = 1;
+		for( var thisLine in lines ) {
+			var priceLine  = super.bean( "PriceLine" );
+			dump(i);
+			dump(thisLine);
+			dump(priceLine);
+			priceLine.setName( thisLine.name );
+			priceLine.setAmount( thisLine.amount );
 			
-			lines.add( line );
+			lines.add( priceLine );
+			//i++
 		}
+		//abort;
 
 		bean.setLines( lines );
 

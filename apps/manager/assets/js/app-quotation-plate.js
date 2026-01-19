@@ -183,6 +183,7 @@ AP.plate.modal = ( function() {
                 method: {
                     id: "C" // calculated
                 },
+                lines: [],
                 total: 0,
             },
             product: {
@@ -255,6 +256,38 @@ AP.plate.modal = ( function() {
         ],
     };
 
+    var updatePrice = function() {
+
+        // console.log( "calculatePriceItem" );
+
+        var status = $( "#quotation-totals-item-loading" );
+        status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
+
+        var data = viewModel.get( "detailForm.data" );
+        // data.data.pricing = viewModel.get( "detailForm.data.pricing" );
+
+        NM.util.ajax( {
+            method: "POST",
+            url: "/manager/ajax/quotation-items/pricing",
+            data: JSON.stringify( data ),
+            callback: {
+                done: function( xhr ) {
+                    if ( xhr.data ) {
+
+                        console.log( "pricing", xhr.data );
+
+                        status.html( "" );
+
+                        viewModel.set( "detailForm.data.pricing", xhr.data );
+
+
+                    }
+                }
+            }
+        } );
+
+    };
+
     var viewModel = new kendo.data.ObservableObject( {
 
         detailForm: defaultDetailForm,
@@ -275,6 +308,13 @@ AP.plate.modal = ( function() {
             onCreate: undefined,
             onUpdate: undefined,
             onLoad: undefined,
+        },
+
+        updatePricing() {
+
+            updatePrice();
+
+            return false;
         },
 
         getFruitCount() {
@@ -676,13 +716,25 @@ AP.plate.modal = ( function() {
                             viewModel.renderProductItemsFruit( productId );
                         }
 
+                        // Recupera tutti i select con classe "select-item" e aggancia calculatePriceItem
+                        var selects = $( "select.select-item" );
+                        console.log( "select:lenght", selects.length );
+
+                        $( "select.select-item" ).each( function() {
+                            console.log( "change.calculatePrice:before" );
+                            $( this ).off( "change.calculatePrice" ).on( "change.calculatePrice", function() {
+                                console.log( "change.calculatePrice:after" );
+                                updatePrice();
+                            } );
+                        } );
+
                         // resolve();
 
                     },
                 }
             } );
 
-            // } );
+            console.log( "loadProductItems:end" );
 
         },
 
@@ -938,7 +990,7 @@ AP.plate.modal = ( function() {
                 label.text( attrName );
                 subContainer.append( label );
 
-                const select = $( "<select>" ).addClass( "form-control form-control-sm me-3 mb-2" ).on( "change", function() {
+                const select = $( "<select>" ).addClass( "form-control form-control-sm select-item me-3 mb-2" ).on( "change", function() {
                     const selectedId = $( this ).val();
                     const attributeId = $( this ).data( "attribute-id" );
 
@@ -984,6 +1036,7 @@ AP.plate.modal = ( function() {
 
                 subContainer.append( select );
             } );
+
         },
 
         renderProductItemsPlate: function() {
@@ -1007,7 +1060,7 @@ AP.plate.modal = ( function() {
                 label.text( item.level + " " + attrName );
                 subContainer.append( label );
 
-                const select = $( "<select>" ).addClass( "form-control form-control-sm me-3 mb-2" ).on( "change", function() {
+                const select = $( "<select>" ).addClass( "form-control form-control-sm select-item me-3 mb-2" ).on( "change", function() {
                     const selectedId = $( this ).val();
                     const attributeId = $( this ).data( "attribute-id" );
 
@@ -1023,6 +1076,9 @@ AP.plate.modal = ( function() {
                     viewModel.changeImage( value );
 
                     viewModel.loadProductItems( selectedId, attributeId );
+
+                    // viewModel.calculatePriceItem();
+
                 } );
 
                 select.attr( "data-attribute-id", item.attributeId );
@@ -1115,8 +1171,6 @@ AP.plate.modal = ( function() {
 
         save: function() {
 
-            console.log( "plate:save" );
-
             const parsedData = viewModel.get( "detailForm.data" );
             var status = fields.modalRoot.find( ".save-status" );
 
@@ -1132,9 +1186,9 @@ AP.plate.modal = ( function() {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
 
                 parsedData.imageBase64 = imgData;
-                //parsedData.price = AP.quotation.pricing.getData().data;
+                // parsedData.price = AP.quotation.pricing.getData().data;
 
-                console.log("imageBase64", parsedData.imageBase64)
+                // console.log("imageBase64", parsedData.imageBase64)
 
                 NM.util.ajax( {
                     method: "POST",
@@ -1145,7 +1199,7 @@ AP.plate.modal = ( function() {
                             status.html( "" );
                             AP.widget.notify( "success", "Placca salvata correttamente." );
                             viewModel.set( "detailForm", defaultDetailForm );
-                            //setTimeout( () => window.location.reload(), 1000 );
+                            // setTimeout( () => window.location.reload(), 1000 );
                         }
                     }
                 } );
@@ -1215,9 +1269,9 @@ AP.plate.modal = ( function() {
 
     };
 
-    pub.edit = function ({ id, onSave, clone = false }) {
-        
-        console.log("edit");
+    pub.edit = function( { id, onSave, clone = false } ) {
+
+        console.log( "edit" );
 
         viewModel.set( "detailForm", defaultDetailForm );
 
@@ -1234,8 +1288,8 @@ AP.plate.modal = ( function() {
                 done: function( xhr ) {
 
                     viewModel.populateProduct( xhr.data.quotationItem.product ); // without items
-                    
-                    viewModel.set("detailForm.data.id", xhr.data.quotationItem.id);
+
+                    viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
                     viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
 
                     // console.log( "productItems", "xhr.data.quotationItem.items" );

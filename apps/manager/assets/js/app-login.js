@@ -6,10 +6,6 @@ AP["login-fields"] = {
 
 $( document ).ready( function(){
 
-    /*
-        dom inits
-    */
-
     if ( AP["login-fields"].loginForm.length ) {
 
         AP.login.init();

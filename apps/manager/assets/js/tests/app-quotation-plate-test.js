@@ -52,7 +52,7 @@ $( document ).ready( async function() {
             await helper.wait( 500 );
             modelEle.val( modelId ).trigger( "change" );
 
-            await helper.wait( 600 );
+            await helper.wait( 1200 );
             finishEle.val( finishId ).trigger( "change" );
 
             // switch to fruits tab
