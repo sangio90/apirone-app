@@ -55,6 +55,7 @@
     "QuotationItemSignageRow.bean": {},
     "QuotationItemFruit.bean": {},
     "QuotationStatusHistory.bean": {},
+    "QuotationItemPrice.bean": {},
     "QuotationPrice.bean": {},
     "QuotationZone.bean": {},
     "RawProduct.bean": {},

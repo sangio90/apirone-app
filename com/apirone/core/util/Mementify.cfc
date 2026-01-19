@@ -795,6 +795,14 @@ component {
 	 */
 	private struct function $getCachedMetadata( required any target ){
 		// Prima otteniamo il metadata base per avere il fullname
+
+		/*
+		if( isNull( arguments.target ) ) {
+			dump(arguments.target)
+			abort;
+		}
+		*/
+
 		var metadata = GetMetadata( arguments.target );
 		var fullname = metadata.fullname;
 

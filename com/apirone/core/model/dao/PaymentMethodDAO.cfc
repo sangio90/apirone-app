@@ -2,6 +2,10 @@
 	<cffunction returntype="Query" name="read">
 		<cfargument name="paymentMethodId" type="String" required="true">
 
+		<cfif !request.loadFromVerticale>
+			<cfreturn getMockedPaymentMethod( arguments.paymentMethodId )>
+		</cfif>
+
 		<cfquery name="local.q" datasource="verticale">
 			SELECT
 				pagcod AS payment_method_id,
@@ -21,6 +25,10 @@
 		<cfargument name="limit" required="true" type="Numeric" default="0">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="pagdes">
+
+		<cfif !request.loadFromVerticale>
+			<cfreturn listMockedPaymentMethod()>
+		</cfif>
 
 		<cfquery name="local.q" datasource="verticale">
 			SELECT

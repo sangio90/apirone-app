@@ -1,11 +1,12 @@
 ﻿<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	
 	<cffunction name="read" returntype="Query">
-		<cfargument name="quotationItemId" type="String" required="true">
+		<cfargument name="quotationItemPriceId" type="Numeric" required="true">
+
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
-				quotation_item_price
+				quotation_item_prices
 			WHERE
 				quotation_item_price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemPriceId#">
 		</cfquery>

@@ -309,13 +309,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 			)
 			.getData();
-		if ( !Len( product ) || Len( product ) > 1 ) {
-			var message = "Combinazione Linea/Modello/Categoria/Finitura non disponibile.";
-			result.setData( { "error" = message } );
-			result.setStatus( "ERRORE" );
-			event.setValue( "result", result );
-			return;
-		}
 		
 		product = product[ 1 ];
 		
@@ -413,10 +406,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var tmpDir = super.getTempDir();
 		var bean = super.bean( "QuotationItemPlate" );
+		var status = super.bean( "Status" );
 
-		var price = populatePriceItem( json );
-
-		bean.setPrice( price );
+		//json.delete( "imageBase64" );	
 
 		var fileName   = "preview_plate_id_" & CreateUUID() & ".png";
 		var filePath   = tmpDir & "/" & fileName;
@@ -427,7 +419,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var id = json.id;
 
-
 		if ( Len( id ) ) {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
@@ -436,8 +427,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setQuantity( json.quantity );
 		bean.setStatus( status.setId( json.status.id ) );
-		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
-		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationZone.id ) );
+		bean.setSpecial( json.special );
+
+		var price = populatePriceItem( json );
+
+		bean.setPrice( price );
 
 		var product = super.fire( "Product.search",
 				{
@@ -698,10 +692,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var lines = [];
 
-		bean.setAmount( data.price.total );
-		bean.setDiscount1( Len( data.price?.discount1 ) ? data.price?.discount1 : 0 );
-		bean.setDiscount2( Len( data.price?.discount2 ) ? data.price?.discount2 : 0 );
-		bean.setMethod( method.setId( data.price.method.id ) );
+		bean.setAmount( data.pricing.total );
+		bean.setDiscount1( Len( data.pricing?.discount1 ) ? data.pricing?.discount1 : 0 );
+		bean.setDiscount2( Len( data.pricing?.discount2 ) ? data.pricing?.discount2 : 0 );
+		bean.setMethod( method.setId( data.pricing.method.id ) );
 
 		for( var thisLine in data.price.lines ) {
 			var line  = super.bean( "PriceLine" );

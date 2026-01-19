@@ -56,7 +56,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var obj = super.bean( "PaymentMethod" );
 
-			obj.setId( record.payment_method_id.toString() );
+			obj.setId( record.payment_method_id );
 			obj.setName( record.payment_method );
 
 			return obj;

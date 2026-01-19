@@ -2,6 +2,10 @@
 	<cffunction returntype="Query" name="read">
 		<cfargument name="currencyId" type="String" required="true">
 
+		<cfif !request.loadFromVerticale>
+			<cfreturn getMockedCurrency( arguments.currencyId )>
+		</cfif>
+
 		<cfquery name="local.q" datasource="verticale">
 			SELECT
 				valcod AS currency_id,
@@ -17,7 +21,10 @@
 	</cffunction>
 
 	<cffunction returntype="Query" name="find">
-		<cfargument name="currencyId" type="String" required="true">
+
+		<cfif !request.loadFromVerticale>
+			<cfreturn listMockedCurrency()>
+		</cfif>
 
 		<cfquery name="local.q" datasource="verticale">
 			SELECT

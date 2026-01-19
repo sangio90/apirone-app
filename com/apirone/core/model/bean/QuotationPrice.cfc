@@ -5,7 +5,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	//property name="amount" type="Numeric";
 	property name="discount1" type="Numeric" ;
 	property name="discount2" type="Numeric" ;
-	property name="flatDiscount" type="Numeric" ;
+	property name="flatDiscount" type="Numeric";
 	property name="shippingCost" type="Numeric";
 	property name="totalGoods" type="Numeric";
 

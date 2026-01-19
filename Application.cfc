@@ -32,7 +32,7 @@ component extends="com.apirone.core.root.Application" {
 
 	public Boolean function onRequestStart( string targetPage ) {
 
-		param request.loadFromVerticale = true;
+		param request.loadFromVerticale = false;
 
 		SetLocale( "italian (italy)" );
 

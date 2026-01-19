@@ -387,18 +387,11 @@ AP.quotation.detail = ( function() {
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
-                            if( xhr.status == "ERRORE" ) {
-                                var error = "Errore nel salvataggio del preventivo.";
-                                if ( xhr.data.error ) {
-                                    error = xhr.data.error;
-                                }
-                                AP.widget.notify( "error", error );
-                            }
-                            if ( xhr.status == "SUCCESS" ) {
-                                AP.widget.notify( "success", "Preventivo salvato correttamente." );
-                                viewModel.set( "detailForm", defaultDetailForm );
-                                window.location.href = "/manager/quotations/" + xhr.data.payload.ID;
-                            }
+
+                            AP.widget.notify( "success", "Preventivo salvato correttamente." );
+                            viewModel.set( "detailForm", defaultDetailForm );
+                            //window.location.href = "/manager/quotations/" + xhr.data.payload.ID;
+ 
                         }
                     }
                 } );
@@ -545,6 +538,7 @@ AP.quotation.detail = ( function() {
 
         editPlate: function( event ) {
             event.preventDefault();
+            //console.logx("editPlate")
             plateApp().edit( { id: event.data.id } );
             fields.totalItemBox.show();
             AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item", viewModel.get( "save" ) );

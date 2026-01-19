@@ -163,23 +163,6 @@ AP.plate.modal = ( function() {
 
     };
 
-    /*
-    var defaultPricingForm = {
-        data: {
-            discount1: "",
-            discount2: "",
-
-            method: {
-                id: "C" // calculated
-            },
-
-            total: "0",
-            // lines: [], // es. { name: "Frutto 1", amount: 10.5 },
-        },
-
-    };
-    */
-
     var defaultDetailForm = {
         data: {
             // quotationItemId: "",
@@ -197,8 +180,6 @@ AP.plate.modal = ( function() {
             pricing: {
                 discount1: "",
                 discount2: "",
-                flateDiscount: "",
-                subtotalBeforeFlat: "",
                 method: {
                     id: "C" // calculated
                 },
@@ -1151,7 +1132,9 @@ AP.plate.modal = ( function() {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
 
                 parsedData.imageBase64 = imgData;
-                parsedData.price = AP.quotation.pricing.getData().data;
+                //parsedData.price = AP.quotation.pricing.getData().data;
+
+                console.log("imageBase64", parsedData.imageBase64)
 
                 NM.util.ajax( {
                     method: "POST",
@@ -1162,7 +1145,7 @@ AP.plate.modal = ( function() {
                             status.html( "" );
                             AP.widget.notify( "success", "Placca salvata correttamente." );
                             viewModel.set( "detailForm", defaultDetailForm );
-                            setTimeout( () => window.location.reload(), 1000 );
+                            //setTimeout( () => window.location.reload(), 1000 );
                         }
                     }
                 } );
@@ -1232,7 +1215,9 @@ AP.plate.modal = ( function() {
 
     };
 
-    pub.edit = function( { id, onSave, clone = false } ) {
+    pub.edit = function ({ id, onSave, clone = false }) {
+        
+        console.log("edit");
 
         viewModel.set( "detailForm", defaultDetailForm );
 
@@ -1249,7 +1234,8 @@ AP.plate.modal = ( function() {
                 done: function( xhr ) {
 
                     viewModel.populateProduct( xhr.data.quotationItem.product ); // without items
-                    viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
+                    
+                    viewModel.set("detailForm.data.id", xhr.data.quotationItem.id);
                     viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
 
                     // console.log( "productItems", "xhr.data.quotationItem.items" );

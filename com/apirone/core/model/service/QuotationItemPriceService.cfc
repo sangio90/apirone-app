@@ -46,10 +46,10 @@
 		String quotationitemId,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotation.id" } ]
+		required Array orderBy  = [ { field = "quotationItemPrice.id" } ]
 	){
 		
-		arguments[ "orderby" ] = super.createOrderBy( arguments[ "productItem.id" ] );
+		arguments[ "orderby" ] = super.createOrderBy( arguments.orderBy );
 		
 		var rows    = [];
 		var result  = super.getResult();
@@ -106,8 +106,8 @@
 			
 			bean.setDiscount1( record.discount1 );
 			bean.setDiscount2( record.discount2 );
-			bean.setAmount( record.price );
-			bean.setFlatDiscount( record.flat_discount );
+			bean.setAmount( record.amount );
+			//bean.setFlatDiscount( record.flat_discount );
 			bean.setMethod( method.setId( record.price_method_id ) );
 
 			bean.setId( record.quotation_item_price_id );
