@@ -127,7 +127,7 @@
 						<label class="text-end col-3">Nota</label>
 						<div class="col-9">
 							<textarea name="note" class="form-control" rows="2" 
-								data-bind="value: detailForm.data.notes">
+								data-bind="value: detailForm.data.note">
 							</textarea>
 						</div>
 					</div>

@@ -15,7 +15,7 @@
 		"opportunity",
 		"pricelist",
 		"agent",
-		"notes",
+		"note",
 		"rowNumber",
 		"productCode",
 		"variantCode",

@@ -75,8 +75,8 @@
 											<cfif !isNull(oggetto.getQuantity())>
 												<span style="font-size: 8pt; text-transform: lowecase">Qty: #oggetto.getQuantity()#</span>
 											</cfif>
-											<cfif !isNull(oggetto.getNotes()) && args.params.notes>
-												<span style="font-size: 8pt; text-transform: lowecase">Note: #oggetto.getNotes()#</span>
+											<cfif !isNull(oggetto.getNote()) && args.params.note>
+												<span style="font-size: 8pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 											</cfif>
 										</cfif>
 									</td>
@@ -98,9 +98,9 @@
 																			<span style="font-size: 8pt; text-transform: lowecase">
 																				#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()#</span>
 																		</cfloop>
-																		<cfif !isNull(fruit.getNotes()) && args.params.notes>
+																		<cfif !isNull(fruit.getNote()) && args.params.note>
 																			<span style="font-size: 8pt; margin-top: 4pt;">
-																				<i>( Note: #fruit.getNotes()# )</i>
+																				<i>( Note: #fruit.getNote()# )</i>
 																			</span>
 																		</cfif>
 																	</cfif>

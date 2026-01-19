@@ -256,6 +256,17 @@ AP.plate.modal = ( function() {
         ],
     };
 
+    var applyUserPrefIfNewMode = function( prefKey, viewModelPath, selector ) {
+        var value = AP.getUserPref( prefKey );
+
+        if ( value && value !== "undefined" && !viewModel.get( "isEditMode" ) ) {
+            viewModel.set( viewModelPath, value );
+            if ( selector ) {
+                $( selector ).trigger( "change" );
+            }
+        }
+    };
+
     var updatePrice = function() {
 
         // console.log( "calculatePriceItem" );
@@ -303,6 +314,8 @@ AP.plate.modal = ( function() {
         currentFruit: {},
 
         toggleFruitsLabel: "Comprimi tutti",
+
+        isEditMode: false,
 
         callback: {
             onCreate: undefined,
@@ -448,7 +461,7 @@ AP.plate.modal = ( function() {
 
                         // console.log( "firstLoadProductItems:xhr.data", xhr.data );
 
-                        var userItems = AP.getUserPref( "plate.product.items" );
+                        // var userItems = AP.getUserPref( "plate.product.items" );
 
                         // console.log( "xhr.count", xhr.count );
 
@@ -461,18 +474,7 @@ AP.plate.modal = ( function() {
                                 viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
                             }
 
-                            if ( quotationItemId != "" || !userItems || userItems.length == 0 ) {
-                                viewModel.set( "detailForm.data.product.items", new kendo.data.DataSource() );
-                            } else {
-                                if ( quotationItemId == "" ) {
-                                    const itemsDataSource = new kendo.data.DataSource( {
-                                        data: userItems
-                                    } );
-                                    viewModel.set( "detailForm.data.product.items", itemsDataSource );
-                                    viewModel.get( "detailForm.data.product.items" ).read();
-                                    viewModel.renderProductPreview( viewModel.get( "detailForm.data.product.items" ) );
-                                }
-                            }
+                            viewModel.set( "detailForm.data.product.items", new kendo.data.DataSource() );
 
                             var productItems = viewModel.get( "detailForm.data.product.items" );
 
@@ -754,11 +756,11 @@ AP.plate.modal = ( function() {
 
         loadProduct() { // triggered by onchange event on finishId field
 
-            console.log( "loadProduct" );
-
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
             var modelId = viewModel.get( "detailForm.data.product.model.id" );
             var finishId = viewModel.get( "detailForm.data.product.finish.id" );
+
+            AP.setUserPref( "plate.finishId", finishId );
 
             NM.util.ajax( {
                 method: "GET",
@@ -769,8 +771,6 @@ AP.plate.modal = ( function() {
                     "&finishId=" + finishId,
                 callback: {
                     done: function( xhr ) {
-
-                        // console.log( "loadProduct:populate", xhr.data );
 
                         viewModel.populateProduct( xhr.data );
 
@@ -1115,14 +1115,21 @@ AP.plate.modal = ( function() {
         },
 
         loadLines: function( onLoad ) {
+
+            // console.log( "loadLines:lineId:onLoad",  );
+
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/lines/22",
                 callback: {
                     done: function( xhr ) {
 
+                        console.log( "loadLines:lineId:done" );
+
                         viewModel.get( "lines" ).data( xhr.data );
                         NM.util.openModal( AP.plate.fields.modalRoot );
+
+                        applyUserPrefIfNewMode( "plate.lineId", "detailForm.data.product.line.id", "#plate-line" );
 
                         if ( onLoad !== undefined ) {
                             onLoad();
@@ -1135,6 +1142,7 @@ AP.plate.modal = ( function() {
         loadModels: function( event ) {
 
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
+            AP.setUserPref( "plate.lineId", lineId );
 
             NM.util.ajax( {
                 method: "GET",
@@ -1143,16 +1151,21 @@ AP.plate.modal = ( function() {
                     done: function( xhr ) {
                         // console.log( "loadModels" );
                         viewModel.get( "models" ).data( xhr.data );
-                        // viewModel.set( "detailForm.data.product.model.id", xhr.data[0] );
+
+                        applyUserPrefIfNewMode( "plate.modelId", "detailForm.data.product.model.id", "#plate-model" );
 
                     },
                 },
             } );
+
+
         },
 
         loadFinishes: function( event ) {
 
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
+            var modelId = viewModel.get( "detailForm.data.product.model.id" );
+            AP.setUserPref( "plate.modelId", modelId );
 
             NM.util.ajax( {
                 method: "GET",
@@ -1162,6 +1175,7 @@ AP.plate.modal = ( function() {
 
                         viewModel.get( "finishes" ).data( xhr.data );
 
+                        applyUserPrefIfNewMode( "plate.finishId", "detailForm.data.product.finish.id", "#plate-finish" );
                     },
                 },
             } );
@@ -1263,7 +1277,18 @@ AP.plate.modal = ( function() {
             viewModel.set( "callback.onSave", onSave );
         }
 
+        viewModel.set( "detailForm", defaultDetailForm );
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
+        viewModel.set( "isEditMode", false );
+
+        console.log( "plate:new" );
+
+        /*
+        if ( AP.getUserPref( "plate.lineId" ) ) {
+            viewModel.set( "detailForm.data.product.line.id", AP.getUserPref( "plate.lineId" ) );
+            $( "#plate-line" ).trigger( "change" );
+        }
+        */
 
         viewModel.loadLines();
 
@@ -1277,6 +1302,7 @@ AP.plate.modal = ( function() {
         window.location.hash = "plate/" + id;
 
         viewModel.set( "detailForm", defaultDetailForm );
+        viewModel.set( "isEditMode", true );
 
         viewModel.set( "detailForm.isClone", clone );
 

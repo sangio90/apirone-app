@@ -594,12 +594,15 @@ AP.accessory.modal = ( function() {
         if ( AP.getUserPref( "accessory.categoryId" ) ) {
             viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.category.id", AP.getUserPref( "accessory.categoryId" ) );
         }
+
         if ( AP.getUserPref( "accessory.lineId" ) ) {
             viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.line.id", AP.getUserPref( "accessory.lineId" ) );
         }
+
         if ( AP.getUserPref( "accessory.modelId" ) ) {
             viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.model.id", AP.getUserPref( "accessory.modelId" ) );
         }
+
         if ( AP.getUserPref( "accessory.finishId" ) ) {
             viewModel.set( "detailForm.data.quotationItem.product.finish.id", AP.getUserPref( "accessory.finishId" ) );
         }

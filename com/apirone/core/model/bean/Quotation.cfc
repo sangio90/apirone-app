@@ -3,7 +3,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="quotationNumber" type="String";
 	property name="versionNumber" type="Numeric";
 	property name="quotationDate" type="Date";
-	property name="notes" type="String";
+	property name="note" type="String";
 	property name="validityDate" type="Date";
 	property name="active" type="Numeric";
 	property name="price" type="com.apirone.core.model.bean.QuotationPrice";

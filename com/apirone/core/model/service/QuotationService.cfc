@@ -1056,7 +1056,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setVersionNumber( record.version_number );
 			bean.setQuotationDate( record.quotation_date );
 			bean.setCreatedAt( record.created_at );
-			bean.setNotes( record.notes );
+			bean.setNotes( record.note );
 			bean.setValidityDate( record.validity_date );
 			bean.setExported( record.exported );
 			bean.setActive( record.active );

@@ -129,7 +129,7 @@
 				quotation_number,
 				version_number,
 				quotation_date,
-				notes,
+				note,
 				validity_date,
 				opportunity_id,
 				lead_id,
@@ -147,7 +147,7 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVersionNumber()#">,
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getQuotationDate()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNotes()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNote()#">,
 				<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getValidityDate()#">,
 				<cfif !IsNull( arguments.quotation.getOpportunity()?.getId() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOpportunity().getId()#">::uuid
@@ -215,7 +215,7 @@
 					</cfif>
 				,
 
-				notes = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNotes()#">
+				note = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getNotes()#">
 				,
 
 				payment_method_id =

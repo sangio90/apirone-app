@@ -6,7 +6,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var printParams = {
 			'report' = rc.report,
 			'images' = rc.images == 'true',
-			'notes' = rc.notes == 'true',
+			'note' = rc.note == 'true',
 			'grouped' = rc.grouped == 'true',
 			'discounts' = rc.discounts == 'true',
 		}

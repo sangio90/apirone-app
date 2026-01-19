@@ -1,9 +1,31 @@
 ﻿<cfoutput>
 	<div class="pricing-box h-100">
 
-		<div class="row mb-2">
+		<div class="row">
 
-			<div class="col-6">
+			<div class="row mb-2">
+
+				<div class="col-6">
+					<div class="mb-1">Quantità:</div>
+					<div>
+						<input class="form-control form-control-sm" name="position" 
+							placeholder="Posizione" data-bind="value: detailForm.data.quantity">
+					</div>
+				</div>
+
+				<div class="col-6">
+					<div class="mb-1">Speciale:</div>
+					<div>
+						<input class="form-check-input" type="checkbox"
+							name="special" 
+							data-bind="value: detailForm.data.special">
+					</div>
+				</div>
+			
+			</div>
+
+			<div class="col-6 mb-2">
+
 				<div class="mb-1">Stato:</div>
 				<div>
 					<select name="status" class="form-control form-control-sm" id="input-price-status"
@@ -25,19 +47,6 @@
 				</div>
 			</div>
 
-		</div>
-
-		<div class="row mb-2">
-
-			<div class="col-12">
-				<div class="mb-1">Speciale:</div>
-				<div>
-					<input class="form-check-input" type="checkbox"
-						name="special" 
-						data-bind="value: detailForm.data.special">
-				</div>
-			</div>
-		
 		</div>
 
 		<div class="row mb-2">

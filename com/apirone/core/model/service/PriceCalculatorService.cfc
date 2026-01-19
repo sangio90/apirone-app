@@ -189,7 +189,7 @@
 					appendLog(
 						message = "Markup generale per questo attributo: #productItem.getId()#. Totale componenti: #compCost# * markup: #amount#;Costo attributo: #formatExtended( itemCost )#"
 					);
-					
+
 					priceProcessed = true;
 				}
 			}
@@ -254,9 +254,6 @@
 			},
 			"logFile" = variables.logConfig.filePath
 		};
-
-		dump(output);
-		//abort;
 
 		return output;
 	}

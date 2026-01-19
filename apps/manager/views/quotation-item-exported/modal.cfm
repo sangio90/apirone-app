@@ -22,7 +22,7 @@
                                         { 'field':'color', 'title':'Colore', width: '10%' },
                                         { 'field':'um', 'title':'UM', width: '10%'},
                                         { 'field':'quantity', 'title':'Quantità', width: '10%', 'headerAttributes': { 'class': 'justify-content-end' }},
-                                        { 'field':'notes', 'title':'Note', width: '20%'},
+                                        { 'field':'note', 'title':'Note', width: '20%'},
                                         { 'field':'', 'title':'Azioni', width: '10%', 'headerAttributes': { 'class': 'justify-content-center' }}
                                     ]",
                                     source = "detailForm.items",

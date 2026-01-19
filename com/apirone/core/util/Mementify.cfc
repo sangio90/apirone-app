@@ -62,7 +62,7 @@ component {
 	 * @includes         The properties array or list to build the memento with alongside the default includes
 	 * @excludes         The properties array or list to exclude from the memento alongside the default excludes
 	 * @mappers          A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
-	 * @defaults         A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
+	 * @defaults         A struct of key-value pairs that denote the default values for properties if they are null, defaults for everything are a blank string.
 	 * @ignoreDefaults   If set to true, default includes and excludes will be ignored and only the incoming 'includes' and 'excludes' list will be used.
 	 * @trustedGetters   If set to true, getters will not be checked for in the 'this' scope before trying to invoke them.
 	 * @iso8601Format    If set to true, will use the ISO 8601 standard for formatting dates

@@ -174,10 +174,13 @@
 
     #view( "quotation/totals" )#
 
+    #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-item-article-preview-tmpl" )#
+    <!----
     #template( view="jstemplate/quotation/quotation-item-plate-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-signage-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-accessory-preview-tmpl" )#
-    #template( view="jstemplate/quotation/quotation-item-article-preview-tmpl" )#
+    ---->
     
     #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
 

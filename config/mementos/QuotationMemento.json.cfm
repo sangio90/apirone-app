@@ -34,7 +34,7 @@
 				"customer",
 				"opportunity",
 				"validityDate",
-				"notes",
+				"note",
 				"paymentMethod",
 				"currency",
 				"salesAgent",

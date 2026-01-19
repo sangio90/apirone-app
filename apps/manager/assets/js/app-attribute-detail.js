@@ -293,7 +293,7 @@ AP.attribute.detail = ( function() {
                     callback: {
                         done: function( xhr ) {
 
-                            NM.util.autoHideMessage( status, "<span class='green'>" + xhr.data.message.text + "</span>" );
+                            // NM.util.autoHideMessage( status, "<span class='green'>" + xhr.data.message.text + "</span>" );
 
                             setTimeout( () => {
 

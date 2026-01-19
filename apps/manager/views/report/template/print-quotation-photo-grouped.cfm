@@ -54,8 +54,8 @@
 											<cfset item = oggetto.getItems()[item]>
 											<span style="font-size: 8pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 										</cfloop>
-										<cfif !isNull(oggetto.getNotes()) && args.params.notes>
-											<span style="font-size: 8pt; text-transform: lowecase">Note: #oggetto.getNotes()#</span>
+										<cfif !isNull(oggetto.getNote()) && args.params.note>
+											<span style="font-size: 8pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 										</cfif>
 									</cfif>
 									<div style="font-size: 8pt; line-height: 15px; margin-top: 3px;">

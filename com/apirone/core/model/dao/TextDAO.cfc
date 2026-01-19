@@ -201,9 +201,6 @@
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>
 
-		<cfdump var="#local.result#">
-		<cfabort>
-
 		<cfreturn arguments.text.getId()>
 	</cffunction>
 </cfcomponent>

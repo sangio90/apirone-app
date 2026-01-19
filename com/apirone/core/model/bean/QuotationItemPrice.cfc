@@ -34,6 +34,10 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		var totalGoods = getTotalGoods();
 		var total      = totalGoods;
 
+		//dump("Total goods: " & 	totalGoods);
+		//dump("Total goods: " & 	getMethod().getId());
+		//dump("Total goods: fixex:" & 	isFixed());
+
 		if ( isFixed() ) {
 			return getAmount();
 		}

@@ -65,8 +65,8 @@
 											<cfset item = oggetto.getItems()[item]>
 											<span style="font-size: 8pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 										</cfloop>
-										<cfif !isNull(oggetto.getNotes()) && args.params.notes>
-											<span style="font-size: 8pt; text-transform: lowecase">Note: #oggetto.getNotes()#</span>
+										<cfif !isNull(oggetto.getNote()) && args.params.note>
+											<span style="font-size: 8pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 										</cfif>
 									</cfif>
 									<div style="font-size: 8pt; line-height: 15px; margin-top: 3px;">
@@ -92,9 +92,9 @@
 																		&nbsp;</span>
 																</cfloop>
 																<cfif fi LT fruitsCount>, </cfif>
-																<cfif !isNull(fruit.getNotes()) && args.params.notes>
+																<cfif !isNull(fruit.getNote()) && args.params.note>
 																	<span style="font-size: 8pt; margin-top: 4pt;">
-																		<i>( Note: #fruit.getNotes()# )</i>
+																		<i>( Note: #fruit.getNote()# )</i>
 																	</span>
 																</cfif>
 															</span>

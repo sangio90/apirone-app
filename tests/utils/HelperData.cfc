@@ -122,7 +122,7 @@ component extends="testbox.system.BaseSpec"{
             quotation = "words:4",
             quotationNumber = "string-numeric:5",
             quotationDate = "date",
-            notes = "words:10",
+            note = "words:10",
             validityDate = "date",
             opportunityName = function(param) {
                 return mock.firstName() & ' ' & mock.lastName();

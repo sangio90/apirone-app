@@ -7,7 +7,7 @@
 			"um",
 			"variant",
 			"color",
-			"notes",
+			"note",
 			"status"
 		]
 	}

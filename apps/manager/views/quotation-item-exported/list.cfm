@@ -48,7 +48,7 @@
                                         { 'field':'exportDate', 'title':'Data', width: '10%' },
                                         { 'field':'variant', 'title':'Variante', width: '10%'},
                                         { 'field':'color', 'title':'Colore', width: '5%'},
-                                        { 'field':'notes', 'title':'Note', width: '25%'},
+                                        { 'field':'note', 'title':'Note', width: '25%'},
                                         { 'field':'', 'title':'Azioni', width: '10%', 'headerAttributes': { 'class': 'justify-content-center' }},
                                         { 
                                             'field'           :'', 

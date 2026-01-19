@@ -7,6 +7,6 @@
 		"variant",
 		"color",
 		"quantity",
-		"notes"
+		"note"
 	]
 }

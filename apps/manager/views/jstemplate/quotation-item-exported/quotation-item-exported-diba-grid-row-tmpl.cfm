@@ -22,7 +22,7 @@
                 <span data-bind="text: quantity"></span>
             </td>
             <td>
-                <span data-bind="text: notes"></span>
+                <span data-bind="text: note"></span>
             </td>
             <td class="text-center">
                 #iconButton(bind="click:delete", class="btn-danger", icon="trash")#

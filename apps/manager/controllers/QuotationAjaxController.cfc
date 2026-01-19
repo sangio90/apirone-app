@@ -114,7 +114,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
 		quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
-		quotation.setNotes( json.notes );
+		quotation.setNote( json.note );
 		
 		quotation.setActive( true );
 		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );

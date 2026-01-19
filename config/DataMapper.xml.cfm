@@ -118,7 +118,7 @@
         <map from="quotationNumber" to="quotationNumber" type="cf:String" />
         <map from="versionNumber" to="versionNumber" type="cf:Numeric" />
         <map from="quotationDate" to="quotationDate" type="cf:Date" />
-        <map from="notes" to="notes" type="cf:String" />
+        <map from="note" to="note" type="cf:String" />
         <map from="validityDate" to="validityDate" type="cf:Date" />
         <map from="pricelist" to="pricelist" ref="Pricelist" />
         <map from="paymentMethod" to="paymentMethod" ref="PaymentMethod" />

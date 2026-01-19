@@ -167,8 +167,8 @@
 																<cfset item = oggetto.getItems()[item]>
 																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 															</cfloop>
-															<cfif !isNull(oggetto.getNotes()) && args.params.notes>
-																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNotes()#</span>
+															<cfif !isNull(oggetto.getNote()) && args.params.note>
+																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 															</cfif>
 														</cfif>
 													</td>
@@ -181,8 +181,8 @@
 																<cfset item = oggetto.getItems()[item]>
 																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 															</cfloop>
-															<cfif !isNull(oggetto.getNotes()) && args.params.notes>
-																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNotes()#</span>
+															<cfif !isNull(oggetto.getNote()) && args.params.note>
+																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 															</cfif>
 														</cfif>
 													</td>
@@ -198,9 +198,9 @@
 																<cfset fruit = oggetto.getFruits()[fi]>
 																Cod. <span style="text-transform: lowercase; font-size: 8pt;">
 																	#fruit.getFruit().getCode()#<cfif fi LT fruitsCount>, </cfif>
-																	<cfif !isNull(fruit.getNotes()) && args.params.notes>
+																	<cfif !isNull(fruit.getNote()) && args.params.note>
 																		<span style="font-size: 8pt; margin-top: 4pt;">
-																			<i>(Note: #fruit.getNotes()#)</i>
+																			<i>(Note: #fruit.getNote()#)</i>
 																		</span>
 																	</cfif>
 																</span>

@@ -16,6 +16,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var rows = super.fire( "QuotationItem.search", params );
 
+		//dump(rows.getData()[1].getPrice() );
+		//abort;
+
 		var data = ( memy.convertList( rows.getData() ) );
 
 		result.setTotal( rows.getTotal() );
@@ -50,7 +53,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 
 		var id   = json.quotationItem.id;
-		var type = json.type
+		var type = json.type;
 
 		if ( !Len( id ) ) {
 			var bean = super.bean( "QuotationItem" );
@@ -405,7 +408,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 		var tmpDir = super.getTempDir();
-		var bean = super.bean( "QuotationItemPlate" );
+		
+		var bean   = super.bean( "QuotationItemPlate" );
 		var status = super.bean( "Status" );
 
 		var beanFruits = [];
@@ -425,6 +429,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		//var price = populatePriceItem( json );
 		var price = getPricing( json );
+
+		dump(price);
+		abort;
 
 		bean.setPrice( price );
 

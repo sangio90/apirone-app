@@ -710,7 +710,7 @@ AP.quotation.zoneModal = ( function() {
     var defaultDetailForm = {
         data: {
             id: "",
-            name: "Nuova Zona",
+            name: "Nuova zona",
             description: "",
             quotation: {
                 id: AP?.page?.quotation?.id || "00001", // TODO: better than this
@@ -922,11 +922,11 @@ AP.quotation.printModal = ( function() {
             const report = viewModel.get( "detailForm.data.report.id" );
             const images = $( "#qt-print-image-checkbox" )[0].checked;
             const grouped = $( "#qt-print-grouped-checkbox" )[0].checked;
-            const notes = $( "#qt-print-notes-checkbox" )[0].checked;
+            const note = $( "#qt-print-note-checkbox" )[0].checked;
             const discounts = $( "#qt-print-discounts-checkbox" )[0].checked;
 
             const url = `/manager/technical-reports/print?id=${AP.page.quotation.id}&report=${report}` +
-                `&images=${images}&grouped=${grouped}&notes=${notes}&discounts=${discounts}`;
+                `&images=${images}&grouped=${grouped}&note=${note}&discounts=${discounts}`;
 
             window.open( url, "_blank" );
         },
@@ -936,37 +936,37 @@ AP.quotation.printModal = ( function() {
 
             const imageCheckbox = $( "#qt-print-image-checkbox" );
             const groupedCheckbox = $( "#qt-print-grouped-checkbox" );
-            const notesCheckbox = $( "#qt-print-notes-checkbox" );
+            const noteCheckbox = $( "#qt-print-note-checkbox" );
             const discountsCheckbox = $( "#qt-print-discounts-checkbox" );
 
             const imagesDiv = $( "#qt-print-images-cont" );
             const groupedDiv = $( "#qt-print-grouped-cont" );
-            const notesDiv = $( "#qt-print-note-cont" );
+            const noteDiv = $( "#qt-print-note-cont" );
             const discountsDiv = $( "#qt-print-discounts-cont" );
 
             // Reset tutto
             imageCheckbox.checked = false;
             groupedCheckbox.checked = false;
-            notesCheckbox.checked = false;
+            noteCheckbox.checked = false;
             discountsCheckbox.checked = false;
 
             // Configurazione per ogni tipo di report
             const config = {
                 classic: {
-                    checkboxes: { image: true, grouped: false, notes: false, discounts: false },
-                    divs: { images: "block", grouped: "none", notes: "block", discounts: "block" }
+                    checkboxes: { image: true, grouped: false, note: false, discounts: false },
+                    divs: { images: "block", grouped: "none", note: "block", discounts: "block" }
                 },
                 photo: {
-                    checkboxes: { image: false, grouped: false, notes: false, discounts: false },
-                    divs: { images: "none", grouped: "block", notes: "none", discounts: "none" }
+                    checkboxes: { image: false, grouped: false, note: false, discounts: false },
+                    divs: { images: "none", grouped: "block", note: "none", discounts: "none" }
                 },
                 zone: {
-                    checkboxes: { image: true, grouped: false, notes: true, discounts: false },
-                    divs: { images: "block", grouped: "none", notes: "block", discounts: "block" }
+                    checkboxes: { image: true, grouped: false, note: true, discounts: false },
+                    divs: { images: "block", grouped: "none", note: "block", discounts: "block" }
                 },
                 technical: {
-                    checkboxes: { image: false, grouped: false, notes: false, discounts: false },
-                    divs: { images: "block", grouped: "block", notes: "block", discounts: "none" }
+                    checkboxes: { image: false, grouped: false, note: false, discounts: false },
+                    divs: { images: "block", grouped: "block", note: "block", discounts: "none" }
                 }
             };
 
@@ -975,12 +975,12 @@ AP.quotation.printModal = ( function() {
             if ( reportConfig ) {
                 imageCheckbox.checked = reportConfig.checkboxes.image;
                 groupedCheckbox.checked = reportConfig.checkboxes.grouped;
-                notesCheckbox.checked = reportConfig.checkboxes.notes;
+                noteCheckbox.checked = reportConfig.checkboxes.note;
                 discountsCheckbox.checked = reportConfig.checkboxes.discounts;
 
                 imagesDiv.css( "display", reportConfig.divs.images );
                 groupedDiv.css( "display", reportConfig.divs.grouped );
-                notesDiv.css( "display", reportConfig.divs.notes );
+                noteDiv.css( "display", reportConfig.divs.note );
                 discountsDiv.css( "display", reportConfig.divs.discounts );
             }
         },

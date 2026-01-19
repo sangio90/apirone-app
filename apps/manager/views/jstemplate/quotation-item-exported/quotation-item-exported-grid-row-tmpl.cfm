@@ -25,7 +25,7 @@
                 <span data-bind="text: color"></span>
             </td>
             <td>
-                <span data-bind="text: notes"></span>
+                <span data-bind="text: note"></span>
             </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", class="btn-primary", icon="list")#

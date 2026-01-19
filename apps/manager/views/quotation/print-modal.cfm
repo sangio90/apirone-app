@@ -43,7 +43,7 @@
                         <div class="row mt-2">
                             <div class="col-6" id="qt-print-note-cont">
                                 <label class="form-check-label">
-                                    <input class="form-check-input ms-2 me-2" type="checkbox" id="qt-print-notes-checkbox" name="notes">
+                                    <input class="form-check-input ms-2 me-2" type="checkbox" id="qt-print-note-checkbox" name="note">
                                     Note
                                 </label>
                             </div>

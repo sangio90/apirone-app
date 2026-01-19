@@ -45,7 +45,7 @@ AP.quotation.header = ( function() {
             },
             quotationDate: quotationDate,
             validityDate: validityDate,
-            notes: "",
+            note: "",
             statusFile: {
                 id: null,
                 file: null

@@ -94,7 +94,7 @@
                             note: "COD.1 - FINITURA OTTONE CRUDO"
                         }
                     ],
-                    notes: [
+                    note: [
                         "3. Cod. 502TC13R - Tappo copriforo - 1/2 modulo -",
                         "ALVEOLI SCHRMATI - ESTETICA RIDOTTA -"
                     ]
@@ -147,7 +147,7 @@
                             position: "CUCINA/2"
                         }
                     ],
-                    notes: [
+                    note: [
                         "3) Cod. 502TC13R - Tappo copriforo - 1/2 modulo -",
                         "ALVEOLI SCHRMATI - ESTETICA RIDOTTA -"
                     ]
@@ -197,7 +197,7 @@
                             position: "CUCINA/2"
                         }
                     ],
-                    notes: [
+                    note: [
                         "3) Cod. 502TC13R - Tappo copriforo - 1/2 modulo -",
                         "ALVEOLI SCHRMATI - ESTETICA RIDOTTA -"
                     ]

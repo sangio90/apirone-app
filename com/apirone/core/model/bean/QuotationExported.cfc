@@ -18,7 +18,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="opportunity" type="String";
 	property name="pricelist" type="String";
 	property name="agent" type="String";
-	property name="notes" type="String";
+	property name="note" type="String";
 
 	//riga
 	property name="rowNumber" type="Numeric";
