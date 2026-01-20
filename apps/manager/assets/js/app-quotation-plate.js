@@ -46,6 +46,7 @@ AP.plate.modal = ( function() {
             width: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].width * data.fruit.positionCount,
             height: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].height,
             columnSpan: data.fruit.positionCount,
+            // orientation: data.fruit.orientation,
             rowSpan: 1,
             code: data.fruit.code,
             name: data.fruit.name,
@@ -79,91 +80,6 @@ AP.plate.modal = ( function() {
         return fruit;
 
     };
-
-    /*
-    var configPlate = function() {
-
-        // var plate = this.plates.get( this.get( "plate" ) );
-        var plate = viewModel.get( "plate" );
-
-        // plate.orientation.id = "VER"; // for test
-        // plate.orientationCell.id = "VER"; // for test
-
-        let freeCellWidth = constants.GRID_CELL_DIMENSIONS[ gridModule.CELL_TYPE.FREE ].width;
-        let freeCellHeight = constants.GRID_CELL_DIMENSIONS[ gridModule.CELL_TYPE.FREE ].height;
-
-        if ( plate.cellOrientation.id == orientation.VERTICAL ) {
-            const tmp = freeCellWidth;
-            freeCellWidth = freeCellHeight;
-            freeCellHeight = tmp;
-        }
-
-        gridModule.setCellDimensions( freeCellWidth, freeCellHeight );
-
-        const grid = [];
-
-        // create grid
-        for ( let iRow = 0; iRow < plate.grid.length; iRow++ ) {
-            const row = [];
-
-            for (
-                let iCol = 0;
-                iCol < plate.grid[iRow].length;
-                iCol++
-            ) {
-                const cellData = plate.grid[iRow][iCol];
-                const cellType = cellData.type;
-
-                const cell = new Cell(
-                    constants.GRID_CELL_DIMENSIONS[cellType].width,
-                    constants.GRID_CELL_DIMENSIONS[cellType].height,
-                    plate.cellOrientation.id,
-                    cellType,
-                );
-
-                row.push( cell );
-            }
-
-            grid.push( row );
-        }
-
-        const plateObj = new Plate( {
-            width: plate.width,
-            height: plate.height,
-            orientation: plate.orientation.id,
-            cellOrientation: plate.cellOrientation.id,
-            id: plate.id,
-            code: plate.code,
-            image: plate.image.uri,
-            grid: grid,
-            isSpecial: false,
-        } );
-
-        // console.log( "fruits:fruitList", fruitList );
-
-        pub.fruitsController = new FruitsController( {
-            plate: plateObj,
-            fruits: [],
-        } );
-
-        pub.fruitsController.plate.drawGridWithin( $( ".plate-designer" ) );
-
-        // se ci sono frutti li reinserisco
-        // var fruitList = [];
-
-        var fruits = viewModel.get( "detailForm.data.fruits" );
-
-        if ( fruits.total() ) {
-            for ( var thisFruit of fruits.data() ) {
-                var obj = mapFruitForPlate( thisFruit );
-                pub.fruitsController.addFruitToPlate( obj );
-            };
-        }
-
-        viewModel.set( "isPlateDefined", true );
-
-    };
-    */
 
     var configPlate = function() {
 

@@ -358,11 +358,11 @@ AP.plate.grid = ( function() {
             for ( let i = 0; i < this.grid.length; i++ ) {
                 const row = this.grid[i];
 
-                console.log( "this.grid[i]", this.grid[i] );
+                // console.log( "this.grid[i]", this.grid[i] );
 
                 const maxCellHeight = Math.max( ...row.map( ( x ) => x.height ) );
 
-                console.log( "cell.maxCellHeight", maxCellHeight );
+                // console.log( "cell.maxCellHeight", maxCellHeight );
 
                 gridTemplateRows[i] = maxCellHeight;
             }
@@ -493,8 +493,8 @@ AP.plate.grid = ( function() {
 
             super( args.width, args.height, args.orientation );
 
-            console.log( "Fruit:orientation", orientation.VERTICAL );
-            console.log( "this.orientation", this.orientation );
+            // console.log( "Fruit:orientation", orientation.VERTICAL );
+            // console.log( "this.orientation", this.orientation );
 
             this.rowSpan =
                 this.orientation == orientation.VERTICAL
@@ -719,15 +719,15 @@ AP.plate.grid = ( function() {
                 height: `${this.height}px`,
             };
 
-            console.log( "drawWithin:imgCSS", imgCSS );
-            console.log( "drawWithin:this.orientation", this.orientation );
-            console.log( "drawWithin:orientation.VERTICAL", orientation.VERTICAL );
+            // console.log( "drawWithin:imgCSS", imgCSS );
+            // console.log( "drawWithin:this.orientation", this.orientation );
+            // console.log( "drawWithin:orientation.VERTICAL", orientation.VERTICAL );
 
             // console.log("Fruit:drawWithin:this.orientation", orientation.VERTICAL);
             // console.log("Fruit:drawWithin:this.orientation", this.orientation);
 
             if ( this.orientation == orientation.VERTICAL ) {
-                console.log( "drawWithin:rotated" );
+                // console.log( "drawWithin:rotated" );
 
                 const tmp = imgCSS.width;
                 imgCSS.width = imgCSS.height;
@@ -766,7 +766,7 @@ AP.plate.grid = ( function() {
     class FruitsController {
         constructor( args ) {
 
-            console.log( "FruitsController initialized", args.plate );
+            // console.log( "FruitsController initialized", args.plate );
 
             this.plate = args.plate;
             this.fruits = args.fruits;
@@ -793,19 +793,16 @@ AP.plate.grid = ( function() {
         // renamed from "onSelectFruit"
         addFruitToPlate( selectedFruit ) {
 
-            // console.log( "addFruitToPlate:fruit", selectedFruit );
-            // console.log( "addFruitToPlate:selectedFruit.image", selectedFruit.image );
-
-            console.log( "addFruitToPlate:this.plate.orientation", this.plate.orientation );
-
-            console.log( "addFruitToPlate:selectedFruit.image.uri", selectedFruit.image?.uri );
+            // console.log( "addFruitToPlate:this.plate", this.plate );
+            // console.log( "addFruitToPlate:selectedFruit.image.uri", selectedFruit.image?.uri );
+            // console.log( "addFruitToPlate:selectedFruit", selectedFruit );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
                 height: selectedFruit.height,
                 rowSpan: selectedFruit.rowSpan,
                 columnSpan: selectedFruit.columnSpan,
-                orientation: this.plate.orientation,
+                orientation: this.plate.cellOrientation,
                 id: selectedFruit.id,
                 code: selectedFruit.code,
                 name: selectedFruit.name,
@@ -844,7 +841,7 @@ AP.plate.grid = ( function() {
         updateFruit( fruitId, changes = {} ) {
             this.fruits.forEach( fruit => {
                 if ( fruit.id === fruitId ) {
-                    console.log( "trovato", fruit.id );
+                    // console.log( "trovato", fruit.id );
                     Object.assign( fruit, changes );
 
                     // Se l'immagine è cambiata, aggiorna il DOM
