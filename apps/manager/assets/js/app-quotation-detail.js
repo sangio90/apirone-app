@@ -60,6 +60,51 @@ AP.quotation.detail = ( function() {
         return AP.quotation.status;
     }
 
+    var setQuotationItems = function( items ) {
+
+        var typeId = viewModel.get( "typeId" );
+
+        if ( typeId == "plate" ) {
+            viewModel.set( "quotationItemsPlate", items );
+        }
+
+        if ( typeId == "signage" ) {
+            viewModel.set( "quotationItemsSignage", items );
+        }
+
+        if ( typeId == "accessory" ) {
+            viewModel.set( "quotationItemsAccessory", items );
+        }
+
+        if ( typeId == "article" ) {
+            viewModel.set( "quotationItemsArticle", items );
+        }
+
+    };
+
+    var getQuotationItems = function( items ) {
+
+        var typeId = viewModel.get( "typeId" );
+
+        if ( typeId == "plate" ) {
+            return viewModel.get( "quotationItemsPlate" );
+        }
+
+        if ( typeId == "signage" ) {
+            return viewModel.get( "quotationItemsSignage" );
+        }
+
+        if ( typeId == "accessory" ) {
+            return viewModel.get( "quotationItemsAccessory" );
+        }
+
+        if ( typeId == "article" ) {
+            return viewModel.get( "quotationItemsArticle" );
+        }
+
+    };
+
+
     var viewModel = kendo.observable( {
         typeId: "plate",
         detailForm: {
@@ -72,14 +117,24 @@ AP.quotation.detail = ( function() {
 
         target: null,
         zones: new kendo.data.DataSource(),
-        quotationItems: new kendo.data.DataSource(),
+
+        // INFO: I split the datasources because it displayed
+        //       ghost "items" when rendered inside tabs
+        // quotationItems: new kendo.data.DataSource(),
+        quotationItemsArticle: new kendo.data.DataSource( {} ),
+        quotationItemsPlate: new kendo.data.DataSource( {} ),
+        quotationItemsSignage: new kendo.data.DataSource( {} ),
+        quotationItemsAccessory: new kendo.data.DataSource( {} ),
 
         showItems: function() {
-            return this.get( "quotationItems" ).total() > 0;
+
+            console.log( "getQuotationItems()", getQuotationItems() );
+
+            return getQuotationItems().total() > 0;
         },
 
         hideItems: function() {
-            return this.get( "quotationItems" ).total() == 0;
+            return getQuotationItems().total() == 0;
         },
 
         crmCustomers: new kendo.data.DataSource( {
@@ -467,7 +522,8 @@ AP.quotation.detail = ( function() {
                     url: url,
                     callback: {
                         done: function( xhr ) {
-                            viewModel.get( "quotationItems" ).data( xhr.data );
+                            // viewModel.get( "quotationItems" ).data( xhr.data );
+                            setQuotationItems( xhr.data );
                         }
                     }
                 } );

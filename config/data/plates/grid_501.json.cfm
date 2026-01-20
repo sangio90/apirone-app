@@ -2,7 +2,7 @@
     "frame": {
         "orientations": {
             "HOR": {
-                "cellOrientation": "HOR",
+                "cellOrientation": "VER",
                 "grid": [
                     [
                         {

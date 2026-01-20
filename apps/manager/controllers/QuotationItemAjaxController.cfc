@@ -20,6 +20,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var rows = super.fire( "QuotationItem.search", params );
 
+
+
 			var data = ( memy.convertList( rows.getData() ) );
 
 			result.setTotal( rows.getTotal() );
@@ -35,9 +37,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	function editArticle( event, rc, prc ){
 		var data   = {}
 		var result = super.getResult();
-		var params = super.paramsFromUrl();
+		//var params = super.paramsFromUrl();
 		var memy     = super.getMementify();
-
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 
@@ -53,12 +54,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
 		var thisId    = "";
 		var messageId = "";
-		var texts     = [];
+		//var texts     = [];
 
 		var result = super.getResult();
 
 		var id   = json.quotationItem.id;
-		var type = json.type;
+		//var type = json.type;
 
 		if ( !Len( id ) ) {
 			var bean = super.bean( "QuotationItem" );

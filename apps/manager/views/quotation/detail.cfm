@@ -112,39 +112,27 @@
 
                                     <div class="tab-content" id="nav-tabContent">
                                         <div class="tab-pane fade show active" id="nav-plate" role="tabpanel">
-                                            <div data-bind="visible: showItems">
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                            <div>
+                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsPlate" class="row">
                                                 </div>
-                                            </div>
-                                            <div data-bind="visible: hideItems">
-                                                <div class="qt-no-items">NESSUNA PLACCA</div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-signage" role="tabpanel">
-                                            <div data-bind="visible: showItems">
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                            <div>
+                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsSignage" class="row">
                                                 </div>
-                                            </div>
-                                            <div data-bind="visible: hideItems">
-                                                <div class="qt-no-items">NESSUNA SEGNALATICA</div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-accessory" role="tabpanel">
-                                            <div data-bind="visible: showItems">
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                            <div>
+                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsAccessory" class="row">
                                                 </div>
-                                            </div>
-                                            <div data-bind="visible: hideItems">
-                                                <div class="qt-no-items">NESSUN ACCESSORIO</div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-article" role="tabpanel">
-                                            <div data-bind="visible: showItems">
-                                                <div data-template="quotation-item-article-preview-tmpl" data-bind="source: quotationItems" class="row">
+                                            <div>
+                                                <div data-template="quotation-item-article-preview-tmpl" data-bind="source: quotationItemsArticle" class="row">
                                                 </div>
-                                            </div>
-                                            <div data-bind="visible: hideItems">
-                                                <div class="qt-no-items">NESSUN SERVIZIO</div>
                                             </div>
                                         </div>
                                     </div>

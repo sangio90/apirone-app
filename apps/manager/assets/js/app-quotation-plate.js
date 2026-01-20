@@ -195,7 +195,10 @@ AP.plate.modal = ( function() {
                 iCol < plate.grid[iRow].length;
                 iCol++
             ) {
-                const cellType = plate.grid[iRow][iCol];
+                // const cellType = plate.grid[iRow][iCol];
+
+                const cellData = plate.grid[iRow][iCol];
+                const cellType = cellData.type;
 
                 const cell = new Cell(
                     constants.GRID_CELL_DIMENSIONS[cellType].width,

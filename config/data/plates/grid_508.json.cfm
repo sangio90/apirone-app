@@ -73,7 +73,7 @@
                 ]
             },
             "VER": {
-                "cellOrientation": "HOR",
+                "cellOrientation": "VER",
                 "grid": [
                     [
                         {
