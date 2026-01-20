@@ -31,7 +31,6 @@
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "productItem.id" ] );
 		
 		var rows    = [];
-		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
@@ -40,6 +39,13 @@
 		} );
 
 		return rows;
+	}
+
+	
+	public Numeric function create( required com.apirone.core.model.bean.QuotationItemPriceLine quotationItemPriceLine ){
+		var newId = getDao().insert( arguments.quotationItemPriceLine );
+
+		return newId;
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required Numeric quotationItemPriceId ){
@@ -53,11 +59,10 @@
 		return outcome;
 	}
 	
-	public Numeric function create( required quotationItemPriceLine ){
-		var newId = getDao().insert( arguments.quotationItemPriceLine );
 
-		return newId;
-	}
+	/*
+		PRIVATE METHODS
+	*/
 
 	private com.apirone.core.model.bean.QuotationItemPrice function build( required Numeric quotationItemPriceLineId ){
 		var record = getDao().read( arguments.quotationItemPriceId );

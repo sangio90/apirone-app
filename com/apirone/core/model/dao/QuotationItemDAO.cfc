@@ -31,13 +31,14 @@
 				quotation_zone_id::varchar,
 				COUNT(quotation_item_id) OVER() AS total
 			FROM quotation_items
-				<!--- LEFT JOIN signage_config_items USING (signage_config_item_id) ---->
+				
 				<cfif !IsNull( arguments.typeId )>
 					INNER JOIN products ON quotation_items.product_id = products.product_id
 					INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
 					INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
 				</cfif>
 			WHERE 1=1
+
 				<cfif !IsNull( arguments.quotationId )>
 					AND quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
 				</cfif>
@@ -51,10 +52,11 @@
 				</cfif>
 			ORDER BY
 				quotation_items.#super.sanitizeSQL( arguments.orderBy )#
-			<cfif arguments.limit GT 0>
-				LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
-				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer">
-			</cfif>
+
+				<cfif arguments.limit GT 0>
+					LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
+					OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer">
+				</cfif>
 		</cfquery>
 
 		<cfreturn local.q>
@@ -160,11 +162,11 @@
 					</cfif>
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
 					,
-					signage_config_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getId()#">,
 					char_count             = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getCharCount()#">,
 					height                 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeight()#">,
 					height_in_pixel        = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getHeightInPixel()#">,
-					row_count              = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getRowCount()#">
+					row_count              = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getRowCount()#">,
+					signage_config_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getId()#">
 				</cfif>
 			WHERE
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getId()#">::uuid

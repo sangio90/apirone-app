@@ -5,25 +5,30 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
 		var memy   = super.getMementify();
-		
+
 		param rc.id = "";
 		param rc.categoryId = "";
 		param rc.quotationZoneId = "";
 
-		params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
-		params[ "quotationId" ] = rc.id;
-		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
+		if( rc.typeId == "article" ) {
 
-		var rows = super.fire( "QuotationItem.search", params );
+		} else {
 
-		//dump(rows.getData()[1].getPrice() );
-		//abort;
+			params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
+			params[ "quotationId" ] = rc.id;
+			params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
 
-		var data = ( memy.convertList( rows.getData() ) );
+			var rows = super.fire( "QuotationItem.search", params );
 
-		result.setTotal( rows.getTotal() );
-		result.setCount( rows.getCount() );
-		result.setData( data );
+			var data = ( memy.convertList( rows.getData() ) );
+
+			result.setTotal( rows.getTotal() );
+			result.setCount( rows.getCount() );
+			result.setData( data );
+
+		}
+		
+
 		event.setValue( "result", result );
 	}
 
@@ -31,12 +36,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = {}
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
-		var mm     = super.getMementify();
+		var memy     = super.getMementify();
 
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 
-		var parsedQuotationItemData = mm.convert( quotationItem, "edit" );
+		var parsedQuotationItemData = memy.convert( quotationItem, "edit" );
 
 		data.append( { "quotationItem" = parsedQuotationItemData } );
 
@@ -402,6 +407,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function savePlate( event, rc, prc ){
+		
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
 		var thisId    = "";
 		var messageId = "";
@@ -428,12 +434,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setSpecial( json.special );
 
 		//var price = populatePriceItem( json );
-		var price = getPricing( json );
+		var pricing = getPricing( json );
 
-		dump(price);
-		abort;
-
-		bean.setPrice( price );
+		bean.setPrice( pricing );
 
 		//json.delete( "imageBase64" )
 		//dump( json );
@@ -645,7 +648,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			productItemsIds
 		);
 
-		var line = super.bean( "PriceLine" );
+		var line = super.bean( "QuotationItemPriceLine" );
 
 		line.setName( "Prezzo placca" );
 		line.setAmount( platePrice );
@@ -660,7 +663,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		for ( var fruit in json.fruits._data ) {
 			var fruitItemsIds = [];
 			
-			var line = super.bean( "PriceLine" );
+			var line = super.bean( "QuotationItemPriceLine" );
 
 			for ( var item in fruit.items._data ) {
 				for ( var value in item.values ) {
@@ -686,30 +689,23 @@ component extends="com.apirone.core.controller.AbsController" {
 	private com.apirone.core.model.bean.QuotationItemPrice function populatePriceItem( data ){
 
 		var method = super.bean( "PriceMethod" );
-		var bean  = super.bean( "QuotationItemPrice" );
+		var bean = super.bean( "QuotationItemPrice" );
 
-		var lines = data.pricing.keyExists("lines") ? data.pricing.lines : [];
-
-		//var lines = [];
+		var lines = [];
+		var thisLines = data.pricing.keyExists("lines") ? data.pricing.lines : [];
 
 		bean.setAmount( data.pricing.total );
 		bean.setDiscount1( Len( data.pricing?.discount1 ) ? data.pricing?.discount1 : 0 );
 		bean.setDiscount2( Len( data.pricing?.discount2 ) ? data.pricing?.discount2 : 0 );
 		bean.setMethod( method.setId( data.pricing.method.id ) );
 
-		//var i = 1;
-		for( var thisLine in lines ) {
-			var priceLine  = super.bean( "PriceLine" );
-			dump(i);
-			dump(thisLine);
-			dump(priceLine);
+		for( var thisLine in thisLines ) {
+			var priceLine  = super.bean( "QuotationItemPriceLine" );
 			priceLine.setName( thisLine.name );
 			priceLine.setAmount( thisLine.amount );
 			
 			lines.add( priceLine );
-			//i++
 		}
-		//abort;
 
 		bean.setLines( lines );
 

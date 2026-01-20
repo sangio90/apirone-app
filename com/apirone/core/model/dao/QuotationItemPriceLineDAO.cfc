@@ -41,7 +41,7 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="Numeric">
-		<cfargument name="quotationItemPriceLine" type="com.apirone.core.model.bean.PriceLine" required="true">
+		<cfargument name="quotationItemPriceLine" type="com.apirone.core.model.bean.QuotationItemPriceLine" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_price_lines (
@@ -59,7 +59,7 @@
 	</cffunction>
 
 	<cffunction name="update" returntype="Numeric">
-		<cfargument name="quotationItemPriceLine" type="com.apirone.core.model.bean.PriceLine" required="true">
+		<cfargument name="quotationItemPriceLine" type="com.apirone.core.model.bean.QuotationItemPriceLine" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_items_price_lines
 			SET

@@ -7,7 +7,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="discount2" type="Numeric";
 	//property name="flatDiscount" type="Numeric";
 
-	property name="lines" type="com.apirone.core.model.bean.PriceLine[]";
+	property name="lines" type="com.apirone.core.model.bean.QuotationItemPriceLine[]";
 	property name="method" type="com.apirone.core.model.bean.PriceMethod";
 
 	public QuotationItemPrice function init(){

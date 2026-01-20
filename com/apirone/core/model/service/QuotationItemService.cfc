@@ -116,7 +116,6 @@
 			price.setQuotationItemId( newId );
 			getQuotationItemPriceService().create( price );
 
-			//TODO: move to service
 			var hash = getProductHashService().createHash( newId );
 
 			if ( !IsNull( hash ) ) {

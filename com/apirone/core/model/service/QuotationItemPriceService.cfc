@@ -81,9 +81,12 @@
 	public String function create( required com.apirone.core.model.bean.QuotationItemPrice quotationItemPrice ){
 		var newId = getDao().insert( arguments.quotationItemPrice );
 
-		for( var line in quotationItemPrice.getLines() ) {
-			line.setQuotationItemPriceId( newId );
-			getQuotationItemPriceLineService().create( line );
+		if( !IsNull( quotationItemPrice.getLines() ) ) {
+			
+			for( var line in quotationItemPrice.getLines() ) {
+				line.setQuotationItemPriceId( newId );
+				getQuotationItemPriceLineService().create( line );
+			}
 		}
 
 		return newId;
