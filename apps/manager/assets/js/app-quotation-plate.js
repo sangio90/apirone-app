@@ -83,11 +83,9 @@ AP.plate.modal = ( function() {
 
     var configPlate = function() {
 
-        // var plate = this.plates.get( this.get( "plate" ) );
         var plate = viewModel.get( "plate" );
 
-        // plate.orientation.id = "VER"; // for test
-        // plate.orientationCell.id = "VER"; // for test
+        console.log( "plate.image", plate );
 
         let freeCellWidth = constants.GRID_CELL_DIMENSIONS[ gridModule.CELL_TYPE.FREE ].width;
         let freeCellHeight = constants.GRID_CELL_DIMENSIONS[ gridModule.CELL_TYPE.FREE ].height;
@@ -471,11 +469,17 @@ AP.plate.modal = ( function() {
 
                         if ( xhr.count > 0 ) {
 
-                            if ( !viewModel.get( "detailForm.data.product.image" ) && xhr.data[0].horizontalImage ) {
+                            if ( xhr.data[0].horizontalImage ) {
+                                var image = xhr.data[0].horizontalImage;
+                            } else {
+                                var image = xhr.data[0].verticalImage;
+                            }
 
-                                viewModel.set( "detailForm.data.product.image", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
+                            if ( !viewModel.get( "detailForm.data.product.image" ) && image ) {
+
+                                viewModel.set( "detailForm.data.product.image", image );
+                                viewModel.set( "backgroundImage", image );
+                                viewModel.set( "backgroundImage.url", "url('" + image.uri + "')" );
                             }
 
                             viewModel.set( "detailForm.data.product.items", new kendo.data.DataSource() );
@@ -746,15 +750,21 @@ AP.plate.modal = ( function() {
 
         populateProduct( product ) { // without items
 
-            // console.log( "populateProduct", product );
+            console.log( "populateProduct", product );
+
+            if ( product.horizontalImage ) {
+                var image = product?.horizontalImage;
+            } else {
+                var image = product?.verticalImage;
+            }
 
             viewModel.set( "detailForm.data.product.id", product?.id ); // "" = nuovo
             viewModel.set( "detailForm.data.product.finish.id", product.finish.id );
             viewModel.set( "detailForm.data.product.model.id", product.model.id );
             viewModel.set( "detailForm.data.product.model.code", product.model.code ); // for frame
             viewModel.set( "detailForm.data.product.line.id", product.line.id );
-            viewModel.set( "detailForm.data.product.image.id", product?.horizontalImage?.id );
-            viewModel.set( "detailForm.data.product.image.uri", product?.horizontalImage?.uri );
+            viewModel.set( "detailForm.data.product.image.id", image?.id );
+            viewModel.set( "detailForm.data.product.image.uri", image?.uri );
 
         },
 

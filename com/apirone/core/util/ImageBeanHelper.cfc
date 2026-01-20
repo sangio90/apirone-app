@@ -40,7 +40,7 @@
 					"\1"
 				)
 			);
-			return findImageByType( images );
+			return findImageByType( images, typeId );
 		}
 		return NullValue();
 	}
