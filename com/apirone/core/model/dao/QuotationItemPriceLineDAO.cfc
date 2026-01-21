@@ -1,7 +1,7 @@
 ﻿<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	
 	<cffunction name="read" returntype="Query">
-		<cfargument name="quotationItemId" type="String" required="true">
+		<cfargument name="quotationItemPriceLineId" type="Numeric" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
@@ -25,16 +25,15 @@
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.quotationItemPriceId )>
-					AND quotation_item_price_lines.quotation_item_price_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemPriceId#">::uuid
+					AND quotation_item_price_lines.quotation_item_price_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPriceId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.productId )>
-					AND quotation_item_price_lines.product_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.productId#">::uuid
+					AND quotation_item_price_lines.product_id = <cfqueryparam cfsqltype="Other" value="#arguments.productId#">
 				</cfif>
 
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderBy )#
-			
 		</cfquery>
 		
 		<cfreturn local.q>
@@ -42,6 +41,10 @@
 
 	<cffunction name="insert" returntype="Numeric">
 		<cfargument name="quotationItemPriceLine" type="com.apirone.core.model.bean.QuotationItemPriceLine" required="true">
+
+		<cfscript>
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceLineDAO: before create line, quotationItemPriceLine: #quotationItemPriceLine.getQuotationItemPriceId()#, price: #quotationItemPriceLine.getAmount()#");
+		</cfscript>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_price_lines (
@@ -53,9 +56,14 @@
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPriceLine.getAmount()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemPriceLine.getQuotationItemPriceId()#">
 			)
-			RETURNING quotation_item_price_id
+			RETURNING quotation_item_price_line_id
 		</cfquery>
-		<cfreturn local.q.quotation_item_price_id>
+
+		<cfscript>
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceLineDAO: after create line: id: #local.q.quotation_item_price_line_id#");
+		</cfscript>
+
+		<cfreturn local.q.quotation_item_price_line_id>
 	</cffunction>
 
 	<cffunction name="update" returntype="Numeric">

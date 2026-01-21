@@ -8,7 +8,6 @@
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductService" inject="ProductService";
 	property name="ProductHashService" inject="ProductHashService";
-	//property name="ProductItemService" inject="ProductItemService";
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="FileService" inject="FileService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
@@ -113,10 +112,16 @@
 
 			var price = arguments.quotationItem.getPrice();
 
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #newId#, line: #price.getLines().len()#");
+
+
 			price.setQuotationItemId( newId );
-			getQuotationItemPriceService().create( price );
+			var id = getQuotationItemPriceService().create( price );
+
 
 			var hash = getProductHashService().createHash( newId );
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="hash: #hash#");
 
 			if ( !IsNull( hash ) ) {
 

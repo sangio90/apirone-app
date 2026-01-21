@@ -67,13 +67,13 @@
 		return result;
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete( required String quotationItemId ){
+	public com.apirone.core.model.bean.Outcome function delete( required String quotationItemPriceId ){
 
 		var outcome = super.bean( "Outcome" );
 
-		outcome.setData( { quotationItemId = arguments.quotationItemId } );
+		outcome.setData( { quotationItemPriceId = arguments.quotationItemPriceId } );
 
-		getDao().delete( arguments.quotationItemId );
+		getDao().delete( arguments.quotationItemPriceId );
 
 		return outcome;
 	}
@@ -81,9 +81,15 @@
 	public String function create( required com.apirone.core.model.bean.QuotationItemPrice quotationItemPrice ){
 		var newId = getDao().insert( arguments.quotationItemPrice );
 
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="quotationItemPriceService: newId:#newId#, lines: #quotationItemPrice.getLines().len()#");
+
 		if( !IsNull( quotationItemPrice.getLines() ) ) {
+
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceService: if !null before loop on lines newId:#newId#, lines: #quotationItemPrice.getLines().len()#");
 			
 			for( var line in quotationItemPrice.getLines() ) {
+				cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceService: line newId:#newId#, lines: #quotationItemPrice.getLines().len()#");
+
 				line.setQuotationItemPriceId( newId );
 				getQuotationItemPriceLineService().create( line );
 			}
@@ -92,11 +98,11 @@
 		return newId;
 	}
 
-	public String function update( required com.apirone.core.model.bean.quotationItemPrice quotationItemPrice ){
-		getDao().update( arguments.quotationItem );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
+	public String function update( required com.apirone.core.model.bean.QuotationItemPrice quotationItemPrice ){
+		getDao().update( arguments.quotationItemPrice );
+		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemPrice.getId() );
 
-		return arguments.quotationItem.getId();
+		return arguments.quotationItemPrice.getId();
 	}
 
 	private com.apirone.core.model.bean.QuotationItemPrice function build( required String quotationItemPriceId ){
@@ -114,6 +120,7 @@
 			bean.setMethod( method.setId( record.price_method_id ) );
 
 			bean.setId( record.quotation_item_price_id );
+			bean.setLines( getQuotationItemPriceLineService().list( quotationItemPriceId = arguments.quotationItemPriceId ) );
 
 			return bean;
 		}

@@ -271,13 +271,10 @@ AP.plate.modal = ( function() {
 
     var updatePrice = function() {
 
-        // console.log( "calculatePriceItem" );
-
-        var status = $( "#quotation-totals-item-loading" );
-        status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
+        var status = $( "#quotation-item-pricing-status" );
+        status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
         var data = viewModel.get( "detailForm.data" );
-        // data.data.pricing = viewModel.get( "detailForm.data.pricing" );
 
         NM.util.ajax( {
             method: "POST",
@@ -287,13 +284,9 @@ AP.plate.modal = ( function() {
                 done: function( xhr ) {
                     if ( xhr.data ) {
 
-                        console.log( "pricing", xhr.data );
-
                         status.html( "" );
-
-                        viewModel.set( "detailForm.data.pricing", xhr.data );
-
-
+                        viewModel.set("detailForm.data.pricing", xhr.data);
+                        
                     }
                 }
             }

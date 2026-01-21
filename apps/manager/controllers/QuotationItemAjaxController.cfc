@@ -20,8 +20,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var rows = super.fire( "QuotationItem.search", params );
 
-
-
 			var data = ( memy.convertList( rows.getData() ) );
 
 			result.setTotal( rows.getTotal() );
@@ -421,8 +419,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var beanFruits = [];
 
-		//FileWrite( filePath, binaryData );
-
 		var id = json.id;
 
 		if ( Len( id ) ) {
@@ -436,7 +432,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		//var price = populatePriceItem( json );
 		var pricing = getPricing( json );
-
+		//dump( pricing );
+		//abort;
 		bean.setPrice( pricing );
 
 		//json.delete( "imageBase64" )

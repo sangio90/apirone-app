@@ -52,6 +52,7 @@
     "QuotationItemExportedRow.bean": {},
     "QuotationItemProduct.bean": {},
     "QuotationItemProductItem.bean": {},
+    "QuotationItemPriceLine.bean": {},
     "QuotationItemSignageRow.bean": {},
     "QuotationItemFruit.bean": {},
     "QuotationStatusHistory.bean": {},

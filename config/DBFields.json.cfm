@@ -205,6 +205,11 @@
         "type": "Integer"
     },
 
+    "quotationItemPriceLine.id": {
+        "name": "quotation_item_price_line_id",
+        "type": "Integer"
+    },
+
     "quotationItemProduct.id": {
         "name": "quotation_item_product_id",
         "type": "uuid"

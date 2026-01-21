@@ -35,7 +35,11 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="Numeric">
-		<cfargument name="quotationPriceLine" type="com.apirone.core.model.bean.QuotationPriceLine" required="true">
+		<cfargument name="quotationPriceLine" type="com.apirone.core.model.bean.QuotationItemPriceLine" required="true">
+
+		<cfscript>
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceLineService: create line, productItemId: #quotationItemPriceLine.getQuotationItemPriceId()#, price: #quotationItemPriceLine.getAmount()#");
+		</cfscript>
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_price_lines (

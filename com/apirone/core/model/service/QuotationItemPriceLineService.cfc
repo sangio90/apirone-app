@@ -26,9 +26,10 @@
 
 	public Array function list(
 		required String quotationItemPriceId,
+		required Array orderBy  = [ { field = "quotationItemPriceLine.id", desc = "asc" } ]
 	){
 		
-		arguments[ "orderby" ] = super.createOrderBy( arguments[ "productItem.id" ] );
+		arguments[ "orderby" ] = super.createOrderBy( arguments.orderBy );
 		
 		var rows    = [];
 		var records = getDao().find( argumentCollection = arguments );
@@ -43,6 +44,8 @@
 
 	
 	public Numeric function create( required com.apirone.core.model.bean.QuotationItemPriceLine quotationItemPriceLine ){
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceLineService: create line, productItemId: #quotationItemPriceLine.getQuotationItemPriceId()#, price: #quotationItemPriceLine.getAmount()#");
+
 		var newId = getDao().insert( arguments.quotationItemPriceLine );
 
 		return newId;
@@ -64,15 +67,20 @@
 		PRIVATE METHODS
 	*/
 
-	private com.apirone.core.model.bean.QuotationItemPrice function build( required Numeric quotationItemPriceLineId ){
-		var record = getDao().read( arguments.quotationItemPriceId );
+	private com.apirone.core.model.bean.QuotationItemPriceLine function build( required Numeric quotationItemPriceLineId ){
+		var record = getDao().read( arguments.quotationItemPriceLineId );
 		
 		if ( record.recordCount ) {
+
+			var bean = super.bean( "QuotationItemPriceLine" );p
 			
 			bean.setId( record.quotation_item_price_line_id );
-			bean.setAmount( record.price );
-			bean.setProductItemId( record.product_item_id );
-			bean.setProductItemPriceId( record.product_item_price_id );
+			bean.setAmount( record.amount );
+			//bean.setProductItemId( record.product_item_id );
+			//bean.setProductItemPriceId( record.product_item_price_id );
+			bean.setQuotationItemPriceId( record.quotation_item_price_id );
+			bean.setName( record.name ); //TODO: rename this field to quotation_item_price_line
+			bean.setCreatedAt( record.created_at ); 
 
 			return bean;
 		}
