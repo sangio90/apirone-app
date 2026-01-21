@@ -49,8 +49,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	){
 		prc.title = "Mappa placche";
 
-		prc.jsFiles.add("stan/app-plate");
-		prc.cssFiles.add("stan/app-plate");
+		prc.jsFiles.add("stan/app-map");
+		prc.cssFiles.add("stan-plate");
 
 		event.setView( "plate/map" );
 	}

@@ -12,11 +12,6 @@ $( document ).ready( function() {
         } );
     }
 
-    if ( AP.plate.fields.mapRoot.length ) {
-        AP.plate.map.init( {
-            container: AP.plate.fields.mapRoot,
-        } );
-    }
 } );
 
 AP.plate.designer = ( function() {
@@ -1282,4 +1277,3 @@ AP.plate.designer = ( function() {
 
     return pub;
 }() );
-

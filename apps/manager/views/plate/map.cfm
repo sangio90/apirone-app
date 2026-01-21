@@ -3,11 +3,11 @@
 	plates = [
 		{
 			"uuid" = createUUID(),
-			"img" = "../../../../assets/main/img/plate1.png",
+			"img" = "/assets/main/img/plate1.png",
 			"totalQuantity" = 1,
 			"availableQuantity" = 1,
 			"marker" = {
-				"img" = "../../../../assets/main/img/red_pin.png",
+				"img" = "/assets/main/img/pin-red.png",
 				"model" = {
 					"width" = 32,
 					"height" = 32,
@@ -16,11 +16,11 @@
 		},
 		{
 			"uuid" = createUUID(),
-			"img" = "../../../../assets/main/img/plate2.png",
+			"img" = "/assets/main/img/plate2.png",
 			"totalQuantity" = 10,
 			"availableQuantity" = 10,
 			"marker" = {
-				"img" = "../../../../assets/main/img/green_pin.png",
+				"img" = "/assets/main/img/pin-green.png",
 				"model" = {
 					"width" = 32,
 					"height" = 32,
@@ -29,11 +29,11 @@
 		},
 		{
 			"uuid" = createUUID(),
-			"img" = "../../../../assets/main/img/plate3.png",
+			"img" = "/assets/main/img/plate3.png",
 			"totalQuantity" = 100,
 			"availableQuantity" = 100,
 			"marker" = {
-				"img" = "../../../../assets/main/img/blue_pin.png",
+				"img" = "/assets/main/img/pin-blue.png",
 				"model" = {
 					"width" = 32,
 					"height" = 32,
@@ -42,7 +42,7 @@
 		},
 	];
 	platesMap = {
-		"img" = "../../../../assets/main/img/planimetria.jpg",
+		"img" = "/assets/fakes/img/planimetria.jpg",
 		"width" = 856, // in px
 		"height" = 582, // in px
 	};

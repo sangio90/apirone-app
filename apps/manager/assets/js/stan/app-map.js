@@ -1,4 +1,21 @@
-﻿AP.plate.map = ( function() {
+﻿AP.plate = AP.plate || {};
+
+AP.plate.fields = {
+    designerRoot: $( "#plate-designer-root" ),
+    mapRoot: $( "#plates-map-root" ),
+};
+
+
+$( document ).ready( function() {
+
+    if ( AP.plate.fields.mapRoot.length ) {
+        AP.plate.map.init( {
+            container: AP.plate.fields.mapRoot,
+        } );
+    }
+} );
+
+AP.plate.map = ( function() {
     const { MarkerArea, CustomImageMarker, ImageMarkerEditor } = markerjs3;
 
     // Seguendo la guida: https://markerjs.com/docs-v3/documents/guides_and_tutorials.tutorials.custom_marker_types
@@ -186,6 +203,9 @@
     } );
 
     pub.init = function( setup ) {
+
+        console.log( "map:init" );
+
         priv.container = setup.container;
 
         priv.vm.set( "plates", pageData.plates );
