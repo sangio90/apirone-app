@@ -16,6 +16,7 @@ $( document ).ready( function() {
 AP.plate.modal = ( function() {
 
     const gridModule = AP.plate.grid;
+    const fields = AP.plate.fields;
 
     const {
         constants,
@@ -27,8 +28,6 @@ AP.plate.modal = ( function() {
         FruitsController
     } = gridModule;
 
-    // Maintain access to fields for UI interaction parts
-    const fields = AP.plate.fields;
 
     var pub = {
         fruitsController: null,
@@ -46,7 +45,6 @@ AP.plate.modal = ( function() {
             width: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].width * data.fruit.positionCount,
             height: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].height,
             columnSpan: data.fruit.positionCount,
-            // orientation: data.fruit.orientation,
             rowSpan: 1,
             code: data.fruit.code,
             name: data.fruit.name,
@@ -285,8 +283,8 @@ AP.plate.modal = ( function() {
                     if ( xhr.data ) {
 
                         status.html( "" );
-                        viewModel.set("detailForm.data.pricing", xhr.data);
-                        
+                        viewModel.set( "detailForm.data.pricing", xhr.data );
+
                     }
                 }
             }
@@ -576,11 +574,8 @@ AP.plate.modal = ( function() {
                 var fruits = viewModel.get( "detailForm.data.fruits" );
                 var product = fruits.get( fruitId );
 
-                // var product = fruit;
                 var productItems = product.get( "items" );
                 var prodyctIdForCall = product.get( "fruit.id" );
-
-                // console.log( "loadProductItems:fruit" );
 
             }
 
@@ -737,13 +732,11 @@ AP.plate.modal = ( function() {
                 }
             } );
 
-            console.log( "loadProductItems:end" );
+            // console.log( "loadProductItems:end" );
 
         },
 
         populateProduct( product ) { // without items
-
-            console.log( "populateProduct", product );
 
             if ( product.horizontalImage ) {
                 var image = product?.horizontalImage;

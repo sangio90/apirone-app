@@ -4,7 +4,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data = [];
 
 		var result = super.getResult();
-		var mm     = super.getMementify();
+		var memy   = super.getMementify();
 		var params = super.paramsFromUrl();
 
 		params[ "categoryModeId" ] = "COM";
@@ -12,7 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var rows = super.fire( "product.search", params );
 
 		for ( var row in rows.getData() ) {
-			var obj = mm.convert( row, "list" );
+			var obj = memy.convert( row, "list" );
 			data.add( obj );
 		}
 
@@ -392,9 +392,20 @@ component extends="com.apirone.core.controller.AbsController" {
 		params["productId"] = rc.id;
 		var rows = super.fire( "Combination.search", params )
 
+		// without Mementify
+		// error: component [com.apirone.core.model.bean.Combination] has no function with name [getrawProduct]
+		
 		for ( var row in rows.getData() ) {
-			var obj = memy.convert( row );
-			data.add( obj );
+			
+			var line = {
+				"id"        = row.getId(),
+				"shortId"   = row.getShortId(),
+				"status"    = row.getStatus(),
+				"productId" = row.getProductId(),
+				"name"      = row.getName()
+			};
+			
+			data.add( line );
 		}
 
 		result.setTotal( rows.getTotal() );

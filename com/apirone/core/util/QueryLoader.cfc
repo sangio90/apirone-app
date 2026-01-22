@@ -4,8 +4,6 @@
 
 	<cffunction name="getCosts" returntype="Query">
 		
-		<cfset var result = "">
-
 		<cfset var cm = getCacheManager()>
 
 		<cfset var cache = cm.get( scope = "verticale.query", key = "costs"  )>

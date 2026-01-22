@@ -156,10 +156,7 @@ component extends="coldbox.system.Interceptor" {
 		var result = {
 			"appName"    = config.get( "appName" ),
 			"appVersion" = config.get( "appVersion" ),
-			"user"       = { "id" = session.user.getId(), "shortId" = session.user.getShortId() },
-			"account"    = { //TODO: remove this
-				"shortId" = session.user.getAccount()?.getShortId() ?: "not-exists"
-			}
+			"user"       = { "id" = session.user.getId(), "shortId" = session.user.getShortId() }
 		};
 
 		return result;

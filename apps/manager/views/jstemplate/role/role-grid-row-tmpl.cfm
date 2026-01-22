@@ -14,6 +14,9 @@
                 <span class="small-code">(<span data-bind="text: type.id"></span>)</span>
             </td>
             <td class="text-center">
+                #iconButton(bind="click:editPermissions", icon="key")#
+            </td>
+            <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
             </td>
         </tr>

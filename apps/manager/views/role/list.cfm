@@ -24,6 +24,7 @@
                                         { 'title':'ID',  width: '70px' },
                                         { 'title':'Nome' },
                                         { 'title':'Tipo' },
+                                        { 'title':'', 'width' :'50px', 'headerAttributes': { 'class': 'text-center' } },
                                         { 'title':'', 'width' :'50px', 'headerAttributes': { 'class': 'text-center' } }
                                     ]",
 									rowTemplate = "role/role-grid-row-tmpl"
@@ -41,5 +42,6 @@
     </div>
     
     #view("role/detail-modal")#
+    #view("role/detail-permission-modal")#
 
 </cfoutput>

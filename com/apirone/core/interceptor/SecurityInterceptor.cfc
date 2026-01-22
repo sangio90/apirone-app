@@ -99,7 +99,6 @@ component extends="coldbox.system.Interceptor" {
 		// Se hasAccess è true, l'esecuzione continua normalmente.
 	}
 
-	// TODO: use this in SecurityInterceptor
 	private String function storeRequest(
 		required event,
 		required prefix  = "api",

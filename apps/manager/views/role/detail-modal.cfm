@@ -1,10 +1,10 @@
 ﻿<cfoutput>
-    <div id="role-permissions-modal" class="modal fade">
+    <div id="role-detail-modal" class="modal fade">
         
         <section class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                <form id="role-permissions-form" method="POST" name="role-permissions-form">
+                <form id="role-detail-form" method="POST" name="role-detail-form">
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:detailForm.title"></h2>
@@ -14,38 +14,22 @@
                     <div class="card-body">
 
                         <div class="mb-3 row">
-                            <div class="col-12">
-                                <div class="form-group pb-3">
-                                    <label class="col-sm-2 col-form-label text-start">Entità</label>
-                                    <select type="text" class="form-control" name="entity" 
-                                        required
-                                        data-bind="source: detailForm.entities, value: detailForm.data.entity, events: { change: getPermissions }"
-                                        data-value-field="id"
-                                        data-text-field="name"
-                                    >
-                                    </select>
-                                </div>
+                            <label class="col-sm-3 col-form-label text-end">Offerta massima</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control col-sm-4" 
+                                    name="offerMaxAmount"
+                                    maxlength="5"
+                                    data-bind="value: detailForm.data.offerMaxAmount">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3 row">
-                             #grid( 
-                                id="permission-grid",
-                                class="no-pager hidden",
-                                columns="[
-                                    { 'field':'id', 'title':'ID', width: '30%' },
-                                    { 'field':'name', 'title':'Nome', width: '30%'},
-                                    { 'field':'createdAt', 'title':'Data', width: '30%'},
-                                    { 
-                                        'field':'', 
-                                        'title':'<input type=checkbox name=selectAll>',
-                                        'width':'35px',
-                                        'headerAttributes': { 'class': 'justify-content-center' }
-                                    }
-                                ]",
-                                source="detailForm.data.entity.permissions",
-                                rowTemplate="role/permissions-tmpl"
-                             )#
+                            <label class="col-sm-3 col-form-label text-end">Sconto massimo</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control col-sm-4" 
+                                    name="offerMaxDiscount"
+                                    data-bind="value: detailForm.data.offerMaxDiscount">
+                            </div>
                         </div>
 
                     </div>
@@ -67,8 +51,6 @@
             </div>
         </section>
     
-        #template( view="jstemplate/role/permissions-tmpl" )#
     </div>
-    
 
 </cfoutput>

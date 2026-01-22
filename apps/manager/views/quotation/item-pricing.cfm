@@ -108,7 +108,7 @@
 				<div class="row mb-2 mt-2">
 					<div class="col-12 d-flex align-items-center">
 						#button(bind="click:updatePricing", size="sm", icon="sync", class="mt-3", label="Aggiorna prezzi")#
-						<div class="ms-2 mt-3 status" id="quotation-item-pricing-status">status</div>
+						<div class="ms-2 mt-3 status" id="quotation-item-pricing-status"></div>
 					</div>
 				</div>
 

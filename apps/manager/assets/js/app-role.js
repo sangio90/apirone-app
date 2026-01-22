@@ -4,6 +4,7 @@ AP.role.fields = {
     rolesList: $( "#role-list-root" ),
     rolePermissions: $( "#role-permissions-modal" ),
     rolePermissionsForm: $( "#role-permissions-form" ),
+    roleDetailModal: $( "#role-detail-modal" ),
 };
 
 $( document ).ready( function(){
@@ -67,7 +68,7 @@ AP.role.detail = ( function() {
             } );
         },
 
-        save: function( event ) {
+        savePermissions: function( event ) {
             var thisForm = AP.role.fields.rolePermissionsForm;
             var status = thisForm.find( ".status" );
 
@@ -93,6 +94,16 @@ AP.role.detail = ( function() {
     } );
 
     pub.edit = function( role ) {
+        viewModel.set( "detailForm.title", "Modifica < " + role.name + " >" );
+
+        // viewModel.set( "detailForm.title", "Modifica permessi per < " + role.name + " >" );
+        // viewModel.set( "detailForm.data.id", role.id );
+        // viewModel.set( "detailForm.data.name", role.name );
+
+        NM.util.openModal( fields.roleDetailModal );
+    };
+
+    pub.editPermissions = function( role ) {
         viewModel.set( "detailForm", getDefaultDetailForm() );
 
         var entities = AP.page.entities.slice();
@@ -124,7 +135,7 @@ AP.role.detail = ( function() {
 AP.role.list = ( function() {
 
     var pub = {};
-    var rolePermissions = AP.role.detail;
+    var detailApp = AP.role.detail;
     var fields = AP.role.fields;
 
     var dataSources = {
@@ -133,9 +144,15 @@ AP.role.list = ( function() {
 
     var viewModel = kendo.observable( {
         rows: dataSources.items,
+        editPermissions: function( event ) {
+
+            detailApp.editPermissions( event.data );
+
+            return false;
+        },
         edit: function( event ) {
 
-            rolePermissions.edit( event.data );
+            detailApp.edit( event.data );
 
             return false;
         }

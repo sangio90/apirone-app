@@ -91,39 +91,4 @@ $( document ).ready( function(){
         ignore: [ ".ignore" ]
     } );
 
-    if( $( "#morrisBar" ).get( 0 ) ) {
-        Morris.Bar( {
-            resize: true,
-            element: "morrisBar",
-            data: morrisBarData,
-            xkey: "y",
-            ykeys: [ "a" ],
-            labels: [ "Mesi" ],
-            hideHover: true,
-            barColors: [ "#0088cc" ]
-        } );
-    }
-
-    if( $( "#morrisLine" ).get( 0 ) ) {
-        Morris.Line( {
-            resize: true,
-            element: "morrisLine",
-            data: morrisLineData,
-            xkey: "y",
-            ykeys: [ "a", "b" ],
-            labels: [ "Partner A", "Partner B" ],
-            hideHover: true,
-            lineColors: [ "#0088cc", "#734ba9" ],
-        } );
-    }
-
-    if( $( "#morrisDonut" ).get( 0 ) ) {
-        Morris.Donut( {
-            resize: true,
-            element: "morrisDonut",
-            data: morrisDonutData,
-            colors: [ "#0088cc", "#734ba9", "#E36159" ]
-        } );
-    }
-
 } );
