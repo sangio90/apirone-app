@@ -9,7 +9,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var item    = super.service( "SignageConfigItem" ).get( rc.id );
 		var signage = super.service( "SignageConfig" ).get( item.getSignageConfigId() );
 
-		var bundleId = signage.getCatalogBundle().getId()
+		var bundleId = signage.getCatalogBundle().getId();
 
 		// se l'id prodotto non è definito, setto il primo prodotto del bundle
 		if ( !Len( rc.productId ) ) {
@@ -20,7 +20,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			var redirectTo = "/manager/signages/rows-config-item/#rc.id#/product/#prc.product.getId()#";
 
 			cflocation( url = redirectTo, addToken = "false" );
-			abort;
 		} else {
 			prc.product = super.service( "Product" ).get( rc.productId );
 		}

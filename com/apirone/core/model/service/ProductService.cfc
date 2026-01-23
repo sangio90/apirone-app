@@ -395,7 +395,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setFinish( getFinishService().get( record.finish_id ) );
 			}
 
-			bean.setId( record.product_id );
+			bean.setId( record.product_id.toString() );
 			bean.setSerial( record.serial );
 			bean.setCreatedAt( record.created_at );
 			bean.setStatus( getStatusService().get( record.status_id ) );

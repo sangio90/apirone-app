@@ -208,10 +208,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var account = NullValue();
 
-		if ( record.RecordCount ) {
+		if ( record.recordCount ) {
 			var account = super.bean( "Account" );
 
-			account.setId( record.account_id );
+			account.setId( record.account_id.toString() );
 			account.setEmail( record.email );
 			account.setName( record.account );
 			account.setPwd( record.pwd );

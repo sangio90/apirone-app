@@ -115,17 +115,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	private com.apirone.core.model.bean.User function build( required String userId ){
 		var record = getDao().read( userId = arguments.userId );
 
-		if ( record.RecordCount ) {
+		if ( record.recordCount ) {
 			var user = super.bean( "User" );
 
 			user.setId( record.user_id );
 			user.setName( record.user_name );
 			user.setSerial( record.serial );
 			user.setPhone( record.phone );
-			//user.setApiKey( record.api_key );
 			user.setCreatedAt( record.created_at );
 			
-			user.setAccount( getAccountService().get( record.account_id ) );
+			user.setAccount( getAccountService().get( record.account_id.toString() ) );
 			user.setStatus( getStatusService().get( record.status_id ) );
 			user.setRole( getRoleService().get( record.role_id ) );
 			user.setLang( getLangService().get( record.lang_id ) );

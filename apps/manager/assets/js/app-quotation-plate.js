@@ -716,7 +716,7 @@ AP.plate.modal = ( function() {
 
                         // Recupera tutti i select con classe "select-item" e aggancia calculatePriceItem
                         var selects = $( "select.select-item" );
-                        console.log( "select:lenght", selects.length );
+                        // console.log( "select:lenght", selects.length );
 
                         $( "select.select-item" ).each( function() {
                             // console.log( "change.calculatePrice:before" );
@@ -799,7 +799,7 @@ AP.plate.modal = ( function() {
 
                             var thisImage = xhr.data[0].horizontalImage;
 
-                            console.log( "addProductItemsToFruit:xhr.data", xhr.data );
+                            // console.log( "addProductItemsToFruit:xhr.data", xhr.data );
 
                             // Overwrite the product image if the item image exists
                             if ( thisImage ) {
@@ -822,7 +822,7 @@ AP.plate.modal = ( function() {
                                 }
 
 
-                                console.log( "attribute:item", item );
+                                // console.log( "attribute:item", item );
 
                                 if ( attributeExisting ) {
 
@@ -857,7 +857,7 @@ AP.plate.modal = ( function() {
 
                             } );
 
-                            console.log( "fruitItems", fruitItems.data() );
+                            // console.log( "fruitItems", fruitItems.data() );
 
                             thisFruit.set( "items", fruitItems );
 
@@ -994,7 +994,7 @@ AP.plate.modal = ( function() {
                     const selectedId = $( this ).val();
                     const attributeId = $( this ).data( "attribute-id" );
 
-                    console.log( "changeFruitImage:values", item.values );
+                    // console.log( "changeFruitImage:values", item.values );
 
                     var value;
 
@@ -1124,7 +1124,7 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        console.log( "loadLines:lineId:done" );
+                        // console.log( "loadLines:lineId:done" );
 
                         viewModel.get( "lines" ).data( xhr.data );
                         NM.util.openModal( AP.plate.fields.modalRoot );
@@ -1232,7 +1232,7 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
 
-                        console.log( "loadFruits", xhr.data );
+                        // console.log( "loadFruits", xhr.data );
 
                         for ( var thisFruit of xhr.data ) {
 
@@ -1260,9 +1260,9 @@ AP.plate.modal = ( function() {
             viewModel.set( "currentFruit", newFruit );
             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
-            console.log( "pub.fruitsController", pub.fruitsController );
+            // console.log( "pub.fruitsController", pub.fruitsController );
 
-            console.log( "newFruit", newFruit );
+            // console.log( "newFruit", newFruit );
 
             pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
 
@@ -1281,14 +1281,7 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         viewModel.set( "isEditMode", false );
 
-        console.log( "plate:new" );
-
-        /*
-        if ( AP.getUserPref( "plate.lineId" ) ) {
-            viewModel.set( "detailForm.data.product.line.id", AP.getUserPref( "plate.lineId" ) );
-            $( "#plate-line" ).trigger( "change" );
-        }
-        */
+        // console.log( "plate:new" );
 
         viewModel.loadLines();
 

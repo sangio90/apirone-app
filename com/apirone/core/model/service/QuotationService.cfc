@@ -1049,7 +1049,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var calculatedAmount = 0;
 
-			bean.setId( record.quotation_id );
+			bean.setId( record.quotation_id.toString() );
 			bean.setSerial( record.serial );
 			bean.setName( record.quotation );
 			bean.setQuotationNumber( record.quotation_number );
@@ -1062,7 +1062,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setActive( record.active );
 			bean.setLang( getLangService().get( record.lang_id ) );
 			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
-			bean.setOwner( getUserService().get( record.owner_id ) );
+			bean.setOwner( getUserService().get( record.owner_id.toString() ) );
 			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 
 			//by a trigger from history
@@ -1098,7 +1098,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			*/
 
 			if ( !IsNull( record.opportunity_id ) ) {
-				bean.setOpportunity( getOpportunityService().get( record.opportunity_id ) );
+				bean.setOpportunity( getOpportunityService().get( record.opportunity_id.toString() ) );
 			}
 
 			if ( !IsNull( record.lead_id ) ) {
@@ -1109,8 +1109,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setVatCode( getVatCodeService().get( record.vat_code_id ) );
 			}
 
-			if (!isNull(record.sales_agent_account_id)) {
-				bean.setsalesAgent( getUserService().get( record.sales_agent_account_id ) );
+			if ( !IsNull( record.sales_agent_account_id ) ) {
+				bean.setSalesAgent( getUserService().get( record.sales_agent_account_id.toString() ) );
 			}
 
 			bean.setCalculatedAmount(

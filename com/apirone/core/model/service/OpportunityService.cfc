@@ -18,10 +18,13 @@
 
 		// Recupera da CRM e mappa
 		var crmData  = getCrmApiService().getOpportunity( opportunityId );
-		var opportunity = new com.apirone.core.model.bean.Opportunity();
+		var opportunity = super.bean("Opportunity");
+
 		if (!IsNull(crmData) && !isNull(crmData.data)) {
+			
 			crmData = crmData.data;
 			opportunity = getCrmMapper().mapOpportunity( crmData );
+			
 			cm.put( getCacheScope(), opportunityId, opportunity );
 		}
 

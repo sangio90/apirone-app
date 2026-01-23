@@ -42,7 +42,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public Array function list(){
+	public Array function list( String productId, Numeric originId ){
 		var result = [];
 		var rows   = [];
 

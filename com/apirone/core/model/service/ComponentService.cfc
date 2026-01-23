@@ -319,7 +319,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			// TODO: factory for all Component*
 			var bean   = super.bean( "Component" );
-			var kindId = "CP";
+		    var kindId = "CP";
+
+			if ( Len( record.signage_config_item_join_id ) AND Len( record.product_item_join_id ) ) {
+				bean = super.bean( "ComponentSignageItemProduct" );
+
+				bean.setProductItem( getProductItemService().get( record.product_item_join_id ) );
+				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_join_id ) );
+
+				kindId = "PS";
+			}
 
 			if ( Val( record.product_item_id ) ) {
 
