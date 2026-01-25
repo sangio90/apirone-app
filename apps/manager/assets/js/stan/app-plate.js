@@ -67,6 +67,10 @@ AP.plate.designer = ( function() {
             };
 
             for ( let row = 0; row < grid.length; row++ ) {
+                if( result.column != null ) {
+                    break;
+                }
+
                 for ( let column = 0; column < grid[row].length; column++ ) {
                     const cell = grid[row][column];
 
@@ -75,30 +79,52 @@ AP.plate.designer = ( function() {
                             const fruitWidth = Math.abs( fruitPosition.left - fruitPosition.right );
 
                             result.column = ( column - ( fruitWidth / FREE_CELL_WIDTH ) ) + 1;
+
+                            break;
                         }
                     } else if ( ( newPositionDirection & MOVE_DIRECTION.LEFT ) == MOVE_DIRECTION.LEFT ) {
                         if ( cell.left <= fruitPosition.left && fruitPosition.left <= cell.right ) {
                             result.column = column;
+
+                            break;
                         }
                     } else { // STILL
                         if ( cell.left <= fruitPosition.left && fruitPosition.left <= cell.right ) {
                             result.column = column;
+
+                            break;
                         }
                     }
+                }
+            }
+
+            for ( let row = 0; row < grid.length; row++ ) {
+                if( result.row != null ) {
+                    break;
+                }
+
+                for ( let column = 0; column < grid[row].length; column++ ) {
+                    const cell = grid[row][column];
 
                     if ( ( newPositionDirection & MOVE_DIRECTION.BOTTOM ) == MOVE_DIRECTION.BOTTOM ) {
                         if ( cell.top <= fruitPosition.bottom && fruitPosition.bottom <= cell.bottom ) {
                             const fruitHeight = Math.abs( fruitPosition.top - fruitPosition.bottom );
 
                             result.row = ( row - ( fruitHeight / FREE_CELL_HEIGHT ) ) + 1;
+
+                            break;
                         }
                     } else if ( ( newPositionDirection & MOVE_DIRECTION.TOP ) == MOVE_DIRECTION.TOP ) {
                         if ( cell.top <= fruitPosition.top && fruitPosition.top <= cell.bottom ) {
                             result.row = row;
+
+                            break;
                         }
                     } else { // STILL
                         if ( cell.top <= fruitPosition.top && fruitPosition.top <= cell.bottom ) {
                             result.row = row;
+
+                            break;
                         }
                     }
                 }
@@ -121,18 +147,15 @@ AP.plate.designer = ( function() {
             return result;
         },
         extractTopLeftPositionFrom( gridPosition ) {
-            const result = {
-                top: null,
-                left: null,
-            };
-
             const fruitsController = AP.plate.designer.fruitsController;
             const grid = fruitsController.plate.grid;
 
             const cell = grid[gridPosition.row][gridPosition.column];
 
-            result.top = cell.top;
-            result.left = cell.left;
+            const result = {
+                top: cell.top,
+                left: cell.left,
+            };
 
             return result;
         },
