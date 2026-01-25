@@ -413,8 +413,8 @@ AP.plate.designer = ( function() {
 
                     const cellPosition = $plateCell.position();
 
-                    cell.top = cellPosition.top;
-                    cell.left = cellPosition.left;
+                    cell.top = Math.round( cellPosition.top );
+                    cell.left = Math.round( cellPosition.left );
                 }
             }
         }
