@@ -617,7 +617,7 @@ h2 {
     background-color: #d2e0f5;
 }
 
-/* 
+/*
 	shorthands
 */
 
@@ -694,7 +694,7 @@ h2 {
     text-decoration: underline !important;
 }
 
-/* 
+/*
 	// shorthands
 */
 
@@ -887,12 +887,12 @@ h2 {
     line-height: 1.3;
 }
 
-#signage-preview-background {
+#quotation-signage-preview-background {
     background-repeat: no-repeat;
 }
 
 /*
-    price simulate log list 
+    price simulate log list
 */
 
 .price-container-list {
@@ -935,11 +935,11 @@ h2 {
 }
 
 /*
-    // price simulate log list 
+    // price simulate log list
 */
 
 /*
-    search widget 
+    search widget
 */
 .search-widget-input {
     width: 400px;
@@ -958,7 +958,7 @@ h2 {
 }
 
 /*
-    search widget 
+    search widget
 */
 
 .auto-clear-status {

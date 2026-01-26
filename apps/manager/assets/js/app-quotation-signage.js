@@ -523,12 +523,12 @@ AP.signage.modal = ( function() {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
                 $( "#signangeProductCategory" ).prop( "disabled", true );
                 if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
-                    $( "#signage-preview-background" ).css( {
+                    $( "#quotation-signage-preview-background" ).css( {
                         width: "500px",
                         height: "500px"
                     } );
                 } else {
-                    $( "#signage-preview-background" ).css( {
+                    $( "#quotation-signage-preview-background" ).css( {
                         width: "500px",
                         height: null
                     } );
@@ -1000,7 +1000,7 @@ AP.signage.modal = ( function() {
             }
             parsedData.quotationId = quotationId;
             parsedData.type = "signage";
-            var preview = $( "#signage-preview-background" )[0];
+            var preview = $( "#quotation-signage-preview-background" )[0];
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
