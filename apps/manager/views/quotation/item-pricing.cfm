@@ -4,14 +4,6 @@
 		<div class="row">
 
 			<div class="col-6">
-				<div class="mb-1">Quantità:</div>
-				<div>
-					<input class="form-control form-control-sm" name="position" 
-						placeholder="Posizione" data-bind="value: detailForm.data.quantity">
-				</div>
-			</div>
-
-			<div class="col-6">
 				<div class="mb-1">Speciale:</div>
 				<div>
 					<input class="form-check-input" type="checkbox"
@@ -52,7 +44,16 @@
 		</div>
 
 		<div>
-			<div class="pricing-box">
+			<div class="pricing-box" id="quotation-item-pricing-box">
+
+				<div class="row mb-2">
+					<div class="col-4 mt-2">Sconti</div>
+					<div class="col-8">
+						<input class="form-control form-control" name="position" 
+							placeholder="Posizione" data-bind="value: detailForm.data.quantity">
+					</div>
+				</div>
+				
 
 				<div class="row mb-2">
 					<div class="col-12">

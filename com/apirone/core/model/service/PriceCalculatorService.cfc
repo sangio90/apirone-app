@@ -1,4 +1,10 @@
-﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
+﻿/*
+	per signage:
+		AND product_item_join_id = <cfqueryparam value="#arguments.signageItemProduct.productItemId#" cfsqltype="Integer">
+		AND signage_config_item_join_id = <cfqueryparam value="#arguments.signageItemProduct.SignageConfigItemId#" cfsqltype="Integer">
+*/
+
+component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";

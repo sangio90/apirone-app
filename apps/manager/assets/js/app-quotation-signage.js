@@ -510,7 +510,7 @@ AP.signage.modal = ( function() {
                 url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ),
                 callback: {
                     done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona la Linea" } );
+                        xhr.data.unshift( { id: "", name: "-- Seleziona" } );
                         viewModel.get( "lines" ).data( xhr.data );
                     },
                 },
@@ -523,12 +523,12 @@ AP.signage.modal = ( function() {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
                 $( "#signangeProductCategory" ).prop( "disabled", true );
                 if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
-                    $( "#quotation-signage-preview-background" ).css( {
+                    $( "#signage-preview-background" ).css( {
                         width: "500px",
                         height: "500px"
                     } );
                 } else {
-                    $( "#quotation-signage-preview-background" ).css( {
+                    $( "#signage-preview-background" ).css( {
                         width: "500px",
                         height: null
                     } );
@@ -558,7 +558,7 @@ AP.signage.modal = ( function() {
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
                     callback: {
                         done: function( xhr ) {
-                            xhr.data.unshift( { id: "", name: "-- Seleziona la Finitura" } );
+                            xhr.data.unshift( { id: "", name: "-- Seleziona" } );
                             viewModel.get( "finishes" ).data( xhr.data );
                             NM.util.ajax( {
                                 method: "GET",
@@ -1000,7 +1000,7 @@ AP.signage.modal = ( function() {
             }
             parsedData.quotationId = quotationId;
             parsedData.type = "signage";
-            var preview = $( "#quotation-signage-preview-background" )[0];
+            var preview = $( "#signage-preview-background" )[0];
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
@@ -1172,7 +1172,7 @@ AP.signage.modal = ( function() {
             callback: {
                 done: function( xhr ) {
                     if ( xhr.data.length > 0 ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona la Categoria" } );
+                        xhr.data.unshift( { id: "", name: "-- seleziona" } );
                         viewModel.get( "categories" ).data( xhr.data );
                     }
                     NM.util.openModal( AP.signage.fields.modalRoot );
@@ -1185,18 +1185,23 @@ AP.signage.modal = ( function() {
         if ( AP.getUserPref( "signage.categoryId" ) ) {
             viewModel.set( "detailForm.data.signageConfig.catalogBundle.category.id", AP.getUserPref( "signage.categoryId" ) );
         }
+
         if ( AP.getUserPref( "signage.lineId" ) ) {
             viewModel.set( "detailForm.data.signageConfig.catalogBundle.line.id", AP.getUserPref( "signage.lineId" ) );
         }
+
         if ( AP.getUserPref( "signage.modelId" ) ) {
             viewModel.set( "detailForm.data.signageConfig.catalogBundle.model.id", AP.getUserPref( "signage.modelId" ) );
         }
+
         if ( AP.getUserPref( "signage.finishId" ) ) {
             viewModel.set( "detailForm.data.quotationItem.product.finish.id", AP.getUserPref( "signage.finishId" ) );
         }
+
         if ( AP.getUserPref( "signage.fontId" ) ) {
             viewModel.set( "detailForm.data.signageConfig.font.id", AP.getUserPref( "signage.fontId" ) );
         }
+
         if ( AP.getUserPref( "signage.signageConfigId" ) ) {
             viewModel.set( "detailForm.data.quotationItem.signageConfigItem.id", AP.getUserPref( "signage.signageConfigId" ) );
             viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", AP.getUserPref( "signage.signageConfigRowCount" ) );

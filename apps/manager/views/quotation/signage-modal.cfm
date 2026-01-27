@@ -1,13 +1,13 @@
 ﻿<cfoutput>
-    <div id="signage-modal" class="modal fade quotation-item-modal" tabindex="-1">
+    <div id="signage-modal" class="modal fade quotation-item-modal">
         
-        <section class="modal-dialog modalxl">
+        <section class="modal-dialog modal-xl">
             <div class="modal-content">
 
                 <form id="line-detail-form">
-                
-                    <header class="card-header d-flex justify-content-between">
-                        <h5 data-bind="text:detailForm.title"></h5>
+
+                    <header class="card-header d-flex align-elements-center justify-content-between">
+                        <h2 class="card-title" data-bind="text:detailForm.title"></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" data-bind="click:resetForm" aria-label="Chiudi"></button>
                     </header>                
                         
@@ -57,7 +57,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.model.id">    
+                            <div class="col-1" data-bind="visible: detailForm.data.signageConfig.catalogBundle.model.id">    
                                 <label class="col-sm-2 col-form-label text-start">Finitura</label>
                                 <div class="col-sm-10">
                                     <select id="signageFinish" 
@@ -96,23 +96,29 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-1 mb-3 flex justify-content-end">
+                                 <label class="col-sm-12 col-form-label text-start"></label>
+                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters, visible:visibleUpperClearButton">Reset</button>
+                            </div>
                         </div>
                         <div class="mb-3 mt-3 row" data-bind="visible:detailForm.data.quotationItem.signageConfigItem.id">
-                            <div class="col-3 mb-3">
+
+                            <!--- 
+                                albero
+                            --->
+                            <div class="col-2 mb-3">
                                 Albero
                             </div>
-                            <div class="col-5 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
+
+                            <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 <div class="flex justify-content-between">
                                     <span>Righe</span>
                                     <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageRow, enabled:detailForm.data.quotationItem.signageConfigItem.id">Aggiungi Riga</button>
                                 </div>
                             </div>
-                            <div class="col-3 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
+                            <div class="col-2 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
                                 <span>Anteprima</span>
-                            </div>
-                            <div class="col-1 mb-3 flex justify-content-end">
-                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci Configurazione</button>
                             </div>
                             <div class="col-3 mb-3">
                                 <div id="product-items" style="max-width: 100%"></div>

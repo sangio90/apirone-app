@@ -4,6 +4,15 @@
 <cfset art="LAV-INCISIONE1">    <!--- con varianti e colori  --->
 
 <cfquery name="j" datasource="verticale">
+    SELECT *
+    FROM codiva
+</cfquery>
+
+<cfdump var="#j#">
+
+<cfabort>
+
+<cfquery name="j" datasource="verticale">
     SELECT lisart, liscvr, liscol, lispre
     FROM azapi_listin
     WHERE lisart='SEMLASOTTOROLOG'

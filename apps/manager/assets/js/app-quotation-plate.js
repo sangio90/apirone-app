@@ -18,6 +18,10 @@ AP.plate.modal = ( function() {
     const gridModule = AP.plate.grid;
     const fields = AP.plate.fields;
 
+    function pricingApp() {
+        return AP.quotation.itemPricing;
+    }
+
     const {
         constants,
         orientation,
@@ -177,15 +181,7 @@ AP.plate.modal = ( function() {
                 id: "",
                 code: ""
             },
-            pricing: {
-                discount1: "",
-                discount2: "",
-                method: {
-                    id: "C" // calculated
-                },
-                lines: [],
-                total: 0,
-            },
+            pricing: {}, // set in pricing app
             product: {
                 id: "",
                 orientation: {
@@ -269,26 +265,7 @@ AP.plate.modal = ( function() {
 
     var updatePrice = function() {
 
-        var status = $( "#quotation-item-pricing-status" );
-        status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
-
-        var data = viewModel.get( "detailForm.data" );
-
-        NM.util.ajax( {
-            method: "POST",
-            url: "/manager/ajax/quotation-items/pricing",
-            data: JSON.stringify( data ),
-            callback: {
-                done: function( xhr ) {
-                    if ( xhr.data ) {
-
-                        status.html( "" );
-                        viewModel.set( "detailForm.data.pricing", xhr.data );
-
-                    }
-                }
-            }
-        } );
+        pricingApp().update();
 
     };
 
@@ -1193,6 +1170,7 @@ AP.plate.modal = ( function() {
             parsedData.quotationId = AP.page.quotation.id;
             parsedData.isClone = viewModel.get( "detailForm.isClone" );
             parsedData.type = "plate";
+            parsedData.pricing = pricingApp().getData();
 
             var preview = $( "#plate-background" )[0];
 
@@ -1280,6 +1258,8 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm", defaultDetailForm );
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         viewModel.set( "isEditMode", false );
+
+        pricingApp().init( "", undefined );
 
         // console.log( "plate:new" );
 

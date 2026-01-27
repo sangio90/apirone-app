@@ -2,6 +2,7 @@
 
 current_date_time="`date "+%Y-%m-%d %H:%M:%S"`";
 echo '-------------------------'
+echo 'CLOC COUNTER'
 echo $current_date_time;
 echo '-------------------------'
 

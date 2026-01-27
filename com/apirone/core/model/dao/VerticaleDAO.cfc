@@ -41,8 +41,6 @@
         <cfreturn q>
     </cffunction>
 
-  
-
     <cffunction name="listMockedVatCode" access="public" returntype="Query" output="false">
         <cfset var records = listMockedRawVatCode()>
         <cfset var q = QueryNew( "ivacod,ivades,ivaper,total", "Integer,Varchar,Decimal,Integer" )>
@@ -152,11 +150,12 @@
 
     <cffunction name="listMockedRawVatCode" access="private" returntype="Array" output="false">
         <cfreturn [
-            { ivacod="22", ivades="IVA 22%", ivaper="22.00" },
-            { ivacod="10", ivades="IVA 10%", ivaper="10.00" },
             { ivacod="4", ivades="IVA 4%", ivaper="4.00" },
             { ivacod="7", ivades="IVA 7%", ivaper="7.00" },
-            { ivacod="0", ivades="IVA 0%", ivaper="0.00" }
+            { ivacod="10", ivades="IVA 10%", ivaper="10.00" },
+            { ivacod="22", ivades="IVA 22%", ivaper="22.00" },
+            { ivacod="106", ivades="MNF 17% TRASPORTI PER RSM", ivaper="17.00" },
+            { ivacod="203", ivades="ESENTE RSM IVA 0%", ivaper="0.00" }
         ]>
     </cffunction>
 

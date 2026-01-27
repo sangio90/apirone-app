@@ -558,25 +558,21 @@ AP.quotation.detail = ( function() {
 
         addPlate: function() {
             plateApp().new();
-            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addSignage: function() {
             signageApp().new();
-            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addAccessory: function() {
             accessoryApp().new();
-            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addArticle: function() {
             articleApp().new();
-            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
@@ -702,7 +698,7 @@ AP.quotation.detail = ( function() {
     } );
 
     pub.showTotals = function( options ) {
-        AP.quotation.pricing.init( undefined, "general" );
+        AP.quotation.totalPricing.init();
     };
 
     pub.checkUrlHash = function() {

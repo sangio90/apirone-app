@@ -108,6 +108,9 @@
 
                             </div>
 
+                            <!--- 
+                                designer placca
+                            --->                            
                             <div class="col-8">
                                 <div id="plate-designer-header" class="mb-2 pb-2">
                                     <div class="row">
