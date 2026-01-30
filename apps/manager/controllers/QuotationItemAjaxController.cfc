@@ -681,12 +681,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		var bean = super.bean( "QuotationItemPrice" );
 
 		var lines = [];
-		var thisLines = data.pricing.keyExists("lines") ? data.pricing.lines : [];
+		var thisLines = data.price.keyExists("lines") ? data.price.lines : [];
 
-		bean.setAmount( data.pricing.total );
-		bean.setDiscount1( Len( data.pricing?.discount1 ) ? data.pricing?.discount1 : 0 );
-		bean.setDiscount2( Len( data.pricing?.discount2 ) ? data.pricing?.discount2 : 0 );
-		bean.setMethod( method.setId( data.pricing.method.id ) );
+		bean.setAmount( data.price.total );
+		bean.setDiscount1( Len( data.price?.discount1 ) ? data.price?.discount1 : 0 );
+		bean.setDiscount2( Len( data.price?.discount2 ) ? data.price?.discount2 : 0 );
+		bean.setMethod( method.setId( data.price.method.id ) );
 
 		for( var thisLine in thisLines ) {
 			var priceLine  = super.bean( "QuotationItemPriceLine" );
