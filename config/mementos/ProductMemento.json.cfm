@@ -71,6 +71,7 @@
 				"importantAttributes",
 				"prices",
 				"special$boolean",
+				"category.type.id",
 			]
 		},
 
