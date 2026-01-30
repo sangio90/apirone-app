@@ -1259,7 +1259,7 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         viewModel.set( "isEditMode", false );
 
-        pricingApp().init( "", "plate", undefined );
+        pricingApp().init( "", "signage", undefined );
 
         // console.log( "plate:new" );
 

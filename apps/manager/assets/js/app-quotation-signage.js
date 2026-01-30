@@ -1009,7 +1009,6 @@ AP.signage.modal = ( function() {
             parsedData.quotationId = quotationId;
             parsedData.type = "signage";
 
-
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;

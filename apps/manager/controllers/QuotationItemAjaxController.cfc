@@ -574,9 +574,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var json = DeserializeJSON( GetHTTPRequestData().content )
 
-		dump(json);
-		abort;
-
 		var price = getPricing( json );
 
 		var memy = super.getMementify();
