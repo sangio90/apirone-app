@@ -58,6 +58,7 @@
 
 		pricing.setTotalGoods( totalItems );
 		pricing.setVatCode( quotation.getVatCode() );
+		pricing.setCurrency( quotation.getCurrency() );
 
 		return pricing;
 

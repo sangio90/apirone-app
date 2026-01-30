@@ -20,7 +20,8 @@ module.exports = {
             "setTimeout": "readonly",
             "FileReader": "readonly",
             "html2canvas": "readonly",
-            "localStorage": "readonly"
+            "localStorage": "readonly",
+            "URLSearchParams": "readonly"
         }
     },
     files: [ "**/*.js" ],

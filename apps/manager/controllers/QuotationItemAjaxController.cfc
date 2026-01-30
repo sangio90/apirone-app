@@ -419,33 +419,27 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var beanFruits = [];
 
-		var id = json.id;
+		var id = json.item.id;
 
 		if ( Len( id ) ) {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
 
 		bean.setQuotation( super.fire( "Quotation.get", [ json.quotationId ] ) ); //TODO: move to QuotationId
-		bean.setQuantity( json.quantity );
-		bean.setStatus( status.setId( json.status.id ) );
-		bean.setSpecial( json.special );
+		bean.setQuantity( json.item.quantity );
+		bean.setStatus( status.setId( json.item.status.id ) );
+		bean.setSpecial( json.item.special );
 
-		//var price = populatePriceItem( json );
 		var pricing = getPricing( json );
-		//dump( pricing );
-		//abort;
+		
 		bean.setPrice( pricing );
-
-		//json.delete( "imageBase64" )
-		//dump( json );
-		//abort;
-
+		
 		var product = super.fire( "Product.search",
 				{
 					categoryId = 22,
-					lineId     = json.product.line.id,
-					modelId    = json.product.model.id,
-					finishId   = json.product.finish.id
+					lineId     = json.item.product.line.id,
+					modelId    = json.item.product.model.id,
+					finishId   = json.item.product.finish.id
 				}
 			).getData();
 
@@ -453,7 +447,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setProduct( product );
 
-		for ( var thisFruit in json.fruits._data ) {
+		for ( var thisFruit in json.item.fruits._data ) {
 			if ( IsNumeric( thisFruit.id ) ) {
 				// update
 				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
@@ -493,7 +487,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			super.fire( "quotationItemProductItem.delete", { "productItemId" = quotationItemProductItem.getId() } )
 		} );
 
-		var productItemsData = json.product.items._data;
+		var productItemsData = json.item.product.items._data;
 
 		productItemsData.each( function( productItemRow ){
 			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
@@ -580,6 +574,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var json = DeserializeJSON( GetHTTPRequestData().content )
 
+		dump(json);
+		abort;
+
 		var price = getPricing( json );
 
 		var memy = super.getMementify();
@@ -589,32 +586,31 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 
-
 	/*
 		private methods
 	*/
 
-	function getPricing( json ){
+	private com.apirone.core.model.bean.QuotationItemPrice function getPricing( required Struct data ){
 
 		//var result = super.getResult();
 		
-		var json = arguments.json
+		var json = arguments.data;
+
+		var pricing = super.bean( "QuotationItemPrice" );
+		var method  = super.bean( "PriceMethod" );
 
 		var calculator = super.service( "PriceCalculator" );
-		//var memy   = super.getMementify();
-
-		var method  = super.bean( "PriceMethod" );
-		var pricing = super.bean( "QuotationItemPrice" );
 
 		var lines = [];
 
+		pricing.setQuantity( Val( json.pricing.quantity ) ? json.pricing.quantity : 1 );
 		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
 		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
 		        
 		pricing.setMethod( method.setId( json.pricing.method.id ) );
 		
         if ( pricing.isFixed() ) {
-			pricing.setAmount( Val( json.pricing.total ) ? json.pricing.total : 0 );
+			pricing.setAmount( Val( json.total ) ? json.total : 0 );
 		} else {
 			pricing.setAmount( 0 );
 		}
@@ -625,7 +621,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var productItemsIds = [];
 
-		for ( var item in json.product.items._data ) {
+		//dump(json.data.product);
+		//abort;
+
+		var product = json.item.product;
+
+		for ( var item in product.items._data ) {
 			for ( var value in item.values ) {
 				if ( value.selected ) {
 					productItemsIds.add( value.productItemId );
@@ -633,16 +634,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		/*
-		dump( json.product.id );
-		dump( json.quantity );
-		dump( productItemsIds );
-		abort;
-		*/
-
 		var platePrice = calculator.calculate(
-			json.product.id,
-			json.quantity,
+			product.id,
+			json.pricing.quantity,
 			productItemsIds
 		);
 
@@ -658,7 +652,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			fruits price
 		*/
 
-		for ( var fruit in json.fruits._data ) {
+		for ( var fruit in json.item.fruits._data ) {
 			var fruitItemsIds = [];
 			
 			var line = super.bean( "QuotationItemPriceLine" );
@@ -765,8 +759,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			"type" = type
 		};
 
-		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# saveImage: #SerializeJSON( result )#");
-		
 		return result;
 
 	}

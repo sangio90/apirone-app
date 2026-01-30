@@ -10,7 +10,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productItemService" inject="ProductItemService";
 	property name="componentService" inject="ComponentService";
 	property name="metadataService" inject="MetadataService";
-	// property name="priceTypeService" inject="PriceTypeService";
+	property name="currencyService" inject="CurrencyService";
 
 	variables.logConfig = {};
 	variables.costs     = [];
@@ -27,8 +27,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Struct function simulate(
 		required String productId,
 		required Numeric quantity = 1,
-		Array producItemtIds
+		String currencyId="EUR",
+		Array producItemtIds,
 	){
+
+
 		if ( arguments.quantity LTE 0 ) {
 			Throw(
 				type    = "apirone.error.PriceCalculator.QuantityLessThenZero",
@@ -58,6 +61,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productSvc   = getProductService();
 		var componentSvc = getComponentService();
 		var metadataSvc  = getMetadataService();
+		var currencySvc  = getCurrencyService();
 
 		var productId      = arguments.productId;
 		var productItemIds = arguments.producItemtIds;
@@ -65,6 +69,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var product       = productSvc.get( productId );
 		var price         = product.getPrice( "PRICE" );
 		
+		var currency = currencySvc.get( arguments.currencyId );
+
 		//TODO: change this bullshit!
 		var settings = metadataSvc.list( typeId=107 );
 		var generalMarkup = settings[1].getValue();
@@ -87,7 +93,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		);
 
 		/*
-			fixed cost
+			1. fixed cost
 		*/
 
 		var fixedCost     = product.getPrice( "COST_FIXED" )?.getAmount() ?: 0;
@@ -101,7 +107,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 		/*
-			cost bundle
+			2. cost bundle (first link)
 		*/
 
 		var bundleCost = 0;
@@ -127,7 +133,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 		/*
-			cost base product
+			3. cost base product (second link)
 		*/
 
 		var productComponents = componentSvc.list( productId = productId, includeBaseAttributeComponents = true );
@@ -140,7 +146,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 		/*
-			cost items
+			cost items (tree)
 		*/
 
 		var attributePrice = product.getPrice( "PROD_ITEM_GEN" );
@@ -236,20 +242,38 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var finalPrice = ( ( bundleCost + productCost + totalCostItems + unitFixedCost ) + markup) * generalMarkup;
 
 			appendLog(
-				message    = "Prezzo finale fisso. ( ( bundle: #bundleCost# + prodotto: #productCost# + totale items: #totalCostItems# + costo fisso: #unitFixedCost# ) + markup: #markup#) * costo generale: #generalMarkup#;Prezzo finale: #formatExtended( finalPrice )#",
+				message    = "Prezzo finale fisso. ( ( bundle: #bundleCost# + prodotto: #productCost# + totale items: #totalCostItems# + costo fisso: #unitFixedCost# ) + markup: #markup#) * markup generale: #generalMarkup#;Prezzo finale: #formatExtended( finalPrice )#",
 				lineTypeId = "H"
 			);
 		} else {
 			var finalPrice = ( ( ( bundleCost + productCost ) * markup ) + totalCostItems + unitFixedCost ) * generalMarkup;
 
 			appendLog(
-				message    = "Prezzo finale. ( ( ( bundle: #bundleCost# + prodotto: #productCost# ) * markup: #markup# ) + totale items: #totalCostItems# + costo fisso: #unitFixedCost# ) * costo generale: #generalMarkup#;Prezzo finale: #formatExtended( finalPrice )#",
+				message    = "Prezzo finale. ( ( ( bundle: #bundleCost# + prodotto: #productCost# ) * markup: #markup# ) + totale items: #totalCostItems# + costo fisso: #unitFixedCost# ) * markup generale: #generalMarkup#;Prezzo finale: #formatExtended( finalPrice )#",
 				lineTypeId = "H"
 			);
 		}
 
+		if( currency.getId() != "EUR" ){
+			var targetCurrency = currencySvc.get( arguments.currencyId );
+			var exchangeRate   = currencySvc.getExchangeRate( "EUR", currency.getId() );
+
+			finalPrice = finalPrice * exchangeRate;
+			finalCost  = finalCost * exchangeRate;
+			// all values
+
+			appendLog(
+				message    = "Conversione valuta da #currency.getCode()# a #targetCurrency.getCode()#. Tasso di cambio: #exchangeRate#;Prezzo finale convertito: #formatExtended( finalPrice )#;Costo finale convertito: #formatExtended( finalCost )#",
+				lineTypeId = "H"
+			);
+
+		}
+
+		dump(currency);
+		abort;
+
 		var output = {
-			values = {
+			"values" = {
 				"finalCost"      = finalCost,
 				"bundleCost"     = bundleCost,
 				"productCost"    = productCost,
@@ -258,6 +282,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				"finalPrice"     = finalPrice,
 				"priceType"      = price
 			},
+			"currency" = currency,
 			"logFile" = variables.logConfig.filePath
 		};
 

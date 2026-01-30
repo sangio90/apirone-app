@@ -57,7 +57,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-1" data-bind="visible: detailForm.data.signageConfig.catalogBundle.model.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.model.id">    
                                 <label class="col-sm-2 col-form-label text-start">Finitura</label>
                                 <div class="col-sm-10">
                                     <select id="signageFinish" 
@@ -84,7 +84,7 @@
                                 </div>
                             </div>
                             <div class="col-1" data-bind="visible: detailForm.data.signageConfig.font.id">    
-                                <label class="col-sm-12 col-form-label text-start">Dimensione Font</label>
+                                <label class="col-sm-12 col-form-label text-start">Dimensione</label>
                                 <div class="col-sm-12">
                                     <select id="signageFontSize" 
                                         class="form-control"
@@ -96,59 +96,74 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-1 mb-3 flex justify-content-end">
-                                 <label class="col-sm-12 col-form-label text-start"></label>
-                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters, visible:visibleUpperClearButton">Reset</button>
+                        </div>
+
+                        <div class="mb-2 mt-2 row mb-2 pb-2 bb-1">
+                            <div class="col-12 text-end">
+                                <a class="underline hand" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci configurazione</a>
                             </div>
                         </div>
+
                         <div class="mb-3 mt-3 row" data-bind="visible:detailForm.data.quotationItem.signageConfigItem.id">
 
                             <!--- 
                                 albero
                             --->
                             <div class="col-2 mb-3">
-                                Albero
+                                <div id="product-items" style="max-width: 100%"></div>
                             </div>
 
                             <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
-                                <div class="flex justify-content-between">
-                                    <span>Righe</span>
+                                
+                                <div class="flex justify-content-between mb-3">
+                                    <span class="me-2">Righe</span>
                                     <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageRow, enabled:detailForm.data.quotationItem.signageConfigItem.id">Aggiungi Riga</button>
                                 </div>
+
+                                <div id="signage-rows-container" style="max-height: 600px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
+                                    <!--- qui dentro vanno gli items --->
+                                </div>
+
                             </div>
-                            <div class="col-2 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
+                            
+                            <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
                                 <span>Anteprima</span>
-                            </div>
-                            <div class="col-3 mb-3">
-                                <div id="product-items" style="max-width: 100%"></div>
-                            </div>
-                            <div id="signage-rows-container" class="col-5" style="max-height: 600px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
-                                <!--- qui dentro vanno gli items --->
-                            </div>
 
-                            <div id="quotation-signage-preview-background"
-                                class="col-3 d-flex justify-content-center align-items-center"
-                                data-bind="visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
-                                <div id="signage-preview-container"
-                                    class="d-flex flex-column justify-content-center"
-                                    data-template="signage-line-preview-row-tmpl"
-                                    data-bind="source: detailForm.data.quotationItem.signageRows">
-                                    <!-- qui dentro vanno gli items di preview -->
+                                <div id="quotation-signage-preview-background"
+                                    class="col-3 d-flex justify-content-center align-items-center"
+                                    data-bind="visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
+                                    <div id="signage-preview-container"
+                                        class="d-flex flex-column justify-content-center"
+                                        data-template="signage-line-preview-row-tmpl"
+                                        data-bind="source: detailForm.data.quotationItem.signageRows">
+                                        <!-- qui dentro vanno gli items di preview -->
+                                    </div>
                                 </div>
                             </div>
 
+                            <!--- 
+                                dettaglio riga / pricing 
+                            --->
+                            <div class="col-2">
+
+                                #view("quotation/item-pricing")#
+
+                            </div>
                         </div>
                     </div>
 
                     <footer class="card-footer">
                         <div class="row">
-                            <div class="col-md-12 float-end">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci configurazione</button>
+                            </div>
+
+                            <div class="col-md-6 float-end">
                                 <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save, enabled:canSave">
                                     <i class="fas fa-save"></i> Salva
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal" data-bind="click:resetForm">Chiudi</button>
-                                <button type="button" class="btn btn-primary btn-sm me-2 float-end" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci Configurazione</button>
                                 <div class="status errors-counter mt-1 float-end me-3"></div>
                             </div>
                         </div>

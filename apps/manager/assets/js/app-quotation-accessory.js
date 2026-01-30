@@ -678,6 +678,10 @@ AP.accessory.modal = ( function() {
         kendo.bind( AP.accessory.fields.modalRoot, viewModel );
     };
 
+    pub.getData = function() {
+        return viewModel.get( "detailForm.data" );
+    };
+
     renderQuotationItemTotals = function( quotationItemId ) {
         NM.util.ajax( {
             method: "GET",

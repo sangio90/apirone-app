@@ -37,27 +37,43 @@
 					</div>
 					<div class="row mt-3 mb-2 align-items-center d-flex">
 						<div class="col-4">Sconti</div>
-						<div class="col-4">
-							<input class="form-control text-end" name="discount1"
+						<div class="col-4 d-flex align-items-center">
+							<input class="form-control text-end me-1" name="discount1"
 								placeholder="%" data-bind="value: pricing.data.discount1">
+								<span>%</span>
 						</div>
-						<div class="col-4">
-							<input class="form-control text-end" name="discount2" 
+						<div class="col-4 d-flex align-items-center">
+							<input class="form-control text-end me-1" name="discount2" 
 								placeholder="%" data-bind="value: pricing.data.discount2">
+								<span>%</span>
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
-						<div class="col-8">Spese di trasporto</div>
-						<div class="col-4">
-							<input class="form-control text-end" name="shippingCost" 
+						<div class="col-8 mt-2">Spese di trasporto</div>
+						<div class="col-4 d-flex align-items-center">
+							<input class="form-control text-end me-1" name="shippingCost" 
 								placeholder="%" data-bind="value: pricing.data.shippingCost">
+								<span>&euro;</span>
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
-						<div class="col-8">Sconto incondizionato</div>
-						<div class="col-4">
-							<input class="form-control text-end" name="flatDiscount" 
+						<div class="col-8 mt-2">Subtotale</div>
+						<div class="col-4 text-end">
+							<span data-bind="text: pricing.data.subtotalBeforeFlat" data-format="0.00"></span> &euro;
+						</div>
+					</div>
+					<div class="row mt-3 mb-2">
+						<div class="col-8 mt-2">Sconto incondizionato</div>
+						<div class="col-4 d-flex align-items-center">
+							<input class="form-control text-end me-1" name="flatDiscount" 
 								placeholder="%" data-bind="value: pricing.data.flatDiscount">
+							<span>&euro;</span>
+						</div>
+					</div>
+					<div class="row mt-3 mb-2">
+						<div class="col-8">Imponibile</div>
+						<div class="col-4 text-end">
+							<span data-bind="text: pricing.data.taxable" data-format="0.00"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">

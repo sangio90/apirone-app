@@ -1,8 +1,6 @@
 AP.namespace( "quotation" );
 
 Object.assign( AP.quotation.fields, {
-    // boxPricing: $( "#quotation-totals" ),
-    // boxItemPricing: $( "#quotation-totals" ),
     boxItemPricing: $( "#quotation-item-pricing-box" ),
     boxTotalPricing: $( "#quotation-total-pricing-box" ),
 } );
@@ -26,9 +24,33 @@ AP.quotation.itemPricing = ( function() {
         }
     };
 
+    var getItem = function() {
+
+        var result = {};
+
+        var type = viewModel.get( "typeId" );
+
+        if ( type == "plate" ) {
+            result = AP.plate.modal.getItem();
+            // result = data.data; // plate
+        }
+
+        if ( type == "signage" ) {
+            result = AP.signage.modal.getItem();
+        }
+
+        if ( type == "accessory" ) {
+            result = AP.accessory.modal.getItem();
+        }
+
+        return result;
+
+    };
+
     var viewModel = kendo.observable( {
 
         pricing: defaultForm,
+        typeId: undefined, // plate, signage, accessory
 
         changeMethod: function( event ) {
 
@@ -52,23 +74,29 @@ AP.quotation.itemPricing = ( function() {
             var status = $( "#quotation-item-pricing-status" );
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
-            var data = viewModel.get( "detailForm.data" );
+            var payload = {};
+
+            payload.item    = getItem(); // from app
+            payload.pricing = viewModel.get( "pricing.data" );
+            payload.typeId  = viewModel.get( "typeId" );
 
             NM.util.ajax( {
                 method: "POST",
                 url: "/manager/ajax/quotation-items/pricing",
-                data: JSON.stringify( data ),
+                data: JSON.stringify( payload ),
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data ) {
 
                             status.html( "" );
-                            viewModel.set( "detailForm.data.pricing", xhr.data );
+                            viewModel.set( "pricing.data", xhr.data );
 
                         }
                     }
                 }
             } );
+
+            return false;
 
         },
 
@@ -80,9 +108,11 @@ AP.quotation.itemPricing = ( function() {
     	viewModel.update();
     };
 
-    pub.init = function( id, data ) { // type: item, quotation
+    pub.init = function( id, typeId, data ) { // type: plate, signage, accessory
 
-        kendo.bind( fields.boxPricingItem, viewModel );
+        kendo.bind( fields.boxItemPricing, viewModel );
+
+        viewModel.set( "typeId", typeId );
 
         if ( data ) {
             viewModel.set( "pricing", data );
@@ -90,16 +120,12 @@ AP.quotation.itemPricing = ( function() {
             viewModel.set( "pricing", defaultForm );
         }
 
-        // viewModel.set( "pricing.data.id", id );
-        // viewModel.set( "pricing.data.id", id );
-
-        // fields.boxPricing.show();
+        console.log( "qta", viewModel.get( "pricing.data.quantity" ) );
 
     };
 
     pub.getData = function( itemId ) {
 
-        // var model = getCurrentViewModel();
         return viewModel.get( "pricing" );
 
     };
@@ -124,11 +150,34 @@ AP.quotation.totalPricing = ( function() {
         var newSymbol = newStatus ? "▲" : "▼";
         viewModel.set( "detail.symbol", newSymbol );
 
-        AP.setUserPref( "quotation.pricing.isCollapsed", newStatus );
+        AP.setUserPref( "quotation.totalPricing.isBoxCollapsed", newStatus );
 
         return false;
 
     };
+
+    var fetchTotals = function( payload, method ) {
+
+        var status = $( "#quotation-totals-general-loading" );
+        status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
+
+        NM.util.ajax( {
+            method: method,
+            url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
+            data: JSON.stringify( payload ),
+            callback: {
+                done: function( xhr ) {
+
+                    status.html( "" );
+
+                    viewModel.set( "pricing.counters", xhr.data.counters );
+                    viewModel.set( "pricing.data", xhr.data.pricing );
+                }
+            }
+        } );
+
+    };
+
 
     var viewModel = kendo.observable( {
 
@@ -207,28 +256,12 @@ AP.quotation.totalPricing = ( function() {
         },
 
         updateTotals: function( event ) {
+            var pricing = viewModel.get( "pricing.data" );
+            fetchTotals( pricing, "POST" );
+        },
 
-            var status = $( "#quotation-totals-general-loading" );
-            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
-
-            var data = AP.plate.modal.getVM().detailForm;
-            data.data.pricing = viewModel.get( "pricing.data" );
-
-            NM.util.ajax( {
-                method: "POST",
-                url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
-                data: JSON.stringify( data.data ),
-                callback: {
-                    done: function( xhr ) {
-
-                        status.html( "" );
-
-                        viewModel.set( "pricing.counters", xhr.data.counters );
-                        viewModel.set( "pricing.data", xhr.data.pricing );
-                    }
-                }
-            } );
-
+        getTotals: function( event ) {
+            fetchTotals( undefined, "GET" );
         },
 
         collapseTotals: function() {
@@ -239,6 +272,10 @@ AP.quotation.totalPricing = ( function() {
 
     pub.updateTotals = function() {
     	viewModel.updateTotals();
+    };
+
+    pub.getTotals = function() {
+    	viewModel.getTotals();
     };
 
     pub.init = function() { // type: item, quotation

@@ -28,11 +28,13 @@
 				</div>
 			</div>
 
-			<div class="col-6">
-				<div class="mb-1">Posizione:</div>
-				<div>
-					<input class="form-control form-control-sm" name="position" 
-						placeholder="Posizione" data-bind="value: detailForm.data.position.code">
+			<div class="col-12">
+				<div class="row mb-2">
+					<div class="col-4 mt-2">Posizione:</div>
+					<div class="col-8">
+						<input class="form-control form-control-sm" name="position" 
+							placeholder="Posizione" data-bind="value: detailForm.data.position.code">
+					</div>
 				</div>
 			</div>
 
@@ -47,10 +49,10 @@
 			<div class="pricing-box" id="quotation-item-pricing-box">
 
 				<div class="row mb-2">
-					<div class="col-4 mt-2">Sconti</div>
+					<div class="col-4 mt-2">Quantità</div>
 					<div class="col-8">
-						<input class="form-control form-control" name="position" 
-							placeholder="Posizione" data-bind="value: detailForm.data.quantity">
+						<input class="form-control form-control" name="quantity" 
+							data-bind="value: pricing.data.quantity">
 					</div>
 				</div>
 				
@@ -58,7 +60,7 @@
 				<div class="row mb-2">
 					<div class="col-12">
 						<table style="width: 100%" class="quotation-table-item-prices-totals">
-							<tbody data-bind="source: detailForm.data.pricing.lines" 
+							<tbody data-bind="source: pricing.data.lines" 
 								data-template="quotation-pricing-totals-item-tmpl"></tbody>
 						</table>
 					</div>
@@ -68,11 +70,11 @@
 					<div class="col-4 mt-2">Sconti</div>
 					<div class="col-4">
 						<input class="form-control" name="discount1" 
-							placeholder="%" data-bind="value: detailForm.data.pricing.discount1">
+							placeholder="%" data-bind="value: pricing.data.discount1">
 					</div>
 					<div class="col-4">
 						<input class="form-control" name="discount2" 
-							placeholder="%" data-bind="value: detailForm.data.pricing.discount2">
+							placeholder="%" data-bind="value: pricing.data.discount2">
 					</div>
 				</div>
 
@@ -85,7 +87,7 @@
 				<div class="row mb-2">
 					<div class="col-5">
 						<select name="priceMethod" class="form-control" id="input-price-method"
-							data-bind="value: detailForm.data.pricing.method, events: { change: changeMethod }"
+							data-bind="value: pricing.data.method, events: { change: changeMethod }"
 							data-value-field="id"
 							data-text-field="name"
 							>
@@ -98,7 +100,7 @@
 							<input class="form-control text-end" name="total" id="input-item-total"
 								placeholder="Totale"
 								data-format="0.00"
-								data-bind="value: detailForm.data.pricing.total">
+								data-bind="value: pricing.data.total">
 							<span class="input-group-text">
 								<i class="fas fa-euro-sign"></i>
 							</span>
@@ -108,7 +110,7 @@
 
 				<div class="row mb-2 mt-2">
 					<div class="col-12 d-flex align-items-center">
-						#button(bind="click:updatePricing", size="sm", icon="sync", class="mt-3", label="Aggiorna prezzi")#
+						#button(bind="click:update", size="sm", icon="sync", class="mt-3", label="Aggiorna prezzi")#
 						<div class="ms-2 mt-3 status" id="quotation-item-pricing-status"></div>
 					</div>
 				</div>

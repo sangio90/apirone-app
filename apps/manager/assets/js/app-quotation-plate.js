@@ -32,7 +32,6 @@ AP.plate.modal = ( function() {
         FruitsController
     } = gridModule;
 
-
     var pub = {
         fruitsController: null,
     };
@@ -181,7 +180,6 @@ AP.plate.modal = ( function() {
                 id: "",
                 code: ""
             },
-            pricing: {}, // set in pricing app
             product: {
                 id: "",
                 orientation: {
@@ -272,7 +270,6 @@ AP.plate.modal = ( function() {
     var viewModel = new kendo.data.ObservableObject( {
 
         detailForm: defaultDetailForm,
-        // pricing: defaultPricingForm,
 
         lines: new kendo.data.DataSource(),
         models: new kendo.data.DataSource(),
@@ -1162,17 +1159,20 @@ AP.plate.modal = ( function() {
 
         save: function() {
 
-            const parsedData = viewModel.get( "detailForm.data" );
+            // const parsedData =
             var status = fields.modalRoot.find( ".save-status" );
+            var preview = $( "#plate-background" )[0];
 
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
+            var parsedData = {};
             parsedData.quotationId = AP.page.quotation.id;
-            parsedData.isClone = viewModel.get( "detailForm.isClone" );
-            parsedData.type = "plate";
-            parsedData.pricing = pricingApp().getData();
+            parsedData.isClone     = viewModel.get( "detailForm.isClone" );
+            parsedData.typeId      = "plate";
+            parsedData.pricing     = pricingApp().getData().data;
+            parsedData.item        = viewModel.get( "detailForm.data" );
 
-            var preview = $( "#plate-background" )[0];
+            console.log( "parsedData.pricing", parsedData.pricing );
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
@@ -1259,7 +1259,7 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         viewModel.set( "isEditMode", false );
 
-        pricingApp().init( "", undefined );
+        pricingApp().init( "", "plate", undefined );
 
         // console.log( "plate:new" );
 
@@ -1402,8 +1402,8 @@ AP.plate.modal = ( function() {
         kendo.bind( settings.container, viewModel );
     };
 
-    pub.getVM = function() {
-        return viewModel;
+    pub.getItem = function() {
+        return viewModel.get( "detailForm.data" );
     };
 
     return pub;
