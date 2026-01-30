@@ -136,8 +136,10 @@ AP.product.items = ( function() {
         images: undefined,
         currentImageEntity: undefined,
         currentUploadUrl: undefined,
+        simulationSignageConfigItem: null,
         product: AP.page.product,
         statuses: AP.page.statuses,
+        fontSizeOptions: AP.page.fontSizeOptions,
         unlinkedCount: 0,
 
         cloneForm: {
@@ -242,11 +244,27 @@ AP.product.items = ( function() {
             }
 
             var quantity = $( "#product-simulate-quantity" ).val();
+            var lettersQuantity = 0;
+
+            var url = "/manager/ajax/products/" + AP.page.productId + "/price/simulate"
+            var data = { itemIds: ids, quantity: quantity, currencyId: "EUR" }
+
+            if (AP.page.product.category.type.id == "SEG") {
+                lettersQuantity = $( "#product-simulate-letters-quantity" ).val();
+                if ((viewModel.get("simulationSignageConfigItem") == null || viewModel.get("simulationSignageConfigItem") == "null")) {
+                    AP.widget.notify( "warning", "Seleziona Font Family / Altezza per la simulazione del prezzo di una segnaletica." );
+                    $( "#product-simulate-loading" ).html( "" );
+                    return false;
+                }
+                url = "/manager/ajax/products/" + AP.page.productId + "/price/simulate-signage"
+                data.simulationSignageConfigItemId = viewModel.get("simulationSignageConfigItem");
+                data.lettersQuantity = lettersQuantity;
+            }
 
             NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax/products/" + AP.page.productId + "/price/simulate",
-                data: { itemIds: ids, quantity: quantity }, // the selected items
+                url: url,
+                data: data,
                 callback: {
                     done: function( xhr ) {
                         $( "#product-simulate-loading" ).html( "" );
@@ -737,6 +755,7 @@ AP.product.items = ( function() {
         */
 
         kendo.bind( fields.rootDetail, viewModel );
+        viewModel.set("simulationSignageConfigItem", "null");
 
         fields.detailForm.validate( {
             onfocusout: function( element ) {
