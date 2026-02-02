@@ -297,7 +297,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setNote( json.quotationItem.note );
 		bean.setStatus( status.setId( json.quotationItem.status.id ) );
 
-		var pricing = getPricing( json );
+		var pricing = getSignagePricing( json );
 
 		var price = populatePriceItem( json );
 		bean.setPrice( price );
@@ -617,30 +617,27 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var lines = [];
 
-		pricing.setQuantity( Val( json.pricing.quantity ) ? json.pricing.quantity : 1 );
-		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
-		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
+		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
+		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
 		        
-		pricing.setMethod( method.setId( json.pricing.method.id ) );
+		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
 		
         if ( pricing.isFixed() ) {
-			pricing.setAmount( Val( json.total ) ? json.total : 0 );
+			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
 		} else {
 			pricing.setAmount( 0 );
 		}
 
 		/*
-			plate price
+			signage price
 		*/
 
 		var productItemsIds = [];
 
-		//dump(json.data.product);
-		//abort;
-
 		var product = json.item.product;
 
-		for ( var item in product.items._data ) {
+		for ( var item in json.quotationItem.product.items._data ) {
 			for ( var value in item.values ) {
 				if ( value.selected ) {
 					productItemsIds.add( value.productItemId );
@@ -648,16 +645,16 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		var platePrice = calculator.calculate(
+		var signagePrice = calculator.calculate(
 			product.id,
-			json.pricing.quantity,
+			json.quotationItem.quantity,
 			productItemsIds
 		);
 
 		var line = super.bean( "QuotationItemPriceLine" );
 
-		line.setName( "Prezzo placca" );
-		line.setAmount( platePrice );
+		line.setName( "Prezzo segnaletica" );
+		line.setAmount( signagePrice );
 
 		lines.add( line );
 

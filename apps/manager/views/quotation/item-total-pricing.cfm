@@ -1,14 +1,5 @@
 ﻿<cfoutput>
 <div class="pricing-box" id="#args.id#">
-
-	<div class="row mb-2">
-		<div class="col-4 mt-2">Quantità</div>
-		<div class="col-8">
-			<input class="form-control form-control" name="quantity" 
-				data-bind="value: pricing.data.quantity">
-		</div>
-	</div>
-
 	<div class="row mb-2">
 		<div class="col-12">
 			<table style="width: 100%" class="quotation-table-item-prices-totals">

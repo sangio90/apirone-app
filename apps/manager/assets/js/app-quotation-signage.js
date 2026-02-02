@@ -21,10 +21,6 @@ AP.signage.modal = ( function() {
     var defaultDetailForm = {
         data: {
             id: "",
-            special: false,
-            status: {
-                id: "ACT",
-            },
             quotationItem: {
                 id: "",
                 quantity: 1,
@@ -42,6 +38,12 @@ AP.signage.modal = ( function() {
                     id: "",
                 },
                 signageRows: new kendo.data.DataSource(),
+                special: false,
+                status: {
+                    id: "ACT",
+                    name: "Attivo"
+                },
+                note: "",
             },
             signageConfig: {
                 catalogBundle: {
@@ -61,6 +63,7 @@ AP.signage.modal = ( function() {
             },
         },
         statuses: AP.page.statuses,
+        itemStatuses: AP.page.itemStatuses,
         title: "Carica segnaletica",
         canSave: false,
     };
@@ -775,7 +778,7 @@ AP.signage.modal = ( function() {
                     }
                 }
             } ).then( async function() {
-                // Se ci sono quotation items pre-selezionati, li carichiamo
+                // Se ci sono product items pre-selezionati, li carichiamo
                 if ( quotationItemId != "" ) {
                     await NM.util.ajax( {
                         method: "GET",
@@ -842,7 +845,6 @@ AP.signage.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.data.length > 0 ) {
-                                let attribute = null;
                                 let toInsert = false;
                                 let parentIndex = -1;
 
@@ -861,19 +863,6 @@ AP.signage.modal = ( function() {
                                     }
                                 }
 
-                                // Creo nuovo attributo se necessario
-                                if ( !attribute ) {
-                                    attribute = {
-                                        attribute_id: xhr.data[0].attribute.id,
-                                        attribute_name: xhr.data[0].attribute.name,
-                                        parent_attribute_id: attributeId,
-                                        parent_item_id: originId,
-                                        level: attributeArray[parentIndex].level + 1,
-                                        values: []
-                                    };
-                                    toInsert = true;
-                                }
-
                                 // Imposto selected sul parent
                                 if ( parentIndex !== -1 ) {
                                     const parent = productItems.at( parentIndex );
@@ -882,19 +871,32 @@ AP.signage.modal = ( function() {
                                     } );
                                 }
 
+                                var lastAttributeId = null;
+                                let attributes = [];
+                                let attribute;
                                 // Popolo i valori del nuovo attributo
                                 xhr.data.forEach( function( item ) {
+                                    if (lastAttributeId == null || lastAttributeId != item.attribute.id) {
+                                        attribute = {
+                                            attribute_id: item.attribute.id,
+                                            attribute_name: item.attribute.name,
+                                            parent_attribute_id: attributeId,
+                                            parent_item_id: originId,
+                                            level: attributeArray[parentIndex].level + 1,
+                                            values: []
+                                        };
+                                        attributes.push( attribute );
+                                    }
                                     attribute.values.push( {
                                         attributeValue: item.attributeValue,
                                         product_item_id: item.id,
                                         selected: false
                                     } );
+                                    lastAttributeId = item.attribute.id;
                                 } );
-
-                                // Inserisco attributo se nuovo
-                                if ( toInsert ) {
-                                    productItems.insert( parentIndex + 1, attribute );
-                                }
+                                for ( let i = 0; i < attributes.length; i++ ) {
+                                    productItems.insert( parentIndex + 1, attributes[i] );
+                                }    
                             } else {
                                 // Se non ci sono figli, setto selected sul parent
                                 let parentIndex = -1;
@@ -1018,7 +1020,7 @@ AP.signage.modal = ( function() {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
                 parsedData.price = pricingApp().getData().data;
-
+                
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotation-items/signage",
@@ -1176,7 +1178,7 @@ AP.signage.modal = ( function() {
 
         console.log( "new" );
 
-        pricingApp().init( "plate", undefined );
+        pricingApp().init( "signage", undefined );
 
         NM.util.ajax( {
             method: "GET",
@@ -1328,10 +1330,11 @@ AP.signage.modal = ( function() {
                             }, 200 );
                         }, 200 );
                     }, 200 );
+
+                    pricingApp().init( "signage", { data: xhr.data.quotationItem.price } );
                 },
             },
         } );
-
     };
 
     pub.init = function() {

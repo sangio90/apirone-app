@@ -17,7 +17,7 @@
 							<label class="col-3 control-label text-sm-end pt-2">Servizio</label>
 							<div class="col-9">
 								<select name="newStatus" class="form-control"
-									data-bind="source: statuses, events: { change: showDocumentRequired }, value: detailForm.data.newStatus"
+									data-bind="source: articles, events: { change: showDocumentRequired }, value: detailForm.data.newStatus"
 									data-value-field="id"
 									data-text-field="name"
 								>
@@ -45,6 +45,14 @@
 							</div>
 						</div>
 
+						<div class="form-group row pb-3">
+							<label class="col-sm-3 control-label text-sm-end pt-2">Descrizione</label>
+                            <div class="col-sm-9">
+								<div class="input-group">
+									<textarea name="note" class="form-control" data-bind="value: detailForm.data.note" rows="4"></textarea>
+								</div>
+                            </div>
+						</div>
 					</div>
 
 					<footer class="card-footer">    

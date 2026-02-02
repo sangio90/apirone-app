@@ -15,7 +15,10 @@
                 "product.finish",
                 "quotationZone",
                 "signageRows",
-                "signageConfigItem"
+                "signageConfigItem",
+                "special",
+                "status",
+                "note",
             ]
         }
     }

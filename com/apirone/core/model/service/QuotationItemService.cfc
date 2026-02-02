@@ -7,6 +7,8 @@
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductService" inject="ProductService";
+	property name="StatusService" inject="StatusService";
+	property name="ArticleService" inject="ArticleService";
 	property name="ProductHashService" inject="ProductHashService";
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="FileService" inject="FileService";
@@ -204,6 +206,14 @@
 
 			if ( Len( record.product_id ) ) {
 				bean.setProduct( getProductService().get( record.product_id ) );
+			}
+
+			if ( Len( record.status_id ) ) {
+				bean.setStatus( getStatusService().get( record.status_id ) );
+			}
+
+			if ( Len( record.article_id ) ) {
+				bean.setArticle( getArticleService().get( record.article_id ) );
 			}
 			
 			bean.setQuotationZone(

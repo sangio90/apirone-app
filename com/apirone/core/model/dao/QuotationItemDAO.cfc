@@ -34,6 +34,9 @@
 				
 				<cfif !IsNull( arguments.typeId )>
 					INNER JOIN products ON quotation_items.product_id = products.product_id
+					<cfif arguments.typeId EQ "ART">
+						INNER JOIN articles ON quotation_items.article_id = articles.article_id
+					</cfif>
 					INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
 					INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
 				</cfif>
@@ -48,7 +51,11 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.typeId )>
-					AND product_categories.product_category_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.typeId#">
+					<cfif arguments.typeId EQ "ART">
+						AND quotation_items.article_id IS NOT NULL
+					<cfelse>
+						AND product_categories.product_category_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.typeId#">
+					</cfif>
 				</cfif>
 			ORDER BY
 				quotation_items.#super.sanitizeSQL( arguments.orderBy )#
@@ -74,6 +81,7 @@
 				quotation_id,
 				quotation_zone_id,
 				product_id,
+				article_id,
 				<!---
 				discount1,
 				discount2,
@@ -102,6 +110,11 @@
 				</cfif>
 				<cfif NOT IsNull( arguments.quotationItem.getProduct() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getProduct().getId()#">::uuid,
+				<cfelse>
+					NULL,
+				</cfif>
+				<cfif NOT IsNull( arguments.quotationItem.getArticle() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getArticle().getId()#">::uuid,
 				<cfelse>
 					NULL,
 				</cfif>
@@ -149,6 +162,12 @@
 				product_id =
 					<cfif NOT IsNull( arguments.quotationItem.getProduct() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getProduct().getId()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>,
+				article_id =
+					<cfif NOT IsNull( arguments.quotationItem.getArticle() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getArticle().getId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>,

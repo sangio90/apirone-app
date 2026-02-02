@@ -17,13 +17,10 @@
 				<div class="mb-1">Stato:</div>
 				<div>
 					<select name="status" class="form-control form-control-sm" id="input-price-status"
-						data-bind="value: detailForm.data.quotationItem.status"
+						data-bind="source: detailForm.itemStatuses, value: detailForm.data.quotationItem.status"
 						data-value-field="id"
 						data-text-field="name"
 						>
-						<option value="ACT" SELECTED>Attivo</option>
-						<option value="BLK">Bloccato</option>
-						<option value="IGN">Ignora</option>
 					</select>
 				</div>
 			</div>

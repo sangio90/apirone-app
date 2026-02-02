@@ -21,9 +21,11 @@ AP.article.modal = ( function() {
             article: {
                 id: "",
                 price: 0,
+                note: "",
             },
             quantity: 1
         },
+        articles: [],
         title: "Carica servizio",
     };
 
@@ -95,6 +97,33 @@ AP.article.modal = ( function() {
 
     pub.init = function() {
         kendo.bind( fields.articleModalRoot, viewModel );
+        AP.loading.show();
+        
+        NM.util.ajax( {
+            method: "GET",
+            url: "/manager/ajax/articles/",
+            callback: {
+                done: function( xhr ) {
+                    if( xhr.status == "INVALID" ) {
+                        AP.loading.hide();
+                        NM.form.showMessages( xhr.data );
+                        return;
+                    }
+
+                    if ( xhr.data.success == false ) {
+                        AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante la lettura dei servizi." );
+                        AP.loading.hide();
+                        return;
+                    }
+                    if (xhr.data && xhr.data.length > 0) {
+                        viewModel.set( "articles", xhr.data );
+                    }
+                    AP.loading.hide();
+                }
+            }
+        } );
+
+        
     };
 
     return pub;

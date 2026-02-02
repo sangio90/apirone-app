@@ -1,12 +1,12 @@
 <cfprocessingdirective pageEncoding="UTF-8">
 
 <nmscript type="text/x-kendo-template" id="quotation-item-article-preview-tmpl">
-    <div class="quotation-item m-1 col-3" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editAccessory">
+    <div class="quotation-item m-1 col-3" data-uid="#: uid #" style="cursor: pointer" data-bind="click:editArticle">
         <div class="quotation-item-inner">
             <div class="row">
                 <div class="col-12 d-flex justify-content-center mb-2" style="font-size: 14px; font-weight: bold;">
                     <div>
-                        Accessorio
+                        Servizio
                     </div>
                     <div class="ms-2 d-flex justify-content-center p-1" style="border: 1px solid red; height: 25px; width: 25px; border-radius: 5px" data-bind="click:delete" data-id="#: id#">
                         <i class="fas fa-trash" style="color: red; cursor: pointer"></i>
