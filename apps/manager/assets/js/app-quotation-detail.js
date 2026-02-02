@@ -820,8 +820,8 @@ AP.quotation.detail = ( function() {
 
         // Se non c'è nessun tab nell'URL, carica il tab delle placche di default
         var urlParams = new URLSearchParams( window.location.search );
-        
-        if (!urlParams.get("tab")) {
+
+        if ( !urlParams.get( "tab" ) ) {
             $( "body" ).find( "button#nav-plate-tab" ).click();
         }
 

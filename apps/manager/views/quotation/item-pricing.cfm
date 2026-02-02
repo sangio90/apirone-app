@@ -45,8 +45,10 @@
 
 		</div>
 
+		<cffile action="append" file="#ExpandPath('/debug.log')#" output="#SerializeJSON(args)#">
+
 		<div>
-			<div class="pricing-box" id="quotation-item-pricing-box">
+			<div class="pricing-box" id="#args.id#">
 
 				<div class="row mb-2">
 					<div class="col-4 mt-2">Quantità</div>
@@ -55,7 +57,6 @@
 							data-bind="value: pricing.data.quantity">
 					</div>
 				</div>
-				
 
 				<div class="row mb-2">
 					<div class="col-12">

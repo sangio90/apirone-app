@@ -43,8 +43,8 @@ AP.plate.modal = ( function() {
     var mapFruitForPlate = function( data ) {
 
         var fruit = {
-            id: data.id,
-            fruitId: data.fruit.id,
+            id: data.id, // ID univoco dell'istanza generato da createFruit()
+            fruitId: data.fruitId, // ID del prodotto frutto originale
             width: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].width * data.fruit.positionCount,
             height: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].height,
             columnSpan: data.fruit.positionCount,
@@ -61,11 +61,12 @@ AP.plate.modal = ( function() {
     var createFruit = function( data ) {
         // QuotationItemFruis
         // data: { position: 1, fruit: { id: "", name: "" }, items: [] }
-        if ( !data.id ) {
-            data.id = NM.util.uuid();
-        }
 
         var fruit = data;
+
+        // Genera ID univoco per questa istanza
+        fruit.id = NM.util.uuid();
+        fruit.fruitId = data.fruit.id; // ID del prodotto frutto originale
 
         fruit.items = new kendo.data.DataSource( {
             data: [],
@@ -120,6 +121,7 @@ AP.plate.modal = ( function() {
                     constants.GRID_CELL_DIMENSIONS[cellType].height,
                     plate.cellOrientation.id,
                     cellType,
+                    cellData.id
                 );
 
                 row.push( cell );
@@ -1159,6 +1161,17 @@ AP.plate.modal = ( function() {
 
         save: function() {
 
+            console.log( "save:pub.fruitsController", pub.fruitsController.fruits );
+            console.log( "save:detailForm.data.fruits", viewModel.get( "detailForm.data.fruits" ).data() );
+
+            // Crea una mappa { id: cellIds } per ogni frutto
+            var positions = {};
+            pub.fruitsController.fruits.forEach( function( fruit ) {
+                positions[ fruit.id ] = fruit.cellIds;
+            } );
+
+            console.log( "save:positions", positions );
+
             // const parsedData =
             var status = fields.modalRoot.find( ".save-status" );
             var preview = $( "#plate-background" )[0];
@@ -1171,6 +1184,7 @@ AP.plate.modal = ( function() {
             parsedData.typeId      = "plate";
             parsedData.pricing     = pricingApp().getData().data;
             parsedData.item        = viewModel.get( "detailForm.data" );
+            parsedData.positions   = positions;
 
             console.log( "parsedData.pricing", parsedData.pricing );
 
@@ -1259,7 +1273,7 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         viewModel.set( "isEditMode", false );
 
-        pricingApp().init( "", "signage", undefined );
+        pricingApp().init( "plate", undefined );
 
         // console.log( "plate:new" );
 
@@ -1400,6 +1414,23 @@ AP.plate.modal = ( function() {
         initFruitsSuggest();
 
         kendo.bind( settings.container, viewModel );
+
+        // document.getElementById( "contact" ).classList.add( "active" );
+
+        // TODO: Attiva il primo tab ogni volta che
+        // la modale viene aperta. Bisognerebbe capire perchè
+        settings.container.on( "shown.bs.modal", function() {
+            setTimeout( function() {
+
+                // Forza l'attivazione del primo tab manipolando direttamente le classi
+                $( "#plate-product-items-tab" ).addClass( "show active" );
+                $( "#plate-fruit-product-items-tab" ).removeClass( "show active" );
+
+                $( "#plate-product-items-but" ).addClass( "active" );
+                $( "#plate-fruit-product-items-but" ).removeClass( "active" );
+            }, 50 );
+        } );
+
     };
 
     pub.getItem = function() {

@@ -13,7 +13,7 @@
                         
                     <div class="card-body">
 
-                        <div class="mb-3 row">
+                        <div class="mb-2 row">
                             <div class="col-1">    
                                 <label class="col-sm-12 col-form-label text-start">Quantità</label>
                                 <input class="form-control" type="number" data-bind="value: detailForm.data.quotationItem.quantity" min="1">
@@ -98,7 +98,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-2 mt-2 row mb-2 pb-2 bb-1">
+                        <div class="row mb-2 pb-2 bb-1">
                             <div class="col-12 text-end">
                                 <a class="underline hand" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci configurazione</a>
                             </div>
@@ -146,9 +146,7 @@
                                 dettaglio riga / pricing 
                             --->
                             <div class="col-2">
-
-                                #view("quotation/item-pricing")#
-
+                                #view(view="quotation/item-pricing", args={id="signage-quotation-item-pricing-box"})#
                             </div>
                         </div>
                     </div>

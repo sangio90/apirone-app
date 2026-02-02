@@ -118,6 +118,7 @@
 
 			price.setQuotationItemId( newId );
 			var id = getQuotationItemPriceService().create( price );
+			//var id = getQuotationItemPriceService().create( price );
 
 
 			var hash = getProductHashService().createHash( newId );

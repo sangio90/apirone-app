@@ -1,7 +1,7 @@
 AP.namespace( "quotation" );
 
 Object.assign( AP.quotation.fields, {
-    boxItemPricing: $( "#quotation-item-pricing-box" ),
+    /* boxItemPricing: $( "#quotation-item-pricing-box" ), */
     boxTotalPricing: $( "#quotation-total-pricing-box" ),
 } );
 
@@ -71,6 +71,8 @@ AP.quotation.itemPricing = ( function() {
 
         update: function( event ) {
 
+            console.log( "pricing:update" );
+
             var status = $( "#quotation-item-pricing-status" );
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
 
@@ -108,9 +110,15 @@ AP.quotation.itemPricing = ( function() {
     	viewModel.update();
     };
 
-    pub.init = function( id, typeId, data ) { // type: plate, signage, accessory
+    pub.init = function( typeId, data ) { // type: plate, signage, accessory
 
-        kendo.bind( fields.boxItemPricing, viewModel );
+        var elementId = $( "#" + typeId + "-quotation-item-pricing-box" );
+
+        console.log( "elementId", elementId );
+
+        console.log( "fields.boxItemPricing", fields.boxItemPricing );
+
+        kendo.bind( elementId, viewModel );
 
         viewModel.set( "typeId", typeId );
 

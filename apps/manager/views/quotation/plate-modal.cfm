@@ -64,7 +64,7 @@
                                 <nav>
 
                                     <ul class="nav nav-tabs" role="tablist" id="quotation-plate-product-items-tabs">
-                                        <li class="nav-item active">
+                                        <li class="nav-item show active">
                                             <a class="nav-link active" id="plate-product-items-but" data-bs-toggle="tab" 
                                                 href="##plate-product-items-tab" role="tab" aria-controls="tab1" aria-selected="true">
                                                 Placca
@@ -84,7 +84,7 @@
 
                                     <!--- plate ---->
                                     <div class="tab-pane fade show active" id="plate-product-items-tab" role="tabpanel" aria-labelledby="plate-product-items-but">
-                                        <div data-bind="visible: detailForm.data.product.id" class="text-end mb-2">
+                                        <div class="text-end mb-2">
                                             <a href="##" data-bind="click: goToProduct" target="_blank">Vai al prodotto</a>
                                         </div>
 								        <div id="quotation-plate-product-items" style="max-width: 100%">
@@ -93,7 +93,7 @@
                                     </div>
 
                                     <!--- fruits ---->
-                                    <div class="tab-pane fade" id="plate-fruit-product-items-tab" role="tabpanel" aria-labelledby="plate-fruit-product-items-but">
+                                    <div class="tab-pane" id="plate-fruit-product-items-tab" role="tabpanel" aria-labelledby="plate-fruit-product-items-but">
                                         <div class="text-end"><a href="##" data-bind="click:toggleFruits, text:toggleFruitsLabel" class="hand"></a></div>
 								        <div id="quotation-plate-fruits-product-items" style="max-width: 100%">
                                             <div data-template="quotation-fruit-row-tmpl" data-bind="source: detailForm.data.fruits">
@@ -149,9 +149,7 @@
                                 dettaglio riga / pricing 
                             --->
                             <div class="col-2">
-
-                                #view("quotation/item-pricing")#
-
+                                #view(view="quotation/item-pricing", args={id="plate-quotation-item-pricing-box"})#
                             </div>
                         </div>
 

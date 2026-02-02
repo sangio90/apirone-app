@@ -719,6 +719,10 @@ AP.signage.modal = ( function() {
                 url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
                     done: function( xhr ) {
+
+                        console.log( "firstLoadProductItems:productId", productId );
+                        console.log( "firstLoadProductItems:xhr", xhr.data );
+
                         if ( xhr.data.length > 0 ) {
                             if ( quotationItemId != "" ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
@@ -964,13 +968,13 @@ AP.signage.modal = ( function() {
                     select.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
                 }
 
-                const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
+                const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona un valore" );
                 select.append( emptyOption );
 
                 values.forEach( function( attrValue ) {
                     const option = $( "<option>" )
                         .val( attrValue.product_item_id )
-                        .html( `<b>${attrName}</b> ${attrValue.attributeValue.rawValue.name}` );
+                        .html( `${attrValue.attributeValue.rawValue.name}` );
                     select.append( option );
                 } );
 
@@ -1171,7 +1175,7 @@ AP.signage.modal = ( function() {
 
         console.log( "new" );
 
-        pricingApp().init( "", "plate", undefined );
+        pricingApp().init( "plate", undefined );
 
         NM.util.ajax( {
             method: "GET",

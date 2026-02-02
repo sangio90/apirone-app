@@ -431,7 +431,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setSpecial( json.item.special );
 
 		var pricing = getPricing( json );
-		
+
 		bean.setPrice( pricing );
 		
 		var product = super.fire( "Product.search",
@@ -448,6 +448,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setProduct( product );
 
 		for ( var thisFruit in json.item.fruits._data ) {
+
+			var positions = json.positions[ thisFruit.id ];
+
 			if ( IsNumeric( thisFruit.id ) ) {
 				// update
 				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
@@ -462,11 +465,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			fruitBean.setFruit( product );
 			//fruitBean.setQuotationItemId( thisId );
-			fruitBean.setPosition( thisFruit.position );
+			fruitBean.setPositions( positions );
 
 			beanFruits.add( fruitBean );
 
-			//super.fire( action, [ fruitBean ] );
 		}
 
 		bean.setFruits( beanFruits );

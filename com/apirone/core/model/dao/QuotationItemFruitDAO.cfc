@@ -50,7 +50,7 @@
 				fruit_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getQuotationItemId()#">::uuid,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruit.getPosition()#">,
+				0,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getFruit().getId()#">::uuid
 			)
 			RETURNING quotation_item_fruit_id
