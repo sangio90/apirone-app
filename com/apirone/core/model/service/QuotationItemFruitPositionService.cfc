@@ -11,11 +11,11 @@
 			return cache.data;
 		}
 
-		var bean = build( arguments.quotationItemFruitId );
+		var bean = build( arguments.quotationItemFruitPositionId );
 
 		cm.put(
 			getCacheScope(),
-			arguments.quotationItemFruitId,
+			arguments.quotationItemFruitPositionId,
 			bean
 		);
 
@@ -28,19 +28,15 @@
 	}
 
 	public com.apirone.core.model.bean.Result function search(
-		String str,
-		required Numeric limit  = 15,
-		required Numeric offset = 0,
-		required Array orderBy  = [ { field = "quotationItemFruit.id" } ]
+		String quotationItemFruitId,
 	){
-		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
 		var rows    = [];
 		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( record.quotation_item_fruit_id ) );
+			rows.add( record.position );
 		} );
 
 		result.setData( rows );

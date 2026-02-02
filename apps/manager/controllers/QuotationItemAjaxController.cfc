@@ -82,22 +82,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function listFruits( event, rc, prc ){
 		
-		var data   = {};
+		var data   = [];
 		var result = super.getResult();
 		var memy   = super.getMementify();
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 		var fruits = quotationItem.getFruits();
 
-		/*
-		quotationItem.getFruits().each( function( fruit ){
-			data.append( memy.convert( fruit ) );
+		fruits.each( function( fruit ){
+			data.add( memy.convert( fruit, "edit" ) );
 		} );
-		*/
 
 		//var parsedQuotationItemData = memy.convert( , "edit" );
 
-		result.setData( fruits );
+		result.setData( data );
 		event.setValue( "result", result );
 	}	
 

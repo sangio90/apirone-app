@@ -148,7 +148,7 @@
 	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){
 		var record = getDao().read( arguments.quotationItemId );
 		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.quotationItemId )
-		
+
 		if ( record.recordCount ) {
 			
 			var pricing = super.bean( "QuotationItemPrice" );
