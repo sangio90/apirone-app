@@ -406,4 +406,8 @@
         "name": "permission_id",
         "type": "Varchar"
     },
+    "quotationZonePosition.name": {
+        "name": "name",
+        "type": "Varchar"
+    },
 }
