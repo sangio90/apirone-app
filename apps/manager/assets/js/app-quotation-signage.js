@@ -21,6 +21,10 @@ AP.signage.modal = ( function() {
     var defaultDetailForm = {
         data: {
             id: "",
+            special: false,
+            status: {
+                id: "ACT",
+            },
             quotationItem: {
                 id: "",
                 quantity: 1,
@@ -55,9 +59,6 @@ AP.signage.modal = ( function() {
                     id: ""
                 }
             },
-            status: {
-                id: "ACT",
-            }
         },
         statuses: AP.page.statuses,
         title: "Carica segnaletica",
