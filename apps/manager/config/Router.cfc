@@ -511,7 +511,7 @@
 		post( "/ajax/quotation-items/article" ).to( "QuotationItemAjaxController.saveArticle" ).end();
 		
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
-		post( "/ajax/quotation-items/pricing" ).to( "QuotationItemAjaxController.calculate" ).end();
+		post( "/ajax/quotation-items/:type/pricing" ).to( "QuotationItemAjaxController.calculate" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		//get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();

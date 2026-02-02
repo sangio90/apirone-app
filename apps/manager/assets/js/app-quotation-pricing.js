@@ -84,7 +84,7 @@ AP.quotation.itemPricing = ( function() {
 
             NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax/quotation-items/pricing",
+                url: "/manager/ajax/quotation-items/" + viewModel.get( "typeId" ) + "/pricing",
                 data: JSON.stringify( payload ),
                 callback: {
                     done: function( xhr ) {

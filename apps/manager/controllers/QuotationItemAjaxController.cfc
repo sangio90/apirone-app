@@ -10,23 +10,17 @@ component extends="com.apirone.core.controller.AbsController" {
 		param rc.categoryId = "";
 		param rc.quotationZoneId = "";
 
-		if( rc.typeId == "article" ) {
+		params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
+		params[ "quotationId" ] = rc.id;
+		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
 
-		} else {
+		var rows = super.fire( "QuotationItem.search", params );
 
-			params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
-			params[ "quotationId" ] = rc.id;
-			params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
+		var data = ( memy.convertList( rows.getData() ) );
 
-			var rows = super.fire( "QuotationItem.search", params );
-
-			var data = ( memy.convertList( rows.getData() ) );
-
-			result.setTotal( rows.getTotal() );
-			result.setCount( rows.getCount() );
-			result.setData( data );
-
-		}
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( data );
 		
 
 		event.setValue( "result", result );
@@ -299,8 +293,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
 
-		bean.setSpecial( json.special );
-		bean.setStatus( status.setId( json.status.id ) );
+		bean.setSpecial( json.quotationItem.special );
+		bean.setNote( json.quotationItem.note );
+		bean.setStatus( status.setId( json.quotationItem.status.id ) );
+
+		var pricing = getPricing( json );
 
 		var price = populatePriceItem( json );
 		bean.setPrice( price );
@@ -591,7 +588,13 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var json = DeserializeJSON( GetHTTPRequestData().content )
 
-		var price = getPricing( json );
+		if (rc.type == "signage") {
+			var price = getSignagePricing( json );
+		} elseif(rc.type == "plate") {
+			var price = getPlatePricing( json );
+		} else {
+			var price = getPricing( json );
+		}
 
 		var memy = super.getMementify();
 		var data = memy.convert( price );
@@ -604,9 +607,96 @@ component extends="com.apirone.core.controller.AbsController" {
 		private methods
 	*/
 
-	private com.apirone.core.model.bean.QuotationItemPrice function getPricing( required Struct data ){
+	private com.apirone.core.model.bean.QuotationItemPrice function getSignagePricing( required Struct data ){
+		var json = arguments.data;
 
-		//var result = super.getResult();
+		var pricing = super.bean( "QuotationItemPrice" );
+		var method  = super.bean( "PriceMethod" );
+
+		var calculator = super.service( "PriceCalculator" );
+
+		var lines = [];
+
+		pricing.setQuantity( Val( json.pricing.quantity ) ? json.pricing.quantity : 1 );
+		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
+		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+		        
+		pricing.setMethod( method.setId( json.pricing.method.id ) );
+		
+        if ( pricing.isFixed() ) {
+			pricing.setAmount( Val( json.total ) ? json.total : 0 );
+		} else {
+			pricing.setAmount( 0 );
+		}
+
+		/*
+			plate price
+		*/
+
+		var productItemsIds = [];
+
+		//dump(json.data.product);
+		//abort;
+
+		var product = json.item.product;
+
+		for ( var item in product.items._data ) {
+			for ( var value in item.values ) {
+				if ( value.selected ) {
+					productItemsIds.add( value.productItemId );
+				}
+			}
+		}
+
+		var platePrice = calculator.calculate(
+			product.id,
+			json.pricing.quantity,
+			productItemsIds
+		);
+
+		var line = super.bean( "QuotationItemPriceLine" );
+
+		line.setName( "Prezzo placca" );
+		line.setAmount( platePrice );
+
+		lines.add( line );
+
+
+		/*
+			fruits price
+		*/
+
+		for ( var fruit in json.item.fruits._data ) {
+			var fruitItemsIds = [];
+			
+			var line = super.bean( "QuotationItemPriceLine" );
+
+			for ( var item in fruit.items._data ) {
+				for ( var value in item.values ) {
+					if ( value.selected ) {
+						fruitItemsIds.add( value.productItemId );
+					}
+				}
+			}
+
+			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds );
+
+			line.setName( "#fruit.fruit?.name#" );
+			line.setAmount( fruitPrice );
+
+			lines.add( line );
+		}
+
+		pricing.setLines( lines );
+
+		return pricing;
+	}
+
+	/*
+		private methods
+	*/
+
+	private com.apirone.core.model.bean.QuotationItemPrice function getPlatePricing( required Struct data ){
 		
 		var json = arguments.data;
 
@@ -690,7 +780,70 @@ component extends="com.apirone.core.controller.AbsController" {
 		pricing.setLines( lines );
 
 		return pricing;
-	}	
+	}
+
+	/*
+		private methods
+	*/
+
+	private com.apirone.core.model.bean.QuotationItemPrice function getPricing( required Struct data ){
+
+		//var result = super.getResult();
+		
+		var json = arguments.data;
+
+		var pricing = super.bean( "QuotationItemPrice" );
+		var method  = super.bean( "PriceMethod" );
+
+		var calculator = super.service( "PriceCalculator" );
+
+		var lines = [];
+
+		pricing.setQuantity( Val( json.pricing.quantity ) ? json.pricing.quantity : 1 );
+		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
+		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+		        
+		pricing.setMethod( method.setId( json.pricing.method.id ) );
+		
+        if ( pricing.isFixed() ) {
+			pricing.setAmount( Val( json.total ) ? json.total : 0 );
+		} else {
+			pricing.setAmount( 0 );
+		}
+
+		/*
+			price
+		*/
+
+		var productItemsIds = [];
+
+		var product = json.item.product;
+
+		for ( var item in product.items._data ) {
+			for ( var value in item.values ) {
+				if ( value.selected ) {
+					productItemsIds.add( value.productItemId );
+				}
+			}
+		}
+
+		var price = calculator.calculate(
+			product.id,
+			json.pricing.quantity,
+			productItemsIds
+		);
+
+		var line = super.bean( "QuotationItemPriceLine" );
+
+		line.setName( "Prezzo base" );
+		line.setAmount( price );
+
+		lines.add( line );
+
+		pricing.setLines( lines );
+
+		return pricing;
+	}
 	
 	private com.apirone.core.model.bean.QuotationItemPrice function populatePriceItem( data ){
 
@@ -784,7 +937,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = {
 			"plate"     = "PLA",
 			"accessory" = "ACC",
-			"signage"   = "SIG"
+			"signage"   = "SEG",
+			"article"   = "ART"
 		}
 
 		return params[ arguments.slug ];		
