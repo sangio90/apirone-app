@@ -1,17 +1,4 @@
 ﻿<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-	<cffunction name="read" returntype="Query">
-		
-		<cfargument name="quotationItemFruitPositionId" type="Numeric" required="true">
-
-		<cfquery name="local.q" datasource="apirone">
-			SELECT *
-			FROM
-				quotation_item_fruits
-			WHERE
-				quotation_item_fruit_position_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruitPositionId#">
-		</cfquery>
-		<cfreturn local.q>
-	</cffunction>
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationItemFruitId" type="String" required="false">
@@ -19,21 +6,14 @@
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				quotation_item_fruit_position_id,
-				COUNT(quotation_item_fruit_position_id) OVER() AS total
+				COUNT(quotation_item_fruit_position_id) OVER() AS total,
+				position
 			FROM
 				quotation_item_fruit_positions
 			WHERE 1=1
-
-				AND quotation_item_fruit_positions.quotation_item_fruit_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemFruitId#">::uuid
-
+				AND quotation_item_fruit_positions.quotation_item_fruit_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruitId#">
 			ORDER BY
-				#super.sanitizeSQL( arguments.orderBy )#
-			<cfif arguments.limit GT 0>
-				LIMIT
-					<cfqueryparam value="#arguments.limit#" cfsqltype="integer">
-				OFFSET
-					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
-			</cfif>
+				created_at
 		</cfquery>
 		<cfreturn local.q>
 	</cffunction>

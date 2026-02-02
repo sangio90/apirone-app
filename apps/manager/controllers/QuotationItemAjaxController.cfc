@@ -82,22 +82,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function listFruits( event, rc, prc ){
 		
-		var data   = {};
+		var data   = [];
 		var result = super.getResult();
 		var memy   = super.getMementify();
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 		var fruits = quotationItem.getFruits();
 
-		/*
-		quotationItem.getFruits().each( function( fruit ){
-			data.append( memy.convert( fruit ) );
+		fruits.each( function( fruit ){
+			data.add( memy.convert( fruit, "edit" ) );
 		} );
-		*/
 
 		//var parsedQuotationItemData = memy.convert( , "edit" );
 
-		result.setData( fruits );
+		result.setData( data );
 		event.setValue( "result", result );
 	}	
 
@@ -184,6 +182,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
 
+		bean.setSpecial( json.special );
+		bean.setStatus( status.setId( json.status.id ) );
+
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
 		bean.setQuantity( json.quotationItem.quantity );
@@ -264,12 +265,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} )
 
+		/*
+		nel servizio
 		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
 		if ( !IsNull( hash ) ) {
 			bean.setHash( hash );
 			bean.setId( thisId );
 			super.fire( "quotationItem.update", [ bean ] );
 		}
+		*/
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
@@ -283,16 +287,20 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "";
 		var texts     = [];
 
+		var status = super.bean( "Status" );
 		var result = super.getResult();
 
 		var id   = json.quotationItem.id;
 		var type = json.type
-			
+
 		if ( !Len( id ) ) {
 			var bean = super.bean( "QuotationItemSignage" );
 		} else {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
+
+		bean.setSpecial( json.special );
+		bean.setStatus( status.setId( json.status.id ) );
 
 		var price = populatePriceItem( json );
 		bean.setPrice( price );
@@ -378,6 +386,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				);
 
 				var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
+
 				quotationItemProductItemBean.setQuotationItemId( thisId );
 				quotationItemProductItemBean.setProductItem( productItem );
 				quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
@@ -391,12 +400,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} )
 
+		/*
+		nel servizio
 		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
 		if ( !IsNull( hash ) ) {
 			bean.setHash( hash );
 			bean.setId( thisId );
 			super.fire( "quotationItem.update", [ bean ] );
 		}
+		*/
 
 		var message = completeMessage( messageId );
 		

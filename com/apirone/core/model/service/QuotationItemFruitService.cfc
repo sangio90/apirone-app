@@ -110,13 +110,20 @@
 			var bean = super.bean( "quotationItemFruit" );
 
 			bean.setId( record.quotation_item_fruit_id );
-			bean.setPosition( record.position );
+			bean.setCreatedAt( record.created_at );
+
 			bean.setFruit( getProductService().get( record.fruit_id ) );
 
 			var items = getQuotationItemProductItemService().list( quotationItemFruitId = quotationItemFruitId );
 
 			if ( Len( items ) ) {
 				bean.setItems( items );
+			}
+
+			var positions = getQuotationItemFruitPositionService().list( quotationItemFruitId=arguments.quotationItemFruitId );
+
+			if ( Len( positions ) ) {
+				bean.setPositions( positions );
 			}
 
 			bean.setNote( record.note );
