@@ -8,7 +8,7 @@
 				<div>
 					<input class="form-check-input" type="checkbox"
 						name="special" 
-						data-bind="value: detailForm.data.special">
+						data-bind="value: detailForm.data.quotationItem.special">
 				</div>
 			</div>
 
@@ -17,7 +17,7 @@
 				<div class="mb-1">Stato:</div>
 				<div>
 					<select name="status" class="form-control form-control-sm" id="input-price-status"
-						data-bind="value: detailForm.data.status"
+						data-bind="value: detailForm.data.quotationItem.status"
 						data-value-field="id"
 						data-text-field="name"
 						>
@@ -39,14 +39,14 @@
 			</div>
 
 			<div class="col-12 mb-2">
-				<textarea class="form-control" name="notes" placeholder="Note" rows="4"
-					data-bind="value: detailForm.data.note"></textarea>
+				<textarea class="form-control" name="note" placeholder="Note" rows="4"
+					data-bind="value: detailForm.data.quotationItem.note"></textarea>
 			</div>
 
 		</div>
 
 		<div>
-			#view(view="item-total-pricing", args=args)#
+			#view(view="quotation/item-total-pricing", args=args)#
 		</div>
 		
 	</div>

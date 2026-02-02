@@ -46,7 +46,7 @@
 		</div>
 
 		<div>
-			#view(view="item-total-pricing", args=args)#
+			#view(view="quotation/item-total-pricing", args=args)#
 		</div>
 
 	</div>
