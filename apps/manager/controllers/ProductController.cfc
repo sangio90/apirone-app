@@ -81,6 +81,38 @@ component extends="com.apirone.core.controller.AbsController" {
 			);
 		}
 
+		
+		var fontSizeOptions   = [];
+		if (
+			product
+				.getCategory()
+				.getType()
+				.getId() == "SEG"
+		) {
+			/*
+				selected fonts
+			*/
+			var signageConfigs = super.fire( "signageConfig.list", { "catalogBundleId" = product.getCatalogBundle().getId() } );
+			fontSizeOptions.add( {
+				"id" = "null",
+				"name" = "Seleziona font/altezza",
+				"height" = null,
+			} );
+			for ( var signageConfig in signageConfigs ) {
+				var obj = memy.convert( signageConfig, "list" );
+
+				for ( var signageConfigItem in signageConfig.getItems() ) {
+					fontSizeOptions.add( {
+						"id"     = signageConfigItem.getId(),
+						"name" = signageConfig.getFont().getName() & " - " & signageConfigItem.getSize().getName() & "mm",
+						"height"   = signageConfigItem.getSize().getName(),
+					} );
+				}
+				
+			}
+		}
+
+		prc.page[ "fontSizeOptions" ]     = fontSizeOptions;
 		prc.page[ "productId" ]           = product.getId();
 		prc.page[ "attributeStatusList" ] = memy.convertList( super.fire( "status.list", [ "attribute" ] ) );
 		prc.page[ "methods" ]             = memy.convertList( super.fire( "lookup.list", { "entity" = "priceMethod" } ) );

@@ -1,88 +1,56 @@
 AP.namespace( "quotation" );
 
 Object.assign( AP.quotation.fields, {
-    boxPricing: $( "#quotation-totals" ),
-    boxItemPricing: $( "#quotation-totals-item-content" ),
-    boxGeneralPricing: $( "#quotation-totals-general-content" ),
+    /* boxItemPricing: $( "#quotation-item-pricing-box" ), */
+    boxTotalPricing: $( "#quotation-total-pricing-box" ),
 } );
 
-AP.quotation.pricing = ( function() {
+AP.quotation.itemPricing = ( function() {
 
     var pub = {};
     var fields = AP.quotation.fields;
-    var type = undefined; // set by init()
-    var saveMethod = undefined; // set by init()
 
-    var getCurrentViewModel = function() {
+    var defaultForm = {
+        data: {
+            id: "",
+            quantity: 1,
+            discount1: "",
+            discount2: "",
+            method: {
+                id: "C" // calculated
+            },
+            lines: [], // es. { name: "Frutto 1", amount: 10.5 },
+            total: 0,
+        }
+    };
 
-        if ( type == "item" ) {
-            return viewModelItem;
+    var getItem = function() {
+
+        var result = {};
+
+        var type = viewModel.get( "typeId" );
+
+        if ( type == "plate" ) {
+            result = AP.plate.modal.getItem();
+            // result = data.data; // plate
         }
 
-        return viewModelGeneral;
+        if ( type == "signage" ) {
+            result = AP.signage.modal.getItem();
+        }
+
+        if ( type == "accessory" ) {
+            result = AP.accessory.modal.getItem();
+        }
+
+        return result;
 
     };
 
-    var getCommonData = function() {
+    var viewModel = kendo.observable( {
 
-        var isCollapsed = AP.getUserPref( "quotation.pricing.isCollapsed", false );
-
-        return kendo.observable( {
-            title: "",
-            isCollapsed: isCollapsed,
-            symbol: isCollapsed ? "▲" : "▼"
-        } );
-
-    };
-
-    var collapseBox = function() {
-
-        var model = getCurrentViewModel();
-        var status = model.get( "common.isCollapsed" );
-        var newStatus = !status;
-
-        model.set( "common.isCollapsed", newStatus );
-
-        var newSymbol = newStatus ? "▲" : "▼";
-        model.set( "common.symbol", newSymbol );
-
-        AP.setUserPref( "quotation.pricing.isCollapsed", newStatus );
-
-        return false;
-
-    };
-
-    var viewModelItem = kendo.observable( {
-
-        common: getCommonData(),
-
-        item: {
-            id: "",
-            status: {
-                id: "ACT"
-            },
-            special: false,
-            position: {
-                code: ""
-            }
-        },
-
-        pricing: {
-            data: {
-                discount1: "",
-                discount2: "",
-
-                method: {
-                    id: "C" // calculated
-                },
-
-                total: "0",
-                lines: [], // es. { name: "Frutto 1", amount: 10.5 },
-            },
-        },
-
-        isItem: true,
-        isGeneral: false,
+        pricing: defaultForm,
+        typeId: undefined, // plate, signage, accessory
 
         changeMethod: function( event ) {
 
@@ -101,25 +69,130 @@ AP.quotation.pricing = ( function() {
 
         },
 
-        collapseTotals: function() {
+        update: function( event ) {
 
-            collapseBox();
+            console.log( "pricing:update" );
+
+            var status = $( "#quotation-item-pricing-status" );
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
+
+            var payload = {};
+
+            payload.item    = getItem(); // from app
+            payload.pricing = viewModel.get( "pricing.data" );
+            payload.typeId  = viewModel.get( "typeId" );
+
+            NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/quotation-items/pricing",
+                data: JSON.stringify( payload ),
+                callback: {
+                    done: function( xhr ) {
+                        if ( xhr.data ) {
+
+                            status.html( "" );
+                            viewModel.set( "pricing.data", xhr.data );
+
+                        }
+                    }
+                }
+            } );
+
+            return false;
+
         },
 
     } );
 
-    var viewModelGeneral = kendo.observable( {
 
-        common: getCommonData(),
+    pub.update = function() {
 
-        getFormattedTotal: function() {
+    	viewModel.update();
+    };
 
-            var value = this.get( "pricing.data.total" );
+    pub.init = function( typeId, data ) { // type: plate, signage, accessory
 
-            if( value ) { console.log( "getFormattedTotal:value", value ); }
+        var elementId = $( "#" + typeId + "-quotation-item-pricing-box" );
 
-            return value;
+        console.log( "elementId", elementId );
 
+        console.log( "fields.boxItemPricing", fields.boxItemPricing );
+
+        kendo.bind( elementId, viewModel );
+
+        viewModel.set( "typeId", typeId );
+
+        if ( data ) {
+            viewModel.set( "pricing", data );
+        } else {
+            viewModel.set( "pricing", defaultForm );
+        }
+
+        console.log( "qta", viewModel.get( "pricing.data.quantity" ) );
+
+    };
+
+    pub.getData = function( itemId ) {
+
+        return viewModel.get( "pricing" );
+
+    };
+
+    return pub;
+} () );
+
+AP.quotation.totalPricing = ( function() {
+
+    var pub = {};
+    var fields = AP.quotation.fields;
+
+    var isCollapsed = AP.getUserPref( "quotation.totalPricing.isBoxCollapsed", false );
+
+    var collapseBox = function() {
+
+        var status = viewModel.get( "detail.isCollapsed" );
+        var newStatus = !status;
+
+        viewModel.set( "detail.isCollapsed", newStatus );
+
+        var newSymbol = newStatus ? "▲" : "▼";
+        viewModel.set( "detail.symbol", newSymbol );
+
+        AP.setUserPref( "quotation.totalPricing.isBoxCollapsed", newStatus );
+
+        return false;
+
+    };
+
+    var fetchTotals = function( payload, method ) {
+
+        var status = $( "#quotation-totals-general-loading" );
+        status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
+
+        NM.util.ajax( {
+            method: method,
+            url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
+            data: JSON.stringify( payload ),
+            callback: {
+                done: function( xhr ) {
+
+                    status.html( "" );
+
+                    viewModel.set( "pricing.counters", xhr.data.counters );
+                    viewModel.set( "pricing.data", xhr.data.pricing );
+                }
+            }
+        } );
+
+    };
+
+
+    var viewModel = kendo.observable( {
+
+        detail: {
+            title: "",
+            isCollapsed: isCollapsed,
+            symbol: isCollapsed ? "▲" : "▼",
         },
 
         pricing: {
@@ -142,8 +215,15 @@ AP.quotation.pricing = ( function() {
             },
         },
 
-        isItem: false,
-        isGeneral: true,
+        getFormattedTotal: function() {
+
+            var value = this.get( "pricing.data.total" );
+
+            if( value ) { console.log( "getFormattedTotal:value", value ); }
+
+            return value;
+
+        },
 
         init: function( event ) {
 
@@ -158,8 +238,8 @@ AP.quotation.pricing = ( function() {
 
                         status.html( "" );
 
-                        viewModelGeneral.set( "pricing.counters", xhr.data.counters );
-                        viewModelGeneral.set( "pricing.data", xhr.data.pricing );
+                        viewModel.set( "pricing.counters", xhr.data.counters );
+                        viewModel.set( "pricing.data", xhr.data.pricing );
                     }
                 }
             } );
@@ -171,7 +251,7 @@ AP.quotation.pricing = ( function() {
             var ele = $( event.currentTarget );
 
             var value = ele.val();
-            var input = fields.boxPricing.find( "#input-total" );
+            var input = fields.boxTotalPricing.find( "#input-total" );
 
             if ( value == "C" ) {
                 this.update();
@@ -184,28 +264,12 @@ AP.quotation.pricing = ( function() {
         },
 
         updateTotals: function( event ) {
+            var pricing = viewModel.get( "pricing.data" );
+            fetchTotals( pricing, "POST" );
+        },
 
-            var status = $( "#quotation-totals-general-loading" );
-            status.html( "<img src='/assets/main/img/ajax-loading-blu.svg' width=20 height=20>" );
-
-            var data = AP.plate.modal.getVM().detailForm;
-            data.data.pricing = viewModelGeneral.get( "pricing.data" );
-
-            NM.util.ajax( {
-                method: "POST",
-                url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/totals",
-                data: JSON.stringify( data.data ),
-                callback: {
-                    done: function( xhr ) {
-
-                        status.html( "" );
-
-                        viewModelGeneral.set( "pricing.counters", xhr.data.counters );
-                        viewModelGeneral.set( "pricing.data", xhr.data.pricing );
-                    }
-                }
-            } );
-
+        getTotals: function( event ) {
+            fetchTotals( undefined, "GET" );
         },
 
         collapseTotals: function() {
@@ -214,45 +278,28 @@ AP.quotation.pricing = ( function() {
 
     } );
 
-    pub.updateItem = function() {
-
-        // console.log( "saveMethod", saveMethod );
-
-        // saveMethod();
-
-    	viewModelItem.update();
-    };
-
     pub.updateTotals = function() {
-    	viewModelGeneral.update();
+    	viewModel.updateTotals();
     };
 
-    pub.init = function( id, initType, saveMethod ) { // type: item, quotation
+    pub.getTotals = function() {
+    	viewModel.getTotals();
+    };
 
-        // console.log( "saveMethod", saveMethod );
+    pub.init = function() { // type: item, quotation
 
-        type = initType; // Imposta la variabile type
+        kendo.bind( fields.boxTotalPricing, viewModel );
 
-        if ( type == "item" ) {
-            var model = viewModelItem;
-            viewModelItem.set( "item.id", id );
-            viewModelItem.set( "common.title", "Dettaglio riga" );
-        } else {
-            var model = viewModelGeneral;
-            viewModelGeneral.set( "common.title", "Totali preventivo" );
-            viewModelGeneral.init();
-        }
+        viewModel.set( "detail.title", "Totali preventivo" );
 
-        kendo.bind( fields.boxPricing, model );
-
-        fields.boxPricing.show();
+        fields.boxTotalPricing.show();
 
     };
 
     pub.getData = function( itemId ) {
 
-        var model = getCurrentViewModel();
-        return model.get( "pricing" );
+        // var model = getCurrentViewModel();
+        return viewModel.get( "pricing" );
 
     };
 

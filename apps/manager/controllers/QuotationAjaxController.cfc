@@ -310,10 +310,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var service = super.service( "QuotationPrice" );
 
 		pricing.setQuotationId( rc.id );
-		pricing.setDiscount1( Val( json.pricing?.discount1 ) ? json.pricing.discount1 : 0 );
-		pricing.setDiscount2( Val( json.pricing?.discount2 ) ? json.pricing.discount2 : 0 );
+		pricing.setDiscount1( Val( json?.discount1 ) ? json.discount1 : 0 );
+		pricing.setDiscount2( Val( json?.discount2 ) ? json.discount2 : 0 );
+		pricing.setFlatDiscount( Val( json?.flatDiscount ) ? json.flatDiscount : 0 );
 
-		pricing.setShippingCost( Len( json.pricing?.shippingCost ) ? json.pricing.shippingCost : 0 );
+		pricing.setShippingCost( Len( json?.shippingCost ) ? json.shippingCost : 0 );
 
 		service.save( pricing );
 
@@ -393,9 +394,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var values = result.getCalculatedTotals();
 
+		dump
+
 		var data = {
 			"counters" = counters,
-			"pricing" = values
+			"pricing" = values,
+			"currency" = result.getCurrency()
 		}
 
 		return data;

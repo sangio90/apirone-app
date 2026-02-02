@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="quotationItemId" type="String";
 	property name="position" type="Numeric";
+	property name="positions" type="String[]"; //["ID0001","ID0002"]
 	property name="note" type="String";
 
 	property name="fruit" type="com.apirone.core.model.bean.Product";

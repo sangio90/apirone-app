@@ -1,4 +1,5 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
+
 	<cffunction name="read">
 		<cfargument name="roleId" type="String" required="true">
 
@@ -97,5 +98,6 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
+
 </cfcomponent>
 

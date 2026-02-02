@@ -16,11 +16,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return cache.data;
 		}
 
-		var obj = build( arguments.catalogBundleId );
+		var bean = build( arguments.catalogBundleId );
 
-		cm.put( getCacheScope(), catalogBundleId, obj );
+		cm.put( getCacheScope(), catalogBundleId, bean );
 
-		return obj;
+		return bean;
 	}
 
 	public Array function list(){
@@ -115,18 +115,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.catalogBundleId );
 
 		if ( record.RecordCount ) {
-			var obj = super.bean( "CatalogBundle" );
+			var bean = super.bean( "CatalogBundle" );
 
-			obj.setId( record.catalog_bundle_id );
-			obj.setName( record.catalog_bundle );
-			obj.setCreatedAt( record.created_at );
-			obj.setMarkupValue( record.markup_value );
+			bean.setId( record.catalog_bundle_id );
+			bean.setName( record.catalog_bundle );
+			bean.setCreatedAt( record.created_at );
+			bean.setMarkupValue( record.markup_value );
 
-			obj.setLine( getLineService().get( record.line_id ) );
-			obj.setModel( getModelService().get( record.model_id ) );
-			obj.setCategory( getProductCategoryService().get( record.product_category_id ) );
+			bean.setLine( getLineService().get( record.line_id ) );
+			bean.setModel( getModelService().get( record.model_id ) );
+			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
 
-			return obj;
+			return bean;
 		}
 
 		return NullValue();

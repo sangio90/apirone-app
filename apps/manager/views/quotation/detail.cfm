@@ -4,7 +4,7 @@
             <div class="col-lg-3">
                 <h2>#prc.title#</h2>
             </div>
-			
+
             <div class="col-9 text-end mt-3">
 				#button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left", class="me-4" )#
 				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#

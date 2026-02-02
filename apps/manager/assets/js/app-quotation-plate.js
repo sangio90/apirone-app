@@ -18,6 +18,10 @@ AP.plate.modal = ( function() {
     const gridModule = AP.plate.grid;
     const fields = AP.plate.fields;
 
+    function pricingApp() {
+        return AP.quotation.itemPricing;
+    }
+
     const {
         constants,
         orientation,
@@ -27,7 +31,6 @@ AP.plate.modal = ( function() {
         Fruit,
         FruitsController
     } = gridModule;
-
 
     var pub = {
         fruitsController: null,
@@ -40,8 +43,8 @@ AP.plate.modal = ( function() {
     var mapFruitForPlate = function( data ) {
 
         var fruit = {
-            id: data.id,
-            fruitId: data.fruit.id,
+            id: data.id, // ID univoco dell'istanza generato da createFruit()
+            fruitId: data.fruitId, // ID del prodotto frutto originale
             width: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].width * data.fruit.positionCount,
             height: constants.GRID_CELL_DIMENSIONS[gridModule.CELL_TYPE.FREE].height,
             columnSpan: data.fruit.positionCount,
@@ -58,11 +61,12 @@ AP.plate.modal = ( function() {
     var createFruit = function( data ) {
         // QuotationItemFruis
         // data: { position: 1, fruit: { id: "", name: "" }, items: [] }
-        if ( !data.id ) {
-            data.id = NM.util.uuid();
-        }
 
         var fruit = data;
+
+        // Genera ID univoco per questa istanza
+        fruit.id = NM.util.uuid();
+        fruit.fruitId = data.fruit.id; // ID del prodotto frutto originale
 
         fruit.items = new kendo.data.DataSource( {
             data: [],
@@ -117,6 +121,7 @@ AP.plate.modal = ( function() {
                     constants.GRID_CELL_DIMENSIONS[cellType].height,
                     plate.cellOrientation.id,
                     cellType,
+                    cellData.id
                 );
 
                 row.push( cell );
@@ -176,15 +181,6 @@ AP.plate.modal = ( function() {
             position: {
                 id: "",
                 code: ""
-            },
-            pricing: {
-                discount1: "",
-                discount2: "",
-                method: {
-                    id: "C" // calculated
-                },
-                lines: [],
-                total: 0,
             },
             product: {
                 id: "",
@@ -269,33 +265,13 @@ AP.plate.modal = ( function() {
 
     var updatePrice = function() {
 
-        var status = $( "#quotation-item-pricing-status" );
-        status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
-
-        var data = viewModel.get( "detailForm.data" );
-
-        NM.util.ajax( {
-            method: "POST",
-            url: "/manager/ajax/quotation-items/pricing",
-            data: JSON.stringify( data ),
-            callback: {
-                done: function( xhr ) {
-                    if ( xhr.data ) {
-
-                        status.html( "" );
-                        viewModel.set( "detailForm.data.pricing", xhr.data );
-
-                    }
-                }
-            }
-        } );
+        pricingApp().update();
 
     };
 
     var viewModel = new kendo.data.ObservableObject( {
 
         detailForm: defaultDetailForm,
-        // pricing: defaultPricingForm,
 
         lines: new kendo.data.DataSource(),
         models: new kendo.data.DataSource(),
@@ -1185,16 +1161,32 @@ AP.plate.modal = ( function() {
 
         save: function() {
 
-            const parsedData = viewModel.get( "detailForm.data" );
+            console.log( "save:pub.fruitsController", pub.fruitsController.fruits );
+            console.log( "save:detailForm.data.fruits", viewModel.get( "detailForm.data.fruits" ).data() );
+
+            // Crea una mappa { id: cellIds } per ogni frutto
+            var positions = {};
+            pub.fruitsController.fruits.forEach( function( fruit ) {
+                positions[ fruit.id ] = fruit.cellIds;
+            } );
+
+            console.log( "save:positions", positions );
+
+            // const parsedData =
             var status = fields.modalRoot.find( ".save-status" );
+            var preview = $( "#plate-background" )[0];
 
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
+            var parsedData = {};
             parsedData.quotationId = AP.page.quotation.id;
-            parsedData.isClone = viewModel.get( "detailForm.isClone" );
-            parsedData.type = "plate";
+            parsedData.isClone     = viewModel.get( "detailForm.isClone" );
+            parsedData.typeId      = "plate";
+            parsedData.pricing     = pricingApp().getData().data;
+            parsedData.item        = viewModel.get( "detailForm.data" );
+            parsedData.positions   = positions;
 
-            var preview = $( "#plate-background" )[0];
+            console.log( "parsedData.pricing", parsedData.pricing );
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
@@ -1280,6 +1272,8 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm", defaultDetailForm );
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         viewModel.set( "isEditMode", false );
+
+        pricingApp().init( "plate", undefined );
 
         // console.log( "plate:new" );
 
@@ -1420,10 +1414,27 @@ AP.plate.modal = ( function() {
         initFruitsSuggest();
 
         kendo.bind( settings.container, viewModel );
+
+        // document.getElementById( "contact" ).classList.add( "active" );
+
+        // TODO: Attiva il primo tab ogni volta che
+        // la modale viene aperta. Bisognerebbe capire perchè
+        settings.container.on( "shown.bs.modal", function() {
+            setTimeout( function() {
+
+                // Forza l'attivazione del primo tab manipolando direttamente le classi
+                $( "#plate-product-items-tab" ).addClass( "show active" );
+                $( "#plate-fruit-product-items-tab" ).removeClass( "show active" );
+
+                $( "#plate-product-items-but" ).addClass( "active" );
+                $( "#plate-fruit-product-items-but" ).removeClass( "active" );
+            }, 50 );
+        } );
+
     };
 
-    pub.getVM = function() {
-        return viewModel;
+    pub.getItem = function() {
+        return viewModel.get( "detailForm.data" );
     };
 
     return pub;

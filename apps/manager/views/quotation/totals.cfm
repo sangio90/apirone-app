@@ -1,20 +1,20 @@
 ﻿<cfoutput>
-	<div id="quotation-totals" class="container py-3 quotation-totals-box">
+	<div id="quotation-total-pricing-box" class="container py-3 quotation-totals-box">
 		<div>
 			<div class="d-flex hand" data-bind="click: collapseTotals">
 				<div class="justify-content-start" style="width: 95%" id="qt-totals-title">
-					<h3 data-bind="text: common.title"></h3>
+					<h3 data-bind="text: detail.title"></h3>
 				</div>
 				<div style="font-size: 1.5em;"
-					id="qt-item-totals-symbol" data-bind="text:common.symbol"></div>
+					id="qt-item-totals-symbol" data-bind="text:detail.symbol"></div>
 			</div>
 
-			<div class="quotation-totals-content" id="quotation-totals-content" data-bind="invisible:common.isCollapsed">
+			<div class="quotation-totals-content" id="quotation-totals-content" data-bind="invisible:detail.isCollapsed">
 			
 				<!--- 
 					total princing
 				--->
-				<div id="quotation-totals-general-content" data-bind="visible: isGeneral">
+				<div id="quotation-totals-general-content">
 					<div class="d-flex align-items-center justify-content-between" >
 						<div>
 							<div>Placche:</div>
@@ -37,27 +37,43 @@
 					</div>
 					<div class="row mt-3 mb-2 align-items-center d-flex">
 						<div class="col-4">Sconti</div>
-						<div class="col-4">
-							<input class="form-control text-end" name="discount1"
+						<div class="col-4 d-flex align-items-center">
+							<input class="form-control text-end me-1" name="discount1"
 								placeholder="%" data-bind="value: pricing.data.discount1">
+								<span>%</span>
 						</div>
-						<div class="col-4">
-							<input class="form-control text-end" name="discount2" 
+						<div class="col-4 d-flex align-items-center">
+							<input class="form-control text-end me-1" name="discount2" 
 								placeholder="%" data-bind="value: pricing.data.discount2">
+								<span>%</span>
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
-						<div class="col-8">Spese di trasporto</div>
-						<div class="col-4">
-							<input class="form-control text-end" name="shippingCost" 
+						<div class="col-8 mt-2">Spese di trasporto</div>
+						<div class="col-4 d-flex align-items-center">
+							<input class="form-control text-end me-1" name="shippingCost" 
 								placeholder="%" data-bind="value: pricing.data.shippingCost">
+								<span>&euro;</span>
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
-						<div class="col-8">Sconto incondizionato</div>
-						<div class="col-4">
-							<input class="form-control text-end" name="flatDiscount" 
+						<div class="col-8 mt-2">Subtotale</div>
+						<div class="col-4 text-end">
+							<span data-bind="text: pricing.data.subtotalBeforeFlat" data-format="0.00"></span> &euro;
+						</div>
+					</div>
+					<div class="row mt-3 mb-2">
+						<div class="col-8 mt-2">Sconto incondizionato</div>
+						<div class="col-4 d-flex align-items-center">
+							<input class="form-control text-end me-1" name="flatDiscount" 
 								placeholder="%" data-bind="value: pricing.data.flatDiscount">
+							<span>&euro;</span>
+						</div>
+					</div>
+					<div class="row mt-3 mb-2">
+						<div class="col-8">Imponibile</div>
+						<div class="col-4 text-end">
+							<span data-bind="text: pricing.data.taxable" data-format="0.00"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">

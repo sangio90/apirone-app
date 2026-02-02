@@ -5,7 +5,6 @@
     svc = model.getInstance("TextService");
 
     rows = [
-
         {
             id: "horizontal",
             text: "Orizzontale"
@@ -18,7 +17,6 @@
             id: "default",
             text: "Predefinita"
         }
-
     ];
 
     for( item in rows  ) {

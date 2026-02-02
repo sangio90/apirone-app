@@ -64,6 +64,10 @@ AP.quotation.detail = ( function() {
         return AP.quotation.status;
     }
 
+    function pricingApp() {
+        return AP.quotation.totalPricing;
+    }
+
     var setQuotationItems = function( items ) {
 
         var typeId = viewModel.get( "typeId" );
@@ -266,9 +270,15 @@ AP.quotation.detail = ( function() {
         changeType: function( event ) {
 
             var target = $( event.currentTarget );
+            var type = target.data( "type" );
 
-            viewModel.set( "typeId", target.data( "type" ) );
+            viewModel.set( "typeId", type );
             viewModel.loadItems();
+
+            // Aggiorna l'URL con il tab attivo
+            var url = new URL( window.location );
+            url.searchParams.set( "tab", type );
+            window.history.pushState( {}, "", url );
         },
 
         getImageSrc: function( event ) {
@@ -558,25 +568,21 @@ AP.quotation.detail = ( function() {
 
         addPlate: function() {
             plateApp().new();
-            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addSignage: function() {
             signageApp().new();
-            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addAccessory: function() {
             accessoryApp().new();
-            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
         addArticle: function() {
             articleApp().new();
-            // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
             return false;
         },
 
@@ -702,7 +708,7 @@ AP.quotation.detail = ( function() {
     } );
 
     pub.showTotals = function( options ) {
-        AP.quotation.pricing.init( undefined, "general" );
+        AP.quotation.totalPricing.init();
     };
 
     pub.checkUrlHash = function() {
@@ -752,6 +758,52 @@ AP.quotation.detail = ( function() {
         }
     };
 
+    pub.checkUrlTab = function() {
+        // Controlla il parametro ?tab= nell'URL e attiva il tab corrispondente
+        var urlParams = new URLSearchParams( window.location.search );
+        var tabParam = urlParams.get( "tab" );
+
+        if ( tabParam ) {
+            var validTabs = [ "plate", "signage", "accessory", "article" ];
+
+            if ( validTabs.includes( tabParam.toLowerCase() ) ) {
+                var tabType = tabParam.toLowerCase();
+                var tabButton = document.querySelector( "button#nav-" + tabType + "-tab" );
+
+                if ( tabButton ) {
+                    console.log( "Activating tab from URL:", tabType );
+
+                    // Rimuove la classe active da tutti i tab
+                    document.querySelectorAll( ".nav-link" ).forEach( function( btn ) {
+                        btn.classList.remove( "active" );
+                    } );
+
+                    // Nasconde tutti i tab-pane
+                    document.querySelectorAll( ".tab-pane" ).forEach( function( pane ) {
+                        pane.classList.remove( "show", "active" );
+                    } );
+
+                    // Attiva il tab corretto
+                    tabButton.classList.add( "active" );
+                    var targetPane = document.querySelector( tabButton.getAttribute( "data-bs-target" ) );
+                    if ( targetPane ) {
+                        targetPane.classList.add( "show", "active" );
+                    }
+
+                    // Aggiorna il viewModel
+                    viewModel.set( "typeId", tabType );
+                    viewModel.loadItems();
+
+                    // Aggiorna la visibilità dei pulsanti
+                    fields.addPlateBtn.toggle( tabType === "plate" );
+                    fields.addSignageBtn.toggle( tabType === "signage" );
+                    fields.addAccessoryBtn.toggle( tabType === "accessory" );
+                    fields.addArticleBtn.toggle( tabType === "article" );
+                }
+            }
+        }
+    };
+
     pub.config = function( options ) {
         return viewModel.get( "detailForm.data" );
     };
@@ -763,8 +815,15 @@ AP.quotation.detail = ( function() {
     pub.init = function() {
         kendo.bind( AP.quotation.fields.detailRoot, viewModel );
 
-        // plates by default
-        $( "body" ).find( "button#nav-plate-tab" ).click();
+        // Controlla se c'è un parametro tab nell'URL
+        pub.checkUrlTab();
+
+        // Se non c'è nessun tab nell'URL, carica il tab delle placche di default
+        var urlParams = new URLSearchParams( window.location.search );
+
+        if ( !urlParams.get( "tab" ) ) {
+            $( "body" ).find( "button#nav-plate-tab" ).click();
+        }
 
         viewModel.getZones();
 
@@ -810,6 +869,10 @@ AP.quotation.detail = ( function() {
                 fields.addAccessoryBtn.hide();
                 fields.addArticleBtn.show();
             } );
+
+            console.log( "pricingApp", pricingApp );
+
+            pricingApp().getTotals();
 
         }
     };

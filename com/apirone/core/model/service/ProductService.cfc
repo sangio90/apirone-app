@@ -68,6 +68,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		String lineId,
+		String catalogBundleId,
 		Array excludedCategoryIds = [],
 		required Numeric limit    = 15,
 		required Numeric offset   = 0,

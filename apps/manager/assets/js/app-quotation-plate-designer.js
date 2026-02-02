@@ -450,10 +450,11 @@ AP.plate.grid = ( function() {
     }
 
     class Cell extends Rectangle {
-        constructor( width, height, orientation, type ) {
+        constructor( width, height, orientation, type, id ) {
             super( width, height, orientation );
 
             this.type = type;
+            this.id = id; // ID della cella dalla griglia
             this._position = null;
         }
 
@@ -506,9 +507,11 @@ AP.plate.grid = ( function() {
                     : args.columnSpan;
 
             this.id = args.id;
+            this.fruitId = args.fruitId; // ID del prodotto frutto (può essere duplicato)
             this.code = args.code;
             this.name = args.name;
             this.image = args.image;
+            this.cellIds = []; // Array di ID delle celle occupate dal frutto
 
             this._gridPosition = null;
             this._originalGridPosition = null;
@@ -534,6 +537,29 @@ AP.plate.grid = ( function() {
 
                 this.top = top;
                 this.left = left;
+
+                // Aggiorna gli ID delle celle occupate dal frutto
+                this.updateCellIds();
+            }
+        }
+
+        updateCellIds() {
+            this.cellIds = [];
+
+            const fruitsController = AP.plate.modal.fruitsController;
+            if ( !fruitsController || !fruitsController.plate || !fruitsController.plate.grid ) {
+                return;
+            }
+
+            const grid = fruitsController.plate.grid;
+
+            // Calcola tutte le celle occupate dal frutto
+            for ( let row = this._gridPosition.row; row < this._gridPosition.row + this.rowSpan && row < grid.length; row++ ) {
+                for ( let col = this._gridPosition.column; col < this._gridPosition.column + this.columnSpan && col < grid[row].length; col++ ) {
+                    if ( grid[row][col] && grid[row][col].id ) {
+                        this.cellIds.push( grid[row][col].id );
+                    }
+                }
             }
         }
 
@@ -803,7 +829,8 @@ AP.plate.grid = ( function() {
                 rowSpan: selectedFruit.rowSpan,
                 columnSpan: selectedFruit.columnSpan,
                 orientation: this.plate.cellOrientation,
-                id: selectedFruit.id,
+                id: selectedFruit.id, // ID univoco già generato da createFruit()
+                fruitId: selectedFruit.fruitId, // ID del prodotto frutto originale
                 code: selectedFruit.code,
                 name: selectedFruit.name,
                 image: selectedFruit.image,
@@ -823,6 +850,55 @@ AP.plate.grid = ( function() {
 
                 fruitObj.drawWithin( $( "#quotation-plate-fruits" ) );
                 fruitObj.initDraggableWidget( this );
+            }
+
+        }
+
+        addFruitToPositions( selectedFruit, cellIds ) {
+
+            // console.log( "addFruitToPositions:selectedFruit", selectedFruit );
+            // console.log( "addFruitToPositions:cellIds", cellIds );
+
+            const fruitObj = new Fruit( {
+                width: selectedFruit.width,
+                height: selectedFruit.height,
+                rowSpan: selectedFruit.rowSpan,
+                columnSpan: selectedFruit.columnSpan,
+                orientation: this.plate.cellOrientation,
+                id: selectedFruit.id, // ID univoco già generato da createFruit()
+                fruitId: selectedFruit.fruitId, // ID del prodotto frutto originale
+                code: selectedFruit.code,
+                name: selectedFruit.name,
+                image: selectedFruit.image,
+            } );
+
+            // Trova la posizione della prima cella nell'array
+            const grid = this.plate.grid;
+            let foundPosition = null;
+
+            for ( let y = 0; y < grid.length && !foundPosition; y++ ) {
+                for ( let x = 0; x < grid[y].length && !foundPosition; x++ ) {
+                    const cell = grid[y][x];
+
+                    // Verifica se questa cella è la prima nell'array di cellIds
+                    if ( cell.id === cellIds[0] ) {
+                        foundPosition = { row: y, column: x };
+                    }
+                }
+            }
+
+            if ( foundPosition ) {
+                fruitObj.gridPosition = new FruitGridPosition(
+                    foundPosition.row,
+                    foundPosition.column,
+                );
+
+                this.fruits.push( fruitObj );
+
+                fruitObj.drawWithin( $( "#quotation-plate-fruits" ) );
+                fruitObj.initDraggableWidget( this );
+            } else {
+                console.error( "addFruitToPositions: Position not found for cellIds", cellIds );
             }
 
         }

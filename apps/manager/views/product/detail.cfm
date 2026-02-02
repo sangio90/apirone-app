@@ -168,36 +168,45 @@
                                                         <div class="col-sm-6">
                                                         
                                                             <div class="row">
-                                                            
-                                                                <div class="col-12 ">
-                                                                
-                                                                    <div class="d-flex gap-2 align-items-center">
+                                                                <div class="col-3">
+                                                                    <label class="my-1">Quantità</label>
+                                                                    <input class="form-control text-end" 
+                                                                        id="product-simulate-quantity" value="1" type="number" min="1" style="width: 100px">
+                                                                    <cfif prc.product.getCategory().getType().getId() == "SEG">
+                                                                        <label class="my-1">N° Lettere</label>
+                                                                        <input class="form-control text-end" 
+                                                                            id="product-simulate-letters-quantity" value="0" type="number" min="0" style="width: 100px"> 
+                                                                    </cfif>
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <cfif prc.product.getCategory().getType().getId() == "SEG">
+                                                                        <label class="my-1">Font Family / Altezza:</label>
+                                                                        <select type="text" class="form-control" style="width: 400px;" name="simulationSignageConfigItem"
+                                                                            data-bind="value: simulationSignageConfigItem, source: fontSizeOptions"
+                                                                            data-value-field="id"
+                                                                            data-text-field="name"
+                                                                            data-value-primitive="true"
+                                                                        >
+                                                                        </select>   
+                                                                    </cfif>
+                                                                    #button(
+                                                                        label="Simula prezzo",
+                                                                        bind  = "click:simulatePrice",
+                                                                        size  = "sm",
+                                                                        class = "mt-4"
+                                                                        
+                                                                    )#
 
-                                                                    
-                                                                        <input class="form-control col-sm-2 text-end" 
-                                                                            id="product-simulate-quantity" value="1" type="number" min="1" style="width: 100px">
-
-                                                                        #button(
-                                                                            label="Simula prezzo",
-                                                                            bind  = "click:simulatePrice",
-                                                                            size  = "sm",
-                                                                            class = "ms-2"
-                                                                        )#
-
-                                                                        <div id="product-simulate-loading"></div>
-
-                                                                    </div>
-                                                                    
-                                                                    <div>
-
-                                                                        <h3>Prezzi</h3>
-                                                                        <div data-bind="source: product.prices" data-template="price-row-tmpl">
-                                                                        </div>
-
-                                                                    </div>
-
+                                                                    <div id="product-simulate-loading"></div>
                                                                 </div>
 
+                                                            </div>                                                                    
+                                                            <div>
+                                                                <cfif prc.product.getPrices().len() GT 0>
+                                                                    <h3>Prezzi</h3>
+                                                                    <div data-bind="source: product.prices" data-template="price-row-tmpl">
+                                                                    </div>
+                                                                </cfif>
                                                             </div>
                                                         
                                                         </div>

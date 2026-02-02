@@ -3,6 +3,7 @@
 	property name="dao" inject="QuotationItemFruitDAO";
 	property name="productService" inject="ProductService";
 	property name="quotationItemProductItemService" inject="QuotationItemProductItemService";
+	property name="quotationItemFruitPositionService" inject="QuotationItemFruitPositionService";
 	property name="cacheScope" type="String" default="QuotationItemFruit.bean";
 
 	public com.apirone.core.model.bean.QuotationItemFruit function get( required Numeric quotationItemFruitId ){
@@ -77,11 +78,26 @@
 	public Numeric function create( required quotationItemFruit ){
 		var newId = getDao().insert( arguments.quotationItemFruit );
 
+		getQuotationItemFruitPositionService().deleteByQuotationItemFruitId( newId );
+		
+		if( Len( arguments.quotationItemFruit?.getPositions() ) ){
+			for( var item in arguments.quotationItemFruit?.getPositions() ){
+				getQuotationItemFruitPositionService().create( newId, item );
+			}
+		}
+
 		return newId;
 	}
 
 	public Numeric function update( required com.apirone.core.model.bean.QuotationItemFruit quotationItemFruit ){
 		getDao().update( arguments.quotationItemFruit );
+
+		getQuotationItemFruitPositionService().deleteByQuotationItemFruitId( arguments.quotationItemFruit.getId() );
+		
+		if( Len( quotationItemFruit.getPositions() ) ){
+			getQuotationItemFruitPositionService().create( arguments.quotationItemFruit.getId(), arguments.quotationItemFruit.getPositions() );
+		}
+
 		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemFruit.getId() );
 
 		return arguments.quotationItemFruit.getId();
