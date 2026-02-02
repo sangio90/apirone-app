@@ -55,6 +55,10 @@
 				--products.product_id,
 				products.product_id::varchar,
 				products.code,
+				product_categories.code:: varchar,
+				lines.code:: varchar,
+				models.code::varchar,
+				finishes.code::varchar,
 				COUNT(product_id) OVER() AS total
 			FROM
 				products
@@ -64,6 +68,9 @@
 								(products.catalog_bundle_id IS NULL AND product_categories.product_category_id = products.product_category_id)
 								OR (products.catalog_bundle_id IS NOT NULL AND product_categories.product_category_id = catalog_bundles.product_category_id)
 						)
+						LEFT JOIN lines ON catalog_bundles.line_id = lines.line_id
+						LEFT JOIN models ON catalog_bundles.model_id = models.model_id
+						LEFT JOIN finishes ON products.finish_id = finishes.finish_id
 						<cfif !IsNull( arguments.str )>
 							INNER JOIN texts USING ( product_id )
 						</cfif>
@@ -71,7 +78,7 @@
 			WHERE 1=1
 
 				<cfif !IsNull( arguments.str )>
-					AND 
+					AND
 					( 	texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 						OR products.code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 					)
@@ -90,13 +97,13 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.lineId )>
-					
+
 					<cfif !IsNull( arguments.categoryModeId ) AND arguments.categoryModeId EQ "BAS">
 						AND jsonb_exists_any( lines, ARRAY[<cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">] )
 					<cfelse>
 						AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 					</cfif>
-					
+
 				</cfif>
 
 				<cfif !IsNull( arguments.categoryId )>
@@ -120,7 +127,11 @@
 			ORDER BY
 				<!--- #super.sanitizeSQL( arguments.orderBy )# - --->
 				<!--- TODO: dovrei fare la inner se l'ordinamento prevede product.name --->
-				products.product_id::varchar
+				product_categories.code::varchar,
+				lines.code::varchar,
+				models.code::varchar,
+				finishes.code::varchar,
+				products.code
 
 			<cfif arguments.limit GTE 0>
 				LIMIT
