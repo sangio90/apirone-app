@@ -42,7 +42,7 @@
                                                 <label class="me-2">Zone: </label>
                                                 <select 
                                                     class="form-control me-3"
-                                                    data-bind="source: zones, value: detailForm.data.zone, events: { change: getItems }"
+                                                    data-bind="source: zones, value: detailForm.data.zone, events: { change: loadItems }"
                                                     data-value-field="id"
                                                     data-text-field="name"
                                                     id="zones-selector">
