@@ -149,7 +149,7 @@
                                 dettaglio riga / pricing 
                             --->
                             <div class="col-2">
-                                #view(view="quotation/item-pricing", args={id="plate-quotation-item-pricing-box"})#
+                                #view(view="quotation/item-plate-pricing", args={id="plate-quotation-item-pricing-box"})#
                             </div>
                         </div>
 

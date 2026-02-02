@@ -427,6 +427,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var tmpDir = super.getTempDir();
 		
 		var bean   = super.bean( "QuotationItemPlate" );
+		var zone   = super.bean( "QuotationZone" );
 		var status = super.bean( "Status" );
 
 		var beanFruits = [];
@@ -438,8 +439,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		bean.setQuotation( super.fire( "Quotation.get", [ json.quotationId ] ) ); //TODO: move to QuotationId
+		
 		bean.setQuantity( json.item.quantity );
 		bean.setStatus( status.setId( json.item.status.id ) );
+		bean.setQuotationZone( zone.setId( json.item.quotationZone.id ) );
 		bean.setSpecial( json.item.special );
 
 		var pricing = getPricing( json );

@@ -35,12 +35,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		var totalGoods = getTotalGoods();
 		var total      = totalGoods;
 
-		//dump("Total goods: " & 	totalGoods);
-		//dump("Total goods: " & 	getMethod().getId());
-		//dump("Total goods: fixex:" & 	isFixed());
-
 		if ( isFixed() ) {
-			return getAmount();
+			return NumberFormat(getAmount(), "9.99");
 		}
 
 		if ( StructKeyExists( variables, "discount1" ) && variables.discount1 > 0 ) {
@@ -51,7 +47,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			total = total - ( total * variables.discount2 / 100 );
 		}
 
-		return total;
+		return NumberFormat(total, "9.99");
 	}
 
 	public Boolean function isFixed(){

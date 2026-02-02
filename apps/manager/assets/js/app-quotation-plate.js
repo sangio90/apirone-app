@@ -871,8 +871,6 @@ AP.plate.modal = ( function() {
 
         changeImage: function( attribute ) {
 
-            // console.log( "changeImage", attribute );
-
             var uri = "";
 
             var orientationId = viewModel.get( "detailForm.data.product.orientation.id" );
@@ -941,12 +939,7 @@ AP.plate.modal = ( function() {
             var fruits = viewModel.get( "detailForm.data.fruits" );
             var fruit = fruits.get( fruitId );
 
-            // console.log( "fruitItems:renderProductItemsFruit:fruit", fruit );
-
             const attributeArray = fruit.get( "items" ).data();
-
-            // console.log( "fruitItems:renderProductItemsFruit:attributeArray", attributeArray );
-            // return;
 
             attributeArray.forEach( function( item ) { // i select
 
@@ -969,8 +962,6 @@ AP.plate.modal = ( function() {
                 const select = $( "<select>" ).addClass( "form-control form-control-sm select-item me-3 mb-2" ).on( "change", function() {
                     const selectedId = $( this ).val();
                     const attributeId = $( this ).data( "attribute-id" );
-
-                    // console.log( "changeFruitImage:values", item.values );
 
                     var value;
 
@@ -1186,15 +1177,10 @@ AP.plate.modal = ( function() {
             parsedData.item        = viewModel.get( "detailForm.data" );
             parsedData.positions   = positions;
 
-            console.log( "parsedData.pricing", parsedData.pricing );
-
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
 
                 parsedData.imageBase64 = imgData;
-                // parsedData.price = AP.quotation.pricing.getData().data;
-
-                // console.log("imageBase64", parsedData.imageBase64)
 
                 NM.util.ajax( {
                     method: "POST",
@@ -1205,7 +1191,7 @@ AP.plate.modal = ( function() {
                             status.html( "" );
                             AP.widget.notify( "success", "Placca salvata correttamente." );
                             viewModel.set( "detailForm", defaultDetailForm );
-                            // setTimeout( () => window.location.reload(), 1000 );
+                            setTimeout( () => window.location.reload(), 1000 );
                         }
                     }
                 } );
@@ -1268,6 +1254,8 @@ AP.plate.modal = ( function() {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
+
+        console.log( "new:zone", AP.quotation.detail.config().zone );
 
         viewModel.set( "detailForm", defaultDetailForm );
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
