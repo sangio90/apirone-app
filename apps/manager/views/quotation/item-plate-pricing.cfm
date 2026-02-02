@@ -48,6 +48,6 @@
 		<div>
 			#view(view="item-total-pricing", args=args)#
 		</div>
-		
+
 	</div>
 </cfoutput>
