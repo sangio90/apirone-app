@@ -114,25 +114,19 @@
 
 			var price = arguments.quotationItem.getPrice();
 
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #newId#, line: #price.getLines().len()#");
-
-
 			price.setQuotationItemId( newId );
 			var id = getQuotationItemPriceService().create( price );
-			//var id = getQuotationItemPriceService().create( price );
 
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #newId#, line: #price.getLines().len()#");
 
 			var hash = getProductHashService().createHash( newId );
 			cffile( action="append", file="#ExpandPath('/debug.log')#", output="hash: #hash#");
 
 			if ( !IsNull( hash ) ) {
-
+				quotationItem = get(newId);
 				quotationItem.setHash( hash );
-				quotationItem.setId( newId );
-				
 				update( quotationItem );
-				
 			}
 
 		}
@@ -143,6 +137,16 @@
 	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 		getDao().update( arguments.quotationItem );
 		super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
+
+		if (!isNull(arguments.quotationItem.getPrice().getQuotationItemId())) {
+			var price = arguments.quotationItem.getPrice();
+
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #arguments.quotationItem.getId()#, line: #price.getLines().len()#");
+
+			var id = getQuotationItemPriceService().update( price );
+		}
+
 
 		return arguments.quotationItem.getId();
 	}

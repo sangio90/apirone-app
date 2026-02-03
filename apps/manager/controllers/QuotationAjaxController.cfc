@@ -394,8 +394,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var values = result.getCalculatedTotals();
 
-		dump
-
 		var data = {
 			"counters" = counters,
 			"pricing" = values,

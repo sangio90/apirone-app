@@ -24,7 +24,9 @@ AP.signage.modal = ( function() {
             quotationItem: {
                 id: "",
                 quantity: 1,
-                price: 0,
+                price: {
+                    id: null,
+                },
                 product: {
                     finish: {
                         id: ""
@@ -64,6 +66,10 @@ AP.signage.modal = ( function() {
         },
         statuses: AP.page.statuses,
         itemStatuses: AP.page.itemStatuses,
+        priceTypes: [
+            { id: "C", name: "Calcolato" },
+            { id: "F", name: "Fisso" },
+        ],
         title: "Carica segnaletica",
         canSave: false,
     };
@@ -723,10 +729,6 @@ AP.signage.modal = ( function() {
                 url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
                     done: function( xhr ) {
-
-                        console.log( "firstLoadProductItems:productId", productId );
-                        console.log( "firstLoadProductItems:xhr", xhr.data );
-
                         if ( xhr.data.length > 0 ) {
                             if ( quotationItemId != "" ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
@@ -845,7 +847,6 @@ AP.signage.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.data.length > 0 ) {
-                                let toInsert = false;
                                 let parentIndex = -1;
 
                                 // Trovo l'indice dell'attributo selezionato
@@ -998,7 +999,7 @@ AP.signage.modal = ( function() {
         },
 
         save: function( event ) {
-            // AP.loading.show();
+            AP.loading.show();
             var preview = $( "#quotation-signage-preview-background" )[0];
             var quotationId = AP.page.quotation.id;
             const parsedData = viewModel.get( "detailForm.data" );
@@ -1019,8 +1020,9 @@ AP.signage.modal = ( function() {
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
-                parsedData.price = pricingApp().getData().data;
-                
+                parsedData.quotationItem.price = pricingApp().getData().data;
+
+                AP.loading.show()
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotation-items/signage",
@@ -1032,7 +1034,7 @@ AP.signage.modal = ( function() {
                             viewModel.set( "detailForm", defaultDetailForm );
 
                             setTimeout( function() {
-                                // AP.loading.hide();
+                                AP.loading.hide();
                                 window.location.reload();
                             }, 1000 );
                         },
@@ -1176,8 +1178,6 @@ AP.signage.modal = ( function() {
             viewModel.set( "callback.onSave", onSave );
         }
 
-        console.log( "new" );
-
         pricingApp().init( "signage", undefined );
 
         NM.util.ajax( {
@@ -1238,17 +1238,17 @@ AP.signage.modal = ( function() {
                                             if ( AP.getUserPref( "signage.signageConfigId" ) ) {
                                                 setTimeout( function() {
                                                     viewModel.parseLines();
-                                                }, 200 );
+                                                }, 400 );
                                             }
-                                        }, 200 );
+                                        }, 400 );
                                     }
-                                }, 200 );
+                                }, 400 );
                             }
-                        }, 200 );
+                        }, 400 );
                     }
-                }, 200 );
+                }, 400 );
             }
-        }, 200 );
+        }, 400 );
     };
 
     pub.edit = function( { id, onSave } ) {
@@ -1324,12 +1324,12 @@ AP.signage.modal = ( function() {
                                             } );
                                             NM.util.openModal( AP.signage.fields.modalRoot );
                                             viewModel.setSelectedTextAlignIcon();
-                                        }, 200 );
-                                    }, 200 );
-                                }, 200 );
-                            }, 200 );
-                        }, 200 );
-                    }, 200 );
+                                        }, 400 );
+                                    }, 400 );
+                                }, 400 );
+                            }, 400 );
+                        }, 400 );
+                    }, 400 );
 
                     pricingApp().init( "signage", { data: xhr.data.quotationItem.price } );
                 },

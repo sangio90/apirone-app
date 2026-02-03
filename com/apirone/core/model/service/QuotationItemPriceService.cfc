@@ -102,6 +102,21 @@
 		getDao().update( arguments.quotationItemPrice );
 		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemPrice.getId() );
 
+		//cancello le righe esistenti
+		getQuotationItemPriceLineService().deleteByQuotationItemPriceId( quotationItemPriceId = arguments.quotationItemPrice.getId() )
+
+		if( !IsNull( quotationItemPrice.getLines() ) ) {
+
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceService: if !null before loop on lines newId:#quotationItemPrice.getId()#, lines: #quotationItemPrice.getLines().len()#");
+			
+			for( var line in quotationItemPrice.getLines() ) {
+				cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceService: line newId:#quotationItemPrice.getId()#, lines: #quotationItemPrice.getLines().len()#");
+
+				line.setQuotationItemPriceId( quotationItemPrice.getId() );
+				getQuotationItemPriceLineService().create( line );
+			}
+		}
+
 		return arguments.quotationItemPrice.getId();
 	}
 

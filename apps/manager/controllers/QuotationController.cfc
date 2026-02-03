@@ -68,7 +68,7 @@
 		var memy = super.getMementify();
 
 		page[ "statuses" ]       = memy.convertList( super.fire( "status.list", [ "QUOTATION" ] ) );
-		page[ "itemStatuses" ]       = memy.convertList( super.fire( "status.list", [ "QUOTATION_ITEM" ] ) );
+		page[ "itemStatuses" ]   = memy.convertList( super.fire( "status.list", [ "QUOTATION_ITEM" ] ) );
 		page[ "languages" ]      = memy.convertList( super.fire( "lang.list" ) );
 		page[ "paymentMethods" ] = memy.convertList( [ super.fire( "paymentMethod.get", [18] ) ] );
 		page[ "currencies" ]     = memy.convertList( super.fire( "currency.list" ) );

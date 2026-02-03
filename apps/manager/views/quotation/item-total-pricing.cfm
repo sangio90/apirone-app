@@ -28,17 +28,16 @@
 	</div>
 
 	<div class="row mb-2">
-		<div class="col-5">
+		<div class="col-6">
 			<select name="priceMethod" class="form-control" id="input-price-method"
-				data-bind="value: pricing.data.method, events: { change: changeMethod }"
+				data-role="dropdownlist"
+				data-bind="source: detailForm.priceTypes, value: pricing.data.method.id, events: { change: changeMethod }"
 				data-value-field="id"
 				data-text-field="name"
 				>
-				<option value="C">Calcolato</option>
-				<option value="F">Fisso</option>
 			</select>
 		</div>
-		<div class="col-7">
+		<div class="col-6">
 			<div class="input-group">
 				<input class="form-control text-end" name="total" id="input-item-total"
 					placeholder="Totale"

@@ -296,10 +296,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setSpecial( json.quotationItem.special );
 		bean.setNote( json.quotationItem.note );
 		bean.setStatus( status.setId( json.quotationItem.status.id ) );
-
-		var pricing = getSignagePricing( json );
-
-		var price = populatePriceItem( json );
+		if ( !Len( id ) ) {
+			json.quotationItem.id = lcase(createUUID());
+		}
+		var price = getSignagePricing( json );
 		bean.setPrice( price );
 
 		bean.setSignageConfigItem(
@@ -585,9 +585,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function calculate( event, rc, prc ){
-
 		var json = DeserializeJSON( GetHTTPRequestData().content )
-
 		if (rc.type == "signage") {
 			var price = getSignagePricing( json );
 		} elseif(rc.type == "plate") {
@@ -601,7 +599,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", data );
 	}
-
 
 	/*
 		private methods
@@ -617,13 +614,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var lines = [];
 
+		pricing.setQuotationItemId( json.quotationItem.id );
+		pricing.setId( Val( json.quotationItem.price.id ) ? json.quotationItem.price.id : null );
 		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
 		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
 		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
 		        
 		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
 		
-        if ( pricing.isFixed() ) {
+        if ( json.quotationItem.price.method.id EQ 'F' ) {
 			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
 		} else {
 			pricing.setAmount( 0 );
@@ -632,57 +631,35 @@ component extends="com.apirone.core.controller.AbsController" {
 		/*
 			signage price
 		*/
-
 		var productItemsIds = [];
 
-		var product = json.item.product;
+		var product = json.quotationItem.product;
 
 		for ( var item in json.quotationItem.product.items._data ) {
 			for ( var value in item.values ) {
 				if ( value.selected ) {
-					productItemsIds.add( value.productItemId );
+					productItemsIds.add( value.product_item_id );
 				}
 			}
 		}
 
+		var lettersQuantity = 0;
+		for ( var signageRow in json.quotationItem.signageRows._data ) {
+			lettersQuantity += Val( signageRow.charCount ) ? signageRow.charCount : 0;
+		}
 		var signagePrice = calculator.calculate(
 			product.id,
 			json.quotationItem.quantity,
-			productItemsIds
+			productItemsIds,
+			lettersQuantity,
+			json.quotationItem.signageConfigItem.id
 		);
-
 		var line = super.bean( "QuotationItemPriceLine" );
 
 		line.setName( "Prezzo segnaletica" );
 		line.setAmount( signagePrice );
 
 		lines.add( line );
-
-
-		/*
-			fruits price
-		*/
-
-		for ( var fruit in json.item.fruits._data ) {
-			var fruitItemsIds = [];
-			
-			var line = super.bean( "QuotationItemPriceLine" );
-
-			for ( var item in fruit.items._data ) {
-				for ( var value in item.values ) {
-					if ( value.selected ) {
-						fruitItemsIds.add( value.productItemId );
-					}
-				}
-			}
-
-			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds );
-
-			line.setName( "#fruit.fruit?.name#" );
-			line.setAmount( fruitPrice );
-
-			lines.add( line );
-		}
 
 		pricing.setLines( lines );
 
@@ -721,9 +698,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		*/
 
 		var productItemsIds = [];
-
-		//dump(json.data.product);
-		//abort;
 
 		var product = json.item.product;
 

@@ -81,12 +81,12 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_item_prices
 			SET
-				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getProductId()#">::uuid,
 				name = '',
 				amount = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getAmount()#">,
-				quotation_item_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getDiscount1()#">,
-				discount1 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getDiscount2()#">,
-				discount2 = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getMethod().getId()#">
+				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getQuotationItemId()#">::uuid,
+				discount1 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getDiscount1()#">,
+				discount2 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getDiscount2()#">,
+				price_method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getMethod().getId()#">
 			WHERE
 				quotation_item_price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemPrice.getId()#">
 		</cfquery>

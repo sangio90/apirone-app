@@ -1,5 +1,6 @@
 {
     defaultIncludes = [
+        "id",
         "totalGoods",
         "lines",
         "discount1",

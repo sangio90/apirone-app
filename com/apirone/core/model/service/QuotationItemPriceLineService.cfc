@@ -51,13 +51,24 @@
 		return newId;
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete( required Numeric quotationItemPriceId ){
+	public com.apirone.core.model.bean.Outcome function delete( required Numeric quotationItemPriceLineId ){
+
+		var outcome = super.bean( "Outcome" );
+
+		outcome.setData( { quotationItemPriceLineId = arguments.quotationItemPriceLineId } );
+
+		getDao().delete( arguments.quotationItemPriceLineId );
+
+		return outcome;
+	}
+
+	public com.apirone.core.model.bean.Outcome function deleteByQuotationItemPriceId( required Numeric quotationItemPriceId ){
 
 		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { quotationItemPriceId = arguments.quotationItemPriceId } );
 
-		getDao().delete( arguments.quotationItemPriceId );
+		getDao().deleteByQuotationItemPriceId( arguments.quotationItemPriceId );
 
 		return outcome;
 	}

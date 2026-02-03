@@ -81,7 +81,7 @@
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">
-		<cfargument name="quotationItemPriceId" type="Numeric" required="true">
+		<cfargument name="quotationItemPriceLineId" type="Numeric" required="true">
 		<cfquery name="local.q" datasource="apirone" result="result">
 			DELETE
 			FROM 
