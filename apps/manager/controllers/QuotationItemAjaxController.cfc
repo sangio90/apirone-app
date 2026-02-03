@@ -586,6 +586,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function calculate( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content )
+
 		if (rc.type == "signage") {
 			var price = getSignagePricing( json );
 		} elseif(rc.type == "plate") {
@@ -681,14 +682,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var lines = [];
 
-		pricing.setQuantity( Val( json.pricing.quantity ) ? json.pricing.quantity : 1 );
-		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
-		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+		pricing.setQuantity( Val( json.price.quantity ) ? json.price.quantity : 1 );
+		pricing.setDiscount1( Val( json.price.discount1 ) ? json.price.discount1 : 0 );
+		pricing.setDiscount2( Val( json.price.discount2 ) ? json.price.discount2 : 0 );
 		        
-		pricing.setMethod( method.setId( json.pricing.method.id ) );
+		pricing.setMethod( method.setId( json.price.method.id ) );
 		
         if ( pricing.isFixed() ) {
-			pricing.setAmount( Val( json.total ) ? json.total : 0 );
+			pricing.setAmount( Val( json.price.total ) ? json.price.total : 0 );
 		} else {
 			pricing.setAmount( 0 );
 		}
@@ -711,7 +712,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var platePrice = calculator.calculate(
 			product.id,
-			json.pricing.quantity,
+			json.price.quantity,
 			productItemsIds
 		);
 

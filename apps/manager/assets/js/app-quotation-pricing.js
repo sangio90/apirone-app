@@ -81,15 +81,24 @@ AP.quotation.itemPricing = ( function() {
             AP.loading.show();
             var payload = {};
 
-            payload.quotationItem = getItem();
+            payload = getItem();
+
+            var typeId = viewModel.get( "typeId" );
+
+            if ( typeId == "plate" ) {
+                payload.price = viewModel.get( "pricing.data" );
+            } else {
+                payload.quotationItem.price.discount1 = viewModel.get( "pricing.data.discount1" );
+                payload.quotationItem.price.discount2 = viewModel.get( "pricing.data.discount2" );
+                payload.quotationItem.price.total = viewModel.get( "pricing.data.total" );
+                payload.quotationItem.price.method = viewModel.get( "pricing.data.method" );
+            }
+
+            payload.price = viewModel.get( "pricing.data." );
             // payload.quotationItem.price = viewModel.get( "pricing.data" );
 
-            payload.quotationItem.price.discount1 = viewModel.get( "pricing.data.discount1" );
-            payload.quotationItem.price.discount2 = viewModel.get( "pricing.data.discount2" );
-            payload.quotationItem.price.total = viewModel.get( "pricing.data.total" );
-            payload.quotationItem.price.method = viewModel.get( "pricing.data.method" );
 
-            const url = "/manager/ajax/quotation-items/type/" + viewModel.get( "typeId" ) + "/pricing";
+            const url = "/manager/ajax/quotation-items/type/" + typeId + "/pricing";
 
             NM.util.ajax( {
                 method: "POST",
