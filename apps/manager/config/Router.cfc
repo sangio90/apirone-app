@@ -500,6 +500,7 @@
 			quotation items
 		*/
 		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
+		post( "/ajax/quotation-items/type/:type/pricing" ).to( "QuotationItemAjaxController.calculate" ).end();
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
 		get( "/ajax/quotation-items/plate/:id/fruits" ).to( "QuotationItemAjaxController.listFruits" ).end();
 		get( "/ajax/quotation-items/plate/:id" ).to( "QuotationItemAjaxController.editPlate" ).end();
@@ -511,7 +512,6 @@
 		post( "/ajax/quotation-items/article" ).to( "QuotationItemAjaxController.saveArticle" ).end();
 		
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
-		post( "/ajax/quotation-items/:type/pricing" ).to( "QuotationItemAjaxController.calculate" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		//get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();

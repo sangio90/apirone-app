@@ -17,7 +17,8 @@ AP.quotation.itemPricing = ( function() {
             discount1: "",
             discount2: "",
             method: {
-                id: "C" // calculated
+                id: "F", // calculated,
+                name: "Fisso"
             },
             lines: [], // es. { name: "Frutto 1", amount: 10.5 },
             total: 0,
@@ -53,46 +54,46 @@ AP.quotation.itemPricing = ( function() {
         typeId: undefined, // plate, signage, accessory
 
         changeMethod: function( event ) {
-
-            var ele = $( event.currentTarget );
-
-            var value = ele.val();
-            var price = fields.boxPricing.find( "#input-item-total" );
-
+            var value = event.sender.value();
             if ( value == "C" ) {
-                this.updateItem();
-
-                price.prop( "readonly", true );
+                viewModel.set('pricing.data.discount1', 0);
+                viewModel.set('pricing.data.discount2', 0);
+                viewModel.set('pricing.data.total', 0);
+                $('[name="discount1"]').prop('disabled', true);
+                $('[name="discount2"]').prop('disabled', true);
+                $('#input-item-total').prop('disabled', true);
+                this.update();
             } else {
-                price.prop( "readonly", false );
+                $('[name="discount1"]').prop('disabled', false);
+                $('[name="discount2"]').prop('disabled', false);
+                $('#input-item-total').prop('disabled', false);
+                viewModel.set('pricing.data.lines', []);
+                viewModel.set('pricing.data.total', 0);
             }
-
+            
         },
 
         update: function( event ) {
-
-            console.log( "pricing:update" );
-
-            var status = $( "#quotation-item-pricing-status" );
-            status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
-
+            AP.loading.show();
             var payload = {};
-
-            payload.item    = getItem(); // from app
-            payload.pricing = viewModel.get( "pricing.data" );
-            payload.typeId  = viewModel.get( "typeId" );
-
+            payload = getItem();
+            payload.quotationItem.price.discount1 = viewModel.get( "pricing.data.discount1" );
+            payload.quotationItem.price.discount2 = viewModel.get( "pricing.data.discount2" );
+            payload.quotationItem.price.total = viewModel.get( "pricing.data.total" );
+            payload.quotationItem.price.method = viewModel.get( "pricing.data.method" );
+            const url = "/manager/ajax/quotation-items/type/" + viewModel.get( "typeId" ) + "/pricing";
             NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax/quotation-items/" + viewModel.get( "typeId" ) + "/pricing",
+                url: url,
                 data: JSON.stringify( payload ),
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data ) {
-
-                            status.html( "" );
-                            viewModel.set( "pricing.data", xhr.data );
-
+                            AP.loading.hide();
+                            if (viewModel.get( "typeId" ) != "plate") {
+                                viewModel.set( "pricing.data.total", xhr.data.totalGoods );
+                                viewModel.set( "pricing.data.lines", xhr.data.lines );
+                            }
                         }
                     }
                 }
@@ -113,11 +114,6 @@ AP.quotation.itemPricing = ( function() {
     pub.init = function( typeId, data ) { // type: plate, signage, accessory
 
         var elementId = $( "#" + typeId + "-quotation-item-pricing-box" );
-
-        console.log( "elementId", elementId );
-
-        console.log( "fields.boxItemPricing", fields.boxItemPricing );
-
         kendo.bind( elementId, viewModel );
 
         viewModel.set( "typeId", typeId );
@@ -127,8 +123,6 @@ AP.quotation.itemPricing = ( function() {
         } else {
             viewModel.set( "pricing", defaultForm );
         }
-
-        console.log( "qta", viewModel.get( "pricing.data.quantity" ) );
 
     };
 
@@ -218,9 +212,6 @@ AP.quotation.totalPricing = ( function() {
         getFormattedTotal: function() {
 
             var value = this.get( "pricing.data.total" );
-
-            if( value ) { console.log( "getFormattedTotal:value", value ); }
-
             return value;
 
         },
