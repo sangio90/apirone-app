@@ -31,7 +31,7 @@
 		<div class="col-6">
 			<select name="priceMethod" class="form-control" id="input-price-method"
 				data-role="dropdownlist"
-				data-bind="source: detailForm.priceTypes, value: pricing.data.method.id, events: { change: changeMethod }"
+				data-bind="source: pricing.priceTypes, value: pricing.data.method.id, events: { change: changeMethod }"
 				data-value-field="id"
 				data-text-field="name"
 				>
