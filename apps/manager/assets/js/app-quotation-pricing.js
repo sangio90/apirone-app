@@ -22,7 +22,11 @@ AP.quotation.itemPricing = ( function() {
             },
             lines: [], // es. { name: "Frutto 1", amount: 10.5 },
             total: 0,
-        }
+        },
+        priceTypes: [
+            { id: "C", name: "Calcolato" },
+            { id: "F", name: "Fisso" },
+        ],
     };
 
     var getItem = function() {
@@ -56,32 +60,37 @@ AP.quotation.itemPricing = ( function() {
         changeMethod: function( event ) {
             var value = event.sender.value();
             if ( value == "C" ) {
-                viewModel.set('pricing.data.discount1', 0);
-                viewModel.set('pricing.data.discount2', 0);
-                viewModel.set('pricing.data.total', 0);
-                $('[name="discount1"]').prop('disabled', true);
-                $('[name="discount2"]').prop('disabled', true);
-                $('#input-item-total').prop('disabled', true);
+                viewModel.set( "pricing.data.discount1", 0 );
+                viewModel.set( "pricing.data.discount2", 0 );
+                viewModel.set( "pricing.data.total", 0 );
+                $( "[name=\"discount1\"]" ).prop( "disabled", true );
+                $( "[name=\"discount2\"]" ).prop( "disabled", true );
+                $( "#input-item-total" ).prop( "disabled", true );
                 this.update();
             } else {
-                $('[name="discount1"]').prop('disabled', false);
-                $('[name="discount2"]').prop('disabled', false);
-                $('#input-item-total').prop('disabled', false);
-                viewModel.set('pricing.data.lines', []);
-                viewModel.set('pricing.data.total', 0);
+                $( "[name=\"discount1\"]" ).prop( "disabled", false );
+                $( "[name=\"discount2\"]" ).prop( "disabled", false );
+                $( "#input-item-total" ).prop( "disabled", false );
+                viewModel.set( "pricing.data.lines", [] );
+                viewModel.set( "pricing.data.total", 0 );
             }
-            
+
         },
 
         update: function( event ) {
             AP.loading.show();
             var payload = {};
-            payload = getItem();
+
+            payload.quotationItem = getItem();
+            // payload.quotationItem.price = viewModel.get( "pricing.data" );
+
             payload.quotationItem.price.discount1 = viewModel.get( "pricing.data.discount1" );
             payload.quotationItem.price.discount2 = viewModel.get( "pricing.data.discount2" );
             payload.quotationItem.price.total = viewModel.get( "pricing.data.total" );
             payload.quotationItem.price.method = viewModel.get( "pricing.data.method" );
+
             const url = "/manager/ajax/quotation-items/type/" + viewModel.get( "typeId" ) + "/pricing";
+
             NM.util.ajax( {
                 method: "POST",
                 url: url,
@@ -90,7 +99,7 @@ AP.quotation.itemPricing = ( function() {
                     done: function( xhr ) {
                         if ( xhr.data ) {
                             AP.loading.hide();
-                            if (viewModel.get( "typeId" ) != "plate") {
+                            if ( viewModel.get( "typeId" ) != "plate" ) {
                                 viewModel.set( "pricing.data.total", xhr.data.totalGoods );
                                 viewModel.set( "pricing.data.lines", xhr.data.lines );
                             }
@@ -114,9 +123,13 @@ AP.quotation.itemPricing = ( function() {
     pub.init = function( typeId, data ) { // type: plate, signage, accessory
 
         var elementId = $( "#" + typeId + "-quotation-item-pricing-box" );
+
+        console.log( "elementID", elementId );
+
         kendo.bind( elementId, viewModel );
 
         viewModel.set( "typeId", typeId );
+        console.log( "typeId", viewModel.get( "typeId" ) );
 
         if ( data ) {
             viewModel.set( "pricing", data );

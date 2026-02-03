@@ -66,10 +66,6 @@ AP.signage.modal = ( function() {
         },
         statuses: AP.page.statuses,
         itemStatuses: AP.page.itemStatuses,
-        priceTypes: [
-            { id: "C", name: "Calcolato" },
-            { id: "F", name: "Fisso" },
-        ],
         title: "Carica segnaletica",
         canSave: false,
     };
@@ -873,11 +869,11 @@ AP.signage.modal = ( function() {
                                 }
 
                                 var lastAttributeId = null;
-                                let attributes = [];
+                                const attributes = [];
                                 let attribute;
                                 // Popolo i valori del nuovo attributo
                                 xhr.data.forEach( function( item ) {
-                                    if (lastAttributeId == null || lastAttributeId != item.attribute.id) {
+                                    if ( lastAttributeId == null || lastAttributeId != item.attribute.id ) {
                                         attribute = {
                                             attribute_id: item.attribute.id,
                                             attribute_name: item.attribute.name,
@@ -897,7 +893,7 @@ AP.signage.modal = ( function() {
                                 } );
                                 for ( let i = 0; i < attributes.length; i++ ) {
                                     productItems.insert( parentIndex + 1, attributes[i] );
-                                }    
+                                }
                             } else {
                                 // Se non ci sono figli, setto selected sul parent
                                 let parentIndex = -1;
@@ -945,7 +941,8 @@ AP.signage.modal = ( function() {
             const container = $( "#product-items" );
             container.empty();
             const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
-            attributeArray = productItems.data();
+            var attributeArray = productItems.data();
+
             attributeArray.forEach( function( item ) {
                 const attrName = item.attribute_name;
                 const values = item.values;
@@ -1022,7 +1019,7 @@ AP.signage.modal = ( function() {
                 parsedData.imageBase64 = imgData;
                 parsedData.quotationItem.price = pricingApp().getData().data;
 
-                AP.loading.show()
+                AP.loading.show();
                 NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotation-items/signage",

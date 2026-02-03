@@ -180,7 +180,7 @@ AP.plate.modal = ( function() {
             },
             position: {
                 id: "",
-                code: ""
+                name: ""
             },
             product: {
                 id: "",
@@ -209,11 +209,6 @@ AP.plate.modal = ( function() {
             quotationZone: {
                 id: ""
             },
-            /*
-            selectedOrientation: {
-                id: "HOR"
-            },
-            */
             fruits: new kendo.data.DataSource( { // es. data: { position: 1, { fruit: { id: , name: } } }
                 data: [],
                 schema: {
@@ -221,10 +216,15 @@ AP.plate.modal = ( function() {
                 }
             } )
         },
-        // statuses: AP.page.statuses,
+        statuses: AP.page.statuses,
+        itemStatuses: AP.page.itemStatuses,
         title: "Carica placca",
         canSave: false,
         isClone: false,
+        priceTypes: [
+            { id: "C", name: "Calcolato" },
+            { id: "F", name: "Fisso" },
+        ],
     };
 
     var defaultPlate = {
@@ -1044,8 +1044,6 @@ AP.plate.modal = ( function() {
 
                     viewModel.loadProductItems( selectedId, attributeId );
 
-                    // viewModel.calculatePriceItem();
-
                 } );
 
                 select.attr( "data-attribute-id", item.attributeId );
@@ -1054,9 +1052,6 @@ AP.plate.modal = ( function() {
                     select.css( "margin-left", ( 1.5 * item.level ) + "rem" );
                     select.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
                 }
-
-                // const emptyOption = $( "<option>" ).val( "" ).html( "-- Seleziona valore attributo" );
-                // select.append( emptyOption );
 
                 values.forEach( function( attrValue ) {
                     const option = $( "<option>" )
@@ -1170,6 +1165,7 @@ AP.plate.modal = ( function() {
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
             var parsedData = {};
+
             parsedData.quotationId = AP.page.quotation.id;
             parsedData.isClone     = viewModel.get( "detailForm.isClone" );
             parsedData.typeId      = "plate";
@@ -1263,7 +1259,8 @@ AP.plate.modal = ( function() {
 
         pricingApp().init( "plate", undefined );
 
-        // console.log( "plate:new" );
+        initFruitsSuggest();
+        initPositionSuggest();
 
         viewModel.loadLines();
 
@@ -1334,7 +1331,81 @@ AP.plate.modal = ( function() {
 
                     loadAll();
 
+                    initFruitsSuggest();
+                    initPositionSuggest();
+
                 },
+            },
+        } );
+
+    };
+
+    var initPositionSuggest = function() {
+
+        console.log( "suggest:", viewModel.get( "detailForm.data.quotationZone" ) );
+
+        var suggest = $( "#qt-plate-position-suggest" );
+        var autocomplete = suggest.data( "kendoAutoComplete" );
+        var suggestTemplate = $( "#quotation-position-suggest-row-tmpl" ).html();
+
+        if ( autocomplete ) {
+            return;
+        }
+
+        suggest.keypress( function( event ) {
+            if ( event.keyCode == 13 ) {
+                return false;
+            }
+        } );
+
+        suggest.kendoAutoComplete( {
+            template: $.proxy( kendo.template( suggestTemplate ) ),
+            height: "auto",
+            dataTextField: "term",
+            highlightFirst: true,
+            minLength: 2,
+            dataSource: new kendo.data.DataSource( {
+                serverFiltering: true,
+                transport: {
+                    read: {
+                        url: "/ajax/quotations/" + viewModel.get( "detailForm.data.quotationZone.id" ) + "/positions",
+                        data: {
+                            str: function() {
+                                return suggest.data( "kendoAutoComplete" ).value();
+                            },
+                        },
+                    },
+                    parameterMap: function( data, type ) {
+                        if ( type === "read" ) {
+                            return { "str": data.str()  };
+                        }
+                    }
+                },
+                schema: {
+                    data: function( xhr ) {
+                        return xhr.data;
+                    }
+                },
+            } ),
+            change: function( e ) {
+                var value = this.value();
+                var exists = false;
+
+                // Verifichiamo se l'elemento è presente nel DataSource
+                var dataItem = this.dataSource.data().find( item => item.Name === value );
+
+                if ( !dataItem ) {
+                    console.log( "suggest:Inserito nuovo elemento:", value );
+                    // Qui puoi gestire la logica per i nuovi elementi
+                    // Magari aprendo una modale o preparando una chiamata Ajax
+                } else {
+                    console.log( "suggest:Elemento selezionato dalla lista:", dataItem );
+                }
+            },
+
+            select: function( event ) {
+                var item = this.dataItem( event.item.index() );
+                console.log( "suggest:Inserito nuovo elemento:", item );
             },
         } );
 
@@ -1398,8 +1469,6 @@ AP.plate.modal = ( function() {
     pub.init = function( setup ) {
 
         settings.container = setup.container;
-
-        initFruitsSuggest();
 
         kendo.bind( settings.container, viewModel );
 
