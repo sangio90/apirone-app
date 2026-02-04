@@ -18,12 +18,27 @@ AP.article.modal = ( function() {
     var defaultDetailForm = {
         data: {
             id: "",
-            article: {
+            quotationItem: {
                 id: "",
-                price: 0,
+                name: "",
+                quantity: 1,
                 note: "",
+                price: {
+                    total: 0,
+                    amount: 0,
+                },
+                quotationZone: {
+                    id: ""
+                },
+                article: {
+                    code: "",
+                    id: ""
+                },
+                status: {
+                    id: "ACT",
+                    name: "Attivo"
+                }
             },
-            quantity: 1
         },
         articles: [],
         title: "Carica servizio",
@@ -42,12 +57,24 @@ AP.article.modal = ( function() {
             onLoad: undefined,
         },
 
-        save: function( event ) {
+        //preimpostiamo il prezzo con quello definito nell'anagrafica servizi
+        setDefault: function( event ) {
+            const article = viewModel.get('articles').find(article => article.id == $(event.currentTarget).val())
+            if (article && article.price && article.price.amount > 0) {
+                viewModel.set('detailForm.data.quotationItem.price.amount', article.price.amount)
+            }
+            if (article && article.descriptionItem && article.descriptionItem.name != '') {
+                viewModel.set('detailForm.data.quotationItem.note', article.descriptionItem.name)
+            }
+        },
 
+        save: function( event ) {
+            let data = viewModel.get('detailForm.data');
+            data.id = AP.page.quotation.id;
             NM.util.ajax( {
                 method: "POST",
                 url: "/manager/ajax/quotation-items/article",
-                data: JSON.stringify( parsedData ),
+                data: JSON.stringify( data ),
                 callback: {
                     done: function( xhr ) {
                         $( "#signage-modal" ).hide();
@@ -55,7 +82,6 @@ AP.article.modal = ( function() {
                         viewModel.set( "detailForm", defaultDetailForm );
 
                         setTimeout( function() {
-                            // AP.loading.hide();
                             window.location.reload();
                         }, 1000 );
                     },
@@ -63,6 +89,10 @@ AP.article.modal = ( function() {
             } );
 
             return false;
+        },
+
+        resetForm: function() {
+            viewModel.set( "detailForm", defaultDetailForm );
         },
     } );
 
@@ -73,26 +103,27 @@ AP.article.modal = ( function() {
 
         viewModel.resetForm();
 
+        viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
+
         NM.util.openModal( fields.articleModalRoot );
 
     };
 
     pub.edit = function( id, onSave ) {
         viewModel.resetForm();
-
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotation-items/article/" + id,
             callback: {
                 done: function( xhr ) {
-
-                    viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
-                    viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
-
+                    xhr.data.quotationItem.price.amount = xhr.data.quotationItem.price.total
+                    viewModel.set( "detailForm.data.quotationItem", xhr.data.quotationItem );
+                    NM.util.openModal( fields.articleModalRoot );
                 },
             },
         } );
 
+        renderQuotationItemTotals( id );
     };
 
     pub.init = function() {
@@ -122,8 +153,48 @@ AP.article.modal = ( function() {
                 }
             }
         } );
+    };
 
-        
+    renderQuotationItemTotals = function( quotationItemId ) {
+        NM.util.ajax( {
+            method: "GET",
+            url: `/manager/ajax/quotation-items/${quotationItemId}/total`,
+            callback: {
+                done: function( xhr ) {
+                    if( xhr.data ) {
+                        if ( !xhr.data.id || xhr.data.id != quotationItemId ) {
+                            $( "#quotation-totals-item" ).hide();
+                        } else {
+                            viewModel.set( "detailForm.data.totals", xhr.data );
+                            var totals = viewModel.get( "detailForm.data.totals" );
+                            if ( xhr.data ) {
+                                const table = $( "#quotation-totals-item" ).find( "table" )[0];
+                                totals.products.forEach( function( row ) {
+                                    $( table ).append( `
+                                        <tr>
+                                            <td>${row.id} - ${row.label}</td>
+                                            <td>${row.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
+                                        </tr>
+                                    ` );
+                                } );
+                                $( table ).append(
+                                    `<tr>
+                                        <td>${totals.quantity.label}</td>
+                                        <td>${totals.quantity.count}</td>
+                                    </tr>
+                                    <tr style="font-weight: bold">
+                                        <td>${totals.total.label}</td>
+                                        <td>${totals.total.amount.toLocaleString( "it-IT", { style: "currency", currency: "EUR" } )}</td>
+                                    </tr>
+                                    `
+                                );
+                            }
+                            $( "#quotation-totals-item" ).show();
+                        }
+                    }
+                }
+            }
+        } );
     };
 
     return pub;

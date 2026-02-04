@@ -120,13 +120,15 @@
 			cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
 			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #newId#, line: #price.getLines().len()#");
 
-			var hash = getProductHashService().createHash( newId );
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="hash: #hash#");
+			if ( isNull(arguments.quotationItem.getArticle()) ) {
+				var hash = getProductHashService().createHash( newId );
+				cffile( action="append", file="#ExpandPath('/debug.log')#", output="hash: #hash#");
 
-			if ( !IsNull( hash ) ) {
-				quotationItem = get(newId);
-				quotationItem.setHash( hash );
-				update( quotationItem );
+				if ( !IsNull( hash ) ) {
+					quotationItem = get(newId);
+					quotationItem.setHash( hash );
+					update( quotationItem );
+				}
 			}
 
 		}

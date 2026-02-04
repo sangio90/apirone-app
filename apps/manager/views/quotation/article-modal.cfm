@@ -16,8 +16,8 @@
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Servizio</label>
 							<div class="col-9">
-								<select name="newStatus" class="form-control"
-									data-bind="source: articles, events: { change: showDocumentRequired }, value: detailForm.data.newStatus"
+								<select name="article" class="form-control"
+									data-bind="source: articles, value: detailForm.data.quotationItem.article, events: { change: setDefault }"
 									data-value-field="id"
 									data-text-field="name"
 								>
@@ -28,7 +28,7 @@
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Quantità</label>
 							<div class="col-9">
-								<input type="number" name="quantity" class="form-control" data-bind="value: detailForm.data.quantity" min="1" step="1" />
+								<input type="number" name="quantity" class="form-control" data-bind="value: detailForm.data.quotationItem.quantity" min="1" step="1" />
 							</div>
 						</div>
 
@@ -36,7 +36,7 @@
 							<label class="col-sm-3 control-label text-sm-end pt-2">Prezzo</label>
 							<div class="col-sm-9">
 								<div class="input-group">
-									<input type="number" name="price" class="form-control" placeholder="" value="" />
+									<input type="number" name="price" class="form-control" placeholder="" data-bind="value: detailForm.data.quotationItem.price.amount" />
 									<span class="input-group-text">
 										<i class="fas fa-euro-sign text-4"></i>
 									</span>
@@ -49,7 +49,7 @@
 							<label class="col-sm-3 control-label text-sm-end pt-2">Descrizione</label>
                             <div class="col-sm-9">
 								<div class="input-group">
-									<textarea name="note" class="form-control" data-bind="value: detailForm.data.note" rows="4"></textarea>
+									<textarea name="note" class="form-control" data-bind="value: detailForm.data.quotationItem.note" rows="4"></textarea>
 								</div>
                             </div>
 						</div>

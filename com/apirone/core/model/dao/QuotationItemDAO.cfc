@@ -33,12 +33,13 @@
 			FROM quotation_items
 				
 				<cfif !IsNull( arguments.typeId )>
-					INNER JOIN products ON quotation_items.product_id = products.product_id
 					<cfif arguments.typeId EQ "ART">
 						INNER JOIN articles ON quotation_items.article_id = articles.article_id
+					<cfelse>
+						INNER JOIN products ON quotation_items.product_id = products.product_id
+						INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+						INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
 					</cfif>
-					INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
-					INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
 				</cfif>
 			WHERE 1=1
 
@@ -82,6 +83,7 @@
 				quotation_zone_id,
 				product_id,
 				article_id,
+				note,
 				<!---
 				discount1,
 				discount2,
@@ -118,6 +120,7 @@
 				<cfelse>
 					NULL,
 				</cfif>
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getNote()#">,
 				<!-----
 				<cfqueryparam cfsqltype="Float" value="#price.getDiscount1()#">,
 				<cfqueryparam cfsqltype="Float" value="#price.getDiscount2()#">,
@@ -171,6 +174,7 @@
 					<cfelse>
 						NULL
 					</cfif>,
+				note = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getNote()#">,
 				<!---- price = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getPrice()#">, ---->
 				quantity = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">,
 				"hash" =

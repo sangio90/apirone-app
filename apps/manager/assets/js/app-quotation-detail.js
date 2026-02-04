@@ -135,9 +135,6 @@ AP.quotation.detail = ( function() {
         quotationItemsAccessory: new kendo.data.DataSource( {} ),
 
         showItems: function() {
-
-            console.log( "getQuotationItems()", getQuotationItems() );
-
             return getQuotationItems().total() > 0;
         },
 
@@ -592,8 +589,6 @@ AP.quotation.detail = ( function() {
 
             var typeId = viewModel.get( "typeId" );
 
-            console.log( "edit:typeId", typeId );
-
             if ( typeId == "plate" ) {
                 plateApp().edit( { id: event.data.id } );
             }
@@ -607,7 +602,7 @@ AP.quotation.detail = ( function() {
             }
 
             if ( typeId == "article" ) {
-                articleApp().edit( { id: event.data.id } );
+                articleApp().edit( event.data.id );
             }
 
             event.preventDefault();
@@ -727,8 +722,6 @@ AP.quotation.detail = ( function() {
                 var type = parts[0];
                 var itemId = parts[1];
 
-                console.log( "URL hash detected - Type:", type, "ID:", itemId );
-
                 // Chiama la funzione edit corrispondente
                 switch ( type.toLowerCase() ) {
                 case "plate":
@@ -771,8 +764,6 @@ AP.quotation.detail = ( function() {
                 var tabButton = document.querySelector( "button#nav-" + tabType + "-tab" );
 
                 if ( tabButton ) {
-                    console.log( "Activating tab from URL:", tabType );
-
                     // Rimuove la classe active da tutti i tab
                     document.querySelectorAll( ".nav-link" ).forEach( function( btn ) {
                         btn.classList.remove( "active" );
@@ -829,8 +820,6 @@ AP.quotation.detail = ( function() {
 
         AP.quotation.detail.showTotals();
 
-        console.log( "AP.page.quotation" );
-
         // Controlla URL hash per auto-aprire edit modal
         // console.log( "init:checkUrlHash" );
         pub.checkUrlHash();
@@ -838,7 +827,6 @@ AP.quotation.detail = ( function() {
         if ( AP.page.quotation ) {
 
             document.querySelector( "#nav-plate-tab" ).addEventListener( "click", function( event ) {
-                console.log( "nav-plate-tab" );
                 event.preventDefault();
                 fields.addPlateBtn.show();
                 fields.addSignageBtn.hide();
@@ -869,8 +857,6 @@ AP.quotation.detail = ( function() {
                 fields.addAccessoryBtn.hide();
                 fields.addArticleBtn.show();
             } );
-
-            console.log( "pricingApp", pricingApp );
 
             pricingApp().getTotals();
 
@@ -1171,9 +1157,6 @@ AP.quotation.printModal = ( function() {
     pub.init = function() {
         kendo.bind( fields.printModalRoot, viewModel );
         viewModel.toggleOptions();
-
-        console.log( "typeId", viewModel.get( "typeId" ) );
-
     };
 
     pub.methods = function( options ) {

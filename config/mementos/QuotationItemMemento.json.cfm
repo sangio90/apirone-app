@@ -15,6 +15,27 @@
                 "items",
                 "note",
                 "createdAt",
+                "special",
+                "status",
+            ]
+        },
+        editArticle = {
+            defaultIncludes = [
+                "id",
+                "price",
+                "price.total",
+                "quantity",
+                "product.id",
+                "product.finish",
+                "product.model",
+                "product.line",
+                "quotationZone",
+                "article",
+                "items",
+                "note",
+                "createdAt",
+                "special",
+                "status",
             ]
         }
     }

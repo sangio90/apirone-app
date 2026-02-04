@@ -15,7 +15,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
 
 		var rows = super.fire( "QuotationItem.search", params );
-
 		var data = ( memy.convertList( rows.getData() ) );
 
 		result.setTotal( rows.getTotal() );
@@ -34,7 +33,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 
-		var parsedQuotationItemData = memy.convert( quotationItem, "edit" );
+		var parsedQuotationItemData = memy.convert( quotationItem, "editArticle" );
 
 		data.append( { "quotationItem" = parsedQuotationItemData } );
 
@@ -46,12 +45,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
 		var thisId    = "";
 		var messageId = "";
-		//var texts     = [];
 
 		var result = super.getResult();
 
 		var id   = json.quotationItem.id;
-		//var type = json.type;
 
 		if ( !Len( id ) ) {
 			var bean = super.bean( "QuotationItem" );
@@ -59,12 +56,31 @@ component extends="com.apirone.core.controller.AbsController" {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
 
-		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
+		bean.setQuotation( super.service( "Quotation" ).get( json.id ) );
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
 		bean.setQuantity( json.quotationItem.quantity );
+		bean.setArticle( super.fire( "Article.get", { articleId = json.quotationItem.article.id } ) );
 
-		var price = populatePriceItem( json );
+		var price = super.bean( "QuotationItemPrice" );
+		
+		price.setDiscount1( 0 );
+		price.setDiscount2( 0 );
+		var method  = super.bean( "PriceMethod" );
+		price.setMethod( method.setId( "F" ) );
+		price.setAmount( Val( json.quotationItem.price.amount ) ? json.quotationItem.price.amount : 0 );
+		var status  = super.bean( "Status" );
+		bean.setStatus( status.setId( json.quotationItem.status.id ) );
+		bean.setNote( json.quotationItem.note );
+
 		bean.setPrice( price );
+
+		if ( !Len( id ) ) {
+			messageId = "quotationItem.created";
+			thisId    = super.fire( "quotationItem.create", [ bean ] )
+		} else {
+			messageId = "quotationItem.updated";
+			thisId    = super.fire( "quotationItem.update", [ bean ] )
+		}
 
 		var message = completeMessage( messageId );
 
