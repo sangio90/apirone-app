@@ -41,6 +41,9 @@
 <body>
     <div id="global-loading-spinner">
         <div id="global-loading-spinner-circle"></div>
+        <cfif prc.isDev>
+            <div style="clear:all"><a href="javascript:AP.loading.hide()">Chiudi</a></div>
+        </cfif>
     </div>
     <section class="body">
 

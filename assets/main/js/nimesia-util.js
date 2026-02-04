@@ -231,11 +231,16 @@ NM.storage = {
     */
 
     set: function( key, value ) {
-        localStorage.setItem( key, JSON.stringify( value ) );
+        if ( value != "undefined" ) {
+            localStorage.setItem( key, JSON.stringify( value ) );
+        }
     },
 
     get: function( key, defaultValue ) {
         var value = localStorage.getItem( key );
+        if ( value == "undefined" ) {
+            return "";
+        }
         return value ? JSON.parse( value ) : defaultValue;
     },
 

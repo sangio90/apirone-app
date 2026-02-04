@@ -34,6 +34,7 @@
 		<cfargument name="str" type="String">
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="catalogBundleLineId" type="String">
+		<cfargument name="catalogBundleCategoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
 		<cfargument name="typeId" type="String">
 		<cfargument name="statusId" type="String">
@@ -50,7 +51,7 @@
 				COUNT(model_id) OVER() AS total
 			FROM
 				models
-					<cfif !IsNull( arguments.lineId ) OR !IsNull( arguments.catalogBundleLineId )>
+					<cfif !IsNull( arguments.lineId ) OR !IsNull( arguments.catalogBundleCategoryId ) OR !IsNull( arguments.catalogBundleLineId )>
 						INNER JOIN catalog_bundles USING (model_id)
 					</cfif>
 			WHERE 1=1
@@ -68,7 +69,11 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.catalogBundleLineId )>
-					AND catalog_bundles.line_id = <cfqueryparam cfsqltype="varchar" value="#arguments.catalogBundleLineId#">::uuid
+					AND catalog_bundles.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundleLineId#">::uuid
+				</cfif>
+
+				<cfif !IsNull( arguments.catalogBundleCategoryId )>
+					AND catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.catalogBundleCategoryId#">
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
