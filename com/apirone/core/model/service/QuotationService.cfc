@@ -179,22 +179,53 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var index = 1;
 
 				for ( var quotationItem in arguments.quotationItems ) {
+					if (!isNull(quotationItem.getArticle())) {
+						var dataExport = {
+							"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
+							"ARCODART"  = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ),
+							"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, 35 ) & RepeatString(
+								"0",
+								35 - Len( quotationItem.getArticle().getDescription().subString( 0, 35 ) )
+							),
+							"ARDATCAR"  = Now(),
+							"ARUNMIS1"  = "PZ",
+							"VARCOD"    = "0000000000",
+							"CLCODICE"  = "000000",
+							"CLANNOTA"  = quotationItem.getNote()
+						}
+
+						result.success = getDao().exportProduct( dataExport );
+						var existingCodes = exportCodeService.list(
+							str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
+						);
+
+						if ( existingCodes.len() > 0 ) {
+							continue;
+						}
+
+						var exportCode = super.bean( "ExportCode" );
+						exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
+						exportCode.setCounter( "000000" );
+						exportCodeService.create( "exportCode" = exportCode );
+
+						continue;
+					} else {
+						var code = "";
+
+						var product = quotationItem.getProduct()
+						
+						if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
+							result.error = 'Prodotto o Categoria Prodotto non trovata.'
+							return result;
+						}
+						
+						
+						var categoryCode = Trim( product.getCategory().getCode() );
+						code &= categoryCode;
+						var note = "";
+					}
 
 					setComponentCounter( 0 )
-
-					var code = "";
-
-					var product = quotationItem.getProduct()
-					
-					if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
-						result.error = 'Prodotto o Categoria Prodotto non trovata.'
-						return result;
-					}
-					
-					
-					var categoryCode = Trim( product.getCategory().getCode() );
-					code &= categoryCode;
-					var note = "";
 
 					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
 					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
@@ -293,9 +324,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						}
 
 						var productComponents = getComponents( product.getId(), quotationItem, productItemIds );
-
-						//dump(productComponents);
-						//abort;
 
 						varCode &= RepeatString( "0", 10 - Len( varCode ) )
 
@@ -472,13 +500,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						result.success = getDao().exportDiba( productComponent );
 					}
 
-					
-
 				}
 			}
 		}
 
-		notifyProductsVerticale();
+		// notifyProductsVerticale();
 
 		return result;
 	}
@@ -488,7 +514,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			'success' = false,
 			'error' = null
 		};
-		
+
 		transaction {
 			if (quotationItems.len() > 0) {
 				var quotation = quotationItems[1].getQuotation();
@@ -506,19 +532,59 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				for ( var quotationItem in arguments.quotationItems ) {
 					var quotationData = {}
 					quotationData.append(quotationDataHead);
-					setComponentCounter( 0 )
-					var code    = "";
-					var product = quotationItem.getProduct()
-					if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
-						result.error = 'Prodotto o Categoria Prodotto non trovata.'
-						return result;
+
+					if (!isNull(quotationItem.getArticle())) {
+						var product = null
+						var code = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ) & "0000000000"
+						var existingCodes = exportCodeService.list( str = code );
+						if ( existingCodes.len() == 0 ) {
+							result.error = 'Prima esporta gli articoli.';
+							return result;
+						}
+
+						var data = {
+							"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
+							"ARCODART"  = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ),
+							"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, 35 ) & RepeatString(
+								"0",
+								35 - Len( quotationItem.getArticle().getDescription().subString( 0, 35 ) )
+							),
+							"ARDATCAR"  = Now(),
+							"ARUNMIS1"  = "PZ",
+							"VARCOD"    = "0000000000",
+							"CLCODICE"  = "000000",
+							"CLANNOTA"  = quotationItem.getNote()
+						}
+
+						quotationData["CPROWNUM"] = index;
+						quotationData["CPROWORD"] = index * 10;
+						quotationData["MMCODART"] = data["ARCODART"];
+						quotationData["MMCODVAR"] = data["VARCOD"];
+						quotationData["MMCODCOL"] = data["CLCODICE"];
+						quotationData["ARUNMIS1"] = "PZ";
+						quotationData["MMQTAMOV"] = quotationItem.getQuantity();
+						quotationData["MMVALUNI"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
+						quotationData["MMSCOAR1"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getDiscount1() : 0;
+						quotationData["MMSCOAR2"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getDiscount2() : 0;
+						quotationData["MMEVASIO"] = quotation.getValidityDate();
+						quotationData["MM_STATO"] = "N";
+
+						allProductItems.append(quotationData);
+					} else {
+						setComponentCounter( 0 )
+						var code    = "";
+						var product = quotationItem.getProduct()
+						if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
+							result.error = 'Prodotto o Categoria Prodotto non trovata.'
+							return result;
+						}
+						var categoryCode = Trim( product.getCategory().getCode() );
+						code &= categoryCode;
+						var nota = "";
 					}
-					var categoryCode = Trim( product.getCategory().getCode() );
-					code &= categoryCode;
-					var nota = "";
 
 					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
-					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
+					if ( !isNull(product) && IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
 						if ( IsNull( product.getLine() ) ) {
 							result.error = 'Linea Prodotto non trovata.'
 							return result;
@@ -637,12 +703,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								}
 								//se non esiste questo varCode con questa combinazione di colCode, 
 								// vuol dire che sicuramente non sono stati esportati ancora gli articoli quindi torno errore
-								result.error = 'Prima esporta gli articoli.';
+								result.error = 'Prima esporta gli articoli.AA' & code & varCode ;
 								return result;
 							}
 						} else {
 							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
-							result.error = 'Prima esporta gli articoli.';
+							result.error = 'Prima esporta gli articoli.' & code & varCode;
 							return result;
 						}
 						arKey = code & varCode & colCode;
@@ -676,7 +742,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						allProductItems.append(quotationData);
 					}
 
-					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
+					if ( !isNull(product) && IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
 						var data = {
 							"AR_CHIAVE" = product.getCode() & RepeatString( "0", 31 - Len( product.getCode() ) ),
 							"ARCODART"  = product.getCode() & RepeatString( "0", 15 - Len( product.getCode() ) ),
@@ -715,7 +781,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		result.success = true;
 
-		notifyOrdersVerticale();
+		// notifyOrdersVerticale();
 
 		return result;
 	}
