@@ -19,7 +19,7 @@
 								<select name="article" class="form-control"
 									data-bind="source: articles, value: detailForm.data.quotationItem.article, events: { change: setDefault }"
 									data-value-field="id"
-									data-text-field="name"
+									data-text-field="label"
 								>
 								</select>
 							</div>

@@ -58,7 +58,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var status  = super.bean( "Status" );
 		var article = super.bean( "Article" );
-		var type    = super.bean( "ArticleType" );
 		var price   = super.bean( "Price" );
 
 		article.setId( json.id );
@@ -66,7 +65,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		article.setExternalId( json.externalId );
 
 		article.setStatus( status.setId( json.status.id ) );
-		article.setType( type.setId( json.type.id ) );
 		
 		var nameItem        = super.buildTextBean( json.nameItem, "NAME" );
 		var descriptionItem = super.buildTextBean( json.descriptionItem, "DESC" );

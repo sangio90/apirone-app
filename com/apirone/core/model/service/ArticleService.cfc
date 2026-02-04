@@ -31,7 +31,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		String typeId,
 		String statusId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
@@ -224,7 +223,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 			
 			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setType( getLookupService().get( "articleType", record.type_id ) );
 
 			return bean;
 		}

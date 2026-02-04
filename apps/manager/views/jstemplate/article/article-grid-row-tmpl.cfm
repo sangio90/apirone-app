@@ -18,9 +18,6 @@
             <td class="text-end">
                 <span data-format="0.00" data-bind="text: price.amount"></span> &euro;
             </td>
-            <td>
-                <span data-bind="text: type.name"></span>
-            </td>
             <td class="text-center">
                 #iconButton(bind="click:edit", icon="edit")#
             </td>

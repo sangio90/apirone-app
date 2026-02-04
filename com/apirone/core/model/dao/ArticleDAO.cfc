@@ -31,7 +31,6 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
-		<cfargument name="typeId" type="String">
 		<cfargument name="statusId" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
@@ -45,10 +44,6 @@
 			FROM
 				articles
 			WHERE 1=1
-
-				<cfif !IsNull( arguments.typeId )>
-					AND articles.type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.typeId#">
-				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>
 					AND articles.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
@@ -83,13 +78,11 @@
 			INSERT INTO articles (
 				external_id,
 				status_id,
-				type_id,
 				code
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.line.getExternalId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getType().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getCode()#">
 			) RETURNING article_id
 		</cfquery>
@@ -106,7 +99,6 @@
 			SET
 				external_id = <cfqueryparam cfsqltype="varchar" value="#arguments.article.getExternalId()#">,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.article.getStatus().getId()#">,
-				type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.article.getType().getId()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.article.getCode()#">
 			WHERE
 				article_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.article.getId()#">::uuid

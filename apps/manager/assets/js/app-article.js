@@ -23,9 +23,6 @@ AP.article.detail = ( function() {
             code: "",
             externalId: "",
             name: "",
-            type: {
-                id: "SER",
-            },
             nameItem: {
                 id: "",
                 name: "",
@@ -48,7 +45,6 @@ AP.article.detail = ( function() {
                 amount: ""
             }
         },
-        types: AP.page.types,
         statuses: AP.page.statuses,
         title: "Carica servizio",
     };

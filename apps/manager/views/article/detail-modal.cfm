@@ -60,20 +60,6 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Tipo</label>
-                            <div class="col-sm-10">
-                                <select id="typeId" class="form-control"
-                                    required
-                                    data-placeholder="-- Seleziona il tipo"
-                                    data-bind="source: detailForm.types, value: detailForm.data.type" 
-                                    data-value-field="id"
-                                    data-text-field="name"
-                                    >
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Stato</label>
                             <div class="col-sm-10">
                                 <select id="statusId" class="form-control"

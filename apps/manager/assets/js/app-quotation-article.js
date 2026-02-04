@@ -147,6 +147,9 @@ AP.article.modal = ( function() {
                         return;
                     }
                     if (xhr.data && xhr.data.length > 0) {
+                        xhr.data.forEach( function (article) {
+                            article.label = article.code +  " (" + article.name + ")"
+                        })
                         viewModel.set( "articles", xhr.data );
                     }
                     AP.loading.hide();
