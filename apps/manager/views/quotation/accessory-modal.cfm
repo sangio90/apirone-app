@@ -6,10 +6,10 @@
 
                 <form id="line-detail-form">
                 
-                    <header class="card-header d-flex justify-content-between">
-                        <h5 data-bind="text:detailForm.title"></h5>
+                    <header class="card-header d-flex align-elements-center justify-content-between">
+                        <h2 class="card-title" data-bind="text:detailForm.title"></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" data-bind="click:resetForm" aria-label="Chiudi"></button>
-                    </header>                
+                    </header>          
                         
                     <div class="card-body">
 
@@ -71,23 +71,41 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 mt-4 row" data-bind="visible: detailForm.data.quotationItem.product.finish.id">
-                            <div class="col-4 mb-3">
-                                Albero
+
+                        <div class="row mb-2 pb-2 bb-1">
+                            <div class="col-12 text-end">
+                                <a class="underline hand" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci configurazione</a>
                             </div>
-                            <div class="col-7 mb-3" data-bind="visible: detailForm.data.quotationItem.product.finish.id">
-                                <span>Anteprima</span>
+                        </div>
+
+                        <div class="mb-3 mt-4" data-bind="visible: detailForm.data.quotationItem.product.finish.id">
+                            
+                            <div class="row">
+                                <div class="col-4 mb-3">
+                                    Albero
+                                </div>
+                                <div class="col-8 mb-3" data-bind="visible: detailForm.data.quotationItem.product.finish.id">
+                                    <span>Anteprima</span>
+                                </div>
                             </div>
-                            <div class="col-1 mb-3 flex justify-content-end">
-                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci Configurazione</button>
-                            </div>
-                            <div class="col-4 mb-3">
-                                <div id="accessory-product-items" style="max-width: 100%"></div>
-                            </div>
-                            <div id="accessory-preview-background"
-                                class="col-8 d-flex justify-content-center align-items-center"
-                                data-bind="visible:detailForm.data.quotationItem.product.finish.id, style: { backgroundImage: backgroundImage.url, position: relative }"
-                            >
+
+                            <div class="row">
+                                <div class="col-4 mb-3">
+                                    <div id="accessory-product-items" style="max-width: 100%"></div>
+                                </div>
+                                
+                                <div class="col-6 mb-3 position-relative">
+                                    <div id="accessory-preview-background"
+                                        class="col-12 d-flex justify-content-center align-items-center"
+                                        data-bind="visible:detailForm.data.quotationItem.product.finish.id, style: { backgroundImage: backgroundImage.url, position: relative }"
+                                    >
+                                    </div>
+                                </div>
+
+                                <div class="col-2">
+                                    #view(view="quotation/item-pricing", args={id="accessory-quotation-item-pricing-box"})#
+                                </div>
+
                             </div>
                         </div>
                     </div>

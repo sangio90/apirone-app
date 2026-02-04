@@ -19,6 +19,37 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function listPositions( event, rc, prc ){
+
+		param rc.zoneId="";
+		
+		var memy   = super.getMementify();
+		var result = super.getResult();
+		var data   = [];
+
+		if( !Len( rc.zoneId ) ){
+			var result = super.getResult();
+			result.setData( [] );
+			event.setValue( "result", result );
+			return;
+		}
+
+		var params = super.paramsFromUrl();
+
+		params[ "zoneId" ] = rc.zoneId;
+
+		var rows = super.fire( "QuotationZonePosition.list", params );
+
+		var data = memy.convertList( rows, "list" ) 
+
+		result.setData( data );
+
+		result.setTotal( rows.len() );
+		result.setCount( rows.len() );
+
+		event.setValue( "result", result );
+	}
+
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 		

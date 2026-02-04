@@ -134,6 +134,7 @@
                                     class="col-3 d-flex justify-content-center align-items-center"
                                     data-bind="visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
                                     <div id="signage-preview-container"
+                                        style="min-width: 100%"
                                         class="d-flex flex-column justify-content-center"
                                         data-template="signage-line-preview-row-tmpl"
                                         data-bind="source: detailForm.data.quotationItem.signageRows">

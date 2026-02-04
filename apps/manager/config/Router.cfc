@@ -456,6 +456,7 @@
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();
 
+		get( "/ajax/quotations/zones/:zoneId/positions" ).to( "QuotationZoneAjaxController.listPositions" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
 		delete( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.delete" ).end();
 		get( "/ajax/quotations/:quotationId/zones" ).to( "QuotationZoneAjaxController.list" ).end();

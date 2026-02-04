@@ -508,9 +508,11 @@ AP.signage.modal = ( function() {
         setTextAlign: function( e ) {
             var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
             var signageRow = ds.data().find( row => row.uid === e.data.uid );
+
             if ( signageRow ) {
                 signageRow.set( "textAlign", $( e.currentTarget ).data( "value" ) );
             }
+
             $( e.currentTarget ).addClass( "selected-text-align" ).siblings()
                 .removeClass( "selected-text-align" )
                 .addClass( "selected-text-align-not" );

@@ -81,22 +81,18 @@ AP.quotation.itemPricing = ( function() {
             AP.loading.show();
             var payload = {};
 
-            payload = getItem();
-
             var typeId = viewModel.get( "typeId" );
 
             if ( typeId == "plate" ) {
+                payload.item = getItem();
                 payload.price = viewModel.get( "pricing.data" );
             } else {
+                payload = getItem();
                 payload.quotationItem.price.discount1 = viewModel.get( "pricing.data.discount1" );
                 payload.quotationItem.price.discount2 = viewModel.get( "pricing.data.discount2" );
-                payload.quotationItem.price.total = viewModel.get( "pricing.data.total" );
-                payload.quotationItem.price.method = viewModel.get( "pricing.data.method" );
+                payload.quotationItem.price.total     = viewModel.get( "pricing.data.total" );
+                payload.quotationItem.price.method    = viewModel.get( "pricing.data.method" );
             }
-
-            payload.price = viewModel.get( "pricing.data." );
-            // payload.quotationItem.price = viewModel.get( "pricing.data" );
-
 
             const url = "/manager/ajax/quotation-items/type/" + typeId + "/pricing";
 
@@ -108,10 +104,8 @@ AP.quotation.itemPricing = ( function() {
                     done: function( xhr ) {
                         if ( xhr.data ) {
                             AP.loading.hide();
-                            if ( viewModel.get( "typeId" ) != "plate" ) {
-                                viewModel.set( "pricing.data.total", xhr.data.totalGoods );
-                                viewModel.set( "pricing.data.lines", xhr.data.lines );
-                            }
+                            viewModel.set( "pricing.data", xhr.data );
+                            viewModel.set( "pricing.data.total", xhr.data.totalGoods );
                         }
                     }
                 }
@@ -133,12 +127,9 @@ AP.quotation.itemPricing = ( function() {
 
         var elementId = $( "#" + typeId + "-quotation-item-pricing-box" );
 
-        console.log( "elementID", elementId );
-
         kendo.bind( elementId, viewModel );
 
         viewModel.set( "typeId", typeId );
-        console.log( "typeId", viewModel.get( "typeId" ) );
 
         if ( data ) {
             viewModel.set( "pricing", data );

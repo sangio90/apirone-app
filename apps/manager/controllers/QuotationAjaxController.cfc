@@ -9,7 +9,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "typeId" ] = rc.typeId;
 
-		var rows = super.fire( "productCategory.list", params );
+		var rows = super.fire( "productCategory.list" );
 		var data = mem.convertList( rows, "list" );
 
 		result.setTotal( rows.len() );
@@ -46,7 +46,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 		var mem    = super.getMementify();
 
+		param rc.catalogBundleCategoryId = "";
+
 		params[ "catalogBundleLineId" ] = rc.lineId;
+
+		if( Len( rc.catalogBundleCategoryId ) ){
+			params[ "catalogBundleCategoryId" ] = rc.catalogBundleCategoryId;
+		}
 
 		var rows = super.fire( "model.list", params );
 
