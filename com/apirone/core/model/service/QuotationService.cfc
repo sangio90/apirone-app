@@ -767,8 +767,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var price = 0
 						var discount1 = 0
 						var discount2 = 0
-						if (quotationItem.getPrice()) {
-							if (quotationItem.getPrice().getAmount() > 0)) {
+						if (!isNull(quotationItem.getPrice())) {
+							if (quotationItem.getPrice().getAmount() > 0) {
 								price = quotationItem.getPrice().getAmount()
 							} else {
 								price = quotationItem.getPrice().getTotal()
@@ -814,8 +814,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var price = 0
 						var discount1 = 0
 						var discount2 = 0
-						if (quotationItem.getPrice()) {
-							if (quotationItem.getPrice().getAmount() > 0)) {
+						if (!isNull(quotationItem.getPrice())) {
+							if (quotationItem.getPrice().getAmount() > 0) {
 								price = quotationItem.getPrice().getAmount()
 							} else {
 								price = quotationItem.getPrice().getTotal()
