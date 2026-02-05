@@ -222,7 +222,7 @@ AP.quotation.detail = ( function() {
                             return;
                         }
 
-                        if ( xhr.data.success == false ) {
+                        if ( xhr.data.error || xhr.data.success == false ) {
                             AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo." );
                             AP.loading.hide();
                             return;
@@ -248,7 +248,7 @@ AP.quotation.detail = ( function() {
                             return;
                         }
 
-                        if ( xhr.data.success == false ) {
+                        if ( xhr.data.error || xhr.data.success == false ) {
                             AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo." );
                             AP.loading.hide();
                             return;
@@ -257,7 +257,12 @@ AP.quotation.detail = ( function() {
                         $( ".export-button" ).hide();
                         AP.widget.notify( "success", "Preventivo Esportato correttamente." );
                     },
-                    always: function() {
+                    always: function( xhr ) {
+                        if ( xhr && xhr.data && (xhr.data.error || xhr.data.success == false) ) {
+                            AP.widget.notify( "error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo." );
+                            AP.loading.hide();
+                            return;
+                        }
                         AP.loading.hide();
                     }
                 }

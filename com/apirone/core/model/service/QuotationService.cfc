@@ -20,6 +20,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="profileService" inject="ProfileService";
 	property name="langService" inject="LangService";
 	property name="statusService" inject="StatusService";
+	property name="signageConfigService" inject="signageConfigService";
 	property name="pricelistService" inject="PricelistService";
 	property name="paymentMethodService" inject="PaymentMethodService";
 	property name="currencyService" inject="CurrencyService";
@@ -253,6 +254,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							return result;
 						}
 
+						var fontSize = "";
+						var fontName = "";
+						var fontCode = "";
+						var varCode  = "";
+						if (!isNull(quotationItem.getSignageConfigItem())) {
+							var signageConfigId = quotationItem.getSignageConfigItem().getSignageConfigId()
+							var fontSize = quotationItem.getSignageConfigItem().getSize().getName()
+							var signageConfig = getSignageConfigService().get(signageConfigId)
+							var fontCode = signageConfig.getFont().getCode()
+							var fontName = signageConfig.getFont().getName()
+							note &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
+							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
+						}
 
 						var finishCode = Trim( product.getFinish().getCode() );
 						code &= finishCode;
@@ -260,7 +274,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var description = product.getDescription().left( 35 );
 
 						var arKey = code;
-						var varCode  = "";
 						var colCode  = "000000";
 
 						var quotationItemProductItems = QuotationItemProductItemService.list(
@@ -620,7 +633,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						var productItems   = [];
 						var importantAttributes = product.getImportantAttributes();
-						
+
+						//cerco, in caso fosse una segnaletica con lettering, font e fontsize per valorizzare il varcode
+						var fontSize = "";
+						var fontName = "";
+						var fontCode = "";
+						var varCode  = "";
+						if (!isNull(quotationItem.getSignageConfigItem())) {
+							var signageConfigId = quotationItem.getSignageConfigItem().getSignageConfigId()
+							var fontSize = quotationItem.getSignageConfigItem().getSize().getName()
+							var signageConfig = getSignageConfigService().get(signageConfigId)
+							var fontCode = signageConfig.getFont().getCode()
+							var fontName = signageConfig.getFont().getName()
+							nota &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
+							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
+						}
+
 						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti 
 						// (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
 						for ( var quotationItemProductItem in quotationItemProductItems ) {
@@ -677,38 +705,43 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							// se ne esiste almeno uno, per ognuno di questi verifico che tutti i product items (anche quelli non importanti) siano presenti in exportCodeRawValue,
 							// se almeno uno non si trova, passo al successivo. Se non trovo nessun exportCode
 							// cosa che verifico controllando che il colCode rimanga vuoto, allora creo un nuovo exportCode e le relative exportCodeRawValue
+							var productItemIds = ArrayMap( productItems, function(item) { return item.rawValueId  } );
+							var foundMatchingCode = false;
 							for ( var existingCode in existingCodes ) {
 								var exportCodeRawValues = exportCodeRawValueService.list(
 									exportCodeId = existingCode.getId()
 								);
 
-								var allFound = true;
-								
-								for ( var item in productItems ) {
-									var found = false;
-									for ( var exportCodeRawValue in exportCodeRawValues ) {
-										if ( exportCodeRawValue.getRawValue().getId() == item.rawValueId ) {
-											found = true;
-											break;
-										}
+								var exportCodeRawValueIds = ArrayMap(
+									exportCodeRawValues,
+									function(item) {
+										return item.getRawValue().getId();
 									}
-									if ( !found ) {
+								);
+								// assumo che siano tutti presenti
+								var allFound = true;
+
+								for ( var pid in productItemIds ) {
+									if ( !arrayContains( exportCodeRawValueIds, pid ) ) {
 										allFound = false;
 										break;
 									}
 								}
+
 								if ( allFound ) {
 									colCode = existingCode.getCounter();
+									foundMatchingCode = true;
 									break;
 								}
-								//se non esiste questo varCode con questa combinazione di colCode, 
-								// vuol dire che sicuramente non sono stati esportati ancora gli articoli quindi torno errore
-								result.error = 'Prima esporta gli articoli.AA' & code & varCode ;
+							}
+							// se dopo averli provati tutti non ho trovato nulla → errore
+							if ( !foundMatchingCode ) {
+								result.error = 'Prima esporta gli articoli. ' & code & varCode;
 								return result;
 							}
 						} else {
 							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
-							result.error = 'Prima esporta gli articoli.' & code & varCode;
+							result.error = 'Prima esporta gli articoli. ' & code & varCode;
 							return result;
 						}
 						arKey = code & varCode & colCode;
@@ -789,7 +822,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public function getComponents(
 		required String productId,
 		required quotationItem,
-		Array producItemtIds
+		Array productItemIds
 	){
 		var quantity      = quotationItem.getQuantity() ? quotationItem.getQuantity() : 1;
 		var allComponents = [];
@@ -798,7 +831,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var componentSvc = getComponentService();
 
 		var productId      = arguments.productId;
-		var productItemIds = arguments.producItemtIds;
+		var productItemIds = arguments.productItemIds;
 
 		var product = productSvc.get( productId );
 		if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
@@ -819,7 +852,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					includeBaseAttributeComponents = true
 				);
 
-				if ( producItemtIds.len() > 0 ) {
+				if ( productItemIds.len() > 0 ) {
 					for ( var productItemId in productItemIds ) {
 						var signageProductComponents = componentSvc.list(
 							signageItemProduct = {
@@ -848,7 +881,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			allComponents.add( parseComponent( productComponent ) );
 		}
 
-		if ( producItemtIds.len() > 0 ) {
+		if ( productItemIds.len() > 0 ) {
 			for ( var productItemId in productItemIds ) {
 				var productItemComponents = componentSvc.list(
 					productItemId                  = productItemId,
