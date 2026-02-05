@@ -764,11 +764,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData['MMCODCOL'] = data['CLCODICE'];
 						quotationData['ARUNMIS1'] = "PZ";
 						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
-						quotationData['MMVALUNI'] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
-						//quotationData['MMSCOAR1'] = quotationItem.getDiscount1(); TODO: add discount
-						//quotationData['MMSCOAR2'] = quotationItem.getDiscount2();
-						quotationData['MMSCOAR1'] = 0;
-						quotationData['MMSCOAR2'] = 0;
+						var price = 0
+						var discount1 = 0
+						var discount2 = 0
+						if (quotationItem.getPrice()) {
+							if (quotationItem.getPrice().getAmount() > 0)) {
+								price = quotationItem.getPrice().getAmount()
+							} else {
+								price = quotationItem.getPrice().getTotal()
+							}
+							if (quotationItem.getPrice().getDiscount1() > 0) {
+								discount1 = quotationItem.getPrice().getDiscount1()
+							}
+							if (quotationItem.getPrice().getDiscount2() > 0) {
+								discount1 = quotationItem.getPrice().getDiscount2()
+							}
+						}
+						quotationData["MMVALUNI"] = price;
+						quotationData['MMSCOAR1'] = discount1;
+						quotationData['MMSCOAR2'] = discount2;
 						quotationData['MMEVASIO'] = quotation.getValidityDate();
 						quotationData['MM_STATO'] = 'N';
 
@@ -797,9 +811,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData["MMCODCOL"] = data["CLCODICE"];
 						quotationData["ARUNMIS1"] = "PZ";
 						quotationData["MMQTAMOV"] = quotationItem.getQuantity();
-						quotationData["MMVALUNI"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
-						quotationData["MMSCOAR1"] = quotationItem.getDiscount1();
-						quotationData["MMSCOAR2"] = quotationItem.getDiscount2();
+						var price = 0
+						var discount1 = 0
+						var discount2 = 0
+						if (quotationItem.getPrice()) {
+							if (quotationItem.getPrice().getAmount() > 0)) {
+								price = quotationItem.getPrice().getAmount()
+							} else {
+								price = quotationItem.getPrice().getTotal()
+							}
+							if (quotationItem.getPrice().getDiscount1() > 0) {
+								discount1 = quotationItem.getPrice().getDiscount1()
+							}
+							if (quotationItem.getPrice().getDiscount2() > 0) {
+								discount1 = quotationItem.getPrice().getDiscount2()
+							}
+						}
+						quotationData["MMVALUNI"] = price;
+						quotationData['MMSCOAR1'] = discount1;
+						quotationData['MMSCOAR2'] = discount2;
 						quotationData["MMEVASIO"] = quotation.getValidityDate();
 						quotationData["MM_STATO"] = "N";
 
