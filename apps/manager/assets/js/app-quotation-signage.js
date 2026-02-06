@@ -728,9 +728,7 @@ AP.signage.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
-                            if ( quotationItemId != "" ) {
-                                viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
-                            }
+                            viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                             attributeArray = productItems.data();
                             // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
