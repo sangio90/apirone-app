@@ -60,19 +60,19 @@ AP.quotation.itemPricing = ( function() {
         changeMethod: function( event ) {
             var value = event.sender.value();
             if ( value == "C" ) {
-                viewModel.set( "pricing.data.discount1", 0 );
-                viewModel.set( "pricing.data.discount2", 0 );
                 viewModel.set( "pricing.data.total", 0 );
-                $( "[name=\"discount1\"]" ).prop( "disabled", true );
-                $( "[name=\"discount2\"]" ).prop( "disabled", true );
-                $( "#input-item-total" ).prop( "disabled", true );
-                this.update();
-            } else {
                 $( "[name=\"discount1\"]" ).prop( "disabled", false );
                 $( "[name=\"discount2\"]" ).prop( "disabled", false );
-                $( "#input-item-total" ).prop( "disabled", false );
+                this.update();
+                $( "#input-item-total" ).prop( "disabled", true );
+            } else {
+                viewModel.set( "pricing.data.discount1", 0 );
+                viewModel.set( "pricing.data.discount2", 0 );
+                $( "[name=\"discount1\"]" ).prop( "disabled", true );
+                $( "[name=\"discount2\"]" ).prop( "disabled", true );
                 viewModel.set( "pricing.data.lines", [] );
                 viewModel.set( "pricing.data.total", 0 );
+                $( "#input-item-total" ).prop( "disabled", false );
             }
 
         },

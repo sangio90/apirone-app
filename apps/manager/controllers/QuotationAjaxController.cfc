@@ -380,11 +380,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var acc = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "ACC" );
 		var pla = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "PLA" );
 		var seg = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "SEG" );
+		var art = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "ART" );
 
 		var data = {
 			"accessories" = acc.len(),
 			"plates" = pla.len(),
 			"signages" = seg.len(),
+			"articles" = art.len(),
 		}
 
 		return data;
