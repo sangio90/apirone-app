@@ -17,9 +17,9 @@
                             <label class="col-sm-3 col-form-label text-end">Offerta massima</label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control col-sm-4" 
-                                    name="offerMaxAmount"
+                                    name="quotationMaxDiscount"
                                     maxlength="5"
-                                    data-bind="value: detailForm.data.offerMaxAmount">
+                                    data-bind="value: detailForm.data.quotationMaxDiscount">
                             </div>
                         </div>
 
@@ -27,8 +27,8 @@
                             <label class="col-sm-3 col-form-label text-end">Sconto massimo</label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control col-sm-4" 
-                                    name="offerMaxDiscount"
-                                    data-bind="value: detailForm.data.offerMaxDiscount">
+                                    name="quotationMaxAmount"
+                                    data-bind="value: detailForm.data.quotationMaxAmount">
                             </div>
                         </div>
 

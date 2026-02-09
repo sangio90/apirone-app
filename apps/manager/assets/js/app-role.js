@@ -35,6 +35,8 @@ AP.role.detail = ( function() {
                 },
                 id: "",
                 name: "",
+                quotationMaxDiscount: "0",
+                quotationMaxAmount: "0",
             },
             title: "",
             entities: new kendo.data.DataSource()
@@ -68,6 +70,23 @@ AP.role.detail = ( function() {
             } );
         },
 
+        getRole: function( roleId ) {
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/roles/" + roleId,
+                callback: {
+                    done: function( xhr ) {
+
+                        viewModel.set( "detailForm.data.id", xhr.data.id );
+                        viewModel.set( "detailForm.data.name", xhr.data.name );
+                        viewModel.set( "detailForm.data.quotationMaxAmount", xhr.data.quotationMaxAmount );
+                        viewModel.set( "detailForm.data.quotationMaxDiscount", xhr.data.quotationMaxDiscount );
+
+                    },
+                },
+            } );
+        },
+
         savePermissions: function( event ) {
             var thisForm = AP.role.fields.rolePermissionsForm;
             var status = thisForm.find( ".status" );
@@ -91,14 +110,36 @@ AP.role.detail = ( function() {
 
             return false;
         },
+
+        save: function( event ) {
+            var thisForm = AP.role.fields.rolePermissionsForm;
+            var status = thisForm.find( ".status" );
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+            NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/roles",
+                data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                callback: {
+                    done: function( xhr ) {
+                        status.html( "" );
+                        AP.widget.notify( "success", "Ruolo salvato con successo" );
+                    },
+                },
+            } );
+
+            return false;
+        },
     } );
 
     pub.edit = function( role ) {
+
         viewModel.set( "detailForm.title", "Modifica < " + role.name + " >" );
 
-        // viewModel.set( "detailForm.title", "Modifica permessi per < " + role.name + " >" );
-        // viewModel.set( "detailForm.data.id", role.id );
-        // viewModel.set( "detailForm.data.name", role.name );
+        kendo.bind( AP.role.fields.roleDetailModal, viewModel );
+
+        viewModel.getRole( role.id );
 
         NM.util.openModal( fields.roleDetailModal );
     };
