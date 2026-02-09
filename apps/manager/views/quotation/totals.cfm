@@ -28,6 +28,10 @@
 							<div>Accessori:</div>
 							<span data-bind="text: pricing.counters.accessories"></span>
 						</div>
+						<div>
+							<div>Servizi:</div>
+							<span data-bind="text: pricing.counters.articles"></span>
+						</div>
 					</div>
 					<div class="row mt-3 mb-2">
 						<div class="col-8">Totale merce</div>
