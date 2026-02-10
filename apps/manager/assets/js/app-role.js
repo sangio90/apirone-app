@@ -28,13 +28,9 @@ AP.role.detail = ( function() {
     function getDefaultDetailForm() {
         return {
             data: {
-                entity: {
-                    id: "",
-                    name: "",
-                    permissions: new kendo.data.DataSource()
-                },
                 id: "",
                 name: "",
+                permissions: new kendo.data.DataSource(),
                 quotationMaxDiscount: "0",
                 quotationMaxAmount: "0",
             },
@@ -65,23 +61,6 @@ AP.role.detail = ( function() {
                     done: function( xhr ) {
                         viewModel.set( "detailForm.data.entity.permissions", xhr.data );
                         $( "#permission-grid" ).removeClass( "hidden" );
-                    },
-                },
-            } );
-        },
-
-        getRole: function( roleId ) {
-            NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/roles/" + roleId,
-                callback: {
-                    done: function( xhr ) {
-
-                        viewModel.set( "detailForm.data.id", xhr.data.id );
-                        viewModel.set( "detailForm.data.name", xhr.data.name );
-                        viewModel.set( "detailForm.data.quotationMaxAmount", xhr.data.quotationMaxAmount );
-                        viewModel.set( "detailForm.data.quotationMaxDiscount", xhr.data.quotationMaxDiscount );
-
                     },
                 },
             } );
@@ -125,6 +104,7 @@ AP.role.detail = ( function() {
                     done: function( xhr ) {
                         status.html( "" );
                         AP.widget.notify( "success", "Ruolo salvato con successo" );
+                        window.location.reload();
                     },
                 },
             } );
@@ -134,12 +114,10 @@ AP.role.detail = ( function() {
     } );
 
     pub.edit = function( role ) {
-
         viewModel.set( "detailForm.title", "Modifica < " + role.name + " >" );
-
+        viewModel.set( "detailForm.data", role );
+ 
         kendo.bind( AP.role.fields.roleDetailModal, viewModel );
-
-        viewModel.getRole( role.id );
 
         NM.util.openModal( fields.roleDetailModal );
     };

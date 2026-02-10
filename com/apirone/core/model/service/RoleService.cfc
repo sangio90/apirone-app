@@ -45,6 +45,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+	public String function create( required com.apirone.core.model.bean.Role role ){
+		var newId = getDao().insert( arguments.role );
+
+		return newId;
+	}
+
+	public String function update( required com.apirone.core.model.bean.Role role ){
+		getDao().update( arguments.role );
+		super.getCacheManager().remove( getCacheScope(), arguments.role.getId() );
+
+		return arguments.role.getId();
+	}
+
 
 	/*
 		private methods

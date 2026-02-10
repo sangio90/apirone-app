@@ -523,6 +523,7 @@
 			roles
 		*/
 		get( "/roles" ).to( "RoleController.list" ).end();
+		post( "/ajax/roles" ).to( "RoleAjaxController.save" ).end();
 		get( "/roles/print" ).to( "RolController.print" ).end();
 
 		get( "/ajax/roles/:roleId/permissions" ).to( "RolePermissionAjaxController.list" ).end();

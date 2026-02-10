@@ -1,3 +1,3 @@
 ﻿{
-	defaultIncludes = [ "id", "name", "permissions", "type" ],
+	defaultIncludes = [ "id", "name", "permissions", "type", "quotationMaxAmount", "quotationMaxDiscount" ],
 }

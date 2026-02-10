@@ -13,6 +13,12 @@
                 <span data-bind="text: type.name"></span>
                 <span class="small-code">(<span data-bind="text: type.id"></span>)</span>
             </td>
+            <td class="text-end">
+                <span data-bind="text: quotationMaxAmount"></span>
+            </td>
+            <td class="text-end">
+                <span data-bind="text: quotationMaxDiscount"></span>
+            </td>
             <td class="text-center">
                 #iconButton(bind="click:editPermissions", icon="key")#
             </td>

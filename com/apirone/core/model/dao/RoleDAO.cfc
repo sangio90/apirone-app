@@ -59,11 +59,15 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO membership.roles (
 				role_id,
-				role
+				role,
+				quotation_max_amount,
+				quotation_max_discount
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.role.getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.role.getName()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.role.getName()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.role.getQuotationMaxAmount()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.role.getQuotationMaxDiscount()#">
 			) RETURNING role_id
 		</cfquery>
 
@@ -77,7 +81,9 @@
 			UPDATE
 				membership.roles
 			SET
-				role = <cfqueryparam cfsqltype="Varchar" value="#arguments.role.getName()#">
+				role = <cfqueryparam cfsqltype="Varchar" value="#arguments.role.getName()#">,
+				quotation_max_amount = <cfqueryparam cfsqltype="Numeric" value="#arguments.role.getQuotationMaxAmount()#">,
+				quotation_max_discount = <cfqueryparam cfsqltype="Numeric" value="#arguments.role.getQuotationMaxDiscount()#">
 			WHERE
 				role_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.role.getId()#">
 		</cfquery>

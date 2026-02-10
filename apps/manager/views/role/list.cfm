@@ -24,6 +24,8 @@
                                         { 'title':'ID',  width: '70px' },
                                         { 'title':'Nome' },
                                         { 'title':'Tipo' },
+                                        { 'title':'Offerta massima', 'width' :'200px' },
+                                        { 'title':'Sconto massimo', 'width' :'200px' },
                                         { 'title':'', 'width' :'50px', 'headerAttributes': { 'class': 'text-center' } },
                                         { 'title':'', 'width' :'50px', 'headerAttributes': { 'class': 'text-center' } }
                                     ]",

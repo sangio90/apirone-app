@@ -23,12 +23,18 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var bean = super.bean( "Role" );
 
-		bean.setId( json.id );//
+		bean.setId( json?.id );
 		bean.setName( json.name );
 		bean.setQuotationMaxAmount( json.quotationMaxAmount );
 		bean.setQuotationMaxDiscount( json.quotationMaxDiscount );
 
-		var thisId = super.fire( "role.update", [ bean ] )	
+		if ( !Len( json?.id ) ) {
+			messageId = "Role.created";
+			thisId    = super.fire( "Role.create", [ bean ] )
+		} else {
+			messageId = "Role.updated";
+			thisId    = super.fire( "Role.update", [ bean ] )
+		}
 			
 		var message = completeMessage( messageId );
 
