@@ -78,6 +78,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Numeric function create( required quotationItemFruit ){
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="update quotationItemFruit: #arguments.quotationItemFruit.getId()#" );
+		dump( arguments.quotationItemFruit.getId() );
+		abort;
+
 		var newId = getDao().insert( arguments.quotationItemFruit );
 
 		// 01 items
@@ -99,6 +103,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Numeric function update( required com.apirone.core.model.bean.QuotationItemFruit quotationItemFruit ){
 		getDao().update( arguments.quotationItemFruit );
 
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="update quotationItemFruit: #arguments.quotationItemFruit.getId()#" );
+
 		// 01 items
 		getQuotationItemProductItemService().deleteByQuotationItemFruitId( arguments.quotationItemFruit.getId() );
 
@@ -111,6 +117,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		// 02 positions
 		getQuotationItemFruitPositionService().deleteByQuotationItemFruitId( arguments.quotationItemFruit.getId() );
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="delete positions: #arguments.quotationItemFruit.getId()#" );
 
 		for( var position in arguments.quotationItemFruit?.getPositions() ){
 			getQuotationItemFruitPositionService().create( arguments.quotationItemFruit.getId(), position );
@@ -120,6 +127,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return arguments.quotationItemFruit.getId();
 	}
+
+
+	/*
+		private methods
+	*/
 
 	private com.apirone.core.model.bean.QuotationItemFruit function build( required Numeric quotationItemFruitId ){
 		var record = getDao().read( arguments.quotationItemFruitId );

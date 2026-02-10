@@ -1,4 +1,4 @@
-﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
+component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemDAO";
 	property name="quotationItemFruitService" inject="QuotationItemFruitService";
@@ -105,41 +105,25 @@
 
 		transaction {
 
-			if( !IsNull( quotationItem.getPosition() ) ) {
-				if( len( quotationItem.getPosition().getCode() ) ) {
-					var position = quotationItem.getPosition();
-					if( position.getId() == "" ) {
-						position.setZoneId( quotationItem.getQuotationZone().getId() );
-						var newPositionId = getQuotationZonePositionService().create( position );
-						quotationItem.getPosition().setId( newPositionId );
-					}
-				}
-			}
-
+			ensurePosition( arguments.quotationItem );
 
 			var newId = getDao().insert( arguments.quotationItem );
 
-			if( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
-				for( var thisFruit in arguments.quotationItem.getFruits() ) {
+			if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+				for ( var thisFruit in arguments.quotationItem.getFruits() ) {
 					thisFruit.setQuotationItemId( newId );
 					getQuotationItemFruitService().create( thisFruit );
 				}
 			}
 
 			var price = arguments.quotationItem.getPrice();
-
 			price.setQuotationItemId( newId );
-			var id = getQuotationItemPriceService().create( price );
+			getQuotationItemPriceService().create( price );
 
-			//cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
-			//cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #newId#, line: #price.getLines().len()#");
-
-			if ( isNull(arguments.quotationItem.getArticle()) ) {
+			if ( isNull( arguments.quotationItem.getArticle() ) ) {
 				var hash = getProductHashService().createHash( newId );
-				cffile( action="append", file="#ExpandPath('/debug.log')#", output="hash: #hash#");
-
 				if ( !IsNull( hash ) ) {
-					quotationItem = get(newId);
+					quotationItem = get( newId );
 					quotationItem.setHash( hash );
 					update( quotationItem );
 				}
@@ -151,20 +135,53 @@
 	}
 
 	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItem ){
-		getDao().update( arguments.quotationItem );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
 
-		if (!isNull(arguments.quotationItem.getPrice().getQuotationItemId())) {
-			var price = arguments.quotationItem.getPrice();
+		transaction {
 
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #arguments.quotationItem.getId()#, line: #price.getLines().len()#");
+			ensurePosition( arguments.quotationItem );
 
-			var id = getQuotationItemPriceService().update( price );
+			getDao().update( arguments.quotationItem );
+			super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
+
+			if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+				for ( var thisFruit in arguments.quotationItem.getFruits() ) {
+					getQuotationItemFruitService().update( thisFruit );
+				}
+			}
+
+			if ( !IsNull( arguments.quotationItem.getPrice() ) && !IsNull( arguments.quotationItem.getPrice().getQuotationItemId() ) ) {
+				var price = arguments.quotationItem.getPrice();
+				getQuotationItemPriceService().update( price );
+			}
+
+			if ( isNull( arguments.quotationItem.getArticle() ) ) {
+				var hash = getProductHashService().createHash( arguments.quotationItem.getId() );
+				if ( !IsNull( hash ) ) {
+					var beanToUpdate = get( arguments.quotationItem.getId() );
+					beanToUpdate.setHash( hash );
+					update( beanToUpdate );
+				}
+			}
+
 		}
 
-
 		return arguments.quotationItem.getId();
+	}
+
+	/**
+	 * Ensure quotation item position is created and linked when needed.
+	 */
+	private function ensurePosition( required com.apirone.core.model.bean.QuotationItem quotationItem ){
+		if ( !IsNull( arguments.quotationItem.getPosition() ) ) {
+			if ( Len( arguments.quotationItem.getPosition().getCode() ) ) {
+				var position = arguments.quotationItem.getPosition();
+				if ( position.getId() == "" ) {
+					position.setZoneId( arguments.quotationItem.getQuotationZone().getId() );
+					var newPositionId = getQuotationZonePositionService().create( position );
+					arguments.quotationItem.getPosition().setId( newPositionId );
+				}
+			}
+		}
 	}
 
 	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){

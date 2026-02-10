@@ -526,9 +526,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( !Len( id ) OR json.isClone ) {
 			messageId = "quotationItem.created";
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="controller: savePlate: create quotationItem: #bean.getId()#" );
 			thisId    = super.fire( "quotationItem.create", [ bean ] )
 		} else {
 			messageId = "quotationItem.updated";
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="controller: savePlate: update quotationItem: #bean.getId()#" );
 			thisId    = super.fire( "quotationItem.update", [ bean ] )
 		}
 
@@ -563,19 +565,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} );
 
-		/*
-		//TODO: move to service
-		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
-
-		if ( !IsNull( hash ) ) {
-
-			bean.setHash( hash );
-			bean.setId( thisId );
-			
-			super.fire( "quotationItem.update", [ bean ] );
-		}
-		*/
-		
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );

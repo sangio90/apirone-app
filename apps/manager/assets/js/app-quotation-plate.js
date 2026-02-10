@@ -275,6 +275,14 @@ AP.plate.modal = ( function() {
 
     };
 
+    /**
+     * Resetta il detailForm del viewModel sostituendolo con una copia fresca.
+     * Per essere più veloci si può resettare campo per campo anziché sostituire l'oggetto completo.
+     */
+    var resetDetailForm = function() {
+        viewModel.set( "detailForm", createDefaultDetailForm() );
+    };
+
     // --- ViewModel (Kendo ObservableObject) ---
     var viewModel = new kendo.data.ObservableObject( {
 
@@ -328,15 +336,10 @@ AP.plate.modal = ( function() {
         },
 
         changeOrientation( event ) {
-            // console.log( "changeOrientation:event", event );
-
             var orientationId = this.get( "detailForm.data.product.orientation.id" );
 
             var frameId = viewModel.get( "detailForm.data.product.frame.id" );
             var productId = viewModel.get( "detailForm.data.product.id" );
-
-            // console.log( "frameId", frameId );
-            // console.log( "productId", productId );
 
             AP.plate.api.getFrameForOrientation( frameId, orientationId, productId, {
                 done: function( xhr ) {
@@ -756,19 +759,7 @@ AP.plate.modal = ( function() {
                 if ( quotationItemFruitId ) {
                     await AP.plate.api.getQuotationItemFruitProductItems( quotationItemFruitId, {
                         done: async function( xhr ) {
-                            if ( xhr.data.length > 0 ) {
-                                // Ordina per orderby: il primo livello deve essere processato prima del secondo
-                                xhr.data.sort( function( a, b ) { return a.productItem.orderby - b.productItem.orderby; } );
-                                var container = $( "#quotation-fruit-row-items_" + fruitId );
-                                for ( var qi = 0; qi < xhr.data.length; qi++ ) {
-                                    var qipi = xhr.data[qi];
-                                    var sel = container.find( "select[data-attribute-id=\"" + qipi.productItem.attribute.id + "\"]" );
-                                    if ( sel.length > 0 ) {
-                                        sel.val( qipi.productItem.id );
-                                        await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id, fruitId );
-                                    }
-                                }
-                            }
+                            await viewModel.restoreProductItemSelections( xhr.data, "#quotation-fruit-row-items_" + fruitId, fruitId );
                         }
                     } );
                 }
@@ -984,7 +975,7 @@ AP.plate.modal = ( function() {
                     done: function( xhr ) {
                         status.html( "" );
                         AP.widget.notify( "success", "Placca salvata correttamente." );
-                        viewModel.set( "detailForm", createDefaultDetailForm() );
+                        resetDetailForm();
                     }
                 } );
             } );
@@ -1048,7 +1039,7 @@ AP.plate.modal = ( function() {
 
         console.log( "new:zone", AP.quotation.detail.config().zone );
 
-        viewModel.set( "detailForm", createDefaultDetailForm() );
+        resetDetailForm();
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         viewModel.set( "isEditMode", false );
 
@@ -1072,10 +1063,12 @@ AP.plate.modal = ( function() {
      */
     pub.edit = function( { id, onSave, clone = false } ) {
         window.location.hash = "plate/" + id;
-        viewModel.set( "detailForm", createDefaultDetailForm() );
+        resetDetailForm();
         viewModel.set( "isEditMode", true );
         viewModel.set( "detailForm.isClone", clone );
         viewModel.set( "detailForm.title", clone ? "Duplica placca" : "Modifica placca" );
+
+        pricingApp().init( "plate", undefined );
 
         AP.plate.api.getPlate( id, {
             done: function( xhr ) {
