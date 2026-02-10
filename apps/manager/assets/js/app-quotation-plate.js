@@ -976,6 +976,11 @@ AP.plate.modal = ( function() {
                         status.html( "" );
                         AP.widget.notify( "success", "Placca salvata correttamente." );
                         resetDetailForm();
+
+                        setTimeout( function() {
+                            AP.loading.hide();
+                            // window.location.reload();
+                        }, 1000 );
                     }
                 } );
             } );

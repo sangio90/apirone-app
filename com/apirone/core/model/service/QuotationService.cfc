@@ -259,7 +259,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var fontName = "";
 						var fontCode = "";
 						var varCode  = "";
-						if (!isNull(quotationItem.getSignageConfigItem())) {
+						if ( IsInstanceOf ( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
 							var signageConfigId = quotationItem.getSignageConfigItem().getSignageConfigId()
 							var fontSize = quotationItem.getSignageConfigItem().getSize().getName()
 							var signageConfig = getSignageConfigService().get(signageConfigId)
@@ -532,6 +532,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			if (quotationItems.len() > 0) {
 				var quotation = quotationItems[1].getQuotation();
+
+				getDao().deleteExport( quotationNumber = quotation.getQuotationNumber() );
 				quotationDataResult = prepareExportData(quotation);
 				if (!isNull(quotationDataResult.error)) {
 					result.error = quotationDataResult.error;
@@ -640,7 +642,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var fontName = "";
 						var fontCode = "";
 						var varCode  = "";
-						if (!isNull(quotationItem.getSignageConfigItem())) {
+						if ( IsInstanceOf ( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
 							var signageConfigId = quotationItem.getSignageConfigItem().getSignageConfigId()
 							var fontSize = quotationItem.getSignageConfigItem().getSize().getName()
 							var signageConfig = getSignageConfigService().get(signageConfigId)

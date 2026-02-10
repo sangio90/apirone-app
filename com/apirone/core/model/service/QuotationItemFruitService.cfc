@@ -78,10 +78,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public Numeric function create( required quotationItemFruit ){
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="update quotationItemFruit: #arguments.quotationItemFruit.getId()#" );
-		dump( arguments.quotationItemFruit.getId() );
-		abort;
-
 		var newId = getDao().insert( arguments.quotationItemFruit );
 
 		// 01 items

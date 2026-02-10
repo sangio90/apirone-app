@@ -96,9 +96,9 @@ component extends="com.apirone.core.controller.AbsController" {
         };
 
 		var items = super.fire( "ProductItem.list", params );
-	    //var data = ( memy.convertList( items, "treelight" ) );
+	    var data = ( memy.convertList( items, "treelight" ) );
 
-        var data = transformer.convertList( items, "tree" );
+        // var data = transformer.convertList( items, "tree" );
 
 		result.setTotal( data.len() );
 		result.setCount( data.len() );

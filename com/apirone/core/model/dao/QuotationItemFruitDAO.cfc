@@ -46,7 +46,6 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_fruits (
 				quotation_item_id,
-				position,
 				fruit_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getQuotationItemId()#">::uuid,
@@ -63,7 +62,6 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_item_fruits
 			SET
-				position = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruit.getPosition()#">,
 				fruit_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getFruit().getId()#">::uuid
 			WHERE
 				quotation_item_fruit_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruit.getId()#">

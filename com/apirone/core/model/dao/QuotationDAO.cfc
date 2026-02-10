@@ -322,6 +322,20 @@
 		<cfreturn true>
 	</cffunction>
 
+	<cffunction name="deleteExport" returntype="Boolean">
+		<cfargument name="quotationNumber" type="String" required="true">
+
+		<cfquery name="local.q" datasource="verticaleExport">
+			DELETE FROM ORDINI_APIR
+			WHERE CAST(
+				LEFT(MMNUMDOC, CHARINDEX('/', MMNUMDOC + '/') - 1)
+				AS INT
+			) = <cfqueryparam cfsqltype="integer" value="#arguments.quotationNumber#">
+		</cfquery>
+
+		<cfreturn true>
+	</cffunction>
+
 	<cffunction name="exportProduct" returntype="Boolean">
 		<cfargument name="data" type="Struct" required="true">
 		<cfset var qCheck = ""/>

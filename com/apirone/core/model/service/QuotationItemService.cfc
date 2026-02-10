@@ -125,7 +125,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				if ( !IsNull( hash ) ) {
 					quotationItem = get( newId );
 					quotationItem.setHash( hash );
-					update( quotationItem );
+					updateHash( newId, hash );
 				}
 			}
 
@@ -159,13 +159,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				if ( !IsNull( hash ) ) {
 					var beanToUpdate = get( arguments.quotationItem.getId() );
 					beanToUpdate.setHash( hash );
-					update( beanToUpdate );
+					updateHash( beanToUpdate.getId(), hash );
 				}
 			}
 
 		}
 
 		return arguments.quotationItem.getId();
+	}
+
+
+	public Boolean function updateHash( required String quotationItemId, required String hash ){
+		getDao().updateHash( quotationItemId, hash );
+		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemId );
+		return true;
 	}
 
 	/**

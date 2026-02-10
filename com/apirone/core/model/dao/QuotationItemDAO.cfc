@@ -203,6 +203,19 @@
 		<cfreturn arguments.quotationItem.getId()>
 	</cffunction>
 
+	<cffunction name="updateHash" returntype="Boolean">
+		<cfargument name="quotationItemId" type="String" required="true">
+		<cfargument name="hash" type="String" required="true">
+		<cfquery name="local.q" datasource="apirone">
+			UPDATE quotation_items
+			SET
+				"hash" = <cfqueryparam cfsqltype="Varchar" value="#arguments.hash#">
+			WHERE
+				quotation_item_id = <cfqueryparam cfsqltype="Other" value="#arguments.quotationItemId#">::uuid
+		</cfquery>
+		<cfreturn true>
+	</cffunction>
+
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="quotationItemId" type="String" required="true">
 		<cfquery name="local.q" datasource="apirone">

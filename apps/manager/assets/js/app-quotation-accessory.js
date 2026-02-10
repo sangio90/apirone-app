@@ -446,6 +446,9 @@ AP.accessory.modal = ( function() {
                             }
 
                             viewModel.renderProductItems();
+							if ( productItems && productItems.data().length > 0 ) {
+								viewModel.renderProductPreview( productItems );
+							}
                             resolve();
                         },
                         fail: function( err ) {
