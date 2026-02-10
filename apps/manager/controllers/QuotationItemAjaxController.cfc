@@ -474,7 +474,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		for ( var thisFruit in json.item.fruits._data ) {
 
 			var positions = json.positions[ thisFruit.id ];
-			if ( Len( thisFruit.id ) ) {
+			
+			/*
+				INFO:
+				se id numerico: è stato già salvato nel db
+				se id stringa: è stato agenerato da js per il dnd, record nuovo
+			*/
+			if ( IsNumeric( thisFruit.id ) ) {
 				// update
 				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
 				//var action    = "QuotationItemFruit.update";
@@ -612,15 +618,26 @@ component extends="com.apirone.core.controller.AbsController" {
 	function fruitProductItems( event, rc, prc ){
 		var result = super.getResult();
 		var memny  = super.getMementify();
+		
+		/*
+			INFO:
+			se id numerico: è stato già salvato nel db
+			se id stringa: è stato agenerato da js per il dnd, record nuovo
+		*/
+		if( IsNumeric( rc.id ) ) {
+			var quotationItemFruitId = rc.id;
 
-		var quotationItemFruitId = rc.id;
+			var productItems = super.fire( "QuotationItemProductItem.list", { quotationItemFruitId = quotationItemFruitId } );
 
-		var productItems = super.fire( "QuotationItemProductItem.list", { quotationItemFruitId = quotationItemFruitId } );
+			var productItems = memny.convertList( productItems );
+			
+			result.setCount( Len( productItems ) );
+			result.setData( productItems );
 
-		var productItems = memny.convertList( productItems );
-
-		result.setCount( Len( productItems ) );
-		result.setData( productItems );
+		} else {
+			result.setCount( 0 );
+			result.setData( [] );
+		}
 
 		event.setValue( "result", result );
 	}

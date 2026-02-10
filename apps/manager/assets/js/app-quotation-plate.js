@@ -66,9 +66,9 @@ AP.plate.modal = ( function() {
         var fruit = data;
 
         // Genera ID univoco per questa istanza
-        fruit.id = NM.util.uuid();
+        // fruit.id = NM.util.uuid();
         fruit.fruitId = data.fruit.id; // ID del prodotto frutto originale
-        fruit.quotationItemFruitId = data.quotationItemFruitId || null; // ID DB del frutto (solo in modifica)
+        fruit.id = data.id || NM.util.uuid(); // ID DB del frutto (solo in modifica)
         fruit.positionIds = data.positionIds || []; // ID delle celle occupate dal frutto
 
         fruit.items = new kendo.data.DataSource( {
@@ -508,7 +508,7 @@ AP.plate.modal = ( function() {
          * @param {string} [fruitId] - Se presente, carica items per il frutto invece che per la placca
          */
         loadProductItems: function( originId, attributeId, fruitId ) {
-            var type, product, productItems, prodyctIdForCall, productId;
+            var type; var product; var productItems; var prodyctIdForCall; var productId;
 
             if ( fruitId === undefined ) {
                 type = "plate";
@@ -754,7 +754,7 @@ AP.plate.modal = ( function() {
             } ).then( async function() {
                 var fruits = viewModel.get( "detailForm.data.fruits" );
                 var thisFruit = fruits.get( fruitId );
-                var quotationItemFruitId = thisFruit.get( "quotationItemFruitId" );
+                var quotationItemFruitId = thisFruit.get( "id" );
 
                 if ( quotationItemFruitId ) {
                     await AP.plate.api.getQuotationItemFruitProductItems( quotationItemFruitId, {
@@ -998,17 +998,17 @@ AP.plate.modal = ( function() {
                 done: function( xhr ) {
                     for ( var i = 0; i < xhr.data.length; i++ ) {
                         var thisFruit = xhr.data[i];
-                        var newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, quotationItemFruitId: thisFruit.id } );
-                        
+                        var newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
+
                         viewModel.set( "currentFruit", newFruit );
                         viewModel.get( "detailForm.data.fruits" ).add( newFruit );
-                        
+
                         if ( thisFruit.positions && thisFruit.positions.length ) {
                             pub.fruitsController.addFruitToPositions( mapFruitForPlate( newFruit ), thisFruit.positions );
                         } else {
                             pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
                         }
-                        
+
                         viewModel.addProductItemsToFruit( newFruit.id );
                     }
                     if ( typeof onDone === "function" ) {

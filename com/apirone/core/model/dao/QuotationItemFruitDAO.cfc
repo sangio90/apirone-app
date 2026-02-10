@@ -45,11 +45,12 @@
 		<cfargument name="quotationItemFruit" type="com.apirone.core.model.bean.QuotationItemFruit" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_fruits (
+				position,
 				quotation_item_id,
 				fruit_id
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getQuotationItemId()#">::uuid,
 				0,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getQuotationItemId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemFruit.getFruit().getId()#">::uuid
 			)
 			RETURNING quotation_item_fruit_id
