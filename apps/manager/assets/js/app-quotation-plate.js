@@ -1020,10 +1020,6 @@ AP.plate.modal = ( function() {
             viewModel.set( "currentFruit", newFruit );
             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
-            // console.log( "pub.fruitsController", pub.fruitsController );
-
-            // console.log( "newFruit", newFruit );
-
             pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
 
             viewModel.addProductItemsToFruit( newFruit.id );
