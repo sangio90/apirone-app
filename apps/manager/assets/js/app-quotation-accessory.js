@@ -26,7 +26,9 @@ AP.accessory.modal = ( function() {
                 id: "",
                 special: false,
                 quantity: 1,
-                price: {},
+                price: {
+                    id: null,
+                },
                 status: {
                     id: "ACT"
                 },
@@ -654,13 +656,13 @@ AP.accessory.modal = ( function() {
                                     viewModel.loadProduct();
                                     setTimeout( function() {
 
-                                    }, 200 );
+                                    }, 400 );
                                 }
-                            }, 200 );
+                            }, 400 );
                         }
-                    }, 200 );
+                    }, 400 );
                 }
-            }, 200 );
+            }, 400 );
         }
     };
 
@@ -690,8 +692,6 @@ AP.accessory.modal = ( function() {
                                     viewModel.set( "detailForm.data", data );
                                     viewModel.set( "detailForm.title", "Modifica accessorio" );
 
-                                    pricingApp().init( "accessory", xhr.data.price );
-
                                     viewModel.loadLines();
 
                                     setTimeout( function() {
@@ -700,10 +700,11 @@ AP.accessory.modal = ( function() {
                                             viewModel.loadFinishes();
                                             setTimeout( function() {
                                                 viewModel.loadProduct();
-                                            }, 100 );
-                                        }, 100 );
-                                    }, 100 );
+                                            }, 200 );
+                                        }, 200 );
+                                    }, 200 );
                                 }
+                                pricingApp().init( "accessory", { data: xhr.data.quotationItem.price } );
                             },
                         },
                     } );

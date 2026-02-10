@@ -136,7 +136,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "quotationItemId" ] = rc.id;
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
-
 		var parsedQuotationItemData = mm.convert( quotationItem, "edit" );
 
 		var signageConfig = super.fire(
@@ -160,7 +159,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data   = {}
 		var result = super.getResult();
 		var memy     = super.getMementify();
-
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 
 		var item = memy.convert( quotationItem, "edit" );
@@ -207,9 +205,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			.fire(
 				"Product.search",
 				{
-					lineId     = json.quotationItem.product.catalogBundle.line.id,
-					modelId    = json.quotationItem.product.catalogBundle.model.id,
-					categoryId = json.quotationItem.product.catalogBundle.category.id,
+					lineId     = json.quotationItem.product.line.id,
+					modelId    = json.quotationItem.product.model.id,
+					categoryId = json.quotationItem.product.category.id,
 					finishId   = json.quotationItem.product.finish.id
 				}
 			)
@@ -826,14 +824,16 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var lines = [];
 
-		pricing.setQuantity( Val( json.price.quantity ) ? json.price.quantity : 1 );
-		pricing.setDiscount1( Val( json.price.discount1 ) ? json.price.discount1 : 0 );
-		pricing.setDiscount2( Val( json.price.discount2 ) ? json.price.discount2 : 0 );
+		pricing.setQuotationItemId( json.quotationItem.id );
+		pricing.setId( Val( json.quotationItem.price.id ) ? json.quotationItem.price.id : null );
+		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
+		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
+		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
 		        
-		pricing.setMethod( method.setId( json.price.method.id ) );
+		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
 		
-        if ( pricing.isFixed() ) {
-			pricing.setAmount( Val( json.price.total ) ? json.price.total : 0 );
+        if ( json.quotationItem.price.method.id EQ 'F' ) {
+			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
 		} else {
 			pricing.setAmount( 0 );
 		}
@@ -844,19 +844,19 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var productItemsIds = [];
 
-		var product = json.item.product;
+		var product = json.quotationItem.product;
 
 		for ( var item in product.items._data ) {
 			for ( var value in item.values ) {
 				if ( value.selected ) {
-					productItemsIds.add( value.productItemId );
+					productItemsIds.add( value.product_item_id );
 				}
 			}
 		}
 
 		var price = calculator.calculate(
 			product.id,
-			json.price.quantity,
+			json.quotationItem.quantity,
 			productItemsIds
 		);
 
