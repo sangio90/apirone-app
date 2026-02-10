@@ -17,8 +17,8 @@ AP.quotation.itemPricing = ( function() {
             discount1: "",
             discount2: "",
             method: {
-                id: "F", // calculated,
-                name: "Fisso"
+                id: "C", // calculated,
+                name: "Calcolato"
             },
             lines: [], // es. { name: "Frutto 1", amount: 10.5 },
             total: 0,
@@ -78,6 +78,10 @@ AP.quotation.itemPricing = ( function() {
         },
 
         update: function( event ) {
+            if ( viewModel.get( "pricing.data.method.id" ) == "F" ) {
+                AP.widget.notify( "warning", "Hai selezionato Prezzo Fisso." );
+                return false;
+            }
             AP.loading.show();
             var payload = {};
 
