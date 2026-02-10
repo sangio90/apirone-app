@@ -854,7 +854,7 @@ AP.plate.grid = ( function() {
 
         }
 
-        addFruitToPositions( selectedFruit, cellIds ) {
+        addFruitToPositions( selectedFruit, positionIds ) {
 
             // console.log( "addFruitToPositions:selectedFruit", selectedFruit );
             // console.log( "addFruitToPositions:cellIds", cellIds );
@@ -880,8 +880,8 @@ AP.plate.grid = ( function() {
                 for ( let x = 0; x < grid[y].length && !foundPosition; x++ ) {
                     const cell = grid[y][x];
 
-                    // Verifica se questa cella è la prima nell'array di cellIds
-                    if ( cell.id === cellIds[0] ) {
+                    // Verifica se questa cella è la prima nell'array di positionIds
+                    if ( cell.id === positionIds[0] ) {
                         foundPosition = { row: y, column: x };
                     }
                 }
@@ -898,7 +898,7 @@ AP.plate.grid = ( function() {
                 fruitObj.drawWithin( $( "#quotation-plate-fruits" ) );
                 fruitObj.initDraggableWidget( this );
             } else {
-                console.error( "addFruitToPositions: Position not found for cellIds", cellIds );
+                console.error( "addFruitToPositions: Position not found for positionIds", positionIds );
             }
 
         }
@@ -1119,6 +1119,10 @@ AP.plate.grid = ( function() {
 
             // console.log( "onDragging:row", row );
             // console.log( "onDragging:column", column );
+
+            if ( row == null || column == null ) {
+                return;
+            }
 
             const gridPosition = new FruitGridPosition( row, column );
             const { top, left } = utils.extractTopLeftPositionFrom( gridPosition );

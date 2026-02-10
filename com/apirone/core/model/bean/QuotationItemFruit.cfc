@@ -1,7 +1,7 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="quotationItemId" type="String";
-	property name="position" type="Numeric";
+	property name="position" type="Numeric"; //TODO: to remove
 	property name="positions" type="String[]"; //["ID0001","ID0002"]
 	property name="note" type="String";
 

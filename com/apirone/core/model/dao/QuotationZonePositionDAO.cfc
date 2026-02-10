@@ -12,7 +12,8 @@
 	</cffunction>
 
 	<cffunction name="find" returntype="Query">
-		<cfargument name="quotationZoneId" type="String" required="false">
+		<cfargument name="str" type="String" required="false">
+		<cfargument name="zoneId" type="String" required="false">
 		
 		<cfargument name="orderBy" type="String" required="true" default="quotation_zone_position_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
@@ -25,8 +26,11 @@
 			FROM
 				quotation_zone_positions 
 			WHERE 1=1
-				<cfif !IsNull( arguments.quotationZoneId )>
-					AND quotation_zone_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationZoneId#">::uuid
+				<cfif !IsNull( arguments.zoneId )>
+					AND quotation_zone_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.zoneId#">::uuid
+				</cfif>
+				<cfif !IsNull( arguments.str )>
+					AND quotation_zone_positions.code ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
 				</cfif>
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderBy )#
@@ -41,13 +45,13 @@
 	</cffunction>
 
 	<cffunction name="insert" returntype="String">
-		<cfargument name="zone" type="com.apirone.core.model.bean.QuotationZone" required="true">
+		<cfargument name="zone" type="com.apirone.core.model.bean.QuotationZonePosition" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_zone_positions (
 				quotation_zone_id,
-				code,
+				code
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotationZoneId()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getZoneId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getCode()#">
 			)
 			RETURNING quotation_zone_position_id

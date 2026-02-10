@@ -8,8 +8,8 @@
             </td>
             <td>
                 <span data-bind="html: spaces"></span>
-                <b data-bind="text: attribute.name" class="fs-10"></b>: 
-                <span data-bind="text: attributeValue.rawValue.name"></span>
+                <b data-bind="text: attribute.name" class="fs-10"></b> <span data-bind="text: attribute.id" class="fs-10"></span>:  
+                <span data-bind="text: attributeValue.rawValue.name"></span> <span data-bind="text: attributeValue.rawValue.id" class="fs-10"></span>
             </td>
 
             <!--- attivo --->

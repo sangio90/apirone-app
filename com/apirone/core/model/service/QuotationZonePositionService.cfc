@@ -79,16 +79,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.zonePosition.getId();
 	}
 
-	private com.apirone.core.model.bean.QuotationZone function build( required String zoneId ){
+	private com.apirone.core.model.bean.QuotationZonePosition function build( required String zoneId ){
 		var record = getDao().read( arguments.zoneId );
 		if ( record.recordCount ) {
 
-			var bean = super.bean( "QuotationZone" );
+			var bean = super.bean( "QuotationZonePosition" );
 
-			bean.setId( record.quotation_zone_id );
-			bean.setName( record.quotation_zone );
+			bean.setId( record.quotation_zone_position_id );
+			bean.setCode( record.code );
+			bean.setName( record.quotation_zone_position );
 			bean.setCreatedAt( record.created_at );
-			bean.setQuotationZoneId( record.quotation_zone_id );
+			bean.setZoneId( record.quotation_zone_id.toString() );
 
 			return bean;
 		}

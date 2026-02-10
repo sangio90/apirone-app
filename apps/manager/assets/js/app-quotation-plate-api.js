@@ -36,6 +36,11 @@ AP.plate.api = ( function() {
         return ajax( { method: "GET", url: url, callback: callback } );
     }
 
+    function getQuotationItemFruitProductItems( quotationItemFruitId, callback ) {
+        var url = BASE + "/quotation-items/fruits/" + quotationItemFruitId + "/product-items";
+        return ajax( { method: "GET", url: url, callback: callback } );
+    }
+
     function getProductByParams( categoryId, lineId, modelId, finishId, callback ) {
         var url = BASE + "/quotation-items/product/by-params" +
             "?categoryId=" + categoryId +
@@ -85,6 +90,7 @@ AP.plate.api = ( function() {
         getFrame: getFrame,
         getProductItems: getProductItems,
         getQuotationItemProductItems: getQuotationItemProductItems,
+        getQuotationItemFruitProductItems: getQuotationItemFruitProductItems,
         getProductByParams: getProductByParams,
         getLines: getLines,
         getModels: getModels,

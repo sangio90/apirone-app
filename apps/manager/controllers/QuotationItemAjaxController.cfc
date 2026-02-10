@@ -100,10 +100,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var fruits = quotationItem.getFruits();
 
 		fruits.each( function( fruit ){
-			data.add( memy.convert( fruit, "edit" ) );
+			data.add( memy.convert( fruit, "editForPlace" ) );
 		} );
-
-		//var parsedQuotationItemData = memy.convert( , "edit" );
 
 		result.setData( data );
 		event.setValue( "result", result );
@@ -161,15 +159,13 @@ component extends="com.apirone.core.controller.AbsController" {
 	function editAccessory( event, rc, prc ){
 		var data   = {}
 		var result = super.getResult();
-		var params = super.paramsFromUrl();
-		var mm     = super.getMementify();
-
+		var memy     = super.getMementify();
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 
-		var parsedQuotationItemData = mm.convert( quotationItem, "edit" );
-
-		data.append( { "quotationItem" = parsedQuotationItemData } );
+		var item = memy.convert( quotationItem, "edit" );
+		item.product["category"] = memy.convert( quotationItem.getProduct().getCategory() );
+		data.append( { "quotationItem" = item } );
 
 		result.setData( data );
 		event.setValue( "result", result );
@@ -181,6 +177,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "";
 		var texts     = [];
 
+		var status = super.bean( "Status" );
 		var result = super.getResult();
 
 		var id   = json.quotationItem.id;
@@ -192,14 +189,18 @@ component extends="com.apirone.core.controller.AbsController" {
 			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
 		}
 
-		bean.setSpecial( json.special );
-		bean.setStatus( status.setId( json.status.id ) );
-
-		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
+		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) ); //TODO: move to QuotationId
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
 		bean.setQuantity( json.quotationItem.quantity );
 
-		var price = populatePriceItem( json );
+		bean.setSpecial( json.quotationItem.special );
+		bean.setNote( json.quotationItem.note );
+		bean.setStatus( status.setId( json.quotationItem.status.id ) );
+		if ( !Len( id ) ) {
+			json.quotationItem.id = lcase(createUUID());
+		}
+		
+		var price = getPricing( json );
 		bean.setPrice( price );
 
 		var product = super
@@ -262,6 +263,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				);
 
 				var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
+				
 				quotationItemProductItemBean.setQuotationItemId( thisId );
 				quotationItemProductItemBean.setProductItem( productItem );
 				quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
@@ -275,15 +277,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} )
 
-		/*
-		nel servizio
-		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
-		if ( !IsNull( hash ) ) {
-			bean.setHash( hash );
-			bean.setId( thisId );
-			super.fire( "quotationItem.update", [ bean ] );
-		}
-		*/
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
@@ -439,9 +432,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var tmpDir = super.getTempDir();
 		
-		var bean   = super.bean( "QuotationItemPlate" );
-		var zone   = super.bean( "QuotationZone" );
-		var status = super.bean( "Status" );
+		var status   = super.bean( "Status" );
+		var zone     = super.bean( "QuotationZone" );
+		var bean     = super.bean( "QuotationItemPlate" );
 
 		var beanFruits = [];
 
@@ -457,6 +450,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setStatus( status.setId( json.item.status.id ) );
 		bean.setQuotationZone( zone.setId( json.item.quotationZone.id ) );
 		bean.setSpecial( json.item.special );
+
+		if( Len( json.item?.position?.code ) ) {
+			var position = populatePositionBean( json.item.position );
+			bean.setPosition( position );
+		}
 
 		var pricing = getPricing( json );
 
@@ -492,8 +490,33 @@ component extends="com.apirone.core.controller.AbsController" {
 			var product = super.fire( "product.get", [ thisFruit.fruit.id ] );
 
 			fruitBean.setFruit( product );
-			//fruitBean.setQuotationItemId( thisId );
 			fruitBean.setPositions( positions );
+
+		var items = [];
+
+		var fruitProductItemsData = thisFruit.items._data;
+
+		fruitProductItemsData.each( function( productItemRow ){
+			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
+				return value.selected;
+			} )
+
+			if ( Len( selectedValue ) > 0 ) {
+				selectedValue = selectedValue[ 1 ];
+
+				var productItemBean = super.bean( "QuotationItemProductItem" );
+				var productItem     = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
+
+				//productItemBean.setQuotationItemFruitId( fruitBean.getId() );
+				productItemBean.setProductItem( productItem );
+				productItemBean.setOrigin( productItem.getOrigin() );
+				productItemBean.setLevel( productItemRow.level );
+
+				items.add( productItemBean );
+			}
+		} );
+			
+			fruitBean.setItems( items );
 
 			beanFruits.add( fruitBean );
 
@@ -591,6 +614,22 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotationItemId = rc.id;
 
 		var productItems = super.fire( "QuotationItemProductItem.list", { quotationItemId = quotationItemId } );
+
+		var productItems = memny.convertList( productItems );
+
+		result.setCount( Len( productItems ) );
+		result.setData( productItems );
+
+		event.setValue( "result", result );
+	}
+
+	function fruitProductItems( event, rc, prc ){
+		var result = super.getResult();
+		var memny  = super.getMementify();
+
+		var quotationItemFruitId = rc.id;
+
+		var productItems = super.fire( "QuotationItemProductItem.list", { quotationItemFruitId = quotationItemFruitId } );
 
 		var productItems = memny.convertList( productItems );
 
@@ -787,14 +826,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var lines = [];
 
-		pricing.setQuantity( Val( json.pricing.quantity ) ? json.pricing.quantity : 1 );
-		pricing.setDiscount1( Val( json.pricing.discount1 ) ? json.pricing.discount1 : 0 );
-		pricing.setDiscount2( Val( json.pricing.discount2 ) ? json.pricing.discount2 : 0 );
+		pricing.setQuantity( Val( json.price.quantity ) ? json.price.quantity : 1 );
+		pricing.setDiscount1( Val( json.price.discount1 ) ? json.price.discount1 : 0 );
+		pricing.setDiscount2( Val( json.price.discount2 ) ? json.price.discount2 : 0 );
 		        
-		pricing.setMethod( method.setId( json.pricing.method.id ) );
+		pricing.setMethod( method.setId( json.price.method.id ) );
 		
         if ( pricing.isFixed() ) {
-			pricing.setAmount( Val( json.total ) ? json.total : 0 );
+			pricing.setAmount( Val( json.price.total ) ? json.price.total : 0 );
 		} else {
 			pricing.setAmount( 0 );
 		}
@@ -817,7 +856,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var price = calculator.calculate(
 			product.id,
-			json.pricing.quantity,
+			json.price.quantity,
 			productItemsIds
 		);
 
@@ -857,6 +896,20 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setLines( lines );
 
 		return bean;
+
+	}
+
+	private Struct function populatePositionBean( 
+			required Struct data
+		){
+		
+		var position = super.bean( "QuotationZonePosition" );
+
+		position.setId( data.id );
+		position.setCode( data.code );
+		position.setName( data.name );
+
+		return position;
 
 	}
 

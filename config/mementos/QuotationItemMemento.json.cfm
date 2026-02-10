@@ -1,4 +1,4 @@
-﻿{
+{
     defaultIncludes = [ "id", "shortId", "price", "quantity", "image" ],
     profiles        = {
         edit = {
@@ -11,11 +11,14 @@
                 "product.finish",
                 "product.model",
                 "product.line",
+                "product.horizontalImage",
+                "product.verticalImage",
                 "quotationZone",
                 "items",
                 "note",
                 "createdAt",
                 "special",
+                "position",
                 "status",
             ]
         },
@@ -35,6 +38,7 @@
                 "note",
                 "createdAt",
                 "special",
+                "position",
                 "status",
             ]
         }

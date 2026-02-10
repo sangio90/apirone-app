@@ -1,4 +1,5 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
+
 	<cffunction name="read" returntype="Query">
 		<cfargument name="productItemId" type="String" required="true">
 		<cfquery name="local.q" datasource="apirone">
@@ -141,4 +142,16 @@
 		</cfquery>
 		<cfreturn true>
 	</cffunction>
+
+	<cffunction name="deleteByQuotationItemFruitId" returntype="Boolean">
+		<cfargument name="quotationItemFruitId" type="Numeric" required="true">
+		<cfquery name="local.q" datasource="apirone">
+			DELETE FROM
+				quotation_item_product_items
+			WHERE
+				quotation_item_fruit_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruitId#">
+		</cfquery>
+		<cfreturn true>
+	</cffunction>
+
 </cfcomponent>

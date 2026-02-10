@@ -15,6 +15,7 @@ AP.plate.productItems = ( function() {
      * @param {string} opts.subContainerIdPrefix - prefisso id per ogni blocco (es. "attribute-container-" o "fruit-attribute-container-")
      * @param {function(Object):string} opts.labelTextFn - (item) => testo della label
      * @param {function(string, string, *)} opts.onSelectChange - (selectedId, attributeId, value) chiamato al change
+     * @param {boolean} [opts.skipAutoTrigger=false] - Se true, non fa trigger automatico del change (evita loop durante caricamento)
      */
     function renderProductItems( opts ) {
         var container = $( opts.containerSelector );
@@ -24,6 +25,7 @@ AP.plate.productItems = ( function() {
         var subContainerIdPrefix = opts.subContainerIdPrefix;
         var labelTextFn = opts.labelTextFn;
         var onSelectChange = opts.onSelectChange;
+        var skipAutoTrigger = opts.skipAutoTrigger === true;
 
         attributeArray.forEach( function( item ) {
             var newLevel = ( 1.5 * item.level ) + "rem";
@@ -64,11 +66,17 @@ AP.plate.productItems = ( function() {
                 select.append( option );
             } );
 
-            var selectedOption = values.find( function( attrValue ) { return attrValue.selected === true; } );
+            var selectedOption = values.find( function( attrValue ) { return attrValue.selected == true; } );
             if ( selectedOption ) {
                 select.val( selectedOption.productItemId );
             } else {
-                select.prop( "selectedIndex", 0 ).trigger( "change" );
+                // Trigger automatico solo per attributi root (level 0) e solo se non siamo in modalità "skipAutoTrigger".
+                // skipAutoTrigger viene usato quando renderizziamo dopo loadProductItems per evitare loop infiniti.
+                if ( !skipAutoTrigger && item.level === 0 && !item.parentItemId ) {
+                    select.prop( "selectedIndex", 0 ).trigger( "change" );
+                } else {
+                    select.prop( "selectedIndex", 0 );
+                }
             }
             subContainer.append( select );
         } );

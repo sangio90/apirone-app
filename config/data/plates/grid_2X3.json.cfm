@@ -3,7 +3,7 @@
         "orientations": {
             "HOR": {
                 "cellOrientation": "HOR",
-                "grid": [ 
+                "grid": [
                     [
                         { "type": "_", "id": "a1b2c3d4-e5f6-47h8-89j0-k1l2m3n4o5p6" },
                         { "type": "_", "id": "q7r8s9t0-u1v2-43x4-95z6-a7b8c9d0e1f2" },

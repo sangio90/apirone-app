@@ -1,4 +1,6 @@
-﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
+﻿
+
+component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemFruitDAO";
 	property name="productService" inject="ProductService";
@@ -78,12 +80,17 @@
 	public Numeric function create( required quotationItemFruit ){
 		var newId = getDao().insert( arguments.quotationItemFruit );
 
-		getQuotationItemFruitPositionService().deleteByQuotationItemFruitId( newId );
-		
-		if( Len( arguments.quotationItemFruit?.getPositions() ) ){
-			for( var item in arguments.quotationItemFruit?.getPositions() ){
-				getQuotationItemFruitPositionService().create( newId, item );
+		// 01 items
+		if( !IsNull( arguments.quotationItemFruit.getItems() ) ){
+			for( var item in arguments.quotationItemFruit.getItems() ){
+				item.setQuotationItemFruitId( newId );
+				getQuotationItemProductItemService().create( item );
 			}
+		}
+
+		// 02 positions
+		for( var position in arguments.quotationItemFruit?.getPositions() ){
+			getQuotationItemFruitPositionService().create( newId, position );
 		}
 
 		return newId;
@@ -92,10 +99,21 @@
 	public Numeric function update( required com.apirone.core.model.bean.QuotationItemFruit quotationItemFruit ){
 		getDao().update( arguments.quotationItemFruit );
 
+		// 01 items
+		getQuotationItemProductItemService().deleteByQuotationItemFruitId( arguments.quotationItemFruit.getId() );
+
+		if( !IsNull( arguments.quotationItemFruit.getItems() ) ){
+			for( var item in arguments.quotationItemFruit?.getItems() ){
+				item.setQuotationItemFruitId( arguments.quotationItemFruit.getId() );
+				getQuotationItemProductItemService().create( item );
+			}
+		}
+
+		// 02 positions
 		getQuotationItemFruitPositionService().deleteByQuotationItemFruitId( arguments.quotationItemFruit.getId() );
-		
-		if( Len( quotationItemFruit.getPositions() ) ){
-			getQuotationItemFruitPositionService().create( arguments.quotationItemFruit.getId(), arguments.quotationItemFruit.getPositions() );
+
+		for( var position in arguments.quotationItemFruit?.getPositions() ){
+			getQuotationItemFruitPositionService().create( arguments.quotationItemFruit.getId(), position );
 		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemFruit.getId() );

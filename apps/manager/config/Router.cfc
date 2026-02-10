@@ -513,6 +513,7 @@
 		post( "/ajax/quotation-items/article" ).to( "QuotationItemAjaxController.saveArticle" ).end();
 		
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
+		get( "/ajax/quotation-items/fruits/:id/product-items" ).to( "QuotationItemAjaxController.fruitProductItems" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		//get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
@@ -525,7 +526,9 @@
 		get( "/roles/print" ).to( "RolController.print" ).end();
 
 		get( "/ajax/roles/:roleId/permissions" ).to( "RolePermissionAjaxController.list" ).end();
-		post( "/ajax/roles-permissions" ).to( "RolePermissionAjaxController.save" ).end();
+		get( "/ajax/roles/:roleId" ).to( "RoleAjaxController.get" ).end();
+		post( "/ajax/roles" ).to( "RoleAjaxController.save" ).end();
+		post( "/roles-permissions" ).to( "RolePermissionAjaxController.save" ).end();
 
 
 		/*

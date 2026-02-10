@@ -143,31 +143,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			maxThreads = 1
 		);
 
-		/*
-		for ( var product in products ) {
-			var newProduct = Duplicate( product );
-			newProduct.getLine().setId( arguments.toLineId );
-
-			var newId = productService.create( newProduct );
-
-			// duplicate components of product
-			var productComponents = getComponentService().list( productId = product.getId() );
-
-			for ( var itemProductComponent in productComponents ) {
-				var newProductComponent = Duplicate( itemProductComponent );
-
-				newProductComponent.setId( "" );
-				newProductComponent.getProduct().setId( newId );
-
-				getComponentService().create( newProductComponent );
-			}
-
-			// clone all productItems and components
-			getProductService().cloneTree( fromProductId = product.getId(), toProductId = newId );
-
-		}
-		*/
-
 		getCacheManager().removeAll();
 
 		super.logEvent(

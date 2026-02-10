@@ -24,40 +24,40 @@
                                     <select id="accessoryProductCategory" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la categoria"
-                                        data-bind="source: categories, value: detailForm.data.quotationItem.product.catalogBundle.category, events: { change: loadLines }"
+                                        data-bind="source: categories, value: detailForm.data.quotationItem.product.category, events: { change: loadLines }"
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.catalogBundle.category.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.category.id">    
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
                                     <select id="accessoryRow" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la linea"
-                                        data-bind="source: lines, value: detailForm.data.quotationItem.product.catalogBundle.line, events: { change: loadModels }" 
+                                        data-bind="source: lines, value: detailForm.data.quotationItem.product.line, events: { change: loadModels }" 
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.catalogBundle.line.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.line.id">    
                                 <label class="col-sm-2 col-form-label text-start">Modello</label>
                                 <div class="col-sm-10">
                                     <select id="accessoryModel" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona il modello"
-                                        data-bind="source: models, value: detailForm.data.quotationItem.product.catalogBundle.model, events: { change: loadFinishes }" 
+                                        data-bind="source: models, value: detailForm.data.quotationItem.product.model, events: { change: loadFinishes }" 
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.catalogBundle.model.id">
+                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.model.id">
                                 <label class="col-sm-2 col-form-label text-start">Finitura</label>
                                 <div class="col-sm-10">
                                     <select id="accessoryFinish" 
@@ -129,12 +129,3 @@
         </section>
     </div>
 </cfoutput>
-<style>
-    #accessory-preview-background {
-        min-width: 500px;
-        min-height: 500px;
-        background-repeat: no-repeat !important;
-        background-position: center !important;
-        background-size: auto !important;
-    }
-</style>

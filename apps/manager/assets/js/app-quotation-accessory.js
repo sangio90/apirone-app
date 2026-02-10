@@ -35,16 +35,14 @@ AP.accessory.modal = ( function() {
                     finish: {
                         id: ""
                     },
-                    catalogBundle: {
-                        category: {
-                            id: ""
-                        },
-                        line: {
-                            id: ""
-                        },
-                        model: {
-                            id: ""
-                        },
+                    category: {
+                        id: ""
+                    },
+                    line: {
+                        id: ""
+                    },
+                    model: {
+                        id: ""
                     },
                     items: new kendo.data.DataSource(),
                 },
@@ -78,9 +76,9 @@ AP.accessory.modal = ( function() {
             if (
                 vm.get( "detailForm.data.quotationItem.quantity" ) > 0 &&
                 vm.get( "detailForm.data.quotationItem.product.finish.id" ) != "" &&
-                vm.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) != "" &&
-                vm.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) != "" &&
-                vm.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) != ""
+                vm.get( "detailForm.data.quotationItem.product.category.id" ) != "" &&
+                vm.get( "detailForm.data.quotationItem.product.line.id" ) != "" &&
+                vm.get( "detailForm.data.quotationItem.product.model.id" ) != ""
             ) {
                 viewModel.set( "canSave", true );
             } else {
@@ -101,20 +99,20 @@ AP.accessory.modal = ( function() {
         loadLines: function( event ) {
             NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ),
+                url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
                 callback: {
                     done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona la Linea" } );
+                        xhr.data.unshift( { id: "", name: "-- Seleziona la linea" } );
                         viewModel.get( "lines" ).data( xhr.data );
                     },
                 },
             } );
             this.checkCanSave();
-            AP.setUserPref( "accessory.categoryId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) );
+            AP.setUserPref( "accessory.categoryId", viewModel.get( "detailForm.data.quotationItem.product.category.id" ) );
         },
 
         loadModels: function( event ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) != "" ) {
+            if ( viewModel.get( "detailForm.data.quotationItem.product.line.id" ) != "" ) {
                 $( "#accessoryProductCategory" ).prop( "disabled", true );
                 $( "#accessory-preview-background" ).css( {
                     width: "500px",
@@ -126,8 +124,8 @@ AP.accessory.modal = ( function() {
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/models/"
-                    + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" )
-                    + "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ),
+                    + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
+                    + "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
                 callback: {
                     done: function( xhr ) {
                         xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
@@ -136,15 +134,15 @@ AP.accessory.modal = ( function() {
                 },
             } );
             this.checkCanSave();
-            AP.setUserPref( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) );
+            AP.setUserPref( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.line.id" ) );
         },
 
         loadFinishes: function( event ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) != "" ) {
+            if ( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) != "" ) {
                 $( "#accessoryRow" ).prop( "disabled", true );
                 NM.util.ajax( {
                     method: "GET",
-                    url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ),
+                    url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ),
                     callback: {
                         done: function( xhr ) {
                             xhr.data.unshift( { id: "", name: "-- Seleziona la Finitura" } );
@@ -152,11 +150,11 @@ AP.accessory.modal = ( function() {
                             NM.util.ajax( {
                                 method: "GET",
                                 url: "/manager/ajax/model-config/get-by-params?categoryId=" +
-                                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) +
+                                    viewModel.get( "detailForm.data.quotationItem.product.category.id" ) +
                                     "&lineId=" +
-                                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) +
+                                    viewModel.get( "detailForm.data.quotationItem.product.line.id" ) +
                                     "&modelId=" +
-                                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ),
+                                    viewModel.get( "detailForm.data.quotationItem.product.model.id" ),
                                 callback: {
                                     done: function( xhr ) {
                                         if ( xhr.data && xhr.data.modelConfig ) {
@@ -184,7 +182,7 @@ AP.accessory.modal = ( function() {
 
             }
             this.checkCanSave();
-            AP.setUserPref( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) );
+            AP.setUserPref( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.model.id" ) );
         },
 
         loadProduct: function() {
@@ -198,9 +196,9 @@ AP.accessory.modal = ( function() {
             NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/products?categoryId=" +
-                    viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.category.id" ) +
-                    "&lineId=" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.line.id" ) +
-                    "&modelId=" + viewModel.get( "detailForm.data.quotationItem.product.catalogBundle.model.id" ) +
+                    viewModel.get( "detailForm.data.quotationItem.product.category.id" ) +
+                    "&lineId=" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ) +
+                    "&modelId=" + viewModel.get( "detailForm.data.quotationItem.product.model.id" ) +
                     "&finishId=" + viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
                 callback: {
                     done: async function( xhr ) {
@@ -622,19 +620,21 @@ AP.accessory.modal = ( function() {
             },
         } );
 
+
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
 
+
         if ( AP.getUserPref( "accessory.categoryId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.category.id", AP.getUserPref( "accessory.categoryId" ) );
+            viewModel.set( "detailForm.data.quotationItem.product.category.id", AP.getUserPref( "accessory.categoryId" ) );
         }
 
         if ( AP.getUserPref( "accessory.lineId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.line.id", AP.getUserPref( "accessory.lineId" ) );
+            viewModel.set( "detailForm.data.quotationItem.product.line.id", AP.getUserPref( "accessory.lineId" ) );
         }
 
         if ( AP.getUserPref( "accessory.modelId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.catalogBundle.model.id", AP.getUserPref( "accessory.modelId" ) );
+            viewModel.set( "detailForm.data.quotationItem.product.model.id", AP.getUserPref( "accessory.modelId" ) );
         }
 
         if ( AP.getUserPref( "accessory.finishId" ) ) {
@@ -679,37 +679,41 @@ AP.accessory.modal = ( function() {
                     xhr.data.unshift( { id: "", name: "" } );
                     viewModel.get( "categories" ).data( xhr.data );
                     NM.util.openModal( AP.accessory.fields.modalRoot );
+
+                    NM.util.ajax( {
+                        method: "GET",
+                        url: "/manager/ajax/quotation-items/accessory/" + id,
+                        callback: {
+                            done: function( xhr ) {
+                                if ( xhr.status == "SUCCESS" ) {
+                                    var data = xhr.data;
+                                    viewModel.set( "detailForm.data", data );
+                                    viewModel.set( "detailForm.title", "Modifica accessorio" );
+
+                                    pricingApp().init( "accessory", xhr.data.price );
+
+                                    viewModel.loadLines();
+
+                                    setTimeout( function() {
+                                        viewModel.loadModels();
+                                        setTimeout( function() {
+                                            viewModel.loadFinishes();
+                                            setTimeout( function() {
+                                                viewModel.loadProduct();
+                                            }, 100 );
+                                        }, 100 );
+                                    }, 100 );
+                                }
+                            },
+                        },
+                    } );
+
+                    renderQuotationItemTotals( id );
+
                 },
             },
         } );
 
-        NM.util.ajax( {
-            method: "GET",
-            url: "/manager/ajax/quotation-items/accessory/" + id,
-            callback: {
-                done: function( xhr ) {
-                    if ( xhr.status == "SUCCESS" ) {
-                        var data = xhr.data;
-                        viewModel.set( "detailForm.data", data );
-                        viewModel.set( "detailForm.title", "Modifica accessorio" );
-
-                        viewModel.loadLines();
-
-                        setTimeout( function() {
-                            viewModel.loadModels();
-                            setTimeout( function() {
-                                viewModel.loadFinishes();
-                                setTimeout( function() {
-                                    viewModel.loadProduct();
-                                }, 100 );
-                            }, 100 );
-                        }, 100 );
-                    }
-                },
-            },
-        } );
-
-        renderQuotationItemTotals( id );
     };
 
     pub.init = function() {

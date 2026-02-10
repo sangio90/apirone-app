@@ -162,6 +162,12 @@
 					<cfelse>
 						NULL
 					</cfif>,
+				quotation_zone_position_id =
+					<cfif NOT IsNull( arguments.quotationItem.getPosition() )>
+						<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItem.getPosition().getId()#">
+					<cfelse>
+						NULL
+					</cfif>,
 				product_id =
 					<cfif NOT IsNull( arguments.quotationItem.getProduct() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getProduct().getId()#">::uuid

@@ -68,6 +68,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+	public com.apirone.core.model.bean.Outcome function deleteByQuotationItemFruitId( required String quotationItemFruitId ){
+		var outcome = super.bean( "Outcome" );
+
+		outcome.setData( { quotationItemFruitId = arguments.quotationItemFruitId } );
+		getDao().deleteByQuotationItemFruitId( arguments.quotationItemFruitId );
+
+		transaction {
+			try {
+				var cm = getCacheManager();
+				getDao().deleteByQuotationItemFruitId( arguments.quotationItemFruitId );
+				cm.remove( getCacheScope(), arguments.quotationItemFruitId );
+			} catch ( any error ) {
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.CannotDeleteQuotationItemProductItem" );
+				outcome.setMessage( "Cannot delete product item by quotation item fruit id: [#arguments.quotationItemFruitId#]" );
+			}
+		}
+
+		return outcome;
+	}
+
 	public String function create( required com.apirone.core.model.bean.QuotationItemProductItem productItem ){
 		var newId = getDao().insert( arguments.productItem );
 
@@ -85,8 +107,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productItemId );
 		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemProductItem" );
+			
 			bean.setId( record.quotation_item_product_item_id );
 			bean.setQuotationItemId( record.quotation_item_id );
+
 			bean.setProductItem( getProductItemService().get( record.product_item_id ) );
 			bean.setLevel( record.level );
 

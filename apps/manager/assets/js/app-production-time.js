@@ -212,7 +212,6 @@ AP.productionTime.list = ( function() {
             console.log( "detailApp", detailApp );
 
             var onSave = function() {
-                console.log( "onSave" );
                 viewModel.get( "rows" ).read();
             };
 

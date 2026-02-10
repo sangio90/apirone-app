@@ -407,7 +407,7 @@
         "type": "Varchar"
     },
     "quotationZonePosition.name": {
-        "name": "name",
+        "name": "quotation_zone_position",
         "type": "Varchar"
     },
 }

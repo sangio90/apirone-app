@@ -13,6 +13,7 @@
 	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="FileService" inject="FileService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
+	property name="QuotationZonePositionService" inject="QuotationZonePositionService";
 
 	property name="cacheScope" type="String" default="QuotationItem.bean";
 
@@ -103,6 +104,19 @@
 	public String function create( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 
 		transaction {
+
+			if( !IsNull( quotationItem.getPosition() ) ) {
+				if( len( quotationItem.getPosition().getCode() ) ) {
+					var position = quotationItem.getPosition();
+					if( position.getId() == "" ) {
+						position.setZoneId( quotationItem.getQuotationZone().getId() );
+						var newPositionId = getQuotationZonePositionService().create( position );
+						quotationItem.getPosition().setId( newPositionId );
+					}
+				}
+			}
+
+
 			var newId = getDao().insert( arguments.quotationItem );
 
 			if( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
@@ -117,8 +131,8 @@
 			price.setQuotationItemId( newId );
 			var id = getQuotationItemPriceService().create( price );
 
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #newId#, line: #price.getLines().len()#");
+			//cffile( action="append", file="#ExpandPath('/debug.log')#", output="*********************");
+			//cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemService: #newId#, line: #price.getLines().len()#");
 
 			if ( isNull(arguments.quotationItem.getArticle()) ) {
 				var hash = getProductHashService().createHash( newId );
@@ -259,10 +273,17 @@
 
 			bean.setNote( record.note );
 			bean.setHash( record.hash );
-			
+			bean.setSpecial( BooleanFormat( Val( record.special ) ) );
+
+			if( Len( record.quotation_zone_position_id ) ) {
+				bean.setPosition( getQuotationZonePositionService().get( record.quotation_zone_position_id ) );
+			}
+		
+			/*
 			if ( Len( record.position ) ) {
 				bean.setPosition( record.position );
 			}
+			*/
 
 			return bean;
 		}
