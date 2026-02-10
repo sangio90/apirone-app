@@ -528,7 +528,6 @@
 
 		get( "/ajax/roles/:roleId/permissions" ).to( "RolePermissionAjaxController.list" ).end();
 		get( "/ajax/roles/:roleId" ).to( "RoleAjaxController.get" ).end();
-		post( "/ajax/roles" ).to( "RoleAjaxController.save" ).end();
 		post( "/roles-permissions" ).to( "RolePermissionAjaxController.save" ).end();
 
 

@@ -440,8 +440,9 @@
 				CFPROVIN, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
 				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
 				DEPRODOD, DEPROMER, MM_STATO, MMCODAGE, MMCODART, MMCODCOL, MMCODPAG,
-				MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA, MMEVASIO, MMNUMDOC, MMNUMLIS,
-				MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2, MMSERIAL, MMVALUNI
+				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA, 
+				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2, 
+				MMSERIAL, MMVALUNI
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -472,6 +473,9 @@
 				<cfqueryparam value="#left(arguments.data.MMCODART,15)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.MMCODCOL,6)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMCODPAG ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMSCOCF1 ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMSCOCF2 ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMSPETRA ?: 0#" cfsqltype="integer">,
 				<cfqueryparam value="#arguments.data.MMCODVAL ?: 0#" cfsqltype="integer">,
 				<cfqueryparam value="#left(arguments.data.MMCODVAR,10)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMDATDOC#" cfsqltype="date">,

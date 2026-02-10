@@ -7,6 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="QuotationDAO";
 
 	property name="quotationService" inject="QuotationService";
+	property name="quotationPriceService" inject="QuotationPriceService";
 	property name="QuotationItemService" inject="QuotationItemService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="quotationZoneService" inject="QuotationZoneService";
@@ -777,7 +778,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								discount1 = quotationItem.getPrice().getDiscount1()
 							}
 							if (quotationItem.getPrice().getDiscount2() > 0) {
-								discount1 = quotationItem.getPrice().getDiscount2()
+								discount2 = quotationItem.getPrice().getDiscount2()
 							}
 						}
 						quotationData["MMVALUNI"] = price;
@@ -824,7 +825,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								discount1 = quotationItem.getPrice().getDiscount1()
 							}
 							if (quotationItem.getPrice().getDiscount2() > 0) {
-								discount1 = quotationItem.getPrice().getDiscount2()
+								discount2 = quotationItem.getPrice().getDiscount2()
 							}
 						}
 						quotationData["MMVALUNI"] = price;
@@ -954,14 +955,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"data" = {},
 			"error" = null
 		};
-		
+		var quotationPrice = getQuotationPriceService().calculate( quotation.getId() );
 		var customer = quotation.getCustomer();
 
 		if (isNull(quotation.getShippingProfile())) {
 			result.error = "Dati spedizione non trovati."
 			return result;
 		}
-
 		var quotationData = {
 			//"MMSERIAL" = quotation.getSerial(),
 			"MMSERIAL" = quotation.getSerial(), // i need the same code 
@@ -985,6 +985,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFTELEFO" = customer.getPhone(),
 			"CFBLOCCO" = "N",
 			"CFMOROSO" = "N",
+			"MMSCOCF1" = quotationPrice.getDiscount1(),
+			"MMSCOCF2" = quotationPrice.getDiscount2(),
+			"MMSPETRA" = quotationPrice.getShippingCost(),
 			"DECAPDES" = customer.getPostalCode(),
 			"DEDESDOD" = customer.getCompany(),
 			"DEINDDOD" = customer.getStreet(),

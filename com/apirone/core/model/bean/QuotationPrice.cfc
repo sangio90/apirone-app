@@ -8,6 +8,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="flatDiscount" type="Numeric";
 	property name="shippingCost" type="Numeric";
 	property name="totalGoods" type="Numeric";
+	property name="totalMultipliedByQuantity" type="Numeric";
 
 	property name="lines" type="com.apirone.core.model.bean.PriceLine[]";
 	property name="vatCode" type="com.apirone.core.model.bean.VatCode";
@@ -40,8 +41,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	public Numeric function getSubtotalBeforeFlat(){
 		
-		var total = getTotalGoods();
-		
+		var total = getTotalMultipliedByQuantity();
+
 		// --- Gestione Sconti Percentuali (solo sulla merce) ---
 		var discount1 = getDiscount1();
 		// Se non è un numero, lo trattiamo come 0, altrimenti usiamo il valore
@@ -78,7 +79,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		var totals = {}; 
 		
 		// 1. Recupera i valori calcolati (richiama le funzioni che abbiamo definito)
-		var totalGoods = getTotalGoods();
+		var totalGoods = getTotalMultipliedByQuantity();
 		var taxable = getTaxable(); // Naming aggiornato
 		var total = getTotal();
 

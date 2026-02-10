@@ -5,7 +5,6 @@
             defaultIncludes = [
                 "id",
                 "price",
-                "price.total",
                 "quantity",
                 "product.id",
                 "product.finish",

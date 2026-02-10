@@ -105,7 +105,10 @@ AP.quotation.itemPricing = ( function() {
                         if ( xhr.data ) {
                             AP.loading.hide();
                             viewModel.set( "pricing.data", xhr.data );
-                            viewModel.set( "pricing.data.total", xhr.data.totalGoods );
+                            const actualTotal = xhr.data.totalGoods;
+                            const totalDiscounted1 = actualTotal - (actualTotal * viewModel.get( "pricing.data.discount1" ) / 100);
+                            const totalDiscounted2 = totalDiscounted1 - (totalDiscounted1 * viewModel.get( "pricing.data.discount2" ) / 100);
+                            viewModel.set( "pricing.data.total", Number( totalDiscounted2 ).toFixed( 2 ) );
                         }
                     }
                 }

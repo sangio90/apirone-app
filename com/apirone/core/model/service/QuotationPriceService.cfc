@@ -152,7 +152,9 @@
 			bean.setShippingCost( record.shipment_cost );
 			bean.setFlatDiscount( record.flat_discount );
 			bean.setCreatedAt( record.created_at );
-
+			getQuotationItemService().list( quotationId = bean.getQuotationId() ).each( function( item ){
+				bean.setTotalMultipliedByQuantity( bean.getTotalMultipliedByQuantity() + ( item.getPrice().getTotal() * item.getQuantity() ) );
+			} );
 			return bean;
 		}
 		
