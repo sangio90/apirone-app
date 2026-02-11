@@ -979,7 +979,7 @@ AP.plate.modal = ( function() {
 
                         setTimeout( function() {
                             AP.loading.hide();
-                            // window.location.reload();
+                            window.location.reload();
                         }, 1000 );
                     }
                 } );
@@ -1069,8 +1069,6 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm.isClone", clone );
         viewModel.set( "detailForm.title", clone ? "Duplica placca" : "Modifica placca" );
 
-        pricingApp().init( "plate", undefined );
-
         AP.plate.api.getPlate( id, {
             done: function( xhr ) {
                 viewModel.populateProduct( xhr.data.quotationItem.product );
@@ -1097,6 +1095,8 @@ AP.plate.modal = ( function() {
                         } );
                     } );
                 } );
+
+                pricingApp().init( "plate", { data: xhr.data.quotationItem.price } );
             }
         } );
 
