@@ -856,8 +856,8 @@ AP.plate.grid = ( function() {
 
         addFruitToPositions( selectedFruit, positionIds ) {
 
-            // console.log( "addFruitToPositions:selectedFruit", selectedFruit );
-            // console.log( "addFruitToPositions:cellIds", cellIds );
+            console.log( "addFruitToPositions:selectedFruit", selectedFruit );
+            console.log( "addFruitToPositions:cellIds", positionIds );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,

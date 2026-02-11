@@ -113,7 +113,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		// 02 positions
 		getQuotationItemFruitPositionService().deleteByQuotationItemFruitId( arguments.quotationItemFruit.getId() );
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="delete positions: #arguments.quotationItemFruit.getId()#" );
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="delete positions: #arguments.quotationItemFruit.getId()#, #SerializeJSON(arguments.quotationItemFruit.getPositions())#" );
 
 		for( var position in arguments.quotationItemFruit?.getPositions() ){
 			getQuotationItemFruitPositionService().create( arguments.quotationItemFruit.getId(), position );

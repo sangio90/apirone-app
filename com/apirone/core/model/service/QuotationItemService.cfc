@@ -105,7 +105,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 
-			ensurePosition( arguments.quotationItem );
+			arguments.quotationItem = ensurePosition( arguments.quotationItem );
 
 			var newId = getDao().insert( arguments.quotationItem );
 
@@ -136,16 +136,43 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 
+		var oldBean = get( arguments.quotationItem.getId() );
+
+		var fruitIdsToDeleted = [];
+
+		for ( var thisFruit in oldBean.getFruits() ) {
+			var found = false;
+			for ( var newFruit in arguments.quotationItem.getFruits() ) {
+				if ( !IsNull( thisFruit.getId() ) && thisFruit.getId() == newFruit.getId() ) {
+					found = true;
+					break;
+				}
+			}
+			if ( !found ) {
+				fruitIdsToDeleted.add( thisFruit.getId() );
+			}
+		}
+
 		transaction {
 
-			ensurePosition( arguments.quotationItem );
-
 			getDao().update( arguments.quotationItem );
+
+			for( var thisFruitId in fruitIdsToDeleted ) {
+				getQuotationItemFruitService().delete( thisFruitId );
+			}
+
+			arguments.quotationItem = ensurePosition( arguments.quotationItem );
+
 			super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
 
 			if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 				for ( var thisFruit in arguments.quotationItem.getFruits() ) {
-					getQuotationItemFruitService().update( thisFruit );
+					if ( IsNull( thisFruit.getId() ) || thisFruit.getId() == "" ) {
+						thisFruit.setQuotationItemId( arguments.quotationItem.getId() );
+						getQuotationItemFruitService().create( thisFruit );
+					} else {
+						getQuotationItemFruitService().update( thisFruit );
+					}
 				}
 			}
 
@@ -178,7 +205,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/**
 	 * Ensure quotation item position is created and linked when needed.
 	 */
-	private function ensurePosition( required com.apirone.core.model.bean.QuotationItem quotationItem ){
+	private com.apirone.core.model.bean.QuotationItem function ensurePosition( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 		if ( !IsNull( arguments.quotationItem.getPosition() ) ) {
 			if ( Len( arguments.quotationItem.getPosition().getCode() ) ) {
 				var position = arguments.quotationItem.getPosition();
@@ -189,6 +216,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 		}
+		return arguments.quotationItem;
 	}
 
 	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){

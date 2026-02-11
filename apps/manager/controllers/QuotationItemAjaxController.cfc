@@ -432,16 +432,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var tmpDir = super.getTempDir();
 		
-		var status   = super.bean( "Status" );
-		var zone     = super.bean( "QuotationZone" );
-		var bean     = super.bean( "QuotationItemPlate" );
+		var status = super.bean( "Status" );
+		var zone   = super.bean( "QuotationZone" );
+		var bean   = super.bean( "QuotationItemPlate" );
 
 		var beanFruits = [];
 
 		var id = json.item.id;
 
 		if ( Len( id ) ) {
-			var bean = super.fire( "QuotationItem.get", { quotationItemId = id } );
+			var bean = duplicate( super.fire( "QuotationItem.get", { quotationItemId = id } ) );
 		}
 
 		bean.setQuotation( super.fire( "Quotation.get", [ json.quotationId ] ) ); //TODO: move to QuotationId
@@ -485,11 +485,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			if ( IsNumeric( thisFruit.id ) ) {
 				// update
 				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
-				//var action    = "QuotationItemFruit.update";
 			} else {
 				// create
 				var fruitBean = super.bean( "QuotationItemFruit" );
-				//var action    = "QuotationItemFruit.create";
 			}
 
 			var product = super.fire( "product.get", [ thisFruit.fruit.id ] );
@@ -497,29 +495,29 @@ component extends="com.apirone.core.controller.AbsController" {
 			fruitBean.setFruit( product );
 			fruitBean.setPositions( positions );
 
-		var items = [];
+			var items = [];
 
-		var fruitProductItemsData = thisFruit.items._data;
+			var fruitProductItemsData = thisFruit.items._data;
 
-		fruitProductItemsData.each( function( productItemRow ){
-			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
-				return value.selected;
-			} )
+			fruitProductItemsData.each( function( productItemRow ){
+				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
+					return value.selected;
+				} )
 
-			if ( Len( selectedValue ) > 0 ) {
-				selectedValue = selectedValue[ 1 ];
+				if ( Len( selectedValue ) > 0 ) {
+					selectedValue = selectedValue[ 1 ];
 
-				var productItemBean = super.bean( "QuotationItemProductItem" );
-				var productItem     = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
+					var productItemBean = super.bean( "QuotationItemProductItem" );
+					var productItem     = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
 
-				//productItemBean.setQuotationItemFruitId( fruitBean.getId() );
-				productItemBean.setProductItem( productItem );
-				productItemBean.setOrigin( productItem.getOrigin() );
-				productItemBean.setLevel( productItemRow.level );
+					//productItemBean.setQuotationItemFruitId( fruitBean.getId() );
+					productItemBean.setProductItem( productItem );
+					productItemBean.setOrigin( productItem.getOrigin() );
+					productItemBean.setLevel( productItemRow.level );
 
-				items.add( productItemBean );
-			}
-		} );
+					items.add( productItemBean );
+				}
+			} );
 			
 			fruitBean.setItems( items );
 
