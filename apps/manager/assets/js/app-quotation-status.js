@@ -278,7 +278,6 @@ AP.quotation.status = ( function() {
     } );
 
     pub.edit = function() {
-
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/" + AP.page.quotation.id,
@@ -308,6 +307,7 @@ AP.quotation.status = ( function() {
 
         NM.util.openModal( fields.statusModalRoot );
 
+        $( "#qt-status-nav-detail-but" ).trigger( "click" );
     };
 
     pub.init = function() {

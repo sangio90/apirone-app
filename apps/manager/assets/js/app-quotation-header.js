@@ -431,13 +431,12 @@ AP.quotation.header = ( function() {
 
         // $( "#quotationNameInput" ).prop( "readonly", true );
         $( "#quotationNumberInput" ).prop( "readonly", true );
+        $( "#nav-general-tab" ).trigger( "click" );
     };
 
     pub.init = function() {
 
         kendo.bind( fields.headerRoot, viewModel );
-
-        console.log( "headerRoot:init" );
 
         viewModel.get( "languages" ).data( AP.page.languages );
         viewModel.get( "statuses" ).data( AP.page.statuses );

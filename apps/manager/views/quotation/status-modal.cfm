@@ -16,17 +16,17 @@
 						<nav>
 							<ul class="nav nav-tabs" role="tablist">
 								<li class="nav-item active">
-									<a class="nav-link active" id="qt-status-nav-detail-but" data-bs-toggle="tab" 
-										href="##qt-status-nav-detail-tab" role="tab" aria-controls="tab1" aria-selected="true">
+									<button class="nav-link active" id="qt-status-nav-detail-but" data-bs-toggle="tab" 
+										data-bs-target="##qt-status-nav-detail-tab" type="button" role="tab">
 										Dettaglio
-									</a>                        
+									</button>                        
 								</li>
 
 								<li class="nav-item">
-									<a class="nav-link" id="qt-status-nav-grid-but" data-bs-toggle="tab" 
-										href="##qt-status-nav-grid-tab" role="tab" aria-controls="tab2" aria-selected="true">
+									<button class="nav-link" id="qt-status-nav-grid-but" data-bs-toggle="tab" 
+										data-bs-target="##qt-status-nav-grid-tab" type="button" role="tab">
 										Storico
-									</a>
+									</button>
 								</li>
 							</ul>
 
