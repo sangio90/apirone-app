@@ -142,8 +142,8 @@ AP.quotation.itemPricing = ( function() {
             viewModel.set( "pricing", data );
         } else {
             viewModel.set( "pricing", defaultForm );
-            $( "[name=\"discount1\"]" ).prop( "disabled", true );
-            $( "[name=\"discount2\"]" ).prop( "disabled", true );
+            $( "[name=\"discount1\"]" ).prop( "disabled", false );
+            $( "[name=\"discount2\"]" ).prop( "disabled", false );
         }
 
     };
