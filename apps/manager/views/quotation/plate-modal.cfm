@@ -17,7 +17,11 @@
                             bundle / categorie
                         --->
                         <div class="mb-3 row">
-                            <div class="col-4">
+                            <div class="col-1">    
+                                <label class="col-sm-12 col-form-label text-start">Quantità</label>
+                                <input class="form-control" type="number" data-bind="value: detailForm.data.quantity" min="1">
+                            </div>
+                            <div class="col-3">
                                 <label class="col-sm-2 col-form-label">Linea</label>
                                 <select id="plate-line" 
                                     required

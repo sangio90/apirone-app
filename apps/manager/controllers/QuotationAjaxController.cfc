@@ -378,15 +378,43 @@ component extends="com.apirone.core.controller.AbsController" {
 	private Struct function getQuantities( quotationId ){
 
 		var acc = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "ACC" );
+		var accQuantity = 0;
+		var accessoriesTotalPrice = 0;
+		for ( var item in acc ) {
+			accQuantity += item.getQuantity();
+			accessoriesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+		}
 		var pla = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "PLA" );
+		var plaQuantity = 0;
+		var platesTotalPrice = 0;
+		for ( var item in pla ) {
+			plaQuantity += item.getQuantity();
+			platesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+		}
 		var seg = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "SEG" );
+		var segQuantity = 0;
+		var signagesTotalPrice = 0;
+		for ( var item in seg ) {
+			segQuantity += item.getQuantity();
+			signagesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+		}
 		var art = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "ART" );
+		var artQuantity = 0;
+		var articlesTotalPrice = 0;
+		for ( var item in art ) {
+			artQuantity += item.getQuantity();
+			articlesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+		}
 
 		var data = {
-			"accessories" = acc.len(),
-			"plates" = pla.len(),
-			"signages" = seg.len(),
-			"articles" = art.len(),
+			"accessories" = accQuantity,
+			"accessoriesTotalPrice" = accessoriesTotalPrice,
+			"plates" = plaQuantity,
+			"platesTotalPrice" = platesTotalPrice,
+			"signages" = segQuantity,
+			"signagesTotalPrice" = signagesTotalPrice,
+			"articles" = artQuantity,
+			"articlesTotalPrice" = articlesTotalPrice,
 		}
 
 		return data;

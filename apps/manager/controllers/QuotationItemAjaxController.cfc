@@ -738,7 +738,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var lines = [];
 
-		pricing.setQuantity( Val( json.price.quantity ) ? json.price.quantity : 1 );
+		pricing.setQuantity( Val( json.price.quantity ) ? json.item.quantity : 1 );
 		pricing.setDiscount1( Val( json.price.discount1 ) ? json.price.discount1 : 0 );
 		pricing.setDiscount2( Val( json.price.discount2 ) ? json.price.discount2 : 0 );
 		        
@@ -768,7 +768,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var platePrice = calculator.calculate(
 			product.id,
-			json.price.quantity,
+			json.item.quantity,
 			productItemsIds
 		);
 

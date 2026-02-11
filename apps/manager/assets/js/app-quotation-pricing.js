@@ -283,6 +283,7 @@ AP.quotation.totalPricing = ( function() {
 
         getTotals: function( event ) {
             fetchTotals( undefined, "GET" );
+            return ( viewModel.get( "pricing.data" ) );
         },
 
         collapseTotals: function() {
@@ -296,7 +297,7 @@ AP.quotation.totalPricing = ( function() {
     };
 
     pub.getTotals = function() {
-    	viewModel.getTotals();
+    	return viewModel.getTotals();
     };
 
     pub.init = function() { // type: item, quotation

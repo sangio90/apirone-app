@@ -138,18 +138,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var oldBean = get( arguments.quotationItem.getId() );
 
-		var fruitIdsToDeleted = [];
+		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+			var fruitIdsToDeleted = [];
 
-		for ( var thisFruit in oldBean.getFruits() ) {
-			var found = false;
-			for ( var newFruit in arguments.quotationItem.getFruits() ) {
-				if ( !IsNull( thisFruit.getId() ) && thisFruit.getId() == newFruit.getId() ) {
-					found = true;
-					break;
+			for ( var thisFruit in oldBean.getFruits() ) {
+				var found = false;
+				for ( var newFruit in arguments.quotationItem.getFruits() ) {
+					if ( !IsNull( thisFruit.getId() ) && thisFruit.getId() == newFruit.getId() ) {
+						found = true;
+						break;
+					}
 				}
-			}
-			if ( !found ) {
-				fruitIdsToDeleted.add( thisFruit.getId() );
+				if ( !found ) {
+					fruitIdsToDeleted.add( thisFruit.getId() );
+				}
 			}
 		}
 
@@ -157,15 +159,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getDao().update( arguments.quotationItem );
 
-			for( var thisFruitId in fruitIdsToDeleted ) {
-				getQuotationItemFruitService().delete( thisFruitId );
-			}
-
 			arguments.quotationItem = ensurePosition( arguments.quotationItem );
 
 			super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
 
 			if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+				for( var thisFruitId in fruitIdsToDeleted ) {
+					getQuotationItemFruitService().delete( thisFruitId );
+				}
+				
 				for ( var thisFruit in arguments.quotationItem.getFruits() ) {
 					if ( IsNull( thisFruit.getId() ) || thisFruit.getId() == "" ) {
 						thisFruit.setQuotationItemId( arguments.quotationItem.getId() );

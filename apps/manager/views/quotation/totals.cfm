@@ -18,19 +18,27 @@
 					<div class="d-flex align-items-center justify-content-between" >
 						<div>
 							<div>Placche:</div>
-							<span data-bind="text: pricing.counters.plates"></span>
+							<span data-bind="text: pricing.counters.plates"></span> pz 
+							<br>
+							<i data-bind="text: pricing.counters.platesTotalPrice" data-format="0.00 €"></i>
 						</div>
 						<div>
 							<div>Segnaletiche:</div>
-							<span data-bind="text: pricing.counters.signages"></span>
+							<span data-bind="text: pricing.counters.signages"></span> pz 
+							<br>
+							<i data-bind="text: pricing.counters.signagesTotalPrice" data-format="0.00 €"></i>
 						</div>
 						<div>
 							<div>Accessori:</div>
-							<span data-bind="text: pricing.counters.accessories"></span>
+							<span data-bind="text: pricing.counters.accessories"></span> pz 
+							<br>
+							<i data-bind="text: pricing.counters.accessoriesTotalPrice" data-format="0.00 €"></i>
 						</div>
 						<div>
 							<div>Servizi:</div>
-							<span data-bind="text: pricing.counters.articles"></span>
+							<span data-bind="text: pricing.counters.articles"></span> pz 
+							<br>
+							<i data-bind="text: pricing.counters.articlesTotalPrice" data-format="0.00 €"></i>
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
