@@ -247,33 +247,35 @@ component extends="com.apirone.core.controller.AbsController" {
 			)
 		} );
 
-		var productItemsData = json.quotationItem.product.items._data;
-		productItemsData.each( function( productItemRow ){
-			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
-				return v.selected;
-			} );
+		if ( json.quotationItem.product.keyExists( "items" ) ) {
+			var productItemsData = json.quotationItem.product.items._data;
+			productItemsData.each( function( productItemRow ){
+				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
+					return v.selected;
+				} );
 
-			if ( Len( selectedValue ) > 0 ) {
-				selectedValue   = selectedValue[ 1 ];
-				var productItem = super.fire(
-					"productItem.get",
-					{ "productItemId" = selectedValue.product_item_id }
-				);
+				if ( Len( selectedValue ) > 0 ) {
+					selectedValue   = selectedValue[ 1 ];
+					var productItem = super.fire(
+						"productItem.get",
+						{ "productItemId" = selectedValue.product_item_id }
+					);
 
-				var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
-				
-				quotationItemProductItemBean.setQuotationItemId( thisId );
-				quotationItemProductItemBean.setProductItem( productItem );
-				quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
-				quotationItemProductItemBean.setLevel( productItemRow.level );
-				quotationItemProductItemBean.setId( thisId )
+					var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
+					
+					quotationItemProductItemBean.setQuotationItemId( thisId );
+					quotationItemProductItemBean.setProductItem( productItem );
+					quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
+					quotationItemProductItemBean.setLevel( productItemRow.level );
+					quotationItemProductItemBean.setId( thisId )
 
-				super.fire(
-					"quotationItemProductItem.create",
-					{ "productItem" = quotationItemProductItemBean }
-				)
-			}
-		} )
+					super.fire(
+						"quotationItemProductItem.create",
+						{ "productItem" = quotationItemProductItemBean }
+					)
+				}
+			} )
+		}
 
 		var message = completeMessage( messageId );
 
@@ -850,11 +852,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		var productItemsIds = [];
 
 		var product = json.quotationItem.product;
-
-		for ( var item in product.items._data ) {
-			for ( var value in item.values ) {
-				if ( value.selected ) {
-					productItemsIds.add( value.product_item_id );
+		if ( product.keyExists( "items" ) ) {
+			for ( var item in product.items._data ) {
+				for ( var value in item.values ) {
+					if ( value.selected ) {
+						productItemsIds.add( value.product_item_id );
+					}
 				}
 			}
 		}
