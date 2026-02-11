@@ -159,7 +159,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				if ( !IsNull( hash ) ) {
 					//var beanToUpdate = get( arguments.quotationItem.getId() );
 					//beanToUpdate.setHash( hash );
-					updateHash( argumens.quotationItem.getId(), hash );
+					updateHash( arguments.quotationItem.getId(), hash );
 				}
 			}
 
