@@ -46,11 +46,31 @@
 			<a href="?action=cache.empty" class="button is-primary mr-2">Svuota cache</a>
 			<a href="?action=cache.gc" class="button is-primary mr-2">GC</a>
 			<a href="?action=cache.list" class="button is-primary mr-2">Lista cache</a>
+			<a class="button is-primary" href="?action=cache.choose">Remove cache item</a>
 			<a href="/resources/errors/list.cfm" class="button is-primary mr-2">Errori</a>
 			<a href="?action=info.read" class="button is-primary mr-2">Info</a>
 		</div>
 
-		<cfif action IS "cache.list">
+				<cfif action IS "cache.remove">
+					<cfif CacheIdExists( url.cache )>
+						<cfset cm.remove( url.cache )>
+						<p>Object removed</p>
+					<cfelse>
+						<p>Object not found</p>
+					</cfif>
+				</cfif>		
+
+				<cfif action IS "cache.choose">
+					<form method="get">
+						<div class="field is-horizontal">
+							<input name="cache" class="input mr-2">
+							<input type="submit" value="cancella" class="button is-primary">
+							<input name="action" value="cache.remove" type="hidden">
+						</div>
+					</form>
+				</cfif>
+
+				<cfif action IS "cache.list">
 
 			<cfset list = cm.list()>
 			
