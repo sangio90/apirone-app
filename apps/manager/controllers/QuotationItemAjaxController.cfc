@@ -233,7 +233,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotationItem.update", [ bean ] )
 		}
 
-		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId );
+		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "accessory" );
 
 		var quotationItemProductItems = super.fire(
 			"quotationItemProductItem.list",
@@ -343,7 +343,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotationItem.update", [ bean ] )
 		}
 
-		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId );
+		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "signage" );
 
 		for ( var signageRow in json.quotationItem.signageRows._data ) {
 			var signageRowBean = super.fire(
@@ -531,15 +531,13 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		if ( !Len( id ) OR json.isClone ) {
 			messageId = "quotationItem.created";
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="controller: savePlate: create quotationItem: #bean.getId()#" );
 			thisId    = super.fire( "quotationItem.create", [ bean ] )
 		} else {
 			messageId = "quotationItem.updated";
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="controller: savePlate: update quotationItem: #bean.getId()#" );
 			thisId    = super.fire( "quotationItem.update", [ bean ] )
 		}
 
-		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId );
+		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "plate" );
 
 		var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId } );
 
@@ -924,14 +922,18 @@ component extends="com.apirone.core.controller.AbsController" {
 	private Struct function saveImage( 
 			required String imageBase64, 
 			required String quotationItemId,
+			required String typeId
 		){
 		
 		var tmpDir = getTempDir();
 
-		var item = service("QuotationItem").get( arguments.quotationItemId );
+		// INFO: se uso il get qui il servizio crea la cache senza immagine
+		// che sarà vuota quando viene serializzata
+		//var item = service("QuotationItem").get( arguments.quotationItemId );
 
-		var type = "accessory";
+		//var type = "accessory";
 
+		/*
 		if( IsInstanceOf( item, "com.apirone.core.model.bean.QuotationItemPlate" ) ){
 			type = "plate";
 		}
@@ -939,8 +941,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		if( IsInstanceOf( item, "com.apirone.core.model.bean.QuotationItemSignage" ) ){
 			type = "signage";
 		}
+		*/
 
-		var fileName   = "preview_" & type & "_id_" & arguments.quotationItemId & ".png";
+		var fileName   = "preview_" & arguments.typeId & "_id_" & arguments.quotationItemId & ".png";
 		var filePath   = tmpDir & "/" & fileName;
 		var binaryData = ToBinary( arguments.imageBase64 );
 
@@ -972,7 +975,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = {	
 			"fileId"   = fileId,
 			"fileName" = fileName,
-			"type" = type
+			"type" = arguments.typeId
 		};
 
 		return result;

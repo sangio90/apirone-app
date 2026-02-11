@@ -123,8 +123,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( isNull( arguments.quotationItem.getArticle() ) ) {
 				var hash = getProductHashService().createHash( newId );
 				if ( !IsNull( hash ) ) {
-					quotationItem = get( newId );
-					quotationItem.setHash( hash );
+					//quotationItem = get( newId );
+					//quotationItem.setHash( hash );
 					updateHash( newId, hash );
 				}
 			}
@@ -157,9 +157,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( isNull( arguments.quotationItem.getArticle() ) ) {
 				var hash = getProductHashService().createHash( arguments.quotationItem.getId() );
 				if ( !IsNull( hash ) ) {
-					var beanToUpdate = get( arguments.quotationItem.getId() );
-					beanToUpdate.setHash( hash );
-					updateHash( beanToUpdate.getId(), hash );
+					//var beanToUpdate = get( arguments.quotationItem.getId() );
+					//beanToUpdate.setHash( hash );
+					updateHash( argumens.quotationItem.getId(), hash );
 				}
 			}
 
@@ -284,7 +284,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			var images = getFileService().list( quotationItemId = record.quotation_item_id );
-			
+
 			if ( Len( images ) ) {
 				bean.setImage( images[ 1 ] );
 			}
