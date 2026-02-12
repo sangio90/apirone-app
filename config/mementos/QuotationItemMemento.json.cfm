@@ -1,5 +1,17 @@
 {
-    defaultIncludes = [ "id", "shortId", "price", "quantity", "image" ],
+    defaultIncludes = [
+        "id",
+        "shortId",
+        "price",
+        "quantity",
+        "product.finish.code",
+        "product.finish.name",
+        "product.model.code",
+        "product.model.name",
+        "product.line.code",
+        "product.line.name",
+        "image",
+    ],
     profiles        = {
         edit = {
             defaultIncludes = [
