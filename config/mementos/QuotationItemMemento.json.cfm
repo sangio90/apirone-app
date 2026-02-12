@@ -10,6 +10,7 @@
         "product.model.name",
         "product.line.code",
         "product.line.name",
+        "article.name",
         "image",
     ],
     profiles        = {
@@ -53,6 +54,6 @@
                 "status",
             ]
         }
-    }
+    },
 }
 	

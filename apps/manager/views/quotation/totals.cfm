@@ -18,33 +18,33 @@
 					<div class="d-flex align-items-center justify-content-between" >
 						<div>
 							<div>Placche:</div>
-							<span data-bind="text: pricing.counters.plates"></span> pz 
+							<span data-bind="text: pricing.counters.plates" data-format="n2"></span> pz 
 							<br>
-							<i data-bind="text: pricing.counters.platesTotalPrice" data-format="0.00 €"></i>
+							<i data-bind="text: pricing.counters.platesTotalPrice" data-format="n2"></i>
 						</div>
 						<div>
 							<div>Segnaletiche:</div>
-							<span data-bind="text: pricing.counters.signages"></span> pz 
+							<span data-bind="text: pricing.counters.signages" data-format="n2"></span> pz 
 							<br>
-							<i data-bind="text: pricing.counters.signagesTotalPrice" data-format="0.00 €"></i>
+							<i data-bind="text: pricing.counters.signagesTotalPrice" data-format="n2"></i>
 						</div>
 						<div>
 							<div>Accessori:</div>
-							<span data-bind="text: pricing.counters.accessories"></span> pz 
+							<span data-bind="text: pricing.counters.accessories" data-format="n2"></span> pz 
 							<br>
-							<i data-bind="text: pricing.counters.accessoriesTotalPrice" data-format="0.00 €"></i>
+							<i data-bind="text: pricing.counters.accessoriesTotalPrice" data-format="n2"></i>
 						</div>
 						<div>
 							<div>Servizi:</div>
-							<span data-bind="text: pricing.counters.articles"></span> pz 
+							<span data-bind="text: pricing.counters.articles" data-format="n2"></span> pz 
 							<br>
-							<i data-bind="text: pricing.counters.articlesTotalPrice" data-format="0.00 €"></i>
+							<i data-bind="text: pricing.counters.articlesTotalPrice" data-format="n2"></i>
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
 						<div class="col-8">Totale merce</div>
 						<div class="col-4 text-end">
-							<span data-bind="text: pricing.data.totalGoods" data-format="0.00"></span> &euro;
+							<span data-bind="text: pricing.data.totalGoods" data-format="n2"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2 align-items-center d-flex">
@@ -71,7 +71,7 @@
 					<div class="row mt-3 mb-2">
 						<div class="col-8 mt-2">Subtotale</div>
 						<div class="col-4 text-end">
-							<span data-bind="text: pricing.data.subtotalBeforeFlat" data-format="0.00"></span> &euro;
+							<span data-bind="text: pricing.data.subtotalBeforeFlat" data-format="n2"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
@@ -85,19 +85,19 @@
 					<div class="row mt-3 mb-2">
 						<div class="col-8">Imponibile</div>
 						<div class="col-4 text-end">
-							<span data-bind="text: pricing.data.taxable" data-format="0.00"></span> &euro;
+							<span data-bind="text: pricing.data.taxable" data-format="n2"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
 						<div class="col-8">Iva <span data-bind="text: pricing.data.vatPercentage"></span>%</div>
 						<div class="col-4 text-end">
-							<span data-bind="text: pricing.data.vatAmount" data-format="0.00"></span> &euro;
+							<span data-bind="text: pricing.data.vatAmount" data-format="n2"></span> &euro;
 						</div>
 					</div>
 					<div class="row mt-3 mb-2">
 						<div class="col-6"><b>TOTALE</b></div>
 						<div class="col-6 text-end fs-16" >
-							<b><span data-bind="text: pricing.data.total" data-format="0.00"></span> &euro;</b>
+							<b><span data-bind="text: pricing.data.total" data-format="n2"></span> &euro;</b>
 						</div>
 					</div>
 					<div class="d-flex justify-content-end gap-2">

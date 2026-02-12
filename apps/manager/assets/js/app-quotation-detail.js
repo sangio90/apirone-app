@@ -810,6 +810,7 @@ AP.quotation.detail = ( function() {
 
     pub.init = function() {
         kendo.bind( AP.quotation.fields.detailRoot, viewModel );
+        kendo.culture( "it-IT" );
 
         // Controlla se c'è un parametro tab nell'URL
         pub.checkUrlTab();

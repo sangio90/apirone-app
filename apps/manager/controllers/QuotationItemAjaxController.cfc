@@ -15,7 +15,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
 
 		var rows = super.fire( "QuotationItem.search", params );
-		var data = ( memy.convertList( rows.getData() , 'list' ) );
+		var data = ( memy.convertList( rows.getData() ) );
 
 		result.setTotal( rows.getTotal() );
 		result.setCount( rows.getCount() );

@@ -303,6 +303,7 @@ AP.quotation.totalPricing = ( function() {
     pub.init = function() { // type: item, quotation
 
         kendo.bind( fields.boxTotalPricing, viewModel );
+        kendo.culture( "it-IT" );
 
         viewModel.set( "detail.title", "Totali preventivo" );
 

@@ -36,7 +36,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		var total      = totalGoods;
 
 		if ( isFixed() ) {
-			return NumberFormat(getAmount(), "9.99");
+			return val(NumberFormat(getAmount(), "9.99"));
 		}
 
 		if ( StructKeyExists( variables, "discount1" ) && variables.discount1 > 0 ) {
@@ -47,7 +47,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 			total = total - ( total * variables.discount2 / 100 );
 		}
 
-		return NumberFormat(total, "9.99");
+		return val(NumberFormat(total, "9.99"));
 	}
 
 	public Boolean function isFixed(){
