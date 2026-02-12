@@ -178,7 +178,7 @@
     #view( "quotation/totals" )#
 
     #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
-    #template( view="jstemplate/quotation/quotation-item-article-preview-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-item-article-grid-row-tmpl" )#
     #template( view="jstemplate/quotation/quotation-position-suggest-row-tmpl")#
     
     #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
