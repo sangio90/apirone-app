@@ -84,11 +84,11 @@
                                 </div>
                             </div>
                             <div class="col-1" data-bind="visible: detailForm.data.signageConfig.font.id">    
-                                <label class="col-sm-12 col-form-label text-start">Dimensione</label>
+                                <label class="col-sm-12 col-form-label text-start">Altezza font</label>
                                 <div class="col-sm-12">
                                     <select id="signageFontSize" 
                                         class="form-control"
-                                        data-placeholder="-- Seleziona la dimensione del font"
+                                        data-placeholder="-- Seleziona l'altezza del font"
                                         data-bind="source: detailForm.data.signageConfig.items, value: detailForm.data.quotationItem.signageConfigItem, events: { change: parseLines }" 
                                         data-value-field="id"
                                         data-text-field="sizeName"
