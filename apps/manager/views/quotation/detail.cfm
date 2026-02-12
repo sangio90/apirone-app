@@ -131,7 +131,20 @@
                                         </div>
                                         <div class="tab-pane fade" id="nav-article" role="tabpanel">
                                             <div>
-                                                <div data-template="quotation-item-article-preview-tmpl" data-bind="source: quotationItemsArticle" class="row">
+                                                <div class="col-12">
+                                                    #grid(
+                                                        id = "quotation-item-article-grid",
+                                                        class="no-pager",
+                                                        columns = "[
+                                                            { 'field':'', 'title':'',  width: '5%' },
+                                                            { 'field':'article.code', 'title':'Codice', width: '10%' },
+                                                            { 'field':'article.name', 'title':'Nome', width: '30%' },
+                                                            { 'field':'quantity', 'title':'Quantità', width: '10%', 'headerAttributes': { 'class': 'justify-content-end' } },
+                                                            { 'field':'price.total', 'title':'Prezzo', format: '{0:n2}', width: '10%', 'headerAttributes': { 'class': 'justify-content-end' } }
+                                                        ]",
+                                                        source="quotationItemsArticle",
+                                                        rowTemplate = "quotation/quotation-item-article-grid-row-tmpl"
+                                                    )#
                                                 </div>
                                             </div>
                                         </div>

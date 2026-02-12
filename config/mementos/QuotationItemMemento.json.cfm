@@ -10,6 +10,7 @@
         "product.model.name",
         "product.line.code",
         "product.line.name",
+        "article.code",
         "article.name",
         "image",
     ],
