@@ -161,7 +161,7 @@ AP.signage.modal = ( function() {
                     ...item,
                     sizeName: item.size.name
                 } ) );
-                items.unshift( { id: "", sizeName: "-- Dimensione" } );
+                items.unshift( { id: "", sizeName: "-- Altezza font" } );
                 return items;
             }
 
