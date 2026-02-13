@@ -472,20 +472,19 @@ AP.quotation.detail = ( function() {
             return false;
         },
 
-        getZones: function( e ) {
+        getZones: async function( e ) {
 
             if ( AP.page.quotation?.id ) { // if edit mode
 
-                NM.util.ajax( {
+                await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/zones",
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.data.length ) {
                                 var zones = xhr.data;
-                                zones.unshift( { "id": "", "name": "-- Tutte le zone" } );
                             } else {
-                                var zones = [ { "id": "", "name": "-- Tutte le zone" } ];
+                                var zones = [];
                             }
 
                             zones.forEach( function( zone ) {
@@ -808,7 +807,7 @@ AP.quotation.detail = ( function() {
         return viewModel;
     };
 
-    pub.init = function() {
+    pub.init = async function() {
         kendo.bind( AP.quotation.fields.detailRoot, viewModel );
         kendo.culture( "it-IT" );
 
@@ -823,7 +822,20 @@ AP.quotation.detail = ( function() {
             $( "body" ).find( "button#nav-plate-tab" ).click();
         }
 
-        viewModel.getZones();
+        try {
+            await viewModel.getZones();
+
+            const zones = viewModel.get( "detailForm.data.zones" );
+            
+            if (zones && zones.length > 0) {
+                const defaultZone = zones.find( zone => zone.name == '-- Tutte le zone' );
+                if (defaultZone) {
+                    viewModel.set( "detailForm.data.zone", defaultZone || zones[0] );
+                }
+            }
+        } catch (error) {
+            console.error("Errore durante il recupero delle zone:", error);
+        }
 
         AP.quotation.detail.showTotals();
 
@@ -983,9 +995,7 @@ AP.quotation.zoneModal = ( function() {
 
         if ( mode == "delete" ) {
 
-            var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != ""; } );
-
-            zones.unshift( { "id": "", "name": "-- seleziona una zona" } );
+            var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { zone.name != '-- Tutte le zone'; } );
 
             viewModel.get( "zones" ).data( zones );
             $( "#zoneTitle" ).text( "Elimina Zona" );
@@ -1016,9 +1026,8 @@ AP.quotation.zoneModal = ( function() {
 
         if ( mode == "add" ) {
 
-            var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { return zone.id != "" && !zone.origin; } );
+            var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { return !zone.origin && zone.name != '-- Tutte le zone'; } );
 
-            zones.unshift( { "id": "", "name": "-- nessuna" } );
             viewModel.get( "zones" ).data( zones );
             $( "#zoneTitle" ).text( "Nuova Zona" );
 
