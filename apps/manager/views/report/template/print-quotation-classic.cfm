@@ -113,6 +113,9 @@
 				<cfloop collection="#args.data.items#" item="hashKey">
 					<cfset arrayAppend(itemsArray, args.data.items[hashKey])>
 				</cfloop>
+				<cfset arraySort(itemsArray, function(a,b) {
+					return a.item.getHash() LT b.item.getHash() ? -1 : 1;
+				})>
 				<cfloop array="#itemsArray#" index="oggetto">
 					<div class="item" style="page-break-inside: avoid !important;">
 						<cfset zones = oggetto.zones>
@@ -141,7 +144,10 @@
 												</td>
 											</cfif>
 											<td>
-												<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+												<span style="font-size: 8pt; text-transform: lowecase">#!isNull(oggetto.getArticle()) ? oggetto.getArticle().getName() : oggetto.getProduct().getDescription()#</span><br>
+												<cfif !isNull(oggetto.getArticle())>
+													<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getNote()#</span><br>
+												</cfif>
 												<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 													<cfset itemsCount = ArrayLen( oggetto.getItems() )>
 													<cfloop from="1"  to="#itemsCount#" index="item">
@@ -161,7 +167,7 @@
 														Lista Frutti: 
 														<cfif NOT isNull(oggetto.getFruits())>
 															<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
-															<ul style="padding: 0 0 0 14px;">
+															<ul style="padding: 0 0 0 24px;">
 																<cfloop from="1" to="#fruitsCount#" index="fi">
 																	<cfset fruit = oggetto.getFruits()[fi]>
 																	<li style="padding: 0">
@@ -209,7 +215,42 @@
 									#LSNumberFormat( oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
 								</td>
 								<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
-									#LSNumberFormat( quantity * oggetto.getPrice().getAmount(), ".99", "it_IT" )# €
+									#LSNumberFormat( quantity * oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
+								</td>
+							</tr>
+						</table>
+					</div>
+				</cfloop>
+				<div style="width: 100%; height: 5mm;"></div>
+				<cfloop array="#args.data.articleItems#" index="servizio">
+					<div class="item" style="page-break-inside: avoid !important;">
+						<cfset quantity = servizio.getQuantity()>
+						<table style="border-collapse: collapse; width: 100%;">
+							<tr>
+								<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">Servizio</td>
+								<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">Qty.</td>
+								<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">Prezzo</td>
+								<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">Totale</td>
+							</tr>
+							<tr>
+								<td style="padding: 2mm 2mm 4mm 2mm; align-items: center; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; width: 12cm !important;">
+									<table class="hiddenTable">
+										<tr>
+											<td>
+												<span style="font-size: 8pt; text-transform: lowecase">#servizio.getArticle().getName()#</span><br>
+												<span style="font-size: 8pt; text-transform: lowecase">#servizio.getNote()#</span><br>
+											</td>
+										</tr>
+									</table>
+								</td>
+								<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+									#quantity#
+								</td>
+								<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+									#LSNumberFormat( oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
+								</td>
+								<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+									#LSNumberFormat( quantity * oggetto.getPrice().getTotal(), ".99", "it_IT" )# €
 								</td>
 							</tr>
 						</table>
@@ -224,23 +265,15 @@
 								<table style="width: 4in; border-collapse: collapse;">
 									<tr>
 										<td><strong>Totale merce</strong></td>
-										<!--- <td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td> --->
-										#args.data.totalSpent#
+										<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['totalGoods'], ".99", "it_IT" )# €</td>
 									</tr>
 									<tr>
 										<td>IVA 20%</td>
-										<td>Ancora da definire</td>
+										<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['vatAmount'], ".99", "it_IT" )# €</td>
 									</tr>
-									<!---
-									<tr>
-										<td>Sconto 50%</td>
-										<td>Ancora da definire</td>
-									</tr>
-									---->
 									<tr>
 										<td><strong>Totale fattura</strong></td>
-										<!--- <td>#LSNumberFormat( args.data.quotation.getCalculatedAmount(), ".99", "it_IT" )# €</td> --->
-										#args.data.totalSpent#
+										<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], ".99", "it_IT" )# €</td>
 									</tr>
 								</table>
 							</td>

@@ -17,9 +17,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title = "Preventivo";
 
 		var quotation = service("Quotation").get(quotationId = idPreventivo);
+		var quotationPrice = service("QuotationPrice").getByQuotationId(quotationId = idPreventivo);
 
 		var quoteObj = {
 			quotation      = quotation,
+			quotationPrice = quotationPrice,
 			quotationItems = []
 		};
 
@@ -163,9 +165,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotation = quoteObj.quotation;
 		var idPreventivo = quotation.getId();
 		var items = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo ]);
-		var items = items.sort(sortByCategory);
+		var productItems = items.filter(function(item) {
+			return !isNull(item.getProduct())
+		});
+		var articleItems = items.filter(function(item) {
+			return !isNull(item.getArticle())
+		});
+		items = productItems.sort(sortByCategory);
 		items = groupItems(items);
 		quoteObj.items = items;
+		quoteObj.articleItems = articleItems;
 
 		return quoteObj;
 	}
@@ -183,7 +192,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		groupedItems = {};
 
 		for ( quotationItem in quotationItems ) {
-			hashKey = quotationItem.getHash();
+			var hashKey = quotationItem.getHash();
 			if ( !structKeyExists(groupedItems, hashKey) ) {
 				groupedItems[hashKey] = {
 					'item' = quotationItem,
