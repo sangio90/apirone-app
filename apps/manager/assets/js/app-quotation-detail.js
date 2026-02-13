@@ -812,6 +812,7 @@ AP.quotation.detail = ( function() {
         kendo.bind( AP.quotation.fields.detailRoot, viewModel );
         kendo.culture( "it-IT" );
 
+        $('#quotation-totals-flat-discount-row').prop('hidden', !['ADM', 'CMA'].includes(AP.page.userRole.id));
         // Controlla se c'è un parametro tab nell'URL
         pub.checkUrlTab();
 
