@@ -69,6 +69,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var page = {};
 		var memy = super.getMementify();
 
+		page[ "userRole"]        = [ "id": session.user.getRole().getId(), "quotationMaxAmount": session.user.getRole().getQuotationMaxAmount(), "quotationMaxDiscount": session.user.getRole().getQuotationMaxDiscount() ];
 		page[ "statuses" ]       = memy.convertList( super.fire( "status.list", [ "QUOTATION" ] ) );
 		page[ "itemStatuses" ]   = memy.convertList( super.fire( "status.list", [ "QUOTATION_ITEM" ] ) );
 		page[ "languages" ]      = memy.convertList( super.fire( "lang.list" ) );
