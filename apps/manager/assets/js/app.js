@@ -16,6 +16,8 @@ $( document ).ready( function() {
         }
     }
 
+    renderCostsToggle();
+
 } );
 
 AP.core = ( function() {
@@ -75,3 +77,38 @@ AP.loading = {
         $( "#global-loading-spinner" ).css( "display", "none" );
     }
 };
+
+AP.toggleCosts = function() {
+    var current = AP.getUserPref("showCosts");
+    var next = !current;
+
+    AP.setUserPref("showCosts", next);
+
+    document.dispatchEvent(new CustomEvent("costsToggled", {
+        detail: { showCosts: next }
+    }));
+};
+
+function renderCostsToggle() {
+  if (AP.config.user.role != 'ADM') {
+    AP.setUserPref("showCosts", false);
+    return;
+  }
+  const li = document.getElementById("costs-toggle");
+  if (!li) return;
+
+  const showCosts = AP.getUserPref("showCosts") == undefined ? false : AP.getUserPref("showCosts");
+  AP.setUserPref("showCosts", showCosts);
+
+  li.innerHTML = `
+    <a role="menuitem" tabindex="-1" href="javascript:void(0)" id="toggle-costs-link">
+      <i class="bx ${showCosts == false ? "bx-show" : "bx-hide"}"></i>
+      ${showCosts == false ? "Mostra costi" : "Nascondi costi"}
+    </a>
+  `;
+
+  li.querySelector("#toggle-costs-link").addEventListener("click", () => {
+    AP.toggleCosts();
+    renderCostsToggle();
+  });
+}

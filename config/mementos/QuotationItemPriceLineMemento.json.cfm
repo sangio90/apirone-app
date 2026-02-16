@@ -1,3 +1,3 @@
 ﻿{
-	defaultIncludes = [ "id", "name", "amount"]
+	defaultIncludes = [ "id", "name", "amount", "cost"]
 }

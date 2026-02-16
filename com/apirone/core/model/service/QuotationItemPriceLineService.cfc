@@ -83,10 +83,11 @@
 		
 		if ( record.recordCount ) {
 
-			var bean = super.bean( "QuotationItemPriceLine" );p
+			var bean = super.bean( "QuotationItemPriceLine" );
 			
 			bean.setId( record.quotation_item_price_line_id );
 			bean.setAmount( record.amount );
+			bean.setCost( record.cost );
 			//bean.setProductItemId( record.product_item_id );
 			//bean.setProductItemPriceId( record.product_item_price_id );
 			bean.setQuotationItemPriceId( record.quotation_item_price_id );

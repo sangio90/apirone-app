@@ -29,11 +29,16 @@
                         <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image">
                     </div>
                 </div>
-                <div class="col-6 mt-2 d-flex justify-content-center">
+                <div class="col-6 d-flex justify-content-center">
                     Quantità: &nbsp; <span data-bind="text: quantity" data-format="n2"></span>
                 </div>
-                <div class="col-6 mt-2 d-flex justify-content-center">
-                    Prezzo: &nbsp; <span data-bind="text: price.total" data-format="n2"></span>
+                <div class="col-6 d-flex justify-content-center">
+                    Prezzo: &nbsp; <span data-bind="text: price.total" data-format="n2"></span> &euro;
+                </div>
+                <div class="col-6">
+                </div>
+                <div style="width: 50%; color: blue; margin-top: -3px; padding-left: 24px;" data-bind="visible: showCosts">
+                    Costo: &nbsp; <span data-bind="text: price.cost" data-format="n2"></span> &euro;
                 </div>
             </div>
         </div>

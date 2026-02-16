@@ -50,10 +50,12 @@
 			INSERT INTO quotation_item_price_lines (
 				name,
 				amount,
+				cost,
 				quotation_item_price_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPriceLine.getName()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPriceLine.getAmount()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPriceLine.getCost()#">,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemPriceLine.getQuotationItemPriceId()#">
 			)
 			RETURNING quotation_item_price_line_id
@@ -73,6 +75,7 @@
 			SET
 				name = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPriceLine.getName()#">,
 				amount = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPriceLine.getAmount()#">,
+				cost = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPriceLine.getCost()#">,
 				quotation_item_price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemPriceLine.getQuotationItemPriceId()#">
 			WHERE
 				quotation_item_price_line_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemPriceLine.getId()#">
