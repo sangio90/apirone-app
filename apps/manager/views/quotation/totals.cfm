@@ -47,7 +47,7 @@
 							<span data-bind="text: pricing.data.totalGoods" data-format="n2"></span> &euro;
 						</div>
 					</div>
-					<div class="row mt-3 mb-2" style="color: yellow" data-bind="visible: showCosts">
+					<div class="row mt-3 mb-2" style="color: yellow; text-decoration: underline;" data-bind="visible: showCosts">
 						<div class="col-8">Costo produzione</div>
 						<div class="col-4 text-end">
 							<span data-bind="text: pricing.data.costs" data-format="n2"></span> &euro;
