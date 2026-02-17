@@ -177,7 +177,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 
-			if ( !IsNull( arguments.quotationItem.getPrice() ) && !IsNull( arguments.quotationItem.getPrice().getQuotationItemId() ) ) {
+			//if ( !IsNull( arguments.quotationItem.getPrice() ) && !IsNull( arguments.quotationItem.getPrice().getQuotationItemId() ) ) {
+			if ( !IsNull( arguments.quotationItem.getPrice() ) ) {
+
+				var current = getQuotationItemPriceService().getByQuotationItemId( arguments.quotationItem.getId() );
+
+				arguments.quotationItem.getPrice().setId( current.getId() );
+				arguments.quotationItem.getPrice().setQuotationItemId( arguments.quotationItem.getId() );
+
 				var price = arguments.quotationItem.getPrice();
 				getQuotationItemPriceService().update( price );
 			}
@@ -185,8 +192,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( isNull( arguments.quotationItem.getArticle() ) ) {
 				var hash = getProductHashService().createHash( arguments.quotationItem.getId() );
 				if ( !IsNull( hash ) ) {
-					//var beanToUpdate = get( arguments.quotationItem.getId() );
-					//beanToUpdate.setHash( hash );
 					updateHash( arguments.quotationItem.getId(), hash );
 				}
 			}

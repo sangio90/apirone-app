@@ -77,6 +77,11 @@
 
 	<cffunction name="update" returntype="String">
 		<cfargument name="quotationItemPrice" type="com.apirone.core.model.bean.QuotationItemPrice" required="true">
+
+		<!----
+		<cfdump var="#arguments.quotationItemPrice#">
+		<cfabort>
+		---->
 		
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_item_prices

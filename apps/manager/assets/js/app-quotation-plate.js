@@ -952,8 +952,6 @@ AP.plate.modal = ( function() {
                 positions[ fruit.id ] = fruit.cellIds;
             } );
 
-            console.log( "save:positions", positions );
-
             // const parsedData =
             var status = fields.modalRoot.find( ".save-status" );
             var preview = $( "#plate-background" )[0];
@@ -980,7 +978,7 @@ AP.plate.modal = ( function() {
 
                         setTimeout( function() {
                             AP.loading.hide();
-                            window.location.reload();
+                            window.location.href = "/manager/quotations/" + parsedData.quotationId + "?tab=plate";
                         }, 1000 );
                     }
                 } );
