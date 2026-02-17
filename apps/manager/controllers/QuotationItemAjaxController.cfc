@@ -507,8 +507,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			
 			/*
 				INFO:
-				se id numerico: è stato già salvato nel db
-				se id stringa: è stato agenerato da js per il dnd, record nuovo
+				se id è numerico: è stato già salvato nel db
+				se id è stringa: è stato agenerato da js per il dnd, record nuovo
 			*/
 			if ( IsNumeric( thisFruit.id ) ) {
 				// update

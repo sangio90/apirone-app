@@ -259,6 +259,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 			}
 
+			<!---- 
+				TODO: per Umberto: possiamo togliere queste query
+			--->
 			```
 			<cfquery name="total" datasource="apirone">
 				SELECT SUM(amount) AS total
