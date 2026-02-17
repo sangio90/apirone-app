@@ -312,6 +312,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		var price = getSignagePricing( json );
 		bean.setPrice( price );
 
+		if( Len( json.quotationItem?.position?.code ) ) {
+			var position = populatePositionBean( json.quotationItem.position );
+			bean.setPosition( position );
+		} else  {
+			bean.setPosition( null );
+		}
+
 		bean.setSignageConfigItem(
 			super.service( "SignageConfigItem" ).get( json.quotationItem.signageConfigItem.id )
 		);
@@ -469,8 +476,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		} else  {
 			bean.setPosition( null );
 		}
-
-		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="position: #SerializeJson( json.item.position )#");
 
 		var pricing = getPlatePricing( json );
 

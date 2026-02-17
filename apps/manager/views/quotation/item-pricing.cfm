@@ -30,6 +30,7 @@
 					<div class="col-4 mt-2">Posizione:</div>
 					<div class="col-8">
 						<input class="form-control form-control-sm" name="position" 
+							id="#args.id#-position"
 							placeholder="Posizione" data-bind="value: detailForm.data.position.code">
 					</div>
 				</div>

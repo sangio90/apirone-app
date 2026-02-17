@@ -24,6 +24,10 @@ AP.signage.modal = ( function() {
             quotationItem: {
                 id: "",
                 quantity: 1,
+                position: {
+                    id: "",
+                    code: ""
+                },
                 price: {
                     id: null,
                 },
@@ -1219,6 +1223,9 @@ AP.signage.modal = ( function() {
         }
 
         viewModel.loadLines();
+
+        initPositionSuggest();
+
         setTimeout( function() {
             if ( AP.getUserPref( "signage.lineId" ) ) {
                 viewModel.loadModels();
@@ -1248,6 +1255,87 @@ AP.signage.modal = ( function() {
         }, 400 );
     };
 
+    var initPositionSuggest = function() {
+
+        console.log( "initPositionSuggest" );
+
+        var suggest = $( "#signage-quotation-item-pricing-box-position" );
+        var autocomplete = suggest.data( "kendoAutoComplete" );
+        var suggestTemplate = $( "#quotation-position-suggest-row-tmpl" ).html();
+
+        if ( autocomplete ) {
+            return;
+        }
+
+        suggest.keypress( function( event ) {
+            if ( event.keyCode == 13 ) {
+                return false;
+            }
+        } );
+
+        console.log( "suggest", viewModel.get( "detailForm.data" ) );
+
+        suggest.kendoAutoComplete( {
+            template: $.proxy( kendo.template( suggestTemplate ) ),
+            height: "auto",
+            dataTextField: "term",
+            highlightFirst: true,
+            minLength: 2,
+            dataSource: new kendo.data.DataSource( {
+                serverFiltering: true,
+                transport: {
+                    read: {
+                        url: "/manager/ajax/quotations/zones/" + viewModel.get( "detailForm.data.quotationItem.quotationZone.id" ) + "/positions",
+                        data: {
+                            str: function() {
+                                return suggest.data( "kendoAutoComplete" ).value();
+                            },
+                        },
+                    },
+                    parameterMap: function( data, type ) {
+                        if ( type === "read" ) {
+                            return { "str": data.str()  };
+                        }
+                    }
+                },
+                schema: {
+                    data: function( xhr ) {
+                        return xhr.data;
+                    }
+                },
+            } ),
+            noDataTemplate: false,
+
+            change: function( e ) {
+                var value = this.value();
+                // var exists = false;
+
+                // Verifichiamo se l'elemento è presente nel DataSource
+                var exists = this.dataSource.data().find( item => item.code === value );
+
+                console.log( "value", value );
+                console.log( "exists", exists );
+                console.log( "item", value );
+
+                if ( !exists ) {
+                    var position = { id: "", code: value };
+                    console.log( "suggest:Inserito nuovo elemento:", value );
+                    viewModel.set( "detailForm.data.position", position );
+                }
+            },
+
+            select: function( event ) {
+                var position = this.dataItem( event.item.index() );
+                console.log( "suggest:position:", position );
+
+                viewModel.set( "detailForm.data.position", position );
+                var sel = viewModel.get( "detailForm.data.position" );
+                console.log( "sel", sel );
+            }
+        } );
+
+    };
+
     pub.edit = function( { id, onSave } ) {
         viewModel.resetForm();
 
@@ -1268,6 +1356,7 @@ AP.signage.modal = ( function() {
             url: "/manager/ajax/quotation-items/signage/" + id,
             callback: {
                 done: function( xhr ) {
+
                     var data = xhr.data;
 
                     viewModel.set( "detailForm.title", "Modifica segnaletica" );
@@ -1300,6 +1389,8 @@ AP.signage.modal = ( function() {
                             row.set( "index", i + 1 );
                         } );
                     }
+
+                    initPositionSuggest();
 
                     viewModel.loadLines();
 
