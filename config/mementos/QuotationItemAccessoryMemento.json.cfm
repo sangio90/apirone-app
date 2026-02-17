@@ -11,6 +11,7 @@
         "product.line.code",
         "product.line.name",
         "image",
+        "position",
     ],
     profiles = {
         edit = {
@@ -27,6 +28,7 @@
                 "items",
                 "note",
                 "createdAt",
+                "position",
             ]
         }
     }

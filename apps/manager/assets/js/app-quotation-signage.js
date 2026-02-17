@@ -1304,16 +1304,7 @@ AP.signage.modal = ( function() {
 
             change: function( e ) {
                 var value = this.value();
-                // var exists = false;
-
-                // Verifichiamo se l'elemento è presente nel DataSource
-
-                console.log( "change", this.dataSource.data() );
-
                 var exists = this.dataSource.data().find( item => item.code === value );
-
-                console.log( "change", exists  );
-
 
                 if ( !exists ) {
                     var position = { id: "", code: value };

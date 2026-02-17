@@ -32,6 +32,10 @@ AP.accessory.modal = ( function() {
                 status: {
                     id: "ACT"
                 },
+                position: {
+                    id: "",
+                    code: ""
+                },
                 note: "",
                 product: {
                     finish: {
@@ -446,9 +450,9 @@ AP.accessory.modal = ( function() {
                             }
 
                             viewModel.renderProductItems();
-							if ( productItems && productItems.data().length > 0 ) {
-								viewModel.renderProductPreview( productItems );
-							}
+                            if ( productItems && productItems.data().length > 0 ) {
+                                viewModel.renderProductPreview( productItems );
+                            }
                             resolve();
                         },
                         fail: function( err ) {
@@ -611,6 +615,8 @@ AP.accessory.modal = ( function() {
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         pricingApp().init( "accessory", undefined );
 
+        initPositionSuggest();
+
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
@@ -695,6 +701,8 @@ AP.accessory.modal = ( function() {
                                     viewModel.set( "detailForm.data", data );
                                     viewModel.set( "detailForm.title", "Modifica accessorio" );
 
+                                    initPositionSuggest();
+
                                     viewModel.loadLines();
 
                                     setTimeout( function() {
@@ -726,6 +734,79 @@ AP.accessory.modal = ( function() {
 
     pub.getData = function() {
         return viewModel.get( "detailForm.data" );
+    };
+
+    var initPositionSuggest = function() {
+
+        console.log( "initPositionSuggest" );
+
+        var suggest = $( "#accessory-quotation-item-pricing-box-position" );
+        var autocomplete = suggest.data( "kendoAutoComplete" );
+        var suggestTemplate = $( "#quotation-position-suggest-row-tmpl" ).html();
+
+        if ( autocomplete ) {
+            return;
+        }
+
+        suggest.keypress( function( event ) {
+            if ( event.keyCode == 13 ) {
+                return false;
+            }
+        } );
+
+        console.log( "new:zone initPositionSuggest", viewModel.get( "detailForm.data.quotationZone" ) );
+
+        suggest.kendoAutoComplete( {
+            template: $.proxy( kendo.template( suggestTemplate ) ),
+            height: "auto",
+            dataTextField: "term",
+            highlightFirst: true,
+            minLength: 2,
+            dataSource: new kendo.data.DataSource( {
+                serverFiltering: true,
+                transport: {
+                    read: {
+                        url: "/manager/ajax/quotations/zones/" + viewModel.get( "detailForm.data.quotationZone.id" ) + "/positions",
+                        data: {
+                            str: function() {
+                                return suggest.data( "kendoAutoComplete" ).value();
+                            },
+                        },
+                    },
+                    parameterMap: function( data, type ) {
+                        if ( type === "read" ) {
+                            return { "str": data.str()  };
+                        }
+                    }
+                },
+                schema: {
+                    data: function( xhr ) {
+                        return xhr.data;
+                    }
+                },
+            } ),
+            noDataTemplate: false,
+
+            change: function( e ) {
+                var value = this.value();
+                // var exists = false;
+
+                // Verifichiamo se l'elemento è presente nel DataSource
+                var exists = this.dataSource.data().find( item => item.code === value );
+
+                if ( !exists ) {
+                    var position = { id: "", code: value };
+                    viewModel.set( "detailForm.data.quotationItem.position", position );
+                }
+            },
+
+            select: function( event ) {
+                var position = this.dataItem( event.item.index() );
+                viewModel.set( "detailForm.data.quotationItem.position", position );
+                var sel = viewModel.get( "detailForm.data.quotationItem.position" );
+            }
+        } );
+
     };
 
     renderQuotationItemTotals = function( quotationItemId ) {

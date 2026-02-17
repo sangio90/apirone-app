@@ -198,6 +198,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( !Len( id ) ) {
 			json.quotationItem.id = lcase(createUUID());
 		}
+
+		if( Len( json.quotationItem?.position?.code ) ) {
+			var position = populatePositionBean( json.quotationItem.position );
+			bean.setPosition( position );
+		} else  {
+			bean.setPosition( null );
+		}
 		
 		var price = getPricing( json );
 		bean.setPrice( price );

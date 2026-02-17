@@ -49,7 +49,7 @@
 				</cfif>
 
 				<cfif !IsNull( arguments.quotationZoneId )>
-					AND quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationZoneId#">::uuid
+					AND quotation_items.quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationZoneId#">::uuid
 				</cfif>
 
 				<cfif !IsNull( arguments.typeId )>
@@ -75,8 +75,6 @@
 	<cffunction name="insert" returntype="String">
 		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="true">
 
-		<!--- <cfset var price = arguments.quotationItem.getPrice()> ---->
-
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_items (
 				special,
@@ -86,13 +84,6 @@
 				product_id,
 				article_id,
 				note,
-				<!---
-				discount1,
-				discount2,
-				price_method_id,
-				price_goods,
-				price_final,
-				---->
 				quantity,
 				quotation_zone_position_id,
 				"hash"

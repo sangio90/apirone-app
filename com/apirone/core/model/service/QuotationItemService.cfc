@@ -123,8 +123,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( isNull( arguments.quotationItem.getArticle() ) ) {
 				var hash = getProductHashService().createHash( newId );
 				if ( !IsNull( hash ) ) {
-					//quotationItem = get( newId );
-					//quotationItem.setHash( hash );
 					updateHash( newId, hash );
 				}
 			}
