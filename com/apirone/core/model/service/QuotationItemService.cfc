@@ -14,6 +14,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="FileService" inject="FileService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
 	property name="QuotationZonePositionService" inject="QuotationZonePositionService";
+	property name="LookupService" inject="LookupService";
 
 	property name="cacheScope" type="String" default="QuotationItem.bean";
 
@@ -241,8 +242,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( fruits.len() > 0 ) {
 				
 				var bean = super.bean( "QuotationItemPlate" );
+				var frame = super.bean( "Frame" );
+
 				bean.setFruits( fruits )
-			
+
+				frame.setOrientation( getLookupService().get( "orientation", record.orientation_id ) );
+				bean.setFrame( frame );
+
 			} else {
 				
 				if ( Len( record.signage_config_item_id ) ) {

@@ -35,6 +35,8 @@
                 "position.id",
                 "position.code",
                 "status",
+                "frame.orientation.id",
+                "frame.orientation.name",
             ]
         },
         editArticle = {
@@ -55,7 +57,9 @@
                 "special",
                 "position",
                 "status",
-            ]
+                "frame.orientation.id",
+                "frame.orientation.name",
+        ]
         }
     },
 }
