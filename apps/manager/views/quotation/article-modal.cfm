@@ -36,7 +36,7 @@
 							<label class="col-sm-3 control-label text-sm-end pt-2">Prezzo</label>
 							<div class="col-sm-9">
 								<div class="input-group">
-									<input type="number" name="price" class="form-control" placeholder="" data-bind="value: detailForm.data.quotationItem.price.amount" />
+									<input name="price" class="form-control" placeholder="" data-bind="value: detailForm.data.quotationItem.price.amount, events: { input: normalizeDecimal, change: normalizeDecimal }" />
 									<span class="input-group-text">
 										<i class="fas fa-euro-sign text-4"></i>
 									</span>

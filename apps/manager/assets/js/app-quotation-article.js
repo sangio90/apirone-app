@@ -70,7 +70,9 @@ AP.article.modal = ( function() {
 
         save: function( event ) {
             let data = viewModel.get('detailForm.data');
+
             data.id = AP.page.quotation.id;
+            data.quotationItem.price.amount = parseFloat(data.quotationItem.price.amount)
             NM.util.ajax( {
                 method: "POST",
                 url: "/manager/ajax/quotation-items/article",
@@ -89,6 +91,26 @@ AP.article.modal = ( function() {
             } );
 
             return false;
+        },
+
+        normalizeDecimal: function (event) {
+            const el = event.currentTarget;
+            let v = el.value || "";
+
+            v = v.replace(/,/g, ".");
+
+            v = v.replace(/[^0-9.]/g, "");
+
+            const firstDot = v.indexOf(".");
+            if (firstDot !== -1) {
+                v =
+                v.slice(0, firstDot + 1) +
+                v.slice(firstDot + 1).replace(/\./g, "");
+            }
+
+            el.value = v;
+
+            viewModel.set('detailForm.data.quotationItem.price.amount', v);
         },
 
         resetForm: function() {
@@ -128,6 +150,7 @@ AP.article.modal = ( function() {
 
     pub.init = function() {
         kendo.bind( fields.articleModalRoot, viewModel );
+
         AP.loading.show();
         
         NM.util.ajax( {

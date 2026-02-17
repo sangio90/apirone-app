@@ -38,8 +38,8 @@
                 </div>
                 <div class="col-6">
                 </div>
-                <div style="width: 50%; color: blue; margin-top: -3px; padding-left: 24px; text-decoration: underline;" data-bind="visible: showCosts">
-                    Costo: &nbsp; <span data-bind="text: price.cost" data-format="n2"></span> &euro;
+                <div style="width: 50%; color: blue; margin-top: -9px; padding-left: 24px;" data-bind="visible: showCosts">
+                    <span style="text-decoration: underline;">Costo:</span>&nbsp;&nbsp;<span style="text-decoration: underline;" data-bind="text: price.cost" data-format="n2"></span> &euro;
                 </div>
             </div>
         </div>

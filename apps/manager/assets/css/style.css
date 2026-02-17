@@ -251,6 +251,12 @@ ul.nav-main>li.nav-expanded>a {
     color: White !important;
 }
 
+.btn-secondary {
+    background-color: #ffffff !important;
+    color: #2771e8 !important;
+    border: 1px solid #2771e8 !important;
+}
+
 .btn-danger {
     background-color: #dd391c !important;
     color: White !important;
