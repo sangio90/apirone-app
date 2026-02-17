@@ -8,6 +8,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="flatDiscount" type="Numeric";
 	property name="shippingCost" type="Numeric";
 	property name="totalGoods" type="Numeric";
+	property name="costs" type="Numeric";
 	property name="totalMultipliedByQuantity" type="Numeric";
 
 	property name="lines" type="com.apirone.core.model.bean.PriceLine[]";
@@ -97,6 +98,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		totals["vatPercentage"]      = getVatCode().getValue();  // Percentuale IVA
 		totals["vatAmount"]          = total - taxable;          // Importo IVA calcolato
 		totals["total"]              = total;                    // Totale finale (imponibile + IVA)
+		totals["costs"]              = getCosts();               // Costo totale (aggiunto per mostrare i costi di produzione)
 
 		return totals;
 	}	

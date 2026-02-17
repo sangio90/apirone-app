@@ -15,7 +15,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	variables.logConfig = {};
 	variables.costs     = [];
 
-	public Numeric function calculate(
+	public function calculate(
 		required String productId,
 		required Numeric quantity = 1,
 		Array producItemtIds,
@@ -23,7 +23,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric simulationSignageConfigItemId
 	){
 		var price = simulate( argumentCollection = arguments );
-		return price.values.finalPrice;
+		return { finalPrice: price.values.finalPrice, totalCost: price.values.totalCost };
 	}
 
 	public Struct function simulate(
@@ -81,12 +81,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var markup       = price?.getAmount() ?: 0;
 
 		var name = "#product.getDescription()# (#product.getCode()#)";
-		// dump( name );
-		// dump( isFixedPrice );
-		// abort;
-
-		// var isFixedPrice = ( price.getMethod().getId() == "F" );
-		// var markup       = price?.getAmount() ?: 0;
 
 		appendLog(
 			message   = "Inizio calcolo del prezzo per #name#, quantità: #arguments.quantity#. Prezzo: fisso: #isFixedPrice#, valore: #markup#",
@@ -317,16 +311,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 
 		letteringPriceString = letteringPrice GT 0 ? "+ costo lettering: #formatExtended( letteringPrice )#": "";
+
+		var totalCost = bundleCost + productCost + totalCostItems + unitFixedCost + letteringPrice;
+		appendLog(
+			message    = "Costo finale fisso: bundle: #bundleCost# + prodotto: #productCost# + totale items: #totalCostItems# + costo fisso: #unitFixedCost# + #letteringPriceString# = Costo finale: #formatExtended( totalCost )#",
+			lineTypeId = "H"
+		);
+
 		if ( isFixedPrice ) {
 			var finalPrice = ( ( bundleCost + productCost + totalCostItems + unitFixedCost ) + markup + letteringPrice ) * generalMarkup;
-
 			appendLog(
 				message    = "Prezzo finale fisso. ( ( bundle: #bundleCost# + prodotto: #productCost# + totale items: #totalCostItems# + costo fisso: #unitFixedCost# ) + markup: #markup# #letteringPriceString# ) * markup generale: #generalMarkup#;Prezzo finale: #formatExtended( finalPrice )#",
 				lineTypeId = "H"
 			);
 		} else {
 			var finalPrice = ( ( ( bundleCost + productCost ) * markup ) + totalCostItems + unitFixedCost + letteringPrice ) * generalMarkup;
-
 			appendLog(
 				message    = "Prezzo finale. ( ( ( bundle: #bundleCost# + prodotto: #productCost# ) * markup: #markup# ) + totale items: #totalCostItems# + costo fisso: #unitFixedCost# #letteringPriceString# ) * markup generale: #generalMarkup#;Prezzo finale: #formatExtended( finalPrice )#",
 				lineTypeId = "H"
@@ -355,6 +354,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				"bundleCost"     = bundleCost,
 				"productCost"    = productCost,
 				"totalCostItems" = totalCostItems,
+				"totalCost"      = totalCost,
 				"unitFixedCost"  = unitFixedCost,
 				"finalPrice"     = finalPrice,
 				"priceType"      = price

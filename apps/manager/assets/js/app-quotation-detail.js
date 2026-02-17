@@ -115,20 +115,18 @@ AP.quotation.detail = ( function() {
 
     var viewModel = kendo.observable( {
         typeId: "plate",
+        showCosts: AP.getUserPref("showCosts"),
         detailForm: {
             data: {
                 zone: {
                     id: ""
-                }
-            }
+                },
+            },
         },
 
         target: null,
         zones: new kendo.data.DataSource(),
 
-        // INFO: I split the datasources because it displayed
-        //       ghost "items" when rendered inside tabs
-        // quotationItems: new kendo.data.DataSource(),
         quotationItemsArticle: new kendo.data.DataSource( {} ),
         quotationItemsPlate: new kendo.data.DataSource( {} ),
         quotationItemsSignage: new kendo.data.DataSource( {} ),
@@ -528,7 +526,7 @@ AP.quotation.detail = ( function() {
 
                 var url = "/manager/ajax/quotations/" + AP.page.quotation.id + "/items/" + typeId;
 
-                if ( viewModel.detailForm.data.zone ) {
+                if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.name != "-- Tutte le zone" ) {
                     url = url + "?quotationZoneId=" + viewModel.detailForm.data.zone.id;
                 }
 
@@ -537,7 +535,6 @@ AP.quotation.detail = ( function() {
                     url: url,
                     callback: {
                         done: function( xhr ) {
-                            // viewModel.get( "quotationItems" ).data( xhr.data );
                             setQuotationItems( xhr.data );
                         }
                     }
@@ -547,15 +544,9 @@ AP.quotation.detail = ( function() {
             if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id != "" ) {
                 AP.setUserPref( "quotation.zone.id", viewModel.detailForm.data.zone.id );
                 AP.setUserPref( "quotation.zone.name", viewModel.detailForm.data.zone.name );
-
-                $( "#qt-add-signage" ).prop( "disabled", false );
-                $( "#qt-add-accessory" ).prop( "disabled", false );
             } else {
                 AP.deleteUserPref( "quotation.zone.id" );
                 AP.deleteUserPref( "quotation.zone.name" );
-
-                $( "#qt-add-signage" ).prop( "disabled", true );
-                $( "#qt-add-accessory" ).prop( "disabled", true );
             }
 
             return false;
@@ -880,6 +871,10 @@ AP.quotation.detail = ( function() {
             pricingApp().getTotals();
 
         }
+
+        $(document).on("click", "#toggle-costs-link", function () {
+            viewModel.set("showCosts", AP.getUserPref("showCosts"));
+        });
     };
 
     return pub;

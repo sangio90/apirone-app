@@ -730,7 +730,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var line = super.bean( "QuotationItemPriceLine" );
 
 		line.setName( "Prezzo segnaletica" );
-		line.setAmount( signagePrice );
+		line.setAmount( signagePrice.finalPrice );
+		line.setCost( signagePrice.totalCost );
 
 		lines.add( line );
 
@@ -791,8 +792,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var line = super.bean( "QuotationItemPriceLine" );
 
 		line.setName( "Prezzo placca" );
-		line.setAmount( platePrice );
-
+		line.setAmount( platePrice.finalPrice );
+		line.setCost( platePrice.totalCost );
 		lines.add( line );
 
 
@@ -816,8 +817,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds );
 
 			line.setName( "#fruit.fruit?.name#" );
-			line.setAmount( fruitPrice );
-
+			line.setAmount( fruitPrice.finalPrice );
+			line.setCost( fruitPrice.totalCost );
 			lines.add( line );
 		}
 
@@ -883,7 +884,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		var line = super.bean( "QuotationItemPriceLine" );
 
 		line.setName( "Prezzo base" );
-		line.setAmount( price );
+		line.setAmount( price.finalPrice );
+		line.setCost( price.totalCost );
 
 		lines.add( line );
 

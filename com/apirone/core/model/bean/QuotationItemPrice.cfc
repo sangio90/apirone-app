@@ -31,6 +31,16 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return total;
 	}
 
+	public Numeric function getCost(){
+		var total = 0;
+
+		for ( var line in getLines() ) {
+			total = total + line.getCost();
+		}
+
+		return total;
+	}
+
 	public Numeric function getTotal(){
 		var totalGoods = getTotalGoods();
 		var total      = totalGoods;

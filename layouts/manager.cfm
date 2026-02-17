@@ -94,9 +94,10 @@
                             <li>
                                 <a role="menuitem" tabindex="-1" href="/manager/my/settings"><i class="bx bx-cog"></i> Preferenze</a>
                             </li>
-                            <li>
-                                <a role="menuitem" tabindex="-1" href="/manager/logout"><i class="bx bx-power-off"></i> Esci</a>
-                            </li>
+                            <cfif session.user.getRole().getId() eq 'ADM'>
+                                <li id="costs-toggle" >
+                                </li>
+                            </cfif>
                             <cfif prc.users.len()>
                                 <li class="divider"></li>
                                 <div id="user-other-roles">cambia profilo</div>
@@ -110,6 +111,9 @@
                                     </cfif>
                                 </cfloop>
                             </cfif>
+                            <li>
+                                <a role="menuitem" tabindex="-1" href="/manager/logout"><i class="bx bx-power-off"></i> Esci</a>
+                            </li>
                         </ul>
                     </div>
                 </div>

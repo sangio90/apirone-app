@@ -204,7 +204,7 @@ AP.quotation.totalPricing = ( function() {
 
 
     var viewModel = kendo.observable( {
-
+        showCosts: AP.getUserPref( "showCosts" ),
         detail: {
             title: "",
             isCollapsed: isCollapsed,
@@ -306,6 +306,10 @@ AP.quotation.totalPricing = ( function() {
         kendo.culture( "it-IT" );
 
         viewModel.set( "detail.title", "Totali preventivo" );
+
+        $(document).on("click", "#toggle-costs-link", function () {
+            viewModel.set("showCosts", AP.getUserPref("showCosts"));
+        });
 
         fields.boxTotalPricing.show();
 

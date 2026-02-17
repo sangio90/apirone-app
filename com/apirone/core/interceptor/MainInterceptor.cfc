@@ -152,11 +152,15 @@ component extends="coldbox.system.Interceptor" {
 		// Not all keys, please!
 
 		var config = getContainer().getInstance( "Configuration" ).get();
+		var roleId = null;
+		if ( !isNull(session.user.getRole()) ) {
+			roleId = session.user.getRole().getId();
+		}
 
 		var result = {
 			"appName"    = config.get( "appName" ),
 			"appVersion" = config.get( "appVersion" ),
-			"user"       = { "id" = session.user.getId(), "shortId" = session.user.getShortId() }
+			"user"       = { "id" = session.user.getId(), "shortId" = session.user.getShortId(), "role" = roleId }
 		};
 
 		return result;

@@ -42,6 +42,7 @@
 	public com.apirone.core.model.bean.QuotationPrice function calculate( required String quotationId ){
 
 		var totalItems = 0;
+		var totalCosts = 0;
 		var pricing = getByQuotationId( quotationId = arguments.quotationId );
 		var quotation = getQuotationService().get( quotationId = arguments.quotationId );
 
@@ -54,9 +55,11 @@
 
 		for( var item in items ) {
 			totalItems = totalItems + item.getPrice().getTotal();
+			totalCosts = totalCosts + (item.getPrice().getCost() * item.getQuantity());
 		}
 
 		pricing.setTotalGoods( totalItems );
+		pricing.setCosts( totalCosts );
 		pricing.setVatCode( quotation.getVatCode() );
 		pricing.setCurrency( quotation.getCurrency() );
 
