@@ -12,6 +12,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
 		params[ "quotationId" ] = rc.id;
+		params[ "orderBy" ] = [ { "field" = "quotationZonePosition.code", "dir" = "asc" } ];
 		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
 
 		var rows = super.fire( "QuotationItem.search", params );
@@ -319,6 +320,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
 		bean.setQuantity( json.quotationItem.quantity );
 
+		if( Len( json.quotationItem?.position?.code ) ) {
+			var position = populatePositionBean( json.quotationItem.position );
+			bean.setPosition( position );
+		} else  {
+			bean.setPosition( null );
+		}
+
+
 		var product = super
 			.fire(
 				"Product.search",
@@ -432,9 +441,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var tmpDir = super.getTempDir();
 		
-		var status = super.bean( "Status" );
-		var zone   = super.bean( "QuotationZone" );
-		var bean   = super.bean( "QuotationItemPlate" );
+		var status      = super.bean( "Status" );
+		var zone        = super.bean( "QuotationZone" );
+		var bean        = super.bean( "QuotationItemPlate" );
+		var frame       = super.bean( "Frame" );
+		var orientation = super.bean( "Orientation" );
 
 		var beanFruits = [];
 
@@ -450,11 +461,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setStatus( status.setId( json.item.status.id ) );
 		bean.setQuotationZone( zone.setId( json.item.quotationZone.id ) );
 		bean.setSpecial( json.item.special );
+		bean.setFrame( frame.setOrientation( orientation.setId( json.item.product.orientation.id ) ) );
 
 		if( Len( json.item?.position?.code ) ) {
 			var position = populatePositionBean( json.item.position );
 			bean.setPosition( position );
+		} else  {
+			bean.setPosition( null );
 		}
+
+		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="position: #SerializeJson( json.item.position )#");
 
 		var pricing = getPlatePricing( json );
 
@@ -537,7 +553,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "plate" );
 
-		var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId } );
+		var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId });
 
 		quotationItemProductItems.each( function( quotationItemProductItem ){
 			super.fire( "quotationItemProductItem.delete", { "productItemId" = quotationItemProductItem.getId() } )
@@ -911,7 +927,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		position.setId( data.id );
 		position.setCode( data.code );
-		position.setName( data.name );
+		//position.setName( data.name );
 
 		return position;
 

@@ -28,9 +28,10 @@
 			SELECT
 				quotation_item_id::varchar,
 				quotation_items.quotation_id::varchar,
-				quotation_zone_id::varchar,
+				quotation_zone_positions.quotation_zone_id::varchar,
 				COUNT(quotation_item_id) OVER() AS total
 			FROM quotation_items
+					LEFT JOIN quotation_zone_positions ON quotation_items.quotation_zone_position_id = quotation_zone_positions.quotation_zone_position_id
 				
 				<cfif !IsNull( arguments.typeId )>
 					<cfif arguments.typeId EQ "ART">
@@ -59,7 +60,8 @@
 					</cfif>
 				</cfif>
 			ORDER BY
-				quotation_items.#super.sanitizeSQL( arguments.orderBy )#
+				#super.sanitizeSQL( arguments.orderBy )#
+				<!--- quotation_zone_positions.code ---->
 
 				<cfif arguments.limit GT 0>
 					LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
@@ -92,7 +94,12 @@
 				price_final,
 				---->
 				quantity,
+				quotation_zone_position_id,
 				"hash"
+				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
+					,
+					orientation_id
+				</cfif>
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
 					,
 					signage_config_item_id,
@@ -121,19 +128,22 @@
 					NULL,
 				</cfif>
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getNote()#">,
-				<!-----
-				<cfqueryparam cfsqltype="Float" value="#price.getDiscount1()#">,
-				<cfqueryparam cfsqltype="Float" value="#price.getDiscount2()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#price.getMethod().getId()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#price.getTotalGoods()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#price.getTotal()#">,
-				----->
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getQuantity()#">,
+				<cfif NOT IsNull( arguments.quotationItem.getPosition() )>
+					<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItem.getPosition().getId()#">
+				<cfelse>
+					NULL
+				</cfif>,
 				<cfif NOT IsNull( arguments.quotationItem.getHash() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getHash()#">
 				<cfelse>
 					NULL
 				</cfif>
+				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
+					,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getFrame().getOrientation().getId()#">
+				</cfif>
+
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
 					,
 					<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getId()#">,
@@ -189,6 +199,10 @@
 					<cfelse>
 						NULL
 					</cfif>
+				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
+					,
+					orientation_id         = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getFrame().getOrientation().getId()#">
+				</cfif>
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
 					,
 					char_count             = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItem.getSignageConfigItem().getCharCount()#">,

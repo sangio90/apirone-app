@@ -50,9 +50,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-		var rows               = [];
-		var result             = super.getResult();
-		var records            = getDao().find( argumentCollection = arguments );
+		var rows    = [];
+		var result  = super.getResult();
+		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
 			var quotationItem = get( quotationItemId = record.quotation_item_id );
@@ -157,9 +157,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 
-			getDao().update( arguments.quotationItem );
-
 			arguments.quotationItem = ensurePosition( arguments.quotationItem );
+
+			getDao().update( arguments.quotationItem );
 
 			super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
 
@@ -208,16 +208,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Ensure quotation item position is created and linked when needed.
 	 */
 	private com.apirone.core.model.bean.QuotationItem function ensurePosition( required com.apirone.core.model.bean.QuotationItem quotationItem ){
+		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ensurePosition 1" );
+		
 		if ( !IsNull( arguments.quotationItem.getPosition() ) ) {
 			if ( Len( arguments.quotationItem.getPosition().getCode() ) ) {
+
 				var position = arguments.quotationItem.getPosition();
-				if ( position.getId() == "" ) {
+
+				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ensurePosition 2" );
+				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ensurePosition 44 -#position.getId()#- #!Len( position.getId() )#" );
+				
+				if ( IsNull( position.getId() ) OR !Len( position.getId() ) ) {
+					cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ensurePosition 3" );
+
 					position.setZoneId( arguments.quotationItem.getQuotationZone().getId() );
 					var newPositionId = getQuotationZonePositionService().create( position );
 					arguments.quotationItem.getPosition().setId( newPositionId );
 				}
 			}
 		}
+
 		return arguments.quotationItem;
 	}
 
@@ -262,11 +272,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					AND quotation_items.quotation_item_id = '#record.quotation_item_id#'
 			</cfquery>
 			```
-
-			//pricing.setDiscount1( record.discount1 );
-			//pricing.setDiscount2( record.discount2 );
-			//pricing.setAmount( total.total );
-			//pricing.setMethod( priceMethod.setId("F") );
 
 			var pricing = getQuotationItemPriceService().getByQuotationItemId( quotationItemId = arguments.quotationItemId );
 			bean.setPrice( pricing );
@@ -333,14 +338,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setPosition( getQuotationZonePositionService().get( record.quotation_zone_position_id ) );
 			}
 		
-			/*
-			if ( Len( record.position ) ) {
-				bean.setPosition( record.position );
-			}
-			*/
-
 			return bean;
 		}
+
 		return NullValue();
 	}
 

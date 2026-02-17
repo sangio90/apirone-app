@@ -410,4 +410,8 @@
         "name": "quotation_zone_position",
         "type": "Varchar"
     },
+    "quotationZonePosition.code": {
+        "name": "quotation_zone_positions.code",
+        "type": "Varchar"
+    },
 }

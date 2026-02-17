@@ -10,11 +10,12 @@
         "product.model.name",
         "product.line.code",
         "product.line.name",
+        "position.code",
         "article.code",
         "article.name",
         "image",
     ],
-    profiles        = {
+    profiles = {
         edit = {
             defaultIncludes = [
                 "id",
@@ -31,7 +32,8 @@
                 "note",
                 "createdAt",
                 "special",
-                "position",
+                "position.id",
+                "position.code",
                 "status",
             ]
         },

@@ -185,6 +185,10 @@ AP.plate.modal = ( function() {
                 },
                 position: {
                     id: "",
+                    code: ""
+                },
+                quotationZone: {
+                    id: "",
                     name: ""
                 },
                 product: {
@@ -210,9 +214,6 @@ AP.plate.modal = ( function() {
                         uri: ""
                     },
                     items: new kendo.data.DataSource(),
-                },
-                quotationZone: {
-                    id: ""
                 },
                 fruits: new kendo.data.DataSource( {
                     data: [],
@@ -1041,10 +1042,13 @@ AP.plate.modal = ( function() {
         console.log( "new:zone", AP.quotation.detail.config().zone );
 
         resetDetailForm();
+
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         viewModel.set( "isEditMode", false );
 
         pricingApp().init( "plate", undefined );
+
+        console.log( "new:zona222", viewModel.get( "detailForm.data.quotationZone" ) );
 
         initFruitsSuggest();
         initPositionSuggest();
@@ -1073,6 +1077,7 @@ AP.plate.modal = ( function() {
             done: function( xhr ) {
                 viewModel.populateProduct( xhr.data.quotationItem.product );
                 viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
+                viewModel.set( "detailForm.data.position", xhr.data.quotationItem.position );
                 viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
 
                 initFruitsSuggest();
@@ -1104,7 +1109,7 @@ AP.plate.modal = ( function() {
 
     var initPositionSuggest = function() {
 
-        console.log( "suggest:", viewModel.get( "detailForm.data.quotationZone" ) );
+        console.log( "initPositionSuggest" );
 
         var suggest = $( "#qt-plate-position-suggest" );
         var autocomplete = suggest.data( "kendoAutoComplete" );
@@ -1119,6 +1124,8 @@ AP.plate.modal = ( function() {
                 return false;
             }
         } );
+
+        console.log( "new:zone initPositionSuggest", viewModel.get( "detailForm.data.quotationZone" ) );
 
         suggest.kendoAutoComplete( {
             template: $.proxy( kendo.template( suggestTemplate ) ),
@@ -1149,28 +1156,34 @@ AP.plate.modal = ( function() {
                     }
                 },
             } ),
-            /*
+            noDataTemplate: false,
+
             change: function( e ) {
                 var value = this.value();
-                var exists = false;
+                // var exists = false;
 
                 // Verifichiamo se l'elemento è presente nel DataSource
-                var dataItem = this.dataSource.data().find( item => item.Name === value );
+                var exists = this.dataSource.data().find( item => item.code === value );
 
-                if ( !dataItem ) {
+                console.log( "value", value );
+                console.log( "exists", exists );
+                console.log( "item", value );
+
+                if ( !exists ) {
+                    var position = { id: "", code: value };
                     console.log( "suggest:Inserito nuovo elemento:", value );
-                    // Qui puoi gestire la logica per i nuovi elementi
-                    // Magari aprendo una modale o preparando una chiamata Ajax
-                } else {
-                    console.log( "suggest:Elemento selezionato dalla lista:", dataItem );
+                    viewModel.set( "detailForm.data.position", position );
                 }
             },
-            */
-            noDataTemplate: false,
+
             select: function( event ) {
-                var item = this.dataItem( event.item.index() );
-                // console.log( "suggest:Inserito nuovo elemento:", item );
-            },
+                var position = this.dataItem( event.item.index() );
+                console.log( "suggest:position:", position );
+
+                viewModel.set( "detailForm.data.position", position );
+                var sel = viewModel.get( "detailForm.data.position" );
+                console.log( "sel", sel );
+            }
         } );
 
     };

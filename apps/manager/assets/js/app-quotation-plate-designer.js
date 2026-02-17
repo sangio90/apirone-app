@@ -422,7 +422,8 @@ AP.plate.grid = ( function() {
 
                     if ( cell.type != CELL_TYPE.PROHIBITED ) {
                         const $cellLabel = $( "<span/>", {
-                            text: `(${x}, ${y})`,
+                            // text: `(${x}, ${y})`,
+                            text: "",
                             class: "position-label",
                             css: {
                                 "font-model": "8px",
@@ -467,6 +468,9 @@ AP.plate.grid = ( function() {
         }
 
         setIsOverlapped( value ) {
+
+            console.log( "this.$element", this.$element );
+
             if ( value ) {
                 this.$element.addClass( "overlapped" );
             } else {
@@ -725,9 +729,6 @@ AP.plate.grid = ( function() {
 
         drawWithin( $rootNode ) {
 
-            // console.log( "drawWithin", $rootNode );
-            // console.log( "this.image", this.image );
-
             const $fruit = $( "<div/>", {
                 id: this.id,
                 class: "plate-draggable-fruit",
@@ -737,6 +738,12 @@ AP.plate.grid = ( function() {
                     width: `${this.width}px`,
                     height: `${this.height}px`,
                 },
+                mouseenter: function() {
+                    $( `div[data-fruit-id="${this.id}"]` ).css( "background-color", "#a3fda170" );
+                },
+                mouseleave: function() {
+                    $( `div[data-fruit-id="${this.id}"]` ).css( "background-color", "" );
+                },
                 appendTo: $rootNode,
             } );
 
@@ -745,15 +752,7 @@ AP.plate.grid = ( function() {
                 height: `${this.height}px`,
             };
 
-            // console.log( "drawWithin:imgCSS", imgCSS );
-            // console.log( "drawWithin:this.orientation", this.orientation );
-            // console.log( "drawWithin:orientation.VERTICAL", orientation.VERTICAL );
-
-            // console.log("Fruit:drawWithin:this.orientation", orientation.VERTICAL);
-            // console.log("Fruit:drawWithin:this.orientation", this.orientation);
-
             if ( this.orientation == orientation.VERTICAL ) {
-                // console.log( "drawWithin:rotated" );
 
                 const tmp = imgCSS.width;
                 imgCSS.width = imgCSS.height;
@@ -855,9 +854,6 @@ AP.plate.grid = ( function() {
         }
 
         addFruitToPositions( selectedFruit, positionIds ) {
-
-            console.log( "addFruitToPositions:selectedFruit", selectedFruit );
-            console.log( "addFruitToPositions:cellIds", positionIds );
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
