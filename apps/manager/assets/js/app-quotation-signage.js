@@ -1257,8 +1257,6 @@ AP.signage.modal = ( function() {
 
     var initPositionSuggest = function() {
 
-        console.log( "initPositionSuggest" );
-
         var suggest = $( "#signage-quotation-item-pricing-box-position" );
         var autocomplete = suggest.data( "kendoAutoComplete" );
         var suggestTemplate = $( "#quotation-position-suggest-row-tmpl" ).html();
@@ -1272,8 +1270,6 @@ AP.signage.modal = ( function() {
                 return false;
             }
         } );
-
-        console.log( "suggest", viewModel.get( "detailForm.data" ) );
 
         suggest.kendoAutoComplete( {
             template: $.proxy( kendo.template( suggestTemplate ) ),
@@ -1311,11 +1307,13 @@ AP.signage.modal = ( function() {
                 // var exists = false;
 
                 // Verifichiamo se l'elemento è presente nel DataSource
+
+                console.log( "change", this.dataSource.data() );
+
                 var exists = this.dataSource.data().find( item => item.code === value );
 
-                console.log( "value", value );
-                console.log( "exists", exists );
-                console.log( "item", value );
+                console.log( "change", exists  );
+
 
                 if ( !exists ) {
                     var position = { id: "", code: value };
@@ -1328,8 +1326,8 @@ AP.signage.modal = ( function() {
                 var position = this.dataItem( event.item.index() );
                 console.log( "suggest:position:", position );
 
-                viewModel.set( "detailForm.data.position", position );
-                var sel = viewModel.get( "detailForm.data.position" );
+                viewModel.set( "detailForm.data.quotationItem.position", position );
+                var sel = viewModel.get( "detailForm.data.quotationItem.position" );
                 console.log( "sel", sel );
             }
         } );

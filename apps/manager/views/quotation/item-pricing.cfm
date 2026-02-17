@@ -31,7 +31,7 @@
 					<div class="col-8">
 						<input class="form-control form-control-sm" name="position" 
 							id="#args.id#-position"
-							placeholder="Posizione" data-bind="value: detailForm.data.position.code">
+							placeholder="Posizione" data-bind="value: detailForm.data.quotationItem.position.code">
 					</div>
 				</div>
 			</div>
