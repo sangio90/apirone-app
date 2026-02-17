@@ -116,7 +116,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var quotationItem = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
 
-		var parsedQuotationItemData = memy.convert( quotationItem, "edit" );
+		var parsedQuotationItemData = memy.convert( quotationItem, "editPlate" );
 
 		data.append( {
 			"quotationItem" = parsedQuotationItemData,

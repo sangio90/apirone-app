@@ -16,7 +16,7 @@
         "image",
     ],
     profiles = {
-        edit = {
+        editPlate = {
             defaultIncludes = [
                 "id",
                 "price",
@@ -36,6 +36,27 @@
                 "position.code",
                 "status",
                 "frame"
+            ]
+        },
+        edit = {
+            defaultIncludes = [
+                "id",
+                "price",
+                "quantity",
+                "product.id",
+                "product.finish",
+                "product.model",
+                "product.line",
+                "product.horizontalImage",
+                "product.verticalImage",
+                "quotationZone",
+                "items",
+                "note",
+                "createdAt",
+                "special",
+                "position.id",
+                "position.code",
+                "status",
             ]
         },
         editArticle = {
