@@ -41,6 +41,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			);
 		}
 
+		variables.costs     = [];
+
 		/*
 			INFO:
 
