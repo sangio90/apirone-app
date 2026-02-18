@@ -49,6 +49,7 @@
                                                 </select>
                                                 <div class="col-2 d-flex">
                                                     <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
+                                                    <button type="button" class="btn btn-secondary btn-sm ms-2" data-bind="click:openDuplicateZoneModal">Duplica zona</button>
                                                     <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
                                                 </div>
                                             </div>

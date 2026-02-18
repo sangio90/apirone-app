@@ -59,10 +59,12 @@
 			INSERT INTO quotation_zones (
 				quotation_id,
 				quotation_zone,
+				quantity,
 				origin_id
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotation().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.zone.getQuantity()#">,
 				<cfif !IsNull( arguments.zone.getOrigin() )>
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
 				<cfelse>
@@ -80,7 +82,8 @@
 			UPDATE quotation_zones
 			SET
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotation().getId()#">::uuid,
-				quotation_zone = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">
+				quotation_zone = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">,
+				quantity = <cfqueryparam cfsqltype="Integer" value="#arguments.zone.getQuantity()#">
 				<cfif !IsNull( arguments.zone.getOrigin() )>
 					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
 				</cfif>

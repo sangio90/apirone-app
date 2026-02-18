@@ -2,6 +2,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationZoneDAO";
 	property name="QuotationService" inject="QuotationService";
+	property name="QuotationItemService" inject="QuotationItemService";
+	property name="QuotationItemFruitService" inject="QuotationItemFruitService";
+	property name="QuotationItemPriceService" inject="QuotationItemPriceService";
+	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
+	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
+	property name="FileService" inject="FileService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="cacheScope" type="String" default="QuotationZone.bean";
 
@@ -81,6 +87,43 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.zone.getId();
 	}
 
+	public function duplicateZoneItems( required String duplicatedZoneId, required String newZoneId ) {
+		var items = getQuotationItemService().list( quotationZoneId = arguments.duplicatedZoneId );
+		var newZone = getQuotationZoneService().get( arguments.newZoneId )
+
+		for (var quotationItem in items) {
+			var duplicatedItem = Duplicate( quotationItem );
+			duplicatedItem.setQuotationZone( newZone )
+			var newItemId = getQuotationItemService().create( duplicatedItem );
+			var newItem = getQuotationItemService().get( newItemId );
+
+			//file
+			var quotationItemFile = getFileService().search( quotationItemId = quotationItem.getId() ).getData();
+			if ( Len(quotationItemFile) > 0 ) {
+				var duplicatedFile = Duplicate( quotationItemFile[1] );
+				getFileService().duplicate( duplicatedFile.getId(), newItem );
+			}
+
+			//quotation Item Product items
+			var quotationItemProductItems = getQuotationItemProductItemService().list( quotationItemId = quotationItem.getId() );
+			for ( var quotationItemProductItem in quotationItemProductItems ) {
+				quotationItemProductItem.setId('')
+				quotationItemProductItem.setQuotationItemId( newItemId )
+				getQuotationItemProductItemService().create( quotationItemProductItem )
+			}
+
+			//quotation item signage rows
+			var quotationItemSignageRows = getQuotationItemSignageRowService().list( quotationItemId = quotationItem.getId() );
+			for ( var quotationItemSignageRow in quotationItemSignageRows ) {
+				quotationItemSignageRow.setId('')
+				quotationItemSignageRow.setQuotationItemId( newItemId )
+				getQuotationItemSignageRowService().create( quotationItemSignageRow )
+			}
+		}
+
+		return newZone
+	}
+
 	private com.apirone.core.model.bean.QuotationZone function build( required String zoneId ){
 		var record = getDao().read( arguments.zoneId );
 		if ( record.recordCount ) {
@@ -89,6 +132,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.quotation_zone_id );
 			bean.setName( record.quotation_zone );
+			bean.setQuantity( record.quantity );
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
 
 			bean.setOrigin(

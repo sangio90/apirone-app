@@ -33,7 +33,7 @@
                         <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image">
                     </div>
                 </div>
-                <div class="col-6 mt-2 d-flex justify-content-center">
+                <div class="col-6 d-flex justify-content-center">
                     Quantità: &nbsp; <span data-bind="text: quantity"></span>
                 </div>
                 <div class="col-6 mt-2 d-flex justify-content-center">

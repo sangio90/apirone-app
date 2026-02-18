@@ -112,6 +112,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 				for ( var thisFruit in arguments.quotationItem.getFruits() ) {
 					thisFruit.setQuotationItemId( newId );
+					thisFruit.setId(null)
 					getQuotationItemFruitService().create( thisFruit );
 				}
 			}
@@ -176,7 +177,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 
-			//if ( !IsNull( arguments.quotationItem.getPrice() ) && !IsNull( arguments.quotationItem.getPrice().getQuotationItemId() ) ) {
 			if ( !IsNull( arguments.quotationItem.getPrice() ) ) {
 
 				var current = getQuotationItemPriceService().getByQuotationItemId( arguments.quotationItem.getId() );

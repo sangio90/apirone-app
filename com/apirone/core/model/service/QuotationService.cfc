@@ -150,6 +150,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 			zone.setQuotation( newQuotation );
 			zone.setName( "-- Tutte le zone" );
+			zone.setQuantity(1);
 
 			getQuotationZoneService().create( zone );
 

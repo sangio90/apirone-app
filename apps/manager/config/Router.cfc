@@ -458,6 +458,7 @@
 
 		get( "/ajax/quotations/zones/:zoneId/positions" ).to( "QuotationZoneAjaxController.listPositions" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
+		post( "/ajax/quotations/duplicatezone" ).to( "QuotationZoneAjaxController.duplicate" ).end();
 		delete( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.delete" ).end();
 		get( "/ajax/quotations/:quotationId/zones" ).to( "QuotationZoneAjaxController.list" ).end();
 

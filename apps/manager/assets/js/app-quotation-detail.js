@@ -504,7 +504,7 @@ AP.quotation.detail = ( function() {
                                 }
                                 viewModel.set( "detailForm.data.zone", selectedZone );
                             } else {
-                                viewModel.set( "detailForm.data.zone", zones[1] );
+                                viewModel.set( "detailForm.data.zone", zones[0] );
                             }
 
                             viewModel.set( "detailForm.data.zones", zones );
@@ -520,26 +520,22 @@ AP.quotation.detail = ( function() {
 
         loadItems: function( e ) {
             var typeId = viewModel.get( "typeId" );
-            var container = $( "#quotation-plate-product-items-tabs" );
 
-            if ( viewModel.detailForm.data.zone?.name != "" ) {
+            var url = "/manager/ajax/quotations/" + AP.page.quotation.id + "/items/" + typeId;
 
-                var url = "/manager/ajax/quotations/" + AP.page.quotation.id + "/items/" + typeId;
-
-                if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.name != "-- Tutte le zone" ) {
-                    url = url + "?quotationZoneId=" + viewModel.detailForm.data.zone.id;
-                }
-
-                NM.util.ajax( {
-                    method: "GET",
-                    url: url,
-                    callback: {
-                        done: function( xhr ) {
-                            setQuotationItems( xhr.data );
-                        }
-                    }
-                } );
+            if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id && viewModel.detailForm.data.zone.name != "-- Tutte le zone" ) {
+                url = url + "?quotationZoneId=" + viewModel.detailForm.data.zone.id;
             }
+
+            NM.util.ajax( {
+                method: "GET",
+                url: url,
+                callback: {
+                    done: function( xhr ) {
+                        setQuotationItems( xhr.data );
+                    }
+                }
+            } );
 
             if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id != "" ) {
                 AP.setUserPref( "quotation.zone.id", viewModel.detailForm.data.zone.id );
@@ -668,6 +664,15 @@ AP.quotation.detail = ( function() {
             if ( AP.quotation.fields.zoneModalRoot.length ) {
                 AP.quotation.zoneModal.methods().resetForm();
                 AP.quotation.zoneModal.init( "add" );
+            }
+
+            NM.util.openModal( AP.quotation.fields.zoneModalRoot );
+        },
+
+        openDuplicateZoneModal: function() {
+            if ( AP.quotation.fields.zoneModalRoot.length ) {
+                AP.quotation.zoneModal.methods().resetForm();
+                AP.quotation.zoneModal.init( "duplicate" );
             }
 
             NM.util.openModal( AP.quotation.fields.zoneModalRoot );
@@ -889,15 +894,17 @@ AP.quotation.zoneModal = ( function() {
         data: {
             id: "",
             name: "Nuova zona",
+            quantity: 1,
             description: "",
             quotation: {
-                id: AP?.page?.quotation?.id || "00001", // TODO: better than this
+                id: AP?.page?.quotation?.id || "00001",
             },
             title: this.id ? "Modifica zona" : "Nuova zona",
             parentZone: {
                 id: ""
             },
-            mode: ""
+            mode: "",
+            duplicaConSottozone: false,
         }
     };
 
@@ -942,6 +949,41 @@ AP.quotation.zoneModal = ( function() {
             return false;
         },
 
+        duplicateZone: function( event ) {
+            const duplicaConSottozone = event.currentTarget.id == 'duplicate-zone-with-children-button'
+            viewModel.set('detailForm.data.duplicaConSottozone', duplicaConSottozone)
+
+            var zoneForm = $( "#zone-form" );
+
+            if ( zoneForm.valid() ) {
+                AP.loading.show();
+                NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/quotations/duplicatezone",
+                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                    callback: {
+                        done: function( xhr ) {
+                            if ( xhr.status == "INVALID" ) {
+                                AP.loading.hide();
+                                NM.form.showMessages( xhr.data );
+                                return;
+                            }
+
+                            AP.widget.notify( "success", "Zona salvata correttamente." );
+                            setTimeout( function() {
+                                $( "#zone-modal-root" ).modal( "hide" );
+                                AP.loading.hide();
+                            }, 200 );
+                            AP.quotation.detail.methods().getZones();
+                        }
+                    }
+                } );
+
+            }
+
+            return false;
+        },
+
         deleteZone: function( event ) {
             const zone = viewModel.get( "detailForm.data.parentZone" );
 
@@ -963,6 +1005,7 @@ AP.quotation.zoneModal = ( function() {
 
                             if ( xhr.status == "INVALID" ) {
                                 NM.form.showMessages( xhr.data );
+                                AP.loading.hide();
                                 return;
                             }
 
@@ -990,14 +1033,17 @@ AP.quotation.zoneModal = ( function() {
 
         if ( mode == "delete" ) {
 
-            var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { zone.name != '-- Tutte le zone'; } );
+            var zones = AP.quotation.detail.config().get( "zones" ).filter( function( zone ) { return zone.name != '-- Tutte le zone'; } );
 
             viewModel.get( "zones" ).data( zones );
             $( "#zoneTitle" ).text( "Elimina Zona" );
 
             $( "#delete-zone-button" ).show();
+            $( "#duplicate-zone-button" ).hide();
+            $( "#duplicate-zone-with-children-button" ).hide();
             $( "#add-zone-button" ).hide();
             $( "#zone-name-input" ).hide();
+            $( "#zone-quantity-input" ).hide();
             $( "#zone-label-parent" ).html( "Zona" );
 
             // REF: aggiungo validazione per cancellazione
@@ -1019,6 +1065,40 @@ AP.quotation.zoneModal = ( function() {
 
         }
 
+        if ( mode == "duplicate" ) {
+
+            var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { return zone.name != '-- Tutte le zone'; } );
+
+            viewModel.get( "zones" ).data( zones );
+            $( "#zoneTitle" ).text( "Nuova Zona" );
+
+            $( "#delete-zone-button" ).hide();
+            $( "#add-zone-button" ).hide();
+            $( "#duplicate-zone-button" ).show();
+            $( "#duplicate-zone-with-children-button" ).show();
+            $( "#zone-quantity-input" ).show();
+            $( "#zone-name-input" ).show();
+            $( "#zone-label-parent" ).html( "Zona da duplicare" );
+
+            // REF: aggiungo validazione per inserimento
+            zoneForm.validate( {
+                onfocusout: function( element ) {
+                    $( element ).valid();
+                },
+                rules: {
+                    name: {
+                        required: true
+                    },
+                },
+                messages: {
+                    name: {
+                        required: "Inserisci un nome"
+                    },
+                },
+            } );
+
+        }
+
         if ( mode == "add" ) {
 
             var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { return !zone.origin && zone.name != '-- Tutte le zone'; } );
@@ -1027,8 +1107,11 @@ AP.quotation.zoneModal = ( function() {
             $( "#zoneTitle" ).text( "Nuova Zona" );
 
             $( "#delete-zone-button" ).hide();
+            $( "#duplicate-zone-button" ).hide();
+            $( "#duplicate-zone-with-children-button" ).hide();
             $( "#add-zone-button" ).show();
             $( "#zone-name-input" ).show();
+            $( "#zone-quantity-input" ).show();
             $( "#zone-label-parent" ).html( "Zona padre" );
 
             // REF: aggiungo validazione per inserimento

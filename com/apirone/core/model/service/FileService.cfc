@@ -142,6 +142,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
+	public function duplicate( required String fileId, required entity ){
+		var file = get( arguments.fileId );
+
+		var entity    = super.bean( "Entity" );
+		entity.setKey( "quotationItem.id" );
+		entity.setValue( arguments.entity.getId() );
+
+		var newFileId = getDao().insert( file = file, entity = entity );
+
+		return newFileId;
+	}
+
 	public Void function resize( required String filePath, required Numeric size ){
 		var sizePath = Replace( filePath, "_ori", size );
 
