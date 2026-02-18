@@ -371,7 +371,7 @@ AP.plate.modal = ( function() {
          * Carica la placca (griglia, orientamento, immagine) in base al frame del modello.
          * @returns {*} Thenable restituita da getFrame (per incatenare in edit()).
          */
-        loadPlate: function() {
+        loadPlate: function( orientation ) {
             var modelId = this.get( "detailForm.data.product.model.code" );
             var image = this.get( "detailForm.data.product.image" );
 
@@ -394,17 +394,26 @@ AP.plate.modal = ( function() {
 
             return AP.plate.api.getFrame( frameId, {
                 done: function( xhr ) {
+
+
+                    console.log( "getFrame", xhr );
+
                     viewModel.set( "plate.id", xhr.data.id );
                     viewModel.set( "plate.code", xhr.data.code );
                     viewModel.set( "plate.width", xhr.data?.width ?? 1200 );
                     viewModel.set( "plate.height", xhr.data?.height ?? 500 );
                     viewModel.set( "plate.orientation", xhr.data.orientation );
-                    viewModel.set( "detailForm.data.product.orientation", xhr.data.orientation );
+                    viewModel.set( "detailForm.data.product.orientation", orientation ?? xhr.data.orientation );
                     viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
                     viewModel.set( "availableOrientations", xhr.data.availableOrientations );
                     viewModel.set( "plate.grid", xhr.data.grid );
                     viewModel.set( "plate.image", image );
                     viewModel.set( "plate.grid", xhr.data.grid );
+
+                    if ( orientation ) {
+                        viewModel.changeOrientation();
+                    }
+
                     configPlate();
                 }
             } );
@@ -973,12 +982,14 @@ AP.plate.modal = ( function() {
                 AP.plate.api.savePlate( parsedData, {
                     done: function( xhr ) {
                         status.html( "" );
+
                         AP.widget.notify( "success", "Placca salvata correttamente." );
+
                         resetDetailForm();
 
                         setTimeout( function() {
                             AP.loading.hide();
-                            window.location.href = "/manager/quotations/" + parsedData.quotationId + "?tab=plate";
+                            // window.location.href = "/manager/quotations/" + parsedData.quotationId + "?tab=plate";
                         }, 1000 );
                     }
                 } );
@@ -1073,10 +1084,14 @@ AP.plate.modal = ( function() {
 
         AP.plate.api.getPlate( id, {
             done: function( xhr ) {
+
+                console.log( "orientation", xhr.data.quotationItem.frame.orientation );
+
                 viewModel.populateProduct( xhr.data.quotationItem.product );
                 viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
                 viewModel.set( "detailForm.data.position", xhr.data.quotationItem.position );
                 viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
+                // viewModel.set( "detailForm.data.product.orientation", xhr.data.quotationItem.frame.orientation );
 
                 initFruitsSuggest();
                 initPositionSuggest();
@@ -1086,7 +1101,7 @@ AP.plate.modal = ( function() {
                     viewModel.loadModels( undefined, function() {
                         viewModel.loadFinishes( undefined, function() {
                             viewModel.firstLoadProductItems().then( function() {
-                                var platePromise = viewModel.loadPlate();
+                                var platePromise = viewModel.loadPlate( xhr.data.quotationItem.frame.orientation );
                                 if ( platePromise && typeof platePromise.then === "function" ) {
                                     platePromise.then( function() {
                                         viewModel.loadFruits();
@@ -1156,31 +1171,23 @@ AP.plate.modal = ( function() {
             } ),
             noDataTemplate: false,
 
-            change: function( e ) {
+            change: function( event ) {
+
                 var value = this.value();
                 // var exists = false;
 
                 // Verifichiamo se l'elemento è presente nel DataSource
                 var exists = this.dataSource.data().find( item => item.code === value );
 
-                console.log( "value", value );
-                console.log( "exists", exists );
-                console.log( "item", value );
-
                 if ( !exists ) {
                     var position = { id: "", code: value };
-                    console.log( "suggest:Inserito nuovo elemento:", value );
                     viewModel.set( "detailForm.data.position", position );
                 }
             },
 
             select: function( event ) {
                 var position = this.dataItem( event.item.index() );
-                console.log( "suggest:position:", position );
-
                 viewModel.set( "detailForm.data.position", position );
-                var sel = viewModel.get( "detailForm.data.position" );
-                console.log( "sel", sel );
             }
         } );
 

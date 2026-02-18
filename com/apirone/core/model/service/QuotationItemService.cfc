@@ -81,7 +81,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Outcome function delete( required String quotationItemId ){
 		var outcome = super.bean( "Outcome" );
-		var obj     = get( arguments.quotationItemId );
 
 		outcome.setData( { quotationItemId = arguments.quotationItemId } );
 		getDao().delete( arguments.quotationItemId );
@@ -212,18 +211,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Ensure quotation item position is created and linked when needed.
 	 */
 	private com.apirone.core.model.bean.QuotationItem function ensurePosition( required com.apirone.core.model.bean.QuotationItem quotationItem ){
-		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ensurePosition 1" );
 		
 		if ( !IsNull( arguments.quotationItem.getPosition() ) ) {
 			if ( Len( arguments.quotationItem.getPosition().getCode() ) ) {
 
 				var position = arguments.quotationItem.getPosition();
 
-				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ensurePosition 2" );
-				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ensurePosition 44 -#position.getId()#- #!Len( position.getId() )#" );
-				
 				if ( IsNull( position.getId() ) OR !Len( position.getId() ) ) {
-					cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# ensurePosition 3" );
 
 					position.setZoneId( arguments.quotationItem.getQuotationZone().getId() );
 					var newPositionId = getQuotationZonePositionService().create( position );

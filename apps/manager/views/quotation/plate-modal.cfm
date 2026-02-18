@@ -189,8 +189,12 @@
                                                 <div class="col-4 mt-2">Posizione:</div>
                                                 <div class="col-8">
                                                     <input class="form-control form-control-sm" name="position" 
+                                                        placeholder="Posizione"
                                                         id="qt-plate-position-suggest"
-                                                        placeholder="Posizione" data-bind="value: detailForm.data.position.code">
+
+                                                        data-text-field="code"
+                                                        data-value-primitive="true"
+                                                        data-bind="value: detailForm.data.position">
                                                 </div>
                                             </div>
                                         </div>

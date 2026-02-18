@@ -6,12 +6,15 @@
             <div class="row">
                 <div class="col-1">
                 </div>
-                <div class="col-7 d-flex justify-content-start">
-                    <!--- <span data-bind="text: position.code"></span>  ---->
+                <div class="col-7 justify-content-start">
+                    
                     <div style="font-size: 10px;"> 
                         <span data-bind="text: product.line.name"></span> - 
                         <span data-bind="text: product.model.code"></span> - 
                         <span data-bind="text: product.finish.code"></span> 
+                    </div>
+                    <div>
+                        <span data-bind="text: position.code"></span> 
                     </div>
                 </div>
                 <div class="col-3 d-flex justify-content-end mb-3">
@@ -33,7 +36,7 @@
                 <div class="col-6 mt-2 d-flex justify-content-center">
                     Quantità: &nbsp; <span data-bind="text: quantity"></span>
                 </div>
-                <div class="col-6 d-flex justify-content-center">
+                <div class="col-6 mt-2 d-flex justify-content-center">
                     Prezzo: &nbsp; <span data-bind="text: price.total" data-format="n2"></span> &euro;
                 </div>
                 <div class="col-6">
