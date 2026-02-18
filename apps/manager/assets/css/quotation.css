@@ -6,9 +6,22 @@
 .quotation-totals-box {
 	position: fixed;
 	bottom: 20px;
-	right: 20px;
+	right: 320px;
 	background-color: #2771e8;
-	width: 500px;
+	width: 600px;
+	color: white;
+	padding: 10px 20px;
+	border-radius: 10px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	z-index: 999999;
+}
+
+.quotation-totals-box-collapsed {
+	position: fixed;
+	bottom: 20px;
+	right: 320px;
+	background-color: #2771e8;
+	width: 250px;
 	color: white;
 	padding: 10px 20px;
 	border-radius: 10px;

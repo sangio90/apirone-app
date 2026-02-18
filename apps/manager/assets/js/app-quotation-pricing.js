@@ -174,6 +174,15 @@ AP.quotation.totalPricing = ( function() {
         var newSymbol = newStatus ? "▲" : "▼";
         viewModel.set( "detail.symbol", newSymbol );
 
+        const totalsBox = $('#quotation-total-pricing-box')
+        if (newStatus) {
+            totalsBox.removeClass('quotation-totals-box')
+            totalsBox.addClass('quotation-totals-box-collapsed')
+        } else {
+            totalsBox.addClass('quotation-totals-box')
+            totalsBox.removeClass('quotation-totals-box-collapsed')
+        }
+
         AP.setUserPref( "quotation.totalPricing.isBoxCollapsed", newStatus );
 
         return false;
@@ -310,6 +319,14 @@ AP.quotation.totalPricing = ( function() {
         $(document).on("click", "#toggle-costs-link", function () {
             viewModel.set("showCosts", AP.getUserPref("showCosts"));
         });
+
+        if (viewModel.get( "detail.isCollapsed" )) {
+            fields.boxTotalPricing.removeClass('quotation-totals-box')
+            fields.boxTotalPricing.addClass('quotation-totals-box-collapsed')
+        } else {
+            fields.boxTotalPricing.addClass('quotation-totals-box')
+            fields.boxTotalPricing.removeClass('quotation-totals-box-collapsed')
+        }
 
         fields.boxTotalPricing.show();
 
