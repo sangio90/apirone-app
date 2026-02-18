@@ -477,14 +477,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setSpecial( json.item.special );
 		bean.setFrame( frame.setOrientation( orientation.setId( json.item.product.orientation.id ) ) );
 
-		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# json.item: #SerializeJSON(json.item.position)#" );
-
 		if( Len( json.item?.position?.code ) ) {
 			var position = populatePositionBean( json.item.position );
 			bean.setPosition( position );
 		}
-
-		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# getPosition: #SerializeJSON(bean.getPosition())#" );
 
 		var pricing = getPlatePricing( json );
 
