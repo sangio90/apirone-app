@@ -26,6 +26,9 @@ COPY extras/luceedebug.jar /app/extras/luceedebug.jar
 EXPOSE 8081 10000 9999
 ENV CommandBox_home=/app/.CommandBox
 
+RUN java -jar /opt/commandbox.jar install
+RUN alias box='java -jar /opt/commandbox.jar'
+
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 CMD ["/start.sh"]
