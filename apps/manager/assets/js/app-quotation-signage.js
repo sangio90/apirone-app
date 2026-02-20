@@ -1218,77 +1218,79 @@ AP.signage.modal = ( function() {
     pub.edit = async function( { id, onSave } ) {
         viewModel.resetForm();
 
-        await NM.util.ajax( {
+        const categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
-                    xhr.data.unshift( { id: "", name: "" } );
-                    viewModel.get( "categories" ).data( xhr.data );
-                    NM.util.openModal( AP.signage.fields.modalRoot );
+                    //NOOP
                 },
             },
         } );
 
-        NM.util.ajax( {
+		categoriesResponse.data.unshift( { id: "", name: "" } );
+		viewModel.get( "categories" ).data( categoriesResponse.data );
+		NM.util.openModal( AP.signage.fields.modalRoot );
+
+        const signageResponse = NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotation-items/signage/" + id,
             callback: {
                 done: async function( xhr ) {
-
-                    var data = xhr.data;
-
-                    viewModel.set( "detailForm.title", "Modifica segnaletica" );
-
-                    var signageRowsArray = data.quotationItem.signageRows;
-
-                    if ( data.quotationItem && Array.isArray( signageRowsArray ) ) {
-                        data.quotationItem.signageRows = new kendo.data.DataSource( {
-                            data: signageRowsArray.slice(),
-                            schema: {
-                                model: {
-                                    id: "id"
-                                }
-                            }
-                        } );
-                    } else {
-                        data.quotationItem.signageRows = new kendo.data.DataSource( {
-                            data: [],
-                            schema: { model: { id: "id" } }
-                        } );
-                    }
-
-                    data.quotationItem.signageRows.read();
-                    viewModel.set( "detailForm.data", data );
-
-                    var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
-
-                    if ( ds && ds.data().length ) {
-                        ds.data().forEach( function( row, i ) {
-                            row.set( "index", i + 1 );
-                        } );
-                    }
-
-                    initPositionSuggest();
-
-                    await viewModel.loadLines();
-                    await viewModel.loadModels();
-					await viewModel.loadFinishes();
-					await viewModel.loadSignageConfigs();
-					await viewModel.loadFontSizes();
-					await viewModel.parseLines();
-					await ds.data().forEach( row => {
-						viewModel.updateCharCounter( {
-							currentTarget: document.getElementById( row.uid + "_contentInput" )
-						} );
-					} );
-					NM.util.openModal( AP.signage.fields.modalRoot );
-					viewModel.setSelectedTextAlignIcon();
-
-                    pricingApp().init( "signage", { data: xhr.data.quotationItem.price } );
+					// NOOP
                 },
             },
         } );
+		var data = signageResponse.data;
+
+		viewModel.set( "detailForm.title", "Modifica segnaletica" );
+
+		var signageRowsArray = data.quotationItem.signageRows;
+
+		if ( data.quotationItem && Array.isArray( signageRowsArray ) ) {
+			data.quotationItem.signageRows = new kendo.data.DataSource( {
+				data: signageRowsArray.slice(),
+				schema: {
+					model: {
+						id: "id"
+					}
+				}
+			} );
+		} else {
+			data.quotationItem.signageRows = new kendo.data.DataSource( {
+				data: [],
+				schema: { model: { id: "id" } }
+			} );
+		}
+
+		data.quotationItem.signageRows.read();
+		viewModel.set( "detailForm.data", data );
+
+		var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+
+		if ( ds && ds.data().length ) {
+			ds.data().forEach( function( row, i ) {
+				row.set( "index", i + 1 );
+			} );
+		}
+
+		initPositionSuggest();
+
+		await viewModel.loadLines();
+		await viewModel.loadModels();
+		await viewModel.loadFinishes();
+		await viewModel.loadSignageConfigs();
+		await viewModel.loadFontSizes();
+		await viewModel.parseLines();
+		await ds.data().forEach( row => {
+			viewModel.updateCharCounter( {
+				currentTarget: document.getElementById( row.uid + "_contentInput" )
+			} );
+		} );
+		NM.util.openModal( AP.signage.fields.modalRoot );
+		viewModel.setSelectedTextAlignIcon();
+
+		pricingApp().init( "signage", { data: signageResponse.data.quotationItem.price } );
     };
 
     pub.init = function() {
