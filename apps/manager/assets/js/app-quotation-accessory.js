@@ -615,8 +615,6 @@ AP.accessory.modal = ( function() {
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         pricingApp().init( "accessory", undefined );
 
-        initPositionSuggest();
-
         const categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
@@ -636,7 +634,6 @@ AP.accessory.modal = ( function() {
 
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
-
 
         if ( AP.getUserPref( "accessory.categoryId" ) ) {
             viewModel.set( "detailForm.data.quotationItem.product.category.id", AP.getUserPref( "accessory.categoryId" ) );
@@ -666,6 +663,7 @@ AP.accessory.modal = ( function() {
 				}
 			}
         }
+		initPositionSuggest();
     };
 
     pub.getItem = function() {
@@ -706,13 +704,13 @@ AP.accessory.modal = ( function() {
 
             viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
 
-			initPositionSuggest();
 
 			await viewModel.loadLines();
 
 			await viewModel.loadModels();
 			await viewModel.loadFinishes();
 			await viewModel.loadProduct();
+			initPositionSuggest();
 		}
 
 		pricingApp().init( "accessory", { data: accessoryResponse.data.quotationItem.price } );
