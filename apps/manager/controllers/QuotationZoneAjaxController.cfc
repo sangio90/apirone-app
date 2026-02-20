@@ -38,8 +38,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "zoneId" ] = rc.zoneId;
 
-		dump()
-
 		var rows = super.fire( "QuotationZonePosition.list", params );
 
 		var data = memy.convertList( rows, "list" ) 
