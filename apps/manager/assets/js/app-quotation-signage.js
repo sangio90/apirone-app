@@ -195,7 +195,7 @@ AP.signage.modal = ( function() {
             return false;
         },
 
-        parseLines: function( e ) {
+        parseLines: async function( e ) {
             if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) != "" ) {
                 viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
                 if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
@@ -217,34 +217,32 @@ AP.signage.modal = ( function() {
                                 const exceeded = viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().slice( viewModel.get( "maxRows" ) );
                                 const promises = exceeded.map( signageRow => {
                                     return new Promise( resolve => {
-                                        setTimeout( function() {
-                                            NM.util.ajax( {
-                                                method: "DELETE",
-                                                url: "/manager/ajax/quotation-items/signagerow",
-                                                data: { id: signageRow.id },
-                                                callback: {
-                                                    done: function( xhr ) {
-                                                        if ( xhr.status == "ERROR" ) {
-                                                            AP.widget.notify( "error", "Errore nella cancellazione della Riga Segnaletica." );
-                                                        }
-                                                        if ( xhr.status == "SUCCESS" ) {
-                                                            AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
-                                                            const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
-                                                            const row = ds.view().find( r => r.id === signageRow.id );
-                                                            if ( row ) {
-                                                                ds.remove( row );
-                                                            }
-                                                            if ( ds ) {
-                                                                ds.data().forEach( ( row, i ) => {
-                                                                    row.set( "index", i + 1 );
-                                                                } );
-                                                            }
-                                                        }
-                                                        resolve();
-                                                    }
-                                                }
-                                            } );
-                                        }, 200 );
+										NM.util.ajax( {
+											method: "DELETE",
+											url: "/manager/ajax/quotation-items/signagerow",
+											data: { id: signageRow.id },
+											callback: {
+												done: function( xhr ) {
+													if ( xhr.status == "ERROR" ) {
+														AP.widget.notify( "error", "Errore nella cancellazione della Riga Segnaletica." );
+													}
+													if ( xhr.status == "SUCCESS" ) {
+														AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
+														const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+														const row = ds.view().find( r => r.id === signageRow.id );
+														if ( row ) {
+															ds.remove( row );
+														}
+														if ( ds ) {
+															ds.data().forEach( ( row, i ) => {
+																row.set( "index", i + 1 );
+															} );
+														}
+													}
+													resolve();
+												}
+											}
+										} );
                                     } );
                                 } );
 
@@ -522,8 +520,8 @@ AP.signage.modal = ( function() {
                 .addClass( "selected-text-align-not" );
         },
 
-        loadLines: function( event ) {
-            NM.util.ajax( {
+        loadLines: async function( event ) {
+            await NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ),
                 callback: {
@@ -537,7 +535,7 @@ AP.signage.modal = ( function() {
             AP.setUserPref( "signage.categoryId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) );
         },
 
-        loadModels: function( event ) {
+        loadModels: async function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
                 $( "#signangeProductCategory" ).prop( "disabled", true );
                 if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
@@ -554,7 +552,7 @@ AP.signage.modal = ( function() {
             } else {
                 $( "#signangeProductCategory" ).prop( "disabled", false );
             }
-            NM.util.ajax( {
+            await NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
                 callback: {
@@ -568,10 +566,10 @@ AP.signage.modal = ( function() {
             AP.setUserPref( "signage.lineId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) );
         },
 
-        loadFinishes: function( event ) {
+        loadFinishes: async function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) != "" ) {
                 $( "#signageRow" ).prop( "disabled", true );
-                NM.util.ajax( {
+                await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
                     callback: {
@@ -622,13 +620,13 @@ AP.signage.modal = ( function() {
             AP.setUserPref( "signage.modelId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) );
         },
 
-        loadSignageConfigs: function( event ) {
+        loadSignageConfigs: async function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                 $( "#signageModel" ).prop( "disabled", true );
             } else {
                 $( "#signageModel" ).prop( "disabled", false );
             }
-            NM.util.ajax( {
+            const xhr = await NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/signage-configs?categoryId="
                     + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
@@ -636,51 +634,56 @@ AP.signage.modal = ( function() {
                     + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
                     + "&modelId="
                     + viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
-                callback: {
-                    done: function( xhr ) {
-                        const fonts = [];
-
-                        for ( var font of xhr.data ) {
-                            fonts.push( font.font );
-                        }
-                        fonts.unshift( { id: "", name: "-- Seleziona il Font" } );
-                        viewModel.get( "fonts" ).data( fonts );
-                        xhr.data.unshift( { id: "", name: "" } );
-                        viewModel.get( "signageConfigs" ).data( xhr.data );
-
-                        if ( fonts.length === 1 ) {
-                            viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
-                            viewModel.get( "fontSizes" ).data( xhr.data[0].items );
-                        }
-                        if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
-                            NM.util.ajax( {
-                                method: "GET",
-                                url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" +
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
-                                "&lineId=" +
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
-                                "&modelId=" +
-                                viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
-                                "&finishId=" +
-                                viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
-                                callback: {
-                                    done: function( xhr ) {
-                                        if ( xhr.data.productId ) {
-                                            viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data.productId );
-                                        }
-                                        if ( xhr.data.file ) {
-                                            viewModel.set( "backgroundImage", xhr.data.file );
-                                            viewModel.set( "backgroundImage.url", "url('" + xhr.data.file.uri + "')" );
-                                        } else {
-                                            viewModel.set( "backgroundImage.url", "url()" );
-                                        }
-                                    },
-                                },
-                            } );
-                        }
-                    },
-                },
+				callback: {
+					done: function (xhr) {
+						//NOOP
+					}
+				}
             } );
+
+			const fonts = [];
+
+			for ( var font of xhr.data ) {
+				fonts.push( font.font );
+			}
+			fonts.unshift( { id: "", name: "-- Seleziona il Font" } );
+			viewModel.get( "fonts" ).data( fonts );
+			xhr.data.unshift( { id: "", name: "" } );
+			viewModel.get( "signageConfigs" ).data( xhr.data );
+
+			if ( fonts.length === 1 ) {
+				viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
+				viewModel.get( "fontSizes" ).data( xhr.data[0].items );
+			}
+			if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
+				const xhr2 = await NM.util.ajax( {
+					method: "GET",
+					url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" +
+						viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
+						"&lineId=" +
+						viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
+						"&modelId=" +
+						viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
+						"&finishId=" +
+						viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
+					callback: {
+						done: function (xhr) {
+							//NOOP
+						}
+					}
+				} );
+				if ( xhr2.data.productId ) {
+					viewModel.set( "detailForm.data.quotationItem.product.id", xhr2.data.productId );
+				}
+				if ( xhr2.data.file ) {
+					viewModel.set( "backgroundImage", xhr2.data.file );
+					viewModel.set( "backgroundImage.url", "url('" + xhr2.data.file.uri + "')" );
+				} else {
+					viewModel.set( "backgroundImage.url", "url()" );
+				}
+			}
+
+
             this.checkCanSave();
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != AP.getUserPref( "signage.finishId" ) ) {
                 AP.deleteUserPref( "signage.product.items" );
@@ -688,7 +691,7 @@ AP.signage.modal = ( function() {
             AP.setUserPref( "signage.finishId", viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) );
         },
 
-        loadFontSizes: function() {
+        loadFontSizes: async function() {
             if ( viewModel.get( "detailForm.data.signageConfig.font.id" ) != "" ) {
                 $( "#signageFinish" ).prop( "disabled", true );
             } else {
@@ -696,7 +699,7 @@ AP.signage.modal = ( function() {
             }
             var signageConfig = viewModel.getSignageConfig();
             if ( signageConfig ) {
-                this.firstLoadProductItems();
+                await this.firstLoadProductItems();
                 // const exists = viewModel.getSignageConfig().items.some( item => item.id === "" );
                 // viewModel.getSignageConfig().items.forEach( function( item ) {
                 //     fontSizes.push( item.size );
@@ -1068,132 +1071,31 @@ AP.signage.modal = ( function() {
             AP.deleteUserPref( "signage.product.items" );
             this.checkCanSave();
         },
-
-        handleParamsUnset: function( param ) {
-            if ( param === "category" ) {
-                setTimeout( function() {
-                    if ( $( "#signageFontSize" ).val() !== "" ) {
-                        $( "#signageFontSize" ).val( "" );
-                        $( "#signageFontSize" ).trigger( "change" );
-                    }
-                    setTimeout( function() {
-                        if ( $( "#signageFont" ).val() !== "" ) {
-                            $( "#signageFont" ).val( "" );
-                            $( "#signageFont" ).trigger( "change" );
-                        }
-                        setTimeout( function() {
-                            if ( $( "#signageFinish" ).val() !== "" ) {
-                                $( "#signageFinish" ).val( "" );
-                                $( "#signageFinish" ).trigger( "change" );
-                            }
-                            setTimeout( function() {
-                                if ( $( "#signageModel" ).val() !== "" ) {
-                                    $( "#signageModel" ).val( "" );
-                                    $( "#signageModel" ).trigger( "change" );
-                                }
-                                setTimeout( function() {
-                                    if ( $( "#signageRow" ).val() !== "" ) {
-                                        $( "#signageRow" ).val( "" );
-                                        $( "#signageRow" ).trigger( "change" );
-                                    }
-                                }, 100 );
-                            }, 100 );
-                        }, 100 );
-                    }, 100 );
-                }, 100 );
-            }
-            if ( param === "line" ) {
-                setTimeout( function() {
-                    if ( $( "#signageFontSize" ).val() !== "" ) {
-                        $( "#signageFontSize" ).val( "" );
-                        $( "#signageFontSize" ).trigger( "change" );
-                    }
-                    setTimeout( function() {
-                        if ( $( "#signageFont" ).val() !== "" ) {
-                            $( "#signageFont" ).val( "" );
-                            $( "#signageFont" ).trigger( "change" );
-                        }
-                        setTimeout( function() {
-                            if ( $( "#signageFinish" ).val() !== "" ) {
-                                $( "#signageFinish" ).val( "" );
-                                $( "#signageFinish" ).trigger( "change" );
-                            }
-                            setTimeout( function() {
-                                if ( $( "#signageModel" ).val() !== "" ) {
-                                    $( "#signageModel" ).val( "" );
-                                    $( "#signageModel" ).trigger( "change" );
-                                }
-                            }, 100 );
-                        }, 100 );
-                    }, 100 );
-                }, 100 );
-            }
-            if ( param === "model" ) {
-                setTimeout( function() {
-                    if ( $( "#signageFontSize" ).val() !== "" ) {
-                        $( "#signageFontSize" ).val( "" );
-                        $( "#signageFontSize" ).trigger( "change" );
-                    }
-                    setTimeout( function() {
-                        if ( $( "#signageFont" ).val() !== "" ) {
-                            $( "#signageFont" ).val( "" );
-                            $( "#signageFont" ).trigger( "change" );
-                        }
-                        setTimeout( function() {
-                            if ( $( "#signageFinish" ).val() !== "" ) {
-                                $( "#signageFinish" ).val( "" );
-                                $( "#signageFinish" ).trigger( "change" );
-                            }
-                        }, 100 );
-                    }, 100 );
-                }, 100 );
-            }
-            if ( param === "finish" ) {
-                setTimeout( function() {
-                    if ( $( "#signageFontSize" ).val() !== "" ) {
-                        $( "#signageFontSize" ).val( "" );
-                        $( "#signageFontSize" ).trigger( "change" );
-                    }
-                    setTimeout( function() {
-                        if ( $( "#signageFont" ).val() !== "" ) {
-                            $( "#signageFont" ).val( "" );
-                            $( "#signageFont" ).trigger( "change" );
-                        }
-                    }, 100 );
-                }, 100 );
-            }
-            if ( param === "font" ) {
-                setTimeout( function() {
-                    if ( $( "#signageFontSize" ).val() !== "" ) {
-                        $( "#signageFontSize" ).val( "" );
-                        $( "#signageFontSize" ).trigger( "change" );
-                    }
-                }, 100 );
-            }
-            this.checkCanSave();
-        }
     } );
 
-    pub.new = function( onSave ) {
+    pub.new = async function( onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
 
         pricingApp().init( "signage", undefined );
 
-        NM.util.ajax( {
+        const categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
-                    if ( xhr.data.length > 0 ) {
-                        xhr.data.unshift( { id: "", name: "-- seleziona" } );
-                        viewModel.get( "categories" ).data( xhr.data );
-                    }
-                    NM.util.openModal( AP.signage.fields.modalRoot );
+                    //NOOP
                 }
             },
         } );
+
+		if ( categoriesResponse.data.length > 0 ) {
+			categoriesResponse.data.unshift( { id: "", name: "-- seleziona" } );
+			viewModel.get( "categories" ).data( categoriesResponse.data );
+		}
+
+		NM.util.openModal( AP.signage.fields.modalRoot );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
 
@@ -1222,37 +1124,25 @@ AP.signage.modal = ( function() {
             viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", AP.getUserPref( "signage.signageConfigRowCount" ) );
         }
 
-        viewModel.loadLines();
+        await viewModel.loadLines();
 
         initPositionSuggest();
 
-        setTimeout( function() {
-            if ( AP.getUserPref( "signage.lineId" ) ) {
-                viewModel.loadModels();
-                setTimeout( function() {
-                    if ( AP.getUserPref( "signage.modelId" ) ) {
-                        viewModel.loadFinishes();
-                        setTimeout( function() {
-                            if ( AP.getUserPref( "signage.finishId" ) ) {
-                                viewModel.loadSignageConfigs();
-                                setTimeout( function() {
-                                    if ( AP.getUserPref( "signage.fontId" ) ) {
-                                        viewModel.loadFontSizes();
-                                        setTimeout( function() {
-                                            if ( AP.getUserPref( "signage.signageConfigId" ) ) {
-                                                setTimeout( function() {
-                                                    viewModel.parseLines();
-                                                }, 400 );
-                                            }
-                                        }, 400 );
-                                    }
-                                }, 400 );
-                            }
-                        }, 400 );
-                    }
-                }, 400 );
-            }
-        }, 400 );
+		if ( AP.getUserPref( "signage.lineId" ) ) {
+			await viewModel.loadModels();
+			if ( AP.getUserPref( "signage.modelId" ) ) {
+				await viewModel.loadFinishes();
+				if ( AP.getUserPref( "signage.finishId" ) ) {
+					await viewModel.loadSignageConfigs();
+					if ( AP.getUserPref( "signage.fontId" ) ) {
+						await viewModel.loadFontSizes();
+						if ( AP.getUserPref( "signage.signageConfigId" ) ) {
+							viewModel.parseLines();
+						}
+					}
+				}
+			}
+		}
     };
 
     var initPositionSuggest = function() {
@@ -1325,10 +1215,10 @@ AP.signage.modal = ( function() {
 
     };
 
-    pub.edit = function( { id, onSave } ) {
+    pub.edit = async function( { id, onSave } ) {
         viewModel.resetForm();
 
-        NM.util.ajax( {
+        await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
@@ -1344,7 +1234,7 @@ AP.signage.modal = ( function() {
             method: "GET",
             url: "/manager/ajax/quotation-items/signage/" + id,
             callback: {
-                done: function( xhr ) {
+                done: async function( xhr ) {
 
                     var data = xhr.data;
 
@@ -1381,32 +1271,19 @@ AP.signage.modal = ( function() {
 
                     initPositionSuggest();
 
-                    viewModel.loadLines();
-
-                    setTimeout( function() {
-                        viewModel.loadModels();
-                        setTimeout( function() {
-                            viewModel.loadFinishes();
-                            setTimeout( function() {
-                                viewModel.loadSignageConfigs();
-                                setTimeout( function() {
-                                    viewModel.loadFontSizes();
-                                    setTimeout( function() {
-                                        setTimeout( function() {
-                                            viewModel.parseLines();
-                                            ds.data().forEach( row => {
-                                                viewModel.updateCharCounter( {
-                                                    currentTarget: document.getElementById( row.uid + "_contentInput" )
-                                                } );
-                                            } );
-                                            NM.util.openModal( AP.signage.fields.modalRoot );
-                                            viewModel.setSelectedTextAlignIcon();
-                                        }, 400 );
-                                    }, 400 );
-                                }, 400 );
-                            }, 400 );
-                        }, 400 );
-                    }, 400 );
+                    await viewModel.loadLines();
+                    await viewModel.loadModels();
+					await viewModel.loadFinishes();
+					await viewModel.loadSignageConfigs();
+					await viewModel.loadFontSizes();
+					await viewModel.parseLines();
+					await ds.data().forEach( row => {
+						viewModel.updateCharCounter( {
+							currentTarget: document.getElementById( row.uid + "_contentInput" )
+						} );
+					} );
+					NM.util.openModal( AP.signage.fields.modalRoot );
+					viewModel.setSelectedTextAlignIcon();
 
                     pricingApp().init( "signage", { data: xhr.data.quotationItem.price } );
                 },
