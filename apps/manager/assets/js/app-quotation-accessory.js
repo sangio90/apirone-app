@@ -617,7 +617,7 @@ AP.accessory.modal = ( function() {
 
         initPositionSuggest();
 
-        const categoriesResponse = NM.util.ajax( {
+        const categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
             callback: {
@@ -675,7 +675,7 @@ AP.accessory.modal = ( function() {
     pub.edit = async function( { id, onSave } ) {
         viewModel.resetForm();
 
-        const categoriesResponse = NM.util.ajax( {
+        const categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
             callback: {
