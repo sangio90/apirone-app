@@ -859,6 +859,15 @@ AP.plate.modal = ( function() {
                 },
                 skipAutoTrigger: skipAutoTrigger === true
             } );
+
+            $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" ).on( "mouseenter", function() {
+                const color = "rgba(162, 253, 161, 0.44)";            
+                $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", color );
+                $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "#a3fda170" );
+            } ).on( "mouseleave", function() {
+                $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "" );
+                $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "" );
+            } );
         },
 
         /**
@@ -1126,6 +1135,7 @@ AP.plate.modal = ( function() {
                 viewModel.populateProduct( xhr.data.quotationItem.product );
                 viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
                 viewModel.set( "detailForm.data.position", xhr.data.quotationItem.position );
+                viewModel.set( "detailForm.data.note", xhr.data.quotationItem.note );
                 viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
                 // viewModel.set( "detailForm.data.product.orientation", xhr.data.quotationItem.frame.orientation );
 
