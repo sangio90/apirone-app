@@ -65,14 +65,14 @@
 				icon: "fas fa-bezier-curve",
 				title: "Prodotti per linea",
 			},
-			
+
 			{
 				href: "/manager/articles",
 				icon: "far fa-lemon",
 				title: "Servizi",
 			},
 		]
-	},	
+	},
 	{
 		href: "#",
 		icon: "fas fa-cogs",
@@ -147,7 +147,7 @@
 			{
 				href: "/manager/lines/costs",
 				icon: "fas fa-cogs",
-				title: "Costi per linea",
+				title: "Costi per linea/finitura",
 			},
 			{
 				href: "/manager/metadata-types",
@@ -227,7 +227,7 @@
 				title: "Preventivi esportati",
 			},
 		]
-	},	
+	},
 
 	{
 		href: "#",
