@@ -476,6 +476,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setQuotationZone( zone.setId( json.item.quotationZone.id ) );
 		bean.setSpecial( json.item.special );
 		bean.setFrame( frame.setOrientation( orientation.setId( json.item.product.orientation.id ) ) );
+		bean.setNote( json.item.note )
 
 		if( Len( json.item?.position?.code ) ) {
 			var position = populatePositionBean( json.item.position );

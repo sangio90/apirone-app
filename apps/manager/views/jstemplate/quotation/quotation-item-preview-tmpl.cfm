@@ -6,15 +6,17 @@
             <div class="row">
                 <div class="col-1">
                 </div>
-                <div class="col-7 justify-content-start">
-                    
-                    <div style="font-size: 10px;"> 
+                <div class="col-7 justify-content-start" style="margin-top: -15px;">
+                    <div style="font-size: 10px; margin-bottom: -10px;"> 
                         <span data-bind="text: product.line.name"></span> - 
                         <span data-bind="text: product.model.code"></span> - 
                         <span data-bind="text: product.finish.code"></span> 
                     </div>
-                    <div>
-                        <span data-bind="text: position.code"></span> 
+                    <div style="font-size: 10px; margin-bottom: -2px;" data-bind="visible: position.code"> 
+                        <span>Posizione: </span><span data-bind="text: position.code"></span> 
+                    </div>
+                    <div style="font-size: 10px;"> 
+                        <i data-bind="text: note_short, attr: { title: note }"></i>
                     </div>
                 </div>
                 <div class="col-3 d-flex justify-content-end mb-3">
@@ -36,13 +38,9 @@
                 <div class="col-6 d-flex justify-content-center">
                     Quantità: &nbsp; <span data-bind="text: quantity"></span>
                 </div>
-                <div class="col-6 mt-2 d-flex justify-content-center">
-                    Prezzo: &nbsp; <span data-bind="text: price.total" data-format="n2"></span> &euro;
-                </div>
                 <div class="col-6">
-                </div>
-                <div style="width: 50%; color: blue; margin-top: -9px; padding-left: 24px;" data-bind="visible: showCosts">
-                    <span style="text-decoration: underline;">Costo:</span>&nbsp;&nbsp;<span style="text-decoration: underline;" data-bind="text: price.cost" data-format="n2"></span> &euro;
+                    <span>Prezzo: &nbsp; <span data-bind="text: price.total" data-format="n2"></span> &euro;</span>
+                    <span data-bind="visible: showCosts" style="color: blue;"><br><span style="text-decoration: underline;">Costo:</span>&nbsp;&nbsp;<span style="text-decoration: underline;" data-bind="text: price.cost" data-format="n2"></span> &euro;</span>
                 </div>
             </div>
         </div>

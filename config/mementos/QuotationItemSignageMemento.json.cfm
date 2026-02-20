@@ -12,6 +12,7 @@
         "product.line.name",
         "image",
         "position",
+        "note",
     ],
     profiles = {
         edit = {

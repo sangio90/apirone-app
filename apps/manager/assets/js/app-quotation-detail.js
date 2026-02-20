@@ -532,6 +532,11 @@ AP.quotation.detail = ( function() {
                 url: url,
                 callback: {
                     done: function( xhr ) {
+                        for (row in xhr.data) {
+                            if (xhr.data[row].note) {
+                                xhr.data[row].note_short = xhr.data[row].note.substr(0,23)
+                            }
+                        }
                         setQuotationItems( xhr.data );
                     }
                 }

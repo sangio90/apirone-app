@@ -14,6 +14,7 @@
         "article.code",
         "article.name",
         "image",
+        "note",
     ],
     profiles = {
         editPlate = {
