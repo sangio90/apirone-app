@@ -1232,7 +1232,7 @@ AP.signage.modal = ( function() {
 		viewModel.get( "categories" ).data( categoriesResponse.data );
 		NM.util.openModal( AP.signage.fields.modalRoot );
 
-        const signageResponse = NM.util.ajax( {
+        const signageResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotation-items/signage/" + id,
             callback: {
