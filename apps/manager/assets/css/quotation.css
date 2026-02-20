@@ -6,7 +6,7 @@
 .quotation-totals-box {
 	position: fixed;
 	bottom: 20px;
-	right: 320px;
+	right: 20px;
 	background-color: #2771e8;
 	width: 600px;
 	color: white;
@@ -19,7 +19,7 @@
 .quotation-totals-box-collapsed {
 	position: fixed;
 	bottom: 20px;
-	right: 320px;
+	right: 20px;
 	background-color: #2771e8;
 	width: 250px;
 	color: white;

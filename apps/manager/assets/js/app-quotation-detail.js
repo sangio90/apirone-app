@@ -21,12 +21,16 @@ $( document ).ready( function() {
 
     [ "signage-modal", "plate-modal-root", "accessory-modal", "article-modal" ].forEach( id => {
         document.getElementById( id )?.addEventListener( "hide.bs.modal", () => {
+            $('#quotation-total-pricing-box').show()
             AP.quotation.detail.showTotals();
             // Rimuove l'hash dall'URL quando si chiude la modale
             if ( window.location.hash ) {
                 window.history.replaceState( null, null, window.location.pathname + window.location.search );
             }
         } );
+        document.getElementById( id )?.addEventListener( "show.bs.modal", () => {
+            $('#quotation-total-pricing-box').hide()
+        });
     } );
 
     $( "form#zone-form" ).on( "submit", function( event ) {

@@ -180,6 +180,7 @@ AP.plate.modal = ( function() {
                 quantity: 1,
                 // price: 0,
                 special: false,
+                note: '',
                 status: {
                     id: "ACT"
                 },
