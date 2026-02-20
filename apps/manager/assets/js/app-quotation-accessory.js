@@ -775,9 +775,6 @@ AP.accessory.modal = ( function() {
 
             change: function( e ) {
                 var value = this.value();
-                // var exists = false;
-
-                // Verifichiamo se l'elemento è presente nel DataSource
                 var exists = this.dataSource.data().find( item => item.code === value );
 
                 if ( !exists ) {

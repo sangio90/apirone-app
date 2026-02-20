@@ -1126,8 +1126,6 @@ AP.signage.modal = ( function() {
 
         await viewModel.loadLines();
 
-        initPositionSuggest();
-
 		if ( AP.getUserPref( "signage.lineId" ) ) {
 			await viewModel.loadModels();
 			if ( AP.getUserPref( "signage.modelId" ) ) {
@@ -1143,6 +1141,7 @@ AP.signage.modal = ( function() {
 				}
 			}
 		}
+		initPositionSuggest();
     };
 
     var initPositionSuggest = function() {
@@ -1275,8 +1274,6 @@ AP.signage.modal = ( function() {
 			} );
 		}
 
-		initPositionSuggest();
-
 		await viewModel.loadLines();
 		await viewModel.loadModels();
 		await viewModel.loadFinishes();
@@ -1292,6 +1289,7 @@ AP.signage.modal = ( function() {
 		viewModel.setSelectedTextAlignIcon();
 
 		pricingApp().init( "signage", { data: signageResponse.data.quotationItem.price } );
+		initPositionSuggest();
     };
 
     pub.init = function() {
