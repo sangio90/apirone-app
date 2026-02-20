@@ -937,7 +937,10 @@ AP.plate.modal = ( function() {
             } );
         },
 
-        resetForm: function() { },
+        resetForm: function() {
+			viewModel.set( "detailForm", defaultDetailForm );
+			viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
+		},
 
         // --- Save (payload = contratto server, non modificare) ---
         /**
@@ -1041,6 +1044,38 @@ AP.plate.modal = ( function() {
             viewModel.addProductItemsToFruit( newFruit.id );
 
         },
+
+		visibleUpperClearButton: function() {
+			const id = viewModel.get( "detailForm.data.id" );
+			return id == "";
+		},
+
+		clearFilters: function() {
+			this.clearForm()
+			AP.deleteUserPref( "plate.lineId" );
+			AP.deleteUserPref( "plate.modelId" );
+			AP.deleteUserPref( "plate.finishId" );
+			this.checkCanSave();
+		},
+
+		checkCanSave: function() {
+			var vm = viewModel;
+			if (
+				vm.get( "detailForm.data.quotationItem.quantity" ) > 0 &&
+				vm.get( "detailForm.data.quotationItem.product.finish.id" ) != ""
+			) {
+				viewModel.set( "canSave", true );
+			} else {
+				viewModel.set( "canSave", false );
+			}
+		},
+
+		clearForm: function() {
+			var vm = viewModel
+			vm.set("detailForm.data.product.line.id", "");
+			vm.set("detailForm.data.product.finish.id", "");
+			vm.set("detailForm.data.product.model.id", "");
+		}
 
     } );
 
