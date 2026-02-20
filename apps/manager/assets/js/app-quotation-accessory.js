@@ -579,7 +579,7 @@ AP.accessory.modal = ( function() {
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
-                            if( xhr.status == "ERROR" ) {
+                            if( xhr.status === "ERROR" ) {
                                 if ( xhr.data && xhr.data.error ) {
                                     AP.widget.notify( "error", xhr.data.error );
                                 } else {
@@ -588,7 +588,7 @@ AP.accessory.modal = ( function() {
                                 AP.loading.hide();
                             }
 
-                            if ( xhr.status == "SUCCESS" ) {
+                            if ( xhr.status === "SUCCESS" ) {
                                 $( "#accessory-modal" ).hide();
                                 AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                                 viewModel.set( "detailForm", defaultDetailForm );
@@ -607,7 +607,7 @@ AP.accessory.modal = ( function() {
         },
     } );
 
-    pub.new = function( onSave ) {
+    pub.new = async function( onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
@@ -617,19 +617,21 @@ AP.accessory.modal = ( function() {
 
         initPositionSuggest();
 
-        NM.util.ajax( {
+        const categoriesResponse = NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
             callback: {
                 done: function( xhr ) {
-                    if ( xhr.data.length > 0 ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona la Categoria" } );
-                        viewModel.get( "categories" ).data( xhr.data );
-                    }
-                    NM.util.openModal( AP.accessory.fields.modalRoot );
+					//NOOP
                 },
             },
         } );
+
+		if ( categoriesResponse.data.length > 0 ) {
+			categoriesResponse.data.unshift( { id: "", name: "-- Seleziona la Categoria" } );
+			viewModel.get( "categories" ).data( categoriesResponse.data );
+		}
+		NM.util.openModal( AP.accessory.fields.modalRoot );
 
 
         viewModel.resetForm();
@@ -653,25 +655,16 @@ AP.accessory.modal = ( function() {
         }
 
         if ( AP.getUserPref( "accessory.categoryId" ) ) {
-            viewModel.loadLines();
-            setTimeout( function() {
-                if ( AP.getUserPref( "accessory.lineId" ) ) {
-                    viewModel.loadModels();
-                    setTimeout( function() {
-                        if ( AP.getUserPref( "accessory.modelId" ) ) {
-                            viewModel.loadFinishes();
-                            setTimeout( function() {
-                                if ( AP.getUserPref( "accessory.finishId" ) ) {
-                                    viewModel.loadProduct();
-                                    setTimeout( function() {
-
-                                    }, 400 );
-                                }
-                            }, 400 );
-                        }
-                    }, 400 );
-                }
-            }, 400 );
+            await viewModel.loadLines();
+			if ( AP.getUserPref( "accessory.lineId" ) ) {
+				await viewModel.loadModels();
+				if ( AP.getUserPref( "accessory.modelId" ) ) {
+					await viewModel.loadFinishes();
+					if ( AP.getUserPref( "accessory.finishId" ) ) {
+						await viewModel.loadProduct();
+					}
+				}
+			}
         }
     };
 
@@ -679,52 +672,49 @@ AP.accessory.modal = ( function() {
         return viewModel.get( "detailForm.data" );
     };
 
-    pub.edit = function( { id, onSave } ) {
+    pub.edit = async function( { id, onSave } ) {
         viewModel.resetForm();
 
-        NM.util.ajax( {
+        const categoriesResponse = NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
             callback: {
                 done: function( xhr ) {
-                    xhr.data.unshift( { id: "", name: "" } );
-                    viewModel.get( "categories" ).data( xhr.data );
-                    NM.util.openModal( AP.accessory.fields.modalRoot );
-
-                    NM.util.ajax( {
-                        method: "GET",
-                        url: "/manager/ajax/quotation-items/accessory/" + id,
-                        callback: {
-                            done: function( xhr ) {
-                                if ( xhr.status == "SUCCESS" ) {
-                                    var data = xhr.data;
-                                    viewModel.set( "detailForm.data", data );
-                                    viewModel.set( "detailForm.title", "Modifica accessorio" );
-
-                                    initPositionSuggest();
-
-                                    viewModel.loadLines();
-
-                                    setTimeout( function() {
-                                        viewModel.loadModels();
-                                        setTimeout( function() {
-                                            viewModel.loadFinishes();
-                                            setTimeout( function() {
-                                                viewModel.loadProduct();
-                                            }, 200 );
-                                        }, 200 );
-                                    }, 200 );
-                                }
-                                pricingApp().init( "accessory", { data: xhr.data.quotationItem.price } );
-                            },
-                        },
-                    } );
-
-                    renderQuotationItemTotals( id );
-
+                    //NOOP
                 },
             },
         } );
+
+		categoriesResponse.data.unshift( { id: "", name: "" } );
+		viewModel.get( "categories" ).data( categoriesResponse.data );
+		NM.util.openModal( AP.accessory.fields.modalRoot );
+
+		const accessoryResponse = await NM.util.ajax( {
+			method: "GET",
+			url: "/manager/ajax/quotation-items/accessory/" + id,
+			callback: {
+				done: function( xhr ) {
+					//NOOP
+				},
+			},
+		} );
+
+		if ( accessoryResponse.status === "SUCCESS" ) {
+			var data = accessoryResponse.data;
+			viewModel.set( "detailForm.data", data );
+			viewModel.set( "detailForm.title", "Modifica accessorio" );
+
+			initPositionSuggest();
+
+			await viewModel.loadLines();
+
+			await viewModel.loadModels();
+			await viewModel.loadFinishes();
+			await viewModel.loadProduct();
+		}
+		pricingApp().init( "accessory", { data: accessoryResponse.data.quotationItem.price } );
+
+		renderQuotationItemTotals( id );
 
     };
 
