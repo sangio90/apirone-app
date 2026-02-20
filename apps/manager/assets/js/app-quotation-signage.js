@@ -377,7 +377,7 @@ AP.signage.modal = ( function() {
         updateCharCounter: function( e ) {
             const signageConfig = viewModel.getSignageConfig();
             let charCount = e.currentTarget.value.length;
-            const realContent = e.currentTarget.value;
+            const realContent = e.currentTarget?.value || 0;
             const pictogramNames = viewModel.get( "pictogramNames" );
             let content = e.currentTarget.value;
             const usedPictos = [];
