@@ -1198,7 +1198,7 @@ AP.signage.modal = ( function() {
                 if ( !exists ) {
                     var position = { id: "", code: value };
                     console.log( "suggest:Inserito nuovo elemento:", value );
-                    viewModel.set( "detailForm.data.position", position );
+                    viewModel.set( "detailForm.data.quotationItem.position", position );
                 }
             },
 
