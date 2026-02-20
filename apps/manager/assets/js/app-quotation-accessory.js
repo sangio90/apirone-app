@@ -704,6 +704,8 @@ AP.accessory.modal = ( function() {
 			viewModel.set( "detailForm.data", data );
 			viewModel.set( "detailForm.title", "Modifica accessorio" );
 
+            viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
+
 			initPositionSuggest();
 
 			await viewModel.loadLines();
@@ -712,6 +714,7 @@ AP.accessory.modal = ( function() {
 			await viewModel.loadFinishes();
 			await viewModel.loadProduct();
 		}
+
 		pricingApp().init( "accessory", { data: accessoryResponse.data.quotationItem.price } );
 
 		renderQuotationItemTotals( id );
@@ -727,9 +730,6 @@ AP.accessory.modal = ( function() {
     };
 
     var initPositionSuggest = function() {
-
-        console.log( "initPositionSuggest" );
-
         var suggest = $( "#accessory-quotation-item-pricing-box-position" );
         var autocomplete = suggest.data( "kendoAutoComplete" );
         var suggestTemplate = $( "#quotation-position-suggest-row-tmpl" ).html();
@@ -744,8 +744,6 @@ AP.accessory.modal = ( function() {
             }
         } );
 
-        console.log( "new:zone initPositionSuggest", viewModel.get( "detailForm.data.quotationZone" ) );
-
         suggest.kendoAutoComplete( {
             template: $.proxy( kendo.template( suggestTemplate ) ),
             height: "auto",
@@ -756,7 +754,7 @@ AP.accessory.modal = ( function() {
                 serverFiltering: true,
                 transport: {
                     read: {
-                        url: "/manager/ajax/quotations/zones/" + viewModel.get( "detailForm.data.quotationZone.id" ) + "/positions",
+                        url: "/manager/ajax/quotations/zones/" + viewModel.get( "detailForm.data.quotationItem.quotationZone.id" ) + "/positions",
                         data: {
                             str: function() {
                                 return suggest.data( "kendoAutoComplete" ).value();

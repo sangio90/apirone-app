@@ -1265,6 +1265,7 @@ AP.signage.modal = ( function() {
 
 		data.quotationItem.signageRows.read();
 		viewModel.set( "detailForm.data", data );
+        viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
 
 		var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
 

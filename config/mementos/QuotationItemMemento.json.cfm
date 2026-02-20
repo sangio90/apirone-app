@@ -10,6 +10,7 @@
         "product.model.name",
         "product.line.code",
         "product.line.name",
+        "position.id",
         "position.code",
         "article.code",
         "article.name",
