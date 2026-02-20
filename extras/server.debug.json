@@ -1,0 +1,36 @@
+{
+    "host":"0.0.0.0",
+    "port":8080,
+    "webroot":"/app",
+    "profile":"${server.profile}",
+    "app":{
+        "cfengine":"lucee@5.4.8.2"
+    },
+    "name":"${server.name}",
+    "openBrowser":false,
+    "web":{
+        "gzipEnable":true,
+        "blockSensitivePaths":false,
+        "directoryBrowsing":true,
+        "accessLogEnable":true,
+        "host":"${server.host}",
+        "http":{
+            "port":"${server.port}"
+        },
+        "rewrites":{
+            "enable":true,
+            "config":"config/urlrewrite.xml"
+        }
+    },
+    "jvm":{
+        "minHeapSize":"1024",
+        "heapSize":"4096",
+        "args":[
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=localhost:9999",
+            "-javaagent:extras/luceedebug.jar=jdwpHost=localhost,jdwpPort=9999,debugHost=0.0.0.0,debugPort=10000,jarPath=extras/luceedebug.jar"
+        ]
+    },
+    "-jvm.args":"-javaagent:/app/extras/luceedebug.jar=jdwpHost=localhost,jdwpPort=9999,debugHost=0.0.0.0,debugPort=10000,jarPath=/app/extras/luceedebug.jar",
+    "host=0.0.0.0":true,
+    "foreground":true
+}
