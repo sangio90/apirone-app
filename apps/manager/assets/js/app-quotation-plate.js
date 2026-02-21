@@ -1059,6 +1059,11 @@ AP.plate.modal = ( function() {
 			return id == "";
 		},
 
+        visibleLowerClearButton: function() {
+            const id = viewModel.get( "detailForm.data.id" );
+            return id == "";
+        },
+
 		clearFilters: function() {
 			this.clearForm()
 			AP.deleteUserPref( "plate.lineId" );
