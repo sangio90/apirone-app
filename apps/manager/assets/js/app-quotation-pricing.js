@@ -176,11 +176,9 @@ AP.quotation.totalPricing = ( function() {
 
         const totalsBox = $('#quotation-total-pricing-box')
         if (newStatus) {
-            totalsBox.removeClass('quotation-totals-box')
-            totalsBox.addClass('quotation-totals-box-collapsed')
+            totalsBox.addClass('collapsed')
         } else {
-            totalsBox.addClass('quotation-totals-box')
-            totalsBox.removeClass('quotation-totals-box-collapsed')
+            totalsBox.removeClass('collapsed')
         }
 
         AP.setUserPref( "quotation.totalPricing.isBoxCollapsed", newStatus );
@@ -321,11 +319,9 @@ AP.quotation.totalPricing = ( function() {
         });
 
         if (viewModel.get( "detail.isCollapsed" )) {
-            fields.boxTotalPricing.removeClass('quotation-totals-box')
-            fields.boxTotalPricing.addClass('quotation-totals-box-collapsed')
+            fields.boxTotalPricing.addClass('collapsed')
         } else {
-            fields.boxTotalPricing.addClass('quotation-totals-box')
-            fields.boxTotalPricing.removeClass('quotation-totals-box-collapsed')
+            fields.boxTotalPricing.removeClass('collapsed')
         }
 
         fields.boxTotalPricing.show();
