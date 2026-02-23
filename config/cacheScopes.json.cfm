@@ -26,6 +26,7 @@
     "Lang.bean": {},
     "Lead.bean": {},
     "Line.bean": {},
+    "LineCost.bean": {},
     "MetadataType.bean": {},
     "Metadata.bean": {},
     "Model.bean": {},

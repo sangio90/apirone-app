@@ -121,6 +121,21 @@
         "type": "Varchar"
     },
 
+    "linecost.line_code": {
+        "name": "lines.code",
+        "type": "Varchar"
+    },
+
+    "linecost.finish_code": {
+        "name": "finishes.code",
+        "type": "Varchar"
+    },
+
+    "linecost.productcategory_code": {
+        "name": "product_categories.code",
+        "type": "Numeric"
+    },
+
     "productItem.id": {
         "name": "product_item_id",
         "type": "Integer"
@@ -289,7 +304,7 @@
         "name": "frame_cell_id",
         "type": "Integer"
     },
-    
+
     "frame.id": {
         "name": "frame_id",
         "type": "uuid"

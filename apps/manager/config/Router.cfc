@@ -385,15 +385,12 @@
 		get( "/product-categories" ).to( "ProductCategoryController.list" ).end();
 
 		/*
-			lines costs
+			line costs
 		*/
-		get( "/ajax/lines/costs" ).to( "LineCostAjaxController.list" ).end();
+		get( "/ajax/line_costs" ).to( "LineCostAjaxController.list" ).end();
+		post( "/ajax/line_costs" ).to( "LineCostController.save" ).end();
+		delete( "/ajax/line_costs" ).to( "LineAjaxController.delete" ).end();
 
-		post( "/lines/costs/add" ).to( "LineCostController.add" ).end();
-		post( "/lines/costs" ).to( "LineCostController.save" ).end();
-		get( "/lines/costs" ).to( "LineCostController.list" ).end();
-
-		
 		/*
 			lines
 		*/
@@ -473,7 +470,7 @@
 		delete( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.delete" ).end();
 
 		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
-		
+
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
 		post( "/quotations" ).to( "QuotationController.create" ).end(); // Da togliere
@@ -512,7 +509,7 @@
 		post( "/ajax/quotation-items/accessory" ).to( "QuotationItemAjaxController.saveAccessory" ).end();
 		get( "/ajax/quotation-items/article/:id" ).to( "QuotationItemAjaxController.editArticle" ).end();
 		post( "/ajax/quotation-items/article" ).to( "QuotationItemAjaxController.saveArticle" ).end();
-		
+
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
 		get( "/ajax/quotation-items/fruits/:id/product-items" ).to( "QuotationItemAjaxController.fruitProductItems" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
