@@ -11,17 +11,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="metadataService" inject="MetadataService";
 	property name="currencyService" inject="CurrencyService";
+	property name="quotationItemDAO" inject="QuotationItemDAO";
 
 	variables.logConfig = {};
 	variables.costs     = [];
 
 	private function isPlaccaOrSegnaletica(product)
 	{
-		if (!product || !product.getCategory() || !product.getCategory().getType()) {
+		if (isNull(product) || isNull(product.getCategory()) || isNull(product.getCategory().getType())) {
 			return false;
-			//TODO gestire eccezione
 		}
 		return ListFind( "PLA,SEG", product.getCategory().getType().getId() );
+	}
+
+	private function getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId(quotation, quotationItemId, lineId, finishId) {
+		if ( IsNull( quotation ) ) {
+			return 0;
+		}
+		arguments['quotationId'] = quotation.getId();
+		return getQuotationItemDAO().getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
 	}
 
 	public function calculate(
@@ -30,8 +38,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Array producItemtIds,
 		Numeric lettersQuantity = 0,
 		Numeric simulationSignageConfigItemId,
-		Quotation quotation = null
-	){
+		Quotation quotation = javacast("null", ""),
+		QuotationItem quotationItem = javacast("null", "")
+		){
 		var price = simulate( argumentCollection = arguments );
 		return { finalPrice: price.values.finalPrice, totalCost: price.values.totalCost };
 	}
@@ -42,7 +51,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Array producItemtIds,
 		String currencyId="EUR",
 		Numeric lettersQuantity = 0,
-		Numeric simulationSignageConfigItemId
+		Numeric simulationSignageConfigItemId,
+		Quotation quotation = javacast("null", ""),
+		QuotationItem quotationItem = javacast("null", "")
 	){
 		if ( arguments.quantity LTE 0 ) {
 			Throw(
@@ -82,7 +93,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var product       = productSvc.get( productId );
 		var price         = product.getPrice( "PRICE" );
-		
+
 		//var currency = currencySvc.get( arguments.currencyId );
 
 		var settings = metadataSvc.list( typeId=107 );
@@ -104,11 +115,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		*/
 
 		var fixedCost     = product.getPrice( "COST_FIXED" )?.getAmount() ?: 0;
-		if (isPlaccaOrSegnaletica()) {
+		var unitFixedCost = fixedCost / arguments.quantity;
+		var quantitaTotale = arguments.quantity;
+		if (isPlaccaOrSegnaletica(product)) {
 			appendLog(
 				message="Il prodotto è PLA or SEG, quindi i COST fixed li calcolo dividendo il costo fisso della tabella costi fissi linea_finitura su tutti gli altri articoli del preventivo"
 			)
-			if ( IsNull( arguments.quotation ) ) {
+			if ( IsNull( arguments.quotationItem ) ) {
 				appendLog(
 					message="Siccome sto simulando il costo NON ho altri articoli con cui dividere il costo fisso, quindi divido solo per il campo quantità (#arguments.quantity#)"
 				)
@@ -120,16 +133,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			);
 
 			//Se non nullo leggo il campo "cost" e lo scrivo in fixedCost
-			if ( !IsNull( lineCostRecord ) ) {
+			if ( len(lineCostRecord) > 0 ) {
+				lineCostRecord = lineCostRecord[1];
 				fixedCost = lineCostRecord.getCost();
-			} else {
+				quantitaTotale = getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId(
+					quotation,
+					IsNull(quotationItem) ? null : quotationItem.getId(),
+					product.getLine().getId(),
+					product.getFinish().getId()
+				);
+				quantitaTotale += arguments.quantity;
+				unitFixedCost = fixedCost / quantitaTotale;
 			}
 
 		}
-		var unitFixedCost = fixedCost / arguments.quantity;
+
 
 		appendLog(
-			message = "Costo fisso per #arguments.quantity# pezzi. Costo fisso #fixedCost# / #arguments.quantity#;Costo fisso unitario: #formatExtended( unitFixedCost )#"
+			message = "Costo fisso per #quantitaTotale# pezzi. Costo fisso #fixedCost# / #quantitaTotale#;Costo fisso unitario: #formatExtended( unitFixedCost )#"
 		);
 
 		addCost( "Costo fisso", unitFixedCost, "P" ); // sommerò gli "P" per il costo finale
@@ -582,7 +603,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				itemCost = markup;
 				priceProcessed = true;
 			}
-		//se non è presente un price specifico per l'item o se esiste ma è percentuale e non fisso, uso il markup generale 
+		//se non è presente un price specifico per l'item o se esiste ma è percentuale e non fisso, uso il markup generale
 		} else {
 			if ( !IsNull( attributePrice ) ) {
 				markup = attributePrice.getAmount();

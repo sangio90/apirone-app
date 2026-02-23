@@ -593,6 +593,17 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} );
 
+		var altriQuotationItems = super.fire( "quotationItem.getAltreRigheByQuotationLineIdAndFinishId", {
+			 "quotationId" = json.quotationId, 
+			 "quotationItemId" = thisId, 
+			 "lineId" = json.item.product.line.id,
+			 "finishId" = json.item.product.finish.id 
+			} 
+		);
+
+		//Funzione che riceve quotationItemId, quotationId, line e finish e aggiorna tutte le righe con quotationItemId <> da quotationItemId e stessa line e finish con i dati del quotationItem con id = quotationItemId
+		//che condividono quotation,line e finish, ripartendo il fixed_cost sulla nuova quantita totale
+
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
@@ -731,12 +742,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		for ( var signageRow in json.quotationItem.signageRows._data ) {
 			lettersQuantity += Val( signageRow.charCount ) ? signageRow.charCount : 0;
 		}
+		//TODO test che con signage funzioni
 		var signagePrice = calculator.calculate(
 			product.id,
 			json.quotationItem.quantity,
 			productItemsIds,
 			lettersQuantity,
-			json.quotationItem.signageConfigItem.id
+			json.quotationItem.signageConfigItem.id,
+			json.quotation,
+			json.quotationItem
 		);
 		var line = super.bean( "QuotationItemPriceLine" );
 
@@ -794,10 +808,24 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
+		var quotationItem = null;
+		if (json.item.id != "") {
+			var quotationItem = super.service( "QuotationItem" ).get( json.item.id );
+		}
+
+		var quotation = null;
+		if (json.quotationId != "") {
+			var quotation = super.service( "Quotation" ).get( json.quotationId );
+		}
+
 		var platePrice = calculator.calculate(
 			product.id,
 			json.item.quantity,
-			productItemsIds
+			productItemsIds,
+			0,
+			0,
+			quotation,
+			quotationItem
 		);
 
 		var line = super.bean( "QuotationItemPriceLine" );
@@ -825,7 +853,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 			}
 
-			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds );
+			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds, 0, 0, quotation, quotationItem );
 
 			line.setName( "#fruit.fruit?.name#" );
 			line.setAmount( fruitPrice.finalPrice );
@@ -889,7 +917,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var price = calculator.calculate(
 			product.id,
 			json.quotationItem.quantity,
-			productItemsIds
+			productItemsIds,
+			0,
+			0,
+			json.quotation,
+			json.quotationItem
 		);
 
 		var line = super.bean( "QuotationItemPriceLine" );

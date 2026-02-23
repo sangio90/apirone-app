@@ -387,9 +387,11 @@
 		/*
 			line costs
 		*/
-		get( "/ajax/line_costs" ).to( "LineCostAjaxController.list" ).end();
-		post( "/ajax/line_costs" ).to( "LineCostController.save" ).end();
-		delete( "/ajax/line_costs" ).to( "LineAjaxController.delete" ).end();
+		get( "/ajax/lines/costs" ).to( "LineCostAjaxController.list" ).end();
+
+		post( "/lines/costs/add" ).to( "LineCostController.add" ).end();
+		post( "/lines/costs" ).to( "LineCostController.save" ).end();
+		get( "/lines/costs" ).to( "LineCostController.list" ).end();
 
 		/*
 			lines

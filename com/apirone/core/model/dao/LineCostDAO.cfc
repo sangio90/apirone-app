@@ -21,9 +21,8 @@
 	</cffunction>
 
 	<cffunction name="find" returntype="Query">
-		<cfargument name="str" type="String">
-		<cfargument name="lineId" type="Varchar">
-		<cfargument name="finishId" type="Varchar">
+		<cfargument name="lineId" type="String">
+		<cfargument name="finishId" type="String">
 		<cfargument name="productCategoryId" type="Numeric">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
@@ -49,11 +48,11 @@
 			</cfif>
 
 			<cfif !IsNull( arguments.lineId )>
-				AND line_costs.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">
+				AND line_costs.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid
 			</cfif>
 
 			<cfif !IsNull( arguments.finishId )>
-				AND line_costs.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">
+				AND line_costs.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
 			</cfif>
 
 			ORDER BY

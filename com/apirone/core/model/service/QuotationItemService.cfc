@@ -350,4 +350,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
+	public function getAltreRigheByQuotationLineIdAndFinishId( 
+		required String quotationItemId, 
+		required String quotationId,
+		required String finishId,
+		required String lineId
+	){
+		if ( IsNull( quotationId ) ) {
+			return [];
+		}
+		return getDao().getAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
+	}
+
 }

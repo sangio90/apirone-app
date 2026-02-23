@@ -1,7 +1,7 @@
 component extends="com.apirone.core.controller.AbsController" {
 
 	function simulate( event, rc, prc ){
-		var result = super.service( "PriceCalculator" ).simulate( rc.id, rc.quantity, ListToArray( rc.itemIds ), rc.currencyId );
+		var result = super.service( "PriceCalculator" ).simulate( rc.id, rc.quantity, ListToArray( rc.itemIds ), rc.currencyId, 0, 0, null, null );
 
 		var description = prepareDescription( result.logFile );
 
@@ -14,7 +14,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function simulateSignage( event, rc, prc ){
-		var result = super.service( "PriceCalculator" ).simulate( rc.id, rc.quantity, ListToArray( rc.itemIds ), rc.currencyId, rc.lettersQuantity, rc.simulationSignageConfigItemId );
+		var result = super.service( "PriceCalculator" ).simulate( rc.id, rc.quantity, ListToArray( rc.itemIds ), rc.currencyId, rc.lettersQuantity, rc.simulationSignageConfigItemId, null, null );
 
 		var description = prepareDescription( result.logFile );
 
