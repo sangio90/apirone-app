@@ -15,12 +15,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	variables.logConfig = {};
 	variables.costs     = [];
 
+	private function isPlaccaOrSegnaletica(product)
+	{
+		if (!product || !product.getCategory() || !product.getCategory().getType()) {
+			return false;
+			//TODO gestire eccezione
+		}
+		return ListFind( "PLA,SEG", product.getCategory().getType().getId() );
+	}
+
 	public function calculate(
 		required String productId,
 		required Numeric quantity = 1,
 		Array producItemtIds,
 		Numeric lettersQuantity = 0,
-		Numeric simulationSignageConfigItemId
+		Numeric simulationSignageConfigItemId,
+		Quotation quotation = null
 	){
 		var price = simulate( argumentCollection = arguments );
 		return { finalPrice: price.values.finalPrice, totalCost: price.values.totalCost };
@@ -94,6 +104,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		*/
 
 		var fixedCost     = product.getPrice( "COST_FIXED" )?.getAmount() ?: 0;
+		if (isPlaccaOrSegnaletica()) {
+			appendLog(
+				message="Il prodotto è PLA or SEG, quindi i COST fixed li calcolo dividendo il costo fisso della tabella costi fissi linea_finitura su tutti gli altri articoli del preventivo"
+			)
+			if ( IsNull( arguments.quotation ) ) {
+				appendLog(
+					message="Siccome sto simulando il costo NON ho altri articoli con cui dividere il costo fisso, quindi divido solo per il campo quantità (#arguments.quantity#)"
+				)
+			}
+
+			lineCostRecord = super.service( "LineCost" ).list(
+				lineId   = product.getLine().getId(),
+				finishId = product.getFinish().getId()
+			);
+
+			//Se non nullo leggo il campo "cost" e lo scrivo in fixedCost
+			if ( !IsNull( lineCostRecord ) ) {
+				fixedCost = lineCostRecord.getCost();
+			} else {
+			}
+
+		}
 		var unitFixedCost = fixedCost / arguments.quantity;
 
 		appendLog(
