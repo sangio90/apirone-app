@@ -831,7 +831,7 @@ AP.quotation.detail = ( function() {
             await viewModel.getZones();
 
             const zones = viewModel.get( "detailForm.data.zones" );
-            
+
             if (zones && zones.length > 0) {
                 const defaultZone = zones.find( zone => zone.name == '-- Tutte le zone' );
                 if (defaultZone) {

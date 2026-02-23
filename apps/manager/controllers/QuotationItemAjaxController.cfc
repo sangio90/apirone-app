@@ -494,7 +494,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					modelId    = json.item.product.model.id,
 					finishId   = json.item.product.finish.id
 				}
-			).getData();
+			).getData();js
 
 		product = product[ 1 ];
 

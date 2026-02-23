@@ -167,7 +167,6 @@
                                 <div class="h-100">
 
                                     <div class="row">
-
                                         <div class="col-6">
                                             <div class="mb-1">Speciale:</div>
                                             <div>
@@ -192,35 +191,50 @@
 
                                         <div class="col-12">
                                             <div class="row mb-2">
-                                                <div class="col-4 mt-2">Posizione:</div>
+                                                <div class="col-4 mt-2">Zona:</div>
                                                 <div class="col-8">
-                                                    <input class="form-control form-control-sm" name="position"
-                                                        placeholder="Posizione"
-                                                        id="qt-plate-position-suggest"
-
-                                                        data-text-field="code"
-                                                        data-value-primitive="true"
-                                                        data-bind="value: detailForm.data.position">
+                                                    <select
+                                                        class="form-control my-2"
+                                                        name="zona"
+                                                        data-bind="source: zones, value: detailForm.data.quotationZone"
+                                                        data-value-field="id"
+                                                        data-text-field="name"
+                                                        id="zones-selector">
+                                                    </select>
+                                                </div>
+                                                    <div class="col-4 mt-2">Sottozona:</div>
+                                                    <div class="col-8">
+                                                        <select
+															class="form-control form-control my-2"
+															name="sottozona"
+                                                            data-bind="source: subzones, value: detailForm.data.quotationSubzone, enabled: detailForm.data.quotationZone"
+                                                            data-value-field="id"
+                                                            data-text-field="name"
+															id="subzones-selector">
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-4 mt-2">Posizione:</div>
+                                                    <div class="col-8">
+                                                        <input class="form-control form-control-sm" name="position"
+                                                            placeholder="Posizione"
+                                                            id="qt-plate-position-suggest"
+                                                            data-text-field="code"
+                                                            data-value-primitive="true"
+                                                            data-bind="value: detailForm.data.position" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div class="col-12 mb-2">
                                             <textarea class="form-control" name="notes" placeholder="Note" rows="4"
                                                 data-bind="value: detailForm.data.note"></textarea>
                                         </div>
-
-                                    </div>
-
                                     <div>
                                         #view(view="quotation/item-total-pricing", args={id="plate-quotation-item-pricing-box"})#
                                     </div>
-
                                 </div>
                             </div>
                         </div>
-
-                    </div>
 
                     <footer class="card-footer">
                         <div class="row">

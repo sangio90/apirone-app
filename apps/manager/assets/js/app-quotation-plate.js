@@ -301,14 +301,56 @@ AP.plate.modal = ( function() {
 
         toggleFruitsLabel: "Comprimi tutti",
 
+		zones: [],
+		subzones: [],
+		allZones: [],
+
         isEditMode: false,
+		loadZones: async function( e ) {
+			return await NM.util.ajax( {
+				method: "GET",
+				url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/zones",
+				callback: {
+					done: function( xhr ) {
+						let allZones
+						let zones
+						if ( xhr.data.length ) {
+							allZones = xhr.data;
+						} else {
+							allZones = [];
+						}
+						viewModel.set("allZones", allZones);
+						zones = allZones.filter( function( zone ) {
+							return !zone.origin
+						});
+						viewModel.set( "zones", zones);
+					}
+				}
+			} );
+		},
+
+		loadSubZones: function (quotationZone) {
+			this.set("detailForm.data.quotationSubzone", null);
+
+			if (!quotationZone) {
+				this.set("subzones", []);
+				return;
+			}
+
+			var allZones = this.get("allZones")
+
+			var filtered = allZones.filter(function (z) {
+				return z.origin && z.origin.id === quotationZone.id;
+			});
+
+			this.set("subzones", filtered);
+		},
 
         callback: {
             onCreate: undefined,
             onUpdate: undefined,
             onLoad: undefined,
         },
-
         updatePricing() {
 
             updatePrice();
@@ -861,7 +903,7 @@ AP.plate.modal = ( function() {
             } );
 
             $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" ).on( "mouseenter", function() {
-                const color = "rgba(162, 253, 161, 0.44)";            
+                const color = "rgba(162, 253, 161, 0.44)";
                 $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", color );
                 $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "#a3fda170" );
             } ).on( "mouseleave", function() {
@@ -988,6 +1030,15 @@ AP.plate.modal = ( function() {
             parsedData.typeId      = "plate";
             parsedData.price       = pricingApp().getData().data;
             parsedData.positions   = positions;
+			if ( viewModel.get( "detailForm.data.quotationSubzone" ) ) {
+				parsedData.item.quotationZone = viewModel.get( "detailForm.data.quotationSubzone" );
+			} else if (viewModel.get("detailForm.data.quotationZone")) {
+				parsedData.item.quotationZone = viewModel.get( "detailForm.data.quotationZone" );
+			}
+
+			if (viewModel.get("clone")) {
+				parsedData.item.id = "";
+			}
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 var imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
@@ -1089,9 +1140,15 @@ AP.plate.modal = ( function() {
 			vm.set("detailForm.data.product.line.id", "");
 			vm.set("detailForm.data.product.finish.id", "");
 			vm.set("detailForm.data.product.model.id", "");
-		}
-
+		},
     } );
+
+	viewModel.bind("change", function (e) {
+		if (e.field === "detailForm.data.quotationZone") {
+			const quotationZone = viewModel.get("detailForm.data.quotationZone");
+			viewModel.loadSubZones(quotationZone);
+		}
+	});
 
     pub.new = function( onSave ) {
         if ( onSave ) {
@@ -1106,8 +1163,6 @@ AP.plate.modal = ( function() {
         viewModel.set( "isEditMode", false );
 
         pricingApp().init( "plate", undefined );
-
-        console.log( "new:zona222", viewModel.get( "detailForm.data.quotationZone" ) );
 
         initFruitsSuggest();
         initPositionSuggest();
@@ -1134,14 +1189,20 @@ AP.plate.modal = ( function() {
 
         AP.plate.api.getPlate( id, {
             done: function( xhr ) {
-
-                console.log( "orientation", xhr.data.quotationItem.frame.orientation );
-
-                viewModel.populateProduct( xhr.data.quotationItem.product );
+				viewModel.populateProduct( xhr.data.quotationItem.product );
                 viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
                 viewModel.set( "detailForm.data.position", xhr.data.quotationItem.position );
                 viewModel.set( "detailForm.data.note", xhr.data.quotationItem.note );
-                viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
+
+                const quotationZone = xhr.data.quotationItem.quotationZone
+                if ( quotationZone ) {
+                    if (quotationZone.origin) {
+                        viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone.origin );
+                        viewModel.set( "detailForm.data.quotationSubzone", xhr.data.quotationItem.quotationZone );
+                    } else {
+                        viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
+                    }
+                }
                 // viewModel.set( "detailForm.data.product.orientation", xhr.data.quotationItem.frame.orientation );
 
                 initFruitsSuggest();
@@ -1300,11 +1361,13 @@ AP.plate.modal = ( function() {
 
     };
 
-    pub.init = function( setup ) {
+    pub.init = async function( setup ) {
 
         settings.container = setup.container;
 
         kendo.bind( settings.container, viewModel );
+
+		viewModel.loadZones();
 
         // document.getElementById( "contact" ).classList.add( "active" );
 
@@ -1321,12 +1384,15 @@ AP.plate.modal = ( function() {
                 $( "#plate-fruit-product-items-but" ).removeClass( "active" );
             }, 50 );
         } );
-
     };
 
     pub.getItem = function() {
         return viewModel.get( "detailForm.data" );
     };
+
+	pub.clone = function({ clone, id }) {
+		pub.edit({ id, clone })
+	}
 
     return pub;
 }() );
