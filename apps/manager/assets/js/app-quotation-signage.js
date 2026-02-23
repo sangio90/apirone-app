@@ -1290,6 +1290,7 @@ AP.signage.modal = ( function() {
 
 		pricingApp().init( "signage", { data: signageResponse.data.quotationItem.price } );
 		initPositionSuggest();
+        AP.loading.hide();
     };
 
     pub.init = function() {

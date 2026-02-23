@@ -586,7 +586,7 @@ AP.quotation.detail = ( function() {
         // edit
 
         edit: function( event ) {
-
+            AP.loading.show();
             var typeId = viewModel.get( "typeId" );
 
             if ( typeId == "plate" ) {

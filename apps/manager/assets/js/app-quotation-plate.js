@@ -1153,6 +1153,7 @@ AP.plate.modal = ( function() {
                         viewModel.loadFinishes( undefined, function() {
                             viewModel.firstLoadProductItems().then( function() {
                                 var platePromise = viewModel.loadPlate( xhr.data.quotationItem.frame.orientation );
+                                AP.loading.hide();
                                 if ( platePromise && typeof platePromise.then === "function" ) {
                                     platePromise.then( function() {
                                         viewModel.loadFruits();

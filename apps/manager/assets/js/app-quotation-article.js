@@ -146,6 +146,7 @@ AP.article.modal = ( function() {
         } );
 
         renderQuotationItemTotals( id );
+        AP.loading.hide();
     };
 
     pub.init = function() {

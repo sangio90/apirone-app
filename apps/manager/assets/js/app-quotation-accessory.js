@@ -716,7 +716,7 @@ AP.accessory.modal = ( function() {
 		pricingApp().init( "accessory", { data: accessoryResponse.data.quotationItem.price } );
 
 		renderQuotationItemTotals( id );
-
+        AP.loading.hide();
     };
 
     pub.init = function() {
