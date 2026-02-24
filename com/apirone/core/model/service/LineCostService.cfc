@@ -7,7 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productItemService" inject="ProductItemService";
 	property name="cacheScope" type="String" default="LineCost.bean";
 
-	public com.apirone.core.model.bean.LineCost function get( required String lineCostId ){
+	public com.apirone.core.model.bean.LineCost function get( required Numeric lineCostId ){
 		var cm = getCacheManager();
 
 		var cache = cm.get( getCacheScope(), arguments.lineCostId );
@@ -29,7 +29,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Result function search(
-		String str,
+		Numeric categoryId,
+		String lineId,
+		String finishId,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "linecost.line_code", desc = "asc" }, { field = "linecost.finish_code", desc = "asc" } ]
@@ -74,8 +76,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		super.logEvent(
 			event   = "lineCost.updated",
-			message = "LineCost [#arguments.line.getId()#] updated",
-			payload = { "id" = arguments.line.getId() }
+			message = "LineCost [#arguments.lineCost.getId()#] updated",
+			payload = { "id" = arguments.lineCost.getId() }
 		);
 
 		super.getCacheManager().remove( getCacheScope(), arguments.lineCost.getId() );
@@ -83,7 +85,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.lineCost.getId();
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete( required String lineCostId ){
+	public com.apirone.core.model.bean.Outcome function delete( required Integer lineCostId ){
 		var outcome = super.bean( "Outcome" );
 
 		var obj = get( arguments.lineCostId );
@@ -96,8 +98,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setData( { "deletedCount" = result } )
 
 				getCacheManager().remove( getCacheScope(), arguments.lineCostId );
-
-				// super.logAction( type = "LINE.DELETED", message = "LineCost [#arguments.lineCostId#] deleted" );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -120,7 +120,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.LineCost function build( required String lineCostId ){
+	private com.apirone.core.model.bean.LineCost function build( required Numeric lineCostId ){
 		var record = getDao().read( arguments.lineCostId );
 
 		if ( record.recordCount ) {

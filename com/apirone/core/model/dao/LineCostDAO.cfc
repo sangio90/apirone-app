@@ -1,50 +1,40 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction name="read">
+		<cfargument name="lineCostId" type="Numeric" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				line_cost_id,
-				line_costs.product_category_id as product_category_id,
-				line_costs.line_id::varchar as line_id,
-				line_costs.finish_id::varchar as finish_id,
-				"cost"
+				*
 			FROM
 				line_costs
-			LEFT JOIN
-				lines ON lines.line_id = line_costs.line_id
-			LEFT JOIN
-				finishes ON finishes.finish_id = line_costs.finish_id
-			LEFT JOIN
-				product_categories ON product_categories.product_category_id = line_costs.product_category_id
+			WHERE
+				line_cost_id = <cfqueryparam cfsqltype="Integer" value="#arguments.lineCostId#">
 		</cfquery>
 
 		<cfreturn local.q>
 	</cffunction>
 
 	<cffunction name="find" returntype="Query">
+		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
 		<cfargument name="finishId" type="String">
-		<cfargument name="productCategoryId" type="Numeric">
 
-		<cfargument name="limit" required="true" type="Numeric" default="0">
+		<cfargument name="limit" required="true" type="Numeric" default="20">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
-		<cfargument name="orderby" required="true" type="String" default="code">
+		<cfargument name="orderby" required="true" type="String" default="line_cost_id">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				line_costs.line_cost_id,
-				COUNT(line_costs.line_cost_id) OVER() AS total
+				line_cost_id,
+				COUNT(line_cost_id) OVER() AS total
 			FROM
 				line_costs
-			LEFT JOIN
-				lines ON lines.line_id = line_costs.line_id
-			LEFT JOIN
-				finishes ON finishes.finish_id = line_costs.finish_id
-			LEFT JOIN
-				product_categories ON product_categories.product_category_id = line_costs.product_category_id
+					INNER JOIN product_categories USING (product_category_id)
+					INNER JOIN lines USING (line_id)
+					INNER JOIN finishes USING (finish_id)
 			WHERE 1=1
 
-			<cfif !IsNull( arguments.productCategoryId )>
-				AND line_costs.product_category_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.productCategoryId#">
+			<cfif !IsNull( arguments.categoryId )>
+				AND line_costs.product_category_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.categoryId#">
 			</cfif>
 
 			<cfif !IsNull( arguments.lineId )>
@@ -56,7 +46,7 @@
 			</cfif>
 
 			ORDER BY
-			#super.sanitizeSQL( arguments.orderby )#
+				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
 				LIMIT
@@ -73,7 +63,7 @@
 		<cfargument name="line_cost" type="com.apirone.core.model.bean.LineCost" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			INSERT INTO lines (
+			INSERT INTO line_costs (
 				line_id,
 				finish_id,
 				product_category_id,
@@ -82,7 +72,7 @@
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.line_cost.getLine().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.line_cost.getFinish().getId()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.line_cost.getProductCategory().getId()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.line_cost.getCategory().getId()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.line_cost.getCost()#">
 			) RETURNING line_cost_id
 		</cfquery>
@@ -97,15 +87,15 @@
 			UPDATE
 				line_costs
 			SET
-				line_id = <cfqueryparam cfsqltype="varchar" value="#arguments.line_cost.getLine().getId()#">::uuid,
+				line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line_cost.getLine().getId()#">::uuid,
 				finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line_cost.getFinish().getId()#">::uuid,
-				product_category_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line_cost.getProductCategory().getId()#">,
+				product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.line_cost.getCategory().getId()#">,
 				cost = <cfqueryparam cfsqltype="Numeric" value="#arguments.line_cost.getCost()#">
 			WHERE
-				line_cost_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line_cost.getId()#">::uuid
+				line_cost_id = <cfqueryparam cfsqltype="Integer" value="#arguments.line_cost.getId()#">
 		</cfquery>
 
-		<cfreturn arguments.line.getId()>
+		<cfreturn arguments.line_cost.getId()>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">

@@ -136,6 +136,11 @@
         "type": "Numeric"
     },
 
+    "listCost.id": {
+        "name": "line_cost_id",
+        "type": "Integer"
+    },
+
     "productItem.id": {
         "name": "product_item_id",
         "type": "Integer"
