@@ -206,7 +206,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			bean.setPosition( null );
 		}
 		
-		var price = getPricing( json );
+		var price = super.fire( 'QuotationItem.getPricing', { 'data' = json } );
 		bean.setPrice( price );
 
 		var product = super
@@ -316,7 +316,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( !Len( id ) ) {
 			json.quotationItem.id = lcase(createUUID());
 		}
-		var price = getSignagePricing( json );
+		var price = super.fire( 'QuotationItem.getSignagePricing', { 'data' = json } );
 		bean.setPrice( price );
 
 		if( Len( json.quotationItem?.position?.code ) ) {
@@ -439,6 +439,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 		*/
 
+		super.fire( "quotationItem.ripartizioneCostiFissi", {
+			 "quotationId" = json.quotationId, 
+			 "quotationItemId" = thisId, 
+			 "lineId" = json.signageConfig.catalogBundle.line.id,
+			 "finishId" = json.quotationItem.product.finish.id 
+			} 
+		);
+
 		var message = completeMessage( messageId );
 		
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
@@ -483,7 +491,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			bean.setPosition( position );
 		}
 
-		var pricing = getPlatePricing( json );
+		var pricing = super.fire( 'QuotationItem.getPlatePricing', { 'data' = json } );
 
 		bean.setPrice( pricing );
 		
@@ -593,7 +601,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} );
 
-		var altriQuotationItems = super.fire( "quotationItem.getAltreRigheByQuotationLineIdAndFinishId", {
+		super.fire( "quotationItem.ripartizioneCostiFissi", {
 			 "quotationId" = json.quotationId, 
 			 "quotationItemId" = thisId, 
 			 "lineId" = json.item.product.line.id,
@@ -617,6 +625,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var id = GetHTTPRequestData().content;
 
+		var quotationItem = super.fire( "quotationItem.get", [ id ]);
+		var quotationId = quotationItem.getQuotation().getId()
+		var lineId = quotationItem.getProduct().getLine().getId()
+		var finishId = quotationItem.getProduct().getFinish().getId()
+
 		var outcome = super.fire( "quotationItem.delete", [ id ] );
 
 		if ( outcome.getStatus() == "ERROR" ) {
@@ -628,6 +641,16 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			event.setValue( "result", validation );
 			return;
+		}
+
+		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
+			super.fire( "quotationItem.ripartizioneCostiFissi", {
+				"quotationId" = quotationId,
+				"quotationItemId" = id, 
+				"lineId" = lineId,
+				"finishId" = finishId
+				} 
+			);
 		}
 
 		result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
@@ -682,286 +705,17 @@ component extends="com.apirone.core.controller.AbsController" {
 		var json = DeserializeJSON( GetHTTPRequestData().content )
 
 		if (rc.type == "signage") {
-			var price = getSignagePricing( json );
+			var price = super.fire( 'QuotationItem.getSignagePricing', { 'data' = json } );
 		} elseif(rc.type == "plate") {
-			var price = getPlatePricing( json );
+			var price = super.fire( 'QuotationItem.getPlatePricing', { 'data' = json } );
 		} else {
-			var price = getPricing( json );
+			var price = super.fire( 'QuotationItem.getPricing', { 'data' = json } );
 		}
 
 		var memy = super.getMementify();
 		var data = memy.convert( price );
 
 		event.setValue( "result", data );
-	}
-
-	/*
-		private methods
-	*/
-
-	private com.apirone.core.model.bean.QuotationItemPrice function getSignagePricing( required Struct data ){
-		var json = arguments.data;
-
-		var pricing = super.bean( "QuotationItemPrice" );
-		var method  = super.bean( "PriceMethod" );
-
-		var calculator = super.service( "PriceCalculator" );
-
-		var lines = [];
-
-		pricing.setQuotationItemId( json.quotationItem.id );
-		pricing.setId( Val( json.quotationItem.price.id ) ? json.quotationItem.price.id : null );
-		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
-		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
-		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
-		        
-		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
-		
-        if ( json.quotationItem.price.method.id EQ 'F' ) {
-			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
-		} else {
-			pricing.setAmount( 0 );
-		}
-
-		/*
-			signage price
-		*/
-		var productItemsIds = [];
-
-		var product = json.quotationItem.product;
-
-		for ( var item in json.quotationItem.product.items._data ) {
-			for ( var value in item.values ) {
-				if ( value.selected ) {
-					productItemsIds.add( value.product_item_id );
-				}
-			}
-		}
-
-		var lettersQuantity = 0;
-		for ( var signageRow in json.quotationItem.signageRows._data ) {
-			lettersQuantity += Val( signageRow.charCount ) ? signageRow.charCount : 0;
-		}
-		//TODO test che con signage funzioni
-		var signagePrice = calculator.calculate(
-			product.id,
-			json.quotationItem.quantity,
-			productItemsIds,
-			lettersQuantity,
-			json.quotationItem.signageConfigItem.id,
-			json.quotation,
-			json.quotationItem
-		);
-		var line = super.bean( "QuotationItemPriceLine" );
-
-		line.setName( "Prezzo segnaletica" );
-		line.setAmount( signagePrice.finalPrice );
-		line.setCost( signagePrice.totalCost );
-
-		lines.add( line );
-
-		pricing.setLines( lines );
-
-		return pricing;
-	}
-
-	/*
-		private methods
-	*/
-
-	private com.apirone.core.model.bean.QuotationItemPrice function getPlatePricing( required Struct data ){
-		
-		var json = arguments.data;
-
-		var pricing = super.bean( "QuotationItemPrice" );
-		var method  = super.bean( "PriceMethod" );
-
-		var calculator = super.service( "PriceCalculator" );
-
-		var lines = [];
-
-		pricing.setQuantity( Val( json.price.quantity ) ? json.item.quantity : 1 );
-		pricing.setDiscount1( Val( json.price.discount1 ) ? json.price.discount1 : 0 );
-		pricing.setDiscount2( Val( json.price.discount2 ) ? json.price.discount2 : 0 );
-		        
-		pricing.setMethod( method.setId( json.price.method.id ) );
-		
-        if ( pricing.isFixed() ) {
-			pricing.setAmount( Val( json.price.total ) ? json.price.total : 0 );
-		} else {
-			pricing.setAmount( 0 );
-		}
-
-		/*
-			plate price
-		*/
-
-		var productItemsIds = [];
-
-		var product = json.item.product;
-
-		for ( var item in product.items._data ) {
-			for ( var value in item.values ) {
-				if ( value.selected ) {
-					productItemsIds.add( value.productItemId );
-				}
-			}
-		}
-
-		var quotationItem = null;
-		if (json.item.id != "") {
-			var quotationItem = super.service( "QuotationItem" ).get( json.item.id );
-		}
-
-		var quotation = null;
-		if (json.quotationId != "") {
-			var quotation = super.service( "Quotation" ).get( json.quotationId );
-		}
-
-		var platePrice = calculator.calculate(
-			product.id,
-			json.item.quantity,
-			productItemsIds,
-			0,
-			0,
-			quotation,
-			quotationItem
-		);
-
-		var line = super.bean( "QuotationItemPriceLine" );
-
-		line.setName( "Prezzo placca" );
-		line.setAmount( platePrice.finalPrice );
-		line.setCost( platePrice.totalCost );
-		lines.add( line );
-
-
-		/*
-			fruits price
-		*/
-
-		for ( var fruit in json.item.fruits._data ) {
-			var fruitItemsIds = [];
-			
-			var line = super.bean( "QuotationItemPriceLine" );
-
-			for ( var item in fruit.items._data ) {
-				for ( var value in item.values ) {
-					if ( value.selected ) {
-						fruitItemsIds.add( value.productItemId );
-					}
-				}
-			}
-
-			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds, 0, 0, quotation, quotationItem );
-
-			line.setName( "#fruit.fruit?.name#" );
-			line.setAmount( fruitPrice.finalPrice );
-			line.setCost( fruitPrice.totalCost );
-			lines.add( line );
-		}
-
-		pricing.setLines( lines );
-
-		return pricing;
-	}
-
-	/*
-		private methods
-	*/
-
-	private com.apirone.core.model.bean.QuotationItemPrice function getPricing( required Struct data ){
-
-		//var result = super.getResult();
-		
-		var json = arguments.data;
-
-		var pricing = super.bean( "QuotationItemPrice" );
-		var method  = super.bean( "PriceMethod" );
-
-		var calculator = super.service( "PriceCalculator" );
-
-		var lines = [];
-
-		pricing.setQuotationItemId( json.quotationItem.id );
-		pricing.setId( Val( json.quotationItem.price.id ) ? json.quotationItem.price.id : null );
-		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
-		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
-		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
-		        
-		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
-		
-        if ( json.quotationItem.price.method.id EQ 'F' ) {
-			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
-		} else {
-			pricing.setAmount( 0 );
-		}
-
-		/*
-			price
-		*/
-
-		var productItemsIds = [];
-
-		var product = json.quotationItem.product;
-		if ( product.keyExists( "items" ) ) {
-			for ( var item in product.items._data ) {
-				for ( var value in item.values ) {
-					if ( value.selected ) {
-						productItemsIds.add( value.product_item_id );
-					}
-				}
-			}
-		}
-
-		var price = calculator.calculate(
-			product.id,
-			json.quotationItem.quantity,
-			productItemsIds,
-			0,
-			0,
-			json.quotation,
-			json.quotationItem
-		);
-
-		var line = super.bean( "QuotationItemPriceLine" );
-
-		line.setName( "Prezzo base" );
-		line.setAmount( price.finalPrice );
-		line.setCost( price.totalCost );
-
-		lines.add( line );
-
-		pricing.setLines( lines );
-
-		return pricing;
-	}
-	
-	private com.apirone.core.model.bean.QuotationItemPrice function populatePriceItem( data ){
-
-		var method = super.bean( "PriceMethod" );
-		var bean = super.bean( "QuotationItemPrice" );
-
-		var lines = [];
-		var thisLines = data.price.keyExists("lines") ? data.price.lines : [];
-
-		bean.setAmount( data.price.total );
-		bean.setDiscount1( Len( data.price?.discount1 ) ? data.price?.discount1 : 0 );
-		bean.setDiscount2( Len( data.price?.discount2 ) ? data.price?.discount2 : 0 );
-		bean.setMethod( method.setId( data.price.method.id ) );
-
-		for( var thisLine in thisLines ) {
-			var priceLine  = super.bean( "QuotationItemPriceLine" );
-			priceLine.setName( thisLine.name );
-			priceLine.setAmount( thisLine.amount );
-			
-			lines.add( priceLine );
-		}
-
-		bean.setLines( lines );
-
-		return bean;
-
 	}
 
 	private Struct function populatePositionBean( 

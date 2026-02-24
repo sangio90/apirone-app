@@ -1053,7 +1053,7 @@ AP.plate.modal = ( function() {
 
                         setTimeout( function() {
                             AP.loading.hide();
-                            // window.location.href = "/manager/quotations/" + parsedData.quotationId + "?tab=plate";
+                            window.location.href = "/manager/quotations/" + parsedData.quotationId + "?tab=plate";
                         }, 1000 );
                     }
                 } );
