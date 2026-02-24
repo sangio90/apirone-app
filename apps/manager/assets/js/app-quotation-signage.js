@@ -196,7 +196,7 @@ AP.signage.modal = ( function() {
         },
 
         parseLines: async function( e ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) != "" ) {
+            if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) && viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) != "" ) {
                 viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
                 if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
                     bootbox.confirm( {
@@ -679,7 +679,7 @@ AP.signage.modal = ( function() {
 					viewModel.set( "backgroundImage", xhr2.data.file );
 					viewModel.set( "backgroundImage.url", "url('" + xhr2.data.file.uri + "')" );
 				} else {
-					viewModel.set( "backgroundImage.url", "url()" );
+					viewModel.set( "backgroundImage.url", "" );
 				}
 			}
 
