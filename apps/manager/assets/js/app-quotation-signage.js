@@ -196,67 +196,64 @@ AP.signage.modal = ( function() {
         },
 
         parseLines: async function( e ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) && viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size.id" ) != "" ) {
-                viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
-                if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
-                    bootbox.confirm( {
-                        title: "Cancellazione righe",
-                        message: "Cambiando la dimensione del font cambierà la quantità di righe che puoi inserire nella segnaletica. Le righe in eccesso verranno eliminate, Vuoi procedere?",
-                        buttons: {
-                            confirm: {
-                                label: "Si, confermo",
-                                className: "btn-primary",
-                            },
-                            cancel: {
-                                label: "No, chiudi",
-                                className: "btn-danger",
-                            },
+            viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
+            if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
+                bootbox.confirm( {
+                    title: "Cancellazione righe",
+                    message: "Cambiando la dimensione del font cambierà la quantità di righe che puoi inserire nella segnaletica. Le righe in eccesso verranno eliminate, Vuoi procedere?",
+                    buttons: {
+                        confirm: {
+                            label: "Si, confermo",
+                            className: "btn-primary",
                         },
-                        callback: function( result ) {
-                            if ( result ) {
-                                const exceeded = viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().slice( viewModel.get( "maxRows" ) );
-                                const promises = exceeded.map( signageRow => {
-                                    return new Promise( resolve => {
-										NM.util.ajax( {
-											method: "DELETE",
-											url: "/manager/ajax/quotation-items/signagerow",
-											data: { id: signageRow.id },
-											callback: {
-												done: function( xhr ) {
-													if ( xhr.status == "ERROR" ) {
-														AP.widget.notify( "error", "Errore nella cancellazione della Riga Segnaletica." );
-													}
-													if ( xhr.status == "SUCCESS" ) {
-														AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
-														const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
-														const row = ds.view().find( r => r.id === signageRow.id );
-														if ( row ) {
-															ds.remove( row );
-														}
-														if ( ds ) {
-															ds.data().forEach( ( row, i ) => {
-																row.set( "index", i + 1 );
-															} );
-														}
-													}
-													resolve();
-												}
-											}
-										} );
+                        cancel: {
+                            label: "No, chiudi",
+                            className: "btn-danger",
+                        },
+                    },
+                    callback: function( result ) {
+                        if ( result ) {
+                            const exceeded = viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().slice( viewModel.get( "maxRows" ) );
+                            const promises = exceeded.map( signageRow => {
+                                return new Promise( resolve => {
+                                    NM.util.ajax( {
+                                        method: "DELETE",
+                                        url: "/manager/ajax/quotation-items/signagerow",
+                                        data: { id: signageRow.id },
+                                        callback: {
+                                            done: function( xhr ) {
+                                                if ( xhr.status == "ERROR" ) {
+                                                    AP.widget.notify( "error", "Errore nella cancellazione della Riga Segnaletica." );
+                                                }
+                                                if ( xhr.status == "SUCCESS" ) {
+                                                    AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
+                                                    const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+                                                    const row = ds.view().find( r => r.id === signageRow.id );
+                                                    if ( row ) {
+                                                        ds.remove( row );
+                                                    }
+                                                    if ( ds ) {
+                                                        ds.data().forEach( ( row, i ) => {
+                                                            row.set( "index", i + 1 );
+                                                        } );
+                                                    }
+                                                }
+                                                resolve();
+                                            }
+                                        }
                                     } );
                                 } );
+                            } );
 
-                                Promise.all( promises ).then( () => {
-                                    viewModel.save();
-                                } );
-                            }
-                        },
-                    } );
-                }
-                $( "#signageFont" ).prop( "disabled", true );
-            } else {
-                $( "#signageFont" ).prop( "disabled", false );
+                            Promise.all( promises ).then( () => {
+                                viewModel.save();
+                            } );
+                        }
+                    },
+                } );
             }
+            $( "#signageFont" ).prop( "disabled", true );
+            
             viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( signageRow => {
                 this.parsedLineContent( signageRow.content, signageRow.id );
                 viewModel.updateCharCounter( {
