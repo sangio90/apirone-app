@@ -621,11 +621,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				continue;
 			}
 
-			applicaCostoFisso(quotationItem)
+			aggiornaPrezzo(quotationItem)
 		}
 	}
 
-	public function applicaCostoFisso( required quotationItem )
+	public function aggiornaPrezzo( required quotationItem )
 	{
 		var quotationId = quotationItem.getQuotation().getId()
 		var productId = quotationItem.getProduct().getId();
