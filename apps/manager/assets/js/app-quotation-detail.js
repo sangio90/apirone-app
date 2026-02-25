@@ -709,6 +709,22 @@ AP.quotation.detail = ( function() {
             statusApp().edit();
 
         },
+
+        updateAllPrices: function() {
+            AP.loading.show()
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/updateallprices",
+                callback: {
+                    done: function( xhr ) {
+                        AP.widget.notify('success', 'Prezzi articoli aggiornati con i costi fissi.')
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 500)
+                    }
+                }
+            } );
+        }
     } );
 
     pub.showTotals = function( options ) {
@@ -825,6 +841,11 @@ AP.quotation.detail = ( function() {
 
         if ( !urlParams.get( "tab" ) ) {
             $( "body" ).find( "button#nav-plate-tab" ).click();
+            $('#qt-update-prices').show();
+        } else {
+            if (!['signage', 'plate'].includes(urlParams.get('tab'))) {
+                $('#qt-update-prices').hide();
+            }
         }
 
         try {
@@ -856,6 +877,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.hide();
                 fields.addArticleBtn.hide();
+                $('#qt-update-prices').show();
             } );
 
             document.querySelector( "#nav-signage-tab" ).addEventListener( "click", function( event ) {
@@ -864,6 +886,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.show();
                 fields.addAccessoryBtn.hide();
                 fields.addArticleBtn.hide();
+                $('#qt-update-prices').show();
             } );
 
             document.querySelector( "#nav-accessory-tab" ).addEventListener( "click", function( event ) {
@@ -872,6 +895,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.show();
                 fields.addArticleBtn.hide();
+                $('#qt-update-prices').hide();
             } );
 
             document.querySelector( "#nav-article-tab" ).addEventListener( "click", function( event ) {
@@ -880,6 +904,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.hide();
                 fields.addArticleBtn.show();
+                $('#qt-update-prices').hide();
             } );
 
             pricingApp().getTotals();

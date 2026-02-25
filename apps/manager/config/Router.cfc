@@ -461,6 +461,7 @@
 		delete( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.delete" ).end();
 		get( "/ajax/quotations/:quotationId/zones" ).to( "QuotationZoneAjaxController.list" ).end();
 
+		get( "/ajax/quotations/:id/updateallprices" ).to( "QuotationItemAjaxController.updateAllPrices" ).end();
 		get( "/ajax/quotations/:id/items/:typeId" ).to( "QuotationItemAjaxController.list" ).end();
 
 		get( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.totals" ).end();

@@ -439,7 +439,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 		*/
 
-		super.fire( "quotationItem.ripartizioneCostiFissi", {
+		super.fire( "quotationItem.ripartizioneCostiFissiSuAltriArticoli", {
 			 "quotationId" = json.quotationId, 
 			 "quotationItemId" = thisId, 
 			 "lineId" = json.signageConfig.catalogBundle.line.id,
@@ -601,7 +601,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		} );
 
-		super.fire( "quotationItem.ripartizioneCostiFissi", {
+		super.fire( "quotationItem.ripartizioneCostiFissiSuAltriArticoli", {
 			 "quotationId" = json.quotationId, 
 			 "quotationItemId" = thisId, 
 			 "lineId" = json.item.product.line.id,
@@ -644,13 +644,36 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
-			super.fire( "quotationItem.ripartizioneCostiFissi", {
+			super.fire( "quotationItem.ripartizioneCostiFissiSuAltriArticoli", {
 				"quotationId" = quotationId,
 				"quotationItemId" = id, 
 				"lineId" = lineId,
 				"finishId" = finishId
 				} 
 			);
+		}
+
+		result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
+
+		event.setValue( "result", result );
+	}
+
+	function updateAllPrices( event, rc, prc ){
+		var result     = super.getResult();
+		var validation = getValidationResult();
+
+		var id = rc.id;
+
+		if (IsNull(id)) {
+			return result
+		}
+
+		var quotationItems = super.fire( "quotationItem.list", { quotationId = id } )
+
+		for (var quotationItem in quotationItems) {
+			if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
+				super.fire( "quotationItem.applicaCostoFisso", { "quotationItem" = quotationItem } );
+			}
 		}
 
 		result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );

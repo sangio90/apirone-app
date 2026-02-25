@@ -101,7 +101,9 @@
 
                                             </div>
                                             <div class="col-8 text-end mb-2">
-
+                                                <button class="btn btn-primary btn-md" id="qt-update-prices" type="button" data-bind="click:updateAllPrices">
+                                                    <i class="fas fa-sync"></i> Aggiorna tutti i prezzi
+                                                </button>
                                                 #addButton( label="Aggiungi placca", id="qt-add-plate", bind="click:addPlate")#
                                                 #addButton( label="Aggiungi segnaletica", id="qt-add-signage", bind="click:addSignage", style="display: none" )#
                                                 #addButton( label="Aggiungi accessorio", id="qt-add-accessory", bind="click:addAccessory", style="display: none" )#
