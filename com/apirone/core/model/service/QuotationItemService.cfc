@@ -598,7 +598,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return getDao().getAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
 	}
 
-	public function ripartizioneCostiFissiSuAltriArticoli(
+	public function aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId(
 		required String quotationItemId, 
 		required String quotationId,
 		required String finishId,

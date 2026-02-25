@@ -358,96 +358,88 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		bean.setProduct( super.fire( "Product.get", { "productId" = product.getId() } ) );
 
-		if ( !Len( id ) ) {
-			messageId = "quotationItem.created";
-			thisId    = super.fire( "quotationItem.create", [ bean ] )
-		} else {
-			messageId = "quotationItem.updated";
-			thisId    = super.fire( "quotationItem.update", [ bean ] )
-		}
-
-		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "signage" );
-
-		for ( var signageRow in json.quotationItem.signageRows._data ) {
-			var signageRowBean = super.fire(
-				"QuotationItemSignageRow.get",
-				{ quotationItemSignageRowId = signageRow.id }
-			);
-
-			if ( !Len( signageRowBean ) ) {
-				var signageRowBean = super.bean( "QuotationItemSignageRow" );
-				var messaggiId     = "QuotationItemSignageRow.create";
+		var message = 'Errore durante il salvataggio della segnaletica.'
+		transaction {
+			if ( !Len( id ) ) {
+				messageId = "quotationItem.created";
+				thisId    = super.fire( "quotationItem.create", [ bean ] )
 			} else {
-				var messaggiId = "QuotationItemSignageRow.update";
+				messageId = "quotationItem.updated";
+				thisId    = super.fire( "quotationItem.update", [ bean ] )
 			}
 
-			signageRowBean.setQuotationItemId( thisId );
-			signageRowBean.setTextAlign( signageRow.textAlign );
-			signageRowBean.setContent( signageRow.content );
-			signageRowBean.setCharCount( signageRow.charCount );
-			signageRowBean.setOrderby( signageRow.index );
+			saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "signage" );
 
-			super.fire( messaggiId, [ signageRowBean ] );
-		}
-
-		var quotationItemProductItems = super.fire(
-			"quotationItemProductItem.list",
-			{ quotationItemId = thisId }
-		);
-
-		quotationItemProductItems.each( function( quotationItemProductItem ){
-			super.fire(
-				"quotationItemProductItem.delete",
-				{ "productItemId" = quotationItemProductItem.getId() }
-			)
-		} );
-
-		var productItemsData = json.quotationItem.product.items._data;
-		productItemsData.each( function( productItemRow ){
-			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
-				return v.selected;
-			} )
-			if ( Len( selectedValue ) > 0 ) {
-				selectedValue   = selectedValue[ 1 ];
-				var productItem = super.fire(
-					"productItem.get",
-					{ "productItemId" = selectedValue.product_item_id }
+			for ( var signageRow in json.quotationItem.signageRows._data ) {
+				var signageRowBean = super.fire(
+					"QuotationItemSignageRow.get",
+					{ quotationItemSignageRowId = signageRow.id }
 				);
 
-				var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
+				if ( !Len( signageRowBean ) ) {
+					var signageRowBean = super.bean( "QuotationItemSignageRow" );
+					var messaggiId     = "QuotationItemSignageRow.create";
+				} else {
+					var messaggiId = "QuotationItemSignageRow.update";
+				}
 
-				quotationItemProductItemBean.setQuotationItemId( thisId );
-				quotationItemProductItemBean.setProductItem( productItem );
-				quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
-				quotationItemProductItemBean.setLevel( productItemRow.level );
-				quotationItemProductItemBean.setId( thisId )
+				signageRowBean.setQuotationItemId( thisId );
+				signageRowBean.setTextAlign( signageRow.textAlign );
+				signageRowBean.setContent( signageRow.content );
+				signageRowBean.setCharCount( signageRow.charCount );
+				signageRowBean.setOrderby( signageRow.index );
 
-				super.fire(
-					"quotationItemProductItem.create",
-					{ "productItem" = quotationItemProductItemBean }
-				)
+				super.fire( messaggiId, [ signageRowBean ] );
 			}
-		} )
 
-		/*
-		nel servizio
-		var hash = super.fire( "productHash.createHash", { "quotationItemId" = thisId } );
-		if ( !IsNull( hash ) ) {
-			bean.setHash( hash );
-			bean.setId( thisId );
-			super.fire( "quotationItem.update", [ bean ] );
+			var quotationItemProductItems = super.fire(
+				"quotationItemProductItem.list",
+				{ quotationItemId = thisId }
+			);
+
+			quotationItemProductItems.each( function( quotationItemProductItem ){
+				super.fire(
+					"quotationItemProductItem.delete",
+					{ "productItemId" = quotationItemProductItem.getId() }
+				)
+			} );
+
+			var productItemsData = json.quotationItem.product.items._data;
+			productItemsData.each( function( productItemRow ){
+				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
+					return v.selected;
+				} )
+				if ( Len( selectedValue ) > 0 ) {
+					selectedValue   = selectedValue[ 1 ];
+					var productItem = super.fire(
+						"productItem.get",
+						{ "productItemId" = selectedValue.product_item_id }
+					);
+
+					var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
+
+					quotationItemProductItemBean.setQuotationItemId( thisId );
+					quotationItemProductItemBean.setProductItem( productItem );
+					quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
+					quotationItemProductItemBean.setLevel( productItemRow.level );
+					quotationItemProductItemBean.setId( thisId )
+
+					super.fire(
+						"quotationItemProductItem.create",
+						{ "productItem" = quotationItemProductItemBean }
+					)
+				}
+			} )
+
+			super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId", {
+				"quotationId" = json.quotationId, 
+				"quotationItemId" = thisId, 
+				"lineId" = json.signageConfig.catalogBundle.line.id,
+				"finishId" = json.quotationItem.product.finish.id 
+				} 
+			);
+			message = completeMessage( messageId );
 		}
-		*/
-
-		super.fire( "quotationItem.ripartizioneCostiFissiSuAltriArticoli", {
-			 "quotationId" = json.quotationId, 
-			 "quotationItemId" = thisId, 
-			 "lineId" = json.signageConfig.catalogBundle.line.id,
-			 "finishId" = json.quotationItem.product.finish.id 
-			} 
-		);
-
-		var message = completeMessage( messageId );
 		
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
 
@@ -562,57 +554,61 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setFruits( beanFruits );
 
-		if ( !Len( id ) OR json.isClone ) {
-			messageId = "quotationItem.created";
-			thisId    = super.fire( "quotationItem.create", [ bean ] )
-		} else {
-			messageId = "quotationItem.updated";
-			thisId    = super.fire( "quotationItem.update", [ bean ] )
+		var message = 'Errore durante il salvataggio della placca.'
+		transaction {
+			if ( !Len( id ) OR json.isClone ) {
+				messageId = "quotationItem.created";
+				thisId    = super.fire( "quotationItem.create", [ bean ] )
+			} else {
+				messageId = "quotationItem.updated";
+				thisId    = super.fire( "quotationItem.update", [ bean ] )
+			}
+
+			saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "plate" );
+
+			var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId });
+
+			quotationItemProductItems.each( function( quotationItemProductItem ){
+				super.fire( "quotationItemProductItem.delete", { "productItemId" = quotationItemProductItem.getId() } )
+			} );
+
+			var productItemsData = json.item.product.items._data;
+
+			productItemsData.each( function( productItemRow ){
+				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
+					return value.selected;
+				} )
+
+				if ( Len( selectedValue ) > 0 ) {
+					selectedValue = selectedValue[ 1 ];
+
+					var productItemBean = super.bean( "QuotationItemProductItem" );
+					var productItem     = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
+
+					productItemBean.setQuotationItemId( thisId );
+					productItemBean.setProductItem( productItem );
+					productItemBean.setOrigin( productItem.getOrigin() );
+					productItemBean.setLevel( productItemRow.level );
+					// productItemBean.setId( thisId )
+
+					super.fire( "quotationItemProductItem.create", [ productItemBean ] )
+				}
+			} );
+
+
+			//Funzione che riceve quotationItemId, quotationId, line e finish e aggiorna tutte le righe con quotationItemId <> da quotationItemId e stessa line e finish con i dati del quotationItem con id = quotationItemId
+			//che condividono quotation,line e finish, ripartendo il fixed_cost sulla nuova quantita totale
+			super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId", {
+				"quotationId" = json.quotationId, 
+				"quotationItemId" = thisId, 
+				"lineId" = json.item.product.line.id,
+				"finishId" = json.item.product.finish.id 
+				} 
+			);
+			
+			message = completeMessage( messageId );
 		}
 
-		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "plate" );
-
-		var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId });
-
-		quotationItemProductItems.each( function( quotationItemProductItem ){
-			super.fire( "quotationItemProductItem.delete", { "productItemId" = quotationItemProductItem.getId() } )
-		} );
-
-		var productItemsData = json.item.product.items._data;
-
-		productItemsData.each( function( productItemRow ){
-			var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
-				return value.selected;
-			} )
-
-			if ( Len( selectedValue ) > 0 ) {
-				selectedValue = selectedValue[ 1 ];
-
-				var productItemBean = super.bean( "QuotationItemProductItem" );
-				var productItem     = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
-
-				productItemBean.setQuotationItemId( thisId );
-				productItemBean.setProductItem( productItem );
-				productItemBean.setOrigin( productItem.getOrigin() );
-				productItemBean.setLevel( productItemRow.level );
-				// productItemBean.setId( thisId )
-
-				super.fire( "quotationItemProductItem.create", [ productItemBean ] )
-			}
-		} );
-
-		super.fire( "quotationItem.ripartizioneCostiFissiSuAltriArticoli", {
-			 "quotationId" = json.quotationId, 
-			 "quotationItemId" = thisId, 
-			 "lineId" = json.item.product.line.id,
-			 "finishId" = json.item.product.finish.id 
-			} 
-		);
-
-		//Funzione che riceve quotationItemId, quotationId, line e finish e aggiorna tutte le righe con quotationItemId <> da quotationItemId e stessa line e finish con i dati del quotationItem con id = quotationItemId
-		//che condividono quotation,line e finish, ripartendo il fixed_cost sulla nuova quantita totale
-
-		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
 
@@ -630,30 +626,31 @@ component extends="com.apirone.core.controller.AbsController" {
 		var lineId = quotationItem.getProduct().getLine().getId()
 		var finishId = quotationItem.getProduct().getFinish().getId()
 
-		var outcome = super.fire( "quotationItem.delete", [ id ] );
+		transaction {
+			var outcome = super.fire( "quotationItem.delete", [ id ] );
 
-		if ( outcome.getStatus() == "ERROR" ) {
-			var error = super.getValidationError(
-				message = getMessage( "quotationItem.notDeleted" ),
-				field   = "general"
-			);
-			validation.addError( error );
+			if ( outcome.getStatus() == "ERROR" ) {
+				var error = super.getValidationError(
+					message = getMessage( "quotationItem.notDeleted" ),
+					field   = "general"
+				);
+				validation.addError( error );
 
-			event.setValue( "result", validation );
-			return;
+				event.setValue( "result", validation );
+				return;
+			}
+
+			if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
+				super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId", {
+					"quotationId" = quotationId,
+					"quotationItemId" = id, 
+					"lineId" = lineId,
+					"finishId" = finishId
+					} 
+				);
+			}
+			result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
 		}
-
-		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
-			super.fire( "quotationItem.ripartizioneCostiFissiSuAltriArticoli", {
-				"quotationId" = quotationId,
-				"quotationItemId" = id, 
-				"lineId" = lineId,
-				"finishId" = finishId
-				} 
-			);
-		}
-
-		result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
 
 		event.setValue( "result", result );
 	}
@@ -664,19 +661,18 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var id = rc.id;
 
-		if (IsNull(id)) {
-			return result
-		}
+		if (!IsNull(id)) {
+			var quotationItems = super.fire( "quotationItem.list", { quotationId = id } )
 
-		var quotationItems = super.fire( "quotationItem.list", { quotationId = id } )
-
-		for (var quotationItem in quotationItems) {
-			if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
-				super.fire( "quotationItem.aggiornaPrezzo", { "quotationItem" = quotationItem } );
+			transaction {
+				for (var quotationItem in quotationItems) {
+					if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
+						super.fire( "quotationItem.aggiornaPrezzo", { "quotationItem" = quotationItem } );
+					}
+				}
+				result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
 			}
 		}
-
-		result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
 
 		event.setValue( "result", result );
 	}
