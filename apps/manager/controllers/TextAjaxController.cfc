@@ -38,7 +38,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var statuses = [];
 
-			var langs = super.fire( "text.list", { entity = row.getEntity() } );
+			var langs = super.fire( "text.list", { entity = row.getEntity(), kind = row.getKind().getId() } );
 
 			for( var lang in langs ) {
 
@@ -84,7 +84,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var text = super.fire( "text.get", [ rc.id ] );
 
-		var rows = super.fire( "text.list", { entity = text.getEntity() } );
+		var rows = super.fire( "text.list", { entity = text.getEntity(), kind = text.getKind().getId() } );
 
 		for ( var row in rows ) {
 			var bean = dm.convert( row, "Text", true );
