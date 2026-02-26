@@ -67,6 +67,9 @@
                                             <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:print">
                                             <i class="fas fa-print"></i> Stampa
                                             </button>
+                                            <!--- <button type="button" class="btn btn-default btn-sm me-2" data-bind="click:createAllTraduzioniMancanti">
+                                            <i class="fas fa-flag"></i> Creazione Massiva Traduzioni Mancanti
+                                            </button> --->
                                         </div>
                                     </div>
                                 </div>
