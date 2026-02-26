@@ -32,6 +32,33 @@ AP.core = ( function() {
 
 }() );
 
+AP.hasRole = function (roles) {
+    const userRole = AP.config.user?.role;
+    if (!userRole) return false;
+
+    let rolesArray = [];
+    if (Array.isArray(roles)) {
+        rolesArray = roles;
+    } else if (typeof roles === "string") {
+        rolesArray = roles.split('/').map(r => r.trim());
+    }
+
+    return rolesArray.includes(userRole);
+};
+
+kendo.data.binders.role = kendo.data.Binder.extend({
+    refresh: function() {
+        var rolesString = this.element.getAttribute("data-role-list");
+        var hasPermission = AP.hasRole(rolesString);
+
+        if (hasPermission) {
+            $(this.element).show(); // O rimuovi d-none
+        } else {
+            $(this.element).hide();
+        }
+    }
+});
+
 AP.namespace = function( name ) {
     var parts = name.split( "." );
     var current = AP;

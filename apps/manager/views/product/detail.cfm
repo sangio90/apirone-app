@@ -3,7 +3,6 @@
 <cfoutput>
 
     <div id="product-detail-root">
-
         <div class="row">
             <div class="col-10">
                 #pageTitle()#
@@ -353,17 +352,19 @@
                                     Clona albero
                                 </a>
 
-                            </div>                                    
+                            </div>           
 
-                            <div class="text-end col-4 mb-2">
-
+                            <div class="text-end col-4 mb-2" 
+                                style="display:none" 
+                                data-bind="role: this" 
+                                data-role-list="ADM/TCD"
+                            >
                                 #deleteButton(
                                     bind  = "click:removeAttributes",
                                     size  = "sm",
                                     class = "ms-2"
                                 )#
-
-                            </div>                                    
+                            </div>
 
                             <form id="product-grid-form">
 
