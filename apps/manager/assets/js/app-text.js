@@ -113,6 +113,7 @@ AP.text.list = ( function() {
         },
 
         createTraduzioniMancanti: function( event ) {
+            AP.loading.show()
             const traduzioni = event.data.detailForm.data.texts
             const requiredLangs = ["IT","EN","FR","ES","DE"];
 
@@ -129,11 +130,37 @@ AP.text.list = ( function() {
                 method: "GET",
                 url: `/manager/ajax/texts_createtraduzionimancanti/${traduzioni[0].id}`,
                 callback: {
-                    done: function( xhr ) {
-                        AP.widget.notify( "success", "Traduzioni mancanti aggiunte con successo" );
-                        setTimeout( () => {
-                            window.location.href = window.location.pathname+"?"+$.param( { "reset":1, "fwreinit":1 } );
-                        }, 500 );
+                    always: function( xhr ) {
+                        debugger
+                        AP.loading.hide()
+                        if (xhr.status && xhr.status == 'SUCCESS') {
+                            AP.widget.notify( "success", "Hai aggiunto " + (xhr.count > 0 ? xhr.count : "") + " traduzioni mancanti con successo" );
+                            setTimeout( () => {
+                                window.location.href = window.location.pathname+"?"+$.param( { "reset":1, "fwreinit":1 } );
+                            }, 500 );
+                        }
+                    }
+                }
+            } );
+
+            return false;
+
+        },
+
+        createAllTraduzioniMancanti: function( event ) {
+            AP.loading.show()
+            NM.util.ajax( {
+                method: "GET",
+                url: `/manager/ajax/texts_createalltraduzionimancanti`,
+                callback: {
+                    always: function( xhr ) {
+                        AP.loading.hide()
+                        if (xhr.status && xhr.status == 'SUCCESS') {
+                            AP.widget.notify( "success", "Hai aggiunto " + (xhr.count > 0 ? xhr.count : "") + " traduzioni mancanti con successo" );
+                            setTimeout( () => {
+                                window.location.href = window.location.pathname+"?"+$.param( { "reset":1, "fwreinit":1 } );
+                            }, 500 );
+                        }
                     }
                 }
             } );
