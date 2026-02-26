@@ -33,6 +33,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var quotation = super.fire( "Quotation.get", [ rc.id ] );
 
+		var user = session.user;
+		if (!isNull(user) && !isNull(user.getRole()) && ArrayContains(['ADM', 'CMA'], user.getRole().getId()) == 0 && quotation.getOwner().getId() != user.getId()) {
+        	relocate( uri="/manager/dashboard", postProcessExempt=false, addToken=false );
+			return;
+		}
+
 		prc.title     = "Modifica preventivo < #quotation.getQuotationNumber()# / #quotation.getVersionNumber()# > ";
 
 		prc.quotation = quotation;

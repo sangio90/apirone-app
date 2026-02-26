@@ -87,11 +87,13 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
 		var data = [];
-
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
 		var mem    = super.getMementify();
-
+		var user = session.user;
+		if (!isNull(user) && !isNull(user.getRole()) && ArrayContains(['ADM', 'CMA'], user.getRole().getId()) == 0) {
+			params['ownerId'] = user.getId();
+		}
 		var rows = super.fire( "quotation.search", params );
 		var data = mem.convertList( rows.getData() );
 
