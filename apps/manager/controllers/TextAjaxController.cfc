@@ -167,19 +167,21 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var rows = super.fire( "text.list" );
 
-		for ( var row in rows ) {
+		var createdCounter = 0;
+		transaction {
+			for ( var row in rows ) {
 
-			var statuses = [];
+				var statuses = [];
 
-			var hasItalian = super.fire( "text.list", { entity = row.getEntity(), kind = row.getKind().getId(), langId = 'IT' } );
+				var hasItalian = super.fire( "text.list", { entity = row.getEntity(), kind = row.getKind().getId(), langId = 'IT' } );
 
-			var createdCounter = 0;
-			if (Len(hasItalian) > 0) {
-				var italianText = hasItalian[1];
-				var id = italianText.getId();
-				var thisCreatedCounter = createTraduzioniByTextId(id)
-				createdCounter += thisCreatedCounter;
-			}			
+				if (Len(hasItalian) > 0) {
+					var italianText = hasItalian[1];
+					var id = italianText.getId();
+					var thisCreatedCounter = createTraduzioniByTextId(id)
+					createdCounter += thisCreatedCounter;
+				}			
+			}
 		}
 
 		var message = completeMessage( messageId );

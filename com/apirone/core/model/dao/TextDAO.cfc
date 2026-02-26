@@ -43,7 +43,7 @@
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="texts.created_at DESC">
 
-		<cfif !IsNull( arguments.entity )>
+		<cfif !IsNull( arguments.entity ) && !isNull(arguments.entity.getKey())>
 			<cfset field = super.getDBField( arguments.entity.getKey() )>
 			<cfset value = arguments.entity.getValue()>
 		</cfif>
