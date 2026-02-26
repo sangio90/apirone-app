@@ -74,6 +74,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.role_id );
 			bean.setCreatedAt( record.created_at );
 			bean.setType( getLookupService().get( "roleType", record.role_type_id ) );
+			bean.setMinQuantity( record.min_quantity );
+			bean.setMaxQuantity( record.max_quantity );
 			bean.setQuotationMaxDiscount( record.quotation_max_discount );
 			bean.setQuotationMaxAmount( record.quotation_max_amount );
 

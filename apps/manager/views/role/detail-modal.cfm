@@ -14,6 +14,26 @@
                     <div class="card-body">
 
                         <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label text-end">Quantità minima</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control col-sm-4" 
+                                    name="minQuantity"
+                                    maxlength="5"
+                                    data-bind="value: detailForm.data.minQuantity">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label text-end">Quantità massima</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control col-sm-4" 
+                                    name="maxQuantity"
+                                    maxlength="5"
+                                    data-bind="value: detailForm.data.maxQuantity">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
                             <label class="col-sm-3 col-form-label text-end">Offerta massima</label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control col-sm-4" 

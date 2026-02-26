@@ -14,6 +14,12 @@
                 <span class="small-code">(<span data-bind="text: type.id"></span>)</span>
             </td>
             <td class="text-end">
+                <span data-bind="text: minQuantity"></span>
+            </td>
+            <td class="text-end">
+                <span data-bind="text: maxQuantity"></span>
+            </td>
+            <td class="text-end">
                 <span data-bind="text: quotationMaxAmount"></span>
             </td>
             <td class="text-end">

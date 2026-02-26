@@ -66,6 +66,8 @@
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.role.getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.role.getName()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#int(arguments.role.getMinQuantity())#">,
+				<cfqueryparam cfsqltype="Numeric" value="#int(arguments.role.getMaxQuantity())#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.role.getQuotationMaxAmount()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.role.getQuotationMaxDiscount()#">
 			) RETURNING role_id
@@ -82,6 +84,8 @@
 				membership.roles
 			SET
 				role = <cfqueryparam cfsqltype="Varchar" value="#arguments.role.getName()#">,
+				min_quantity = <cfqueryparam cfsqltype="Numeric" value="#int(arguments.role.getMinQuantity())#">,
+				max_quantity = <cfqueryparam cfsqltype="Numeric" value="#int(arguments.role.getMaxQuantity())#">,
 				quotation_max_amount = <cfqueryparam cfsqltype="Numeric" value="#arguments.role.getQuotationMaxAmount()#">,
 				quotation_max_discount = <cfqueryparam cfsqltype="Numeric" value="#arguments.role.getQuotationMaxDiscount()#">
 			WHERE

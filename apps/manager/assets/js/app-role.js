@@ -31,6 +31,8 @@ AP.role.detail = ( function() {
                 id: "",
                 name: "",
                 permissions: new kendo.data.DataSource(),
+                minQuantity: "1",
+                maxQuantity: "1",
                 quotationMaxDiscount: "0",
                 quotationMaxAmount: "0",
             },

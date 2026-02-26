@@ -4,6 +4,8 @@
         "name", 
         "permissions", 
         "type", 
+        "minQuantity", 
+        "maxQuantity", 
         "quotationMaxAmount", 
         "quotationMaxDiscount" 
     ],

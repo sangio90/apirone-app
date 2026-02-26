@@ -25,6 +25,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setId( json?.id );
 		bean.setName( json.name );
+		bean.setMinQuantity( json.minQuantity );
+		bean.setMaxQuantity( json.maxQuantity );
 		bean.setQuotationMaxAmount( json.quotationMaxAmount );
 		bean.setQuotationMaxDiscount( json.quotationMaxDiscount );
 
