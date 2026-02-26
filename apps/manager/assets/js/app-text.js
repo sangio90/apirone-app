@@ -99,13 +99,41 @@ AP.text.list = ( function() {
 
                         setTimeout( () => {
 
-                            $( "#account-detail-modal" ).modal( "hide" );
-                            // viewModel.get( "rows" ).read();
-                            // TODO better than this. remove single cache
+                            $( "#text-detail-modal" ).modal( "hide" );
                             window.location.href = window.location.pathname+"?"+$.param( { "reset":1, "fwreinit":1 } );
 
 
                         }, 1000 );
+                    }
+                }
+            } );
+
+            return false;
+
+        },
+
+        createTraduzioniMancanti: function( event ) {
+            const traduzioni = event.data.detailForm.data.texts
+            const requiredLangs = ["IT","EN","FR","ES","DE"];
+
+            const allPresent = requiredLangs.every(req =>
+                traduzioni.some(item => item.lang.id === req)
+            );
+
+            if (allPresent) {
+                AP.widget.notify( "warning", "Le cinque traduzioni sono già presenti." );
+                return false;
+            }
+
+            NM.util.ajax( {
+                method: "GET",
+                url: `/manager/ajax/texts_createtraduzionimancanti/${traduzioni[0].id}`,
+                callback: {
+                    done: function( xhr ) {
+                        AP.widget.notify( "success", "Traduzioni mancanti aggiunte con successo" );
+                        setTimeout( () => {
+                            window.location.href = window.location.pathname+"?"+$.param( { "reset":1, "fwreinit":1 } );
+                        }, 500 );
                     }
                 }
             } );
