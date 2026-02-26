@@ -141,6 +141,55 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function createTraduzioniMancanti( event, rc, prc ){
+
+		var result = super.getResult();
+		var thisId    = "";
+		var messageId = "text.saved";
+
+		var id = rc.id
+
+		var text = super.fire( "text.get", [ rc.id ] );
+
+		if (isNull(text)) {
+			result.setStatus( "ERROR" );
+			return result;
+		}
+
+		var textEntity = text.getEntity();
+		var allEntityTexts = super.fire( "text.list", { entity = textEntity }  );
+		var requiredLangs = ["IT","EN","FR","ES","DE"];
+
+		var presentLangs = allEntityTexts.map(function(text){
+			return text.getLang().getId();
+		});
+
+		var missingLangs = requiredLangs.filter(function(lang){
+			return !presentLangs.contains(lang);
+		});
+		
+		for ( var missingLang in missingLangs ) {
+
+			var newText   = super.bean( "Text" );
+			var lang   = super.bean( "Lang" );
+			var status = super.bean( "Status" );
+
+			newText.setEntity( textEntity );
+			newText.setKind( text.getKind() );
+			newText.setName( "** To translate" )
+			newText.setLang( lang.setId( missingLang ) );
+			newText.setStatus( status.setId( "TOT" ) );
+
+			thisId = super.fire( "text.create", [ newText ] )
+		}
+
+		var message = completeMessage( messageId );
+
+		result.setData( message, { payload = { id = thisId } } );
+
+		event.setValue( "result", result );
+	}
+
 	private function getEntityName( id ){
 		// TODO: consider to move into DBFields.json
 
