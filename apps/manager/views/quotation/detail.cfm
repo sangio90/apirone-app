@@ -33,32 +33,25 @@
 
                             <div class="row">
 
-                                <div class="col-6">
-
-                                    <div class="mb-3 d-flex ">
-                                        <div class="row align-items-center">
-                                        
-                                            <div class="col-12 d-flex align-items-center">
-                                                <label class="me-2">Zone: </label>
-                                                <select 
-                                                    style="min-width: 500px;"
-                                                    class="form-control me-3"
-                                                    data-bind="source: zones, value: detailForm.data.zone, events: { change: loadItems }"
-                                                    data-value-field="id"
-                                                    data-text-field="name"
-                                                    id="zones-selector">
-                                                </select>
-                                                <div class="col-2 d-flex">
-                                                    <div data-bind="visible: canEdit">
-                                                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
-                                                        <button type="button" class="btn btn-secondary btn-sm ms-2" data-bind="click:openDuplicateZoneModal">Duplica zona</button>
-                                                        <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="col-4 d-flex">
+                                    <label class="me-2">Zone: </label>
+                                    <select 
+                                        style="max-width: 600px;"
+                                        class="form-control me-3"
+                                        data-bind="source: zones, value: detailForm.data.zone, events: { change: loadItems }"
+                                        data-value-field="id"
+                                        data-text-field="name"
+                                        id="zones-selector">
+                                    </select>
+                                </div>
+                                <div class="col-8">
+                                    <div class="d-flex">
+                                        <span data-bind="visible: canEdit">
+                                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
+                                            <button type="button" class="btn btn-secondary btn-sm ms-2" data-bind="click:openDuplicateZoneModal">Duplica zona</button>
+                                            <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
+                                        </span>
                                     </div>
-
                                 </div>
 
                             </div>
