@@ -10,7 +10,14 @@
 				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
                 #button( bind="click:exportProducts, visible: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
                 #button( bind="click:export, visible: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
-				#button( bind="click:openStatusModal, visible: canEdit", size="sm", label="Status: #prc.quotation.getStatusHistory().getStatus().getName()#", icon="check-circle" )#
+				<button type="button" 
+                        class="btn btn-primary btn-sm" 
+                        data-role-list="ADM/CMA"
+                        data-bind="click: openStatusModal, roleEnable: this">
+                    
+                    <i class="fas fa-check-circle"></i> 
+                    Status: #prc.quotation.getStatusHistory().getStatus().getName()#
+                </button>
 				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
 			</div>
             
@@ -104,7 +111,11 @@
                                                 #addButton( label="Aggiungi segnaletica", id="qt-add-signage", bind="click:addSignage", style="display: none" )#
                                                 #addButton( label="Aggiungi accessorio", id="qt-add-accessory", bind="click:addAccessory", style="display: none" )#
                                                 #addButton( label="Aggiungi servizio", id="qt-add-article", bind="click:addArticle", style="display: none" )#
-
+                                                <cfif #prc.quotation.getStatusHistory().getStatus().getId() == 'LAV'#>
+                                                    <button class="btn btn-success btn-md" id="qt-update-prices" type="button" data-bind="click:approveQuotation">
+                                                        <i class="fas fa-check"></i> Concludi preventivo
+                                                    </button>
+                                                </cfif>
                                             </div>
                                         </div>
                                     </nav>
