@@ -52,9 +52,23 @@ kendo.data.binders.role = kendo.data.Binder.extend({
         var hasPermission = AP.hasRole(rolesString);
 
         if (hasPermission) {
-            $(this.element).show(); // O rimuovi d-none
+            $(this.element).show();
         } else {
             $(this.element).hide();
+        }
+    }
+});
+
+kendo.data.binders.roleEnable = kendo.data.Binder.extend({
+    refresh: function() {
+        var rolesString = this.element.getAttribute("data-role-list");
+        var hasPermission = AP.hasRole(rolesString);
+
+        var widget = kendo.widgetInstance($(this.element));        
+        if (widget && typeof widget.enable === "function") {
+            widget.enable(hasPermission);
+        } else {
+            $(this.element).prop("disabled", !hasPermission);
         }
     }
 });
