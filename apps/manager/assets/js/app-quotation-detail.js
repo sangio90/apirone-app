@@ -396,6 +396,43 @@ AP.quotation.detail = ( function() {
             return false;
         },
 
+        approveQuotation: function ( event ) {
+            event.stopPropagation();
+
+            bootbox.confirm( {
+                title: "Conferma approvazione",
+                message: "Sei sicuro di voler approvare questo preventivo?",
+                buttons: {
+                    confirm: {
+                        label: "Si, confermo",
+                        className: "btn-primary",
+                    },
+                    cancel: {
+                        label: "No, chiudi",
+                        className: "btn-danger",
+                    },
+                },
+                callback: function( result ) {
+                    if ( result ) {
+                        NM.util.ajax( {
+                            method: "GET",
+                            url: "/manager/ajax/quotations_approve/" + AP.page.quotation.id,
+                            callback: {
+                                done: function( xhr ) {
+                                    AP.widget.notify( xhr.status, xhr.data.message )
+                                    setTimeout(() => {
+                                        window.location.reload()
+                                    }, 2000)
+                                }
+                            }
+                        } );
+                    }
+                },
+            } );
+
+            return false;
+        }, 
+
         save: function( event ) {
             var detailFormDom = AP.quotation.fields.detailForm;
 
