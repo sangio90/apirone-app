@@ -62,9 +62,9 @@
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '90px' },
                                         { 'field':'name', 'title':'Descrizione' },
-                                        { 'field':'', 'title':'Duplica', width: '55px'},
-                                        { 'field':'', 'title':'Possibili combinazioni', width: '55px'},
-                                        { 'field':'', 'title':'Tutti gli attributi', width: '55px'}
+                                        { 'field':'', 'title':'Duplica', width: '100px', 'headerAttributes': { 'class': 'justify-content-center' } },
+                                        { 'field':'', 'title':'Possibili combinazioni', width: '200px', 'headerAttributes': { 'class': 'justify-content-center' } },
+                                        { 'field':'', 'title':'Tutti gli attributi', width: '155px', 'headerAttributes': { 'class': 'justify-content-center' } }
                                     ]",
 									rowTemplate = "line/line-category-grid-row-tmpl"
 								)#

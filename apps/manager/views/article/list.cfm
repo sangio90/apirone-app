@@ -5,7 +5,7 @@
             <div class="col-6">
 				#pageTitle()#
             </div>
-			<div class="col-6 text-end pb-3">
+			<div class="col-6 text-end pb-3" data-bind="role: this" data-role-list="ADM/TCD">
 				#addButton( bind = "click:new", size = "sm" )#
 			</div>
         </div>
@@ -66,7 +66,7 @@
 							</div>
 
 							<div class="col-sm-2">
-								<div class="float-end">
+								<div class="float-end" data-bind="role: this" data-role-list="ADM/TCD">
 									#deleteButton( bind  = "click:delete", size = "sm" )#
 								</div>
 
@@ -84,12 +84,12 @@
                                         { 'field':'externalId', 'title':'Codice esterno', width: '150px' },
                                         { 'field':'nameItem.name', 'title':'Nome' },
                                         { 'field':'price.amount', 'title':'Prezzo', width: '150px' },
-                                        { 'field':'', 'title':'Modifica', width: '55px'},
+                                        { 'field':'', 'title':'Modifica', width: '90px', 'headerAttributes': { 'class': 'justify-content-center' } },
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
                                             'width'           :'40px',
-                                            'headerAttributes': { 'class': 'text-center' }
+											'headerAttributes': { 'class': 'justify-content-center' } 
                                         }
                                     ]",
 									rowTemplate = "article/article-grid-row-tmpl"

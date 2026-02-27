@@ -6,9 +6,9 @@
             <div class="col-6">
 				#pageTitle()#
             </div>
-			<div class="col-6 text-end pb-3" data-bind="role: this" data-role-list="ADM/TCD">
+			<!--- <div class="col-6 text-end pb-3" data-bind="role: this" data-role-list="ADM/TCD">
                 #addButton( bind="click:new", size="sm" )#
-			</div>
+			</div> --->
         </div>
 
 		<div class="row">
@@ -101,11 +101,11 @@
 									columns = "[
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'category.id', 'title':'Categoria' },
-                                        { 'field':'line.name', 'title':'Linea' },
+                                        { 'field':'line.name', 'title':'Linea', width: '150px' },
                                         { 'field':'model.name', 'title':'Modello'},
                                         { 'field':'finish.name', 'title':'Finitura'},
-                                        { 'field':'prices', 'title':'Prezzi'},
-                                        { 'field':'', 'title':'Attributi', width: '55px'}
+                                        { 'field':'prices', 'title':'Prezzi', width: '380px'},
+                                        { 'field':'', 'title':'Attributi', width: '90px', 'headerAttributes': { 'class': 'justify-content-center' } }
                                     ]",
 									rowTemplate = "product/product-grid-row-tmpl"
 								)#
