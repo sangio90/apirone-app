@@ -20,13 +20,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "role.saved";
 
 		var result = super.getResult();
-		
+
 		var bean = super.bean( "Role" );
 
 		bean.setId( json?.id );
 		bean.setName( json.name );
-		bean.setMinQuantity( json.minQuantity );
-		bean.setMaxQuantity( json.maxQuantity );
 		bean.setQuotationMaxAmount( json.quotationMaxAmount );
 		bean.setQuotationMaxDiscount( json.quotationMaxDiscount );
 
@@ -37,7 +35,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			messageId = "Role.updated";
 			thisId    = super.fire( "Role.update", [ bean ] )
 		}
-			
+
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );

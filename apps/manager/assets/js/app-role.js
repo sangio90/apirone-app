@@ -31,8 +31,6 @@ AP.role.detail = ( function() {
                 id: "",
                 name: "",
                 permissions: new kendo.data.DataSource(),
-                minQuantity: "1",
-                maxQuantity: "1",
                 quotationMaxDiscount: "0",
                 quotationMaxAmount: "0",
             },
@@ -118,7 +116,7 @@ AP.role.detail = ( function() {
     pub.edit = function( role ) {
         viewModel.set( "detailForm.title", "Modifica < " + role.name + " >" );
         viewModel.set( "detailForm.data", role );
- 
+
         kendo.bind( AP.role.fields.roleDetailModal, viewModel );
 
         NM.util.openModal( fields.roleDetailModal );
