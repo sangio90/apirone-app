@@ -94,10 +94,8 @@
                             <li>
                                 <a role="menuitem" tabindex="-1" href="/manager/my/settings"><i class="bx bx-cog"></i> Preferenze</a>
                             </li>
-                            <cfif session.user.getRole().getId() eq 'ADM'>
-                                <li id="costs-toggle" >
-                                </li>
-                            </cfif>
+                            <li id="costs-toggle" data-bind="role: this" data-role-list="ADM/TCD/CMA">
+                            </li>
                             <cfif prc.users.len()>
                                 <li class="divider"></li>
                                 <div id="user-other-roles">cambia profilo</div>

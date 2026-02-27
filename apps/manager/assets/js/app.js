@@ -117,7 +117,7 @@ AP.toggleCosts = function() {
 };
 
 function renderCostsToggle() {
-  if (AP.config.user.role != 'ADM') {
+  if (!AP.hasRole('ADM/TCD/CMA')) {
     AP.setUserPref("showCosts", false);
     return;
   }
