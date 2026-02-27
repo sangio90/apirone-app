@@ -91,7 +91,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 		var mem    = super.getMementify();
 		var user = session.user;
-		if (!isNull(user) && !isNull(user.getRole()) && ArrayContains(['ADM', 'CMA'], user.getRole().getId()) == 0) {
+		if (!isNull(user) && !isNull(user.getRole()) && ArrayContains(['ADM', 'CMA', 'CMS', 'TCD', 'TCS', 'TCJ'], user.getRole().getId()) == 0) {
 			params['ownerId'] = user.getId();
 		}
 		var rows = super.fire( "quotation.search", params );

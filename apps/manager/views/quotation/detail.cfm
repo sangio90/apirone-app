@@ -8,9 +8,9 @@
             <div class="col-9 text-end mt-3">
 				#button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left", class="me-4" )#
 				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
-                #button( bind="click:exportProducts", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
-                #button( bind="click:export", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
-				#button( bind="click:openStatusModal", size="sm", label="Status: #prc.quotation.getStatusHistory().getStatus().getName()#", icon="check-circle" )#
+                #button( bind="click:exportProducts, visible: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
+                #button( bind="click:export, visible: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
+				#button( bind="click:openStatusModal, visible: canEdit", size="sm", label="Status: #prc.quotation.getStatusHistory().getStatus().getName()#", icon="check-circle" )#
 				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
 			</div>
             
@@ -41,6 +41,7 @@
                                             <div class="col-12 d-flex align-items-center">
                                                 <label class="me-2">Zone: </label>
                                                 <select 
+                                                    style="min-width: 500px;"
                                                     class="form-control me-3"
                                                     data-bind="source: zones, value: detailForm.data.zone, events: { change: loadItems }"
                                                     data-value-field="id"
@@ -48,9 +49,11 @@
                                                     id="zones-selector">
                                                 </select>
                                                 <div class="col-2 d-flex">
-                                                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
-                                                    <button type="button" class="btn btn-secondary btn-sm ms-2" data-bind="click:openDuplicateZoneModal">Duplica zona</button>
-                                                    <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
+                                                    <div data-bind="visible: canEdit">
+                                                        <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
+                                                        <button type="button" class="btn btn-secondary btn-sm ms-2" data-bind="click:openDuplicateZoneModal">Duplica zona</button>
+                                                        <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -100,7 +103,7 @@
                                                 </button>
 
                                             </div>
-                                            <div class="col-8 text-end mb-2">
+                                            <div class="col-8 text-end mb-2" data-bind="visible: canEdit">
                                                 <button class="btn btn-primary btn-md" id="qt-update-prices" type="button" data-bind="click:updateAllPrices">
                                                     <i class="fas fa-sync"></i> Aggiorna tutti i prezzi
                                                 </button>

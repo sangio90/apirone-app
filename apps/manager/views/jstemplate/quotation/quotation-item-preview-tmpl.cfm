@@ -20,19 +20,26 @@
                     </div>
                 </div>
                 <div class="col-3 d-flex justify-content-end mb-3">
-                    <div class="ms-2 d-flex justify-content-center p-1 qt-item-clone-rounded" data-bind="click:edit" data-id="#: id#" title="Modifica">
-                        <i class="fas fa-edit" style="cursor: pointer"></i>
-                    </div>
-                    <div class="ms-2 d-flex justify-content-center p-1 qt-item-clone-rounded" data-bind="click:clone" data-id="#: id#" title="Duplica">
-                        <i class="fas fa-clone" style="cursor: pointer"></i>
-                    </div>
-                    <div class="ms-2 d-flex justify-content-center p-1 qt-item-trash-rounded" data-bind="click:delete" data-id="#: id#" title="Cancella">
-                        <i class="fas fa-trash" style="color: red; cursor: pointer"></i>
+                    <div data-bind="visible: canEdit">
+                        <div class="ms-2 d-flex justify-content-center p-1 qt-item-clone-rounded" data-bind="click:edit" data-id="#: id#" title="Modifica">
+                            <i class="fas fa-edit" style="cursor: pointer"></i>
+                        </div>
+                        <div class="ms-2 d-flex justify-content-center p-1 qt-item-clone-rounded" data-bind="click:clone" data-id="#: id#" title="Duplica">
+                            <i class="fas fa-clone" style="cursor: pointer"></i>
+                        </div>
+                        <div class="ms-2 d-flex justify-content-center p-1 qt-item-trash-rounded" data-bind="click:delete" data-id="#: id#" title="Cancella">
+                            <i class="fas fa-trash" style="color: red; cursor: pointer"></i>
+                        </div>
                     </div>
                 </div>
                 <div class="col-12 d-flex justify-content-center">
                     <div class="qt-item-image-container">
-                        <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image">
+                        <div data-bind="visible: canEdit">
+                            <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image">
+                        </div>
+                        <div data-bind="visible: canSee">
+                            <img data-bind="attr: { src: getImageSrc }" class="qt-item-image" style="cursor: default">
+                        </div>
                     </div>
                 </div>
                 <div class="col-6 d-flex justify-content-center">
