@@ -21,8 +21,13 @@
                 <span data-bind="text: finish.name"></span>
             </td>
             <td class="prices-product-cell text-end">
-                <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
-                </div>
+                ## if (AP.hasRole('ADM/CMA')) { ##
+                    <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
+                    </div>
+                ## } else { ##
+                    <div data-bind="source: prices" data-template="price-row-tmpl" class="price-container-list">
+                    </div>
+                ## } ##
             </td>            
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#

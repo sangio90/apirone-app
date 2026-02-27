@@ -4,7 +4,7 @@
 
 		<section class="modal-dialog modal-xl">
 			<div class="modal-content">
-				
+
 				<header class="card-header d-flex align-elements-center justify-content-between modal-header--sticky">
 					<h2 class="card-title"><span data-bind="text: getModalTitle"></span></h2>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
@@ -109,7 +109,10 @@
 									</div>
 								</div>
 
-								<div class="col-2 text-end">
+								<div class="col-2 text-end"
+									data-bind="role: this" 
+									data-role-list="ADM/TCD"
+								>
 									#iconButton( bind="click:copy", icon="copy", variant="default", size="sm", class="me-2", title="Copia le righe selezionate" )#
 									#iconButton( bind="click:paste", icon="paste", variant="default", size="sm", title="Incolla le righe selezionate" )#
 								</div>
@@ -137,7 +140,12 @@
 					<div class="row">
 						<div class="col-md-12 text-end">
 							<button type="button" class="btn btn-default btn-sm me-2" data-bs-dismiss="modal">Chiudi</button>
-							#saveButton(bind="click:save", size="sm")#
+							<span
+								data-bind="role: this" 
+								data-role-list="ADM/TCD"
+							>
+								#saveButton(bind="click:save", size="sm")#
+							</span>
 						</div>
 					</div>
 				</footer>

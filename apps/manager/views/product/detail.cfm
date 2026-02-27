@@ -70,7 +70,7 @@
                                                 Generale
                                         </a>
                                     </li>
-                                    <li class="nav-item">
+                                    <li class="nav-item" data-bind="role: this" data-role-list="ADM/TCD" >
                                         <a class="nav-link" role="tab"data-bs-toggle="tab"  aria-selected="true"
                                             id="product-detail-tab"  
                                             href="##product-detail" 
@@ -99,7 +99,7 @@
 
                                         <div class="tab-pane p-2 fade show active" id="product-general" role="tabpanel" aria-labelledby="product-general-tab">
 
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-4 mb-3" data-bind="role: this" data-role-list="ADM/TCD">
                                                 <button class="btn btn-primary btn-sm" data-bind="click:openAttributesList">Gestisci attributi &raquo;</button>
                                             </div>
 
@@ -142,25 +142,30 @@
                                                                 
                                                             <br>
 
-                                                            - <a href="" class="underline"
-                                                                data-type="product"
-                                                                data-bind="click: openReorderingModal">
-                                                                    Riordina attributi &raquo;
-                                                                </a>
+                                                            <span
+                                                                data-bind="role: this" 
+                                                                data-role-list="ADM/TCD"
+                                                            >
+                                                                - <a href="" class="underline"
+                                                                    data-type="product"
+                                                                    data-bind="click: openReorderingModal"
+                                                                    >
+                                                                        Riordina attributi &raquo;
+                                                                    </a>
 
-                                                            <br>
+                                                                <br>
+                                                                - <a href="" class="underline"
+                                                                    data-type="product"
+                                                                    data-bind="click:openImagesList">
+                                                                        Aggiungi immagini per questo articolo &raquo;
+                                                                    </a>
 
-                                                            - <a href="" class="underline"
-                                                                data-type="product"
-                                                                data-bind="click:openImagesList">
-                                                                    Aggiungi immagini per questo articolo &raquo;
-                                                                </a>
+                                                                <br>
 
-                                                            <br>
-
-                                                            - <a href="/manager/products/#rc.id#/combinations" class="underline">
-                                                                    Tutte le combinazioni &raquo;
-                                                                </a>
+                                                                - <a href="/manager/products/#rc.id#/combinations" class="underline">
+                                                                        Tutte le combinazioni &raquo;
+                                                                    </a>
+                                                            </span>
 
                                                         </div>
 
@@ -225,7 +230,7 @@
 
                                         <div class="tab-pane p-2 fade" id="product-detail" role="tabpanel" aria-labelledby="product-detail-tab">
                                             
-                                            <div class="row">
+                                            <div class="row" data-bind="role: this" data-role-list="ADM/TCD">
 
                                                 <div class="col-md-12 mb-3 col-lg-6">
 
@@ -336,26 +341,32 @@
                                     data-bind="click:toggleUnlinked, text: textToggleLink">
                                 </a>
 
-                                |
+                                <span
+                                    data-bind="role: this"
+                                    data-role-list="ADM/TCD"
+                                >
+                                    |
 
-                                <a href="" class="underline" data-type="item" data-product-id="0" 
-                                    data-product-name="Attributo radice" 
-                                    data-bind="click:openAttributesList">
-                                    Aggiungi attributo di base
-                                </a>
+                                    <a href="" class="underline" data-type="item" data-product-id="0" 
+                                        data-product-name="Attributo radice" 
+                                        data-bind="click:openAttributesList"
+                                    >
+                                        Aggiungi attributo di base
+                                    </a>
 
-                                |
+                                    |
 
-                                <a href="" class="underline" 
-                                    data-product-name="Attributo radice" 
-                                    data-bind="click:showCloneModal">
-                                    Clona albero
-                                </a>
+                                    <a href="" class="underline" 
+                                        data-product-name="Attributo radice" 
+                                        data-bind="click:showCloneModal"
+                                    >
+                                        Clona albero
+                                    </a>
+                                </span>
 
                             </div>           
 
                             <div class="text-end col-4 mb-2" 
-                                style="display:none" 
                                 data-bind="role: this" 
                                 data-role-list="ADM/TCD"
                             >
@@ -385,9 +396,9 @@
                                         { 'field':'Id', 'title':'ID', width: '70px' },
                                         { 'field':'name', 'title':'Attributo' },
                                         { 'field':'', 'title':'Prezzo', width: '180px'},
-                                        { 'field':'', 'title':'Aggiungi immagini', width: '55px'},
-                                        { 'field':'', 'title':'Aggiungi altri attributi', width: '55px'},
-                                        { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '55px'},
+                                        { 'field':'', 'title':'Aggiungi immagini', width: '200px'},
+                                        { 'field':'', 'title':'Aggiungi altri attributi', width: '200px'},
+                                        { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '250px'},
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
