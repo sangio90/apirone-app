@@ -85,7 +85,7 @@
                         <i class="fa custom-caret"></i>
                     </a>
 
-                    <div class="dropdown-menu" style="width:150px;">
+                    <div class="dropdown-menu" style="width:300px !important;">
                         <ul class="list-unstyled mb-2">
                             <li class="divider"></li>
                             <li>
