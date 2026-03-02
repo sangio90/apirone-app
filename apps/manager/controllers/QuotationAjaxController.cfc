@@ -185,49 +185,68 @@ component extends="com.apirone.core.controller.AbsController" {
 			var quotation = super.fire( 'quotation.get', [ quotationId ] );
 			var userRole = session.user.getRole().getId();
 
-			var totals = getTotals(quotationId).pricing
-			var totalPrice = totals.total
+			if (!ArrayContains(['ADM', 'CMA'], userRole)) {
+				var totals = getTotals(quotationId).pricing
+				var totalPrice = totals.total
 
-			if (totalPrice > session.user.getRole().getQuotationMaxAmount()) {
-				isValid = false;
-				message = "Approvazione rimandata ad un superiore, il prezzo totale del preventivo è " & numberFormat( totalPrice, "999,999.00" ) & " €, ed è maggiore del tuo massimale: " & numberFormat( session.user.getRole().getQuotationMaxAmount(), "999,999.00" ) &  " €";
+				if (session.user.getRole().getQuotationMaxAmount() && session.user.getRole().getQuotationMaxAmount() > 0 && totalPrice > session.user.getRole().getQuotationMaxAmount()) {
+					isValid = false;
+					message = "Approvazione rimandata ad un superiore, il prezzo totale del preventivo è " & numberFormat( totalPrice, "999,999.00" ) & " €, ed è maggiore del tuo massimale: " & numberFormat( session.user.getRole().getQuotationMaxAmount(), "999,999.00" ) &  " €";
 
-				history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
-				super.fire('QuotationStatusHistory.create', [ history ] );
-				
-				result.setData( { "message" = message, "error" = {} } );
-				result.setStatus('warning')
-				event.setValue( "result", result );
-				return;
-			}
+					history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
+					super.fire('QuotationStatusHistory.create', [ history ] );
+					
+					result.setData( { "message" = message, "error" = {} } );
+					result.setStatus('warning')
+					event.setValue( "result", result );
+					return;
+				}
 
-			if (isValid) {
-				var quotationDiscount1 = totals.discount1
-				var quotationDiscount2 = totals.discount2
+				if (isValid) {
+					var quotationDiscount1 = totals.discount1
+					var quotationDiscount2 = totals.discount2
 
-				var quotationItems = quotation.getItems()
+					var quotationItems = super.fire( 'QuotationItem.list', [ quotationId = quotationId ] )
 
-				for (var quotationItem in quotationItems) {
-					isValid = validateDiscounts( 
-						session.user.getRole().getQuotationMaxDiscount(),
-						quotationDiscount1,
-						quotationDiscount2,
-						quotationItem.getPrice().getDiscount1(),
-						quotationItem.getPrice().getDiscount2()
-					)
-					if (!IsValid) {	
-						var message = "C'è almeno una riga del preventivo che supera il tuo massimale di sconto. Approvazione rimandata ad un superiore.";
+					for (var quotationItem in quotationItems) {
+						if (!isNull(quotationItem.getArticle())) {
+							continue;
+						}
+						isValid = super.fire( 'QuotationItem.validateQuantity', [ quotation, quotationItem ])
+						if (!IsValid) {	
+							var message = "C'è almeno un prodotto nel preventivo che sfora le quantità minima o massima. Approvazione rimandata ad un superiore.";
 
-						history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
-						super.fire('QuotationStatusHistory.create', [ history ] );
+							history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
+							super.fire('QuotationStatusHistory.create', [ history ] );
 
-						result.setData( { "message" = message, "error" = {} } );
-						result.setStatus('warning')
-						event.setValue( "result", result );
-						return;
+							result.setData( { "message" = message, "error" = {} } );
+							result.setStatus('warning')
+							event.setValue( "result", result );
+							return;
+						}
+						isValid = super.fire( 'QuotationItem.validateDiscounts', [ 
+							session.user.getRole().getQuotationMaxDiscount(),
+							quotationDiscount1,
+							quotationDiscount2,
+							quotationItem.getPrice().getDiscount1(),
+							quotationItem.getPrice().getDiscount2() 
+						])
+
+						if (!IsValid) {	
+							var message = "C'è almeno una riga del preventivo che supera il tuo massimale di sconto. Approvazione rimandata ad un superiore.";
+
+							history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
+							super.fire('QuotationStatusHistory.create', [ history ] );
+
+							result.setData( { "message" = message, "error" = {} } );
+							result.setStatus('warning')
+							event.setValue( "result", result );
+							return;
+						}
 					}
 				}
 			}
+			
 			history.setStatus( super.fire( 'status.get', [ 'APR' ] ) );
 			super.fire('QuotationStatusHistory.create', [ history ] );
 		} catch (e) {
@@ -240,29 +259,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		result.setData( { "message" = message, "error" = { } } );
 		event.setValue( "result", result );
-	}
-
-	function validateDiscounts(
-		required numeric maxUserDiscount,
-		required numeric quotationDiscount1,
-		required numeric quotationDiscount2,
-		required array  items
-	) {
-
-		for ( var item in arguments.items ) {
-			var factor =
-				( 1 - arguments.quotationDiscount1 / 100 ) *
-				( 1 - arguments.quotationDiscount2 / 100 ) *
-				( 1 - item.discount1 / 100 ) *
-				( 1 - item.discount2 / 100 );
-			var totalDiscount = ( 1 - factor ) * 100;
-
-			if ( totalDiscount GT arguments.maxUserDiscount ) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	function setQuotationStatusHistory(json) {

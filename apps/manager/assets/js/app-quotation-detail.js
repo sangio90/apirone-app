@@ -414,15 +414,20 @@ AP.quotation.detail = ( function() {
                 },
                 callback: function( result ) {
                     if ( result ) {
+                        AP.loading.show()
                         NM.util.ajax( {
                             method: "GET",
                             url: "/manager/ajax/quotations_approve/" + AP.page.quotation.id,
                             callback: {
                                 done: function( xhr ) {
-                                    AP.widget.notify( xhr.status, xhr.data.message )
-                                    setTimeout(() => {
-                                        window.location.reload()
-                                    }, 2000)
+                                    AP.loading.hide()
+                                    const status = xhr.status ? xhr.status.toLowerCase() : 'error'
+                                    AP.widget.notify( status, xhr.data.message )
+                                    if (status == 'success') {
+                                        setTimeout(() => {
+                                            window.location.reload()
+                                        }, 2000)
+                                    }
                                 }
                             }
                         } );

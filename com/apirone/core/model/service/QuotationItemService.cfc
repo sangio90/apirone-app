@@ -748,4 +748,59 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		quotationItem.setPrice( price )
 		update(quotationItem)
 	}
+
+	public function validateQuantity(
+		required Quotation quotation,
+		required QuotationItem quotationItem
+	) {
+		var productMinQuantity = quotationItem.getProduct().getMinQuantity()
+		var productMaxQuantity = quotationItem.getProduct().getMaxQuantity()
+		
+		var productQuantity = 0
+		if (productMinQuantity > 0 || productMaxQuantity > 0) {
+			productQuantity = getProductQuantityByQuotation( quotation, quotationItem.getProduct() )
+		}
+
+		if ( productQuantity LT productMinQuantity || productQuantity GT productMaxQuantity ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public function getProductQuantityByQuotation( Quotation quotation, Product product ) {
+		var quotationItems = list( quotationId = quotation.getId() )
+		var quantity = 0;
+		for ( var item in quotationItems ) {
+			if (!isNull(item.getArticle())) {
+				continue;
+			}
+			if (item.getProduct().getId() == product.getId() ) {
+				quantity += item.getQuantity()
+			}
+		}
+
+		return quantity;
+	}
+
+	public function validateDiscounts(
+		required numeric maxUserDiscount,
+		required numeric quotationDiscount1,
+		required numeric quotationDiscount2,
+		required numeric itemDiscount1,
+		required numeric itemDiscount2
+	) {
+		var factor =
+			( 1 - arguments.quotationDiscount1 / 100 ) *
+			( 1 - arguments.quotationDiscount2 / 100 ) *
+			( 1 - itemDiscount1 / 100 ) *
+			( 1 - itemDiscount2 / 100 );
+		var totalDiscount = ( 1 - factor ) * 100;
+
+		if ( totalDiscount GT arguments.maxUserDiscount ) {
+			return false;
+		}
+
+		return true;
+	}
 }

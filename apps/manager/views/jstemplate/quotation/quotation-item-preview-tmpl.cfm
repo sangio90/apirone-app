@@ -42,12 +42,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 d-flex justify-content-center">
+                <div class="col-5 d-flex justify-content-center">
                     Quantità: &nbsp; <span data-bind="text: quantity"></span>
                 </div>
-                <div class="col-6">
+                <div class="col-7">
                     <span>Prezzo: &nbsp; <span data-bind="text: price.total" data-format="n2"></span> &euro;</span>
-                    <span data-bind="visible: showCosts" style="color: blue;"><br><span style="text-decoration: underline;">Costo:</span>&nbsp;&nbsp;<span style="text-decoration: underline;" data-bind="text: price.cost" data-format="n2"></span> &euro;</span>
+                    <span data-bind="visible: showCosts" style="color: blue;"><br><span>Costo:</span>&nbsp;&nbsp;<span data-bind="text: price.cost" data-format="n2"></span> &euro;</span>
                 </div>
             </div>
         </div>

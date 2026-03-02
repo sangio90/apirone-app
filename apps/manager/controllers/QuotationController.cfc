@@ -46,8 +46,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page = getData().page;
 		prc.page[ "quotation" ]["id"] = quotation.getId();
 		prc.page[ "quotation" ]["exported"] = quotation.getExported();
-		prc.page[ "canSee" ] = user.getRole().getId() == 'CMS';
-		prc.page[ "canEdit" ] = (ArrayContains(['ADM', 'CMA', 'TCD', 'TCS', 'TCJ'], user.getRole().getId()) || quotation.getOwner().getId() == user.getId())
+		prc.page[ "canEdit" ] = (ArrayContains(['ADM', 'CMA', 'TCD', 'TCS', 'TCJ'], user.getRole().getId()) || ( quotation.getOwner().getId() == user.getId() && quotation.getStatusHistory().getStatus().getOrderBy() <= 20 ))
+		prc.page[ "canSee" ] = user.getRole().getId() == 'CMS' || prc.page[ "canEdit" ] == false;
 
 		prc.jsFiles.add( "app-quotation-header" );
 		prc.jsFiles.add( "app-quotation-status" );
