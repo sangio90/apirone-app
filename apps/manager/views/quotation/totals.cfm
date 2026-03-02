@@ -60,12 +60,12 @@
 						<div class="col-4">Sconti</div>
 						<div class="col-4 d-flex align-items-center">
 							<input class="form-control text-end me-1" name="discount1"
-								placeholder="%" data-bind="value: pricing.data.discount1">
+								placeholder="%" data-bind="value: pricing.data.discount1, enabled: canEdit">
 								<span>%</span>
 						</div>
 						<div class="col-4 d-flex align-items-center">
 							<input class="form-control text-end me-1" name="discount2" 
-								placeholder="%" data-bind="value: pricing.data.discount2">
+								placeholder="%" data-bind="value: pricing.data.discount2, enabled: canEdit">
 								<span>%</span>
 						</div>
 					</div>
@@ -73,7 +73,7 @@
 						<div class="col-8 mt-2">Spese di trasporto</div>
 						<div class="col-4 d-flex align-items-center">
 							<input class="form-control text-end me-1" name="shippingCost" 
-								placeholder="%" data-bind="value: pricing.data.shippingCost">
+								placeholder="%" data-bind="value: pricing.data.shippingCost, enabled: canEdit">
 								<span>&euro;</span>
 						</div>
 					</div>
@@ -87,7 +87,7 @@
 						<div class="col-8 mt-2">Sconto incondizionato</div>
 						<div class="col-4 d-flex align-items-center">
 							<input class="form-control text-end me-1" name="flatDiscount" 
-								placeholder="%" data-bind="value: pricing.data.flatDiscount">
+								placeholder="%" data-bind="value: pricing.data.flatDiscount, enabled: canEdit">
 							<span>&euro;</span>
 						</div>
 					</div>
@@ -112,7 +112,7 @@
 					<div class="d-flex justify-content-end gap-2">
 						<div class="py-2 text-end d-flex align-items-center gap-2">
 							<div class="status" id="quotation-totals-general-loading"></div>
-							#button(bind="click:updateTotals", variant="default", label="Salva", size="sm", icon="fa-save")#
+							#button(bind="click:updateTotals, enabled: canEdit", variant="default", label="Salva", size="sm", icon="fa-save")#
 						</div>
 					</div>
 				</div>			

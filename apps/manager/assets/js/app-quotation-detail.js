@@ -127,6 +127,8 @@ AP.quotation.detail = ( function() {
                 },
             },
         },
+        canEdit: AP.page.canEdit,
+        canSee: AP.page.canSee,
 
         target: null,
         zones: new kendo.data.DataSource(),
@@ -393,6 +395,48 @@ AP.quotation.detail = ( function() {
 
             return false;
         },
+
+        approveQuotation: function ( event ) {
+            event.stopPropagation();
+
+            bootbox.confirm( {
+                title: "Conferma approvazione",
+                message: "Sei sicuro di voler approvare questo preventivo?",
+                buttons: {
+                    confirm: {
+                        label: "Si, confermo",
+                        className: "btn-primary",
+                    },
+                    cancel: {
+                        label: "No, chiudi",
+                        className: "btn-danger",
+                    },
+                },
+                callback: function( result ) {
+                    if ( result ) {
+                        AP.loading.show()
+                        NM.util.ajax( {
+                            method: "GET",
+                            url: "/manager/ajax/quotations_approve/" + AP.page.quotation.id,
+                            callback: {
+                                done: function( xhr ) {
+                                    AP.loading.hide()
+                                    const status = xhr.status ? xhr.status.toLowerCase() : 'error'
+                                    AP.widget.notify( status, xhr.data.message )
+                                    if (status == 'success') {
+                                        setTimeout(() => {
+                                            window.location.reload()
+                                        }, 2000)
+                                    }
+                                }
+                            }
+                        } );
+                    }
+                },
+            } );
+
+            return false;
+        }, 
 
         save: function( event ) {
             var detailFormDom = AP.quotation.fields.detailForm;
@@ -709,6 +753,22 @@ AP.quotation.detail = ( function() {
             statusApp().edit();
 
         },
+
+        updateAllPrices: function() {
+            AP.loading.show()
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/updateallprices",
+                callback: {
+                    done: function( xhr ) {
+                        AP.widget.notify('success', 'Prezzi articoli aggiornati con i costi fissi.')
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 500)
+                    }
+                }
+            } );
+        }
     } );
 
     pub.showTotals = function( options ) {
@@ -816,7 +876,7 @@ AP.quotation.detail = ( function() {
         kendo.bind( AP.quotation.fields.detailRoot, viewModel );
         kendo.culture( "it-IT" );
 
-        $('#quotation-totals-flat-discount-row').prop('hidden', !['ADM', 'CMA'].includes(AP.page.userRole.id));
+        $('#quotation-totals-flat-discount-row').prop('hidden', !['ADM', 'CMA', 'TCD'].includes(AP.page.userRole.id));
         // Controlla se c'è un parametro tab nell'URL
         pub.checkUrlTab();
 
@@ -825,6 +885,11 @@ AP.quotation.detail = ( function() {
 
         if ( !urlParams.get( "tab" ) ) {
             $( "body" ).find( "button#nav-plate-tab" ).click();
+            $('#qt-update-prices').show();
+        } else {
+            if (!['signage', 'plate'].includes(urlParams.get('tab'))) {
+                $('#qt-update-prices').hide();
+            }
         }
 
         try {
@@ -856,6 +921,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.hide();
                 fields.addArticleBtn.hide();
+                $('#qt-update-prices').show();
             } );
 
             document.querySelector( "#nav-signage-tab" ).addEventListener( "click", function( event ) {
@@ -864,6 +930,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.show();
                 fields.addAccessoryBtn.hide();
                 fields.addArticleBtn.hide();
+                $('#qt-update-prices').show();
             } );
 
             document.querySelector( "#nav-accessory-tab" ).addEventListener( "click", function( event ) {
@@ -872,6 +939,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.show();
                 fields.addArticleBtn.hide();
+                $('#qt-update-prices').hide();
             } );
 
             document.querySelector( "#nav-article-tab" ).addEventListener( "click", function( event ) {
@@ -880,6 +948,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.hide();
                 fields.addArticleBtn.show();
+                $('#qt-update-prices').hide();
             } );
 
             pricingApp().getTotals();

@@ -33,6 +33,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var quotation = super.fire( "Quotation.get", [ rc.id ] );
 
+		var user = session.user;
+		if (!isNull(user) && !isNull(user.getRole()) && user.getRole().getId() == 'CMJ' && quotation.getOwner().getId() != user.getId()) {
+        	relocate( uri="/manager/dashboard", postProcessExempt=false, addToken=false );
+			return;
+		}
+		if (!isNull(user) && !isNull(user.getRole()) && user.getRole().getId() == 'PRO' && quotation.getStatusHistory().getStatus().getId() != 'CON') {
+        	relocate( uri="/manager/dashboard", postProcessExempt=false, addToken=false );
+			return;
+		}
+
 		prc.title     = "Modifica preventivo < #quotation.getQuotationNumber()# / #quotation.getVersionNumber()# > ";
 
 		prc.quotation = quotation;
@@ -40,6 +50,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page = getData().page;
 		prc.page[ "quotation" ]["id"] = quotation.getId();
 		prc.page[ "quotation" ]["exported"] = quotation.getExported();
+		prc.page[ "canEdit" ] = (ArrayContains(['ADM', 'CMA', 'TCD', 'TCS', 'TCJ'], user.getRole().getId()) || ( quotation.getOwner().getId() == user.getId() && quotation.getStatusHistory().getStatus().getOrderBy() <= 20 ))
+		prc.page[ "canSee" ] = user.getRole().getId() == 'CMS' || prc.page[ "canEdit" ] == false || user.getRole().getId() == 'PRO';
 
 		prc.jsFiles.add( "app-quotation-header" );
 		prc.jsFiles.add( "app-quotation-status" );

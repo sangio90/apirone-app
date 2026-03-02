@@ -41,6 +41,10 @@
 }
 
 .ui-pnotify-title {
+    font-size: 20px !important;
+}
+
+.ui-pnotify-text {
     font-size: 16px !important;
 }
 
@@ -331,13 +335,7 @@ h2 {
 #user-other-roles {
     font-size: 11px;
     text-transform: uppercase;
-    text-align: right;
-    margin-top: -15px;
-    margin-right: 10px;
-    background: white;
-    position: absolute;
-    right: 40px;
-    top: 165px;
+    text-align: center;
     padding: 5px 10px;
     color: #ACACAC;
 }

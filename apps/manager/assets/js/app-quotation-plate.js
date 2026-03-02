@@ -1008,7 +1008,7 @@ AP.plate.modal = ( function() {
          * @property {string} imageBase64 - PNG in base64 senza prefisso data:image/png;base64,
          */
         save: function() {
-
+            AP.loading.show();
             // Crea una mappa { id: cellIds } per ogni frutto
             var positions = {};
 
@@ -1053,7 +1053,7 @@ AP.plate.modal = ( function() {
 
                         setTimeout( function() {
                             AP.loading.hide();
-                            // window.location.href = "/manager/quotations/" + parsedData.quotationId + "?tab=plate";
+                            window.location.href = "/manager/quotations/" + parsedData.quotationId + "?tab=plate";
                         }, 1000 );
                     }
                 } );
@@ -1193,6 +1193,7 @@ AP.plate.modal = ( function() {
                 viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
                 viewModel.set( "detailForm.data.position", xhr.data.quotationItem.position );
                 viewModel.set( "detailForm.data.note", xhr.data.quotationItem.note );
+                viewModel.set( "detailForm.data.quantity", xhr.data.quotationItem.quantity );
 
                 const quotationZone = xhr.data.quotationItem.quotationZone
                 if ( quotationZone ) {

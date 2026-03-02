@@ -20,7 +20,7 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-12 float-end">
-                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
+                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save, enabled: canEdit">
                                     <i class="fas fa-save"></i> Salva
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>

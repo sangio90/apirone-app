@@ -24,7 +24,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String str,
 		required Array orderBy  = [ { field = "role.id", desc = "asc" } ]
 	){
-		
+
 		var rows   = [];
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );

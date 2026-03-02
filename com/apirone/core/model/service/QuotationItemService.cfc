@@ -350,4 +350,457 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
+	public com.apirone.core.model.bean.QuotationItemPrice function getPlatePricing( required Struct data ){
+		
+		var json = arguments.data;
+
+		var pricing = super.bean( "QuotationItemPrice" );
+		var method  = super.bean( "PriceMethod" );
+
+		var calculator = super.service( "PriceCalculator" );
+
+		var lines = [];
+
+		pricing.setQuantity( Val( json.price.quantity ) ? json.item.quantity : 1 );
+		pricing.setDiscount1( Val( json.price.discount1 ) ? json.price.discount1 : 0 );
+		pricing.setDiscount2( Val( json.price.discount2 ) ? json.price.discount2 : 0 );
+		        
+		pricing.setMethod( method.setId( json.price.method.id ) );
+		
+        if ( pricing.isFixed() ) {
+			pricing.setAmount( Val( json.price.total ) ? json.price.total : 0 );
+		} else {
+			pricing.setAmount( 0 );
+		}
+
+		/*
+			plate price
+		*/
+
+		var productItemsIds = [];
+
+		var product = json.item.product;
+
+		for ( var item in product.items._data ) {
+			for ( var value in item.values ) {
+				if ( value.selected ) {
+					productItemsIds.add( value.productItemId );
+				}
+			}
+		}
+
+		var quotationItem = null;
+		if (json.item.id != "") {
+			var quotationItem = super.service( "QuotationItem" ).get( json.item.id );
+		}
+
+		var quotation = null;
+		if (json.quotationId != "") {
+			var quotation = super.service( "Quotation" ).get( json.quotationId );
+		}
+
+		var platePrice = calculator.calculate(
+			product.id,
+			json.item.quantity,
+			productItemsIds,
+			0,
+			0,
+			quotation,
+			quotationItem
+		);
+
+		var line = super.bean( "QuotationItemPriceLine" );
+
+		line.setName( "Prezzo placca" );
+		line.setAmount( platePrice.finalPrice );
+		line.setCost( platePrice.totalCost );
+		lines.add( line );
+
+
+		/*
+			fruits price
+		*/
+
+		for ( var fruit in json.item.fruits._data ) {
+			var fruitItemsIds = [];
+			
+			var line = super.bean( "QuotationItemPriceLine" );
+
+			for ( var item in fruit.items._data ) {
+				for ( var value in item.values ) {
+					if ( value.selected ) {
+						fruitItemsIds.add( value.productItemId );
+					}
+				}
+			}
+
+			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds, 0, 0, quotation, quotationItem );
+
+			line.setName( "#fruit.fruit?.name#" );
+			line.setAmount( fruitPrice.finalPrice );
+			line.setCost( fruitPrice.totalCost );
+			lines.add( line );
+		}
+
+		pricing.setLines( lines );
+
+		return pricing;
+	}
+
+	public com.apirone.core.model.bean.QuotationItemPrice function getSignagePricing( required Struct data ){
+		var json = arguments.data;
+
+		var pricing = super.bean( "QuotationItemPrice" );
+		var method  = super.bean( "PriceMethod" );
+
+		var calculator = super.service( "PriceCalculator" );
+
+		var lines = [];
+
+		pricing.setQuotationItemId( json.quotationItem.id );
+		pricing.setId( Val( json.quotationItem.price.id ) ? json.quotationItem.price.id : null );
+		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
+		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
+		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
+		        
+		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
+		
+        if ( json.quotationItem.price.method.id EQ 'F' ) {
+			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
+		} else {
+			pricing.setAmount( 0 );
+		}
+
+		/*
+			signage price
+		*/
+		var productItemsIds = [];
+
+		var product = json.quotationItem.product;
+
+		var product = json.quotationItem.product;
+		if ( product.keyExists( "items" ) ) {
+			for ( var item in product.items._data ) {
+				for ( var value in item.values ) {
+					if ( value.selected ) {
+						productItemsIds.add( value.product_item_id );
+					}
+				}
+			}
+		}
+
+		var lettersQuantity = 0;
+		for ( var signageRow in json.quotationItem.signageRows._data ) {
+			lettersQuantity += Val( signageRow.charCount ) ? signageRow.charCount : 0;
+		}
+		
+		var quotation = getQuotationService().get( json.quotationId )
+		var quotationItem = get( json.quotationItem.id )
+
+		var signagePrice = calculator.calculate(
+			product.id,
+			json.quotationItem.quantity,
+			productItemsIds,
+			lettersQuantity,
+			json.quotationItem.signageConfigItem.id,
+			quotation,
+			quotationItem
+		);
+		var line = super.bean( "QuotationItemPriceLine" );
+
+		line.setName( "Prezzo segnaletica" );
+		line.setAmount( signagePrice.finalPrice );
+		line.setCost( signagePrice.totalCost );
+
+		lines.add( line );
+
+		pricing.setLines( lines );
+
+		return pricing;
+	}
+
+	public com.apirone.core.model.bean.QuotationItemPrice function getPricing( required Struct data ){		
+		var json = arguments.data;
+
+		var pricing = super.bean( "QuotationItemPrice" );
+		var method  = super.bean( "PriceMethod" );
+
+		var calculator = super.service( "PriceCalculator" );
+
+		var lines = [];
+
+		pricing.setQuotationItemId( json.quotationItem.id );
+		pricing.setId( Val( json.quotationItem.price.id ) ? json.quotationItem.price.id : null );
+		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
+		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
+		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
+		        
+		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
+		
+        if ( json.quotationItem.price.method.id EQ 'F' ) {
+			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
+		} else {
+			pricing.setAmount( 0 );
+		}
+
+		/*
+			price
+		*/
+
+		var productItemsIds = [];
+
+		var product = json.quotationItem.product;
+		if ( product.keyExists( "items" ) ) {
+			for ( var item in product.items._data ) {
+				for ( var value in item.values ) {
+					if ( value.selected ) {
+						productItemsIds.add( value.product_item_id );
+					}
+				}
+			}
+		}
+
+		var quotation = getQuotationService().get( json.quotationId )
+		var quotationItem = get( json.quotationItem.id )
+
+		var price = calculator.calculate(
+			product.id,
+			json.quotationItem.quantity,
+			productItemsIds,
+			0,
+			0,
+			quotation,
+			quotationItem
+		);
+
+		var line = super.bean( "QuotationItemPriceLine" );
+
+		line.setName( "Prezzo base" );
+		line.setAmount( price.finalPrice );
+		line.setCost( price.totalCost );
+
+		lines.add( line );
+
+		pricing.setLines( lines );
+
+		return pricing;
+	}
+
+	public function getAltreRigheByQuotationLineIdAndFinishId( 
+		required String quotationItemId, 
+		required String quotationId,
+		required String finishId,
+		required String lineId
+	){
+		if ( IsNull( quotationId ) ) {
+			return [];
+		}
+		return getDao().getAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
+	}
+
+	public function aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId(
+		required String quotationItemId, 
+		required String quotationId,
+		required String finishId,
+		required String lineId
+	){
+		var rows = this.getAltreRigheByQuotationLineIdAndFinishId(
+			"quotationId" = quotationId, 
+			"quotationItemId" = quotationItemId, 
+			"lineId" = lineId,
+			"finishId" = finishId
+		)
+
+		for (var row in rows) {
+			var data = {}
+			var quotationItem = get( quotationItemId = row.quotation_item_id );
+			if (
+				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") && 
+				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")
+			) {
+				continue;
+			}
+
+			aggiornaPrezzo(quotationItem)
+		}
+	}
+
+	public function aggiornaPrezzo( required quotationItem )
+	{
+		var quotationId = quotationItem.getQuotation().getId()
+		var productId = quotationItem.getProduct().getId();
+		var quantity = quotationItem.getQuantity();
+		var productItemIds = [];
+		for (var item in quotationItem.getItems()) {
+			productItemIds.append(item.getProductItem().getId())
+		}
+
+		//questa parte serve per replicare le strutture dati che si aspettano getSignagePricing e la getPlatePricing quando chiamate dal client
+		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
+			var json = 
+			{
+				"quotationId": "",
+				"price": {
+					"quantity": 0,
+					"discount1": 0,
+					"discount2": 0,
+					"total": 0,
+					"method": { "id": "" }
+				},
+				"item": {
+					"id": "",
+					"quantity": 0,
+					"product": {
+						"id": "",
+						"items": { "_data": [] }
+					},
+					"fruits": { "_data": [] }
+				}
+			}
+			json.quotationId = quotationId;
+			json.item.id = quotationItem.getId();
+			json.item.quantity = quantity;
+			if (!isNull(quotationItem.getPrice())) {
+				json.price.id = quotationItem.getPrice().getId();
+				json.price.discount1 = quotationItem.getPrice().getDiscount1();
+				json.price.discount2 = quotationItem.getPrice().getDiscount2();
+				json.price.method.id = quotationItem.getPrice().getMethod().getId();
+				json.price.total = quotationItem.getPrice().getMethod().getId() == "F" ? quotationItem.getPrice().getAmount() : 0;
+			}
+			json.item.product.id = productId;
+			for (productItemId in productItemIds) {
+				json.item.product.items._data.append({
+					values = [
+						{ selected = true, productItemId = productItemId }
+					]
+				});
+			}
+			var fruits = quotationItem.getFruits();
+			for (var fruit in fruits) {
+				var fruitItems = []
+
+				for (fruitItem in fruit.getItems()) {
+					fruitItems.append({
+						values = [
+							{ selected = true, productItemId = productItemId }
+						]
+					})
+				}
+				json.item.fruits._data.append({
+					"fruit": {
+						"id": fruit.getFruit().getId()
+					},
+					"fruitId": fruit.getId(),
+					"items": { "_data": fruitItems }
+				});
+			}
+			var price = getPlatePricing(json)
+		} 
+
+		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
+			json = {
+				"quotationId": "",
+				"quotationItem": {
+					"id": "",
+					"quantity": 0,
+					"price": {
+						"id": 0,
+						"discount1": 0,
+						"discount2": 0,
+						"method": { "id": "F" },
+						"total": 0
+					},
+					"product": {
+						"id": "",
+					"items": { "_data": [] }
+					},
+					"signageRows": { "_data": [] },
+					"signageConfigItem": { "id": 0 }
+				}
+			}
+
+			json.quotationId = quotationId;
+			json.quotationItem.id = quotationItem.getId()
+			json.quotationItem.quantity = quantity
+			if (!isNull(quotationItem.getPrice())) {
+				json.quotationItem.price.id = quotationItem.getPrice().getId();
+				json.quotationItem.price.discount1 = quotationItem.getPrice().getDiscount1();
+				json.quotationItem.price.discount2 = quotationItem.getPrice().getDiscount2();
+				json.quotationItem.price.method.id = quotationItem.getPrice().getMethod().getId();
+				json.quotationItem.price.total = quotationItem.getPrice().getMethod().getId() == "F" ? quotationItem.getPrice().getAmount() : 0;
+			}
+			json.quotationItem.product.id = productId;
+			for (productItemId in productItemIds) {
+				json.quotationItem.product.items._data.append({
+					values = [
+						{ selected = true, product_item_id = productItemId }
+					]
+				});
+			}
+
+			json.quotationItem.signageConfigItem.id = quotationItem.getSignageConfigItem().getId()
+			for ( var signageRow in quotationItem.getSignageRows() ) {
+				json.quotationItem.signageRows._data.append({ charCount = signageRow.getCharCount() });
+			}
+			var price = getSignagePricing(json)
+		}
+
+		quotationItem.setPrice( price )
+		update(quotationItem)
+	}
+
+	public function validateQuantity(
+		required Quotation quotation,
+		required QuotationItem quotationItem
+	) {
+		var productMinQuantity = quotationItem.getProduct().getMinQuantity()
+		var productMaxQuantity = quotationItem.getProduct().getMaxQuantity()
+		
+		var productQuantity = 0
+		if (productMinQuantity > 0 || productMaxQuantity > 0) {
+			productQuantity = getProductQuantityByQuotation( quotation, quotationItem.getProduct() )
+		}
+
+		if ( productQuantity LT productMinQuantity || productQuantity GT productMaxQuantity ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public function getProductQuantityByQuotation( Quotation quotation, Product product ) {
+		var quotationItems = list( quotationId = quotation.getId() )
+		var quantity = 0;
+		for ( var item in quotationItems ) {
+			if (!isNull(item.getArticle())) {
+				continue;
+			}
+			if (item.getProduct().getId() == product.getId() ) {
+				quantity += item.getQuantity()
+			}
+		}
+
+		return quantity;
+	}
+
+	public function validateDiscounts(
+		required numeric maxUserDiscount,
+		required numeric quotationDiscount1,
+		required numeric quotationDiscount2,
+		required numeric itemDiscount1,
+		required numeric itemDiscount2
+	) {
+		var factor =
+			( 1 - arguments.quotationDiscount1 / 100 ) *
+			( 1 - arguments.quotationDiscount2 / 100 ) *
+			( 1 - itemDiscount1 / 100 ) *
+			( 1 - itemDiscount2 / 100 );
+		var totalDiscount = ( 1 - factor ) * 100;
+
+		if ( totalDiscount GT arguments.maxUserDiscount ) {
+			return false;
+		}
+
+		return true;
+	}
 }

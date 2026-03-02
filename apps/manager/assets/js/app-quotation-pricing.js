@@ -97,6 +97,7 @@ AP.quotation.itemPricing = ( function() {
                 payload.quotationItem.price.total     = viewModel.get( "pricing.data.total" );
                 payload.quotationItem.price.method    = viewModel.get( "pricing.data.method" );
             }
+            payload.quotationId = AP.page.quotation.id;
 
             const url = "/manager/ajax/quotation-items/type/" + typeId + "/pricing";
 
@@ -212,6 +213,8 @@ AP.quotation.totalPricing = ( function() {
 
     var viewModel = kendo.observable( {
         showCosts: AP.getUserPref( "showCosts" ),
+        canEdit: AP.page.canEdit,
+        canSee: AP.page.canSee,
         detail: {
             title: "",
             isCollapsed: isCollapsed,

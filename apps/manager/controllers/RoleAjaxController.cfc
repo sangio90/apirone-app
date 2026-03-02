@@ -20,7 +20,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var messageId = "role.saved";
 
 		var result = super.getResult();
-		
+
 		var bean = super.bean( "Role" );
 
 		bean.setId( json?.id );
@@ -35,7 +35,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			messageId = "Role.updated";
 			thisId    = super.fire( "Role.update", [ bean ] )
 		}
-			
+
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );

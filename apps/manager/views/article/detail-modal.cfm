@@ -16,22 +16,50 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Codice</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" 
-                                    name="code"
-                                    maxlength="10"
-                                    data-bind="value: detailForm.data.code"
-                                    onkeyup="this.value = this.value.toUpperCase();">
+                                <div data-bind="role: this" data-role-list="ADM/TCD">
+                                    <input 
+                                        type="text" required class="form-control col-sm-4" 
+                                        name="code"
+                                        maxlength="10"
+                                        data-bind="value: detailForm.data.code"
+                                        onkeyup="this.value = this.value.toUpperCase();"
+                                    >
+                                </div>
+                                <div data-bind="role: this" data-role-list="CMA/TCJ/TCS">
+                                    <input 
+                                        type="text" required class="form-control col-sm-4" 
+                                        disabled
+                                        name="code"
+                                        maxlength="10"
+                                        data-bind="value: detailForm.data.code"
+                                        onkeyup="this.value = this.value.toUpperCase();"
+                                    >
+                                </div>
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Codice esterno</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control col-sm-4 uppercase" 
-                                    name="externalId"
-                                    maxlength="15"
-                                    data-bind="value: detailForm.data.externalId"
-                                    onkeyup="this.value = this.value.toUpperCase();">
+                                <div data-bind="role: this" data-role-list="ADM/TCD">
+                                    <input 
+                                        type="text" class="form-control col-sm-4 uppercase" 
+                                        name="externalId"
+                                        maxlength="15"
+                                        data-bind="value: detailForm.data.externalId"
+                                        onkeyup="this.value = this.value.toUpperCase();"
+                                    >
+                                </div>
+                                <div data-bind="role: this" data-role-list="CMA/TCJ/TCS">
+                                    <input 
+                                        disabled
+                                        type="text" required class="form-control col-sm-4 uppercase" 
+                                        name="externalId"
+                                        maxlength="15"
+                                        data-bind="value: detailForm.data.externalId"
+                                        onkeyup="this.value = this.value.toUpperCase();"
+                                    >
+                                </div>
                             </div>
                             <div class="col-sm-10 offset-sm-2">
                                 <span class="field-note">Lo stesso codice usato in Verticale</span>
@@ -42,33 +70,79 @@
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Nome</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4 uppercase" name="name"
-                                    data-msg-required="Nome richiesto"
-                                    maxlength="125"
-                                    data-bind="value: detailForm.data.nameItem.name">
+                                <div data-bind="role: this" data-role-list="ADM/TCD">
+                                    <input 
+                                        type="text" required class="form-control col-sm-4 uppercase" name="name"
+                                        data-msg-required="Nome richiesto"
+                                        maxlength="125"
+                                        data-bind="value: detailForm.data.nameItem.name"
+                                    >
+                                </div>
+                                <div data-bind="role: this" data-role-list="CMA/TCJ/TCS">
+                                    <input
+                                        disabled
+                                        type="text" required class="form-control col-sm-4 uppercase" name="name"
+                                        data-msg-required="Nome richiesto"
+                                        maxlength="125"
+                                        data-bind="value: detailForm.data.nameItem.name"
+                                    >
+                                </div>
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Descrizione</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control col-sm-4 uppercase" name="description"
-                                    data-msg-required="Descrizione richiesta"
-                                    maxlength="125"
-                                    data-bind="value: detailForm.data.descriptionItem.name">
+                                <div data-bind="role: this" data-role-list="ADM/TCD">
+                                    <input 
+                                        type="text" 
+                                        class="form-control col-sm-4 uppercase" 
+                                        name="description"
+                                        data-msg-required="Descrizione richiesta"
+                                        maxlength="125"
+                                        data-bind="value: detailForm.data.descriptionItem.name"
+                                    >
+                                </div>
+                                <div data-bind="role: this" data-role-list="CMA/TCJ/TCS">
+                                    <input
+                                        disabled
+                                        type="text" 
+                                        class="form-control col-sm-4 uppercase" 
+                                        name="description"
+                                        data-msg-required="Descrizione richiesta"
+                                        maxlength="125"
+                                        data-bind="value: detailForm.data.descriptionItem.name"
+                                    >
+                                </div>
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Stato</label>
                             <div class="col-sm-10">
-                                <select id="statusId" class="form-control"
-                                    required
-                                    data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
-                                    data-value-field="id"
-                                    data-text-field="name"
-                                    >
-                                </select>
+                                <div data-bind="role: this" data-role-list="ADM/TCD">
+                                    <select 
+                                        id="statusId" 
+                                        class="form-control"
+                                        required
+                                        data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
+                                        data-value-field="id"
+                                        data-text-field="name"
+                                        >
+                                    </select>
+                                </div>
+                                <div data-bind="role: this" data-role-list="CMA/TCJ/TCS">
+                                    <select
+                                        disabled
+                                        id="statusId" 
+                                        class="form-control"
+                                        required
+                                        data-bind="source: detailForm.statuses, value: detailForm.data.status.id" 
+                                        data-value-field="id"
+                                        data-text-field="name"
+                                        >
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -76,7 +150,8 @@
                             <label class="col-sm-2 col-form-label text-end">Prezzo</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="price" data-bind="value: detailForm.data.price.amount">
+                                    <input type="text" class="form-control" name="price" data-bind="value: detailForm.data.price.amount, role: this" data-role-list="ADM/CMA">
+                                    <input disabled type="text" class="form-control" name="price" data-bind="value: detailForm.data.price.amount, role: this" data-role-list="TCD">
                                     <span class="input-group-text">
                                         <i class="fas fa-euro-sign text-4"></i>
                                     </span>

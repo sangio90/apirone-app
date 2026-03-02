@@ -16,25 +16,33 @@
             ##if (status.id == 'ACT') {## 
 
                 <td class="prices-product-cell">
-                    <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
-                    </div>
+                    ## if (AP.hasRole('ADM/CMA')) { ##
+                        <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
+                        </div>
+                    ## } ##
                 </td>
                 <td class="text-center">
+                    ## if (AP.hasRole('ADM/TCD')) { ##
                     <button type="button" class="btn btn-default btn-sm" data-bind="click:openImagesList" data-type="productItem">
                         <i class="fas fa-image"></i> 
                     </button>
+                    ## } ##
                 </td>
 
                 <td class="text-center">
+                    ## if (AP.hasRole('ADM/TCD')) { ##
                     <button type="button" class="btn btn-default btn-sm" data-bind="click:openAttributesList, attr: { data-origin-id: id }">
                         <i class="fas fa-plus"></i> 
                     </button>
+                    ## } ##
                 </td>
                 <td class="text-center">
+                    ## if (AP.hasRole('ADM/TCD')) { ##
                     <button type="button" class="btn btn-default btn-sm" data-bind="click:openComponentsList" data-type="item"> 
                         <i class="fas fa-window-restore"></i>
                         <i class="button-badge info" data-bind="text: componentCount"></i> 
                     </button>
+                    ## } ##
                 </td>
                 <td class="text-center">
                     <input type="checkbox" class="form-check-input"
@@ -47,9 +55,11 @@
             ##} else {##
 
                 <td class="text-center">
+                    ## if (AP.hasRole('ADM/TCD')) { ##
                     <button type="button" class="btn btn-default btn-sm" data-bind="click:addValue">
                         <i class="fas fa-chevron-right"></i>
                     </button>
+                    ## } ##
                 </td>
             
             ##}##

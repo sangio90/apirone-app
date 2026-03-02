@@ -19,7 +19,9 @@
                 <span data-format="0.00" data-bind="text: price.amount"></span> &euro;
             </td>
             <td class="text-center">
+                ## if (AP.hasRole('ADM/TCD/CMA')) { ##
                 #iconButton(bind="click:edit", icon="edit")#
+                ## } ##
             </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"

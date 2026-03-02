@@ -4,11 +4,13 @@
     <nmscript type="text/x-kendo-template" id="quotation-item-article-grid-row-tmpl">
         <tr class="k-master-row" data-uid="##: uid ##">
             <td class="text-center">
-                <div class="btn btn-default btn-sm" data-bind="click:edit" data-id="##:id##"  title="Modifica">
-                    <i class="fas fa-edit" style="cursor: pointer"></i>
-                </div>
-                <div class="btn btn-default btn-sm" data-bind="click:delete" data-id="##:id##"  title="Cancella">
-                    <i class="fas fa-trash" style="color: red; cursor: pointer"></i>
+                <div data-bind="visible: canEdit">
+                    <div class="btn btn-default btn-sm" data-bind="click:edit" data-id="##:id##"  title="Modifica">
+                        <i class="fas fa-edit" style="cursor: pointer"></i>
+                    </div>
+                    <div class="btn btn-default btn-sm" data-bind="click:delete" data-id="##:id##"  title="Cancella">
+                        <i class="fas fa-trash" style="color: red; cursor: pointer"></i>
+                    </div>
                 </div>
             </td>
             <td>

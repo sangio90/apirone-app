@@ -57,13 +57,13 @@
 									id      = "quotation-grid",
 									columns = "[
                                         { 'field':'shortId', 'title':'ID',  width: '80px' },
-                                        { 'field':'quotationNumber', 'title':'##', width: '70px' },
+                                        { 'field':'quotationNumber', 'title':'##', width: '80px' },
                                         { 'field':'name', 'title':'Nome' },
                                         { 'field':'referentName', 'title':'Referente' },
-                                        { 'field':'owner.email', 'title':'Account', width: '15%'},
-                                        { 'field':'createdAt', 'title':'Creato il', width: '140px'},
+                                        { 'field':'owner.email', 'title':'Account', width: '10%'},
+                                        { 'field':'createdAt', 'title':'Creato il', width: '10%'},
                                         { 'field':'status', 'title':'Stato', width: '15%'},
-                                        { 'field':'', 'title':'Modifica', width: '55px'},
+                                        { 'field':'', 'title':'Modifica', width: '90px'},
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

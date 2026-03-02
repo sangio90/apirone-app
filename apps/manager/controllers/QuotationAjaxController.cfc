@@ -87,11 +87,18 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
 		var data = [];
-
 		var result = super.getResult();
 		var params = super.paramsFromUrl();
 		var mem    = super.getMementify();
-
+		var user = session.user;
+		if (!isNull(user) && !isNull(user.getRole())) {
+			if (user.getRole().getId() == 'CMJ') {
+				params['ownerId'] = user.getId();
+			}
+			if (user.getRole().getId() == 'PRO') {
+				params['statusId'] = 'CON';
+			}
+		}
 		var rows = super.fire( "quotation.search", params );
 		var data = mem.convertList( rows.getData() );
 
@@ -165,6 +172,97 @@ component extends="com.apirone.core.controller.AbsController" {
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message, "payload" = { "id" = thisId }, "error" = {} } );
+		event.setValue( "result", result );
+	}
+
+	function approveQuotation( event, rc, prc ) {
+		var thisId = "";
+		var message = "Preventivo approvato.";
+		var result    = super.getResult();
+
+		var isValid = true;
+		var quotationId = rc.id
+
+		try {
+			var history = super.bean( "QuotationStatusHistory" );
+			history.setQuotationId( quotationId );
+			history.setUser( session.user );
+			var quotation = super.fire( 'quotation.get', [ quotationId ] );
+			var userRole = session.user.getRole().getId();
+
+			if (!ArrayContains(['ADM', 'CMA'], userRole)) {
+				var totals = getTotals(quotationId).pricing
+				var totalPrice = totals.total
+
+				if (session.user.getRole().getQuotationMaxAmount() && session.user.getRole().getQuotationMaxAmount() > 0 && totalPrice > session.user.getRole().getQuotationMaxAmount()) {
+					isValid = false;
+					message = "Approvazione rimandata ad un superiore, il prezzo totale del preventivo è " & numberFormat( totalPrice, "999,999.00" ) & " €, ed è maggiore del tuo massimale: " & numberFormat( session.user.getRole().getQuotationMaxAmount(), "999,999.00" ) &  " €";
+
+					history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
+					super.fire('QuotationStatusHistory.create', [ history ] );
+					
+					result.setData( { "message" = message, "error" = {} } );
+					result.setStatus('warning')
+					event.setValue( "result", result );
+					return;
+				}
+
+				if (isValid) {
+					var quotationDiscount1 = totals.discount1
+					var quotationDiscount2 = totals.discount2
+
+					var quotationItems = super.fire( 'QuotationItem.list', [ quotationId = quotationId ] )
+
+					for (var quotationItem in quotationItems) {
+						if (!isNull(quotationItem.getArticle())) {
+							continue;
+						}
+						isValid = super.fire( 'QuotationItem.validateQuantity', [ quotation, quotationItem ])
+						if (!IsValid) {	
+							var message = "C'è almeno un prodotto nel preventivo che sfora le quantità minima o massima. Approvazione rimandata ad un superiore.";
+
+							history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
+							super.fire('QuotationStatusHistory.create', [ history ] );
+
+							result.setData( { "message" = message, "error" = {} } );
+							result.setStatus('warning')
+							event.setValue( "result", result );
+							return;
+						}
+						isValid = super.fire( 'QuotationItem.validateDiscounts', [ 
+							session.user.getRole().getQuotationMaxDiscount(),
+							quotationDiscount1,
+							quotationDiscount2,
+							quotationItem.getPrice().getDiscount1(),
+							quotationItem.getPrice().getDiscount2() 
+						])
+
+						if (!IsValid) {	
+							var message = "C'è almeno una riga del preventivo che supera il tuo massimale di sconto. Approvazione rimandata ad un superiore.";
+
+							history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
+							super.fire('QuotationStatusHistory.create', [ history ] );
+
+							result.setData( { "message" = message, "error" = {} } );
+							result.setStatus('warning')
+							event.setValue( "result", result );
+							return;
+						}
+					}
+				}
+			}
+			
+			history.setStatus( super.fire( 'status.get', [ 'APR' ] ) );
+			super.fire('QuotationStatusHistory.create', [ history ] );
+		} catch (e) {
+			message = "Errore durante l'approvazione del preventivo: " & e.Message
+			result.setData( { "message" = message, "error" = {} } );
+			result.setStatus('error')
+			event.setValue( "result", result );
+		}
+		
+
+		result.setData( { "message" = message, "error" = { } } );
 		event.setValue( "result", result );
 	}
 
@@ -421,7 +519,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 	}
 	
-	private Struct function getTotals( quotationId ){
+	public Struct function getTotals( quotationId ){
 
 		var service = super.service( "QuotationPrice" );
 

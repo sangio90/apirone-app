@@ -52,7 +52,9 @@
                     <input type="checkbox" value="##:id##" name="selected" class="form-check-input">
                 </td>
                 <td width="40" class="text-end">
-                    #iconButton( icon="trash", bind="click:deactivate" )#
+                    ## if (AP.hasRole('ADM/TCD')) { ##
+                        #iconButton( icon="trash", bind="click:deactivate" )#
+                    ## } ##
                 </td>                    
 
             ##} else {##
@@ -65,7 +67,9 @@
                     <input type="checkbox" value="##:id##" name="selected" class="form-check-input">
                 </td>
                 <td width="40" class="text-end">
-                    #iconButton( icon="trash", bind="click:remove" )#
+                    ## if (AP.hasRole('ADM/TCD')) { ##
+                        #iconButton( icon="trash", bind="click:remove" )#
+                    ## } ##
                 </td>                    
 
             ##}##

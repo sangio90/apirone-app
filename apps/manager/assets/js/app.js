@@ -32,6 +32,47 @@ AP.core = ( function() {
 
 }() );
 
+AP.hasRole = function (roles) {
+    const userRole = AP.config.user?.role;
+    if (!userRole) return false;
+
+    let rolesArray = [];
+    if (Array.isArray(roles)) {
+        rolesArray = roles;
+    } else if (typeof roles === "string") {
+        rolesArray = roles.split('/').map(r => r.trim());
+    }
+
+    return rolesArray.includes(userRole);
+};
+
+kendo.data.binders.role = kendo.data.Binder.extend({
+    refresh: function() {
+        var rolesString = this.element.getAttribute("data-role-list");
+        var hasPermission = AP.hasRole(rolesString);
+
+        if (hasPermission) {
+            $(this.element).show();
+        } else {
+            $(this.element).hide();
+        }
+    }
+});
+
+kendo.data.binders.roleEnable = kendo.data.Binder.extend({
+    refresh: function() {
+        var rolesString = this.element.getAttribute("data-role-list");
+        var hasPermission = AP.hasRole(rolesString);
+
+        var widget = kendo.widgetInstance($(this.element));        
+        if (widget && typeof widget.enable === "function") {
+            widget.enable(hasPermission);
+        } else {
+            $(this.element).prop("disabled", !hasPermission);
+        }
+    }
+});
+
 AP.namespace = function( name ) {
     var parts = name.split( "." );
     var current = AP;
@@ -90,7 +131,7 @@ AP.toggleCosts = function() {
 };
 
 function renderCostsToggle() {
-  if (AP.config.user.role != 'ADM') {
+  if (!AP.hasRole('ADM/TCD/CMA')) {
     AP.setUserPref("showCosts", false);
     return;
   }

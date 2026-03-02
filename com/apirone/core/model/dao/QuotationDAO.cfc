@@ -34,8 +34,8 @@
 		<cfargument name="shippingProfileId" type="String" required="false">
 		<cfargument name="salesAgentId" type="String" required="false">
 		<cfargument name="graphicTechnicianId" type="String" required="false">
+		<cfargument name="ownerId" type="String" required="false">
 		<cfargument name="str" type="String" required="false">
-
 		<cfargument
 			name    ="orderBy"
 			type    ="String"
@@ -105,6 +105,10 @@
 
 			<cfif !IsNull( arguments.graphicTechnicianId )>
 				AND graphic_technician_account_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.graphicTechnicianId#">::uuid
+			</cfif>
+
+			<cfif !IsNull( arguments.ownerId )>
+				AND owner_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.ownerId#">::uuid
 			</cfif>
 
 			ORDER BY

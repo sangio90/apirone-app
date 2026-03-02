@@ -8,9 +8,16 @@
             <div class="col-9 text-end mt-3">
 				#button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left", class="me-4" )#
 				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
-                #button( bind="click:exportProducts", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
-                #button( bind="click:export", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
-				#button( bind="click:openStatusModal", size="sm", label="Status: #prc.quotation.getStatusHistory().getStatus().getName()#", icon="check-circle" )#
+                #button( bind="click:exportProducts, visible: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
+                #button( bind="click:export, visible: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
+				<button type="button" 
+                        class="btn btn-primary btn-sm" 
+                        data-role-list="ADM/CMA"
+                        data-bind="click: openStatusModal, roleEnable: this">
+                    
+                    <i class="fas fa-check-circle"></i> 
+                    Status: #prc.quotation.getStatusHistory().getStatus().getName()#
+                </button>
 				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
 			</div>
             
@@ -33,29 +40,25 @@
 
                             <div class="row">
 
-                                <div class="col-6">
-
-                                    <div class="mb-3 d-flex ">
-                                        <div class="row align-items-center">
-                                        
-                                            <div class="col-12 d-flex align-items-center">
-                                                <label class="me-2">Zone: </label>
-                                                <select 
-                                                    class="form-control me-3"
-                                                    data-bind="source: zones, value: detailForm.data.zone, events: { change: loadItems }"
-                                                    data-value-field="id"
-                                                    data-text-field="name"
-                                                    id="zones-selector">
-                                                </select>
-                                                <div class="col-2 d-flex">
-                                                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
-                                                    <button type="button" class="btn btn-secondary btn-sm ms-2" data-bind="click:openDuplicateZoneModal">Duplica zona</button>
-                                                    <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="col-4 d-flex">
+                                    <label class="me-2">Zone: </label>
+                                    <select 
+                                        style="max-width: 600px;"
+                                        class="form-control me-3"
+                                        data-bind="source: zones, value: detailForm.data.zone, events: { change: loadItems }"
+                                        data-value-field="id"
+                                        data-text-field="name"
+                                        id="zones-selector">
+                                    </select>
+                                </div>
+                                <div class="col-8">
+                                    <div class="d-flex">
+                                        <span data-bind="visible: canEdit">
+                                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
+                                            <button type="button" class="btn btn-secondary btn-sm ms-2" data-bind="click:openDuplicateZoneModal">Duplica zona</button>
+                                            <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
+                                        </span>
                                     </div>
-
                                 </div>
 
                             </div>
@@ -100,13 +103,19 @@
                                                 </button>
 
                                             </div>
-                                            <div class="col-8 text-end mb-2">
-
+                                            <div class="col-8 text-end mb-2" data-bind="visible: canEdit">
+                                                <button class="btn btn-primary btn-md" id="qt-update-prices" type="button" data-bind="click:updateAllPrices">
+                                                    <i class="fas fa-sync"></i> Aggiorna tutti i prezzi
+                                                </button>
                                                 #addButton( label="Aggiungi placca", id="qt-add-plate", bind="click:addPlate")#
                                                 #addButton( label="Aggiungi segnaletica", id="qt-add-signage", bind="click:addSignage", style="display: none" )#
                                                 #addButton( label="Aggiungi accessorio", id="qt-add-accessory", bind="click:addAccessory", style="display: none" )#
                                                 #addButton( label="Aggiungi servizio", id="qt-add-article", bind="click:addArticle", style="display: none" )#
-
+                                                <cfif #prc.quotation.getStatusHistory().getStatus().getId() == 'LAV'#>
+                                                    <button class="btn btn-success btn-md" id="qt-update-prices" type="button" data-bind="click:approveQuotation">
+                                                        <i class="fas fa-check"></i> Concludi preventivo
+                                                    </button>
+                                                </cfif>
                                             </div>
                                         </div>
                                     </nav>

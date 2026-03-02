@@ -8,6 +8,7 @@
 		"FONT_FAMILY": {},
 		"FONT_FAMILY_SIZE": {},
 		"LINE": {},
+		"LINECOST": {},
 		"MODEL": {},
 		"PICTOGRAM": {},
 		"PRICE": {},

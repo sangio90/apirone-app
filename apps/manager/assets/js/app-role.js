@@ -116,7 +116,7 @@ AP.role.detail = ( function() {
     pub.edit = function( role ) {
         viewModel.set( "detailForm.title", "Modifica < " + role.name + " >" );
         viewModel.set( "detailForm.data", role );
- 
+
         kendo.bind( AP.role.fields.roleDetailModal, viewModel );
 
         NM.util.openModal( fields.roleDetailModal );

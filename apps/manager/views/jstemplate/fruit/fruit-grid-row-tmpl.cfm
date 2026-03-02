@@ -22,14 +22,21 @@
                 <span data-bind="text: positionCount"></span>
             </td>
             <td class="prices-product-cell">
-                <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
-                </div>
+                ## if (AP.hasRole('ADM/CMA')) { ##
+                    <div data-bind="source: prices, events: { click: editPrices }" data-template="price-row-tmpl" class="hand price-container-list">
+                    </div>
+                ## } else { ##
+                    <div data-bind="source: prices" data-template="price-row-tmpl" class="price-container-list">
+                    </div>
+                ## } ##
             </td>
             <td class="text-center">
                 #iconButton(bind="click:attributes", icon="external-link-square-alt")#
             </td>
             <td class="text-center">
-                #iconButton(bind="click:edit", icon="edit")#
+                ## if (AP.hasRole('ADM/TCD')) { ##
+                    #iconButton(bind="click:edit", icon="edit")#
+                ## } ##
             </td>
             <td class="text-center">
                 <input type="checkbox" class="form-check-input"

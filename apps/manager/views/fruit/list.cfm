@@ -6,9 +6,9 @@
             <div class="col-6">
 				#pageTitle()#
             </div>
-			<div class="col-6 text-end pb-3">
+			<!--- <div class="col-6 text-end pb-3" data-bind="role: this" data-role-list="ADM/TCD">
                 #addButton( bind="click:new", size="sm" )#
-			</div>
+			</div> --->
         </div>
 
 		<div class="row">
@@ -68,7 +68,7 @@
 							</div>
 
 							<div class="col-sm-2">
-								<div class="float-end">
+								<div class="float-end" data-bind="role: this" data-role-list="ADM/TCD">
 									#deleteButton(
 										bind  = "click:delete",
 										size  = "sm"
@@ -87,17 +87,17 @@
                                         { 'field':'shortId', 'title':'ID', width: '80px' },
                                         { 'field':'code', 'title':'Codice', width: '120px' },
                                         { 'field':'name', 'title':'Descrizione' },
-                                        { 'field':'name', 'title':'Categoria'},
-                                        { 'field':'name', 'title':'Linee'},
-                                        { 'field':'name', 'title':'Posizioni', width: '50px' },
-                                        { 'field':'prices', 'title':'Prezzi'},
-                                        { 'field':'', 'title':'Tutti gli attributi', width: '55px'},
-                                        { 'field':'', 'title':'Modifica', width: '55px'},
+                                        { 'field':'name', 'title':'Categoria', width: '180px'},
+                                        { 'field':'name', 'title':'Linee', width: '180px'},
+                                        { 'field':'name', 'title':'Posizioni', width: '150px' },
+                                        { 'field':'prices', 'title':'Prezzi', width: '250px'},
+                                        { 'field':'', 'title':'Tutti gli attributi', width: '145px', 'headerAttributes': { 'class': 'justify-content-center' } },
+                                        { 'field':'', 'title':'Modifica', width: '90px', 'headerAttributes': { 'class': 'justify-content-center' } },
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
                                             'width'           :'40px',
-                                            'headerAttributes': { 'class': 'text-center' }
+                                            'headerAttributes': { 'class': 'justify-content-center' } 
                                         }
 
                                     ]",

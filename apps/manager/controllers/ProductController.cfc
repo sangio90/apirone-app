@@ -81,7 +81,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			);
 		}
 
-		
+
 		var fontSizeOptions   = [];
 		if (
 			product
@@ -102,13 +102,19 @@ component extends="com.apirone.core.controller.AbsController" {
 				var obj = memy.convert( signageConfig, "list" );
 
 				for ( var signageConfigItem in signageConfig.getItems() ) {
+
+					var name = !isNull(signageConfig.getFont()) ? signageConfig.getFont().getName() : ''
+					if (isNull(signageConfigItem.getSize()) || isNull(signageConfigItem.getSize().getName())) {
+						continue;
+					}
+
 					fontSizeOptions.add( {
 						"id"     = signageConfigItem.getId(),
-						"name" = signageConfig.getFont().getName() & " - " & signageConfigItem.getSize().getName() & "mm",
-						"height"   = signageConfigItem.getSize().getName(),
+						"name"   = name & " - " & signageConfigItem.getSize().getName() & "mm",
+						"height" = signageConfigItem.getSize().getName(),
 					} );
 				}
-				
+
 			}
 		}
 
