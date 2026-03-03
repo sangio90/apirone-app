@@ -1112,7 +1112,9 @@ AP.quotation.zonesModal = (function () {
                 
                 return newZ;
             });
-            this.set('detailForm.zones', zones);
+            let parentZones = zones.filter(z => !z.origin);
+
+            viewModel.set('zones', parentZones);
             $("#zones-grid").data("kendoGrid").dataSource.data(zones);
 
         }
