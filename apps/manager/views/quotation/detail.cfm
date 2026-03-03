@@ -54,9 +54,7 @@
                                 <div class="col-8">
                                     <div class="d-flex">
                                         <span data-bind="visible: canEdit">
-                                            <button type="button" class="btn btn-primary btn-sm" data-bind="click:openAddZoneModal">Aggiungi zona</button>
-                                            <button type="button" class="btn btn-secondary btn-sm ms-2" data-bind="click:openDuplicateZoneModal">Duplica zona</button>
-                                            <button type="button" class="btn btn-danger btn-sm ms-2" data-bind="click:openDeleteZoneModal">Elimina zona</button>
+				                            #button( type="button", bind="click:openZonesDialog", size="sm", label="Gestisci Zone" )#
                                         </span>
                                     </div>
                                 </div>
@@ -181,7 +179,7 @@
     #view( "quotation/plate-modal" )#
     #view( "quotation/article-modal" )#
 
-    #view( "quotation/zone-modal" )#
+    #view( "quotation/zones-modal" )#
     #view( "quotation/print-modal" )#
     #view( "quotation/status-modal" )#
 

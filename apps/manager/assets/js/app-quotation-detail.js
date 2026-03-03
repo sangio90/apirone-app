@@ -3,6 +3,7 @@ AP.namespace( "quotation" );
 Object.assign( AP.quotation.fields, {
     detailRoot     : $( "#quotation-detail-root" ),
     detailForm     : $( "#quotation-detail-header-form" ),
+    zonesModalRoot : $( "#zones-modal-root" ),
     zoneModalRoot  : $( "#zone-modal-root" ),
     printModalRoot : $( "#print-modal-root" ),
     statusModalRoot: $( "#qt-status-modal-root" ),
@@ -31,12 +32,6 @@ $( document ).ready( function() {
         document.getElementById( id )?.addEventListener( "show.bs.modal", () => {
             $('#quotation-total-pricing-box').hide()
         });
-    } );
-
-    $( "form#zone-form" ).on( "submit", function( event ) {
-        event.preventDefault();
-        AP.quotation.zoneModal.methods().createZone();
-        return false;
     } );
 } );
 
@@ -354,7 +349,6 @@ AP.quotation.detail = ( function() {
         },
 
         delete: function( event ) {
-
             event.stopPropagation();
             var itemId = event.currentTarget.dataset.id;
 
@@ -373,12 +367,14 @@ AP.quotation.detail = ( function() {
                 },
                 callback: function( result ) {
                     if ( result ) {
+                        AP.loading.show()
                         NM.util.ajax( {
                             method: "DELETE",
                             url: "/manager/ajax/quotation-items",
                             data: itemId,
                             callback: {
                                 done: function( xhr ) {
+                                    AP.loading.hide()
                                     if ( xhr.status == "INVALID" ) {
                                         NM.form.showMessages( xhr.data );
                                         return;
@@ -520,7 +516,7 @@ AP.quotation.detail = ( function() {
 
         getZones: async function( e ) {
 
-            if ( AP.page.quotation?.id ) { // if edit mode
+            if ( AP.page.quotation?.id ) {
 
                 await NM.util.ajax( {
                     method: "GET",
@@ -713,32 +709,6 @@ AP.quotation.detail = ( function() {
             // AP.quotation.pricing.init( viewModel.get( "detailForm.data.id" ), "item" );
         },
 
-        openAddZoneModal: function() {
-            if ( AP.quotation.fields.zoneModalRoot.length ) {
-                AP.quotation.zoneModal.methods().resetForm();
-                AP.quotation.zoneModal.init( "add" );
-            }
-
-            NM.util.openModal( AP.quotation.fields.zoneModalRoot );
-        },
-
-        openDuplicateZoneModal: function() {
-            if ( AP.quotation.fields.zoneModalRoot.length ) {
-                AP.quotation.zoneModal.methods().resetForm();
-                AP.quotation.zoneModal.init( "duplicate" );
-            }
-
-            NM.util.openModal( AP.quotation.fields.zoneModalRoot );
-        },
-
-        openDeleteZoneModal: function() {
-            if ( AP.quotation.fields.zoneModalRoot.length ) {
-                AP.quotation.zoneModal.init( "delete" );
-            }
-
-            NM.util.openModal( AP.quotation.fields.zoneModalRoot );
-        },
-
         openPrintModal: function() {
             if ( AP.quotation.fields.printModalRoot.length ) {
                 AP.quotation.printModal.methods().resetForm();
@@ -746,6 +716,13 @@ AP.quotation.detail = ( function() {
             }
 
             NM.util.openModal( AP.quotation.fields.printModalRoot );
+        },
+
+        openZonesDialog: function () {
+            if ( AP.quotation.fields.zonesModalRoot.length ) {
+                AP.quotation.zonesModal.init();
+            }
+            NM.util.openModal( AP.quotation.fields.zonesModalRoot );
         },
 
         openStatusModal: function() {
@@ -868,6 +845,10 @@ AP.quotation.detail = ( function() {
         return viewModel.get( "detailForm.data" );
     };
 
+    pub.getZones = function() {
+        return viewModel.getZones();
+    };
+
     pub.methods = function( options ) {
         return viewModel;
     };
@@ -963,260 +944,212 @@ AP.quotation.detail = ( function() {
     return pub;
 } () );
 
-AP.quotation.zoneModal = ( function() {
+AP.quotation.zonesModal = (function () {
     var pub = {};
-    // REF: il nome è errato
     var fields = AP.quotation.fields;
 
-    var defaultDetailForm = {
-        data: {
-            id: "",
-            name: "Nuova zona",
+    var viewModel = kendo.observable({
+        zones: [],
+        detailForm: {
+            zones: [],
+            data: {
+                id: null,
+                name: "",
+                quantity: 1,
+                parentZone: null,
+                quotation: { id: AP.page.quotation.id }
+            }
+        },
+
+        defaultDetailFormData: {
+            id: null,
+            name: "",
             quantity: 1,
-            description: "",
-            quotation: {
-                id: AP?.page?.quotation?.id || "00001",
-            },
-            title: this.id ? "Modifica zona" : "Nuova zona",
-            parentZone: {
-                id: ""
-            },
-            mode: "",
-            duplicaConSottozone: false,
-        }
-    };
-
-    var viewModel = kendo.observable( {
-        detailForm: defaultDetailForm,
-        zones: new kendo.data.DataSource(),
-
-        resetForm: function() {
-            viewModel.set( "detailForm", defaultDetailForm );
+            parentZone: null,
+            quotation: { id: AP.page.quotation.id }
         },
 
-        createZone: function( event ) {
+        editZone: function(e) {
+            var item = e.data;
+            this.setupZoneModal(item);
+        },
 
-            var zoneForm = $( "#zone-form" );
-
-            if ( zoneForm.valid() ) {
-                AP.loading.show();
-                NM.util.ajax( {
-                    method: "POST",
-                    url: "/manager/ajax/quotations/zones",
-                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
-                    callback: {
-                        done: function( xhr ) {
-                            if ( xhr.status == "INVALID" ) {
-                                AP.loading.show();
-                                NM.form.showMessages( xhr.data );
-                                return;
+        deleteZone: function(e) {
+            var item = e.data;
+            var self = this;
+            bootbox.confirm("Eliminare la zona " + item.name + "?", function(result) {
+                if(result) {
+                    NM.util.ajax({
+                        method: "DELETE",
+                        url: "/manager/ajax/quotations/zones/",
+                        data: JSON.stringify({ zone: { id: item.id } }),
+                        callback: { 
+                            done: function(xhr) {
+                                AP.widget.notify(xhr.data.status.toLowerCase(), xhr.data.message)
+                                AP.quotation.detail.getZones().then(() => self.refreshGrids());
                             }
-
-                            AP.widget.notify( "success", "Zona salvata correttamente." );
-                            setTimeout( function() {
-                                $( "#zone-modal-root" ).modal( "hide" );
-                                AP.loading.hide();
-                            }, 200 );
-                            AP.quotation.detail.methods().getZones();
                         }
-                    }
-                } );
+                    });
+                }
+            });
+        },
 
+        openDuplicateDialog: function(e) {
+            var item = e.data;
+            this.set("detailForm.data", {
+                id: item.id,
+                name: item.name + " Copia",
+                quantity: item.quantity,
+                parentZone: (item.origin && item.origin.id) ? item.origin.id : null,
+                quotation: { id: AP.page.quotation.id }
+            });
+            $("#duplicateDialogTitle").text("Duplica zona " + item.name);
+            $("#duplicateNameInput").val(this.get('detailForm.data.name'));
+            $("#duplicateDialog").modal("show");
+        },
+
+        setupZoneModal: function(item) {
+            if (item) {
+                this.set("detailForm.data", {
+                    id: item.id,
+                    name: item.name,
+                    quantity: item.quantity,
+                    parentZone: (item.origin && item.origin.id) ? item.origin.id : null,
+                    quotation: { id: AP.page.quotation.id }
+                });
+                $("#zoneTitle").text("Modifica Zona: " + item.name);
+                $("#duplicate-zone-button, #duplicate-zone-with-children-button, #delete-zone-button").hide();
+                $('#save-zone-button').show()
+            } else {
+                this.set("detailForm.data", {
+                    id: null,
+                    name: "",
+                    quantity: 1,
+                    parentZone: null,
+                    quotation: { id: AP.page.quotation.id }
+                });
+                $("#zoneTitle").text("Nuova Zona");
+                $("#duplicate-zone-button, #duplicate-zone-with-children-button, #delete-zone-button").hide();
+                $('#save-zone-button').show()
+            }
+            
+            NM.util.openModal($("#zone-modal-root"));
+        },
+
+        addZone: function(e) {
+            if(e) e.preventDefault();
+            this.setupZoneModal(null);
+        },
+
+        saveZone: function() {
+            var data = this.get("detailForm.data");
+            AP.loading.show();
+            NM.util.ajax({
+                method: "POST",
+                url: "/manager/ajax/quotations/zones",
+                data: JSON.stringify(data),
+                callback: {
+                    done: (xhr) => {
+                        AP.loading.hide();
+                        fields.zoneModalRoot.modal('hide');
+                        let message = xhr.data.message
+                        if (message.toLowerCase() == 'not found') {
+                            message = data.id ? "Zona Aggiornata" : "Zona Creata"
+                        }
+                        AP.widget.notify(xhr.data.status, message);
+                        this.set('detailForm.data', this.get('defaultDetailFormData'))
+                        AP.quotation.detail.getZones().then(() => this.refreshGrids());
+                    }
+                }
+            });
+        },
+
+        duplicateZone: function(withChildren, newName) {
+
+            var zoneId = this.get("detailForm.data.id");
+
+            if (!zoneId) {
+                AP.widget.notify("error", "Errore: nessuna zona selezionata.");
+                return;
             }
 
-            return false;
-        },
+            let data = this.get('detailForm.data')
+            data.duplicaConSottozone = withChildren
+            data.name = newName
 
-        duplicateZone: function( event ) {
-            const duplicaConSottozone = event.currentTarget.id == 'duplicate-zone-with-children-button'
-            viewModel.set('detailForm.data.duplicaConSottozone', duplicaConSottozone)
+            AP.loading.show();
 
-            var zoneForm = $( "#zone-form" );
-
-            if ( zoneForm.valid() ) {
-                AP.loading.show();
-                NM.util.ajax( {
-                    method: "POST",
-                    url: "/manager/ajax/quotations/duplicatezone",
-                    data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
-                    callback: {
-                        done: function( xhr ) {
-                            if ( xhr.status == "INVALID" ) {
-                                AP.loading.hide();
-                                NM.form.showMessages( xhr.data );
-                                return;
-                            }
-
-                            AP.widget.notify( "success", "Zona salvata correttamente." );
-                            setTimeout( function() {
-                                $( "#zone-modal-root" ).modal( "hide" );
-                                AP.loading.hide();
-                            }, 200 );
-                            AP.quotation.detail.methods().getZones();
+            NM.util.ajax({
+                method: "POST",
+                url: "/manager/ajax/quotations/duplicatezone",
+                data: JSON.stringify(data),
+                callback: {
+                    done: () => {
+                        AP.loading.hide();
+                        $("#duplicateDialog").modal("hide");
+                        AP.widget.notify("success", "Zona duplicata con successo");
+                        var url = new URL(window.location.href);
+                        if (!url.searchParams.has("reset")) {
+                            url.searchParams.set("reset", "1");
+                            window.location.href = url.toString();
+                        } else {
+                            window.location.reload(); 
                         }
-                    }
-                } );
-
-            }
-
-            return false;
+                    },
+                    fail: () => AP.loading.hide()
+                }
+            });
         },
 
-        deleteZone: function( event ) {
-            const zone = viewModel.get( "detailForm.data.parentZone" );
-
-            var zoneForm = $( "#zone-form" );
-            var status = zoneForm.find( ".status" );
-
-            status.html( "<img src='/assets/main/img/ajax-loading.svg' width=20 height=20>" );
-
-            if ( zoneForm.valid() ) {
-                AP.loading.show();
-                NM.util.ajax( {
-                    method: "DELETE",
-                    url: "/manager/ajax/quotations/zones",
-                    data: JSON.stringify( { "zone": zone } ),
-                    callback: {
-                        done: function( xhr ) {
-
-                            status.html( "" );
-
-                            if ( xhr.status == "INVALID" ) {
-                                NM.form.showMessages( xhr.data );
-                                AP.loading.hide();
-                                return;
-                            }
-
-                            AP.widget.notify( "success", xhr.data.message );
-                            setTimeout( function() {
-                                $( "#zone-modal-root" ).modal( "hide" );
-                                AP.loading.hide();
-                            }, 200 );
-                            AP.quotation.detail.methods().getZones();
-
-                        }
-                    }
-                } );
-            }
-            return false;
-        },
-    } );
-
-    pub.init = function( mode ) {
-        kendo.bind( fields.zoneModalRoot, viewModel );
-
-        var zoneForm = $( "#zone-form" );
-
-        NM.form.removeRules( zoneForm );
-
-        if ( mode == "delete" ) {
-
-            var zones = AP.quotation.detail.config().get( "zones" ).filter( function( zone ) { return zone.name != '-- Tutte le zone'; } );
-
-            viewModel.get( "zones" ).data( zones );
-            $( "#zoneTitle" ).text( "Elimina Zona" );
-
-            $( "#delete-zone-button" ).show();
-            $( "#duplicate-zone-button" ).hide();
-            $( "#duplicate-zone-with-children-button" ).hide();
-            $( "#add-zone-button" ).hide();
-            $( "#zone-name-input" ).hide();
-            $( "#zone-quantity-input" ).hide();
-            $( "#zone-label-parent" ).html( "Zona" );
-
-            // REF: aggiungo validazione per cancellazione
-            zoneForm.validate( {
-                onfocusout: function( element ) {
-                    $( element ).valid();
-                },
-                rules: {
-                    parentId: {
-                        required: true
-                    },
-                },
-                messages: {
-                    parentId: {
-                        required: "Seleziona una zona"
-                    },
-                },
-            } );
+        refreshGrids: function() {
+            let zones = AP.quotation.detail.config().zones.filter(z => z.name != '-- Tutte le zone')
+            .map(z => {
+                let newZ = { ...z }; 
+                
+                if (newZ.name.startsWith("\u00A0\u00A0- ")) {
+                    newZ.name = newZ.name.replace("\u00A0\u00A0- ", "");
+                }
+                
+                return newZ;
+            });
+            this.set('detailForm.zones', zones);
+            $("#zones-grid").data("kendoGrid").dataSource.data(zones);
 
         }
+    });
 
-        if ( mode == "duplicate" ) {
+    pub.init = function () {
+        let allZones = AP.quotation.detail.config().zones || [];
+        let gridZones = allZones
+            .filter(z => z.name != '-- Tutte le zone')
+            .map(z => {
+                let newZ = { ...z }; 
+                
+                if (newZ.name.startsWith("\u00A0\u00A0- ")) {
+                    newZ.name = newZ.name.replace("\u00A0\u00A0- ", "");
+                }
+                
+                return newZ;
+            });
+        let parentZones = allZones.filter(z => !z.origin);
 
-            var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { return zone.name != '-- Tutte le zone'; } );
+        viewModel.set('zones', parentZones);
+        viewModel.set('detailForm.zones', gridZones);
+        
+        kendo.bind(fields.zonesModalRoot, viewModel);
+        kendo.bind(fields.zoneModalRoot, viewModel);
 
-            viewModel.get( "zones" ).data( zones );
-            $( "#zoneTitle" ).text( "Nuova Zona" );
+       $("#duplicateSimpleBtn").on("click", function() {
+            viewModel.duplicateZone(false, $("#duplicateNameInput").val());
+        });
 
-            $( "#delete-zone-button" ).hide();
-            $( "#add-zone-button" ).hide();
-            $( "#duplicate-zone-button" ).show();
-            $( "#duplicate-zone-with-children-button" ).show();
-            $( "#zone-quantity-input" ).show();
-            $( "#zone-name-input" ).show();
-            $( "#zone-label-parent" ).html( "Zona da duplicare" );
-
-            // REF: aggiungo validazione per inserimento
-            zoneForm.validate( {
-                onfocusout: function( element ) {
-                    $( element ).valid();
-                },
-                rules: {
-                    name: {
-                        required: true
-                    },
-                },
-                messages: {
-                    name: {
-                        required: "Inserisci un nome"
-                    },
-                },
-            } );
-
-        }
-
-        if ( mode == "add" ) {
-
-            var zones = AP.quotation.detail.config().get( "zones" ).filter( ( zone ) => { return !zone.origin && zone.name != '-- Tutte le zone'; } );
-
-            viewModel.get( "zones" ).data( zones );
-            $( "#zoneTitle" ).text( "Nuova Zona" );
-
-            $( "#delete-zone-button" ).hide();
-            $( "#duplicate-zone-button" ).hide();
-            $( "#duplicate-zone-with-children-button" ).hide();
-            $( "#add-zone-button" ).show();
-            $( "#zone-name-input" ).show();
-            $( "#zone-quantity-input" ).show();
-            $( "#zone-label-parent" ).html( "Zona padre" );
-
-            // REF: aggiungo validazione per inserimento
-            zoneForm.validate( {
-                onfocusout: function( element ) {
-                    $( element ).valid();
-                },
-                rules: {
-                    name: {
-                        required: true
-                    },
-                },
-                messages: {
-                    name: {
-                        required: "Inserisci un nome"
-                    },
-                },
-            } );
-
-        }
+        $("#duplicateWithChildrenBtn").on("click", function() {
+            viewModel.duplicateZone(true, $("#duplicateNameInput").val());
+        });
     };
 
-    pub.methods = function( options ) {
-        return viewModel;
-    };
     return pub;
-} () );
+})();
 
 AP.quotation.printModal = ( function() {
     var pub = {};
