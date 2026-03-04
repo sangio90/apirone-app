@@ -233,6 +233,7 @@ AP.accessory.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
+							// TODO Valutare di rimuovere questo if, 99% non serve a niente
                             if ( !viewModel.get( "detailForm.data.quotationItem.product.image" ) && xhr.data[0].horizontalImage ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
@@ -262,7 +263,9 @@ AP.accessory.modal = ( function() {
                                             product_item_id: item.id,
                                             parent_attribute_id: null,
                                             level: 0,
-                                            selected: false
+                                            selected: false,
+                                            horizontalImage: item.horizontalImage,
+                                            verticalImage: item.verticalImage
                                         } );
                                         productItems.trigger( "change" );
                                     }
@@ -276,7 +279,9 @@ AP.accessory.modal = ( function() {
                                             {
                                                 attributeValue: item.attributeValue,
                                                 product_item_id: item.id,
-                                                selected: false
+                                                selected: false,
+                                                horizontalImage: item.horizontalImage,
+                                                verticalImage: item.verticalImage
                                             }
                                         ]
                                     };
@@ -401,7 +406,9 @@ AP.accessory.modal = ( function() {
                                     attribute.values.push( {
                                         attributeValue: item.attributeValue,
                                         product_item_id: item.id,
-                                        selected: false
+                                        selected: false,
+                                        horizontalImage: item.horizontalImage,
+                                        verticalImage: item.verticalImage
                                     } );
                                     lastAttributeId = item.attribute.id;
                                 } );
@@ -458,9 +465,10 @@ AP.accessory.modal = ( function() {
             productItems.data().forEach( function( item ) {
                 const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
                 if ( selectedValues.length > 0 ) {
-                    if ( selectedValues[0].attributeValue?.horizontalImage ) {
-                        // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
-                        // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
+                    if ( selectedValues[0].horizontalImage ) {
+                        $( "#accessory-preview-background-tree" ).empty();
+                        $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValues[0].horizontalImage.uri}" style="width: 500px; height: auto;">` );
+                    } else if ( selectedValues[0].attributeValue?.horizontalImage ) {
                         $( "#accessory-preview-background-tree" ).empty();
                         $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValues[0].attributeValue.horizontalImage.uri}" style="width: 500px; height: auto;">` );
                     }
