@@ -24,7 +24,7 @@
                                     <select id="accessoryProductCategory" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la categoria"
-                                        data-bind="source: categories, value: detailForm.data.quotationItem.product.category, events: { change: loadLines }"
+                                        data-bind="source: categories, value: detailForm.data.quotationItem.product.category.id, events: { change: loadLines }"
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
