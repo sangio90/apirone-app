@@ -120,21 +120,21 @@ AP.accessory.modal = ( function() {
         loadModels: function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.line.id" ) != "" ) {
                 $( "#accessoryProductCategory" ).prop( "disabled", true );
+                NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/models/"
+                        + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
+                        + "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
+                            viewModel.get( "models" ).data( xhr.data );
+                        },
+                    },
+                } );
             } else {
                 $( "#accessoryProductCategory" ).prop( "disabled", false );
             }
-            NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/models/"
-                    + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
-                    + "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
-                        viewModel.get( "models" ).data( xhr.data );
-                    },
-                },
-            } );
             this.checkCanSave();
             AP.setUserPref( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.line.id" ) );
         },

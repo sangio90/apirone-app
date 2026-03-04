@@ -64,12 +64,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			originId    = Len( json.parentZone?.id ) ? json.parentZone.id : null
 		}
 
-		var existingCombination = super.service( "QuotationZone" ).search( argumentCollection = params );
+		var existingCombinations = super.service( "QuotationZone" ).search( argumentCollection = params );
 
-		if( Len( existingCombination.getData() ) ) {
-			result.setData( { "message" = getMessage( "zone.existInQuotation" ), "status" = "error" } );
-			event.setValue( "result", result );
-			return;
+		if( Len( existingCombinations.getData() ) ) {
+			var existingCombination = existingCombinations.getData()[1]
+			if (isNull(json.id) || json.id == "" || existingCombination.getId() != json.id) {
+				result.setData( { "message" = getMessage( "zone.existInQuotation" ), "status" = "error" } );
+				event.setValue( "result", result );
+				return;
+			}
 		}
 
 		quotationZone.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );

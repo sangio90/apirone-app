@@ -8,6 +8,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
+	property name="quotationZoneService" inject="QuotationZoneService";
 	property name="componentService" inject="ComponentService";
 	property name="metadataService" inject="MetadataService";
 	property name="currencyService" inject="CurrencyService";
@@ -35,6 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public function calculate(
 		required String productId,
 		required Numeric quantity = 1,
+		required String quotationItemZoneId,
 		Array producItemtIds,
 		Numeric lettersQuantity = 0,
 		Numeric simulationSignageConfigItemId,
@@ -48,6 +50,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Struct function simulate(
 		required String productId,
 		required Numeric quantity = 1,
+		required String quotationItemZoneId,
 		Array producItemtIds,
 		String currencyId="EUR",
 		Numeric lettersQuantity = 0,
@@ -94,6 +97,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var product       = productSvc.get( productId );
 		var price         = product.getPrice( "PRICE" );
 
+		var zone = getQuotationZoneService().get(quotationItemZoneId)
+		var originZone = zone.getOrigin()
+		var zoneQuantity = zone.getQuantity();
+		if (!isNull(originZone)) {
+			zoneQuantity *= originZone.getQuantity()
+		}
+
+		var quantityMultipliedByZones = arguments.quantity * zoneQuantity;
+
 		//var currency = currencySvc.get( arguments.currencyId );
 
 		var settings = metadataSvc.list( typeId=107 );
@@ -119,7 +131,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var quantitaTotale = arguments.quantity;
 		if (isPlaccaOrSegnaletica(product)) {
 			appendLog(
-				message="Il prodotto è PLA or SEG, quindi i COST fixed li calcolo dividendo il costo fisso della tabella costi fissi linea_finitura su tutti gli altri articoli del preventivo"
+				message="Il prodotto è PLA o SEG, quindi i COST_FIXED li calcolo dividendo il costo fisso della tabella costi fissi linea_finitura su tutti gli altri articoli del preventivo"
 			)
 			if ( IsNull( arguments.quotationItem ) ) {
 				appendLog(
@@ -135,14 +147,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			//Se non nullo leggo il campo "cost" e lo scrivo in fixedCost
 			if ( len(lineCostRecord) > 0 ) {
 				lineCostRecord = lineCostRecord[1];
-				fixedCost = lineCostRecord.getCost();
+				fixedCost += lineCostRecord.getCost();
 				quantitaTotale = getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId(
 					quotation,
 					IsNull(quotationItem) ? null : quotationItem.getId(),
 					product.getLine().getId(),
 					product.getFinish().getId()
 				);
-				quantitaTotale += arguments.quantity;
+				quantitaTotale += quantityMultipliedByZones;
 				unitFixedCost = fixedCost / quantitaTotale;
 			}
 

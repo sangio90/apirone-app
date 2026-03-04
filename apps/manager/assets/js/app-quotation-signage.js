@@ -252,7 +252,13 @@ AP.signage.modal = ( function() {
                     },
                 } );
             }
-            $( "#signageFont" ).prop( "disabled", true );
+
+            const signageConfigItemId = viewModel.get('detailForm.data.quotationItem.signageConfigItem.id')
+            if (!signageConfigItemId || signageConfigItemId == '') {
+                $( "#signageFont" ).prop( "disabled", false )
+            } else {
+                $( "#signageFont" ).prop( "disabled", true )
+            }
             
             viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( signageRow => {
                 this.parsedLineContent( signageRow.content, signageRow.id );
