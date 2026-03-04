@@ -443,7 +443,6 @@
 		/*
 			quotations
 		*/
-		delete( "/ajax/quotations/:id" ).to( "QuotationAjaxController.delete" ).end();
 		get( "/ajax/quotations-export/:id" ).to( "QuotationAjaxController.export" ).end();
 		get( "/ajax/quotations-export-products/:id" ).to( "QuotationAjaxController.exportProducts" ).end();
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
@@ -499,6 +498,7 @@
 		post( "/ajax/quotations-exported" ).to( "QuotationExportedAjaxController.deleteMulti" ).end();
 		get( "/ajax/quotations-exported" ).to( "QuotationExportedAjaxController.list" ).end();
 		delete( "/ajax/quotation-exported-rows" ).to( "QuotationExportedAjaxController.deleteRow" ).end();
+		delete( "/ajax/quotations/:id" ).to( "QuotationAjaxController.delete" ).end();
 
 		/*
 			quotation items
