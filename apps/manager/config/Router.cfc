@@ -443,6 +443,7 @@
 		/*
 			quotations
 		*/
+		delete( "/ajax/quotations/:id" ).to( "QuotationAjaxController.delete" ).end();
 		get( "/ajax/quotations-export/:id" ).to( "QuotationAjaxController.export" ).end();
 		get( "/ajax/quotations-export-products/:id" ).to( "QuotationAjaxController.exportProducts" ).end();
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();

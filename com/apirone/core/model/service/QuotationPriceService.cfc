@@ -164,4 +164,14 @@
 		return NullValue();
 	}
 
+	public com.apirone.core.model.bean.Outcome function delete( required Numeric quotationPriceId ){
+
+		var outcome = super.bean( "Outcome" );
+
+		outcome.setData( { quotationPriceId = arguments.quotationPriceId } );
+		getDao().delete( arguments.quotationPriceId );
+
+		return outcome;
+	}
+
 }

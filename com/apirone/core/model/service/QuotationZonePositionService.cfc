@@ -45,7 +45,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete( required String quotationZonePositionId ){
+	public com.apirone.core.model.bean.Outcome function delete( required Number quotationZonePositionId ){
 		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { quotationZonePositionId = arguments.quotationZonePositionId } );
@@ -57,6 +57,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				getDao().delete( arguments.quotationZonePositionId );
 				cm.remove( getCacheScope(), arguments.quotationZonePositionId );
 			} catch ( any error ) {
+				rethrow
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.errors.CannotDeleteQuotationZone" );

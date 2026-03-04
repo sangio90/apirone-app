@@ -65,6 +65,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				getDao().delete( arguments.zoneId );
 				cm.remove( getCacheScope(), arguments.zoneId );
 			} catch ( any error ) {
+				rethrow
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteQuotationZone" );

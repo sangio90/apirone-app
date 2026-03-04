@@ -22,6 +22,7 @@ AP.quotation.list = ( function() {
     var fields = AP.quotation.fields;
 
     var viewModel = kendo.observable( {
+        dataSource: dataSources,
         rows: dataSources.items,
 
         getCreatedAt: function( event ) {
@@ -97,15 +98,56 @@ AP.quotation.list = ( function() {
             return false;
         },
 
-        edit: function( e ) {
-            e.preventDefault();
+		edit: function( e ) {
+			e.preventDefault();
+			const id = e.data.id;
+			if ( !id || id == "" ) {
+				return false;
+			}
+			const url = "/manager/quotations/" + id;
+			window.location.href = "/manager/quotations/" + id;
+		},
+
+		destroy: function( e ) {
+			e.preventDefault();
             const id = e.data.id;
-            if ( !id || id == "" ) {
-                return false;
-            }
-            const url = "/manager/quotations/" + id;
-            window.location.href = "/manager/quotations/" + id;
-        },
+			if ( !id || id == "" ) {
+				return false;
+			}
+
+            bootbox.confirm( {
+                title: "Conferma cancellazione preventivo",
+                message: "Sei sicuro di voler eliminare questo preventivo? Tutte le zone, gli articoli e i prezzi calcolati verranno persi definivamente.",
+                buttons: {
+                    confirm: {
+                        label: "Si, confermo",
+                        className: "btn-primary",
+                    },
+                    cancel: {
+                        label: "No, chiudi",
+                        className: "btn-danger",
+                    },
+                },
+                callback: function( result ) {
+                    if ( result ) {
+                        NM.util.ajax({
+                        method: "DELETE",
+                        url: "/manager/ajax/quotations/" + id,
+                        callback: {
+                            done: async function (xhr) {
+                                AP.widget.notify( "success", "Preventivo eliminato con successo." );
+                                AP.loading.show();
+                                await viewModel.dataSource.items.read()
+                                viewModel.rows = viewModel.dataSource.items;
+                                viewModel.search();
+                                AP.loading.hide();
+                            }
+                        }
+                    });
+                    } 
+                },
+            } );
+		},
 
         new: function( ) {
             window.location.href = "/manager/quotations/new";
