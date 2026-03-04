@@ -90,7 +90,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-4 mb-3">
+                                <div class="col-3 mb-3">
                                     <div id="accessory-product-items" style="max-width: 100%"></div>
                                 </div>
                                 
@@ -102,7 +102,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-2">
+                                <div class="col-3">
                                     #view(view="quotation/item-pricing", args={id="accessory-quotation-item-pricing-box"})#
                                 </div>
 
