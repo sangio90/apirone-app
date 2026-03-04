@@ -635,34 +635,31 @@ AP.accessory.modal = ( function() {
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
 
-        if ( AP.getUserPref( "accessory.categoryId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.category.id", AP.getUserPref( "accessory.categoryId" ) );
-        }
+        const accessoryCategoryId = AP.getUserPref( "accessory.categoryId" )
+        const accessoryLineId = AP.getUserPref( "accessory.lineId" )
+        const accessoryModelId = AP.getUserPref( "accessory.modelId" )
+        const accessoryFinishId = AP.getUserPref( "accessory.finishId" )
 
-        if ( AP.getUserPref( "accessory.lineId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.line.id", AP.getUserPref( "accessory.lineId" ) );
-        }
-
-        if ( AP.getUserPref( "accessory.modelId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.model.id", AP.getUserPref( "accessory.modelId" ) );
-        }
-
-        if ( AP.getUserPref( "accessory.finishId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.finish.id", AP.getUserPref( "accessory.finishId" ) );
-        }
-
-        if ( AP.getUserPref( "accessory.categoryId" ) ) {
+        if ( accessoryCategoryId ) {
+            viewModel.set( "detailForm.data.quotationItem.product.category.id", accessoryCategoryId );
             await viewModel.loadLines();
-			if ( AP.getUserPref( "accessory.lineId" ) ) {
-				await viewModel.loadModels();
-				if ( AP.getUserPref( "accessory.modelId" ) ) {
-					await viewModel.loadFinishes();
-					if ( AP.getUserPref( "accessory.finishId" ) ) {
-						await viewModel.loadProduct();
-					}
-				}
-			}
         }
+
+        if ( accessoryLineId ) {
+            viewModel.set( "detailForm.data.quotationItem.product.line.id", accessoryLineId );
+            await viewModel.loadModels();
+        }
+
+        if ( accessoryModelId ) {
+            viewModel.set( "detailForm.data.quotationItem.product.model.id", accessoryModelId );
+            await viewModel.loadFinishes();
+        }
+
+        if ( accessoryFinishId ) {
+            viewModel.set( "detailForm.data.quotationItem.product.finish.id", accessoryFinishId );
+            await viewModel.loadProduct();
+        }
+
 		initPositionSuggest();
     };
 
@@ -699,6 +696,7 @@ AP.accessory.modal = ( function() {
 
 		if ( accessoryResponse.status === "SUCCESS" ) {
 			var data = accessoryResponse.data;
+
 			viewModel.set( "detailForm.data", data );
 			viewModel.set( "detailForm.title", "Modifica accessorio" );
 
