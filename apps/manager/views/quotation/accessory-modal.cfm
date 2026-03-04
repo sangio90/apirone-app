@@ -95,10 +95,10 @@
                                 </div>
                                 
                                 <div class="col-6 mb-3 position-relative">
-                                    <div id="accessory-preview-background"
-                                        class="col-12 d-flex justify-content-center align-items-center"
-                                        data-bind="visible:detailForm.data.quotationItem.product.finish.id, style: { backgroundImage: backgroundImage.url, position: relative }"
-                                    >
+                                    <div id="accessory-preview-background" style="width: 500px;">
+                                        <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }" /> 
+                                        <div id="accessory-preview-background-tree" style="position: absolute; top: 0; left: 0;">
+                                    </div>
                                     </div>
                                 </div>
 

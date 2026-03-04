@@ -120,10 +120,6 @@ AP.accessory.modal = ( function() {
         loadModels: function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.line.id" ) != "" ) {
                 $( "#accessoryProductCategory" ).prop( "disabled", true );
-                $( "#accessory-preview-background" ).css( {
-                    width: "500px",
-                    height: "500px"
-                } );
             } else {
                 $( "#accessoryProductCategory" ).prop( "disabled", false );
             }
@@ -172,11 +168,6 @@ AP.accessory.modal = ( function() {
                                         } else {
                                             viewModel.set( "modelConfig", { width: null, height: null } );
                                         }
-
-                                        $( "#accessory-preview-container" ).css( {
-                                            width: "500px",
-                                            height: "500px"
-                                        } );
                                     }
                                 }
                             } );
@@ -192,7 +183,7 @@ AP.accessory.modal = ( function() {
         },
 
         loadProduct: function() {
-            $( "#accessory-preview-background" ).empty();
+            $('#accessory-preview-background-tree').empty()
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                 $( "#accessoryModel" ).prop( "disabled", true );
             } else {
@@ -213,9 +204,9 @@ AP.accessory.modal = ( function() {
                             viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
                             if ( xhr.data[0].horizontalImage ) {
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
+                                viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri );
                             } else {
-                                viewModel.set( "backgroundImage.url", "url()" );
+                                viewModel.set( "backgroundImage.url", "" );
                             }
                             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                                 await self.firstLoadProductItems();
@@ -245,7 +236,7 @@ AP.accessory.modal = ( function() {
                             if ( !viewModel.get( "detailForm.data.quotationItem.product.image" ) && xhr.data[0].horizontalImage ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
+                                viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri);
                             }
                             if ( quotationItemId != "" || !AP.getUserPref( "accessory.product.items" ) || AP.getUserPref( "accessory.product.items" ).length == 0 ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
@@ -470,7 +461,8 @@ AP.accessory.modal = ( function() {
                     if ( selectedValues[0].attributeValue?.horizontalImage ) {
                         // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
                         // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
-                        $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.horizontalImage.uri}" style="postion: absolute; top: 0; left: 0;">` );
+                        $( "#accessory-preview-background-tree" ).empty();
+                        $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValues[0].attributeValue.horizontalImage.uri}" style="width: 500px; height: auto;">` );
                     }
                 }
             } );
