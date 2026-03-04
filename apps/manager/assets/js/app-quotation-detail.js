@@ -537,20 +537,6 @@ AP.quotation.detail = ( function() {
 
                             viewModel.get( "zones" ).data( zones );
 
-                            // la prima zona viene caricata con il preventivo
-
-                            if ( NM.storage.get( "quotation.zone.id" ) ) {
-                                var selectedZone = zones.find( zone => zone.id == NM.storage.get( "quotation.zone.id" ) );
-                                if ( !selectedZone ) {
-                                    NM.storage.delete( "quotation.zone.id" );
-                                    NM.storage.delete( "quotation.zone.name" );
-                                    selectedZone = zones[1];
-                                }
-                                viewModel.set( "detailForm.data.zone", selectedZone );
-                            } else {
-                                viewModel.set( "detailForm.data.zone", zones[0] );
-                            }
-
                             viewModel.set( "detailForm.data.zones", zones );
                             viewModel.loadItems();
                         }
@@ -563,12 +549,16 @@ AP.quotation.detail = ( function() {
         },
 
         loadItems: function( e ) {
+            if (e && e.currentTarget && e.currentTarget.id == 'zones-selector') {
+                AP.setUserPref( "quotation." + AP.page.quotation.id + ".zone.id", viewModel.detailForm.data.zone.id );
+                AP.setUserPref( "quotation." + AP.page.quotation.id + ".zone.name", viewModel.detailForm.data.zone.name );
+            }
             var typeId = viewModel.get( "typeId" );
 
             var url = "/manager/ajax/quotations/" + AP.page.quotation.id + "/items/" + typeId;
 
-            if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id && viewModel.detailForm.data.zone.name != "-- Tutte le zone" ) {
-                url = url + "?quotationZoneId=" + viewModel.detailForm.data.zone.id;
+            if (AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.id" ) && AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.name" ) != "-- Tutte le zone") {
+                url = url + "?quotationZoneId=" + AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.id" );
             }
 
             NM.util.ajax( {
@@ -585,14 +575,6 @@ AP.quotation.detail = ( function() {
                     }
                 }
             } );
-
-            if ( viewModel.detailForm.data.zone && viewModel.detailForm.data.zone.id != "" ) {
-                AP.setUserPref( "quotation.zone.id", viewModel.detailForm.data.zone.id );
-                AP.setUserPref( "quotation.zone.name", viewModel.detailForm.data.zone.name );
-            } else {
-                AP.deleteUserPref( "quotation.zone.id" );
-                AP.deleteUserPref( "quotation.zone.name" );
-            }
 
             return false;
         },
@@ -883,7 +865,27 @@ AP.quotation.detail = ( function() {
                 if (defaultZone) {
                     viewModel.set( "detailForm.data.zone", defaultZone || zones[0] );
                 }
+
+                let zoneObject = {
+                    "id": "",
+                    "name": ""
+                }
+                if (AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.id" ) && AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.name" )) {
+                    zoneObject = {
+                        "id": AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.id" ),
+                        "name": AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.name" )
+                    }
+                } else {
+                    if (defaultZone) {
+                        zoneObject = {
+                            "id": defaultZone.id,
+                            "name": defaultZone.name
+                        }
+                    }
+                }
+                viewModel.set('detailForm.data.zone', zoneObject)
             }
+
         } catch (error) {
             console.error("Errore durante il recupero delle zone:", error);
         }
