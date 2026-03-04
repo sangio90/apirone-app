@@ -391,7 +391,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var quotationItem = null;
 		if (json.item.id != "") {
-			var quotationItem = super.service( "QuotationItem" ).get( json.item.id );
+			quotationItem = super.service( "QuotationItem" ).get( json.item.id );
 		}
 
 		var quotation = null;
@@ -435,7 +435,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 
-			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, json.quotationItem.quotationZone.id, fruitItemsIds, 0, 0, quotation, quotationItem );
+			var fruitPrice = calculator.calculate( 
+				fruit.fruit.id, 
+				1, 
+				json.item.quotationZone.id, 
+				fruitItemsIds, 
+				0, 
+				0, 
+				quotation, 
+				quotationItem 
+			);
 
 			line.setName( "#fruit.fruit?.name#" );
 			line.setAmount( fruitPrice.finalPrice );
