@@ -557,7 +557,7 @@ AP.quotation.detail = ( function() {
 
             var url = "/manager/ajax/quotations/" + AP.page.quotation.id + "/items/" + typeId;
 
-            if (AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.id" ) && AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.name" ) != "-- Tutte le zone") {
+            if (AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.id" ) && AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.id" ) != '' && AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.name" ) != "-- Tutte le zone") {
                 url = url + "?quotationZoneId=" + AP.getUserPref( "quotation." + AP.page.quotation.id + ".zone.id" );
             }
 
