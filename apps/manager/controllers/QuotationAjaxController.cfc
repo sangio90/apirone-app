@@ -475,29 +475,53 @@ component extends="com.apirone.core.controller.AbsController" {
 		var accQuantity = 0;
 		var accessoriesTotalPrice = 0;
 		for ( var item in acc ) {
-			accQuantity += item.getQuantity();
-			accessoriesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			accQuantity += item.getQuantity() * zoneQuantity;
+			accessoriesTotalPrice += item.getQuantity() * zoneQuantity * item.getPrice().getTotal();
 		}
 		var pla = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "PLA" );
 		var plaQuantity = 0;
 		var platesTotalPrice = 0;
 		for ( var item in pla ) {
-			plaQuantity += item.getQuantity();
-			platesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			plaQuantity += item.getQuantity() * zoneQuantity;
+			platesTotalPrice += item.getQuantity() * zoneQuantity * item.getPrice().getTotal();
 		}
 		var seg = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "SEG" );
 		var segQuantity = 0;
 		var signagesTotalPrice = 0;
 		for ( var item in seg ) {
-			segQuantity += item.getQuantity();
-			signagesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			segQuantity += item.getQuantity() * zoneQuantity;
+			signagesTotalPrice += item.getQuantity() * zoneQuantity * item.getPrice().getTotal();
 		}
 		var art = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "ART" );
 		var artQuantity = 0;
 		var articlesTotalPrice = 0;
 		for ( var item in art ) {
-			artQuantity += item.getQuantity();
-			articlesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			artQuantity += item.getQuantity() * zoneQuantity;
+			articlesTotalPrice += item.getQuantity() * zoneQuantity * item.getPrice().getTotal();
 		}
 
 		var data = {
