@@ -63,8 +63,8 @@ AP.quotation.itemPricing = ( function() {
                 viewModel.set( "pricing.data.total", 0 );
                 $( "[name=\"discount1\"]" ).prop( "disabled", false );
                 $( "[name=\"discount2\"]" ).prop( "disabled", false );
+                viewModel.set("pricing.isTotalEnabled", false);
                 this.update();
-                $( "#input-item-total" ).prop( "disabled", true );
             } else {
                 viewModel.set( "pricing.data.discount1", 0 );
                 viewModel.set( "pricing.data.discount2", 0 );
@@ -72,7 +72,7 @@ AP.quotation.itemPricing = ( function() {
                 $( "[name=\"discount2\"]" ).prop( "disabled", true );
                 viewModel.set( "pricing.data.lines", [] );
                 viewModel.set( "pricing.data.total", 0 );
-                $( "#input-item-total" ).prop( "disabled", false );
+                viewModel.set("pricing.isTotalEnabled", true);
             }
 
         },
@@ -140,11 +140,17 @@ AP.quotation.itemPricing = ( function() {
         viewModel.set( "typeId", typeId );
 
         if ( data ) {
+            if (data.data.method.id == "C") {
+                viewModel.set("pricing.isTotalEnabled", false);
+            } else {
+                viewModel.set("pricing.isTotalEnabled", true);
+            }
             viewModel.set( "pricing", data );
         } else {
             viewModel.set( "pricing", defaultForm );
             $( "[name=\"discount1\"]" ).prop( "disabled", false );
             $( "[name=\"discount2\"]" ).prop( "disabled", false );
+            viewModel.set("pricing.isTotalEnabled", false);
         }
 
     };
@@ -266,23 +272,6 @@ AP.quotation.totalPricing = ( function() {
                     }
                 }
             } );
-
-        },
-
-        changeMethod: function( event ) {
-
-            var ele = $( event.currentTarget );
-
-            var value = ele.val();
-            var input = fields.boxTotalPricing.find( "#input-total" );
-
-            if ( value == "C" ) {
-                this.update();
-
-                input.prop( "readonly", true );
-            } else {
-                input.prop( "readonly", false );
-            }
 
         },
 

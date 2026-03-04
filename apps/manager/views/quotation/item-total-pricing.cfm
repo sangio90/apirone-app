@@ -51,7 +51,7 @@
 				<input class="form-control text-end" name="total" id="input-item-total" style="font-size: 12px;"
 					placeholder="Totale"
 					data-format="0.00"
-					data-bind="value: pricing.data.total">
+					data-bind="value: pricing.data.total, enabled: pricing.isTotalEnabled">
 				<span class="input-group-text">
 					<i class="fas fa-euro-sign"></i>
 				</span>
