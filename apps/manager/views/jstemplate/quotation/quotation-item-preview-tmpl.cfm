@@ -42,13 +42,30 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-5 d-flex justify-content-center">
-                    Quantità: &nbsp; <span data-bind="text: quantity"></span>
+                <div class="col-1"></div>
+                <div class="col-5" style="font-size: 11px">
+                    <table style="margin: 0; padding: 0">
+                        <tr>
+                            <td class="text-left">Quantità:&nbsp;</td>
+                            <td><span data-bind="text: quantity"></span></td>
+                        </tr>
+                    </table>
                 </div>
-                <div class="col-7">
-                    <span>Prezzo: &nbsp; <span data-bind="text: price.total" data-format="n2"></span> &euro;</span>
-                    <span data-bind="visible: showCosts" style="color: blue;"><br><span>Costo:</span>&nbsp;&nbsp;<span data-bind="text: price.cost" data-format="n2"></span> &euro;</span>
+                <div class="col-5" style="font-size: 11px">
+                    <table>
+                        <tr>
+                            <td class="text-left">Prezzo:&nbsp;</td>
+                            <td class="d-flex justify-content-end"><span data-bind="text: price.total" data-format="n2"></span></td>
+                            <td class="text-left">&nbsp;&euro;</td>
+                        </tr>
+                        <tr data-bind="visible: showCosts" style="color: blue;">
+                            <td class="text-left">Costo:&nbsp;</td>
+                            <td class="d-flex justify-content-end"><span data-bind="text: price.cost" data-format="n2"></span></td>
+                            <td class="text-left">&nbsp;&euro;</td>
+                        </tr>
+                    </table>
                 </div>
+                <div class="col-1"></div>
             </div>
         </div>
     </div>
