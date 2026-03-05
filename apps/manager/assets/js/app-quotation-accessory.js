@@ -735,7 +735,10 @@ AP.accessory.modal = ( function() {
 
 		renderQuotationItemTotals( id );
 
-        viewModel.handleSelectChanges()
+        $( "#accessoryProductCategory" ).prop( "disabled", true );
+        $( "#accessoryLine" ).prop( "disabled", true );
+        $( "#accessoryModel" ).prop( "disabled", true );
+
         AP.loading.hide();
     };
 
