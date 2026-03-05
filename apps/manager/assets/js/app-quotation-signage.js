@@ -124,7 +124,7 @@ AP.signage.modal = ( function() {
             viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
 
             $( "#signangeProductCategory" ).prop( "disabled", false );
-            $( "#signageRow" ).prop( "disabled", false );
+            $( "#signageLine" ).prop( "disabled", false );
             $( "#signageModel" ).prop( "disabled", false );
             $( "#signageFinish" ).prop( "disabled", false );
             $( "#signageFont" ).prop( "disabled", false );
@@ -252,14 +252,7 @@ AP.signage.modal = ( function() {
                     },
                 } );
             }
-
-            const signageConfigItemId = viewModel.get('detailForm.data.quotationItem.signageConfigItem.id')
-            if (!signageConfigItemId || signageConfigItemId == '') {
-                $( "#signageFont" ).prop( "disabled", false )
-            } else {
-                $( "#signageFont" ).prop( "disabled", true )
-            }
-            
+          
             viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( signageRow => {
                 this.parsedLineContent( signageRow.content, signageRow.id );
                 viewModel.updateCharCounter( {
@@ -524,23 +517,24 @@ AP.signage.modal = ( function() {
         },
 
         loadLines: async function( event ) {
-            await NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ),
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona" } );
-                        viewModel.get( "lines" ).data( xhr.data );
+            if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) && viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) != '') {
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ),
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "-- Seleziona" } );
+                            viewModel.get( "lines" ).data( xhr.data );
+                        },
                     },
-                },
-            } );
+                } );
+            }
             this.checkCanSave();
             AP.setUserPref( "signage.categoryId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) );
         },
 
         loadModels: async function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
-                $( "#signangeProductCategory" ).prop( "disabled", true );
                 if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
                     $( "#quotation-signage-preview-background" ).css( {
                         width: "500px",
@@ -552,8 +546,6 @@ AP.signage.modal = ( function() {
                         height: null
                     } );
                 }
-            } else {
-                $( "#signangeProductCategory" ).prop( "disabled", false );
             }
             await NM.util.ajax( {
                 method: "GET",
@@ -571,7 +563,6 @@ AP.signage.modal = ( function() {
 
         loadFinishes: async function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) != "" ) {
-                $( "#signageRow" ).prop( "disabled", true );
                 await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
@@ -616,19 +607,12 @@ AP.signage.modal = ( function() {
                         },
                     },
                 } );
-            } else {
-                $( "#signageRow" ).prop( "disabled", false );
             }
             this.checkCanSave();
             AP.setUserPref( "signage.modelId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) );
         },
 
         loadSignageConfigs: async function( event ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
-                $( "#signageModel" ).prop( "disabled", true );
-            } else {
-                $( "#signageModel" ).prop( "disabled", false );
-            }
             const xhr = await NM.util.ajax( {
                 method: "GET",
                 url: "/manager/ajax/quotations/signage-configs?categoryId="
@@ -695,11 +679,6 @@ AP.signage.modal = ( function() {
         },
 
         loadFontSizes: async function() {
-            if ( viewModel.get( "detailForm.data.signageConfig.font.id" ) != "" ) {
-                $( "#signageFinish" ).prop( "disabled", true );
-            } else {
-                $( "#signageFinish" ).prop( "disabled", false );
-            }
             var signageConfig = viewModel.getSignageConfig();
             if ( signageConfig ) {
                 await this.firstLoadProductItems();
@@ -1074,6 +1053,49 @@ AP.signage.modal = ( function() {
             AP.deleteUserPref( "signage.product.items" );
             this.checkCanSave();
         },
+
+        handleSelectChanges: function() {
+            $( "#signangeProductCategory" ).on( "change", function(e) {
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", { 'id':'' });
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
+                viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                AP.deleteUserPref( "signage.lineId" );
+                AP.deleteUserPref( "signage.modelId" );
+                AP.deleteUserPref( "signage.finishId" );
+                AP.deleteUserPref( "signage.fontId" );
+                AP.deleteUserPref( "signage.signageConfigId" );
+            } );
+            $( "#signageLine" ).on( "change", function(e) {
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
+                viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                AP.deleteUserPref( "signage.modelId" );
+                AP.deleteUserPref( "signage.finishId" );
+                AP.deleteUserPref( "signage.fontId" );
+                AP.deleteUserPref( "signage.signageConfigId" );
+            } );
+            $( "#signageModel" ).on( "change", function(e) {
+                viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
+                viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                AP.deleteUserPref( "signage.finishId" );
+                AP.deleteUserPref( "signage.fontId" );
+                AP.deleteUserPref( "signage.signageConfigId" );
+            } );
+            $( "#signageFinish" ).on( "change", function(e) {
+                viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                AP.deleteUserPref( "signage.fontId" );
+                AP.deleteUserPref( "signage.signageConfigId" );
+            } );
+            $( "#signageFont" ).on( "change", function(e) {
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                AP.deleteUserPref( "signage.signageConfigId" );
+            } );
+        }
     } );
 
     pub.new = async function( onSave ) {
@@ -1083,7 +1105,7 @@ AP.signage.modal = ( function() {
 
         pricingApp().init( "signage", undefined );
 
-        const categoriesResponse = await NM.util.ajax( {
+        let categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
@@ -1094,6 +1116,7 @@ AP.signage.modal = ( function() {
         } );
 
 		if ( categoriesResponse.data.length > 0 ) {
+            categoriesResponse.data = categoriesResponse.data.filter(c => c.type.id == 'SEG')
 			categoriesResponse.data.unshift( { id: "", name: "-- seleziona" } );
 			viewModel.get( "categories" ).data( categoriesResponse.data );
 		}
@@ -1101,6 +1124,7 @@ AP.signage.modal = ( function() {
 		NM.util.openModal( AP.signage.fields.modalRoot );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
+        viewModel.handleSelectChanges()
 
         if ( AP.getUserPref( "signage.categoryId" ) ) {
             viewModel.set( "detailForm.data.signageConfig.catalogBundle.category.id", AP.getUserPref( "signage.categoryId" ) );
@@ -1293,6 +1317,12 @@ AP.signage.modal = ( function() {
 
 		pricingApp().init( "signage", { data: signageResponse.data.quotationItem.price } );
 		initPositionSuggest();
+
+        $( "#signangeProductCategory" ).prop( "disabled", true );
+        $( "#signageLine" ).prop( "disabled", true );
+        $( "#signageModel" ).prop( "disabled", true );
+        $( "#signageFinish" ).prop( "disabled", true );
+
         AP.loading.hide();
     };
 

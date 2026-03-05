@@ -34,7 +34,7 @@
                             <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.category.id">    
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
-                                    <select id="signageRow" 
+                                    <select id="signageLine" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la linea"
                                         data-bind="source: lines, value: detailForm.data.signageConfig.catalogBundle.line, events: { change: loadModels }" 
