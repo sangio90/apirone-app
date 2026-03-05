@@ -523,6 +523,11 @@
 
 
 		/*
+			combinations
+		*/
+		post( "/ajax/combinations/findByListOfProductItemIds" ).to( "CombinationAjaxController.findByListOfProductItemIds" ).end();
+
+		/*
 			roles
 		*/
 		get( "/roles" ).to( "RoleController.list" ).end();

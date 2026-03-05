@@ -50,6 +50,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	public com.apirone.core.model.bean.Combination function findByListOfProductItemIds(
+		required Array productItemIds,
+		){
+
+		var query = getDao().findByListOfProductItemIds( argumentCollection = arguments );
+		var bean = build( query.combination_id );
+		return bean;
+	}
+
 	public Array function calculateCombinations( required String productId, attributeIds=[] ){
 		var items = getProductItemService().getFlatTree(
 			productId            = arguments.productId,
@@ -67,7 +76,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		for ( var node in tree ) {
 			var combinationAlreadyExists = getCombinationProductItemDao().exists( node );
-		
+
 			//dump(var="#combinationAlreadyExists#", label="combinationAlreadyExists");
 
 			if ( combinationAlreadyExists ) {
@@ -88,7 +97,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var name = "";
 			var index = 1;
-            
+
 			for ( var productItemId in node ) {
 				var item    = super.bean( "CombinationProductItem" );
 				var product = getProductItemService().get( productItemId );
@@ -119,10 +128,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				//}
 
 			}
-			
+
 			combination.setName( name );
 			combination.setId( combinationId );
-			
+
 			update( combination );
 		}
 		// Converto l'albero in un array di combinazioni uniche

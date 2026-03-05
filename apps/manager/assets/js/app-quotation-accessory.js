@@ -450,6 +450,30 @@ AP.accessory.modal = ( function() {
                                 viewModel.renderProductPreview( productItems );
                             }
                             resolve();
+							selectedProductItemIds = []
+							for (const pi of productItems.data()) {
+								selectedValue = pi.values.filter( v => v.selected )
+								if ( selectedValue.length > 0 ) {
+									selectedProductItemIds.push( selectedValue[0].product_item_id );
+								}
+							}
+
+							if (selectedProductItemIds.length) {
+								NM.util.ajax({
+										method: "POST",
+										url: '/manager/ajax/combinations/findByListOfProductItemIds',
+										data: JSON.stringify({productItemIds: selectedProductItemIds}),
+										callback: {
+											done: function (xhr) {
+												if (xhr.status === 'SUCCESS' && xhr.data?.horizontalImage) {
+                                                $( "#accessory-preview-background-tree" ).empty();
+                                                    $( "#accessory-preview-background-tree" ).append( `<img src="${xhr.data.horizontalImage}" style="width: 500px; height: auto;">` );
+                                                }
+											}
+										}
+									}
+								)
+							}
                         },
                         fail: function( err ) {
                             reject( err );
@@ -460,19 +484,23 @@ AP.accessory.modal = ( function() {
         },
 
         renderProductPreview: function( productItems ) {
-            productItems.data().forEach( function( item ) {
-				$( "#accessory-preview-background-tree" ).empty();
-                const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
-                if ( selectedValues.length > 0 ) {
-                    if ( selectedValues[0].horizontalImage ) {
-                        $( "#accessory-preview-background-tree" ).empty();
-                        $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValues[0].horizontalImage.uri}" style="width: 500px; height: auto;">` );
-                    } else if ( selectedValues[0].attributeValue?.horizontalImage ) {
-                        $( "#accessory-preview-background-tree" ).empty();
-                        $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValues[0].attributeValue.horizontalImage.uri}" style="width: 500px; height: auto;">` );
+            // $( "#accessory-preview-background-tree" ).empty();
+            let selectedValues = []
+            for (const productItem of productItems._data) {
+                const productItemSelectedData = productItem.values.filter( ( value ) => { return value.selected == true; } );
+                selectedValues = selectedValues.concat( productItemSelectedData );
+            }
+            $( "#accessory-preview-background-tree" ).empty();
+
+            if ( selectedValues.length > 0 ) {
+                for (const selectedValue of selectedValues) {
+                    if ( selectedValue.horizontalImage ) {
+                        $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValue.horizontalImage.uri}" style="width: 500px; height: auto;position: absolute; top: 0; left: 0;">` );
+                    } else if ( selectedValue.attributeValue?.horizontalImage ) {
+                        $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValue.attributeValue.horizontalImage.uri}" style="width: 500px; height: auto;position: absolute; top: 0; left: 0;">` );
                     }
                 }
-            } );
+            }
             return true;
         },
 

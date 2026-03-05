@@ -96,8 +96,8 @@
                                 
                                 <div class="col-6 mb-3 position-relative">
                                     <div id="accessory-preview-background" style="width: 500px;">
-                                        <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }" /> 
-                                        <div id="accessory-preview-background-tree" style="position: absolute; top: 0; left: 0;">
+                                        <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }, visible: backgroundImage.url" /> 
+                                        <div id="accessory-preview-background-tree" style="position: absolute; top: 0; left: 12px;">
                                     </div>
                                     </div>
                                 </div>
