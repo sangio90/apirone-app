@@ -295,17 +295,9 @@ h2 {
     border-bottom: 1px solid #eee !important;
 }
 
-@media (min-width: 1300) and (max-width: 1899px) {
-    .modal-xl {
-        max-width: 1350px;
-    }
-}
-
-@media (min-width: 1900px) {
-    .modal-xl {
-        width: 97vw !important;
-        max-width: 1890px;
-    }
+.modal-xl {
+    width: 97vw !important;
+    max-width: 1890px;
 }
 
 .modalxl {

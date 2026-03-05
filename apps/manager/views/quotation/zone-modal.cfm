@@ -9,20 +9,19 @@
                 
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" id="zoneTitle"></h2>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi">
-                    </header>                
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                    </header>             
                         
                     <div class="card-body">
                         <div class="mb-3 row">
                             <div class="col-4">
-                                <label class="col-sm-12 col-form-label text-start" id="zone-label-parent">Zona</label>
-                                <select class="form-control me-3" 
+                                <label class="col-sm-12 col-form-label text-start" id="zone-label-parent">Zona Padre</label>
+                                <select class="form-control" 
                                     id="parentId"
                                     name="parentId"
-                                    data-bind="source: zones, value: detailForm.data.parentZone"
+                                    data-bind="source: zones, value: detailForm.data.parentZone" 
                                     data-value-field="id"
-                                    data-text-field="name"
-                                >
+                                    data-text-field="name">
                                 </select>
                             </div>
                             <div class="col-4" id="zone-name-input">    
@@ -47,7 +46,7 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-12 float-end">
-                                <button type="button" id="add-zone-button" class="btn btn-primary btn-sm float-end" data-bind="click:createZone">
+                                <button type="button" id="save-zone-button" class="btn btn-primary btn-sm float-end" data-bind="click:saveZone">
                                     <i class="fas fa-save"></i> Salva
                                 </button>
                                 <button type="button" id="duplicate-zone-button" class="btn btn-primary btn-sm float-end" data-bind="click:duplicateZone">

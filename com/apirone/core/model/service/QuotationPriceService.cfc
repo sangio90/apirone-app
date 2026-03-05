@@ -54,8 +54,15 @@
 		var items = getQuotationItemService().list( quotationId = arguments.quotationId );
 
 		for( var item in items ) {
-			totalItems = totalItems + item.getPrice().getTotal();
-			totalCosts = totalCosts + (item.getPrice().getCost() * item.getQuantity());
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+
+			totalItems = totalItems + (item.getPrice().getTotal() * zoneQuantity);
+			totalCosts = totalCosts + (item.getPrice().getCost() * item.getQuantity() * zoneQuantity);
 		}
 
 		pricing.setTotalGoods( totalItems );
@@ -156,12 +163,28 @@
 			bean.setFlatDiscount( record.flat_discount );
 			bean.setCreatedAt( record.created_at );
 			getQuotationItemService().list( quotationId = bean.getQuotationId() ).each( function( item ){
-				bean.setTotalMultipliedByQuantity( bean.getTotalMultipliedByQuantity() + ( item.getPrice().getTotal() * item.getQuantity() ) );
+				var zone = item.getQuotationZone()
+				var originZone = zone.getOrigin()
+				var zoneQuantity = zone.getQuantity();
+				if (!isNull(originZone)) {
+					zoneQuantity *= originZone.getQuantity()
+				}
+				bean.setTotalMultipliedByQuantity( bean.getTotalMultipliedByQuantity() + ( item.getPrice().getTotal() * item.getQuantity() * zoneQuantity ) );
 			} );
 			return bean;
 		}
 		
 		return NullValue();
+	}
+
+	public com.apirone.core.model.bean.Outcome function delete( required Numeric quotationPriceId ){
+
+		var outcome = super.bean( "Outcome" );
+
+		outcome.setData( { quotationPriceId = arguments.quotationPriceId } );
+		getDao().delete( arguments.quotationPriceId );
+
+		return outcome;
 	}
 
 }

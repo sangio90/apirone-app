@@ -52,6 +52,30 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<cffunction name="findByListOfProductItemIds" access="public">
+		<cfargument name="productItemIds" type="array" required="true">
+
+		<cfset var N = arrayLen(arguments.productItemIds)>
+		<cfset var idsList = arrayToList(arguments.productItemIds)>
+		<cfset var q = "">
+
+		<cfquery name="q" datasource="apirone">
+			SELECT cpi.combination_id
+			FROM combination_product_items cpi
+			GROUP BY cpi.combination_id
+			HAVING
+			COUNT(*) = <cfqueryparam value="#N#" cfsqltype="cf_sql_integer">
+			AND COUNT(CASE
+			WHEN cpi.product_item_id IN (
+			<cfqueryparam value="#idsList#" list="true" cfsqltype="cf_sql_integer">
+			)
+			THEN 1
+			END) = <cfqueryparam value="#N#" cfsqltype="cf_sql_integer">
+		</cfquery>
+
+		<cfreturn q>
+	</cffunction>
+
 	<cffunction name="insert" returntype="String">
 		<cfargument name="combination" type="com.apirone.core.model.bean.Combination" required="true">
 
@@ -75,9 +99,9 @@
 		<cfargument name="combination" type="com.apirone.core.model.bean.Combination" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE 
-				combinations 
-			SET 
+			UPDATE
+				combinations
+			SET
 				combination = <cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getName()#">
 			WHERE
 				combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combination.getId()#">::uuid
@@ -90,8 +114,8 @@
 		<cfargument name="combinationId" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			DELETE 
-            FROM 
+			DELETE
+            FROM
                 combinations
 			WHERE
 		    	combination_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.combinationId#">::uuid

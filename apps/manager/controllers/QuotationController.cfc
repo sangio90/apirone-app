@@ -30,7 +30,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var memy = super.getMementify();
 
 		prc.isEditing = true;
-		
+
 		var quotation = super.fire( "Quotation.get", [ rc.id ] );
 
 		var user = session.user;
@@ -85,7 +85,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		page[ "statuses" ]       = memy.convertList( super.fire( "status.list", [ "QUOTATION" ] ) );
 		page[ "itemStatuses" ]   = memy.convertList( super.fire( "status.list", [ "QUOTATION_ITEM" ] ) );
 		page[ "languages" ]      = memy.convertList( super.fire( "lang.list" ) );
-		page[ "paymentMethods" ] = memy.convertList( [ super.fire( "paymentMethod.get", [18] ) ] );
+		page[ "paymentMethods" ] = memy.convertList( super.fire( "paymentMethod.list" ) );
 		page[ "currencies" ]     = memy.convertList( super.fire( "currency.list" ) );
 		page[ "frames" ]         = memy.convertList( super.fire( "frame.list" ), "minimal" );
 		page[ "vatCodes" ]       = memy.convertList( super.fire( "vatCode.list" ) );
@@ -93,7 +93,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		page[ "saleUsers" ]      = memy.convertList( super.fire( "user.list", { roleTypeId="COM" } ) );
 
 		return { "page" = page }
-	
+
 	}
 
 }

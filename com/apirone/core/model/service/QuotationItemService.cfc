@@ -391,7 +391,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var quotationItem = null;
 		if (json.item.id != "") {
-			var quotationItem = super.service( "QuotationItem" ).get( json.item.id );
+			quotationItem = super.service( "QuotationItem" ).get( json.item.id );
 		}
 
 		var quotation = null;
@@ -402,6 +402,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var platePrice = calculator.calculate(
 			product.id,
 			json.item.quantity,
+			json.item.quotationZone.id,
 			productItemsIds,
 			0,
 			0,
@@ -434,7 +435,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 
-			var fruitPrice = calculator.calculate( fruit.fruit.id, 1, fruitItemsIds, 0, 0, quotation, quotationItem );
+			var fruitPrice = calculator.calculate( 
+				fruit.fruit.id, 
+				1, 
+				json.item.quotationZone.id, 
+				fruitItemsIds, 
+				0, 
+				0, 
+				quotation, 
+				quotationItem 
+			);
 
 			line.setName( "#fruit.fruit?.name#" );
 			line.setAmount( fruitPrice.finalPrice );
@@ -495,11 +505,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 		
 		var quotation = getQuotationService().get( json.quotationId )
-		var quotationItem = get( json.quotationItem.id )
+		var quotationItem = !isNull(json.quotationItem.id) && json.quotationItem.id != '' ? get( json.quotationItem.id ) : null
 
 		var signagePrice = calculator.calculate(
 			product.id,
 			json.quotationItem.quantity,
+			json.quotationItem.quotationZone.id,
 			productItemsIds,
 			lettersQuantity,
 			json.quotationItem.signageConfigItem.id,
@@ -561,11 +572,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var quotation = getQuotationService().get( json.quotationId )
-		var quotationItem = get( json.quotationItem.id )
+		var quotationItem = !isNull(json.quotationItem.id) && json.quotationItem.id != '' ? get( json.quotationItem.id ) : null
 
 		var price = calculator.calculate(
 			product.id,
 			json.quotationItem.quantity,
+			json.quotationItem.quotationZone.id,
 			productItemsIds,
 			0,
 			0,
@@ -654,11 +666,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						"id": "",
 						"items": { "_data": [] }
 					},
+					"quotationZone": {
+						"id": ""
+					},
 					"fruits": { "_data": [] }
 				}
 			}
 			json.quotationId = quotationId;
 			json.item.id = quotationItem.getId();
+			json.item.quotationZone.id = quotationItem.getQuotationZone().getId();
 			json.item.quantity = quantity;
 			if (!isNull(quotationItem.getPrice())) {
 				json.price.id = quotationItem.getPrice().getId();
@@ -710,6 +726,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						"method": { "id": "F" },
 						"total": 0
 					},
+					"quotationZone": {
+						"id": ""
+					},
 					"product": {
 						"id": "",
 					"items": { "_data": [] }
@@ -721,6 +740,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			json.quotationId = quotationId;
 			json.quotationItem.id = quotationItem.getId()
+			json.quotationItem.quotationZone.id = quotationItem.getQuotationZone().getId()
 			json.quotationItem.quantity = quantity
 			if (!isNull(quotationItem.getPrice())) {
 				json.quotationItem.price.id = quotationItem.getPrice().getId();

@@ -60,12 +60,12 @@
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">
-		<cfargument name="zoneId" type="String" required="true">
+		<cfargument name="zonePositionId" type="Number" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM quotation_zone_positions
 			WHERE
-				quotation_zone_position_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zonePositionId#">
+				quotation_zone_position_id = <cfqueryparam cfsqltype="Number" value="#arguments.zonePositionId#">
 		</cfquery>
 		<cfreturn true>
 	</cffunction>

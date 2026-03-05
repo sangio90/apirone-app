@@ -24,7 +24,7 @@
                                     <select id="accessoryProductCategory" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la categoria"
-                                        data-bind="source: categories, value: detailForm.data.quotationItem.product.category, events: { change: loadLines }"
+                                        data-bind="source: categories, value: detailForm.data.quotationItem.product.category.id, events: { change: loadLines }"
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
@@ -34,7 +34,7 @@
                             <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.category.id">    
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
-                                    <select id="accessoryRow" 
+                                    <select id="accessoryLine" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la linea"
                                         data-bind="source: lines, value: detailForm.data.quotationItem.product.line, events: { change: loadModels }" 
@@ -90,19 +90,19 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-4 mb-3">
+                                <div class="col-3 mb-3">
                                     <div id="accessory-product-items" style="max-width: 100%"></div>
                                 </div>
                                 
                                 <div class="col-6 mb-3 position-relative">
-                                    <div id="accessory-preview-background"
-                                        class="col-12 d-flex justify-content-center align-items-center"
-                                        data-bind="visible:detailForm.data.quotationItem.product.finish.id, style: { backgroundImage: backgroundImage.url, position: relative }"
-                                    >
+                                    <div id="accessory-preview-background" style="width: 500px;">
+                                        <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }, visible: backgroundImage.url" /> 
+                                        <div id="accessory-preview-background-tree" style="position: absolute; top: 0; left: 12px;">
+                                    </div>
                                     </div>
                                 </div>
 
-                                <div class="col-2">
+                                <div class="col-3">
                                     #view(view="quotation/item-pricing", args={id="accessory-quotation-item-pricing-box"})#
                                 </div>
 

@@ -64,16 +64,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			originId    = Len( json.parentZone?.id ) ? json.parentZone.id : null
 		}
 
-		var existingCombination = super.service( "QuotationZone" ).search( argumentCollection = params );
+		var existingCombinations = super.service( "QuotationZone" ).search( argumentCollection = params );
 
-		if( Len( existingCombination.getData() ) ) {
-			
-			var error = super.getValidationError( message = getMessage( "zone.existInQuotation" ), field="name" );
-			validation.addError( error );
-
-			event.setValue( "result", validation );
-			return;
-
+		if( Len( existingCombinations.getData() ) ) {
+			var existingCombination = existingCombinations.getData()[1]
+			if (isNull(json.id) || json.id == "" || existingCombination.getId() != json.id) {
+				result.setData( { "message" = getMessage( "zone.existInQuotation" ), "status" = "error" } );
+				event.setValue( "result", result );
+				return;
+			}
 		}
 
 		quotationZone.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
@@ -81,20 +80,30 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotationZone.setQuantity( json.quantity );
 
 		if ( Len( json.parentZone?.id ) ) {
+			if (!isNull(json.id)) {
+				var children = super.service( "QuotationZone" ).list( "originId" = rc.id );
+				if (Len(children) > 0) {
+					result.setData( { "message" = "Non è possibile assegnare una zona padre ad una zona con sottozone.", "status" = "error" } );
+					event.setValue( "result", result );
+					return;
+				}
+			}
+
 			quotationZone.setOrigin( super.service( "QuotationZone" ).get( json.parentZone.id ) );
 		}
 
-		if ( !Len( json.id ) ) {
+		if ( isNull( json.id ) ) {
 			messageId = "quotationZone.created";
 			thisId    = super.fire( "quotationZone.create", [ quotationZone ] )
 		} else {
+			quotationZone.setId( json.id )
 			messageId = "quotationZone.updated";
 			thisId    = super.fire( "quotationZone.update", [ quotationZone ] )
 		}
 		
 		var message = getMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message, "status" = "success" }, { "payload" = { id = thisId } } );
 
 		event.setValue( "result", result );
 	}
@@ -107,7 +116,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var quotationZone = super.bean( "QuotationZone" );
 
-		var zoneToDuplicate = super.fire( "QuotationZone.get", [ json.parentZone.id ] );
+		var zoneToDuplicate = super.fire( "QuotationZone.get", [ json.id ] );
 
 		var zoneObject = {
 			quotationId = json.quotation.id,
@@ -137,13 +146,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		transaction {
-			if ( !Len( json.id ) ) {
-				messageId = "quotationZone.created";
-				thisId    = super.fire( "quotationZone.create", [ quotationZone ] )
-			} else {
-				messageId = "quotationZone.updated";
-				thisId    = super.fire( "quotationZone.update", [ quotationZone ] )
-			}
+			messageId = "quotationZone.created";
+			thisId    = super.fire( "quotationZone.create", [ quotationZone ] )
 
 			var duplicatedZone = super.service( "QuotationZone" ).duplicateZoneItems( duplicatedZoneId: zoneToDuplicate.getId(), newZoneId: thisId  );
 			if (json.duplicaConSottozone) {
@@ -181,19 +185,22 @@ component extends="com.apirone.core.controller.AbsController" {
 			var zoneInUse = super.fire( "quotationItem.search", [ quotationZoneId = zone.id ] );
 
 			if( Len( zoneInUse.getData() ) ) {
-				var error = getValidationError( message = getMessage( "zone.notDeletedWithQuotationItem" ), field="parentId" );
-				validation.addError( error );
+				result.setData( { "message" = getMessage( "zone.notDeletedWithQuotationItem" ), "status" = 'error' } );
+				event.setValue( "result", result );
+				return;
 			}
 
 			var zoneWithSubzone = super.fire( "quotationZone.search", [ originId = zone.id ] );
 
 			if ( Len( zoneWithSubzone.getData() ) ) {
-				var error = getValidationError( message = getMessage( "zone.notDeletedWithSubZone" ), field="parentId" );
-				validation.addError( error );
+				result.setData( { "message" = getMessage( "zone.notDeletedWithSubZone" ), "status" = 'error' } );
+				event.setValue( "result", result );
+				return;
 			}
 				
 			if ( validation.hasErrors() ) {
-				event.setValue( "result", validation );
+				result.setData( { "message" = "Errore generico durante la cancellazione della Zona.", "status" = 'error' } );
+				event.setValue( "result", result );
 				return;
 			}
 
@@ -201,14 +208,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var outcome = super.fire( "quotationZone.delete", [ zone.id ] );
 
-		if ( outcome.hasError() ) {
-			var error = getValidationError( message = getMessage( "zone.notDeleted" ), field="general" );
-			validation.addError( error );
-			event.setValue( "result", validation );
-			return;
-		}
-
-		result.setData( { "message" = getMessage( "zone.deleted" )  } );
+		result.setData( { "message" = getMessage( "zone.deleted" ), "status" = "success"  } );
 
 		event.setValue( "result", result );
 	}

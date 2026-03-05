@@ -500,6 +500,7 @@
 		post( "/ajax/quotations-exported" ).to( "QuotationExportedAjaxController.deleteMulti" ).end();
 		get( "/ajax/quotations-exported" ).to( "QuotationExportedAjaxController.list" ).end();
 		delete( "/ajax/quotation-exported-rows" ).to( "QuotationExportedAjaxController.deleteRow" ).end();
+		delete( "/ajax/quotations/:id" ).to( "QuotationAjaxController.delete" ).end();
 
 		/*
 			quotation items
@@ -522,6 +523,11 @@
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		//get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
 
+
+		/*
+			combinations
+		*/
+		post( "/ajax/combinations/findByListOfProductItemIds" ).to( "CombinationAjaxController.findByListOfProductItemIds" ).end();
 
 		/*
 			roles

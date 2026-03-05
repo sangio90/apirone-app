@@ -240,9 +240,13 @@
 
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
-				SUM(quotation_items.quantity) AS total_quantity
+				SUM(
+					COALESCE(quotation_items.quantity, 0) * COALESCE(qz.quantity, 1) * COALESCE(qzo.quantity, 1)
+				) AS total_quantity
 			FROM quotation_items
-			LEFT JOIN products ON quotation_items.product_id = products.product_id
+				LEFT JOIN products ON quotation_items.product_id = products.product_id
+				LEFT JOIN quotation_zones qz ON qz.quotation_zone_id = quotation_items.quotation_zone_id
+				LEFT JOIN quotation_zones qzo ON qzo.quotation_zone_id = qz.origin_id
 			WHERE
 				products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid AND
 				products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid AND

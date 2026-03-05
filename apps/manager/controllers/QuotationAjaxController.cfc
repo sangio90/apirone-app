@@ -119,7 +119,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var currency      = super.bean( "Currency" );
 		var quotation     = super.bean( "Quotation" );
 		var paymentMethod = super.bean( "PaymentMethod" );
-		
+
 		quotation.setId( json.id );
 		quotation.setName( json.name );
 		//quotation.setQuotationNumber( json.quotationNumber );
@@ -128,7 +128,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setValidityDate( IsDate( json?.validityDate ) ? json.validityDate : NullValue() );
 		quotation.setQuotationDate( IsDate( json?.quotationDate ) ? json.quotationDate : NullValue() );
 		quotation.setNote( json.note );
-		
+
 		quotation.setActive( true );
 		quotation.setLang( super.fire( "lang.get", [ json.lang.id ] ) );
 
@@ -160,10 +160,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		// quotation.setsalesAgent( type.setId( json.salesAgent.id ) );
 		// quotation.setgraphicTechnician( type.setId( json.graphicTechnician.id ) );
 		if ( !Len( json.id ) ) {
-			
+
 			thisId = super.fire( "quotation.create", [ quotation, session.user.getId() ] );
 			messageId = "quotation.created";
-			
+
 		} else {
 			thisId    = super.fire( "quotation.update", [ quotation ] )
 			messageId = "quotation.updated";
@@ -200,7 +200,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 					history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
 					super.fire('QuotationStatusHistory.create', [ history ] );
-					
+
 					result.setData( { "message" = message, "error" = {} } );
 					result.setStatus('warning')
 					event.setValue( "result", result );
@@ -218,7 +218,7 @@ component extends="com.apirone.core.controller.AbsController" {
 							continue;
 						}
 						isValid = super.fire( 'QuotationItem.validateQuantity', [ quotation, quotationItem ])
-						if (!IsValid) {	
+						if (!IsValid) {
 							var message = "C'è almeno un prodotto nel preventivo che sfora le quantità minima o massima. Approvazione rimandata ad un superiore.";
 
 							history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
@@ -229,15 +229,15 @@ component extends="com.apirone.core.controller.AbsController" {
 							event.setValue( "result", result );
 							return;
 						}
-						isValid = super.fire( 'QuotationItem.validateDiscounts', [ 
+						isValid = super.fire( 'QuotationItem.validateDiscounts', [
 							session.user.getRole().getQuotationMaxDiscount(),
 							quotationDiscount1,
 							quotationDiscount2,
 							quotationItem.getPrice().getDiscount1(),
-							quotationItem.getPrice().getDiscount2() 
+							quotationItem.getPrice().getDiscount2()
 						])
 
-						if (!IsValid) {	
+						if (!IsValid) {
 							var message = "C'è almeno una riga del preventivo che supera il tuo massimale di sconto. Approvazione rimandata ad un superiore.";
 
 							history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
@@ -251,7 +251,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					}
 				}
 			}
-			
+
 			history.setStatus( super.fire( 'status.get', [ 'APR' ] ) );
 			super.fire('QuotationStatusHistory.create', [ history ] );
 		} catch (e) {
@@ -260,7 +260,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			result.setStatus('error')
 			event.setValue( "result", result );
 		}
-		
+
 
 		result.setData( { "message" = message, "error" = { } } );
 		event.setValue( "result", result );
@@ -322,20 +322,16 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function delete( event, rc, prc ){
 		var result    = super.getResult();
-		var list      = GetHTTPRequestData().content;
 		var messageId = "quotation.deletedAllRecords";
 
 		var errors  = [];
 		var payload = "";
 
-		var ids = ListToArray( list );
+		var id = rc.id
+		var outcome = super.fire( "quotation.delete", [ id ] );
 
-		for ( var id in ids ) {
-			var outcome = super.fire( "quotation.delete", [ id ] );
-
-			if ( outcome.getStatus() == "ERROR" ) {
-				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
-			}
+		if ( outcome.getStatus() == "ERROR" ) {
+			errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
 		}
 
 		if ( errors.len() ) {
@@ -405,7 +401,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		event.setValue( "result", data );
 	}
-	
+
 	function updateTotals( event, rc, prc ){
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
@@ -440,7 +436,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var data = [];
 
 		var result = super.getResult();
-		
+
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
 
 		var result         = super.fire( "Quotation.exportProducts", [ quotationItems ] );
@@ -468,40 +464,64 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	
+
 	/*
 		private methods
 	*/
-	
+
 	private Struct function getQuantities( quotationId ){
 
 		var acc = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "ACC" );
 		var accQuantity = 0;
 		var accessoriesTotalPrice = 0;
 		for ( var item in acc ) {
-			accQuantity += item.getQuantity();
-			accessoriesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			accQuantity += item.getQuantity() * zoneQuantity;
+			accessoriesTotalPrice += item.getQuantity() * zoneQuantity * item.getPrice().getTotal();
 		}
 		var pla = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "PLA" );
 		var plaQuantity = 0;
 		var platesTotalPrice = 0;
 		for ( var item in pla ) {
-			plaQuantity += item.getQuantity();
-			platesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			plaQuantity += item.getQuantity() * zoneQuantity;
+			platesTotalPrice += item.getQuantity() * zoneQuantity * item.getPrice().getTotal();
 		}
 		var seg = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "SEG" );
 		var segQuantity = 0;
 		var signagesTotalPrice = 0;
 		for ( var item in seg ) {
-			segQuantity += item.getQuantity();
-			signagesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			segQuantity += item.getQuantity() * zoneQuantity;
+			signagesTotalPrice += item.getQuantity() * zoneQuantity * item.getPrice().getTotal();
 		}
 		var art = super.service( "QuotationItem" ).list( quotationId = quotationId, typeId = "ART" );
 		var artQuantity = 0;
 		var articlesTotalPrice = 0;
 		for ( var item in art ) {
-			artQuantity += item.getQuantity();
-			articlesTotalPrice += item.getQuantity() * item.getPrice().getTotal();
+			var zone = item.getQuotationZone()
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			artQuantity += item.getQuantity() * zoneQuantity;
+			articlesTotalPrice += item.getQuantity() * zoneQuantity * item.getPrice().getTotal();
 		}
 
 		var data = {
@@ -516,9 +536,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		return data;
-		
+
 	}
-	
+
 	public Struct function getTotals( quotationId ){
 
 		var service = super.service( "QuotationPrice" );
@@ -535,7 +555,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		return data;
-		
-	}	
+
+	}
 
 }

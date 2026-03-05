@@ -96,56 +96,49 @@ AP.accessory.modal = ( function() {
             viewModel.set( "detailForm", defaultDetailForm );
             viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
             $( "#accessoryProductCategory" ).prop( "disabled", false );
-            $( "#accessoryRow" ).prop( "disabled", false );
+            $( "#accessoryLine" ).prop( "disabled", false );
             $( "#accessoryModel" ).prop( "disabled", false );
-            $( "#accessoryFinish" ).prop( "disabled", false );
             $( "#accessory-product-items" ).empty();
         },
 
         loadLines: function( event ) {
-            NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona la linea" } );
-                        viewModel.get( "lines" ).data( xhr.data );
+            if (viewModel.get( "detailForm.data.quotationItem.product.category.id" ) && viewModel.get( "detailForm.data.quotationItem.product.category.id" ) != '') {
+                NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "-- Seleziona la linea" } );
+                            viewModel.get( "lines" ).data( xhr.data );
+                        },
                     },
-                },
-            } );
+                } );
+            }
             this.checkCanSave();
             AP.setUserPref( "accessory.categoryId", viewModel.get( "detailForm.data.quotationItem.product.category.id" ) );
         },
 
         loadModels: function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.line.id" ) != "" ) {
-                $( "#accessoryProductCategory" ).prop( "disabled", true );
-                $( "#accessory-preview-background" ).css( {
-                    width: "500px",
-                    height: "500px"
-                } );
-            } else {
-                $( "#accessoryProductCategory" ).prop( "disabled", false );
-            }
-            NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/models/"
-                    + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
-                    + "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
-                        viewModel.get( "models" ).data( xhr.data );
+                NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/models/"
+                        + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
+                        + "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
+                            viewModel.get( "models" ).data( xhr.data );
+                        },
                     },
-                },
-            } );
+                } );
+            }
             this.checkCanSave();
             AP.setUserPref( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.line.id" ) );
         },
 
         loadFinishes: function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) != "" ) {
-                $( "#accessoryRow" ).prop( "disabled", true );
                 NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ),
@@ -172,32 +165,19 @@ AP.accessory.modal = ( function() {
                                         } else {
                                             viewModel.set( "modelConfig", { width: null, height: null } );
                                         }
-
-                                        $( "#accessory-preview-container" ).css( {
-                                            width: "500px",
-                                            height: "500px"
-                                        } );
                                     }
                                 }
                             } );
                         },
                     },
                 } );
-            } else {
-                $( "#accessoryRow" ).prop( "disabled", false );
-
             }
             this.checkCanSave();
             AP.setUserPref( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.model.id" ) );
         },
 
         loadProduct: function() {
-            $( "#accessory-preview-background" ).empty();
-            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
-                $( "#accessoryModel" ).prop( "disabled", true );
-            } else {
-                $( "#accessoryModel" ).prop( "disabled", false );
-            }
+            $('#accessory-preview-background-tree').empty()
             const self = this;
             NM.util.ajax( {
                 method: "GET",
@@ -213,9 +193,9 @@ AP.accessory.modal = ( function() {
                             viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
                             if ( xhr.data[0].horizontalImage ) {
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
+                                viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri );
                             } else {
-                                viewModel.set( "backgroundImage.url", "url()" );
+                                viewModel.set( "backgroundImage.url", "" );
                             }
                             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                                 await self.firstLoadProductItems();
@@ -242,10 +222,11 @@ AP.accessory.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
+							// TODO Valutare di rimuovere questo if, 99% non serve a niente
                             if ( !viewModel.get( "detailForm.data.quotationItem.product.image" ) && xhr.data[0].horizontalImage ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
                                 viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage.url", "url('" + xhr.data[0].horizontalImage.uri + "')" );
+                                viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri);
                             }
                             if ( quotationItemId != "" || !AP.getUserPref( "accessory.product.items" ) || AP.getUserPref( "accessory.product.items" ).length == 0 ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
@@ -271,7 +252,9 @@ AP.accessory.modal = ( function() {
                                             product_item_id: item.id,
                                             parent_attribute_id: null,
                                             level: 0,
-                                            selected: false
+                                            selected: false,
+                                            horizontalImage: item.horizontalImage,
+                                            verticalImage: item.verticalImage
                                         } );
                                         productItems.trigger( "change" );
                                     }
@@ -285,7 +268,9 @@ AP.accessory.modal = ( function() {
                                             {
                                                 attributeValue: item.attributeValue,
                                                 product_item_id: item.id,
-                                                selected: false
+                                                selected: false,
+                                                horizontalImage: item.horizontalImage,
+                                                verticalImage: item.verticalImage
                                             }
                                         ]
                                     };
@@ -410,7 +395,9 @@ AP.accessory.modal = ( function() {
                                     attribute.values.push( {
                                         attributeValue: item.attributeValue,
                                         product_item_id: item.id,
-                                        selected: false
+                                        selected: false,
+                                        horizontalImage: item.horizontalImage,
+                                        verticalImage: item.verticalImage
                                     } );
                                     lastAttributeId = item.attribute.id;
                                 } );
@@ -454,6 +441,30 @@ AP.accessory.modal = ( function() {
                                 viewModel.renderProductPreview( productItems );
                             }
                             resolve();
+							selectedProductItemIds = []
+							for (const pi of productItems.data()) {
+								selectedValue = pi.values.filter( v => v.selected )
+								if ( selectedValue.length > 0 ) {
+									selectedProductItemIds.push( selectedValue[0].product_item_id );
+								}
+							}
+
+							if (selectedProductItemIds.length) {
+								NM.util.ajax({
+										method: "POST",
+										url: '/manager/ajax/combinations/findByListOfProductItemIds',
+										data: JSON.stringify({productItemIds: selectedProductItemIds}),
+										callback: {
+											done: function (xhr) {
+												if (xhr.status === 'SUCCESS' && xhr.data?.horizontalImage) {
+                                                $( "#accessory-preview-background-tree" ).empty();
+                                                    $( "#accessory-preview-background-tree" ).append( `<img src="${xhr.data.horizontalImage}" style="width: 500px; height: auto;">` );
+                                                }
+											}
+										}
+									}
+								)
+							}
                         },
                         fail: function( err ) {
                             reject( err );
@@ -464,16 +475,23 @@ AP.accessory.modal = ( function() {
         },
 
         renderProductPreview: function( productItems ) {
-            productItems.data().forEach( function( item ) {
-                const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
-                if ( selectedValues.length > 0 ) {
-                    if ( selectedValues[0].attributeValue?.horizontalImage ) {
-                        // Probabilmente è giusto l'append, ma al momento vengono affiancati e non sovrapposti
-                        // $( "#accessory-preview-background" ).append( `<img src="${selectedValues[0].attributeValue.image.uri}" style="postion: absolute; top: 0; left: 0;">` );
-                        $( "#accessory-preview-background" ).html( `<img src="${selectedValues[0].attributeValue.horizontalImage.uri}" style="postion: absolute; top: 0; left: 0;">` );
+            // $( "#accessory-preview-background-tree" ).empty();
+            let selectedValues = []
+            for (const productItem of productItems._data) {
+                const productItemSelectedData = productItem.values.filter( ( value ) => { return value.selected == true; } );
+                selectedValues = selectedValues.concat( productItemSelectedData );
+            }
+            $( "#accessory-preview-background-tree" ).empty();
+
+            if ( selectedValues.length > 0 ) {
+                for (const selectedValue of selectedValues) {
+                    if ( selectedValue.horizontalImage ) {
+                        $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValue.horizontalImage.uri}" style="width: 500px; height: auto;position: absolute; top: 0; left: 0;">` );
+                    } else if ( selectedValue.attributeValue?.horizontalImage ) {
+                        $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValue.attributeValue.horizontalImage.uri}" style="width: 500px; height: auto;position: absolute; top: 0; left: 0;">` );
                     }
                 }
-            } );
+            }
             return true;
         },
 
@@ -605,17 +623,40 @@ AP.accessory.modal = ( function() {
 
             return false;
         },
+
+        handleSelectChanges: function() {
+            $( "#accessoryProductCategory" ).on( "change", function(e) {
+                viewModel.set('detailForm.data.quotationItem.product.line', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.items', [])
+                AP.deleteUserPref( "accessory.lineId" );
+                AP.deleteUserPref( "accessory.modelId" );
+                AP.deleteUserPref( "accessory.finishId" );
+            } );
+            $( "#accessoryLine" ).on( "change", function(e) {
+                viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.items', [])
+                AP.deleteUserPref( "accessory.modelId" );
+                AP.deleteUserPref( "accessory.finishId" );
+            } );
+            $( "#accessoryModel" ).on( "change", function(e) {
+                viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.items', [])
+                AP.deleteUserPref( "accessory.finishId" );
+            } );
+        }
     } );
 
     pub.new = async function( onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
-
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         pricingApp().init( "accessory", undefined );
 
-        const categoriesResponse = await NM.util.ajax( {
+        let categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
             callback: {
@@ -626,6 +667,7 @@ AP.accessory.modal = ( function() {
         } );
 
 		if ( categoriesResponse.data.length > 0 ) {
+            categoriesResponse.data = categoriesResponse.data.filter(c => c.type.id == 'ACC')
 			categoriesResponse.data.unshift( { id: "", name: "-- Seleziona la Categoria" } );
 			viewModel.get( "categories" ).data( categoriesResponse.data );
 		}
@@ -635,34 +677,33 @@ AP.accessory.modal = ( function() {
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
 
-        if ( AP.getUserPref( "accessory.categoryId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.category.id", AP.getUserPref( "accessory.categoryId" ) );
-        }
+        viewModel.handleSelectChanges()
 
-        if ( AP.getUserPref( "accessory.lineId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.line.id", AP.getUserPref( "accessory.lineId" ) );
-        }
+        const accessoryCategoryId = AP.getUserPref( "accessory.categoryId" )
+        const accessoryLineId = AP.getUserPref( "accessory.lineId" )
+        const accessoryModelId = AP.getUserPref( "accessory.modelId" )
+        const accessoryFinishId = AP.getUserPref( "accessory.finishId" )
 
-        if ( AP.getUserPref( "accessory.modelId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.model.id", AP.getUserPref( "accessory.modelId" ) );
-        }
-
-        if ( AP.getUserPref( "accessory.finishId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.finish.id", AP.getUserPref( "accessory.finishId" ) );
-        }
-
-        if ( AP.getUserPref( "accessory.categoryId" ) ) {
+        if ( accessoryCategoryId ) {
+            viewModel.set( "detailForm.data.quotationItem.product.category.id", accessoryCategoryId );
             await viewModel.loadLines();
-			if ( AP.getUserPref( "accessory.lineId" ) ) {
-				await viewModel.loadModels();
-				if ( AP.getUserPref( "accessory.modelId" ) ) {
-					await viewModel.loadFinishes();
-					if ( AP.getUserPref( "accessory.finishId" ) ) {
-						await viewModel.loadProduct();
-					}
-				}
-			}
         }
+
+        if ( accessoryLineId ) {
+            viewModel.set( "detailForm.data.quotationItem.product.line.id", accessoryLineId );
+            await viewModel.loadModels();
+        }
+
+        if ( accessoryModelId ) {
+            viewModel.set( "detailForm.data.quotationItem.product.model.id", accessoryModelId );
+            await viewModel.loadFinishes();
+        }
+
+        if ( accessoryFinishId ) {
+            viewModel.set( "detailForm.data.quotationItem.product.finish.id", accessoryFinishId );
+            await viewModel.loadProduct();
+        }
+
 		initPositionSuggest();
     };
 
@@ -699,11 +740,11 @@ AP.accessory.modal = ( function() {
 
 		if ( accessoryResponse.status === "SUCCESS" ) {
 			var data = accessoryResponse.data;
+
 			viewModel.set( "detailForm.data", data );
 			viewModel.set( "detailForm.title", "Modifica accessorio" );
 
             viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
-
 
 			await viewModel.loadLines();
 
@@ -716,6 +757,11 @@ AP.accessory.modal = ( function() {
 		pricingApp().init( "accessory", { data: accessoryResponse.data.quotationItem.price } );
 
 		renderQuotationItemTotals( id );
+
+        $( "#accessoryProductCategory" ).prop( "disabled", true );
+        $( "#accessoryLine" ).prop( "disabled", true );
+        $( "#accessoryModel" ).prop( "disabled", true );
+
         AP.loading.hide();
     };
 

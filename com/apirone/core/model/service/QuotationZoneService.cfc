@@ -65,6 +65,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				getDao().delete( arguments.zoneId );
 				cm.remove( getCacheScope(), arguments.zoneId );
 			} catch ( any error ) {
+				rethrow
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteQuotationZone" );
@@ -82,7 +83,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.QuotationZone zone ){
 		getDao().update( arguments.zone );
+		var children = list( originId = arguments.zone.getId() )
 		super.getCacheManager().remove( getCacheScope(), arguments.zone.getId() );
+		for (var child in children) {
+			super.getCacheManager().remove( getCacheScope(), child.getId() );
+		}
 
 		return arguments.zone.getId();
 	}

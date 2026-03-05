@@ -6,13 +6,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationDAO";
 
-	property name="quotationService" inject="QuotationService";
-	property name="quotationPriceService" inject="QuotationPriceService";
-	property name="QuotationItemService" inject="QuotationItemService";
-	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
-	property name="quotationZoneService" inject="QuotationZoneService";
-	property name="QuotationItemPositionService" inject="QuotationItemPositionService";
+	//Ho ordinato i DAO in ordine di cancellazione, se elimino in questo ordine non dovrei avere problemi con la cancellazione a cascata
+	property name="QuotationStatusHistoryService" inject="QuotationStatusHistoryService";
+	property name="QuotationItemPriceLineService" inject="QuotationItemPriceLineService";
+	property name="QuotationPriceService" inject="QuotationPriceService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
+	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
+	property name="QuotationPriceLineService" inject="QuotationPriceLineService";
+	property name="QuotationItemPriceService" inject="QuotationItemPriceService";
+	property name="QuotationItemFruitPositionService" inject="QuotationItemFruitPositionService";
+	property name="QuotationItemFruitService" inject="QuotationItemFruitService";
+	property name="QuotationZonePositionService" inject="QuotationZonePositionService";
+	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="QuotationItemService" inject="QuotationItemService";
+	property name="QuotationService" inject="QuotationService";
+
+
+	// TODO capire se questo service esiste ancora dal momento che la tabella sul DB non c'e', viene usato nella clone
+	property name="QuotationItemPositionService" inject="QuotationItemPositionService";
+
 	property name="exportCodeService" inject="ExportCodeService";
 	property name="exportCodeRawValueService" inject="ExportCodeRawValueService";
 	property name="rawValueService" inject="RawValueService";
@@ -33,7 +45,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="vatCodeService" inject="VatCodeService";
 	property name="countryService" inject="CountryService";
-	property name="quotationStatusHistoryService" inject="QuotationStatusHistoryService";
 	property name="fileService" inject="FileService";
 	
 	property name="componentCounter" type="Numeric";
@@ -94,22 +105,79 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var obj     = get( arguments.quotationId );
 
 		outcome.setData( { quotationId = arguments.quotationId } );
-		getDao().delete( arguments.quotationId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
+				quotationPrices = getQuotationPriceService().list( quotationId = arguments.quotationId );
+				for ( var price in quotationPrices ) {
+					getQuotationPriceLineService().deleteByQuotationPriceId( price.getId() );
+					getQuotationPriceService().delete( price.getId() );
+				}
+
+				//Elimino quotationstatushistory
+				quotationStatusHistory = getQuotationStatusHistoryService().list( quotationId = arguments.quotationId );
+				for ( var history in quotationStatusHistory ) {
+					getQuotationStatusHistoryService().delete( history.getId() );
+				}
+
+				quotationItems = getQuotationItemService().list( quotationId = arguments.quotationId );
+				for ( var item in quotationItems ) {
+					//Elimino i quotation item price
+					quotationItemPrices = getQuotationItemPriceService().list( quotationItemId = item.getId() );
+					for ( var itemPrice in quotationItemPrices ) {
+						getQuotationItemPriceService().delete( itemPrice.getId() );
+					}
+
+					//Elimino i quotation item fruit
+					quotationItemFruits = getQuotationItemFruitService().list( quotationItemId = item.getId() );
+					for ( var fruit in quotationItemFruits ) {
+						//Elimino i quotation item fruit position
+						quotationItemFruitPositions = getQuotationItemFruitPositionService().list( quotationItemFruit = fruit.getId() );
+						for ( var fruitPosition in quotationItemFruitPositions ) {
+							getQuotationItemFruitPositionService().delete( fruitPosition.getId() );
+						}
+						getQuotationItemFruitService().delete( fruit.getId() );
+					}
+
+					quotationItemSignageRows = getQuotationItemSignageRowService().list( quotationItemId = item.getId() );
+					for ( var signageRow in quotationItemSignageRows ) {
+						getQuotationItemSignageRowService().delete( signageRow.getId() );
+					}
+
+					quotationItemsProductItems = getQuotationItemProductItemService().list( quotationItemId = item.getId() );
+					for ( var quotationItemProductItem in quotationItemsProductItems ) {
+						getQuotationItemProductItemService().delete( quotationItemProductItem.getId() );
+					}
+					getQuotationItemService().delete( item.getId() );
+					
+				}
+
+				quotationZones = getQuotationZoneService().list( quotationId = arguments.quotationId );
+				for ( var zone in quotationZones ) {
+					quotationZonePositions = getQuotationZonePositionService().list( zoneId = zone.getId() );
+					for ( var zonePosition in quotationZonePositions ) {
+						getQuotationZonePositionService().delete( zonePosition.getId() );
+					}
+					getQuotationZoneService().delete( zone.getId() );
+				}
 
 				getDao().delete( arguments.quotationId );
 
-				cm.remove( getCacheScope(), arguments.quotationId );
 			} catch ( any error ) {
+				transaction action="rollback";
+				rethrow
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteQuotation" );
 				outcome.setMessage( "Cannot delete quotation [#arguments.quotationId#]" );
+				return outcome;
 			}
 		}
+
+
+		// var cm = getCacheManager();
+		// cm.remove( getCacheScope(), arguments.quotationId );
+			
 
 		return outcome;
 	}

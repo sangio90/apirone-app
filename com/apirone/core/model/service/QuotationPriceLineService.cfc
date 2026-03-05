@@ -51,6 +51,16 @@
 
 		return outcome;
 	}
+
+	public com.apirone.core.model.bean.Outcome function deleteByQuotationPriceId( required Numeric quotationPriceId ){
+
+		var outcome = super.bean( "Outcome" );
+
+		outcome.setData( { quotationPriceId = arguments.quotationPriceId } );
+		getDao().deleteByQuotationPriceId( arguments.quotationPriceId );
+
+		return outcome;
+	}
 	
 	public Numeric function create( required QuotationPriceLine ){
 		var newId = getDao().insert( arguments.QuotationPriceLine );
