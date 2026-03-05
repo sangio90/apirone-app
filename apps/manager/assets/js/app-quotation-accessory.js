@@ -139,7 +139,6 @@ AP.accessory.modal = ( function() {
 
         loadFinishes: function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) != "" ) {
-                // $( "#accessoryLine" ).prop( "disabled", true );
                 NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ),
@@ -172,9 +171,6 @@ AP.accessory.modal = ( function() {
                         },
                     },
                 } );
-            } else {
-                // $( "#accessoryLine" ).prop( "disabled", false );
-
             }
             this.checkCanSave();
             AP.setUserPref( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.model.id" ) );
@@ -182,11 +178,6 @@ AP.accessory.modal = ( function() {
 
         loadProduct: function() {
             $('#accessory-preview-background-tree').empty()
-            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
-                // $( "#accessoryModel" ).prop( "disabled", true );
-            } else {
-                // $( "#accessoryModel" ).prop( "disabled", false );
-            }
             const self = this;
             NM.util.ajax( {
                 method: "GET",
@@ -638,6 +629,7 @@ AP.accessory.modal = ( function() {
                 viewModel.set('detailForm.data.quotationItem.product.line', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.items', [])
                 AP.deleteUserPref( "accessory.lineId" );
                 AP.deleteUserPref( "accessory.modelId" );
                 AP.deleteUserPref( "accessory.finishId" );
@@ -645,11 +637,13 @@ AP.accessory.modal = ( function() {
             $( "#accessoryLine" ).on( "change", function(e) {
                 viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.items', [])
                 AP.deleteUserPref( "accessory.modelId" );
                 AP.deleteUserPref( "accessory.finishId" );
             } );
             $( "#accessoryModel" ).on( "change", function(e) {
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.items', [])
                 AP.deleteUserPref( "accessory.finishId" );
             } );
         }
@@ -662,7 +656,7 @@ AP.accessory.modal = ( function() {
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         pricingApp().init( "accessory", undefined );
 
-        const categoriesResponse = await NM.util.ajax( {
+        let categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
             callback: {
@@ -673,6 +667,7 @@ AP.accessory.modal = ( function() {
         } );
 
 		if ( categoriesResponse.data.length > 0 ) {
+            categoriesResponse.data = categoriesResponse.data.filter(c => c.type.id == 'ACC')
 			categoriesResponse.data.unshift( { id: "", name: "-- Seleziona la Categoria" } );
 			viewModel.get( "categories" ).data( categoriesResponse.data );
 		}
