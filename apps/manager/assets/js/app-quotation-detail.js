@@ -1135,7 +1135,7 @@ AP.quotation.zonesModal = (function () {
                 
                 return newZ;
             });
-        let parentZones = allZones.filter(z => !z.origin);
+        let parentZones = allZones.filter(z => !z.origin && z.name != '-- Tutte le zone');
 
         viewModel.set('zones', parentZones);
         viewModel.set('detailForm.zones', gridZones);
