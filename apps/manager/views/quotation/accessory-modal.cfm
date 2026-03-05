@@ -34,7 +34,7 @@
                             <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.category.id">    
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
-                                    <select id="accessoryRow" 
+                                    <select id="accessoryLine" 
                                         class="form-control"
                                         data-placeholder="-- Seleziona la linea"
                                         data-bind="source: lines, value: detailForm.data.quotationItem.product.line, events: { change: loadModels }" 

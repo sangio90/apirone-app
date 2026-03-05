@@ -96,30 +96,30 @@ AP.accessory.modal = ( function() {
             viewModel.set( "detailForm", defaultDetailForm );
             viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
             $( "#accessoryProductCategory" ).prop( "disabled", false );
-            $( "#accessoryRow" ).prop( "disabled", false );
+            $( "#accessoryLine" ).prop( "disabled", false );
             $( "#accessoryModel" ).prop( "disabled", false );
-            $( "#accessoryFinish" ).prop( "disabled", false );
             $( "#accessory-product-items" ).empty();
         },
 
         loadLines: function( event ) {
-            NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona la linea" } );
-                        viewModel.get( "lines" ).data( xhr.data );
+            if (viewModel.get( "detailForm.data.quotationItem.product.category.id" ) && viewModel.get( "detailForm.data.quotationItem.product.category.id" ) != '') {
+                NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "-- Seleziona la linea" } );
+                            viewModel.get( "lines" ).data( xhr.data );
+                        },
                     },
-                },
-            } );
+                } );
+            }
             this.checkCanSave();
             AP.setUserPref( "accessory.categoryId", viewModel.get( "detailForm.data.quotationItem.product.category.id" ) );
         },
 
         loadModels: function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.line.id" ) != "" ) {
-                $( "#accessoryProductCategory" ).prop( "disabled", true );
                 NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/models/"
@@ -132,8 +132,6 @@ AP.accessory.modal = ( function() {
                         },
                     },
                 } );
-            } else {
-                $( "#accessoryProductCategory" ).prop( "disabled", false );
             }
             this.checkCanSave();
             AP.setUserPref( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.line.id" ) );
@@ -141,7 +139,7 @@ AP.accessory.modal = ( function() {
 
         loadFinishes: function( event ) {
             if ( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) != "" ) {
-                $( "#accessoryRow" ).prop( "disabled", true );
+                // $( "#accessoryLine" ).prop( "disabled", true );
                 NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ),
@@ -175,7 +173,7 @@ AP.accessory.modal = ( function() {
                     },
                 } );
             } else {
-                $( "#accessoryRow" ).prop( "disabled", false );
+                // $( "#accessoryLine" ).prop( "disabled", false );
 
             }
             this.checkCanSave();
@@ -185,9 +183,9 @@ AP.accessory.modal = ( function() {
         loadProduct: function() {
             $('#accessory-preview-background-tree').empty()
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
-                $( "#accessoryModel" ).prop( "disabled", true );
+                // $( "#accessoryModel" ).prop( "disabled", true );
             } else {
-                $( "#accessoryModel" ).prop( "disabled", false );
+                // $( "#accessoryModel" ).prop( "disabled", false );
             }
             const self = this;
             NM.util.ajax( {
@@ -605,13 +603,33 @@ AP.accessory.modal = ( function() {
 
             return false;
         },
+
+        handleSelectChanges: function() {
+            $( "#accessoryProductCategory" ).on( "change", function(e) {
+                viewModel.set('detailForm.data.quotationItem.product.line', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                AP.deleteUserPref( "accessory.lineId" );
+                AP.deleteUserPref( "accessory.modelId" );
+                AP.deleteUserPref( "accessory.finishId" );
+            } );
+            $( "#accessoryLine" ).on( "change", function(e) {
+                viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
+                viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                AP.deleteUserPref( "accessory.modelId" );
+                AP.deleteUserPref( "accessory.finishId" );
+            } );
+            $( "#accessoryModel" ).on( "change", function(e) {
+                viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
+                AP.deleteUserPref( "accessory.finishId" );
+            } );
+        }
     } );
 
     pub.new = async function( onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
-
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
         pricingApp().init( "accessory", undefined );
 
@@ -634,6 +652,8 @@ AP.accessory.modal = ( function() {
 
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
+
+        viewModel.handleSelectChanges()
 
         const accessoryCategoryId = AP.getUserPref( "accessory.categoryId" )
         const accessoryLineId = AP.getUserPref( "accessory.lineId" )
@@ -702,7 +722,6 @@ AP.accessory.modal = ( function() {
 
             viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
 
-
 			await viewModel.loadLines();
 
 			await viewModel.loadModels();
@@ -714,6 +733,8 @@ AP.accessory.modal = ( function() {
 		pricingApp().init( "accessory", { data: accessoryResponse.data.quotationItem.price } );
 
 		renderQuotationItemTotals( id );
+
+        viewModel.handleSelectChanges()
         AP.loading.hide();
     };
 
