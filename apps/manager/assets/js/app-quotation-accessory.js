@@ -463,6 +463,7 @@ AP.accessory.modal = ( function() {
             productItems.data().forEach( function( item ) {
                 const selectedValues = item.values.filter( ( value ) => { return value.selected == true; } );
                 if ( selectedValues.length > 0 ) {
+                    $( "#accessory-preview-background-tree" ).empty();
                     if ( selectedValues[0].horizontalImage ) {
                         $( "#accessory-preview-background-tree" ).empty();
                         $( "#accessory-preview-background-tree" ).append( `<img src="${selectedValues[0].horizontalImage.uri}" style="width: 500px; height: auto;">` );
