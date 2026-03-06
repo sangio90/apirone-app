@@ -90,6 +90,7 @@ AP.signage.modal = ( function() {
             height: null,
             width: null
         },
+        cloneMode: false,
 
 		zones: [],
 		subzones: [],
@@ -1033,6 +1034,9 @@ AP.signage.modal = ( function() {
             parsedData.quotationId = quotationId;
             parsedData.type = "signage";
             parsedData.quotationItem.quotationZone = (viewModel.get('quotationSubzone.id') && viewModel.get('quotationSubzone.id') != '') ? viewModel.get('quotationSubzone') : viewModel.get('quotationZone')
+            if (viewModel.get('cloneMode')) {
+                parsedData.quotationItem.id = ""
+            }
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
@@ -1291,7 +1295,7 @@ AP.signage.modal = ( function() {
 
     };
 
-    pub.edit = async function( { id, onSave } ) {
+    pub.edit = async function( { id, clone = false, onSave } ) {
         viewModel.resetForm();
 
         const categoriesResponse = await NM.util.ajax( {
@@ -1389,6 +1393,17 @@ AP.signage.modal = ( function() {
             viewModel.set('subzones', children)
         } else {
             viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
+        }
+
+        if (clone) {
+            viewModel.set('cloneMode', true)
+            viewModel.set('detailForm.title', "Clona Segnaletica")
+            $('#save-button').css("display", "none")
+            $('#clone-button').css("display", "block")
+        } else {
+            viewModel.set('cloneMode', false)
+            $('#save-button').css("display", "block")
+            $('#clone-button').css("display", "none")
         }
 
         AP.loading.hide();

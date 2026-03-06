@@ -76,6 +76,7 @@ AP.accessory.modal = ( function() {
             height: null,
             width: null
         },
+        cloneMode: false,
 
 		zones: [],
 		subzones: [],
@@ -619,6 +620,9 @@ AP.accessory.modal = ( function() {
 
                 parsedData.imageBase64 = imgData;
                 parsedData.quotationItem.price = pricingApp().getData().data;
+                if (viewModel.get('cloneMode')) {
+                    parsedData.quotationItem.id = ""
+                }
 
                 JSON.stringify( parsedData );
 
@@ -761,7 +765,7 @@ AP.accessory.modal = ( function() {
         return viewModel.get( "detailForm.data" );
     };
 
-    pub.edit = async function( { id, onSave } ) {
+    pub.edit = async function( { id, clone = false, onSave } ) {
         viewModel.resetForm();
 
         const categoriesResponse = await NM.util.ajax( {
@@ -828,6 +832,17 @@ AP.accessory.modal = ( function() {
             viewModel.set('subzones', children)
         } else {
             viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
+        }
+
+        if (clone) {
+            viewModel.set('cloneMode', true)
+            viewModel.set('detailForm.title', "Clona Accessorio")
+            $('#save-button').css("display", "none")
+            $('#clone-button').css("display", "block")
+        } else {
+            viewModel.set('cloneMode', false)
+            $('#save-button').css("display", "block")
+            $('#clone-button').css("display", "none")
         }
 
         AP.loading.hide();

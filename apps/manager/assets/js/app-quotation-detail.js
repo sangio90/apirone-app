@@ -381,7 +381,13 @@ AP.quotation.detail = ( function() {
                                     }
 
                                     AP.widget.notify( "success", "Riga cancellata correttamente." );
-                                    window.location.href = "/manager/quotations/" + AP.page.quotation.id;
+                                    var urlParams = new URLSearchParams( window.location.search );
+                                    var tabParam = urlParams.get( "tab" );
+                                    if (tabParam && tabParam != '') {
+                                        window.location.href = "/manager/quotations/" + AP.page.quotation.id + "?tab=" + tabParam;
+                                    } else {
+                                        window.location.href = "/manager/quotations/" + AP.page.quotation.id;
+                                    }
                                 }
                             }
                         } );
@@ -636,19 +642,19 @@ AP.quotation.detail = ( function() {
             var typeId = viewModel.get( "typeId" );
 
             if ( typeId == "plate" ) {
-                plateApp().clone( { id: event.data.id, clone: true  } );
+                plateApp().edit( { id: event.data.id, clone: true  } );
             }
 
             if ( typeId == "accessory" ) {
-                accessoryApp().clone( { id: event.data.id, clone: true  } );
+                accessoryApp().edit( { id: event.data.id, clone: true  } );
             }
 
             if ( typeId == "signage" ) {
-                signageApp().clone( { id: event.data.id, clone: true  } );
+                signageApp().edit( { id: event.data.id, clone: true  } );
             }
 
             if ( typeId == "article" ) {
-                articleApp().clone( { id: event.data.id, clone: true  } );
+                articleApp().edit( { id: event.data.id, clone: true  } );
             }
 
             event.preventDefault();

@@ -113,8 +113,11 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-12 float-end">
-                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save, enabled:canSave">
+                                <button id="save-button" type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save, enabled:canSave">
                                     <i class="fas fa-save"></i> Salva
+                                </button>
+                                <button id="clone-button" type="button" class="btn btn-warning btn-sm float-end" style="display: none" data-bind="click:save, enabled:canSave">
+                                    <i class="fas fa-save"></i> Clona
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal" data-bind="click:resetForm">Chiudi</button>
                                 <button type="button" class="btn btn-primary btn-sm me-2 float-end" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci Configurazione</button>
