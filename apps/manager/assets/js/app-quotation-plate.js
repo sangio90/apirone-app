@@ -1185,7 +1185,7 @@ AP.plate.modal = ( function() {
         resetDetailForm();
         viewModel.set( "isEditMode", true );
         viewModel.set( "detailForm.isClone", clone );
-        viewModel.set( "detailForm.title", clone ? "Duplica placca" : "Modifica placca" );
+        viewModel.set( "detailForm.title", clone ? "Clona placca" : "Modifica placca" );
 
         AP.plate.api.getPlate( id, {
             done: function( xhr ) {
@@ -1232,6 +1232,14 @@ AP.plate.modal = ( function() {
             }
         } );
 
+        if (clone) {
+            $('#saveButton').css("display", "none")
+            $('#cloneButton').css("display", "block")
+        } else {
+            viewModel.set('cloneMode', false)
+            $('#saveButton').css("display", "block")
+            $('#cloneButton').css("display", "none")
+        }
     };
 
     var initPositionSuggest = function() {

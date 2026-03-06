@@ -642,7 +642,7 @@ AP.quotation.detail = ( function() {
             var typeId = viewModel.get( "typeId" );
 
             if ( typeId == "plate" ) {
-                plateApp().edit( { id: event.data.id, clone: true  } );
+                plateApp().clone( { id: event.data.id, clone: true  } );
             }
 
             if ( typeId == "accessory" ) {
