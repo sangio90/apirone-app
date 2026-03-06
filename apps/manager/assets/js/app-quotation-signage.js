@@ -826,6 +826,30 @@ AP.signage.modal = ( function() {
                 const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
                 const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                 const attributeArray = productItems.data();
+                const getAllDescendantIndices = (startIndex, array) => {
+                    const foundIndices = [];
+                    // Partiamo dall'ID dell'elemento iniziale
+                    const queue = [array[startIndex].attribute_id];
+
+                    let i = 0;
+                    while (i < queue.length) {
+                        const currentParentId = queue[i];
+                        
+                        // Cerchiamo nell'array tutti i figli di questo ID
+                        array.forEach((item, index) => {
+                            if (item.parent_attribute_id === currentParentId) {
+                                // Se non abbiamo già aggiunto questo indice (evita loop infiniti)
+                                if (!foundIndices.includes(index)) {
+                                    foundIndices.push(index);
+                                    // Aggiungiamo l'ID del figlio alla coda per cercare i SUOI figli nel prossimo giro
+                                    queue.push(item.attribute_id);
+                                }
+                            }
+                        });
+                        i++;
+                    }
+                    return foundIndices;
+                };
                 originId = originId || "";
 
                 let url = "/manager/ajax/product-items?productId=" + productId;
@@ -938,9 +962,16 @@ AP.signage.modal = ( function() {
                                     if ( d.parent_item_id ) {
                                         if ( attributeArray[idx - 1].values.filter( v => v.selected == false && v.product_item_id == d.parent_item_id ).length > 0 ) {
                                             elementsToRemove.push( idx );
+                                            // aggiunto perche senza cercare i discendenti di secondo o piu livello, rimanevano dei residui dell'albero delle vecchie impostazioni
+                                            let descendantIndexes = getAllDescendantIndices(idx, attributeArray)
+                                            descendantIndexes.forEach( function(d) {
+                                                elementsToRemove.push(d)
+                                            } )
                                         }
                                     }
                                 } );
+
+                                elementsToRemove = elementsToRemove.sort((a, b) => b - a)
                                 elementsToRemove.forEach( function( idx ) {
                                     productItems.remove( productItems.at( idx ) );
                                 } );
