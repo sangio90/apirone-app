@@ -77,6 +77,36 @@ AP.accessory.modal = ( function() {
             width: null
         },
 
+		zones: [],
+		subzones: [],
+		allZones: [],
+        quotationZone: {
+            "id": ""
+        },
+        quotationSubzone: {
+            "id": ""
+        },
+
+        changeZone: function() {
+            const allZones = viewModel.get('allZones')
+            viewModel.set('quotationSubzone', { "id": "" })
+            viewModel.get('quotationSubzone')
+            viewModel.set('subzones', [])
+            if (viewModel.get('quotationZone.name') != '-- Tutte le zone') {
+                let children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('quotationZone.id')))
+                children.unshift({
+                    "id": "",
+                    "name": "\u00A0\u00A0- "
+                })
+                viewModel.set('subzones', children)
+            }
+            return;
+        },
+
+        isSubzoneEnabled: function() {
+            return viewModel.get('quotationZone') && viewModel.get('quotationZone.name') != '-- Tutte le zone';
+        },
+
         checkCanSave: function() {
             var vm = viewModel;
             if (
@@ -582,6 +612,7 @@ AP.accessory.modal = ( function() {
             const parsedData = viewModel.get( "detailForm.data" );
             parsedData.quotationId = quotationId;
             parsedData.type = "accessory";
+            parsedData.quotationItem.quotationZone = (viewModel.get('quotationSubzone.id') && viewModel.get('quotationSubzone.id') != '') ? viewModel.get('quotationSubzone') : viewModel.get('quotationZone')
 
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
@@ -705,6 +736,25 @@ AP.accessory.modal = ( function() {
         }
 
 		initPositionSuggest();
+
+        const allZones = AP.quotation.detail.config().zones
+        const parentZones = allZones.filter(z => !z.origin)
+        
+        viewModel.set('allZones', allZones)
+        viewModel.set('zones', parentZones)
+        const zone = AP.quotation.detail.config().zone
+        if (zone.origin) {
+            viewModel.set('quotationZone', zone.origin)
+            viewModel.set('quotationSubzone', zone)
+            const children = allZones.filter(z => z.origin && (z.origin.id == zone.origin.id))
+            children.unshift({
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            })
+            viewModel.set('subzones', children)
+        } else {
+            viewModel.set('quotationZone', zone)
+        }
     };
 
     pub.getItem = function() {
@@ -761,6 +811,24 @@ AP.accessory.modal = ( function() {
         $( "#accessoryProductCategory" ).prop( "disabled", true );
         $( "#accessoryLine" ).prop( "disabled", true );
         $( "#accessoryModel" ).prop( "disabled", true );
+        const allZones = AP.quotation.detail.config().zones
+        const parentZones = allZones.filter(z => !z.origin)
+        
+        viewModel.set('allZones', allZones)
+        viewModel.set('zones', parentZones)
+        
+        if (viewModel.get('detailForm.data.quotationItem.quotationZone.origin')) {
+            viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone.origin'))
+            viewModel.set('quotationSubzone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
+            const children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('detailForm.data.quotationItem.quotationZone.origin.id')))
+            children.unshift({
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            })
+            viewModel.set('subzones', children)
+        } else {
+            viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
+        }
 
         AP.loading.hide();
     };
