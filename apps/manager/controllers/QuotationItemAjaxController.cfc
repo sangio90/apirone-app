@@ -594,6 +594,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					productItemBean.setQuotationItemId( thisId );
 					productItemBean.setProductItem( productItem );
 					productItemBean.setOrigin( productItem.getOrigin() );
+					// if (structKeyExists(selectedValue, 'note')) {
+					// 	productItemBean.setNote( selectedValue.note );
+					// }
 					productItemBean.setLevel( productItemRow.level );
 					// productItemBean.setId( thisId )
 

@@ -79,6 +79,34 @@ AP.plate.productItems = ( function() {
                 }
             }
             subContainer.append( select );
+            // if (selectedOption && selectedOption.attributeValue.allowNote) {
+            //     debugger
+            //     const labelNote = $( "<label>" );
+            //     labelNote.addClass( "mb-1" );
+            //     labelNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+            //     labelNote.text( "NOTE" );
+            //     subContainer.append( labelNote );
+
+            //     let note = ''
+            //     if ("note" in selectedOption) {
+            //         note = selectedOption.note
+            //     } else {
+            //         selectedOption.note = ''
+            //     }
+            //     //definisco il tag html e imposto onchange una funzione che cerca in product items notes dentro il viewmodel se trova un elemento per product item id e attribute value id
+            //     const inputNote = $( "<input>" ).addClass( "form-control me-3 mb-2" )
+            //     .on("input", function () {
+            //         note = this.value
+            //         selectedOption.note = note
+            //     });
+            //     inputNote.attr( "data-attribute-id", item.attribute_id );
+            //     inputNote.val(note)
+            //     if ( item.level > 0 ) {
+            //         inputNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+            //         inputNote.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
+            //     }
+            //     subContainer.append( inputNote );
+            // }
         } );
     }
 
