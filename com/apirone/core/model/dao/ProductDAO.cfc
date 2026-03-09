@@ -20,6 +20,21 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<cffunction name="readIds">
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				product_id::varchar
+			FROM
+				products
+				INNER JOIN product_categories 
+					ON products.product_category_id = product_categories.product_category_id
+			WHERE
+				product_categories.product_category_type_id IN ('ACC', 'SEG')
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="readByCode" output="false">
 		<cfargument name="code" type="String" required="true">
 

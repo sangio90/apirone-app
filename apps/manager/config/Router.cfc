@@ -348,6 +348,8 @@
 		/*
 			products
 		*/
+
+		get( "/ajax/massiveproductreorder" ).to( "ProductAjaxController.massiveProductReorder" ).end();
 		get( "/ajax/products/get-id-and-file-by-params" ).to( "ProductAjaxController.getIdAndFileByParams" ).end();
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
 		post( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();

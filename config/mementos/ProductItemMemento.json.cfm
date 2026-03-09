@@ -45,6 +45,8 @@
 				"attributeValue.horizontalImage",
 				"attributeValue.verticalImage",
 				"attributeValue.rawValue.name",
+				"attributeValue.rawValue.id",
+				"attributeValue.allowNote",
 				"horizontalImage",
 				"verticalImage",
 				"important$boolean"
