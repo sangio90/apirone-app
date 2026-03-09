@@ -68,7 +68,8 @@
 				quotation_item_fruit_id,
 				origin_id,
 				product_item_id,
-				level
+				level,
+				note
 			) VALUES (
 
 				<cfif !IsNull( arguments.productItem.getQuotationItemId() )>
@@ -90,7 +91,13 @@
 				</cfif>,
 
 				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getProductItem().getId()#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">
+				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getLevel()#">,
+
+				<cfif !IsNull( arguments.productItem.getNote() )>
+					<cfqueryparam cfsqltype="Text" value="#arguments.productItem.getNote()#">
+				<cfelse>
+					NULL
+				</cfif>
 			)
 			RETURNING quotation_item_product_item_id
 		</cfquery>
@@ -123,6 +130,13 @@
 				origin_id =
 					<cfif !IsNull( arguments.productItem.getOrigin() )>
 						<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getOrigin().getId()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				note =
+					<cfif !IsNull( arguments.productItem.getNote() )>
+						<cfqueryparam cfsqltype="Text" value="#arguments.productItem.getNote()#">
 					<cfelse>
 						NULL
 					</cfif>
