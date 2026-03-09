@@ -922,7 +922,7 @@ AP.plate.modal = ( function() {
                 containerSelector: "#quotation-plate-product-items",
                 attributeArray: productItems.data(),
                 subContainerIdPrefix: "attribute-container-",
-                labelTextFn: function( item ) { return item.level + " " + item.attributeName; },
+                labelTextFn: function( item ) { return item.attributeName; },
                 onSelectChange: function( selectedId, attributeId, value ) {
                     viewModel.changeImage( value );
                     viewModel.loadProductItems( selectedId, attributeId );
