@@ -247,7 +247,7 @@
                                 <button id="saveButton" type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
                                     <i class="fas fa-save"></i> Salva
                                 </button>
-                                <button id="cloneButton" type="button" class="btn btn-warning btn-sm float-end" data-bind="click:save">
+                                <button id="cloneButton" type="button" class="btn btn-warning btn-sm float-end" style="display: none" data-bind="click:save">
                                     <i class="fas fa-save"></i> Clona
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
