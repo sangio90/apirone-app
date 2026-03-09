@@ -16,6 +16,7 @@
 	<cffunction name="find" returntype="Query">
 		<cfargument name="hash" type="String">
 		<cfargument name="productHashId" type="Numeric">
+		<cfargument name="jsonData" type="String">
 
 		<cfargument name="limit" required="true" type="Numeric" default="20">
 		<cfargument name="offset" required="true" type="Numeric" default="0">
@@ -34,6 +35,10 @@
 
 				<cfif !IsNull( arguments.productHashId )>
 					AND product_hash_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productHashId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.jsonData )>
+					AND json_data = <cfqueryparam cfsqltype="Varchar" value="#arguments.jsonData#">
 				</cfif>
 
 			ORDER BY

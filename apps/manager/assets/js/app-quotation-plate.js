@@ -1236,7 +1236,6 @@ AP.plate.modal = ( function() {
             $('#saveButton').css("display", "none")
             $('#cloneButton').css("display", "block")
         } else {
-            viewModel.set('cloneMode', false)
             $('#saveButton').css("display", "block")
             $('#cloneButton').css("display", "none")
         }

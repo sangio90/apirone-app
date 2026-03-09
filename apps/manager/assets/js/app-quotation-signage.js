@@ -72,6 +72,7 @@ AP.signage.modal = ( function() {
         itemStatuses: AP.page.itemStatuses,
         title: "Carica segnaletica",
         canSave: false,
+        productItemsNotes: [],
     };
 
     var viewModel = kendo.observable( {
@@ -1037,6 +1038,76 @@ AP.signage.modal = ( function() {
                 }
 
                 subContainer.append( select );
+                if (selectedOption && selectedOption.attributeValue.allowNote) {
+                    const labelNote = $( "<label>" );
+                    labelNote.addClass( "mb-1" );
+                    labelNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                    labelNote.text( "NOTE" );
+                    subContainer.append( labelNote );
+
+                    let note = ''
+                    if (viewModel.get('detailForm.data.quotationItem.items')) {
+                        //cerco se il campo è censito, questo in pratica verifica se sono in edit o in new, perche in new non ho ancora questa struttura
+                        campoPresenteNeiQuotationItemProductItems = viewModel.get('detailForm.data.quotationItem.items').find(i => i.productItem.attributeValue.rawValue.id == selectedOption.attributeValue.rawValue.id)
+                        //se presente e con note (perche non tutti i campi hanno le note) e con nota valorizzata
+                        if (campoPresenteNeiQuotationItemProductItems && campoPresenteNeiQuotationItemProductItems.note && campoPresenteNeiQuotationItemProductItems.note != '') {
+                            //cerco nella struttura note dei product items che ho creato nel viewmodel. Se trovo qualcosa non lo sovvrascrivo, vuol dire che ho già caricato i dati e sto solo modificando il valore
+                            const result = viewModel.detailForm.productItemsNotes.find(n =>
+                                n.product_item_id === selectedOption.product_item_id &&
+                                n.attribute_raw_value_id === selectedOption.attributeValue.id
+                            );
+                            //altrimenti setto per la prima volta la nota nella struttura del viewmodel con i dati provenienti dal backend
+                            if (!result) {
+                                viewModel.detailForm.productItemsNotes.push({
+                                    product_item_id: selectedOption.product_item_id,
+                                    attribute_raw_value_id: selectedOption.attributeValue.id,
+                                    note: campoPresenteNeiQuotationItemProductItems.note
+                                });
+                                note = campoPresenteNeiQuotationItemProductItems.note
+                            } else {
+                                note = result.note
+                            }
+                        }
+                    } else {
+                        //non sono in edit o comunque ho modificato l'albero, non posso piu partire dai dati del detailForm, 
+                        // cerco se ho qualcosa in product items note. Se si, setto le note
+                        let existing = viewModel.detailForm.productItemsNotes.find(n =>
+                            n.product_item_id === selectedOption.product_item_id &&
+                            n.attribute_raw_value_id === selectedOption.attributeValue.id
+                        );
+                        if (existing) {
+                            note = existing.note;
+                        }
+                    }
+                    //definisco il tag html e imposto onchange una funzione che cerca in product items notes dentro il viewmodel se trova un elemento per product item id e attribute value id
+                    const inputNote = $( "<input>" ).addClass( "form-control me-3 mb-2" )
+                    .on("input", function () {
+                        let existing = viewModel.detailForm.productItemsNotes.find(n =>
+                            n.product_item_id === selectedOption.product_item_id &&
+                            n.attribute_raw_value_id === selectedOption.attributeValue.id
+                        );
+
+                        //se la trovo, imposto il valore della chiave note di quel elemento con il valore immesso nella input
+                        if (existing) {
+                            existing.note = this.value;
+                        } else {
+                            //altrimenti creo un nuovo elemento
+                            viewModel.detailForm.productItemsNotes.push({
+                                product_item_id: selectedOption.product_item_id,
+                                attribute_raw_value_id: selectedOption.attributeValue.id,
+                                note: this.value
+                            });
+                        }
+                        note = this.value
+                    });
+                    inputNote.attr( "data-attribute-id", item.attribute_id );
+                    inputNote.val(note)
+                    if ( item.level > 0 ) {
+                        inputNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                        inputNote.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
+                    }
+                    subContainer.append( inputNote );
+                }
             } );
         },
 
@@ -1069,6 +1140,20 @@ AP.signage.modal = ( function() {
                 parsedData.quotationItem.id = ""
             }
 
+            //durante la save faccio passare le note dei product items e setto i valori nella struttura dati che passo al backend per il salvataggio
+            const productItemsNotes = viewModel.detailForm.productItemsNotes
+            parsedData.quotationItem.product.items._data.forEach(function (row) {
+                const selectedOption = row.values.find(r => r.selected == true)
+                if (selectedOption) {
+                    const note = productItemsNotes.find(n =>
+                        n.product_item_id === selectedOption.product_item_id &&
+                        n.attribute_raw_value_id === selectedOption.attributeValue.id
+                    );
+                    if (note) {
+                        row.note = note.note
+                    }
+                }
+            })
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;

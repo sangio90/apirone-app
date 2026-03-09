@@ -24,6 +24,7 @@
                 "quotationZone",
                 "signageRows",
                 "signageConfigItem",
+                "items",
                 "special",
                 "status",
                 "note",

@@ -28,7 +28,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		Numeric productHashId,
-		String hash
+		String hash,
+		String jsonData,
 	){
 		var rows   = [];
 		var result = super.getResult();
@@ -125,15 +126,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var modelId = quotationItem.getProduct().getModel().getId();
 		var finishId = quotationItem.getProduct().getFinish().getId();
 		var note = quotationItem.getNote();
-		var items = getProductItemService().list( quotationItem.getProduct().getId() );
-
-		ArraySort( items, function(a, b) {
-			return compare(a.getId(), b.getId());
-		});
+		var items = quotationItem.getItems();
 
 		var productItems = [];
-		for (var item in items) {
-			productItems.append( item.getId() );
+		if (!isNull(items)) {
+			ArraySort( items, function(a, b) {
+				return compare(a.getProductItem().getId(), b.getProductItem().getId());
+			});
+
+			for (var item in items) {
+				productItems.append( { "productItemId" = item.getProductItem().getId(), "note" = Trim( item.getNote() ) } );
+			}
 		}
 
 		var jsonData = {
@@ -198,10 +201,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		
 		var hashValue = hash(jsonData, "MD5");
 
-		var existProdutHash = search( hash = hashValue );
+		var existProductHash = search( jsonData = jsonData );
 		
-		if ( existProdutHash.getCount() > 0 ) {
-			return existProdutHash.getData()[1]
+		if ( existProductHash.getCount() > 0 ) {
+			return existProductHash.getData()[1]
 		}
 		
 		var bean = super.bean( "ProductHash" );

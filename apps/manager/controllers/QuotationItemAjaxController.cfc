@@ -275,6 +275,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					quotationItemProductItemBean.setProductItem( productItem );
 					quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
 					quotationItemProductItemBean.setLevel( productItemRow.level );
+					if (structKeyExists(productItemRow, 'note')) {
+						quotationItemProductItemBean.setNote( productItemRow.note );
+					}
 					quotationItemProductItemBean.setId( thisId )
 
 					super.fire(
@@ -422,6 +425,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					quotationItemProductItemBean.setProductItem( productItem );
 					quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
 					quotationItemProductItemBean.setLevel( productItemRow.level );
+					if (structKeyExists(productItemRow, 'note')) {
+						quotationItemProductItemBean.setNote( productItemRow.note );
+					}
 					quotationItemProductItemBean.setId( thisId )
 
 					super.fire(
