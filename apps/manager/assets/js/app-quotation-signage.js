@@ -1516,6 +1516,13 @@ AP.signage.modal = ( function() {
             viewModel.set('subzones', children)
         } else {
             viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
+            const children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('detailForm.data.quotationItem.quotationZone.id')))
+            children.unshift({
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            })
+            viewModel.set('subzones', children)
+            viewModel.set('quotationSubzone', { "id": "" })
         }
 
         if (clone) {
