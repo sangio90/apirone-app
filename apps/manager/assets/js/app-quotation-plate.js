@@ -216,12 +216,14 @@ AP.plate.modal = ( function() {
                     },
                     items: new kendo.data.DataSource(),
                 },
+                plateQuotationItemProductItems: [],
                 fruits: new kendo.data.DataSource( {
                     data: [],
                     schema: {
                         model: { id: "id" }
                     }
-                } )
+                } ),
+                fruitQuotationItemProductItems: []
             },
             statuses: AP.page.statuses,
             itemStatuses: AP.page.itemStatuses,
@@ -1070,6 +1072,7 @@ AP.plate.modal = ( function() {
             var id = viewModel.get( "detailForm.data.id" );
             AP.plate.api.getPlateFruits( id, {
                 done: function( xhr ) {
+                    let fruitQuotationItemProductItems = []
                     for ( var i = 0; i < xhr.data.length; i++ ) {
                         var thisFruit = xhr.data[i];
                         var newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
@@ -1084,6 +1087,18 @@ AP.plate.modal = ( function() {
                         }
 
                         viewModel.addProductItemsToFruit( newFruit.id );
+
+                        thisFruit.items.forEach(function(item) {
+                            if (item.productItem.attributeValue.allowNote) {
+                                fruitQuotationItemProductItems.push({
+                                    'quotation_item_fruit_id': thisFruit.id,
+                                    'product_item_id': item.productItem.id,
+                                    'attribute_value_id': item.productItem.attributeValue.id,
+                                    'note': item.note
+                                })
+                            }
+                        })
+                        viewModel.set('detailForm.data.fruitQuotationItemProductItems', fruitQuotationItemProductItems)
                     }
                     if ( typeof onDone === "function" ) {
                         onDone();
@@ -1194,6 +1209,7 @@ AP.plate.modal = ( function() {
                 viewModel.set( "detailForm.data.position", xhr.data.quotationItem.position );
                 viewModel.set( "detailForm.data.note", xhr.data.quotationItem.note );
                 viewModel.set( "detailForm.data.quantity", xhr.data.quotationItem.quantity );
+                viewModel.set( "detailForm.data.plateQuotationItemProductItems", xhr.data.quotationItem.items );
 
                 const quotationZone = xhr.data.quotationItem.quotationZone
                 if ( quotationZone ) {

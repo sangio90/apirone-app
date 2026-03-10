@@ -546,6 +546,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					//productItemBean.setQuotationItemFruitId( fruitBean.getId() );
 					productItemBean.setProductItem( productItem );
 					productItemBean.setOrigin( productItem.getOrigin() );
+					if (structKeyExists(selectedValue, 'note')) {
+						productItemBean.setNote( selectedValue.note );
+					}
 					productItemBean.setLevel( productItemRow.level );
 
 					items.add( productItemBean );
@@ -594,9 +597,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					productItemBean.setQuotationItemId( thisId );
 					productItemBean.setProductItem( productItem );
 					productItemBean.setOrigin( productItem.getOrigin() );
-					// if (structKeyExists(selectedValue, 'note')) {
-					// 	productItemBean.setNote( selectedValue.note );
-					// }
+					if (structKeyExists(selectedValue, 'note')) {
+						productItemBean.setNote( selectedValue.note );
+					}
 					productItemBean.setLevel( productItemRow.level );
 					// productItemBean.setId( thisId )
 
