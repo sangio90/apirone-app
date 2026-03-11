@@ -22,7 +22,6 @@ AP.file.modal = ( function() {
         };
 
         if( current ) {
-
             switch( current.type ) {
 
             case "productItem": // productItem
@@ -53,6 +52,14 @@ AP.file.modal = ( function() {
 
                 result.modalTitle = "File per la combinazione: <" + current.name.substr( current.name.length - 5 ) + " >";
                 result.readUrl = baseUrl + "/combinations/" + current.id + "/images";
+                result.modifyUrl = result.readUrl;
+
+                break;
+
+            case "quotationItem":
+
+                result.modalTitle = "File per la riga di preventivo: <" + current.name.substr( current.name.length - 5 ) + " >";
+                result.readUrl = baseUrl + "/quotation-items/" + current.id + "/images";
                 result.modifyUrl = result.readUrl;
 
                 break;
@@ -152,7 +159,6 @@ AP.file.modal = ( function() {
 
     };
 
-
     pub.init = function() {
         console.log( "AP.file.modal.init" );
     };
@@ -211,7 +217,20 @@ AP.file.modal = ( function() {
                                         },
 
                                         success: function( event, data ) {
-                                            // TODO
+                                            //questo caso capita quando sto selezionando un'immagine custom per un quotation item. In questa occasione
+                                            //l'unico modo per avere nel riquadro della preview l'immagine aggiornata è ricaricare la pagina, percheé
+                                            //per come è definito questo componente, non riesco a trasmettere alla quotation item modal il path
+                                            //della nuova immagine caricata. 
+                                            if (viewModel.get('currentItem') && viewModel.get('currentItem.type') == 'quotationItem') {
+                                                const params = new URLSearchParams(window.location.search);
+
+                                                if (!params.has("reset")) {
+                                                    params.set("reset", 1);
+                                                    window.location.search = params.toString();
+                                                } else {
+                                                    window.location.reload()
+                                                }
+                                            }
                                             console.log( "success", data );
                                         },
 

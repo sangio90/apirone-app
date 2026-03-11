@@ -172,7 +172,7 @@
                                             <div>
                                                 <input class="form-check-input" type="checkbox"
                                                     name="special"
-                                                    data-bind="value: detailForm.data.special">
+                                                    data-bind="checked: detailForm.data.special">
                                             </div>
                                         </div>
 

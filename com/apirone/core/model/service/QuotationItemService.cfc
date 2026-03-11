@@ -318,6 +318,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setNote( record.note );
 			bean.setHash( record.hash );
 			bean.setSpecial( BooleanFormat( Val( record.special ) ) );
+			bean.setCustomImage( BooleanFormat( Val( record.custom_image ) ) );
 
 			if( Len( record.quotation_zone_position_id ) ) {
 				bean.setPosition( getQuotationZonePositionService().get( record.quotation_zone_position_id ) );

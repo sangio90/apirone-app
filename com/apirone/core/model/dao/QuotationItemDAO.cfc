@@ -78,6 +78,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_items (
 				special,
+				custom_image,
 				status_id,
 				quotation_id,
 				quotation_zone_id,
@@ -101,6 +102,7 @@
 				</cfif>
 			) VALUES (
 				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getSpecial()#">,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getCustomImage()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
 				<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
@@ -156,6 +158,7 @@
 			SET
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
 				special = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getSpecial()#">,
+				custom_image = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getCustomImage()#">,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getStatus().getId()#">,
 				quotation_zone_id =
 					<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>

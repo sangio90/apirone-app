@@ -10,6 +10,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		param rc.categoryId = "";
 		param rc.quotationZoneId = "";
 
+		prc.jsFiles.add( "app-file" );
+
 		params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
 		params[ "quotationId" ] = rc.id;
 		params[ "orderBy" ] = [ { "field" = "quotationZonePosition.code", "dir" = "asc" } ];
@@ -191,6 +193,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) ); //TODO: move to QuotationId
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
 		bean.setQuantity( json.quotationItem.quantity );
+		bean.setCustomImage( json.quotationItem.customImage );
 
 		bean.setSpecial( json.quotationItem.special );
 		bean.setNote( json.quotationItem.note );

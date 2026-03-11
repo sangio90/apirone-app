@@ -28,6 +28,7 @@ AP.signage.modal = ( function() {
                     id: "",
                     code: ""
                 },
+                customImage: false,
                 price: {
                     id: null,
                 },
@@ -101,6 +102,11 @@ AP.signage.modal = ( function() {
         },
         quotationSubzone: {
             "id": ""
+        },
+
+        //aggiunto per gestire il cambiamento delle checkbox
+        toggleCustomImage: function( event ) {
+            return
         },
 
         changeZone: function() {
@@ -1535,6 +1541,9 @@ AP.signage.modal = ( function() {
             $('#save-button').css("display", "block")
             $('#clone-button').css("display", "none")
         }
+
+        viewModel.set('detailForm.data.quotationItem.special', data.quotationItem.special == 'true')
+        $('#imageCustomInput').hide()
 
         AP.loading.hide();
     };

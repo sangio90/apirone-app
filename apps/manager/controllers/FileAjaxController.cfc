@@ -29,6 +29,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			var config = imageConfigs[ "attributeValue" ];
 		}
 
+		if ( rc.by == "quotation-items" ) {
+			var params = { quotationItemId = rc.id }
+			var config = imageConfigs[ "quotationItem" ];
+		}
+
 		for ( var typeId in config.types ) {
 			params.put( "typeId", typeId );
 
@@ -83,6 +88,19 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( rc.by == "attributes-values" ) {
 			entity.setKey( "attributeValue.id" );
 			var kindId = "attributeValue";
+		}
+		
+		if ( rc.by == "quotation-items" ) {
+			//cerco la quotationItem. se la trovo, imposto customImage a true. Questa cosa è resa necessaria perchè il componente FE app-file, non sa niente del contesto dove viene usato e
+			//quando carichi un'immagine ricarica. Siccome noi, potremmo non aver ancora flaggato customImage quando salviamo l'immagine, ci troveremmo ad avere un prodotto con un'immagine custom ma
+			//senza il flag.
+			var quotationItem = super.fire( 'QuotationItem.get', [ rc.id ] )
+			if (!isNull(quotationItem)) {
+				quotationItem.setCustomImage(true)
+				super.fire( 'QuotationItem.update', [ quotationItem ] )
+			}
+			entity.setKey( "quotationItem.id" );
+			var kindId = "quotationItem";
 		}
 
 		entity.setValue( rc.id );

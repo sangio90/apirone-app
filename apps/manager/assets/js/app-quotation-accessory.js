@@ -16,6 +16,10 @@ AP.accessory.modal = ( function() {
         return AP.quotation.itemPricing;
     }
 
+    function fileApp() {
+        return AP.file.modal;
+    }
+
     var pub = {};
 
     var defaultDetailForm = {
@@ -25,6 +29,7 @@ AP.accessory.modal = ( function() {
             quotationItem: {
                 id: "",
                 special: false,
+                customImage: false,
                 quantity: 1,
                 price: {
                     id: null,
@@ -87,6 +92,40 @@ AP.accessory.modal = ( function() {
         },
         quotationSubzone: {
             "id": ""
+        },
+        showCustomImage: false,
+        showImage: true,
+
+        //aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
+        toggleCustomImage: function( event ) {
+            const value = event.target.checked
+            viewModel.set('showCustomImage', value)
+            viewModel.set('showImage', !value)
+
+            return
+        },
+
+        //metodo che compone la struttura dati da passare al componente app-file, punto centralizzato di gestione del caricamento immagini
+        openImagesList: function( event ) {
+
+            var element = $( event.currentTarget );
+
+            if ( !element.attr( "data-type" ) ) {
+                console.error( "ERROR. Set data-type attribute in currentTarget" );
+                return;
+            }
+
+
+            var type = element.data( "type" );
+            var value = {
+                type: type,
+                id: viewModel.get('detailForm.data.quotationItem.id'),
+                name: viewModel.get('detailForm.data.quotationItem.id'),
+            };
+
+            fileApp().open( value );
+
+            return false;
         },
 
         changeZone: function() {
@@ -223,11 +262,27 @@ AP.accessory.modal = ( function() {
                         if ( xhr.data ) {
                             viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data[0].id );
                             viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
-                            if ( xhr.data[0].horizontalImage ) {
-                                viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri );
+                            //al caricamento del prodotto, se la riga di preventivo prevede custom image, carico l'immagine manualmente leggendo da file per quotationItemId
+                            if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage')) {
+                                await NM.util.ajax( {
+                                    method: "GET",
+                                    url: "/manager/ajax/quotation-items/" + viewModel.get('detailForm.data.quotationItem.id') + "/images" ,
+                                    callback: {
+                                        done: function( xhr ) {
+                                            if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
+                                                viewModel.set( "backgroundCustomImage", xhr.data[0] );
+                                                viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
+                                            }
+                                        }
+                                    }
+                                })
                             } else {
-                                viewModel.set( "backgroundImage.url", "" );
+                                if ( xhr.data[0].horizontalImage ) {
+                                    viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
+                                    viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri );
+                                } else {
+                                    viewModel.set( "backgroundImage.url", "" );
+                                }
                             }
                             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                                 await self.firstLoadProductItems();
@@ -255,11 +310,6 @@ AP.accessory.modal = ( function() {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
 							// TODO Valutare di rimuovere questo if, 99% non serve a niente
-                            if ( !viewModel.get( "detailForm.data.quotationItem.product.image" ) && xhr.data[0].horizontalImage ) {
-                                viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
-                                viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri);
-                            }
                             if ( quotationItemId != "" || !AP.getUserPref( "accessory.product.items" ) || AP.getUserPref( "accessory.product.items" ).length == 0 ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                             } else {
@@ -709,7 +759,19 @@ AP.accessory.modal = ( function() {
             AP.loading.show();
 
             var quotationId = AP.page.quotation.id;
-            var preview = $( "#accessory-preview-background" )[0];
+            
+            //quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a 
+            let preview = $( "#accessory-preview-background" )[0];
+            if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage') && viewModel.get('detailForm.data.quotationItem.customImage') == true) {
+                //se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
+               if (!viewModel.get('backgroundCustomImage.url')) {
+                    AP.widget.notify( "error", "Hai scelto custom image, devi selezionare un'immagine prima di salvare." );
+                    AP.loading.hide()
+                    return false;
+               }
+
+               preview = $( "#accessory-preview-custom-background" )[0];
+            }
 
             const parsedData = viewModel.get( "detailForm.data" );
             parsedData.quotationId = quotationId;
@@ -973,11 +1035,28 @@ AP.accessory.modal = ( function() {
             $('#save-button').css("display", "block")
             $('#clone-button').css("display", "none")
         }
+        
+        //aggiunto queste due righe per gestire i boolean
+        viewModel.set('detailForm.data.quotationItem.customImage', data.quotationItem.customImage == 'true')
+        viewModel.set('detailForm.data.quotationItem.special', data.quotationItem.special == 'true')
+
+        //in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
+        //altrimenti farò il contrario
+        viewModel.set('showCustomImage', viewModel.get('detailForm.data.quotationItem.customImage'))
+        viewModel.set('showImage', !viewModel.get('detailForm.data.quotationItem.customImage'))
 
         AP.loading.hide();
     };
 
     pub.init = function() {
+        const url = new URL(window.location);
+
+        //tolto il parametro reset dall'url quando apro la pagina. fatto perchè quando salvo l'immagine custom sono costretto a metterlo per far si che si vedo nella pagina del preventivo.
+        //aggiungo questa istruzione per evitare che rimanga nell'url e rallenti la pagina nelle successive operazioni.
+        if (url.searchParams.has("reset")) {
+            url.searchParams.delete("reset");
+            window.history.replaceState({}, "", url);
+        }
         kendo.bind( AP.accessory.fields.modalRoot, viewModel );
     };
 

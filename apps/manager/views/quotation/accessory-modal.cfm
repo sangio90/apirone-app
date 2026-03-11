@@ -95,10 +95,12 @@
                                 </div>
                                 
                                 <div class="col-6 mb-3 position-relative">
-                                    <div id="accessory-preview-background" style="width: 500px;">
+                                    <div id="accessory-preview-background" style="width: 500px;" data-bind="visible: showImage">
                                         <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }, visible: backgroundImage.url" /> 
-                                        <div id="accessory-preview-background-tree" style="position: absolute; top: 0; left: 12px;">
+                                        <div id="accessory-preview-background-tree" style="position: absolute; top: 0; left: 12px;"></div>
                                     </div>
+                                    <div id="accessory-preview-custom-background" style="width: 500px;" data-bind="visible: showCustomImage">
+                                        <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundCustomImage.url }, visible: backgroundCustomImage.url" />
                                     </div>
                                 </div>
 
@@ -131,4 +133,6 @@
             </div>
         </section>
     </div>
+
+    #view( "file/list-modal" )#
 </cfoutput>
