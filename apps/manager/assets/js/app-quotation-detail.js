@@ -1121,6 +1121,10 @@ AP.quotation.zonesModal = (function () {
                 return newZ;
             });
             let parentZones = zones.filter(z => !z.origin);
+            parentZones.unshift({
+                'id': '',
+                'name': '\u00A0\u00A0- '
+            })
 
             viewModel.set('zones', parentZones);
             $("#zones-grid").data("kendoGrid").dataSource.data(zones);
@@ -1143,6 +1147,10 @@ AP.quotation.zonesModal = (function () {
             });
         let parentZones = allZones.filter(z => !z.origin && z.name != '-- Tutte le zone');
 
+        parentZones.unshift({
+            'id': '',
+            'name': '\u00A0\u00A0- '
+        })
         viewModel.set('zones', parentZones);
         viewModel.set('detailForm.zones', gridZones);
         

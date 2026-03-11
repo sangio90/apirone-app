@@ -90,6 +90,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 
 			quotationZone.setOrigin( super.service( "QuotationZone" ).get( json.parentZone.id ) );
+		} else {
+			quotationZone.setOrigin( null );
 		}
 
 		if ( isNull( json.id ) ) {
