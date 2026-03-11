@@ -83,9 +83,11 @@
 			SET
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getQuotation().getId()#">::uuid,
 				quotation_zone = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getName()#">,
-				quantity = <cfqueryparam cfsqltype="Integer" value="#arguments.zone.getQuantity()#">
+				quantity = <cfqueryparam cfsqltype="Integer" value="#arguments.zone.getQuantity()#">,
 				<cfif !IsNull( arguments.zone.getOrigin() )>
-					,origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
+					origin_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getOrigin().getId()#">::uuid
+				<cfelse>
+					origin_id = null
 				</cfif>
 			WHERE
 				quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zone.getId()#">::uuid
