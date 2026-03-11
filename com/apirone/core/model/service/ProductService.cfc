@@ -45,6 +45,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
+	public function readIds(){
+		return getDao().readIds();
+	}
+
 	public Array function list(){
 		// TODO: check formatter
 		arguments[ "limit" ] = -1;

@@ -381,7 +381,13 @@ AP.quotation.detail = ( function() {
                                     }
 
                                     AP.widget.notify( "success", "Riga cancellata correttamente." );
-                                    window.location.href = "/manager/quotations/" + AP.page.quotation.id;
+                                    var urlParams = new URLSearchParams( window.location.search );
+                                    var tabParam = urlParams.get( "tab" );
+                                    if (tabParam && tabParam != '') {
+                                        window.location.href = "/manager/quotations/" + AP.page.quotation.id + "?tab=" + tabParam;
+                                    } else {
+                                        window.location.href = "/manager/quotations/" + AP.page.quotation.id;
+                                    }
                                 }
                             }
                         } );
@@ -640,15 +646,15 @@ AP.quotation.detail = ( function() {
             }
 
             if ( typeId == "accessory" ) {
-                accessoryApp().clone( { id: event.data.id, clone: true  } );
+                accessoryApp().edit( { id: event.data.id, clone: true  } );
             }
 
             if ( typeId == "signage" ) {
-                signageApp().clone( { id: event.data.id, clone: true  } );
+                signageApp().edit( { id: event.data.id, clone: true  } );
             }
 
             if ( typeId == "article" ) {
-                articleApp().clone( { id: event.data.id, clone: true  } );
+                articleApp().edit( { id: event.data.id, clone: true  } );
             }
 
             event.preventDefault();
@@ -1135,7 +1141,7 @@ AP.quotation.zonesModal = (function () {
                 
                 return newZ;
             });
-        let parentZones = allZones.filter(z => !z.origin);
+        let parentZones = allZones.filter(z => !z.origin && z.name != '-- Tutte le zone');
 
         viewModel.set('zones', parentZones);
         viewModel.set('detailForm.zones', gridZones);

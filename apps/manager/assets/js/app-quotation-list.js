@@ -95,6 +95,8 @@ AP.quotation.list = ( function() {
 
             viewModel.set( "rows", filterDataSource );
 
+            AP.loading.hide()
+
             return false;
         },
 
@@ -156,7 +158,7 @@ AP.quotation.list = ( function() {
 
     pub.init = function() {
 
-        console.log( "qt:init" );
+        AP.loading.show()
 
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 

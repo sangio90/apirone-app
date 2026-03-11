@@ -28,6 +28,7 @@ AP.signage.modal = ( function() {
                     id: "",
                     code: ""
                 },
+                customImage: false,
                 price: {
                     id: null,
                 },
@@ -72,6 +73,7 @@ AP.signage.modal = ( function() {
         itemStatuses: AP.page.itemStatuses,
         title: "Carica segnaletica",
         canSave: false,
+        productItemsNotes: [],
     };
 
     var viewModel = kendo.observable( {
@@ -89,6 +91,42 @@ AP.signage.modal = ( function() {
         modelConfig: {
             height: null,
             width: null
+        },
+        cloneMode: false,
+
+		zones: [],
+		subzones: [],
+		allZones: [],
+        quotationZone: {
+            "id": ""
+        },
+        quotationSubzone: {
+            "id": ""
+        },
+
+        //aggiunto per gestire il cambiamento delle checkbox
+        toggleCustomImage: function( event ) {
+            return
+        },
+
+        changeZone: function() {
+            const allZones = viewModel.get('allZones')
+            viewModel.set('quotationSubzone', { "id": "" })
+            viewModel.get('quotationSubzone')
+            viewModel.set('subzones', [])
+            if (viewModel.get('quotationZone.name') != '-- Tutte le zone') {
+                let children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('quotationZone.id')))
+                children.unshift({
+                    "id": "",
+                    "name": "\u00A0\u00A0- "
+                })
+                viewModel.set('subzones', children)
+            }
+            return;
+        },
+
+        isSubzoneEnabled: function() {
+            return viewModel.get('quotationZone') && viewModel.get('quotationZone.name') != '-- Tutte le zone';
         },
 
         pictogramNames: [
@@ -795,6 +833,30 @@ AP.signage.modal = ( function() {
                 const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
                 const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                 const attributeArray = productItems.data();
+                const getAllDescendantIndices = (startIndex, array) => {
+                    const foundIndices = [];
+                    // Partiamo dall'ID dell'elemento iniziale
+                    const queue = [array[startIndex].attribute_id];
+
+                    let i = 0;
+                    while (i < queue.length) {
+                        const currentParentId = queue[i];
+                        
+                        // Cerchiamo nell'array tutti i figli di questo ID
+                        array.forEach((item, index) => {
+                            if (item.parent_attribute_id === currentParentId) {
+                                // Se non abbiamo già aggiunto questo indice (evita loop infiniti)
+                                if (!foundIndices.includes(index)) {
+                                    foundIndices.push(index);
+                                    // Aggiungiamo l'ID del figlio alla coda per cercare i SUOI figli nel prossimo giro
+                                    queue.push(item.attribute_id);
+                                }
+                            }
+                        });
+                        i++;
+                    }
+                    return foundIndices;
+                };
                 originId = originId || "";
 
                 let url = "/manager/ajax/product-items?productId=" + productId;
@@ -907,9 +969,16 @@ AP.signage.modal = ( function() {
                                     if ( d.parent_item_id ) {
                                         if ( attributeArray[idx - 1].values.filter( v => v.selected == false && v.product_item_id == d.parent_item_id ).length > 0 ) {
                                             elementsToRemove.push( idx );
+                                            // aggiunto perche senza cercare i discendenti di secondo o piu livello, rimanevano dei residui dell'albero delle vecchie impostazioni
+                                            let descendantIndexes = getAllDescendantIndices(idx, attributeArray)
+                                            descendantIndexes.forEach( function(d) {
+                                                elementsToRemove.push(d)
+                                            } )
                                         }
                                     }
                                 } );
+
+                                elementsToRemove = elementsToRemove.sort((a, b) => b - a)
                                 elementsToRemove.forEach( function( idx ) {
                                     productItems.remove( productItems.at( idx ) );
                                 } );
@@ -975,6 +1044,76 @@ AP.signage.modal = ( function() {
                 }
 
                 subContainer.append( select );
+                if (selectedOption && selectedOption.attributeValue.allowNote) {
+                    const labelNote = $( "<label>" );
+                    labelNote.addClass( "mb-1" );
+                    labelNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                    labelNote.text( "NOTE" );
+                    subContainer.append( labelNote );
+
+                    let note = ''
+                    if (viewModel.get('detailForm.data.quotationItem.items')) {
+                        //cerco se il campo è censito, questo in pratica verifica se sono in edit o in new, perche in new non ho ancora questa struttura
+                        campoPresenteNeiQuotationItemProductItems = viewModel.get('detailForm.data.quotationItem.items').find(i => i.productItem.attributeValue.rawValue.id == selectedOption.attributeValue.rawValue.id)
+                        //se presente e con note (perche non tutti i campi hanno le note) e con nota valorizzata
+                        if (campoPresenteNeiQuotationItemProductItems && campoPresenteNeiQuotationItemProductItems.note && campoPresenteNeiQuotationItemProductItems.note != '') {
+                            //cerco nella struttura note dei product items che ho creato nel viewmodel. Se trovo qualcosa non lo sovvrascrivo, vuol dire che ho già caricato i dati e sto solo modificando il valore
+                            const result = viewModel.detailForm.productItemsNotes.find(n =>
+                                n.product_item_id === selectedOption.product_item_id &&
+                                n.attribute_raw_value_id === selectedOption.attributeValue.id
+                            );
+                            //altrimenti setto per la prima volta la nota nella struttura del viewmodel con i dati provenienti dal backend
+                            if (!result) {
+                                viewModel.detailForm.productItemsNotes.push({
+                                    product_item_id: selectedOption.product_item_id,
+                                    attribute_raw_value_id: selectedOption.attributeValue.id,
+                                    note: campoPresenteNeiQuotationItemProductItems.note
+                                });
+                                note = campoPresenteNeiQuotationItemProductItems.note
+                            } else {
+                                note = result.note
+                            }
+                        }
+                    } else {
+                        //non sono in edit o comunque ho modificato l'albero, non posso piu partire dai dati del detailForm, 
+                        // cerco se ho qualcosa in product items note. Se si, setto le note
+                        let existing = viewModel.detailForm.productItemsNotes.find(n =>
+                            n.product_item_id === selectedOption.product_item_id &&
+                            n.attribute_raw_value_id === selectedOption.attributeValue.id
+                        );
+                        if (existing) {
+                            note = existing.note;
+                        }
+                    }
+                    //definisco il tag html e imposto onchange una funzione che cerca in product items notes dentro il viewmodel se trova un elemento per product item id e attribute value id
+                    const inputNote = $( "<input>" ).addClass( "form-control me-3 mb-2" )
+                    .on("input", function () {
+                        let existing = viewModel.detailForm.productItemsNotes.find(n =>
+                            n.product_item_id === selectedOption.product_item_id &&
+                            n.attribute_raw_value_id === selectedOption.attributeValue.id
+                        );
+
+                        //se la trovo, imposto il valore della chiave note di quel elemento con il valore immesso nella input
+                        if (existing) {
+                            existing.note = this.value;
+                        } else {
+                            //altrimenti creo un nuovo elemento
+                            viewModel.detailForm.productItemsNotes.push({
+                                product_item_id: selectedOption.product_item_id,
+                                attribute_raw_value_id: selectedOption.attributeValue.id,
+                                note: this.value
+                            });
+                        }
+                        note = this.value
+                    });
+                    inputNote.attr( "data-attribute-id", item.attribute_id );
+                    inputNote.val(note)
+                    if ( item.level > 0 ) {
+                        inputNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                        inputNote.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
+                    }
+                    subContainer.append( inputNote );
+                }
             } );
         },
 
@@ -1002,7 +1141,25 @@ AP.signage.modal = ( function() {
             }
             parsedData.quotationId = quotationId;
             parsedData.type = "signage";
+            parsedData.quotationItem.quotationZone = (viewModel.get('quotationSubzone.id') && viewModel.get('quotationSubzone.id') != '') ? viewModel.get('quotationSubzone') : viewModel.get('quotationZone')
+            if (viewModel.get('cloneMode')) {
+                parsedData.quotationItem.id = ""
+            }
 
+            //durante la save faccio passare le note dei product items e setto i valori nella struttura dati che passo al backend per il salvataggio
+            const productItemsNotes = viewModel.detailForm.productItemsNotes
+            parsedData.quotationItem.product.items._data.forEach(function (row) {
+                const selectedOption = row.values.find(r => r.selected == true)
+                if (selectedOption) {
+                    const note = productItemsNotes.find(n =>
+                        n.product_item_id === selectedOption.product_item_id &&
+                        n.attribute_raw_value_id === selectedOption.attributeValue.id
+                    );
+                    if (note) {
+                        row.note = note.note
+                    }
+                }
+            })
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
@@ -1169,6 +1326,32 @@ AP.signage.modal = ( function() {
 			}
 		}
 		initPositionSuggest();
+
+        const allZones = AP.quotation.detail.config().zones
+        const parentZones = allZones.filter(z => !z.origin)
+        
+        viewModel.set('allZones', allZones)
+        viewModel.set('zones', parentZones)
+        const zone = AP.quotation.detail.config().zone
+        if (zone.origin) {
+            viewModel.set('quotationZone', zone.origin)
+            viewModel.set('quotationSubzone', zone)
+            const children = allZones.filter(z => z.origin && (z.origin.id == zone.origin.id))
+            children.unshift({
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            })
+            viewModel.set('subzones', children)
+        } else {
+            viewModel.set('quotationZone', zone)
+            const children = allZones.filter(z => z.origin && (z.origin.id == zone.id))
+            children.unshift({
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            })
+            viewModel.set('subzones', children)
+            viewModel.set('quotationSubzone', { "id": "" })
+        }
     };
 
     var initPositionSuggest = function() {
@@ -1241,7 +1424,7 @@ AP.signage.modal = ( function() {
 
     };
 
-    pub.edit = async function( { id, onSave } ) {
+    pub.edit = async function( { id, clone = false, onSave } ) {
         viewModel.resetForm();
 
         const categoriesResponse = await NM.util.ajax( {
@@ -1322,6 +1505,45 @@ AP.signage.modal = ( function() {
         $( "#signageLine" ).prop( "disabled", true );
         $( "#signageModel" ).prop( "disabled", true );
         $( "#signageFinish" ).prop( "disabled", true );
+        const allZones = AP.quotation.detail.config().zones
+        const parentZones = allZones.filter(z => !z.origin)
+        
+        viewModel.set('allZones', allZones)
+        viewModel.set('zones', parentZones)
+        
+        if (viewModel.get('detailForm.data.quotationItem.quotationZone.origin')) {
+            viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone.origin'))
+            viewModel.set('quotationSubzone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
+            const children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('detailForm.data.quotationItem.quotationZone.origin.id')))
+            children.unshift({
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            })
+            viewModel.set('subzones', children)
+        } else {
+            viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
+            const children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('detailForm.data.quotationItem.quotationZone.id')))
+            children.unshift({
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            })
+            viewModel.set('subzones', children)
+            viewModel.set('quotationSubzone', { "id": "" })
+        }
+
+        if (clone) {
+            viewModel.set('cloneMode', true)
+            viewModel.set('detailForm.title', "Clona Segnaletica")
+            $('#save-button').css("display", "none")
+            $('#clone-button').css("display", "block")
+        } else {
+            viewModel.set('cloneMode', false)
+            $('#save-button').css("display", "block")
+            $('#clone-button').css("display", "none")
+        }
+
+        viewModel.set('detailForm.data.quotationItem.special', data.quotationItem.special == 'true')
+        $('#imageCustomInput').hide()
 
         AP.loading.hide();
     };

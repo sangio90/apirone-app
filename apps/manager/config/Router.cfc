@@ -330,11 +330,11 @@
 			files
 		*/
 		delete( "/ajax/files/:id" ).to( "FileAjaxController.delete" ).end();
-		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" )
+		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values|quotation-items)/:id/images" )
 			.to( "FileAjaxController.list" )
 			.end();
 
-		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values)/:id/images" )
+		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values|quotation-items)/:id/images" )
 			.to( "FileAjaxController.upload" )
 			.end();
 
@@ -350,6 +350,8 @@
 		/*
 			products
 		*/
+
+		get( "/ajax/massiveproductreorder" ).to( "ProductAjaxController.massiveProductReorder" ).end();
 		get( "/ajax/products/get-id-and-file-by-params" ).to( "ProductAjaxController.getIdAndFileByParams" ).end();
 		get( "/ajax/products/code-exists" ).to( "ProductAjaxController.codeExists" ).end();
 		post( "/ajax/products/:id/combinations/calculate" ).to( "ProductAjaxController.calculateCombinations" ).end();

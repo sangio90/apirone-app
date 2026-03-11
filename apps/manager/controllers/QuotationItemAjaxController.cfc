@@ -10,6 +10,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		param rc.categoryId = "";
 		param rc.quotationZoneId = "";
 
+		prc.jsFiles.add( "app-file" );
+
 		params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
 		params[ "quotationId" ] = rc.id;
 		params[ "orderBy" ] = [ { "field" = "quotationZonePosition.code", "dir" = "asc" } ];
@@ -191,6 +193,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) ); //TODO: move to QuotationId
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
 		bean.setQuantity( json.quotationItem.quantity );
+		bean.setCustomImage( json.quotationItem.customImage );
 
 		bean.setSpecial( json.quotationItem.special );
 		bean.setNote( json.quotationItem.note );
@@ -275,6 +278,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					quotationItemProductItemBean.setProductItem( productItem );
 					quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
 					quotationItemProductItemBean.setLevel( productItemRow.level );
+					if (structKeyExists(productItemRow, 'note')) {
+						quotationItemProductItemBean.setNote( productItemRow.note );
+					}
 					quotationItemProductItemBean.setId( thisId )
 
 					super.fire(
@@ -422,6 +428,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					quotationItemProductItemBean.setProductItem( productItem );
 					quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
 					quotationItemProductItemBean.setLevel( productItemRow.level );
+					if (structKeyExists(productItemRow, 'note')) {
+						quotationItemProductItemBean.setNote( productItemRow.note );
+					}
 					quotationItemProductItemBean.setId( thisId )
 
 					super.fire(
@@ -540,6 +549,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					//productItemBean.setQuotationItemFruitId( fruitBean.getId() );
 					productItemBean.setProductItem( productItem );
 					productItemBean.setOrigin( productItem.getOrigin() );
+					if (structKeyExists(selectedValue, 'note')) {
+						productItemBean.setNote( selectedValue.note );
+					}
 					productItemBean.setLevel( productItemRow.level );
 
 					items.add( productItemBean );
@@ -588,6 +600,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					productItemBean.setQuotationItemId( thisId );
 					productItemBean.setProductItem( productItem );
 					productItemBean.setOrigin( productItem.getOrigin() );
+					if (structKeyExists(selectedValue, 'note')) {
+						productItemBean.setNote( selectedValue.note );
+					}
 					productItemBean.setLevel( productItemRow.level );
 					// productItemBean.setId( thisId )
 

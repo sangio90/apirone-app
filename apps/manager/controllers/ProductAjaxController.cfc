@@ -545,4 +545,42 @@ component extends="com.apirone.core.controller.AbsController" {
 		return result;
 	}
 
+	public function massiveProductReorder()
+	{
+		var data   = [];
+		var result = super.getResult();
+		var message = 'Riorinamento massivo completato'
+		result.setStatus('SUCCESS')
+
+		transaction {
+			try {
+				var products = super.fire( "product.readIds" )
+				for (var product in products) {
+					var params = {
+						productId            = product.product_id,
+						includeMissingValues = false
+					};
+
+					var transformer = super.transformer( "ProductItem" );
+					var items = super.fire( "ProductItem.getFlatTree", params );
+					var orderby = 10
+					for (var item in items) {
+						if (!isNull(item) && IsInstanceOf(item, 'com.apirone.core.model.bean.ProductItem') && item.getId() > 0) {
+							item.setOrderBy( orderby )
+							super.fire( "ProductItem.update", { productItem = item } )
+							orderby += 10
+						}
+					}
+				}
+			} catch (e) {
+				message = 'errore durante la procedura'
+				result.setStatus('ERROR')
+			}
+			
+		}
+		
+		result.setData( { "message" = message } );
+		event.setValue( "result", result );
+	}
+
 }

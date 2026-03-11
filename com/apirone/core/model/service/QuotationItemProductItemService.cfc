@@ -113,6 +113,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setProductItem( getProductItemService().get( record.product_item_id ) );
 			bean.setLevel( record.level );
+			bean.setNote( record.note );
 
 			if ( !IsNull( record.origin_id ) ) {
 				bean.setOrigin( getProductItemService().get( record.origin_id ) );

@@ -22,6 +22,7 @@
                 "fruit.code",
                 "fruit.positionCount",
                 "fruit.horizontalImage",
+                "items",
                 "positions",
                 "createdAt",
             ]

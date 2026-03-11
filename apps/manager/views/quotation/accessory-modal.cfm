@@ -95,10 +95,12 @@
                                 </div>
                                 
                                 <div class="col-6 mb-3 position-relative">
-                                    <div id="accessory-preview-background" style="width: 500px;">
+                                    <div id="accessory-preview-background" style="width: 500px;" data-bind="visible: showImage">
                                         <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }, visible: backgroundImage.url" /> 
-                                        <div id="accessory-preview-background-tree" style="position: absolute; top: 0; left: 12px;">
+                                        <div id="accessory-preview-background-tree" style="position: absolute; top: 0; left: 12px;"></div>
                                     </div>
+                                    <div id="accessory-preview-custom-background" style="width: 500px;" data-bind="visible: showCustomImage">
+                                        <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundCustomImage.url }, visible: backgroundCustomImage.url" />
                                     </div>
                                 </div>
 
@@ -113,8 +115,11 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-12 float-end">
-                                <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save, enabled:canSave">
+                                <button id="save-button" type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save, enabled:canSave">
                                     <i class="fas fa-save"></i> Salva
+                                </button>
+                                <button id="clone-button" type="button" class="btn btn-warning btn-sm float-end" style="display: none" data-bind="click:save, enabled:canSave">
+                                    <i class="fas fa-save"></i> Clona
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal" data-bind="click:resetForm">Chiudi</button>
                                 <button type="button" class="btn btn-primary btn-sm me-2 float-end" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci Configurazione</button>
@@ -128,4 +133,6 @@
             </div>
         </section>
     </div>
+
+    #view( "file/list-modal" )#
 </cfoutput>

@@ -258,27 +258,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			
 			}
 
-			<!---- 
-				TODO: per Umberto: possiamo togliere queste query
-			--->
-			```
-			<cfquery name="total" datasource="apirone">
-				SELECT SUM(amount) AS total
-				FROM quotation_items
-					INNER JOIN quotation_item_prices ON quotation_items.quotation_item_id = quotation_item_prices.quotation_item_id
-				WHERE 1=1
-					AND quotation_items.quotation_item_id = '#record.quotation_item_id#'
-			</cfquery>
-
-			<cfquery name="total" datasource="apirone">
-				SELECT SUM(amount) AS total
-				FROM quotation_items
-					INNER JOIN quotation_item_prices ON quotation_items.quotation_item_id = quotation_item_prices.quotation_item_id
-				WHERE 1=1
-					AND quotation_items.quotation_item_id = '#record.quotation_item_id#'
-			</cfquery>
-			```
-
 			var pricing = getQuotationItemPriceService().getByQuotationItemId( quotationItemId = arguments.quotationItemId );
 			bean.setPrice( pricing );
 
@@ -339,6 +318,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setNote( record.note );
 			bean.setHash( record.hash );
 			bean.setSpecial( BooleanFormat( Val( record.special ) ) );
+			bean.setCustomImage( BooleanFormat( Val( record.custom_image ) ) );
 
 			if( Len( record.quotation_zone_position_id ) ) {
 				bean.setPosition( getQuotationZonePositionService().get( record.quotation_zone_position_id ) );

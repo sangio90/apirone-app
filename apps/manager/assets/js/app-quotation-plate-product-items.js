@@ -79,6 +79,63 @@ AP.plate.productItems = ( function() {
                 }
             }
             subContainer.append( select );
+            if (selectedOption && selectedOption.attributeValue.allowNote) {
+                //recuperiamo i qipi dalla prima lettura dal backend
+                const plateQuotationItemProductItems = AP.plate.modal.getItem().plateQuotationItemProductItems
+                let note = ''
+                if (plateQuotationItemProductItems.length > 0) {
+                    //cerchiamo il qipi che corrisponde al pi selezionato cercando per pi_id e attribute_value_id
+                    const selectedPlateOptionQuotationItemProductItem = plateQuotationItemProductItems.find(qipi => 
+                        qipi.productItem.attributeValue.id == selectedOption.attributeValue.id &&
+                        qipi.productItem.id == selectedOption.productItemId
+                    )
+                    //se lo troviamo, settiamo le note
+                    if (selectedPlateOptionQuotationItemProductItem) {
+                        note = selectedPlateOptionQuotationItemProductItem.note
+                    }
+                }
+
+                //visto che questa procedura gira anche per gli items dei fruits, cerco anche nella struttura dati 
+                //quotationItemProductItems dei frutti. Se ne trovo:
+                const fruitQuotationItemProductItems = AP.plate.modal.getItem().fruitQuotationItemProductItems
+                if (fruitQuotationItemProductItems.length > 0) {
+                    //cerchiamo il qipi che corrisponde al pi selezionato cercando per fruit_id (preso dal id container jquery), pi_id e attribute_value_id
+                    //non bastano pi_id e av_id perche potremmo avere due frutti uguali con note diverse
+                    const selectedFruitOptionQuotationItemProductItem = fruitQuotationItemProductItems.find( qipi =>
+                        qipi.product_item_id == selectedOption.productItemId &&
+                        qipi.attribute_value_id == selectedOption.attributeValue.id &&
+                        qipi.quotation_item_fruit_id == container[0].id.split("_").pop()
+                    ) 
+                    //se lo troviamo, settiamo le note
+                    if (selectedFruitOptionQuotationItemProductItem) {
+                        note = selectedFruitOptionQuotationItemProductItem.note
+                    }
+                }
+
+                const labelNote = $( "<label>" );
+                labelNote.addClass( "mb-1" );
+                labelNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                labelNote.text( "NOTE" );
+                subContainer.append( labelNote );
+                if ("note" in selectedOption) {
+                    note = selectedOption.note
+                } else {
+                    selectedOption.note = ''
+                }
+                //definisco il tag html e imposto onchange una funzione che cerca in product items notes dentro il viewmodel se trova un elemento per product item id e attribute value id
+                const inputNote = $( "<input>" ).addClass( "form-control me-3 mb-2" )
+                .on("input", function () {
+                    note = this.value
+                    selectedOption.note = note
+                });
+                inputNote.attr( "data-attribute-id", item.attribute_id );
+                inputNote.val(note)
+                if ( item.level > 0 ) {
+                    inputNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
+                    inputNote.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
+                }
+                subContainer.append( inputNote );
+            }
         } );
     }
 

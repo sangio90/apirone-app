@@ -4,6 +4,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="note" type="String";
 	property name="hash" type="String";
 	property name="special" type="Boolean" default="false";
+	property name="hash" type="String";
+	property name="customImage" type="Boolean" default="false";
 
 	property name="quotation" type="com.apirone.core.model.bean.Quotation";
 	property name="quotationZone" type="com.apirone.core.model.bean.QuotationZone";
