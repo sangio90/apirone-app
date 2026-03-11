@@ -124,6 +124,8 @@ AP.quotation.header = ( function() {
         quotationItems: new kendo.data.DataSource(),
         saleUsers: new kendo.data.DataSource(),
         techUsers: new kendo.data.DataSource(),
+        canEdit: AP.page.canEdit,
+        canSee: AP.page.canSee,
 
         crmCustomers: new kendo.data.DataSource( {
             serverFiltering: true,
