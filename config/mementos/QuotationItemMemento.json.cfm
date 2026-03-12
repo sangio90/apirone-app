@@ -14,6 +14,7 @@
         "position.code",
         "article.code",
         "article.name",
+        "special",
         "image",
         "note",
     ],
