@@ -586,9 +586,13 @@ AP.signage.modal = ( function() {
                     } );
                 }
             }
+            let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
+            if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
+                url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
+            }
             await NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
+                url: url,
                 callback: {
                     done: function( xhr ) {
                         xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
