@@ -85,7 +85,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.lineCost.getId();
 	}
 
-	public com.apirone.core.model.bean.Outcome function delete( required Integer lineCostId ){
+	public com.apirone.core.model.bean.Outcome function delete( required Numeric lineCostId ){
 		var outcome = super.bean( "Outcome" );
 
 		var obj = get( arguments.lineCostId );
