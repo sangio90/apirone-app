@@ -1,11 +1,11 @@
 ﻿<cfoutput>
     <div id="quotation-detail-root">
         <div class="row mb-3">
-            <div class="col-lg-3">
+            <div class="col-4">
                 <h2>#prc.title#</h2>
             </div>
 
-            <div class="col-9 text-end mt-3">
+            <div class="col-8 text-end mt-3">
 				#button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left", class="me-4" )#
 				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
                 #button( bind="click:exportProducts, visible: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#

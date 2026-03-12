@@ -30,6 +30,9 @@
                         <div class="ms-2 d-flex justify-content-center p-1 qt-item-trash-rounded" data-bind="click:delete" data-id="#: id#" title="Cancella">
                             <i class="fas fa-trash" style="color: red; cursor: pointer"></i>
                         </div>
+                        <div class="ms-1 pb-2" style="color: rgb(199, 113, 0);" data-bind="visible: special" title="Speciale">
+                            <i class="fas fa-star"></i>
+                        </div>
                     </div>
                 </div>
                 <div class="col-12 d-flex justify-content-center">
