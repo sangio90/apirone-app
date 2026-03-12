@@ -1506,10 +1506,6 @@ AP.signage.modal = ( function() {
 		pricingApp().init( "signage", { data: signageResponse.data.quotationItem.price } );
 		initPositionSuggest();
 
-        $( "#signangeProductCategory" ).prop( "disabled", true );
-        $( "#signageLine" ).prop( "disabled", true );
-        $( "#signageModel" ).prop( "disabled", true );
-        $( "#signageFinish" ).prop( "disabled", true );
         const allZones = AP.quotation.detail.config().zones
         const parentZones = allZones.filter(z => !z.origin)
         
@@ -1549,6 +1545,7 @@ AP.signage.modal = ( function() {
 
         viewModel.set('detailForm.data.quotationItem.special', data.quotationItem.special == 'true')
         $('#imageCustomInput').hide()
+        viewModel.handleSelectChanges()
 
         AP.loading.hide();
     };

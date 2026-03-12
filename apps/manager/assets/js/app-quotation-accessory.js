@@ -996,9 +996,6 @@ AP.accessory.modal = ( function() {
 
 		renderQuotationItemTotals( id );
 
-        $( "#accessoryProductCategory" ).prop( "disabled", true );
-        $( "#accessoryLine" ).prop( "disabled", true );
-        $( "#accessoryModel" ).prop( "disabled", true );
         const allZones = AP.quotation.detail.config().zones
         const parentZones = allZones.filter(z => !z.origin)
         
@@ -1044,7 +1041,7 @@ AP.accessory.modal = ( function() {
         //altrimenti farò il contrario
         viewModel.set('showCustomImage', viewModel.get('detailForm.data.quotationItem.customImage'))
         viewModel.set('showImage', !viewModel.get('detailForm.data.quotationItem.customImage'))
-
+        viewModel.handleSelectChanges()
         AP.loading.hide();
     };
 
