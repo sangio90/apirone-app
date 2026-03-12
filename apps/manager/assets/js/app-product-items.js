@@ -280,6 +280,31 @@ AP.product.items = ( function() {
 
         },
 
+		saveMargins: function (event ) {
+			var margin_top = viewModel.get('product.marginTop');
+			var margin_left = viewModel.get('product.marginLeft');
+			var plate_width = viewModel.get('product.plateWidth');
+			var plate_height = viewModel.get('product.plateHeight');
+
+			var url = "/manager/ajax/products/" + AP.page.productId + "/save-margins"
+
+			NM.util.ajax( {
+				method: "POST",
+				url: url,
+				data: {
+					marginTop: margin_top,
+					marginLeft: margin_left,
+					plateWidth: plate_width,
+					plateHeight: plate_height
+				},
+				callback: {
+					done: function( xhr ) {
+						$( "#product-simulate-loading" ).html( "" );
+					},
+				},
+			} );
+		},
+
         save: function( event ) {
 
             if ( fields.detailForm.valid() ) {

@@ -206,7 +206,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			for ( var item in items ) {
 				var bean = super.fire( "ProductItem.get", { productItemId = item.getId() } );
-				
+
 				bean.setOrderBy( orderby );
 
 				super.fire( "ProductItem.update", { productItem = bean } );
@@ -394,9 +394,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		// without Mementify
 		// error: component [com.apirone.core.model.bean.Combination] has no function with name [getrawProduct]
-		
+
 		for ( var row in rows.getData() ) {
-			
+
 			var line = {
 				"id"        = row.getId(),
 				"shortId"   = row.getShortId(),
@@ -404,7 +404,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				"productId" = row.getProductId(),
 				"name"      = row.getName()
 			};
-			
+
 			data.add( line );
 		}
 
@@ -430,7 +430,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var result = super.getResult();
 		super.service( "Combination" ).calculateCombinations( rc.id, attributeIds );
-		
+
 		event.setValue( "result", result );
 	}
 
@@ -528,14 +528,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var transformer = super.transformer( "ProductItem" );
 		var items = super.fire( "ProductItem.getFlatTree", params );
-		
+
 		var data = super.eachParallelAndReorder( items, function( item, index ){
 
 			var row = transformer.convert( profile = "tree", bean = item );
 			row[ "spaces" ] = RepeatString( "&nbsp;&nbsp;&nbsp;&nbsp;", item.getLevel() );
-			
+
 			return row;
-		
+
 		} );
 
 		result.setTotal( data.len() );
@@ -576,10 +576,26 @@ component extends="com.apirone.core.controller.AbsController" {
 				message = 'errore durante la procedura'
 				result.setStatus('ERROR')
 			}
-			
+
 		}
-		
+
 		result.setData( { "message" = message } );
+		event.setValue( "result", result );
+	}
+
+	public function saveMargins(event, rc, prc)
+	{
+		var result = super.getResult();
+		var productService = service( "Product" );
+		var product    = productService.get( rc.id );
+
+		product.setMarginTop( rc.marginTop );
+		product.setMarginLeft( rc.marginLeft );
+		product.setPlateWidth( rc.plateWidth );
+		product.setPlateHeight( rc.plateHeight );
+
+		var thisId    = productService.update( product )
+		result.setData( { "message" = "Aggiornamento completato con successo" }, { "payload" = { id = thisId } } );
 		event.setValue( "result", result );
 	}
 

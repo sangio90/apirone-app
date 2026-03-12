@@ -271,9 +271,22 @@
 				,
 				lines = <cfqueryparam cfsqltype="Other" value="#SerializeJSON( lines )#">,
 
-				<cfif IsInstanceOf( arguments.product, "com.apirone.core.model.bean.ProductBase" )>
-					product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.product.getCategory().getId()#">,
+				<cfif arguments.product.getPlateWidth()>
+					plate_width = <cfqueryparam cfsqltype="Numeric" value="#arguments.product.getPlateWidth()#">,
 				</cfif>
+
+				<cfif arguments.product.getPlateHeight()>
+					plate_height = <cfqueryparam cfsqltype="Numeric" value="#arguments.product.getPlateHeight()#">,
+				</cfif>
+
+				<cfif arguments.product.getMarginTop()>
+					margin_top = <cfqueryparam cfsqltype="Numeric" value="#arguments.product.getMarginTop()#">,
+				</cfif>
+
+				<cfif arguments.product.getMarginLeft()>
+					margin_left = <cfqueryparam cfsqltype="Numeric" value="#arguments.product.getMarginLeft()#">,
+				</cfif>
+
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getStatus().getId()#">
 			WHERE
 				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.product.getId()#">::uuid

@@ -17,16 +17,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="cacheScope" type="String" default="Product.bean";
 
 	public com.apirone.core.model.bean.Product function get( required String productId ){
-		var cm = getCacheManager();
+		 var cm = getCacheManager();
 
-		var cache = cm.get( getCacheScope(), arguments.productId );
+		 var cache = cm.get( getCacheScope(), arguments.productId );
 
-		if ( cache.status ) {
-			return cache.data;
-		}
+		 if ( cache.status ) {
+		 	return cache.data;
+		 }
 
 		var bean = build( arguments.productId );
-		cm.put( getCacheScope(), arguments.productId, bean );
+		 cm.put( getCacheScope(), arguments.productId, bean );
 
 		return bean;
 	}
@@ -293,7 +293,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if( arguments.deleteCache ) {
 			getCacheManager().removeAll();
 		}
-		
+
 		super.logEvent(
 			event   = "product.CLONED_TREE",
 			message = "End clone tree of product [#arguments.fromProductId#] to [#arguments.toProductId#]",
@@ -348,7 +348,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		super.getCacheManager().remove( getCacheScope(), product.getId() );
 
 		return product.getId();
-	}	
+	}
 
 	public Void function removeCache( required String productId ){
 		var cm = super.getCacheManager();
@@ -407,6 +407,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setSpecial( BooleanFormat( record.special ) ); //TODO: to remove
 			bean.setMinQuantity( record.min_quantity );
 			bean.setMaxQuantity( record.max_quantity );
+			bean.setMarginTop( record.margin_top );
+			bean.setMarginLeft( record.margin_left );
+			bean.setPlateWidth( record.plate_width );
+			bean.setPlateHeight( record.plate_height );
 			bean.setTexts( getTextService().list( productId = record.product_id ) );
 
 			bean.setImportantAttributes( super.getAttributesBeanByIds( record.attributes_important ) );

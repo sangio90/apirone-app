@@ -22,7 +22,11 @@
 				"finish",
 				"prices",
 				"horizontalImage",
-				"verticalImage"
+				"verticalImage",
+				"marginTop",
+				"marginLeft",
+				"plateWidth",
+				"plateHeight"
 			]
 		},
 		menu = {
@@ -56,7 +60,11 @@
 				"finish.id",
 				"finish.name",
 				"horizontalImage",
-				"verticalImage"
+				"verticalImage",
+				"marginTop",
+				"marginLeft",
+				"plateWidth",
+				"plateHeight"
 			]
 		},
 		detail = {
@@ -72,6 +80,10 @@
 				"prices",
 				"special$boolean",
 				"category.type.id",
+				"marginTop",
+				"marginLeft",
+				"plateWidth",
+				"plateHeight"
 			]
 		},
 
