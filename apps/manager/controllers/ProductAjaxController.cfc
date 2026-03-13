@@ -261,6 +261,10 @@ component extends="com.apirone.core.controller.AbsController" {
 					json     = super.getMementify().convert( file, "list" );
 					data.set( "file", json )
 				}
+				data.set("marginTop", products [ 1 ].getMarginTop() )
+				data.set("marginLeft", products [ 1 ].getMarginLeft() )
+				data.set("plateWidth", products [ 1 ].getPlateWidth() )
+				data.set("plateHeight", products [ 1 ].getPlateHeight() )
 				result.setData( data )
 			}
 		}
@@ -595,6 +599,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		product.setPlateHeight( rc.plateHeight );
 
 		var thisId    = productService.update( product )
+		//Automatismo che aggiorna margini e altezza targa per tutte le segnaletiche che condividono la stessa linea e modello
+		var altreSegnaleticheConStessaLineaModello = productService.search( catalogBundleId = product.getCatalogBundle().getId());
+		for ( var row in altreSegnaleticheConStessaLineaModello.getData() ) {
+			row.setMarginTop( rc.marginTop );
+			row.setMarginLeft( rc.marginLeft );
+			row.setPlateWidth( rc.plateWidth );
+			row.setPlateHeight( rc.plateHeight );
+			productService.update( row )
+		}
 		result.setData( { "message" = "Aggiornamento completato con successo" }, { "payload" = { id = thisId } } );
 		event.setValue( "result", result );
 	}
