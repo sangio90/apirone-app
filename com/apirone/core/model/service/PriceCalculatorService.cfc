@@ -36,7 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public function calculate(
 		required String productId,
 		required Numeric quantity = 1,
-		required String quotationItemZoneId,
+		quotationItemZoneId = javacast("null", ""),
 		Array producItemtIds,
 		Numeric lettersQuantity = 0,
 		Numeric simulationSignageConfigItemId,
@@ -50,7 +50,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Struct function simulate(
 		required String productId,
 		required Numeric quantity = 1,
-		required String quotationItemZoneId,
+		quotationItemZoneId = javacast("null", ""),
 		Array producItemtIds,
 		String currencyId="EUR",
 		Numeric lettersQuantity = 0,
@@ -97,14 +97,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var product       = productSvc.get( productId );
 		var price         = product.getPrice( "PRICE" );
 
-		var zone = getQuotationZoneService().get(quotationItemZoneId)
-		var originZone = zone.getOrigin()
-		var zoneQuantity = zone.getQuantity();
-		if (!isNull(originZone)) {
-			zoneQuantity *= originZone.getQuantity()
+		var quantity = arguments.quantity
+		if (!isNull(arguments.quotationItemZoneId)) {
+			var zone = getQuotationZoneService().get(arguments.quotationItemZoneId)
+			var originZone = zone.getOrigin()
+			var zoneQuantity = zone.getQuantity();
+			if (!isNull(originZone)) {
+				zoneQuantity *= originZone.getQuantity()
+			}
+			quantity = arguments.quantity * zoneQuantity;
 		}
 
-		var quantityMultipliedByZones = arguments.quantity * zoneQuantity;
 
 		//var currency = currencySvc.get( arguments.currencyId );
 
@@ -154,7 +157,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					product.getLine().getId(),
 					product.getFinish().getId()
 				);
-				quantitaTotale += quantityMultipliedByZones;
+				quantitaTotale += quantity;
 				unitFixedCost = fixedCost / quantitaTotale;
 			}
 
