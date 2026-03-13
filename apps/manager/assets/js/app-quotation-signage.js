@@ -55,7 +55,7 @@ AP.signage.modal = ( function() {
             signageConfig: {
                 catalogBundle: {
                     category: {
-                        id: 20 // segnaletica interna
+                        id: ""
                     },
                     line: {
                         id: ""
@@ -669,15 +669,11 @@ AP.signage.modal = ( function() {
 					}
 				} );
 				if ( xhr2.data.productId ) {
-					let marginLeft = xhr2.data.marginLeft
-					let marginTop = xhr2.data.marginTop
-					let plateWidth = xhr2.data.plateWidth
-					let plateHeight = xhr2.data.plateHeight
-					viewModel.set('detailForm.data.quotationItem.product.marginLeft', marginLeft +'px')
-					viewModel.set('detailForm.data.quotationItem.product.marginTop', marginTop +'px')
-					viewModel.set('detailForm.data.quotationItem.product.plateWidth', plateWidth +'px')
-					viewModel.set('detailForm.data.quotationItem.product.plateHeight', plateHeight +'px')
-					viewModel.set('detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled', marginLeft <= 0 || marginTop <= 0 || plateWidth <= 0 || plateHeight <= 0)
+					viewModel.set( "detailForm.data.quotationItem.product.id", xhr2.data.productId );
+                    viewModel.set( "detailForm.data.quotationItem.product.plateWidth", xhr2.data.plateWidth );
+                    viewModel.set( "detailForm.data.quotationItem.product.plateHeight", xhr2.data.plateHeight );
+                    viewModel.set( "detailForm.data.quotationItem.product.marginTop", xhr2.data.marginTop );
+                    viewModel.set( "detailForm.data.quotationItem.product.marginLeft", xhr2.data.marginLeft );
 				}
 				if ( xhr2.data.file ) {
 					viewModel.set( "backgroundImage", xhr2.data.file );
@@ -1208,39 +1204,49 @@ AP.signage.modal = ( function() {
                 viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
                 viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
                 viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.product.items", []);
                 AP.deleteUserPref( "signage.lineId" );
                 AP.deleteUserPref( "signage.modelId" );
                 AP.deleteUserPref( "signage.finishId" );
                 AP.deleteUserPref( "signage.fontId" );
                 AP.deleteUserPref( "signage.signageConfigId" );
+                AP.deleteUserPref( "signage.product.items" );
             } );
             $( "#signageLine" ).on( "change", function(e) {
                 viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { 'id':'' });
                 viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
                 viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
                 viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.product.items", []);
                 AP.deleteUserPref( "signage.modelId" );
                 AP.deleteUserPref( "signage.finishId" );
                 AP.deleteUserPref( "signage.fontId" );
                 AP.deleteUserPref( "signage.signageConfigId" );
+                AP.deleteUserPref( "signage.product.items" );
             } );
             $( "#signageModel" ).on( "change", function(e) {
                 viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
                 viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
                 viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.product.items", []);
                 AP.deleteUserPref( "signage.finishId" );
                 AP.deleteUserPref( "signage.fontId" );
                 AP.deleteUserPref( "signage.signageConfigId" );
+                AP.deleteUserPref( "signage.product.items" );
             } );
             $( "#signageFinish" ).on( "change", function(e) {
                 viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
                 viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.product.items", []);
                 AP.deleteUserPref( "signage.fontId" );
                 AP.deleteUserPref( "signage.signageConfigId" );
+                AP.deleteUserPref( "signage.product.items" );
             } );
             $( "#signageFont" ).on( "change", function(e) {
                 viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
+                viewModel.set( "detailForm.data.quotationItem.product.items", []);
                 AP.deleteUserPref( "signage.signageConfigId" );
+                AP.deleteUserPref( "signage.product.items" );
             } );
         }
     } );
@@ -1257,6 +1263,7 @@ AP.signage.modal = ( function() {
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
+                    debugger
                     //NOOP
                 }
             },
@@ -1273,48 +1280,60 @@ AP.signage.modal = ( function() {
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
         viewModel.handleSelectChanges()
 
-        if ( AP.getUserPref( "signage.categoryId" ) ) {
-            viewModel.set( "detailForm.data.signageConfig.catalogBundle.category.id", AP.getUserPref( "signage.categoryId" ) );
+        const signageCategoryId = AP.getUserPref( "signage.categoryId" )
+        const signageLineId = AP.getUserPref( "signage.lineId" )
+        const signageModelId = AP.getUserPref( "signage.modelId" )
+        const signageFinishId = AP.getUserPref( "signage.finishId" )
+        const signageFontId = AP.getUserPref( "signage.fontId" )
+        const signageSignageConfigId = AP.getUserPref( "signage.signageConfigId" )
+        const signageSignageConfigRowCount = AP.getUserPref( "signage.signageConfigRowCount" )
+
+        if (signageCategoryId) {
+            let category = viewModel.categories.data().find(c => c.id == signageCategoryId)
+            if (category) {
+                category = { id: category.id, name: category.name };
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.category", category );
+                await viewModel.loadLines();
+                if ( signageLineId ) {
+                    let line = viewModel.lines.data().find(l => l.id == signageLineId)
+                    if (line) {
+                        line = { id: line.id, name: line.name };
+                        viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", line );
+                        await viewModel.loadModels();
+                        if ( signageModelId ) {
+                            let model = viewModel.models.data().find(m => m.id == signageModelId)
+                            if (model) {
+                                model = { id: model.id, name: model.name };
+                                viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", model );
+                                await viewModel.loadFinishes();
+                                if ( signageFinishId ) {
+                                    let finish = viewModel.finishes.data().find(f => f.id = signageFinishId)
+                                    if (finish) {
+                                        finish = { id: finish.id, name: finish.name };
+                                        viewModel.set( "detailForm.data.quotationItem.product.finish", finish );
+                                        await viewModel.loadSignageConfigs();
+                                        if ( signageFontId ) {
+                                            let font = viewModel.fonts.data().find(f => f.id = signageFontId)
+                                            if (font) {
+                                                font = { id: font.id, name: font.name };
+                                                viewModel.set( "detailForm.data.signageConfig.font", font)
+                                                await viewModel.loadFontSizes();
+                                                if ( signageSignageConfigId ) {
+                                                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem.id", signageSignageConfigId );
+                                                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", signageSignageConfigRowCount );
+                                                    viewModel.parseLines();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        if ( AP.getUserPref( "signage.lineId" ) ) {
-            viewModel.set( "detailForm.data.signageConfig.catalogBundle.line.id", AP.getUserPref( "signage.lineId" ) );
-        }
-
-        if ( AP.getUserPref( "signage.modelId" ) ) {
-            viewModel.set( "detailForm.data.signageConfig.catalogBundle.model.id", AP.getUserPref( "signage.modelId" ) );
-        }
-
-        if ( AP.getUserPref( "signage.finishId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.product.finish.id", AP.getUserPref( "signage.finishId" ) );
-        }
-
-        if ( AP.getUserPref( "signage.fontId" ) ) {
-            viewModel.set( "detailForm.data.signageConfig.font.id", AP.getUserPref( "signage.fontId" ) );
-        }
-
-        if ( AP.getUserPref( "signage.signageConfigId" ) ) {
-            viewModel.set( "detailForm.data.quotationItem.signageConfigItem.id", AP.getUserPref( "signage.signageConfigId" ) );
-            viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", AP.getUserPref( "signage.signageConfigRowCount" ) );
-        }
-
-        await viewModel.loadLines();
-
-		if ( AP.getUserPref( "signage.lineId" ) ) {
-			await viewModel.loadModels();
-			if ( AP.getUserPref( "signage.modelId" ) ) {
-				await viewModel.loadFinishes();
-				if ( AP.getUserPref( "signage.finishId" ) ) {
-					await viewModel.loadSignageConfigs();
-					if ( AP.getUserPref( "signage.fontId" ) ) {
-						await viewModel.loadFontSizes();
-						if ( AP.getUserPref( "signage.signageConfigId" ) ) {
-							viewModel.parseLines();
-						}
-					}
-				}
-			}
-		}
 		initPositionSuggest();
 
         const allZones = AP.quotation.detail.config().zones

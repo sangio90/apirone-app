@@ -23,10 +23,12 @@
                                 <div class="col-sm-10">
                                     <select id="signangeProductCategory"
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona la categoria"
                                         data-bind="source: categories, value: detailForm.data.signageConfig.catalogBundle.category, events: { change: loadLines }"
                                         data-value-field="id"
                                         data-text-field="name"
+                                        data-filter="contains"
                                         >
                                     </select>
                                 </div>
@@ -36,10 +38,12 @@
                                 <div class="col-sm-10">
                                     <select id="signageLine"
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona la linea"
                                         data-bind="source: lines, value: detailForm.data.signageConfig.catalogBundle.line, events: { change: loadModels }"
                                         data-value-field="id"
                                         data-text-field="name"
+                                        data-filter="contains"
                                         >
                                     </select>
                                 </div>
@@ -49,10 +53,12 @@
                                 <div class="col-sm-10">
                                     <select id="signageModel"
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona il modello"
                                         data-bind="source: models, value: detailForm.data.signageConfig.catalogBundle.model, events: { change: loadFinishes }"
                                         data-value-field="id"
                                         data-text-field="name"
+                                        data-filter="contains"
                                         >
                                     </select>
                                 </div>
@@ -62,10 +68,12 @@
                                 <div class="col-sm-10">
                                     <select id="signageFinish"
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona la finitura"
                                         data-bind="source: finishes, value: detailForm.data.quotationItem.product.finish, events: { change: loadSignageConfigs }"
                                         data-value-field="id"
                                         data-text-field="name"
+                                        data-filter="contains"
                                         >
                                     </select>
                                 </div>
@@ -75,10 +83,12 @@
                                 <div class="col-sm-10">
                                     <select id="signageFont"
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona il font"
                                         data-bind="source: fonts, value: detailForm.data.signageConfig.font, events: { change: loadFontSizes }"
                                         data-value-field="id"
                                         data-text-field="name"
+                                        data-filter="contains"
                                         >
                                     </select>
                                 </div>
