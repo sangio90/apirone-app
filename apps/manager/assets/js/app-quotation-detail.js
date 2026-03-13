@@ -68,7 +68,6 @@ AP.quotation.detail = ( function() {
     }
 
     var setQuotationItems = function( items ) {
-
         var typeId = viewModel.get( "typeId" );
 
         if ( typeId == "plate" ) {
@@ -577,6 +576,10 @@ AP.quotation.detail = ( function() {
                                 xhr.data[row].note_short = xhr.data[row].note.substr(0,23)
                             }
                         }
+                        xhr.data.forEach(function(item) {
+                            item.special = item.special == 'true'
+                        })
+
                         setQuotationItems( xhr.data );
                     }
                 }

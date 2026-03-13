@@ -1028,12 +1028,12 @@ AP.accessory.modal = ( function() {
         if (clone) {
             viewModel.set('cloneMode', true)
             viewModel.set('detailForm.title', "Clona Accessorio")
-            $('#save-button').css("display", "none")
-            $('#clone-button').css("display", "block")
+            $('#save-accessory-button').css("display", "none")
+            $('#clone-accessory-button').css("display", "block")
         } else {
             viewModel.set('cloneMode', false)
-            $('#save-button').css("display", "block")
-            $('#clone-button').css("display", "none")
+            $('#save-accessory-button').css("display", "block")
+            $('#clone-accessory-button').css("display", "none")
         }
         
         //aggiunto queste due righe per gestire i boolean

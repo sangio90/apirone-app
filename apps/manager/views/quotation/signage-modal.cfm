@@ -1,6 +1,6 @@
 ﻿<cfoutput>
     <div id="signage-modal" class="modal fade quotation-item-modal">
-        
+
         <section class="modal-dialog modal-xl">
             <div class="modal-content">
 
@@ -9,19 +9,19 @@
                     <header class="card-header d-flex align-elements-center justify-content-between">
                         <h2 class="card-title" data-bind="text:detailForm.title"></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" data-bind="click:resetForm" aria-label="Chiudi"></button>
-                    </header>                
-                        
+                    </header>
+
                     <div class="card-body">
 
                         <div class="mb-2 row">
-                            <div class="col-1">    
+                            <div class="col-1">
                                 <label class="col-sm-12 col-form-label text-start">Quantità</label>
                                 <input class="form-control" type="number" data-bind="value: detailForm.data.quotationItem.quantity" min="1">
                             </div>
                             <div class="col-2">
                                 <label class="col-sm-2 col-form-label text-start">Categoria</label>
                                 <div class="col-sm-10">
-                                    <select id="signangeProductCategory" 
+                                    <select id="signangeProductCategory"
                                         class="form-control"
                                         data-placeholder="-- Seleziona la categoria"
                                         data-bind="source: categories, value: detailForm.data.signageConfig.catalogBundle.category, events: { change: loadLines }"
@@ -31,49 +31,49 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.category.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.category.id">
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
-                                    <select id="signageLine" 
+                                    <select id="signageLine"
                                         class="form-control"
                                         data-placeholder="-- Seleziona la linea"
-                                        data-bind="source: lines, value: detailForm.data.signageConfig.catalogBundle.line, events: { change: loadModels }" 
+                                        data-bind="source: lines, value: detailForm.data.signageConfig.catalogBundle.line, events: { change: loadModels }"
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.line.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.line.id">
                                 <label class="col-sm-2 col-form-label text-start">Modello</label>
                                 <div class="col-sm-10">
-                                    <select id="signageModel" 
+                                    <select id="signageModel"
                                         class="form-control"
                                         data-placeholder="-- Seleziona il modello"
-                                        data-bind="source: models, value: detailForm.data.signageConfig.catalogBundle.model, events: { change: loadFinishes }" 
+                                        data-bind="source: models, value: detailForm.data.signageConfig.catalogBundle.model, events: { change: loadFinishes }"
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.model.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.model.id">
                                 <label class="col-sm-2 col-form-label text-start">Finitura</label>
                                 <div class="col-sm-10">
-                                    <select id="signageFinish" 
+                                    <select id="signageFinish"
                                         class="form-control"
                                         data-placeholder="-- Seleziona la finitura"
-                                        data-bind="source: finishes, value: detailForm.data.quotationItem.product.finish, events: { change: loadSignageConfigs }" 
+                                        data-bind="source: finishes, value: detailForm.data.quotationItem.product.finish, events: { change: loadSignageConfigs }"
                                         data-value-field="id"
                                         data-text-field="name"
                                         >
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.finish.id">    
+                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.finish.id">
                                 <label class="col-sm-2 col-form-label text-start">Font</label>
                                 <div class="col-sm-10">
-                                    <select id="signageFont" 
+                                    <select id="signageFont"
                                         class="form-control"
                                         data-placeholder="-- Seleziona il font"
                                         data-bind="source: fonts, value: detailForm.data.signageConfig.font, events: { change: loadFontSizes }"
@@ -83,13 +83,13 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-1" data-bind="visible: detailForm.data.signageConfig.font.id">    
+                            <div class="col-1" data-bind="visible: detailForm.data.signageConfig.font.id">
                                 <label class="col-sm-12 col-form-label text-start">Altezza font</label>
                                 <div class="col-sm-12">
-                                    <select id="signageFontSize" 
+                                    <select id="signageFontSize"
                                         class="form-control"
                                         data-placeholder="-- Seleziona l'altezza del font"
-                                        data-bind="source: detailForm.data.signageConfig.items, value: detailForm.data.quotationItem.signageConfigItem, events: { change: parseLines }" 
+                                        data-bind="source: detailForm.data.signageConfig.items, value: detailForm.data.quotationItem.signageConfigItem, events: { change: parseLines }"
                                         data-value-field="id"
                                         data-text-field="sizeName"
                                         >
@@ -106,7 +106,7 @@
 
                         <div class="mb-3 mt-3 row" data-bind="visible:detailForm.data.quotationItem.signageConfigItem.id">
 
-                            <!--- 
+                            <!---
                                 albero
                             --->
                             <div class="col-2 mb-3">
@@ -114,7 +114,7 @@
                             </div>
 
                             <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
-                                
+
                                 <div class="flex justify-content-between mb-3">
                                     <span class="me-2">Righe</span>
                                     <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageRow, enabled:detailForm.data.quotationItem.signageConfigItem.id">Aggiungi Riga</button>
@@ -125,26 +125,30 @@
                                 </div>
 
                             </div>
-                            
+
                             <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
                                 <span>Anteprima</span>
-
+								<div data-bind="visible:detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled">
+									<span style="color: red">Attenzione! Il prodotto ha margini non corretti per la configurazione di segnaletica. Aggiorna i margini del prodotto o scegli un altro prodotto per visualizzare l'anteprima.</span>
+								</div>
                                 <div id="quotation-signage-preview-background"
                                     class="col-3 d-flex justify-content-center align-items-center"
-                                    data-bind="visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }">
+                                    data-bind="visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }"
+                                    style="position: relative"
+                                    >
                                     <div id="signage-preview-container"
-                                        style="min-width: 100%"
                                         class="d-flex flex-column justify-content-center"
+                                        style="position: absolute"
                                         data-template="signage-line-preview-row-tmpl"
-                                        data-bind="source: detailForm.data.quotationItem.signageRows">
+                                        data-bind="source: detailForm.data.quotationItem.signageRows, style: { textAlign: textAlign, left: detailForm.data.quotationItem.product.marginLeft, top: detailForm.data.quotationItem.product.marginTop, width: detailForm.data.quotationItem.product.plateWidth, height: detailForm.data.quotationItem.product.plateHeight }">
                                         <!-- qui dentro vanno gli items di preview -->
                                     </div>
                                 </div>
                             </div>
 
-                            <!--- 
-                                dettaglio riga / pricing 
+                            <!---
+                                dettaglio riga / pricing
                             --->
                             <div class="col-2">
                                 #view(view="quotation/item-pricing", args={id="signage-quotation-item-pricing-box"})#
@@ -184,9 +188,9 @@
                     <div class="text-center px-2 mt-1" style="font-size: 11px">Inserendo queste parole contornate da "<" e ">", verranno inseriti i pittogrammi nella riga.</div>
                     <div class="modal-body" data-bind="source: parsedPictograms" data-template="pictogram-template">
                         <script id="pictogram-template" type="text/x-kendo-template">
-                            <div class="row text-center p-3">
+                            <div class="row text-center">
                                 <div class="col-3">##= data.label ##</div>
-                                <div class="col-3">##= data.image ##</div>                            
+                                <div class="col-3">##= data.image ##</div>
                             </div>
                         </script>
                     </div>

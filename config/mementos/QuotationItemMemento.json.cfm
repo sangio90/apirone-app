@@ -10,10 +10,16 @@
         "product.model.name",
         "product.line.code",
         "product.line.name",
+        "product.marginLeft",
+		"product.marginTop",
+		"product.plateWidth",
+		"product.plateHeight",
+		"product.id",
         "position.id",
         "position.code",
         "article.code",
         "article.name",
+        "special",
         "image",
         "note",
     ],
@@ -85,4 +91,3 @@
         }
     },
 }
-	
