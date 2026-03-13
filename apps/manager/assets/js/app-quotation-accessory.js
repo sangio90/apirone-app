@@ -844,15 +844,18 @@ AP.accessory.modal = ( function() {
                 viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
+                $( "#accessory-product-items" ).empty();
                 AP.deleteUserPref( "accessory.lineId" );
                 AP.deleteUserPref( "accessory.modelId" );
                 AP.deleteUserPref( "accessory.finishId" );
                 AP.deleteUserPref( "accessory.product.items" );
             } );
             $( "#accessoryLine" ).on( "change", function(e) {
+                debugger
                 viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
+                $( "#accessory-product-items" ).empty();
                 AP.deleteUserPref( "accessory.modelId" );
                 AP.deleteUserPref( "accessory.finishId" );
                 AP.deleteUserPref( "accessory.product.items" );
@@ -860,6 +863,7 @@ AP.accessory.modal = ( function() {
             $( "#accessoryModel" ).on( "change", function(e) {
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
+                $( "#accessory-product-items" ).empty();
                 AP.deleteUserPref( "accessory.finishId" );
                 AP.deleteUserPref( "accessory.product.items" );
             } );
