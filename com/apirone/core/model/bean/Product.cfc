@@ -33,6 +33,12 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 
 	property name="minQuantity" type="Numeric" default=0;
 	property name="maxQuantity" type="Numeric" default=0;
+
+	property name="marginTop" type="Numeric" default=0;
+	property name="marginLeft" type="Numeric" default=0;
+	property name="plateHeight" type="Numeric" default=0;
+	property name="plateWidth" type="Numeric" default=0;
+	
 	property name="special" type="Boolean" default=false;
 	property name="serial" type="Numeric";
 

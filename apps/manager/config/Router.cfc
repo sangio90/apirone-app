@@ -39,6 +39,7 @@
 		post( "/ajax/prices/reassign" ).to( "PriceAjaxController.reassign" ).end();
 		post( "/ajax/:by-regex:(products|product-items)/:id/price/simulate" ).to( "PriceAjaxController.simulate" ).end();
 		post( "/ajax/products/:id/price/simulate-signage" ).to( "PriceAjaxController.simulateSignage" ).end();
+		post( "/ajax/products/:id/save-margins" ).to( "ProductAjaxController.saveMargins" ).end();
 		get( "/prices/manage" ).to( "PriceController.manage" ).end();
 
 		get( "/ajax/:by-regex:(products|product-items)/:id/prices" ).to( "PriceAjaxController.list" ).end();
@@ -295,6 +296,8 @@
 		*/
 		get( "/ajax/texts/:id/all" ).to( "TextAjaxController.all" ).end();
 		get( "/ajax/texts/:id" ).to( "TextAjaxController.get" ).end();
+		get( "/ajax/texts_createtraduzionimancanti/:id" ).to( "TextAjaxController.createTraduzioniMancanti" ).end();
+		get( "/ajax/texts_createalltraduzionimancanti" ).to( "TextAjaxController.createAllTraduzioniMancanti" ).end();
 		get( "/ajax/texts" ).to( "TextAjaxController.list" ).end();
 		post( "/ajax/texts" ).to( "TextAjaxController.save" ).end();
 		get( "/texts" ).to( "TextController.list" ).end();

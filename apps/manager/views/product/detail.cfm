@@ -39,7 +39,7 @@
 
                                     <label class="me-2">Modello:</label>
 
-                                    <select name="modelId" class="form-control w-auto" 
+                                    <select name="modelId" class="form-control w-auto"
                                         data-bind="events: { change: changeUri }">
                                         <option value="">-- non trovato</option>
                                         <cfloop array="#prc.models#" item="item">
@@ -64,16 +64,16 @@
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li class="nav-item active">
                                         <a class="nav-link active" role="tab" data-bs-toggle="tab" aria-selected="true"
-                                            id="product-general-tab"  
-                                            href="##product-general" 
+                                            id="product-general-tab"
+                                            href="##product-general"
                                             aria-controls="product-general">
                                                 Generale
                                         </a>
                                     </li>
-                                    <li class="nav-item" data-bind="role: this" data-role-list="ADM/TCD" >
+                                    <li class="nav-item" data-bind="role: this" data-role-list="ADM/TCD/CMA" >
                                         <a class="nav-link" role="tab"data-bs-toggle="tab"  aria-selected="true"
-                                            id="product-detail-tab"  
-                                            href="##product-detail" 
+                                            id="product-detail-tab"
+                                            href="##product-detail"
                                             aria-controls="product-detail">
                                                 Altri dati
                                         </a>
@@ -128,22 +128,22 @@
                                                                     data-bind="click:openComponentsList">
                                                                         Componenti per #prc.line.getName()# / #prc.model.getCode()# &raquo;
                                                                     </a>
-                                                                
+
                                                                 <br>
                                                             </cfif>
 
-                                                            - <a href="" class="underline" 
-                                                                data-type="product" 
+                                                            - <a href="" class="underline"
+                                                                data-type="product"
                                                                 data-product-id="#rc.id#"
                                                                 data-product-name="#prc.textLink#"
                                                                 data-bind="click: openComponentsList">
                                                                     #prc.textLink# &raquo;
                                                                 </a>
-                                                                
+
                                                             <br>
 
                                                             <span
-                                                                data-bind="role: this" 
+                                                                data-bind="role: this"
                                                                 data-role-list="ADM/TCD"
                                                             >
                                                                 - <a href="" class="underline"
@@ -170,16 +170,16 @@
                                                         </div>
 
                                                         <div class="col-sm-6">
-                                                        
+
                                                             <div class="row">
                                                                 <div class="col-3">
                                                                     <label class="my-1">Quantità</label>
-                                                                    <input class="form-control text-end" 
+                                                                    <input class="form-control text-end"
                                                                         id="product-simulate-quantity" value="1" type="number" min="1" style="width: 100px">
                                                                     <cfif prc.product.getCategory().getType().getId() == "SEG">
                                                                         <label class="my-1">N° Lettere</label>
-                                                                        <input class="form-control text-end" 
-                                                                            id="product-simulate-letters-quantity" value="0" type="number" min="0" style="width: 100px"> 
+                                                                        <input class="form-control text-end"
+                                                                            id="product-simulate-letters-quantity" value="0" type="number" min="0" style="width: 100px">
                                                                     </cfif>
                                                                 </div>
                                                                 <div class="col-3">
@@ -191,20 +191,56 @@
                                                                             data-text-field="name"
                                                                             data-value-primitive="true"
                                                                         >
-                                                                        </select>   
+                                                                        </select>
                                                                     </cfif>
                                                                     #button(
                                                                         label="Simula prezzo",
                                                                         bind  = "click:simulatePrice",
                                                                         size  = "sm",
                                                                         class = "mt-4"
-                                                                        
+
                                                                     )#
 
                                                                     <div id="product-simulate-loading"></div>
                                                                 </div>
-
-                                                            </div>                                                                    
+																<cfif prc.product.getCategory().getType().getId() == "SEG">
+																	<div class="row mt-4">
+																		<div class="col-2">
+																			<label class="my-1">Larghezza targa</label>
+																			<div class="d-flex">
+																			<input class="form-control text-end" id="plate_width" data-bind="value: product.plateWidth" />
+																			<div class="ms-1 mt-2">px</div>
+																			</div>
+																		</div>
+																		<div class="col-2">
+																			<label class="my-1">Altezza targa</label>
+																			<div class="d-flex">
+																			<input class="form-control text-end" id="plate_height" data-bind="value: product.plateHeight" />
+																			<div class="ms-1 mt-2">px</div>
+																			</div>
+																		</div>
+																		<div class="col-2">
+																			<label class="my-1">Margine alto</label>
+																			<div class="d-flex">
+																			<input class="form-control text-end" id="margin_top" data-bind="value: product.marginTop" />
+																			<div class="ms-1 mt-2">px</div>
+																			</div>
+																		</div>
+																		<div class="col-2">
+																			<label class="my-1">Margine sinistra</label>
+																			<div class="d-flex">
+																			<input class="form-control text-end" id="margin_left" data-bind="value: product.marginLeft" />
+																			<div class="ms-1 mt-2">px</div>
+																			</div>
+																		</div>
+																		<div class="col-3 mt-4">
+																			<button class="btn btn-secondary btn-sm mt-2" data-bind="click:saveMargins">
+																				Salva Configurazione Margini
+																			</button>
+																		</div>
+																	</div>
+																</cfif>
+                                                            </div>
                                                             <div>
                                                                 <cfif prc.product.getPrices().len() GT 0>
                                                                     <h3>Prezzi</h3>
@@ -212,7 +248,7 @@
                                                                     </div>
                                                                 </cfif>
                                                             </div>
-                                                        
+
                                                         </div>
 
                                                     </div>
@@ -223,14 +259,14 @@
 
                                         </div>
 
-                                        
+
                                         <!---
                                             Altri dati
                                         --->
 
                                         <div class="tab-pane p-2 fade" id="product-detail" role="tabpanel" aria-labelledby="product-detail-tab">
                                             
-                                            <div class="row" data-bind="role: this" data-role-list="ADM/TCD">
+                                            <div class="row" data-bind="role: this" data-role-list="ADM/TCD/CMA">
 
                                                 <div class="col-md-12 mb-3 col-lg-6">
 
@@ -258,7 +294,7 @@
                                                         <div class="form-group pb-3 row align-items-center">
                                                             <label class="col-3 text-end" for="qta">Quantità minima</label>
                                                             <div class="col-9">
-                                                                <input class="form-control col-9" name="minQuantity" id="minQuantity" 
+                                                                <input class="form-control col-9" name="minQuantity" id="minQuantity"
                                                                     data-bind="value: product.minQuantity"
                                                                     >
                                                             </div>
@@ -267,7 +303,7 @@
                                                         <div class="form-group pb-3 row align-items-center">
                                                             <label class="col-3 text-end" for="qta">Quantità massima</label>
                                                             <div class="col-9">
-                                                                <input class="form-control col-9" name="maxQuantity" id="maxQuantity" 
+                                                                <input class="form-control col-9" name="maxQuantity" id="maxQuantity"
                                                                     data-bind="value: product.maxQuantity"
                                                                     >
                                                             </div>
@@ -277,14 +313,14 @@
                                                             <label class="col-3 text-end" for="special">Attributi da esportare</label>
                                                             <div class="col-9">
 
-                                                                <select id="product-important-attributes" 
+                                                                <select id="product-important-attributes"
                                                                     data-placeholder="-- Seleziona gli attributi"
-                                                                    data-role="multiselect" 
-                                                                    data-bind="source: attributesForSuggest, value: product.importantAttributes" 
+                                                                    data-role="multiselect"
+                                                                    data-bind="source: attributesForSuggest, value: product.importantAttributes"
                                                                     data-value-field="id"
                                                                     data-text-field="name">
                                                                 </select>
-                                                                
+
                                                                 <script type="text/template" id="product-attribute-suggest-list-row-xx">
                                                                     <div>
                                                                         <span data-bind="text: name"></span>
@@ -299,8 +335,8 @@
                                                         <div class="form-group pb-3 row align-items-center">
                                                             <label class="col-3 text-end" for="special">Speciale</label>
                                                             <div class="col-9">
-                                                                <input class="me-4 ms-2" type="checkbox" name="special" id="special" 
-                                                                    data-bind="checked: product.special">                                                        
+                                                                <input class="me-4 ms-2" type="checkbox" name="special" id="special"
+                                                                    data-bind="checked: product.special">
                                                             </div>
                                                         </div>
 
@@ -311,8 +347,8 @@
                                                                 <div class="status errors-counter ms-2"></div>
                                                             </div>
                                                         </div>
-                                                    
-                                                    
+
+
 
                                                 </div>
 
@@ -324,7 +360,7 @@
                                     </div>
 
                                 </form>
-                            
+
                             </div>
 
                         </div>
@@ -347,8 +383,8 @@
                                 >
                                     |
 
-                                    <a href="" class="underline" data-type="item" data-product-id="0" 
-                                        data-product-name="Attributo radice" 
+                                    <a href="" class="underline" data-type="item" data-product-id="0"
+                                        data-product-name="Attributo radice"
                                         data-bind="click:openAttributesList"
                                     >
                                         Aggiungi attributo di base
@@ -356,18 +392,18 @@
 
                                     |
 
-                                    <a href="" class="underline" 
-                                        data-product-name="Attributo radice" 
+                                    <a href="" class="underline"
+                                        data-product-name="Attributo radice"
                                         data-bind="click:showCloneModal"
                                     >
                                         Clona albero
                                     </a>
                                 </span>
 
-                            </div>           
+                            </div>
 
-                            <div class="text-end col-4 mb-2" 
-                                data-bind="role: this" 
+                            <div class="text-end col-4 mb-2"
+                                data-bind="role: this"
                                 data-role-list="ADM/TCD"
                             >
                                 #deleteButton(
@@ -381,9 +417,9 @@
 
                                 <!---
                                 TODO: remove productAttributesList
-                                #productAttributesList( 
-                                    id="product-items-grid", 
-                                    type="product", 
+                                #productAttributesList(
+                                    id="product-items-grid",
+                                    type="product",
                                     onDataBound="AP.product.items.onDataBound",
                                     pageSizes=false
                                 )#
@@ -399,9 +435,9 @@
                                         { 'field':'', 'title':'Aggiungi immagini', width: '200px'},
                                         { 'field':'', 'title':'Aggiungi altri attributi', width: '200px'},
                                         { 'field':'', 'title':'Aggiungi componenti all\'attributo', width: '250px'},
-                                        { 
-                                            'field'           :'', 
-                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                        {
+                                            'field'           :'',
+                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
                                             'width'           :'40px',
                                             'headerAttributes': { 'class': 'text-center' }
                                         }
@@ -414,8 +450,8 @@
 
                             <!---- // product grid ---->
 
-                        </div>                        
-                    
+                        </div>
+
                     </div>
 
                 </section>
@@ -431,7 +467,7 @@
 
     #template("jstemplate/attribute/attribute-suggest-list-row-tmpl")#
     #template("jstemplate/price/price-row-tmpl")#
-    
+
     #view( "attribute/detail-modal" )#
     #view( "component/list-modal" )#
     #view( "file/list-modal" )#

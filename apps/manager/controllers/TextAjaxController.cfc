@@ -38,7 +38,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var statuses = [];
 
-			var langs = super.fire( "text.list", { entity = row.getEntity() } );
+			var langs = super.fire( "text.list", { entity = row.getEntity(), kind = row.getKind().getId() } );
 
 			for( var lang in langs ) {
 
@@ -84,7 +84,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var text = super.fire( "text.get", [ rc.id ] );
 
-		var rows = super.fire( "text.list", { entity = text.getEntity() } );
+		var rows = super.fire( "text.list", { entity = text.getEntity(), kind = text.getKind().getId() } );
 
 		for ( var row in rows ) {
 			var bean = dm.convert( row, "Text", true );
@@ -139,6 +139,97 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( message, { payload = { id = thisId } } );
 
 		event.setValue( "result", result );
+	}
+
+	function createTraduzioniMancanti( event, rc, prc ){
+
+		var result = super.getResult();
+		var thisId    = "";
+		var messageId = "text.saved";
+
+		var id = rc.id
+
+		var createdCounter = createTraduzioniByTextId(id)
+
+		var message = completeMessage( messageId );
+
+		result.setCount( createdCounter )
+		result.setData( message );
+
+		event.setValue( "result", result );
+	}
+
+	function createAllTraduzioniMancanti( event, rc, prc ){
+
+		var result = super.getResult();
+		var thisId    = "";
+		var messageId = "text.saved";
+
+		var rows = super.fire( "text.list" );
+
+		for ( var row in rows ) {
+
+			var statuses = [];
+
+			var hasItalian = super.fire( "text.list", { entity = row.getEntity(), kind = row.getKind().getId(), langId = 'IT' } );
+
+			var createdCounter = 0;
+			if (Len(hasItalian) > 0) {
+				var italianText = hasItalian[1];
+				var id = italianText.getId();
+				var thisCreatedCounter = createTraduzioniByTextId(id)
+				createdCounter += thisCreatedCounter;
+			}			
+		}
+
+		var message = completeMessage( messageId );
+
+		result.setCount( createdCounter )
+		result.setData( message );
+
+		event.setValue( "result", result );
+	}
+
+	public function createTraduzioniByTextId(id)
+	{
+		var text = super.fire( "text.get", [ id ] );
+
+		if (isNull(text)) {
+			result.setStatus( "ERROR" );
+			return result;
+		}
+
+		var textEntity = text.getEntity();
+		var textKind = text.getKind();
+		var allEntityTexts = super.fire( "text.list", { entity = textEntity, kind = textKind.getId() }  );
+		var requiredLangs = ["IT","EN","FR","ES","DE"];
+
+		var presentLangs = allEntityTexts.map(function(text){
+			return text.getLang().getId();
+		});
+
+		var missingLangs = requiredLangs.filter(function(lang){
+			return !presentLangs.contains(lang);
+		});
+		
+		var createdCount = 0
+		for ( var missingLang in missingLangs ) {
+
+			var newText   = super.bean( "Text" );
+			var lang   = super.bean( "Lang" );
+			var status = super.bean( "Status" );
+
+			newText.setEntity( textEntity );
+			newText.setKind( textKind );
+			newText.setName( "** To translate" )
+			newText.setLang( lang.setId( missingLang ) );
+			newText.setStatus( status.setId( "TOT" ) );
+
+			thisId = super.fire( "text.create", [ newText ] );
+			createdCount++
+		}
+
+		return createdCount;
 	}
 
 	private function getEntityName( id ){

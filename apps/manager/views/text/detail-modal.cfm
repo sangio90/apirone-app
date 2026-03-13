@@ -34,6 +34,9 @@
                             <button type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save">
                                 <i class="fas fa-save"></i> <span data-bind="text: detailForm.labelButton"></span>
                             </button>
+                            <button type="button" class="btn btn-primary btn-sm me-2 float-end" data-bind="click:createTraduzioniMancanti">
+                                <i class="fas fa-flag"></i> Crea Traduzioni Mancanti</span>
+                            </button>
                             <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
                             <div class="status errors-counter mt-1 float-end me-3" id="attribute-values-add-form-status"></div>
                         </div>
