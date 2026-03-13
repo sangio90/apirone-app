@@ -13,6 +13,9 @@
                 <span data-bind="text: lang.name"></span>
             </td>
             <td>
+                <span data-bind="text: kind.id"></span>
+            </td>
+            <td>
                 <span data-bind="text: entity.key"></span><br>
                 <span class="small-code">(<span data-bind="text: entity.shortValue"></span>)</span>
             </td>

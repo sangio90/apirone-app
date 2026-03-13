@@ -40,6 +40,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String productId,
 		String finishId,
 		String articleId,
+		String kind,
 		required Numeric limit  = 20,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "lang.orderBy", dir = "asc" } ]

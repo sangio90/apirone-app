@@ -296,6 +296,8 @@
 		*/
 		get( "/ajax/texts/:id/all" ).to( "TextAjaxController.all" ).end();
 		get( "/ajax/texts/:id" ).to( "TextAjaxController.get" ).end();
+		get( "/ajax/texts_createtraduzionimancanti/:id" ).to( "TextAjaxController.createTraduzioniMancanti" ).end();
+		get( "/ajax/texts_createalltraduzionimancanti" ).to( "TextAjaxController.createAllTraduzioniMancanti" ).end();
 		get( "/ajax/texts" ).to( "TextAjaxController.list" ).end();
 		post( "/ajax/texts" ).to( "TextAjaxController.save" ).end();
 		get( "/texts" ).to( "TextController.list" ).end();

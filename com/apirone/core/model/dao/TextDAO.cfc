@@ -33,6 +33,7 @@
 		<cfargument name="fontId" type="Numeric">
 		<cfargument name="countryId" type="String">
 		<cfargument name="articleId" type="String">
+		<cfargument name="kind" type="String">
 
 		<cfargument name="fromDate" type="Date">
 		<cfargument name="toDate" type="Date">
@@ -90,6 +91,10 @@
 
 			<cfif !IsNull( arguments.articleId )>
 				AND article_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.articleId#">::uuid
+			</cfif>
+
+			<cfif !IsNull( arguments.kind )>
+				AND text_kind_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.kind#">
 			</cfif>
 
 			<cfif !IsNull( arguments.rawValueId )>
@@ -187,7 +192,7 @@
 				lang_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getLang().getId()#">
 				<!---
 				text_kind_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getKind().getId()#">
-				status_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getStatus().getId()#">, 
+				status_id	= <cfqueryparam cfsqltype="varchar" value="#arguments.text.getStatus().getId()#">,
 				#field.name# =
 
 					<cfif field.type == "uuid">

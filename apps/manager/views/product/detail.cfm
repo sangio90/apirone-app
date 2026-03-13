@@ -70,7 +70,7 @@
                                                 Generale
                                         </a>
                                     </li>
-                                    <li class="nav-item" data-bind="role: this" data-role-list="ADM/TCD" >
+                                    <li class="nav-item" data-bind="role: this" data-role-list="ADM/TCD/CMA" >
                                         <a class="nav-link" role="tab"data-bs-toggle="tab"  aria-selected="true"
                                             id="product-detail-tab"
                                             href="##product-detail"
@@ -265,8 +265,8 @@
                                         --->
 
                                         <div class="tab-pane p-2 fade" id="product-detail" role="tabpanel" aria-labelledby="product-detail-tab">
-
-                                            <div class="row" data-bind="role: this" data-role-list="ADM/TCD">
+                                            
+                                            <div class="row" data-bind="role: this" data-role-list="ADM/TCD/CMA">
 
                                                 <div class="col-md-12 mb-3 col-lg-6">
 
