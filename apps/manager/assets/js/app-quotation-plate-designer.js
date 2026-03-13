@@ -311,9 +311,12 @@ AP.plate.grid = ( function() {
                     width: `${this.width}px`,
                     height: `${this.height}px`,
                     "background-image": `url('${this.image}')`,
+					position: 'relative',
                 },
                 appendTo: $rootNode,
             } );
+
+			$( "#plate-background" ).append('<div class="attributes" style="position: absolute; width: 100%; height: 100%;"></div>')
 
             const platePosition = $plateBackground.position();
 

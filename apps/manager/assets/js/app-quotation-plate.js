@@ -279,6 +279,26 @@ AP.plate.modal = ( function() {
 
     };
 
+	var updateImage = function(productItem) {
+		if (productItem.values && productItem.values.length) {
+			let selected = productItem.values.filter(el => el.selected)
+			if (selected.length) {
+				selected = selected[0]
+				$(`#plate-background .attributes #${productItem.attributeId}`).remove();
+				const orientation = viewModel.get("detailForm.data.product.orientation.id");
+				if (orientation == 'VER') {
+					if (selected.verticalImage) {
+						$("#plate-background .attributes").append(`<div id="${productItem.attributeId}" style="width: 100%; height: 100%; background-image: url('${selected.verticalImage.uri}')"></div>`)
+					}
+				} else {
+					if (selected.horizontalImage) {
+						$("#plate-background .attributes").append(`<div id="${productItem.attributeId}" style="width: 100%; height: 100%; background-image: url('${selected.horizontalImage.uri}')"></div>`)
+					}
+				}
+			}
+		}
+	}
+
     /**
      * Resetta il detailForm del viewModel sostituendolo con una copia fresca.
      * Per essere più veloci si può resettare campo per campo anziché sostituire l'oggetto completo.
@@ -395,9 +415,11 @@ AP.plate.modal = ( function() {
                     viewModel.set( "plate.image", xhr.data.image );
                     viewModel.set( "detailForm.data.product.orientation", xhr.data.orientation );
                     configPlate();
+					for (let i in viewModel.get("detailForm.data.product.items")._data) {
+						updateImage(viewModel.get("detailForm.data.product.items")._data[i])
+					}
                 }
             } );
-
         },
 
         toggleFruits( event ) {
@@ -478,12 +500,12 @@ AP.plate.modal = ( function() {
             return AP.plate.api.getProductItems( productId, null, {
                 done: function( xhr ) {
                     if ( xhr.count > 0 ) {
-                        var image = xhr.data[0].horizontalImage || xhr.data[0].verticalImage;
-                        if ( !viewModel.get( "detailForm.data.product.image" ) && image ) {
-                            viewModel.set( "detailForm.data.product.image", image );
-                            viewModel.set( "backgroundImage", image );
-                            viewModel.set( "backgroundImage.url", "url('" + image.uri + "')" );
-                        }
+                        // var image = xhr.data[0].horizontalImage || xhr.data[0].verticalImage;
+                        // if ( !viewModel.get( "detailForm.data.product.image" ) && image ) {
+                        //     viewModel.set( "detailForm.data.product.image", image );
+                        //     viewModel.set( "backgroundImage", image );
+                        //     viewModel.set( "backgroundImage.url", "url('" + image.uri + "')" );
+                        // }
                         viewModel.set( "detailForm.data.product.items", new kendo.data.DataSource() );
                         var productItems = viewModel.get( "detailForm.data.product.items" );
                         var attributeArray = productItems.data();
@@ -492,10 +514,13 @@ AP.plate.modal = ( function() {
                             if ( existing ) {
                                 if ( !existing.values.find( function( v ) { return v.productItemId === item.id; } ) ) {
                                     existing.values.push( {
+										attributeId: item.attribute.id,
                                         attributeValue: item.attributeValue,
                                         productItemId: item.id,
                                         images: item.images,
-                                        selected: false
+                                        selected: false,
+										horizontalImage: item.horizontalImage,
+										verticalImage: item.verticalImage,
                                     } );
                                     productItems.trigger( "change" );
                                 }
@@ -508,7 +533,9 @@ AP.plate.modal = ( function() {
                                         attributeValue: item.attributeValue,
                                         productItemId: item.id,
                                         images: item.images,
-                                        selected: false
+                                        selected: false,
+										horizontalImage: item.horizontalImage,
+										verticalImage: item.verticalImage
                                     } ]
                                 } );
                             }
@@ -703,7 +730,9 @@ AP.plate.modal = ( function() {
                         elementsToRemove.reverse().forEach( function( idx ) {
                             productItems.remove( productItems.at( idx ) );
                         } );
+						updateImage(parent);
                     }
+
 
                     // Render
                     doRender();
