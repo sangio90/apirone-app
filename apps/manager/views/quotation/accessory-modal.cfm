@@ -18,42 +18,45 @@
                                 <label class="col-sm-12 col-form-label text-start">Quantità</label>
                                 <input class="form-control" type="number" data-bind="value: detailForm.data.quotationItem.quantity" min="1">
                             </div>
-                            <div class="col-2">
+                            <div class="col-3">
                                 <label class="col-sm-2 col-form-label text-start">Categoria</label>
                                 <div class="col-sm-10">
                                     <select id="accessoryProductCategory" 
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona la categoria"
-                                        data-bind="source: categories, value: detailForm.data.quotationItem.product.category.id, events: { change: loadLines }"
+                                        data-bind="source: categories, value: detailForm.data.quotationItem.product.category, events: { change: loadLines }"
                                         data-value-field="id"
                                         data-text-field="name"
-                                        >
+                                        data-filter="contains">
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.category.id">    
+                            <div class="col-3" data-bind="visible: detailForm.data.quotationItem.product.category.id">    
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
                                     <select id="accessoryLine" 
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona la linea"
                                         data-bind="source: lines, value: detailForm.data.quotationItem.product.line, events: { change: loadModels }" 
                                         data-value-field="id"
                                         data-text-field="name"
-                                        >
+                                        data-filter="contains">
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2" data-bind="visible: detailForm.data.quotationItem.product.line.id">    
+                            <div class="col-3" data-bind="visible: detailForm.data.quotationItem.product.line.id">    
                                 <label class="col-sm-2 col-form-label text-start">Modello</label>
                                 <div class="col-sm-10">
                                     <select id="accessoryModel" 
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona il modello"
                                         data-bind="source: models, value: detailForm.data.quotationItem.product.model, events: { change: loadFinishes }" 
                                         data-value-field="id"
                                         data-text-field="name"
-                                        >
+                                        data-filter="contains">
                                     </select>
                                 </div>
                             </div>
@@ -62,11 +65,12 @@
                                 <div class="col-sm-10">
                                     <select id="accessoryFinish" 
                                         class="form-control"
+                                        data-role="combobox"
                                         data-placeholder="-- Seleziona la finitura"
                                         data-bind="source: finishes, value: detailForm.data.quotationItem.product.finish, events: { change: loadProduct }" 
                                         data-value-field="id"
                                         data-text-field="name"
-                                        >
+                                        data-filter="contains">
                                     </select>
                                 </div>
                             </div>

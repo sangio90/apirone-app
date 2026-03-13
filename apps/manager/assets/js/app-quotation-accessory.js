@@ -172,9 +172,9 @@ AP.accessory.modal = ( function() {
             $( "#accessory-product-items" ).empty();
         },
 
-        loadLines: function( event ) {
+        loadLines: async function( event ) {
             if (viewModel.get( "detailForm.data.quotationItem.product.category.id" ) && viewModel.get( "detailForm.data.quotationItem.product.category.id" ) != '') {
-                NM.util.ajax( {
+                await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
                     callback: {
@@ -189,9 +189,9 @@ AP.accessory.modal = ( function() {
             AP.setUserPref( "accessory.categoryId", viewModel.get( "detailForm.data.quotationItem.product.category.id" ) );
         },
 
-        loadModels: function( event ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.product.line.id" ) != "" ) {
-                NM.util.ajax( {
+        loadModels: async function( event ) {
+            if ( viewModel.get( "detailForm.data.quotationItem.product.line.id" ) && viewModel.get( "detailForm.data.quotationItem.product.line.id" ) != "" ) {
+                await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/models/"
                         + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
@@ -208,9 +208,9 @@ AP.accessory.modal = ( function() {
             AP.setUserPref( "accessory.lineId", viewModel.get( "detailForm.data.quotationItem.product.line.id" ) );
         },
 
-        loadFinishes: function( event ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) != "" ) {
-                NM.util.ajax( {
+        loadFinishes: async function( event ) {
+            if ( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) && viewModel.get( "detailForm.data.quotationItem.product.model.id" ) != "" ) {
+                await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ),
                     callback: {
@@ -247,50 +247,52 @@ AP.accessory.modal = ( function() {
             AP.setUserPref( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.model.id" ) );
         },
 
-        loadProduct: function() {
+        loadProduct: async function() {
             $('#accessory-preview-background-tree').empty()
-            const self = this;
-            NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/products?categoryId=" +
-                    viewModel.get( "detailForm.data.quotationItem.product.category.id" ) +
-                    "&lineId=" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ) +
-                    "&modelId=" + viewModel.get( "detailForm.data.quotationItem.product.model.id" ) +
-                    "&finishId=" + viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
-                callback: {
-                    done: async function( xhr ) {
-                        if ( xhr.data ) {
-                            viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data[0].id );
-                            viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
-                            //al caricamento del prodotto, se la riga di preventivo prevede custom image, carico l'immagine manualmente leggendo da file per quotationItemId
-                            if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage')) {
-                                await NM.util.ajax( {
-                                    method: "GET",
-                                    url: "/manager/ajax/quotation-items/" + viewModel.get('detailForm.data.quotationItem.id') + "/images" ,
-                                    callback: {
-                                        done: function( xhr ) {
-                                            if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
-                                                viewModel.set( "backgroundCustomImage", xhr.data[0] );
-                                                viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
+            if (viewModel.get('detailForm.data.quotationItem.product.finish.id')) {
+                const self = this;
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/products?categoryId=" +
+                        viewModel.get( "detailForm.data.quotationItem.product.category.id" ) +
+                        "&lineId=" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ) +
+                        "&modelId=" + viewModel.get( "detailForm.data.quotationItem.product.model.id" ) +
+                        "&finishId=" + viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
+                    callback: {
+                        done: async function( xhr ) {
+                            if ( xhr.data ) {
+                                viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data[0].id );
+                                viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
+                                //al caricamento del prodotto, se la riga di preventivo prevede custom image, carico l'immagine manualmente leggendo da file per quotationItemId
+                                if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage')) {
+                                    await NM.util.ajax( {
+                                        method: "GET",
+                                        url: "/manager/ajax/quotation-items/" + viewModel.get('detailForm.data.quotationItem.id') + "/images" ,
+                                        callback: {
+                                            done: function( xhr ) {
+                                                if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
+                                                    viewModel.set( "backgroundCustomImage", xhr.data[0] );
+                                                    viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
+                                                }
                                             }
                                         }
-                                    }
-                                })
-                            } else {
-                                if ( xhr.data[0].horizontalImage ) {
-                                    viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
-                                    viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri );
+                                    })
                                 } else {
-                                    viewModel.set( "backgroundImage.url", "" );
+                                    if ( xhr.data[0].horizontalImage ) {
+                                        viewModel.set( "backgroundImage", xhr.data[0].horizontalImage );
+                                        viewModel.set( "backgroundImage.url", xhr.data[0].horizontalImage.uri );
+                                    } else {
+                                        viewModel.set( "backgroundImage.url", "" );
+                                    }
+                                }
+                                if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
+                                    await self.firstLoadProductItems();
                                 }
                             }
-                            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
-                                await self.firstLoadProductItems();
-                            }
-                        }
+                        },
                     },
-                },
-            } );
+                } );
+            }
             this.checkCanSave();
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != AP.getUserPref( "accessory.finishId" ) ) {
                 AP.deleteUserPref( "accessory.product.items" );
@@ -845,6 +847,7 @@ AP.accessory.modal = ( function() {
                 AP.deleteUserPref( "accessory.lineId" );
                 AP.deleteUserPref( "accessory.modelId" );
                 AP.deleteUserPref( "accessory.finishId" );
+                AP.deleteUserPref( "accessory.product.items" );
             } );
             $( "#accessoryLine" ).on( "change", function(e) {
                 viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
@@ -852,11 +855,13 @@ AP.accessory.modal = ( function() {
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
                 AP.deleteUserPref( "accessory.modelId" );
                 AP.deleteUserPref( "accessory.finishId" );
+                AP.deleteUserPref( "accessory.product.items" );
             } );
             $( "#accessoryModel" ).on( "change", function(e) {
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
                 AP.deleteUserPref( "accessory.finishId" );
+                AP.deleteUserPref( "accessory.product.items" );
             } );
         }
     } );
@@ -896,24 +901,37 @@ AP.accessory.modal = ( function() {
         const accessoryModelId = AP.getUserPref( "accessory.modelId" )
         const accessoryFinishId = AP.getUserPref( "accessory.finishId" )
 
-        if ( accessoryCategoryId ) {
-            viewModel.set( "detailForm.data.quotationItem.product.category.id", accessoryCategoryId );
-            await viewModel.loadLines();
-        }
-
-        if ( accessoryLineId ) {
-            viewModel.set( "detailForm.data.quotationItem.product.line.id", accessoryLineId );
-            await viewModel.loadModels();
-        }
-
-        if ( accessoryModelId ) {
-            viewModel.set( "detailForm.data.quotationItem.product.model.id", accessoryModelId );
-            await viewModel.loadFinishes();
-        }
-
-        if ( accessoryFinishId ) {
-            viewModel.set( "detailForm.data.quotationItem.product.finish.id", accessoryFinishId );
-            await viewModel.loadProduct();
+        if (accessoryCategoryId) {
+            let category = viewModel.categories.data().find(c => c.id == accessoryCategoryId)
+            if (category) {
+                category = { id: category.id, name: category.name };
+                viewModel.set( "detailForm.data.quotationItem.product.category", category );
+                await viewModel.loadLines();
+                if (accessoryLineId) {
+                    let line = viewModel.lines.data().find(l => l.id == accessoryLineId)
+                    if (line) {
+                        line = { id: line.id, name: line.name };
+                        viewModel.set( "detailForm.data.quotationItem.product.line", line );
+                        await viewModel.loadModels();
+                        if (accessoryModelId) {
+                            let model = viewModel.models.data().find(m => m.id == accessoryModelId)
+                            if (model) {
+                                model = { id: model.id, name: model.name };
+                                viewModel.set( "detailForm.data.quotationItem.product.model", model );
+                                await viewModel.loadFinishes();
+                                if (accessoryFinishId) {
+                                    let finish = viewModel.finishes.data().find(f => f.id = accessoryFinishId)
+                                    if (finish) {
+                                        finish = { id: finish.id, name: finish.name };
+                                        viewModel.set( "detailForm.data.quotationItem.product.finish", finish );
+                                        await viewModel.loadProduct();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
 		initPositionSuggest();
@@ -980,15 +998,17 @@ AP.accessory.modal = ( function() {
 			var data = accessoryResponse.data;
 
 			viewModel.set( "detailForm.data", data );
+            viewModel.set('detailForm.data.quotationItem.customImage', viewModel.get('detailForm.data.quotationItem.customImage') == 'true')
+            viewModel.set('detailForm.data.quotationItem.special', viewModel.get('detailForm.data.quotationItem.special') == 'true')
 			viewModel.set( "detailForm.title", "Modifica accessorio" );
 
             viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
 
 			await viewModel.loadLines();
-
 			await viewModel.loadModels();
 			await viewModel.loadFinishes();
 			await viewModel.loadProduct();
+
 			initPositionSuggest();
 		}
 
@@ -1032,10 +1052,6 @@ AP.accessory.modal = ( function() {
             $('#save-accessory-button').css("display", "block")
             $('#clone-accessory-button').css("display", "none")
         }
-        
-        //aggiunto queste due righe per gestire i boolean
-        viewModel.set('detailForm.data.quotationItem.customImage', data.quotationItem.customImage == 'true')
-        viewModel.set('detailForm.data.quotationItem.special', data.quotationItem.special == 'true')
 
         //in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
         //altrimenti farò il contrario
