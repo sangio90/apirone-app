@@ -16,6 +16,10 @@ AP.signage.modal = ( function() {
         return AP.quotation.itemPricing;
     }
 
+    function fileApp() {
+        return AP.file.modal;
+    }
+
     var pub = {};
 
     var defaultDetailForm = {
@@ -46,6 +50,7 @@ AP.signage.modal = ( function() {
                 },
                 signageRows: new kendo.data.DataSource(),
                 special: false,
+                customImage: false,
                 status: {
                     id: "ACT",
                     name: "Attivo"
@@ -103,10 +108,39 @@ AP.signage.modal = ( function() {
         quotationSubzone: {
             "id": ""
         },
+        showCustomImage: false,
+        showImage: true,
 
-        //aggiunto per gestire il cambiamento delle checkbox
+        //aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
         toggleCustomImage: function( event ) {
+            const value = event.target.checked
+            viewModel.set('showCustomImage', value)
+            viewModel.set('showImage', !value)
+
             return
+        },
+
+        //metodo che compone la struttura dati da passare al componente app-file, punto centralizzato di gestione del caricamento immagini
+        openImagesList: function( event ) {
+
+            var element = $( event.currentTarget );
+
+            if ( !element.attr( "data-type" ) ) {
+                console.error( "ERROR. Set data-type attribute in currentTarget" );
+                return;
+            }
+
+
+            var type = element.data( "type" );
+            var value = {
+                type: type,
+                id: viewModel.get('detailForm.data.quotationItem.id'),
+                name: viewModel.get('detailForm.data.quotationItem.id'),
+            };
+
+            fileApp().open( value );
+
+            return false;
         },
 
         changeZone: function() {
@@ -675,12 +709,26 @@ AP.signage.modal = ( function() {
                     viewModel.set( "detailForm.data.quotationItem.product.marginTop", xhr2.data.marginTop );
                     viewModel.set( "detailForm.data.quotationItem.product.marginLeft", xhr2.data.marginLeft );
 				}
-				if ( xhr2.data.file ) {
-					viewModel.set( "backgroundImage", xhr2.data.file );
-					viewModel.set( "backgroundImage.url", "url('" + xhr2.data.file.uri + "')" );
-				} else {
-					viewModel.set( "backgroundImage.url", "" );
-				}
+                if ( xhr2.data.file ) {
+                    viewModel.set( "backgroundImage", xhr2.data.file );
+                    viewModel.set( "backgroundImage.url", "url('" + xhr2.data.file.uri + "')" );
+                } else {
+                    viewModel.set( "backgroundImage.url", "" );
+                }
+                if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage')) {
+                    await NM.util.ajax( {
+                        method: "GET",
+                        url: "/manager/ajax/quotation-items/" + viewModel.get('detailForm.data.quotationItem.id') + "/images" ,
+                        callback: {
+                            done: function( xhr ) {
+                                if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
+                                    viewModel.set( "backgroundCustomImage", xhr.data[0] );
+                                    viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
+                                }
+                            }
+                        }
+                    })
+                }
 			}
 
 
@@ -1111,8 +1159,20 @@ AP.signage.modal = ( function() {
 
         save: function( event ) {
             AP.loading.show();
-            var preview = $( "#quotation-signage-preview-background" )[0];
             var quotationId = AP.page.quotation.id;
+
+            //quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a 
+            let preview = $( "#quotation-signage-preview-background" )[0];
+            if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage') && viewModel.get('detailForm.data.quotationItem.customImage') == true) {
+                //se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
+               if (!viewModel.get('backgroundCustomImage.url')) {
+                    AP.widget.notify( "error", "Hai scelto custom image, devi selezionare un'immagine prima di salvare." );
+                    AP.loading.hide()
+                    return false;
+               }
+
+               preview = $( "#quotation-signage-preview-custom-background" )[0];
+            }
             const parsedData = viewModel.get( "detailForm.data" );
             const signageRows = parsedData.quotationItem.signageRows.data();
             var exceedinRows = 0;
@@ -1483,6 +1543,8 @@ AP.signage.modal = ( function() {
 
 		data.quotationItem.signageRows.read();
 		viewModel.set( "detailForm.data", data );
+        viewModel.set('detailForm.data.quotationItem.customImage', viewModel.get('detailForm.data.quotationItem.customImage') == 'true')
+        viewModel.set('detailForm.data.quotationItem.special', viewModel.get('detailForm.data.quotationItem.special') == 'true')
         viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
 
 		var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
@@ -1547,8 +1609,11 @@ AP.signage.modal = ( function() {
             $('#clone-button').css("display", "none")
         }
 
-        viewModel.set('detailForm.data.quotationItem.special', data.quotationItem.special == 'true')
-        $('#imageCustomInput').hide()
+        //in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
+        //altrimenti farò il contrario
+        viewModel.set('showCustomImage', viewModel.get('detailForm.data.quotationItem.customImage'))
+        viewModel.set('showImage', !viewModel.get('detailForm.data.quotationItem.customImage'))
+
         viewModel.handleSelectChanges()
 
         AP.loading.hide();

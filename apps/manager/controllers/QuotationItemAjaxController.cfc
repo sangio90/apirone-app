@@ -348,6 +348,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
 		bean.setQuantity( json.quotationItem.quantity );
+		bean.setCustomImage( json.quotationItem.customImage );
 
 		if( Len( json.quotationItem?.position?.code ) ) {
 			var position = populatePositionBean( json.quotationItem.position );

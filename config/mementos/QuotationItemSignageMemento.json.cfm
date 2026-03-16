@@ -34,6 +34,7 @@
                 "signageRows",
                 "signageConfigItem",
                 "items",
+                "customImage",
                 "special",
                 "status",
                 "note",
