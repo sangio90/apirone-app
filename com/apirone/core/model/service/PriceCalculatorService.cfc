@@ -33,6 +33,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return getQuotationItemDAO().getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
 	}
 
+	private function getQuantitaTotaleAltreRigheByQuotationAndProduct(quotation, quotationItemId) {
+		if ( IsNull( quotation ) ) {
+			return 0;
+		}
+		arguments['quotationId'] = quotation.getId();
+		return getQuotationItemDAO().getQuantitaTotaleAltreRigheByQuotationAndProduct(argumentCollection = arguments);
+	}
+
 	public function calculate(
 		required String productId,
 		required Numeric quantity = 1,
@@ -129,9 +137,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			fixed cost
 		*/
 
-		var fixedCost     = product.getPrice( "COST_FIXED" )?.getAmount() ?: 0;
-		var unitFixedCost = fixedCost / arguments.quantity;
 		var quantitaTotale = arguments.quantity;
+		var fixedCost = 0;
+		var unitFixedCost = 0;
 		if (isPlaccaOrSegnaletica(product)) {
 			appendLog(
 				message="Il prodotto è PLA o SEG, quindi i COST_FIXED li calcolo dividendo il costo fisso della tabella costi fissi linea_finitura su tutti gli altri articoli del preventivo"
@@ -160,7 +168,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				quantitaTotale += quantity;
 				unitFixedCost = fixedCost / quantitaTotale;
 			}
-
+		} else {
+			fixedCost     = product.getPrice( "COST_FIXED" )?.getAmount() ?: 0;
+			quantitaTotale = getQuantitaTotaleAltreRigheByQuotationAndProduct(
+				quotation,
+				IsNull(quotationItem) ? null : quotationItem.getId(),
+				product.getId()
+			)
+			quantitaTotale += quantity;
+			unitFixedCost = fixedCost / quantitaTotale;
 		}
 
 
@@ -384,7 +400,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var totalCost = bundleCost + productCost + totalCostItems + unitFixedCost + letteringPrice;
 		appendLog(
-			message    = "Costo finale fisso: bundle: #bundleCost# + prodotto: #productCost# + totale items: #totalCostItems# + costo fisso: #unitFixedCost# + #letteringPriceString# = Costo finale: #formatExtended( totalCost )#",
+			message    = "Costo finale fisso: bundle: #bundleCost# + prodotto: #productCost# + totale items: #totalCostItems# + costo fisso: #unitFixedCost# #letteringPriceString# = Costo finale: #formatExtended( totalCost )#",
 			lineTypeId = "H"
 		);
 

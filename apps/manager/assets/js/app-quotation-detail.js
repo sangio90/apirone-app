@@ -859,7 +859,7 @@ AP.quotation.detail = ( function() {
             $( "body" ).find( "button#nav-plate-tab" ).click();
             $('#qt-update-prices').show();
         } else {
-            if (!['signage', 'plate'].includes(urlParams.get('tab'))) {
+            if (!['signage', 'plate', 'accessory'].includes(urlParams.get('tab'))) {
                 $('#qt-update-prices').hide();
             }
         }
@@ -931,7 +931,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.show();
                 fields.addArticleBtn.hide();
-                $('#qt-update-prices').hide();
+                $('#qt-update-prices').show();
             } );
 
             document.querySelector( "#nav-article-tab" ).addEventListener( "click", function( event ) {
