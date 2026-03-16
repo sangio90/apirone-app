@@ -21,6 +21,63 @@ AP.lineCost.list = ( function() {
 
     var viewModel = kendo.observable( {
         rows: dataSources.items,
+        categories: AP.page.categories,
+        category: {
+            "id": "",
+            "name": ""
+        },
+        selecteCategory: {
+            "id": "",
+            "name": ""
+        },
+        allLines: AP.page.lines,
+        lines: new kendo.data.DataSource(),
+        line: {
+            "id": "",
+            "name": ""
+        },
+        selecteLine: {
+            "id": "",
+            "name": ""
+        },
+        allFinishes: AP.page.finishes,
+        finishes: new kendo.data.DataSource(),
+        finish: {
+            "id": "",
+            "name": ""
+        },
+        selecteFinish: {
+            "id": "",
+            "name": ""
+        },
+
+        loadLines: function() {
+            this.get('lines').data([]);
+            let allLines = this.get("allLines");
+            const category = this.get('category')
+            const categoryLines = allLines.filter(function(line) {
+                return line.categories.filter(cat => cat.id == category.id).length > 0
+            })
+            this.get('lines').data(categoryLines);
+            this.set('line', { "id": "", "name": ""})
+            this.set('model', { "id": "", "name": ""})
+        },
+
+        loadFinishes: function() {
+            this.get('finishes').data([]);
+            let allFinishes = this.get("allFinishes");
+            const category = this.get('category')
+            const categoryFinishes = allFinishes.filter(function(finish) {
+                return finish.categories.filter(cat => cat.id == category.id).length > 0
+            })
+            categoryFinishes.forEach(function(cf) {
+                if (cf.texts.find(t => t.lang.id == 'IT' && t.name != '')) {
+                    cf.name = cf.texts.find(t => t.lang.id == 'IT' && t.name != '').name
+                }
+            })
+            this.get('finishes').data(categoryFinishes);
+            this.set('finish', { "id": "", "name": ""})
+        },
 
         search: function( event ) {
             const data = $('#line-cost-search-form').serializeArray();
@@ -41,7 +98,7 @@ AP.lineCost.list = ( function() {
                 parsedData[row.name] = row.value
             })
             parsedData.id = null
-            if (!parsedData.category_id || !parsedData.line_id || !parsedData.finish_id || !parsedData.cost) {
+            if (!parsedData.categoryId || !parsedData.lineId || !parsedData.finishId || !parsedData.cost) {
                 AP.widget.notify( "error", "Compilare tutti i campi." )
                 return false
             }
@@ -93,9 +150,9 @@ AP.lineCost.list = ( function() {
 
             parsedData = {
                 "id": id,
-                "category_id": categoryId,
-                "line_id": lineId,
-                "finish_id": finishId,
+                "categoryId": categoryId,
+                "lineId": lineId,
+                "finishId": finishId,
                 "cost": cost
             }
 

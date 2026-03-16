@@ -18,34 +18,44 @@
 							<div class="col-sm-12">
 								<div class="box-search-small">
 									<form id = "line-cost-search-form" class = "d-flex align-items-center justify-content-end">
-										<div class="col">
+										
+										<div class="col-4 pe-1">
 											<span>Categoria</span>
-											<select class="form-control me-2" name="categoryId">
-												<option value="">-- tutte</option>
-												<cfloop array="#prc.categories#" item="item">
-													<option value="#item.getId()#">#item.getName()#</option>
-												</cfloop>
+											<select class="form-control me-2" name="categoryId"
+												data-role="combobox"
+												data-placeholder="-- Seleziona categoria"
+												data-bind="source: categories, value: selectedCategory, events: { change: loadLines }"
+												data-value-field="id"
+												data-text-field="name"
+												data-filter="contains">
 											</select>
 										</div>
 
-										<div class="col">
+										<div class="col-3 pe-1">
 											<span>Linea</span>
-											<select class="form-control me-2" name="lineId">
-												<option value="">-- tutte</option>
-												<cfloop array="#prc.lines#" item="item">
-													<option value="#item.getId()#">#item.getName()#</option>
-												</cfloop>
+											<select class="form-control" name="lineId"
+												data-role="combobox"
+												data-placeholder="-- Seleziona linea"
+												data-bind="source: lines, value: selectedLine, events: { change: loadFinishes }" 
+												data-value-field="id"
+												data-text-field="name"
+												data-filter="contains">
 											</select>
 										</div>
 
-										<div class="col">
+										<div class="col-3 pe-1">
 											<span>Finitura</span>
-											<select class="form-control me-2" name="finishId">
-												<option value="">-- tutte</option>
-												<cfloop array="#prc.finishes#" item="item">
-													<option value="#item.getId()#">#item.getName()# (#item.getCode()#)</option>
-												</cfloop>
+											<select class="form-control" name="finishId"
+												data-role="combobox"
+												data-placeholder="-- Seleziona finitura"
+												data-bind="source: finishes, value: selectedFinish" 
+												data-value-field="id"
+												data-text-field="name"
+												data-filter="contains">
 											</select>
+										</div>
+
+										<div class="col-1 pe-1">
 										</div>
 
 										<div class="align-self-end d-flex">
@@ -94,31 +104,37 @@
 
 							<div class="mb-3">
 								<label class="form-label">Categoria</label>
-								<select class="form-control" name="category_id">
-								<option value="">-- tutte</option>
-								<cfloop array="#prc.categories#" item="item">
-									<option value="#item.getId()#">#item.getName()#</option>
-								</cfloop>
+								<select class="form-control me-2" name="categoryId"
+									data-role="combobox"
+									data-placeholder="-- Seleziona categoria"
+									data-bind="source: categories, value: category, events: { change: loadLines }"
+									data-value-field="id"
+									data-text-field="name"
+									data-filter="contains">
 								</select>
 							</div>
 
 							<div class="mb-3">
 								<label class="form-label">Linea</label>
-								<select class="form-control" name="line_id">
-								<option value="">-- tutte</option>
-								<cfloop array="#prc.lines#" item="item">
-									<option value="#item.getId()#">#item.getName()#</option>
-								</cfloop>
+								<select class="form-control" name="lineId"
+									data-role="combobox"
+									data-placeholder="-- Seleziona linea"
+									data-bind="source: lines, value: line, events: { change: loadFinishes }" 
+									data-value-field="id"
+									data-text-field="name"
+									data-filter="contains">
 								</select>
 							</div>
 
 							<div class="mb-3">
 								<label class="form-label">Finitura</label>
-								<select class="form-control" name="finish_id">
-								<option value="">-- tutte</option>
-								<cfloop array="#prc.finishes#" item="item">
-									<option value="#item.getId()#">#item.getName()# (#item.getCode()#)</option>
-								</cfloop>
+								<select class="form-control" name="finishId"
+									data-role="combobox"
+									data-placeholder="-- Seleziona finitura"
+									data-bind="source: finishes, value: finish" 
+									data-value-field="id"
+									data-text-field="name"
+									data-filter="contains">
 								</select>
 							</div>
 

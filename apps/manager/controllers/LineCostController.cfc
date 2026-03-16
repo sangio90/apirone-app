@@ -3,9 +3,9 @@ component extends="com.apirone.core.controller.AbsController" {
 	function list( event, rc, prc ){
 		prc.title = "Costi per linea/finitura";
 
-		prc.categories = super.fire( "ProductCategory.list" );
-		prc.lines      = super.fire( "Line.list" );
-		prc.finishes   = super.fire( "Finish.list" );
+		prc.page['categories'] = super.fire( "ProductCategory.list" );
+		prc.page['lines']      = super.fire( "Line.list" );
+		prc.page['finishes']   = super.fire( "Finish.list" );
 
 		prc.jsFiles.add( "app-line-cost" );
 
