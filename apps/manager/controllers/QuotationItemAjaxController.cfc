@@ -494,6 +494,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setStatus( status.setId( json.item.status.id ) );
 		bean.setQuotationZone( zone.setId( json.item.quotationZone.id ) );
 		bean.setSpecial( json.item.special );
+		bean.setCustomImage( json.item.customImage );
 		bean.setFrame( frame.setOrientation( orientation.setId( json.item.product.orientation.id ) ) );
 		bean.setNote( json.item.note )
 

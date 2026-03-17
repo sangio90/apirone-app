@@ -146,13 +146,15 @@
 
                                 <div id="plate-designer-root">
                                     <!--- Dynamically populated container --->
-                                    <div class="plate-designer" id="plate-designer">
+                                    <div class="plate-designer" id="plate-designer" style="display: none">
                                         <div class="plate-designer-canvas" id="plate-designer-canvas">
                                             <h1 style="opacity: 0.5;">Definisci le impostazioni in alto per iniziare</h1>
                                         </div>
                                     </div>
+                                    <div class="plate-custom-designer" id="plate-custom-designer" style="display: none">
+                                        <img id="plate-custom-image" data-bind="attr: { src: backgroundCustomImage.url }, visible: backgroundCustomImage.url" />
+                                    </div>
                                 </div>
-
                             </div>
 
                             <!---
@@ -167,12 +169,31 @@
                                 <div class="h-100">
 
                                     <div class="row">
-                                        <div class="col-6">
+                                        <div class="col-3">
                                             <div class="mb-1">Speciale:</div>
                                             <div>
                                                 <input class="form-check-input" type="checkbox"
                                                     name="special"
                                                     data-bind="checked: detailForm.data.special">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-3">
+                                            <div id="imageCustomInput" data-bind="visible: detailForm.data.id">
+                                                <div class="mb-1">Immagine Custom:</div>
+                                                <div>
+                                                    <input class="form-check-input me-4" type="checkbox"
+                                                        name="customImage" 
+                                                        data-bind="checked: detailForm.data.customImage, events: { change: toggleCustomImage }"
+                                                    >
+                                                    <a type="button" class="btn btn-primary btn-sm"
+                                                        data-type="quotationItem"
+                                                        data-bind="click:openImagesList, visible: detailForm.data.customImage"
+                                                        style="font-size: 10px;"
+                                                    >
+                                                        Aggiungi <i class="fas fa-image"></i>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
 

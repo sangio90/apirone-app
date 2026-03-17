@@ -851,7 +851,6 @@ AP.accessory.modal = ( function() {
                 AP.deleteUserPref( "accessory.product.items" );
             } );
             $( "#accessoryLine" ).on( "change", function(e) {
-                debugger
                 viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])

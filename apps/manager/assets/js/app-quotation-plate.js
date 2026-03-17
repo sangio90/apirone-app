@@ -10,7 +10,6 @@ $( document ).ready( function() {
 
         AP.plate.modal.init( { container: AP.plate.fields.modalRoot } );
     }
-
 } );
 
 AP.plate.modal = ( function() {
@@ -20,6 +19,10 @@ AP.plate.modal = ( function() {
 
     function pricingApp() {
         return AP.quotation.itemPricing;
+    }
+
+    function fileApp() {
+        return AP.file.modal;
     }
 
     const {
@@ -180,6 +183,7 @@ AP.plate.modal = ( function() {
                 quantity: 1,
                 // price: 0,
                 special: false,
+                customImage: false,
                 note: '',
                 status: {
                     id: "ACT"
@@ -309,6 +313,67 @@ AP.plate.modal = ( function() {
 
     // --- ViewModel (Kendo ObservableObject) ---
     var viewModel = new kendo.data.ObservableObject( {
+        backgroundCustomImage: {
+            'id': '',
+            'url': ''
+        },
+        backgroundStyle: function () {
+            var url = this.get("backgroundCustomImage.url");
+            return url ? "background-image: url(" + url + ")" : "";
+        },
+        //aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
+        toggleCustomImage: async function( event ) {
+            await viewModel.loadBackgroundCustomImage(viewModel.get('detailForm.data.id'))
+            if (viewModel.get('detailForm.data.customImage') == true) {
+                $('#plate-designer').hide()
+                $('#plate-custom-designer').show()
+            } else {
+                $('#plate-designer').show()
+                $('#plate-custom-designer').hide()
+            }
+
+            return
+        },
+
+        loadBackgroundCustomImage: async function(quotationItemId) {
+            if (quotationItemId && quotationItemId != '') {
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotation-items/" + quotationItemId + "/images" ,
+                    callback: {
+                        done: function( xhr ) {
+                            if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
+                                viewModel.set( "backgroundCustomImage", xhr.data[0] );
+                                viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
+                            }
+                        }
+                    }
+                })
+            }
+        },
+
+        //metodo che compone la struttura dati da passare al componente app-file, punto centralizzato di gestione del caricamento immagini
+        openImagesList: function( event ) {
+
+            var element = $( event.currentTarget );
+
+            if ( !element.attr( "data-type" ) ) {
+                console.error( "ERROR. Set data-type attribute in currentTarget" );
+                return;
+            }
+
+
+            var type = element.data( "type" );
+            var value = {
+                type: type,
+                id: viewModel.get('detailForm.data.id'),
+                name: viewModel.get('detailForm.data.id'),
+            };
+
+            fileApp().open( value );
+
+            return false;
+        },
 
         detailForm: createDefaultDetailForm(),
 
@@ -420,6 +485,18 @@ AP.plate.modal = ( function() {
 					}
                 }
             } );
+
+            if (viewModel.get('detailForm.data.product.orientation.id') == 'HOR') {
+                $('#plate-custom-image').css({
+                    "max-width": "1200px",
+                    "max-height": "500px"
+                });
+            } else {
+                $('#plate-custom-image').css({
+                    "max-height": "1200px",
+                    "max-width": "500px",
+                });
+            }
         },
 
         toggleFruits( event ) {
@@ -769,7 +846,7 @@ AP.plate.modal = ( function() {
          * Carica il prodotto (linea/modello/finitura) e i suoi product items, poi la placca.
          * Chiamato al change della finitura (nuova placca).
          */
-        loadProduct: function() {
+        loadProduct: async function() {
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
             var modelId = viewModel.get( "detailForm.data.product.model.id" );
             var finishId = viewModel.get( "detailForm.data.product.finish.id" );
@@ -1050,6 +1127,16 @@ AP.plate.modal = ( function() {
             // const parsedData =
             var status = fields.modalRoot.find( ".save-status" );
             var preview = $( "#plate-background" )[0];
+            if (viewModel.get('detailForm.data.id') && viewModel.get('detailForm.data.customImage') && viewModel.get('detailForm.data.customImage') == true) {
+                //se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
+               if (!viewModel.get('backgroundCustomImage.url')) {
+                    AP.widget.notify( "error", "Hai scelto custom image, devi selezionare un'immagine prima di salvare." );
+                    AP.loading.hide()
+                    return false;
+               }
+
+               preview = $( "#plate-custom-image" )[0];
+            }
 
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
@@ -1213,6 +1300,8 @@ AP.plate.modal = ( function() {
 
         viewModel.loadLines();
 
+        $('#plate-custom-designer').hide()
+        $('#plate-designer').show()
     };
 
     /**
@@ -1232,13 +1321,25 @@ AP.plate.modal = ( function() {
         viewModel.set( "detailForm.title", clone ? "Clona placca" : "Modifica placca" );
 
         AP.plate.api.getPlate( id, {
-            done: function( xhr ) {
+            done: async function( xhr ) {
 				viewModel.populateProduct( xhr.data.quotationItem.product );
                 viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
                 viewModel.set( "detailForm.data.position", xhr.data.quotationItem.position );
                 viewModel.set( "detailForm.data.note", xhr.data.quotationItem.note );
                 viewModel.set( "detailForm.data.quantity", xhr.data.quotationItem.quantity );
                 viewModel.set( "detailForm.data.special", xhr.data.quotationItem.special == 'true' );
+                viewModel.set( "detailForm.data.customImage", xhr.data.quotationItem.customImage == 'true' );
+                //in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
+                //altrimenti farò il contrario
+
+                await viewModel.loadBackgroundCustomImage(xhr.data.quotationItem.id)
+                if (xhr.data.quotationItem.customImage == 'true') {
+                    $('#plate-custom-designer').show()
+                    $('#plate-designer').hide()
+                } else {
+                    $('#plate-custom-designer').hide()
+                    $('#plate-designer').show()
+                }
                 viewModel.set( "detailForm.data.plateQuotationItemProductItems", xhr.data.quotationItem.items );
 
                 const quotationZone = xhr.data.quotationItem.quotationZone
