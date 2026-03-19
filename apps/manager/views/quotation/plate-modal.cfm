@@ -26,10 +26,12 @@
                                 <select id="plate-line"
                                     required
                                     class="form-control"
+                                    data-role="combobox"
+                                    data-placeholder="-- Seleziona la linea"
                                     data-bind="source: lines, value: detailForm.data.product.line.id, events: { change: loadModels }"
                                     data-value-field="id"
                                     data-text-field="name"
-                                    >
+                                    data-filter="contains">
                                 </select>
                             </div>
 
@@ -38,10 +40,12 @@
                                 <select id="plate-model"
                                     required
                                     class="form-control"
+                                    data-role="combobox"
+                                    data-placeholder="-- Seleziona il modello"
                                     data-bind="source: models, value: detailForm.data.product.model.id, events: { change: loadFinishes }"
                                     data-value-field="id"
                                     data-text-field="code"
-                                    >
+                                    data-filter="contains">
                                 </select>
                             </div>
 
@@ -50,10 +54,12 @@
                                 <select id="plate-finish"
                                     required
                                     class="form-control"
+                                    data-role="combobox"
+                                    data-placeholder="-- Seleziona la finitura"
                                     data-bind="source: finishes, value: detailForm.data.product.finish.id, events: { change: loadProduct }"
                                     data-value-field="id"
                                     data-text-field="name"
-                                    >
+                                    data-filter="contains">
                                 </select>
                             </div>
                         </div>
@@ -165,7 +171,7 @@
                                 #view(view="quotation/item-plate-pricing", args={id="plate-quotation-item-pricing-box"})#
                             </div>
                             ---->
-                            <div class="col-2">
+                            <div class="col-2" style="z-index: 1">
                                 <div class="h-100">
 
                                     <div class="row">

@@ -15,7 +15,6 @@ AP.plate.productItems = ( function() {
      * @param {string} opts.subContainerIdPrefix - prefisso id per ogni blocco (es. "attribute-container-" o "fruit-attribute-container-")
      * @param {function(Object):string} opts.labelTextFn - (item) => testo della label
      * @param {function(string, string, *)} opts.onSelectChange - (selectedId, attributeId, value) chiamato al change
-     * @param {boolean} [opts.skipAutoTrigger=false] - Se true, non fa trigger automatico del change (evita loop durante caricamento)
      */
     function renderProductItems( opts ) {
         var container = $( opts.containerSelector );
@@ -25,7 +24,9 @@ AP.plate.productItems = ( function() {
         var subContainerIdPrefix = opts.subContainerIdPrefix;
         var labelTextFn = opts.labelTextFn;
         var onSelectChange = opts.onSelectChange;
-        var skipAutoTrigger = opts.skipAutoTrigger === true;
+        // var skipAutoTrigger = opts.skipAutoTrigger === true;
+        // fissato skipautotrigger a false perche non vengono caricate le immagini con l'immagine degli items (legno standard su placca wood)
+        var skipAutoTrigger = false;
 
         attributeArray.forEach( function( item ) {
             var newLevel = ( 1.5 * item.level ) + "rem";
