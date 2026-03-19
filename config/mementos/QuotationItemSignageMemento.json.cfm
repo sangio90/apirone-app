@@ -15,6 +15,7 @@
         "product.plateWidth",
         "product.plateHeight",
         "image",
+        "special",
         "position",
         "note",
     ],
