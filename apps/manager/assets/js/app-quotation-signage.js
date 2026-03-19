@@ -574,17 +574,9 @@ AP.signage.modal = ( function() {
 
         loadModels: async function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
-                if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
-                    $( "#quotation-signage-preview-background" ).css( {
-                        width: "500px",
-                        height: "500px"
-                    } );
-                } else {
-                    $( "#quotation-signage-preview-background" ).css( {
-                        width: "500px",
-                        height: null
-                    } );
-                }
+				$( "#quotation-signage-preview-background" ).css( {
+					width: "500px",
+				} );
             }
             let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
             if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
@@ -677,7 +669,7 @@ AP.signage.modal = ( function() {
 				}
 				if ( xhr2.data.file ) {
 					viewModel.set( "backgroundImage", xhr2.data.file );
-					viewModel.set( "backgroundImage.url", "url('" + xhr2.data.file.uri + "')" );
+					viewModel.set( "backgroundImage.url", xhr2.data.file.uri);
 				} else {
 					viewModel.set( "backgroundImage.url", "" );
 				}
