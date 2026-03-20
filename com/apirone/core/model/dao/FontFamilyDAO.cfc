@@ -29,6 +29,22 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<cffunction name="getFontFamilyBySignageConfigId">
+		<cfargument name="signageConfigId" type="Numeric" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				DISTINCT(font_families.font_family_id) AS fontFamilyId
+			FROM signage_config_items
+				LEFT JOIN signage_configs on signage_config_items.signage_config_id = signage_configs.signage_config_id
+				LEFT JOIN fonts on signage_configs.font_id = fonts.font_id
+				LEFT JOIN font_families on fonts.font_family_id = font_families.font_family_id
+			WHERE signage_config_items.signage_config_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigId#">
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction returntype="Query" name="find">
 		<cfargument name="str" type="String">
 

@@ -22,6 +22,14 @@
 		return bean;
 	}
 
+	public com.apirone.core.model.bean.FontFamily function getFontFamilyBySignageConfigId( required Numeric signageConfigId ){
+		var record = getDao().getFontFamilyBySignageConfigId( arguments.signageConfigId );
+
+		var bean = build( record.fontFamilyId );
+
+		return bean;
+	}
+
 	public Array function list(){
 		arguments[ "limit" ] = -1;
 		return search( argumentCollection = arguments ).getData();

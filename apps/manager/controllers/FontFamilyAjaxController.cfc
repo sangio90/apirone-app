@@ -30,6 +30,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function getBySignageConfigId( event, rc, prc ){
+
+		var result = super.fire( "fontFamily.getFontFamilyBySignageConfigId", { signageConfigId = rc.signageConfigId } );
+
+		event.setValue( "result", result );
+	}
+
 	function save( event, rc, prc ){
 		var result     = super.getResult();
 		var fontFamily = super.bean( "FontFamily" );

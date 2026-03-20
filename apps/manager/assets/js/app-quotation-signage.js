@@ -73,6 +73,7 @@ AP.signage.modal = ( function() {
                     id: ""
                 }
             },
+            fontFamilyName: ""
         },
         statuses: AP.page.statuses,
         itemStatuses: AP.page.itemStatuses,
@@ -209,7 +210,7 @@ AP.signage.modal = ( function() {
                 const name = p.replace( /[<>]/g, "" );
                 return {
                     label: name,
-                    image: `<img src="/assets/main/pictograms/Arial/${name}.png" alt="${name}" class="pictogram px-2">`
+                    image: `<img src="/assets/main/pictograms/Arial/${name}.svg" alt="${name}" class="pictogram px-2" style="height: 30px; width: 30px;">`
                 };
             } );
         },
@@ -372,6 +373,9 @@ AP.signage.modal = ( function() {
             const fontFamily = signageConfig.font && signageConfig.font.family ? signageConfig.font.family : "";
             const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel * 1.4 : 16 * 1.4;
 
+            let fontFamilyName = "Arial"
+            fontFamilyName = viewModel.get('detailForm.data.fontFamilyName') != '' ? viewModel.get('detailForm.data.fontFamilyName') : fontFamilyName
+
             // costruisco la regex solo con i nomi interni dei pictogram (senza <>), escapati
             const innerNames = pictogramNames.map( n => n.replace( /[<>]/g, "" ) );
             const escapedNames = innerNames.map( this.escapeRegExp );
@@ -385,13 +389,12 @@ AP.signage.modal = ( function() {
                 if ( match.index > lastIndex ) {
                     parts.push( this.escapeHtml( valore.substring( lastIndex, match.index ) ) );
                 }
-
                 const pictogramName = match[1]; // es. "man"
                 const imgHtml =
                     // TODO: usare il font selezionato quando avremo i pictogram in tutti i font,
                     //      creare una mappa fontFamily -> esistenza pictogram
                     // "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogramName + ".png\" " +
-                    "<img src=\"/assets/main/pictograms/Arial/" + pictogramName + ".png\" " +
+                    "<img src=\"/assets/main/pictograms/" + fontFamilyName + "/" + pictogramName + ".svg\" " +
                     "alt=\"" + pictogramName + "\" " +
                     "style=\"height: " + heightPx + "px;\" " +
                     "class=\"pictogram px-2\">";
@@ -466,9 +469,9 @@ AP.signage.modal = ( function() {
             const pictogramNames = viewModel.get( "pictogramNames" );
             let content = e.currentTarget.value;
             const usedPictos = [];
-
+            
             pictogramNames.forEach( pictogram => {
-                let position = realContent.indexOf( pictogram );
+                let position = realContent ? realContent.indexOf( pictogram ) : -1;
                 while ( position !== -1 ) {
                     usedPictos[position] = pictogram;
                     position = realContent.indexOf( pictogram, position + 1 );
@@ -769,6 +772,24 @@ AP.signage.modal = ( function() {
                     this.parseLines();
                 }
             }
+
+            if (
+                viewModel.get('detailForm.data.quotationItem') && 
+                viewModel.get('detailForm.data.quotationItem.signageConfigItem')
+            ) {
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/font-families/get-by-signage-config-id?signageConfigId=" + viewModel.get('detailForm.data.quotationItem.signageConfigItem.signageConfigId'),
+                    callback: {
+                        done: function( xhr ) {
+                            if (xhr.data) {
+                                viewModel.set('detailForm.data.fontFamilyName', xhr.data.name)
+                            }
+                        }
+                    }
+                } );
+            }
+
             this.checkCanSave();
             AP.setUserPref( "signage.fontId", viewModel.get( "detailForm.data.signageConfig.font.id" ) );
         },
