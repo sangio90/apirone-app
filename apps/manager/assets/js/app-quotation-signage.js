@@ -350,7 +350,6 @@ AP.signage.modal = ( function() {
             } );
             this.checkCanSave();
             AP.setUserPref( "signage.signageConfigId", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) );
-            AP.setUserPref( "signage.signageConfigRowCount", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
         },
 
         parsedLineContent: function( valore, id ) {
@@ -1350,7 +1349,6 @@ AP.signage.modal = ( function() {
         const signageFinishId = AP.getUserPref( "signage.finishId" )
         const signageFontId = AP.getUserPref( "signage.fontId" )
         const signageSignageConfigId = AP.getUserPref( "signage.signageConfigId" )
-        const signageSignageConfigRowCount = AP.getUserPref( "signage.signageConfigRowCount" )
 
         if (signageCategoryId) {
             let category = viewModel.categories.data().find(c => c.id == signageCategoryId)
@@ -1381,9 +1379,11 @@ AP.signage.modal = ( function() {
                                                 viewModel.set( "detailForm.data.signageConfig.font", font)
                                                 await viewModel.loadFontSizes();
                                                 if ( signageSignageConfigId ) {
-                                                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem.id", signageSignageConfigId );
-                                                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", signageSignageConfigRowCount );
-                                                    viewModel.parseLines();
+                                                    const signageSignageConfigItem = viewModel.getSignageConfig().items.find(s => s.id == signageSignageConfigId)
+                                                    if (signageSignageConfigItem) {
+                                                        viewModel.set( "detailForm.data.quotationItem.signageConfigItem", signageSignageConfigItem );
+                                                        viewModel.parseLines();
+                                                    }
                                                 }
                                             }
                                         }
