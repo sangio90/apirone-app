@@ -775,7 +775,8 @@ AP.signage.modal = ( function() {
 
             if (
                 viewModel.get('detailForm.data.quotationItem') && 
-                viewModel.get('detailForm.data.quotationItem.signageConfigItem')
+                viewModel.get('detailForm.data.quotationItem.signageConfigItem') &&
+                viewModel.get('detailForm.data.quotationItem.signageConfigItem.signageConfigId')
             ) {
                 await NM.util.ajax( {
                     method: "GET",
