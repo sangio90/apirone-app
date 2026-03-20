@@ -623,20 +623,22 @@ AP.signage.modal = ( function() {
         },
 
         loadModels: async function( event ) {
-            let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
-            if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
-                url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
-            }
-            await NM.util.ajax( {
-                method: "GET",
-                url: url,
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
-                        viewModel.get( "models" ).data( xhr.data );
+            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) && viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
+                let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
+                if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
+                    url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
+                }
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: url,
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
+                            viewModel.get( "models" ).data( xhr.data );
+                        },
                     },
-                },
-            } );
+                } );
+            }
             this.checkCanSave();
             AP.setUserPref( "signage.lineId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) );
         },
