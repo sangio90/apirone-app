@@ -608,17 +608,9 @@ AP.signage.modal = ( function() {
 
         loadModels: async function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
-                if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.code" ) != "LET00" ) {
-                    $( "#quotation-signage-preview-background" ).css( {
-                        width: "500px",
-                        height: "500px"
-                    } );
-                } else {
-                    $( "#quotation-signage-preview-background" ).css( {
-                        width: "500px",
-                        height: null
-                    } );
-                }
+				$( "#quotation-signage-preview-background" ).css( {
+					width: "500px",
+				} );
             }
             let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
             if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
@@ -1161,7 +1153,7 @@ AP.signage.modal = ( function() {
             AP.loading.show();
             var quotationId = AP.page.quotation.id;
 
-            //quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a 
+            //quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a
             let preview = $( "#quotation-signage-preview-background" )[0];
             if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage') && viewModel.get('detailForm.data.quotationItem.customImage') == true) {
                 //se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
@@ -1334,12 +1326,12 @@ AP.signage.modal = ( function() {
 		}
 
         AP.setUserPref( "signage.categoryId", 20 )
-        
+
 		NM.util.openModal( AP.signage.fields.modalRoot );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
         viewModel.handleSelectChanges()
-        
+
         const signageCategoryId = AP.getUserPref( "signage.categoryId" )
         const signageLineId = AP.getUserPref( "signage.lineId" )
         const signageModelId = AP.getUserPref( "signage.modelId" )

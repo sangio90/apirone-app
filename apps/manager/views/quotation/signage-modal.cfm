@@ -124,22 +124,21 @@
                             <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
                                 <span>Anteprima</span>
-                                <div data-bind="visible: showImage">
-                                    <div data-bind="visible:detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled">
-                                        <span style="color: red">Attenzione! Il prodotto ha margini non corretti per la configurazione di segnaletica. Aggiorna i margini del prodotto o scegli un altro prodotto per visualizzare l'anteprima.</span>
-                                    </div>
-                                    <div id="quotation-signage-preview-background"
-                                        class="col-3 d-flex justify-content-center align-items-center"
-                                        data-bind="visible:detailForm.data.signageConfig.font.id, style: { backgroundImage: backgroundImage.url }"
-                                        style="position: relative"
-                                        >
-                                        <div id="signage-preview-container"
-                                            class="d-flex flex-column justify-content-center"
-                                            style="position: absolute"
-                                            data-template="signage-line-preview-row-tmpl"
-                                            data-bind="source: detailForm.data.quotationItem.signageRows, style: { textAlign: textAlign, left: detailForm.data.quotationItem.product.marginLeft, top: detailForm.data.quotationItem.product.marginTop, width: detailForm.data.quotationItem.product.plateWidth, height: detailForm.data.quotationItem.product.plateHeight }">
-                                            <!-- qui dentro vanno gli items di preview -->
-                                        </div>
+								<div data-bind="visible:detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled">
+									<span style="color: red">Attenzione! Il prodotto ha margini non corretti per la configurazione di segnaletica. Aggiorna i margini del prodotto o scegli un altro prodotto per visualizzare l'anteprima.</span>
+								</div>
+                                <div id="quotation-signage-preview-background"
+                                    class="col-3 d-flex justify-content-center align-items-center"
+                                    data-bind="visible:detailForm.data.signageConfig.font.id"
+                                    style="position: relative"
+                                    >
+									<img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }, visible: backgroundImage.url" />
+                                    <div id="signage-preview-container"
+                                        class="d-flex flex-column justify-content-center"
+                                        style="position: absolute; top: 0; left: 0;"
+                                        data-template="signage-line-preview-row-tmpl"
+                                        data-bind="source: detailForm.data.quotationItem.signageRows, style: { textAlign: textAlign, left: detailForm.data.quotationItem.product.marginLeft, top: detailForm.data.quotationItem.product.marginTop, width: detailForm.data.quotationItem.product.plateWidth, height: detailForm.data.quotationItem.product.plateHeight }">
+                                        <!-- qui dentro vanno gli items di preview -->
                                     </div>
                                 </div>
                                 <div id="quotation-signage-preview-custom-background" style="width: 500px;" data-bind="visible: showCustomImage">
