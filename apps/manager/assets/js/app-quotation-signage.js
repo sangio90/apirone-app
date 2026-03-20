@@ -60,7 +60,7 @@ AP.signage.modal = ( function() {
             signageConfig: {
                 catalogBundle: {
                     category: {
-                        id: ""
+                        id: 20
                     },
                     line: {
                         id: ""
@@ -1247,7 +1247,6 @@ AP.signage.modal = ( function() {
 
         clearFilters: function() {
             viewModel.resetForm();
-            AP.deleteUserPref( "signage.categoryId" );
             AP.deleteUserPref( "signage.lineId" );
             AP.deleteUserPref( "signage.modelId" );
             AP.deleteUserPref( "signage.finishId" );
@@ -1323,23 +1322,24 @@ AP.signage.modal = ( function() {
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
-                    debugger
                     //NOOP
                 }
             },
         } );
 
 		if ( categoriesResponse.data.length > 0 ) {
-            categoriesResponse.data = categoriesResponse.data.filter(c => c.type.id == 'SEG')
-			categoriesResponse.data.unshift( { id: "", name: "-- seleziona" } );
+            categoriesResponse.data = categoriesResponse.data.filter(c => c.id == 20)
 			viewModel.get( "categories" ).data( categoriesResponse.data );
+            viewModel.set('detailForm.data.signageConfig.catalogBundle.category', categoriesResponse.data[0])
 		}
 
+        AP.setUserPref( "signage.categoryId", 20 )
+        
 		NM.util.openModal( AP.signage.fields.modalRoot );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
         viewModel.handleSelectChanges()
-
+        
         const signageCategoryId = AP.getUserPref( "signage.categoryId" )
         const signageLineId = AP.getUserPref( "signage.lineId" )
         const signageModelId = AP.getUserPref( "signage.modelId" )
@@ -1351,8 +1351,6 @@ AP.signage.modal = ( function() {
         if (signageCategoryId) {
             let category = viewModel.categories.data().find(c => c.id == signageCategoryId)
             if (category) {
-                category = { id: category.id, name: category.name };
-                viewModel.set( "detailForm.data.signageConfig.catalogBundle.category", category );
                 await viewModel.loadLines();
                 if ( signageLineId ) {
                     let line = viewModel.lines.data().find(l => l.id == signageLineId)
@@ -1506,7 +1504,7 @@ AP.signage.modal = ( function() {
             },
         } );
 
-		categoriesResponse.data.unshift( { id: "", name: "" } );
+        categoriesResponse.data = categoriesResponse.data.filter(c => c.id == 20)
 		viewModel.get( "categories" ).data( categoriesResponse.data );
 		NM.util.openModal( AP.signage.fields.modalRoot );
 

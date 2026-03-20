@@ -18,21 +18,6 @@
                                 <label class="col-sm-12 col-form-label text-start">Quantità</label>
                                 <input class="form-control" type="number" data-bind="value: detailForm.data.quotationItem.quantity" min="1">
                             </div>
-                            <div class="col-2">
-                                <label class="col-sm-2 col-form-label text-start">Categoria</label>
-                                <div class="col-sm-10">
-                                    <select id="signangeProductCategory"
-                                        class="form-control"
-                                        data-role="combobox"
-                                        data-placeholder="-- Seleziona la categoria"
-                                        data-bind="source: categories, value: detailForm.data.signageConfig.catalogBundle.category, events: { change: loadLines }"
-                                        data-value-field="id"
-                                        data-text-field="name"
-                                        data-filter="contains"
-                                        >
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-2" data-bind="visible: detailForm.data.signageConfig.catalogBundle.category.id">
                                 <label class="col-sm-2 col-form-label text-start">Linea</label>
                                 <div class="col-sm-10">
