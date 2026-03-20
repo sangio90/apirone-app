@@ -251,8 +251,7 @@ input#input-item-total[readonly] {
 }
 
 #quotation-signage-preview-background {
-	min-width: 500px;
-	min-height: 500px;
+    min-width: 500px;
 	background-repeat: no-repeat !important;
 	background-position: center !important;
 	background-size: auto !important;

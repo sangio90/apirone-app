@@ -703,7 +703,7 @@ AP.signage.modal = ( function() {
 				}
                 if ( xhr2.data.file ) {
                     viewModel.set( "backgroundImage", xhr2.data.file );
-                    viewModel.set( "backgroundImage.url", "url('" + xhr2.data.file.uri + "')" );
+                    viewModel.set( "backgroundImage.url", xhr2.data.file.uri );
                 } else {
                     viewModel.set( "backgroundImage.url", "" );
                 }
