@@ -661,81 +661,82 @@ AP.signage.modal = ( function() {
         },
 
         loadSignageConfigs: async function( event ) {
-            const xhr = await NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/signage-configs?categoryId="
-                    + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
-                    + "&lineId="
-                    + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
-                    + "&modelId="
-                    + viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
-				callback: {
-					done: function (xhr) {
-						//NOOP
-					}
-				}
-            } );
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) && viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "") {
+                const xhr = await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/signage-configs?categoryId="
+                        + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
+                        + "&lineId="
+                        + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
+                        + "&modelId="
+                        + viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
+                    callback: {
+                        done: function (xhr) {
+                            //NOOP
+                        }
+                    }
+                } );
 
-			const fonts = [];
+                const fonts = [];
 
-			for ( var font of xhr.data ) {
-				fonts.push( font.font );
-			}
-			fonts.unshift( { id: "", name: "-- Seleziona il Font" } );
-			viewModel.get( "fonts" ).data( fonts );
-			xhr.data.unshift( { id: "", name: "" } );
-			viewModel.get( "signageConfigs" ).data( xhr.data );
-
-			if ( fonts.length === 1 ) {
-				viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
-				viewModel.get( "fontSizes" ).data( xhr.data[0].items );
-			}
-			if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
-				const xhr2 = await NM.util.ajax( {
-					method: "GET",
-					url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" +
-						viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
-						"&lineId=" +
-						viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
-						"&modelId=" +
-						viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
-						"&finishId=" +
-						viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
-					callback: {
-						done: function (xhr) {
-							//NOOP
-						}
-					}
-				} );
-				if ( xhr2.data.productId ) {
-					viewModel.set( "detailForm.data.quotationItem.product.id", xhr2.data.productId );
-                    viewModel.set( "detailForm.data.quotationItem.product.plateWidth", xhr2.data.plateWidth );
-                    viewModel.set( "detailForm.data.quotationItem.product.plateHeight", xhr2.data.plateHeight );
-                    viewModel.set( "detailForm.data.quotationItem.product.marginTop", xhr2.data.marginTop );
-                    viewModel.set( "detailForm.data.quotationItem.product.marginLeft", xhr2.data.marginLeft );
-				}
-                if ( xhr2.data.file ) {
-                    viewModel.set( "backgroundImage", xhr2.data.file );
-                    viewModel.set( "backgroundImage.url", xhr2.data.file.uri );
-                } else {
-                    viewModel.set( "backgroundImage.url", "" );
+                for ( var font of xhr.data ) {
+                    fonts.push( font.font );
                 }
-                if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage')) {
-                    await NM.util.ajax( {
+                fonts.unshift( { id: "", name: "-- Seleziona il Font" } );
+                viewModel.get( "fonts" ).data( fonts );
+                xhr.data.unshift( { id: "", name: "" } );
+                viewModel.get( "signageConfigs" ).data( xhr.data );
+
+                if ( fonts.length === 1 ) {
+                    viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
+                    viewModel.get( "fontSizes" ).data( xhr.data[0].items );
+                }
+                if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
+                    const xhr2 = await NM.util.ajax( {
                         method: "GET",
-                        url: "/manager/ajax/quotation-items/" + viewModel.get('detailForm.data.quotationItem.id') + "/images" ,
+                        url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" +
+                            viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
+                            "&lineId=" +
+                            viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
+                            "&modelId=" +
+                            viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
+                            "&finishId=" +
+                            viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
                         callback: {
-                            done: function( xhr ) {
-                                if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
-                                    viewModel.set( "backgroundCustomImage", xhr.data[0] );
-                                    viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
-                                }
+                            done: function (xhr) {
+                                //NOOP
                             }
                         }
-                    })
+                    } );
+                    if ( xhr2.data.productId ) {
+                        viewModel.set( "detailForm.data.quotationItem.product.id", xhr2.data.productId );
+                        viewModel.set( "detailForm.data.quotationItem.product.plateWidth", xhr2.data.plateWidth );
+                        viewModel.set( "detailForm.data.quotationItem.product.plateHeight", xhr2.data.plateHeight );
+                        viewModel.set( "detailForm.data.quotationItem.product.marginTop", xhr2.data.marginTop );
+                        viewModel.set( "detailForm.data.quotationItem.product.marginLeft", xhr2.data.marginLeft );
+                    }
+                    if ( xhr2.data.file ) {
+                        viewModel.set( "backgroundImage", xhr2.data.file );
+                        viewModel.set( "backgroundImage.url", xhr2.data.file.uri );
+                    } else {
+                        viewModel.set( "backgroundImage.url", "" );
+                    }
+                    if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage')) {
+                        await NM.util.ajax( {
+                            method: "GET",
+                            url: "/manager/ajax/quotation-items/" + viewModel.get('detailForm.data.quotationItem.id') + "/images" ,
+                            callback: {
+                                done: function( xhr ) {
+                                    if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
+                                        viewModel.set( "backgroundCustomImage", xhr.data[0] );
+                                        viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
+                                    }
+                                }
+                            }
+                        })
+                    }
                 }
-			}
-
+            }
 
             this.checkCanSave();
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != AP.getUserPref( "signage.finishId" ) ) {
