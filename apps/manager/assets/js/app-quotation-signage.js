@@ -607,11 +607,6 @@ AP.signage.modal = ( function() {
         },
 
         loadModels: async function( event ) {
-            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
-				$( "#quotation-signage-preview-background" ).css( {
-					width: "500px",
-				} );
-            }
             let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
             if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
                 url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
