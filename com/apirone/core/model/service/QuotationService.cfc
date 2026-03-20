@@ -538,6 +538,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"AR_CHIAVE" = arKey,
 							"ARCODART"  = code & RepeatString( "0", 15 - Len( code ) ),
 							"ARDESART"  = description,
+							"ARDESSUP"  = quotationItem.getSpecial() && quotationItem.getSpecial() == 'true' ? 'SÌ DWG' : 'NO DWG',
 							"ARDATCAR"  = Now(),
 							"ARUNMIS1"  = "PZ",
 							"VARCOD"    = varCode,
