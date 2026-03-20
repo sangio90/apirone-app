@@ -940,11 +940,14 @@ AP.accessory.modal = ( function() {
 		initPositionSuggest();
 
         const allZones = AP.quotation.detail.config().zones
-        const parentZones = allZones.filter(z => !z.origin)
+        const parentZones = allZones.filter(z => !z.origin && z.id != '')
         
         viewModel.set('allZones', allZones)
         viewModel.set('zones', parentZones)
-        const zone = AP.quotation.detail.config().zone
+        let zone = AP.quotation.detail.config().zone
+        if (zone.id == '') {
+            zone = allZones.find(z => z.name == 'Non assegnato')
+        }
         if (zone.origin) {
             viewModel.set('quotationZone', zone.origin)
             viewModel.set('quotationSubzone', zone)
@@ -964,6 +967,9 @@ AP.accessory.modal = ( function() {
             viewModel.set('subzones', children)
             viewModel.set('quotationSubzone', { "id": "" })
         }
+
+        viewModel.set('showCustomImage', false)
+        viewModel.set('showImage', true)
     };
 
     pub.getItem = function() {
@@ -1020,7 +1026,7 @@ AP.accessory.modal = ( function() {
 		renderQuotationItemTotals( id );
 
         const allZones = AP.quotation.detail.config().zones
-        const parentZones = allZones.filter(z => !z.origin)
+        const parentZones = allZones.filter(z => !z.origin && z.id != '')
         
         viewModel.set('allZones', allZones)
         viewModel.set('zones', parentZones)

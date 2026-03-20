@@ -1407,7 +1407,11 @@ AP.plate.modal = ( function() {
 
         resetDetailForm();
 
-        viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
+        let zone = AP.quotation.detail.config().zone
+        if (zone.id == '') {
+            zone = viewModel.get('zones').find(z => z.name == 'Non assegnato')
+        }
+        viewModel.set( "detailForm.data.quotationZone", zone );
         viewModel.set( "isEditMode", false );
 
         viewModel.handleSelectChanges()

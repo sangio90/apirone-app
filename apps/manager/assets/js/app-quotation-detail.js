@@ -534,6 +534,14 @@ AP.quotation.detail = ( function() {
                                 var zones = [];
                             }
 
+                            zones.unshift(
+                                {
+                                    "id": "",
+                                    "name": "-- Tutte le zone",
+                                    "quantity": 1
+                                }
+                            )
+
                             zones.forEach( function( zone ) {
                                 if ( zone.origin ) {
                                     zone.name = "\u00A0\u00A0- " + zone.name;
@@ -1138,7 +1146,7 @@ AP.quotation.zonesModal = (function () {
     pub.init = function () {
         let allZones = AP.quotation.detail.config().zones || [];
         let gridZones = allZones
-            .filter(z => z.name != '-- Tutte le zone')
+            .filter(z => z.name != '-- Tutte le zone' && z.name != 'Non assegnato')
             .map(z => {
                 let newZ = { ...z }; 
                 
@@ -1148,7 +1156,7 @@ AP.quotation.zonesModal = (function () {
                 
                 return newZ;
             });
-        let parentZones = allZones.filter(z => !z.origin && z.name != '-- Tutte le zone');
+        let parentZones = allZones.filter(z => !z.origin && z.name != '-- Tutte le zone' && z.name != 'Non assegnato');
 
         parentZones.unshift({
             'id': '',

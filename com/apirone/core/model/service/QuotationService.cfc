@@ -225,7 +225,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			newQuotation.setId( newId );
 
 			zone.setQuotation( newQuotation );
-			zone.setName( "-- Tutte le zone" );
+			zone.setName( "Non assegnato" );
 			zone.setQuantity(1);
 
 			getQuotationZoneService().create( zone );
