@@ -829,11 +829,11 @@ AP.plate.modal = ( function() {
                         await doRender();
 
                         // Aggiorna pricing sui select
-                        $( "select.select-item" ).each( function() {
-                            $( this ).off( "change.calculatePrice" ).on( "change.calculatePrice", function() {
-                                updatePrice();
-                            } );
-                        } );
+                        // $( "select.select-item" ).each( function() {
+                        //     $( this ).off( "change.calculatePrice" ).on( "change.calculatePrice", function() {
+                        //         updatePrice();
+                        //     } );
+                        // } );
                     }
                 }
             })
@@ -903,11 +903,11 @@ AP.plate.modal = ( function() {
                     callback: {
                         done: async function( xhr ) {
                             if ( xhr.count > 0 ) {
-                                var thisImage = xhr.data[0].horizontalImage;
-                                if ( thisImage ) {
-                                    thisFruit.set( "fruit.horizontalImage", thisImage );
-                                    pub.fruitsController.updateFruit( thisFruit.id, { image: thisImage.uri } );
-                                }
+                                // var thisImage = xhr.data[0].horizontalImage;
+                                // if ( thisImage ) {
+                                //     thisFruit.set( "fruit.horizontalImage", thisImage );
+                                //     pub.fruitsController.updateFruit( thisFruit.id, { image: thisImage.uri } );
+                                // }
                                 var fruitItems = thisFruit.get( "items" );
                                 var attributeArray = fruitItems.data();
                                 xhr.data.forEach( function( item ) {
@@ -916,11 +916,11 @@ AP.plate.modal = ( function() {
                                         item.horizontalImage.uri : ''
                                     )
                                     const attributeExisting = attributeArray.find( function( d ) { return d.attributeId === item.attribute.id; } );
-                                    var img = item.images && item.images[0];
-                                    if ( img ) {
-                                        thisFruit.set( "fruit.horizontalImage", img );
-                                        pub.fruitsController.updateFruit( thisFruit.id, { image: img.uri } );
-                                    }
+                                    // var img = item.images && item.images[0];
+                                    // if ( img ) {
+                                    //     thisFruit.set( "fruit.horizontalImage", img );
+                                    //     pub.fruitsController.updateFruit( thisFruit.id, { image: img.uri } );
+                                    // }
                                     if ( attributeExisting ) {
                                         attributeExisting.values.push( {
                                             attributeValue: item.attributeValue,
@@ -1013,40 +1013,8 @@ AP.plate.modal = ( function() {
 
         },
 
-        changeFruitImageOld: function( fruitId, value ) {
-
-            if ( value?.images ) {
-
-                var uri = value.images[0]?.uri;
-
-                if ( uri ) {
-                    pub.fruitsController.updateFruit( fruitId, { image: uri } );
-
-                }
-
-            }
-
-        },
-
-        changeFruitImage: function( fruitId, value ) {
-            let uri = ''
-            if ( value?.images ) {
-                
-                uri = value.images[0]?.uri;
-                
-                if ( uri && uri != '' ) {
-                    pub.fruitsController.updateFruit( fruitId, { image: uri } );
-                    
-                }
-                
-            } else {
-                productItemImage = viewModel.get('detailForm.data.productItemsImages.' + value.productItemId)
-                if (productItemImage && productItemImage != '') {
-                    uri = productItemImage;
-                    pub.fruitsController.updateFruit( fruitId, { image: uri } );
-                }
-            }
-
+        changeFruitImage: async function( fruitId, value ) {
+            //cerco i productItems del frutto
             selectedProductItemIds = []
             const fruit = viewModel.get('detailForm.data.fruits')._data.find(f => f.id == fruitId)
             let fruitItems = []
@@ -1064,16 +1032,37 @@ AP.plate.modal = ( function() {
                 })
             }
 
+            const actualFruitImage = $('#quotation-plate-fruits #' + fruitId + ' img');
+            if (actualFruitImage.length) {
+                actualFruitImage.attr('src', '/assets/main/img/fruit-generic.png')
+            }
+            //se ne trovo, cerco l'immagine per la combinazione
             if (selectedProductItemIds.length) {
-                NM.util.ajax({
+                await NM.util.ajax({
                     method: "POST",
                     url: '/manager/ajax/combinations/findByListOfProductItemIds',
-                    data: JSON.stringify({productItemIds: selectedProductItemIds}),
+                    data: JSON.stringify( { 'productItemIds': selectedProductItemIds } ),
                     callback: {
                         done: function (xhr) {
-                                if (xhr.status === 'SUCCESS' && xhr.data?.horizontalImage) {
-                                // $( "#accessory-preview-background-tree" ).empty();
-                                //     $( "#accessory-preview-background-tree" ).append( `<img src="${xhr.data.horizontalImage}" style="width: 500px; height: auto;">` );
+                                if (xhr.status === 'SUCCESS') {
+                                    const actualFruitImage = $('#quotation-plate-fruits #' + fruitId + ' img');
+                                    if (xhr.data && actualFruitImage.length) {
+                                        ///se trovo l'immagine per la combinazione la setto
+                                        if (xhr.data.horizontalImage) {
+                                            actualFruitImage.attr('src', xhr.data.horizontalImage)
+                                        } else {
+                                            // altrimenti cerco come default la prima immagine disponibile nell'array delle immagini dei product items popolato in addProductItemsToFruit
+                                            let firstProductItemWithImageId = selectedProductItemIds.find(id => {
+                                                const img = viewModel.get('detailForm.data.productItemsImages.' + id);
+                                                return img && img !== '';
+                                            });
+                                            const firstValidImage = viewModel.get('detailForm.data.productItemsImages.' + firstProductItemWithImageId)
+
+                                            if (firstValidImage) {
+                                                actualFruitImage.attr('src', firstValidImage )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1096,8 +1085,8 @@ AP.plate.modal = ( function() {
                 subContainerIdPrefix: "fruit-attribute-container-",
                 labelTextFn: function (item) { return item.attributeName; },
                 onSelectChange: async function (selectedId, attributeId, value) {
-                    viewModel.changeFruitImage(fruitId, value);
                     await viewModel.loadProductItems(selectedId, attributeId, fruitId);
+                    await viewModel.changeFruitImage(fruitId, value);
                 }
             });
 
