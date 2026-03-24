@@ -106,59 +106,60 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		outcome.setData( { quotationId = arguments.quotationId } );
 
-		transaction {
 			try {
-				quotationPrices = getQuotationPriceService().list( quotationId = arguments.quotationId );
-				for ( var price in quotationPrices ) {
-					getQuotationPriceLineService().deleteByQuotationPriceId( price.getId() );
-					getQuotationPriceService().delete( price.getId() );
-				}
-
-				//Elimino quotationstatushistory
-				quotationStatusHistory = getQuotationStatusHistoryService().list( quotationId = arguments.quotationId );
-				for ( var history in quotationStatusHistory ) {
-					getQuotationStatusHistoryService().delete( history.getId() );
-				}
-
-				quotationItems = getQuotationItemService().list( quotationId = arguments.quotationId );
-				for ( var item in quotationItems ) {
-					//Elimino i quotation item price
-					quotationItemPrices = getQuotationItemPriceService().list( quotationItemId = item.getId() );
-					for ( var itemPrice in quotationItemPrices ) {
-						getQuotationItemPriceService().delete( itemPrice.getId() );
+				transaction {
+					quotationPrices = getQuotationPriceService().list( quotationId = arguments.quotationId );
+					for ( var price in quotationPrices ) {
+						getQuotationPriceLineService().deleteByQuotationPriceId( price.getId() );
+						getQuotationPriceService().delete( price.getId() );
 					}
 
-					//Elimino i quotation item fruit
-					quotationItemFruits = getQuotationItemFruitService().list( quotationItemId = item.getId() );
-					for ( var fruit in quotationItemFruits ) {
-						//Elimino i quotation item fruit position
-						quotationItemFruitPositions = getQuotationItemFruitPositionService().list( quotationItemFruit = fruit.getId() );
-						for ( var fruitPosition in quotationItemFruitPositions ) {
-							getQuotationItemFruitPositionService().delete( fruitPosition.getId() );
+					//Elimino quotationstatushistory
+					quotationStatusHistory = getQuotationStatusHistoryService().list( quotationId = arguments.quotationId );
+					for ( var history in quotationStatusHistory ) {
+						getQuotationStatusHistoryService().delete( history.getId() );
+					}
+
+					quotationItems = getQuotationItemService().list( quotationId = arguments.quotationId );
+					for ( var item in quotationItems ) {
+						//Elimino i quotation item price
+						quotationItemPrices = getQuotationItemPriceService().list( quotationItemId = item.getId() );
+						for ( var itemPrice in quotationItemPrices ) {
+							getQuotationItemPriceService().delete( itemPrice.getId() );
 						}
-						getQuotationItemFruitService().delete( fruit.getId() );
+
+						//Elimino i quotation item fruit
+						quotationItemFruits = getQuotationItemFruitService().list( quotationItemId = item.getId() );
+						for ( var fruit in quotationItemFruits ) {
+							//Elimino i quotation item fruit position
+							quotationItemFruitPositions = getQuotationItemFruitPositionService().list( quotationItemFruit = fruit.getId() );
+							for ( var fruitPosition in quotationItemFruitPositions ) {
+								getQuotationItemFruitPositionService().delete( fruitPosition.getId() );
+							}
+							getQuotationItemFruitService().delete( fruit.getId() );
+						}
+
+						quotationItemSignageRows = getQuotationItemSignageRowService().list( quotationItemId = item.getId() );
+						for ( var signageRow in quotationItemSignageRows ) {
+							getQuotationItemSignageRowService().delete( signageRow.getId() );
+						}
+
+						quotationItemsProductItems = getQuotationItemProductItemService().list( quotationItemId = item.getId() );
+						for ( var quotationItemProductItem in quotationItemsProductItems ) {
+							getQuotationItemProductItemService().delete( quotationItemProductItem.getId() );
+						}
+						getQuotationItemService().delete( item.getId() );
+
 					}
 
-					quotationItemSignageRows = getQuotationItemSignageRowService().list( quotationItemId = item.getId() );
-					for ( var signageRow in quotationItemSignageRows ) {
-						getQuotationItemSignageRowService().delete( signageRow.getId() );
+					var quotationZones = getQuotationZoneService().list( quotationId = arguments.quotationId );
+
+					for ( var zone in quotationZones ) {
+						deleteQuotationZonesRecursive( zone.getId() ); 
 					}
 
-					quotationItemsProductItems = getQuotationItemProductItemService().list( quotationItemId = item.getId() );
-					for ( var quotationItemProductItem in quotationItemsProductItems ) {
-						getQuotationItemProductItemService().delete( quotationItemProductItem.getId() );
-					}
-					getQuotationItemService().delete( item.getId() );
-
+					getDao().delete( arguments.quotationId );
 				}
-
-				quotationZones = getQuotationZoneService().list( quotationId = arguments.quotationId );
-				for ( var zone in quotationZones ) {
-					deleteQuotationZonesRecursive( zone.getId() );
-				}
-
-				getDao().delete( arguments.quotationId );
-
 			} catch ( any error ) {
 				transaction action="rollback";
 				rethrow
@@ -168,7 +169,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				outcome.setMessage( "Cannot delete quotation [#arguments.quotationId#]" );
 				return outcome;
 			}
-		}
 
 
 		// var cm = getCacheManager();
@@ -194,11 +194,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	// questo metodo andrà usato anche da sistemi esterni e legarsi alla session non è consentito
 	public String function create(
 		required com.apirone.core.model.bean.Quotation quotation,
-		required String userId
+		required String userId,
+		Boolean isClone = false
 	){
 
-		arguments.quotation.setQuotationNumber( getNextNumber() );
-		arguments.quotation.setVersionNumber( 1 );
+		if (!isClone) {
+			arguments.quotation.setQuotationNumber( getNextNumber() );
+			arguments.quotation.setVersionNumber( 1 );
+		}
 
 		transaction {
 
@@ -217,18 +220,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationStatusHistoryService().create( history );
 
 
-			/*
-				add first zone
-			*/
-			var zone = super.bean( "QuotationZone" );
-			var newQuotation = super.bean( "Quotation" );
-			newQuotation.setId( newId );
+			if (!isClone) {
+				/*
+					add first zone
+				*/
+				var zone = super.bean( "QuotationZone" );
+				var newQuotation = super.bean( "Quotation" );
+				newQuotation.setId( newId );
 
-			zone.setQuotation( newQuotation );
-			zone.setName( "Non assegnato" );
-			zone.setQuantity(1);
+				zone.setQuotation( newQuotation );
+				zone.setName( "Non assegnato" );
+				zone.setQuantity(1);
 
-			getQuotationZoneService().create( zone );
+				getQuotationZoneService().create( zone );
+			}
 
 		}
 
@@ -1088,91 +1093,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public String function clone( required com.apirone.core.model.bean.Quotation quotation, required String statusId ){
+	public String function clone( required com.apirone.core.model.bean.Quotation quotation ){
 		var originalQuotation = arguments.quotation;
 		var clonedQuotation = Duplicate( originalQuotation );
-		var quotationZoneIdsMap = {};
+		clonedQuotation.setId( "" );
+		clonedQuotation.setActive( 0 );
+		var clonedQuotationId = create( clonedQuotation, session.user.getId(), true );
+		
+		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
 
-		originalQuotation.setActive( 0 );
+		for ( var quotationZone in quotationZones ) {
+			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId )
+		}
+
+		originalQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
 		quotationService.update( originalQuotation );
-		clonedQuotation.setId( LCase( CreateUUID() ) );
-		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
-		clonedQuotation.setActive( 1 );
-
-		var status = StatusService.get( arguments.statusId );
-		clonedQuotation.setStatus( status );
-
-		var newQuotationId = getDao().insert( clonedQuotation );
-
-		var quotationZones = quotationZoneSvc.list( quotationId = originalQuotation.getId() );
-
-		var quotationZonesWithoutParent = ArrayFilter( quotationZones, function( quotationZone ){
-			return IsNull( quotationZone.getOrigin() );
-		} )
-
-		for ( var quotationZone in quotationZonesWithoutParent ) {
-			var clonedZone = Duplicate( quotationZone );
-			clonedZone.setQuotation( quotationService.get( newQuotationId ) );
-			clonedZone.setId( LCase( CreateUUID() ) );
-			var newQuotationZoneId = quotationZoneSvc.create( clonedZone );
-			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
-		}
-
-		var quotationZonesWithParent = ArrayFilter( quotationZones, function( quotationZone ){
-			return !IsNull( quotationZone.getOrigin() );
-		} )
-
-		for ( var quotationZone in quotationZonesWithParent ) {
-			var clonedZone = Duplicate( quotationZone );
-
-			// Set the quotation for the cloned zone
-			clonedZone.setQuotation( quotationService.get( newQuotationId ) );
-			clonedZone.setId( LCase( CreateUUID() ) );
-
-			var newOriginId = quotationZoneIdsMap[ quotationZone.getOrigin().getId() ];
-
-			clonedZone.setOrigin( quotationZoneSvc.get( newOriginId ) );
-
-			var newQuotationZoneId = quotationZoneSvc.create( clonedZone );
-
-			quotationZoneIdsMap[ quotationZone.getId() ] = newQuotationZoneId;
-		}
-
-		var quotationItems = QuotationItemService.list( quotationId = originalQuotation.getId() );
-
-		for ( var quotationItem in quotationItems ) {
-			var clonedItem = Duplicate( quotationItem );
-			clonedItem.setQuotation( quotationService.get( newQuotationId ) );
-			clonedItem.setQuotationZone(
-				quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] )
-			);
-			clonedItem.setId( LCase( CreateUUID() ) );
-			var newQuotationItemId = QuotationItemService.create( clonedItem );
-
-			var quotationItemSignageRows = QuotationItemSignageRowService.list( quotationItemId = quotationItem.getId() );
-			for ( quotationItemSignageRow in quotationItemSignageRows ) {
-				var clonedQuotationItemSignageRow = Duplicate( quotationItemSignageRow );
-				clonedQuotationItemSignageRow.setQuotationItemId( newQuotationItemId );
-				QuotationItemSignageRowService.create( clonedQuotationItemSignageRow );
-			}
-
-			var quotationItemPositions = QuotationItemPositionService.list( quotationItemId = quotationItem.getId() );
-
-			for ( quotationItemPosition in quotationItemPositions ) {
-				var clonedQuotationItemPosition = Duplicate( quotationItemPosition );
-				clonedQuotationItemPosition.setQuotationItem( clonedItem );
-				clonedQuotationItemPosition.setQuotationZone(
-					quotationZoneSvc.get( quotationZoneIdsMap[ quotationItem.getQuotationZone().getId() ] )
-				);
-				QuotationItemPositionService.create( clonedQuotationItemPosition );
-			}
-		}
-
-		return newQuotationId;
 
 		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
 
-		return arguments.quotation;
+		return clonedQuotationId;
 	}
 
 	/**
