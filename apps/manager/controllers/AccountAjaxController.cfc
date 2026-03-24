@@ -10,7 +10,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		args["orderBy"] = [ { field = "account.email", desc = "asc" } ]
         
-        var rows = super.fire("account.search", args ).getData();
+        var rows = super.fire("account.list", args );
 
 		var data = memy.convertList( rows, "list" );
         
