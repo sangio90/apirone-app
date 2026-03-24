@@ -195,10 +195,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function create(
 		required com.apirone.core.model.bean.Quotation quotation,
 		required String userId,
-		Boolean isClone = false
+		Boolean isClone = false,
+		Boolean isPromoteStatus = false,
 	){
-
-		if (!isClone) {
+		if (!isPromoteStatus) {
 			arguments.quotation.setQuotationNumber( getNextNumber() );
 			arguments.quotation.setVersionNumber( 1 );
 		}
@@ -220,7 +220,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationStatusHistoryService().create( history );
 
 
-			if (!isClone) {
+			if (!isClone && !isPromoteStatus) {
 				/*
 					add first zone
 				*/
@@ -1097,7 +1097,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var originalQuotation = arguments.quotation;
 		var clonedQuotation = Duplicate( originalQuotation );
 		clonedQuotation.setId( "" );
-		clonedQuotation.setActive( 0 );
 		var clonedQuotationId = create( clonedQuotation, session.user.getId(), true );
 		
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
@@ -1106,10 +1105,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId )
 		}
 
-		originalQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
 		quotationService.update( originalQuotation );
 
-		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
+		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
+
+		return clonedQuotationId;
+	}
+
+	public String function promoteStatus( required com.apirone.core.model.bean.Quotation quotation ){
+		var originalQuotation = arguments.quotation;
+		var clonedQuotation = Duplicate( originalQuotation );
+		clonedQuotation.setId( "" );
+		clonedQuotation.setActive( 0 );
+		clonedQuotation.setQuotationNumber( originalQuotation.getQuotationNumber() );
+		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() );
+		var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
+		
+		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
+
+		for ( var quotationZone in quotationZones ) {
+			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId )
+		}
+
+		quotationService.update( originalQuotation );
+
+		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
 
 		return clonedQuotationId;
 	}

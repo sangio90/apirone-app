@@ -155,10 +155,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		quotation.setPaymentMethod( paymentMethod.setId( json.paymentMethod.id ) );
 		quotation.setCurrency( currency.setId( json.currency.id ) );
-		// quotation.setBillingProfile( type.setId( json.billingProfile.id ) );
-		// quotation.setShippingProfile( type.setId( json.shippingProfile.id ) );
-		// quotation.setsalesAgent( type.setId( json.salesAgent.id ) );
-		// quotation.setgraphicTechnician( type.setId( json.graphicTechnician.id ) );
 		if ( !Len( json.id ) ) {
 
 			thisId = super.fire( "quotation.create", [ quotation, session.user.getId() ] );
@@ -200,7 +196,7 @@ component extends="com.apirone.core.controller.AbsController" {
 						message = "Approvazione rimandata ad un superiore, il prezzo totale del preventivo è " & numberFormat( totalPrice, "999,999.00" ) & " €, ed è maggiore del tuo massimale: " & numberFormat( session.user.getRole().getQuotationMaxAmount(), "999,999.00" ) &  " €";
 
 						history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
-						super.fire('Quotation.clone', { 'quotation': quotation });
+						super.fire('Quotation.promoteStatus', { 'quotation': quotation });
 						super.fire('QuotationStatusHistory.create', [ history ] );
 
 						result.setData( { "message" = message, "error" = {} } );
@@ -224,7 +220,7 @@ component extends="com.apirone.core.controller.AbsController" {
 								var message = "C'è almeno un prodotto nel preventivo che sfora le quantità minima o massima. Approvazione rimandata ad un superiore.";
 
 								history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
-								super.fire('Quotation.clone', { 'quotation': quotation });
+								super.fire('Quotation.promoteStatus', { 'quotation': quotation });
 								super.fire('QuotationStatusHistory.create', [ history ] );
 
 								result.setData( { "message" = message, "error" = {} } );
@@ -244,7 +240,7 @@ component extends="com.apirone.core.controller.AbsController" {
 								var message = "C'è almeno una riga del preventivo che supera il tuo massimale di sconto. Approvazione rimandata ad un superiore.";
 
 								history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
-								super.fire('Quotation.clone', { 'quotation': quotation });
+								super.fire('Quotation.promoteStatus', { 'quotation': quotation });
 								super.fire('QuotationStatusHistory.create', [ history ] );
 
 								result.setData( { "message" = message, "error" = {} } );
