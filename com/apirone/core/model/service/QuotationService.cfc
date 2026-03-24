@@ -655,13 +655,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLANNOTA"  = quotationItem.getNote()
 						}
 
+						var quotationItemQuantity = quotationItem.getQuantity()
+						if (!isNull(quotationItem.getQuotationZone())) {
+							if (!isNull(quotationItem.getQuotationZone().getOrigin())) {
+								quotationItemQuantity *= quotationItem.getQuotationZone().getOrigin().getQuantity()
+							}
+							quotationItemQuantity *= quotationItem.getQuotationZone().getQuantity()
+						}
 						quotationData["CPROWNUM"] = index;
 						quotationData["CPROWORD"] = index * 10;
 						quotationData["MMCODART"] = data["ARCODART"];
 						quotationData["MMCODVAR"] = data["VARCOD"];
 						quotationData["MMCODCOL"] = data["CLCODICE"];
 						quotationData["ARUNMIS1"] = "PZ";
-						quotationData["MMQTAMOV"] = quotationItem.getQuantity();
+						quotationData["MMQTAMOV"] = quotationItemQuantity;
 						quotationData["MMVALUNI"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getAmount() : 0;
 						quotationData["MMSCOAR1"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getDiscount1() : 0;
 						quotationData["MMSCOAR2"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getDiscount2() : 0;
@@ -843,13 +850,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLANNOTA"  = nota
 						}
 
+						var quotationItemQuantity = quotationItem.getQuantity()
+						if (!isNull(quotationItem.getQuotationZone())) {
+							if (!isNull(quotationItem.getQuotationZone().getOrigin())) {
+								quotationItemQuantity *= quotationItem.getQuotationZone().getOrigin().getQuantity()
+							}
+							quotationItemQuantity *= quotationItem.getQuotationZone().getQuantity()
+						}
 						quotationData['CPROWNUM'] = index;
 						quotationData['CPROWORD'] = index * 10;
 						quotationData['MMCODART'] = data['ARCODART'];
 						quotationData['MMCODVAR'] = data['VARCOD'];
 						quotationData['MMCODCOL'] = data['CLCODICE'];
 						quotationData['ARUNMIS1'] = "PZ";
-						quotationData['MMQTAMOV'] = quotationItem.getQuantity();
+						quotationData['MMQTAMOV'] = quotationItemQuantity;
 						var price = 0
 						var discount1 = 0
 						var discount2 = 0
@@ -890,13 +904,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLANNOTA" = nota
 						}
 
+						var quotationItemQuantity = quotationItem.getQuantity()
+						if (!isNull(quotationItem.getQuotationZone())) {
+							if (!isNull(quotationItem.getQuotationZone().getOrigin())) {
+								quotationItemQuantity *= quotationItem.getQuotationZone().getOrigin().getQuantity()
+							}
+							quotationItemQuantity *= quotationItem.getQuotationZone().getQuantity()
+						}
 						quotationData["CPROWNUM"] = index;
 						quotationData["CPROWORD"] = index * 10;
 						quotationData["MMCODART"] = data["ARCODART"];
 						quotationData["MMCODVAR"] = data["VARCOD"];
 						quotationData["MMCODCOL"] = data["CLCODICE"];
 						quotationData["ARUNMIS1"] = "PZ";
-						quotationData["MMQTAMOV"] = quotationItem.getQuantity();
+						quotationData["MMQTAMOV"] = quotationItemQuantity;
 						var price = 0
 						var discount1 = 0
 						var discount2 = 0
