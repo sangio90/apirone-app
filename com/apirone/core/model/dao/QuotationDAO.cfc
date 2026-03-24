@@ -294,6 +294,12 @@
 						NULL
 					</cfif>
 				,
+					<cfif !IsNull( arguments.quotation.getVersionNumber() )>
+						version_number = <cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVersionNumber()#">
+					<cfelse>
+						NULL
+					</cfif>
+				,
 				vat_code_id =
 					<cfif !IsNull( arguments.quotation.getVatCode() )>
 						<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVatCode().getId()#">
