@@ -1121,7 +1121,7 @@ AP.quotation.zonesModal = (function () {
         },
 
         refreshGrids: function() {
-            let zones = AP.quotation.detail.config().zones.filter(z => z.name != '-- Tutte le zone')
+            let zones = AP.quotation.detail.config().zones.filter(z => z.name != '-- Tutte le zone' && z.name != 'Non assegnato')
             .map(z => {
                 let newZ = { ...z }; 
                 
