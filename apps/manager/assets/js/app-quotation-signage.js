@@ -370,11 +370,9 @@ AP.signage.modal = ( function() {
             ) {
                 signageConfigItem.size = viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" );
             }
-            const fontFamily = signageConfig.font && signageConfig.font.family ? signageConfig.font.family : "";
             const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel * 1.4 : 16 * 1.4;
 
-            let fontFamilyName = "Arial"
-            fontFamilyName = viewModel.get('detailForm.data.fontFamilyName') != '' ? viewModel.get('detailForm.data.fontFamilyName') : fontFamilyName
+            const fontFamilyName = viewModel.get('detailForm.data.fontFamilyName') != '' ? viewModel.get('detailForm.data.fontFamilyName') : 'Arial'
 
             // costruisco la regex solo con i nomi interni dei pictogram (senza <>), escapati
             const innerNames = pictogramNames.map( n => n.replace( /[<>]/g, "" ) );
@@ -409,12 +407,13 @@ AP.signage.modal = ( function() {
             }
 
             contentSpanPreview.css( {
-                "font-family": fontFamilyName,
+                "font-family": fontFamilyName + ", Arial, sans-serif",
                 "font-size": heightPx + "px",
                 "line-height": heightPx + "px",
             } );
 
             contentSpanPreview.html( parts.join( "" ) );
+            
 
             return false;
         },
@@ -767,7 +766,7 @@ AP.signage.modal = ( function() {
                         viewModel.parseLines();
                     }
                 } );
-                if ( viewModel.get( "detailForm.data.signageConfig.items" ).length == 2 ) {
+                if ( viewModel.get( "detailForm.data.signageConfig.items" ).length >= 2 ) {
                     viewModel.set( "detailForm.data.quotationItem.signageConfigItem", viewModel.get( "detailForm.data.signageConfig.items" )[1] );
                     this.parseLines();
                 }
