@@ -59,7 +59,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		limit = -1
 	){
 		if ( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
-			return searchByProductItemId( arguments.productItemId );
+			return searchByProductItemIdForPriceCalculator( arguments.productItemId );
 		}
 
 		var rows   = [];
@@ -292,7 +292,55 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	*/
 
 	// TODO: di fatto avrebbe più senso sia searchByAttributeValueId, ma per ora lo lascio così
-	private Array function searchByProductItemId( required String productItemId ){
+	private com.apirone.core.model.bean.Result function searchByProductItemId( required String productItemId ){
+		var data   = [];
+		var result = getResult();
+
+		// components of productItem
+		var componentItems = list( productItemId = arguments.productItemId );
+
+		for ( var item in componentItems ) {
+			item.setTypeId( "own" );
+			data.add( item );
+		}
+
+		// components of attribute of productItem
+		var productItem = getProductItemService().get( arguments.productItemId );
+
+		if ( Len( productItem.getAttributeValue().getId() ) ) {
+			var attrComponents = list( attributeValueId = productItem.getAttributeValue().getId() );
+
+			for ( var thisComponent in attrComponents ) {
+				
+				// thisComponent is ComponentAttributeValue
+				// move to ComponentProductItem
+
+				var bean = super.bean("ComponentProductItem");
+				
+				bean.setRawMemento( thisComponent.getRawMemento() );
+				bean.setProductItem( productItem );
+				bean.setTypeId( "base" );
+
+				var override = getComponentOverrideService().list( productItem.getId(), thisComponent.getId() );
+
+				if ( override.len() ) {
+					// TODO: should be only one override. Add check? db guarantees uniqueness
+
+					bean.setOverride( override[ 1 ] );
+				}
+
+				data.add( bean );
+			}
+		}
+
+		result.setData( data );
+		result.setCount( data.len() );
+		result.setTotal( data.len() );
+
+		return result;
+	}
+
+	private Array function searchByProductItemIdForPriceCalculator( required String productItemId ){
 		var data   = [];
 		var result = getResult();
 

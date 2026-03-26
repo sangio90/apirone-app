@@ -267,10 +267,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var dataExport = {
 							"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
 							"ARCODART"  = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ),
-							"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, 35 ) & RepeatString(
+							"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, Len(quotationItem.getArticle().getDescription()) ) & RepeatString(
 								"0",
-								35 - Len( quotationItem.getArticle().getDescription().subString( 0, 35 ) )
+								35 - Len( quotationItem.getArticle().getDescription().subString( 0, Len(quotationItem.getArticle().getDescription()) ) )
 							),
+							"ARDESSUP"  = "",
 							"ARDATCAR"  = Now(),
 							"ARUNMIS1"  = "PZ",
 							"VARCOD"    = "0000000000",
@@ -644,10 +645,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var data = {
 							"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
 							"ARCODART"  = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ),
-							"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, 35 ) & RepeatString(
+							"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, Len(quotationItem.getArticle().getDescription()) ) & RepeatString(
 								"0",
-								35 - Len( quotationItem.getArticle().getDescription().subString( 0, 35 ) )
+								35 - Len( quotationItem.getArticle().getDescription().subString( 0, Len(quotationItem.getArticle().getDescription()) ) )
 							),
+							"ARDESSUP"  = "",
 							"ARDATCAR"  = Now(),
 							"ARUNMIS1"  = "PZ",
 							"VARCOD"    = "0000000000",
