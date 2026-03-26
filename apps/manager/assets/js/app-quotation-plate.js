@@ -1183,6 +1183,12 @@ AP.plate.modal = ( function() {
             // Crea una mappa { id: cellIds } per ogni frutto
             var positions = {};
 
+            if (!pub.fruitsController.fruits.length) {
+                AP.widget.notify( "error", "Devi configurare almeno un frutto per poter procedere." );
+                AP.loading.hide()
+                return false;
+            }
+
             pub.fruitsController.fruits.forEach( function( fruit ) {
                 positions[ fruit.id ] = fruit.cellIds;
             } );
