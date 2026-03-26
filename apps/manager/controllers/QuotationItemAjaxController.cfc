@@ -649,9 +649,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var quotationItem = super.fire( "quotationItem.get", [ id ]);
 		var quotationId = quotationItem.getQuotation().getId()
-		var lineId = quotationItem.getProduct().getLine().getId()
-		var finishId = quotationItem.getProduct().getFinish().getId()
-		var productId = quotationItem.getProduct().getId()
+		if (isNull(quotationItem.getArticle())) {
+			var lineId = quotationItem.getProduct().getLine().getId()
+			var finishId = quotationItem.getProduct().getFinish().getId()
+			var productId = quotationItem.getProduct().getId()
+		}
 
 		transaction {
 			var outcome = super.fire( "quotationItem.delete", [ id ] );
@@ -675,7 +677,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					"finishId" = finishId
 					} 
 				);
-			} elseif (!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle")) {
+			} elseif (isNull(quotationItem.getArticle())) {
 				super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdAndProductId", {
 					"quotationId" = quotationId,
 					"quotationItemId" = id, 
