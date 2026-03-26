@@ -1,4 +1,5 @@
-component extends="com.apirone.core.controller.AbsController" {
+component extends="com.apirone.core.controller.AbsController" accessors="true" {
+	property name="dao" inject="ProductItemDAO";
 
     function listComponents( event, rc, prc ){
 
@@ -69,7 +70,7 @@ component extends="com.apirone.core.controller.AbsController" {
             productComponent.setColor( color );
             productComponent.setVariant( variant );
             productComponent.setQuantity( thisComponent.quantity );
-            
+
             super.fire( "ProductItem.addComponent", { productItemId = itemId, productComponent = productComponent } );
 
         }
@@ -95,14 +96,20 @@ component extends="com.apirone.core.controller.AbsController" {
             originId = StructKeyExists(rc, "originId") ? rc.originId : null
         };
 
-		var items = super.fire( "ProductItem.list", params );
-	    var data = ( memy.convertList( items, "treelight" ) );
+        var data = getDao().findComplete( argumentCollection = params );
+
+		//var items = super.fire( "ProductItem.list", params );
+	    // var data = ( memy.convertList( a, "treelight" ) );
 
         // var data = transformer.convertList( items, "tree" );
 
-		result.setTotal( data.len() );
-		result.setCount( data.len() );
-		result.setData( data );
+        var jsonData = serializeJSON(data, "struct")
+        var deserializedJsonData = deserializeJSON(jsonData);
+
+		result.setTotal( arrayLen(deserializedJsonData) );
+		result.setCount( arrayLen(deserializedJsonData) );
+		result.setData( deserializedJsonData );
+        //?productId=64c21935-dca1-494b-8640-9ec5f65f25e8&originId=101634
 
 		event.setValue( "result", result );
 	}

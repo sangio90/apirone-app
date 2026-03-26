@@ -15,6 +15,32 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<cffunction name="findComplete" returntype="Query">
+		<cfargument name="productId" type="String">
+		<cfargument name="originId" type="Numeric">
+		<cfquery name="local.q" datasource="apirone" result="local.result">
+			SELECT
+				*
+			FROM
+				product_items
+				<cfif !IsNull( arguments.attributeId )>
+					INNER JOIN attributes_raw_values USING ( attribute_raw_value_id )
+						INNER JOIN attributes USING ( attribute_id )
+				</cfif>
+			WHERE 1=1
+
+				<cfif !IsNull( arguments.productId )>
+					AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+				</cfif>
+
+			ORDER BY
+				product_items.orderby ASC
+		</cfquery>
+
+		<cfreturn local.q>
+
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="productId" type="String">
 		<cfargument name="originId" type="Numeric">

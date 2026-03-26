@@ -115,12 +115,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
-		var records = getDao().find( argumentCollection = arguments );
-
-		records.each( function( record ){
-			rows.add( get( record.product_item_id ) );
-		} );
-
+		var records = getDao().findComplete( argumentCollection = arguments );
+	
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.recordcount ) );
