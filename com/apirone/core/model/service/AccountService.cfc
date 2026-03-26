@@ -183,6 +183,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	public Array function list(){
+		arguments[ "limit" ] = -1;
+
+		return search( argumentCollection = arguments ).getData();
+	}
+
 	public String function createPassword( required String accountId, required String pwd ){
 		var token =
 		"jbGM,xxJJaJX-ol@@5m88" &

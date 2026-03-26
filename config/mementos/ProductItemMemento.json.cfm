@@ -13,7 +13,8 @@
 				"level",
 				"orderBy",
 				"productId",
-				"spaces"
+				"spaces",
+				"images"
 			]
 		},
 		tree = {

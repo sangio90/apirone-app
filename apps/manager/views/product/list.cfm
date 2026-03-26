@@ -25,39 +25,45 @@
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
 
-										<div class="col">
+										<div class="col-3 pe-1">
 											<span>Categoria</span>
-											<select class="form-control me-2" name="categoryId">
-												<option value="">-- tutte</option>
-												<cfloop array="#prc.categories#" item="item">
-													<option value="#item.getId()#">#item.getName()#</option>
-												</cfloop>
+											<select class="form-control me-2" name="categoryId"
+												data-role="combobox"
+												data-placeholder="-- Seleziona categoria"
+												data-bind="source: categories, value: category, events: { change: loadLines }"
+												data-value-field="id"
+												data-text-field="name"
+												data-filter="contains">
 											</select>
 										</div>
 
-										<div class="col">
+										<div class="col-2 pe-1">
 											<span>Linea</span>
-											<select class="form-control me-2" name="lineId">
-												<option value="">-- tutte</option>
-												<cfloop array="#prc.lines#" item="item">
-													<option value="#item.getId()#">#item.getName()#</option>
-												</cfloop>
+											<select class="form-control" name="lineId"
+												data-role="combobox"
+												data-placeholder="-- Seleziona linea"
+												data-bind="source: lines, value: line, events: { change: loadModels }" 
+												data-value-field="id"
+												data-text-field="name"
+												data-filter="contains">
 											</select>
 										</div>
 
-										<div class="col">
+										<div class="col-3 pe-1">
 											<span>Modello</span>
-											<select class="form-control me-2" name="modelId">
-												<option value="">-- tutte</option>
-												<cfloop array="#prc.models#" item="item">
-													<option value="#item.getId()#">#item.getName()# (#item.getCode()#)</option>
-												</cfloop>
+											<select class="form-control" name="modelId"
+												data-role="combobox"
+												data-placeholder="-- Seleziona modello"
+												data-bind="source: models, value: model" 
+												data-value-field="id"
+												data-text-field="name"
+												data-filter="contains">
 											</select>
 										</div>
 
-										<div class="col">
+										<div class="col-1 pe-1">
 											<span>Status</span>
-											<select class="form-control me-2" name="statusId">
+											<select class="form-control" name="statusId">
 												<option value="">-- tutti</option>
 												<cfloop array="#prc.statuses#" item="item">
 													<option value="#item.getId()#">#item.getName()#</option>
@@ -65,7 +71,7 @@
 											</select>
 										</div>
 
-										<div class="col">
+										<div class="col-1 pe-1">
 											<span>Ordina per</span>
 											<select class="form-control me-2" name="orderBy">
 												<option value="product.code-asc" SELECTED>Codice [A-Z]</option>

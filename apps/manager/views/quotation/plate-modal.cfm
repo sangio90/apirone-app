@@ -26,10 +26,12 @@
                                 <select id="plate-line"
                                     required
                                     class="form-control"
+                                    data-role="combobox"
+                                    data-placeholder="-- Seleziona la linea"
                                     data-bind="source: lines, value: detailForm.data.product.line.id, events: { change: loadModels }"
                                     data-value-field="id"
                                     data-text-field="name"
-                                    >
+                                    data-filter="contains">
                                 </select>
                             </div>
 
@@ -38,10 +40,12 @@
                                 <select id="plate-model"
                                     required
                                     class="form-control"
+                                    data-role="combobox"
+                                    data-placeholder="-- Seleziona il modello"
                                     data-bind="source: models, value: detailForm.data.product.model.id, events: { change: loadFinishes }"
                                     data-value-field="id"
                                     data-text-field="code"
-                                    >
+                                    data-filter="contains">
                                 </select>
                             </div>
 
@@ -50,10 +54,12 @@
                                 <select id="plate-finish"
                                     required
                                     class="form-control"
+                                    data-role="combobox"
+                                    data-placeholder="-- Seleziona la finitura"
                                     data-bind="source: finishes, value: detailForm.data.product.finish.id, events: { change: loadProduct }"
                                     data-value-field="id"
                                     data-text-field="name"
-                                    >
+                                    data-filter="contains">
                                 </select>
                             </div>
                         </div>
@@ -146,13 +152,15 @@
 
                                 <div id="plate-designer-root">
                                     <!--- Dynamically populated container --->
-                                    <div class="plate-designer" id="plate-designer">
+                                    <div class="plate-designer" id="plate-designer" style="display: none">
                                         <div class="plate-designer-canvas" id="plate-designer-canvas">
                                             <h1 style="opacity: 0.5;">Definisci le impostazioni in alto per iniziare</h1>
                                         </div>
                                     </div>
+                                    <div class="plate-custom-designer" id="plate-custom-designer" style="display: none">
+                                        <img id="plate-custom-image" data-bind="attr: { src: backgroundCustomImage.url }, visible: backgroundCustomImage.url" />
+                                    </div>
                                 </div>
-
                             </div>
 
                             <!---
@@ -163,16 +171,35 @@
                                 #view(view="quotation/item-plate-pricing", args={id="plate-quotation-item-pricing-box"})#
                             </div>
                             ---->
-                            <div class="col-2">
+                            <div class="col-2" style="z-index: 1">
                                 <div class="h-100">
 
                                     <div class="row">
-                                        <div class="col-6">
+                                        <div class="col-3">
                                             <div class="mb-1">Speciale:</div>
                                             <div>
                                                 <input class="form-check-input" type="checkbox"
                                                     name="special"
                                                     data-bind="checked: detailForm.data.special">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-3">
+                                            <div id="imageCustomInput" data-bind="visible: detailForm.data.id">
+                                                <div class="mb-1">Immagine Custom:</div>
+                                                <div>
+                                                    <input class="form-check-input me-4" type="checkbox"
+                                                        name="customImage" 
+                                                        data-bind="checked: detailForm.data.customImage, events: { change: toggleCustomImage }"
+                                                    >
+                                                    <a type="button" class="btn btn-primary btn-sm"
+                                                        data-type="quotationItem"
+                                                        data-bind="click:openImagesList, visible: detailForm.data.customImage"
+                                                        style="font-size: 10px;"
+                                                    >
+                                                        Aggiungi <i class="fas fa-image"></i>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
 

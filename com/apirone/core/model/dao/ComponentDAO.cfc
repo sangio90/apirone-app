@@ -1,6 +1,7 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction name="read">
 		<cfargument name="componentId" type="Numeric" required="true">
+		<cfargument name="productItemId" type="Numeric" required="false">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
@@ -11,6 +12,105 @@
 		</cfquery>
 
 		<cfreturn local.q>
+	</cffunction>
+	
+	<cffunction name="priceCalculatorRead" returntype="struct">
+		<cfargument name="componentId" type="numeric" required="false">
+		<cfargument name="productItemId" type="numeric" required="false">
+
+		<cfquery name="componentQuery" datasource="apirone">
+			SELECT
+				c.component_id as id,
+				
+				CASE 
+					WHEN co.deleted = true THEN true
+					ELSE false
+				END AS isDeleted,
+
+				CASE
+					WHEN co.deleted = true THEN 0
+					WHEN co.quantity IS NOT NULL THEN c.quantity + co.quantity
+					ELSE c.quantity
+				END AS totalQuantity,
+
+				c.raw_product_id,
+				c.variant_id,
+				c.color_id
+
+			FROM components c
+
+			LEFT JOIN component_overrides co 
+				ON c.component_id = co.component_id 
+				<cfif NOT IsNull(arguments.productItemId)>
+					AND co.product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="integer">
+				</cfif>
+			WHERE 1=1
+			<cfif NOT IsNull(arguments.componentId)>
+				AND c.component_id = <cfqueryparam value="#arguments.componentId#" cfsqltype="integer">
+			</cfif>
+			<cfif NOT IsNull(arguments.productItemId)>
+				AND c.product_item_id = <cfqueryparam value="#arguments.productItemId#" cfsqltype="integer">
+			</cfif>
+		</cfquery>
+
+		<cfif componentQuery.recordCount EQ 0>
+			<cfreturn {} />
+		</cfif>
+
+		<cfset component = componentQuery.getRow(1)>
+		<cfset component["costAmount"] = 0>
+		<cfquery name="verticalCost" datasource="verticale">
+			SELECT TOP 1 lispre
+			FROM azapi_listin
+			WHERE TRIM(lisart) = <cfqueryparam value="#Trim(component.raw_product_id)#" cfsqltype="varchar">
+			AND (
+				(
+					TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar"> AND 
+					TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar">
+				) 
+				OR TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar">
+				OR TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar">
+				OR 1=1
+			)
+			ORDER BY
+				CASE
+					WHEN 
+						TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar">
+						AND TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar"> 
+						THEN 1
+					WHEN 
+						TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar"> 
+						THEN 2
+					WHEN 
+						TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar"> 
+						THEN 3
+					ELSE 4
+				END
+		</cfquery>
+
+		<cfif verticalCost.recordCount GT 0>
+			<cfset component["costAmount"] = verticalCost.lispre[1]>
+		</cfif>
+
+		<cfquery name="rawProductData" datasource="verticale">
+			SELECT
+				ardesart as raw_product_name,
+				CASE WHEN artipmat = 'LAV' THEN 'LV' ELSE 'MP' END AS raw_product_processiong_type
+			FROM
+				azapi_artico a
+			WHERE
+				arcodart = <cfqueryparam cfsqltype="varchar" value="#component.raw_product_id#">
+		</cfquery>
+
+		<cfif rawProductData.recordCount GT 0>
+			<cfset component["raw_product_name"] = rawProductData.getRow(1).raw_product_name>
+			<cfset component["raw_product_processiong_type"] = rawProductData.getRow(1).raw_product_processiong_type>
+		<cfelse>
+			<cfset component["raw_product_name"] = "">
+			<cfset component["raw_product_processiong_type"] = "">
+		</cfif>
+
+		<cfreturn component>
 	</cffunction>
 
 	<cffunction returntype="Query" name="find">

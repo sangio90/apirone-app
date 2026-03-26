@@ -236,61 +236,70 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		bean.setProduct( super.fire( "Product.get", { "productId" = product.getId() } ) );
 		
-		if ( !Len( id ) ) {
-			messageId = "quotationItem.created";
-			thisId    = super.fire( "quotationItem.create", [ bean ] )
-		} else {
-			messageId = "quotationItem.updated";
-			thisId    = super.fire( "quotationItem.update", [ bean ] )
-		}
+		transaction {
+			if ( !Len( id ) ) {
+				messageId = "quotationItem.created";
+				thisId    = super.fire( "quotationItem.create", [ bean ] )
+			} else {
+				messageId = "quotationItem.updated";
+				thisId    = super.fire( "quotationItem.update", [ bean ] )
+			}
 
-		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "accessory" );
+			saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "accessory" );
 
-		var quotationItemProductItems = super.fire(
-			"quotationItemProductItem.list",
-			{ quotationItemId = thisId }
-		);
-		
-		quotationItemProductItems.each( function( quotationItemProductItem ){
-			super.fire(
-				"quotationItemProductItem.delete",
-				{ "productItemId" = quotationItemProductItem.getId() }
-			)
-		} );
+			var quotationItemProductItems = super.fire(
+				"quotationItemProductItem.list",
+				{ quotationItemId = thisId }
+			);
+			
+			quotationItemProductItems.each( function( quotationItemProductItem ){
+				super.fire(
+					"quotationItemProductItem.delete",
+					{ "productItemId" = quotationItemProductItem.getId() }
+				)
+			} );
 
-		if ( json.quotationItem.product.keyExists( "items" ) ) {
-			var productItemsData = json.quotationItem.product.items._data;
-			productItemsData.each( function( productItemRow ){
-				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
-					return v.selected;
-				} );
+			if ( json.quotationItem.product.keyExists( "items" ) ) {
+				var productItemsData = json.quotationItem.product.items._data;
+				productItemsData.each( function( productItemRow ){
+					var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
+						return v.selected;
+					} );
 
-				if ( Len( selectedValue ) > 0 ) {
-					selectedValue   = selectedValue[ 1 ];
-					var productItem = super.fire(
-						"productItem.get",
-						{ "productItemId" = selectedValue.product_item_id }
-					);
+					if ( Len( selectedValue ) > 0 ) {
+						selectedValue   = selectedValue[ 1 ];
+						var productItem = super.fire(
+							"productItem.get",
+							{ "productItemId" = selectedValue.product_item_id }
+						);
 
-					var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
-					
-					quotationItemProductItemBean.setQuotationItemId( thisId );
-					quotationItemProductItemBean.setProductItem( productItem );
-					quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
-					quotationItemProductItemBean.setLevel( productItemRow.level );
-					if (structKeyExists(productItemRow, 'note')) {
-						quotationItemProductItemBean.setNote( productItemRow.note );
+						var quotationItemProductItemBean = super.bean( "quotationItemProductItem" );
+						
+						quotationItemProductItemBean.setQuotationItemId( thisId );
+						quotationItemProductItemBean.setProductItem( productItem );
+						quotationItemProductItemBean.setOrigin( productItem.getOrigin() );
+						quotationItemProductItemBean.setLevel( productItemRow.level );
+						if (structKeyExists(productItemRow, 'note')) {
+							quotationItemProductItemBean.setNote( productItemRow.note );
+						}
+						quotationItemProductItemBean.setId( thisId )
+
+						super.fire(
+							"quotationItemProductItem.create",
+							{ "productItem" = quotationItemProductItemBean }
+						)
 					}
-					quotationItemProductItemBean.setId( thisId )
+				} )
+			}
 
-					super.fire(
-						"quotationItemProductItem.create",
-						{ "productItem" = quotationItemProductItemBean }
-					)
-				}
-			} )
+			super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdAndProductId", {
+				"quotationId" = json.quotationId,
+				"quotationItemId" = thisId, 
+				"productId" = json.quotationItem.product.id
+				} 
+			);
 		}
-
+		
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
@@ -339,6 +348,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setQuotation( super.service( "Quotation" ).get( json.quotationId ) );
 		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
 		bean.setQuantity( json.quotationItem.quantity );
+		bean.setCustomImage( json.quotationItem.customImage );
 
 		if( Len( json.quotationItem?.position?.code ) ) {
 			var position = populatePositionBean( json.quotationItem.position );
@@ -484,6 +494,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setStatus( status.setId( json.item.status.id ) );
 		bean.setQuotationZone( zone.setId( json.item.quotationZone.id ) );
 		bean.setSpecial( json.item.special );
+		bean.setCustomImage( json.item.customImage );
 		bean.setFrame( frame.setOrientation( orientation.setId( json.item.product.orientation.id ) ) );
 		bean.setNote( json.item.note )
 
@@ -640,6 +651,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotationId = quotationItem.getQuotation().getId()
 		var lineId = quotationItem.getProduct().getLine().getId()
 		var finishId = quotationItem.getProduct().getFinish().getId()
+		var productId = quotationItem.getProduct().getId()
 
 		transaction {
 			var outcome = super.fire( "quotationItem.delete", [ id ] );
@@ -663,6 +675,13 @@ component extends="com.apirone.core.controller.AbsController" {
 					"finishId" = finishId
 					} 
 				);
+			} elseif (!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle")) {
+				super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdAndProductId", {
+					"quotationId" = quotationId,
+					"quotationItemId" = id, 
+					"productId" = productId
+					} 
+				);
 			}
 			result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
 		}
@@ -677,11 +696,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var id = rc.id;
 
 		if (!IsNull(id)) {
-			var quotationItems = super.fire( "quotationItem.list", { quotationId = id } )
+			var quotationItems = super.fire( "quotationItem.list", { quotationId = id, useCache = false } )
 
 			transaction {
 				for (var quotationItem in quotationItems) {
-					if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
+					if (!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle")) {
 						super.fire( "quotationItem.aggiornaPrezzo", { "quotationItem" = quotationItem } );
 					}
 				}

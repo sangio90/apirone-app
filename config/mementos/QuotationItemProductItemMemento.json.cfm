@@ -9,6 +9,7 @@
 		"productItem.attributeValue.rawValue",
 		"productItem.attributeValue.allowNote",
 		"productItem.attributeValue.id",
+		"productItem.images",
 		"origin",
 		"origin.attribute",
 		"level",

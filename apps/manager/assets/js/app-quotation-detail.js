@@ -534,6 +534,14 @@ AP.quotation.detail = ( function() {
                                 var zones = [];
                             }
 
+                            zones.unshift(
+                                {
+                                    "id": "",
+                                    "name": "-- Tutte le zone",
+                                    "quantity": 1
+                                }
+                            )
+
                             zones.forEach( function( zone ) {
                                 if ( zone.origin ) {
                                     zone.name = "\u00A0\u00A0- " + zone.name;
@@ -859,7 +867,7 @@ AP.quotation.detail = ( function() {
             $( "body" ).find( "button#nav-plate-tab" ).click();
             $('#qt-update-prices').show();
         } else {
-            if (!['signage', 'plate'].includes(urlParams.get('tab'))) {
+            if (!['signage', 'plate', 'accessory'].includes(urlParams.get('tab'))) {
                 $('#qt-update-prices').hide();
             }
         }
@@ -931,7 +939,7 @@ AP.quotation.detail = ( function() {
                 fields.addSignageBtn.hide();
                 fields.addAccessoryBtn.show();
                 fields.addArticleBtn.hide();
-                $('#qt-update-prices').hide();
+                $('#qt-update-prices').show();
             } );
 
             document.querySelector( "#nav-article-tab" ).addEventListener( "click", function( event ) {
@@ -1113,7 +1121,7 @@ AP.quotation.zonesModal = (function () {
         },
 
         refreshGrids: function() {
-            let zones = AP.quotation.detail.config().zones.filter(z => z.name != '-- Tutte le zone')
+            let zones = AP.quotation.detail.config().zones.filter(z => z.name != '-- Tutte le zone' && z.name != 'Non assegnato')
             .map(z => {
                 let newZ = { ...z }; 
                 
@@ -1138,7 +1146,7 @@ AP.quotation.zonesModal = (function () {
     pub.init = function () {
         let allZones = AP.quotation.detail.config().zones || [];
         let gridZones = allZones
-            .filter(z => z.name != '-- Tutte le zone')
+            .filter(z => z.name != '-- Tutte le zone' && z.name != 'Non assegnato')
             .map(z => {
                 let newZ = { ...z }; 
                 
@@ -1148,7 +1156,7 @@ AP.quotation.zonesModal = (function () {
                 
                 return newZ;
             });
-        let parentZones = allZones.filter(z => !z.origin && z.name != '-- Tutte le zone');
+        let parentZones = allZones.filter(z => !z.origin && z.name != '-- Tutte le zone' && z.name != 'Non assegnato');
 
         parentZones.unshift({
             'id': '',

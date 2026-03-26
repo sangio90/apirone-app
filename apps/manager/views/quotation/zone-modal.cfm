@@ -41,6 +41,17 @@
                                     data-bind="value: detailForm.data.quantity">
                             </div>
                         </div>
+                        <div class="mb-3 row">
+                            <div class="col-12">
+                                <div class="alert alert-danger">
+                                    <b>Attenzione</b>: la quantità delle zone "figlie" deve considerarsi già moltiplicata per la quantità della zona padre.<br><br>
+                                    Esempio:<br>
+                                    Camera&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(qtà 10)<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;|_ Bagno (qtà 1)<br>
+                                    I prodotti nel bagno avranno quantità n * 10. In questo caso, dovrò impostare quantità Bagno a 2 solo se ogni camera ha effettivamente due bagni. 
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <footer class="card-footer">

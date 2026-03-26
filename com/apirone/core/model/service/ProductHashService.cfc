@@ -126,6 +126,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var modelId = quotationItem.getProduct().getModel().getId();
 		var finishId = quotationItem.getProduct().getFinish().getId();
 		var note = quotationItem.getNote();
+		var special = quotationItem.getSpecial();
 		var items = quotationItem.getItems();
 
 		var productItems = [];
@@ -145,6 +146,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"modelId": modelId,
 			"finishId": finishId,
 			"note": note,
+			"special": special,
 			"productItems": productItems
 		};
 

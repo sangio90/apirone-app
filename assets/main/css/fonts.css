@@ -135,3 +135,100 @@
 		U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122,
 		U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* ===== CUSTOM FONTS ===== */
+
+@font-face {
+    font-family: 'Agenda';
+    src: url('/assets/main/fonts/agenda.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Arial';
+    src: url('/assets/main/fonts/arial.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'ARIAL ROUNDED';
+    src: url('/assets/main/fonts/arial-rounded.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Baskerville Old Face';
+    src: url('/assets/main/fonts/baskerville-old-face.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Caghen';
+    src: url('/assets/main/fonts/caghen.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Century Gothic';
+    src: url('/assets/main/fonts/century.gothic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Din Light Regular';
+    src: url('/assets/main/fonts/din-light.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Futura Std Cond';
+    src: url('/assets/main/fonts/futura-std-cond.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Helvetica Neue LT STD 75 BOLD';
+    src: url('/assets/main/fonts/helvetica-neue-75-bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Helvetica Neue LT STD 65 MEDIUM';
+    src: url('/assets/main/fonts/helvetica-neue-65-medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Interdimensional';
+    src: url('/assets/main/fonts/interdimensional.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'ITC Officina Sans Bold';
+    src: url('/assets/main/fonts/itc-officina-bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Made Cannes';
+    src: url('/assets/main/fonts/made-cannes.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Maison Neue Demi';
+    src: url('/assets/main/fonts/maison-neue-demi.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('/assets/main/fonts/montserrat-regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Montserrat b';
+    src: url('/assets/main/fonts/montserrat-bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Mouse Deco Regular';
+    src: url('/assets/main/fonts/mouse-deco.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'TRAJAN PRO';
+    src: url('/assets/main/fonts/trajan-pro.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Times New Roman';
+    src: url('/assets/main/fonts/times-new-roman.woff2') format('woff2');
+}

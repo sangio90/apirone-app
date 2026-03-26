@@ -25,7 +25,7 @@
 
 		<cfquery name="local.q" datasource="apirone" result="local.result">
 			SELECT
-				product_item_id, origin_id
+				product_item_id, origin_id, attribute_raw_value_id
 			FROM
 				product_items
 				<cfif !IsNull( arguments.attributeId )>

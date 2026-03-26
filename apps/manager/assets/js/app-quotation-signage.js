@@ -16,6 +16,10 @@ AP.signage.modal = ( function() {
         return AP.quotation.itemPricing;
     }
 
+    function fileApp() {
+        return AP.file.modal;
+    }
+
     var pub = {};
 
     var defaultDetailForm = {
@@ -46,6 +50,7 @@ AP.signage.modal = ( function() {
                 },
                 signageRows: new kendo.data.DataSource(),
                 special: false,
+                customImage: false,
                 status: {
                     id: "ACT",
                     name: "Attivo"
@@ -55,7 +60,7 @@ AP.signage.modal = ( function() {
             signageConfig: {
                 catalogBundle: {
                     category: {
-                        id: ""
+                        id: 20
                     },
                     line: {
                         id: ""
@@ -68,6 +73,7 @@ AP.signage.modal = ( function() {
                     id: ""
                 }
             },
+            fontFamilyName: ""
         },
         statuses: AP.page.statuses,
         itemStatuses: AP.page.itemStatuses,
@@ -103,10 +109,39 @@ AP.signage.modal = ( function() {
         quotationSubzone: {
             "id": ""
         },
+        showCustomImage: false,
+        showImage: true,
 
-        //aggiunto per gestire il cambiamento delle checkbox
+        //aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
         toggleCustomImage: function( event ) {
+            const value = event.target.checked
+            viewModel.set('showCustomImage', value)
+            viewModel.set('showImage', !value)
+
             return
+        },
+
+        //metodo che compone la struttura dati da passare al componente app-file, punto centralizzato di gestione del caricamento immagini
+        openImagesList: function( event ) {
+
+            var element = $( event.currentTarget );
+
+            if ( !element.attr( "data-type" ) ) {
+                console.error( "ERROR. Set data-type attribute in currentTarget" );
+                return;
+            }
+
+
+            var type = element.data( "type" );
+            var value = {
+                type: type,
+                id: viewModel.get('detailForm.data.quotationItem.id'),
+                name: viewModel.get('detailForm.data.quotationItem.id'),
+            };
+
+            fileApp().open( value );
+
+            return false;
         },
 
         changeZone: function() {
@@ -149,7 +184,8 @@ AP.signage.modal = ( function() {
                 vm.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) != "" &&
                 vm.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" &&
                 vm.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) != "" &&
-                vm.get( "detailForm.data.signageConfig.font.id" ) != ""
+                vm.get( "detailForm.data.signageConfig.font.id" ) != "" &&
+                vm.get( "detailForm.data.quotationItem.signageRows" ).data().length <= vm.get( "maxRows" )
             ) {
                 viewModel.set( "canSave", true );
             } else {
@@ -174,7 +210,7 @@ AP.signage.modal = ( function() {
                 const name = p.replace( /[<>]/g, "" );
                 return {
                     label: name,
-                    image: `<img src="/assets/main/pictograms/Arial/${name}.png" alt="${name}" class="pictogram px-2">`
+                    image: `<img src="/assets/main/pictograms/Arial/${name}.svg" alt="${name}" class="pictogram px-2" style="height: 30px; width: 30px;">`
                 };
             } );
         },
@@ -236,59 +272,75 @@ AP.signage.modal = ( function() {
         parseLines: async function( e ) {
             viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
             if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
-                bootbox.confirm( {
-                    title: "Cancellazione righe",
-                    message: "Cambiando la dimensione del font cambierà la quantità di righe che puoi inserire nella segnaletica. Le righe in eccesso verranno eliminate, Vuoi procedere?",
-                    buttons: {
-                        confirm: {
-                            label: "Si, confermo",
-                            className: "btn-primary",
+                if (viewModel.get('detailForm.data.quotationItem.id') != '') {
+                    bootbox.confirm( {
+                        title: "Cancellazione righe",
+                        message: "Cambiando la dimensione del font cambierà la quantità di righe che puoi inserire nella segnaletica. Le righe in eccesso verranno eliminate, Vuoi procedere?",
+                        buttons: {
+                            confirm: {
+                                label: "Si, confermo",
+                                className: "btn-primary",
+                            },
+                            cancel: {
+                                label: "No, chiudi",
+                                className: "btn-danger",
+                            },
                         },
-                        cancel: {
-                            label: "No, chiudi",
-                            className: "btn-danger",
-                        },
-                    },
-                    callback: function( result ) {
-                        if ( result ) {
-                            const exceeded = viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().slice( viewModel.get( "maxRows" ) );
-                            const promises = exceeded.map( signageRow => {
-                                return new Promise( resolve => {
-                                    NM.util.ajax( {
-                                        method: "DELETE",
-                                        url: "/manager/ajax/quotation-items/signagerow",
-                                        data: { id: signageRow.id },
-                                        callback: {
-                                            done: function( xhr ) {
-                                                if ( xhr.status == "ERROR" ) {
-                                                    AP.widget.notify( "error", "Errore nella cancellazione della Riga Segnaletica." );
-                                                }
-                                                if ( xhr.status == "SUCCESS" ) {
-                                                    AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
-                                                    const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
-                                                    const row = ds.view().find( r => r.id === signageRow.id );
-                                                    if ( row ) {
-                                                        ds.remove( row );
+                        callback: function( result ) {
+                            if ( result ) {
+                                const exceeded = viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().slice( viewModel.get( "maxRows" ) );
+                                const promises = exceeded.map( signageRow => {
+                                    return new Promise( resolve => {
+                                        NM.util.ajax( {
+                                            method: "DELETE",
+                                            url: "/manager/ajax/quotation-items/signagerow",
+                                            data: { id: signageRow.id },
+                                            callback: {
+                                                done: function( xhr ) {
+                                                    if ( xhr.status == "ERROR" ) {
+                                                        AP.widget.notify( "error", "Errore nella cancellazione della Riga Segnaletica." );
                                                     }
-                                                    if ( ds ) {
-                                                        ds.data().forEach( ( row, i ) => {
-                                                            row.set( "index", i + 1 );
-                                                        } );
+                                                    if ( xhr.status == "SUCCESS" ) {
+                                                        AP.widget.notify( "success", "Riga Segnaletica eliminata correttamente." );
+                                                        const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+                                                        const row = ds.view().find( r => r.id === signageRow.id );
+                                                        if ( row ) {
+                                                            ds.remove( row );
+                                                        }
+                                                        if ( ds ) {
+                                                            ds.data().forEach( ( row, i ) => {
+                                                                row.set( "index", i + 1 );
+                                                            } );
+                                                        }
                                                     }
+                                                    resolve();
                                                 }
-                                                resolve();
                                             }
-                                        }
+                                        } );
                                     } );
                                 } );
-                            } );
 
-                            Promise.all( promises ).then( () => {
-                                viewModel.save();
+                                Promise.all( promises ).then( () => {
+                                    viewModel.save();
+                                } );
+                            }
+                        },
+                    } );
+                } else {
+                    const exceeded = viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().slice( viewModel.get( "maxRows" ) );
+                    exceeded.map( signageRow => {
+                        const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+                        const row = ds.view().find( r => r.id === signageRow.id );
+                        if ( row ) {
+                            ds.remove( row );
+                        }
+                        if ( ds ) {
+                            ds.data().forEach( ( row, i ) => {
+                                row.set( "index", i + 1 );
                             } );
                         }
-                    },
-                } );
+                    })
+                }
             }
 
             viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( signageRow => {
@@ -299,7 +351,6 @@ AP.signage.modal = ( function() {
             } );
             this.checkCanSave();
             AP.setUserPref( "signage.signageConfigId", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) );
-            AP.setUserPref( "signage.signageConfigRowCount", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
         },
 
         parsedLineContent: function( valore, id ) {
@@ -319,8 +370,9 @@ AP.signage.modal = ( function() {
             ) {
                 signageConfigItem.size = viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" );
             }
-            const fontFamily = signageConfig.font && signageConfig.font.family ? signageConfig.font.family : "";
             const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel * 1.4 : 16 * 1.4;
+
+            const fontFamilyName = viewModel.get('detailForm.data.fontFamilyName') != '' ? viewModel.get('detailForm.data.fontFamilyName') : 'Arial'
 
             // costruisco la regex solo con i nomi interni dei pictogram (senza <>), escapati
             const innerNames = pictogramNames.map( n => n.replace( /[<>]/g, "" ) );
@@ -335,13 +387,12 @@ AP.signage.modal = ( function() {
                 if ( match.index > lastIndex ) {
                     parts.push( this.escapeHtml( valore.substring( lastIndex, match.index ) ) );
                 }
-
                 const pictogramName = match[1]; // es. "man"
                 const imgHtml =
                     // TODO: usare il font selezionato quando avremo i pictogram in tutti i font,
                     //      creare una mappa fontFamily -> esistenza pictogram
                     // "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogramName + ".png\" " +
-                    "<img src=\"/assets/main/pictograms/Arial/" + pictogramName + ".png\" " +
+                    "<img src=\"/assets/main/pictograms/" + fontFamilyName + "/" + pictogramName + ".svg\" " +
                     "alt=\"" + pictogramName + "\" " +
                     "style=\"height: " + heightPx + "px;\" " +
                     "class=\"pictogram px-2\">";
@@ -356,12 +407,13 @@ AP.signage.modal = ( function() {
             }
 
             contentSpanPreview.css( {
-                "font-family": fontFamily,
+                "font-family": fontFamilyName + ", Arial, sans-serif",
                 "font-size": heightPx + "px",
                 "line-height": heightPx + "px",
             } );
 
             contentSpanPreview.html( parts.join( "" ) );
+            
 
             return false;
         },
@@ -416,9 +468,9 @@ AP.signage.modal = ( function() {
             const pictogramNames = viewModel.get( "pictogramNames" );
             let content = e.currentTarget.value;
             const usedPictos = [];
-
+            
             pictogramNames.forEach( pictogram => {
-                let position = realContent.indexOf( pictogram );
+                let position = realContent ? realContent.indexOf( pictogram ) : -1;
                 while ( position !== -1 ) {
                     usedPictos[position] = pictogram;
                     position = realContent.indexOf( pictogram, position + 1 );
@@ -573,25 +625,22 @@ AP.signage.modal = ( function() {
         },
 
         loadModels: async function( event ) {
-            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
-				$( "#quotation-signage-preview-background" ).css( {
-					width: "500px",
-				} );
-            }
-            let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
-            if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
-                url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
-            }
-            await NM.util.ajax( {
-                method: "GET",
-                url: url,
-                callback: {
-                    done: function( xhr ) {
-                        xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
-                        viewModel.get( "models" ).data( xhr.data );
+            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) && viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
+                let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
+                if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
+                    url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
+                }
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: url,
+                    callback: {
+                        done: function( xhr ) {
+                            xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
+                            viewModel.get( "models" ).data( xhr.data );
+                        },
                     },
-                },
-            } );
+                } );
+            }
             this.checkCanSave();
             AP.setUserPref( "signage.lineId", viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) );
         },
@@ -614,67 +663,82 @@ AP.signage.modal = ( function() {
         },
 
         loadSignageConfigs: async function( event ) {
-            const xhr = await NM.util.ajax( {
-                method: "GET",
-                url: "/manager/ajax/quotations/signage-configs?categoryId="
-                    + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
-                    + "&lineId="
-                    + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
-                    + "&modelId="
-                    + viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
-				callback: {
-					done: function (xhr) {
-						//NOOP
-					}
-				}
-            } );
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) && viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "") {
+                const xhr = await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/signage-configs?categoryId="
+                        + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
+                        + "&lineId="
+                        + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
+                        + "&modelId="
+                        + viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
+                    callback: {
+                        done: function (xhr) {
+                            //NOOP
+                        }
+                    }
+                } );
 
-			const fonts = [];
+                const fonts = [];
 
-			for ( var font of xhr.data ) {
-				fonts.push( font.font );
-			}
-			fonts.unshift( { id: "", name: "-- Seleziona il Font" } );
-			viewModel.get( "fonts" ).data( fonts );
-			xhr.data.unshift( { id: "", name: "" } );
-			viewModel.get( "signageConfigs" ).data( xhr.data );
+                for ( var font of xhr.data ) {
+                    fonts.push( font.font );
+                }
+                fonts.unshift( { id: "", name: "-- Seleziona il Font" } );
+                viewModel.get( "fonts" ).data( fonts );
+                xhr.data.unshift( { id: "", name: "" } );
+                viewModel.get( "signageConfigs" ).data( xhr.data );
 
-			if ( fonts.length === 1 ) {
-				viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
-				viewModel.get( "fontSizes" ).data( xhr.data[0].items );
-			}
-			if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
-				const xhr2 = await NM.util.ajax( {
-					method: "GET",
-					url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" +
-						viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
-						"&lineId=" +
-						viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
-						"&modelId=" +
-						viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
-						"&finishId=" +
-						viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
-					callback: {
-						done: function (xhr) {
-							//NOOP
-						}
-					}
-				} );
-				if ( xhr2.data.productId ) {
-					viewModel.set( "detailForm.data.quotationItem.product.id", xhr2.data.productId );
-                    viewModel.set( "detailForm.data.quotationItem.product.plateWidth", xhr2.data.plateWidth );
-                    viewModel.set( "detailForm.data.quotationItem.product.plateHeight", xhr2.data.plateHeight );
-                    viewModel.set( "detailForm.data.quotationItem.product.marginTop", xhr2.data.marginTop );
-                    viewModel.set( "detailForm.data.quotationItem.product.marginLeft", xhr2.data.marginLeft );
-				}
-				if ( xhr2.data.file ) {
-					viewModel.set( "backgroundImage", xhr2.data.file );
-					viewModel.set( "backgroundImage.url", xhr2.data.file.uri);
-				} else {
-					viewModel.set( "backgroundImage.url", "" );
-				}
-			}
-
+                if ( fonts.length === 1 ) {
+                    viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
+                    viewModel.get( "fontSizes" ).data( xhr.data[0].items );
+                }
+                if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
+                    const xhr2 = await NM.util.ajax( {
+                        method: "GET",
+                        url: "/manager/ajax/products/get-id-and-file-by-params?categoryId=" +
+                            viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) +
+                            "&lineId=" +
+                            viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) +
+                            "&modelId=" +
+                            viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
+                            "&finishId=" +
+                            viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
+                        callback: {
+                            done: function (xhr) {
+                                //NOOP
+                            }
+                        }
+                    } );
+                    if ( xhr2.data.productId ) {
+                        viewModel.set( "detailForm.data.quotationItem.product.id", xhr2.data.productId );
+                        viewModel.set( "detailForm.data.quotationItem.product.plateWidth", xhr2.data.plateWidth );
+                        viewModel.set( "detailForm.data.quotationItem.product.plateHeight", xhr2.data.plateHeight );
+                        viewModel.set( "detailForm.data.quotationItem.product.marginTop", xhr2.data.marginTop );
+                        viewModel.set( "detailForm.data.quotationItem.product.marginLeft", xhr2.data.marginLeft );
+                    }
+                    if ( xhr2.data.file ) {
+                        viewModel.set( "backgroundImage", xhr2.data.file );
+                        viewModel.set( "backgroundImage.url", xhr2.data.file.uri );
+                    } else {
+                        viewModel.set( "backgroundImage.url", "" );
+                    }
+                    if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage')) {
+                        await NM.util.ajax( {
+                            method: "GET",
+                            url: "/manager/ajax/quotation-items/" + viewModel.get('detailForm.data.quotationItem.id') + "/images" ,
+                            callback: {
+                                done: function( xhr ) {
+                                    if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
+                                        viewModel.set( "backgroundCustomImage", xhr.data[0] );
+                                        viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
+                                    }
+                                }
+                            }
+                        })
+                    }
+                }
+            }
 
             this.checkCanSave();
             if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != AP.getUserPref( "signage.finishId" ) ) {
@@ -702,11 +766,30 @@ AP.signage.modal = ( function() {
                         viewModel.parseLines();
                     }
                 } );
-                if ( viewModel.get( "detailForm.data.signageConfig.items" ).length == 2 ) {
+                if ( viewModel.get( "detailForm.data.signageConfig.items" ).length >= 2 ) {
                     viewModel.set( "detailForm.data.quotationItem.signageConfigItem", viewModel.get( "detailForm.data.signageConfig.items" )[1] );
                     this.parseLines();
                 }
             }
+
+            if (
+                viewModel.get('detailForm.data.quotationItem') && 
+                viewModel.get('detailForm.data.quotationItem.signageConfigItem') &&
+                viewModel.get('detailForm.data.quotationItem.signageConfigItem.signageConfigId')
+            ) {
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/font-families/get-by-signage-config-id?signageConfigId=" + viewModel.get('detailForm.data.quotationItem.signageConfigItem.signageConfigId'),
+                    callback: {
+                        done: function( xhr ) {
+                            if (xhr.data) {
+                                viewModel.set('detailForm.data.fontFamilyName', xhr.data.name)
+                            }
+                        }
+                    }
+                } );
+            }
+
             this.checkCanSave();
             AP.setUserPref( "signage.fontId", viewModel.get( "detailForm.data.signageConfig.font.id" ) );
         },
@@ -1103,8 +1186,20 @@ AP.signage.modal = ( function() {
 
         save: function( event ) {
             AP.loading.show();
-            var preview = $( "#quotation-signage-preview-background" )[0];
             var quotationId = AP.page.quotation.id;
+
+            //quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a
+            let preview = $( "#quotation-signage-preview-background" )[0];
+            if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage') && viewModel.get('detailForm.data.quotationItem.customImage') == true) {
+                //se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
+               if (!viewModel.get('backgroundCustomImage.url')) {
+                    AP.widget.notify( "error", "Hai scelto custom image, devi selezionare un'immagine prima di salvare." );
+                    AP.loading.hide()
+                    return false;
+               }
+
+               preview = $( "#quotation-signage-preview-custom-background" )[0];
+            }
             const parsedData = viewModel.get( "detailForm.data" );
             const signageRows = parsedData.quotationItem.signageRows.data();
             var exceedinRows = 0;
@@ -1179,7 +1274,6 @@ AP.signage.modal = ( function() {
 
         clearFilters: function() {
             viewModel.resetForm();
-            AP.deleteUserPref( "signage.categoryId" );
             AP.deleteUserPref( "signage.lineId" );
             AP.deleteUserPref( "signage.modelId" );
             AP.deleteUserPref( "signage.finishId" );
@@ -1255,17 +1349,18 @@ AP.signage.modal = ( function() {
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
-                    debugger
                     //NOOP
                 }
             },
         } );
 
 		if ( categoriesResponse.data.length > 0 ) {
-            categoriesResponse.data = categoriesResponse.data.filter(c => c.type.id == 'SEG')
-			categoriesResponse.data.unshift( { id: "", name: "-- seleziona" } );
+            categoriesResponse.data = categoriesResponse.data.filter(c => c.id == 20)
 			viewModel.get( "categories" ).data( categoriesResponse.data );
+            viewModel.set('detailForm.data.signageConfig.catalogBundle.category', categoriesResponse.data[0])
 		}
+
+        AP.setUserPref( "signage.categoryId", 20 )
 
 		NM.util.openModal( AP.signage.fields.modalRoot );
         viewModel.resetForm();
@@ -1278,13 +1373,10 @@ AP.signage.modal = ( function() {
         const signageFinishId = AP.getUserPref( "signage.finishId" )
         const signageFontId = AP.getUserPref( "signage.fontId" )
         const signageSignageConfigId = AP.getUserPref( "signage.signageConfigId" )
-        const signageSignageConfigRowCount = AP.getUserPref( "signage.signageConfigRowCount" )
 
         if (signageCategoryId) {
             let category = viewModel.categories.data().find(c => c.id == signageCategoryId)
             if (category) {
-                category = { id: category.id, name: category.name };
-                viewModel.set( "detailForm.data.signageConfig.catalogBundle.category", category );
                 await viewModel.loadLines();
                 if ( signageLineId ) {
                     let line = viewModel.lines.data().find(l => l.id == signageLineId)
@@ -1311,9 +1403,11 @@ AP.signage.modal = ( function() {
                                                 viewModel.set( "detailForm.data.signageConfig.font", font)
                                                 await viewModel.loadFontSizes();
                                                 if ( signageSignageConfigId ) {
-                                                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem.id", signageSignageConfigId );
-                                                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem.rowCount", signageSignageConfigRowCount );
-                                                    viewModel.parseLines();
+                                                    const signageSignageConfigItem = viewModel.getSignageConfig().items.find(s => s.id == signageSignageConfigId)
+                                                    if (signageSignageConfigItem) {
+                                                        viewModel.set( "detailForm.data.quotationItem.signageConfigItem", signageSignageConfigItem );
+                                                        viewModel.parseLines();
+                                                    }
                                                 }
                                             }
                                         }
@@ -1329,11 +1423,14 @@ AP.signage.modal = ( function() {
 		initPositionSuggest();
 
         const allZones = AP.quotation.detail.config().zones
-        const parentZones = allZones.filter(z => !z.origin)
+        const parentZones = allZones.filter(z => !z.origin && z.id != '')
 
         viewModel.set('allZones', allZones)
         viewModel.set('zones', parentZones)
-        const zone = AP.quotation.detail.config().zone
+        let zone = AP.quotation.detail.config().zone
+        if (zone.id == '') {
+            zone = allZones.find(z => z.name == 'Non assegnato')
+        }
         if (zone.origin) {
             viewModel.set('quotationZone', zone.origin)
             viewModel.set('quotationSubzone', zone)
@@ -1353,6 +1450,9 @@ AP.signage.modal = ( function() {
             viewModel.set('subzones', children)
             viewModel.set('quotationSubzone', { "id": "" })
         }
+
+        viewModel.set('showCustomImage', false)
+        viewModel.set('showImage', true)
     };
 
     var initPositionSuggest = function() {
@@ -1438,7 +1538,7 @@ AP.signage.modal = ( function() {
             },
         } );
 
-		categoriesResponse.data.unshift( { id: "", name: "" } );
+        categoriesResponse.data = categoriesResponse.data.filter(c => c.id == 20)
 		viewModel.get( "categories" ).data( categoriesResponse.data );
 		NM.util.openModal( AP.signage.fields.modalRoot );
 
@@ -1475,6 +1575,8 @@ AP.signage.modal = ( function() {
 
 		data.quotationItem.signageRows.read();
 		viewModel.set( "detailForm.data", data );
+        viewModel.set('detailForm.data.quotationItem.customImage', viewModel.get('detailForm.data.quotationItem.customImage') == 'true')
+        viewModel.set('detailForm.data.quotationItem.special', viewModel.get('detailForm.data.quotationItem.special') == 'true')
         viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
 
 		var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
@@ -1503,7 +1605,7 @@ AP.signage.modal = ( function() {
 		initPositionSuggest();
 
         const allZones = AP.quotation.detail.config().zones
-        const parentZones = allZones.filter(z => !z.origin)
+        const parentZones = allZones.filter(z => !z.origin && z.id != '')
 
         viewModel.set('allZones', allZones)
         viewModel.set('zones', parentZones)
@@ -1539,8 +1641,11 @@ AP.signage.modal = ( function() {
             $('#clone-button').css("display", "none")
         }
 
-        viewModel.set('detailForm.data.quotationItem.special', data.quotationItem.special == 'true')
-        $('#imageCustomInput').hide()
+        //in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
+        //altrimenti farò il contrario
+        viewModel.set('showCustomImage', viewModel.get('detailForm.data.quotationItem.customImage'))
+        viewModel.set('showImage', !viewModel.get('detailForm.data.quotationItem.customImage'))
+
         viewModel.handleSelectChanges()
 
         AP.loading.hide();

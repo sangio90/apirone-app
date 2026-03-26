@@ -32,9 +32,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var lineCost = super.bean( "LineCost" );
 		lineCost.setCost( json.cost );
-		var category = super.fire( 'ProductCategory.get', [ json.category_id ] );
-		var line = super.fire( 'Line.get', [ json.line_id ] );
-		var finish = super.fire( 'Finish.get', [ json.finish_id ] );
+		var category = super.fire( 'ProductCategory.get', [ json.categoryId ] );
+		var line = super.fire( 'Line.get', [ json.lineId ] );
+		var finish = super.fire( 'Finish.get', [ json.finishId ] );
 		lineCost.setCategory( category );
 		lineCost.setLine( line );
 		lineCost.setFinish( finish );

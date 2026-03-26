@@ -92,13 +92,71 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.zone.getId();
 	}
 
-	public function duplicateZoneItems( required String duplicatedZoneId, required String newZoneId ) {
+	public function duplicate( required String zoneId, required quotationId, duplicaConSottozone = true, name = null ) {
+		var quotationZone = super.bean( "QuotationZone" );
+
+		var zoneToDuplicate = get(arguments.zoneId);
+		var name = !isNull(arguments.name) ? arguments.name : zoneToDuplicate.getName();
+
+		var zoneObject = {
+			quotationId = arguments.quotationId,
+			name = name,
+			quantity = zoneToDuplicate.getQuantity(),
+			originId = !isNull( zoneToDuplicate.getOrigin() ) ?	zoneToDuplicate.getOrigin().getId() : null,
+		}
+
+		var existingCombination = search( argumentCollection = zoneObject );
+
+		if( Len( existingCombination.getData() ) ) {
+			
+			var error = super.getValidationError( message = getMessage( "zone.existInQuotation" ), field="name" );
+			validation.addError( error );
+
+			event.setValue( "result", validation );
+			return;
+
+		}
+		var quotation = getQuotationService().get( arguments.quotationId )
+		quotationZone.setQuotation( quotation );
+		quotationZone.setName( name );
+		quotationZone.setQuantity( zoneToDuplicate.getQuantity() );
+
+		if ( !isNull( zoneObject.originId ) && !duplicaConSottozone ) {
+			quotationZone.setOrigin( zoneToDuplicate.getOrigin() );
+		}
+
+		transaction {
+			messageId = "quotationZone.created";
+			thisId    = create( quotationZone )
+
+			var duplicatedZone = duplicateZoneItems( duplicatedZoneId: zoneToDuplicate.getId(), newZoneId: thisId, quotation: quotation  );
+			if (arguments.duplicaConSottozone) {
+				var sottozone = list( originId = zoneToDuplicate.getId() )
+				for (sottozona in sottozone) {
+					var newSottozona = super.bean( "QuotationZone" );
+					newSottozona.setQuotation( quotation );
+					newSottozona.setName( sottozona.getName() );
+					newSottozona.setQuantity( sottozona.getQuantity() );
+					newSottozona.setOrigin( duplicatedZone );
+					var newSottozonaId = create( newSottozona )
+					//in caso di duplica all'interno di un preventivo passare quotation è superfluo, perché sto clonando una zona dentro lo stesso preventivo
+					//in caso però di duplica del preventivo (e.g. approvazione preventivo) il preventivo che passo è quello clonato, quindi i nuovi items che creo dentro duplicateZoneItems, porteranno l'id del quotation clonato
+					duplicateZoneItems( duplicatedZoneId: sottozona.getId(), newZoneId: newSottozonaId, quotation: quotation );
+				}
+			}
+		}
+
+		return { 'messageId': messageId, 'zoneId': thisId }
+	}
+
+	public function duplicateZoneItems( required String duplicatedZoneId, required String newZoneId, required quotation ) {
 		var items = getQuotationItemService().list( quotationZoneId = arguments.duplicatedZoneId );
 		var newZone = getQuotationZoneService().get( arguments.newZoneId )
 
 		for (var quotationItem in items) {
 			var duplicatedItem = Duplicate( quotationItem );
 			duplicatedItem.setQuotationZone( newZone )
+			duplicatedItem.setQuotation( quotation )
 			var newItemId = getQuotationItemService().create( duplicatedItem );
 			var newItem = getQuotationItemService().get( newItemId );
 

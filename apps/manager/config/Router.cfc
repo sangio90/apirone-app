@@ -194,6 +194,7 @@
 			font families
 		*/
 		get( "/ajax/font-families/code-exists" ).to( "FontFamilyAjaxController.codeExists" ).end();
+		get( "/ajax/font-families/get-by-signage-config-id" ).to( "FontFamilyAjaxController.getBySignageConfigId" ).end();
 		get( "/ajax/font-families/:id" ).to( "FontFamilyAjaxController.get" ).end();
 		delete( "/ajax/font-families" ).to( "FontFamilyAjaxController.delete" ).end();
 		get( "/ajax/font-families" ).to( "FontFamilyAjaxController.list" ).end();

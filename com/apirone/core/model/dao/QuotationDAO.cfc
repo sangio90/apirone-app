@@ -294,6 +294,12 @@
 						NULL
 					</cfif>
 				,
+					<cfif !IsNull( arguments.quotation.getVersionNumber() )>
+						version_number = <cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVersionNumber()#">
+					<cfelse>
+						NULL
+					</cfif>
+				,
 				vat_code_id =
 					<cfif !IsNull( arguments.quotation.getVatCode() )>
 						<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getVatCode().getId()#">
@@ -357,6 +363,7 @@
 					AR_CHIAVE, 
 					ARCODART, 
 					ARDESART, 
+					ARDESSUP, 
 					ARDATCAR, 
 					ARUNMIS1, 
 					VARCOD, 
@@ -370,6 +377,7 @@
 					<cfqueryparam value="#arguments.data.AR_CHIAVE#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.ARCODART#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.ARDESART#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.ARDESSUP#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.ARDATCAR#" cfsqltype="date">,
 					<cfqueryparam value="#arguments.data.ARUNMIS1#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.VARCOD#" cfsqltype="varchar">,

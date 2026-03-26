@@ -5,9 +5,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var memy = super.getMementify();
 
-		prc.categories = super.fire( "productCategory.list", { modeId = "COM" } );
-		prc.lines      = super.fire( "line.list" );
-		prc.models     = super.fire( "model.list" );
+		prc.page['categories'] = super.fire( "productCategory.list", { modeId = "COM" } );
+		prc.page['lines']      = super.fire( "line.list" );
+		prc.page['models']     = super.fire( "model.list" );
 		prc.statuses   = super.fire( "status.list", [ "line" ] );
 		prc.finishes   = super.fire( "finish.list" );
 

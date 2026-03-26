@@ -18,12 +18,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="QuotationItem.bean";
 
-	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId ){
+	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId, Boolean useCache = true ){
 		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.quotationItemId );
+		if (useCache) {
+			var cache = cm.get( getCacheScope(), arguments.quotationItemId );
 
-		if ( cache.status ) {
-			return cache.data;
+			if ( cache.status ) {
+				return cache.data;
+			}
 		}
 
 		var bean = build( arguments.quotationItemId );
@@ -42,9 +44,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments ).getData();
 	}
 
+	//{26 marzo 2026} aggiunto parametro useCache = false perche durante la procedura di quotationItemAjaxController.updateAllPrices la cache condizionava in maniera errata il calcolo
+	// vedi get()
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		String mode,
+		Boolean useCache = true,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotation.id" } ]
@@ -54,9 +59,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows    = [];
 		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
+		var useCache = arguments.useCache;
 
-		records.each( function( record ){
-			var quotationItem = get( quotationItemId = record.quotation_item_id );
+		records.each( function( record ) {
+			var quotationItem = get( quotationItemId = record.quotation_item_id, useCache = useCache );
 			if ( IsNull( mode ) ) {
 				rows.add( quotationItem );
 			} else {
@@ -581,8 +587,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public function getAltreRigheByQuotationLineIdAndFinishId( 
 		required String quotationItemId, 
 		required String quotationId,
-		required String finishId,
-		required String lineId
+		required String lineId,
+		required String finishId
 	){
 		if ( IsNull( quotationId ) ) {
 			return [];
@@ -590,15 +596,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return getDao().getAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
 	}
 
+	public function getAltreRigheByQuotationAndProductId( 
+		required String quotationItemId, 
+		required String quotationId,
+		required String productId
+	){
+		if ( IsNull( quotationId ) ) {
+			return [];
+		}
+		return getDao().getAltreRigheByQuotationAndProductId(argumentCollection = arguments);
+	}
+
 	public function aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId(
 		required String quotationItemId, 
 		required String quotationId,
-		required String finishId,
-		required String lineId
+		required String lineId,
+		required String finishId
 	){
 		var rows = this.getAltreRigheByQuotationLineIdAndFinishId(
-			"quotationId" = quotationId, 
 			"quotationItemId" = quotationItemId, 
+			"quotationId" = quotationId, 
 			"lineId" = lineId,
 			"finishId" = finishId
 		)
@@ -609,6 +626,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if (
 				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") && 
 				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")
+			) {
+				continue;
+			}
+
+			aggiornaPrezzo(quotationItem)
+		}
+	}
+	
+	public function aggiornaPrezzoAltriArticoliByQuotationIdAndProductId(
+		required String quotationItemId, 
+		required String quotationId,
+		required String productId
+	){
+		var rows = this.getAltreRigheByQuotationAndProductId(
+			"quotationItemId" = quotationItemId, 
+			"quotationId" = quotationId, 
+			"productId" = productId
+		)
+
+		for (var row in rows) {
+			var data = {}
+			var quotationItem = get( quotationItemId = row.quotation_item_id );
+			if (
+				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || 
+				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage") ||
+				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle")
 			) {
 				continue;
 			}
@@ -691,7 +734,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				});
 			}
 			var price = getPlatePricing(json)
-		} 
+		}
 
 		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
 			json = {
@@ -743,6 +786,49 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				json.quotationItem.signageRows._data.append({ charCount = signageRow.getCharCount() });
 			}
 			var price = getSignagePricing(json)
+		} elseif (!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle") && !IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
+			json = {
+				"quotationId": "",
+				"quotationItem": {
+					"id": "",
+					"quantity": 0,
+					"price": {
+						"id": 0,
+						"discount1": 0,
+						"discount2": 0,
+						"method": { "id": "F" },
+						"total": 0
+					},
+					"quotationZone": {
+						"id": ""
+					},
+					"product": {
+						"id": "",
+					"items": { "_data": [] }
+					}
+				}
+			}
+
+			json.quotationId = quotationId;
+			json.quotationItem.id = quotationItem.getId()
+			json.quotationItem.quotationZone.id = quotationItem.getQuotationZone().getId()
+			json.quotationItem.quantity = quantity
+			if (!isNull(quotationItem.getPrice())) {
+				json.quotationItem.price.id = quotationItem.getPrice().getId();
+				json.quotationItem.price.discount1 = quotationItem.getPrice().getDiscount1();
+				json.quotationItem.price.discount2 = quotationItem.getPrice().getDiscount2();
+				json.quotationItem.price.method.id = quotationItem.getPrice().getMethod().getId();
+				json.quotationItem.price.total = quotationItem.getPrice().getMethod().getId() == "F" ? quotationItem.getPrice().getAmount() : 0;
+			}
+			json.quotationItem.product.id = productId;
+			for (productItemId in productItemIds) {
+				json.quotationItem.product.items._data.append({
+					values = [
+						{ selected = true, product_item_id = productItemId }
+					]
+				});
+			}
+			var price = getPricing(json)
 		}
 
 		quotationItem.setPrice( price )

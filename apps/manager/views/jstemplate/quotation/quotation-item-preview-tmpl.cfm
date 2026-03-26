@@ -4,9 +4,7 @@
     <div class="quotation-item m-1 col-md-3" data-uid="#: uid #">
         <div class="quotation-item-inner">
             <div class="row">
-                <div class="col-1">
-                </div>
-                <div class="col-7 justify-content-start" style="margin-top: -15px; min-height: 2rem;">
+                <div class="col-8 justify-content-start" style="margin-top: -15px; min-height: 2rem;">
                     <div style="font-size: 10px; margin-bottom: -10px;"> 
                         <span data-bind="text: product.line.name"></span> - 
                         <span data-bind="text: product.model.code"></span> - 

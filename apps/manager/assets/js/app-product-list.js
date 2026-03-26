@@ -54,7 +54,47 @@ AP.product.list = ( function() {
     var viewModel = kendo.observable( {
         rows: dataSources.items,
         detailForm: defaultDetailForm,
+        categories: AP.page.categories,
+        category: {
+            "id": "",
+            "name": ""
+        },
+        allLines: AP.page.lines,
+        lines: new kendo.data.DataSource(),
+        line: {
+            "id": "",
+            "name": ""
+        },
+        allModels: AP.page.models,
+        models: new kendo.data.DataSource(),
+        model: {
+            "id": "",
+            "name": ""
+        },
         // methods: AP.page.methods,
+
+        loadLines: function() {
+            this.get('lines').data([]);
+            let allLines = this.get("allLines");
+            const category = this.get('category')
+            const categoryLines = allLines.filter(function(line) {
+                return line.categories.filter(cat => cat.id == category.id).length > 0
+            })
+            this.get('lines').data(categoryLines);
+            this.set('line', { "id": "", "name": ""})
+            this.set('model', { "id": "", "name": ""})
+        },
+
+        loadModels: function() {
+            this.get('models').data([]);
+            let allModels = this.get("allModels");
+            const category = this.get('category')
+            const categoryModels = allModels.filter(function(model) {
+                return model.categories.filter(cat => cat.id == category.id).length > 0
+            })
+            this.get('models').data(categoryModels);
+            this.set('model', { "id": "", "name": ""})
+        },
 
         editPrices: function( event ) {
 

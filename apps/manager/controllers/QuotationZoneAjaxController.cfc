@@ -116,59 +116,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var validation = super.getValidationResult();
 		
-		var quotationZone = super.bean( "QuotationZone" );
-
-		var zoneToDuplicate = super.fire( "QuotationZone.get", [ json.id ] );
-
-		var zoneObject = {
-			quotationId = json.quotation.id,
-			name = json.name,
-			quantity = json.quantity,
-			originId = !isNull( zoneToDuplicate.getOrigin() ) ?	zoneToDuplicate.getOrigin().getId() : null,
-		}
-
-		var existingCombination = super.service( "QuotationZone" ).search( argumentCollection = zoneObject );
-
-		if( Len( existingCombination.getData() ) ) {
-			
-			var error = super.getValidationError( message = getMessage( "zone.existInQuotation" ), field="name" );
-			validation.addError( error );
-
-			event.setValue( "result", validation );
-			return;
-
-		}
-
-		quotationZone.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
-		quotationZone.setName( json.name );
-		quotationZone.setQuantity( json.quantity );
-
-		if ( !isNull( zoneObject.originId ) ) {
-			quotationZone.setOrigin( zoneToDuplicate.getOrigin() );
-		}
-
-		transaction {
-			messageId = "quotationZone.created";
-			thisId    = super.fire( "quotationZone.create", [ quotationZone ] )
-
-			var duplicatedZone = super.service( "QuotationZone" ).duplicateZoneItems( duplicatedZoneId: zoneToDuplicate.getId(), newZoneId: thisId  );
-			if (json.duplicaConSottozone) {
-				var sottozone = super.service( "QuotationZone" ).list( originId = zoneToDuplicate.getId() )
-				for (sottozona in sottozone) {
-					var newSottozona = super.bean( "QuotationZone" );
-					newSottozona.setQuotation( super.service( "Quotation" ).get( json.quotation.id ) );
-					newSottozona.setName( sottozona.getName() );
-					newSottozona.setQuantity( sottozona.getQuantity() );
-					newSottozona.setOrigin( duplicatedZone );
-					var newSottozonaId = super.fire( "quotationZone.create", [ newSottozona ] )
-					super.service( "QuotationZone" ).duplicateZoneItems( duplicatedZoneId: sottozona.getId(), newZoneId: newSottozonaId  );
-				}
-			}
-		}
+		var duplicateResult = super.fire( "QuotationZone.duplicate" , [ 'zoneId' = json.id, 'quotationId' = json.quotation.id, 'duplicaConSottozone' = json.duplicaConSottozone, 'name' = json.name ]);
 		
-		var message = getMessage( messageId );
+		var message = getMessage( duplicateResult.messageId );
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message }, { "payload" = { id = duplicateResult.zoneId } } );
 
 		event.setValue( "result", result );
 	}

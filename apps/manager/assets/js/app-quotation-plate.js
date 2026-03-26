@@ -10,7 +10,6 @@ $( document ).ready( function() {
 
         AP.plate.modal.init( { container: AP.plate.fields.modalRoot } );
     }
-
 } );
 
 AP.plate.modal = ( function() {
@@ -20,6 +19,10 @@ AP.plate.modal = ( function() {
 
     function pricingApp() {
         return AP.quotation.itemPricing;
+    }
+
+    function fileApp() {
+        return AP.file.modal;
     }
 
     const {
@@ -90,7 +93,6 @@ AP.plate.modal = ( function() {
 
         var plate = viewModel.get( "plate" );
 
-        console.log( "plate.image", plate );
 
         let freeCellWidth = constants.GRID_CELL_DIMENSIONS[ gridModule.CELL_TYPE.FREE ].width;
         let freeCellHeight = constants.GRID_CELL_DIMENSIONS[ gridModule.CELL_TYPE.FREE ].height;
@@ -180,6 +182,7 @@ AP.plate.modal = ( function() {
                 quantity: 1,
                 // price: 0,
                 special: false,
+                customImage: false,
                 note: '',
                 status: {
                     id: "ACT"
@@ -223,7 +226,8 @@ AP.plate.modal = ( function() {
                         model: { id: "id" }
                     }
                 } ),
-                fruitQuotationItemProductItems: []
+                fruitQuotationItemProductItems: [],
+                productItemsImages: []
             },
             statuses: AP.page.statuses,
             itemStatuses: AP.page.itemStatuses,
@@ -309,6 +313,67 @@ AP.plate.modal = ( function() {
 
     // --- ViewModel (Kendo ObservableObject) ---
     var viewModel = new kendo.data.ObservableObject( {
+        backgroundCustomImage: {
+            'id': '',
+            'url': ''
+        },
+        backgroundStyle: function () {
+            var url = this.get("backgroundCustomImage.url");
+            return url ? "background-image: url(" + url + ")" : "";
+        },
+        //aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
+        toggleCustomImage: async function( event ) {
+            await viewModel.loadBackgroundCustomImage(viewModel.get('detailForm.data.id'))
+            if (viewModel.get('detailForm.data.customImage') == true) {
+                $('#plate-designer').hide()
+                $('#plate-custom-designer').show()
+            } else {
+                $('#plate-designer').show()
+                $('#plate-custom-designer').hide()
+            }
+
+            return
+        },
+
+        loadBackgroundCustomImage: async function(quotationItemId) {
+            if (quotationItemId && quotationItemId != '') {
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotation-items/" + quotationItemId + "/images" ,
+                    callback: {
+                        done: function( xhr ) {
+                            if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
+                                viewModel.set( "backgroundCustomImage", xhr.data[0] );
+                                viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
+                            }
+                        }
+                    }
+                })
+            }
+        },
+
+        //metodo che compone la struttura dati da passare al componente app-file, punto centralizzato di gestione del caricamento immagini
+        openImagesList: function( event ) {
+
+            var element = $( event.currentTarget );
+
+            if ( !element.attr( "data-type" ) ) {
+                console.error( "ERROR. Set data-type attribute in currentTarget" );
+                return;
+            }
+
+
+            var type = element.data( "type" );
+            var value = {
+                type: type,
+                id: viewModel.get('detailForm.data.id'),
+                name: viewModel.get('detailForm.data.id'),
+            };
+
+            fileApp().open( value );
+
+            return false;
+        },
 
         detailForm: createDefaultDetailForm(),
 
@@ -401,25 +466,41 @@ AP.plate.modal = ( function() {
             event.data.set( "expanded", !event.data.get( "expanded" ) );
         },
 
-        changeOrientation( event ) {
+        changeOrientation: async function ( event ) {
             var orientationId = this.get( "detailForm.data.product.orientation.id" );
 
             var frameId = viewModel.get( "detailForm.data.product.frame.id" );
             var productId = viewModel.get( "detailForm.data.product.id" );
 
-            AP.plate.api.getFrameForOrientation( frameId, orientationId, productId, {
-                done: function( xhr ) {
-                    viewModel.set( "plate.orientation", xhr.data.orientation );
-                    viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
-                    viewModel.set( "plate.grid", xhr.data.grid );
-                    viewModel.set( "plate.image", xhr.data.image );
-                    viewModel.set( "detailForm.data.product.orientation", xhr.data.orientation );
-                    configPlate();
-					for (let i in viewModel.get("detailForm.data.product.items")._data) {
-						updateImage(viewModel.get("detailForm.data.product.items")._data[i])
-					}
-                }
+            await NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/frames/" + frameId + "?orientationId=" + orientationId + "&productId=" + productId,
+                callback: {
+                    done: function( xhr ) {
+                        viewModel.set( "plate.orientation", xhr.data.orientation );
+                        viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
+                        viewModel.set( "plate.grid", xhr.data.grid );
+                        viewModel.set( "plate.image", xhr.data.image );
+                        viewModel.set( "detailForm.data.product.orientation", xhr.data.orientation );
+                        configPlate();
+                        for (let i in viewModel.get("detailForm.data.product.items")._data) {
+                            updateImage(viewModel.get("detailForm.data.product.items")._data[i])
+                        }
+                    },
+                },
             } );
+
+            if (viewModel.get('detailForm.data.product.orientation.id') == 'HOR') {
+                $('#plate-custom-image').css({
+                    "max-width": "1200px",
+                    "max-height": "500px"
+                });
+            } else {
+                $('#plate-custom-image').css({
+                    "max-height": "1200px",
+                    "max-width": "500px",
+                });
+            }
         },
 
         toggleFruits( event ) {
@@ -438,11 +519,9 @@ AP.plate.modal = ( function() {
          * Carica la placca (griglia, orientamento, immagine) in base al frame del modello.
          * @returns {*} Thenable restituita da getFrame (per incatenare in edit()).
          */
-        loadPlate: function( orientation ) {
+        loadPlate: async function( orientation ) {
             var modelId = this.get( "detailForm.data.product.model.code" );
             var image = this.get( "detailForm.data.product.image" );
-
-            console.log( "modelId", modelId );
 
             // get plate/frame by code
             // for plate, code of frame is the same code of model
@@ -458,33 +537,31 @@ AP.plate.modal = ( function() {
             var frameId = frame.id;
 
             this.set( "detailForm.data.product.frame.id", frameId );
+            return await NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/frames/" + frameId,
+                callback: {
+                    done: async function( xhr ) {
+                        viewModel.set( "plate.id", xhr.data.id );
+                        viewModel.set( "plate.code", xhr.data.code );
+                        viewModel.set( "plate.width", xhr.data?.width ?? 1200 );
+                        viewModel.set( "plate.height", xhr.data?.height ?? 500 );
+                        viewModel.set( "plate.orientation", xhr.data.orientation );
+                        viewModel.set( "detailForm.data.product.orientation", orientation ?? xhr.data.orientation );
+                        viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
+                        viewModel.set( "availableOrientations", xhr.data.availableOrientations );
+                        viewModel.set( "plate.grid", xhr.data.grid );
+                        viewModel.set( "plate.image", image );
+                        viewModel.set( "plate.grid", xhr.data.grid );
 
-            return AP.plate.api.getFrame( frameId, {
-                done: function( xhr ) {
+                        if ( orientation ) {
+                            await viewModel.changeOrientation();
+                        }
 
-
-                    console.log( "getFrame", xhr );
-
-                    viewModel.set( "plate.id", xhr.data.id );
-                    viewModel.set( "plate.code", xhr.data.code );
-                    viewModel.set( "plate.width", xhr.data?.width ?? 1200 );
-                    viewModel.set( "plate.height", xhr.data?.height ?? 500 );
-                    viewModel.set( "plate.orientation", xhr.data.orientation );
-                    viewModel.set( "detailForm.data.product.orientation", orientation ?? xhr.data.orientation );
-                    viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
-                    viewModel.set( "availableOrientations", xhr.data.availableOrientations );
-                    viewModel.set( "plate.grid", xhr.data.grid );
-                    viewModel.set( "plate.image", image );
-                    viewModel.set( "plate.grid", xhr.data.grid );
-
-                    if ( orientation ) {
-                        viewModel.changeOrientation();
-                    }
-
-                    configPlate();
-                }
+                        configPlate();
+                    },
+                },
             } );
-
         },
 
         /**
@@ -493,65 +570,67 @@ AP.plate.modal = ( function() {
          * Restituisce la thenable dell’ajax così il chiamante può incatenare (es. .then(loadPlate)).
          * @returns {*} Thenable restituita da getProductItems().then(...)
          */
-        firstLoadProductItems: function() {
+        firstLoadProductItems: async function() {
             var quotationItemId = viewModel.get( "detailForm.data.id" );
             var productId = viewModel.get( "detailForm.data.product.id" );
 
-            return AP.plate.api.getProductItems( productId, null, {
-                done: function( xhr ) {
-                    if ( xhr.count > 0 ) {
-                        // var image = xhr.data[0].horizontalImage || xhr.data[0].verticalImage;
-                        // if ( !viewModel.get( "detailForm.data.product.image" ) && image ) {
-                        //     viewModel.set( "detailForm.data.product.image", image );
-                        //     viewModel.set( "backgroundImage", image );
-                        //     viewModel.set( "backgroundImage.url", "url('" + image.uri + "')" );
-                        // }
-                        viewModel.set( "detailForm.data.product.items", new kendo.data.DataSource() );
-                        var productItems = viewModel.get( "detailForm.data.product.items" );
-                        var attributeArray = productItems.data();
-                        xhr.data.forEach( function( item ) {
-                            var existing = attributeArray.find( function( d ) { return d.attributeId === item.attribute.id; } );
-                            if ( existing ) {
-                                if ( !existing.values.find( function( v ) { return v.productItemId === item.id; } ) ) {
-                                    existing.values.push( {
-										attributeId: item.attribute.id,
-                                        attributeValue: item.attributeValue,
-                                        productItemId: item.id,
-                                        images: item.images,
-                                        selected: false,
-										horizontalImage: item.horizontalImage,
-										verticalImage: item.verticalImage,
+            await NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/product-items?productId=" + productId,
+                callback: {
+                    done: async function( xhr ) {
+                        if ( xhr.count > 0 ) {
+                            viewModel.set( "detailForm.data.product.items", new kendo.data.DataSource() );
+                            var productItems = viewModel.get( "detailForm.data.product.items" );
+                            var attributeArray = productItems.data();
+                            xhr.data.forEach( function( item ) {
+                                var existing = attributeArray.find( function( d ) { return d.attributeId === item.attribute.id; } );
+                                if ( existing ) {
+                                    if ( !existing.values.find( function( v ) { return v.productItemId === item.id; } ) ) {
+                                        existing.values.push( {
+                                            attributeId: item.attribute.id,
+                                            attributeValue: item.attributeValue,
+                                            productItemId: item.id,
+                                            images: item.images,
+                                            selected: false,
+                                            horizontalImage: item.horizontalImage,
+                                            verticalImage: item.verticalImage,
+                                        } );
+                                    }
+                                } else {
+                                    productItems.add( {
+                                        attributeId: item.attribute.id,
+                                        attributeName: item.attribute.name,
+                                        level: 0,
+                                        values: [ {
+                                            attributeValue: item.attributeValue,
+                                            attributeId: item.attribute.id,
+                                            productItemId: item.id,
+                                            images: item.images,
+                                            selected: false,
+                                            horizontalImage: item.horizontalImage,
+                                            verticalImage: item.verticalImage
+                                        } ]
                                     } );
-                                    productItems.trigger( "change" );
                                 }
-                            } else {
-                                productItems.add( {
-                                    attributeId: item.attribute.id,
-                                    attributeName: item.attribute.name,
-                                    level: 0,
-                                    values: [ {
-                                        attributeValue: item.attributeValue,
-                                        productItemId: item.id,
-                                        images: item.images,
-                                        selected: false,
-										horizontalImage: item.horizontalImage,
-										verticalImage: item.verticalImage
-                                    } ]
-                                } );
-                            }
-                        } );
-                        viewModel.renderProductItemsPlate();
+                            } );
+                            await viewModel.renderProductItemsPlate();
+                            productItems.trigger( "change" );
+                        }
                     }
                 }
-            } ).then( async function() {
-                if ( quotationItemId && quotationItemId.length ) {
-                    await AP.plate.api.getQuotationItemProductItems( quotationItemId, {
-                        done: async function( xhr ) {
-                            await viewModel.restoreProductItemSelections( xhr.data, "#quotation-plate-product-items" );
-                        }
-                    } );
-                }
-            } );
+            })
+
+            if ( quotationItemId && quotationItemId.length ) {
+                await NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
+                callback: {
+                    done: async function( xhr ) {
+                        await viewModel.restoreProductItemSelections( xhr.data, "#quotation-plate-product-items" );
+                    }
+                }}
+            )}
         },
 
         /**
@@ -574,6 +653,13 @@ AP.plate.modal = ( function() {
                     if ( sel.length > 0 ) {
                         sel.val( qipi.productItem.id );
                         await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id, fruitId );
+                        if (fruitId) {
+                            productItemImage = viewModel.get('detailForm.data.productItemsImages.' + qipi.productItem.id)
+                            if (productItemImage && productItemImage != '') {
+                                uri = productItemImage;
+                                pub.fruitsController.updateFruit( fruitId, { image: uri } );
+                            }
+                        }
                     }
                 }
             }
@@ -589,20 +675,20 @@ AP.plate.modal = ( function() {
          * @param {string} attributeId - ID dell'attributo selezionato
          * @param {string} [fruitId] - Se presente, carica items per il frutto invece che per la placca
          */
-        loadProductItems: function( originId, attributeId, fruitId ) {
-            var type; var product; var productItems; var prodyctIdForCall; var productId;
+        loadProductItems: async function( originId, attributeId, fruitId ) {
+            var type; var product; var productItems; var productIdForCall; var productId;
 
             if ( fruitId === undefined ) {
                 type = "plate";
                 product = viewModel.get( "detailForm.data.product" );
                 productItems = viewModel.get( "detailForm.data.product.items" );
-                prodyctIdForCall = product.get( "id" );
+                productIdForCall = product.get( "id" );
             } else {
                 type = "fruit";
                 var fruits = viewModel.get( "detailForm.data.fruits" );
                 product = fruits.get( fruitId );
                 productItems = product.get( "items" );
-                prodyctIdForCall = product.get( "fruit.id" );
+                productIdForCall = product.get( "fruit.id" );
             }
 
             productId = product.get( "id" );
@@ -610,11 +696,11 @@ AP.plate.modal = ( function() {
             originId = originId || "";
 
             // --- Funzione di render locale ---
-            function doRender() {
+            async function doRender() {
                 if ( type === "plate" ) {
-                    viewModel.renderProductItemsPlate( true );
+                    await viewModel.renderProductItemsPlate();
                 } else {
-                    viewModel.renderProductItemsFruit( productId, true );
+                    await viewModel.renderProductItemsFruit( productId );
                 }
             }
 
@@ -640,111 +726,117 @@ AP.plate.modal = ( function() {
                         }
                     }
                 }
-                doRender();
+                await doRender();
                 return;
             }
 
-            // --- Selezionamento: originId valorizzato ---
-            return AP.plate.api.getProductItems( prodyctIdForCall, originId, {
-                done: function( xhr ) {
-                    if ( xhr.data.length > 0 ) {
-                        // Trovo l'indice dell'attributo selezionato
-                        var parentIndex = -1;
-                        attributeArray.forEach( function( d, idx ) {
-                            if ( d.attributeId == attributeId ) { parentIndex = idx; }
-                        } );
+            let url = "/manager/ajax/product-items?productId=" + productIdForCall;
+            if ( originId ) {
+                url += "&originId=" + originId;
+            }
 
-                        // Rimuovo eventuali attributi figli
-                        var i = parentIndex + 1;
-                        while ( i < attributeArray.length ) {
-                            if ( attributeArray[i].level > attributeArray[parentIndex].level ) {
-                                productItems.remove( attributeArray[i] );
-                            } else {
-                                break;
-                            }
-                        }
-
-                        // Imposto selected sul parent
-                        if ( parentIndex !== -1 ) {
-                            var parent = productItems.at( parentIndex );
-                            parent.get( "values" ).forEach( function( v ) {
-                                v.selected = v.productItemId == originId;
+            return await NM.util.ajax( {
+                method: "GET",
+                url: url,
+                callback: {
+                    done: async function( xhr ) {
+                        if ( xhr.data.length > 0 ) {
+                            // Trovo l'indice dell'attributo selezionato
+                            var parentIndex = -1;
+                            attributeArray.forEach( function( d, idx ) {
+                                if ( d.attributeId == attributeId ) { parentIndex = idx; }
                             } );
-                        }
 
-                        // Creo i nuovi attributi figli
-                        var lastAttributeId = null;
-                        var attributes = [];
-                        var attribute;
-
-                        xhr.data.forEach( function( item ) {
-                            if ( lastAttributeId == null || lastAttributeId != item.attribute.id ) {
-                                attribute = {
-                                    attributeId: item.attribute.id,
-                                    attributeName: item.attribute.name,
-                                    parentAttributeId: attributeId,
-                                    parentItemId: originId,
-                                    level: attributeArray[parentIndex].level + 1,
-                                    values: []
-                                };
-                                attributes.push( attribute );
-                            }
-                            attribute.values.push( {
-                                attributeValue: item.attributeValue,
-                                productItemId: item.id,
-                                selected: false
-                            } );
-                            lastAttributeId = item.attribute.id;
-                        } );
-
-                        // Inserisco i nuovi attributi dopo il parent
-                        for ( var i = 0; i < attributes.length; i++ ) {
-                            productItems.insert( parentIndex + 1 + i, attributes[i] );
-                        }
-
-                    } else {
-                        // Nessun figlio: setto selected sul parent e rimuovo eventuali orfani
-                        var parentIndex = -1;
-                        attributeArray.forEach( function( d, idx ) {
-                            if ( d.attributeId == attributeId ) { parentIndex = idx; }
-                        } );
-
-                        if ( parentIndex !== -1 ) {
-                            var parent = productItems.at( parentIndex );
-                            parent.get( "values" ).forEach( function( v ) {
-                                v.selected = v.productItemId == originId;
-                            } );
-                        }
-
-                        // Rimuovo elementi dell'albero legati a un parent non selezionato (come in signage.js)
-                        var elementsToRemove = [];
-                        attributeArray.forEach( function( d, idx ) {
-                            if ( d.parentItemId ) {
-                                if ( idx > 0 && attributeArray[idx - 1].values.filter( function( v ) {
-                                    return v.selected == false && v.productItemId == d.parentItemId;
-                                } ).length > 0 ) {
-                                    elementsToRemove.push( idx );
+                            // Rimuovo eventuali attributi figli
+                            var i = parentIndex + 1;
+                            while ( i < attributeArray.length ) {
+                                if ( attributeArray[i].level > attributeArray[parentIndex].level ) {
+                                    productItems.remove( attributeArray[i] );
+                                } else {
+                                    break;
                                 }
                             }
-                        } );
-                        elementsToRemove.reverse().forEach( function( idx ) {
-                            productItems.remove( productItems.at( idx ) );
-                        } );
-						updateImage(parent);
+
+                            // Imposto selected sul parent
+                            if ( parentIndex !== -1 ) {
+                                var parent = productItems.at( parentIndex );
+                                parent.get( "values" ).forEach( function( v ) {
+                                    v.selected = v.productItemId == originId;
+                                } );
+                            }
+
+                            // Creo i nuovi attributi figli
+                            var lastAttributeId = null;
+                            var attributes = [];
+                            var attribute;
+
+                            xhr.data.forEach( function( item ) {
+                                if ( lastAttributeId == null || lastAttributeId != item.attribute.id ) {
+                                    attribute = {
+                                        attributeId: item.attribute.id,
+                                        attributeName: item.attribute.name,
+                                        parentAttributeId: attributeId,
+                                        parentItemId: originId,
+                                        level: attributeArray[parentIndex].level + 1,
+                                        values: []
+                                    };
+                                    attributes.push( attribute );
+                                }
+                                attribute.values.push( {
+                                    attributeValue: item.attributeValue,
+                                    productItemId: item.id,
+                                    selected: false
+                                } );
+                                lastAttributeId = item.attribute.id;
+                            } );
+
+                            // Inserisco i nuovi attributi dopo il parent
+                            for ( var i = 0; i < attributes.length; i++ ) {
+                                productItems.insert( parentIndex + 1 + i, attributes[i] );
+                            }
+
+                        } else {
+                            // Nessun figlio: setto selected sul parent e rimuovo eventuali orfani
+                            var parentIndex = -1;
+                            attributeArray.forEach( function( d, idx ) {
+                                if ( d.attributeId == attributeId ) { parentIndex = idx; }
+                            } );
+
+                            if ( parentIndex !== -1 ) {
+                                var parent = productItems.at( parentIndex );
+                                parent.get( "values" ).forEach( function( v ) {
+                                    v.selected = v.productItemId == originId;
+                                } );
+                            }
+
+                            // Rimuovo elementi dell'albero legati a un parent non selezionato (come in signage.js)
+                            var elementsToRemove = [];
+                            attributeArray.forEach( function( d, idx ) {
+                                if ( d.parentItemId ) {
+                                    if ( idx > 0 && attributeArray[idx - 1].values.filter( function( v ) {
+                                        return v.selected == false && v.productItemId == d.parentItemId;
+                                    } ).length > 0 ) {
+                                        elementsToRemove.push( idx );
+                                    }
+                                }
+                            } );
+                            elementsToRemove.reverse().forEach( function( idx ) {
+                                productItems.remove( productItems.at( idx ) );
+                            } );
+                            updateImage(parent);
+                        }
+                        // Render
+                        await doRender();
+
+                        // Aggiorna pricing sui select
+                        // $( "select.select-item" ).each( function() {
+                        //     $( this ).off( "change.calculatePrice" ).on( "change.calculatePrice", function() {
+                        //         updatePrice();
+                        //     } );
+                        // } );
                     }
-
-
-                    // Render
-                    doRender();
-
-                    // Aggiorna pricing sui select
-                    $( "select.select-item" ).each( function() {
-                        $( this ).off( "change.calculatePrice" ).on( "change.calculatePrice", function() {
-                            updatePrice();
-                        } );
-                    } );
                 }
-            } );
+            })
         },
 
         populateProduct( product ) { // without items
@@ -769,86 +861,109 @@ AP.plate.modal = ( function() {
          * Carica il prodotto (linea/modello/finitura) e i suoi product items, poi la placca.
          * Chiamato al change della finitura (nuova placca).
          */
-        loadProduct: function() {
+        loadProduct: async function() {
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
             var modelId = viewModel.get( "detailForm.data.product.model.id" );
             var finishId = viewModel.get( "detailForm.data.product.finish.id" );
             AP.setUserPref( "plate.finishId", finishId );
+            if (finishId && finishId != '') {
+                var url = "/manager/ajax/quotation-items/product/by-params" +
+                "?categoryId=" + 22 +
+                "&lineId=" + lineId +
+                "&modelId=" + modelId +
+                "&finishId=" + finishId;
 
-            AP.plate.api.getProductByParams( 22, lineId, modelId, finishId, {
-                done: function( xhr ) {
-                    viewModel.populateProduct( xhr.data );
-                    viewModel.firstLoadProductItems().then( function() {
-                        setTimeout( function() {
-                            viewModel.loadPlate();
-                        }, 500 );
-                    } );
-                }
-            } );
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: url,
+                    callback: {
+                        done: async function( xhr ) {
+                            viewModel.populateProduct( xhr.data )
+                            await viewModel.firstLoadProductItems();
+                            await viewModel.loadPlate();
+                        }
+                    }
+                })
+            } else {
+                viewModel.set('detailForm.data.product.items', [])
+                $('#quotation-plate-product-items').empty()
+                $('#plate-background').remove()
+            }
         },
 
-        addProductItemsToFruit: function( fruitId ) {
-
+        addProductItemsToFruit: async function( fruitId ) {
             var fruits = viewModel.get( "detailForm.data.fruits" );
             var thisFruit = fruits.get( fruitId );
             var productId = thisFruit.fruit.id;
-
-            AP.plate.api.getProductItems( productId, null, {
-                done: function( xhr ) {
-                    if ( xhr.count > 0 ) {
-                        var thisImage = xhr.data[0].horizontalImage;
-                        if ( thisImage ) {
-                            thisFruit.set( "fruit.horizontalImage", thisImage );
-                            pub.fruitsController.updateFruit( thisFruit.id, { image: thisImage.uri } );
+            let url = "/manager/ajax/product-items?productId=" + productId;
+            
+            await NM.util.ajax( {
+                    method: "GET",
+                    url: url,
+                    callback: {
+                        done: async function( xhr ) {
+                            if ( xhr.count > 0 ) {
+                                // var thisImage = xhr.data[0].horizontalImage;
+                                // if ( thisImage ) {
+                                //     thisFruit.set( "fruit.horizontalImage", thisImage );
+                                //     pub.fruitsController.updateFruit( thisFruit.id, { image: thisImage.uri } );
+                                // }
+                                var fruitItems = thisFruit.get( "items" );
+                                var attributeArray = fruitItems.data();
+                                xhr.data.forEach( function( item ) {
+                                    viewModel.set('detailForm.data.productItemsImages.' + item.shortId, 
+                                        item.horizontalImage ? 
+                                        item.horizontalImage.uri : ''
+                                    )
+                                    const attributeExisting = attributeArray.find( function( d ) { return d.attributeId === item.attribute.id; } );
+                                    // var img = item.images && item.images[0];
+                                    // if ( img ) {
+                                    //     thisFruit.set( "fruit.horizontalImage", img );
+                                    //     pub.fruitsController.updateFruit( thisFruit.id, { image: img.uri } );
+                                    // }
+                                    if ( attributeExisting ) {
+                                        attributeExisting.values.push( {
+                                            attributeValue: item.attributeValue,
+                                            productItemId: item.id,
+                                            images: item.images,
+                                            selected: false
+                                        } );
+                                    } else {
+                                        fruitItems.add( {
+                                            attributeId: item.attribute.id,
+                                            attributeName: item.attribute.name,
+                                            level: 0,
+                                            values: [ {
+                                                attributeValue: item.attributeValue,
+                                                productItemId: item.id,
+                                                images: item.images,
+                                                selected: false
+                                            } ]
+                                        } );
+                                    }
+                                } );
+                                thisFruit.set( "items", fruitItems );
+                                await viewModel.renderProductItemsFruit( fruitId );
+                            }
                         }
-                        var fruitItems = thisFruit.get( "items" );
-                        var attributeArray = fruitItems.data();
-                        xhr.data.forEach( function( item ) {
-                            const attributeExisting = attributeArray.find( function( d ) { return d.attributeId === item.attribute.id; } );
-                            var img = item.images && item.images[0];
-                            if ( img ) {
-                                thisFruit.set( "fruit.horizontalImage", img );
-                                pub.fruitsController.updateFruit( thisFruit.id, { image: img.uri } );
-                            }
-                            if ( attributeExisting ) {
-                                attributeExisting.values.push( {
-                                    attributeValue: item.attributeValue,
-                                    productItemId: item.id,
-                                    images: item.images,
-                                    selected: false
-                                } );
-                            } else {
-                                fruitItems.add( {
-                                    attributeId: item.attribute.id,
-                                    attributeName: item.attribute.name,
-                                    level: 0,
-                                    values: [ {
-                                        attributeValue: item.attributeValue,
-                                        productItemId: item.id,
-                                        images: item.images,
-                                        selected: false
-                                    } ]
-                                } );
-                            }
-                        } );
-                        thisFruit.set( "items", fruitItems );
-                        viewModel.renderProductItemsFruit( fruitId );
                     }
                 }
-            } ).then( async function() {
-                var fruits = viewModel.get( "detailForm.data.fruits" );
-                var thisFruit = fruits.get( fruitId );
-                var quotationItemFruitId = thisFruit.get( "id" );
+            )
+            var fruits = viewModel.get( "detailForm.data.fruits" );
+            var thisFruit = fruits.get( fruitId );
+            var quotationItemFruitId = thisFruit.get( "id" );
 
-                if ( quotationItemFruitId ) {
-                    await AP.plate.api.getQuotationItemFruitProductItems( quotationItemFruitId, {
+            if ( quotationItemFruitId ) {
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotation-items/fruits/" + quotationItemFruitId + "/product-items",
+                    callback: {
                         done: async function( xhr ) {
                             await viewModel.restoreProductItemSelections( xhr.data, "#quotation-fruit-row-items_" + fruitId, fruitId );
                         }
-                    } );
-                }
-            } );
-
+                    }
+                });
+            }
         },
 
         changeImage: function( attribute ) {
@@ -898,17 +1013,61 @@ AP.plate.modal = ( function() {
 
         },
 
-        changeFruitImage: function( fruitId, value ) {
+        changeFruitImage: async function( fruitId, value ) {
+            //cerco i productItems del frutto
+            selectedProductItemIds = []
+            const fruit = viewModel.get('detailForm.data.fruits')._data.find(f => f.id == fruitId)
+            let fruitItems = []
+            if (fruit) {
+                fruitItems = fruit.items.data()
+            }
+            if (fruitItems.length > 0) {
+                fruitItems.forEach(function(fruitItem) {
+                    const selected = fruitItem.values.find(v => v.selected == true)
+                    if (selected) {
+                        selectedProductItemIds.push(selected.productItemId)
+                    } else {
+                        selectedProductItemIds.push(fruitItem.values[0].productItemId)
+                    }
+                })
+            }
 
-            if ( value?.images ) {
+            const actualFruitImage = $('#quotation-plate-fruits #' + fruitId + ' img');
+            if (actualFruitImage.length) {
+                actualFruitImage.attr('src', '/assets/main/img/fruit-generic.png')
+            }
+            //se ne trovo, cerco l'immagine per la combinazione
+            if (selectedProductItemIds.length) {
+                await NM.util.ajax({
+                    method: "POST",
+                    url: '/manager/ajax/combinations/findByListOfProductItemIds',
+                    data: JSON.stringify( { 'productItemIds': selectedProductItemIds } ),
+                    callback: {
+                        done: function (xhr) {
+                                if (xhr.status === 'SUCCESS') {
+                                    const actualFruitImage = $('#quotation-plate-fruits #' + fruitId + ' img');
+                                    if (xhr.data && actualFruitImage.length) {
+                                        ///se trovo l'immagine per la combinazione la setto
+                                        if (xhr.data.horizontalImage) {
+                                            actualFruitImage.attr('src', xhr.data.horizontalImage)
+                                        } else {
+                                            // altrimenti cerco come default la prima immagine disponibile nell'array delle immagini dei product items popolato in addProductItemsToFruit
+                                            let firstProductItemWithImageId = selectedProductItemIds.find(id => {
+                                                const img = viewModel.get('detailForm.data.productItemsImages.' + id);
+                                                return img && img !== '';
+                                            });
+                                            const firstValidImage = viewModel.get('detailForm.data.productItemsImages.' + firstProductItemWithImageId)
 
-                var uri = value.images[0]?.uri;
-
-                if ( uri ) {
-                    pub.fruitsController.updateFruit( fruitId, { image: uri } );
-
-                }
-
+                                            if (firstValidImage) {
+                                                actualFruitImage.attr('src', firstValidImage )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
             }
 
         },
@@ -916,22 +1075,20 @@ AP.plate.modal = ( function() {
         /**
          * Renderizza i product items per un frutto.
          * @param {string} fruitId - ID del frutto
-         * @param {boolean} [skipAutoTrigger=false] - Se true, non fa trigger automatico del change (per evitare loop durante caricamento)
          */
-        renderProductItemsFruit: function( fruitId, skipAutoTrigger ) {
+        renderProductItemsFruit: async function( fruitId ) {
             var fruits = viewModel.get( "detailForm.data.fruits" );
             var fruit = fruits.get( fruitId );
-            AP.plate.productItems.renderProductItems( {
+            AP.plate.productItems.renderProductItems({
                 containerSelector: "#quotation-fruit-row-items_" + fruitId,
-                attributeArray: fruit.get( "items" ).data(),
+                attributeArray: fruit.get("items").data(),
                 subContainerIdPrefix: "fruit-attribute-container-",
-                labelTextFn: function( item ) { return item.attributeName; },
-                onSelectChange: function( selectedId, attributeId, value ) {
-                    viewModel.changeFruitImage( fruitId, value );
-                    viewModel.loadProductItems( selectedId, attributeId, fruitId );
-                },
-                skipAutoTrigger: skipAutoTrigger === true
-            } );
+                labelTextFn: function (item) { return item.attributeName; },
+                onSelectChange: async function (selectedId, attributeId, value) {
+                    await viewModel.loadProductItems(selectedId, attributeId, fruitId);
+                    await viewModel.changeFruitImage(fruitId, value);
+                }
+            });
 
             $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" ).on( "mouseenter", function() {
                 const color = "rgba(162, 253, 161, 0.44)";
@@ -943,80 +1100,63 @@ AP.plate.modal = ( function() {
             } );
         },
 
-        /**
-         * Renderizza i product items per la placca.
-         * @param {boolean} [skipAutoTrigger=false] - Se true, non fa trigger automatico del change (per evitare loop durante caricamento)
-         */
-        renderProductItemsPlate: function( skipAutoTrigger ) {
+        renderProductItemsPlate: async function() {
             var productItems = viewModel.get( "detailForm.data.product.items" );
             AP.plate.productItems.renderProductItems( {
                 containerSelector: "#quotation-plate-product-items",
                 attributeArray: productItems.data(),
                 subContainerIdPrefix: "attribute-container-",
                 labelTextFn: function( item ) { return item.attributeName; },
-                onSelectChange: function( selectedId, attributeId, value ) {
+                onSelectChange: async function( selectedId, attributeId, value ) {
+                    await viewModel.loadProductItems( selectedId, attributeId );
                     viewModel.changeImage( value );
-                    viewModel.loadProductItems( selectedId, attributeId );
-                },
-                skipAutoTrigger: skipAutoTrigger === true
+                }
             } );
         },
 
         // --- API: lines, models, finishes, load/save plate ---
-        /**
-         * Carica le linee (categoria 22) e apre la modale.
-         * @param {function} [onLoad] - Chiamato quando le linee sono caricate (per incatenare il passo successivo in edit()).
-         */
-        loadLines: function( onLoad ) {
-            AP.plate.api.getLines( 22, {
-                done: function( xhr ) {
-                    viewModel.get( "lines" ).data( xhr.data );
-                    NM.util.openModal( AP.plate.fields.modalRoot );
-                    applyUserPrefIfNewMode( "plate.lineId", "detailForm.data.product.line.id", "#plate-line" );
-                    if ( typeof onLoad === "function" ) {
-                        onLoad();
-                    }
-                }
+        loadLines: async function( event ) {
+            await NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotations/lines/22",
+                callback: {
+                    done: function( xhr ) {
+                        viewModel.get( "lines" ).data( xhr.data );
+                    },
+                },
             } );
         },
 
-        /**
-         * Carica i modelli per la linea selezionata.
-         * @param {*} [event] - Evento (opzionale, per binding Kendo).
-         * @param {function} [onDone] - Chiamato quando i modelli sono caricati (per incatenare in edit()).
-         */
-        loadModels: function( event, onDone ) {
+        loadModels: async function( event ) {
             var lineId = viewModel.get( "detailForm.data.product.line.id" );
+            if (lineId && lineId != '') {
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/models/" + lineId,
+                    callback: {
+                        done: function( xhr ) {
+                            viewModel.get( "models" ).data( xhr.data );
+                        },
+                    },
+                } );
+            }
             AP.setUserPref( "plate.lineId", lineId );
-            AP.plate.api.getModels( lineId, {
-                done: function( xhr ) {
-                    viewModel.get( "models" ).data( xhr.data );
-                    applyUserPrefIfNewMode( "plate.modelId", "detailForm.data.product.model.id", "#plate-model" );
-                    if ( typeof onDone === "function" ) {
-                        onDone();
-                    }
-                }
-            } );
         },
 
-        /**
-         * Carica le finiture per linea (categoria 22).
-         * @param {*} [event] - Evento (opzionale, per binding Kendo).
-         * @param {function} [onDone] - Chiamato quando le finiture sono caricate (per incatenare in edit()).
-         */
-        loadFinishes: function( event, onDone ) {
-            var lineId = viewModel.get( "detailForm.data.product.line.id" );
-            var modelId = viewModel.get( "detailForm.data.product.model.id" );
-            AP.setUserPref( "plate.modelId", modelId );
-            AP.plate.api.getFinishes( 22, lineId, {
-                done: function( xhr ) {
-                    viewModel.get( "finishes" ).data( xhr.data );
-                    applyUserPrefIfNewMode( "plate.finishId", "detailForm.data.product.finish.id", "#plate-finish" );
-                    if ( typeof onDone === "function" ) {
-                        onDone();
-                    }
-                }
-            } );
+        loadFinishes: async function( event ) {
+            if ( viewModel.get( "detailForm.data.product.model.id" ) && viewModel.get( "detailForm.data.product.model.id" ) != "" ) {
+                await NM.util.ajax( {
+                    method: "GET",
+                    url: "/manager/ajax/quotations/finishes/22/" + viewModel.get( "detailForm.data.product.line.id" ),
+                    callback: {
+                        done: function( xhr ) {
+                            viewModel.get( "finishes" ).data( xhr.data );
+                        },
+                    },
+                } );
+            }
+            this.checkCanSave();
+            AP.setUserPref( "plate.modelId", viewModel.get( "detailForm.data.product.model.id" ) );
         },
 
         resetForm: function() {
@@ -1038,10 +1178,16 @@ AP.plate.modal = ( function() {
          * @property {Object.<string, string[]>} positions - mappa fruitId -> array di cellIds occupate (es. { "uuid-1": ["cell-1","cell-2"] })
          * @property {string} imageBase64 - PNG in base64 senza prefisso data:image/png;base64,
          */
-        save: function() {
+        save: async function() {
             AP.loading.show();
             // Crea una mappa { id: cellIds } per ogni frutto
             var positions = {};
+
+            if (!pub.fruitsController.fruits.length) {
+                AP.widget.notify( "error", "Devi configurare almeno un frutto per poter procedere." );
+                AP.loading.hide()
+                return false;
+            }
 
             pub.fruitsController.fruits.forEach( function( fruit ) {
                 positions[ fruit.id ] = fruit.cellIds;
@@ -1050,6 +1196,16 @@ AP.plate.modal = ( function() {
             // const parsedData =
             var status = fields.modalRoot.find( ".save-status" );
             var preview = $( "#plate-background" )[0];
+            if (viewModel.get('detailForm.data.id') && viewModel.get('detailForm.data.customImage') && viewModel.get('detailForm.data.customImage') == true) {
+                //se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
+               if (!viewModel.get('backgroundCustomImage.url')) {
+                    AP.widget.notify( "error", "Hai scelto custom image, devi selezionare un'immagine prima di salvare." );
+                    AP.loading.hide()
+                    return false;
+               }
+
+               preview = $( "#plate-custom-image" )[0];
+            }
 
             status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
 
@@ -1071,10 +1227,15 @@ AP.plate.modal = ( function() {
 				parsedData.item.id = "";
 			}
 
-            html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
+            html2canvas( preview, { useCORS: true } ).then( async function( canvas ) {
                 var imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
                 parsedData.imageBase64 = imgData;
-                AP.plate.api.savePlate( parsedData, {
+
+                await NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax//quotation-items/plate",
+                data: JSON.stringify( parsedData ),
+                callback: {
                     done: function( xhr ) {
                         status.html( "" );
 
@@ -1087,7 +1248,8 @@ AP.plate.modal = ( function() {
                             window.location.href = "/manager/quotations/" + parsedData.quotationId + "?tab=plate";
                         }, 1000 );
                     }
-                } );
+                }
+                });
             } );
 
             return false;
@@ -1097,47 +1259,48 @@ AP.plate.modal = ( function() {
          * Carica i frutti della placca (in modifica) e li aggiunge alla griglia.
          * @param {function} [onDone] - Chiamato quando i frutti sono stati caricati (per incatenare in edit()).
          */
-        loadFruits: function( onDone ) {
+        loadFruits: async function( onDone ) {
             var id = viewModel.get( "detailForm.data.id" );
-            AP.plate.api.getPlateFruits( id, {
-                done: function( xhr ) {
-                    let fruitQuotationItemProductItems = []
-                    for ( var i = 0; i < xhr.data.length; i++ ) {
-                        var thisFruit = xhr.data[i];
-                        var newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
 
-                        viewModel.set( "currentFruit", newFruit );
-                        viewModel.get( "detailForm.data.fruits" ).add( newFruit );
+            await NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotation-items/plate/" + id + "/fruits",
+                callback: {
+                    done: function( xhr ) {
+                        let fruitQuotationItemProductItems = []
+                        for ( var i = 0; i < xhr.data.length; i++ ) {
+                            var thisFruit = xhr.data[i];
+                            var newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
 
-                        if ( thisFruit.positions && thisFruit.positions.length ) {
-                            pub.fruitsController.addFruitToPositions( mapFruitForPlate( newFruit ), thisFruit.positions );
-                        } else {
-                            pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
-                        }
+                            viewModel.set( "currentFruit", newFruit );
+                            viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
-                        viewModel.addProductItemsToFruit( newFruit.id );
-
-                        thisFruit.items.forEach(function(item) {
-                            if (item.productItem.attributeValue.allowNote) {
-                                fruitQuotationItemProductItems.push({
-                                    'quotation_item_fruit_id': thisFruit.id,
-                                    'product_item_id': item.productItem.id,
-                                    'attribute_value_id': item.productItem.attributeValue.id,
-                                    'note': item.note
-                                })
+                            if ( thisFruit.positions && thisFruit.positions.length ) {
+                                pub.fruitsController.addFruitToPositions( mapFruitForPlate( newFruit ), thisFruit.positions );
+                            } else {
+                                pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
                             }
-                        })
-                        viewModel.set('detailForm.data.fruitQuotationItemProductItems', fruitQuotationItemProductItems)
-                    }
-                    if ( typeof onDone === "function" ) {
-                        onDone();
+
+                            viewModel.addProductItemsToFruit( newFruit.id );
+
+                            thisFruit.items.forEach(function(item) {
+                                if (item.productItem.attributeValue.allowNote) {
+                                    fruitQuotationItemProductItems.push({
+                                        'quotation_item_fruit_id': thisFruit.id,
+                                        'product_item_id': item.productItem.id,
+                                        'attribute_value_id': item.productItem.attributeValue.id,
+                                        'note': item.note
+                                    })
+                                }
+                            })
+                            viewModel.set('detailForm.data.fruitQuotationItemProductItems', fruitQuotationItemProductItems)
+                        }
                     }
                 }
-            } );
+            })
         },
 
         onSelectFruit: function( selectedFruit ) {
-
             var newFruit = createFruit( { position: 1, fruit: selectedFruit } );
 
             viewModel.set( "currentFruit", newFruit );
@@ -1185,6 +1348,41 @@ AP.plate.modal = ( function() {
 			vm.set("detailForm.data.product.finish.id", "");
 			vm.set("detailForm.data.product.model.id", "");
 		},
+
+        handleSelectChanges: function() {
+            $( "#plate-line" ).on( "change", function(e) {
+                viewModel.set('detailForm.data.product.model', { 'id':'' })
+                viewModel.set('detailForm.data.product.finish', { 'id':'' })
+                $('#quotation-plate-product-items').empty()
+                viewModel.set('detailForm.data.product.items', new kendo.data.DataSource( {
+                    data: []
+                } ))
+                viewModel.set('detailForm.data.fruits', new kendo.data.DataSource( {
+                    data: [],
+                    schema: {
+                        model: { id: "id" }
+                    }
+                } ))
+                $('#plate-background').remove()
+                AP.deleteUserPref( "plate.modelId" );
+                AP.deleteUserPref( "plate.finishId" );
+            } );
+            $( "#plate-model" ).on( "change", function(e) {
+                viewModel.set('detailForm.data.product.finish', { 'id':'' })
+                $('#quotation-plate-product-items').empty()
+                viewModel.set('detailForm.data.product.items', new kendo.data.DataSource( {
+                    data: []
+                } ))
+                viewModel.set('detailForm.data.fruits', new kendo.data.DataSource( {
+                    data: [],
+                    schema: {
+                        model: { id: "id" }
+                    }
+                } ))
+                $('#plate-background').remove()
+                AP.deleteUserPref( "plate.finishId" );
+            } );
+        }
     } );
 
 	viewModel.bind("change", function (e) {
@@ -1194,25 +1392,61 @@ AP.plate.modal = ( function() {
 		}
 	});
 
-    pub.new = function( onSave ) {
+    pub.new = async function( onSave ) {
         if ( onSave ) {
             viewModel.set( "callback.onSave", onSave );
         }
+        NM.util.openModal( AP.plate.fields.modalRoot );
 
-        console.log( "new:zone", AP.quotation.detail.config().zone );
+        await viewModel.loadLines();
 
         resetDetailForm();
 
-        viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
+        let zone = AP.quotation.detail.config().zone
+        if (zone.id == '') {
+            zone = viewModel.get('zones').find(z => z.name == 'Non assegnato')
+        }
+        viewModel.set( "detailForm.data.quotationZone", zone );
         viewModel.set( "isEditMode", false );
+
+        viewModel.handleSelectChanges()
+
+        const plateLineId = AP.getUserPref( "plate.lineId" )
+        const plateModelId = AP.getUserPref( "plate.modelId" )
+        const plateFinishId = AP.getUserPref( "plate.finishId" )
+
+        if (plateLineId) {
+            let line = viewModel.lines.data().find(l => l.id == plateLineId)
+            if (line) {
+                line = { id: line.id, name: line.name };
+                viewModel.set( "detailForm.data.product.line", line );
+                await viewModel.loadModels();
+                if (plateModelId) {
+                    let model = viewModel.models.data().find(m => m.id == plateModelId)
+                    if (model) {
+                        model = { id: model.id, name: model.name };
+                        viewModel.set( "detailForm.data.product.model", model );
+                        await viewModel.loadFinishes();
+                        if (plateFinishId) {
+                            let finish = viewModel.finishes.data().find(f => f.id = plateFinishId)
+                            if (finish) {
+                                finish = { id: finish.id, name: finish.name };
+                                viewModel.set( "detailForm.data.product.finish", finish );
+                                await viewModel.loadProduct()
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         pricingApp().init( "plate", undefined );
 
         initFruitsSuggest();
         initPositionSuggest();
 
-        viewModel.loadLines();
-
+        $('#plate-custom-designer').hide()
+        $('#plate-designer').show()
     };
 
     /**
@@ -1224,60 +1458,71 @@ AP.plate.modal = ( function() {
      * @param {function} [opts.onSave] - Callback dopo salvataggio
      * @param {boolean} [opts.clone=false] - Se true, titolo "Duplica placca"
      */
-    pub.edit = function( { id, onSave, clone = false } ) {
+    pub.edit = async function( { id, onSave, clone = false } ) {
         window.location.hash = "plate/" + id;
         resetDetailForm();
         viewModel.set( "isEditMode", true );
         viewModel.set( "detailForm.isClone", clone );
         viewModel.set( "detailForm.title", clone ? "Clona placca" : "Modifica placca" );
 
-        AP.plate.api.getPlate( id, {
-            done: function( xhr ) {
-				viewModel.populateProduct( xhr.data.quotationItem.product );
-                viewModel.set( "detailForm.data.id", xhr.data.quotationItem.id );
-                viewModel.set( "detailForm.data.position", xhr.data.quotationItem.position );
-                viewModel.set( "detailForm.data.note", xhr.data.quotationItem.note );
-                viewModel.set( "detailForm.data.quantity", xhr.data.quotationItem.quantity );
-                viewModel.set( "detailForm.data.special", xhr.data.quotationItem.special == 'true' );
-                viewModel.set( "detailForm.data.plateQuotationItemProductItems", xhr.data.quotationItem.items );
+		NM.util.openModal( AP.plate.fields.modalRoot );
 
-                const quotationZone = xhr.data.quotationItem.quotationZone
-                if ( quotationZone ) {
-                    if (quotationZone.origin) {
-                        viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone.origin );
-                        viewModel.set( "detailForm.data.quotationSubzone", xhr.data.quotationItem.quotationZone );
-                    } else {
-                        viewModel.set( "detailForm.data.quotationZone", xhr.data.quotationItem.quotationZone );
-                    }
+		const plateResponse = await NM.util.ajax( {
+			method: "GET",
+			url: "/manager/ajax/quotation-items/plate/" + id,
+			callback: {
+				done: function( xhr ) {
+					//NOOP
+				},
+			},
+		} );
+
+		if ( plateResponse.status === "SUCCESS" ) {
+            var data = plateResponse.data;
+            viewModel.populateProduct( data.quotationItem.product );
+            viewModel.set( "detailForm.data.id", data.quotationItem.id );
+            viewModel.set( "detailForm.data.position", data.quotationItem.position );
+            viewModel.set( "detailForm.data.note", data.quotationItem.note );
+            viewModel.set( "detailForm.data.quantity", data.quotationItem.quantity );
+            viewModel.set( "detailForm.data.special", data.quotationItem.special == 'true' );
+            viewModel.set( "detailForm.data.customImage", data.quotationItem.customImage == 'true' );
+            //in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
+            //altrimenti farò il contrario
+
+            viewModel.set( "detailForm.data.plateQuotationItemProductItems", data.quotationItem.items );
+
+            const quotationZone = data.quotationItem.quotationZone
+            if ( quotationZone ) {
+                if (quotationZone.origin) {
+                    viewModel.set( "detailForm.data.quotationZone", data.quotationItem.quotationZone.origin );
+                    viewModel.set( "detailForm.data.quotationSubzone", xhr.data.quotationItem.quotationZone );
+                } else {
+                    viewModel.set( "detailForm.data.quotationZone", data.quotationItem.quotationZone );
                 }
-                // viewModel.set( "detailForm.data.product.orientation", xhr.data.quotationItem.frame.orientation );
-
-                initFruitsSuggest();
-                initPositionSuggest();
-
-                // Catena di caricamento senza delay artificiali: ogni passo chiama il successivo nel suo callback.
-                viewModel.loadLines( function() {
-                    viewModel.loadModels( undefined, function() {
-                        viewModel.loadFinishes( undefined, function() {
-                            viewModel.firstLoadProductItems().then( function() {
-                                var platePromise = viewModel.loadPlate( xhr.data.quotationItem.frame.orientation );
-                                AP.loading.hide();
-                                if ( platePromise && typeof platePromise.then === "function" ) {
-                                    platePromise.then( function() {
-                                        viewModel.loadFruits();
-                                    } );
-                                } else {
-                                    viewModel.loadFruits();
-                                }
-                            } );
-                        } );
-                    } );
-                } );
-
-                pricingApp().init( "plate", { data: xhr.data.quotationItem.price } );
             }
-        } );
 
+            await viewModel.loadBackgroundCustomImage(data.quotationItem.id)
+            if (data.quotationItem.customImage == 'true') {
+                $('#plate-custom-designer').show()
+                $('#plate-designer').hide()
+            } else {
+                $('#plate-custom-designer').hide()
+                $('#plate-designer').show()
+            }
+
+			await viewModel.loadLines();
+			await viewModel.loadModels();
+			await viewModel.loadFinishes();
+			await viewModel.firstLoadProductItems();
+            await viewModel.loadPlate( data.quotationItem.frame.orientation );
+            await viewModel.loadFruits();
+			
+
+            initFruitsSuggest();
+            initPositionSuggest();
+            pricingApp().init( "plate", { data: data.quotationItem.price } );
+        }
+        
         if (clone) {
             $('#saveButton').css("display", "none")
             $('#cloneButton').css("display", "block")
@@ -1285,6 +1530,9 @@ AP.plate.modal = ( function() {
             $('#saveButton').css("display", "block")
             $('#cloneButton').css("display", "none")
         }
+        
+        viewModel.handleSelectChanges()
+        AP.loading.hide()
     };
 
     var initPositionSuggest = function() {

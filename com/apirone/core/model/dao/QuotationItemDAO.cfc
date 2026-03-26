@@ -263,6 +263,31 @@
 		<cfreturn local.q.total_quantity ?: 0>
 	</cffunction>
 
+	<cffunction name="getQuantitaTotaleAltreRigheByQuotationAndProduct" returntype="Numeric">
+		<cfargument name="quotationId" type="String" required="true">
+		<cfargument name="quotationItemId" type="String" required="true">
+		<cfargument name="productId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone" result="result">
+			SELECT
+				SUM(
+					COALESCE(quotation_items.quantity, 0) * COALESCE(qz.quantity, 1) * COALESCE(qzo.quantity, 1)
+				) AS total_quantity
+			FROM quotation_items
+				LEFT JOIN products ON quotation_items.product_id = products.product_id
+				LEFT JOIN quotation_zones qz ON qz.quotation_zone_id = quotation_items.quotation_zone_id
+				LEFT JOIN quotation_zones qzo ON qzo.quotation_zone_id = qz.origin_id
+			WHERE
+				products.product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid AND
+				quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
+				<cfif arguments.quotationItemId != "" >
+					AND quotation_items.quotation_item_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
+				</cfif>
+
+		</cfquery>
+		<cfreturn local.q.total_quantity ?: 0>
+	</cffunction>
+
 	<cffunction name="getAltreRigheByQuotationLineIdAndFinishId" returntype="Query">
 		<cfargument name="quotationId" type="String" required="true">
 		<cfargument name="quotationItemId" type="String" required="true">
@@ -277,6 +302,24 @@
 			WHERE
 				products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid AND
 				products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid AND
+				quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid AND
+				quotation_items.quotation_item_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
+		</cfquery>
+		<cfreturn local.q>
+	</cffunction>
+
+	<cffunction name="getAltreRigheByQuotationAndProductId" returntype="Query">
+		<cfargument name="quotationId" type="String" required="true">
+		<cfargument name="quotationItemId" type="String" required="true">
+		<cfargument name="productId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone" result="result">
+			SELECT
+				quotation_items.*
+			FROM quotation_items
+			LEFT JOIN products ON quotation_items.product_id = products.product_id
+			WHERE
+				products.product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid AND
 				quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid AND
 				quotation_items.quotation_item_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
 		</cfquery>
