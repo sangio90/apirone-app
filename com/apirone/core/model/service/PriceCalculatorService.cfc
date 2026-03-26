@@ -449,7 +449,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"logFile" = variables.logConfig.filePath
 		};
 
-		FileAppend( "/repository/private/logs/prices/misura-tempi-calcolo.log", "#DateTimeFormat( Now(), "yyyy-mm-dd HH:nn:ss" )# - Fine. #Chr( 10 )#" );
 		return output;
 	}
 
