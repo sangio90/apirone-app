@@ -959,6 +959,7 @@ AP.accessory.modal = ( function() {
             viewModel.set('subzones', children)
         } else {
             viewModel.set('quotationZone', zone)
+            viewModel.set('detailForm.data.quotationItem.quotationZone', zone)
             const children = allZones.filter(z => z.origin && (z.origin.id == zone.id))
             children.unshift({
                 "id": "",

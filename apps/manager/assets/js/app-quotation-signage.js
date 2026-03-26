@@ -407,7 +407,7 @@ AP.signage.modal = ( function() {
             }
 
             contentSpanPreview.css( {
-                "font-family": fontFamilyName + ", Arial, sans-serif",
+                "font-family": fontFamilyName + ", Arial, san",
                 "font-size": heightPx + "px",
                 "line-height": heightPx + "px",
             } );
@@ -1442,6 +1442,7 @@ AP.signage.modal = ( function() {
             viewModel.set('subzones', children)
         } else {
             viewModel.set('quotationZone', zone)
+            viewModel.set('detailForm.data.quotationItem.quotationZone', zone)
             const children = allZones.filter(z => z.origin && (z.origin.id == zone.id))
             children.unshift({
                 "id": "",
