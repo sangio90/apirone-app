@@ -18,12 +18,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="cacheScope" type="String" default="QuotationItem.bean";
 
-	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId ){
+	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId, Boolean useCache = true ){
 		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.quotationItemId );
+		if (useCache) {
+			var cache = cm.get( getCacheScope(), arguments.quotationItemId );
 
-		if ( cache.status ) {
-			return cache.data;
+			if ( cache.status ) {
+				return cache.data;
+			}
 		}
 
 		var bean = build( arguments.quotationItemId );
@@ -42,9 +44,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments ).getData();
 	}
 
+	//{26 marzo 2026} aggiunto parametro useCache = false perche durante la procedura di quotationItemAjaxController.updateAllPrices la cache condizionava in maniera errata il calcolo
+	// vedi get()
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		String mode,
+		Boolean useCache = true,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotation.id" } ]
@@ -54,9 +59,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows    = [];
 		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
+		var useCache = arguments.useCache;
 
-		records.each( function( record ){
-			var quotationItem = get( quotationItemId = record.quotation_item_id );
+		records.each( function( record ) {
+			var quotationItem = get( quotationItemId = record.quotation_item_id, useCache = useCache );
 			if ( IsNull( mode ) ) {
 				rows.add( quotationItem );
 			} else {

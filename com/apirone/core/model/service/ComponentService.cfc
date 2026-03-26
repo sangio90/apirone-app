@@ -7,6 +7,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="colorService" inject="ColorService";
 	property name="productService" inject="ProductService";
 	property name="productItemService" inject="ProductItemService";
+	property name="productItemDAO" inject="ProductItemDAO";
 	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="lineService" inject="LineService";
 	property name="modelService" inject="ModelService";
@@ -46,6 +47,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var result = getDao().find( argumentCollection = arguments );
 
 		return Val( result.total );
+	}
+
+	public Array function priceCalculatorSearch(
+		String lineId,
+		String modelId,
+		String productId,
+		Numeric productItemId,
+		Numeric attributeValueId,
+		Boolean includeBaseAttributeComponents = false hint="Only for product productItemId",
+		limit = -1
+	){
+		if ( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
+			return searchByProductItemId( arguments.productItemId );
+		}
+
+		var rows   = [];
+		var result = super.getResult();
+
+		var records = getDao().find( argumentCollection = arguments );
+
+		records.each( function( record ){
+			var component = getDao().priceCalculatorRead( componentId = record.component_id, productItemId = !isNull(arguments.productItemId) ? arguments.productItemId : null )
+			rows.add(component)
+		} );
+
+		return rows
 	}
 
 	public com.apirone.core.model.bean.Result function search(
@@ -265,7 +292,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	*/
 
 	// TODO: di fatto avrebbe più senso sia searchByAttributeValueId, ma per ora lo lascio così
-	private com.apirone.core.model.bean.Result function searchByProductItemId( required String productItemId ){
+	private Array function searchByProductItemId( required String productItemId ){
+		var data   = [];
+		var result = getResult();
+
+		// components of productItem
+		var componentItems = getDao().find( "productItemId" = arguments.productItemId )
+
+		for ( var item in componentItems ) {
+			var componentItem = getDao().priceCalculatorRead( componentId = item.component_id, productItemId = arguments.productItemId );
+			data.add(componentItem)
+		}
+
+		// components of attribute of productItem
+		var productItem = getProductItemDAO().read( arguments.productItemId );
+
+		if ( Len( productItem.attribute_raw_value_id ) ) {
+			var attributeValueId = productItem.attribute_raw_value_id[1]
+			var attributeComponents = priceCalculatorSearch( attributeValueId = attributeValueId )
+			if (Len(attributeComponents))
+			for (var attributeComponent in attributeComponents) {
+				data.add(attributeComponent)
+			}
+		}
+		
+		return data;
+	}
+
+	/*
+    	private method
+	*/
+
+	// TODO: di fatto avrebbe più senso sia searchByAttributeValueId, ma per ora lo lascio così
+	private com.apirone.core.model.bean.Result function searchByProductItemIdOld( required String productItemId ){
 		var data   = [];
 		var result = getResult();
 

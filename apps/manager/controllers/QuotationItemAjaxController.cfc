@@ -696,7 +696,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var id = rc.id;
 
 		if (!IsNull(id)) {
-			var quotationItems = super.fire( "quotationItem.list", { quotationId = id } )
+			var quotationItems = super.fire( "quotationItem.list", { quotationId = id, useCache = false } )
 
 			transaction {
 				for (var quotationItem in quotationItems) {

@@ -194,13 +194,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var bundleCost = 0;
 
 		if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
-			var bundleComponents = componentSvc.list(
+			var bundleComponents = componentSvc.priceCalculatorSearch(
 				lineId                         = product.getLine().getId(),
 				modelId                        = product.getModel().getId(),
 				includeBaseAttributeComponents = true
 			);
 
-			var bundleCost = calculateComponentsTotal( bundleComponents );
+			var bundleCost = calculateComponentsTotal( bundleComponents, "CatalogBundle" );
 		}
 
 		// il log viene scritto da in calculateComponentsTotal()
@@ -217,9 +217,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			cost base product
 		*/
 
-		var productComponents = componentSvc.list( productId = productId, includeBaseAttributeComponents = true );
+		var productComponents = componentSvc.priceCalculatorSearch( productId = productId, includeBaseAttributeComponents = true );
 
-		var productCost = calculateComponentsTotal( productComponents );
+		var productCost = calculateComponentsTotal( productComponents, "Product" );
 
 		// appendLog( message = "Costo componenti prodotto #productComponents#;Totale unitario: #formatExtended( productCost )#" );
 
@@ -234,7 +234,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		appendLog( "** Inizio del calcolo del prezzo degli attributi: #ArrayToList(productItemIds)#" );
 
 		for ( var itemId in productItemIds ) {
-			var itemComponents = componentSvc.list( productItemId = itemId, includeBaseAttributeComponents = true );
+			var itemComponents = componentSvc.priceCalculatorSearch( productItemId = itemId, includeBaseAttributeComponents = true );
 
 			var itemCost = 0;
 			var compCost = 0;
@@ -261,7 +261,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					itemCost = amount;
 					priceProcessed = true;
 				} else if ( productItemPrice.getMethod().getId() == "M" ) {
-					var compCost = calculateComponentsTotal( itemComponents );
+					var compCost = calculateComponentsTotal( itemComponents, "ProductItem" );
 					itemCost     = compCost * productItemPrice.getAmount();
 
 					appendLog(
@@ -272,7 +272,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			} else {
 				if ( !IsNull( attributePrice ) ) {
-					compCost = calculateComponentsTotal( itemComponents );
+					var compCost = calculateComponentsTotal( itemComponents, "ProductItem" );
 
 					var amount = attributePrice.getAmount() ?: 0;
 
@@ -375,12 +375,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				//calcolo costo componenti segnaletica
 				var signageBundleCost = 0;
 				if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
-					var signageBundleComponents = componentSvc.list(
+					var signageBundleComponents = componentSvc.priceCalculatorSearch(
 						signageConfigItemId = simulationSignageConfigItemId,
 						includeBaseAttributeComponents = true
 					);
 
-					var fontPricePerLetter += calculateComponentsTotal( signageBundleComponents );
+					var fontPricePerLetter += calculateComponentsTotal( signageBundleComponents, "SignageConfigItem" );
 				}
 
 				addCost(
@@ -449,15 +449,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"logFile" = variables.logConfig.filePath
 		};
 
+		FileAppend( "/repository/private/logs/prices/misura-tempi-calcolo.log", "#DateTimeFormat( Now(), "yyyy-mm-dd HH:nn:ss" )# - Fine. #Chr( 10 )#" );
 		return output;
 	}
 
-
-	/*
-		private methods
-	*/
-
-	private Numeric function calculateComponentsTotal( Array components, Struct price ){
+	private Numeric function calculateComponentsTotal( Array components, String compType, Struct price ){
 		var total = 0;
 		var log   = "";
 
@@ -465,24 +461,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return 0
 		}
 
-		var compType = ListLast(
-			Replace(
-				GetComponentMetadata( components[ 1 ] ).name,
-				"Component",
-				""
-			),
-			"."
-		);
-
 		appendLog( "* Inizio del calcolo del costo dei componenti #compType#" );
 
 		for ( var component in components ) {
-			var name = "Componente: #component.getId()# - articolo: #component.getRawProduct().getId()# variante: #component.getVariant().getId()# colore: #component.getColor().getId()#";
+			var name = "Componente: #component.id# - articolo: #component.raw_product_id# variante: #component.variant_id# colore: #component.color_id#";
 
-			if ( !component.isDeleted() ) {
-				var amount = component.getCost().getAmount();
+			if ( !component.isDeleted ) {
+				var amount = component.costAmount;
 
-				var quantity = component.getTotalQuantity(); // with override
+				var quantity = component.totalQuantity; // with override
 
 				var rowTotal = amount * quantity;
 
@@ -599,7 +586,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	private function calculateSignageProductItemPrice( Struct signageItemProduct, attributePrice, sizes ){
 		componentSvc = getComponentService();
-		var itemComponents = componentSvc.list( signageItemProduct = signageItemProduct );
+		var itemComponents = componentSvc.priceCalculatorSearch( signageItemProduct = signageItemProduct );
 		if ( Len( itemComponents ) EQ 0 ) {
 			return;
 		}
@@ -648,22 +635,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// calcolo il costo dei componenti
 			for ( var itemComponent in itemComponents ) {
 				var actualComponentCost = 0;
-				var itemComponentCost = itemComponent.getCost().getAmount();
+				var itemComponentCost = itemComponent.costAmount;
 				if (itemComponentCost <= 0) {
 					appendLog(
-						message = "Componente: #itemComponent.getRawProduct().getName()#. Costo componente è zero, lo salto."
+						message = "Componente: #itemComponent.raw_product_id#. Costo componente è zero, lo salto."
 					);
 					continue;
 				}
 				var itemComponentQuantity = itemComponent.getQuantity();
 				if (itemComponentQuantity <= 0) {
 					appendLog(
-						message = "Componente: #itemComponent.getRawProduct().getName()#. Quantità componente è zero, lo salto."
+						message = "Componente: #itemComponent.raw_product_id#. Quantità componente è zero, lo salto."
 					);
 					continue;
 				}
 				//se componente è materia prima faccio i calcoli in base all'unità di misura
-				if (itemComponent.getRawProduct().getProcessingType().getId() == 'MP') {
+				if (itemComponent.raw_product_processiong_type == 'MP') {
 					// passaggi per ottenere il coefficiente dal metadata e l'unita di misura
 					var rawValueId = productItem.getAttributeValue().getRawValue().getId();
 					var metadata = metadataService.list( rawValueId = rawValueId );
@@ -692,7 +679,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						//sommo il costo al costo dei componenti
 						compCost += weightPrice;
 						actualComponentCost = weightPrice;
-						appendLog( message = "Componente: #itemComponent.getRawProduct().getName()#. Costo calcolato per peso: #weightPrice#€ ricavato moltiplicando #unitPrice#€ per #weight#kg; Costo componente calcolato: #formatExtended( actualComponentCost )#€" );
+						appendLog( message = "Componente: #itemComponent.raw_product_name#. Costo calcolato per peso: #weightPrice#€ ricavato moltiplicando #unitPrice#€ per #weight#kg; Costo componente calcolato: #formatExtended( actualComponentCost )#€" );
 					} else if (measurementUnit EQ 'MQ') {
 						//uguale al volume, ma usero la superficie invece del volume per i calcoli
 						var surfaceArea = sizes.surfaceArea * coefficient
@@ -700,19 +687,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var surfaceAreaPrice = unitPrice * surfaceArea;
 						compCost += surfaceAreaPrice;
 						actualComponentCost = surfaceAreaPrice;
-						appendLog( message = "Componente: #itemComponent.getRawProduct().getName()#. Costo calcolato per superficie: #surfaceAreaPrice#€ ricavato moltiplicando #unitPrice#€ per #surfaceArea#mq; Costo componente calcolato: #formatExtended( actualComponentCost )#€" );
+						appendLog( message = "Componente: #itemComponent.raw_product_name#. Costo calcolato per superficie: #surfaceAreaPrice#€ ricavato moltiplicando #unitPrice#€ per #surfaceArea#mq; Costo componente calcolato: #formatExtended( actualComponentCost )#€" );
 					} else {
 						actualComponentCost = itemComponentCost * itemComponentQuantity;
 						compCost += actualComponentCost;
 						appendLog(
-							message = "Componente: #itemComponent.getRawProduct().getName()#. Costo unitario componente: #formatExtended( itemComponentCost )#€ * quantità: #itemComponentQuantity#; Costo componente calcolato: #formatExtended( actualComponentCost )#€"
+							message = "Componente: #itemComponent.raw_product_name#. Costo unitario componente: #formatExtended( itemComponentCost )#€ * quantità: #itemComponentQuantity#; Costo componente calcolato: #formatExtended( actualComponentCost )#€"
 						);
 					}
 				} else {
 					//se non è materia prima sommo direttamente il costo moltiplicato per la quantità
 					actualComponentCost = itemComponentCost * itemComponentQuantity;
 					appendLog(
-						message = "Componente: #itemComponent.getRawProduct().getName()#. Costo unitario componente: #formatExtended( itemComponentCost )#€ * quantità: #itemComponentQuantity#; Costo componente calcolato: #formatExtended( actualComponentCost )#€"
+						message = "Componente: #itemComponent.raw_product_name#. Costo unitario componente: #formatExtended( itemComponentCost )#€ * quantità: #itemComponentQuantity#; Costo componente calcolato: #formatExtended( actualComponentCost )#€"
 					);
 					compCost += itemComponentCost * itemComponentQuantity;
 				}
