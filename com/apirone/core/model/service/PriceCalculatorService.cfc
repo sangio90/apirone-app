@@ -641,7 +641,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					);
 					continue;
 				}
-				var itemComponentQuantity = itemComponent.getQuantity();
+				var itemComponentQuantity = itemComponent.totalquantity;
 				if (itemComponentQuantity <= 0) {
 					appendLog(
 						message = "Componente: #itemComponent.raw_product_id#. Quantità componente è zero, lo salto."
