@@ -407,7 +407,7 @@ AP.signage.modal = ( function() {
             }
 
             contentSpanPreview.css( {
-                "font-family": fontFamilyName + ", Arial",
+                "font-family": fontFamilyName,
                 "font-size": heightPx + "px",
                 "line-height": heightPx + "px",
             } );
