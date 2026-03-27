@@ -328,8 +328,6 @@ AP.quotation.header = ( function() {
                             var customerId =  viewModel.get( "detailForm.data.customer.id" );
                             var opportunityId = viewModel.get( "detailForm.data.opportunity.id" );
 
-                            console.log( "lead", viewModel.get( "detailForm.data.lead" ) );
-
                             if ( customerId || leadId || opportunityId ) {
                                 return false;
                             }

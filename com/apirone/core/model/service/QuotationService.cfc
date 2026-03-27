@@ -1310,6 +1310,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setSalesAgent( getUserService().get( record.sales_agent_account_id.toString() ) );
 			}
 
+			if ( !IsNull( record.graphic_technician_account_id ) ) {
+				bean.setGraphicTechnician( getUserService().get( record.graphic_technician_account_id.toString() ) );
+			}
+
 			bean.setCalculatedAmount(
 				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
 			);
