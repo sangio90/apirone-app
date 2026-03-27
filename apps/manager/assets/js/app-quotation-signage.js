@@ -73,7 +73,6 @@ AP.signage.modal = ( function() {
                     id: ""
                 }
             },
-            fontFamilyName: ""
         },
         statuses: AP.page.statuses,
         itemStatuses: AP.page.itemStatuses,
@@ -93,6 +92,7 @@ AP.signage.modal = ( function() {
         fontSizes: new kendo.data.DataSource(),
         signageImages: new kendo.data.DataSource(),
         backgroundImage: {},
+        fontFamilyName: "",
         maxRows: 0,
         modelConfig: {
             height: null,
@@ -372,7 +372,7 @@ AP.signage.modal = ( function() {
             }
             const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel * 1.4 : 16 * 1.4;
 
-            const fontFamilyName = viewModel.get('detailForm.data.fontFamilyName') != '' ? viewModel.get('detailForm.data.fontFamilyName') : 'Arial'
+            const fontFamilyName = viewModel.get('fontFamilyName') != '' ? viewModel.get('fontFamilyName') : 'Arial'
 
             // costruisco la regex solo con i nomi interni dei pictogram (senza <>), escapati
             const innerNames = pictogramNames.map( n => n.replace( /[<>]/g, "" ) );
@@ -407,13 +407,13 @@ AP.signage.modal = ( function() {
             }
 
             contentSpanPreview.css( {
-                "font-family": fontFamilyName + ", Arial, san",
+                "font-family": fontFamilyName + ", Arial",
                 "font-size": heightPx + "px",
                 "line-height": heightPx + "px",
             } );
 
             contentSpanPreview.html( parts.join( "" ) );
-            
+
 
             return false;
         },
@@ -468,7 +468,7 @@ AP.signage.modal = ( function() {
             const pictogramNames = viewModel.get( "pictogramNames" );
             let content = e.currentTarget.value;
             const usedPictos = [];
-            
+
             pictogramNames.forEach( pictogram => {
                 let position = realContent ? realContent.indexOf( pictogram ) : -1;
                 while ( position !== -1 ) {
@@ -766,14 +766,15 @@ AP.signage.modal = ( function() {
                         viewModel.parseLines();
                     }
                 } );
-                if ( viewModel.get( "detailForm.data.signageConfig.items" ).length >= 2 ) {
+
+                if ( viewModel.get( "detailForm.data.quotationItem.id" ) == "" && viewModel.get( "detailForm.data.signageConfig.items" ).length >= 2 && viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id") == '' ) {
                     viewModel.set( "detailForm.data.quotationItem.signageConfigItem", viewModel.get( "detailForm.data.signageConfig.items" )[1] );
                     this.parseLines();
                 }
             }
 
             if (
-                viewModel.get('detailForm.data.quotationItem') && 
+                viewModel.get('detailForm.data.quotationItem') &&
                 viewModel.get('detailForm.data.quotationItem.signageConfigItem') &&
                 viewModel.get('detailForm.data.quotationItem.signageConfigItem.signageConfigId')
             ) {
@@ -783,7 +784,7 @@ AP.signage.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if (xhr.data) {
-                                viewModel.set('detailForm.data.fontFamilyName', xhr.data.name)
+                                viewModel.set('fontFamilyName', xhr.data.name)
                             }
                         }
                     }
