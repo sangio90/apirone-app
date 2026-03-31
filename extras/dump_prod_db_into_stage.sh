@@ -9,7 +9,7 @@ set +a
 pg_dump \
 	--no-owner \
 	--dbname=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME} \
-	> /home/${SSH_USER}/backup-database-apir-$(date +"%Y-%m-%d").sql"
+	> /home/${SSH_USER}/backup-database-apir-$(date +"%Y-%m-%d").sql
 
 PGPASSWORD=${STAGE_DB_PASSWORD} psql -h ${STAGE_DB_HOST} -U ${STAGE_DB_USER} -d ${STAGE_DB_NAME} -p ${STAGE_DB_PORT} -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
 PGPASSWORD=${STAGE_DB_PASSWORD} psql -h ${STAGE_DB_HOST} -U ${STAGE_DB_USER} -d ${STAGE_DB_NAME} -p ${STAGE_DB_PORT} -c 'DROP SCHEMA backup CASCADE;'
