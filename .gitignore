@@ -26,3 +26,4 @@ assets/main/img/fototestvertical.png
 .CommandBox
 extras/.env
 extras/*.sql
+server.json
