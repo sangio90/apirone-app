@@ -2,6 +2,9 @@
 
 set -a
 
+BASEDIR=$(dirname "$0")
+source ${BASEDIR}/.env
+
 source .env
 
 set +a
