@@ -26,9 +26,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="QuotationItemPositionService" inject="QuotationItemPositionService";
 
 	property name="exportCodeService" inject="ExportCodeService";
-	property name="exportCodeFruitService" inject="ExportCodeFruitService";
-	property name="exportCodeRawValueService" inject="ExportCodeRawValueService";
-	property name="exportCodeFruitService" inject="ExportCodeFruitService";
 	property name="rawValueService" inject="RawValueService";
 	property name="attributeService" inject="AttributeService";
 	property name="userService" inject="UserService";
@@ -55,7 +52,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="fileService" inject="FileService";
 	property name="ProductHashService" inject="ProductHashService";
 
-	property name="componentCounter" type="Numeric";
 	property name="cacheScope" type="String" default="Quotation.bean";
 
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
@@ -266,7 +262,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			if ( arguments.quotationItems.len() ) {
+				// ciclo su tutti i prodotti del preventivo
 				for ( var quotationItem in arguments.quotationItems ) {
+					//se tipo servizio, la gestione è light
 					if (!isNull(quotationItem.getArticle())) {
 						var dataExport = {
 							"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
@@ -284,34 +282,49 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLANNOTA"  = quotationItem.getNote()
 						}
 
-						result.success = getDao().exportProduct( dataExport );
+						
+						// non abbiamo un prodotto legato a questa riga, quindi cerchiamo per codice e basta tra i codici gia esportati.
 						var existingCodes = exportCodeService.list(
 							str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
 						);
-
+						
 						if ( existingCodes.len() > 0 ) {
 							continue;
 						}
-
+						
+						///se non troviamo, creiamo ed esportiamo in verticale
 						var exportCode = super.bean( "ExportCode" );
 						exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
 						exportCode.setCounter( "000000" );
 						exportCodeService.create( "exportCode" = exportCode );
+						result.success = getDao().exportProduct( dataExport );
 
 						continue;
 					} else {
+						//in caso il prodotto non sia un servizio, ma un prodotto con hash, la gestione è più complessa
+						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
+							result.success = false;
+							result.error = 'Hash riga preventivo non trovata.';
+						}
 						var productHash = getProductHashService().getByHash( quotationItem.getHash() );
 						if ( isNull(productHash) ) {
 							result.success = false;
 							result.error = 'Hash prodotto non trovato.';
 						}
+						//appurato che la riga di preventivo ha un hash associato e che l'hash corrisponda effettivamente ad un record sulla tabella degli hash
+						//cerchiamo se l'hash è gia stato associato ad un codice esportato in verticale.
 						var existingCode = exportCodeService.list( "productHashId" = productHash.getId() );
 						if ( existingCode.len() > 0 ) {
 							continue;
 						}
+
+						//se non lo troviamo, trasformiamo i dati da jason a struttura e poterla consultare e poter creare un nuovo codice
+						//e i nuovi record nella tabella degli articoli e delle rispettive diba su verticale.
 						var quotationItemData = deserializeJson( productHash.getJsonData() );
 						var code = "";
 
+						//prime due cose: cerchiamo il prodotto corrispondente all'id preso dall'hash e prendiamo categoria, 
+						//linea, modello e finitura per comporre la prima parte del codice.
 						var product = getProductService().get( quotationItemData.productId );
 						var category = getProductCategoryService().get( quotationItemData.categoryId );
 						if ( IsNull( product ) || IsNull( category ) ) {
@@ -352,12 +365,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						var description = product.getDescription().left( 35 );
 
+						//inizializiamo il codice variane, il codice colore e le note segnaletica.
 						var arKey = code;
 						var colCode  = "000000";
 						var varCode  = "";
 						var noteSegnaletica = '';
 						
-						//signage
+						//se l'articolo è una segnaletica
 						if (StructKeyExists( quotationItemData, "signageRows" ) ) {
 							var signageConfigItem = getSignageConfigItemService().get( quotationItemData.signageConfigItemId );
 							var fontSize = signageConfigItem.getSize().getName();
@@ -365,6 +379,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							var fontCode = signageConfig.getFont().getCode();
 							var fontName = signageConfig.getFont().getName();
 							note &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
+							//il varcode viene popolato con 
 							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
 							var signageRowsCounter = 1;
 							for ( var signageRow in quotationItemData.signageRows ) {
@@ -449,7 +464,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 									fruitsProductItems[fruitsIndex] = [];
 									fruitsProductItemIds[fruitsIndex] = [];
 									for ( var fruitItem in fruitItems ) {
-										var fruitItemBean = getProductItemService().get( fruitItem );
+										var fruitItemBean = getProductItemService().get( fruitItem.productItemId );
 										var attributeValue = fruitItemBean.getAttributeValue();
 										var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
 
@@ -466,11 +481,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 										} );
 										arrayAppend( fruitsProductItemIds[fruitsIndex], productItem.getId() );
 										note &= attribute.getName() & ": " & rawValue.getName() & "; ";
+										if (fruitItem.note != "") {
+											note &= " Note: " & fruitItem.note & "; ";
+										}
 									}
 
 								}
 								//per ogni frutto recupero i componenti
-								arrayAppend(fruitsComponents, getComponents( fruitBean.getId(), quotationItem, fruitsProductItemIds[fruitsIndex] ));
+								arrayAppend(fruitsComponents, getComponents( fruit.product, quotationItem, fruitsProductItemIds[fruitsIndex] ));
 								fruitsIndex++;
 							}
 						}
@@ -531,14 +549,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					}
 
 					var grouped = {};
-					var orderMap = {};
 
 					for (var row in allComponents) {
 						var key = row.DSCODMAT & "|" & row.DSVARMAT & "|" & row.DSCOLMAT;
 						if ( !structKeyExists(grouped, key) ) {
 							grouped[key] = duplicate(row);
 							grouped[key].DSQTAMOV = val(row.DSQTAMOV);
-							orderMap[key] = row.CPROWNUM;
 						} else {
 							grouped[key].DSQTAMOV += val(row.DSQTAMOV);
 						}
@@ -582,8 +598,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				quotationDataHead = quotationDataResult.data;
 			}
 
+			quotationItemsToExport = [];
 			if ( quotationItems.len() > 0 ) {
-				var allProductItems = [];
 				var index = 1;
 				for ( var quotationItem in arguments.quotationItems ) {
 					var quotationData = {}
@@ -632,180 +648,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData["MMSCOAR2"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getDiscount2() : 0;
 						quotationData["MMEVASIO"] = quotation.getValidityDate();
 						quotationData["MM_STATO"] = "N";
-
-						allProductItems.append(quotationData);
-					} else {
-						setComponentCounter( 0 )
-						var code    = "";
-						var product = quotationItem.getProduct()
-						if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
-							result.error = 'Prodotto o Categoria Prodotto non trovata.'
-							return result;
+					} else {						
+						//in caso il prodotto non sia un servizio, ma un prodotto con hash, la gestione è più complessa
+						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
+							result.success = false;
+							result.error = 'Hash riga preventivo non trovata.';
 						}
-						var categoryCode = Trim( product.getCategory().getCode() );
-						code &= categoryCode;
-						var nota = "";
-					}
-
-					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
-					if ( !isNull(product) && IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
-						if ( IsNull( product.getLine() ) ) {
-							result.error = 'Linea Prodotto non trovata.'
-							return result;
+						var productHash = getProductHashService().getByHash( quotationItem.getHash() );
+						if ( isNull(productHash) ) {
+							result.success = false;
+							result.error = 'Hash prodotto non trovato.';
 						}
-						var line     = product.getLine();
-						var lineCode = Trim( line.getCode() );
-
-						code &= lineCode;
-
-						if ( IsNull( product.getModel() ) ) {
-							result.error = 'Modello Prodotto non trovato.'
-							return result;
-						}
-						var model = product.getModel();
-						code &= Trim( model.getCode() );
-
-						if ( IsNull( product.getFinish() ) ) {
-							result.error = 'Finitura Prodotto non trovata.'
-							return result;
-						}
-						var finishCode = Trim( product.getFinish().getCode() );
-						code &= finishCode;
-						description = product.getDescription().len() >= 35 ? product.getDescription().subString( 0, 35 ) : product.getDescription();
-
-						var arKey = code;
-						var varCode  = "";
-						var colCode  = "000000";
-
-						var quotationItemProductItems = QuotationItemProductItemService.list(
-							quotationItemId = quotationItem.getId(),
-							orderBy         = [ { field = "productItem.id" } ]
-						);
-
-						var productItems   = [];
-						var importantAttributes = product.getImportantAttributes();
-
-						//cerco, in caso fosse una segnaletica con lettering, font e fontsize per valorizzare il varcode
-						var fontSize = "";
-						var fontName = "";
-						var fontCode = "";
-						var varCode  = "";
-						if ( IsInstanceOf ( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
-							var signageConfigId = quotationItem.getSignageConfigItem().getSignageConfigId()
-							var fontSize = quotationItem.getSignageConfigItem().getSize().getName()
-							var signageConfig = getSignageConfigService().get(signageConfigId)
-							var fontCode = signageConfig.getFont().getCode()
-							var fontName = signageConfig.getFont().getName()
-							nota &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
-							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
-						}
-
-						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti
-						// (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
-						for ( var quotationItemProductItem in quotationItemProductItems ) {
-							var productItem = quotationItemProductItem.getProductItem();
-							if ( !IsNull( productItem ) ) {
-								var attributeValue = productItem.getAttributeValue();
-								var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
-								if ( IsNull( attribute ) ) {
-									result.error = 'Attributo Prodotto non trovato.';
-									return result;
-								}
-								var rawValue = attributeValue.getRawValue();
-								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
-								// se lo trovo lo imposto come importante, a patto che non ne siano gia stati trovati 2 (len 10)
-								var isImportant = false;
-								if (!isNull(importantAttributes)) {
-									isImportant = importantAttributes.some(function(item) {
-										return item.getId() == attribute.getId();
-									});
-								}
-								if (isImportant) {
-									if ( varCode.len() < 10 ) {
-										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-										ArrayAppend(productItems, {
-											"important"   = true,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-									} else {
-										ArrayAppend(productItems, {
-											"important"   = false,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-									}
-								} else {
-									ArrayAppend(productItems, {
-										"important"   = false,
-										"rawValueId"  = rawValue.getId(),
-										"attributeId" = attributeValue.getAttributeId()
-									} );
-								}
-							}
-							nota &= attribute.getName() & ": " & rawValue.getName() & "; ";
-						}
-
-						varCode &= RepeatString( "0", 10 - Len( varCode ) )
-
-						// per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode
-						// ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
-						var existingCodes = exportCodeService.list( str = code & varCode );
-
-						if ( existingCodes.len() > 0 ) {
-							// se ne esiste almeno uno, per ognuno di questi verifico che tutti i product items (anche quelli non importanti) siano presenti in exportCodeRawValue,
-							// se almeno uno non si trova, passo al successivo. Se non trovo nessun exportCode
-							// cosa che verifico controllando che il colCode rimanga vuoto, allora creo un nuovo exportCode e le relative exportCodeRawValue
-							var productItemIds = ArrayMap( productItems, function(item) { return item.rawValueId  } );
-							var foundMatchingCode = false;
-							for ( var existingCode in existingCodes ) {
-								var exportCodeRawValues = exportCodeRawValueService.list(
-									exportCodeId = existingCode.getId()
-								);
-
-								var exportCodeRawValueIds = ArrayMap(
-									exportCodeRawValues,
-									function(item) {
-										return item.getRawValue().getId();
-									}
-								);
-								// assumo che siano tutti presenti
-								var allFound = true;
-
-								for ( var pid in productItemIds ) {
-									if ( !arrayContains( exportCodeRawValueIds, pid ) ) {
-										allFound = false;
-										break;
-									}
-								}
-
-								if ( allFound ) {
-									colCode = existingCode.getCounter();
-									foundMatchingCode = true;
-									break;
-								}
-							}
-							// se dopo averli provati tutti non ho trovato nulla → errore
-							if ( !foundMatchingCode ) {
-								result.error = 'Prima esporta gli articoli. ' & code & varCode;
-								return result;
-							}
+						//appurato che la riga di preventivo ha un hash associato e che l'hash corrisponda effettivamente ad un record sulla tabella degli hash
+						//cerchiamo se l'hash è gia stato associato ad un codice esportato in verticale.
+						var existingCode = exportCodeService.list( "productHashId" = productHash.getId() );
+						if ( existingCode.len() > 0 ) {
+							var code = existingCode[1].getName().left( 15 );
+							var varCode = existingCode[1].getName().right( 10 );
+							var colCode = existingCode[1].getCounter();
+							
 						} else {
 							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
 							result.error = 'Prima esporta gli articoli. ' & code & varCode;
 							return result;
-						}
-						arKey = code & varCode & colCode;
-
-						var data = {
-							"AR_CHIAVE" = arKey,
-							"ARCODART"  = code & RepeatString( "0", 15 - Len( code ) ),
-							"ARDESART"  = description,
-							"ARDATCAR"  = Now(),
-							"ARUNMIS1"  = "PZ",
-							"VARCOD"    = varCode,
-							"CLCODICE"  = colCode,
-							"CLANNOTA"  = nota
 						}
 
 						var quotationItemQuantity = quotationItem.getQuantity()
@@ -817,9 +682,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						}
 						quotationData['CPROWNUM'] = index;
 						quotationData['CPROWORD'] = index * 10;
-						quotationData['MMCODART'] = data['ARCODART'];
-						quotationData['MMCODVAR'] = data['VARCOD'];
-						quotationData['MMCODCOL'] = data['CLCODICE'];
+						quotationData['MMCODART'] = code & RepeatString( "0", 15 - Len( code ) );
+						quotationData['MMCODVAR'] = varCode;
+						quotationData['MMCODCOL'] = colCode;
 						quotationData['ARUNMIS1'] = "PZ";
 						quotationData['MMQTAMOV'] = quotationItemQuantity;
 						var price = 0
@@ -843,66 +708,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData['MMSCOAR2'] = discount2;
 						quotationData['MMEVASIO'] = quotation.getValidityDate();
 						quotationData['MM_STATO'] = 'N';
-
-						allProductItems.append(quotationData);
 					}
-
-					if ( !isNull(product) && IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
-						var data = {
-							"AR_CHIAVE" = product.getCode() & RepeatString( "0", 31 - Len( product.getCode() ) ),
-							"ARCODART"  = product.getCode() & RepeatString( "0", 15 - Len( product.getCode() ) ),
-							"ARDESART"  = product.getName().subString( 0, 35 ) & RepeatString(
-								"0",
-								35 - Len( product.getName().subString( 0, 35 ) )
-							),
-							"ARDATCAR" = Now(),
-							"ARUNMIS1" = "PZ",
-							"VARCOD"   = "0000000000",
-							"CLCODICE" = "000000",
-							"CLANNOTA" = nota
-						}
-
-						var quotationItemQuantity = quotationItem.getQuantity()
-						if (!isNull(quotationItem.getQuotationZone())) {
-							if (!isNull(quotationItem.getQuotationZone().getOrigin())) {
-								quotationItemQuantity *= quotationItem.getQuotationZone().getOrigin().getQuantity()
-							}
-							quotationItemQuantity *= quotationItem.getQuotationZone().getQuantity()
-						}
-						quotationData["CPROWNUM"] = index;
-						quotationData["CPROWORD"] = index * 10;
-						quotationData["MMCODART"] = data["ARCODART"];
-						quotationData["MMCODVAR"] = data["VARCOD"];
-						quotationData["MMCODCOL"] = data["CLCODICE"];
-						quotationData["ARUNMIS1"] = "PZ";
-						quotationData["MMQTAMOV"] = quotationItemQuantity;
-						var price = 0
-						var discount1 = 0
-						var discount2 = 0
-						if (!isNull(quotationItem.getPrice())) {
-							if (quotationItem.getPrice().getAmount() > 0) {
-								price = quotationItem.getPrice().getAmount()
-							} else {
-								price = quotationItem.getPrice().getTotal()
-							}
-							if (quotationItem.getPrice().getDiscount1() > 0) {
-								discount1 = quotationItem.getPrice().getDiscount1()
-							}
-							if (quotationItem.getPrice().getDiscount2() > 0) {
-								discount2 = quotationItem.getPrice().getDiscount2()
-							}
-						}
-						quotationData["MMVALUNI"] = price;
-						quotationData['MMSCOAR1'] = discount1;
-						quotationData['MMSCOAR2'] = discount2;
-						quotationData["MMEVASIO"] = quotation.getValidityDate();
-						quotationData["MM_STATO"] = "N";
-
-						allProductItems.append(quotationData);
-					}
-
-					getDao().export( quotationData );
+					ArrayAppend( quotationItemsToExport, quotationData );
 					index = index + 1;
+				}
+				
+				for ( quotationItemToExport in quotationItemsToExport ) {
+					getDao().export( quotationItemToExport );
 				}
 			}
 		}
@@ -992,8 +804,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public function parseComponent( com.apirone.core.model.bean.Component component ){
-		var counter = getComponentCounter();
-
 		var componente  = {
 			"DS_CHIAVE" = "",
 			"DSCODART"  = "",
@@ -1004,12 +814,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"DSCOLMAT"  = component.getColor().getId(),
 			"DSQTAMOV"  = component.getQuantity(),
 			"DSUNMIS1"  = component.getRawProduct()?.getMeasurementUnit()?.getId(),
-			"CPROWNUM" = counter + 1,
-			"CPROWORD" = ( counter + 1 ) * 10,
+			"CPROWNUM" = 0,
+			"CPROWORD" = 0,
 			"DSTIPRIG" = "R"
 		};
-
-		setComponentCounter( counter + 1 );
 
 		return componente;
 	}
@@ -1027,7 +835,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return result;
 		}
 		var quotationData = {
-			//"MMSERIAL" = quotation.getSerial(),
 			"MMSERIAL" = quotation.getSerial(), // i need the same code
 			"MM_IDRIF" = quotation.getQuotationNumber(), // i need the same code
 			"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
@@ -1114,48 +921,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
 
 		return clonedQuotationId;
-	}
-
-	/**
-	 * Crea un oggetto ExportCode e i relativi ExportCodeRawValue.
-	 * @param code Il codice base per il nome.
-	 * @param varCode La variabile del codice da concatenare.
-	 * @param productItems Array di oggetti item con rawValueId, attributeId e important.
-	 * @param counterValue Il valore del contatore. Di default è '000001', ma può essere maxCounter.
-	 */
-	public void function createExportCodeAndRawValues(
-		required string code,
-		required string varCode,
-		required array productItems,
-		String counterValue = "000001"
-	) {
-		// Definizione delle variabili di servizio (assumendo che siano iniettate o disponibili)
-		// Queste dovrebbero essere accessibili nello scope della funzione o del CFC
-		var exportCodeService = variables.exportCodeService;
-		var rawValueService = variables.rawValueService;
-		var attributeService = variables.attributeService;
-		var exportCodeRawValueService = variables.exportCodeRawValueService;
-
-		// 1. Impostazione e creazione di ExportCode
-		var exportCode = super.bean( "ExportCode" );
-
-		exportCode.setName( arguments.code & arguments.varCode );
-		exportCode.setCounter( arguments.counterValue );
-
-		var exportCodeId = exportCodeService.create( exportCode = exportCode );
-		exportCode.setId( exportCodeId );
-
-		// 2. Creazione di ExportCodeRawValue per ogni item
-		for ( var item in arguments.productItems ) {
-			var exportCodeRawValue = super.bean( "ExportCodeRawValue" );
-
-			exportCodeRawValue.setExportCode( exportCode );
-			exportCodeRawValue.setRawValue( rawValueService.get( item.rawValueId ) );
-			exportCodeRawValue.setAttribute( attributeService.get( item.attributeId ) );
-			exportCodeRawValue.setImportant( item.important );
-
-			exportCodeRawValueService.create( exportCodeRawValue );
-		}
 	}
 
 	public Void function removeCache( required String quotationId ){
