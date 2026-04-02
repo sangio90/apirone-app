@@ -126,7 +126,8 @@ AP.plate.modal = ( function() {
                     constants.GRID_CELL_DIMENSIONS[cellType].height,
                     plate.cellOrientation.id,
                     cellType,
-                    cellData.id
+                    cellData.id,
+                    cellData.order
                 );
 
                 row.push( cell );
@@ -552,7 +553,6 @@ AP.plate.modal = ( function() {
                         viewModel.set( "availableOrientations", xhr.data.availableOrientations );
                         viewModel.set( "plate.grid", xhr.data.grid );
                         viewModel.set( "plate.image", image );
-                        viewModel.set( "plate.grid", xhr.data.grid );
 
                         if ( orientation ) {
                             await viewModel.changeOrientation();
@@ -654,7 +654,7 @@ AP.plate.modal = ( function() {
                         sel.val( qipi.productItem.id );
                         await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id, fruitId );
                         if (fruitId) {
-                            productItemImage = viewModel.get('detailForm.data.productItemsImages.' + qipi.productItem.id)
+                            const productItemImage = viewModel.get('detailForm.data.productItemsImages.' + qipi.productItem.id)
                             if (productItemImage && productItemImage != '') {
                                 uri = productItemImage;
                                 pub.fruitsController.updateFruit( fruitId, { image: uri } );
@@ -898,10 +898,10 @@ AP.plate.modal = ( function() {
             let url = "/manager/ajax/product-items?productId=" + productId;
             
             await NM.util.ajax( {
-                    method: "GET",
-                    url: url,
-                    callback: {
-                        done: async function( xhr ) {
+                method: "GET",
+                url: url,
+                callback: {
+                    done: async function( xhr ) {
                             if ( xhr.count > 0 ) {
                                 // var thisImage = xhr.data[0].horizontalImage;
                                 // if ( thisImage ) {
@@ -1015,7 +1015,8 @@ AP.plate.modal = ( function() {
 
         changeFruitImage: async function( fruitId, value ) {
             //cerco i productItems del frutto
-            selectedProductItemIds = []
+
+            let selectedProductItemIds = []
             const fruit = viewModel.get('detailForm.data.fruits')._data.find(f => f.id == fruitId)
             let fruitItems = []
             if (fruit) {
@@ -1032,10 +1033,11 @@ AP.plate.modal = ( function() {
                 })
             }
 
-            const actualFruitImage = $('#quotation-plate-fruits #' + fruitId + ' img');
-            if (actualFruitImage.length) {
-                actualFruitImage.attr('src', '/assets/main/img/fruit-generic.png')
-            }
+            // 02/04/2026 - commentato questo pezzo perché causava delle anomalie nell'assegnazione delle immagini ai frutti.
+            // const actualFruitImage = $('#quotation-plate-fruits #' + fruitId + ' img');
+            // if (actualFruitImage.length) {
+            //     actualFruitImage.attr('src', '/assets/main/img/fruit-generic.png')
+            // }
             //se ne trovo, cerco l'immagine per la combinazione
             if (selectedProductItemIds.length) {
                 await NM.util.ajax({
@@ -1233,7 +1235,7 @@ AP.plate.modal = ( function() {
 
                 await NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax//quotation-items/plate",
+                url: "/manager/ajax/quotation-items/plate",
                 data: JSON.stringify( parsedData ),
                 callback: {
                     done: function( xhr ) {
@@ -1276,7 +1278,8 @@ AP.plate.modal = ( function() {
                             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
                             if ( thisFruit.positions && thisFruit.positions.length ) {
-                                pub.fruitsController.addFruitToPositions( mapFruitForPlate( newFruit ), thisFruit.positions );
+                                const positionsIds = thisFruit.positions.map( p => p.position );
+                                pub.fruitsController.addFruitToPositions( mapFruitForPlate( newFruit ), positionsIds );
                             } else {
                                 pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
                             }

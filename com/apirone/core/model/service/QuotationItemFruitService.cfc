@@ -90,7 +90,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		// 02 positions
 		for( var position in arguments.quotationItemFruit?.getPositions() ){
-			getQuotationItemFruitPositionService().create( newId, position );
+			getQuotationItemFruitPositionService().create( newId, position.id, position.order );
 		}
 
 		return newId;
@@ -116,7 +116,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		cffile( action="append", file="#ExpandPath('/debug.log')#", output="delete positions: #arguments.quotationItemFruit.getId()#, #SerializeJSON(arguments.quotationItemFruit.getPositions())#" );
 
 		for( var position in arguments.quotationItemFruit?.getPositions() ){
-			getQuotationItemFruitPositionService().create( arguments.quotationItemFruit.getId(), position );
+			if (!StructKeyExists(position, 'id') && StructKeyExists(position, 'position')) {
+				position['id'] = position.position;
+			}
+			getQuotationItemFruitPositionService().create( arguments.quotationItemFruit.getId(), position.id, position.order );
 		}
 
 		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemFruit.getId() );
@@ -148,6 +151,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var positions = getQuotationItemFruitPositionService().list( quotationItemFruitId=arguments.quotationItemFruitId );
 
+			var positionsData = [];
 			if ( Len( positions ) ) {
 				bean.setPositions( positions );
 			}

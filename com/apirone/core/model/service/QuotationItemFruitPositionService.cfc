@@ -36,7 +36,10 @@
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( record.position );
+			rows.add( {
+				'position' = record.position,
+				'order'    = record.order
+			 } );
 		} );
 
 		result.setData( rows );
@@ -90,7 +93,7 @@
 		return outcome;
 	}
 
-	public Numeric function create( required quotationItemFruitId, required String position ){
+	public Numeric function create( required quotationItemFruitId, required String position, required Numeric order ){
 		var newId = getDao().insert( argumentCollection = arguments );
 
 		return newId;

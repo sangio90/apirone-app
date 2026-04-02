@@ -149,6 +149,14 @@ component extends="com.apirone.core.controller.AbsController" {
 			quotation.setCustomer( super.fire( "customer.get", [ json.customer.id ] ) )
 		}
 
+		if ( Len( json?.salesAgent?.id ) ) {
+			quotation.setSalesAgent( super.fire( "user.get", [ json.salesAgent.id ] ) )
+		}
+
+		if ( Len( json?.graphicTechnician?.id ) ) {
+			quotation.setGraphicTechnician( super.fire( "user.get", [ json.graphicTechnician.id ] ) )
+		}
+
 		if ( Len( json?.shippingProfile?.id ) ) {
 			quotation.setShippingProfile( super.bean("ShippingProfile").setId( json.shippingProfile.id ) );
 		}

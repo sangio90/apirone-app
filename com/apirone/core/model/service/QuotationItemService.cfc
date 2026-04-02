@@ -238,14 +238,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){
 		var record = getDao().read( arguments.quotationItemId );
 		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.quotationItemId )
-
 		if ( record.recordCount ) {
 			
 			var pricing = super.bean( "QuotationItemPrice" );
 			var priceMethod = super.bean( "PriceMethod" );
 			
 			if ( fruits.len() > 0 ) {
-				
+				arraySort(fruits, function(a, b) {
+					return a.getPositions()[1].order - b.getPositions()[1].order;
+				});
 				var bean = super.bean( "QuotationItemPlate" );
 				var frame = super.bean( "Frame" );
 

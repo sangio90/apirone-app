@@ -1,5 +1,5 @@
 ﻿{
-	defaultIncludes = [ "id", "name", "fontFamily" ],
+	defaultIncludes = [ "id", "code", "name", "fontFamily" ],
 	profiles        = {
 		list = {
 			defaultIncludes = [
