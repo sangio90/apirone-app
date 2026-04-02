@@ -195,17 +195,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var quotationItemFruits = [];
 		for (var row in rows) {
 			var fruit = row.getFruit()
-			var fruitRows = getProductItemService().list( fruit.getId() );
+			var fruitRows = row.getItems();
 
 			arraySort(fruitRows, function(a, b) {
-				return compare(a.getOrderBy(), b.getOrderBy());
+				return compare(a.getProductItem().getOrderBy(), b.getProductItem().getOrderBy());
 			});
 
 			var fruitItems = [];
 			for (var fruitRow in fruitRows) {
-				fruitItems.append( fruitRow.getId() );
+				fruitItems.append({ "productItemId" = fruitRow.getProductItem().getId(), "note" = Trim( fruitRow.getNote() ) });
 			}
-			quotationItemFruits.append( { 'position' = Trim( row.getPosition() ), 'note' = Trim( row.getNote() ), 'product' = row.getFruit().getId(), 'productItems' = fruitItems } );
+			quotationItemFruits.append( { 'position' = Trim( row.getPositions()[1].order ), 'product' = row.getFruit().getId(), 'productItems' = fruitItems } );
 		}
 		jsonData['fruits'] = quotationItemFruits;
 
