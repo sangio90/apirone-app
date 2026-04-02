@@ -359,7 +359,8 @@
 					ARDESSUP, 
 					ARDATCAR, 
 					ARUNMIS1, 
-					VARCOD, 
+					VARCOD,
+					VARNOT,
 					CLCODICE, 
 					CLANNOTA,
 					AR_STATO,
@@ -374,6 +375,7 @@
 					<cfqueryparam value="#arguments.data.ARDATCAR#" cfsqltype="date">,
 					<cfqueryparam value="#arguments.data.ARUNMIS1#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.VARCOD#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.VARNOT#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.CLCODICE#" cfsqltype="varchar">,
 					<cfqueryparam value="#arguments.data.CLANNOTA#" cfsqltype="varchar">,
 					'N', <!--- nuovo ---->
