@@ -28,6 +28,7 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
+		<cfargument name="productHashId" type="Numeric">
 
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -42,6 +43,9 @@
 			WHERE 1=1
 				<cfif !IsNull( arguments.str )>
 					AND export_code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+				</cfif>
+				<cfif !IsNull( arguments.productHashId )>
+					AND product_hash_id = <cfqueryparam cfsqltype="integer" value="#arguments.productHashId#">
 				</cfif>
 			ORDER BY
 				export_code ASC
@@ -63,11 +67,13 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO export_codes (
 				export_code,
-				counter
+				counter,
+				product_hash_id
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#Trim( arguments.exportCode.getName() )#">,
-				<cfqueryparam cfsqltype="Varchar" value="#Trim( arguments.exportCode.getCounter() )#">
+				<cfqueryparam cfsqltype="Varchar" value="#Trim( arguments.exportCode.getCounter() )#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.exportCode.getProductHashId()#">
 			) RETURNING export_code_id
 		</cfquery>
 
@@ -82,7 +88,8 @@
 				export_codes
 			SET
 				export_code = <cfqueryparam cfsqltype="Varchar" value="#Trim( arguments.exportCode.getName() )#">,
-				counter = <cfqueryparam cfsqltype="Varchar" value="#Trim( arguments.exportCode.getCounter() )#">
+				counter = <cfqueryparam cfsqltype="Varchar" value="#Trim( arguments.exportCode.getCounter() )#">,
+				product_hash_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.exportCode.getProductHashId()#">
 			WHERE
 				export_code_id = <cfqueryparam cfsqltype="Numeric" value="#arguments.exportCode.getId()#">
 		</cfquery>

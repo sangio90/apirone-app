@@ -34,6 +34,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
+		Numeric productHashId,
 		required Numeric limit    = 15,
 		required Numeric offset   = 0,
 		required Array orderBy    = [ { field = "exportCode.id" } ]
@@ -101,6 +102,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.export_code_id );
 			bean.setName( record.export_code );
 			bean.setCounter( record.counter );
+			bean.setProductHashId( record.product_hash_id );
 
 			return bean;
 		}

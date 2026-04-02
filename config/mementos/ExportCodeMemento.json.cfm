@@ -1,3 +1,3 @@
 ﻿{
-	defaultIncludes = [ "id", "name", "counter" ]
+	defaultIncludes = [ "id", "name", "counter", "productHashId" ]
 }
