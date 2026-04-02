@@ -26,7 +26,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="QuotationItemPositionService" inject="QuotationItemPositionService";
 
 	property name="exportCodeService" inject="ExportCodeService";
+	property name="exportCodeFruitService" inject="ExportCodeFruitService";
 	property name="exportCodeRawValueService" inject="ExportCodeRawValueService";
+	property name="exportCodeFruitService" inject="ExportCodeFruitService";
 	property name="rawValueService" inject="RawValueService";
 	property name="attributeService" inject="AttributeService";
 	property name="userService" inject="UserService";
@@ -34,6 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="langService" inject="LangService";
 	property name="statusService" inject="StatusService";
 	property name="signageConfigService" inject="signageConfigService";
+	property name="SignageConfigItemService" inject="SignageConfigItemService";
 	property name="pricelistService" inject="PricelistService";
 	property name="paymentMethodService" inject="PaymentMethodService";
 	property name="currencyService" inject="CurrencyService";
@@ -41,11 +44,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="opportunityService" inject="OpportunityService";
 	property name="leadService" inject="LeadService";
 	property name="productService" inject="ProductService";
+	property name="productCategoryService" inject="ProductCategoryService";
+	property name="lineService" inject="LineService";
+	property name="modelService" inject="ModelService";
+	property name="finishService" inject="FinishService";
 	property name="productItemService" inject="ProductItemService";
 	property name="componentService" inject="ComponentService";
 	property name="vatCodeService" inject="VatCodeService";
 	property name="countryService" inject="CountryService";
 	property name="fileService" inject="FileService";
+	property name="ProductHashService" inject="ProductHashService";
 
 	property name="componentCounter" type="Numeric";
 	property name="cacheScope" type="String" default="Quotation.bean";
@@ -252,16 +260,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Struct function exportProducts( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
 
 		var result = {
-			"success" = false,
+			"success" = true,
 			"error" = null
 		};
 
 		transaction {
 			if ( arguments.quotationItems.len() ) {
-
-				var allProductItems = [];
-				var index = 1;
-
 				for ( var quotationItem in arguments.quotationItems ) {
 					if (!isNull(quotationItem.getArticle())) {
 						var dataExport = {
@@ -275,6 +279,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"ARDATCAR"  = Now(),
 							"ARUNMIS1"  = "PZ",
 							"VARCOD"    = "0000000000",
+							"VARNOT"    = "",
 							"CLCODICE"  = "000000",
 							"CLANNOTA"  = quotationItem.getNote()
 						}
@@ -295,88 +300,90 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						continue;
 					} else {
+						var productHash = getProductHashService().getByHash( quotationItem.getHash() );
+						if ( isNull(productHash) ) {
+							result.success = false;
+							result.error = 'Hash prodotto non trovato.';
+						}
+						var existingCode = exportCodeService.list( "productHashId" = productHash.getId() );
+						if ( existingCode.len() > 0 ) {
+							continue;
+						}
+						var quotationItemData = deserializeJson( productHash.getJsonData() );
 						var code = "";
 
-						var product = quotationItem.getProduct()
-
-						if ( IsNull( product ) || IsNull( product.getCategory() ) ) {
+						var product = getProductService().get( quotationItemData.productId );
+						var category = getProductCategoryService().get( quotationItemData.categoryId );
+						if ( IsNull( product ) || IsNull( category ) ) {
+							result.success = false;
 							result.error = 'Prodotto o Categoria Prodotto non trovata.'
 							return result;
 						}
 
-
-						var categoryCode = Trim( product.getCategory().getCode() );
+						var categoryCode = Trim( category.getCode() );
 						code &= categoryCode;
 						var note = "";
-					}
 
-					setComponentCounter( 0 )
-
-					// Se il prodotto è complesso, devo costruire il codice articolo con Linea, Modello, Finitura
-					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
-
-						if ( IsNull( product.getLine() ) ) {
+						var line = getLineService().get( quotationItemData.lineId );
+						if ( IsNull( line ) ) {
+							result.success = false;
 							result.error = "Linea prodotto non trovata."
 							return result;
 						}
-
-						var line     = product.getLine();
 						var lineCode = Trim( line.getCode() );
-
 						code &= lineCode;
 
-						if ( IsNull( product.getModel() ) ) {
+						var model = getModelService().get( quotationItemData.modelId );
+						if ( IsNull( model ) ) {
+							result.success = false;
 							result.error = "Modello prodotto non trovato."
 							return result;
 						}
-
-						var model = product.getModel();
 						code &= Trim( model.getCode() );
 
-						if ( IsNull( product.getFinish() ) ) {
+						var finish = getFinishService().get( quotationItemData.finishId );
+						if ( IsNull( finish ) ) {
+							result.success = false;
 							result.error = "Finitura prodotto non trovata."
 							return result;
 						}
-
-						var fontSize = "";
-						var fontName = "";
-						var fontCode = "";
-						var varCode  = "";
-						if ( IsInstanceOf ( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
-							var signageConfigId = quotationItem.getSignageConfigItem().getSignageConfigId()
-							var fontSize = quotationItem.getSignageConfigItem().getSize().getName()
-							var signageConfig = getSignageConfigService().get(signageConfigId)
-							var fontCode = signageConfig.getFont().getCode()
-							var fontName = signageConfig.getFont().getName()
-							note &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
-							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
-						}
-
-						var finishCode = Trim( product.getFinish().getCode() );
+						var finishCode = Trim( finish.getCode() );
 						code &= finishCode;
 
 						var description = product.getDescription().left( 35 );
 
 						var arKey = code;
 						var colCode  = "000000";
+						var varCode  = "";
+						var noteSegnaletica = '';
+						
+						//signage
+						if (StructKeyExists( quotationItemData, "signageRows" ) ) {
+							var signageConfigItem = getSignageConfigItemService().get( quotationItemData.signageConfigItemId );
+							var fontSize = signageConfigItem.getSize().getName();
+							var signageConfig = getSignageConfigService().get( signageConfigItem.getSignageConfigId() );
+							var fontCode = signageConfig.getFont().getCode();
+							var fontName = signageConfig.getFont().getName();
+							note &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
+							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
+							var signageRowsCounter = 1;
+							for ( var signageRow in quotationItemData.signageRows ) {
+								noteSegnaletica &= 'riga ' & signageRowsCounter & ': Allineamento: ' & signageRow['text-align'] & ': Testo: "' & signageRow.content & '"";';
+								signageRowsCounter++;
+							}
+						}
 
-						var quotationItemProductItems = QuotationItemProductItemService.list(
-							quotationItemId = quotationItem.getId(),
-							orderBy         = [ { field = "productItem.id" } ]
-						);
-
-						var productItems   = [];
 						var productItemIds = [];
+						var productItems   = [];
 						var importantAttributes = product.getImportantAttributes();
-
-						// faccio passare tutti i product items e creo una struttura dove definisco quelli importanti (che vanno nel varCode) e quelli non importanti (che vanno solo nel colCode)
-						for ( var quotationItemProductItem in quotationItemProductItems ) {
-							var productItem = quotationItemProductItem.getProductItem();
+						for ( var quotationItemProductItem in quotationItemData.productItems ) {
+							var productItem = getProductItemService().get( quotationItemProductItem.productItemId );
 							if ( !IsNull( productItem ) ) {
 								var attributeValue = productItem.getAttributeValue();
 								var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
 
 								if ( IsNull( attribute ) ) {
+									result.success = false;
 									result.error = 'Attributo Prodotto non trovato.';
 									return result;
 								}
@@ -394,215 +401,164 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								if (isImportant) {
 									if ( varCode.len() < 10 ) {
 										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-										productItems.add( {
+										arrayAppend(productItems, {
 											"important"   = true,
 											"rawValueId"  = rawValue.getId(),
 											"attributeId" = attributeValue.getAttributeId()
 										} );
 									} else {
-										productItems.add( {
+										arrayAppend(productItems, {
 											"important"   = false,
 											"rawValueId"  = rawValue.getId(),
 											"attributeId" = attributeValue.getAttributeId()
 										} );
 									}
 								} else {
-									productItems.add( {
+									arrayAppend(productItems, {
 										"important"   = false,
 										"rawValueId"  = rawValue.getId(),
 										"attributeId" = attributeValue.getAttributeId()
 									} );
 								}
-
-								productItemIds.add( productItem.getId() );
+								arrayAppend(productItemIds, productItem.getId())
 							}
 
 							note &= attribute.getName() & ": " & rawValue.getName() & "; ";
 						}
 
 						var productComponents = getComponents( product.getId(), quotationItem, productItemIds );
-
 						varCode &= RepeatString( "0", 10 - Len( varCode ) )
 
-						// per valorizzare il colCode, devo cercare nelle nostre tabelle exportCode
-						// ed exportCodeRawValue se esiste corrispondenza. Cerco prima tutti i codici con exportCode = varCode
-						var existingCodes = exportCodeService.list( str = code & varCode );
+						//se placca
+						if (StructKeyExists( quotationItemData, "fruits" ) ) {
+							var orientation = quotationItem.getFrame().getOrientation().getName()
+							note &= "Orientamento: " & orientation & ";";
 
-						if ( existingCodes.len() > 0 ) {
-							// se ne esiste almeno uno, per ognuno di questi verifico che tutti i product items
-							// (anche quelli non importanti) siano presenti in exportCodeRawValue,
-							// se almeno uno non si trova, passo al successivo. Se non trovo nessun exportCode
-							// cosa che verifico controllando che il colCode rimanga vuoto, allora creo un nuovo exportCode
-							// e le relative exportCodeRawValue
-							for ( var existingCode in existingCodes ) {
-								var exportCodeRawValues = exportCodeRawValueService.list(
-									exportCodeId = existingCode.getId()
-								);
+							var fruits = quotationItemData.fruits;
+							if (Len(fruits)) {
+								note &= " Frutti: "
+							}
+							fruitsIndex = 1;
+							var fruitsComponents = []
+							for ( var fruit in fruits ) {
+								var fruitBean = getProductService().get( fruit.product );
+								note &= " " & fruitBean.getCode()
+								var fruitItems = fruit.productItems;
+								if (Len(fruitItems)) {
+									note &= ": "
+									fruitsProductItems[fruitsIndex] = [];
+									fruitsProductItemIds[fruitsIndex] = [];
+									for ( var fruitItem in fruitItems ) {
+										var fruitItemBean = getProductItemService().get( fruitItem );
+										var attributeValue = fruitItemBean.getAttributeValue();
+										var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
 
-								var allFound = true;
-
-								for ( var item in productItems ) {
-									var found = false;
-									for ( var exportCodeRawValue in exportCodeRawValues ) {
-										if ( exportCodeRawValue.getRawValue().getId() == item.rawValueId ) {
-											found = true;
-											break;
+										if ( IsNull( attribute ) ) {
+											result.success = false;
+											result.error = 'Attributo Frutto non trovato.';
+											return result;
 										}
+										var rawValue = attributeValue.getRawValue();
+										arrayAppend( fruitsProductItems[fruitsIndex], {
+											"important"   = false,
+											"rawValueId"  = rawValue.getId(),
+											"attributeId" = attributeValue.getAttributeId()
+										} );
+										arrayAppend( fruitsProductItemIds[fruitsIndex], productItem.getId() );
+										note &= attribute.getName() & ": " & rawValue.getName() & "; ";
 									}
-									if ( !found ) {
-										allFound = false;
-										break;
-									}
+
 								}
-
-								if ( allFound ) {
-									colCode = existingCode.getCounter()
-									break;
-								}
+								//per ogni frutto recupero i componenti
+								arrayAppend(fruitsComponents, getComponents( fruitBean.getId(), quotationItem, fruitsProductItemIds[fruitsIndex] ));
+								fruitsIndex++;
 							}
-
-							if ( colCode == "000000" ) {
-								// visto che ci troviamo nel caso in cui esiste almeno un exportCode con quel varCode,
-								// cerco il massimo counter e ne creo uno nuovo incrementandolo di uno
-
-								var maxCounter = exportCodeService.max( exportCode = code & varCode );
-								maxCounter     = NumberFormat( maxCounter + 1, "000000" );
-								colCode        = maxCounter;
-
-								/*
-									TODO: create createExportCode
-								*/
-
-								/*
-								createExportCodeAndRawValues(
-									code         = code,
-									varCode      = varCode,
-									counterValue = maxCounter,
-									productItems = productItems
-								)
-								*/
-
-								var exportCode = super.bean( "ExportCode" );
-								exportCode.setName( code & varCode );
-								exportCode.setCounter( maxCounter );
-
-								var exportCodeId = exportCodeService.create( "exportCode" = exportCode );
-								exportCode.setId( exportCodeId );
-
-								for ( var item in productItems ) {
-									var exportCodeRawValue = super.bean( "ExportCodeRawValue" );
-									exportCodeRawValue.setExportCode( exportCode );
-									exportCodeRawValue.setRawValue( rawValueService.get( item.rawValueId ) );
-									exportCodeRawValue.setAttribute( attributeService.get( item.attributeId ) );
-									exportCodeRawValue.setImportant( item.important );
-									exportCodeRawValueService.create( exportCodeRawValue );
-								}
-
-							}
-
-						} else {
-							// non esiste nessun exportCode con quel varCode,
-							// ne creo uno nuovo con counter = '000001' e le relative exportCodeRawValue
-
-							/*
-								TODO: create createExportCode
-							*/
-
-							/*
-							createExportCodeAndRawValues(
-								code         = code,
-								varCode      = varCode,
-								counterValue = "000001",
-								productItems = productItems
-							)
-
-							colCode = "000001";
-							*/
-
-							var exportCode = super.bean( "ExportCode" );
-							exportCode.setName( code & varCode );
-							exportCode.setCounter( "000001" );
-
-							var exportCodeId = exportCodeService.create( "exportCode" = exportCode );
-							exportCode.setId( exportCodeId );
-							colCode = "000001"
-
-							for ( var item in productItems ) {
-								var exportCodeRawValue = super.bean( "ExportCodeRawValue" );
-								exportCodeRawValue.setExportCode( exportCode );
-								exportCodeRawValue.setRawValue( rawValueService.get( item.rawValueId ) );
-								exportCodeRawValue.setAttribute( attributeService.get( item.attributeId ) );
-								exportCodeRawValue.setImportant( item.important );
-								exportCodeRawValueService.create( exportCodeRawValue );
-							}
-
-						}
-
-						arKey = code & varCode & colCode;
-
-						var dataExport = {
-							"AR_CHIAVE" = arKey,
-							"ARCODART"  = code & RepeatString( "0", 15 - Len( code ) ),
-							"ARDESART"  = description,
-							"ARDESSUP"  = quotationItem.getSpecial() && quotationItem.getSpecial() == 'true' ? 'SÌ DWG' : 'NO DWG',
-							"ARDATCAR"  = Now(),
-							"ARUNMIS1"  = "PZ",
-							"VARCOD"    = varCode,
-							"CLCODICE"  = colCode,
-							"CLANNOTA"  = note
-						}
-
-						result.success = getDao().exportProduct( dataExport );
-					}
-
-					if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductBase" ) ) {
-						var productCode = Trim( product.getCode() );
-
-						var dataExport = {
-							"AR_CHIAVE" = productCode & RepeatString( "0", 31 - Len( productCode ) ),
-							"ARCODART"  = productCode & RepeatString( "0", 15 - Len( productCode ) ),
-							"ARDESART"  = product.getName().subString( 0, 35 ) & RepeatString(
-								"0",
-								35 - Len( product.getName().subString( 0, 35 ) )
-							),
-							"ARDATCAR" = Now(),
-							"ARUNMIS1" = "PZ",
-							"VARCOD"   = "0000000000",
-							"CLCODICE" = "000000",
-							"CLANNOTA" = note
-						}
-
-						result.success = getDao().exportProduct( dataExport );
-
-						var existingCodes = exportCodeService.list(
-							str = productCode & RepeatString( "0", 25 - Len( productCode ) )
-						);
-
-						if ( existingCodes.len() > 0 ) {
-							continue;
 						}
 
 						var exportCode = super.bean( "ExportCode" );
-						exportCode.setName( product.getCode() & RepeatString( "0", 25 - Len( product.getCode() ) ) );
-						exportCode.setCounter( "000000" );
-						exportCodeService.create( "exportCode" = exportCode );
-
+						exportCode.setName( code & varCode );
+						exportCode.setProductHashId( productHash.getId() );
+						var maxCounter = exportCodeService.max( exportCode = code & varCode );
+						if (maxCounter > 0) {
+							var newMaxCounter = NumberFormat( maxCounter + 1, "000000" )
+							exportCode.setCounter( newMaxCounter );
+							colCode = newMaxCounter
+						} else {
+							exportCode.setCounter( "000001" );
+							colCode = "000001"
+						}
+						var exportCodeId = exportCodeService.create( "exportCode" = exportCode );
 					}
 
+
+					arKey = code & varCode & colCode;
+					var dataExport = {
+						"AR_CHIAVE" = arKey,
+						"ARCODART"  = code & RepeatString( "0", 15 - Len( code ) ),
+						"ARDESART"  = description,
+						"ARDESSUP"  = quotationItemData.special == 'true' ? 'SÌ DWG' : 'NO DWG',
+						"ARDATCAR"  = Now(),
+						"ARUNMIS1"  = "PZ",
+						"VARCOD"    = varCode,
+						"VARNOT" = noteSegnaletica,
+						"CLCODICE"  = colCode,
+						"CLANNOTA"  = note
+					}
+
+					result.success = getDao().exportProduct( dataExport );
+
+					var allComponents = [];
 					for ( var productComponent in productComponents ) {
 						productComponent.DS_CHIAVE = dataExport.AR_CHIAVE;
 						productComponent.DSCODART  = dataExport.ARCODART;
 						productComponent.DSCODVAR  = dataExport.VARCOD;
 						productComponent.DSCODCOL  = dataExport.CLCODICE;
 
-						result.success = getDao().exportDiba( productComponent );
+						ArrayAppend(allComponents, productComponent);
 					}
 
+					if (StructKeyExists( quotationItemData, "fruits" ) ) {
+						for ( var fruitComponents in fruitsComponents ) {
+							for ( var fruitComponent in fruitComponents ) {
+								fruitComponent.DS_CHIAVE = dataExport.AR_CHIAVE;
+								fruitComponent.DSCODART  = dataExport.ARCODART;
+								fruitComponent.DSCODVAR  = dataExport.VARCOD;
+								fruitComponent.DSCODCOL  = dataExport.CLCODICE;
+
+								ArrayAppend(allComponents, fruitComponent);
+							}
+						}
+					}
+
+					var grouped = {};
+					var orderMap = {};
+
+					for (var row in allComponents) {
+						var key = row.DSCODMAT & "|" & row.DSVARMAT & "|" & row.DSCOLMAT;
+						if ( !structKeyExists(grouped, key) ) {
+							grouped[key] = duplicate(row);
+							grouped[key].DSQTAMOV = val(row.DSQTAMOV);
+							orderMap[key] = row.CPROWNUM;
+						} else {
+							grouped[key].DSQTAMOV += val(row.DSQTAMOV);
+						}
+					}
+					var parsedComponents = [];
+
+					for (var key in grouped) {
+						arrayAppend(parsedComponents, grouped[key]);
+					}
+
+					var counter = 0;
+					for (var row in parsedComponents) {
+						counter++;
+						row.CPROWNUM = counter;
+						row.CPROWORD = counter * 10;
+						result.success = getDao().exportDiba( row );
+					}
 				}
 			}
 		}
-
-		// notifyProductsVerticale();
 
 		return result;
 	}
@@ -767,20 +723,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								if (isImportant) {
 									if ( varCode.len() < 10 ) {
 										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-										productItems.add( {
+										ArrayAppend(productItems, {
 											"important"   = true,
 											"rawValueId"  = rawValue.getId(),
 											"attributeId" = attributeValue.getAttributeId()
 										} );
 									} else {
-										productItems.add( {
+										ArrayAppend(productItems, {
 											"important"   = false,
 											"rawValueId"  = rawValue.getId(),
 											"attributeId" = attributeValue.getAttributeId()
 										} );
 									}
 								} else {
-									productItems.add( {
+									ArrayAppend(productItems, {
 										"important"   = false,
 										"rawValueId"  = rawValue.getId(),
 										"attributeId" = attributeValue.getAttributeId()
@@ -982,7 +938,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			);
 
 			for ( var bundleComponent in bundleComponents ) {
-				allComponents.add( parseComponent( bundleComponent ) );
+				ArrayAppend(allComponents, parseComponent( bundleComponent ));
 			}
 
 			if ( IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
@@ -1003,13 +959,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						);
 
 						for ( var signageProductComponent in signageProductComponents ) {
-							allComponents.add( parseComponent( signageProductComponent ) );
+							ArrayAppend(allComponents, parseComponent( signageProductComponent ));
 						}
 					}
 				}
 
 				for ( var signageComponent in signageComponents ) {
-					allComponents.add( parseComponent( signageComponent ) );
+					ArrayAppend(allComponents, parseComponent( signageComponent ));
 				}
 			}
 		}
@@ -1017,7 +973,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productComponents = componentSvc.list( productId = product.getId(), includeBaseAttributeComponents = true );
 
 		for ( var productComponent in productComponents ) {
-			allComponents.add( parseComponent( productComponent ) );
+			ArrayAppend(allComponents, parseComponent( productComponent ));
 		}
 
 		if ( productItemIds.len() > 0 ) {
@@ -1027,7 +983,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					includeBaseAttributeComponents = true
 				);
 				for ( var productItemComponent in productItemComponents ) {
-					allComponents.add( parseComponent( productItemComponent ) );
+					ArrayAppend(allComponents, parseComponent( productItemComponent ));
 				}
 			}
 		}
