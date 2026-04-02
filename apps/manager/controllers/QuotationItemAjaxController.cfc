@@ -299,6 +299,11 @@ component extends="com.apirone.core.controller.AbsController" {
 				} 
 			);
 		}
+
+		if ( !Len( id ) ) {
+			var productHash = super.fire('ProductHash.createHash', { quotationItemId = thisId });
+			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
+		}
 		
 		var message = completeMessage( messageId );
 
@@ -458,6 +463,11 @@ component extends="com.apirone.core.controller.AbsController" {
 				} 
 			);
 			message = completeMessage( messageId );
+		}
+
+		if ( !Len( id ) ) {
+			var productHash = super.fire('ProductHash.createHash', { quotationItemId = thisId });
+			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
 		}
 		
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
@@ -635,6 +645,10 @@ component extends="com.apirone.core.controller.AbsController" {
 			message = completeMessage( messageId );
 		}
 
+		if ( !Len( id ) OR json.isClone ) {
+			var productHash = super.fire('ProductHash.createHash', { quotationItemId = thisId });
+			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
+		}
 
 		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
 
