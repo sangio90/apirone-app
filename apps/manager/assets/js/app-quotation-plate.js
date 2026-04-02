@@ -654,7 +654,7 @@ AP.plate.modal = ( function() {
                         sel.val( qipi.productItem.id );
                         await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id, fruitId );
                         if (fruitId) {
-                            productItemImage = viewModel.get('detailForm.data.productItemsImages.' + qipi.productItem.id)
+                            const productItemImage = viewModel.get('detailForm.data.productItemsImages.' + qipi.productItem.id)
                             if (productItemImage && productItemImage != '') {
                                 uri = productItemImage;
                                 pub.fruitsController.updateFruit( fruitId, { image: uri } );
@@ -898,10 +898,10 @@ AP.plate.modal = ( function() {
             let url = "/manager/ajax/product-items?productId=" + productId;
             
             await NM.util.ajax( {
-                    method: "GET",
-                    url: url,
-                    callback: {
-                        done: async function( xhr ) {
+                method: "GET",
+                url: url,
+                callback: {
+                    done: async function( xhr ) {
                             if ( xhr.count > 0 ) {
                                 // var thisImage = xhr.data[0].horizontalImage;
                                 // if ( thisImage ) {
@@ -1015,7 +1015,8 @@ AP.plate.modal = ( function() {
 
         changeFruitImage: async function( fruitId, value ) {
             //cerco i productItems del frutto
-            selectedProductItemIds = []
+
+            let selectedProductItemIds = []
             const fruit = viewModel.get('detailForm.data.fruits')._data.find(f => f.id == fruitId)
             let fruitItems = []
             if (fruit) {
@@ -1032,10 +1033,11 @@ AP.plate.modal = ( function() {
                 })
             }
 
-            const actualFruitImage = $('#quotation-plate-fruits #' + fruitId + ' img');
-            if (actualFruitImage.length) {
-                actualFruitImage.attr('src', '/assets/main/img/fruit-generic.png')
-            }
+            // 02/04/2026 - commentato questo pezzo perché causava delle anomalie nell'assegnazione delle immagini ai frutti.
+            // const actualFruitImage = $('#quotation-plate-fruits #' + fruitId + ' img');
+            // if (actualFruitImage.length) {
+            //     actualFruitImage.attr('src', '/assets/main/img/fruit-generic.png')
+            // }
             //se ne trovo, cerco l'immagine per la combinazione
             if (selectedProductItemIds.length) {
                 await NM.util.ajax({
