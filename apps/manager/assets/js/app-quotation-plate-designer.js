@@ -454,11 +454,12 @@ AP.plate.grid = ( function() {
     }
 
     class Cell extends Rectangle {
-        constructor( width, height, orientation, type, id ) {
+        constructor( width, height, orientation, type, id, order ) {
             super( width, height, orientation );
 
             this.type = type;
             this.id = id; // ID della cella dalla griglia
+            this.order = order;
             this._position = null;
         }
 
@@ -564,7 +565,10 @@ AP.plate.grid = ( function() {
             for ( let row = this._gridPosition.row; row < this._gridPosition.row + this.rowSpan && row < grid.length; row++ ) {
                 for ( let col = this._gridPosition.column; col < this._gridPosition.column + this.columnSpan && col < grid[row].length; col++ ) {
                     if ( grid[row][col] && grid[row][col].id ) {
-                        this.cellIds.push( grid[row][col].id );
+                        this.cellIds.push( {
+                            id: grid[row][col].id,
+                            order: grid[row][col].order
+                        } );
                     }
                 }
             }

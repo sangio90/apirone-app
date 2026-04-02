@@ -20,6 +20,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
+	public com.apirone.core.model.bean.ProductHash function getByHash( required String hash ){
+		var cm = getCacheManager();
+
+		var record = getDao().find( argumentCollection = arguments );
+
+		if (Len(record)) {
+			var bean = build( record.product_hash_id );
+
+			return bean;
+		}
+
+		return NullValue();
+	}
+
 	public Array function list(){
 		arguments[ "limit" ] = -1;
 
@@ -132,7 +146,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productItems = [];
 		if (!isNull(items)) {
 			ArraySort( items, function(a, b) {
-				return compare(a.getProductItem().getId(), b.getProductItem().getId());
+				return compare(a.getProductItem().getOrderBy(), b.getProductItem().getOrderBy());
 			});
 
 			for (var item in items) {
@@ -144,6 +158,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"categoryId": categoryId,
 			"lineId": lineId,
 			"modelId": modelId,
+			"productId": quotationItem.getProduct().getId(),
 			"finishId": finishId,
 			"note": note,
 			"special": special,
@@ -174,17 +189,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows = quotationItem.getFruits();
 
 		arraySort(rows, function(a, b) {
-			return compare(a.getPosition(), b.getPosition());
+			return compare(a.getPositions()[1].order, b.getPositions()[1].order);
 		});
 
 		var quotationItemFruits = [];
 		for (var row in rows) {
 			var fruit = row.getFruit()
-			//var fruitRows = fruit.getItems()
 			var fruitRows = getProductItemService().list( fruit.getId() );
 
 			arraySort(fruitRows, function(a, b) {
-				return compare(a.getId(), b.getId());
+				return compare(a.getOrderBy(), b.getOrderBy());
 			});
 
 			var fruitItems = [];
@@ -199,7 +213,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	private function prepareBean( jsonData ){
-		var jsonData = serializeJson( jsonData );
+		var sorted = sortTopLevelStruct(jsonData);
+		var jsonData = serializeJson( sorted );
 		
 		var hashValue = hash(jsonData, "MD5");
 
@@ -214,5 +229,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setJsonData( jsonData );
 
 		return bean;
+	}
+
+	function sortTopLevelStruct(s) {
+		var result = structNew("ordered");
+
+		var keys = structKeyArray(s);
+		arraySort(keys, "textnocase");
+
+		for (var k in keys) {
+			result[k] = s[k];
+		}
+
+		return result;
 	}
 }

@@ -7,7 +7,8 @@
 			SELECT
 				quotation_item_fruit_position_id,
 				COUNT(quotation_item_fruit_position_id) OVER() AS total,
-				position
+				position,
+				"order"
 			FROM
 				quotation_item_fruit_positions
 			WHERE 1=1
@@ -21,14 +22,17 @@
 	<cffunction name="insert" returntype="Numeric">
 		<cfargument name="quotationItemFruitId" type="String" required="true">
 		<cfargument name="position" type="String" required="true">
+		<cfargument name="order" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_fruit_positions (
 				quotation_item_fruit_id,
-				position
+				position,
+				"order"
 			) VALUES (
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruitId#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.position#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.position#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.order#">
 			)
 			RETURNING quotation_item_fruit_position_id
 		</cfquery>

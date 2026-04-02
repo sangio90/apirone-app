@@ -126,7 +126,8 @@ AP.plate.modal = ( function() {
                     constants.GRID_CELL_DIMENSIONS[cellType].height,
                     plate.cellOrientation.id,
                     cellType,
-                    cellData.id
+                    cellData.id,
+                    cellData.order
                 );
 
                 row.push( cell );
@@ -552,7 +553,6 @@ AP.plate.modal = ( function() {
                         viewModel.set( "availableOrientations", xhr.data.availableOrientations );
                         viewModel.set( "plate.grid", xhr.data.grid );
                         viewModel.set( "plate.image", image );
-                        viewModel.set( "plate.grid", xhr.data.grid );
 
                         if ( orientation ) {
                             await viewModel.changeOrientation();
@@ -1233,7 +1233,7 @@ AP.plate.modal = ( function() {
 
                 await NM.util.ajax( {
                 method: "POST",
-                url: "/manager/ajax//quotation-items/plate",
+                url: "/manager/ajax/quotation-items/plate",
                 data: JSON.stringify( parsedData ),
                 callback: {
                     done: function( xhr ) {
@@ -1276,7 +1276,8 @@ AP.plate.modal = ( function() {
                             viewModel.get( "detailForm.data.fruits" ).add( newFruit );
 
                             if ( thisFruit.positions && thisFruit.positions.length ) {
-                                pub.fruitsController.addFruitToPositions( mapFruitForPlate( newFruit ), thisFruit.positions );
+                                const positionsIds = thisFruit.positions.map( p => p.position );
+                                pub.fruitsController.addFruitToPositions( mapFruitForPlate( newFruit ), positionsIds );
                             } else {
                                 pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
                             }
