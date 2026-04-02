@@ -136,6 +136,8 @@ AP.plate.productItems = ( function() {
                     inputNote.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
                 }
                 subContainer.append( inputNote );
+                // Forza l'aggiornamento del modello di dati notificando il cambiamento
+                inputNote.trigger("input");
             }
         } );
     }
