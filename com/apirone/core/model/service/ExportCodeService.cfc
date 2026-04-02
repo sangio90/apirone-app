@@ -1,7 +1,6 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ExportCodeDAO";
-	property name="ExportCodeRawValueService" inject="ExportCodeRawValueService";
 
 	property name="cacheScope" type="String" default="ExportCode.bean";
 

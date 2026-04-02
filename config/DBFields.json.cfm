@@ -366,10 +366,6 @@
         "name": "export_code_id",
         "type": "Integer"
     },
-    "exportCodeRawValue.id": {
-        "name": "export_code_raw_value_id",
-        "type": "Integer"
-    },
     "quotationItemExported.exportDate": {
         "name": "ARDATCAR",
         "type": "Date"
