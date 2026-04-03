@@ -613,6 +613,7 @@ AP.plate.modal = ( function() {
                                         } ]
                                     } );
                                 }
+                                productItems.trigger( "change" );
                             } );
                             await viewModel.renderProductItemsPlate();
                             productItems.trigger( "change" );
