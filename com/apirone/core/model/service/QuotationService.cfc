@@ -697,13 +697,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								price = quotationItem.getPrice().getTotal()
 							}
 							if (quotationItem.getPrice().getDiscount1() > 0) {
-								discount1 = quotationItem.getPrice().getDiscount1()
+								discount1 = !isNull(quotationItem.getPrice().getDiscount1()) ? quotationItem.getPrice().getDiscount1() : 0
 							}
 							if (quotationItem.getPrice().getDiscount2() > 0) {
-								discount2 = quotationItem.getPrice().getDiscount2()
+								discount2 = !isNull(quotationItem.getPrice().getDiscount2()) ? quotationItem.getPrice().getDiscount2() : 0
 							}
 						}
-						quotationData["MMVALUNI"] = price;
+						quotationData["MMVALUNI"] = (discount1 > 0 || discount2 > 0) ? getOriginalPrice( finalPrice = price, discount1 = discount1, discount2 = discount2 ) : price;
 						quotationData['MMSCOAR1'] = discount1;
 						quotationData['MMSCOAR2'] = discount2;
 						quotationData['MMEVASIO'] = quotation.getValidityDate();
@@ -716,6 +716,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				for ( quotationItemToExport in quotationItemsToExport ) {
 					getDao().export( quotationItemToExport );
 				}
+
+				var quotationPrice = getQuotationPriceService().calculate( quotation.getId() );
+				if (!isNull(quotationPrice) && quotationPrice.getFlatDiscount() > 0) {
+					var quotationPriceData = {}
+					quotationPriceData.append(quotationDataHead);
+					quotationPriceData['MMCODART'] = "000000000SCONTO";
+					quotationPriceData['MMCODVAR'] = "0000000000";
+					quotationPriceData['MMCODCOL'] = "00000";
+					quotationPriceData['MMVALUNI'] = quotationPrice.getFlatDiscount();
+					quotationPriceData['MMQTAMOV'] = 1;
+					quotationPriceData["MMEVASIO"] = quotation.getValidityDate();
+					quotationPriceData["MM_STATO"] = "N";
+					quotationPriceData['CPROWNUM'] = index;
+					quotationPriceData['CPROWORD'] = index * 10;
+					getDao().export( quotationPriceData );
+				}
 			}
 		}
 
@@ -724,6 +740,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// notifyOrdersVerticale();
 
 		return result;
+	}
+
+	function getOriginalPrice(required numeric finalPrice, required numeric discount1, required numeric discount2) {
+		var s1 = discount1 / 100;
+		var s2 = discount2 / 100;
+
+		var divisor = (1 - s1) * (1 - s2);
+
+		if (divisor == 0) {
+			throw(message = "Divisione per zero: controlla gli sconti");
+		}
+
+		return finalPrice / divisor;
 	}
 
 	public function getComponents(
@@ -842,7 +871,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMDATEVA" = quotation.getValidityDate(),
 			"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
 			"MMNUMLIS" = 1,
-			"MMCODAGE" = (!isNull(quotation.getsalesAgent())) ? quotation.getsalesAgent().getEmail() : null, //trovata tabella AZAPI_AGENTI campo id AGECOD, campo mail AGEMAI
+			"MMCODAGE" = (!isNull(quotation.getSalesAgent())) ? quotation.getSalesAgent().getAccount().getEmail() : null, //trovata tabella AZAPI_AGENTI campo id AGECOD, campo mail AGEMAI
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
 			"CF_IDCLI" = customer.getId(),
