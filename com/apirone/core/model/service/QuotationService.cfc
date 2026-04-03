@@ -716,6 +716,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				for ( quotationItemToExport in quotationItemsToExport ) {
 					getDao().export( quotationItemToExport );
 				}
+
+				var quotationPrice = getQuotationPriceService().calculate( quotation.getId() );
+				if (!isNull(quotationPrice) && quotationPrice.getFlatDiscount() > 0) {
+					var quotationPriceData = {}
+					quotationPriceData.append(quotationDataHead);
+					quotationPriceData['MMCODART'] = "000000000SCONTO";
+					quotationPriceData['MMCODVAR'] = "0000000000";
+					quotationPriceData['MMCODCOL'] = "00000";
+					quotationPriceData['MMVALUNI'] = quotationPrice.getFlatDiscount();
+					quotationPriceData['MMQTAMOV'] = 1;
+					quotationPriceData["MMEVASIO"] = quotation.getValidityDate();
+					quotationPriceData["MM_STATO"] = "N";
+					quotationPriceData['CPROWNUM'] = index;
+					quotationPriceData['CPROWORD'] = index * 10;
+					getDao().export( quotationPriceData );
+				}
 			}
 		}
 
