@@ -600,8 +600,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var thisId    = productService.update( product )
 		//Automatismo che aggiorna margini e altezza targa per tutte le segnaletiche che condividono la stessa linea e modello
-		var altreSegnaleticheConStessaLineaModello = productService.search( catalogBundleId = product.getCatalogBundle().getId());
-		for ( var row in altreSegnaleticheConStessaLineaModello.getData() ) {
+		var altreSegnaleticheConStessaLineaModello = productService.list( catalogBundleId = product.getCatalogBundle().getId());
+		for ( var row in altreSegnaleticheConStessaLineaModello ) {
 			row.setMarginTop( rc.marginTop );
 			row.setMarginLeft( rc.marginLeft );
 			row.setPlateWidth( rc.plateWidth );
