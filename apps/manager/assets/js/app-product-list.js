@@ -77,10 +77,14 @@ AP.product.list = ( function() {
             this.get('lines').data([]);
             let allLines = this.get("allLines");
             const category = this.get('category')
-            const categoryLines = allLines.filter(function(line) {
-                return line.categories.filter(cat => cat.id == category.id).length > 0
-            })
-            this.get('lines').data(categoryLines);
+            if (!category.id) {
+                this.get('lines').data(allLines);
+            } else {
+                const categoryLines = allLines.filter(function(line) {
+                    return line.categories.filter(cat => cat.id == category.id).length > 0
+                })
+                this.get('lines').data(categoryLines);
+            }
             this.set('line', { "id": "", "name": ""})
             this.set('model', { "id": "", "name": ""})
         },
@@ -160,7 +164,7 @@ AP.product.list = ( function() {
     pub.init = function() {
 
         kendo.bind( AP.fields.product.listRoot, viewModel );
-
+        viewModel.loadLines();
     };
 
     return pub;
