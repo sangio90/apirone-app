@@ -1,22 +1,22 @@
 ﻿<cfoutput>
-	
+
 	<div id="fruit-list-root">
-		
+
         <div class="row">
             <div class="col-6">
 				#pageTitle()#
             </div>
-			<!--- <div class="col-6 text-end pb-3" data-bind="role: this" data-role-list="ADM/TCD">
+			<div class="col-6 text-end pb-3" data-bind="role: this" data-role-list="ADM/TCD">
                 #addButton( bind="click:new", size="sm" )#
-			</div> --->
+			</div>
         </div>
 
 		<div class="row">
-			
+
 			<div class="col-lg-12">
 				<section class="card">
 					<div class="card-body">
-						
+
 						<div class="row d-flex align-items-center mb-3">
 							<div class="col-sm-10">
 								<div class="box-search-small">
@@ -24,7 +24,7 @@
 										id   ="fruit-grid-search-form"
 										class="d-flex align-items-center justify-content-end"
 										data-bind: 'events: { submit: search }'>
-										
+
 										<div class="col">
 											<span>Cerca</span>
                                         	<input name="str" placeholder="Cerca" class="form-control me-2" type="text">
@@ -93,11 +93,11 @@
                                         { 'field':'prices', 'title':'Prezzi', width: '250px'},
                                         { 'field':'', 'title':'Tutti gli attributi', width: '145px', 'headerAttributes': { 'class': 'justify-content-center' } },
                                         { 'field':'', 'title':'Modifica', width: '90px', 'headerAttributes': { 'class': 'justify-content-center' } },
-                                        { 
-                                            'field'           :'', 
-                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 
+                                        {
+                                            'field'           :'',
+                                            'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>',
                                             'width'           :'40px',
-                                            'headerAttributes': { 'class': 'justify-content-center' } 
+                                            'headerAttributes': { 'class': 'justify-content-center' }
                                         }
 
                                     ]",
