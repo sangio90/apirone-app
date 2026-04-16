@@ -60,7 +60,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		bean.setQuotation( super.service( "Quotation" ).get( json.id ) );
-		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
+		var quotationZone = super.service( "QuotationZone" ).list( quotationId = json.id, name = 'Non assegnato' );
+		bean.setQuotationZone( quotationZone[ 1 ] );
 		bean.setQuantity( json.quotationItem.quantity );
 		bean.setArticle( super.fire( "Article.get", { articleId = json.quotationItem.article.id } ) );
 
