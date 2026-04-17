@@ -40,8 +40,8 @@
             <div>
                 <table style='width: 100%; border-collapse:collapse'>
                     <tr>
-                        <td style='border: 0; padding-top:5px'>#cfdocument.currentpagenumber#/#cfdocument.totalpagecount#</td>
-                        <td style='border: 0; padding-top:5px' align='right'>Apir Srl - #LsDateFormat( now(), 'dd/mm/yyyy' )#</td>
+                        <td style='border: 0; padding-left:25px;'>#cfdocument.currentpagenumber#/#cfdocument.totalpagecount#</td>
+                        <td style='border: 0; padding-right:25px;' align='right'>Apir Srl - #LsDateFormat( now(), 'dd/mm/yyyy' )#</td>
                     </tr>
                 </table>
             </div>
