@@ -1499,7 +1499,7 @@ AP.plate.modal = ( function() {
             if ( quotationZone ) {
                 if (quotationZone.origin) {
                     viewModel.set( "detailForm.data.quotationZone", data.quotationItem.quotationZone.origin );
-                    viewModel.set( "detailForm.data.quotationSubzone", xhr.data.quotationItem.quotationZone );
+                    viewModel.set( "detailForm.data.quotationSubzone", data.quotationItem.quotationZone );
                 } else {
                     viewModel.set( "detailForm.data.quotationZone", data.quotationItem.quotationZone );
                 }
