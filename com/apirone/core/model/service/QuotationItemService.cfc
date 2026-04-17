@@ -663,6 +663,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public function aggiornaPrezzo( required quotationItem )
 	{
+		if (!isNull(quotationItem.getArticle())) {
+			return false;
+		}
 		var quotationId = quotationItem.getQuotation().getId()
 		var productId = quotationItem.getProduct().getId();
 		var quantity = quotationItem.getQuantity();
