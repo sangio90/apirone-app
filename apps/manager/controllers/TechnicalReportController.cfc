@@ -68,12 +68,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		};
 
 		if (!isNull(quotation.getCustomer().getShippingProfiles()) && quotation.getCustomer().getShippingProfiles().len() > 0) {
-			//TODO: NON CAPISCO, perchè non il profile del preventivo?
 			customerShippingProfile = quotation.getCustomer().getShippingProfiles()[1];
 		}
-
-		<!--- quoteObj.customerShippingProfile = customerShippingProfile; ---->
-
 
 		```
 		<cfquery name="total" datasource="apirone">
@@ -193,14 +189,21 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		for ( quotationItem in quotationItems ) {
 			var hashKey = quotationItem.getHash();
+			var zoneQuantity = !isNull(quotationItem.getQuotationZone().getOrigin()) ? 
+				quotationItem.getQuotationZone().getOrigin().getQuantity() * quotationItem.getQuotationZone().getQuantity() :
+				quotationItem.getQuotationZone().getQuantity();
 			if ( !structKeyExists(groupedItems, hashKey) ) {
+				var quantity = quotationItem.getQuantity();
+				if (len(quotationItem.getQuotationZone())) {
+					quantity = quantity * zoneQuantity;
+				}
 				groupedItems[hashKey] = {
 					'item' = quotationItem,
-					'quantity' = quotationItem.getQuantity(),
+					'quantity' = quantity,
 					'zones' = {}
 				};
 			} else {
-				groupedItems[hashKey].quantity += quotationItem.getQuantity();
+				groupedItems[hashKey].quantity += (quotationItem.getQuantity() * zoneQuantity);
 			}
 			var zoneName = quotationItem.getQuotationZone().getName();
 			var position = quotationItem.getPosition();
@@ -209,8 +212,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				groupedItems[hashKey].zones[ zoneName ] = [];
 			}
 
-			if ( !arrayContains(groupedItems[hashKey].zones[zoneName], position) ) {
-				arrayAppend(groupedItems[hashKey].zones[zoneName], position);
+			if ( !arrayContains(groupedItems[hashKey].zones[zoneName], position) && !isNull(position) ) {
+				arrayAppend(groupedItems[hashKey].zones[zoneName], position.getCode());
 			}
 		}
 
