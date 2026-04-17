@@ -1089,7 +1089,7 @@ AP.plate.modal = ( function() {
                 labelTextFn: function (item) { return item.attributeName; },
                 onSelectChange: async function (selectedId, attributeId, value) {
                     await viewModel.loadProductItems(selectedId, attributeId, fruitId);
-                    await viewModel.changeFruitImage(fruitId, value);
+                    viewModel.changeFruitImage(fruitId, value);
                 }
             });
 
