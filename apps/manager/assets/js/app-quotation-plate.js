@@ -781,6 +781,22 @@ AP.plate.modal = ( function() {
                                         level: attributeArray[parentIndex].level + 1,
                                         values: []
                                     };
+                                    if (parentIndex >= 1) {
+                                        attribute.values.push( {
+                                            attributeValue: {
+                                                allowNote: false,
+                                                horizontalImage: false,
+                                                verticalImage: false,
+                                                id: null,
+                                                rawValue: {
+                                                    id: null,
+                                                    name: '-- Seleziona valore attributo'
+                                                }
+                                            },
+                                            productItemId: null,
+                                            selected: true
+                                        } );
+                                    }
                                     attributes.push( attribute );
                                 }
                                 attribute.values.push( {
@@ -897,7 +913,7 @@ AP.plate.modal = ( function() {
             var thisFruit = fruits.get( fruitId );
             var productId = thisFruit.fruit.id;
             let url = "/manager/ajax/product-items?productId=" + productId;
-            
+
             await NM.util.ajax( {
                 method: "GET",
                 url: url,
