@@ -33,7 +33,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return "#settings.get( "site.repository" )##path#";
 	}
 
-	private String function getRelativePath( size = "_ori" ){
+	public String function getRelativePath( size = "_ori" ){
 		var config = super.getConfiguration();
 
 		var imageConfig = config.get( "imagesConfig" )[ getKind().getId() ];
