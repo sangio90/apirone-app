@@ -1,6 +1,17 @@
 ﻿<cfoutput>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
+		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
+			<style>
+				@page {
+					background-image: url('/assets/main/img/quotation-watermark-2.jpg');
+					background-repeat: repeat;
+					background-size: 1920px;
+					z-index: 900;
+					background-color:rgba(0, 0, 0, 0.1);
+				}
+			</style>
+		</cfif>
 		<div>
 			<cfdocumentitem type="header">
 				<table style="border: 0; width: 100%; margin-left: 0.1in; margin-right: 0.1in;">
@@ -76,22 +87,29 @@
 								<td style="vertical-align: top; padding-top: 5pt; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 0; padding-left: 5pt; width: 9cm !important;">
 									<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 										<div style="font-size: 8pt; line-height: 15px;">
-											<b>Lista Frutti: </b>
+											<Lista Frutti:
 											<cfif NOT isNull(oggetto.getFruits())>
 												<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
-												<ul style="padding: 0 0 0 14px;">
+												<ul style="padding: 0 0 0 24px;">
 													<cfloop from="1" to="#fruitsCount#" index="fi">
 														<cfset fruit = oggetto.getFruits()[fi]>
 														<li style="padding: 0">
-															Cod. 
-															<span style="text-transform: lowercase; font-size: 8pt;">
-																#fruit.getFruit().getCode()#
-																<cfloop array="#fruit.getFruit().getItems()#" index="fruitItem">
-																	<span style="font-size: 8pt; text-transform: lowecase">
-																		#fruitItem.getAttribute().getName()#: #fruitItem.getAttributeValue().getRawValue().getName()# 
-																		&nbsp;</span>
+															<b>P.
+																<cfset fruitPositionsCount = ArrayLen( fruit.getPositions() )>
+																<cfloop from="1" to="#fruitPositionsCount#" index="fpi">
+																	<cfset fruitPosition = fruit.getPositions()[fpi]>
+																	#fruitPosition.order + 1#<cfif fpi < fruitPositionsCount > - </cfif>
 																</cfloop>
-																<cfif fi LT fruitsCount>, </cfif>
+															</b> : Cod.
+															<span style="text-transform: lowercase; font-size: 8pt;">
+																#fruit.getFruit().getCode()#<br>
+																<cfif IsArray( fruit.getItems() )>
+																	<cfloop array="#fruit.getItems()#" index="fruitItem">
+																		<span style="font-size: 8pt; text-transform: lowecase">
+																			#fruitItem.getProductItem().getAttribute().getName()#: #fruitItem.getProductItem().getAttributeValue().getRawValue().getName()#
+																		</span><br>
+																	</cfloop>
+																</cfif>
 																<cfif !isNull(fruit.getNote()) && args.params.note>
 																	<span style="font-size: 8pt; margin-top: 4pt;">
 																		<i>( Note: #fruit.getNote()# )</i>
