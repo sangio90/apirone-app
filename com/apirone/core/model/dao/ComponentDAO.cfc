@@ -183,7 +183,7 @@
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
 
-			<cfif arguments.limit GTE 0>
+			<cfif arguments.limit GT 0>
 				LIMIT
 					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
 				OFFSET
