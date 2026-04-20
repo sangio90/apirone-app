@@ -14,14 +14,14 @@
 		</cfif>
 		<div>
 			<cfdocumentitem type="header">
-				<table style="border: 0; width: 19cm; margin-left: 0.1in;">
+				<table style="border: 0; width: 20cm; margin-left: 0.1in;">
 					<tbody>
 						<tr style="border: 0;">
 							<td style="border: 0;">
 								#getPrintFullHeader()#
 							</td>
 							<td style="border: 0; width: 9cm; padding-top: .4in;">
-								<h2 style="text-align: right">Preventivo N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
+								<h2 style="text-align: right; margin-right: .1in;">Preventivo N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
 								<table style="width: 100%; border: 0;">
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Data</td>
