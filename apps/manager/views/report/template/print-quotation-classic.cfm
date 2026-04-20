@@ -37,7 +37,11 @@
 									</tr>
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Commerciale di Riferimento</td>
-										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">Mario Rossi</td>
+										<cfif !isNull(args.data.quotation.getSalesAgent())>
+											<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#args.data.quotation.getSalesAgent().getAccount().getName()#</td>
+										<cfelse>
+											<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;"></td>
+										</cfif>
 									</tr>
 								</table>
 							</td>
