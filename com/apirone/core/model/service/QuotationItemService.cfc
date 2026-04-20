@@ -652,7 +652,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if (
 				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || 
 				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage") ||
-				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle")
+				!isNull(quotationItem.getArticle())
 			) {
 				continue;
 			}
@@ -725,12 +725,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				for (fruitItem in fruit.getItems()) {
 					fruitItems.append({
 						values = [
-							{ selected = true, productItemId = productItemId }
+							{ selected = true, productItemId = fruitItem.getProductItem().getId() }
 						]
 					})
 				}
 				json.item.fruits._data.append({
 					"fruit": {
+						"name": fruit.getFruit().getName(),
 						"id": fruit.getFruit().getId()
 					},
 					"fruitId": fruit.getId(),
@@ -790,7 +791,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				json.quotationItem.signageRows._data.append({ charCount = signageRow.getCharCount() });
 			}
 			var price = getSignagePricing(json)
-		} elseif (!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle") && !IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
+		} elseif (isNull(quotationItem.getArticle()) && !IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
 			json = {
 				"quotationId": "",
 				"quotationItem": {

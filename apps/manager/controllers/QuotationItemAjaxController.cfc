@@ -717,7 +717,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			transaction {
 				for (var quotationItem in quotationItems) {
-					if (!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle")) {
+					if (isNull(quotationItem.getArticle())) {
 						super.fire( "quotationItem.aggiornaPrezzo", { "quotationItem" = quotationItem } );
 					}
 				}
