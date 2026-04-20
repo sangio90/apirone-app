@@ -111,6 +111,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var sortedZones = [];
 		for (var zone in zones) {
+			if (zone.getName() == 'Non assegnato') {
+				var unassignedZone = zone;
+				continue;
+			}
 			//aggiungiamo le zone figlie ad ogni zona padre
 			if (isNull(zone.getOrigin())) {
 				sortedZones.add(zone)
@@ -120,7 +124,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 			}
 		}
-
+		sortedZones.add(unassignedZone);
+		var articleItems = [];
 		for ( var i = 1; i LTE ArrayLen( sortedZones ); i++ ) {
 			var zone = sortedZones[i];
 			//se stampa raggruppata
@@ -142,6 +147,14 @@ component extends="com.apirone.core.controller.AbsController" {
 			} else {
 				var zoneItems = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo, 'quotationZoneId' = zone.getId() ]);
 			}
+			if (zone.getName() == 'Non assegnato') {
+				articleItems = zoneItems.filter(function(item) {
+					return !isNull(item.getArticle())
+				});
+			}
+			zoneItems = zoneItems.filter(function(item) {
+				return isNull(item.getArticle())
+			})
 			zone.zoneItems = zoneItems;
 		}
 
@@ -152,6 +165,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		quoteObj.zones = sortedZones;
+		quoteObj.articleItems = articleItems;
 
 		return quoteObj;
 	}

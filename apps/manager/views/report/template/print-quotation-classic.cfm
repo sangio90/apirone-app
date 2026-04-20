@@ -100,7 +100,7 @@
 										<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
 										<td style="border: 0">
 											#args.data.quotation.getShippingProfile().getCity()# #args.data.quotation.getShippingProfile().getState()#<br>
-											#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()# 
+											#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()#
 											#args.data.quotation.getShippingProfile().getCountry().getIsoCode()#<br>
 										</td>
 									</tr>
@@ -153,7 +153,7 @@
 											</cfif>
 											<td>
 												<span style="font-size: 8pt; text-transform: lowecase">#!isNull(oggetto.getArticle()) ? oggetto.getArticle().getName() : oggetto.getProduct().getDescription()#</span><br>
-												<cfif !isNull(oggetto.getArticle())>
+												<cfif isNull(oggetto.getArticle())>
 													<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getNote()#</span><br>
 												</cfif>
 												<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
@@ -172,7 +172,7 @@
 											<td style="vertical-align: bottom; padding: 3pt 0 3px 0;">
 												<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 													<div style="font-size: 8pt; line-height: 15px;">
-														Lista Frutti: 
+														Lista Frutti:
 														<cfif NOT isNull(oggetto.getFruits())>
 															<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
 															<ul style="padding: 0 0 0 24px;">
@@ -185,7 +185,7 @@
 																				<cfset fruitPosition = fruit.getPositions()[fpi]>
 																				#fruitPosition.order + 1#<cfif fpi < fruitPositionsCount > - </cfif>
 																			</cfloop>
-																		</b> : Cod. 
+																		</b> : Cod.
 																		<span style="text-transform: lowercase; font-size: 8pt;">
 																			#fruit.getFruit().getCode()#<br>
 																			<cfif IsArray( fruit.getItems() )>
@@ -213,7 +213,7 @@
 														<cfloop collection="#zones#" item="zoneName">
 															<div style="font-size: 8pt; line-height: 15px; padding-left: 3px;">
 																<cfif zoneName != 'Non assegnato'>
-																	#zoneName#: 
+																	#zoneName#:
 																</cfif>
 																#arrayToList(zones[zoneName], ", ")#
 															</div>
@@ -299,7 +299,7 @@
 											<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
 												#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['totalGoods'], "9,999.99", "it_IT" )# €
 											<cfelse>
-												#LSNumberFormat( 
+												#LSNumberFormat(
 													args.data.quotationPrice.getCalculatedTotals()['totalGoods'] *
 													( 1 - args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ) *
 													( 1 - args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100 )
@@ -311,7 +311,7 @@
 										<tr>
 											<td><strong>Sconti</strong></td>
 											<td>
-												- #LSNumberFormat( 
+												- #LSNumberFormat(
 													args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - (args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ))
 													, "9,999.99", "it_IT" )
 												# €
@@ -320,7 +320,7 @@
 										<tr>
 											<td><strong></strong></td>
 											<td>
-												- #LSNumberFormat( 
+												- #LSNumberFormat(
 													(args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 )) * args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100
 													, "9,999.99", "it_IT" )
 												# €
