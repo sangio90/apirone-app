@@ -1,6 +1,17 @@
 ﻿<cfoutput>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="2.6" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
+		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
+			<style>
+				@page {
+					background-image: url('/assets/main/img/quotation-watermark-2.jpg');
+					background-repeat: repeat;
+					background-size: 1920px;
+					z-index: 900;
+					background-color:rgba(0, 0, 0, 0.1);
+				}
+			</style>
+		</cfif>
 		<div>
 			<cfdocumentitem type="header">
 				<table style="border: 0; width: 19cm; margin-left: 0.1in;">

@@ -186,15 +186,7 @@
 </cffunction>
 
 <cffunction name="printStyle">
-	<style>
-		@page {
-			background-image: url('http://apirone.local:7110/assets/main/img/quotation-watermark-2.jpg');
-			background-repeat: repeat;
-			background-size: 1920px;
-			z-index: -1;
-			background-color:rgba(0, 0, 0, 0.1);
-		}
-		
+	<style>	
 		body, td, th, span, div, p { font-family: 'Poppins'; font-size: 13px }
 		
 		table {
