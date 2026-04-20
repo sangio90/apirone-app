@@ -214,7 +214,10 @@
 										</table>
 									</td>
 									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 2cm !important; text-align: right; padding-right: 0.1in;">
-										#oggetto.getQuantity()#
+										<cfset zoneQuantity = stanza.getQuantity()>
+										<cfset parentZoneQuantity = !isNull(stanza.getOrigin()) ? stanza.getOrigin().getQuantity() : 1>
+										<cfset oggettoQuantity = oggetto.getQuantity() * zoneQuantity * parentZoneQuantity>
+										#oggettoQuantity#
 									</td>
 									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 										<cfset prezzoFinale = oggetto.getPrice().getTotal()>

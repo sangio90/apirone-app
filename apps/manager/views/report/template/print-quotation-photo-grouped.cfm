@@ -1,6 +1,17 @@
 ﻿<cfoutput>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
+		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
+			<style>
+				@page {
+					background-image: url('/assets/main/img/quotation-watermark-2.jpg');
+					background-repeat: repeat;
+					background-size: 1920px;
+					z-index: 900;
+					background-color:rgba(0, 0, 0, 0.1);
+				}
+			</style>
+		</cfif>
 		<div>
 			<cfdocumentitem type="header">
 				<table style="border: 0; width: 100%; margin-left: 0.1in; margin-right: 0.1in;">
@@ -34,16 +45,15 @@
 					<div class="item" style="page-break-inside: avoid;">
 						<table style="border-collapse: collapse; width: 100%;">
 							<tr>
-								<td style="width: 11cm; border-right: 0; text-align: left; padding-left: 0.1in"><strong>Articolo</strong></td>
-								<td style="width: 9cm; border-left: 0; text-align: right;"></td>
-							</tr>
-							<tr>
 								<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; width: 11cm !important;">
 									<cfif IsNull( oggetto.getImage() )>
 										<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 11cm !important;">
 									<cfelse>
 										<img src="#expandPath('/assets/main/img/fototesthorizontal.png')#" style="object-fit: contain; width: 11cm !important;">
-										<!--- <img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 6cm !important;"> --->
+										<!--- Queste sono quelle che dovrebbero funionare --->
+											<img src="#oggetto.getImage().getRelativePath()#" style="object-fit: contain; width: 11cm !important;">
+											<img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 11cm !important;">
+										<!--- Fine  --->
 									</cfif>
 								</td>
 								<td style="padding-right: 0; border-left: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">
