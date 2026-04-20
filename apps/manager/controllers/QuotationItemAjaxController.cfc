@@ -540,7 +540,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				se id è numerico: è stato già salvato nel db
 				se id è stringa: è stato agenerato da js per il dnd, record nuovo
 			*/
-			if ( IsNumeric( thisFruit.id ) ) {
+			if ( IsNumeric( thisFruit.id ) && !json.isClone ) {
 				// update
 				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
 			} else {
