@@ -213,10 +213,21 @@
 									#quantity#
 								</td>
 								<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+									<cfset prezzoFinale = oggetto.getPrice().getTotal()>
 									<cfif args.params.discounts>
-									<cfelse>
-										#LSNumberFormat( oggetto.getPrice().getTotal(), "9,999.99", "it_IT" )# €
+										<cfset sconto1 = oggetto.getPrice().getDiscount1()>
+										<cfset sconto2 = oggetto.getPrice().getDiscount2()>
+										<cfset moltiplicatore = (1 - (sconto1 / 100)) * (1 - (sconto2 / 100))>
+										<cfif moltiplicatore EQ 0>
+											<cfset prezzoIniziale = 0>
+										<cfelse>
+											<cfset prezzoIniziale = prezzoFinale / moltiplicatore>
+										</cfif>
+										<cfif sconto1 GT 0 OR sconto2 GT 0>
+											<del>#LSNumberFormat( prezzoIniziale, "9,999.99", "it_IT" )# €</del> <br><br>
+										</cfif>
 									</cfif>
+									#LSNumberFormat( prezzoFinale, "9,999.99", "it_IT" )# €
 								</td>
 								<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 									#LSNumberFormat( quantity * oggetto.getPrice().getTotal(), "9,999.99", "it_IT" )# €
@@ -269,8 +280,38 @@
 								<table style="width: 4in; border-collapse: collapse;">
 									<tr>
 										<td><strong>Totale merce</strong></td>
-										<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['totalGoods'], "9,999.99", "it_IT" )# €</td>
+										<td>
+											<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
+												#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['totalGoods'], "9,999.99", "it_IT" )# €
+											<cfelse>
+												#LSNumberFormat( 
+													args.data.quotationPrice.getCalculatedTotals()['totalGoods'] *
+													( 1 - args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ) *
+													( 1 - args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100 )
+												, "9,999.99", "it_IT" ) # €
+											</cfif>
+										</td>
 									</tr>
+									<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
+										<tr>
+											<td><strong>Sconti</strong></td>
+											<td>
+												- #LSNumberFormat( 
+													args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - (args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ))
+													, "9,999.99", "it_IT" )
+												# €
+											</td>
+										</tr>
+										<tr>
+											<td><strong></strong></td>
+											<td>
+												- #LSNumberFormat( 
+													(args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 )) * args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100
+													, "9,999.99", "it_IT" )
+												# €
+											</td>
+										</tr>
+									</cfif>
 									<tr>
 										<cfif #!isNull( args.data.quotation.getVatCode())#>
 											<td>#args.data.quotation.getVatCode().getName()#</td>
@@ -279,6 +320,12 @@
 										</cfif>
 										<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['vatAmount'], "9,999.99", "it_IT" )# €</td>
 									</tr>
+									<cfif #!isNull( args.data.quotationPrice.getShippingCost())#>
+										<tr>
+											<td>Spedizione</td>
+											<td>#LSNumberFormat( args.data.quotationPrice.getShippingCost(), "9,999.99", "it_IT" )# €</td>
+										</tr>
+									</cfif>
 									<tr>
 										<td><strong>Totale fattura</strong></td>
 										<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], "9,999.99", "it_IT" )# €</td>
