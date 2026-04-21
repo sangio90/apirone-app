@@ -14,6 +14,10 @@
                         data-bind="click: openDuplicateDialog" title="Duplica">
                     <i class="fas fa-copy"></i>
                 </button>
+                <button type="button" class="btn btn-sm btn-secondary" 
+                        data-bind="click: openImagesList" title="Pianta">
+                    <i class="fas fa-map"></i>
+                </button>
             </td>
             <td><span>##: name ##</span></td>
             <td><span>##: (origin && origin.name) ? origin.name : '-' ##</span></td>

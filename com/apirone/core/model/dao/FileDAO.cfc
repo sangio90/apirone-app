@@ -19,6 +19,7 @@
 		<cfargument name="combinationId" type="String">
 		<cfargument name="typeId" type="String">
 		<cfargument name="quotationItemId" type="String">
+		<cfargument name="quotationZoneId" type="String">
 		<cfargument name="quotationStatusHistoryId" type="String">
 		<cfargument name="pictogramId" type="Numeric">
 
@@ -56,6 +57,10 @@
 			
 			<cfif !IsNull( arguments.quotationItemId )>
 				AND quotation_item_id = <cfqueryparam value="#arguments.quotationItemId#" cfsqltype="Varchar">::uuid
+			</cfif>
+			
+			<cfif !IsNull( arguments.quotationZoneId )>
+				AND quotation_zone_id = <cfqueryparam value="#arguments.quotationZoneId#" cfsqltype="Varchar">::uuid
 			</cfif>
 			
 			<cfif !IsNull( arguments.quotationStatusHistoryId )>

@@ -59,6 +59,12 @@ component output="true" accessors="true" {
 						"default" = { "sizes" = [ { "width" = "500" } ] }
 					}
 				},
+				"quotationZone" = {
+					"path"  = "quotation-zones",
+					"types" = {
+						"default" = { "sizes" = [ { "width" = "500" } ] }
+					}
+				},
 				"pictogram" = {
 					"path"  = "pictograms",
 					"types" = {

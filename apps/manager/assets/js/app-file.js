@@ -64,6 +64,14 @@ AP.file.modal = ( function() {
 
                 break;
 
+            case "quotationZone":
+                const zoneName = current.origin ? current.origin + " - " + current.name : current.name
+                result.modalTitle = "File per la piante della zona: < " + zoneName + " >";
+                result.readUrl = baseUrl + "/quotation-zones/" + current.id + "/images";
+                result.modifyUrl = result.readUrl;
+
+                break;
+
             default:
                 throw Error( "ERROR. Type not managed: " + current.type );
             }

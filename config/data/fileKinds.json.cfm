@@ -18,6 +18,9 @@
         id: "quotationItem",
     },
     {
+        id: "quotationZone",
+    },
+    {
         id: "quotationStatusHistory",
     },
     {

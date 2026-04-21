@@ -34,6 +34,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			var config = imageConfigs[ "quotationItem" ];
 		}
 
+		if ( rc.by == "quotation-zones" ) {
+			var params = { quotationZoneId = rc.id }
+			var config = imageConfigs[ "quotationZone" ];
+		}
+
 		for ( var typeId in config.types ) {
 			params.put( "typeId", typeId );
 
@@ -101,6 +106,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 			entity.setKey( "quotationItem.id" );
 			var kindId = "quotationItem";
+		}
+		
+		if ( rc.by == "quotation-zones" ) {
+			entity.setKey( "quotationZone.id" );
+			var kindId = "quotationZone";
 		}
 
 		entity.setValue( rc.id );

@@ -332,11 +332,11 @@
 			files
 		*/
 		delete( "/ajax/files/:id" ).to( "FileAjaxController.delete" ).end();
-		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values|quotation-items)/:id/images" )
+		get( "/ajax/:by-regex:(products|product-items|combinations|attributes-values|quotation-items|quotation-zones)/:id/images" )
 			.to( "FileAjaxController.list" )
 			.end();
 
-		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values|quotation-items)/:id/images" )
+		post( "/ajax/:by-regex:(products|product-items|combinations|attributes-values|quotation-items|quotation-zones)/:id/images" )
 			.to( "FileAjaxController.upload" )
 			.end();
 

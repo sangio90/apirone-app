@@ -220,6 +220,11 @@
         "type": "uuid"
     },
 
+    "quotationZone.id": {
+        "name": "quotation_zone_id",
+        "type": "uuid"
+    },
+
     "quotationItemPrice.id": {
         "name": "quotation_item_price_id",
         "type": "Integer"

@@ -967,6 +967,10 @@ AP.quotation.zonesModal = (function () {
     var pub = {};
     var fields = AP.quotation.fields;
 
+    function fileApp() {
+        return AP.file.modal;
+    }
+
     var viewModel = kendo.observable({
         zones: [],
         detailForm: {
@@ -1025,6 +1029,19 @@ AP.quotation.zonesModal = (function () {
             $("#duplicateDialogTitle").text("Duplica zona " + item.name);
             $("#duplicateNameInput").val(this.get('detailForm.data.name'));
             $("#duplicateDialog").modal("show");
+        },
+
+        openImagesList: function( event ) {
+            var value = {
+                type: "quotationZone",
+                id: event.data.id,
+                origin: event.data.origin ? event.data.origin.name : null,
+                name: event.data.name,
+            };
+
+            fileApp().open( value );
+
+            return false;
         },
 
         setupZoneModal: function(item) {

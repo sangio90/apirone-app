@@ -14,6 +14,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="FileService" inject="FileService";
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
 	property name="QuotationZonePositionService" inject="QuotationZonePositionService";
+	property name="QuotationItemPositionService" inject="QuotationItemPositionService";
 	property name="LookupService" inject="LookupService";
 
 	property name="cacheScope" type="String" default="QuotationItem.bean";
@@ -134,6 +135,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 
+			if (isNull(quotationItem.getArticle())) {
+				var quotationItemQuantity = arguments.quotationItem.getQuantity();
+				if (quotationItemQuantity > 0) {
+					for (var i = 1; i <= quotationItemQuantity; i++) {
+						var position = super.bean("QuotationItemPosition");
+						position.setQuotationItemId(newId);
+						position.setSequence(i);
+						getQuotationItemPositionService().create(position);
+					}
+				}
+			}
+
 		}
 
 		return newId;
@@ -198,6 +211,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var hash = getProductHashService().createHash( arguments.quotationItem.getId() );
 				if ( !IsNull( hash ) ) {
 					updateHash( arguments.quotationItem.getId(), hash );
+				}
+
+				var quotationItemQuantity = arguments.quotationItem.getQuantity();
+				var maxSequenceQuotationItemPosition = getQuotationItemPositionService().getMaxSequenceByQuotationItemId( arguments.quotationItem.getId() );
+
+				if (quotationItemQuantity > maxSequenceQuotationItemPosition) {
+					for (var i = maxSequenceQuotationItemPosition + 1; i <= quotationItemQuantity; i++) {
+						var position = super.bean("QuotationItemPosition");
+						position.setQuotationItemId(arguments.quotationItem.getId());
+						position.setSequence(i);
+						getQuotationItemPositionService().create(position);
+					}
+				} else if (quotationItemQuantity < maxSequenceQuotationItemPosition) {
+					for (var i = quotationItemQuantity + 1; i <= maxSequenceQuotationItemPosition; i++) {
+						var positionToDelete = getQuotationItemPositionService().list( quotationItemId = arguments.quotationItem.getId(), sequence = i );
+						if (Len(positionToDelete) > 0) {
+							getQuotationItemPositionService().delete(positionToDelete[1].getId());
+						}
+					}
 				}
 			}
 
