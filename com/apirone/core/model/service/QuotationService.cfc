@@ -159,7 +159,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					var quotationZones = getQuotationZoneService().list( quotationId = arguments.quotationId );
 
 					for ( var zone in quotationZones ) {
-						deleteQuotationZonesRecursive( zone.getId() ); 
+						deleteQuotationZonesRecursive( zone.getId() );
 					}
 
 					getDao().delete( arguments.quotationId );
@@ -282,16 +282,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"CLANNOTA"  = quotationItem.getNote()
 						}
 
-						
+
 						// non abbiamo un prodotto legato a questa riga, quindi cerchiamo per codice e basta tra i codici gia esportati.
 						var existingCodes = exportCodeService.list(
 							str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
 						);
-						
+
 						if ( existingCodes.len() > 0 ) {
 							continue;
 						}
-						
+
 						///se non troviamo, creiamo ed esportiamo in verticale
 						var exportCode = super.bean( "ExportCode" );
 						exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
@@ -323,7 +323,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var quotationItemData = deserializeJson( productHash.getJsonData() );
 						var code = "";
 
-						//prime due cose: cerchiamo il prodotto corrispondente all'id preso dall'hash e prendiamo categoria, 
+						//prime due cose: cerchiamo il prodotto corrispondente all'id preso dall'hash e prendiamo categoria,
 						//linea, modello e finitura per comporre la prima parte del codice.
 						var product = getProductService().get( quotationItemData.productId );
 						var category = getProductCategoryService().get( quotationItemData.categoryId );
@@ -370,7 +370,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						var colCode  = "000000";
 						var varCode  = "";
 						var noteSegnaletica = '';
-						
+
 						//se l'articolo è una segnaletica
 						if (StructKeyExists( quotationItemData, "signageRows" ) ) {
 							var signageConfigItem = getSignageConfigItemService().get( quotationItemData.signageConfigItemId );
@@ -379,7 +379,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							var fontCode = signageConfig.getFont().getCode();
 							var fontName = signageConfig.getFont().getName();
 							note &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
-							//il varcode viene popolato con 
+							//il varcode viene popolato con
 							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
 							var signageRowsCounter = 1;
 							for ( var signageRow in quotationItemData.signageRows ) {
@@ -570,6 +570,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						counter++;
 						row.CPROWNUM = counter;
 						row.CPROWORD = counter * 10;
+						row.DSDATCRE = DateFormat(now(), "yyyy-mm-dd");
 						result.success = getDao().exportDiba( row );
 					}
 				}
@@ -648,7 +649,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData["MMSCOAR2"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getDiscount2() : 0;
 						quotationData["MMEVASIO"] = quotation.getValidityDate();
 						quotationData["MM_STATO"] = "N";
-					} else {						
+					} else {
 						//in caso il prodotto non sia un servizio, ma un prodotto con hash, la gestione è più complessa
 						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
 							result.success = false;
@@ -666,7 +667,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							var code = existingCode[1].getName().left( 15 );
 							var varCode = existingCode[1].getName().right( 10 );
 							var colCode = existingCode[1].getCounter();
-							
+
 						} else {
 							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
 							result.error = 'Prima esporta gli articoli. ' & code & varCode;
@@ -712,7 +713,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					ArrayAppend( quotationItemsToExport, quotationData );
 					index = index + 1;
 				}
-				
+
 				for ( quotationItemToExport in quotationItemsToExport ) {
 					getDao().export( quotationItemToExport );
 				}
@@ -913,7 +914,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var clonedQuotation = Duplicate( originalQuotation );
 		clonedQuotation.setId( "" );
 		var clonedQuotationId = create( clonedQuotation, session.user.getId(), true );
-		
+
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
 
 		for ( var quotationZone in quotationZones ) {
@@ -936,7 +937,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		clonedQuotation.setQuotationNumber( originalQuotation.getQuotationNumber() );
 		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() );
 		var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
-		
+
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
 
 		for ( var quotationZone in quotationZones ) {
