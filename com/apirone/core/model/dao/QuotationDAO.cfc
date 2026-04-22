@@ -432,7 +432,7 @@
 					<cfqueryparam value="#arguments.data.CPROWORD#" cfsqltype="numeric">,
 					<cfqueryparam value="#arguments.data.DSTIPRIG#" cfsqltype="varchar">,
 					'N', <!--- nuovo --->
-					<cfqueryparam value="#arguments.data.DSDATCRE#" cfsqltype="cf_sql_date">
+					<cfqueryparam value="#arguments.data.DSDATCRE#" cfsqltype="date">
 				)
 			</cfquery>
 		</cfif>
