@@ -781,6 +781,22 @@ AP.plate.modal = ( function() {
                                         level: attributeArray[parentIndex].level + 1,
                                         values: []
                                     };
+                                    if (parentIndex >= 1) {
+                                        attribute.values.push( {
+                                            attributeValue: {
+                                                allowNote: false,
+                                                horizontalImage: false,
+                                                verticalImage: false,
+                                                id: null,
+                                                rawValue: {
+                                                    id: null,
+                                                    name: '-- Seleziona valore attributo'
+                                                }
+                                            },
+                                            productItemId: null,
+                                            selected: true
+                                        } );
+                                    }
                                     attributes.push( attribute );
                                 }
                                 attribute.values.push( {
@@ -897,7 +913,7 @@ AP.plate.modal = ( function() {
             var thisFruit = fruits.get( fruitId );
             var productId = thisFruit.fruit.id;
             let url = "/manager/ajax/product-items?productId=" + productId;
-            
+
             await NM.util.ajax( {
                 method: "GET",
                 url: url,
@@ -1089,7 +1105,7 @@ AP.plate.modal = ( function() {
                 labelTextFn: function (item) { return item.attributeName; },
                 onSelectChange: async function (selectedId, attributeId, value) {
                     await viewModel.loadProductItems(selectedId, attributeId, fruitId);
-                    await viewModel.changeFruitImage(fruitId, value);
+                    viewModel.changeFruitImage(fruitId, value);
                 }
             });
 
@@ -1499,7 +1515,7 @@ AP.plate.modal = ( function() {
             if ( quotationZone ) {
                 if (quotationZone.origin) {
                     viewModel.set( "detailForm.data.quotationZone", data.quotationItem.quotationZone.origin );
-                    viewModel.set( "detailForm.data.quotationSubzone", xhr.data.quotationItem.quotationZone );
+                    viewModel.set( "detailForm.data.quotationSubzone", data.quotationItem.quotationZone );
                 } else {
                     viewModel.set( "detailForm.data.quotationZone", data.quotationItem.quotationZone );
                 }

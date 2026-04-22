@@ -60,7 +60,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		bean.setQuotation( super.service( "Quotation" ).get( json.id ) );
-		bean.setQuotationZone( super.service( "QuotationZone" ).get( json.quotationItem.quotationZone.id ) );
+		var quotationZone = super.service( "QuotationZone" ).list( quotationId = json.id, name = 'Non assegnato' );
+		bean.setQuotationZone( quotationZone[ 1 ] );
 		bean.setQuantity( json.quotationItem.quantity );
 		bean.setArticle( super.fire( "Article.get", { articleId = json.quotationItem.article.id } ) );
 
@@ -539,7 +540,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				se id è numerico: è stato già salvato nel db
 				se id è stringa: è stato agenerato da js per il dnd, record nuovo
 			*/
-			if ( IsNumeric( thisFruit.id ) ) {
+			if ( IsNumeric( thisFruit.id ) && !json.isClone ) {
 				// update
 				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
 			} else {
@@ -716,7 +717,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			transaction {
 				for (var quotationItem in quotationItems) {
-					if (!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemArticle")) {
+					if (isNull(quotationItem.getArticle())) {
 						super.fire( "quotationItem.aggiornaPrezzo", { "quotationItem" = quotationItem } );
 					}
 				}

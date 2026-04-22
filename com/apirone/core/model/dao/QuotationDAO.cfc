@@ -353,15 +353,15 @@
 		<cfif qCheck.recordCount EQ 0>
 			<cfquery datasource="verticaleExport">
 				INSERT INTO ARTICO_APIR (
-					AR_CHIAVE, 
-					ARCODART, 
-					ARDESART, 
-					ARDESSUP, 
-					ARDATCAR, 
-					ARUNMIS1, 
+					AR_CHIAVE,
+					ARCODART,
+					ARDESART,
+					ARDESSUP,
+					ARDATCAR,
+					ARUNMIS1,
 					VARCOD,
 					VARNOT,
-					CLCODICE, 
+					CLCODICE,
 					CLANNOTA,
 					AR_STATO,
 					CL_STATO,
@@ -380,7 +380,7 @@
 					<cfqueryparam value="#arguments.data.CLANNOTA#" cfsqltype="varchar">,
 					'N', <!--- nuovo ---->
 					'N',
-					'N' 
+					'N'
 				)
 			</cfquery>
 		</cfif>
@@ -403,19 +403,20 @@
 		<cfif qCheck.recordCount EQ 0>
 			<cfquery datasource="verticaleExport">
 				INSERT INTO DISBAS_APIR (
-					DS_CHIAVE, 
-					DSCODART, 
-					DSCODVAR, 
-					DSCODCOL, 
-					DSCODMAT, 
-					DSVARMAT, 
-					DSCOLMAT, 
-					DSQTAMOV, 
-					DSUNMIS1, 
-					CPROWNUM, 
-					CPROWORD, 
-					DSTIPRIG, 
-					DS_STATO
+					DS_CHIAVE,
+					DSCODART,
+					DSCODVAR,
+					DSCODCOL,
+					DSCODMAT,
+					DSVARMAT,
+					DSCOLMAT,
+					DSQTAMOV,
+					DSUNMIS1,
+					CPROWNUM,
+					CPROWORD,
+					DSTIPRIG,
+					DS_STATO,
+					DSDATCRE
 				)
 				VALUES (
 					<cfqueryparam value="#arguments.data.DS_CHIAVE#" cfsqltype="varchar">,
@@ -430,7 +431,8 @@
 					<cfqueryparam value="#arguments.data.CPROWNUM#" cfsqltype="numeric">,
 					<cfqueryparam value="#arguments.data.CPROWORD#" cfsqltype="numeric">,
 					<cfqueryparam value="#arguments.data.DSTIPRIG#" cfsqltype="varchar">,
-					'N' <!--- nuovo --->
+					'N', <!--- nuovo --->
+					<cfqueryparam value="#arguments.data.DSDATCRE#" cfsqltype="cf_sql_date">
 				)
 			</cfquery>
 		</cfif>
@@ -461,8 +463,8 @@
 				CFPROVIN, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
 				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
 				DEPRODOD, DEPROMER, MM_STATO, MMCODAGE, MMCODART, MMCODCOL, MMCODPAG,
-				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA, 
-				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2, 
+				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA,
+				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
 				MMSERIAL, MMVALUNI
 			)
 			VALUES (
