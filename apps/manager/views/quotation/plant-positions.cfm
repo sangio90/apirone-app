@@ -17,14 +17,15 @@
 					<div class="card-body">
                         <div id="vue-plant-positions-app" data-quotation-id="#prc.quotation.getId()#" data-base-url="#prc.baseUrl#">
                             <div class="loadingOverlay" v-if="isLoading">
-                                <i class="fas fa-spinner fa-spin fa-3"></i>
+                                <i class="fas fa-spinner fa-spin fa-3x"></i>
                             </div>
                             <div class="row">
                                 <div class="col-11">
                                     <h5>Filtri Ricerca</h5>
                                 </div>
-                                <div class="col-1">
-                                    <button class="btn btn-primary" @click="savePositions" :disabled="!selectedZoneId">Salva posizioni</button>
+                                <div class="col-1 d-flex align-items-center justify-content-end">
+                                    <button class="btn btn-primary" @click="savePositions" :disabled="!selectedZoneId">Salva posizioni <i class="fas fa-save"></i></button>
+                                    <button class="btn btn-primary" style="margin-left: 10px;" @click="printPlant" :disabled="!selectedZoneId">Stampa pianta <i class="fas fa-print"></i></button>
                                 </div>
                             </div>
                             <div class="row">
@@ -46,9 +47,10 @@
                                     <h5>Articoli</h5>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <div style="position: relative; display: inline-block;" v-if="selectedZone.image">
+                                    <div style="position: relative; display: inline-block;" v-if="selectedZone.image" id="plant-to-capture">
                                         <img 
                                             :src="selectedZone.image.uri"
+                                            crossorigin="anonymous"
                                             alt="Pianta del preventivo"
                                             style="max-height: 700px;"
                                         >

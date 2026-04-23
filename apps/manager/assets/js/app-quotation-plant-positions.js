@@ -176,23 +176,8 @@ AP.quotation.plantPositions = (function () {
                 },
                 savePositions: async function () {
                     var self = this;
-                    let quotationItemPositions = [];
-                    self.quotationItems.forEach(item => {
-                        if (item.positions && item.positions.length) {
-                            item.positions.forEach(pos => {
-                                quotationItemPositions.push({
-                                    id: pos.id,
-                                    coordinateX: pos.coordinateX,
-                                    coordinateY: pos.coordinateY,
-                                    visible: pos.visible == true ? 1 : 0,
-                                    sequence: pos.sequence,
-                                    quotationItemId: item.id
-                                });
-                            });
-                        }
-                    })
+                    let quotationItemPositions = this.getPositions();
                     if (quotationItemPositions.length == 0) {
-                        AP.widget.notify( "warning", "Non ci sono posizioni da salvare.");
                         return;
                     }
 
@@ -214,6 +199,60 @@ AP.quotation.plantPositions = (function () {
                     .fail(function (err) {
                         AP.widget.notify( "error", "Errore sconosciuto durante il salvataggio.");
                     })
+                },
+                async printPlant() {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/manager/ajax/quotation-item-positions-print';
+                    form.target = '_blank';
+
+                    const element = document.getElementById( 'plant-to-capture' );
+    
+                    const canvas = await html2canvas( element, {
+                        useCORS: true,
+                        scale: 2
+                    });
+                    
+                    const base64Image = canvas.toDataURL( 'image/png' );
+
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'data';
+                    input.value = JSON.stringify({
+                        image: base64Image,
+                        zoneId: this.selectedZoneId
+                    });
+
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                },
+                getImageSrc() {
+                    const el = document.getElementById('plant-to-capture');
+                    const img = el ? el.querySelector('img') : null;
+
+                    return img ? img.src : null;
+                },
+                getPositions() {
+                    let quotationItemPositions = [];
+                    this.quotationItems.forEach(item => {
+                        if (item.positions && item.positions.length) {
+                            item.positions.forEach(pos => {
+                                quotationItemPositions.push({
+                                    id: pos.id,
+                                    coordinateX: pos.coordinateX,
+                                    coordinateY: pos.coordinateY,
+                                    visible: pos.visible == true ? 1 : 0,
+                                    sequence: pos.sequence,
+                                    quotationItemId: item.id,
+                                    type: item.product ? item.product.category.type.name : null,
+                                    position: item.position ? item.position.code : 'senza posizione' + ' - ' + pos.sequence
+                                });
+                            });
+                        }
+                    })
+                    return quotationItemPositions;
                 }
             },
 

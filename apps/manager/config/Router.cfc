@@ -488,6 +488,7 @@
 		get( "/quotations" ).to( "QuotationController.list" ).end();
 		get( "/quotation-plant-positions/:id" ).to( "QuotationController.plantPositions" ).end();
 		post( "/ajax/quotation-item-positions/" ).to( "QuotationItemPositionAjaxController.save" ).end();
+		post( "/ajax/quotation-item-positions-print" ).to( "QuotationItemPositionAjaxController.print" ).end();
 
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();

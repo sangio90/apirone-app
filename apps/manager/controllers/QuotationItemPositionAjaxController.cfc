@@ -31,4 +31,51 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 	}
 
+	function print( event, rc, prc ){
+
+		var json = DeserializeJSON( rc.data );
+
+		var zoneId = json.zoneId;
+		var zone = super.fire( "QuotationZone.get", [ zoneId ] );
+		var quotation = zone.getQuotation();
+		var base64Image = json.image ?: "";
+
+		var saveAsName = "print-quotation-plant_#DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
+
+		var orientation = "portrait";
+
+		if ( len( base64Image ) ) {
+			var pureBase64 = reReplace( base64Image, "^data:image/[a-zA-Z]+;base64,", "" );
+			var binaryImg  = binaryDecode( pureBase64, "base64" );
+			var cfImage    = imageNew( binaryImg );
+			
+			if ( cfImage.width > cfImage.height ) {
+				orientation = "landscape";
+			}
+		}
+
+		var params = {
+			title   = "Preventivo",
+			data    = {
+				"zone" = zone,
+				"quotation" = quotation,
+				"positions" = json.positions ?: [],
+				"image" = base64Image
+			},
+			pdfArgs = {
+				bookmark          = true,
+				backgroundVisible = true,
+				orientation       = orientation,
+				pageType          = "A4",
+				overwrite         = true,
+				fontEmbed         = true,
+				saveAsName        = saveAsName
+			}
+		}
+
+		var templatePath = "report/template/print-quotation-plant";
+
+		event.renderData( data = view( view = templatePath, args = params ), type = "PDF" );
+	}
+
 }
