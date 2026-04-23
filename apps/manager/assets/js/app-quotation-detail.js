@@ -744,7 +744,12 @@ AP.quotation.detail = ( function() {
                     }
                 }
             } );
-        }
+        },
+
+		openPlantPosition: function( e ) {
+			e.preventDefault();
+			window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id;
+		},
     } );
 
     pub.showTotals = function( options ) {

@@ -19,6 +19,7 @@
                     Status: #prc.quotation.getStatusHistory().getStatus().getName()#
                 </button>
 				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
+				#button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map" )#
 			</div>
             
             <div class="export-button-tooltip col-6 text-end">

@@ -71,6 +71,9 @@
 				<cfif !IsNull( arguments.coordinate_y )>
 					,coordinate_y
 				</cfif>
+				<cfif !IsNull( arguments.visible )>
+					,visible
+				</cfif>
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.position.getQuotationItemId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.position.getSequence()#">
@@ -79,6 +82,9 @@
 				</cfif>
 				<cfif !IsNull( arguments.coordinate_y )>
 					,<cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateY()#">
+				</cfif>
+				<cfif !IsNull( arguments.visible )>
+					,<cfqueryparam cfsqltype="Boolean" value="#arguments.position.getVisible()#">
 				</cfif>
 			)
 			RETURNING quotation_item_position_id
@@ -94,7 +100,8 @@
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.position.getQuotationItemId()#">::uuid,
 				"sequence" = <cfqueryparam cfsqltype="Integer" value="#arguments.position.getSequence()#">,
 				coordinate_x = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateX()#">,
-				coordinate_y = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateY()#">
+				coordinate_y = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateY()#">,
+				visible = <cfqueryparam cfsqltype="Boolean" value="#arguments.position.getVisible()#">
 			WHERE
 				quotation_item_position_id = <cfqueryparam cfsqltype="Integer" value="#arguments.position.getId()#">
 		</cfquery>

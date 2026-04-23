@@ -470,6 +470,7 @@
 
 		get( "/ajax/quotations/:id/updateallprices" ).to( "QuotationItemAjaxController.updateAllPrices" ).end();
 		get( "/ajax/quotations/:id/items/:typeId" ).to( "QuotationItemAjaxController.list" ).end();
+		get( "/ajax/quotations/:id/itemsbyzone/:zoneId" ).to( "QuotationItemAjaxController.listByZone" ).end();
 
 		get( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.totals" ).end();
 		post( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.updateTotals" ).end();
@@ -485,6 +486,8 @@
 		get( "/quotations/:id" ).to( "QuotationController.edit" ).end();
 		post( "/quotations" ).to( "QuotationController.create" ).end(); // Da togliere
 		get( "/quotations" ).to( "QuotationController.list" ).end();
+		get( "/quotation-plant-positions/:id" ).to( "QuotationController.plantPositions" ).end();
+		post( "/ajax/quotation-item-positions/" ).to( "QuotationItemPositionAjaxController.save" ).end();
 
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();

@@ -10,6 +10,21 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setView( "quotation/list" );
 	}
 
+	function plantPositions( event, rc, prc ){
+		var quotation = super.fire( "Quotation.get", [ rc.id ] );
+		var settings = new config.Settings();
+
+		var baseUrl = "#settings.get( "site.repository" )#";
+
+		prc.title = "Posizioni in pianta - Preventivo < " & quotation.getName() & " >";
+
+		prc.baseUrl = baseUrl;
+		prc.quotation = quotation;
+		prc.jsFiles.add( "app-quotation-plant-positions" );
+
+		event.setView( "quotation/plant-positions" );
+	}
+
 	function new( event, rc, prc ){
 		prc.isEditing = false;
 

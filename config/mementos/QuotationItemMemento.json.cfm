@@ -17,6 +17,7 @@
 		"product.id",
         "position.id",
         "position.code",
+        "positions",
         "article.code",
         "article.name",
         "special",

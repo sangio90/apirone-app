@@ -99,6 +99,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setQuotationItemId( record.quotation_item_id );
 			bean.setCoordinateX( record.coordinate_x );
 			bean.setCoordinateY( record.coordinate_y );
+			bean.setVisible( record.visible );
 			return bean;
 		}
 		return NullValue();

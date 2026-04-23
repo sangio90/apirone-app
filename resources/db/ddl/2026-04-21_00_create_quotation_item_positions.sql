@@ -13,9 +13,6 @@ CREATE TABLE quotation_item_positions (
 	  UNIQUE (quotation_item_id, sequence)
 );
 
-ALTER TABLE quotation_zones
-	ADD COLUMN map_file TEXT;
-
 
 
 

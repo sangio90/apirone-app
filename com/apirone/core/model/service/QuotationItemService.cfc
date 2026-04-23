@@ -362,7 +362,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if( Len( record.quotation_zone_position_id ) ) {
 				bean.setPosition( getQuotationZonePositionService().get( record.quotation_zone_position_id ) );
 			}
-		
+			var quotationItemPositions = getQuotationItemPositionService().list( quotationItemId = arguments.quotationItemId );
+			if ( Len( quotationItemPositions ) ) {
+				bean.setPositions( quotationItemPositions );
+			}
 			return bean;
 		}
 

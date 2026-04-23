@@ -202,6 +202,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				IsNull( record.origin_id ) ? NullValue() : getQuotationZoneService().get( record.origin_id )
 			);
 
+			var images = getFileService().list( quotationZoneId = record.quotation_zone_id );
+			if ( Len( images ) ) {
+				bean.setImage( images[ 1 ] );
+			}
+
 			return bean;
 		}
 		return NullValue();

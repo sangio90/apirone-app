@@ -28,6 +28,24 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function listByZone( event, rc, prc ){
+		
+		var result = super.getResult();
+		var params = super.paramsFromUrl();
+
+		params[ "quotationId" ] = rc.id;
+		params[ "quotationZoneId" ] = Len( rc.zoneId ) ? rc.zoneId : null;
+		params[ "useCache" ] = false;
+
+		var rows = super.fire( "QuotationItem.search", params );
+
+		result.setTotal( rows.getTotal() );
+		result.setCount( rows.getCount() );
+		result.setData( rows.getData() );
+
+		event.setValue( "result", result );
+	}
+
 	function editArticle( event, rc, prc ){
 		var data   = {}
 		var result = super.getResult();
