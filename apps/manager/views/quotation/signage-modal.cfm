@@ -1,6 +1,6 @@
 ﻿<cfoutput>
     <div id="signage-modal" class="modal fade quotation-item-modal">
-
+        <script src="/assets/main/js/vendor/snapdom.js"></script>
         <section class="modal-dialog modal-xl">
             <div class="modal-content">
 
