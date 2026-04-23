@@ -232,6 +232,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var attributePrice = product.getPrice( "PROD_ITEM_GEN" );
 
 		appendLog( "** Inizio del calcolo del prezzo degli attributi: #ArrayToList(productItemIds)#" );
+		producItemtIds = productItemIds.filter(function (item) { return !isNull(item)});
 
 		for ( var itemId in productItemIds ) {
 			var itemComponents = componentSvc.priceCalculatorSearch( productItemId = itemId, includeBaseAttributeComponents = true );
