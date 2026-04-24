@@ -18,5 +18,32 @@
             <img src="#args.data.image#" 
                  style="display: block; margin: 0 auto; width: 100%; max-width: #imgMaxWidth#; height: #containerHeight#;" />
         </div>
+
+        <cfdocumentitem type="pagebreak" />
+
+        <div style="padding: 0.5cm 0 0 0;">
+            <h4 style="text-align: center; font-family: sans-serif; margin: 0 0 0.5cm 0;">
+                Elementi preventivo
+            </h4>
+            <table>
+                <cfloop array="#args.data.quotationItems#" item="quotationItem">
+                    <tr>
+                        <td>
+                            #quotationItem.getProduct().getCategory().getName()# #quotationItem.getProduct().getLine().getName()# #quotationItem.getProduct().getModel().getName()# #quotationItem.getProduct().getFinish().getCode()# <br>
+                            - Qtà: #quotationItem.getQuantity()# <br>
+                            <cfloop array="#quotationItem.getPositions()#" item="position">
+                                <div>
+                                    <cfif quotationItem.getPosition() NEQ "">
+                                        - Posizione: #quotationItem.getPosition()# #position.getSequence()#
+                                    <cfelse>
+                                        - Posizione: senza posizione #position.getSequence()#
+                                    </cfif>
+                                </div>
+                            </cfloop>
+                        </td>
+                    </tr>
+                </cfloop>
+            </table>
+        </div>
     </cfdocument>
 </cfoutput>

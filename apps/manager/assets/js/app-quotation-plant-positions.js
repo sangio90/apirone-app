@@ -101,6 +101,11 @@ AP.quotation.plantPositions = (function () {
                     }
                 },
                 selectPosition: function (position) {
+                    if (this.selectedItemPositionId === position.id) {
+                        this.selectedItemPositionId = null;
+                        this.selectedItemPosition = {};
+                        return;
+                    }
                     this.selectedItemPosition = position;
                     this.selectedItemPositionId = position.id;
                 },
@@ -201,6 +206,8 @@ AP.quotation.plantPositions = (function () {
                     })
                 },
                 async printPlant() {
+                    this.selectedItemPositionId = null;
+                    this.selectedItemPosition = {};
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = '/manager/ajax/quotation-item-positions-print';

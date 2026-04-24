@@ -38,6 +38,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var zoneId = json.zoneId;
 		var zone = super.fire( "QuotationZone.get", [ zoneId ] );
 		var quotation = zone.getQuotation();
+		var quotationItems = super.fire( "QuotationItem.list", [ "quotationZoneId" = zoneId ] );
 		var base64Image = json.image ?: "";
 
 		var saveAsName = "print-quotation-plant_#DateTimeFormat(Now(), 'yyyyMMdd-HHnnss')#.pdf";
@@ -59,6 +60,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			data    = {
 				"zone" = zone,
 				"quotation" = quotation,
+				"quotationItems" = quotationItems,
 				"positions" = json.positions ?: [],
 				"image" = base64Image
 			},

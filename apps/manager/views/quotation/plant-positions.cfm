@@ -79,7 +79,7 @@
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div v-if="quotationItems.length > 0">
+                                    <div v-if="quotationItems.length > 0" style="align-items: center; display: flex; height: 100%;">
                                         <table>
                                             <tr v-for="quotationItem in quotationItems" :key="quotationItem.id" :value="quotationItem.id">
                                                 <td>
