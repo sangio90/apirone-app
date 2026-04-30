@@ -477,7 +477,7 @@ AP.plate.modal = ( function() {
                 method: "GET",
                 url: "/manager/ajax/frames/" + frameId + "?orientationId=" + orientationId + "&productId=" + productId,
                 callback: {
-                    done: function( xhr ) {
+                    done: async function( xhr ) {
                         viewModel.set( "plate.orientation", xhr.data.orientation );
                         viewModel.set( "plate.cellOrientation", xhr.data.cellOrientation );
                         viewModel.set( "plate.grid", xhr.data.grid );
@@ -486,6 +486,26 @@ AP.plate.modal = ( function() {
                         configPlate();
                         for (let i in viewModel.get("detailForm.data.product.items")._data) {
                             updateImage(viewModel.get("detailForm.data.product.items")._data[i])
+                        }
+                        if (viewModel.get('detailForm.data.fruits') && viewModel.get('detailForm.data.fruits')._data && viewModel.get('detailForm.data.fruits')._data.length) {
+                            for(let f in viewModel.get('detailForm.data.fruits')._data) {
+                                const fruit = viewModel.get('detailForm.data.fruits')._data[f]
+                                if (fruit.id && fruit.items._data.length) {
+                                    const fruitItems = fruit.items._data
+                                    for (let fi in fruitItems) {
+                                        fi = fruitItems[fi]
+                                        if (fi.attributeId && fi.attributeId != '') {
+                                            const fiSelected = fi.values.find(value => value.selected == true)
+                                            if (fiSelected) {
+                                                $('#fruit-attribute-container-' + fi.attributeId)
+                                                    .find('select[data-attribute-id="' + fi.attributeId + '"]')
+                                                    .val(fiSelected.productItemId)
+                                                    .trigger('change')
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
                 },
@@ -928,8 +948,8 @@ AP.plate.modal = ( function() {
                                 var fruitItems = thisFruit.get( "items" );
                                 var attributeArray = fruitItems.data();
                                 xhr.data.forEach( function( item ) {
-                                    viewModel.set('detailForm.data.productItemsImages.' + item.shortId, 
-                                        item.horizontalImage ? 
+                                    viewModel.set('detailForm.data.productItemsImages.' + item.shortId,
+                                        item.horizontalImage ?
                                         item.horizontalImage.uri : ''
                                     )
                                     const attributeExisting = attributeArray.find( function( d ) { return d.attributeId === item.attribute.id; } );
@@ -1098,25 +1118,27 @@ AP.plate.modal = ( function() {
         renderProductItemsFruit: async function( fruitId ) {
             var fruits = viewModel.get( "detailForm.data.fruits" );
             var fruit = fruits.get( fruitId );
-            AP.plate.productItems.renderProductItems({
-                containerSelector: "#quotation-fruit-row-items_" + fruitId,
-                attributeArray: fruit.get("items").data(),
-                subContainerIdPrefix: "fruit-attribute-container-",
-                labelTextFn: function (item) { return item.attributeName; },
-                onSelectChange: async function (selectedId, attributeId, value) {
-                    await viewModel.loadProductItems(selectedId, attributeId, fruitId);
-                    viewModel.changeFruitImage(fruitId, value);
-                }
-            });
+            if (fruit) {
+                AP.plate.productItems.renderProductItems({
+                    containerSelector: "#quotation-fruit-row-items_" + fruitId,
+                    attributeArray: fruit.get("items").data(),
+                    subContainerIdPrefix: "fruit-attribute-container-",
+                    labelTextFn: function (item) { return item.attributeName; },
+                    onSelectChange: async function (selectedId, attributeId, value) {
+                        await viewModel.loadProductItems(selectedId, attributeId, fruitId);
+                        viewModel.changeFruitImage(fruitId, value);
+                    }
+                });
 
-            $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" ).on( "mouseenter", function() {
-                const color = "rgba(162, 253, 161, 0.44)";
-                $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", color );
-                $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "#a3fda170" );
-            } ).on( "mouseleave", function() {
-                $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "" );
-                $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "" );
-            } );
+                $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" ).on( "mouseenter", function() {
+                    const color = "rgba(162, 253, 161, 0.44)";
+                    $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", color );
+                    $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "#a3fda170" );
+                } ).on( "mouseleave", function() {
+                    $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "" );
+                    $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "" );
+                } );
+            }
         },
 
         renderProductItemsPlate: async function() {
@@ -1536,13 +1558,13 @@ AP.plate.modal = ( function() {
 			await viewModel.firstLoadProductItems();
             await viewModel.loadPlate( data.quotationItem.frame.orientation );
             await viewModel.loadFruits();
-			
+
 
             initFruitsSuggest();
             initPositionSuggest();
             pricingApp().init( "plate", { data: data.quotationItem.price } );
         }
-        
+
         if (clone) {
             $('#saveButton').css("display", "none")
             $('#cloneButton').css("display", "block")
@@ -1550,7 +1572,7 @@ AP.plate.modal = ( function() {
             $('#saveButton').css("display", "block")
             $('#cloneButton').css("display", "none")
         }
-        
+
         viewModel.handleSelectChanges()
         AP.loading.hide()
     };
