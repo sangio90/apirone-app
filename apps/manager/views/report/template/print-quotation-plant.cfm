@@ -33,8 +33,8 @@
                             - Qtà: #quotationItem.getQuantity()# <br>
                             <cfloop array="#quotationItem.getPositions()#" item="position">
                                 <div>
-                                    <cfif quotationItem.getPosition() NEQ "">
-                                        - Posizione: #quotationItem.getPosition()# #position.getSequence()#
+                                    <cfif !isNull(quotationItem.getPosition()) && quotationItem.getPosition().getCode() NEQ "">
+                                        - Posizione: #quotationItem.getPosition().getCode()# #position.getSequence()#
                                     <cfelse>
                                         - Posizione: senza posizione #position.getSequence()#
                                     </cfif>

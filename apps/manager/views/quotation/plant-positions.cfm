@@ -56,24 +56,41 @@
                                         >
                                         <div class="overlay-layer">
                                             <div v-for="quotationItem in quotationItems" :key="quotationItem.id">
-                                                <div
-                                                    v-if="p.visible"
-                                                    v-for="p in quotationItem.positions" 
-                                                    :key="p.id"
-                                                    class="marker"
-                                                    :style="getMarkerStyle(p)"
-                                                    @click="selectPosition(p)"
-                                                    @mousedown="startDrag($event, p)"
-                                                >
-                                                    <span class="marker-initial" v-html="getInitial(quotationItem)"></span>
-                                                    <div 
-                                                        v-if="p.id == selectedItemPositionId"
-                                                        class="marker-wrapper"
-                                                    ></div>
-                                                    <div class="marker-label">
-                                                        {{ quotationItem.position ? quotationItem.position.code : 'senza posizione' }} - {{ p.sequence }}
-                                                    </div>
-                                                </div>
+                                                <template v-for="p in quotationItem.positions">
+                                                    <template v-if="p.visible">
+                                                        <div
+                                                            class="pin"
+                                                            :style="getPinStyle(p)"
+                                                            @click="selectPosition(p)"
+                                                            @mousedown="startDrag($event, p)"
+                                                            :key="'pin-' + p.id"
+                                                        >
+                                                        </div>
+                                                        <div 
+                                                            class="pin-label"
+                                                            :style="getLabelStyle(p)"
+                                                            :key="'label-' + p.id"
+                                                        >
+                                                            {{ formatLabelText(p) }}
+                                                        </div>
+                                                        <div v-if="p.id == selectedItemPositionId">
+                                                            <div 
+                                                                class="selection-ring"
+                                                                :style="getSelectionRingStyle(p)"
+                                                                :key="'ring-' + p.id"
+                                                                :style="{ borderColor: getColor(quotationItem) }"
+                                                            ></div>
+                                                            <img 
+                                                                src="/assets/main/img/rotation-arrow.png" 
+                                                                alt="Ruota Pin"
+                                                                class="rotation-arrow"
+                                                                :style="getArrowStyle(p)"
+                                                                @mousedown.stop="startRotate($event, p)" 
+                                                                :key="'arrow-' + p.id"
+                                                            />
+                                                        </div>
+                                                    </template>
+                                                </template>
                                             </div>
                                         </div>
                                     </div>
@@ -101,6 +118,10 @@
                                                                             <input class="form-control" v-model="selectedItemPosition.coordinateY">
                                                                         </div>
                                                                         <div style="margin-left: 5px;">
+                                                                            <label>Angolo</label>
+                                                                            <input type="number" class="form-control" v-model.number="selectedItemPosition.angle">
+                                                                        </div>
+                                                                        <div style="margin-left: 5px;">
                                                                             <label>Visibile</label><br>
                                                                             <input style="margin-left: 15px; margin-top: 10px;" type="checkbox" class="form-check-input" v-model="selectedItemPosition.visible">
                                                                         </div>
@@ -122,83 +143,85 @@
 		</div>
     </div>
     <style>
-        .overlay-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        .marker {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            position: absolute;
-            pointer-events: auto;
-        }
-        .marker-wrapper {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 40px;
-            height: 40px;
-            transform: translate(-50%, -50%);
-            border: 2px solid rgb(68, 130, 232);
-            pointer-events: none;
-        }
-        .position-selected {
-            height: 64px;
-            color: white;
-            cursor: pointer;
-            background-color: rgb(68, 130, 232);
-        }
-        .position {
-            height: 64px;
-            cursor: pointer;
-            background-color: transparent;
-        }
-        .marker-label {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            white-space: nowrap;
-            pointer-events: none;
-        }
-        .marker-label::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            
-            border-width: 4px;
-            border-style: solid;
-            border-color: rgba(0,0,0,0.7) transparent transparent transparent;
-        }
-        .marker-initial {
-            color: white;
-            font-size: 12px;
-            padding-bottom: 2px;
-            pointer-events: none;
-        }
-        .loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(121, 121, 121, 0.663);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
+    .overlay-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .position-selected {
+        height: 64px;
+        color: white;
+        cursor: pointer;
+        background-color: rgb(68, 130, 232);
+    }
+
+    .position {
+        height: 64px;
+        cursor: pointer;
+        background-color: transparent;
+    }
+
+    .loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(121, 121, 121, 0.663);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .pin {
+        position: absolute;
+        cursor: pointer;
+        pointer-events: auto;
+        transform-origin: center;
+        border-radius: 50% 50% 50% 0;
+        width: 35px;
+        height: 35px;
+    }
+
+    .selection-ring {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        border: 2px solid;
+        border-radius: 38%;
+        pointer-events: none;
+        transform-origin: center;
+    }
+
+    .pin-label {
+        position: absolute;
+        pointer-events: none;
+        font-size: 10px;
+        max-width: 35px;
+        white-space: normal; 
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        line-height: 1.2;
+        color: white;
+    }
+
+    .rotation-arrow {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        padding: 10px;
+        box-sizing: content-box;
+        opacity: 1;
+        pointer-events: auto;
+        cursor: move;
+        transform-origin: center;
+        object-fit: contain;
+    }
     </style>
 </cfoutput>

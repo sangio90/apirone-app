@@ -38,7 +38,12 @@ AP.quotation.plantPositions = (function () {
                 selectedItemPosition: {},
                 dragging: false,
                 draggedPosition: null,
-                isLoading: false
+                isLoading: false,
+                isRotating: false,
+                rotatedPosition: null,
+                initialMouseX: 0,
+                initialAngle: 0,
+                rotationSpeedFactor: 0.5,
             },
 
             methods: {
@@ -109,12 +114,92 @@ AP.quotation.plantPositions = (function () {
                     this.selectedItemPosition = position;
                     this.selectedItemPositionId = position.id;
                 },
-                getMarkerStyle(pos) {
-                    let quotationItem = this.quotationItems.find(quotationItem =>  quotationItem.id == pos.quotationItemId );
+                getPinStyle(pos) {
+                    let quotationItem = this.quotationItems.find(
+                        quotationItem => quotationItem.id == pos.quotationItemId
+                    );
+                    let color = this.getColor(quotationItem);
+                    return {
+                        backgroundColor: color,
+                        left: (pos.coordinateX * 100) + '%',
+                        top: (pos.coordinateY * 100) + '%',
+                        transform: 'translate(-50%, -50%) rotate(' + (Number(pos.angle) + 135 || 135) + 'deg)'
+                    };
+                },
+                getSelectionRingStyle(pos) {
+                    let quotationItem = this.quotationItems.find(
+                        quotationItem => quotationItem.id == pos.quotationItemId
+                    );
+                    let color = this.getColor(quotationItem);
+                    return {
+                        borderColor: color,
+                        left: (pos.coordinateX * 100) + '%',
+                        top: (pos.coordinateY * 100) + '%',
+                        transform: 'translate(-50%, -53%)'
+                    };
+                },
+                getLabelStyle(pos) {
+                    return {
+                        position: 'absolute',
+                        left: (pos.coordinateX * 100) + '%',
+                        top: (pos.coordinateY * 100) + '%',
+                        transform: 'translate(-50%, -50%)' 
+                    };
+                },
+                getArrowStyle(pos) {
+                    return {
+                        position: 'absolute',
+                        left: (pos.coordinateX * 100) + '%',
+                        top: (pos.coordinateY * 100) + '%',
+                        transform: 'translate(+180%, -265%)'
+                    };
+                },
+                getArrowStyle(pos) {
+                    let pinAngle = Number(pos.angle) || 0;
+
+                    // --- CALCOLO OFFSET BASE DELLA PUNTA ---
+                    // Il tuo pin ha border-radius: 50% 50% 50% 0.
+                    // Geometricamente, questo posiziona la punta a -135 gradi (Sud-Ovest).
+                    const tipOffset = -90; 
+
+                    // Angolo finale su cui orbitare (posizione geometrica della punta)
+                    let orbitAngle = pinAngle + tipOffset;
+
+                    // Distanza dall'orbita (in pixel) rispetto al centro del pin
+                    const distance = 50; 
+
+                    // Convertiamo l'angolo in radianti per le funzioni Math
+                    const radians = orbitAngle * (Math.PI / 180);
+
+                    // Calcoliamo lo spostamento X e Y basato sull'angolo (trigonometria base)
+                    const offsetX = Math.round(distance * Math.cos(radians));
+                    const offsetY = Math.round(distance * Math.sin(radians));
+
+                    return {
+                        position: 'absolute',
+                        left: (pos.coordinateX * 100) + '%',
+                        top: (pos.coordinateY * 100) + '%',
+                        
+                        // Applichiamo lo spostamento calcolato, mantenendo la freccia dritta
+                        transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`
+
+                    };
+                },
+                startDrag(event, pos) {
+                    event.preventDefault();
+                    this.dragging = true;
+                    this.draggedPosition = pos;
+
+                    document.addEventListener('mousemove', this.onDrag);
+                    document.addEventListener('mouseup', this.stopDrag);
+                },
+                getColor(quotationItem) {
                     let background = 'rgb(232, 93, 68)';
+
                     if (quotationItem) {
                         const name = quotationItem?.product?.category?.type?.name;
                         const firstChar = name ? name.charAt(0).toUpperCase() : '';
+
                         if (firstChar === 'P') {
                             background = 'rgb(68, 130, 232)';
                         }
@@ -122,25 +207,14 @@ AP.quotation.plantPositions = (function () {
                             background = 'rgb(69, 232, 118)';
                         }
                     }
-                    return {
-                        position: 'absolute',
-                        left: (pos.coordinateX * 100) + '%',
-                        top: (pos.coordinateY * 100) + '%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: background,
-                    };
-                },
-                startDrag(event, pos) {
-                    this.dragging = true;
-                    this.draggedPosition = pos;
 
-                    document.addEventListener('mousemove', this.onDrag);
-                    document.addEventListener('mouseup', this.stopDrag);
+                    return background;
                 },
                 onDrag(event) {
                     if (!this.dragging || !this.draggedPosition) return;
 
-                    const overlay = this.$el.querySelector('.overlay-layer');
+                    const overlay = document.querySelector('#plant-to-capture .overlay-layer');
+                    if (!overlay) return;
                     const rect = overlay.getBoundingClientRect();
 
                     let x = event.clientX - rect.left;
@@ -161,6 +235,75 @@ AP.quotation.plantPositions = (function () {
                     document.removeEventListener('mousemove', this.onDrag);
                     document.removeEventListener('mouseup', this.stopDrag);
                 },
+                startRotate(event, pos) {
+                    event.preventDefault();
+                    this.isRotating = true;
+                    this.rotatedPosition = pos;
+
+                    // Calcoliamo le coordinate assolute in pixel del centro del pin sulla pagina
+                    const overlay = document.querySelector('#plant-to-capture .overlay-layer');
+                    if (overlay) {
+                        const rect = overlay.getBoundingClientRect();
+                        this.pinCenterX = rect.left + (pos.coordinateX * rect.width);
+                        this.pinCenterY = rect.top + (pos.coordinateY * rect.height);
+                    }
+                    // 1. Memorizziamo l'angolo iniziale del pin
+                    this.initialPinAngle = Number(pos.angle) || 0;
+
+                    // 2. Calcoliamo l'angolo iniziale del mouse rispetto al centro del pin al momento del click
+                    const deltaX = event.clientX - this.pinCenterX;
+                    const deltaY = event.clientY - this.pinCenterY;
+                    this.initialMouseAngle = (Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 360) % 360;
+
+                    document.addEventListener('mousemove', this.onRotate);
+                    document.addEventListener('mouseup', this.stopRotate);
+                },
+
+                onRotate(event) {
+                    if (!this.isRotating || !this.rotatedPosition) return;
+
+                    // Calcoliamo la distanza tra il mouse e il centro del pin
+                    const deltaX = event.clientX - this.pinCenterX;
+                    const deltaY = event.clientY - this.pinCenterY;
+                    
+                    // Angolo corrente del mouse rispetto al centro
+                    let currentMouseAngle = (Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 360) % 360;
+
+                    // Differenza rispetto al click iniziale
+                    let angleDiff = currentMouseAngle - this.initialMouseAngle;
+
+                    // Nuovo angolo calcolato sommando la differenza all'angolo iniziale
+                    let newAngle = this.initialPinAngle + angleDiff;
+
+                    // Normalizzazione dell'angolo tra 0 e 360
+                    newAngle = (newAngle % 360 + 360) % 360;
+
+                    // Se il pin ha un orientamento di default (es. se la punta non è a 0° ma a 135°),
+                    // puoi aggiungere o sottrarre un eventuale offset per allineare l'angolo alla freccia.
+                    // Ad esempio: newAngle = (newAngle + 90) % 360;
+
+                    if (event.shiftKey) {
+                        // Rotazione di 1 grado
+                        this.rotatedPosition.angle = Math.round(newAngle);
+                    } else {
+                        // Snap di 45 in 45 gradi
+                        let snappedAngle = Math.round(newAngle / 45) * 45;
+                        
+                        if (snappedAngle >= 360) {
+                            snappedAngle = 0;
+                        }
+                        
+                        this.rotatedPosition.angle = snappedAngle;
+                    }
+                },
+
+                stopRotate() {
+                    this.isRotating = false;
+                    this.rotatedPosition = null;
+
+                    document.removeEventListener('mousemove', this.onRotate);
+                    document.removeEventListener('mouseup', this.stopRotate);
+                },
                 getInitial(item) {
                     const name = item?.product?.category?.type?.name;
                     const firstChar = name ? name.charAt(0).toUpperCase() : '';
@@ -179,6 +322,21 @@ AP.quotation.plantPositions = (function () {
 
                     return '';
                 },
+
+                formatLabelText(p) {
+                    let quotationItem = this.quotationItems.find(
+                        quotationItem => quotationItem.id == p.quotationItemId
+                    );
+
+                    let fullText = `${quotationItem.position ? quotationItem.position.code : 'SP'} - ${p.sequence}`;
+                    
+                    if (fullText.length > 10) {
+                        return fullText.slice(0, 10);
+                    }
+                    
+                    return fullText;
+                },
+
                 savePositions: async function () {
                     var self = this;
                     let quotationItemPositions = this.getPositions();
@@ -251,6 +409,7 @@ AP.quotation.plantPositions = (function () {
                                     coordinateX: pos.coordinateX,
                                     coordinateY: pos.coordinateY,
                                     visible: pos.visible == true ? 1 : 0,
+                                    angle: pos.angle || 0,
                                     sequence: pos.sequence,
                                     quotationItemId: item.id,
                                     type: item.product ? item.product.category.type.name : null,

@@ -100,6 +100,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCoordinateX( record.coordinate_x );
 			bean.setCoordinateY( record.coordinate_y );
 			bean.setVisible( record.visible );
+			bean.setAngle( record.angle );
 			return bean;
 		}
 		return NullValue();

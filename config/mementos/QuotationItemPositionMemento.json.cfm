@@ -5,6 +5,7 @@
         "coordinateX",
         "coordinateY",
         "sequence",
-        "visible"
+        "visible",
+        "angle"
     ]
 }

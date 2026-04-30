@@ -15,6 +15,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					position.setCoordinateX( pos.coordinateX );
 					position.setCoordinateY( pos.coordinateY );
 					position.setVisible( pos.visible );
+					position.setAngle( int(pos.angle) );
 					super.fire( "QuotationItemPosition.update", [ position ] );
 				}
 					result.setData( { "message" = "Salvataggio massivo posizioni completato." } );

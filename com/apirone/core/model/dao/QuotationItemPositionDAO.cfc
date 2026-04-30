@@ -34,7 +34,6 @@
 				<cfif !IsNull( arguments.sequence )>
 					AND "sequence" = <cfqueryparam cfsqltype="Integer" value="#arguments.sequence#">
 				</cfif>
-
 			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
 
 			<cfif arguments.limit GT 0>
@@ -74,6 +73,9 @@
 				<cfif !IsNull( arguments.visible )>
 					,visible
 				</cfif>
+				<cfif !IsNull( arguments.angle )>
+					,angle
+				</cfif>
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.position.getQuotationItemId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.position.getSequence()#">
@@ -85,6 +87,9 @@
 				</cfif>
 				<cfif !IsNull( arguments.visible )>
 					,<cfqueryparam cfsqltype="Boolean" value="#arguments.position.getVisible()#">
+				</cfif>
+				<cfif !IsNull( arguments.angle )>
+					,<cfqueryparam cfsqltype="Numeric" value="#arguments.position.getAngle()#">
 				</cfif>
 			)
 			RETURNING quotation_item_position_id
@@ -101,7 +106,8 @@
 				"sequence" = <cfqueryparam cfsqltype="Integer" value="#arguments.position.getSequence()#">,
 				coordinate_x = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateX()#">,
 				coordinate_y = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateY()#">,
-				visible = <cfqueryparam cfsqltype="Boolean" value="#arguments.position.getVisible()#">
+				visible = <cfqueryparam cfsqltype="Boolean" value="#arguments.position.getVisible()#">,
+				angle = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getAngle()#">
 			WHERE
 				quotation_item_position_id = <cfqueryparam cfsqltype="Integer" value="#arguments.position.getId()#">
 		</cfquery>
