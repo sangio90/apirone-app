@@ -24,14 +24,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments ).getData();
 	}
 
-	public Number function getMaxSequenceByQuotationItemId(
-		required String quotationItemId
-	){
-		var maxSequence = getDao().getMaxSequenceByQuotationItemId( arguments.quotationItemId );
-
-		return maxSequence;
-	}
-
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		required Numeric limit  = 15,
@@ -95,7 +87,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( record.recordCount ) {
 			var bean = super.bean( "QuotationItemPosition" );
 			bean.setId( record.quotation_item_position_id );
-			bean.setSequence( record.sequence );
 			bean.setQuotationItemId( record.quotation_item_id );
 			bean.setCoordinateX( record.coordinate_x );
 			bean.setCoordinateY( record.coordinate_y );

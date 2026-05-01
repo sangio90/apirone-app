@@ -4,7 +4,6 @@
         "shortId",
         "coordinateX",
         "coordinateY",
-        "sequence",
         "visible",
         "angle"
     ]

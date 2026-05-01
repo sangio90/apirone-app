@@ -71,6 +71,7 @@
                                                 <template v-for="p in quotationItem.positions">
                                                     <template v-if="p.visible && (showAccessori && quotationItem?.product?.category?.type?.id == 'ACC' || showSegnaletica && quotationItem?.product?.category?.type?.id == 'SEG' || showPlacche && quotationItem?.product?.category?.type?.id == 'PLA')">
                                                         <div
+															:class="{ 'red-border': quotationItem.quantity < quotationItem.positions.length }"
                                                             class="pin"
                                                             :style="getPinStyle(p)"
                                                             @click="selectPosition(p)"
@@ -143,10 +144,11 @@
 														style="display: block; margin-left: 10px;"
 													>
 														<div
-															style="display: flex; float: left;"
+															style="display: flex; float: left; cursor: pointer;"
 															v-for="p in quotationItem.positions"
 															:key="p.id"
 															class="position-card"
+															:class="{ 'red-border': quotationItem.quantity < quotationItem.positions.length, 'with-margin': quotationItem.quantity < quotationItem.positions.length }"
 															@click="selectPosition(p)"
 														>
 															<div style="margin-top: .3em;">
@@ -155,6 +157,13 @@
 															<div class="position-title" style="margin-right: .3em;">
 																{{ quotationItem.position ? quotationItem.position.code : 'N/A' }}
 															</div>
+															<img
+																src="/assets/main/img/delete-icon.jpg"
+																style="width: 20px; height: 20px; margin-top: .3em;"
+																alt="Elimina Pin"
+																@click="deletePosition(p)"
+																:key="`deletearrow-${p.id}`"
+															/>
 														</div>
 													</div>
 												</div>
@@ -170,6 +179,15 @@
 		</div>
     </div>
     <style>
+
+    .red-border {
+    	border: 2px dashed red!important;
+    }
+	.with-margin {
+		margin: .3em;
+		padding: .3em;
+	}
+
     .overlay-layer {
         position: absolute;
         top: 0;

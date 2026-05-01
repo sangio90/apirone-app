@@ -42,8 +42,11 @@ component extends="com.apirone.core.controller.AbsController" {
 				var quotationItemPosition = super.fire( "QuotationItemPosition.get", [ rc.key ] );
 				var quotationItemService = super.service( "QuotationItem" );
 				var quotationItem = quotationItemService.get( quotationItemPosition.getQuotationItemId() );
-				quotationItem.setQuantity( quotationItem.getQuantity() - 1 );
-				quotationItemService.update( quotationItem );
+				if (quotationItem.getQuantity() == quotationItem.getPositions().len() ) {
+					quotationItem.setQuantity( quotationItem.getQuantity() - 1 );
+					quotationItemService.update( quotationItem );
+				}
+
 				var outcome = super.fire( "QuotationItemPosition.delete", { positionId = rc.key } );
 				if ( outcome.getStatus() == "ERROR" ) {
 					var error = super.getValidationError(

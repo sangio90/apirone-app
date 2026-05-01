@@ -1,0 +1,1 @@
+ALTER TABLE public.quotation_item_positions DROP COLUMN sequence;

@@ -15,7 +15,6 @@
 
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationItemId" type="String" required="false">
-		<cfargument name="sequence" type="Numeric" required="false">
 		<cfargument name="orderBy" type="String" required="true" default="quotation_item_position_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
@@ -31,9 +30,6 @@
 				<cfif !IsNull( arguments.quotationItemId )>
 					AND quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
 				</cfif>
-				<cfif !IsNull( arguments.sequence )>
-					AND "sequence" = <cfqueryparam cfsqltype="Integer" value="#arguments.sequence#">
-				</cfif>
 			ORDER BY #super.sanitizeSQL( arguments.orderBy )#
 
 			<cfif arguments.limit GT 0>
@@ -44,26 +40,11 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<cffunction name="getMaxSequenceByQuotationItemId" returntype="numeric">
-		<cfargument name="quotationItemId" type="string" required="true">
-
-		<cfquery name="local.q" datasource="apirone">
-			SELECT
-				MAX("sequence") AS max_sequence
-			FROM
-				quotation_item_positions
-			WHERE quotation_item_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.quotationItemId#">::uuid
-		</cfquery>
-		
-		<cfreturn isNumeric(local.q.max_sequence) ? local.q.max_sequence : 0>
-	</cffunction>
-
 	<cffunction name="insert" returntype="String">
 		<cfargument name="position" type="com.apirone.core.model.bean.QuotationItemPosition" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_positions (
-				quotation_item_id,
-				"sequence"
+				quotation_item_id
 				<cfif !IsNull( arguments.coordinate_x )>
 					,coordinate_x
 				</cfif>
@@ -77,8 +58,7 @@
 					,angle
 				</cfif>
 			) VALUES (
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.position.getQuotationItemId()#">::uuid,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.position.getSequence()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.position.getQuotationItemId()#">::uuid
 				<cfif !IsNull( arguments.coordinate_x )>
 					,<cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateX()#">
 				</cfif>
@@ -103,7 +83,6 @@
 			UPDATE quotation_item_positions
 			SET
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.position.getQuotationItemId()#">::uuid,
-				"sequence" = <cfqueryparam cfsqltype="Integer" value="#arguments.position.getSequence()#">,
 				coordinate_x = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateX()#">,
 				coordinate_y = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateY()#">,
 				visible = <cfqueryparam cfsqltype="Boolean" value="#arguments.position.getVisible()#">,

@@ -470,10 +470,9 @@ AP.quotation.plantPositions = (function () {
                                     coordinateY: pos.coordinateY,
                                     visible: pos.visible == true ? 1 : 0,
                                     angle: pos.angle || 0,
-                                    sequence: pos.sequence,
                                     quotationItemId: item.id,
                                     type: item.product ? item.product.category.type.name : null,
-                                    position: item.position ? item.position.code : 'senza posizione' + ' - ' + pos.sequence
+                                    position: item.position ? item.position.code : 'senza posizione'
                                 });
                             });
                         }

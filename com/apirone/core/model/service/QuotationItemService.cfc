@@ -141,7 +141,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					for (var i = 1; i <= quotationItemQuantity; i++) {
 						var position = super.bean("QuotationItemPosition");
 						position.setQuotationItemId(newId);
-						position.setSequence(i);
 						getQuotationItemPositionService().create(position);
 					}
 				}
@@ -185,7 +184,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				for( var thisFruitId in fruitIdsToDeleted ) {
 					getQuotationItemFruitService().delete( thisFruitId );
 				}
-				
+
 				for ( var thisFruit in arguments.quotationItem.getFruits() ) {
 					if ( IsNull( thisFruit.getId() ) || thisFruit.getId() == "" ) {
 						thisFruit.setQuotationItemId( arguments.quotationItem.getId() );
@@ -214,13 +213,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 
 				var quotationItemQuantity = arguments.quotationItem.getQuantity();
-				var maxSequenceQuotationItemPosition = getQuotationItemPositionService().getMaxSequenceByQuotationItemId( arguments.quotationItem.getId() );
+				var countItemPositions = arguments.quotationItem.getPositions().len();
 
-				if (quotationItemQuantity > maxSequenceQuotationItemPosition) {
-					for (var i = maxSequenceQuotationItemPosition + 1; i <= quotationItemQuantity; i++) {
+				if (quotationItemQuantity > countItemPositions) {
+					for (var i = countItemPositions + 1; i <= quotationItemQuantity; i++) {
 						var position = super.bean("QuotationItemPosition");
 						position.setQuotationItemId(arguments.quotationItem.getId());
-						position.setSequence(i);
 						getQuotationItemPositionService().create(position);
 					}
 				}
@@ -251,7 +249,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Ensure quotation item position is created and linked when needed.
 	 */
 	private com.apirone.core.model.bean.QuotationItem function ensurePosition( required com.apirone.core.model.bean.QuotationItem quotationItem ){
-		
+
 		if ( !IsNull( arguments.quotationItem.getPosition() ) ) {
 			if ( Len( arguments.quotationItem.getPosition().getCode() ) ) {
 
@@ -273,10 +271,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.quotationItemId );
 		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.quotationItemId )
 		if ( record.recordCount ) {
-			
+
 			var pricing = super.bean( "QuotationItemPrice" );
 			var priceMethod = super.bean( "PriceMethod" );
-			
+
 			if ( fruits.len() > 0 ) {
 				arraySort(fruits, function(a, b) {
 					return a.getPositions()[1].order - b.getPositions()[1].order;
@@ -290,13 +288,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setFrame( frame );
 
 			} else {
-				
+
 				if ( Len( record.signage_config_item_id ) ) {
 					var bean = super.bean( "QuotationItemSignage" );
 				} else {
 					var bean = super.bean( "QuotationItem" );
 				}
-			
+
 			}
 
 			var pricing = getQuotationItemPriceService().getByQuotationItemId( quotationItemId = arguments.quotationItemId );
@@ -305,7 +303,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.quotation_item_id );
 			bean.setQuantity( record.quantity );
 			bean.setCreatedAt( record.created_at );
-			
+
 			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
 			//bean.setPrice( pricing );
 
@@ -320,7 +318,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( Len( record.article_id ) ) {
 				bean.setArticle( getArticleService().get( record.article_id ) );
 			}
-			
+
 			bean.setQuotationZone(
 				IsNull( record.quotation_zone_id ) ? NullValue() : getQuotationZoneService().get(
 					record.quotation_zone_id
@@ -329,7 +327,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			if ( Len( record.signage_config_item_id ) ) {
 				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_id ) );
-				
+
 				if ( record.char_count ) {
 					bean.getSignageConfigItem().setCharCount( record.char_count );
 				}
@@ -351,7 +349,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			var items = getQuotationItemProductItemService().list( quotationItemId = quotationItemId );
-			
+
 			if ( Len( items ) ) {
 				bean.setItems( items );
 			}
@@ -375,7 +373,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.QuotationItemPrice function getPlatePricing( required Struct data ){
-		
+
 		var json = arguments.data;
 
 		var pricing = super.bean( "QuotationItemPrice" );
@@ -388,9 +386,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		pricing.setQuantity( Val( json.price.quantity ) ? json.item.quantity : 1 );
 		pricing.setDiscount1( Val( json.price.discount1 ) ? json.price.discount1 : 0 );
 		pricing.setDiscount2( Val( json.price.discount2 ) ? json.price.discount2 : 0 );
-		        
+
 		pricing.setMethod( method.setId( json.price.method.id ) );
-		
+
         if ( pricing.isFixed() ) {
 			pricing.setAmount( Val( json.price.total ) ? json.price.total : 0 );
 		} else {
@@ -448,7 +446,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		for ( var fruit in json.item.fruits._data ) {
 			var fruitItemsIds = [];
-			
+
 			var line = super.bean( "QuotationItemPriceLine" );
 
 			for ( var item in fruit.items._data ) {
@@ -459,15 +457,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 
-			var fruitPrice = calculator.calculate( 
-				fruit.fruit.id, 
-				1, 
-				json.item.quotationZone.id, 
-				fruitItemsIds, 
-				0, 
-				0, 
-				quotation, 
-				quotationItem 
+			var fruitPrice = calculator.calculate(
+				fruit.fruit.id,
+				1,
+				json.item.quotationZone.id,
+				fruitItemsIds,
+				0,
+				0,
+				quotation,
+				quotationItem
 			);
 
 			line.setName( "#fruit.fruit?.name#" );
@@ -496,9 +494,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
 		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
 		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
-		        
+
 		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
-		
+
         if ( json.quotationItem.price.method.id EQ 'F' ) {
 			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
 		} else {
@@ -527,7 +525,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		for ( var signageRow in json.quotationItem.signageRows._data ) {
 			lettersQuantity += Val( signageRow.charCount ) ? signageRow.charCount : 0;
 		}
-		
+
 		var quotation = getQuotationService().get( json.quotationId )
 		var quotationItem = !isNull(json.quotationItem.id) && json.quotationItem.id != '' ? get( json.quotationItem.id ) : null
 
@@ -554,7 +552,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return pricing;
 	}
 
-	public com.apirone.core.model.bean.QuotationItemPrice function getPricing( required Struct data ){		
+	public com.apirone.core.model.bean.QuotationItemPrice function getPricing( required Struct data ){
 		var json = arguments.data;
 
 		var pricing = super.bean( "QuotationItemPrice" );
@@ -569,9 +567,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		pricing.setQuantity( Val( json.quotationItem.quantity ) ? json.quotationItem.quantity : 1 );
 		pricing.setDiscount1( Val( json.quotationItem.price.discount1 ) ? json.quotationItem.price.discount1 : 0 );
 		pricing.setDiscount2( Val( json.quotationItem.price.discount2 ) ? json.quotationItem.price.discount2 : 0 );
-		        
+
 		pricing.setMethod( method.setId( json.quotationItem.price.method.id ) );
-		
+
         if ( json.quotationItem.price.method.id EQ 'F' ) {
 			pricing.setAmount( Val( json.quotationItem.price.total ) ? json.quotationItem.price.total : 0 );
 		} else {
@@ -622,8 +620,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return pricing;
 	}
 
-	public function getAltreRigheByQuotationLineIdAndFinishId( 
-		required String quotationItemId, 
+	public function getAltreRigheByQuotationLineIdAndFinishId(
+		required String quotationItemId,
 		required String quotationId,
 		required String lineId,
 		required String finishId
@@ -634,8 +632,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return getDao().getAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
 	}
 
-	public function getAltreRigheByQuotationAndProductId( 
-		required String quotationItemId, 
+	public function getAltreRigheByQuotationAndProductId(
+		required String quotationItemId,
 		required String quotationId,
 		required String productId
 	){
@@ -646,14 +644,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public function aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId(
-		required String quotationItemId, 
+		required String quotationItemId,
 		required String quotationId,
 		required String lineId,
 		required String finishId
 	){
 		var rows = this.getAltreRigheByQuotationLineIdAndFinishId(
-			"quotationItemId" = quotationItemId, 
-			"quotationId" = quotationId, 
+			"quotationItemId" = quotationItemId,
+			"quotationId" = quotationId,
 			"lineId" = lineId,
 			"finishId" = finishId
 		)
@@ -662,7 +660,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var data = {}
 			var quotationItem = get( quotationItemId = row.quotation_item_id );
 			if (
-				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") && 
+				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") &&
 				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")
 			) {
 				continue;
@@ -671,15 +669,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			aggiornaPrezzo(quotationItem)
 		}
 	}
-	
+
 	public function aggiornaPrezzoAltriArticoliByQuotationIdAndProductId(
-		required String quotationItemId, 
+		required String quotationItemId,
 		required String quotationId,
 		required String productId
 	){
 		var rows = this.getAltreRigheByQuotationAndProductId(
-			"quotationItemId" = quotationItemId, 
-			"quotationId" = quotationId, 
+			"quotationItemId" = quotationItemId,
+			"quotationId" = quotationId,
 			"productId" = productId
 		)
 
@@ -687,7 +685,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var data = {}
 			var quotationItem = get( quotationItemId = row.quotation_item_id );
 			if (
-				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") || 
+				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") ||
 				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage") ||
 				!isNull(quotationItem.getArticle())
 			) {
@@ -713,7 +711,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		//questa parte serve per replicare le strutture dati che si aspettano getSignagePricing e la getPlatePricing quando chiamate dal client
 		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
-			var json = 
+			var json =
 			{
 				"quotationId": "",
 				"price": {
@@ -883,7 +881,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	) {
 		var productMinQuantity = quotationItem.getProduct().getMinQuantity()
 		var productMaxQuantity = quotationItem.getProduct().getMaxQuantity()
-		
+
 		var productQuantity = 0
 		if (productMinQuantity > 0 || productMaxQuantity > 0) {
 			productQuantity = getProductQuantityByQuotation( quotation, quotationItem.getProduct() )

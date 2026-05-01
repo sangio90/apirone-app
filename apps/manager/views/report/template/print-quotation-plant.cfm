@@ -1,9 +1,9 @@
 <cfoutput>
     <cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="1" marginRight="1" marginBottom="1">
         <cfif args.pdfArgs.orientation EQ "landscape">
-            <cfset containerHeight = "15cm"> <cfset imgMaxWidth = "26cm">    
+            <cfset containerHeight = "15cm"> <cfset imgMaxWidth = "26cm">
         <cfelse>
-            <cfset containerHeight = "24cm"> <cfset imgMaxWidth = "19cm">    
+            <cfset containerHeight = "24cm"> <cfset imgMaxWidth = "19cm">
         </cfif>
         <cfdocumentitem type="header">
             <div style="padding-top: 0.5cm;">
@@ -15,7 +15,7 @@
         </cfdocumentitem>
 
         <div style="width: 100%; height: #containerHeight#; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-            <img src="#args.data.image#" 
+            <img src="#args.data.image#"
                  style="display: block; margin: 0 auto; width: 100%; max-width: #imgMaxWidth#; height: #containerHeight#;" />
         </div>
 
@@ -34,9 +34,9 @@
                             <cfloop array="#quotationItem.getPositions()#" item="position">
                                 <div>
                                     <cfif !isNull(quotationItem.getPosition()) && quotationItem.getPosition().getCode() NEQ "">
-                                        - Posizione: #quotationItem.getPosition().getCode()# #position.getSequence()#
+                                        - Posizione: #quotationItem.getPosition().getCode()#
                                     <cfelse>
-                                        - Posizione: senza posizione #position.getSequence()#
+                                        - Posizione: senza posizione
                                     </cfif>
                                 </div>
                             </cfloop>
