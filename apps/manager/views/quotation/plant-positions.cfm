@@ -19,15 +19,15 @@
                             <div class="loadingOverlay" v-if="isLoading">
                                 <i class="fas fa-spinner fa-spin fa-3x"></i>
                             </div>
-                            <div class="row">
-                                <div class="col-11">
-                                    <h5>Filtri Ricerca</h5>
-                                </div>
-                                <div class="col-1 d-flex align-items-center justify-content-end">
-                                    <button class="btn btn-primary" @click="savePositions" :disabled="!selectedZoneId">Salva posizioni <i class="fas fa-save"></i></button>
-                                    <button class="btn btn-primary" style="margin-left: 10px;" @click="printPlant" :disabled="!selectedZoneId">Stampa pianta <i class="fas fa-print"></i></button>
-                                </div>
-                            </div>
+							<div class="row" style="font-size: .9em; font-style: italic;">
+								<div class="col-11">
+									Quando si ruota un oggetto, è possibile usare gli "scatti" di rotazione oppure tenere premuto "shift" per una rotazione libera. Per spostare un oggetto, è sufficiente trascinarlo con il mouse.
+								</div>
+								<div class="col-1 d-flex align-items-center justify-content-end">
+									<button class="btn btn-primary" @click="savePositions" :disabled="!selectedZoneId">Salva posizioni <i class="fas fa-save"></i></button>
+									<button class="btn btn-primary" style="margin-left: 10px;" @click="printPlant" :disabled="!selectedZoneId">Stampa pianta <i class="fas fa-print"></i></button>
+								</div>
+							</div>
                             <div class="row">
                                 <div class="col-2 my-3" >
                                     <label>Zone</label>
@@ -38,6 +38,18 @@
                                         </option>
                                     </select>
                                 </div>
+                                <div class="col-2" style="padding-top: 3.6em;">
+                                    <input type="checkbox" class="form-check-input" v-model="showAccessori">
+                                    <label>Mostra Accessori</label>
+                                </div>
+                                <div class="col-2" style="padding-top: 3.6em;">
+                                    <input type="checkbox" class="form-check-input" v-model="showSegnaletica">
+                                    <label>Mostra Segnaletica</label>
+                                </div>
+                                <div class="col-2" style="padding-top: 3.6em;">
+                                    <input type="checkbox" class="form-check-input" v-model="showPlacche">
+                                    <label>Mostra Placche</label>
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-6">
@@ -46,9 +58,9 @@
                                 <div class="col-6">
                                     <h5>Articoli</h5>
                                 </div>
-                                <div class="col-6 text-center">
+                                <div class="col-12 text-center">
                                     <div style="position: relative; display: inline-block;" v-if="selectedZone.image" id="plant-to-capture">
-                                        <img 
+                                        <img
                                             :src="selectedZone.image.uri"
                                             crossorigin="anonymous"
                                             alt="Pianta del preventivo"
@@ -57,7 +69,7 @@
                                         <div class="overlay-layer">
                                             <div v-for="quotationItem in quotationItems" :key="quotationItem.id">
                                                 <template v-for="p in quotationItem.positions">
-                                                    <template v-if="p.visible">
+                                                    <template v-if="p.visible && (showAccessori && quotationItem?.product?.category?.type?.id == 'ACC' || showSegnaletica && quotationItem?.product?.category?.type?.id == 'SEG' || showPlacche && quotationItem?.product?.category?.type?.id == 'PLA')">
                                                         <div
                                                             class="pin"
                                                             :style="getPinStyle(p)"
@@ -66,7 +78,7 @@
                                                             :key="'pin-' + p.id"
                                                         >
                                                         </div>
-                                                        <div 
+                                                        <div
                                                             class="pin-label"
                                                             :style="getLabelStyle(p)"
                                                             :key="'label-' + p.id"
@@ -74,19 +86,30 @@
                                                             {{ formatLabelText(p) }}
                                                         </div>
                                                         <div v-if="p.id == selectedItemPositionId">
-                                                            <div 
+                                                        	<div class="position-full-text" :style="getSelectionPositionTextStyle(p)">
+                                                        		{{ getPositionFullText(quotationItem) }}
+                                                        	</div>
+                                                            <div
                                                                 class="selection-ring"
                                                                 :style="getSelectionRingStyle(p)"
                                                                 :key="'ring-' + p.id"
                                                                 :style="{ borderColor: getColor(quotationItem) }"
                                                             ></div>
-                                                            <img 
-                                                                src="/assets/main/img/rotation-arrow.png" 
+                                                            <img
+                                                                src="/assets/main/img/rotation-arrow.png"
                                                                 alt="Ruota Pin"
                                                                 class="rotation-arrow"
                                                                 :style="getArrowStyle(p)"
-                                                                @mousedown.stop="startRotate($event, p)" 
+                                                                @mousedown.stop="startRotate($event, p)"
                                                                 :key="'arrow-' + p.id"
+                                                            />
+                                                            <img
+                                                                src="/assets/main/img/delete-icon.jpg"
+                                                                alt="Elimina Pin"
+                                                                class="delete-icon"
+                                                                :style="getDeleteIconStyle(p)"
+                                                                @click="deletePosition(p)"
+                                                                :key="`deletearrow-${p.id}`"
                                                             />
                                                         </div>
                                                     </template>
@@ -95,44 +118,48 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-12">
                                     <div v-if="quotationItems.length > 0" style="align-items: center; display: flex; height: 100%;">
-                                        <table>
-                                            <tr v-for="quotationItem in quotationItems" :key="quotationItem.id" :value="quotationItem.id">
-                                                <td>
-                                                    {{ quotationItem.product.category.name }} {{ quotationItem.product.line.name }} {{ quotationItem.product.model.name }} {{ quotationItem.product.finish.code }}
-                                                    <div style="margin-left: 10px;" v-if="quotationItem.positions.length">
-                                                        <table>
-                                                            <tr v-for="p in quotationItem.positions" :key="p.sequence" :value="p.id" :class="p.id == selectedItemPositionId ? 'position-selected' : 'position'" style="padding: 5px;">
-                                                                <td :id="p.id" @click="selectPosition(p)" style="padding: 10px;">
-                                                                    {{ quotationItem.position ? quotationItem.position.code : 'senza posizione' }} - {{ p.sequence }}
-                                                                </td>
-                                                                <td style="padding: 10px;">
-                                                                    <div v-if="p.id == selectedItemPositionId" style="display: flex;">
-                                                                        <div>
-                                                                            <label>Coordinate X</label>
-                                                                            <input class="form-control" v-model="selectedItemPosition.coordinateX">
-                                                                        </div>
-                                                                        <div style="margin-left: 5px;">
-                                                                            <label>Coordinate Y</label>
-                                                                            <input class="form-control" v-model="selectedItemPosition.coordinateY">
-                                                                        </div>
-                                                                        <div style="margin-left: 5px;">
-                                                                            <label>Angolo</label>
-                                                                            <input type="number" class="form-control" v-model.number="selectedItemPosition.angle">
-                                                                        </div>
-                                                                        <div style="margin-left: 5px;">
-                                                                            <label>Visibile</label><br>
-                                                                            <input style="margin-left: 15px; margin-top: 10px;" type="checkbox" class="form-check-input" v-model="selectedItemPosition.visible">
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <div class="quotation-list">
+                                        	<div v-for="(quotationItemByType, index) in filteredQuotationItemsGroupedByType" :key="quotationItemByType.type" style="margin-right: 20px; display: flex">
+                                        	<div
+												v-for="quotationItem in quotationItemByType"
+												:key="quotationItem.id"
+												class="quotation-item"
+												:style="{ border: '2px solid', borderColor: getBackgroundColor(index), backgroundColor: 'white'}"
+												>
+													<div>{{ quotationItem.type }}</div>
+													<!-- HEADER ITEM -->
+													<div class="quotation-item-header">
+														{{ quotationItem.product.category.name }}
+														{{ quotationItem.product.line.name }}
+														{{ quotationItem.product.model.name }}
+														{{ quotationItem.product.finish.code }}
+													</div>
+
+													<!-- POSITIONS -->
+													<div
+														v-if="quotationItem.positions.length"
+														style="display: block; margin-left: 10px;"
+													>
+														<div
+															style="display: flex; float: left;"
+															v-for="p in quotationItem.positions"
+															:key="p.id"
+															class="position-card"
+															@click="selectPosition(p)"
+														>
+															<div style="margin-top: .3em;">
+																<input type="checkbox" class="form-check-input" v-model="p.visible">
+															</div>
+															<div class="position-title" style="margin-right: .3em;">
+																{{ quotationItem.position ? quotationItem.position.code : 'N/A' }}
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -150,13 +177,6 @@
         width: 100%;
         height: 100%;
         pointer-events: none;
-    }
-
-    .position-selected {
-        height: 64px;
-        color: white;
-        cursor: pointer;
-        background-color: rgb(68, 130, 232);
     }
 
     .position {
@@ -203,7 +223,7 @@
         pointer-events: none;
         font-size: 10px;
         max-width: 35px;
-        white-space: normal; 
+        white-space: normal;
         word-wrap: break-word;
         overflow-wrap: break-word;
         text-align: center;
@@ -222,6 +242,46 @@
         cursor: move;
         transform-origin: center;
         object-fit: contain;
+    }
+
+	.delete-icon {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        padding: 10px;
+        box-sizing: content-box;
+        opacity: 1;
+        pointer-events: auto;
+        cursor: pointer;
+        transform-origin: center;
+        object-fit: contain;
+    }
+
+    .position-full-text {
+        position: absolute;
+        height: 20px;
+        padding: 10px;
+        box-sizing: content-box;
+        opacity: 1;
+        pointer-events: auto;
+        cursor: move;
+        transform-origin: center;
+        object-fit: contain;
+    }
+
+    .position-title {
+        padding: .3em;
+    }
+
+    .quotation-item {
+    	display: inline-block;
+        margin-top: .3em;
+        margin-left: .3em;
+        border-radius: 10px;
+        background-color: rgb(68, 130, 232, 0.2);
+        padding: 10px;
+        max-width: 400px !important;
+        max-height: none !important;
     }
     </style>
 </cfoutput>
