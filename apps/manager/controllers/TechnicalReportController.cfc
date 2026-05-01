@@ -25,6 +25,14 @@ component extends="com.apirone.core.controller.AbsController" {
 			quotationItems = []
 		};
 
+		if (IsNull( quotationPrice) ) {
+			Throw(
+				message = "
+				Preventivo non calcolato"
+			);
+			return;
+		}
+
 		if ( IsNull( quotation.getCustomer() ) ) {
 			Throw(
 				message = "
@@ -108,7 +116,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		//ordiniamo le zone in modo da avere prima quelle padre
 		var zones = super.fire('QuotationZone.list', [ 'quotationId' = idPreventivo, 'orderby' = [ { field = "quotationItemZone.originId", dir = "desc" } ] ]);
-		
+
 		var sortedZones = [];
 		for (var zone in zones) {
 			if (zone.getName() == 'Non assegnato') {
@@ -203,7 +211,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		for ( quotationItem in quotationItems ) {
 			var hashKey = quotationItem.getHash();
-			var zoneQuantity = !isNull(quotationItem.getQuotationZone().getOrigin()) ? 
+			var zoneQuantity = !isNull(quotationItem.getQuotationZone().getOrigin()) ?
 				quotationItem.getQuotationZone().getOrigin().getQuantity() * quotationItem.getQuotationZone().getQuantity() :
 				quotationItem.getQuotationZone().getQuantity();
 			if ( !structKeyExists(groupedItems, hashKey) ) {
