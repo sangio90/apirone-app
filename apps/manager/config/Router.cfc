@@ -487,6 +487,7 @@
 		post( "/quotations" ).to( "QuotationController.create" ).end(); // Da togliere
 		get( "/quotations" ).to( "QuotationController.list" ).end();
 		get( "/quotation-plant-positions/:id" ).to( "QuotationController.plantPositions" ).end();
+		delete( "/ajax/quotation-item-positions/:key" ).to( "QuotationItemPositionAjaxController.delete" ).end();
 		post( "/ajax/quotation-item-positions/" ).to( "QuotationItemPositionAjaxController.save" ).end();
 		post( "/ajax/quotation-item-positions-print" ).to( "QuotationItemPositionAjaxController.print" ).end();
 

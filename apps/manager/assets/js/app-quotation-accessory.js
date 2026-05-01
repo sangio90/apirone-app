@@ -405,7 +405,7 @@ AP.accessory.modal = ( function() {
                     let i = 0;
                     while (i < queue.length) {
                         const currentParentId = queue[i];
-                        
+
                         // Cerchiamo nell'array tutti i figli di questo ID
                         array.forEach((item, index) => {
                             if (item.parent_attribute_id === currentParentId) {
@@ -689,7 +689,7 @@ AP.accessory.modal = ( function() {
                             }
                         }
                     } else {
-                        //non sono in edit o comunque ho modificato l'albero, non posso piu partire dai dati del detailForm, 
+                        //non sono in edit o comunque ho modificato l'albero, non posso piu partire dai dati del detailForm,
                         // cerco se ho qualcosa in product items note. Se si, setto le note
                         let existing = viewModel.detailForm.productItemsNotes.find(n =>
                             n.product_item_id === selectedOption.product_item_id &&
@@ -761,8 +761,8 @@ AP.accessory.modal = ( function() {
             AP.loading.show();
 
             var quotationId = AP.page.quotation.id;
-            
-            //quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a 
+
+            //quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a
             let preview = $( "#accessory-preview-background" )[0];
             if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage') && viewModel.get('detailForm.data.quotationItem.customImage') == true) {
                 //se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
@@ -822,13 +822,42 @@ AP.accessory.modal = ( function() {
 
                             if ( xhr.status === "SUCCESS" ) {
                                 $( "#accessory-modal" ).hide();
-                                AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
-                                viewModel.set( "detailForm", defaultDetailForm );
-                                setTimeout( function() {
-                                    AP.loading.hide();
-                                    window.location.reload();
-                                }
-                                , 1000 );
+								AP.loading.hide()
+
+								const modal = $( "#posizione-in-pianta-modal")
+								function handlerSi() {
+									//TODO aggiungere id zona
+									window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + parsedData.quotationItem.quotationZone.id;
+								}
+								function handlerNo() {
+									window.location.reload();
+								}
+								modal.find("#btn-si").off("click").on("click", handlerSi);
+								modal.find("#btn-no").off("click").on("click", handlerNo);
+
+                                const hoCambiatoZona = parsedData?.quotationItem?.quotationZone?.name != accessoryResponse?.data?.quotationItem?.quotationZone?.name
+                                const hoCambiatoQuantita = parsedData?.quotationItem?.quantity != accessoryResponse?.data?.quotationItem?.quantity
+                                const hoAumentatoQuantita = parsedData?.quotationItem?.quantity > accessoryResponse?.data?.quotationItem?.quantity
+                                const hoDiminuitoQuantita = parsedData?.quotationItem?.quantity < accessoryResponse?.data?.quotationItem?.quantity
+
+								if (
+									(!parsedData.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita) &&
+									parsedData.quotationItem.quotationZone?.name !== 'Non assegnato'
+								) {
+                                    //TODO ci sono tanti casi da gestire:
+                                    //e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)
+                                    //aumento quantita, devo aggiungere marker(easy)
+                                    //riduco quantita, devo rimuovere marker(hard)
+									modal.modal("show")
+									return
+								}
+								viewModel.set( "detailForm", defaultDetailForm );
+								setTimeout( function() {
+										AP.loading.hide();
+										window.location.reload();
+									}
+									, 1000 );
+
                             }
                         }
                     }
@@ -941,7 +970,7 @@ AP.accessory.modal = ( function() {
 
         const allZones = AP.quotation.detail.config().zones
         const parentZones = allZones.filter(z => !z.origin && z.id != '')
-        
+
         viewModel.set('allZones', allZones)
         viewModel.set('zones', parentZones)
         let zone = AP.quotation.detail.config().zone
@@ -994,7 +1023,7 @@ AP.accessory.modal = ( function() {
 		viewModel.get( "categories" ).data( categoriesResponse.data );
 		NM.util.openModal( AP.accessory.fields.modalRoot );
 
-		const accessoryResponse = await NM.util.ajax( {
+		accessoryResponse = await NM.util.ajax( {
 			method: "GET",
 			url: "/manager/ajax/quotation-items/accessory/" + id,
 			callback: {
@@ -1028,10 +1057,10 @@ AP.accessory.modal = ( function() {
 
         const allZones = AP.quotation.detail.config().zones
         const parentZones = allZones.filter(z => !z.origin && z.id != '')
-        
+
         viewModel.set('allZones', allZones)
         viewModel.set('zones', parentZones)
-        
+
         if (viewModel.get('detailForm.data.quotationItem.quotationZone.origin')) {
             viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone.origin'))
             viewModel.set('quotationSubzone', viewModel.get('detailForm.data.quotationItem.quotationZone'))

@@ -860,10 +860,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var quotationPrice = getQuotationPriceService().calculate( quotation.getId() );
 		var customer = quotation.getCustomer();
 
-		if (isNull(quotation.getShippingProfile())) {
-			result.error = "Dati spedizione non trovati."
-			return result;
-		}
+//		if (isNull(quotation.getShippingProfile())) {
+//			result.error = "Dati spedizione non trovati."
+//			return result;
+//		}
 		var quotationData = {
 			"MMSERIAL" = quotation.getSerial(), // i need the same code
 			"MM_IDRIF" = quotation.getQuotationNumber(), // i need the same code
@@ -895,14 +895,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"DELOCDOD" = customer.getCity(),
 			"DEPRODOD" = customer.getState(),
 			"DENAZDOD" = customer.getCountry()?.getIsoCode(),
-			"DECAPDOC" = quotation.getShippingProfile().getPostalCode(),
-			"DEIDDMER" = quotation.getShippingProfile().getId(),
-			"DEDESMER" = quotation.getShippingProfile().getCompany(),
-			"DEINDMER" = quotation.getShippingProfile().getStreet(),
-			"DELOCMER" = quotation.getShippingProfile().getCity(),
-			"DEPROMER" = quotation.getShippingProfile().getState(),
-			"DENAZMER" = quotation.getShippingProfile().getCountry()?.getIsoCode(),
 		};
+
+		if (isNull(quotation.getShippingProfile())) {
+			quotationData["DECAPDOC"] = "";
+			quotationData["DEIDDMER"] = "";
+			quotationData["DEDESMER"] = "";
+			quotationData["DEINDMER"] = "";
+			quotationData["DELOCMER"] = "";
+			quotationData["DEPROMER"] = "";
+			quotationData["DENAZMER"] = "";
+		} else {
+			quotationData["DECAPDOC"] = quotation.getShippingProfile().getPostalCode();
+			quotationData["DEIDDMER"] = quotation.getShippingProfile().getId();
+			quotationData["DEDESMER"] = quotation.getShippingProfile().getCompany();
+			quotationData["DEINDMER"] = quotation.getShippingProfile().getStreet();
+			quotationData["DELOCMER"] = quotation.getShippingProfile().getCity();
+			quotationData["DEPROMER"] = quotation.getShippingProfile().getState();
+			quotationData["DENAZMER"] = quotation.getShippingProfile().getCountry()?.getIsoCode();
+		}
 
 
 		result.data = quotationData;

@@ -44,9 +44,85 @@ AP.quotation.plantPositions = (function () {
                 initialMouseX: 0,
                 initialAngle: 0,
                 rotationSpeedFactor: 0.5,
+				showAccessori: true,
+				showSegnaletica: true,
+				showPlacche: true,
             },
 
+			watch: {
+				showAccessori(newVal) {
+					debugger
+				}
+			},
+
+			computed: {
+				filteredQuotationItemsGroupedByType() {
+					let quotationItemsGroupedByType = {...this.quotationItemsGroupedByType}
+					if (!this.showAccessori) {
+						quotationItemsGroupedByType.accessori = []
+					}
+					if (!this.showSegnaletica) {
+						quotationItemsGroupedByType.segnaletica = []
+					}
+					if (!this.showPlacche) {
+						quotationItemsGroupedByType.placche = []
+					}
+					return quotationItemsGroupedByType
+				},
+				quotationItemsGroupedByType() {
+					let placche = []
+					let segnaletica = []
+					let accessori = []
+					let servizi = [] //TODO non dovrebbero esserci ma verifichiamo
+					placche = this.quotationItems.filter(el => {
+						return el.product.catalogBundle.category.type.id === 'PLA'
+					})
+					segnaletica = this.quotationItems.filter(el => {
+						return el.product.catalogBundle.category.type.id === 'SEG'
+					})
+					accessori = this.quotationItems.filter(el => {
+						return el.product.catalogBundle.category.type.id === 'ACC'
+					})
+					servizi = this.quotationItems.filter(el => {
+						return el.product.catalogBundle.category.type.id === 'FRU'
+					})
+					return {
+						placche,
+						segnaletica,
+						accessori
+					}
+				}
+			},
+
             methods: {
+				async deletePosition(pos) {
+					if (window.confirm('Vuoi eliminare questa posizione?')) {
+						//TODO API Che elimina posizione e riduce di 1 la quantita
+						await $.ajax({
+							url: "/manager/ajax/quotation-item-positions/" + pos.id,
+							method: "DELETE"
+						})
+							.done(function (res) {
+								AP.widget.notify( "success", "Riga cancellata correttamente." );
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1000);
+							})
+							.fail(function (err) {
+								AP.widget.notify( "error", "Errore durante la cancellazione della posizione.");
+							})
+					}
+				},
+				getBackgroundColor: function(type) {
+					let backgroundColor = 'rgb(232, 93, 68)';
+					if (type === 'placche') {
+						backgroundColor = 'rgb(68, 130, 232)';
+					}
+					if (type === 'accessori') {
+						backgroundColor = 'rgb(3,166,54)';
+					}
+					return backgroundColor
+				},
                 increment: function () {
                     this.count++;
                 },
@@ -79,7 +155,7 @@ AP.quotation.plantPositions = (function () {
                         return;
                     }
                     self.isLoading = true;
-                    await this.$nextTick(); 
+                    await this.$nextTick();
 
                     self.selectedZone = self.zones.find(zone => zone.id == self.selectedZoneId) || {};
                     if (self.selectedZone.image) {
@@ -126,6 +202,9 @@ AP.quotation.plantPositions = (function () {
                         transform: 'translate(-50%, -50%) rotate(' + (Number(pos.angle) + 135 || 135) + 'deg)'
                     };
                 },
+				getPositionFullText(p) {
+					return p?.position?.code || 'N/A'
+				},
                 getSelectionRingStyle(pos) {
                     let quotationItem = this.quotationItems.find(
                         quotationItem => quotationItem.id == pos.quotationItemId
@@ -138,12 +217,27 @@ AP.quotation.plantPositions = (function () {
                         transform: 'translate(-50%, -53%)'
                     };
                 },
+                getSelectionPositionTextStyle(pos) {
+                    let quotationItem = this.quotationItems.find(
+                        quotationItem => quotationItem.id == pos.quotationItemId
+                    );
+                    let color = this.getColor(quotationItem);
+                    return {
+						backgroundColor: 'white',
+						padding: '0.3em',
+                        borderColor: color,
+						borderRadius: '0.3em',
+                        left: `calc(${pos.coordinateX * 100}% + 5px)`,
+                        top: `calc(${pos.coordinateY * 100}% - 40px)`,
+                        transform: 'translate(-50%, -53%)'
+                    };
+                },
                 getLabelStyle(pos) {
                     return {
                         position: 'absolute',
                         left: (pos.coordinateX * 100) + '%',
                         top: (pos.coordinateY * 100) + '%',
-                        transform: 'translate(-50%, -50%)' 
+                        transform: 'translate(-50%, -50%)'
                     };
                 },
                 getArrowStyle(pos) {
@@ -151,40 +245,24 @@ AP.quotation.plantPositions = (function () {
                         position: 'absolute',
                         left: (pos.coordinateX * 100) + '%',
                         top: (pos.coordinateY * 100) + '%',
-                        transform: 'translate(+180%, -265%)'
+                        transform: 'translate(+100%, -150%)',
+						backgroundColor: 'white',
+						padding: '3px',
+						borderRadius: '.9em'
                     };
                 },
-                getArrowStyle(pos) {
-                    let pinAngle = Number(pos.angle) || 0;
-
-                    // --- CALCOLO OFFSET BASE DELLA PUNTA ---
-                    // Il tuo pin ha border-radius: 50% 50% 50% 0.
-                    // Geometricamente, questo posiziona la punta a -135 gradi (Sud-Ovest).
-                    const tipOffset = -90; 
-
-                    // Angolo finale su cui orbitare (posizione geometrica della punta)
-                    let orbitAngle = pinAngle + tipOffset;
-
-                    // Distanza dall'orbita (in pixel) rispetto al centro del pin
-                    const distance = 50; 
-
-                    // Convertiamo l'angolo in radianti per le funzioni Math
-                    const radians = orbitAngle * (Math.PI / 180);
-
-                    // Calcoliamo lo spostamento X e Y basato sull'angolo (trigonometria base)
-                    const offsetX = Math.round(distance * Math.cos(radians));
-                    const offsetY = Math.round(distance * Math.sin(radians));
-
-                    return {
-                        position: 'absolute',
-                        left: (pos.coordinateX * 100) + '%',
-                        top: (pos.coordinateY * 100) + '%',
-                        
-                        // Applichiamo lo spostamento calcolato, mantenendo la freccia dritta
-                        transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`
-
-                    };
-                },
+				getDeleteIconStyle(pos) {
+					return {
+						position: 'absolute',
+						left: (pos.coordinateX * 100) + '%',
+						top: (pos.coordinateY * 100) + '%',
+						transform: 'translate(+220%, -138%)',
+						backgroundColor: 'white',
+						border: '2px solid red',
+						padding: '3px',
+						borderRadius: '.9em'
+					};
+				},
                 startDrag(event, pos) {
                     event.preventDefault();
                     this.dragging = true;
@@ -204,7 +282,7 @@ AP.quotation.plantPositions = (function () {
                             background = 'rgb(68, 130, 232)';
                         }
                         if (firstChar === 'A') {
-                            background = 'rgb(69, 232, 118)';
+                            background = 'rgb(3,166,54)';
                         }
                     }
 
@@ -265,7 +343,7 @@ AP.quotation.plantPositions = (function () {
                     // Calcoliamo la distanza tra il mouse e il centro del pin
                     const deltaX = event.clientX - this.pinCenterX;
                     const deltaY = event.clientY - this.pinCenterY;
-                    
+
                     // Angolo corrente del mouse rispetto al centro
                     let currentMouseAngle = (Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 360) % 360;
 
@@ -288,11 +366,11 @@ AP.quotation.plantPositions = (function () {
                     } else {
                         // Snap di 45 in 45 gradi
                         let snappedAngle = Math.round(newAngle / 45) * 45;
-                        
+
                         if (snappedAngle >= 360) {
                             snappedAngle = 0;
                         }
-                        
+
                         this.rotatedPosition.angle = snappedAngle;
                     }
                 },
@@ -304,36 +382,18 @@ AP.quotation.plantPositions = (function () {
                     document.removeEventListener('mousemove', this.onRotate);
                     document.removeEventListener('mouseup', this.stopRotate);
                 },
-                getInitial(item) {
-                    const name = item?.product?.category?.type?.name;
-                    const firstChar = name ? name.charAt(0).toUpperCase() : '';
-
-                    if (firstChar === 'P') {
-                        return '<i class="fas fa-plug"></i>';
-                    }
-
-                    if (firstChar === 'A') {
-                        return '<i class="fas fa-chair"></i>';
-                    }
-
-                    if (firstChar === 'S') {
-                        return '<i class="fas fa-font"></i>';
-                    }
-
-                    return '';
-                },
 
                 formatLabelText(p) {
                     let quotationItem = this.quotationItems.find(
                         quotationItem => quotationItem.id == p.quotationItemId
                     );
 
-                    let fullText = `${quotationItem.position ? quotationItem.position.code : 'SP'} - ${p.sequence}`;
-                    
-                    if (fullText.length > 10) {
-                        return fullText.slice(0, 10);
+                    let fullText = `${quotationItem.position ? quotationItem.position.code : 'N/A'}`;
+
+                    if (fullText.length > 3) {
+                        return fullText.slice(0, 3);
                     }
-                    
+
                     return fullText;
                 },
 
@@ -372,12 +432,12 @@ AP.quotation.plantPositions = (function () {
                     form.target = '_blank';
 
                     const element = document.getElementById( 'plant-to-capture' );
-    
+
                     const canvas = await html2canvas( element, {
                         useCORS: true,
                         scale: 2
                     });
-                    
+
                     const base64Image = canvas.toDataURL( 'image/png' );
 
                     const input = document.createElement('input');
@@ -422,8 +482,15 @@ AP.quotation.plantPositions = (function () {
                 }
             },
 
-            mounted: function () {
-                this.getZones();
+            mounted: async function () {
+                await this.getZones();
+				// Se la querystring contiene zoneId, seleziono la zona e carico gli articoli
+				const urlParams = new URLSearchParams(window.location.search);
+				const zoneIdFromQuery = urlParams.get('zoneId');
+				if (zoneIdFromQuery) {
+					this.selectedZoneId = zoneIdFromQuery;
+					this.getItems();
+				}
             }
         });
 

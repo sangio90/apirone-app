@@ -223,14 +223,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						position.setSequence(i);
 						getQuotationItemPositionService().create(position);
 					}
-				} else if (quotationItemQuantity < maxSequenceQuotationItemPosition) {
-					for (var i = quotationItemQuantity + 1; i <= maxSequenceQuotationItemPosition; i++) {
-						var positionToDelete = getQuotationItemPositionService().list( quotationItemId = arguments.quotationItem.getId(), sequence = i );
-						if (Len(positionToDelete) > 0) {
-							getQuotationItemPositionService().delete(positionToDelete[1].getId());
-						}
-					}
 				}
+				// Logica cancellata provvisoriamente, ora se riduco quantita lo gestisco lato controller, sara possibile eliminare (ridurre qta) solo dalla mappa.
+				// else if (quotationItemQuantity < maxSequenceQuotationItemPosition) {
+				// 	for (var i = quotationItemQuantity + 1; i <= maxSequenceQuotationItemPosition; i++) {
+				// 		var positionToDelete = getQuotationItemPositionService().list( quotationItemId = arguments.quotationItem.getId(), sequence = i );
+				// 		if (Len(positionToDelete) > 0) {
+				// 			getQuotationItemPositionService().delete(positionToDelete[1].getId());
+				// 		}
+				// 	}
+				// }
 			}
 
 		}

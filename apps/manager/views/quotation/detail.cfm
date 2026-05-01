@@ -10,24 +10,24 @@
 				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
                 #button( bind="click:exportProducts, visible: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
                 #button( bind="click:export, visible: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
-				<button type="button" 
-                        class="btn btn-primary btn-sm" 
+				<button type="button"
+                        class="btn btn-primary btn-sm"
                         data-role-list="ADM/CMA"
                         data-bind="click: openStatusModal, roleEnable: this">
-                    
-                    <i class="fas fa-check-circle"></i> 
+
+                    <i class="fas fa-check-circle"></i>
                     Status: #prc.quotation.getStatusHistory().getStatus().getName()#
                 </button>
 				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
 				#button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map" )#
 			</div>
-            
+
             <div class="export-button-tooltip col-6 text-end">
 				<p class="export-button-tooltip" style="color: red; display: none">
                     Il preventivo è già stato esportato
                 </p>
 			</div>
-        
+
         </div>
 
         <div class="row">
@@ -43,7 +43,7 @@
 
                                 <div class="col-4 d-flex">
                                     <label class="me-2">Zone: </label>
-                                    <select 
+                                    <select
                                         style="max-width: 600px;"
                                         class="form-control me-3"
                                         data-bind="source: zones, value: detailForm.data.zone, events: { change: loadItems }"
@@ -69,34 +69,34 @@
                                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                             <div class="col-4 d-flex">
 
-                                                <button class="nav-link active" data-bs-toggle="tab" type="button" role="tab" 
-                                                    id="nav-plate-tab" 
+                                                <button class="nav-link active" data-bs-toggle="tab" type="button" role="tab"
+                                                    id="nav-plate-tab"
                                                     data-type="plate"
-                                                    data-bs-target="##nav-plate" 
+                                                    data-bs-target="##nav-plate"
                                                     data-bind="click:changeType">
                                                     Placche
                                                 </button>
-                                                
-                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
-                                                    id="nav-signage-tab" 
+
+                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
+                                                    id="nav-signage-tab"
                                                     data-type="signage"
-                                                    data-bs-target="##nav-signage" 
+                                                    data-bs-target="##nav-signage"
                                                     data-bind="click:changeType">
                                                     Segnaletiche
                                                 </button>
-                                                
-                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
+
+                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
                                                     id="nav-accessory-tab"
                                                     data-type="accessory"
-                                                    data-bs-target="##nav-accessory" 
+                                                    data-bs-target="##nav-accessory"
                                                     data-bind="click:changeType">
                                                     Accessori
                                                 </button>
 
-                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
+                                                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
                                                     id="nav-article-tab"
                                                     data-type="article"
-                                                    data-bs-target="##nav-article" 
+                                                    data-bs-target="##nav-article"
                                                     data-bind="click:changeType">
                                                     Servizi
                                                 </button>
@@ -172,11 +172,12 @@
         </div>
 
     </div>
-    
+
     #view( "quotation/header-modal" )#
 
     #view( "quotation/signage-modal" )#
     #view( "quotation/accessory-modal" )#
+    #view( "quotation/posizione-in-pianta-modal" )#
     #view( "quotation/plate-modal" )#
     #view( "quotation/article-modal" )#
 
@@ -189,7 +190,7 @@
     #template( view="jstemplate/quotation/quotation-item-preview-tmpl" )#
     #template( view="jstemplate/quotation/quotation-item-article-grid-row-tmpl" )#
     #template( view="jstemplate/quotation/quotation-position-suggest-row-tmpl")#
-    
+
     #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
 
 </cfoutput>
