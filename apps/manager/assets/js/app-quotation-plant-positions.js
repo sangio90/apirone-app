@@ -478,7 +478,16 @@ AP.quotation.plantPositions = (function () {
                         }
                     })
                     return quotationItemPositions;
-                }
+                },
+				addAccessorio() {
+					alert('Funzione da implementare, per ora bisogna PRIMA aggiungere l\'articolo nel preventivo, POI entrare nella planimetria e posizionarlo')
+				},
+				addSegnaletica() {
+					alert('Funzione da implementare, per ora bisogna PRIMA aggiungere l\'articolo nel preventivo, POI entrare nella planimetria e posizionarlo')
+				},
+				addPlacca() {
+					alert('Funzione da implementare, per ora bisogna PRIMA aggiungere l\'articolo nel preventivo, POI entrare nella planimetria e posizionarlo')
+				},
             },
 
             mounted: async function () {

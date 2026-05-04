@@ -52,6 +52,13 @@
                                 </div>
                             </div>
                             <div class="row">
+                            	<div class="col-12 d-flex align-items-center justify-content-around gap-2">
+                            		<button type="button" class="btn btn-primary" @click="addAccessorio">Aggiungi accessorio</button>
+                            		<button type="button" class="btn btn-primary" @click="addSegnaletica">Aggiungi segnaletica</button>
+                            		<button type="button" class="btn btn-primary" @click="addPlacca">Aggiungi placca</button>
+								</div>
+                            </div>
+                            <div class="row">
                                 <div class="col-6">
                                     <h5>Pianta</h5>
                                 </div>
