@@ -145,6 +145,8 @@
 														{{ quotationItem.product.finish.code }}
 													</div>
 
+													<div>Quantità nel preventivo: {{ quotationItem.quantity }}</div>
+
 													<!-- POSITIONS -->
 													<div
 														v-if="quotationItem.positions.length"

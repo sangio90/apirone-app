@@ -96,17 +96,15 @@ AP.quotation.plantPositions = (function () {
 
             methods: {
 				async deletePosition(pos) {
+					const getItems = this.getItems
 					if (window.confirm('Vuoi eliminare questa posizione?')) {
-						//TODO API Che elimina posizione e riduce di 1 la quantita
 						await $.ajax({
 							url: "/manager/ajax/quotation-item-positions/" + pos.id,
 							method: "DELETE"
 						})
 							.done(function (res) {
 								AP.widget.notify( "success", "Riga cancellata correttamente." );
-                                setTimeout(function() {
-                                    window.location.reload();
-                                }, 1000);
+								getItems();
 							})
 							.fail(function (err) {
 								AP.widget.notify( "error", "Errore durante la cancellazione della posizione.");
@@ -149,11 +147,21 @@ AP.quotation.plantPositions = (function () {
                 getItems: async function () {
                     var self = this;
                     if (!self.selectedZoneId) {
-                        AP.widget.notify( "warning", "Selezionare una zona.");
+                        // AP.widget.notify( "warning", "Selezionare una zona.");
                         self.quotationItems = [];
                         self.selectedZone = {};
                         return;
                     }
+
+					const url = new URL(window.location.href);
+					const params = new URLSearchParams(url.search);
+
+					params.set('selectedZoneId', self.selectedZoneId); // aggiunge o aggiorna
+
+					url.search = params.toString();
+
+					window.history.pushState({}, '', url);
+
                     self.isLoading = true;
                     await this.$nextTick();
 
@@ -494,7 +502,7 @@ AP.quotation.plantPositions = (function () {
                 await this.getZones();
 				// Se la querystring contiene zoneId, seleziono la zona e carico gli articoli
 				const urlParams = new URLSearchParams(window.location.search);
-				const zoneIdFromQuery = urlParams.get('zoneId');
+				const zoneIdFromQuery = urlParams.get('selectedZoneId');
 				if (zoneIdFromQuery) {
 					this.selectedZoneId = zoneIdFromQuery;
 					this.getItems();

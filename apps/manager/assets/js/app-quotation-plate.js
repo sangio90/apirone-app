@@ -1279,10 +1279,53 @@ AP.plate.modal = ( function() {
                 callback: {
                     done: function( xhr ) {
                         status.html( "" );
+						AP.loading.hide()
+						AP.widget.notify( "success", "Placca salvata correttamente." );
 
-                        AP.widget.notify( "success", "Placca salvata correttamente." );
+						const pd = viewModel.get( "detailForm.data" );
+						resetDetailForm();
 
-                        resetDetailForm();
+						const modal = $( "#posizione-in-pianta-modal")
+						function handlerSi() {
+							//TODO aggiungere id zona
+							window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + pd.quotationZone.id;
+						}
+						function handlerNo() {
+							window.location.reload();
+						}
+						modal.find("#btn-si").off("click").on("click", handlerSi);
+						modal.find("#btn-no").off("click").on("click", handlerNo);
+
+						let hoCambiatoZona = false
+						let hoCambiatoQuantita = false
+						let hoAumentatoQuantita = false
+						let hoDiminuitoQuantita = false
+						const isNew = typeof plateResponse === 'undefined'
+						if (!isNew) {
+							hoCambiatoZona = pd?.quotationZone?.name != plateResponse?.data?.quotationItem?.quotationZone?.name
+							hoCambiatoQuantita = pd?.quantity != plateResponse?.data?.quotationItem?.quantity
+							hoAumentatoQuantita = pd?.quantity > plateResponse?.data?.quotationItem?.quantity
+							hoDiminuitoQuantita = pd?.quantity < plateResponse?.data?.quotationItem?.quantity
+						}
+
+						if (
+							isNew ||
+							(!pd.id || hoCambiatoZona || hoCambiatoQuantita) &&
+							pd.quotationZone?.name !== 'Non assegnato'
+						) {
+							//TODO ci sono tanti casi da gestire:
+							//e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)
+							//aumento quantita, devo aggiungere marker(easy)
+							//riduco quantita, devo rimuovere marker(hard)
+							modal.modal("show")
+							return
+						}
+						setTimeout( function() {
+								AP.loading.hide();
+								window.location.reload();
+							}
+							, 1000 );
+
 
                         setTimeout( function() {
                             AP.loading.hide();
@@ -1509,7 +1552,7 @@ AP.plate.modal = ( function() {
 
 		NM.util.openModal( AP.plate.fields.modalRoot );
 
-		const plateResponse = await NM.util.ajax( {
+		plateResponse = await NM.util.ajax( {
 			method: "GET",
 			url: "/manager/ajax/quotation-items/plate/" + id,
 			callback: {

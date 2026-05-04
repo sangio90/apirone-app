@@ -835,14 +835,23 @@ AP.accessory.modal = ( function() {
 								modal.find("#btn-si").off("click").on("click", handlerSi);
 								modal.find("#btn-no").off("click").on("click", handlerNo);
 
-                                const hoCambiatoZona = parsedData?.quotationItem?.quotationZone?.name != accessoryResponse?.data?.quotationItem?.quotationZone?.name
-                                const hoCambiatoQuantita = parsedData?.quotationItem?.quantity != accessoryResponse?.data?.quotationItem?.quantity
-                                const hoAumentatoQuantita = parsedData?.quotationItem?.quantity > accessoryResponse?.data?.quotationItem?.quantity
-                                const hoDiminuitoQuantita = parsedData?.quotationItem?.quantity < accessoryResponse?.data?.quotationItem?.quantity
+								const isNew = typeof accessoryResponse === 'undefined'
+								const pd = viewModel.get( "detailForm.data" );
+								let hoCambiatoZona = false
+								let hoCambiatoQuantita = false
+								let hoAumentatoQuantita = false
+								let hoDiminuitoQuantita = false
+								if (!isNew) {
+									hoCambiatoZona = pd?.quotationItem?.quotationZone?.name != accessoryResponse?.data?.quotationItem?.quotationZone?.name
+									hoCambiatoQuantita = pd?.quotationItem?.quantity != accessoryResponse?.data?.quotationItem?.quantity
+									hoAumentatoQuantita = pd?.quotationItem?.quantity > accessoryResponse?.data?.quotationItem?.quantity
+									hoDiminuitoQuantita = pd?.quotationItem?.quantity < accessoryResponse?.data?.quotationItem?.quantity
+								}
 
 								if (
-									(!parsedData.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita) &&
-									parsedData.quotationItem.quotationZone?.name !== 'Non assegnato'
+									isNew ||
+									(!pd.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita) &&
+									pd.quotationItem.quotationZone?.name !== 'Non assegnato'
 								) {
                                     //TODO ci sono tanti casi da gestire:
                                     //e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)

@@ -1251,13 +1251,51 @@ AP.signage.modal = ( function() {
                 callback: {
                     done: function(xhr) {
                         $("#signage-modal").hide();
+						AP.loading.hide()
                         AP.widget.notify("success", "Segnaletica salvata nel preventivo.");
                         viewModel.set("detailForm", defaultDetailForm);
 
-                        setTimeout(function() {
-                            AP.loading.hide();
+                        const modal = $( "#posizione-in-pianta-modal")
+                        function handlerSi() {
+                            //TODO aggiungere id zona
+                            window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + parsedData.quotationItem.quotationZone.id;
+                        }
+                        function handlerNo() {
                             window.location.reload();
-                        }, 1000);
+                        }
+                        modal.find("#btn-si").off("click").on("click", handlerSi);
+                        modal.find("#btn-no").off("click").on("click", handlerNo);
+
+						let hoCambiatoZona = false
+						let hoCambiatoQuantita = false
+						let hoAumentatoQuantita = false
+						let hoDiminuitoQuantita = false
+
+						const isNew = typeof signageResponse === 'undefined'
+						if (!isNew) {
+							hoCambiatoZona = parsedData?.quotationItem?.quotationZone?.name != signageResponse?.data?.quotationItem?.quotationZone?.name
+							hoCambiatoQuantita = parsedData?.quotationItem?.quantity != signageResponse?.data?.quotationItem?.quantity
+							hoAumentatoQuantita = parsedData?.quotationItem?.quantity > signageResponse?.data?.quotationItem?.quantity
+							hoDiminuitoQuantita = parsedData?.quotationItem?.quantity < signageResponse?.data?.quotationItem?.quantity
+						}
+
+                        if (
+							isNew ||
+                            (!parsedData.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita) &&
+                            parsedData.quotationItem.quotationZone?.name !== 'Non assegnato'
+                        ) {
+                            //TODO ci sono tanti casi da gestire:
+                            //e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)
+                            //aumento quantita, devo aggiungere marker(easy)
+                            //riduco quantita, devo rimuovere marker(hard)
+                            modal.modal("show")
+                            return
+                        }
+                        setTimeout( function() {
+                                AP.loading.hide();
+                                window.location.reload();
+                            }
+                            , 1000 );
                     },
                 }
             });
@@ -1547,7 +1585,7 @@ AP.signage.modal = ( function() {
 		viewModel.get( "categories" ).data( categoriesResponse.data );
 		NM.util.openModal( AP.signage.fields.modalRoot );
 
-        const signageResponse = await NM.util.ajax( {
+        signageResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotation-items/signage/" + id,
             callback: {
@@ -1556,6 +1594,7 @@ AP.signage.modal = ( function() {
                 },
             },
         } );
+		debugger
 		var data = signageResponse.data;
 
 		viewModel.set( "detailForm.title", "Modifica segnaletica" );
