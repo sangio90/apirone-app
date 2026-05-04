@@ -416,6 +416,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
+		//TODO debuggare qui per capire cosa fare per il discorso "ok placca senza frutti e aggiunta tappi"
 		var quotationItem = null;
 		if (json.item.id != "") {
 			quotationItem = super.service( "QuotationItem" ).get( json.item.id );

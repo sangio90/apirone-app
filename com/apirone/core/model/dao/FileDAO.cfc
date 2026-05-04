@@ -123,6 +123,42 @@
 		<cfreturn q.file_id>
 	</cffunction>
 
+	<cffunction name="duplicateQuotationZoneFile" returntype="String">
+		<cfargument name="file" type="com.apirone.core.model.bean.File" required="true">
+		<cfargument name="quotationZoneId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			INSERT INTO files(
+				name,
+				type_id,
+				kind_id,
+				size,
+				width,
+				height,
+				alt,
+				description,
+				directory,
+				extension,
+				quotation_zone_id
+			)
+			VALUES (
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getName()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getType().getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getKind().getId()#">,
+				<cfqueryparam cfsqltype="integer" value="#arguments.file.getSize()#">,
+				<cfqueryparam cfsqltype="integer" value="#arguments.file.getWidth()#">,
+				<cfqueryparam cfsqltype="integer" value="#arguments.file.getHeight()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getAlt()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getDescription()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getDirectory()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.file.getExtension()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationZoneId#">::uuid
+			) RETURNING file_id
+		</cfquery>
+
+		<cfreturn q.file_id>
+	</cffunction>
+
 	<cffunction returntype="Boolean" name="delete">
 		<cfargument name="fileId" type="String" required="true">
 		

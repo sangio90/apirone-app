@@ -142,6 +142,24 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var message = super.completeMessage( "file.imageCreated" );
 
+		if (rc.by == "quotation-zones") {
+			// se sto aggiornando (rc.is is not null) cerco le eventuali sottozone e per ciascuna, se non presente l'immagine, imposto questa.
+			if (!isNull(rc.id)) {
+				var quotationZone = super.service( "QuotationZone" ).get( rc.id );
+				var children = super.service( "QuotationZone" ).list( "originId" = rc.id );
+				for (var child in children) {
+					if (IsNull(child.getImage())) {
+						var oldImage = file;
+						oldImage.setId( null );
+						var entity = super.bean( "Entity" );
+						entity.setKey( "quotationZone.id" );
+						entity.setValue( child.getId() );
+						super.service( "File" ).getDao().duplicateQuotationZoneFile(file = oldImage, quotationZoneId = child.getId() );
+					}
+				}
+			}
+		}
+
 		result.setData( {
 			"message" = message,
 			"payload" = { "imageId" = file.getId() }

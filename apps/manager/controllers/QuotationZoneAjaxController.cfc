@@ -102,6 +102,24 @@ component extends="com.apirone.core.controller.AbsController" {
 			messageId = "quotationZone.updated";
 			thisId    = super.fire( "quotationZone.update", [ quotationZone ] )
 		}
+
+		quotationZoneId = rc.id;
+		if (isNull(quotationZoneId)) {
+			quotationZoneId = thisId;
+		}
+
+		// Se la sottozona non ha img, prendo quella del parent
+		if (!IsNull(quotationZone.getOrigin()) && IsNull(quotationZone.getImage()) ) {
+			var parentQuotationZone = super.service( "QuotationZone" ).get( quotationZone.getOrigin().getId() );
+			if ( !IsNull( parentQuotationZone ) && !IsNull( parentQuotationZone.getImage() ) ) {
+				var oldImage = parentQuotationZone.getImage();
+				oldImage.setId( null );
+				var entity = super.bean( "Entity" );
+				entity.setKey( "quotationZone.id" );
+				entity.setValue( quotationZone.getId() );
+				super.service( "File" ).getDao().duplicateQuotationZoneFile(file = oldImage, quotationZoneId = quotationZoneId );
+			}
+		}
 		
 		var message = getMessage( messageId );
 
