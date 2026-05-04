@@ -213,7 +213,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 
 				var quotationItemQuantity = arguments.quotationItem.getQuantity();
-				var countItemPositions = arguments.quotationItem.getPositions().len();
+				var countItemPositions = arguments.quotationItem.getPositions();
+				if (isNull(countItemPositions)) {
+					countItemPositions = 0;
+				} else {
+					countItemPositions = countItemPositions.len();
+				}
 
 				if (quotationItemQuantity > countItemPositions) {
 					for (var i = countItemPositions + 1; i <= quotationItemQuantity; i++) {

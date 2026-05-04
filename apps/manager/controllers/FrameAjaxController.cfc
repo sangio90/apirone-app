@@ -75,12 +75,15 @@
 		obj["orientation"]     = plateOrientation;
 		obj["cellOrientation"] = cellOrientation;
 		obj["grid"]            = orientationConfig["grid"];
-		
+
 		obj.remove( "cells" );
-		
+
 		if ( Len( rc.productId ) ) {
 			var product = super.fire( "product.get", [ rc.productId ] );
-			obj["image"] = super.getMementify().convert( product.getImage( typeId = (thisOrientationId == 'HOR' ? 'horizontal' : 'vertical') ) );
+			var image = product.getImage( typeId = (thisOrientationId == 'HOR' ? 'horizontal' : 'vertical') );
+			if ( Len( image ) ) {
+				obj["image"] = super.getMementify().convert( image );			
+			}
 		}
 
 		result.setData( obj );
@@ -98,7 +101,7 @@
 	}
 
 	function save( event, rc, prc ){
-		
+
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		var cells = [];
@@ -128,7 +131,7 @@
 					cell.setCol( thisCell.data.col )
 					cell.setWidth( thisCell.data.width )
 					cell.setHeight( thisCell.data.height )
-					
+
 					cell.setType( type.setId( thisCell.data.type.id ) )
 					cell.setOrientation( orientation.setId( thisCell.data.orientation.id ) )
 
@@ -148,7 +151,7 @@
 		frame.setStatus( status.setId( json.status.id ) );
 		frame.setOrientation( orientation.setId( json.Orientation.id ) );
 		frame.setCellOrientation( cellOrientation.setId( json.cellOrientation.id ) );
-		
+
 		if ( !Len( json.id ) ) {
 			messageId = "frame.created";
 			thisId    = super.fire( "frame.create", [ frame ] )
