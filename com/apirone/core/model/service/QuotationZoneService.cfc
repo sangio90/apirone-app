@@ -57,9 +57,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var obj     = get( arguments.zoneId );
 
 		outcome.setData( { zoneId = arguments.zoneId } );
-		
+
 		var cm = getCacheManager();
-		
+
 		transaction {
 			try {
 				getDao().delete( arguments.zoneId );
@@ -108,7 +108,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var existingCombination = search( argumentCollection = zoneObject );
 
 		if( Len( existingCombination.getData() ) ) {
-			
+
 			var error = super.getValidationError( message = getMessage( "zone.existInQuotation" ), field="name" );
 			validation.addError( error );
 
