@@ -1,0 +1,1 @@
+ALTER TABLE public.lines ADD COLUMN hscode varchar(255);

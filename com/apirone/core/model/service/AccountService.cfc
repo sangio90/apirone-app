@@ -225,6 +225,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setLastLoggedUserId( record.last_logged_user_id );
 			account.setCreatedAt( record.created_at );
 			account.setUserCount( record.user_count );
+			account.setIdUtenteVerticale( record.id_utente_verticale );
 
 			account.setStatus( getStatusService().get( record.status_id ) );
 		}

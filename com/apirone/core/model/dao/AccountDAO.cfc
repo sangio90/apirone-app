@@ -119,7 +119,8 @@
 			INSERT INTO membership.accounts (
 				email,
 				status_id,
-				account
+				account,
+				id_utente_verticale
 			)
 			VALUES (
 				pgp_sym_encrypt(
@@ -127,7 +128,8 @@
 					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'>
 				)::varchar,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
-				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">
+				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdUtenteVerticale()#">
 			) RETURNING account_id::varchar
 		</cfquery>
 
@@ -146,7 +148,8 @@
 					<cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">,  
 					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'> 
 				)::varchar,
-				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">
+				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
+				id_utente_verticale = <cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdUtenteVerticale()#">
 			WHERE
 				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.account.getId()#">
 		</cfquery>

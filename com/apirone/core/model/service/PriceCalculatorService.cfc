@@ -235,6 +235,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		producItemtIds = productItemIds.filter(function (item) { return !isNull(item)});
 
 		for ( var itemId in productItemIds ) {
+			if ( IsNull( itemId ) ) {
+				throw ("Compilare tutti gli attributi!");
+			}
 			var itemComponents = componentSvc.priceCalculatorSearch( productItemId = itemId, includeBaseAttributeComponents = true );
 
 			var itemCost = 0;

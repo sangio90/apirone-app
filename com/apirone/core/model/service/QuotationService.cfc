@@ -264,6 +264,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( arguments.quotationItems.len() ) {
 				// ciclo su tutti i prodotti del preventivo
 				for ( var quotationItem in arguments.quotationItems ) {
+					var isSpeciale = quotationItem.getSpecial() ? "S" : "N";
 					//se tipo servizio, la gestione è light
 					if (!isNull(quotationItem.getArticle())) {
 						var dataExport = {
@@ -279,9 +280,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							"VARCOD"    = "0000000000",
 							"VARNOT"    = "",
 							"CLCODICE"  = "000000",
-							"CLANNOTA"  = quotationItem.getNote()
+							"CLANNOTA"  = quotationItem.getNote(),
+							"ARIMG_64" = "",
+							"ARSPECIA" = isSpeciale,
+							"ARCODNOM" = ""
 						}
-
 
 						// non abbiamo un prodotto legato a questa riga, quindi cerchiamo per codice e basta tra i codici gia esportati.
 						var existingCodes = exportCodeService.list(
@@ -301,6 +304,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						continue;
 					} else {
+						var hsCode = "";
+						try {
+							hsCode = quotationItem.getProduct().getLine().getHscode();
+						} catch ( any e ) {
+							
+						}
+						var quotationImageFile = quotationItem.getImage();
+						var base64File = "";						
+
+						try {
+							var path = expandPath("/../repository/public/media/quotation-items/500/" & quotationImageFile.getDirectory() & "/" & quotationImageFile.getName());
+							var file = FileReadBinary(path);	
+							if (!isNull(file)) {
+								base64File = ToBase64(file);
+							}
+						} catch ( any e ) {
+							
+						}
+						
 						//in caso il prodotto non sia un servizio, ma un prodotto con hash, la gestione è più complessa
 						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
 							result.success = false;
@@ -520,7 +542,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						"VARCOD"    = varCode,
 						"VARNOT" = noteSegnaletica,
 						"CLCODICE"  = colCode,
-						"CLANNOTA"  = note
+						"CLANNOTA"  = note,
+						"ARIMG_64"  = base64File,
+						"ARSPECIA" = isSpeciale,
+						"ARCODNOM" = hsCode
 					}
 
 					result.success = getDao().exportProduct( dataExport );
@@ -603,6 +628,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( quotationItems.len() > 0 ) {
 				var index = 1;
 				for ( var quotationItem in arguments.quotationItems ) {
+					var salesAgent = quotation.getSalesAgent();
+					var graphicTechnician = quotation.getGraphicTechnician();
+					var salesAgentId = 0;
+					var graphicTechnicianId = 0;
+					if (!isNull(salesAgent)) {
+						salesAgentId = salesAgent.getAccount().getIdUtenteVerticale();
+					}
+					if (!isNull(graphicTechnician)) {
+						graphicTechnicianId = graphicTechnician.getAccount().getIdUtenteVerticale();
+					}
+
 					var quotationData = {}
 					quotationData.append(quotationDataHead);
 
@@ -649,6 +685,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData["MMSCOAR2"] = !isNull(quotationItem.getPrice()) ? quotationItem.getPrice().getDiscount2() : 0;
 						quotationData["MMEVASIO"] = quotation.getValidityDate();
 						quotationData["MM_STATO"] = "N";
+						quotationData["MMUTECOM"] = salesAgentId;
+						quotationData["MMUTETEC"] = graphicTechnicianId;
 					} else {
 						//in caso il prodotto non sia un servizio, ma un prodotto con hash, la gestione è più complessa
 						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
@@ -709,6 +747,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData['MMSCOAR2'] = discount2;
 						quotationData['MMEVASIO'] = quotation.getValidityDate();
 						quotationData['MM_STATO'] = 'N';
+						quotationData["MMUTECOM"] = salesAgentId;
+						quotationData["MMUTETEC"] = graphicTechnicianId;
 					}
 					ArrayAppend( quotationItemsToExport, quotationData );
 					index = index + 1;
@@ -731,6 +771,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					quotationPriceData["MM_STATO"] = "N";
 					quotationPriceData['CPROWNUM'] = index;
 					quotationPriceData['CPROWORD'] = index * 10;
+					quotationPriceData["MMUTECOM"] = salesAgentId;
+					quotationPriceData["MMUTETEC"] = graphicTechnicianId;
 					getDao().export( quotationPriceData );
 				}
 			}

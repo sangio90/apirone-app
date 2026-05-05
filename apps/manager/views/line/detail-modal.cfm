@@ -59,6 +59,17 @@
                         </div>
 
                         <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">HSCODE (Verticale)</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control col-sm-4" 
+                                    name="hscode"
+                                    maxlength="8"
+                                    data-bind="value: detailForm.data.hscode"
+                                    onkeyup="this.value = this.value.toUpperCase();">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Stato</label>
                             <div class="col-sm-10">
                                 <select id="statusId" class="form-control"

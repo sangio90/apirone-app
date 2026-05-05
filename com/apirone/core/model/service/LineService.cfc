@@ -276,6 +276,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setId( record.line_id );
 			bean.setCode( record.code );
+			bean.setHscode( record.hscode );
 			bean.setCreatedAt( record.created_at );
 
 			bean.setStatus( getStatusService().get( record.status_id ) );

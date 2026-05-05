@@ -365,7 +365,10 @@
 					CLANNOTA,
 					AR_STATO,
 					CL_STATO,
-					VAR_STATO
+					VAR_STATO,
+					ARIMG_64,
+					ARSPECIA,
+					ARCODNOM
 				)
 				VALUES (
 					<cfqueryparam value="#arguments.data.AR_CHIAVE#" cfsqltype="varchar">,
@@ -380,7 +383,10 @@
 					<cfqueryparam value="#arguments.data.CLANNOTA#" cfsqltype="varchar">,
 					'N', <!--- nuovo ---->
 					'N',
-					'N'
+					'N',
+					<cfqueryparam value="#arguments.data.ARIMG_64#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.ARSPECIA#" cfsqltype="varchar">,
+					<cfqueryparam value="#arguments.data.ARCODNOM#" cfsqltype="varchar">
 				)
 			</cfquery>
 		</cfif>
@@ -465,7 +471,7 @@
 				DEPRODOD, DEPROMER, MM_STATO, MMCODAGE, MMCODART, MMCODCOL, MMCODPAG,
 				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA,
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
-				MMSERIAL, MMVALUNI
+				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -511,7 +517,9 @@
 				<cfqueryparam value="#arguments.data.MMSCOAR1 ?: 0#" cfsqltype="decimal" scale="6">,
 				<cfqueryparam value="#arguments.data.MMSCOAR2 ?: 0#" cfsqltype="decimal" scale="6">,
 				<cfqueryparam value="#left(arguments.data.MMSERIAL,12)#" cfsqltype="varchar">,
-				<cfqueryparam value="#arguments.data.MMVALUNI ?: 0#" cfsqltype="decimal" scale="6">
+				<cfqueryparam value="#arguments.data.MMVALUNI ?: 0#" cfsqltype="decimal" scale="6">,
+				<cfqueryparam value="#arguments.data.MMUTECOM#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMUTETEC#" cfsqltype="integer">
 			)
 		</cfquery>
 

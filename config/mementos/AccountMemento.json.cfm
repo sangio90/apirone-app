@@ -1,5 +1,5 @@
 ﻿{
-	defaultIncludes = [ "id", "shortId", "name", "email" ],
+	defaultIncludes = [ "id", "shortId", "name", "email", "idUtenteVerticale" ],
 	neverIncludes   = [ "pwd", "apiKey" ],
 	profiles        = {
 		list = {
@@ -12,6 +12,7 @@
 				"status",
 				"shortId",
 				"createdAt",
+				"idUtenteVerticale"
 			]
 		}
 	}

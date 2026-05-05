@@ -92,6 +92,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO lines (
 				code,
+				hscode,
 				line,
 				status_id,
 				orderby,
@@ -99,6 +100,7 @@
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.line.getCode()#">,
+				<cfqueryparam cfsqltype="varchar" value="#arguments.line.getHscode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
 				10,
@@ -121,6 +123,7 @@
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getStatus().getId()#">,
 				line = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getName()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getCode()#">,
+				hscode = <cfqueryparam cfsqltype="Varchar" value="#arguments.line.getHscode()#">,
 				orderby = 20,
 				categories = '#SerializeJSON( categories )#'
 			WHERE

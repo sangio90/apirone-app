@@ -1,0 +1,1 @@
+ALTER TABLE membership.accounts ADD COLUMN id_utente_verticale integer

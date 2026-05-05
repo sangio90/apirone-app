@@ -1,5 +1,5 @@
 ﻿{
-	defaultIncludes = [ "id", "shortId", "name", "code" ],
+	defaultIncludes = [ "id", "shortId", "name", "code", "hscode" ],
 	mappers         = {
 		"descriptionItem" = "descriptionItem",
 	},
@@ -14,6 +14,7 @@
 				"descriptionItem",
 				"createdAt",
 				"code",
+				"hscode",
 				"categories"
 			]
 		}

@@ -4,6 +4,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="thickness" type="com.apirone.core.model.bean.Thickness";
 	property name="categories" type="com.apirone.core.model.bean.ProductCategory[]";
+	property name="hscode" type="String";
 
 	public Line function init(){
 		return this;
