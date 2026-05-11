@@ -284,7 +284,8 @@ AP.plate.modal = ( function() {
 
     };
 
-	var updateImage = function(productItem) {
+	var updateImage = function(productItem, fruitId) {
+        debugger
 		if (productItem.values && productItem.values.length) {
 			let selected = productItem.values.filter(el => el.selected)
 			if (selected.length) {
@@ -293,14 +294,17 @@ AP.plate.modal = ( function() {
 				const orientation = viewModel.get("detailForm.data.product.orientation.id");
 				if (orientation == 'VER') {
 					if (selected.verticalImage) {
-						$("#plate-background .attributes").append(`<div id="${productItem.attributeId}" style="width: 100%; height: 100%; background-image: url('${selected.verticalImage.uri}')"></div>`)
+						$("#plate-background .attributes").append(`<div id="${productItem.attributeId}" style="z-index:${selected.orderby + 1040}; width: 100%; height: 100%; position: absolute; top: 0; left: 0;background-image: url('${selected.verticalImage.uri}')"></div>`)
 					}
 				} else {
+                    debugger
 					if (selected.horizontalImage) {
-						$("#plate-background .attributes").append(`<div id="${productItem.attributeId}" style="width: 100%; height: 100%; background-image: url('${selected.horizontalImage.uri}')"></div>`)
+						$("#plate-background .attributes").append(`<div id="${productItem.attributeId}" style="z-index:${selected.orderby + 1040}; width: 100%; height: 100%; position: absolute; top: 0; left: 0;background-image: url('${selected.horizontalImage.uri}')"></div>`)
 					}
 				}
-			}
+			} else {
+                //TODO pulire
+            }
 		}
 	}
 
@@ -615,6 +619,7 @@ AP.plate.modal = ( function() {
                                             selected: false,
                                             horizontalImage: item.horizontalImage,
                                             verticalImage: item.verticalImage,
+                                            orderby: item.orderby,
                                         } );
                                     }
                                 } else {
@@ -629,7 +634,8 @@ AP.plate.modal = ( function() {
                                             images: item.images,
                                             selected: false,
                                             horizontalImage: item.horizontalImage,
-                                            verticalImage: item.verticalImage
+                                            verticalImage: item.verticalImage,
+                                            orderby: item.orderby,
                                         } ]
                                     } );
                                 }
@@ -799,7 +805,10 @@ AP.plate.modal = ( function() {
                                         parentAttributeId: attributeId,
                                         parentItemId: originId,
                                         level: attributeArray[parentIndex].level + 1,
-                                        values: []
+                                        values: [],
+                                        horizontalImage: item.horizontalImage,
+                                        verticalImage: item.verticalImage,
+                                        orderby: item.orderby,
                                     };
                                     if (parentIndex >= 1) {
                                         attribute.values.push( {
@@ -807,6 +816,7 @@ AP.plate.modal = ( function() {
                                                 allowNote: false,
                                                 horizontalImage: false,
                                                 verticalImage: false,
+                                                orderby: item.orderby,
                                                 id: null,
                                                 rawValue: {
                                                     id: null,
@@ -814,7 +824,10 @@ AP.plate.modal = ( function() {
                                                 }
                                             },
                                             productItemId: null,
-                                            selected: true
+                                            selected: true,
+                                            horizontalImage: item.horizontalImage,
+                                            verticalImage: item.verticalImage,
+                                            orderby: item.orderby,
                                         } );
                                     }
                                     attributes.push( attribute );
@@ -822,6 +835,9 @@ AP.plate.modal = ( function() {
                                 attribute.values.push( {
                                     attributeValue: item.attributeValue,
                                     productItemId: item.id,
+                                    horizontalImage: item.horizontalImage,
+                                    verticalImage: item.verticalImage,
+                                    orderby: item.orderby,
                                     selected: false
                                 } );
                                 lastAttributeId = item.attribute.id;
@@ -963,7 +979,10 @@ AP.plate.modal = ( function() {
                                             attributeValue: item.attributeValue,
                                             productItemId: item.id,
                                             images: item.images,
-                                            selected: false
+                                            selected: false,
+                                            horizontalImage: item.horizontalImage,
+                                            verticalImage: item.verticalImage,
+                                            orderby: item.orderby,
                                         } );
                                     } else {
                                         fruitItems.add( {
@@ -974,7 +993,10 @@ AP.plate.modal = ( function() {
                                                 attributeValue: item.attributeValue,
                                                 productItemId: item.id,
                                                 images: item.images,
-                                                selected: false
+                                                selected: false,
+                                                horizontalImage: item.horizontalImage,
+                                                verticalImage: item.verticalImage,
+                                                orderby: item.orderby,
                                             } ]
                                         } );
                                     }
@@ -1051,6 +1073,7 @@ AP.plate.modal = ( function() {
         },
 
         changeFruitImage: async function( fruitId, value ) {
+
             //cerco i productItems del frutto
 
             let selectedProductItemIds = []
@@ -1119,6 +1142,7 @@ AP.plate.modal = ( function() {
             var fruits = viewModel.get( "detailForm.data.fruits" );
             var fruit = fruits.get( fruitId );
             if (fruit) {
+                //TODO attributeArray deve diventare qualcosa tipo productItems.data(),
                 AP.plate.productItems.renderProductItems({
                     containerSelector: "#quotation-fruit-row-items_" + fruitId,
                     attributeArray: fruit.get("items").data(),
@@ -1127,6 +1151,7 @@ AP.plate.modal = ( function() {
                     onSelectChange: async function (selectedId, attributeId, value) {
                         await viewModel.loadProductItems(selectedId, attributeId, fruitId);
                         viewModel.changeFruitImage(fruitId, value);
+                        updateImage(value, fruitId);
                     }
                 });
 
@@ -1224,11 +1249,11 @@ AP.plate.modal = ( function() {
             // Crea una mappa { id: cellIds } per ogni frutto
             var positions = {};
 
-            if (!pub.fruitsController.fruits.length) {
-                AP.widget.notify( "error", "Devi configurare almeno un frutto per poter procedere." );
-                AP.loading.hide()
-                return false;
-            }
+            // if (!pub.fruitsController.fruits.length) {
+            //     AP.widget.notify( "error", "Devi configurare almeno un frutto per poter procedere." );
+            //     AP.loading.hide()
+            //     return false;
+            // }
 
             pub.fruitsController.fruits.forEach( function( fruit ) {
                 positions[ fruit.id ] = fruit.cellIds;
@@ -1374,7 +1399,7 @@ AP.plate.modal = ( function() {
                                         'quotation_item_fruit_id': thisFruit.id,
                                         'product_item_id': item.productItem.id,
                                         'attribute_value_id': item.productItem.attributeValue.id,
-                                        'note': item.note
+                                        'note': item.note,
                                     })
                                 }
                             })

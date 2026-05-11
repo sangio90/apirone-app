@@ -28,6 +28,17 @@ AP.plate.productItems = ( function() {
         // fissato skipautotrigger a false perche non vengono caricate le immagini con l'immagine degli items (legno standard su placca wood)
         var skipAutoTrigger = false;
 
+        if (typeof( attributeArray ) === "object") {
+            const numericKeys = Object.keys(attributeArray
+            )
+                .filter(k => !isNaN(k))
+                .map(Number);
+            if (numericKeys.length > 0) {
+                attributeArray = numericKeys.map(k => attributeArray[k]);
+            } else {
+                attributeArray = [];
+            }
+        }
         attributeArray.forEach( function( item ) {
             var newLevel = ( 1.5 * item.level ) + "rem";
             var values = item.values;
