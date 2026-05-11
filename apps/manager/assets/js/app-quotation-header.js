@@ -103,11 +103,18 @@ AP.quotation.header = ( function() {
                 country: { id: "", name: "" },
                 state: { id: "", name: "" }
             },
+			nessunAgente: true,
+			agente1: null,
+			agente2: null,
+			agente3: null,
+			agente4: null,
+			agente5: null,
         },
         title: "Modifica preventivo",
         totals: {
             "id": null
-        }
+        },
+		agentiList: []
     };
 
     var viewModel = kendo.observable( {
@@ -222,6 +229,9 @@ AP.quotation.header = ( function() {
                 }
             } );
         },
+		showAgenti: function() {
+			return !viewModel.get("detailForm.data.nessunAgente")
+		},
         changeMode: function( e ) {
             viewModel.set( "mode", e.currentTarget.textContent.toLowerCase() );
             viewModel.getItems();
@@ -457,6 +467,31 @@ AP.quotation.header = ( function() {
         $( "#nav-status-tab" ).on( "click", function( event ) {
             $( "#nav-actual-tab" ).trigger( "click" );
         } );
+
+		NM.util.ajax( {
+			method: "GET",
+			url: "/manager/ajax/accounts",
+			callback: {
+				done: function( xhr ) {
+					viewModel.set( "agentiList", xhr.data );
+				},
+			},
+		} );
+
+		viewModel.bind("change", function(e) {
+
+			if (e.field === "detailForm.data.nessunAgente") {
+				const nessunAgente = viewModel.get("detailForm.data.nessunAgente");
+				debugger
+				if (nessunAgente == true) {
+					viewModel.set("detailForm.data.agente1", null);
+					viewModel.set("detailForm.data.agente2", null);
+					viewModel.set("detailForm.data.agente3", null);
+					viewModel.set("detailForm.data.agente4", null);
+					viewModel.set("detailForm.data.agente5", null);
+				}
+			}
+		});
     };
 
     return pub;

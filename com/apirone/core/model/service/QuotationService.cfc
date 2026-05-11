@@ -308,21 +308,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						try {
 							hsCode = quotationItem.getProduct().getLine().getHscode();
 						} catch ( any e ) {
-							
+
 						}
 						var quotationImageFile = quotationItem.getImage();
-						var base64File = "";						
+						var base64File = "";
 
 						try {
 							var path = expandPath("/../repository/public/media/quotation-items/500/" & quotationImageFile.getDirectory() & "/" & quotationImageFile.getName());
-							var file = FileReadBinary(path);	
+							var file = FileReadBinary(path);
 							if (!isNull(file)) {
 								base64File = ToBase64(file);
 							}
 						} catch ( any e ) {
-							
+
 						}
-						
+
 						//in caso il prodotto non sia un servizio, ma un prodotto con hash, la gestione è più complessa
 						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
 							result.success = false;
@@ -1065,6 +1065,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
 			bean.setOwner( getUserService().get( record.owner_id.toString() ) );
 			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
+
+			bean.setNessunAgente( record.nessun_agente );
+			bean.setAgente1( record.agente1 );
+			bean.setAgente2( record.agente2 );
+			bean.setAgente3( record.agente3 );
+			bean.setAgente4( record.agente4 );
+			bean.setAgente5( record.agente5 );
 
 			//by a trigger from history
 			//bean.setStatus( getStatusService().get( record.status_id ) );

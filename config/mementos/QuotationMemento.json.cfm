@@ -13,7 +13,13 @@
 		"statusHistory",
 		"vatCode",
 		"owner.name",
-		"owner.shortId"
+		"owner.shortId",
+		"nessunAgente",
+		"agente1",
+		"agente2",
+		"agente3",
+		"agente4",
+		"agente5"
 	],
 	profiles = {
 		detail = {
@@ -42,7 +48,13 @@
 				"shippingProfile",
 				"createdAt",
 				"owner.name",
-				"owner.shortId"
+				"owner.shortId",
+				"nessunAgente",
+				"agente1",
+				"agente2",
+				"agente3",
+				"agente4",
+				"agente5"
 			]
 		}
 	}

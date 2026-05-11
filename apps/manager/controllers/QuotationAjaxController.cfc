@@ -163,6 +163,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		quotation.setPaymentMethod( paymentMethod.setId( json.paymentMethod.id ) );
 		quotation.setCurrency( currency.setId( json.currency.id ) );
+
+		quotation.setAgente1( json.agente1?.id );
+		quotation.setAgente2( json.agente2?.id );
+		quotation.setAgente3( json.agente3?.id );
+		quotation.setAgente4( json.agente4?.id );
+		quotation.setAgente5( json.agente5?.id );
+		quotation.setNessunAgente( json.nessunAgente );
+
 		if ( !Len( json.id ) ) {
 
 			thisId = super.fire( "quotation.create", [ quotation, session.user.getId() ] );

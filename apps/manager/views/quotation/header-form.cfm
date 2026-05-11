@@ -64,7 +64,7 @@
 						<div class="col-9">
 							<input type="text" name="customer" class="form-control" id="qt-customer"
 								data-bind="source: crmCustomers, value: detailForm.data.customer"
-								data-text-field="name"								
+								data-text-field="name"
 								data-role="autocomplete"
 								data-value-primitive="false"
 								data-minlength="4"
@@ -110,7 +110,7 @@
 					<div class="row d-flex align-items-center mb-3">
 						<label class="text-end col-3">Data documento</label>
 						<div class="col-9">
-							<input type="date" class="form-control" 
+							<input type="date" class="form-control"
 								data-bind="value: detailForm.data.quotationDate">
 						</div>
 					</div>
@@ -118,7 +118,7 @@
 					<div class="row d-flex align-items-center mb-3">
 						<label class="text-end col-3">Data validità</label>
 						<div class="col-9">
-							<input type="date" class="form-control" 
+							<input type="date" class="form-control"
 								data-bind="value: detailForm.data.validityDate">
 						</div>
 					</div>
@@ -126,7 +126,7 @@
 					<div class="row d-flex align-items-center mb-3">
 						<label class="text-end col-3">Nota</label>
 						<div class="col-9">
-							<textarea name="note" class="form-control" rows="2" 
+							<textarea name="note" class="form-control" rows="2"
 								data-bind="value: detailForm.data.note">
 							</textarea>
 						</div>
@@ -271,12 +271,12 @@
 							<div class="col-9">
 								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingProfile.state" disabled>
 							</div>
-						</div>                                            
-						
+						</div>
+
 					</div>
 
 				</div>
-				
+
 			</div>
 
 			<!---
@@ -321,7 +321,7 @@
 								</select>
 							</div>
 						</div>
-					
+
 					</div>
 
 				</div>
@@ -355,17 +355,82 @@
 					</div>
 				</div>
 
+				<div class="form-group row mb-3">
+					<label class="col-sm-3 control-label text-sm-end pt-2">Agenti</label>
+					<div class="col-sm-9" style="margin-top: 6px;">
+						Nessun agente
+                		<input type="checkbox" name="nessunAgente" data-bind="checked: detailForm.data.nessunAgente" class="form-check-input" />
+					</div>
+				</div>
+
+				<div data-bind="visible: showAgenti">
+					<div class="form-group row mb-3">
+						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 1</label>
+						<div class="col-sm-9">
+							<select name="agente1" class="form-control"
+								data-bind="source: agentiList, value: detailForm.data.agente1"
+								data-value-field="id"
+								data-text-field="name">
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row mb-3">
+						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 2</label>
+						<div class="col-sm-9">
+							<select name="agente2" class="form-control"
+								data-bind="source: agentiList, value: detailForm.data.agente2"
+								data-value-field="id"
+								data-text-field="name">
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row mb-3">
+						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 3</label>
+						<div class="col-sm-9">
+							<select name="agente3" class="form-control"
+								data-bind="source: agentiList, value: detailForm.data.agente3"
+								data-value-field="id"
+								data-text-field="name">
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row mb-3">
+						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 4</label>
+						<div class="col-sm-9">
+							<select name="agente4" class="form-control"
+								data-bind="source: agentiList, value: detailForm.data.agente4"
+								data-value-field="id"
+								data-text-field="name">
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row mb-3">
+						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 5</label>
+						<div class="col-sm-9">
+							<select name="agente5" class="form-control"
+								data-bind="source: agentiList, value: detailForm.data.agente5"
+								data-value-field="id"
+								data-text-field="name">
+							</select>
+						</div>
+					</div>
+				</div>
+
 			</div>
-		
+
 		</div>
 
 	</div>
 
-</cfoutput>		
+</cfoutput>
 <style>
 	#quotation-status-history-grid {
 		max-height: 500px !important;
 		overflow-y: auto;
-		overflow-x: hidden; 
+		overflow-x: hidden;
 	}
-</style>		
+</style>

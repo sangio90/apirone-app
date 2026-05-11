@@ -59,7 +59,13 @@
 				sales_agent_account_id::varchar,
 				graphic_technician_account_id::varchar,
 				shipping_profile_id::varchar,
-				COUNT( quotations.quotation_id ) OVER() AS total
+				COUNT( quotations.quotation_id ) OVER() AS total,
+				quotations.nessun_agente,
+				quotations.agente1,
+				quotations.agente2,
+				quotations.agente3,
+				quotations.agente4,
+				quotations.agente5
 			FROM quotations
 				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
 			WHERE 1=1
@@ -146,7 +152,13 @@
 				sales_agent_account_id,
 				graphic_technician_account_id,
 				vat_code_id,
-				owner_id
+				owner_id,
+				nessun_agente,
+				agente1,
+				agente2,
+				agente3,
+				agente4,
+				agente5
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -196,7 +208,13 @@
 				<cfelse>
 					NULL
 				</cfif>,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOwner().getId()#">::uuid
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOwner().getId()#">::uuid,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotation.getNessunAgente()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente1()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente2()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente3()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente4()#">::uuid,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente5()#">::uuid
 			)
 			RETURNING quotation_id
 		</cfquery>
@@ -307,6 +325,52 @@
 						NULL
 					</cfif>
 
+				,
+				nessun_agente =
+					<cfif !IsNull( arguments.quotation.getNessunAgente() )>
+						<cfqueryparam cfsqltype="Boolean" value="#arguments.quotation.getNessunAgente()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+
+				agente1 =
+					<cfif !IsNull( arguments.quotation.getAgente1() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente1()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>,
+
+
+				agente2 =
+					<cfif !IsNull( arguments.quotation.getAgente2() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente2()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>,
+
+
+				agente3 =
+					<cfif !IsNull( arguments.quotation.getAgente3() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente3()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>,
+
+
+				agente4 =
+					<cfif !IsNull( arguments.quotation.getAgente4() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente4()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>,
+
+				agente5 =
+					<cfif !IsNull( arguments.quotation.getAgente5() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente5()#">::uuid
+					<cfelse>
+						NULL
+					</cfif>
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getId()#">::uuid
 		</cfquery>

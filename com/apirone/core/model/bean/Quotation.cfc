@@ -24,6 +24,12 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="calculatedAmount" type="Numeric";
 	property name="serial" type="Numeric";
 	property name="exported" type="Boolean";
+	property name="nessunAgente" type="Boolean";
+	property name="agente1" type="String";
+	property name="agente2" type="String";
+	property name="agente3" type="String";
+	property name="agente4" type="String";
+	property name="agente5" type="String";
 
 	public Quotation function init(){
 		return this;
@@ -42,17 +48,17 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		if ( Len( getCustomer()?.getName() ) ) {
 			return getCustomer().getName();
 		}
-		
+
 		if ( Len( getLead()?.getName() ) ) {
 			return getLead().getName();
 		}
-		
+
 		if ( Len( getOpportunity()?.getName() ) ) {
 			return getOpportunity().getName();
 		}
-		
+
 		// Se non c'è nessuna delle tre o se manca il campo nome specifico
-		return "Nessun referente" 
+		return "Nessun referente"
 	}
 
 }
