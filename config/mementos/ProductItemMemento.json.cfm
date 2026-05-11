@@ -1,5 +1,5 @@
 ﻿{
-	defaultIncludes = [ "id", "shortId", "name", "code" ],
+	defaultIncludes = [ "id", "shortId", "name", "code", "orderby", ],
 	profiles        = {
 		list = {
 			defaultIncludes = [
@@ -11,10 +11,12 @@
 				"nameItem",
 				"componentCount",
 				"level",
-				"orderBy",
+				"orderby",
 				"productId",
 				"spaces",
-				"images"
+				"images",
+				"horizontalImage",
+				"verticalImage",
 			]
 		},
 		tree = {
@@ -31,7 +33,10 @@
 				"attributeValue.rawValue.id",
 				"attributeValue.rawValue.name",
 				"componentCount",
-				"images"
+				"images",
+				"orderby",
+				"horizontalImage",
+				"verticalImage",
 			]
 		},
 		treelight = {
@@ -50,7 +55,10 @@
 				"attributeValue.allowNote",
 				"horizontalImage",
 				"verticalImage",
-				"important$boolean"
+				"important$boolean",
+				"orderby",
+				"horizontalImage",
+				"verticalImage",
 			]
 		}
 	}
