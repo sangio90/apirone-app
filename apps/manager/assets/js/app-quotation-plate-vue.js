@@ -742,18 +742,21 @@ AP.plate.modal = ( function() {
                                         }
                                     } );
                                     this.detailForm.data.product.items = items;
-                                    for ( const pi of items ) {
-                                        if ( pi.level === 0 && !pi.parentItemId && pi.values && pi.values.length ) {
-                                            const hasSelection = pi.values.some( ( v ) => { return v.selected; } );
-                                            if ( !hasSelection ) {
-                                                pi.values[0].selected = true;
-                                            }
-                                        }
-                                    }
                                 }
                             },
                         },
                     } );
+
+                    // Auto-seleziona il primo valore degli attributi radice e carica i figli
+                    for ( const pi of this.detailForm.data.product.items ) {
+                        if ( pi.level === 0 && !pi.parentItemId && pi.values && pi.values.length ) {
+                            const hasSelection = pi.values.some( ( v ) => { return v.selected; } );
+                            if ( !hasSelection ) {
+                                pi.values[0].selected = true;
+                                await this.loadProductItems( pi.values[0].productItemId, pi.attributeId );
+                            }
+                        }
+                    }
 
                     if ( quotationItemId ) {
                         await ajax( {
@@ -900,6 +903,36 @@ AP.plate.modal = ( function() {
                             },
                         },
                     } );
+
+                    // Auto-seleziona il primo valore di ogni nuovo figlio e carica ricorsivamente
+                    const allItems = this.detailForm.data.product.items;
+                    let parentIdx = -1;
+                    for ( let i = 0; i < allItems.length; i++ ) {
+                        if ( allItems[i].attributeId == attributeId ) {
+                            parentIdx = i;
+                            break;
+                        }
+                    }
+                    if ( parentIdx !== -1 ) {
+                        const parentLevel = allItems[parentIdx].level;
+                        const children = [];
+                        for ( let i = parentIdx + 1; i < allItems.length; i++ ) {
+                            if ( allItems[i].level > parentLevel ) {
+                                children.push( allItems[i] );
+                            } else {
+                                break;
+                            }
+                        }
+                        for ( const child of children ) {
+                            if ( child.values && child.values.length ) {
+                                const hasSelection = child.values.some( ( v ) => { return v.selected; } );
+                                if ( !hasSelection ) {
+                                    child.values[0].selected = true;
+                                    await this.loadProductItems( child.values[0].productItemId, child.attributeId );
+                                }
+                            }
+                        }
+                    }
                 },
 
                 /**
@@ -1142,18 +1175,21 @@ AP.plate.modal = ( function() {
                                         }
                                     } );
                                     thisFruit.items = fruitItems;
-                                    for ( const fi of fruitItems ) {
-                                        if ( fi.level === 0 && !fi.parentItemId && fi.values && fi.values.length ) {
-                                            const hasSelection = fi.values.some( ( v ) => { return v.selected; } );
-                                            if ( !hasSelection ) {
-                                                fi.values[0].selected = true;
-                                            }
-                                        }
-                                    }
                                 }
                             },
                         },
                     } );
+
+                    // Auto-seleziona il primo valore degli attributi radice dei frutti e carica i figli
+                    for ( const fi of thisFruit.items ) {
+                        if ( fi.level === 0 && !fi.parentItemId && fi.values && fi.values.length ) {
+                            const hasSelection = fi.values.some( ( v ) => { return v.selected; } );
+                            if ( !hasSelection ) {
+                                fi.values[0].selected = true;
+                                await this.loadFruitProductItems( fruitId, fi.values[0].productItemId, fi.attributeId );
+                            }
+                        }
+                    }
 
                     const qifId = thisFruit.id;
                     if ( qifId && qifId.length > 0 ) {
@@ -1338,6 +1374,36 @@ AP.plate.modal = ( function() {
                             },
                         },
                     } );
+
+                    // Auto-seleziona il primo valore di ogni nuovo figlio e carica ricorsivamente
+                    const updatedFruitItems = fruit.items;
+                    let fruitParentIdx = -1;
+                    for ( let i = 0; i < updatedFruitItems.length; i++ ) {
+                        if ( updatedFruitItems[i].attributeId == attributeId ) {
+                            fruitParentIdx = i;
+                            break;
+                        }
+                    }
+                    if ( fruitParentIdx !== -1 ) {
+                        const fruitParentLevel = updatedFruitItems[fruitParentIdx].level;
+                        const fruitChildren = [];
+                        for ( let i = fruitParentIdx + 1; i < updatedFruitItems.length; i++ ) {
+                            if ( updatedFruitItems[i].level > fruitParentLevel ) {
+                                fruitChildren.push( updatedFruitItems[i] );
+                            } else {
+                                break;
+                            }
+                        }
+                        for ( const child of fruitChildren ) {
+                            if ( child.values && child.values.length ) {
+                                const hasSelection = child.values.some( ( v ) => { return v.selected; } );
+                                if ( !hasSelection ) {
+                                    child.values[0].selected = true;
+                                    await this.loadFruitProductItems( fruitId, child.values[0].productItemId, child.attributeId );
+                                }
+                            }
+                        }
+                    }
                 },
 
                 /**
