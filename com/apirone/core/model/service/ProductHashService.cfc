@@ -196,15 +196,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		for (var row in rows) {
 			var fruit = row.getFruit()
 			var fruitRows = row.getItems();
-
-			arraySort(fruitRows, function(a, b) {
-				return compare(a.getProductItem().getOrderBy(), b.getProductItem().getOrderBy());
-			});
-
 			var fruitItems = [];
-			for (var fruitRow in fruitRows) {
-				fruitItems.append({ "productItemId" = fruitRow.getProductItem().getId(), "note" = Trim( fruitRow.getNote() ) });
+
+			if ( !isNull( fruitRows ) && fruitRows.len() ) {
+				arraySort(fruitRows, function(a, b) {
+					return compare(a.getProductItem().getOrderBy(), b.getProductItem().getOrderBy());
+				});
+
+				for (var fruitRow in fruitRows) {
+					fruitItems.append({ "productItemId" = fruitRow.getProductItem().getId(), "note" = Trim( fruitRow.getNote() ) });
+				}
 			}
+
 			quotationItemFruits.append( { 'position' = Trim( row.getPositions()[1].order ), 'product' = row.getFruit().getId(), 'productItems' = fruitItems } );
 		}
 		jsonData['fruits'] = quotationItemFruits;
