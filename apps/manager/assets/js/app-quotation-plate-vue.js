@@ -14,9 +14,6 @@ AP.plate.modal = ( function() {
     /** Oggetto pubblico esportato dal modulo. */
     const pub = {};
 
-    /** Riferimenti ai campi DOM del modulo placca. */
-    const fields = AP.plate.fields;
-
     /** Risposta del server restituita dal caricamento della placca in modifica. */
     let plateResponse = null;
 
@@ -257,19 +254,11 @@ AP.plate.modal = ( function() {
         }
 
         // Cache del template originale al primo montaggio e ripristino prima del re-mount
-        if ( !plateVueTemplate ) {
-            plateVueTemplate = $( "#plate-vue-app" ).html() || "";
-        } else {
+        if ( plateVueTemplate ) {
             $( "#plate-vue-app" ).html( plateVueTemplate );
+        } else {
+            plateVueTemplate = $( "#plate-vue-app" ).html() || "";
         }
-
-        // Tab: attiva il pannello "Placca" all'apertura
-        setTimeout( function() {
-            $( "#plate-product-items-tab" ).addClass( "show active" );
-            $( "#plate-fruit-product-items-tab" ).removeClass( "show active" );
-            $( "#plate-product-items-but" ).addClass( "active" );
-            $( "#plate-fruit-product-items-but" ).removeClass( "active" );
-        }, 50 );
 
         // Lega la pulizia alla chiusura del modal (un solo handler attivo per volta)
         $( "#plate-modal-root" ).off( "hidden.bs.modal" ).on( "hidden.bs.modal", function() {
@@ -302,6 +291,8 @@ AP.plate.modal = ( function() {
                 fruitSuggestLoading: false, /** Flag di caricamento per la ricerca frutti. */
                 positionSuggestLoading: false, /** Flag di caricamento per la ricerca posizioni. */
                 productItemsImages: {}, /** Mappa degli URI delle immagini dei product items, indicizzata per ID. */
+                activeTab: "plate", /** Tab attivo nel pannello degli attributi (plate | fruits). */
+                saving: false, /** Flag di caricamento durante il salvataggio. */
 
                 /** Dati di prezzatura: sconti, metodo di calcolo, righe e totale. */
                 pricing: {
@@ -387,15 +378,7 @@ AP.plate.modal = ( function() {
                     if ( id ) {
                         this.loadBackgroundCustomImage( id );
                     }
-                    this.$nextTick( () => {
-                        if ( this.detailForm.data.customImage ) {
-                            $( "#plate-designer" ).hide();
-                            $( "#plate-custom-designer" ).show();
-                        } else {
-                            $( "#plate-designer" ).show();
-                            $( "#plate-custom-designer" ).hide();
-                        }
-                    } );
+                    // La visibilità è gestita da v-show nel template
                 },
 
                 /**
@@ -585,7 +568,6 @@ AP.plate.modal = ( function() {
 
                     if ( !finishId || finishId === "" ) {
                         this.detailForm.data.product.items = [];
-                        $( "#quotation-plate-product-items" ).empty();
                         return;
                     }
 
@@ -1080,7 +1062,7 @@ AP.plate.modal = ( function() {
 
                                     this.addFruitHover( newFruit.id );
 
-                                    thisFruit.items.forEach( ( item ) => {
+                                    thisFruit?.items?.forEach( ( item ) => {
                                         if ( item.productItem && item.productItem.attributeValue && item.productItem.attributeValue.allowNote ) {
                                             fruitQIPIs.push( {
                                                 quotation_item_fruit_id: thisFruit.id,
@@ -1373,17 +1355,6 @@ AP.plate.modal = ( function() {
 
                 // --- Fruit Suggest ---
                 /**
-                 * Inizializza il campo di suggerimento frutti.
-                 * Impedisce l'invio del form alla pressione del tasto Invio.
-                 */
-                initFruitsSuggest: function() {
-                    const $suggest = $( "#plate-fruit-suggest" );
-                    $suggest.off( "keypress" ).on( "keypress", function( e ) {
-                        if ( e.keyCode === 13 ) { return false; }
-                    } );
-                },
-
-                /**
                  * Gestisce l'input di ricerca nel suggeritore frutti.
                  * Se il termine ha almeno 3 caratteri, effettua una richiesta AJAX
                  * per ottenere i suggerimenti filtrati per termine e linea.
@@ -1423,17 +1394,6 @@ AP.plate.modal = ( function() {
                 },
 
                 // --- Position Suggest ---
-                /**
-                 * Inizializza il campo di suggerimento posizioni.
-                 * Impedisce l'invio del form alla pressione del tasto Invio.
-                 */
-                initPositionSuggest: function() {
-                    const $suggest = $( "#qt-plate-position-suggest" );
-                    $suggest.off( "keypress" ).on( "keypress", function( e ) {
-                        if ( e.keyCode === 13 ) { return false; }
-                    } );
-                },
-
                 /**
                  * Gestisce l'input di ricerca nel suggeritore posizioni.
                  * Se il termine ha almeno 2 caratteri ed è selezionata una zona,
@@ -1580,8 +1540,7 @@ AP.plate.modal = ( function() {
                         positions[fruit.id] = fruit.cellIds;
                     } );
 
-                    const statusEl = fields.modalRoot.find( ".save-status" );
-                    statusEl.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+                    this.saving = true;
 
                     let preview = $( "#plate-background" )[0];
                     if ( this.detailForm.data.id && this.detailForm.data.customImage ) {
@@ -1626,13 +1585,13 @@ AP.plate.modal = ( function() {
                             data: JSON.stringify( parsedData ),
                             callback: {
                                 done: ( xhr ) => {
-                                    statusEl.html( "" );
+                                    this.saving = false;
                                     AP.loading.hide();
                                     AP.widget.notify( "success", "Placca salvata correttamente." );
                                     this.showPostSaveModal( parsedData.quotationId );
                                 },
                                 fail: () => {
-                                    statusEl.html( "" );
+                                    this.saving = false;
                                     AP.loading.hide();
                                 },
                             },
@@ -1860,13 +1819,9 @@ AP.plate.modal = ( function() {
             isTotalEnabled: false,
         };
 
-        window.vm.initFruitsSuggest();
-        window.vm.initPositionSuggest();
         window.vm.positionSearchTerm = "";
         window.vm.fruitSearchTerm = "";
 
-        $( "#plate-custom-designer" ).hide();
-        $( "#plate-designer" ).show();
         plateResponse = null;
     };
 
@@ -1923,13 +1878,6 @@ AP.plate.modal = ( function() {
             }
 
             await window.vm.loadBackgroundCustomImage( data.quotationItem.id );
-            if ( data.quotationItem.customImage === "true" ) {
-                $( "#plate-custom-designer" ).show();
-                $( "#plate-designer" ).hide();
-            } else {
-                $( "#plate-custom-designer" ).hide();
-                $( "#plate-designer" ).show();
-            }
 
             await window.vm.loadLines();
             await window.vm.loadModels();
@@ -1938,8 +1886,6 @@ AP.plate.modal = ( function() {
             await window.vm.loadPlate( data.quotationItem.frame ? data.quotationItem.frame.orientation : null );
             await window.vm.loadFruits();
 
-            window.vm.initFruitsSuggest();
-            window.vm.initPositionSuggest();
             window.vm.positionSearchTerm = data.quotationItem.position ? data.quotationItem.position.code : "";
             window.vm.fruitSearchTerm = "";
 
@@ -1955,14 +1901,6 @@ AP.plate.modal = ( function() {
         if ( onSave ) {
             window.vm.detailForm.callback = window.vm.detailForm.callback || {};
             window.vm.detailForm.callback.onSave = onSave;
-        }
-
-        if ( clone ) {
-            $( "#saveButton" ).hide();
-            $( "#cloneButton" ).show();
-        } else {
-            $( "#saveButton" ).show();
-            $( "#cloneButton" ).hide();
         }
 
         AP.loading.hide();

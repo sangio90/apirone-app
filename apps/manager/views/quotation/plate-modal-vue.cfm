@@ -116,15 +116,15 @@
                                         <ul class="nav nav-tabs" role="tablist" id="quotation-plate-product-items-tabs">
                                         <!--- Navigazione a tabs Bootstrap 5 (nav-tabs). role="tablist": accessibilità per screen reader. --->
                                             <li class="nav-item">
-                                                <a class="nav-link active" id="plate-product-items-but" data-bs-toggle="tab"
-                                                    href="##plate-product-items-tab" role="tab" aria-controls="tab1" aria-selected="true">
+                                                <a class="nav-link" :class="{ active: activeTab === 'plate' }" id="plate-product-items-but"
+                                                    @click.prevent="activeTab = 'plate'" role="tab">
                                                     Placca
                                                 </a>
                                             </li>
                                             <!--- Tab "Placca": mostra gli attributi configurabili della placca. .active di default perché la placca è il pannello principale. --->
                                             <li class="nav-item">
-                                                <a class="nav-link" id="plate-fruit-product-items-but" data-bs-toggle="tab"
-                                                    href="##plate-fruit-product-items-tab" role="tab" aria-controls="tab2" aria-selected="true">
+                                                <a class="nav-link" :class="{ active: activeTab === 'fruits' }" id="plate-fruit-product-items-but"
+                                                    @click.prevent="activeTab = 'fruits'" role="tab">
                                                     Frutti <span>(<span>{{ getFruitCount }}</span>)</span>
                                                 </a>
                                                 <!--- Tab "Frutti": mostra i frutti configurati per la placca. {{ getFruitCount }}: proprietà computata Vue che restituisce il numero di frutti aggiunti. Il conteggio è aggiornato automaticamente quando l'utente aggiunge/rimuove frutti. --->
@@ -136,7 +136,7 @@
                                     <!--- Contenitore dei pannelli tab. Ogni .tab-pane corrisponde a un tab sopra definito. --->
 
                                         <!--- plate --->
-                                        <div class="tab-pane fade show active" id="plate-product-items-tab" role="tabpanel" aria-labelledby="plate-product-items-but">
+                                        <div class="tab-pane" :class="{ 'fade': true, 'show': activeTab === 'plate', 'active': activeTab === 'plate' }" id="plate-product-items-tab" role="tabpanel">
                                         <!--- Pannello "Placca": elenca gli attributi configurabili della placca. .show .active: visibile di default. --->
                                             <div class="text-end mb-2">
                                                 <a href="##" @click.prevent="goToProduct" target="_blank">Vai al prodotto</a>
@@ -171,7 +171,7 @@
                                         </div>
 
                                         <!--- fruits --->
-                                        <div class="tab-pane" id="plate-fruit-product-items-tab" role="tabpanel" aria-labelledby="plate-fruit-product-items-but">
+                                        <div class="tab-pane" :class="{ 'fade': true, 'show': activeTab === 'fruits', 'active': activeTab === 'fruits' }" id="plate-fruit-product-items-tab" role="tabpanel">
                                         <!--- Pannello "Frutti": elenco dei frutti configurati per la placca. Ogni frutto può essere espanso per mostrarne gli attributi configurabili. --->
                                             <div class="text-end"><a href="##" @click.prevent="toggleFruits" class="hand">{{ toggleFruitsLabel }}</a></div>
                                             <!--- toggleFruits: espande o contrae TUTTI i frutti contemporaneamente. toggleFruitsLabel: proprietà computata Vue, restituisce "Espandi tutti" o "Comprimi tutti". --->
@@ -203,7 +203,7 @@
                                                                     :style="{ marginLeft: (1.5 * (fi.level || 0)) + 'rem', width: 'calc(100% - ' + (1.5 * (fi.level || 0)) + 'rem)' }"
                                                                     @change="handleFruitProductItemSelect(fruit.id, $event.target.value, fi.attributeId, fi.values.find(function(v) { return v.productItemId == $event.target.value }))">
                                                                     <!--- handleFruitProductItemSelect: come handleProductItemSelect ma specifico per attributi frutto. Riceve: fruit.id, valore selezionato, attributeId, oggetto valore completo. --->
-                                                                                                                                        <option
+                                                                    <option
                                                                         v-for="val in fi.values"
                                                                         :value="val.productItemId"
                                                                         :key="val.productItemId"
@@ -253,6 +253,7 @@
                                                         placeholder="Aggiungi un frutto..."
                                                         v-model="fruitSearchTerm"
                                                         @input="onFruitSearchInput"
+                                                        @keydown.enter.prevent
                                                         autocomplete="off">
                                                     <!--- v-model="fruitSearchTerm": termine di ricerca digitato dall'utente. @input="onFruitSearchInput": chiama la funzione di ricerca a ogni variazione del testo (chiamata API con soglia minima 3 caratteri). autocomplete="off": disabilita l'autocompletamento nativo del browser. --->
                                                     <div v-if="fruitSuggestions.length" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: white; border: 1px solid ##ccc; max-height: 200px; overflow-y: auto;">
@@ -352,7 +353,7 @@
                                                     <div class="col-4 mt-2">Posizione:</div>
                                                     <div class="col-8" style="position: relative;">
                                                     <!--- position: relative: necessario per posizionare il dropdown dei suggerimenti posizione in absolute. --->
-                                                        <input class="form-control form-control-sm" name="position" placeholder="Posizione" id="qt-plate-position-suggest" v-model="positionSearchTerm" @input="onPositionSearchInput" @blur="syncPositionFromSearchTerm" autocomplete="off">
+                                                        <input class="form-control form-control-sm" name="position" placeholder="Posizione" id="qt-plate-position-suggest" v-model="positionSearchTerm" @input="onPositionSearchInput" @blur="syncPositionFromSearchTerm" @keydown.enter.prevent autocomplete="off">
                                                         <!--- Campo di ricerca posizione con autocompletamento. positionSearchTerm: termine di ricerca. @input="onPositionSearchInput": cerca posizioni (min 2 caratteri, richiede zona). @blur="syncPositionFromSearchTerm": sincronizza il valore selezionato quando l'input perde il focus. --->
                                                         <div v-if="positionSuggestions.length" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: white; border: 1px solid ##ccc; max-height: 150px; overflow-y: auto;">
                                                         <!--- Dropdown suggerimenti posizione (stessa logica del dropdown frutti). max-height: 150px: più compatto perché i codici posa sono brevi. --->
@@ -447,20 +448,20 @@
                                 </div>
                                 <div class="col-md-6 float-end">
                                 <!--- Colonna destra del footer: pulsanti di azione allineati a destra. --->
-                                    <button id="saveButton" type="button" class="btn btn-primary btn-sm float-end" @click="save">
+                                    <button id="saveButton" type="button" class="btn btn-primary btn-sm float-end" v-show="!detailForm.isClone" @click="save">
                                     <!--- save: salva l'articolo (creazione o aggiornamento) tramite chiamata AJAX. btn-primary: stile Bootstrap pulsante primario (blu). --->
                                         <i class="fas fa-save"></i> Salva
                                     </button>
-                                    <button id="cloneButton" type="button" class="btn btn-warning btn-sm float-end" style="display: none" @click="save">
-                                    <!--- cloneButton: pulsante per clonare l'articolo. style="display: none": nascosto di default, mostrato da Vue in contesto clone. btn-warning: stile Bootstrap giallo. @click="save": anche il clone usa la stessa funzione save. --->
+                                    <button id="cloneButton" type="button" class="btn btn-warning btn-sm float-end" v-show="detailForm.isClone" @click="save">
+                                    <!--- cloneButton: pulsante per clonare l'articolo. v-show: nascosto di default, mostrato da Vue in contesto clone. btn-warning: stile Bootstrap giallo. @click="save": anche il clone usa la stessa funzione save. --->
                                         <i class="fas fa-save"></i> Clona
                                     </button>
                                     <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
                                     <!--- data-bs-dismiss="modal": chiude il modale Bootstrap 5 senza JavaScript Vue. btn-default: stile Bootstrap pulsante neutro. --->
                                     <button type="button" class="btn btn-primary btn-sm me-2 float-end" @click="clearFilters" v-if="visibleLowerClearButton">Pulisci Configurazione</button>
                                     <!--- clearFilters: stesso comportamento del pulsante "Pulisci configurazione" superiore. v-if="visibleLowerClearButton": variante inferiore dello stesso pulsante logico. --->
-                                    <div class="save-status errors-counter mt-1 float-end me-3"></div>
-                                    <!--- Elemento DOM per mostrare il conteggio errori di validazione o stato del salvataggio. Gestito da Vue/jQuery dopo save. --->
+                                    <img src="/assets/main/img/ajax-loading.svg" width="20" height="20" v-if="saving" class="mt-1 float-end me-3">
+                                    <!--- Indicatore di salvataggio, visibile solo durante la richiesta AJAX. --->
                                 </div>
                             </div>
                         </footer>
