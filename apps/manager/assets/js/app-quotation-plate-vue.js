@@ -1004,16 +1004,16 @@ AP.plate.modal = ( function() {
                          * e inizializza i suoi product items e l'effetto hover.
                          * @param {Object} selectedFruit - Dati del frutto selezionato.
                          */
-                        onSelectFruit: function( selectedFruit ) {
+                        onSelectFruit: async function( selectedFruit ) {
                             const newFruit = createFruit( { position: 1, fruit: selectedFruit } );
                             this.detailForm.data.fruits.push( newFruit );
-                            this.$nextTick( () => {
-                                if ( pub.fruitsController ) {
-                                    pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
-                                }
-                                this.addProductItemsToFruit( newFruit.id );
-                                this.addFruitHover( newFruit.id );
-                            } );
+                            await this.$nextTick();
+                            if ( pub.fruitsController ) {
+                                pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
+                            }
+                            this.addFruitHover( newFruit.id );
+                            await this.addProductItemsToFruit( newFruit.id );
+                            this.changeFruitImage( newFruit.id );
                         },
 
                         /**
@@ -1076,6 +1076,7 @@ AP.plate.modal = ( function() {
                             const id = this.detailForm.data.id;
                             if ( !id ) { return; }
                             const fruitQIPIs = [];
+                            const fruits = [];
 
                             await ajax( {
                                 method: "GET",
@@ -1084,6 +1085,7 @@ AP.plate.modal = ( function() {
                                     done: ( xhr ) => {
                                         xhr.data.forEach( ( thisFruit ) => {
                                             const newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
+                                            fruits.push( newFruit );
                                             this.detailForm.data.fruits.push( newFruit );
 
                                             if ( pub.fruitsController ) {
@@ -1095,7 +1097,6 @@ AP.plate.modal = ( function() {
                                                 }
                                             }
 
-                                            this.addProductItemsToFruit( newFruit.id );
                                             this.addFruitHover( newFruit.id );
 
                                             thisFruit.items.forEach( ( item ) => {
@@ -1113,6 +1114,11 @@ AP.plate.modal = ( function() {
                                     },
                                 },
                             } );
+
+                            for ( const fruit of fruits ) {
+                                await this.addProductItemsToFruit( fruit.id );
+                                this.changeFruitImage( fruit.id );
+                            }
                         },
 
                         /**
