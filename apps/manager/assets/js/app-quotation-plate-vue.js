@@ -894,16 +894,17 @@ AP.plate.modal = ( function() {
                                             } );
                                         }
 
-                                        if ( xhr.data.length > 0 ) {
-                                            const i = parentIndex + 1;
-                                            while ( i < items.length ) {
-                                                if ( items[i].level > items[parentIndex].level ) {
-                                                    items.splice( i, 1 );
-                                                } else {
-                                                    break;
-                                                }
+                                        // Rimuove i vecchi figli prima di caricare i nuovi
+                                        const i = parentIndex + 1;
+                                        while ( i < items.length ) {
+                                            if ( items[i].level > items[parentIndex].level ) {
+                                                items.splice( i, 1 );
+                                            } else {
+                                                break;
                                             }
+                                        }
 
+                                        if ( xhr.data.length > 0 ) {
                                             const newAttrs = [];
                                             let lastAttrId = null;
                                             let attr = null;
@@ -930,12 +931,6 @@ AP.plate.modal = ( function() {
 
                                             for ( let ni = 0; ni < newAttrs.length; ni++ ) {
                                                 items.splice( parentIndex + 1 + ni, 0, newAttrs[ni] );
-                                            }
-                                        } else {
-                                            for ( let ri = items.length - 1; ri >= 0; ri-- ) {
-                                                if ( items[ri].parentItemId && items[ri].parentItemId == originId ) {
-                                                    items.splice( ri, 1 );
-                                                }
                                             }
                                         }
                                         this.detailForm.data.product.items = items.slice();
@@ -1327,16 +1322,17 @@ AP.plate.modal = ( function() {
                                             } );
                                         }
 
-                                        if ( xhr.data.length > 0 ) {
-                                            const i = parentIndex + 1;
-                                            while ( i < fruitItems.length ) {
-                                                if ( fruitItems[i].level > fruitItems[parentIndex].level ) {
-                                                    fruitItems.splice( i, 1 );
-                                                } else {
-                                                    break;
-                                                }
+                                        // Rimuove i vecchi figli prima di caricare i nuovi
+                                        const i = parentIndex + 1;
+                                        while ( i < fruitItems.length ) {
+                                            if ( fruitItems[i].level > fruitItems[parentIndex].level ) {
+                                                fruitItems.splice( i, 1 );
+                                            } else {
+                                                break;
                                             }
+                                        }
 
+                                        if ( xhr.data.length > 0 ) {
                                             const newAttrs = [];
                                             let lastAttrId = null;
                                             let attr = null;
@@ -1367,12 +1363,6 @@ AP.plate.modal = ( function() {
 
                                             for ( let ni = 0; ni < newAttrs.length; ni++ ) {
                                                 fruitItems.splice( parentIndex + 1 + ni, 0, newAttrs[ni] );
-                                            }
-                                        } else {
-                                            for ( let ri = fruitItems.length - 1; ri >= 0; ri-- ) {
-                                                if ( fruitItems[ri].parentItemId && fruitItems[ri].parentItemId == originId ) {
-                                                    fruitItems.splice( ri, 1 );
-                                                }
                                             }
                                         }
                                         fruit.items = fruitItems.slice();
