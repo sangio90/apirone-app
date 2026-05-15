@@ -482,7 +482,7 @@ AP.quotation.header = ( function() {
 
 			if (e.field === "detailForm.data.nessunAgente") {
 				const nessunAgente = viewModel.get("detailForm.data.nessunAgente");
-				debugger
+				// debugger
 				if (nessunAgente == true) {
 					viewModel.set("detailForm.data.agente1", null);
 					viewModel.set("detailForm.data.agente2", null);

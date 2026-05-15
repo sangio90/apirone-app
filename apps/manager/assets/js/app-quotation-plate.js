@@ -285,7 +285,7 @@ AP.plate.modal = ( function() {
     };
 
 	var updateImage = function(productItem, fruitId) {
-        debugger
+        // debugger
 		if (productItem.values && productItem.values.length) {
 			let selected = productItem.values.filter(el => el.selected)
 			if (selected.length) {
@@ -297,7 +297,7 @@ AP.plate.modal = ( function() {
 						$("#plate-background .attributes").append(`<div id="${productItem.attributeId}" style="z-index:${selected.orderby + 1040}; width: 100%; height: 100%; position: absolute; top: 0; left: 0;background-image: url('${selected.verticalImage.uri}')"></div>`)
 					}
 				} else {
-                    debugger
+                    // debugger
 					if (selected.horizontalImage) {
 						$("#plate-background .attributes").append(`<div id="${productItem.attributeId}" style="z-index:${selected.orderby + 1040}; width: 100%; height: 100%; position: absolute; top: 0; left: 0;background-image: url('${selected.horizontalImage.uri}')"></div>`)
 					}
