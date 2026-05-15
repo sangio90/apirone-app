@@ -150,10 +150,10 @@
                                                     <!--- v-if: mostra il container solo se ci sono opzioni disponibili. :id dinamico per manipolazione DOM. --->
                                                         <label class="mb-1" :style="{ marginLeft: (1.5 * item.level) + 'rem' }">{{ item.attributeName }}</label>
                                                         <!--- :style: indentazione dinamica basata sul livello dell'attributo (level 0 = 0rem, level 1 = 1.5rem, ecc.). Crea un effetto ad albero visivo. --->
-                                                        <select
-                                                            class="form-control form-control-sm select-item me-3 mb-2"
-                                                            :data-attribute-id="item.attributeId"
-                                                            :style="item.level > 0 ? { marginLeft: (1.5 * item.level) + 'rem', width: 'calc(100% - ' + (1.5 * item.level) + 'rem)' } : {}"
+                                                         <select
+                                                             class="form-control form-control-sm select-item me-3 mb-2"
+                                                             :data-attribute-id="item.attributeId"
+                                                             :style="{ marginLeft: (1.5 * item.level) + 'rem', width: 'calc(100% - ' + (1.5 * item.level) + 'rem)' }"
                                                             @change="handleProductItemSelect($event.target.value, item.attributeId, item.values.find(function(v) { return v.productItemId == $event.target.value }))">
                                                             <!--- :data-attribute-id: attributo data-* che identifica l'attributo a livello DOM. :style condizionale: se il livello è > 0, la larghezza del select viene ridotta della stessa quantità dell'indentazione. handleProductItemSelect: gestisce la selezione caricando i figli e aggiornando l'immagine. --->
                                                             <option
@@ -198,9 +198,10 @@
                                                             <div v-if="fi.values && fi.values.length" :id="'fruit-attribute-container-' + fi.attributeId" :key="fi.attributeId">
                                                                 <label class="mb-1" :style="{ marginLeft: (1.5 * (fi.level || 0)) + 'rem' }">{{ fi.attributeName }}</label>
                                                                 <select
-                                                                    class="form-control form-control-sm select-item me-3 mb-2"
-                                                                    :data-attribute-id="fi.attributeId"
-                                                                    @change="handleFruitProductItemSelect(fruit.id, $event.target.value, fi.attributeId, fi.values.find(function(v) { return v.productItemId == $event.target.value }))">
+                                                                     class="form-control form-control-sm select-item me-3 mb-2"
+                                                                     :data-attribute-id="fi.attributeId"
+                                                                     :style="{ marginLeft: (1.5 * (fi.level || 0)) + 'rem', width: 'calc(100% - ' + (1.5 * (fi.level || 0)) + 'rem)' }"
+                                                                     @change="handleFruitProductItemSelect(fruit.id, $event.target.value, fi.attributeId, fi.values.find(function(v) { return v.productItemId == $event.target.value }))">
                                                                     <!--- handleFruitProductItemSelect: come handleProductItemSelect ma specifico per attributi frutto. Riceve: fruit.id, valore selezionato, attributeId, oggetto valore completo. --->
                                                                     <option
                                                                         v-for="val in fi.values"
