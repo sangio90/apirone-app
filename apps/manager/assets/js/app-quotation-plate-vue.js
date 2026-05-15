@@ -884,6 +884,9 @@ AP.plate.modal = ( function() {
                                                 parentItemId: originId,
                                                 level: items[parentIndex].level + 1,
                                                 values: [],
+                                                horizontalImage: item.horizontalImage,
+                                                verticalImage: item.verticalImage,
+                                                orderby: item.orderby,
                                             };
                                             newAttrs.push( attr );
                                         }
@@ -891,6 +894,9 @@ AP.plate.modal = ( function() {
                                             attributeValue: item.attributeValue,
                                             productItemId: item.id,
                                             selected: false,
+                                            horizontalImage: item.horizontalImage,
+                                            verticalImage: item.verticalImage,
+                                            orderby: item.orderby,
                                         } );
                                         lastAttrId = item.attribute.id;
                                     } );
@@ -1352,6 +1358,9 @@ AP.plate.modal = ( function() {
                                                 parentItemId: originId,
                                                 level: fruitItems[parentIndex].level + 1,
                                                 values: [],
+                                                horizontalImage: item.horizontalImage,
+                                                verticalImage: item.verticalImage,
+                                                orderby: item.orderby,
                                             };
                                             newAttrs.push( attr );
                                         }
@@ -1417,6 +1426,31 @@ AP.plate.modal = ( function() {
                 handleFruitProductItemSelect: async function( fruitId, selectedId, attributeId, value ) {
                     await this.loadFruitProductItems( fruitId, selectedId, attributeId );
                     this.changeFruitImage( fruitId );
+                    this.updateFruitAttributeOverlay( value );
+                },
+
+                /**
+                 * Aggiorna gli overlay delle immagini degli attributi frutto
+                 * all'interno di #plate-background .attributes.
+                 * Rimuove il div esistente per l'attributo e ne crea uno nuovo
+                 * con l'immagine corrispondente all'orientamento corrente,
+                 * usando orderby + 1040 come z-index.
+                 * @param {Object} value - Oggetto valore selezionato con attributeId, orderby, horizontalImage, verticalImage.
+                 */
+                updateFruitAttributeOverlay: function( value ) {
+                    // debugger;
+                    if ( !value ) {
+                        return;
+                    }
+                    const container = $( "#plate-background .attributes" );
+                    if ( !container.length ) { return; }
+                    $( "#plate-background .attributes #" + value.attributeId ).remove();
+                    const orientationId = this.detailForm.data.product.orientation.id;
+                    const imageUri = orientationId === "VER" ? value.verticalImage?.uri : value.horizontalImage?.uri;
+                    if ( imageUri ) {
+                        const zIndex = ( value.orderby || 0 ) + 1040;
+                        container.append( "<div id=\"" + value.attributeId + "\" style=\"z-index:" + zIndex + "; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('" + imageUri + "')\"></div>" );
+                    }
                 },
 
                 // --- Fruit Suggest ---
