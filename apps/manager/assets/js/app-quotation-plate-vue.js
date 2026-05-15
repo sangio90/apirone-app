@@ -350,6 +350,28 @@ AP.plate.modal = ( function() {
                 "detailForm.data.quotationZoneId": function( newZoneId ) {
                     this.loadSubZones( newZoneId );
                 },
+
+                /**
+                 * Osserva in profondità l'array dei frutti per rilevare cambiamenti
+                 * nelle selezioni degli attributi (sia manuali che automatici).
+                 * Quando una value diventa selected=true, carica i figli tramite
+                 * processFruitCascade e aggiorna gli overlay delle immagini.
+                 * L'uso di deep: true garantisce la reattività anche per modifiche
+                 * annidate (es. values[0].selected = true).
+                 */
+                "detailForm.data.fruits": {
+                    deep: true,
+                    handler: function() {
+                        this.$nextTick( function() {
+                            if ( !this._cascadingFruit ) {
+                                this._cascadingFruit = true;
+                                this.processFruitCascade().finally( function() {
+                                    this._cascadingFruit = false;
+                                }.bind( this ) );
+                            }
+                        }.bind( this ) );
+                    },
+                },
             },
 
             methods: {
@@ -1384,7 +1406,9 @@ AP.plate.modal = ( function() {
                         },
                     } );
 
-                    // Auto-seleziona il primo valore di ogni nuovo figlio e carica ricorsivamente
+                    // Auto-seleziona il primo valore di ogni nuovo figlio
+                    // Il watcher processFruitCascade si occuperà di caricare ricorsivamente
+                    // i figli successivi e di chiamare updateFruitAttributeOverlay.
                     const updatedFruitItems = fruit.items;
                     let fruitParentIdx = -1;
                     for ( let i = 0; i < updatedFruitItems.length; i++ ) {
@@ -1395,21 +1419,16 @@ AP.plate.modal = ( function() {
                     }
                     if ( fruitParentIdx !== -1 ) {
                         const fruitParentLevel = updatedFruitItems[fruitParentIdx].level;
-                        const fruitChildren = [];
                         for ( let i = fruitParentIdx + 1; i < updatedFruitItems.length; i++ ) {
                             if ( updatedFruitItems[i].level > fruitParentLevel ) {
-                                fruitChildren.push( updatedFruitItems[i] );
+                                if ( updatedFruitItems[i].values && updatedFruitItems[i].values.length ) {
+                                    const hasSelection = updatedFruitItems[i].values.some( ( v ) => { return v.selected; } );
+                                    if ( !hasSelection ) {
+                                        updatedFruitItems[i].values[0].selected = true;
+                                    }
+                                }
                             } else {
                                 break;
-                            }
-                        }
-                        for ( const child of fruitChildren ) {
-                            if ( child.values && child.values.length ) {
-                                const hasSelection = child.values.some( ( v ) => { return v.selected; } );
-                                if ( !hasSelection ) {
-                                    child.values[0].selected = true;
-                                    await this.loadFruitProductItems( fruitId, child.values[0].productItemId, child.attributeId );
-                                }
                             }
                         }
                     }
@@ -1426,7 +1445,7 @@ AP.plate.modal = ( function() {
                 handleFruitProductItemSelect: async function( fruitId, selectedId, attributeId, value ) {
                     await this.loadFruitProductItems( fruitId, selectedId, attributeId );
                     this.changeFruitImage( fruitId );
-                    this.updateFruitAttributeOverlay( value );
+                    this.updateFruitAttributeOverlay( attributeId, value );
                 },
 
                 /**
@@ -1437,19 +1456,45 @@ AP.plate.modal = ( function() {
                  * usando orderby + 1040 come z-index.
                  * @param {Object} value - Oggetto valore selezionato con attributeId, orderby, horizontalImage, verticalImage.
                  */
-                updateFruitAttributeOverlay: function( value ) {
-                    // debugger;
-                    if ( !value ) {
-                        return;
-                    }
+                /**
+                 * Processa a cascata tutte le selezioni degli attributi frutto
+                 * che non hanno ancora caricato i figli.
+                 * Itera in un ciclo do-while finché non ci sono più livelli da caricare,
+                 * gestendo sia selezioni manuali (utente) che automatiche (codice).
+                 * Per ogni livello chiama loadFruitProductItems e updateFruitAttributeOverlay.
+                 */
+                processFruitCascade: async function() {
+                    let cascaded;
+                    do {
+                        cascaded = false;
+                        for ( const fruit of this.detailForm.data.fruits ) {
+                            if ( !fruit.items ) { continue; }
+                            for ( const item of fruit.items ) {
+                                const selected = item.values && item.values.find( ( v ) => { return v.selected; } );
+                                if ( !selected || !selected.productItemId ) { continue; }
+                                const childrenLoaded = fruit.items.some( ( ci ) => {
+                                    return ci.parentAttributeId === item.attributeId && ci.parentItemId === selected.productItemId;
+                                } );
+                                if ( !childrenLoaded ) {
+                                    await this.loadFruitProductItems( fruit.id, selected.productItemId, item.attributeId );
+                                    this.updateFruitAttributeOverlay( item.attributeId, selected );
+                                    cascaded = true;
+                                }
+                            }
+                        }
+                    } while ( cascaded );
+                },
+
+                updateFruitAttributeOverlay: function( attributeId, value ) {
+                    if ( !value || !attributeId ) { return; }
                     const container = $( "#plate-background .attributes" );
                     if ( !container.length ) { return; }
-                    $( "#plate-background .attributes #" + value.attributeId ).remove();
+                    $( "#plate-background .attributes #" + attributeId ).remove();
                     const orientationId = this.detailForm.data.product.orientation.id;
                     const imageUri = orientationId === "VER" ? value.verticalImage?.uri : value.horizontalImage?.uri;
                     if ( imageUri ) {
                         const zIndex = ( value.orderby || 0 ) + 1040;
-                        container.append( "<div id=\"" + value.attributeId + "\" style=\"z-index:" + zIndex + "; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('" + imageUri + "')\"></div>" );
+                        container.append( '<div id="' + attributeId + '" style="z-index:' + zIndex + '; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url(\'' + imageUri + '\')"></div>' );
                     }
                 },
 
