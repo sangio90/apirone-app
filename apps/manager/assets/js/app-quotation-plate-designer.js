@@ -473,7 +473,7 @@ AP.plate.grid = ( function() {
 
         setIsOverlapped( value ) {
 
-            console.log( "this.$element", this.$element );
+            // console.log( "this.$element", this.$element );
 
             if ( value ) {
                 this.$element.addClass( "overlapped" );
